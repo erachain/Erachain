@@ -1,6 +1,11 @@
 package core.block;
 
+import java.util.Arrays;
+
+import com.google.common.primitives.Ints;
+
 import core.account.PublicKeyAccount;
+import core.transaction.Transaction;
 
 public class BlockFactory {
 
@@ -23,8 +28,19 @@ public class BlockFactory {
 	
 	public Block parse(byte[] data, boolean forDB) throws Exception
 	{
-		//PARSE BLOCK
-		return Block.parse(data, forDB);
+		//READ VERSION
+		byte[] versionBytes = Arrays.copyOfRange(data, 0, Block.VERSION_LENGTH);
+		
+		
+		int version = Ints.fromByteArray(versionBytes);
+
+		if (version == 0) {
+			//PARSE GENESIS BLOCK
+			return GenesisBlock.parse(data, forDB);
+		} else {
+			//PARSE BLOCK
+			return Block.parse(data, forDB);
+		}
 	}
 
 	// not signed and not getGeneratingBalance

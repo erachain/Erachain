@@ -7,6 +7,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import core.block.Block;
+import core.block.BlockFactory;
 import database.DBSet;
 
 public class BlockMessage extends Message{
@@ -48,7 +49,8 @@ public class BlockMessage extends Message{
 		int height = Ints.fromByteArray(heightBytes);
 				
 		//PARSE BLOCK
-		Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
+		//Block block = Block.parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
+		Block block = BlockFactory.getInstance().parse(Arrays.copyOfRange(data, HEIGHT_LENGTH, data.length + 1), false);
 		//block.getGeneratingBalance(dbSet);
 
 		//CREATE MESSAGE

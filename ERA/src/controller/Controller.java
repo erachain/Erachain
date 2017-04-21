@@ -808,8 +808,49 @@ public class Controller extends Observable {
 		
 		// GET GENESIS BLOCK - TEST WRONG CHAIN
 		byte[]  genesisBlockSign = Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
+		
+		/*
 		// SEND GENESIS BLOCK MESSAGE
-		peer.sendMessage(MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign));
+		////peer.sendMessage(MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign));
+		//SEND MESSAGE TO PEER
+		Message mess = MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign);
+		BlockMessage response = (BlockMessage) peer.getResponse(mess);
+		
+		//CHECK IF WE GOT RESPONSE
+		if(response == null)
+		{
+			//ERROR
+			//error = true;
+			return; // WRONG GENESIS BLOCK
+		}
+		
+		Block block = response.getBlock();
+		//CHECK BLOCK SIGNATURE
+		if(block == null || !(block instanceof GenesisBlock))
+		{
+			//error = true;
+			return; // WRONG GENESIS BLOCK
+		}
+		
+		// TODO CHECK GENESIS BLOCK on CONNECT
+		Message mess = MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign);
+		GetSignaturesMessage response = (GetSignaturesMessage) peer.getResponse(mess);
+		
+		//CHECK IF WE GOT RESPONSE
+		if(response == null)
+		{
+			//ERROR
+			//error = true;
+			return; // WRONG GENESIS BLOCK
+		}
+		
+		byte[] header = response.getParent();
+		if (header == null)
+		{
+			return; // WRONG GENESIS BLOCK
+		}
+		*/
+
 
 		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
