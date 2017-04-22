@@ -566,7 +566,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Attached_Files.add(jPanel_Other_Attached_Files_Work, gridBagConstraints);
 
-        jTabbedPane_Other.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         jPanel_Other_Hashes.setLayout(new java.awt.GridBagLayout());
 
@@ -616,7 +616,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
 
-        jTabbedPane_Other.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -627,7 +627,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(16, 8, 0, 8);
-        add(jTabbedPane_Other, gridBagConstraints);
+ //       add(jTabbedPane_Other, gridBagConstraints);
 
         jPanel_Title.setLayout(new java.awt.GridBagLayout());
 
