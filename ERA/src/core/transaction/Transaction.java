@@ -191,6 +191,7 @@ public abstract class Transaction {
 	public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
 	
 	// OTHER
+	public static final int SIGN_NOTE2_TRANSACTION = 34;
 	public static final int SIGN_NOTE_TRANSACTION = 35;
 	public static final int CERTIFY_PUB_KEYS_TRANSACTION = 36;
 	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 37;
