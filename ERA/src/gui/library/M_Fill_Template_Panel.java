@@ -27,7 +27,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private Params_Template_Model params_Template_Model;
+	Params_Template_Model params_Template_Model;
 	public JComboBox<NoteCls> jComboBox_Template;
 	protected NoteCls sel_note;
 	

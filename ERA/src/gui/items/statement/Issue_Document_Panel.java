@@ -23,7 +23,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -72,6 +75,7 @@ import utils.Compressor_ZIP;
 import utils.Converter;
 import utils.GZIP;
 import utils.Pair;
+import utils.StrJSonFine;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -798,6 +802,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 		//READ SENDER
 		Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
+		Map<String, Object> output = new LinkedHashMap();
+		Map<String, String> params = new LinkedHashMap<String, String>();
 			
 		int feePow = 0;
 		String message = null;
@@ -815,36 +821,31 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			
 			//READ FEE
 			parsing = 2;
-			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());			
+			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());		
+			output.put("Title", this.jTextField_Title_Message.getText());
+			output.put("Template_Key", ((NoteCls)this.fill_Template_Panel.jComboBox_Template.getSelectedItem()).getKey());
+			 HashMap<String, String> template_Params = this.fill_Template_Panel.get_Params();
+			 Set<Entry<String, String>> param_keys = template_Params.entrySet();
+			 
+			 for (Entry<String, String> key1:param_keys){
+				 params.put(key1.getKey(),key1.getValue());
 			
+				 
+				 
+			 }
+			output.put("Params", params);
+			output.put("Message", this.jTextPane_Message_Public.getText());
 			message = this.jTextPane_Message_Public.getText();
 			
 			isTextB = this.jCheckBox_Message_Public.isSelected();
 						
-			if ( isTextB )
-			{
-				messageBytes = message.getBytes( Charset.forName("UTF-8") );
-			}
-			else
-			{
-				try
-				{
-					messageBytes = Converter.parseHexString( message );
-				}
-				catch (Exception g)
-				{
-					try
-					{
-						messageBytes = Base58.decode(message);
-					}
-					catch (Exception e)
-					{
-						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-						
-					}
-					return null;
-				}
-			}
+			
+			messageBytes = message.getBytes( Charset.forName("UTF-8") );
+			
+			String jSons = StrJSonFine.convert(output);
+			byte[] mess = jSons.getBytes( Charset.forName("UTF-8") );
+			
+			
 			if ( messageBytes.length < 10 || messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded! 10...MAX"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
