@@ -63,6 +63,7 @@ import gui.items.notes.ComboBoxModelItemsNotes;
 import gui.library.MButton;
 import gui.library.MImprintEDIT_Pane;
 import gui.library.MTable;
+import gui.library.M_Fill_Template_Panel;
 import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
@@ -101,6 +102,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	private DefaultTableModel params_Template_Model;
 	protected NoteCls sel_note;
 	public JSplitPane sp_pan;
+	 M_Fill_Template_Panel fill_Template_Panel;
 
 	/**
      * Creates new form Issue_Document_Panel
@@ -134,7 +136,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     	
         initComponents();
        
-    jLabel_Template.setText(Lang.getInstance().translate("Select Template") + ":");
+  //  jLabel_Template.setText(Lang.getInstance().translate("Select Template") + ":");
     jLabel_Title_Message.setText(Lang.getInstance().translate("Title") + ":");
     jTextField_Title_Message.setText("");
     jTextField_Fee_Work.setText("0");
@@ -142,7 +144,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     jCheckBox_Message_Private.setSelected(true);
     jCheckBox_Message_Public.setText(Lang.getInstance().translate("Text Message"));
     jCheckBox_Message_Public.setSelected(true);
-    jButton_View.setText(Lang.getInstance().translate("View"));
+//    jButton_View.setText(Lang.getInstance().translate("View"));
     jLabel_Account_Work.setText(Lang.getInstance().translate("Select Account") + ":");
     jButton_Work_OK.setText(Lang.getInstance().translate("Sign and Send"));
     jButton_Work_OK.addActionListener(new ActionListener()
@@ -241,7 +243,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		}
 	});
  // combo Template
-     
+ /*    
    jComboBox_Template.addItemListener(new ItemListener(){
 
 		@Override
@@ -277,7 +279,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			
 		}
 	});
-	
+	*/
     
     TableColumnModel at_F_Col_M = jTable_Attached_Files.getColumnModel();
     
@@ -405,11 +407,11 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jButton_Add_Other_Hashes = new MButton();
         jButton_Remove_Other_Hashes = new MButton();
         jPanel_Title = new javax.swing.JPanel();
-        jLabel_Template = new javax.swing.JLabel();
-        jComboBox_Template = new JComboBox<NoteCls>(new ComboBoxModelItemsNotes());
+   //     jLabel_Template = new javax.swing.JLabel();
+  //      jComboBox_Template = new JComboBox<NoteCls>(new ComboBoxModelItemsNotes());
         jLabel_Title_Message = new javax.swing.JLabel();
         jTextField_Title_Message = new javax.swing.JTextField();
-        jButton_View = new MButton();
+  //      jButton_View = new MButton();
         jPanel_Work = new javax.swing.JPanel();
         jLabel_Account_Work = new javax.swing.JLabel();
         jComboBox_Account_Work = new JComboBox<Account>( new AccountsComboBoxModel());
@@ -476,7 +478,10 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Message_Public.add(jCheckBox_Message_Public, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Public Part"), jPanel_Message_Public);
+     //   jTabbedPane_Message.addTab(Lang.getInstance().translate("Public Part"), jPanel_Message_Public);
+        fill_Template_Panel = new M_Fill_Template_Panel();
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel );
+        
 
         jPanel_Message_Private.setLayout(new java.awt.GridBagLayout());
 
@@ -501,7 +506,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Message_Private.add(jCheckBox_Message_Private, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Private Part"), jPanel_Message_Private);
+   //     jTabbedPane_Message.addTab(Lang.getInstance().translate("Private Part"), jPanel_Message_Private);
      
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -566,7 +571,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Attached_Files.add(jPanel_Other_Attached_Files_Work, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
+    //    jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         jPanel_Other_Hashes.setLayout(new java.awt.GridBagLayout());
 
@@ -616,7 +621,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
+    //    jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -631,11 +636,11 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
         jPanel_Title.setLayout(new java.awt.GridBagLayout());
 
-        jLabel_Template.setText("Template: ");
+  //     jLabel_Template.setText("Template: ");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
-        jPanel_Title.add(jLabel_Template, gridBagConstraints);
+  //      jPanel_Title.add(jLabel_Template, gridBagConstraints);
 
       
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -646,7 +651,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        jPanel_Title.add(jComboBox_Template, gridBagConstraints);
+ //       jPanel_Title.add(jComboBox_Template, gridBagConstraints);
 
         jLabel_Title_Message.setText("Title:");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -667,14 +672,14 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Title.add(jTextField_Title_Message, gridBagConstraints);
 
-        jButton_View.setText("View ");
-        jButton_View.setToolTipText("");
+  //      jButton_View.setText("View ");
+  //      jButton_View.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        jPanel_Title.add(jButton_View, gridBagConstraints);
+   //     jPanel_Title.add(jButton_View, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -857,7 +862,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			//READ NOTE
 			parsing = 5;
 			//CHECK IF PAYMENT OR ASSET TRANSFER
-			NoteCls note = (NoteCls) this.jComboBox_Template.getSelectedItem();
+			NoteCls note = (NoteCls) this.fill_Template_Panel.jComboBox_Template.getSelectedItem();
 			key = note.getKey(); 
 
 		}
@@ -1143,7 +1148,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private MButton jButton_Clear;
     private MButton jButton_Remove_Attached_Files;
     private MButton jButton_Remove_Other_Hashes;
-    private MButton jButton_View;
+ //   private MButton jButton_View;
     private MButton jButton_Work_Cancel;
     private MButton jButton_Work_OK;
     private MButton jButton_Work_OK1;
@@ -1151,10 +1156,10 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JCheckBox jCheckBox_Message_Private;
     private javax.swing.JCheckBox jCheckBox_Message_Public;
     private javax.swing.JComboBox jComboBox_Account_Work;
-    private javax.swing.JComboBox jComboBox_Template;
+ //   private javax.swing.JComboBox jComboBox_Template;
     private javax.swing.JLabel jLabel_Account_Work;
     private javax.swing.JLabel jLabel_Fee_Work;
-    private javax.swing.JLabel jLabel_Template;
+ //   private javax.swing.JLabel jLabel_Template;
     private javax.swing.JLabel jLabel_Title_Message;
     private javax.swing.JPanel jPanel_Attached_Files;
     private javax.swing.JPanel jPanel_Message_Private;

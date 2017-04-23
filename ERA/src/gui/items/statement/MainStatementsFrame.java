@@ -87,11 +87,9 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 		this.jTabbedPane.add(my_Statements_SplitPanel);
 		
 		this.jTabbedPane.add(search_Statements_SplitPanel);
-		this.jTabbedPane.add(Issue_Statement_Panel);
-		
-		if (core.BlockChain.DEVELOP_USE){
-			this.jTabbedPane.add(iss2);
-		 }
+		//this.jTabbedPane.add(Issue_Statement_Panel);
+		this.jTabbedPane.add(iss2);
+	
 		this.pack();
 		//	this.setSize(800,600);
 		this.setMaximizable(true);
@@ -107,7 +105,7 @@ public class MainStatementsFrame extends Main_Internal_Frame{
 	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	    search_Statements_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	 	my_Statements_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
-	 	iss2.sp_pan.setDividerLocation((int)(size.getWidth()/2));
+	 	iss2.fill_Template_Panel.sp_pan.setDividerLocation((int)(size.getWidth()/1.5));
 	 	
 	}
 
