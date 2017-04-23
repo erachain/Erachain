@@ -1,6 +1,7 @@
 package gui.library;
 
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -38,6 +39,12 @@ public class MImprintEDIT_Pane extends JTextPane {
 	
 		
 	}
+	public void set_View(String text1){
+		this.text = text1;
+			setText(init_String(text, true));
+		
+			
+		}
 	
 		
 	public String init_String(String text, boolean first){
@@ -74,6 +81,16 @@ public class MImprintEDIT_Pane extends JTextPane {
 	}
 	return pps;
 	}
-
+	
+	public String init_view(String text, HashMap<String,String> pars){
+	Collection<String> aa = pars.values();
+	for(String par:aa){
+		text = text.replace("{{"+par+"}}", pars.get(par));
+	}
+	return text;
+	}
+	
+	
+	
 }
 

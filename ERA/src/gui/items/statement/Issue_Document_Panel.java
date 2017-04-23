@@ -856,7 +856,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 			isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 
-			boolean encryptMessage = this.encrypted.isSelected();			
+			boolean encryptMessage = this.fill_Template_Panel.jCheckBox_Is_Encripted.isSelected();			
 			encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
 			
 			//READ NOTE

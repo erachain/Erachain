@@ -209,7 +209,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	}// </editor-fold>
 
 	// Variables declaration - do not modify
-	private javax.swing.JCheckBox jCheckBox_Is_Encripted;
+	public javax.swing.JCheckBox jCheckBox_Is_Encripted;
 	private javax.swing.JCheckBox jCheckBox_Is_Text;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel_Template1;
