@@ -856,8 +856,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 			isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
 
-		//	boolean encryptMessage = this.encrypted.isSelected();			
-		//	encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
+			boolean encryptMessage = this.encrypted.isSelected();			
+			encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
 			
 			//READ NOTE
 			parsing = 5;
@@ -892,7 +892,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		//CREATE TX MESSAGE
 		result = Controller.getInstance().signNote(asPack,
 				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
-				feePow, key, messageBytes, isTextByte, null);//encrypted);
+				feePow, key, messageBytes, isTextByte, encrypted);
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
