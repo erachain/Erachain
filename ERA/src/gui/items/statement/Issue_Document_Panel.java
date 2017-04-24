@@ -806,7 +806,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		Map<String, String> params = new LinkedHashMap<String, String>();
 			
 		int feePow = 0;
-		String message = null;
+		String message = "";
 		boolean isTextB = true;
 		byte[] messageBytes;
 		long key = 0;
@@ -824,26 +824,27 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());		
 			output.put("Title", this.jTextField_Title_Message.getText());
 			output.put("Template_Key", ((NoteCls)this.fill_Template_Panel.jComboBox_Template.getSelectedItem()).getKey());
-			 HashMap<String, String> template_Params = this.fill_Template_Panel.get_Params();
-			 Set<Entry<String, String>> param_keys = template_Params.entrySet();
+			HashMap<String, String> template_Params = this.fill_Template_Panel.get_Params();
+			Set<Entry<String, String>> param_keys = template_Params.entrySet();
 			 
-			 for (Entry<String, String> key1:param_keys){
-				 params.put(key1.getKey(),key1.getValue());
+			for (Entry<String, String> key1:param_keys){
+				params.put(key1.getKey(), key1.getValue());
 			
+				message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
 				 
-				 
-			 }
-			output.put("Params", params);
-			output.put("Message", this.jTextPane_Message_Public.getText());
-			message = this.jTextPane_Message_Public.getText();
+			}
+			//output.put("Params", params);
+			//output.put("Message", this.jTextPane_Message_Public.getText());
+			
+			message += this.jTextPane_Message_Public.getText();
 			
 			isTextB = this.jCheckBox_Message_Public.isSelected();
 						
 			
 			messageBytes = message.getBytes( Charset.forName("UTF-8") );
 			
-			String jSons = StrJSonFine.convert(output);
-			byte[] mess = jSons.getBytes( Charset.forName("UTF-8") );
+			//String jSons = StrJSonFine.convert(output);
+			//byte[] mess = jSons.getBytes( Charset.forName("UTF-8") );
 			
 			
 			if ( messageBytes.length < 10 || messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
