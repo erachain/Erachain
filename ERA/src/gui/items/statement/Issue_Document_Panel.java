@@ -802,9 +802,6 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 		//READ SENDER
 		Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
-		Map<String, Object> output = new LinkedHashMap();
-		Map<String, String> params = new LinkedHashMap<String, String>();
-			
 		int feePow = 0;
 		String message = "";
 		boolean isTextB = true;
@@ -822,20 +819,12 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			//READ FEE
 			parsing = 2;
 			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());		
-			output.put("Title", this.jTextField_Title_Message.getText());
-			output.put("Template_Key", ((NoteCls)this.fill_Template_Panel.jComboBox_Template.getSelectedItem()).getKey());
-			HashMap<String, String> template_Params = this.fill_Template_Panel.get_Params();
-			Set<Entry<String, String>> param_keys = template_Params.entrySet();
+			Set<Entry<String, String>> param_keys = this.fill_Template_Panel.get_Params().entrySet();
 			 
 			for (Entry<String, String> key1:param_keys){
-				params.put(key1.getKey(), key1.getValue());
-			
-				message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
+			message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
 				 
 			}
-			//output.put("Params", params);
-			//output.put("Message", this.jTextPane_Message_Public.getText());
-			
 			message += this.jTextPane_Message_Public.getText();
 			
 			isTextB = this.jCheckBox_Message_Public.isSelected();
