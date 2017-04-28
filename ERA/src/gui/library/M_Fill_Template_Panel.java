@@ -1,5 +1,6 @@
 package gui.library;
 
+import java.awt.Point;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
@@ -7,12 +8,14 @@ import java.util.Set;
 
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
 import javax.validation.constraints.Null;
 
 import com.github.rjeschke.txtmark.Processor;
@@ -40,18 +43,27 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
 				// TODO Auto-generated method stub
+				String str = null;
 				EventType i = arg0.getEventType();
 				 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-				 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th, Lang.getInstance().translate("Insert") + " "+arg0.getDescription(), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
+				 if(arg0.getDescription().toString().indexOf('!')==0) {
+    //		System.out.print(arg0.getDescription());
+    		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition()); 
+				str =d.tp.getText();
+    		    	}
+    	else{	 str = JOptionPane.showInputDialog(jTextPane_Message_Public.th, Lang.getInstance().translate("Insert") + " "+arg0.getDescription(), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
+    	
+    	}
 				 if (str==null || str.equals("")) return;
 				 jTextPane_Message_Public.pars.replace("{{"+ arg0.getDescription()+"}}", str);
-				 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
+				 jTextPane_Message_Public.init_view(jTextPane_Message_Public.text, jTextPane_Message_Public.get_Params());
 				 for ( int i1=0; i1 < params_Template_Model.getRowCount(); i1++){
 					 if (arg0.getDescription().equals(params_Template_Model.getValueAt(i1, 0))) params_Template_Model.setValueAt(str, i1, 1);
 					 
     		
     		
     	}
+				 System.out.print("\n"+ jTextPane_Message_Public.getText());	
 			
 			}
 			
@@ -134,13 +146,13 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 					// TODO Auto-generated method stub
 		
 				if (arg0.getType() != 0 && arg0.getColumn()<0 ) return;
-				System.out.print("\n row = " + arg0.getFirstRow() + "  Col="+ arg0.getColumn() + "   type =" + arg0.getType());
+	//			System.out.print("\n row = " + arg0.getFirstRow() + "  Col="+ arg0.getColumn() + "   type =" + arg0.getType());
 				String dd = params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()).toString();
-				System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
+	//			System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
 				
 				 jTextPane_Message_Public.pars.replace("{{"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +"}}",(String) params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
-				 System.out.print("\n" + get_TemplateCls().getName() + "\n");
-					System.out.print(get_Params());
+	//			 System.out.print("\n" + get_TemplateCls().getName() + "\n");
+	//				System.out.print(get_Params());
 				 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
 				arg0=arg0;
 				}});

@@ -393,8 +393,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jScrollPane_Message_Public_TextPane = new javax.swing.JScrollPane();
         jScrollPane_Params_Template_Public_TextPane = new javax.swing.JScrollPane();
         jCheckBox_Message_Public = new javax.swing.JCheckBox();
-        jPanel_Message_Private = new javax.swing.JPanel();
-        jScrollPane_Message_Private_TextPane = new javax.swing.JScrollPane();
+        jPanel_Message = new javax.swing.JPanel();
+        jScrollPane_Message_TextPane = new javax.swing.JScrollPane();
         jTextPane_Message_Private = new javax.swing.JTextPane();
         jCheckBox_Message_Private = new javax.swing.JCheckBox();
         jTabbedPane_Other = new javax.swing.JTabbedPane();
@@ -487,16 +487,16 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jTabbedPane_Message.addTab(Lang.getInstance().translate("Template"), fill_Template_Panel );
         
 
-        jPanel_Message_Private.setLayout(new java.awt.GridBagLayout());
+        jPanel_Message.setLayout(new java.awt.GridBagLayout());
 
-        jScrollPane_Message_Private_TextPane.setViewportView(jTextPane_Message_Private);
+        jScrollPane_Message_TextPane.setViewportView(jTextPane_Message_Private);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
-        jPanel_Message_Private.add(jScrollPane_Message_Private_TextPane, gridBagConstraints);
+        jPanel_Message.add(jScrollPane_Message_TextPane, gridBagConstraints);
 
         jCheckBox_Message_Private.setText("Text");
         jCheckBox_Message_Private.addActionListener(new java.awt.event.ActionListener() {
@@ -508,9 +508,9 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        jPanel_Message_Private.add(jCheckBox_Message_Private, gridBagConstraints);
+  //      jPanel_Message.add(jCheckBox_Message_Private, gridBagConstraints);
 
-   //     jTabbedPane_Message.addTab(Lang.getInstance().translate("Private Part"), jPanel_Message_Private);
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Message"), jPanel_Message);
      
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1153,7 +1153,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
  //   private javax.swing.JLabel jLabel_Template;
     private javax.swing.JLabel jLabel_Title_Message;
     private javax.swing.JPanel jPanel_Attached_Files;
-    private javax.swing.JPanel jPanel_Message_Private;
+    private javax.swing.JPanel jPanel_Message;
     private javax.swing.JPanel jPanel_Message_Public;
     private javax.swing.JPanel jPanel_Other_Attached_Files_Work;
     private javax.swing.JPanel jPanel_Other_Hashes;
@@ -1161,7 +1161,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel_Work;
     private javax.swing.JScrollPane jScrollPane_Attached_Files_Table;
     private javax.swing.JScrollPane jScrollPane_Hashes_Files_Tale;
-    private javax.swing.JScrollPane jScrollPane_Message_Private_TextPane;
+    private javax.swing.JScrollPane jScrollPane_Message_TextPane;
     private javax.swing.JScrollPane jScrollPane_Message_Public_TextPane;
     private javax.swing.JScrollPane jScrollPane_Params_Template_Public_TextPane;
     private javax.swing.JTabbedPane jTabbedPane_Message;
