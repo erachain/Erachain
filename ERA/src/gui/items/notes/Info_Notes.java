@@ -9,6 +9,7 @@ import gui.library.M_Accoutn_Text_Field;
 import gui.library.Statuses_Library_Panel;
 import gui.library.Voush_Library_Panel;
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 public class Info_Notes extends javax.swing.JPanel {
 
@@ -106,7 +107,10 @@ public class Info_Notes extends javax.swing.JPanel {
         jTextArea_Content.setColumns(20);
         jTextArea_Content.setRows(6);
         jTextArea_Content.setAlignmentY(1.0F);
+        jTextArea_Content.setWrapStyleWord(true);
         jTextArea_Content.setLineWrap(true);
+        jTextArea_Content.setEditable(false);
+        MenuPopupUtil.installContextMenu(jTextArea_Content);
         jScrollPane1.setViewportView(jTextArea_Content);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

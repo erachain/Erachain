@@ -71,7 +71,7 @@ function statement(data){
 	output += '<table><tr><td>';
 	output +='<div style="word-wrap: break-word;  width: 800px;">';
 	output +=  '<b>'+data.Label_statement +'</b>';
-	output +='<br><br>' + data.Label_block + ':&nbsp&nbsp <a href=?block='+data.Label_block+ get_lang()+'><b>' + data.block +'</b></a>';
+	output +='<br><br>' + data.Label_block + ':&nbsp&nbsp <a href=?block='+ data.block + get_lang()+'><b>' + data.block +'</b></a>';
 	output +='<br>' + data.Label_date + ':&nbsp&nbsp'+ data.date;
 	
 	if (data.creator_key !="") {

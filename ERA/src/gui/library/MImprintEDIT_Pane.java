@@ -53,7 +53,7 @@ public class MImprintEDIT_Pane extends JTextPane {
 		
 	public String init_String(String text, boolean first){
 		Pattern p = Pattern.compile("\\{\\{(.+?)\\}\\}");
-		if(BlockChain.DEVELOP_USE)	text = text + "\n {{!Bottom}}";
+	//	if(BlockChain.DEVELOP_USE)	text = text + "\n {{!Bottom}}";
 	 String out = text;  // переводим в маркдаун
 	 
 	Matcher m = p.matcher(text);
@@ -101,7 +101,7 @@ public class MImprintEDIT_Pane extends JTextPane {
 	}
 	return text1;
 	}
-	private String to_HTML(String str){
+	public String to_HTML(String str){
 	String out= null;
 	out = str.replaceAll(" ", "&ensp").replaceAll("\t", "&ensp&ensp&ensp&ensp&ensp&ensp&ensp&ensp").replaceAll("\n","<br>");
 	

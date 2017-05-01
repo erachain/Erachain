@@ -5,10 +5,17 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 
 import com.github.rjeschke.txtmark.Processor;
@@ -21,9 +28,11 @@ import core.transaction.Transaction;
 import database.DBSet;
 import gui.library.MTextPane;
 import gui.library.Voush_Library_Panel;
+import gui.library.library;
 import gui.transaction.Rec_DetailsFrame;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -62,35 +71,65 @@ public class Statement_Info extends javax.swing.JPanel {
 		statement = (R_SignNote) transaction;
 		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 		//jTextArea_Body.setContentType("text/html");
+		
+		
+		
 		String description = note.getDescription(); 
-		if (statement.isText() && !statement.isEncrypted()) {
-			List<String> vars = note.getVarNames();
-			if (vars != null && !vars.isEmpty()) {
-				// try replace variables
-				String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
-				String[] rows = dataVars.split("\n");
-				Map<String, String> varsArray = new HashMap<String, String>();
-				for (String row: rows) {
-					String[] var_Name_Value = row.split("=");
-					if (var_Name_Value.length == 2) {
-						varsArray.put(var_Name_Value[0].trim(), var_Name_Value[1].trim());
+		
+		
+		
+//		if (statement.isText() && !statement.isEncrypted()) {
+			if (!statement.isEncrypted()) {
+	
+			
+			 try {
+				 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(statement.getData(), Charset.forName("UTF-8")));
+				 Set<String> kS = data.keySet();
+				 for (String s:kS){
+						description = description.replace("{{" + s + "}}", (CharSequence) data.get(s));
+				 }
+				 jTextArea_Body.setText(
+						  data.get("!!&_Title") + "\n\n"
+							+  description + "\n\n"
+							+    data.get("!!&_Message"));
+				 
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+			//	e.printStackTrace();
+				
+				List<String> vars = note.getVarNames();
+				if (vars != null && !vars.isEmpty()) {
+					// try replace variables
+					String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
+					String[] rows = dataVars.split("\n");
+					Map<String, String> varsArray = new HashMap<String, String>();
+					for (String row: rows) {
+						String[] var_Name_Value = row.split("=");
+						if (var_Name_Value.length == 2) {
+							varsArray.put(var_Name_Value[0].trim(), var_Name_Value[1].trim());
+						}
+						
 					}
 					
+					for (Map.Entry<String, String> item : varsArray.entrySet()) {
+						//description.replaceAll("{{" + item.getKey() + "}}", (String)item.getValue());
+						description = description.replace("{{" + item.getKey() + "}}", (String)item.getValue());
+					}
 				}
 				
-				for (Map.Entry<String, String> item : varsArray.entrySet()) {
-					//description.replaceAll("{{" + item.getKey() + "}}", (String)item.getValue());
-					description = description.replace("{{" + item.getKey() + "}}", (String)item.getValue());
-				}
+				   
+				jTextArea_Body.setText(note.getName() + "\n\n"
+						+ description + "\n\n"
+						+ new String(statement.getData(), Charset.forName("UTF-8")));
+				
 			}
 			
-			jTextArea_Body.set_text(note.getName() + "\n\n"
-					+ Processor.process(description) + "\n\n"
-					+ Processor.process(new String(statement.getData(), Charset.forName("UTF-8"))));
+			
+			
 			
 		} else {
-			jTextArea_Body.set_text(note.getName() + "\n\n"
-					+ Processor.process(description));			
+			jTextArea_Body.setText(note.getName() + "\n"
+					+ Lang.getInstance().translate("Encrypted"));			
 		}
 
 		jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
@@ -111,7 +150,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		jSplitPane1 = new javax.swing.JSplitPane();
 		jPanel1 = new javax.swing.JPanel();
 		jScrollPane3 = new javax.swing.JScrollPane();
-		jTextArea_Body = new MTextPane();
+		jTextArea_Body = new JTextArea();
 		jPanel2 = new javax.swing.JPanel();
 		new javax.swing.JLabel();
 
@@ -157,7 +196,11 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 		
 		
-
+		jTextArea_Body.setWrapStyleWord(true);
+		jTextArea_Body.setLineWrap(true);
+		
+		 MenuPopupUtil.installContextMenu(jTextArea_Body);
+		 jTextArea_Body.setEditable(false);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -202,6 +245,6 @@ public class Statement_Info extends javax.swing.JPanel {
 
 	private javax.swing.JSplitPane jSplitPane1;
 
-	private MTextPane jTextArea_Body;
+	private JTextArea jTextArea_Body;
 	// End of variables declaration
 }

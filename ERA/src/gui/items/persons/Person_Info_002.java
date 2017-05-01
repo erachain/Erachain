@@ -279,6 +279,8 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 		MenuPopupUtil.installContextMenu(jTextArea_Description);
 		jTextArea_Description.setEditable(false);
+		jTextArea_Description.setWrapStyleWord(true);
+		jTextArea_Description.setLineWrap(true);
 		
 
 		String descript = Lang.getInstance().translate("Gender") + ":";
