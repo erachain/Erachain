@@ -36,6 +36,7 @@ import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
+import gui.items.statement.Statement_Info;
 
 public class TransactionDetailsFactory 
 {
@@ -82,11 +83,13 @@ public class TransactionDetailsFactory
 			
 			R_SignNote statement = (R_SignNote) transaction;
 			
-			RecStatementDetailsFrame recStatementDetailsFrame = new RecStatementDetailsFrame(statement);
-			 gridBagConstraints.gridy =recStatementDetailsFrame.labelGBC.gridy+1; 
-			 recStatementDetailsFrame. add(jLabel9, gridBagConstraints);
+			//RecStatementDetailsFrame recStatementDetailsFrame = new RecStatementDetailsFrame(statement);
+			// gridBagConstraints.gridy =recStatementDetailsFrame.labelGBC.gridy+1; 
+			// recStatementDetailsFrame. add(jLabel9, gridBagConstraints);
 			
-			return recStatementDetailsFrame;
+			//recStatementDetailsFrame.add(new Statement_Info(statement))
+			 
+			return new Statement_Info(statement);
 			
 		case Transaction.REGISTER_NAME_TRANSACTION:
 			
