@@ -89,14 +89,29 @@ public class Statement_Info extends javax.swing.JPanel {
 			
 			 try {
 				 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(statement.getData(), Charset.forName("UTF-8")));
-				 Set<String> kS = data.keySet();
+				String str = data.get("Statement_Params").toString();
+				 JSONObject params = (JSONObject) JSONValue.parseWithException(str);
+				 Set<String> kS = params.keySet();
 				 for (String s:kS){
-						description = description.replace("{{" + s + "}}", (CharSequence) data.get(s));
+						description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
 				 }
+				String hasHes = "";
+				 str = data.get("Hashes").toString();
+				 params = (JSONObject) JSONValue.parseWithException(str);
+				 kS = params.keySet();
+				 
+				 int i = 1;
+				 for (String s:kS){
+					 hasHes += i + " " + s + " " + params.get(s) + "\n";
+				 }
+				 
+				 
+				 
 				 jTextArea_Body.setText(
-						  data.get("!!&_Title") + "\n\n"
+						  data.get("Title") + "\n\n"
 							+  description + "\n\n"
-							+    data.get("!!&_Message"));
+							+    data.get("Message") + "\n\n"
+							+ hasHes);
 				 
 			} catch (ParseException e) {
 				// TODO Auto-generated catch block

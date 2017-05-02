@@ -257,12 +257,14 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 				 try {
 					JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
 					str =  (String) data.get("!!&_Title");
+					if (str == null) str = (String) data.get("Title");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
+				
 					
 					 str = new String( record.getData() , Charset.forName("UTF-8") );
 				}	
-				 if (str == null) return "";
+				 if (str == null) return "??";
 				 if (str.length()>50) return str.substring(0,50)+"...";
 					return str ;//transaction.viewReference();//.viewProperies();
 				

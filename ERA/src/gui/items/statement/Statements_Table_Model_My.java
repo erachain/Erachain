@@ -159,6 +159,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 				 try {
 					JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
 					str =  (String) data.get("!!&_Title");
+					if (str == null) str = (String) data.get("Title");
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					

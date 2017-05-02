@@ -3528,14 +3528,31 @@ if ( asset_1 == null) {
 		
 		 try {
 			 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
-			 Set<String> kS = data.keySet();
-			for (String s:kS){
-					description = description.replace("{{" + s + "}}", (CharSequence) data.get(s));
-			 }
+				String str = data.get("Statement_Params").toString();
+				 JSONObject params = (JSONObject) JSONValue.parseWithException(str);
+				 Set<String> kS = params.keySet();
+				 for (String s:kS){
+						description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+				 }
+				String hasHes = "";
+				 str = data.get("Hashes").toString();
+				 params = (JSONObject) JSONValue.parseWithException(str);
+				 kS = params.keySet();
+				 
+				 int i = 1;
+				 for (String s:kS){
+					 hasHes += i + " " + s + " " + params.get(s) + "\n";
+				 }
+				 
+				 
+				 
+				 String sT =
+						  data.get("Title") + "\n\n"
+							+  description + "\n\n"
+							+    data.get("Message") + "\n\n"
+							+ hasHes;
 			
-			String sT = data.get("!!&_Title") + "\n\n"
-						+  description + "\n\n"
-						+    data.get("!!&_Message");
+			
 			
 			output.put("statement", library.to_HTML(sT));
 			 

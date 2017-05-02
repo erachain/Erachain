@@ -625,7 +625,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
         jPanel_Other_Hashes.add(jButton_Remove_Other_Hashes, gridBagConstraints);
 
-    //    jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Hashes"), jPanel_Other_Hashes);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -777,6 +777,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jPanel_Work.getAccessibleContext().setAccessibleDescription("");
     }// </editor-fold>
     
+	@SuppressWarnings("null")
 	public Pair<Transaction, Integer> makeDeal(boolean asPack)
 	{
 		
@@ -809,10 +810,14 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		long key = 0;
 		byte[] isTextByte;
 		byte[] encrypted;
-		
+		HashMap  params_Map = new HashMap();
+		HashMap  out_Map = new HashMap();
+		HashMap hashes_Map = new HashMap();
 		int parsing = 0;
 		try
 		{
+			
+			
 			//READ AMOUNT
 			parsing = 1;
 			
@@ -823,8 +828,23 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			 
 			for (Entry<String, String> key1:param_keys){
 			message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
-				 
+			params_Map.put( key1.getKey(), key1.getValue());
 			}
+			
+			
+			
+			int hR = hashes_Table_Model.getRowCount();
+			for (int i = 0;i<hR;i++){
+				hashes_Map.put(hashes_Table_Model.getValueAt(i, 0),hashes_Table_Model.getValueAt(i, 1));
+				
+			}
+			
+			out_Map.put("Hashes", hashes_Map);
+			out_Map.put("Statement_Params", params_Map);
+			out_Map.put("Version", "2.01");
+			out_Map.put("Message", this.jTextPane_Message_Private.getDocument().getText(0, this.jTextPane_Message_Private.getDocument().getLength()));
+			out_Map.put("Title", jTextField_Title_Message.getText());
+			
 			message += this.jTextPane_Message_Public.getText();
 			
 			isTextB = this.jCheckBox_Message_Public.isSelected();
@@ -832,8 +852,20 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			
 			messageBytes = message.getBytes( Charset.forName("UTF-8") );
 			
+			 String sS = StrJSonFine.convert(out_Map);
+			 messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
+			
+			
+			
+			
+			
+			
+			
 			//String jSons = StrJSonFine.convert(output);
 			//byte[] mess = jSons.getBytes( Charset.forName("UTF-8") );
+			
+			
+			
 			
 			
 			if ( messageBytes.length < 10 || messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
@@ -881,6 +913,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		}
 
 		//CREATE TX MESSAGE
+		
 		result = Controller.getInstance().signNote(asPack,
 				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
 				feePow, key, messageBytes, isTextByte, encrypted);
@@ -892,6 +925,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
+		
 		
 	}
 
