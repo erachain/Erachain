@@ -3524,7 +3524,7 @@ if ( asset_1 == null) {
 		
 		
 		String description = note.getDescription(); 
-		
+		if (!trans.isEncrypted()) {
 		
 		 try {
 			 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
@@ -3566,7 +3566,11 @@ if ( asset_1 == null) {
 		
 		 }
 		
-		
+		} else {
+			output.put("statement",note.getName() + "<br>"
+					+  Lang.getInstance().translate_from_langObj("Encrypted",langObj));			
+		}
+
 		
 		
 		
