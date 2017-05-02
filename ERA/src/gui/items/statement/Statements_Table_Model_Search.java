@@ -16,6 +16,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
@@ -236,7 +238,19 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 				
 			case COLUMN_BODY:				
 				
-				return new String( record.getData() , Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
+			//	return new String( record.getData() , Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
+				String str = "";
+				 try {
+					JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
+					str =  (String) data.get("!!&_Title");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					
+					 str = new String( record.getData() , Charset.forName("UTF-8") );
+				}	
+				 if (str == null) return "";
+				 if (str.length()>50) return str.substring(0,50)+"...";
+					return str ;//transaction.viewReference();//.viewProperies();
 				
 				
 	//		case COLUMN_AMOUNT:
