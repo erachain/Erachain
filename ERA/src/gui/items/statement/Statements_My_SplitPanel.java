@@ -119,6 +119,7 @@ import gui.library.MTable;
 				Statement_Info info_panel = new Statement_Info(statement);
 				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+			//	jSplitPanel.setRightComponent(info_panel);
 			}
 			
 		}

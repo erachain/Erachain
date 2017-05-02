@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
@@ -59,7 +61,7 @@ public class Statement_Info extends javax.swing.JPanel {
 			return;
 		
 		this.transaction = transaction;
-		initComponents();
+		
 
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap()
 				.get(transaction.getBlockHeight(DBSet.getInstance()), transaction.getSeqNo(DBSet.getInstance()));
@@ -69,6 +71,9 @@ public class Statement_Info extends javax.swing.JPanel {
 		}
 
 		statement = (R_SignNote) transaction;
+		
+		initComponents();
+		
 		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 		//jTextArea_Body.setContentType("text/html");
 		
@@ -208,9 +213,20 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
-		jPanel1.add(jTextArea_Body, gridBagConstraints);
+		
+		JScrollPane scrol1 = new JScrollPane();
+		scrol1.setViewportView(jTextArea_Body);
+		jPanel1.add(scrol1, gridBagConstraints);
 
+		if (statement.isEncrypted()){
+		JCheckBox encrip = new JCheckBox(Lang.getInstance().translate("Encrypted"));
+		encrip.setSelected(true);
+		gridBagConstraints.gridy = ++y;
+		jPanel1.add(encrip, gridBagConstraints);
+		}
+		
 		jSplitPane1.setLeftComponent(jPanel1);
+		
 
 		jPanel2.setLayout(new java.awt.GridBagLayout());
 
