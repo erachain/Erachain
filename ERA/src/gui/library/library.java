@@ -332,4 +332,11 @@ public class library {
 	 * } }
 	 */
 
+	public static String to_HTML(String str){
+		String out= null;
+		out = str.replaceAll(" ", "&ensp;").replaceAll("\t", "&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;").replaceAll("\n","<br>");
+		
+		return out;
+		}
+	
 }

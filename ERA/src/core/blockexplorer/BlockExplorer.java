@@ -30,6 +30,8 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -83,6 +85,7 @@ import database.SortableList;
 import gui.items.persons.TableModelPersons;
 import gui.items.statement.Statements_Table_Model_Search;
 import gui.items.statement.Statements_Vouch_Table_Model;
+import gui.library.library;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import gui.models.PersonStatusesModel;
@@ -3476,6 +3479,12 @@ if ( asset_1 == null) {
 			out_statement.put("person_key", model_Statements.get_person_key(row));
 			
 			for (int column=0; column < column_Count; column++ ){
+				
+				
+				
+				
+				
+				
 				out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), model_Statements.getValueAt(row, column).toString());
 				
 			}
@@ -3508,7 +3517,42 @@ if ( asset_1 == null) {
 	
 		output.put("block",block);
 		output.put("Seg_No",seg_No);
+		
+		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
+		//jTextArea_Body.setContentType("text/html");
+		
+		
+		
+		String description = note.getDescription(); 
+		
+		
+		 try {
+			 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
+			 Set<String> kS = data.keySet();
+			for (String s:kS){
+					description = description.replace("{{" + s + "}}", (CharSequence) data.get(s));
+			 }
+			
+			String sT = data.get("!!&_Title") + "\n\n"
+						+  description + "\n\n"
+						+    data.get("!!&_Message");
+			
+			output.put("statement", library.to_HTML(sT));
+			 
+		 } catch (ParseException e) {
+		
+		
+		
+		
+		
 		output.put("statement", Processor.process(new String( trans.getData(), Charset.forName("UTF-8") )));
+		
+		 }
+		
+		
+		
+		
+		
 		output.put("creator", trans.getCreator().getPersonAsString());
 		
 		
