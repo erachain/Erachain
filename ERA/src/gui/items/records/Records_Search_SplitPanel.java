@@ -97,9 +97,10 @@ import utils.MenuPopupUtil;
 		    	sender_address = new JTextField();
 		    	sender_address.setToolTipText("");
 		    	sender_address.setAlignmentX(1.0F);
-		    	sender_address.setMinimumSize(new java.awt.Dimension(200, 20));
+		    	sender_address.setMinimumSize(new java.awt.Dimension(50, 20));
 		    	sender_address.setName(""); // NOI18N
 		    	sender_address.setPreferredSize(new java.awt.Dimension(200, 20));
+		    	sender_address.setMaximumSize(new java.awt.Dimension(2000, 20));
 		       	
 		    	MenuPopupUtil.installContextMenu(sender_address);
 		    	

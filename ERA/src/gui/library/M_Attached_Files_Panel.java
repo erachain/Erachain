@@ -2,9 +2,18 @@ package gui.library;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.zip.DataFormatException;
+import java.util.zip.Inflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
@@ -24,6 +33,8 @@ import core.item.persons.PersonCls;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import lang.Lang;
+import utils.Compressor_ZIP;
+import utils.GZIP;
 import utils.TableMenuPopupUtil;
 import org.apache.commons.net.util.Base64;
 public class M_Attached_Files_Panel extends JPanel{
@@ -33,9 +44,12 @@ public class M_Attached_Files_Panel extends JPanel{
 	private JScrollPane scrollPane;
 
 	public M_Attached_Files_Panel() {
+		
+		setLayout(new java.awt.GridBagLayout());
 		model = new Attache_Files_Model();
 		table = new MTable(model);
 		JPopupMenu menu = new JPopupMenu();
+		java.awt.GridBagConstraints gridBagConstraints;
 
 		
     	
@@ -48,25 +62,46 @@ public class M_Attached_Files_Panel extends JPanel{
   			if (table.getSelectedRow() < 0 ) return;
   				int row = table.convertRowIndexToModel(table.getSelectedRow());
   			My_JFileChooser chooser = new My_JFileChooser();
-  			chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
+  			chooser.setDialogTitle(Lang.getInstance().translate("Save File")+": " + model.getValueAt(row, 0) );
   			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
   			chooser.setMultiSelectionEnabled(false);
-  	//		 if ( chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
+  			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+  			chooser.setAcceptAllFileFilterUsed(false); 
+  			 if ( chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
   	          
-  				 try(FileOutputStream fos=new FileOutputStream("d://1" + model.getValueAt(row, 0)))
+  				String pp = chooser.getSelectedFile().getPath();
+  				 try(FileOutputStream fos=new FileOutputStream(pp + model.getValueAt(row, 0)))
   		        {
   		            // перевод строки в байты
   					String ssst = model.getValueAt(row, 2).toString();
   		            byte[] buffer = Base64.decodeBase64( model.getValueAt(row, 2).toString());
-  		             
+  		            
+  		     //       if ((boolean)model.getValueAt(row, 1)){
+  		            	
+  		     //       	try {
+			//				byte[] buffer1 = GZIP.GZIPdecompress_b(buffer);
+			//				fos.write(buffer1, 0, buffer1.length);
+			//			} catch (Exception e1) {
+			//				// TODO Auto-generated catch block
+			//				e1.printStackTrace();
+			//			} 	
+  		       //     	MyByteArrayDecompress dc = new MyByteArrayDecompress();
+  		       //     	byte[] buffer1 = dc.decompressByteArray(buffer);
+  		            	
+  		            	
+  		            	
+  		    //       }
+  		     //      else {
   		            fos.write(buffer, 0, buffer.length);
+  		     //       }
+  		        
   		        }
   		        catch(IOException ex){
   		             
   		            System.out.println(ex.getMessage());
   		        } 
   	           
-  	   //     }
+  	        }
   			
   			
   			
@@ -94,7 +129,14 @@ public class M_Attached_Files_Panel extends JPanel{
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setViewportView(table);
-		add(scrollPane);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 0.1;
+		gridBagConstraints.weighty = 0.1;
+		
+		add(scrollPane,gridBagConstraints);
 		
 		// TODO Auto-generated constructor stub
 	}
@@ -103,6 +145,26 @@ public class M_Attached_Files_Panel extends JPanel{
 		model.fireTableDataChanged();
 	
 	}
+	
+	private byte[] zip_un(byte[] compressedData) throws  Exception{
+		//    byte[] compressedData = null;
+		    Inflater decompressor = new Inflater();
+		    decompressor.setInput(compressedData);
+		    ByteArrayOutputStream bos = new ByteArrayOutputStream(compressedData.length);
+		    byte[] buf = null;
+		    while (!decompressor.finished()) {
+		      int count = decompressor.inflate(buf);
+		      bos.write(buf, 0, count);
+		    }
+		 //   bos.close();
+		   return bos.toByteArray();
+		  }
+		
+	        
+	       
+	
+	
+
 
 
 }
@@ -136,5 +198,30 @@ class Attache_Files_Model extends DefaultTableModel{
 	return super.getValueAt(row, col);
     	
     	
+    }
+}
+class MyByteArrayDecompress {
+	 
+public byte[] decompressByteArray(byte[] bytes){
+         
+        ByteArrayOutputStream baos = null;
+        Inflater iflr = new Inflater();
+        iflr.setInput(bytes);
+        baos = new ByteArrayOutputStream();
+        byte[] tmp = new byte[4*1024];
+        try{
+            while(!iflr.finished()){
+                int size = iflr.inflate(tmp);
+                baos.write(tmp, 0, size);
+            }
+        } catch (Exception ex){
+             
+        } finally {
+            try{
+                if(baos != null) baos.close();
+            } catch(Exception ex){}
+        }
+         
+        return baos.toByteArray();
     }
 }

@@ -83,7 +83,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 		String description = note.getDescription(); 
 		
-		
+		file_Panel.setVisible(false);
 		
 //		if (statement.isText() && !statement.isEncrypted()) {
 			if (!statement.isEncrypted()) {
@@ -91,6 +91,7 @@ public class Statement_Info extends javax.swing.JPanel {
 				JSONObject params;
 				 String files;
 				 String str;
+				 
 			 try {
 				 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(statement.getData(), Charset.forName("UTF-8")));
 				 // params
@@ -118,8 +119,9 @@ public class Statement_Info extends javax.swing.JPanel {
 				 }
 				 // files
 				 files ="";
-				 
+				
 				 if (data.containsKey("Files")){
+					 file_Panel.setVisible(true);
 				str = data.get("Files").toString();
 				 JSONObject files_json = (JSONObject) JSONValue.parseWithException(str);
 				 kS = files_json.keySet();
@@ -153,7 +155,6 @@ public class Statement_Info extends javax.swing.JPanel {
 			 } catch (ParseException e) {
 				// TODO Auto-generated catch block
 			//	e.printStackTrace();
-				
 				List<String> vars = note.getVarNames();
 				if (vars != null && !vars.isEmpty()) {
 					// try replace variables
@@ -274,11 +275,22 @@ public class Statement_Info extends javax.swing.JPanel {
 		if (statement.isEncrypted()){
 		JCheckBox encrip = new JCheckBox(Lang.getInstance().translate("Encrypted"));
 		encrip.setSelected(true);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.gridy = ++y;
+		gridBagConstraints.weightx = 0.1;
+		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
 		jPanel1.add(encrip, gridBagConstraints);
 		}
 		
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.gridy = ++y;
+		gridBagConstraints.weightx = 0.1;
+		gridBagConstraints.weighty = 0.1;
+		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
 		jPanel1.add(file_Panel, gridBagConstraints);
 		
 		
