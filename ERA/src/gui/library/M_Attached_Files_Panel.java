@@ -36,6 +36,9 @@ import lang.Lang;
 import utils.Compressor_ZIP;
 import utils.GZIP;
 import utils.TableMenuPopupUtil;
+import utils.ZIP_File;
+import utils.Zip_Bytes;
+
 import org.apache.commons.net.util.Base64;
 public class M_Attached_Files_Panel extends JPanel{
 
@@ -76,11 +79,23 @@ public class M_Attached_Files_Panel extends JPanel{
   					String ssst = model.getValueAt(row, 2).toString();
   		            byte[] buffer = Base64.decodeBase64( model.getValueAt(row, 2).toString());
   		            
-  		     //       if ((boolean)model.getValueAt(row, 1)){
+  		           if ((boolean)model.getValueAt(row, 1)){
+  		            	
+  		            	
+  		            
+  		            
+  		      //      	ZIP_File.compressGzipFile(pp + model.getValueAt(row, 0), "temp");	
+  		      //      	FileOutputStream fos_ZIP=new FileOutputStream("temp");
   		            	
   		     //       	try {
-			//				byte[] buffer1 = GZIP.GZIPdecompress_b(buffer);
-			//				fos.write(buffer1, 0, buffer1.length);
+							byte[] buffer1 = null;
+							try {
+								buffer1 = Zip_Bytes.decompress(buffer);
+							} catch (DataFormatException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							fos.write(buffer1, 0, buffer1.length);
 			//			} catch (Exception e1) {
 			//				// TODO Auto-generated catch block
 			//				e1.printStackTrace();
@@ -90,10 +105,10 @@ public class M_Attached_Files_Panel extends JPanel{
   		            	
   		            	
   		            	
-  		    //       }
-  		     //      else {
+  		           }
+  		          else {
   		            fos.write(buffer, 0, buffer.length);
-  		     //       }
+  		           }
   		        
   		        }
   		        catch(IOException ex){

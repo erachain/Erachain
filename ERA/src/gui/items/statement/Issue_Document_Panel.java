@@ -78,6 +78,7 @@ import utils.Converter;
 import utils.GZIP;
 import utils.Pair;
 import utils.StrJSonFine;
+import utils.Zip_Bytes;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -321,12 +322,12 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 					row = jTable_Attached_Files.convertRowIndexToModel(row);
 					attached_Files_Model.setValueAt(new Boolean(!(boolean) attached_Files_Model.getValueAt(row, 2)), row, 2);
 					if (new Boolean((boolean)attached_Files_Model.getValueAt(row,2))) {
-					 Compressor_ZIP zip = new Compressor_ZIP();
-					attached_Files_Model.setValueAt(zip.compress((byte[]) attached_Files_Model.getValueAt(row, 4))	, row, 5); 	
+				//	 Compressor_ZIP zip = new Compressor_ZIP();
+				//	attached_Files_Model.setValueAt(zip.compress((byte[]) attached_Files_Model.getValueAt(row, 4))	, row, 5); 	
 					
 					byte[] z1 = null ;
 					try {
-						attached_Files_Model.setValueAt(GZIP.GZIPcompress( (byte[]) attached_Files_Model.getValueAt(row, 4)), row, 5);
+						attached_Files_Model.setValueAt(Zip_Bytes.compress( (byte[]) attached_Files_Model.getValueAt(row, 4)), row, 5);
 						z1 = (byte[]) attached_Files_Model.getValueAt(row, 4);
 						
 					} catch (Exception e1) {

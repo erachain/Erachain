@@ -1,5 +1,6 @@
 package gui.items.statement;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.zip.DataFormatException;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -36,6 +38,7 @@ import gui.transaction.Rec_DetailsFrame;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import utils.MenuPopupUtil;
+import utils.Zip_Bytes;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -133,12 +136,22 @@ public class Statement_Info extends javax.swing.JPanel {
 					 
 				 }
 				 }
+				
+							 
 				 jTextArea_Body.setText(
 						  data.get("Title") + "\n\n"
-							+  description + "\n\n"
+							+ "desc: " +description + "\n\n"
 							+    data.get("Message") + "\n\n"
 							+ hasHes + "\n\n"
-							+ files );
+							+ files +"\n"
+							
+										 
+						 );
+				 
+				
+						
+						
+				 
 				 
 			if (files != null){
 				
