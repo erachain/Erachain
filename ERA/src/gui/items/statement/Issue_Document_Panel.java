@@ -47,6 +47,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.validation.constraints.Null;
 
+import org.apache.commons.net.util.Base64;
+
 import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
@@ -575,7 +577,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Attached_Files.add(jPanel_Other_Attached_Files_Work, gridBagConstraints);
 
-    //    jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         jPanel_Other_Hashes.setLayout(new java.awt.GridBagLayout());
 
@@ -825,13 +827,13 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			parsing = 2;
 			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());		
 			Set<Entry<String, String>> param_keys = this.fill_Template_Panel.get_Params().entrySet();
-			 
+// template params			 
 			for (Entry<String, String> key1:param_keys){
 			message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
 			params_Map.put( key1.getKey(), key1.getValue());
 			}
 			
-			
+// hashes			
 			
 			int hR = hashes_Table_Model.getRowCount();
 			for (int i = 0;i<hR;i++){
@@ -844,7 +846,27 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			out_Map.put("Version", "2.01");
 			out_Map.put("Message", this.jTextPane_Message_Private.getDocument().getText(0, this.jTextPane_Message_Private.getDocument().getLength()));
 			out_Map.put("Title", jTextField_Title_Message.getText());
+// files	
+			HashMap out_Files = new HashMap();
 			
+			int oF = attached_Files_Model.getRowCount();
+			for (int i=0; i<oF; i++){
+				/*
+				  взять имя файлов 					attached_Files_Model.getValueAt(row,0);
+				  взять признак орхивирования		attached_Files_Model.getValueAt(row,2);
+				  взять содержимое файлов. Если ZIP то зашифрованный, если нет то не зашифрованный 		attached_Files_Model.getValueAt(row,5);
+				*/
+				HashMap file_Attr = new HashMap();
+				file_Attr.put("Name", attached_Files_Model.getValueAt(i,0));
+				file_Attr.put("zip", attached_Files_Model.getValueAt(i,2));
+				byte[] ss = (byte[]) attached_Files_Model.getValueAt(i,5);
+				file_Attr.put("Data",Base64.encodeBase64String(ss));
+				
+				
+				out_Files.put(i, file_Attr);
+				
+			}
+			out_Map.put("Files", out_Files);
 			message += this.jTextPane_Message_Public.getText();
 			
 			isTextB = this.jCheckBox_Message_Public.isSelected();
@@ -1149,7 +1171,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 					}
 
 					
-					attached_Files_Model.addRow(new Object[] {patch.getName().toString(), patch.getPath().substring(0, patch.getPath().length()-patch.getName().length()), new Boolean(false), new Integer(fileInArray.length), fileInArray, null});
+					attached_Files_Model.addRow(new Object[] {patch.getName().toString(), patch.getPath().substring(0, patch.getPath().length()-patch.getName().length()), new Boolean(false), new Integer(fileInArray.length), fileInArray, fileInArray});
 			
 
 				}

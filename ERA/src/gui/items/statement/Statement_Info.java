@@ -29,6 +29,7 @@ import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.library.MTextPane;
+import gui.library.M_Attached_Files_Panel;
 import gui.library.Voush_Library_Panel;
 import gui.library.library;
 import gui.transaction.Rec_DetailsFrame;
@@ -55,6 +56,7 @@ public class Statement_Info extends javax.swing.JPanel {
 	 */
 	R_SignNote statement;
 	Transaction transaction;
+	private M_Attached_Files_Panel file_Panel;
 
 	public Statement_Info(Transaction transaction) {
 		if (transaction == null)
@@ -85,18 +87,27 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 //		if (statement.isText() && !statement.isEncrypted()) {
 			if (!statement.isEncrypted()) {
-	
-			
+				Set<String> kS;
+				JSONObject params;
+				 String files;
+				 String str;
 			 try {
 				 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(statement.getData(), Charset.forName("UTF-8")));
-				String str = data.get("Statement_Params").toString();
-				 JSONObject params = (JSONObject) JSONValue.parseWithException(str);
-				 Set<String> kS = params.keySet();
+				 // params
+				
+				if (data.containsKey("Statement_Params")){
+				str = data.get("Statement_Params").toString();
+				  params = (JSONObject) JSONValue.parseWithException(str);
+				  kS = params.keySet();
 				 for (String s:kS){
 						description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
 				 }
+				}
+				 // hashes
 				String hasHes = "";
-				 str = data.get("Hashes").toString();
+				 
+				 if (data.containsKey("Hashes")){
+				str = data.get("Hashes").toString();
 				 params = (JSONObject) JSONValue.parseWithException(str);
 				 kS = params.keySet();
 				 
@@ -104,16 +115,42 @@ public class Statement_Info extends javax.swing.JPanel {
 				 for (String s:kS){
 					 hasHes += i + " " + s + " " + params.get(s) + "\n";
 				 }
+				 }
+				 // files
+				 files ="";
 				 
-				 
-				 
+				 if (data.containsKey("Files")){
+				str = data.get("Files").toString();
+				 JSONObject files_json = (JSONObject) JSONValue.parseWithException(str);
+				 kS = files_json.keySet();
+				 for (String ff:kS){
+					 String fff = files_json.get(ff).toString();
+					JSONObject file_json = (JSONObject) JSONValue.parseWithException(fff);
+					 files += file_json.get("Name") +"\n";
+					 file_Panel.insert_Row(file_json.get("Name").toString(), ((boolean) file_json.get("zip")), file_json.get("Data").toString()); 
+					 
+				 }
+				 }
 				 jTextArea_Body.setText(
 						  data.get("Title") + "\n\n"
 							+  description + "\n\n"
 							+    data.get("Message") + "\n\n"
-							+ hasHes);
+							+ hasHes + "\n\n"
+							+ files );
 				 
-			} catch (ParseException e) {
+			if (files != null){
+				
+				
+				
+				
+			}
+			 
+			 
+			 
+			 
+			 
+			 
+			 } catch (ParseException e) {
 				// TODO Auto-generated catch block
 			//	e.printStackTrace();
 				
@@ -172,6 +209,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		jScrollPane3 = new javax.swing.JScrollPane();
 		jTextArea_Body = new JTextArea();
 		jPanel2 = new javax.swing.JPanel();
+		file_Panel = new M_Attached_Files_Panel();
 		new javax.swing.JLabel();
 
 		// jTable_Sign = new javax.swing.JTable();
@@ -239,6 +277,11 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.gridy = ++y;
 		jPanel1.add(encrip, gridBagConstraints);
 		}
+		
+		gridBagConstraints.gridy = ++y;
+		jPanel1.add(file_Panel, gridBagConstraints);
+		
+		
 		
 		jSplitPane1.setLeftComponent(jPanel1);
 		
