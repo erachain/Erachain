@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -20,6 +21,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 
+import gui.library.MSplitPane;
 import gui.library.MTable;
 import lang.Lang;
 
@@ -33,10 +35,13 @@ public class Split_Panel extends javax.swing.JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private int spt;
 	/**
      * Creates new form Doma2
      */
+	
     public Split_Panel() {
+    	spt = 0;
         initComponents();
 
 
@@ -44,8 +49,8 @@ public class Split_Panel extends javax.swing.JPanel {
     //    this.jTable_jScrollPanel_LeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
        searchToolBar_LeftPanel.setVisible(false); 
         
-     
-     		
+    //   jSplitPanel.setOneTouchExpandable(true);
+      	
         
         
         
@@ -63,7 +68,8 @@ public class Split_Panel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jSplitPanel = new javax.swing.JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+        jSplitPanel = new MSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+  //      jSplitPanel.M_setDividerSize(20);
         leftPanel = new javax.swing.JPanel();
         toolBar_LeftPanel = new javax.swing.JToolBar();
         button1_ToolBar_LeftPanel = new javax.swing.JButton();
@@ -316,7 +322,7 @@ public class Split_Panel extends javax.swing.JPanel {
     public javax.swing.JPanel jPanel_RightPanel;
     public javax.swing.JScrollPane jScrollPane_jPanel_RightPanel;
     public javax.swing.JScrollPane jScrollPanel_LeftPanel;
-    public javax.swing.JSplitPane jSplitPanel;
+    public MSplitPane jSplitPanel;
     public MTable jTable_jScrollPanel_LeftPanel;
     public javax.swing.JToolBar jToolBar_RightPanel;
     public javax.swing.JPanel leftPanel;

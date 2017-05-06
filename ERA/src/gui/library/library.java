@@ -259,6 +259,12 @@ public class library {
 		UIManager.put("OptionPane.titleFont", font); 
 		
 	      
+		UIManager.put("SplitPane.oneTouchButtonSize",size_font*2);
+    	    UIManager.put("SplitPane.supportsOneTouchButtons",true);
+    	    UIManager.put("SplitPane.dividerSize",size_font);
+    	    UIManager.put("SplitPaneDivider.oneTouchButtonSize",size_font*2);
+    	    UIManager.put("SplitPane.centerOneTouchButtons",true);
+		
 		// .setUIFont(new javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
 		 
 		 ArrayList<Tuple2<String,Object>> ss = new ArrayList<Tuple2<String, Object>>();

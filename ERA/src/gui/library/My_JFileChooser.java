@@ -25,6 +25,7 @@ public class My_JFileChooser extends JFileChooser{
 		UIManager.put("FileChooser.lookInLabelText",Lang.getInstance().translate( "Folder"));
 		UIManager.put("FileChooser.saveInLabelText", Lang.getInstance().translate("Folder"));
 		UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
+		UIManager.put("FileChooser.folderNameLabelText", Lang.getInstance().translate("Folder Name"));
 		UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
 
 		UIManager.put("FileChooser.upFolderToolTipText", Lang.getInstance().translate("UP Folder"));

@@ -36,6 +36,7 @@ import gui.items.persons.Persons_Search_SplitPanel;
 import gui.items.statement.Issue_Document_Panel;
 import gui.items.statement.Statements_My_SplitPanel;
 import gui.items.statement.Statements_Search_SplitPanel;
+import gui.library.MSplitPane;
 import lang.Lang;
 
 
@@ -58,7 +59,7 @@ public class Main_Panel extends javax.swing.JPanel {
 	 */
 	public Main_Panel() {
 		initComponents();
-
+		jSplitPane1.M_setDividerSize(20);
 	}
 
 	/**
@@ -71,7 +72,7 @@ public class Main_Panel extends javax.swing.JPanel {
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
-		jSplitPane1 = new javax.swing.JSplitPane();
+		jSplitPane1 = new MSplitPane();
 		jTabbedPane1 = new M_TabbedPanel(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		mlp = new MainLeftPanel();
 		jTabbedPane1.addMouseListener(new MouseListener(){
@@ -242,7 +243,7 @@ public class Main_Panel extends javax.swing.JPanel {
 
 	// Variables declaration - do not modify
 	
-	private javax.swing.JSplitPane jSplitPane1;
+	private MSplitPane jSplitPane1;
 	private M_TabbedPanel jTabbedPane1;
 	// End of variables declaration
 	
