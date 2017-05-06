@@ -8,6 +8,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Enumeration;
@@ -116,7 +118,34 @@ public class Main_Panel extends javax.swing.JPanel {
 			
 		});
 		
-		
+		mlp.tree.tree.addKeyListener(new KeyListener(){
+
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				if(arg0.getKeyCode() == KeyEvent.VK_ENTER){
+					// find path from name node		
+					
+					dylay(mlp.tree.tree.getLastSelectedPathComponent().toString());					
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			
+			
+			
+		});
 		
 		setLayout(new java.awt.GridBagLayout());
 
@@ -201,13 +230,14 @@ public class Main_Panel extends javax.swing.JPanel {
 		 */
 
 		jSplitPane1.setLeftComponent(mlp);
-		jSplitPane1.setDividerLocation(100);
+		
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		add(jSplitPane1, gridBagConstraints);
+		jSplitPane1.setDividerLocation(250);
 	}// </editor-fold>
 
 	// Variables declaration - do not modify
