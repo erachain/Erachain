@@ -8,9 +8,11 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import controller.Controller;
+import core.BlockChain;
 import gui.create.NoWalletFrame;
 import gui.create.SettingLangFrame;
 import gui.library.MTable;
+import gui2.Main_JFrame;
 import lang.Lang;
 import settings.Settings;
 import utils.SysTray;
@@ -23,6 +25,9 @@ public class Gui extends JFrame{
 
 	private static Gui maingui;
 	private MainFrame mainframe;
+
+
+	private Main_JFrame mm;
 	public static Gui getInstance() throws Exception
 	{
 		if(maingui == null)
@@ -63,7 +68,12 @@ public class Gui extends JFrame{
         	new NoWalletFrame(this);
         } else if (Settings.getInstance().isGuiEnabled())
     	{
-    		mainframe =	MainFrame.getInstance();
+    		
+        	if (BlockChain.DEVELOP_USE) {
+        		mm = Main_JFrame.getInstance();
+        		mm.setVisible(true);
+        	}
+        	mainframe =	MainFrame.getInstance();
     		mainframe.setVisible(true);
     	}
         

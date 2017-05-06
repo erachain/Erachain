@@ -140,10 +140,10 @@ public class Statement_Info extends javax.swing.JPanel {
 							 
 				 jTextArea_Body.setText(
 						  data.get("Title") + "\n\n"
-							+ "desc: " +description + "\n\n"
+							+ description + "\n\n"
 							+    data.get("Message") + "\n\n"
 							+ hasHes + "\n\n"
-							+ files +"\n"
+					//		+ files +"\n"
 							
 										 
 						 );
