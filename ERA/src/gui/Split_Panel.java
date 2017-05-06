@@ -7,6 +7,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -187,7 +188,8 @@ public class Split_Panel extends javax.swing.JPanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(1, 8, 8, 8);
         leftPanel.add(jScrollPanel_LeftPanel, gridBagConstraints);
-
+        jScrollPanel_LeftPanel.setMinimumSize(new Dimension(0,0));
+        leftPanel.setMinimumSize(new Dimension(0,0));
         jSplitPanel.setLeftComponent(leftPanel);
 
         rightPanel1.setMinimumSize(new java.awt.Dimension(150, 0));
@@ -290,8 +292,8 @@ public class Split_Panel extends javax.swing.JPanel {
         
         
         
-        
-
+        jScrollPane_jPanel_RightPanel.setMinimumSize(new Dimension(0,0));
+        rightPanel1.setMinimumSize(new Dimension(0,0));
         jSplitPanel.setRightComponent(rightPanel1);
         
         
@@ -306,6 +308,9 @@ public class Split_Panel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSplitPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
         );
+        
+        jSplitPanel.setDividerLocation(0.3);
+      
     }// </editor-fold>                        
 
     private void button1_ToolBar_LeftPanelActionPerformed(java.awt.event.ActionEvent evt) {                                                          

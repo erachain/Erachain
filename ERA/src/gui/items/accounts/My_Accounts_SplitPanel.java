@@ -42,61 +42,14 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 		this.leftPanel.add( accountPanel, PanelGBC);
 		//this.rightPanel1.add(rightPanel,PanelGBC);
 		jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
+		 this.jSplitPanel.setDividerLocation(0.3);
 		
 		// EVENTS on CURSOR
 		accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
 		
-		 this.jSplitPanel.addMouseListener(new MouseListener(){
-
-				@Override
-				public void mouseClicked(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void mouseEntered(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void mouseExited(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					
-				}
-
-				@Override
-				public void mousePressed(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					if (arg0.getClickCount()==2){
-						
-						if(spt==1){
-							jSplitPanel.setDividerLocation(0);
-							spt=0;
-							return;
-						}
-						if(spt==0){
-							jSplitPanel.setDividerLocation(250);
-							spt=1;
-							
-						}
-						
-					}
-				}
-
-				@Override
-				public void mouseReleased(MouseEvent arg0) {
-					// TODO Auto-generated method stub
-					
-				}
-		    	 
-		    	 
-		    	 
-		    	 
-		     });	
 		
 		
+		this.repaint();
 	
 	}
 	

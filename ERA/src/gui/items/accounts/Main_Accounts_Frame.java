@@ -78,8 +78,8 @@ public class Main_Accounts_Frame extends Main_Internal_Frame {
     this.setVisible(true);
     Dimension size = MainFrame.getInstance().desktopPane.getSize();
     this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-    my_Accounts_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-    search_Accounts.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+  //  my_Accounts_SplitPanel.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+  //  search_Accounts.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	
 	
 	}

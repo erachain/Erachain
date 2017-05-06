@@ -2,6 +2,7 @@ package gui2;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -73,6 +74,7 @@ public class Main_Panel extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		jSplitPane1 = new MSplitPane();
+		jSplitPane1.set_CloseOnOneTouch(jSplitPane1.ONE_TOUCH_CLOSE_LEFT_TOP); // set one touch close LEFT
 		jTabbedPane1 = new M_TabbedPanel(JTabbedPane.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
 		mlp = new MainLeftPanel();
 		jTabbedPane1.addMouseListener(new MouseListener(){
@@ -229,7 +231,7 @@ public class Main_Panel extends javax.swing.JPanel {
 		 * 
 		 * });
 		 */
-
+		mlp.setMinimumSize(new Dimension(0,0));
 		jSplitPane1.setLeftComponent(mlp);
 		
 

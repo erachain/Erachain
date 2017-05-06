@@ -196,8 +196,9 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jPanel5.setLayout(new java.awt.GridBagLayout());
+        jPanel5.setMinimumSize(new Dimension(0,0));
         jSplitPane4.setLeftComponent(jPanel5);
-
+        jSplitPane4.setMinimumSize(new Dimension(0,0));
         jSplitPane3.setTopComponent(jSplitPane4);
 
         jSplitPane5.setBorder(null);
@@ -250,7 +251,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         jPanel8.add(jScrollPane_All_Block_Table, gridBagConstraints);
 
         jSplitPane5.setRightComponent(jPanel8);
-
+        jSplitPane5.setMinimumSize(new Dimension(0,0));
         jSplitPane3.setRightComponent(jSplitPane5);
 
         jPanel6.setLayout(new java.awt.GridBagLayout());
@@ -294,7 +295,7 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         jPanel6.add(record_Panel, gridBagConstraints);
 
         jSplitPane3.setTopComponent(jPanel6);
-
+        jSplitPane3.setMinimumSize(new Dimension(0,0));
         jSplitPane2.setRightComponent(jSplitPane3);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
