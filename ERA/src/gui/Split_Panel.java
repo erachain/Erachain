@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
@@ -62,7 +63,7 @@ public class Split_Panel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jSplitPanel = new javax.swing.JSplitPane();
+        jSplitPanel = new javax.swing.JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
         leftPanel = new javax.swing.JPanel();
         toolBar_LeftPanel = new javax.swing.JToolBar();
         button1_ToolBar_LeftPanel = new javax.swing.JButton();
@@ -286,7 +287,9 @@ public class Split_Panel extends javax.swing.JPanel {
         
 
         jSplitPanel.setRightComponent(rightPanel1);
-
+        
+        
+        
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
