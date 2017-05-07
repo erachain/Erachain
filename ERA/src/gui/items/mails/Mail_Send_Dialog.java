@@ -36,7 +36,6 @@ import gui.Send_Panel;
 //import gui.items.persons.MyPersonsPanel;
 //import gui.items.persons.PersonFrame;
 import javax.swing.JTextField;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.BoxLayout;
 

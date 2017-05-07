@@ -30,7 +30,6 @@ import java.awt.GridBagLayout;
 import javax.swing.JScrollPane;
 
 import javax.swing.JTextField;
-import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.BoxLayout;
 

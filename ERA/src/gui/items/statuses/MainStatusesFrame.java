@@ -356,12 +356,7 @@ public class MainStatusesFrame extends Main_Internal_Frame{
 			
 			 Status_Info info1 = new Status_Info();
 			 info1.setFocusable(false);
-			// JSplitPane PersJSpline = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,true,new JScrollPane(table),new JScrollPane(info1)); 
-			 
-		//	 my_Status_SplitPanel.jTable_jScrollPanel_LeftPanel = table;
-			
-			 
-			 
+		 
 			// обработка изменения положения курсора в таблице
 			table.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
 				@SuppressWarnings("deprecation")
