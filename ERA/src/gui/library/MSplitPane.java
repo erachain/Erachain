@@ -13,6 +13,7 @@ private int wight_Div=10;
 private JButton button;
 private JButton button1;
 private int set_CloseOnOneTouch; // perasmert close one touch panel
+private JButton button_work;
 public static final int ONE_TOUCH_CLOSE_LEFT_TOP = 1; // left-top
 public static final int ONE_TOUCH_CLOSE_RIGHT_BOTTOM = 2; // right-bottom
 public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
@@ -20,7 +21,6 @@ public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
    public MSplitPane() {
 	   super(); //JSplitPane.VERTICAL_SPLIT, true);
 	   splitPane = this;
-	   set_CloseOnOneTouch= ONE_TOUCH_CLOSE_LEFT_RIGHT;
 	   init();
    }
    public MSplitPane(int pos, boolean bol){
@@ -28,17 +28,35 @@ public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
 	   splitPane = this;
 	   init();
 	}
+// TODO    params: ONE_TOUCH_CLOSE_LEFT_TOP, ONE_TOUCH_CLOSE_RIGHT_BOTTOM, ONE_TOUCH_CLOSE_LEFT_RIGHT
    public void set_CloseOnOneTouch(int cl){
-	// TODO    params: ONE_TOUCH_CLOSE_LEFT_TOP, ONE_TOUCH_CLOSE_RIGHT_BOTTOM, ONE_TOUCH_CLOSE_LEFT_RIGHT
+	
 	   set_CloseOnOneTouch = cl;   
-	   
+	  
    }
    
    private void init(){
-     //splitPane.setDividerSize(20);
-     // splitPane.setOneTouchExpandable(true);
-   button1 = new JButton("<");
-      button = new JButton(">");
+	   button1 = new JButton();
+	    button = new JButton();
+	   // set sive devider
+	  Font ff= (Font) UIManager.get("Label.font");
+	  wight_Div = ff.getSize()+4;
+	   // set minimum size panels
+	   Dimension minimumSize = new Dimension(0, 0);
+	//   leftComponent.setMinimumSize(minimumSize);
+	//   rightComponent.setMinimumSize(minimumSize);
+	   splitPane.setResizeWeight(0.5);
+	   // set left-right
+	   set_CloseOnOneTouch= ONE_TOUCH_CLOSE_LEFT_RIGHT;  
+	   
+	   button_work = new JButton("!");
+	  
+	   
+// set icon fron div location
+	   set_button_title();
+	  button_work.setMargin(new Insets(0, 0, 0, 0));
+button1.setMargin(new Insets(0, 0, 0, 0));
+button.setMargin(new Insets(0, 0, 0, 0));
   // set divider position
       button.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent ae) {
@@ -77,43 +95,28 @@ public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
          }
       });
      
-      
+      button_work.addActionListener(new ActionListener() {
+	         public void actionPerformed(ActionEvent ae) {
+	       // 	System.out.print("lastposition = " + splitPane.getLastDividerLocation() + "\n");
+	        	if(getOrientation() == VERTICAL_SPLIT){
+	           	setOrientation(HORIZONTAL_SPLIT);
+	           	
+	        	} else if(getOrientation() == HORIZONTAL_SPLIT ){
+		           	setOrientation(VERTICAL_SPLIT);
+		           
+	        	}
+	        	// set title Deveder Buttons
+	        	set_button_title();
+	        	// repaint Devider Panel
+	      	   	setUI(new ButtonDividerUI(button, button1, wight_Div, button_work));
+	         }
+	      });
      
   
-     setUI(new ButtonDividerUI(button, button1, wight_Div));
+     setUI(new ButtonDividerUI(button, button1, wight_Div, button_work));
       
-     splitPane.addComponentListener(new ComponentListener(){
-
-		@Override
-		public void componentHidden(ComponentEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void componentMoved(ComponentEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void componentResized(ComponentEvent arg0) {
-			// TODO Auto-generated method stub
-		int a = 1;
-		a=a;
-		}
-
-		@Override
-		public void componentShown(ComponentEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-    	  
-    	  
-    	  
-    	  
-      });
- // view bottons divider    
+    
+ // view buttons divider    
      splitPane.addPropertyChangeListener(new PropertyChangeListener(){
 
 		@Override
@@ -178,7 +181,21 @@ public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
  public void  M_setDividerSize(int div){
 	 wight_Div = div;
 	// splitPane.setDividerSize(div);
-	 setUI(new ButtonDividerUI(button, button1, wight_Div));
+	 setUI(new ButtonDividerUI(button, button1, wight_Div,button_work));
+	 
+ }
+ private void set_button_title(){
+	 if (getOrientation()== VERTICAL_SPLIT){
+			//char aa = (char)176;
+			button1.setText((char)0x02C4+"");
+		    button.setText((char)0x02C5+"");
+		    button_work.setText((char)0x02C2+"");
+		}
+		else{  button1.setText((char)0x02C2+"");
+		      button.setText((char)0x02C3+"");
+		      button_work.setText((char)0x02C4+"");
+		      
+		}
 	 
  }
 
@@ -192,11 +209,13 @@ private BasicSplitPaneDivider divider1;
 protected GridBagConstraints gridBagConstraints;
 protected GridBagConstraints gridBagConstraints1;
 private int wight_Div;
+private JButton button_work;
   
-   public ButtonDividerUI(JButton button,JButton button1, int wight_Div ) {
+   public ButtonDividerUI(JButton button,JButton button1, int wight_Div, JButton button_work ) {
       this.button = button;
       this.button1 = button1;
       this.wight_Div = wight_Div;
+      this.button_work = button_work;
    }
   
    public BasicSplitPaneDivider createDefaultDivider() {
@@ -211,18 +230,19 @@ private int wight_Div;
               	divider1.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
               	 button1.setPreferredSize(new Dimension(wight_Div, wight_Div*2));
                  button.setPreferredSize(new Dimension(wight_Div, wight_Div*2));
+                 button_work.setPreferredSize(new Dimension(wight_Div, wight_Div*2));
               	return button.getPreferredSize().width;
             }
             divider1.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
-            //button1.setPreferredSize(new Dimension(wight_Div, wight_Div));
-            //button.setPreferredSize(new Dimension(wight_Div, wight_Div));
+            button1.setPreferredSize(new Dimension(wight_Div*2, wight_Div));
+            button.setPreferredSize(new Dimension(wight_Div*2, wight_Div));
+            button_work.setPreferredSize(new Dimension(wight_Div*2, wight_Div));
           return button.getPreferredSize().height;
          }
       };
   
-      divider1.setLayout(new java.awt.GridBagLayout());
-     
-    
+      
+      divider1.add(button_work);
       divider1.add(button1);
       divider1.add(button);
       return divider1;
