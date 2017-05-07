@@ -28,20 +28,7 @@ import javax.swing.JOptionPane;
 
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import javax.swing.JPanel;
-import java.awt.GridBagLayout;
 import java.awt.Image;
-
-import javax.swing.JScrollPane;
-
-import gui.Send_Panel;
-//import gui.items.persons.IssuePersonFrame;
-//import gui.items.persons.MyPersonsPanel;
-//import gui.items.persons.PersonFrame;
-import javax.swing.JTextField;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.BoxLayout;
 
 public class Account_Lend_Dialog extends JDialog{
 
