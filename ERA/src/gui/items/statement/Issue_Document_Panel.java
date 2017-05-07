@@ -36,7 +36,6 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JSplitPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.event.TableModelEvent;
@@ -67,6 +66,7 @@ import gui.items.imprints.Table_Model_Issue_Hashes;
 import gui.items.notes.ComboBoxModelItemsNotes;
 import gui.library.MButton;
 import gui.library.MImprintEDIT_Pane;
+import gui.library.MSplitPane;
 import gui.library.MTable;
 import gui.library.M_Fill_Template_Panel;
 import gui.library.My_JFileChooser;
@@ -108,7 +108,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	private DefaultTableModel attached_Files_Model;
 	private DefaultTableModel params_Template_Model;
 	protected NoteCls sel_note;
-	public JSplitPane sp_pan;
+	public MSplitPane sp_pan;
 	 M_Fill_Template_Panel fill_Template_Panel;
 
 	/**
@@ -458,7 +458,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jPanel_Message_Public.setLayout(new java.awt.GridBagLayout());
 
         jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
-        sp_pan = new JSplitPane();
+        sp_pan = new MSplitPane();
         sp_pan.setLeftComponent(jScrollPane_Message_Public_TextPane);
         
         jScrollPane_Params_Template_Public_TextPane.setViewportView(jTable_Params_Message_Public);

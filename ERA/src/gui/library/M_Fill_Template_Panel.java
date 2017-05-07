@@ -133,7 +133,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		jComboBox_Template = new JComboBox<NoteCls>(new ComboBoxModelItemsNotes());
 		jCheckBox_Is_Text = new javax.swing.JCheckBox();
 		jCheckBox_Is_Encripted = new javax.swing.JCheckBox();
-		sp_pan = new javax.swing.JSplitPane();
+		sp_pan = new MSplitPane();
 		jScrollPane_Message_Public_TextPane = new javax.swing.JScrollPane();
 		jScrollPane_Params_Template_Public_TextPane = new javax.swing.JScrollPane();
 		
@@ -228,7 +228,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	private javax.swing.JScrollPane jScrollPane_Message_Public_TextPane;
 	private javax.swing.JScrollPane jScrollPane_Params_Template_Public_TextPane;
 	private MTable jTable_Params_Message_Public;
-	public javax.swing.JSplitPane sp_pan;
+	public MSplitPane sp_pan;
 	private MImprintEDIT_Pane jTextPane_Message_Public;
 	// End of variables declaration
 

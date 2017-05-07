@@ -30,6 +30,7 @@ import core.item.notes.NoteCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.library.MSplitPane;
 import gui.library.MTextPane;
 import gui.library.M_Attached_Files_Panel;
 import gui.library.Voush_Library_Panel;
@@ -218,7 +219,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		jLabel_Title = new javax.swing.JLabel();
-		jSplitPane1 = new javax.swing.JSplitPane();
+		jSplitPane1 = new MSplitPane();
 		jPanel1 = new javax.swing.JPanel();
 		jScrollPane3 = new javax.swing.JScrollPane();
 		jTextArea_Body = new JTextArea();
@@ -244,7 +245,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 
 		jSplitPane1.setBorder(null);
-		jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+		jSplitPane1.setOrientation(MSplitPane.VERTICAL_SPLIT);
 
 		jPanel1.setLayout(new java.awt.GridBagLayout());
 		int y = 0;
@@ -342,7 +343,7 @@ public class Statement_Info extends javax.swing.JPanel {
 	private javax.swing.JPanel jPanel2;
 	private javax.swing.JScrollPane jScrollPane3;
 
-	private javax.swing.JSplitPane jSplitPane1;
+	private MSplitPane jSplitPane1;
 
 	private JTextArea jTextArea_Body;
 	// End of variables declaration
