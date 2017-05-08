@@ -1,6 +1,7 @@
 package gui.items.statement;
 
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -459,11 +460,13 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
         jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
         sp_pan = new MSplitPane();
+        sp_pan.set_CloseOnOneTouch(MSplitPane.ONE_TOUCH_CLOSE_RIGHT_BOTTOM);
         sp_pan.setLeftComponent(jScrollPane_Message_Public_TextPane);
-        
         jScrollPane_Params_Template_Public_TextPane.setViewportView(jTable_Params_Message_Public);
+        jScrollPane_Params_Template_Public_TextPane.setMinimumSize(new Dimension(0,0));
+        jTable_Params_Message_Public.setMinimumSize(new Dimension(0,0));
         sp_pan.setRightComponent(jScrollPane_Params_Template_Public_TextPane);
-        
+        sp_pan.setDividerLocation(400);
         
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -778,6 +781,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         add(jPanel_Work, gridBagConstraints);
         jPanel_Work.getAccessibleContext().setAccessibleName("Work");
         jPanel_Work.getAccessibleContext().setAccessibleDescription("");
+        
     }// </editor-fold>
     
 	@SuppressWarnings("null")

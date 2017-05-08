@@ -12,7 +12,7 @@ public class MSplitPane extends JSplitPane
 private int wight_Div=10;
 private JButton button;
 private JButton button1;
-private int set_CloseOnOneTouch; // perasmert close one touch panel
+public int set_CloseOnOneTouch; // perasmert close one touch panel
 private JButton button_work;
 public static final int ONE_TOUCH_CLOSE_LEFT_TOP = 1; // left-top
 public static final int ONE_TOUCH_CLOSE_RIGHT_BOTTOM = 2; // right-bottom
@@ -38,6 +38,8 @@ public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
    private void init(){
 	   button1 = new JButton();
 	    button = new JButton();
+	    button1.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	    button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	   // set sive devider
 	  Font ff= (Font) UIManager.get("Label.font");
 	  wight_Div = ff.getSize()+4;
@@ -50,6 +52,7 @@ public static final int ONE_TOUCH_CLOSE_LEFT_RIGHT = 0; // left-right
 	   set_CloseOnOneTouch= ONE_TOUCH_CLOSE_LEFT_RIGHT;  
 	   
 	   button_work = new JButton("!");
+	   button_work.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	  
 	   
 // set icon fron div location
@@ -127,8 +130,8 @@ button.setMargin(new Insets(0, 0, 0, 0));
 				
 				case (ONE_TOUCH_CLOSE_LEFT_RIGHT):
 					if(((int) arg0.getNewValue())==splitPane.getMinimumDividerLocation()) {
+					button.setVisible(true);
 					button1.setVisible(false);
-	        		button.setVisible(true);
 	        		return;
 				}
 				if(((int) arg0.getNewValue())==splitPane.getMaximumDividerLocation()) {
@@ -142,8 +145,8 @@ button.setMargin(new Insets(0, 0, 0, 0));
 					
 				case (ONE_TOUCH_CLOSE_LEFT_TOP):
 					if(((int) arg0.getNewValue())==splitPane.getMinimumDividerLocation()) {
+						button.setVisible(true);
 						button1.setVisible(false);
-		        		button.setVisible(true);
 		        		return;
 					}
 				button.setVisible(false);

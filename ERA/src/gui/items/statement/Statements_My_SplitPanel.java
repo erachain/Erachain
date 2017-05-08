@@ -97,7 +97,7 @@ import gui.library.MTable;
 			this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+			// jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 	}
 	// set favorine My
 		void favorite_my(JTable table){

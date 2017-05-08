@@ -41,12 +41,28 @@ public tt() {
    DefaultMutableTreeNode person_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Persons")); // ����� ������
    DefaultMutableTreeNode document_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Documents")); // ����� ������
    DefaultMutableTreeNode mails_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Mails"));
+   DefaultMutableTreeNode assets_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Assets"));
+   DefaultMutableTreeNode templates_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Templates"));
+   DefaultMutableTreeNode statuses_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Statuses"));
+   DefaultMutableTreeNode unions_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unions"));
+   DefaultMutableTreeNode votings_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Votings"));
+   DefaultMutableTreeNode records_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Records"));
+   DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
+   
+   
 
    // ���������� �� �������� �����
    root.add(account_Node);
    root.add(person_Node);
    root.add(document_Node);
    root.add(mails_Node);
+   root.add(assets_Node);
+   root.add(templates_Node);
+   root.add(statuses_Node);
+   root.add(unions_Node);
+   root.add(votings_Node);
+   root.add(records_Node);
+   root.add(other_Node);
 
    // ��������� �������� �������� (������) ������ �����
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Persons")));
@@ -65,6 +81,38 @@ public tt() {
    mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Incoming Mails")));
    mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Outcoming Mails")));
    mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Mail")));
+   
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Assets")));
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Assets")));
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Asset")));
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Orders")));
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Balance")));
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Check Exchange")));
+   
+  
+ //  templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Templates")));
+   templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Templates")));
+   templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Template")));
+   
+   
+   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Statuses")));
+   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Statuses")));
+   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Status")));
+   
+   unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unions")));
+   unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unions")));
+   unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Union")));
+   
+   votings_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Votings")));
+   votings_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Votings")));
+   votings_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Voting")));
+   
+   records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Records")));
+   records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Records")));
+   records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));
+   
+   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
+   
    
 
    // ������� ������� ���������� � ��������� ������� ������

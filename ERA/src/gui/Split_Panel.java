@@ -292,7 +292,9 @@ public class Split_Panel extends javax.swing.JPanel {
         
         
         jScrollPane_jPanel_RightPanel.setMinimumSize(new Dimension(0,0));
+        jScrollPane_jPanel_RightPanel.setPreferredSize(new Dimension(350,350));
         rightPanel1.setMinimumSize(new Dimension(0,0));
+        rightPanel1.setPreferredSize(new Dimension(350,350));
         jSplitPanel.setRightComponent(rightPanel1);
         
         

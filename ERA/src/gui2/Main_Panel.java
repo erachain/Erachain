@@ -28,15 +28,35 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import gui.items.accounts.My_Accounts_SplitPanel;
+import gui.items.assets.IssueAssetPanel;
+import gui.items.assets.My_Assets_Tab;
+import gui.items.assets.My_Balance_Tab;
+import gui.items.assets.My_Order_Tab;
+import gui.items.assets.Search_Assets_Tab;
 import gui.items.mails.Incoming_Mails_SplitPanel;
 import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
+import gui.items.notes.IssueNotePanel;
+import gui.items.notes.Search_Notes_Tab;
+import gui.items.other.other_Panel;
 import gui.items.persons.IssuePersonPanel;
 import gui.items.persons.Persons_My_SplitPanel;
 import gui.items.persons.Persons_Search_SplitPanel;
+import gui.items.records.Records_My_SplitPanel;
+import gui.items.records.Records_Search_SplitPanel;
+import gui.items.records.Records_UnConfirmed_Panel;
 import gui.items.statement.Issue_Document_Panel;
 import gui.items.statement.Statements_My_SplitPanel;
 import gui.items.statement.Statements_Search_SplitPanel;
+import gui.items.statuses.IssueStatusPanel;
+import gui.items.statuses.My_Statuses_Tab;
+import gui.items.statuses.Search_Statuses_Tab;
+import gui.items.unions.IssueUnionPanel;
+import gui.items.unions.My_Unions_Tab;
+import gui.items.unions.Search_Union_Tab;
+import gui.items.voting.Create_Voting_Panel;
+import gui.items.voting.Votings_My_SplitPanel;
+import gui.items.voting.Votings_Search_SplitPanel;
 import gui.library.MSplitPane;
 import lang.Lang;
 
@@ -298,6 +318,92 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Send Mail"), new Mail_Send_Panel(null,null,null,null));
 			return;
 		}
+		if ( str.equals( Lang.getInstance().translate("My Assets"))){
+			ccase1( Lang.getInstance().translate("My Assets"), new My_Assets_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Search Assets"))){
+			ccase1( Lang.getInstance().translate("Search Assets"), new Search_Assets_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("My Balance"))){
+			ccase1( Lang.getInstance().translate("My Balance"), new My_Balance_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("My Orders"))){
+			ccase1( Lang.getInstance().translate("My Orders"), new My_Order_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Issue Asset"))){
+			ccase1( Lang.getInstance().translate("Issue Asset"), new IssueAssetPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Check Exchange"))){
+	//		ccase1( Lang.getInstance().translate("Exchange"), new ExchangePanel(null,null,null,null));
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Search Templates"))){
+			ccase1( Lang.getInstance().translate("Search Templates"), new Search_Notes_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Issue Template"))){
+			ccase1( Lang.getInstance().translate("Issue Template"), new IssueNotePanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Issue Status"))){
+			ccase1( Lang.getInstance().translate("Issue Status"), new IssueStatusPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("My Statuses"))){
+			ccase1( Lang.getInstance().translate("My Statuses"), new My_Statuses_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Search Statuses"))){
+			ccase1( Lang.getInstance().translate("Search Statuses"), new Search_Statuses_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("My Unions"))){
+			ccase1( Lang.getInstance().translate("My Unions"), new My_Unions_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Search Unions"))){
+			ccase1( Lang.getInstance().translate("Search Unions"), new Search_Union_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Issue Union"))){
+			ccase1( Lang.getInstance().translate("Issue Union"), new IssueUnionPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("My Votings"))){
+			ccase1( Lang.getInstance().translate("My Votings"), new Votings_My_SplitPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Search Votings"))){
+			ccase1( Lang.getInstance().translate("Search Votings"), new Votings_Search_SplitPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Issue Voting"))){
+			ccase1( Lang.getInstance().translate("Issue Voting"),  new Create_Voting_Panel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("My Records"))){
+			ccase1( Lang.getInstance().translate("My Records"), new Records_My_SplitPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Search Records"))){
+			ccase1( Lang.getInstance().translate("Search Records"), new Records_Search_SplitPanel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Unconfirmed Records"))){
+			ccase1( Lang.getInstance().translate("Unconfirmed Records"), new Records_UnConfirmed_Panel());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Other"))){
+			ccase1( Lang.getInstance().translate("Other"), new other_Panel());
+			return;
+		}
+		
+		
 			
 		
 	}

@@ -3,9 +3,18 @@ package gui2;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+
+import controller.Controller;
 import gui.MainFrame;
+import gui.library.Menu_Deals;
+import gui.library.Menu_Files;
 import gui.status.StatusPanel;
+import lang.Lang;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -54,10 +63,11 @@ public class Main_JFrame extends javax.swing.JFrame {
         jPanel1 = new Main_Panel();
         jPanel2 =  new StatusPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        jMenu2 = new javax.swing.JMenu();
-        
-        
+        jMenu1 = new Menu_Files();
+        jMenu2 = new Menu_Deals();
+    
+      
+	
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     //    getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -97,10 +107,10 @@ public class Main_JFrame extends javax.swing.JFrame {
    //     getContentPane().add(jPanel2, gridBagConstraints);
         this.add(new StatusPanel(), BorderLayout.SOUTH);
 
-        jMenu1.setText("File");
+        jMenu1.setText(Lang.getInstance().translate("File"));
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Edit");
+        jMenu2.setText(Lang.getInstance().translate("Deals"));
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -122,8 +132,8 @@ public class Main_JFrame extends javax.swing.JFrame {
 
    
     // Variables declaration - do not modify                     
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
+    private Menu_Files jMenu1;
+    private Menu_Deals jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private Main_Panel jPanel1;
     private StatusPanel jPanel2;
