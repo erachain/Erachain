@@ -41,6 +41,7 @@ public class Split_Panel extends javax.swing.JPanel {
      */
 	
     public Split_Panel() {
+    	super();
     	spt = 0;
         initComponents();
 

@@ -1,6 +1,7 @@
 package gui2;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -8,23 +9,32 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+
+import org.json.simple.JSONObject;
 
 import controller.Controller;
 import gui.ClosingDialog;
 import gui.MainFrame;
+import gui.Split_Panel;
 import gui.library.Menu_Deals;
 import gui.library.Menu_Files;
 import gui.status.StatusPanel;
 import lang.Lang;
 import settings.Settings;
 import utils.ObserverMessage;
+import utils.SaveStrToFile;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -37,7 +47,7 @@ import utils.ObserverMessage;
  * @author ����
  */
 public class Main_JFrame extends javax.swing.JFrame implements Observer{
-
+	private JSONObject settingsJSONbuf;
     
 	private static Main_JFrame instance;
 	public static Main_JFrame getInstance()
@@ -49,6 +59,9 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 		
 		return instance;
 	}
+
+
+	
 
 
 	
@@ -66,8 +79,13 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 	 					 + " TS:" + Settings.getInstance().getGenesisStamp());
 	 		}
 	 		Controller.getInstance().addObserver(this);		
-	   
-        initComponents();
+	 	//read settings	
+	 		settingsJSONbuf = new JSONObject();
+	 		settingsJSONbuf = Settings.getInstance().Dump();
+	 	initComponents();
+        
+        
+		
     }
 
     /**
@@ -81,8 +99,8 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
         java.awt.GridBagConstraints gridBagConstraints;
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jPanel1 = new Main_Panel();
-        jPanel2 =  new StatusPanel();
+        mainPanel = new Main_Panel();
+        statusPanel =  new StatusPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new Menu_Files();
         jMenu2 = new Menu_Deals();
@@ -107,10 +125,10 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
         gridBagConstraints.weighty = 0.2;
   //      getContentPane().add(jPanel1, gridBagConstraints);
         
-        add(jPanel1, BorderLayout.CENTER);
+        add(mainPanel, BorderLayout.CENTER);
         
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(statusPanel);
+        statusPanel.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
@@ -145,7 +163,120 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
             }
         });
         
-        
+        addWindowListener(new WindowListener(){
+
+			@Override
+			public void windowActivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowClosed(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+			
+				
+			}
+
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				// read settings
+				double lDiv;
+				double div; 
+				Split_Panel sP;
+				HashMap outOpenTabbeds = new HashMap();
+				
+				settingsJSONbuf.put("Main_Frame_Height", getHeight()+""); // высота
+				settingsJSONbuf.put("Main_Frame_Width", getWidth()+""); // длина
+				settingsJSONbuf.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation()+"");
+				// horisontal - vertical orientation
+				if (mainPanel.jSplitPane1.getOrientation() == mainPanel.jSplitPane1.HORIZONTAL_SPLIT){
+				lDiv = (double)mainPanel.jSplitPane1.getLastDividerLocation()/(double)getWidth();
+				div =  (double)mainPanel.jSplitPane1.getDividerLocation()/(double)getWidth();
+				} else{
+				lDiv = (double)mainPanel.jSplitPane1.getLastDividerLocation()/(double)getHeight();
+				div =  (double)mainPanel.jSplitPane1.getDividerLocation()/(double)getHeight();
+				}
+				settingsJSONbuf.put("Main_Frame_Div_Last_Loc",lDiv +"" );
+				settingsJSONbuf.put("Main_Frame_Div_Loc", div + "");
+				Component[] Tabbed_Comps = mainPanel.jTabbedPane1.getComponents();
+				for (int i =0; i< Tabbed_Comps.length;i++){
+					// write in setting opet tabbs
+					settingsJSONbuf.put("OpenTabbeds", outOpenTabbeds)	;
+					// write open tabbed settings Split panel
+					if (mainPanel.jTabbedPane1.getComponent(i) instanceof Split_Panel){
+						HashMap outTabbedDiv = new HashMap();
+						outOpenTabbeds.put(i,mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName());
+						 sP = ((Split_Panel)mainPanel.jTabbedPane1.getComponent(i));
+						outTabbedDiv.put("Div_Orientation",sP.jSplitPanel.getOrientation());
+						
+						// write
+						if (sP.jSplitPanel.getOrientation() == sP.jSplitPanel.HORIZONTAL_SPLIT){
+							lDiv = (double)sP.jSplitPanel.getLastDividerLocation()/(double)getWidth();
+							div =  (double)sP.jSplitPanel.getDividerLocation()/(double)getWidth();
+							} else{
+							lDiv = (double)sP.jSplitPanel.getLastDividerLocation()/(double)getHeight();
+							div =  (double)sP.jSplitPanel.getDividerLocation()/(double)getHeight();
+							}
+						outTabbedDiv.put("Div_Last_Loc",lDiv +"" );
+						outTabbedDiv.put("Div_Loc", div + "");
+						
+						settingsJSONbuf.put(mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName(),outTabbedDiv);
+					}
+					
+					
+					
+				}
+				// save setting to setting file
+				try {
+					SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);			
+				} catch (IOException e) {
+					JOptionPane.showMessageDialog(
+							new JFrame(), "Error writing to the file: " + Settings.getInstance().getSettingsPath()
+									+ "\nProbably there is no access.",
+			                "Error!",
+			                JOptionPane.ERROR_MESSAGE);
+				}	
+				
+				new ClosingDialog();
+					
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowIconified(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void windowOpened(WindowEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				settingsJSONbuf.get("Main_Frame_Height"); // высота
+				settingsJSONbuf.get("Main_Frame_Width"); // длина
+				settingsJSONbuf.get("Main_Frame_Div_Orientation");
+				settingsJSONbuf.get("Main_Frame_Div_Last_Loc");
+				settingsJSONbuf.get("Main_Frame_Div_Loc");
+				
+			}
+        	
+        	
+        	
+        	
+        });
         
         
         pack();
@@ -168,8 +299,8 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
     private Menu_Files jMenu1;
     private Menu_Deals jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private Main_Panel jPanel1;
-    private StatusPanel jPanel2;
+    private Main_Panel mainPanel;
+    private StatusPanel statusPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration                   
 	

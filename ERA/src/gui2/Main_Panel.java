@@ -265,8 +265,8 @@ public class Main_Panel extends javax.swing.JPanel {
 
 	// Variables declaration - do not modify
 	
-	private MSplitPane jSplitPane1;
-	private M_TabbedPanel jTabbedPane1;
+	public MSplitPane jSplitPane1;
+	public M_TabbedPanel jTabbedPane1;
 	// End of variables declaration
 	
 	private void dylay(String str){
