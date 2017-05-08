@@ -2,19 +2,29 @@ package gui2;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
 import controller.Controller;
+import gui.ClosingDialog;
 import gui.MainFrame;
 import gui.library.Menu_Deals;
 import gui.library.Menu_Files;
 import gui.status.StatusPanel;
 import lang.Lang;
+import settings.Settings;
+import utils.ObserverMessage;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -26,7 +36,7 @@ import lang.Lang;
  *
  * @author ����
  */
-public class Main_JFrame extends javax.swing.JFrame {
+public class Main_JFrame extends javax.swing.JFrame implements Observer{
 
     
 	private static Main_JFrame instance;
@@ -46,6 +56,17 @@ public class Main_JFrame extends javax.swing.JFrame {
      * Creates new form ffff
      */
    private Main_JFrame() {
+	   
+	 //CREATE FRAME
+	 		super(controller.Controller.APP_NAME +  " v." + Controller.getVersion());
+	 		this.setVisible(false);
+	 		if(Settings.getInstance().isTestnet()) {
+	 			setTitle(controller.Controller.APP_NAME + " TestNet "
+	 					 +  "v." + Controller.getVersion()
+	 					 + " TS:" + Settings.getInstance().getGenesisStamp());
+	 		}
+	 		Controller.getInstance().addObserver(this);		
+	   
         initComponents();
     }
 
@@ -115,6 +136,18 @@ public class Main_JFrame extends javax.swing.JFrame {
 
         setJMenuBar(jMenuBar1);
 
+        //CLOSE NICELY
+        this.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
+            	new ClosingDialog();
+            }
+        });
+        
+        
+        
+        
         pack();
         Toolkit kit = Toolkit.getDefaultToolkit();
 
@@ -139,4 +172,45 @@ public class Main_JFrame extends javax.swing.JFrame {
     private StatusPanel jPanel2;
     private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration                   
+	
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		
+		ObserverMessage message = (ObserverMessage) arg1;
+		if(message.getType() == ObserverMessage.NETWORK_STATUS)
+		{
+			int status = (int) message.getValue();
+			
+			if(status == Controller.STATUS_NO_CONNECTIONS)
+			{
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_No.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
+				this.setIconImages(icons);
+				
+			}
+			if(status == Controller.STATUS_SYNCHRONIZING)
+			{
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_Se.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
+				this.setIconImages(icons);
+			}
+			if(status == Controller.STATUS_OK)
+			{
+				//ICON
+				List<Image> icons = new ArrayList<Image>();
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+				this.setIconImages(icons);
+			}
+		}	
+		
+	}
 }
