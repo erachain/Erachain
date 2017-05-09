@@ -269,7 +269,7 @@ public class Main_Panel extends javax.swing.JPanel {
 	public M_TabbedPanel jTabbedPane1;
 	// End of variables declaration
 	
-	private void dylay(String str){
+	public void dylay(String str){
 		
 		
 		if(str.equals( Lang.getInstance().translate("My Persons"))){
@@ -407,7 +407,7 @@ public class Main_Panel extends javax.swing.JPanel {
 			
 		
 	}
-	private void ccase1(String str, JPanel pp){
+	public void ccase1(String str, JPanel pp){
 		int s=-1;
 		s = jTabbedPane1.indexOfTab(str);
 		if (s == -1) {

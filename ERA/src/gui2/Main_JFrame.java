@@ -48,6 +48,8 @@ import utils.SaveStrToFile;
  */
 public class Main_JFrame extends javax.swing.JFrame implements Observer{
 	private JSONObject settingsJSONbuf;
+
+	private JSONObject main_Frame_settingsJSON;
     
 	private static Main_JFrame instance;
 	public static Main_JFrame getInstance()
@@ -202,7 +204,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 				Component[] Tabbed_Comps = mainPanel.jTabbedPane1.getComponents();
 				for (int i =0; i< Tabbed_Comps.length;i++){
 					// write in setting opet tabbs
-					outOpenTabbeds.put(i,mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName());
+					outOpenTabbeds.put(mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName(),i);
 					
 					// write open tabbed settings Split panel
 					if (mainPanel.jTabbedPane1.getComponent(i) instanceof Split_Panel){
@@ -221,6 +223,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 						
 						settingsJSON.put(mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName(),outTabbedDiv);
 					}
+					settingsJSON.remove("OpenTabbeds");
 					settingsJSON.put("OpenTabbeds", outOpenTabbeds)	;
 					settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);	
 					
@@ -277,22 +280,22 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 		int devLoc;
 		
 		if(settingsJSONbuf.containsKey("Main_Frame_Setting")){
-			JSONObject settingsJSON = new JSONObject();
-			settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+			main_Frame_settingsJSON = new JSONObject();
+			main_Frame_settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
 		
-		int x =new Integer((String)	settingsJSON.get("Main_Frame_Loc_X")); // x
-		int y =new Integer((String)	settingsJSON.get("Main_Frame_Loc_Y")); // y
+		int x =new Integer((String)	main_Frame_settingsJSON.get("Main_Frame_Loc_X")); // x
+		int y =new Integer((String)	main_Frame_settingsJSON.get("Main_Frame_Loc_Y")); // y
 		setLocation(x, y);
-		int h =new Integer((String)	settingsJSON.get("Main_Frame_Height")); // высота
-		int w =new Integer((String)	settingsJSON.get("Main_Frame_Width")); // длина
+		int h =new Integer((String)	main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
+		int w =new Integer((String)	main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
 			setSize(w, h);
-			mainPanel.jSplitPane1.setOrientation(new Integer((String)settingsJSON.get("Main_Frame_Div_Orientation")));
+			mainPanel.jSplitPane1.setOrientation(new Integer((String)main_Frame_settingsJSON.get("Main_Frame_Div_Orientation")));
 		
 		
 		
 			
-			devLoc = new Integer((String)settingsJSON.get("Main_Frame_Div_Loc"));
-			devLastLoc = new Integer((String)settingsJSON.get("Main_Frame_Div_Last_Loc"));
+			devLoc = new Integer((String)main_Frame_settingsJSON.get("Main_Frame_Div_Loc"));
+			devLastLoc = new Integer((String)main_Frame_settingsJSON.get("Main_Frame_Div_Last_Loc"));
 		 
 			
 	    	mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
@@ -306,9 +309,45 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 			
 		}
     	
+     // load tabs
+		if (main_Frame_settingsJSON.containsKey("OpenTabbeds")){
+			
+		JSONObject openTabes = (JSONObject) main_Frame_settingsJSON.get("OpenTabbeds");
+			if (openTabes.containsKey("My_Accounts_SplitPanel")){
+				mainPanel.dylay("My Accounts");	
+			}
+			
+		}
         
-        
-        
+		/*		
+			      "3":"My_Accounts_SplitPanel",
+			      "4":"Persons_My_SplitPanel",
+			      "5":"Persons_Search_SplitPanel",
+			      "6":"IssuePersonPanel",
+			      "7":"Statements_My_SplitPanel",
+			      "8":"Statements_Search_SplitPanel",
+			      "9":"Issue_Document_Panel",
+			      "10":"Incoming_Mails_SplitPanel",
+			      "11":"Outcoming_Mails_SplitPanel",
+			      "12":"Mail_Send_Panel",
+			      "13":"My_Assets_Tab",
+			      "14":"Search_Assets_Tab",
+			      "15":"IssueAssetPanel",
+			      "16":"My_Order_Tab",
+			      "17":"My_Balance_Tab",
+			      "18":"Search_Notes_Tab",
+			      "19":"My_Statuses_Tab",
+			      "20":"My_Unions_Tab",
+			      "21":"Search_Union_Tab",
+			      "22":"IssueUnionPanel",
+			      "23":"Votings_My_SplitPanel",
+			      "24":"Votings_Search_SplitPanel",
+			      "25":"Create_Voting_Panel",
+			      "26":"Records_My_SplitPanel",
+			      "27":"Records_Search_SplitPanel",
+			      "28":"Records_UnConfirmed_Panel",
+			      "29":"other_Panel"
+			  */ 
    //     Toolkit kit = Toolkit.getDefaultToolkit();
 
    //     Dimension screens = kit.getScreenSize();
