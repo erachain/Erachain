@@ -182,22 +182,21 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 			public void windowClosing(WindowEvent arg0) {
 				// TODO Auto-generated method stub
 				// read settings
-				double lDiv;
-				double div; 
+				int lDiv;
+				int div; 
 				Split_Panel sP;
 				HashMap outOpenTabbeds = new HashMap();
 				
 				settingsJSONbuf.put("Main_Frame_Height", getHeight()+""); // высота
 				settingsJSONbuf.put("Main_Frame_Width", getWidth()+""); // длина
+				settingsJSONbuf.put("Main_Frame_Loc_X", getX()+""); // высота
+				settingsJSONbuf.put("Main_Frame_Loc_Y", getY()+""); // высота
+				
 				settingsJSONbuf.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation()+"");
 				// horisontal - vertical orientation
-				if (mainPanel.jSplitPane1.getOrientation() == mainPanel.jSplitPane1.HORIZONTAL_SPLIT){
-				lDiv = (double)mainPanel.jSplitPane1.getLastDividerLocation()/(double)getWidth();
-				div =  (double)mainPanel.jSplitPane1.getDividerLocation()/(double)getWidth();
-				} else{
-				lDiv = (double)mainPanel.jSplitPane1.getLastDividerLocation()/(double)getHeight();
-				div =  (double)mainPanel.jSplitPane1.getDividerLocation()/(double)getHeight();
-				}
+				lDiv = mainPanel.jSplitPane1.getLastDividerLocation();
+				div =  mainPanel.jSplitPane1.getDividerLocation();
+				
 				settingsJSONbuf.put("Main_Frame_Div_Last_Loc",lDiv +"" );
 				settingsJSONbuf.put("Main_Frame_Div_Loc", div + "");
 				Component[] Tabbed_Comps = mainPanel.jTabbedPane1.getComponents();
@@ -212,13 +211,10 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 						outTabbedDiv.put("Div_Orientation",sP.jSplitPanel.getOrientation());
 						
 						// write
-						if (sP.jSplitPanel.getOrientation() == sP.jSplitPanel.HORIZONTAL_SPLIT){
-							lDiv = (double)sP.jSplitPanel.getLastDividerLocation()/(double)getWidth();
-							div =  (double)sP.jSplitPanel.getDividerLocation()/(double)getWidth();
-							} else{
-							lDiv = (double)sP.jSplitPanel.getLastDividerLocation()/(double)getHeight();
-							div =  (double)sP.jSplitPanel.getDividerLocation()/(double)getHeight();
-							}
+						
+							lDiv = sP.jSplitPanel.getLastDividerLocation();
+							div =  sP.jSplitPanel.getDividerLocation();
+							
 						outTabbedDiv.put("Div_Last_Loc",lDiv +"" );
 						outTabbedDiv.put("Div_Loc", div + "");
 						
@@ -264,34 +260,60 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 			@Override
 			public void windowOpened(WindowEvent arg0) {
 				// TODO Auto-generated method stub
-				
-				settingsJSONbuf.get("Main_Frame_Height"); // высота
-				settingsJSONbuf.get("Main_Frame_Width"); // длина
-				settingsJSONbuf.get("Main_Frame_Div_Orientation");
-				settingsJSONbuf.get("Main_Frame_Div_Last_Loc");
-				settingsJSONbuf.get("Main_Frame_Div_Loc");
-				
 			}
-        	
         	
         	
         	
         });
         
         
+        
+        
+        
         pack();
-        Toolkit kit = Toolkit.getDefaultToolkit();
+        // set perameters size $ split panel
+		int devLastLoc;
+		int devLoc;
+		if(settingsJSONbuf.containsKey("Main_Frame_Height")){
+		
+		
+		int x =new Integer((String)	settingsJSONbuf.get("Main_Frame_Loc_X")); // x
+		int y =new Integer((String)	settingsJSONbuf.get("Main_Frame_Loc_Y")); // y
+		setLocation(x, y);
+		int h =new Integer((String)	settingsJSONbuf.get("Main_Frame_Height")); // высота
+		int w =new Integer((String)	settingsJSONbuf.get("Main_Frame_Width")); // длина
+			setSize(w, h);
+			mainPanel.jSplitPane1.setOrientation(new Integer((String)settingsJSONbuf.get("Main_Frame_Div_Orientation")));
+		
+		
+		
+			
+			devLoc = new Integer((String)settingsJSONbuf.get("Main_Frame_Div_Loc"));
+			devLastLoc = new Integer((String)settingsJSONbuf.get("Main_Frame_Div_Last_Loc"));
+		 
+			
+	    	mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
+			mainPanel.jSplitPane1.setDividerLocation(devLoc);
+			
+		} else{ 
+			setExtendedState(MAXIMIZED_BOTH);
+		}
+    	
+        
+        
+        
+   //     Toolkit kit = Toolkit.getDefaultToolkit();
 
-        Dimension screens = kit.getScreenSize();
+   //     Dimension screens = kit.getScreenSize();
 
-        int w;
+   //     int w;
 
-        w = screens.width;
+   //     w = screens.width;
 
-        setSize((int) (w/1.3),(int) (w/1.3/1.618));
+    //    setSize((int) (w/1.3),(int) (w/1.3/1.618));
 
-        setLocation(w/12, w/12);
-        setExtendedState(MAXIMIZED_BOTH);
+    //    setLocation(w/12, w/12);
+     
     }// </editor-fold>                        
 
    
