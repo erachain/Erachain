@@ -187,7 +187,7 @@ button.setMargin(new Insets(0, 0, 0, 0));
 	 setUI(new ButtonDividerUI(button, button1, wight_Div,button_work));
 	 
  }
- private void set_button_title(){
+ public void set_button_title(){
 	 if (getOrientation()== VERTICAL_SPLIT){
 			//char aa = (char)176;
 			button1.setText((char)0x02C4+"");

@@ -294,6 +294,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 			
 	    	mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
 			mainPanel.jSplitPane1.setDividerLocation(devLoc);
+			mainPanel.jSplitPane1.set_button_title(); // set title diveders buttons
 			
 		} else{ 
 			setExtendedState(MAXIMIZED_BOTH);
