@@ -186,27 +186,28 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 				int div; 
 				Split_Panel sP;
 				HashMap outOpenTabbeds = new HashMap();
+				JSONObject settingsJSON = new JSONObject();
+				settingsJSON.put("Main_Frame_Height", getHeight()+""); // высота
+				settingsJSON.put("Main_Frame_Width", getWidth()+""); // длина
+				settingsJSON.put("Main_Frame_Loc_X", getX()+""); // высота
+				settingsJSON.put("Main_Frame_Loc_Y", getY()+""); // высота
 				
-				settingsJSONbuf.put("Main_Frame_Height", getHeight()+""); // высота
-				settingsJSONbuf.put("Main_Frame_Width", getWidth()+""); // длина
-				settingsJSONbuf.put("Main_Frame_Loc_X", getX()+""); // высота
-				settingsJSONbuf.put("Main_Frame_Loc_Y", getY()+""); // высота
-				
-				settingsJSONbuf.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation()+"");
+				settingsJSON.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation()+"");
 				// horisontal - vertical orientation
 				lDiv = mainPanel.jSplitPane1.getLastDividerLocation();
 				div =  mainPanel.jSplitPane1.getDividerLocation();
 				
-				settingsJSONbuf.put("Main_Frame_Div_Last_Loc",lDiv +"" );
-				settingsJSONbuf.put("Main_Frame_Div_Loc", div + "");
+				settingsJSON.put("Main_Frame_Div_Last_Loc",lDiv +"" );
+				settingsJSON.put("Main_Frame_Div_Loc", div + "");
 				Component[] Tabbed_Comps = mainPanel.jTabbedPane1.getComponents();
 				for (int i =0; i< Tabbed_Comps.length;i++){
 					// write in setting opet tabbs
-					settingsJSONbuf.put("OpenTabbeds", outOpenTabbeds)	;
+					outOpenTabbeds.put(i,mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName());
+					
 					// write open tabbed settings Split panel
 					if (mainPanel.jTabbedPane1.getComponent(i) instanceof Split_Panel){
 						HashMap outTabbedDiv = new HashMap();
-						outOpenTabbeds.put(i,mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName());
+						
 						 sP = ((Split_Panel)mainPanel.jTabbedPane1.getComponent(i));
 						outTabbedDiv.put("Div_Orientation",sP.jSplitPanel.getOrientation());
 						
@@ -218,10 +219,10 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
 						outTabbedDiv.put("Div_Last_Loc",lDiv +"" );
 						outTabbedDiv.put("Div_Loc", div + "");
 						
-						settingsJSONbuf.put(mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName(),outTabbedDiv);
+						settingsJSON.put(mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName(),outTabbedDiv);
 					}
-					
-					
+					settingsJSON.put("OpenTabbeds", outOpenTabbeds)	;
+					settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);	
 					
 				}
 				// save setting to setting file
@@ -274,30 +275,35 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer{
         // set perameters size $ split panel
 		int devLastLoc;
 		int devLoc;
-		if(settingsJSONbuf.containsKey("Main_Frame_Height")){
 		
+		if(settingsJSONbuf.containsKey("Main_Frame_Setting")){
+			JSONObject settingsJSON = new JSONObject();
+			settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
 		
-		int x =new Integer((String)	settingsJSONbuf.get("Main_Frame_Loc_X")); // x
-		int y =new Integer((String)	settingsJSONbuf.get("Main_Frame_Loc_Y")); // y
+		int x =new Integer((String)	settingsJSON.get("Main_Frame_Loc_X")); // x
+		int y =new Integer((String)	settingsJSON.get("Main_Frame_Loc_Y")); // y
 		setLocation(x, y);
-		int h =new Integer((String)	settingsJSONbuf.get("Main_Frame_Height")); // высота
-		int w =new Integer((String)	settingsJSONbuf.get("Main_Frame_Width")); // длина
+		int h =new Integer((String)	settingsJSON.get("Main_Frame_Height")); // высота
+		int w =new Integer((String)	settingsJSON.get("Main_Frame_Width")); // длина
 			setSize(w, h);
-			mainPanel.jSplitPane1.setOrientation(new Integer((String)settingsJSONbuf.get("Main_Frame_Div_Orientation")));
+			mainPanel.jSplitPane1.setOrientation(new Integer((String)settingsJSON.get("Main_Frame_Div_Orientation")));
 		
 		
 		
 			
-			devLoc = new Integer((String)settingsJSONbuf.get("Main_Frame_Div_Loc"));
-			devLastLoc = new Integer((String)settingsJSONbuf.get("Main_Frame_Div_Last_Loc"));
+			devLoc = new Integer((String)settingsJSON.get("Main_Frame_Div_Loc"));
+			devLastLoc = new Integer((String)settingsJSON.get("Main_Frame_Div_Last_Loc"));
 		 
 			
 	    	mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
 			mainPanel.jSplitPane1.setDividerLocation(devLoc);
 			mainPanel.jSplitPane1.set_button_title(); // set title diveders buttons
 			
-		} else{ 
+		} else{
 			setExtendedState(MAXIMIZED_BOTH);
+	//		mainPanel.jSplitPane1.setDividerLocation(250);
+			mainPanel.jSplitPane1.setLastDividerLocation(300);
+			
 		}
     	
         
