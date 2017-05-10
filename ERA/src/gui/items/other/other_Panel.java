@@ -12,7 +12,6 @@ import org.mapdb.Fun.Tuple2;
 
 import database.wallet.BlockMap;
 import gui.CoreRowSorter;
-import gui.MainFrame;
 import gui.library.MTable;
 import gui.models.BlocksTableModel;
 import gui.models.PeersTableModel;
@@ -98,16 +97,16 @@ Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         this.jLabel_Transaction_Title.setText(Lang.getInstance().translate("My Transactions"));
         this.jLabel_My_Block_Title.setText(Lang.getInstance().translate("My Generated Blocks"));
         
-        Dimension size = MainFrame.getInstance().desktopPane.getSize();
+    //    Dimension size = MainFrame.getInstance().desktopPane.getSize();
         //this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	    //split_generated_Block.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
-        int splitP2_Div_LOC = (int)((size.getHeight()-100)*.15);
-        if (splitP2_Div_LOC <90) splitP2_Div_LOC =90;
+    //    int splitP2_Div_LOC = (int)((size.getHeight()-100)*.15);
+   //     if (splitP2_Div_LOC <90) splitP2_Div_LOC =90;
      //   splitP2_Div_LOC =90;
-        this.jSplitPane2.setDividerLocation(splitP2_Div_LOC);
+   //     this.jSplitPane2.setDividerLocation(splitP2_Div_LOC);
         
-        this.jSplitPane3.setDividerLocation((int)((size.getHeight()-100)*.4));
-        this.jSplitPane5.setDividerLocation((int)((size.getWidth()-100)*.5));
+   //     this.jSplitPane3.setDividerLocation((int)((size.getHeight()-100)*.4));
+   //     this.jSplitPane5.setDividerLocation((int)((size.getWidth()-100)*.5));
        
 
         

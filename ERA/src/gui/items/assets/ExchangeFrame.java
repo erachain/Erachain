@@ -2,7 +2,6 @@ package gui.items.assets;
 
 import lang.Lang;
 import utils.Pair;
-import gui.MainFrame;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -41,7 +40,6 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import database.DBSet;
-import gui.MainFrame;
 import gui.library.MTable;
 
 
@@ -259,11 +257,11 @@ public class ExchangeFrame extends JDialog
 			this.pack();
 			this.setResizable(true);
 	//		if(action == "Buy" || action =="To sell") this.setSize(900,800);
-			 int wH = (MainFrame.getInstance().desktopPane.getWidth()- MainFrame.getInstance().desktopPane.getWidth()*15/100);
-			 int hG = (MainFrame.getInstance().desktopPane.getHeight()- MainFrame.getInstance().desktopPane.getHeight()*15/100);
-			 this.setMinimumSize(new Dimension(100,100));
-			this.setSize(new Dimension(wH,hG));
-			this.setPreferredSize(new Dimension(wH,hG));
+	//		 int wH = (MainFrame.getInstance().desktopPane.getWidth()- MainFrame.getInstance().desktopPane.getWidth()*15/100);
+	//		 int hG = (MainFrame.getInstance().desktopPane.getHeight()- MainFrame.getInstance().desktopPane.getHeight()*15/100);
+	//		 this.setMinimumSize(new Dimension(100,100));
+	//		this.setSize(new Dimension(wH,hG));
+	//		this.setPreferredSize(new Dimension(wH,hG));
 			this.setLocationRelativeTo(null);
 			this.setVisible(true);
 	        

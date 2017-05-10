@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-import gui.MainFrame;
 import gui.Send_Frame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;

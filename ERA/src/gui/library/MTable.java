@@ -35,7 +35,6 @@ import org.mapdb.Fun.Tuple4;
 
 import com.toedter.calendar.JCalendar;
 
-import gui.MainFrame;
 import gui.items.persons.TableModelPersons;
 import gui.models.Renderer_Right;
 import lang.Lang;
@@ -228,9 +227,9 @@ public class MTable<U, T> extends JTable {
 							String second_S = (second.a == null)?"":(String)second.a;
 							MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog (column,BigDecimal.class,first.c,first_S,second.c,second_S);
 							 int x = arg0.getXOnScreen()-dialog.getWidth()/2;
-							 if( MainFrame.getInstance().desktopPane.getX() > x)x=MainFrame.getInstance().desktopPane.getX(); 
+					//		 if( MainFrame.getInstance().desktopPane.getX() > x)x=MainFrame.getInstance().desktopPane.getX(); 
 							 int y = arg0.getYOnScreen()-dialog.getHeight();
-							 if (MainFrame.getInstance().desktopPane.getY()>y)y = MainFrame.getInstance().desktopPane.getY();
+					//		 if (MainFrame.getInstance().desktopPane.getY()>y)y = MainFrame.getInstance().desktopPane.getY();
 							dialog.setLocation(x, y);
 							dialog.setVisible(true);
 							
@@ -280,9 +279,9 @@ public class MTable<U, T> extends JTable {
 				String second_S = (second.a == null)?"":(String)second.a;
 				MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog (column,Long.class,first.c,first_S,second.c,second_S);
 				 int x = arg0.getXOnScreen()-dialog.getWidth()/2;
-				 if( MainFrame.getInstance().desktopPane.getX() > x)x=MainFrame.getInstance().desktopPane.getX(); 
+		//		 if( MainFrame.getInstance().desktopPane.getX() > x)x=MainFrame.getInstance().desktopPane.getX(); 
 				 int y = arg0.getYOnScreen()-dialog.getHeight();
-				 if (MainFrame.getInstance().desktopPane.getY()>y)y = MainFrame.getInstance().desktopPane.getY();
+		//		 if (MainFrame.getInstance().desktopPane.getY()>y)y = MainFrame.getInstance().desktopPane.getY();
 				dialog.setLocation(x, y);
 				dialog.setVisible(true);
 				pp = dialog.get_Ansver();
@@ -335,9 +334,9 @@ public class MTable<U, T> extends JTable {
 					String second_S = (second.a == null)?"":(String)second.a;
 					MTable_search_Num_Dialog dialog = new MTable_search_Num_Dialog (column,Integer.class,first.c,first_S,second.c,second_S);
 					 int x = arg0.getXOnScreen()-dialog.getWidth()/2;
-					 if( MainFrame.getInstance().desktopPane.getX() > x)x=MainFrame.getInstance().desktopPane.getX(); 
+			//		 if( MainFrame.getInstance().desktopPane.getX() > x)x=MainFrame.getInstance().desktopPane.getX(); 
 					 int y = arg0.getYOnScreen()-dialog.getHeight();
-					 if (MainFrame.getInstance().desktopPane.getY()>y)y = MainFrame.getInstance().desktopPane.getY();
+			//		 if (MainFrame.getInstance().desktopPane.getY()>y)y = MainFrame.getInstance().desktopPane.getY();
 					dialog.setLocation(x, y);
 					dialog.setVisible(true);
 					pp = dialog.get_Ansver();

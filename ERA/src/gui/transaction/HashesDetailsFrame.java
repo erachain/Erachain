@@ -23,7 +23,6 @@ import core.transaction.Transaction;
 import core.transaction.R_Hashes;
 import core.transaction.R_Vouch;
 import database.DBSet;
-import gui.MainFrame;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -56,7 +55,7 @@ public class HashesDetailsFrame extends Rec_DetailsFrame
 		++detailGBC.gridy;
 		JTextPane txtAreaDescription = new JTextPane();
 		txtAreaDescription.setContentType("text/html");
-		txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
+	//	txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
 
 		txtAreaDescription.setText(new String(r_Hashes.getData(), Charset.forName("UTF-8")));
 		/*
@@ -77,7 +76,7 @@ public class HashesDetailsFrame extends Rec_DetailsFrame
 		++detailGBC.gridy;
 		JTextPane txtAreaHashes = new JTextPane();
 		txtAreaHashes.setContentType("text/html");
-		txtAreaHashes.setBackground(MainFrame.getFrames()[0].getBackground());
+	//	txtAreaHashes.setBackground(MainFrame.getFrames()[0].getBackground());
 
 		txtAreaHashes.setText("<html>" + String.join("<br />", r_Hashes.getHashesB58()) + "</html>");
 		txtAreaHashes.setBorder(name.getBorder());

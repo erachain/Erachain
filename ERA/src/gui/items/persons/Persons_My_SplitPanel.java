@@ -47,7 +47,6 @@
 	import controller.Controller;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
-	import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
 	import gui.Split_Panel;
@@ -135,8 +134,8 @@ import gui.models.Renderer_Boolean;
 	
 		
 
-			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
-			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+	//		 Dimension size = MainFrame.getInstance().desktopPane.getSize();
+	//		 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 			// jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 			
 		  

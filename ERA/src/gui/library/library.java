@@ -32,53 +32,12 @@ import org.jvnet.substance.api.skin.*;
 import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
 */
 
-import gui.MainFrame;
 import lang.Lang;
 import settings.Settings;
 
 public class library {
 
-	// РїРѕРґРїСЂРѕРіСЂР°РјРјР° РІС‹РІРѕРґРёС‚ РІ РїР°РЅРµР»Рё РѕРєРЅРѕ РёР»Рё
-	// РїРµСЂРµРґР°РµС‚ С„РѕРєСѓСЃ РµСЃР»Рё РѕРєРЅРѕ СѓР¶Рµ РѕС‚РєСЂС‹С‚Рѕ
-	// item РѕС‚РєСЂС‹РІР°РµРјРѕРµ РѕРєРЅРѕ
-	// РјР°СЃСЃРёРІ РІСЃРµС… РѕС‚РєСЂС‹С‚С‹С… РѕРєРѕРЅ РІ РїР°РЅРµР»Рё
-	public static void selectOrAdd(JInternalFrame item, JInternalFrame[] openedFrames) {
 
-		// РїСЂРѕРІРµСЂРєР° РµСЃР»Рё СѓР¶Рµ РѕС‚РєСЂС‹С‚Рѕ С‚Р°РєРѕРµ РѕРєРЅРѕ
-		// С‚Рѕ РїРµСЂРµРґР°РµРј С‚РѕР»СЊРєРѕ С„РѕРєСѓСЃ РЅР° РЅРµРіРѕ
-		String itemName = item.getName();
-		if (itemName == null)
-			itemName = item.getClass().getName();
-
-		int k = -1;
-		if (openedFrames != null) {
-			for (int i = 0; i < openedFrames.length; i = i + 1) {
-				String name = openedFrames[i].getName();
-				if (name == null)
-					name = openedFrames[i].getClass().getName();
-				if (name == itemName) {
-					k = i;
-				}
-			}
-			;
-		}
-
-		if (k == -1) {
-			MainFrame.getInstance().desktopPane.add(item);
-			try {
-				item.setSelected(true);
-			} catch (java.beans.PropertyVetoException e1) {
-			}
-		} else {
-			try {
-				openedFrames[k].setSelected(true);
-			} catch (PropertyVetoException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-
-	}
 
 	@SuppressWarnings("unchecked")
 	public static void Set_GUI_Look_And_Feel(String text) {

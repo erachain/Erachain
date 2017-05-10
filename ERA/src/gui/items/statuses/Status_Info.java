@@ -16,7 +16,6 @@ import core.block.GenesisBlock;
 import core.item.statuses.StatusCls;
 import database.ItemStatusMap;
 import database.DBSet;
-import gui.MainFrame;
 import gui.library.MTextPane;
 import lang.Lang;
 

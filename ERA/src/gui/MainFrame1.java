@@ -47,15 +47,15 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame implements Observer{
+public class MainFrame1 extends JFrame implements Observer{
 	
 public  JDesktopPane desktopPane;
-private static MainFrame instance;
-public static MainFrame getInstance()
+private static MainFrame1 instance;
+public static MainFrame1 getInstance()
 {
 	if(instance == null)
 	{
-		instance = new MainFrame();
+		instance = new MainFrame1();
 	}
 	
 	return instance;
@@ -63,7 +63,7 @@ public static MainFrame getInstance()
 
 
 
-	private MainFrame()
+	private MainFrame1()
 	{
 		
 		//CREATE FRAME

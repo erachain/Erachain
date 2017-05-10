@@ -45,7 +45,6 @@ import core.item.unions.UnionCls;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.MainFrame;
 import gui.models.AccountsComboBoxModel;
 import gui.items.unions.Union_Info;
 import gui.items.statuses.ComboBoxModelItemsStatuses;

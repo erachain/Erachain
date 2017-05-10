@@ -51,7 +51,6 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.RunMenu;
 import gui.Split_Panel;

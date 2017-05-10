@@ -14,7 +14,7 @@ import org.mapdb.Fun.Tuple4;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.MainFrame;
+//import gui.MainFrame;
 import lang.Lang;
 
 // Info for record
@@ -27,7 +27,7 @@ public class Record_Info extends JTextPane {
 	public  Record_Info() {
 	
 		this.setContentType("text/html");
-		this.setBackground(MainFrame.getFrames()[0].getBackground());
+	//	this.setBackground(MainFrame.getFrames()[0].getBackground());
 		
 	}
 	

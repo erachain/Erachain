@@ -17,7 +17,6 @@ import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import database.ItemStatusMap;
 import database.DBSet;
-import gui.MainFrame;
 import lang.Lang;
 
 // Info for person
@@ -30,7 +29,7 @@ public class Person_Info extends JTextPane {
 	public  Person_Info() {
 	
 		this.setContentType("text/html");
-		this.setBackground(MainFrame.getFrames()[0].getBackground());
+	//	this.setBackground(MainFrame.getFrames()[0].getBackground());
 		
 	}
 	

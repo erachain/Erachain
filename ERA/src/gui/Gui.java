@@ -24,10 +24,10 @@ public class Gui extends JFrame{
 
 
 	private static Gui maingui;
-	private MainFrame mainframe;
+//	private MainFrame mainframe;
 
 
-	private Main_JFrame mm;
+	private Main_JFrame mainframe;
 	public static Gui getInstance() throws Exception
 	{
 		if(maingui == null)
@@ -69,12 +69,12 @@ public class Gui extends JFrame{
         } else if (Settings.getInstance().isGuiEnabled())
     	{
     		
-        	if (BlockChain.DEVELOP_USE) {
-        		mm = Main_JFrame.getInstance();
-        		mm.setVisible(true);
-        	}
-        	mainframe =	MainFrame.getInstance();
-    		mainframe.setVisible(true);
+      //  	if (BlockChain.DEVELOP_USE) {
+        	mainframe = Main_JFrame.getInstance();
+        	mainframe.setVisible(true);
+      //  	}
+     //   	mainframe =	MainFrame.getInstance();
+    //		mainframe.setVisible(true);
     	}
         
 	}
@@ -90,7 +90,7 @@ public class Gui extends JFrame{
 		SysTray.getInstance().sendMessage(Lang.getInstance().translate("Wallet Initialized"),
 				Lang.getInstance().translate("Your wallet is initialized"), MessageType.INFO);
 		if (Settings.getInstance().isGuiEnabled())
-			mainframe = MainFrame.getInstance();
+			mainframe = Main_JFrame.getInstance();
 	}
 	
 	public void bringtoFront()

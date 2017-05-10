@@ -21,7 +21,6 @@ import core.crypto.Base58;
 import core.transaction.Transaction;
 import core.transaction.R_Vouch;
 import database.DBSet;
-import gui.MainFrame;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -69,7 +68,7 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame
 		++detailGBC.gridy;
 		JTextPane txtAreaDescription = new JTextPane();
 		txtAreaDescription.setContentType("text/html");
-		txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
+	//	txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
 
 		txtAreaDescription.setText(message);
 		/*

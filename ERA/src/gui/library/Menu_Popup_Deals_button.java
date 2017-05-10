@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import gui.MainFrame;
 import gui.Send_Frame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;
@@ -69,7 +68,7 @@ public class Menu_Popup_Deals_button extends JButton{
 				        	public void actionPerformed(ActionEvent e)
 				        	{
 				        		// 
-				        		library.selectOrAdd(new Send_Frame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
+				        		//library.selectOrAdd(new Send_Frame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
 				        	}
 				        });
 				       dealsMenu.add(dealsMenuSendMessage);

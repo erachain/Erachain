@@ -13,8 +13,7 @@
 	import controller.Controller;
 import core.item.assets.AssetCls;
 import core.voting.Poll;
-import gui.MainFrame;
-	import gui.Split_Panel;
+import gui.Split_Panel;
 import gui.library.MTable;
 	import gui.models.WalletItemPersonsTableModel;
 import gui.models.WalletPollsTableModel;
@@ -66,8 +65,8 @@ import lang.Lang;
 			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
 			// EVENTS on CURSOR
 			my_Voting_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
-			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
-			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+	//		 Dimension size = MainFrame.getInstance().desktopPane.getSize();
+	//		 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	//		 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		}
 

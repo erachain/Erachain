@@ -1,7 +1,6 @@
 package gui.records;
 
 import gui.CoreRowSorter;
-import gui.MainFrame;
 import gui.Split_Panel;
 import gui.items.assets.AssetDetailsPanel001;
 import gui.library.MTable;
@@ -144,9 +143,9 @@ public class RecordsPanel extends  JPanel // JPanel
 		record_stpit.jToolBar_RightPanel.setVisible(false);
 		record_stpit.searchToolBar_LeftPanel.setVisible(false);
 		
-		Dimension size = MainFrame.getInstance().desktopPane.getSize();
-		this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-		record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	//	Dimension size = MainFrame.getInstance().desktopPane.getSize();
+	//	this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+	//	record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		
 		// show	
 	//	record_stpit.jTable_jScrollPanel_LeftPanel.setModel(transactionsModel);

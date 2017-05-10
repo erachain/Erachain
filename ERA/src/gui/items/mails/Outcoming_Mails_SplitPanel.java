@@ -44,7 +44,6 @@ import javax.swing.JMenuItem;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.transaction.R_Send;
-import gui.MainFrame;
 	import gui.Main_Internal_Frame;
 	import gui.RunMenu;
 	import gui.Split_Panel;
@@ -179,8 +178,8 @@ import utils.TableMenuPopupUtil;
 			inciming_Mail_Table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 			
 		
-			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
-			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+	//		 Dimension size = MainFrame.getInstance().desktopPane.getSize();
+	//		 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 		//	 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		}
 		class My_Tab_Listener implements ListSelectionListener {
