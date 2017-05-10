@@ -325,6 +325,7 @@ public class Split_Panel extends javax.swing.JPanel {
     	if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
     	 JSONObject params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
     	if (!params.containsKey(str)) return;
+    	Object sss = params.get(str);
     	 JSONObject param = (JSONObject) params.get(str);
     	if (param.containsKey("Div_Last_Loc")) jSplitPanel.setLastDividerLocation(new Integer((String) param.get("Div_Last_Loc")));
     	if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer((String)param.get("Div_Loc")));

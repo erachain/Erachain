@@ -538,12 +538,7 @@ public class Account_Send_Panel extends JPanel
 		//this.setLocation(20, 20);
 	//	this.setIconImages(icons);
 		
-		//CLOSE
-		//setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-        //this.setResizable(true);
-        //splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
-        //this.setVisible(true);
-
+	
         
 	}
 

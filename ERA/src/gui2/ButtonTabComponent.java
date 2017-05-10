@@ -36,8 +36,17 @@ package gui2;
 import javax.swing.*;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
+
+import org.json.simple.JSONObject;
+
+import gui.Split_Panel;
+import settings.Settings;
+import utils.SaveStrToFile;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.util.HashMap;
  
 /**
  * Component to be used as tabComponent;
@@ -99,8 +108,43 @@ public class ButtonTabComponent extends JPanel {
         }
  
         public void actionPerformed(ActionEvent e) {
+        	
             int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+            
             if (i != -1) {
+            	Component p_Comp = pane.getComponentAt(i);
+            	
+            // seve Split Panel params
+            		JSONObject settingsJSONbuf = new JSONObject();
+            		settingsJSONbuf = Settings.getInstance().Dump();
+            	   JSONObject settingsJSON = new JSONObject();
+            		if(settingsJSONbuf.containsKey("Main_Frame_Setting")) settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+            		HashMap outTabbedDiv = new HashMap();
+            	if (p_Comp instanceof Split_Panel) {
+					Split_Panel sP = ((Split_Panel) p_Comp);
+					outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation()+"");
+
+					// write
+
+					int lDiv = sP.jSplitPanel.getLastDividerLocation();
+					int div = sP.jSplitPanel.getDividerLocation();
+
+					outTabbedDiv.put("Div_Last_Loc", lDiv + "");
+					outTabbedDiv.put("Div_Loc", div + "");
+
+					settingsJSON.put(p_Comp.getClass().getSimpleName(),
+							outTabbedDiv);
+					
+					settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
+					// save setting to setting file
+					try {
+						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
+					} catch (IOException e1) {
+						JOptionPane.showMessageDialog(new JFrame(), "Error writing to the file: "
+								+ Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
                 pane.remove(i);
             }
         }

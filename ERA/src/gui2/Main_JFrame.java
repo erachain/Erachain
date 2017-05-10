@@ -162,6 +162,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 				Split_Panel sP;
 				HashMap outOpenTabbeds = new HashMap();
 				JSONObject settingsJSON = new JSONObject();
+				if (settingsJSONbuf.containsKey("Main_Frame_Setting"))  settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
 				settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
 				settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
 				settingsJSON.put("Main_Frame_Loc_X", getX() + ""); // высота
@@ -174,16 +175,16 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 
 				settingsJSON.put("Main_Frame_Div_Last_Loc", lDiv + "");
 				settingsJSON.put("Main_Frame_Div_Loc", div + "");
-				Component[] Tabbed_Comps = mainPanel.jTabbedPane1.getComponents();
-				for (int i = 0; i < Tabbed_Comps.length; i++) {
+				for (int i = 0; i < mainPanel.jTabbedPane1.getTabCount(); i++) {
 					// write in setting opet tabbs
-					outOpenTabbeds.put(i, mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName());
+					Component comp = mainPanel.jTabbedPane1.getComponentAt(i);
+					outOpenTabbeds.put(i, comp.getClass().getSimpleName());
 
 					// write open tabbed settings Split panel
-					if (mainPanel.jTabbedPane1.getComponent(i) instanceof Split_Panel) {
+					if (comp instanceof Split_Panel) {
 						HashMap outTabbedDiv = new HashMap();
 
-						sP = ((Split_Panel) mainPanel.jTabbedPane1.getComponent(i));
+						sP = ((Split_Panel) comp);
 						outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation()+"");
 
 						// write
@@ -194,14 +195,15 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 						outTabbedDiv.put("Div_Last_Loc", lDiv + "");
 						outTabbedDiv.put("Div_Loc", div + "");
 
-						settingsJSON.put(mainPanel.jTabbedPane1.getComponent(i).getClass().getSimpleName(),
+						settingsJSON.put(comp.getClass().getSimpleName(),
 								outTabbedDiv);
 					}
 					settingsJSON.remove("OpenTabbeds");
 					settingsJSON.put("OpenTabbeds", outOpenTabbeds);
-					settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
+					
 
 				}
+				settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
 				// save setting to setting file
 				try {
 					SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
@@ -266,29 +268,32 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 			mainPanel.jSplitPane1.set_button_title(); // set title diveders
 														// buttons
 
+			// load tabs
+			if (main_Frame_settingsJSON.containsKey("OpenTabbeds")) {
+
+				JSONObject openTabes = (JSONObject) main_Frame_settingsJSON.get("OpenTabbeds");
+
+				Set ot = openTabes.keySet();
+
+				for (int i = 0; i < ot.size(); i++) {
+
+					String value = (String) openTabes.get(i + "");
+
+					mainPanel.dylay(value);
+
+				}
+
+			}
+		
+		
 		} else {
 			setExtendedState(MAXIMIZED_BOTH);
 			// mainPanel.jSplitPane1.setDividerLocation(250);
 			mainPanel.jSplitPane1.setLastDividerLocation(300);
 
 		}
-
-		// load tabs
-		if (main_Frame_settingsJSON.containsKey("OpenTabbeds")) {
-
-			JSONObject openTabes = (JSONObject) main_Frame_settingsJSON.get("OpenTabbeds");
-
-			Set ot = openTabes.keySet();
-
-			for (int i = 0; i < ot.size(); i++) {
-
-				String value = (String) openTabes.get(i + "");
-
-				mainPanel.dylay(value);
-
-			}
-
-		}
+		
+		
 
 	}// </editor-fold>
 

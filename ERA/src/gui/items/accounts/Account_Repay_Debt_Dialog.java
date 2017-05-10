@@ -89,9 +89,7 @@ public class Account_Repay_Debt_Dialog extends JDialog{
 		
     //    this.setResizable(false);
         this.setLocationRelativeTo(null);
-		
-  //      this.setResizable(true);
-//        splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
+
         this.setVisible(true);
 	
 	}

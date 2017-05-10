@@ -137,7 +137,7 @@ import gui.models.Renderer_Boolean;
 
 			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+			// jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 			
 		  
 		    
