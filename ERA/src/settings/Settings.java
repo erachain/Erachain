@@ -3,6 +3,7 @@ package settings;
 // 30/03 ++
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.Inet4Address;
@@ -134,65 +135,10 @@ public class Settings {
 	private Settings()
 	{
 		this.localAddress = this.getCurrentIp();
-		int alreadyPassed = 0;
-		
+		JSONObject aa = read_setting_JSON();
+				
+				
 		File file = new File("");
-		try
-		{
-			while(alreadyPassed<2)
-			{
-				//OPEN FILE
-				file = new File(this.userPath + "settings.json");
-				
-				//CREATE FILE IF IT DOESNT EXIST
-				if(!file.exists())
-				{
-					file.createNewFile();
-				}
-				
-				//READ SETTINS JSON FILE
-				List<String> lines = Files.readLines(file, Charsets.UTF_8);
-				
-				String jsonString = "";
-				for(String line : lines){
-					
-					//correcting single backslash bug
-					if(line.contains("userpath"))
-					{
-						line = line.replace("\\", "/");
-					}
-					
-					jsonString += line;
-				}
-				
-				//CREATE JSON OBJECT
-				this.settingsJSON = (JSONObject) JSONValue.parse(jsonString);
-				settingsJSON =	settingsJSON == null ? new JSONObject() : settingsJSON;
-				
-				alreadyPassed++;
-				
-				if(this.settingsJSON.containsKey("userpath"))
-				{
-					this.userPath = (String) this.settingsJSON.get("userpath");
-					
-					if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/")))
-					{
-						this.userPath += "/"; 
-					}
-				}
-				else
-				{
-					alreadyPassed ++;
-				}	
-			}
-		}
-		catch(Exception e)
-		{
-			LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
-			LOGGER.error(e.getMessage(),e);
-			settingsJSON =	new JSONObject();
-		}
-		
 		//TRY READ PEERS.JSON
 		try
 		{
@@ -897,7 +843,68 @@ public class Settings {
 		
 	}
 		
+	public JSONObject  read_setting_JSON() {
+		int alreadyPassed = 0;
+		File file = new File(this.userPath + "settings.json");
+		try
+		{
+			while(alreadyPassed<2)
+			{
+				//OPEN FILE
+		//READ SETTINS JSON FILE
+		List<String> lines = Files.readLines(file, Charsets.UTF_8);
 		
+		String jsonString = "";
+		for(String line : lines){
+			
+			//correcting single backslash bug
+			if(line.contains("userpath"))
+			{
+				line = line.replace("\\", "/");
+			}
+			
+			jsonString += line;
+		}
+		
+		//CREATE JSON OBJECT
+		this.settingsJSON = (JSONObject) JSONValue.parse(jsonString);
+		settingsJSON =	settingsJSON == null ? new JSONObject() : settingsJSON;
+		
+		
+		alreadyPassed++;
+		
+		if(this.settingsJSON.containsKey("userpath"))
+		{
+			this.userPath = (String) this.settingsJSON.get("userpath");
+			
+			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/")))
+			{
+				this.userPath += "/"; 
+			}
+		}
+		else
+		{
+			alreadyPassed ++;
+		}	
+	
+		//CREATE FILE IF IT DOESNT EXIST
+		if(!file.exists())
+		{
+			file.createNewFile();
+		}
+	}
+		
+}
+catch(Exception e)
+{
+	LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
+	LOGGER.error(e.getMessage(),e);
+	settingsJSON =	new JSONObject();
+}
+
+	return settingsJSON;
+	
+	}
 	
 	
 	

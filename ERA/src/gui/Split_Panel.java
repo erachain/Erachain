@@ -28,6 +28,7 @@ import gui.library.MTable;
 import lang.Lang;
 import settings.Settings;
 
+
 /**
  *
  * @author Саша
@@ -322,8 +323,10 @@ public class Split_Panel extends javax.swing.JPanel {
 
 
     private void set_Divider_Parameters(String str){
-    	if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
-    	 JSONObject params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+    	settingsJSONbuf = Settings.getInstance().read_setting_JSON();
+    	JSONObject params;
+		if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
+    	 params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
     	if (!params.containsKey(str)) return;
     	Object sss = params.get(str);
     	 JSONObject param = (JSONObject) params.get(str);
@@ -331,6 +334,7 @@ public class Split_Panel extends javax.swing.JPanel {
     	if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer((String)param.get("Div_Loc")));
     	int ii = new Integer((String)param.get("Div_Orientation"));
     	if (param.containsKey("Div_Orientation"))jSplitPanel.setOrientation(ii);
+    	jSplitPanel.set_button_title();
     	 
     }
     

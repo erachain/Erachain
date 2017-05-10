@@ -68,7 +68,7 @@ import lang.Lang;
 			my_Voting_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
 			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
 			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-			 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	//		 jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		}
 
 		class My_Tab_Listener implements ListSelectionListener {

@@ -153,7 +153,7 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
 		
 		Dimension size = MainFrame.getInstance().desktopPane.getSize();
 		this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-		record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+	//	record_stpit.jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
 		
 		// show	
 	//	record_stpit.jTable_jScrollPanel_LeftPanel.setModel(transactionsModel);

@@ -43,7 +43,7 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 		this.leftPanel.add( accountPanel, PanelGBC);
 		//this.rightPanel1.add(rightPanel,PanelGBC);
 		jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
-		 this.jSplitPanel.setDividerLocation(0.3);
+	//	 this.jSplitPanel.setDividerLocation(0.3);
 		
 		// EVENTS on CURSOR
 		accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());

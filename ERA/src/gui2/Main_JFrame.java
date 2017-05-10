@@ -2,6 +2,7 @@ package gui2;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
@@ -244,25 +245,30 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 
 		pack();
 		// set perameters size $ split panel
-		int devLastLoc;
-		int devLoc;
+		
 
 		if (settingsJSONbuf.containsKey("Main_Frame_Setting")) {
 			main_Frame_settingsJSON = new JSONObject();
 			main_Frame_settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
-
-			int x = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_X")); // x
-			int y = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_Y")); // y
+			int x =0;
+			int y =0;
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Loc_X")) x = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_X")); // x
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Loc_Y")) y = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_Y")); // y
 			setLocation(x, y);
-			int h = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
-			int w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
+			Toolkit kit = Toolkit.getDefaultToolkit();
+	        Dimension screens = kit.getScreenSize();
+			int h = screens.height;
+			int w = screens.width;
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Height")) h = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Width")) w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
 			setSize(w, h);
-			mainPanel.jSplitPane1
-					.setOrientation(new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Orientation")));
-
-			devLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Loc"));
-			devLastLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Last_Loc"));
-
+			int orientation=0;
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Orientation")) orientation = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Orientation"));
+			mainPanel.jSplitPane1.setOrientation(orientation);
+			int devLoc = 250;
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Loc")) devLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Loc"));
+			int devLastLoc = 250;
+			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Last_Loc")) devLastLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Last_Loc"));
 			mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
 			mainPanel.jSplitPane1.setDividerLocation(devLoc);
 			mainPanel.jSplitPane1.set_button_title(); // set title diveders
@@ -270,19 +276,12 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 
 			// load tabs
 			if (main_Frame_settingsJSON.containsKey("OpenTabbeds")) {
-
 				JSONObject openTabes = (JSONObject) main_Frame_settingsJSON.get("OpenTabbeds");
-
 				Set ot = openTabes.keySet();
-
 				for (int i = 0; i < ot.size(); i++) {
-
 					String value = (String) openTabes.get(i + "");
-
 					mainPanel.dylay(value);
-
 				}
-
 			}
 		
 		
