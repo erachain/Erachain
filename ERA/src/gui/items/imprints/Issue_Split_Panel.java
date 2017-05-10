@@ -57,7 +57,7 @@ public class Issue_Split_Panel extends Split_Panel {
 	Issue_Hash_Imprint issue_Hash_Imprint;
 
 	public Issue_Split_Panel() {
-
+		super("Issue_Split_Panel");
 		// left panel
 
 		this.toolBar_LeftPanel.setVisible(false);

@@ -40,6 +40,7 @@ public class Search_Imprints_Tab extends Split_Panel{
 private TableModelImprints tableModelImprints;
 
 public Search_Imprints_Tab(){
+	super("Search_Imprints_Tab");
 
 	setName(Lang.getInstance().translate("Search Imprints"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

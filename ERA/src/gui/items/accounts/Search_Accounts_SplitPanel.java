@@ -6,7 +6,7 @@ import lang.Lang;
 public class Search_Accounts_SplitPanel extends Split_Panel {
 	
 	public Search_Accounts_SplitPanel(){
-		
+		super("Search_Accounts_SplitPanel");
 		
 //		LayoutManager favoritesGBC = this.getLayout();
 

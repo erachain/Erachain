@@ -26,6 +26,7 @@ import gui.library.MTable;
 		
 		
 	public Statements_My_SplitPanel(){
+		super("Statements_My_SplitPanel");
 	
 		this.setName(Lang.getInstance().translate("My Statements"));
 			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

@@ -19,6 +19,7 @@ public class Votings_Search_SplitPanel extends Split_Panel {
 	VotingDetailPanel votingDetailsPanel;
 
 	public Votings_Search_SplitPanel() {
+		super("Votings_Search_SplitPanel");
 		this.leftPanel.setVisible(false);
 		allVotingsPanel = new All_Votings_Panel();
 		this.jSplitPanel.setLeftComponent(allVotingsPanel);

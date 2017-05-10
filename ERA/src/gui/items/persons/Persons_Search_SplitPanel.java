@@ -84,6 +84,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
      int alpha =255;
      int alpha_int;
 	public Persons_Search_SplitPanel(){
+		super("Persons_Search_SplitPanel");
 		setName(Lang.getInstance().translate("Search Persons"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons

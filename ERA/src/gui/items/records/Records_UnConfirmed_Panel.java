@@ -56,7 +56,6 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
 
 	public Records_UnConfirmed_Panel()
 	{
-		
 		setName(Lang.getInstance().translate("Unconfirmed Records"));
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
@@ -147,7 +146,7 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
 		});			
 		
 		
-		Split_Panel record_stpit = new Split_Panel();
+		Split_Panel record_stpit = new Split_Panel("");
 		record_stpit.toolBar_LeftPanel.setVisible(false);
 		record_stpit.jToolBar_RightPanel.setVisible(false);
 		record_stpit.searchToolBar_LeftPanel.setVisible(false);

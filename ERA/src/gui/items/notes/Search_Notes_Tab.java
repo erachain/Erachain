@@ -70,7 +70,7 @@ public class Search_Notes_Tab extends Split_Panel {
 	
 	
 	public Search_Notes_Tab(){
-		
+		super ("Search_Notes_Tab");
 		
 		setName(Lang.getInstance().translate("Search Templates"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

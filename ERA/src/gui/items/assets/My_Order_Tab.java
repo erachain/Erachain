@@ -51,7 +51,7 @@ public class My_Order_Tab extends Split_Panel {
 
 	public My_Order_Tab()
 	{
-
+		super("My_Order_Tab");
 	
 	this.setName(Lang.getInstance().translate("My Orders"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

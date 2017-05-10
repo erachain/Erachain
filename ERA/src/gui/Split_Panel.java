@@ -21,9 +21,12 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 
+import org.json.simple.JSONObject;
+
 import gui.library.MSplitPane;
 import gui.library.MTable;
 import lang.Lang;
+import settings.Settings;
 
 /**
  *
@@ -36,27 +39,16 @@ public class Split_Panel extends javax.swing.JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	private int spt;
+	private JSONObject settingsJSONbuf;
 	/**
      * Creates new form Doma2
      */
 	
-    public Split_Panel() {
+    public Split_Panel(String str) {
     	super();
-    	spt = 0;
+    
         initComponents();
-
-
-       this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-    //    this.jTable_jScrollPanel_LeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
-       searchToolBar_LeftPanel.setVisible(false); 
-        
-    //   jSplitPanel.setOneTouchExpandable(true);
-      	
-        
-        
-        
-        
-      
+        set_Divider_Parameters(str);
     }
   
     /**
@@ -67,6 +59,11 @@ public class Split_Panel extends javax.swing.JPanel {
     
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
+    	
+    	spt = 0;
+    	settingsJSONbuf = new JSONObject();
+		settingsJSONbuf = Settings.getInstance().Dump();
+    	
         java.awt.GridBagConstraints gridBagConstraints;
 
         jSplitPanel = new MSplitPane(MSplitPane.VERTICAL_SPLIT, true);
@@ -312,6 +309,10 @@ public class Split_Panel extends javax.swing.JPanel {
         );
         
         jSplitPanel.setDividerLocation(0.3);
+        
+        this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        //    this.jTable_jScrollPanel_LeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
+           searchToolBar_LeftPanel.setVisible(false); 
       
     }// </editor-fold>                        
 
@@ -320,6 +321,18 @@ public class Split_Panel extends javax.swing.JPanel {
     }                                                         
 
 
+    private void set_Divider_Parameters(String str){
+    	if (!settingsJSONbuf.containsKey("Main_Frame_Setting")) return;
+    	 JSONObject params = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+    	if (!params.containsKey(str)) return;
+    	 JSONObject param = (JSONObject) params.get(str);
+    	if (param.containsKey("Div_Last_Loc")) jSplitPanel.setLastDividerLocation(new Integer((String) param.get("Div_Last_Loc")));
+    	if (param.containsKey("Div_Loc")) jSplitPanel.setDividerLocation(new Integer((String)param.get("Div_Loc")));
+    	int ii = new Integer((String)param.get("Div_Orientation"));
+    	if (param.containsKey("Div_Orientation"))jSplitPanel.setOrientation(ii);
+    	 
+    }
+    
     // Variables declaration - do not modify                     
     public javax.swing.JButton button1_ToolBar_LeftPanel;
     public javax.swing.JButton button2_ToolBar_LeftPanel;

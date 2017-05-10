@@ -31,7 +31,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 	// VotingDetailPanel votingDetailsPanel ;
 
 	public Records_My_SplitPanel() {
-
+		super("Records_My_SplitPanel");
 		this.leftPanel.setVisible(false);
 		allVotingsPanel = new All_Records_Panel();
 		this.jSplitPanel.setLeftComponent(allVotingsPanel);

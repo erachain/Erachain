@@ -84,7 +84,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 	int alpha_int;
 
 	public Statements_Search_SplitPanel() {
-	
+		super("Statements_Search_SplitPanel");
 		setName(Lang.getInstance().translate("Search Statements"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 		

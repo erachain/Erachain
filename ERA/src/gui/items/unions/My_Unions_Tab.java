@@ -25,7 +25,7 @@ public class My_Unions_Tab extends Split_Panel {
 	private TableColumn favoriteColumn;
 
 	public My_Unions_Tab(){
-	
+	super("My_Unions_Tab");
 	// My unions		
 		
 		setName(Lang.getInstance().translate("My Unions"));

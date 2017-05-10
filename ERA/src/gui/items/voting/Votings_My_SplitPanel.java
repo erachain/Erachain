@@ -34,7 +34,7 @@ import lang.Lang;
 		
 		
 	public Votings_My_SplitPanel(){
-	
+	super("Votings_My_SplitPanel");
 		this.setName(Lang.getInstance().translate("My Votings"));
 			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 			// not show buttons

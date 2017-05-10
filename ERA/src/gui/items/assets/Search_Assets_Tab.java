@@ -68,7 +68,7 @@ public class Search_Assets_Tab extends Split_Panel {
 	
 	
 	public Search_Assets_Tab(){
-		
+		super("Search_Assets_Tab");
 		
 		setName(Lang.getInstance().translate("Search Assets"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

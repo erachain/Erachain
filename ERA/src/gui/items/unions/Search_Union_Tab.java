@@ -30,6 +30,7 @@ public class Search_Union_Tab extends Split_Panel{
 	private Search_Union_Tab sUT;
 
 	public Search_Union_Tab(){
+		super("Search_Union_Tab");
 		sUT = this;
 		
 		setName(Lang.getInstance().translate("Search_Union_Tab"));

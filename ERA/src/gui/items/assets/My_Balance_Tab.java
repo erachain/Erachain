@@ -83,7 +83,7 @@ public class My_Balance_Tab extends Split_Panel {
 	@SuppressWarnings({ "null", "unchecked", "rawtypes" })
 	public My_Balance_Tab()
 	{
-
+		super("My_Balance_Tab");
 	
 	this.setName(Lang.getInstance().translate("My Balance"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

@@ -78,7 +78,7 @@ import utils.TableMenuPopupUtil;
 		
 		
 	public Incoming_Mails_SplitPanel(){
-	
+	super("Incoming_Mails_SplitPanel");
 		this.setName(Lang.getInstance().translate("Incoming Mails"));
 			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 			// not show buttons

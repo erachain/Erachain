@@ -85,7 +85,7 @@ import utils.MenuPopupUtil;
 		private JTextField sender_address;
 
 		    public Records_Search_SplitPanel() {
-		   
+		   super("Records_Search_SplitPanel");
 		    	
 		    	this.searchToolBar_LeftPanel.setVisible(true);
 		    	jScrollPane4 = new  JScrollPane();

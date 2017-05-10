@@ -40,7 +40,7 @@ public class My_Statuses_Tab extends Split_Panel {
 
 	// My statuses		
 public My_Statuses_Tab(){	
-		
+		super("My_Statuses_Tab");
 	tSP = this;
 		setName(Lang.getInstance().translate("My Statuses"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

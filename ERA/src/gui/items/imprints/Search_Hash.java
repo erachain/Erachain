@@ -27,6 +27,7 @@ public class Search_Hash extends Split_Panel {
 	
 	
 	public Search_Hash(){
+		super("Search_Hash");
 	
 	this.jButton2_jToolBar_RightPanel.setVisible(false);
 	this.jButton1_jToolBar_RightPanel.setVisible(false);

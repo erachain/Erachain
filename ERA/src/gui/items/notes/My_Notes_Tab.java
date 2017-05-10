@@ -54,7 +54,7 @@ public class My_Notes_Tab extends Split_Panel {
 
 	public My_Notes_Tab()
 	{
-
+		super ("My_Notes_Tab");
 	
 	this.setName("My Notes");
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

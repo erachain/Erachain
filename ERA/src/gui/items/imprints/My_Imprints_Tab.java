@@ -32,6 +32,7 @@ public class My_Imprints_Tab extends Split_Panel{
 	private static final long serialVersionUID = 1L;
 
 public My_Imprints_Tab(){
+	super ("My_Imprints_Tab");
 	
 	setName(Lang.getInstance().translate("My Imprints"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

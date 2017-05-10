@@ -60,7 +60,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 	Issue_Hash_Imprint issue_Hash_Imprint;
 
 	public Write_Documents_Hashes_Panel() {
-
+		super("Write_Documents_Hashes_Panel");
 		// left panel
 
 		this.toolBar_LeftPanel.setVisible(false);

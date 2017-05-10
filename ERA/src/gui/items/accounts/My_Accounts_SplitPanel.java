@@ -20,6 +20,7 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 	private int spt=1;
 	
 	public My_Accounts_SplitPanel(){
+		super("My_Accounts_SplitPanel");
 		
 	//	LayoutManager favoritesGBC = this.getLayout();
 		this.jScrollPanel_LeftPanel.setVisible(false);

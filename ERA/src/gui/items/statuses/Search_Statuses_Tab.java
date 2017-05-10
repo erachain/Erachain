@@ -33,7 +33,8 @@ private TableModelItemStatuses tableModelItemStatuses;
 private MTable statusesTable;
 private Search_Statuses_Tab sST;
 
-public Search_Statuses_Tab(){	
+public Search_Statuses_Tab(){
+	super("Search_Statuses_Tab");
 	sST= this;
 	setName(Lang.getInstance().translate("Search Statuses"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

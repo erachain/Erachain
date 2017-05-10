@@ -76,7 +76,7 @@ import gui.models.Renderer_Boolean;
 		
 		
 	public Persons_My_SplitPanel(){
-		super();
+		super("Persons_My_SplitPanel");
 	
 		this.setName(Lang.getInstance().translate("My Persons"));
 			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");

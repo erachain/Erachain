@@ -23,7 +23,7 @@ public class Generated_Blocks_Panel extends Split_Panel {
 	WalletBlocksTableModel blocksModel;
 
 	public  Generated_Blocks_Panel(){
-		
+		super("Generated_Blocks_Panel");
 		setName(Lang.getInstance().translate("Generated Blocks"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 		

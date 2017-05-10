@@ -16,7 +16,7 @@ public class My_Loans_SplitPanel extends Split_Panel {
 	public Accounts_Panel accountPanel;
 	public Accounts_Right_Panel rightPanel;
 	public My_Loans_SplitPanel(){
-		
+		super("My_Loans_SplitPanel");
 	//	LayoutManager favoritesGBC = this.getLayout();
 		this.jScrollPanel_LeftPanel.setVisible(false);
 		this.searchToolBar_LeftPanel.setVisible(false);
