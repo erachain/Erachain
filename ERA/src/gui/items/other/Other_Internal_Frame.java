@@ -18,7 +18,6 @@ import database.BlockMap;
 import database.DBSet;
 import database.TransactionMap;
 import gui.CoreRowSorter;
-import gui.MainFrame;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
 import gui.items.persons.Persons_Search_SplitPanel;
@@ -40,7 +39,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 		
 		
 		
-	    Dimension size = MainFrame.getInstance().desktopPane.getSize();
+	 //   Dimension size = MainFrame.getInstance().desktopPane.getSize();
 	   
 		
 		this.setTitle(Lang.getInstance().translate("Network DashBoard"));
@@ -193,7 +192,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 	  
 	    
-	    this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+	 //   this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
 	  
 	
 	

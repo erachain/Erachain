@@ -18,7 +18,6 @@ import controller.Controller;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
-import gui.RunMenu;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.library.MButton;

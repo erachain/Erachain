@@ -48,7 +48,6 @@
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 	import gui.Main_Internal_Frame;
-	import gui.RunMenu;
 	import gui.Split_Panel;
 	import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;

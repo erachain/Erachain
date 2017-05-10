@@ -52,7 +52,6 @@ import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.Main_Internal_Frame;
-import gui.RunMenu;
 import gui.Split_Panel;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.TableModelItemAssets;

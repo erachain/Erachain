@@ -52,7 +52,6 @@ import database.DBSet;
 import database.Issue_ItemMap;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
-import gui.Table_Formats;
 import gui.items.unions.TableModelUnions;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;

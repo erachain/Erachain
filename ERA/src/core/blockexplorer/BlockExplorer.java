@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -23,10 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import javax.swing.JTextField;
 import javax.ws.rs.core.UriInfo;
-
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -35,16 +31,12 @@ import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple6;
-
 import com.github.rjeschke.txtmark.Processor;
-
 import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
 import core.account.Account;
-import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
@@ -83,16 +75,10 @@ import core.voting.PollOption;
 import database.DBSet;
 import database.SortableList;
 import gui.items.persons.TableModelPersons;
-import gui.items.statement.Statements_Table_Model_Search;
-import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.library.library;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
-import gui.models.PersonStatusesModel;
-import gui.models.WalletItemPersonsTableModel;
 import lang.Lang;
-import lang.LangFile;
-import network.Peer;
 import settings.Settings;
 import utils.BlExpUnit;
 import utils.DateTimeFormat;
@@ -110,7 +96,6 @@ public class BlockExplorer
 	private Locale local = new Locale("ru","RU"); // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљ Р Т‘Р В°РЎвЂљРЎвЂ№
 	private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // Р Т‘Р В»РЎРЏ РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В° Р Т‘Р В°РЎвЂљРЎвЂ№
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	private String lang; 
 	public static final String  LANG_DEFAULT = "en";
 	private  String lang_file;
 	
@@ -135,16 +120,6 @@ public class BlockExplorer
 		Stopwatch stopwatchAll = new Stopwatch();
 
 		Map output = new LinkedHashMap();
-
-	
-		
-		
-		
-		
-		
-	
-		
-		
 //lang		
 		if(!info.getQueryParameters().containsKey("lang")){
 			lang_file = LANG_DEFAULT +".json"; 	
@@ -175,14 +150,8 @@ public class BlockExplorer
 		output.put("id_menu_pals_asset",  Lang.getInstance().translate_from_langObj("Polls",langObj));
 		output.put("id_menu_assets", Lang.getInstance().translate_from_langObj("Assets",langObj));
 		output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs",langObj));
-		
 	
-	
-	
-		
-		
-
-			if(info.getQueryParameters().containsKey("balance"))
+		if(info.getQueryParameters().containsKey("balance"))
 			{
 				output.put("lastBlock", jsonQueryLastBlock());
 				for (String address : info.getQueryParameters().get("balance")) {

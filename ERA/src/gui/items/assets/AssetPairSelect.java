@@ -56,7 +56,6 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import gui.Table_Formats;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;

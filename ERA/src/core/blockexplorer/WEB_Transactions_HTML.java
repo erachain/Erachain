@@ -1,36 +1,14 @@
 package core.blockexplorer;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
 import javax.swing.table.TableRowSorter;
-
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.json.simple.JSONObject;
-
 import com.github.rjeschke.txtmark.Processor;
-
 import controller.Controller;
-import core.account.Account;
-import core.account.PrivateKeyAccount;
-import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
@@ -62,15 +40,12 @@ import core.transaction.Transaction;
 import core.transaction.VoteOnPollTransaction;
 import database.DBSet;
 import gui.Gui;
-import gui.MainFrame;
-import gui.PasswordPane;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.PollOptionsTableModel;
 import lang.Lang;
 import utils.BigDecimalStringComparator;
 import utils.Converter;
 import utils.DateTimeFormat;
-import utils.MenuPopupUtil;
 
 public class WEB_Transactions_HTML {
 	private static WEB_Transactions_HTML instance;
