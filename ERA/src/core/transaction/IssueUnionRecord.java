@@ -67,7 +67,7 @@ public class IssueUnionRecord extends Issue_ItemRecord
 	
 	// NOT GENESIS ISSUE STRT FRON NUM
 	protected long getStartKey() {
-		return 1000l;
+		return 10000l;
 	}
 
 	//@Override

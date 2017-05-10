@@ -112,13 +112,19 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		//if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		if (person.getHeight() > 255) return Transaction.ITEM_PERSON_HEIGHT_ERROR;
 		
-		if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
-				|| person.getImage().length > MAX_IMAGE_LENGTH) {
-			int height = this.getBlockHeightByParent(db);
-			if (height != 2998) {
-				// early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
-				return Transaction.INVALID_IMAGE_LENGTH;				
+		if (person.getDeathday() == Long.MIN_VALUE
+				|| person.getDeathday() < person.getBirthday()) {
+			// IF PERSON is LIVE
+			if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
+					|| person.getImage().length > MAX_IMAGE_LENGTH) {
+				int height = this.getBlockHeightByParent(db);
+				if (height != 2998) {
+					// early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
+					return Transaction.INVALID_IMAGE_LENGTH;				
+				}
 			}
+		} else {
+			// person is DIE - any PHOTO
 		}
 
 		if (person instanceof PersonHuman) {

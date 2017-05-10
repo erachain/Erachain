@@ -91,7 +91,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		return BigDecimal.ZERO.setScale(8);
 	}
 
-	// NOT GENESIS ISSUE STRT FRON NUM
+	// NOT GENESIS ISSUE START FRON NUM
 	protected long getStartKey() {
 		return 1000l;
 	}
