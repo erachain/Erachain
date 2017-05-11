@@ -3,12 +3,18 @@ package gui2;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -120,6 +126,56 @@ public tt() {
  //  tree.addTreeSelectionListener(this);
    tree.setRootVisible(false);
    for(int i = 0; i < tree.getRowCount(); i ++) tree.expandRow(i);
+   
+   
+   JPopupMenu menu = new JPopupMenu("www");
+   
+   JMenuItem menuExpand = new JMenuItem(Lang.getInstance().translate("Expand All"));
+   menuExpand.addActionListener(new ActionListener(){
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		 for(int i = 0; i < tree.getRowCount(); i ++) tree.expandRow(i);
+	}
+	  });
+   
+   JMenuItem menuColapse = new JMenuItem(Lang.getInstance().translate("Collapse All"));
+   menuColapse.addActionListener(new ActionListener(){
+   @Override
+	public void actionPerformed(ActionEvent arg0) {
+		// TODO Auto-generated method stub
+		 for(int i = 0; i < tree.getRowCount(); i ++) tree.collapseRow(i);
+	}
+	  });
+   menu.add(menuExpand);
+   menu.add(menuColapse);
+   
+   menu.addAncestorListener(new AncestorListener(){
+
+	@Override
+	public void ancestorAdded(AncestorEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ancestorMoved(AncestorEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void ancestorRemoved(AncestorEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	   
+	   
+   });
+   
+   tree.setComponentPopupMenu(menu);
+
    
    // ��������� �������� ���������� � ����
    add(new JScrollPane(tree));

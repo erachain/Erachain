@@ -8,11 +8,9 @@ import javax.swing.RowFilter;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import controller.Controller;
-import core.BlockChain;
 import gui.create.NoWalletFrame;
 import gui.create.SettingLangFrame;
 import gui.library.MTable;
-import gui2.Main_JFrame;
 import lang.Lang;
 import settings.Settings;
 import utils.SysTray;
@@ -24,10 +22,7 @@ public class Gui extends JFrame{
 
 
 	private static Gui maingui;
-//	private MainFrame mainframe;
-
-
-	private Main_JFrame mainframe;
+	private MainFrame mainframe;
 	public static Gui getInstance() throws Exception
 	{
 		if(maingui == null)
@@ -68,13 +63,8 @@ public class Gui extends JFrame{
         	new NoWalletFrame(this);
         } else if (Settings.getInstance().isGuiEnabled())
     	{
-    		
-      //  	if (BlockChain.DEVELOP_USE) {
-        	mainframe = Main_JFrame.getInstance();
-        	mainframe.setVisible(true);
-      //  	}
-     //   	mainframe =	MainFrame.getInstance();
-    //		mainframe.setVisible(true);
+    		mainframe =	MainFrame.getInstance();
+    		mainframe.setVisible(true);
     	}
         
 	}
@@ -90,7 +80,7 @@ public class Gui extends JFrame{
 		SysTray.getInstance().sendMessage(Lang.getInstance().translate("Wallet Initialized"),
 				Lang.getInstance().translate("Your wallet is initialized"), MessageType.INFO);
 		if (Settings.getInstance().isGuiEnabled())
-			mainframe = Main_JFrame.getInstance();
+			mainframe = MainFrame.getInstance();
 	}
 	
 	public void bringtoFront()

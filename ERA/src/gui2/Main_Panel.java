@@ -269,6 +269,8 @@ public class Main_Panel extends javax.swing.JPanel {
 	public M_TabbedPanel jTabbedPane1;
 	// End of variables declaration
 	
+	
+	// add tab from name
 	public void dylay(String str){
 		
 		
@@ -407,6 +409,8 @@ public class Main_Panel extends javax.swing.JPanel {
 			
 		
 	}
+	
+	// insert tab in tabbedpane
 	public void ccase1(String str, JPanel pp){
 		int s=-1;
 		s = jTabbedPane1.indexOfTab(str);
@@ -419,6 +423,7 @@ public class Main_Panel extends javax.swing.JPanel {
 		
 		
 	}
+	// get node by name
     private DefaultMutableTreeNode getNodeByName(String sNodeName, DefaultMutableTreeNode parent){
         if (parent != null)
             for (Enumeration e = parent.breadthFirstEnumeration(); e.hasMoreElements();){

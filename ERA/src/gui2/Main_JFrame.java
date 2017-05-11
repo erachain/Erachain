@@ -61,6 +61,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 
 		// CREATE FRAME
 		super(controller.Controller.APP_NAME + " v." + Controller.getVersion());
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setVisible(false);
 		if (Settings.getInstance().isTestnet()) {
 			setTitle(controller.Controller.APP_NAME + " TestNet " + "v." + Controller.getVersion() + " TS:"

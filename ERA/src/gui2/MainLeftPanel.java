@@ -11,13 +11,13 @@ import javax.swing.event.TreeSelectionListener;
 
 /**
  *
- * @author Саша
+ * @author пїЅпїЅпїЅпїЅ
  */
 public class MainLeftPanel extends javax.swing.JPanel {
 
     public tt tree;
 	/**
-     * Creates new form иии
+     * Creates new form пїЅпїЅпїЅ
      */
     public MainLeftPanel() {
         initComponents();
@@ -56,7 +56,7 @@ public class MainLeftPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.3;
   //      add(jButton2, gridBagConstraints);
 
-        jButton3.setText("jButton3");
+       
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
