@@ -194,6 +194,7 @@ public class Create_Voting_Panel extends JPanel
 	//	this.pack();
    //     this.setResizable(false);
   //      this.setLocationRelativeTo(null);
+    	this.setMinimumSize(new Dimension(0,0));
         this.setVisible(true);
 	}
 	

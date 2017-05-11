@@ -67,7 +67,7 @@ public class IssueStatusPanel extends JPanel
 //		this.setTitle(Lang.getInstance().translate("Issue Status"));
 	//	this.setClosable(true);
 //		this.setResizable(true);
-		setPreferredSize(new Dimension(800, 600));
+	//	setPreferredSize(new Dimension(800, 600));
 	//	this.setLocation(50, 20);
 		
 		
@@ -232,6 +232,7 @@ public class IssueStatusPanel extends JPanel
 	//	this.pack();
    //     this.setResizable(false);
    //     this.setLocationRelativeTo(null);
+    	this.setMinimumSize(new Dimension(0,0));
         this.setVisible(true);
 	}
 	

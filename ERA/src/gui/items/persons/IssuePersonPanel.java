@@ -178,7 +178,7 @@ public class IssuePersonPanel extends JPanel
 			addimage();
 			}
         });
-        
+        this.setMinimumSize(new Dimension(0,0)); 
         this.setVisible(true);
         
 	}

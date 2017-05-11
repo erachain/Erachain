@@ -218,9 +218,9 @@ public class IssueAssetPanel extends JPanel
   //    	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	
       	
-      	this.txtareaDescription.setColumns(20);
+   //   	this.txtareaDescription.setColumns(20);
       	this.txtareaDescription.setLineWrap(true);
-      	this.txtareaDescription.setRows(5);
+    //  	this.txtareaDescription.setRows(5);
       	scrollDescription.setViewportView(this.txtareaDescription);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -229,7 +229,7 @@ public class IssueAssetPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.4;
+        gridBagConstraints.weighty = 0.9;
         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
         add(scrollDescription, gridBagConstraints);
       	
@@ -416,13 +416,14 @@ public class IssueAssetPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        add(jLabel9, gridBagConstraints);
+     //   add(jLabel9, gridBagConstraints);
      //   this.add(this.issueButton, buttonGBC);
         
         //PACK
 	//	this.pack();
    //     this.setResizable(false);
    //     this.setLocationRelativeTo(null);
+        this.setMinimumSize(new Dimension(0,0));
         this.setVisible(true);
 	}
 	

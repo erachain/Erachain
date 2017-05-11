@@ -469,6 +469,7 @@ public class IssueNotePanel extends JPanel
 	        gridBagConstraints.weightx = 0.1;
 	        gridBagConstraints.weighty = 0.3;
 	        add(jLabel_auto_saze, gridBagConstraints);
+	        this.setMinimumSize(new Dimension(0,0));
 	    }// </editor-fold>                        
 
 	    private void jComboBox_Account_CreatorActionPerformed(java.awt.event.ActionEvent evt) {                                                          

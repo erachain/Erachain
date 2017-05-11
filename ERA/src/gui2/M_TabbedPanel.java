@@ -34,6 +34,7 @@ public class M_TabbedPanel extends JTabbedPane {
 		this.setTabComponentAt(this.indexOfComponent(comp), new ButtonTabComponent(this));		
 		// write info to tabbed setting object
 		
+		
 	}
 	
 	

@@ -219,6 +219,8 @@ public void initComponents() {
 					
 
 				}
+				settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex()+ "");
+				
 				settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
 				// save setting to setting file
 				try {
@@ -302,6 +304,8 @@ public void initComponents() {
 					String value = (String) openTabes.get(i + "");
 					mainPanel.dylay(value);
 				}
+				if (main_Frame_settingsJSON.containsKey("Main_Frame_Selected_Tab"))
+					mainPanel.jTabbedPane1.setSelectedIndex(new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Selected_Tab")));
 			}
 		
 		

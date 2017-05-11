@@ -529,7 +529,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(16, 8, 0, 8);
         add(jTabbedPane_Message, gridBagConstraints);
 
-        jPanel_Attached_Files.setMinimumSize(new java.awt.Dimension(0, 64));
+        jPanel_Attached_Files.setMinimumSize(new java.awt.Dimension(0, 0));
         jPanel_Attached_Files.setPreferredSize(new java.awt.Dimension(0, 64));
         jPanel_Attached_Files.setLayout(new java.awt.GridBagLayout());
 
@@ -729,7 +729,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jPanel_Work.add(jLabel_Fee_Work, gridBagConstraints);
 
         jTextField_Fee_Work.setText("jTextField2");
-        jTextField_Fee_Work.setMinimumSize(new java.awt.Dimension(120, 20));
+        jTextField_Fee_Work.setMinimumSize(new java.awt.Dimension(0, 20));
         jTextField_Fee_Work.setPreferredSize(new java.awt.Dimension(120, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -781,6 +781,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         add(jPanel_Work, gridBagConstraints);
         jPanel_Work.getAccessibleContext().setAccessibleName("Work");
         jPanel_Work.getAccessibleContext().setAccessibleDescription("");
+        this.setMinimumSize(new Dimension(0,0));
         
     }// </editor-fold>
     

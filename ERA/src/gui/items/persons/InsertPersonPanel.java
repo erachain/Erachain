@@ -76,7 +76,7 @@ public class InsertPersonPanel extends IssuePersonPanel{
 		super();
 		
 		init();	
-		
+		this.setMinimumSize(new Dimension(0,0));
 	}
 	
 	public String getClipboardContents() {
