@@ -45,6 +45,7 @@ public class MainFrame extends JFrame implements Observer{
 		private StatusPanel statusPanel;
 		private javax.swing.JTabbedPane jTabbedPane1;
 		// End of variables declaration
+		private MainFrame th;
 
 private static MainFrame instance;
 public static MainFrame getInstance()
@@ -71,7 +72,7 @@ public static MainFrame getInstance()
 					 + " TS:" + Settings.getInstance().getGenesisStamp());
 		}
 		
-	
+	th = this;
 	
        
 		Controller.getInstance().addObserver(this);	
@@ -98,7 +99,7 @@ public void initComponents() {
 
 		jTabbedPane1 = new javax.swing.JTabbedPane();
 		mainPanel = new Main_Panel();
-		statusPanel = new StatusPanel();
+		//statusPanel = new StatusPanel();
 		jMenuBar1 = new javax.swing.JMenuBar();
 		jMenu1 = new Menu_Files();
 		jMenu2 = new Menu_Deals();
@@ -122,12 +123,12 @@ public void initComponents() {
 
 		add(mainPanel, BorderLayout.CENTER);
 
-		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(statusPanel);
-		statusPanel.setLayout(jPanel2Layout);
-		jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 0, Short.MAX_VALUE));
-		jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 0, Short.MAX_VALUE));
+	//	javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(statusPanel);
+	//	statusPanel.setLayout(jPanel2Layout);
+	//	jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	//			.addGap(0, 0, Short.MAX_VALUE));
+	//	jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+	//			.addGap(0, 0, Short.MAX_VALUE));
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -135,7 +136,7 @@ public void initComponents() {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.2;
 		// getContentPane().add(jPanel2, gridBagConstraints);
-		this.add(new StatusPanel(), BorderLayout.SOUTH);
+		//this.add(new StatusPanel(), BorderLayout.SOUTH);
 
 		jMenu1.setText(Lang.getInstance().translate("File"));
 		jMenuBar1.add(jMenu1);
@@ -169,11 +170,19 @@ public void initComponents() {
 				Split_Panel sP;
 				HashMap outOpenTabbeds = new HashMap();
 				JSONObject settingsJSON = new JSONObject();
+				settingsJSONbuf = Settings.getInstance().read_setting_JSON();
 				if (settingsJSONbuf.containsKey("Main_Frame_Setting"))  settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+				if (th.getExtendedState() != MAXIMIZED_BOTH) {
+					settingsJSON.put("Main_Frame_is_Max", "false");
 				settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
 				settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
 				settingsJSON.put("Main_Frame_Loc_X", getX() + ""); // высота
 				settingsJSON.put("Main_Frame_Loc_Y", getY() + ""); // высота
+				}
+				else{
+					
+					settingsJSON.put("Main_Frame_is_Max", "true");
+				}
 
 				settingsJSON.put("Main_Frame_Div_Orientation", mainPanel.jSplitPane1.getOrientation() + "");
 				// horisontal - vertical orientation
@@ -268,6 +277,11 @@ public void initComponents() {
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Height")) h = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Width")) w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
 			setSize(w, h);
+			if(main_Frame_settingsJSON.containsKey("Main_Frame_is_Max")){
+				Boolean bb = new Boolean((String)main_Frame_settingsJSON.get("Main_Frame_is_Max"));
+				if (bb)this.setExtendedState(MAXIMIZED_BOTH);
+				
+			}
 			int orientation=0;
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Orientation")) orientation = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Orientation"));
 			mainPanel.jSplitPane1.setOrientation(orientation);

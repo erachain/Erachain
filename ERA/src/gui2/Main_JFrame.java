@@ -70,7 +70,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 		Controller.getInstance().addObserver(this);
 		// read settings
 		settingsJSONbuf = new JSONObject();
-		settingsJSONbuf = Settings.getInstance().Dump();
+		
 		initComponents();
 
 	}
@@ -164,6 +164,7 @@ public class Main_JFrame extends javax.swing.JFrame implements Observer {
 				Split_Panel sP;
 				HashMap outOpenTabbeds = new HashMap();
 				JSONObject settingsJSON = new JSONObject();
+				settingsJSONbuf = Settings.getInstance().read_setting_JSON();
 				if (settingsJSONbuf.containsKey("Main_Frame_Setting"))  settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
 				settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
 				settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
