@@ -13,6 +13,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.TreeSelectionEvent;
@@ -124,6 +125,8 @@ public tt() {
    // ������� ������� ���������� � ��������� ������� ������
    tree = new JTree(root);
  //  tree.addTreeSelectionListener(this);
+   double dd = (double) UIManager.getFont("TextField.font").getSize()* 1.2;
+   tree.setRowHeight((int)dd );
    tree.setRootVisible(false);
    for(int i = 0; i < tree.getRowCount(); i ++) tree.expandRow(i);
    
