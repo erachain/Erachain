@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import java.util.zip.DataFormatException;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -137,11 +138,10 @@ public class Statement_Info extends javax.swing.JPanel {
 					 
 				 }
 				 }
-				
+				 jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+data.get("Title").toString());
 							 
 				 jTextArea_Body.setText(
-						  data.get("Title") + "\n\n"
-							+ description + "\n\n"
+						  	 description + "\n\n"
 							+    data.get("Message") + "\n\n"
 							+ hasHes + "\n\n"
 					//		+ files +"\n"
@@ -257,7 +257,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		// jTextArea_Body.setRows(5);
 		// jScrollPane3.setViewportView(jTextArea_Body);
 	//	jScrollPane3.getViewport().add(jTextArea_Body);
-		jLabel_Title.setText(Lang.getInstance().translate("Statement"));
+		jLabel_Title.setText(Lang.getInstance().translate("Title"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = ++y;
@@ -267,7 +267,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
 		jPanel1.add(jLabel_Title, gridBagConstraints);
 		
-		
+				
 		
 		jTextArea_Body.setWrapStyleWord(true);
 		jTextArea_Body.setLineWrap(true);
@@ -344,7 +344,7 @@ public class Statement_Info extends javax.swing.JPanel {
 	private javax.swing.JScrollPane jScrollPane3;
 
 	private MSplitPane jSplitPane1;
-
+	private JLabel title_Txt;
 	private JTextArea jTextArea_Body;
 	// End of variables declaration
 }
