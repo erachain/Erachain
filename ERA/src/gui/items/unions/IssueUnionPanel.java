@@ -1,6 +1,9 @@
 package gui.items.unions;
 
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
 
@@ -43,6 +46,9 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.item.assets.AssetCls;
+import core.item.unions.UnionCls;
+import core.transaction.IssueUnionRecord;
 import core.transaction.Transaction;
 import gui.transaction.OnDealClick;
 
@@ -64,13 +70,14 @@ public class IssueUnionPanel extends JPanel
 	private JTextField txtHairСolor;
 	private JTextField txtHeight;
 	private JButton issueButton;
+	private IssueUnionPanel th;
 
 	public IssueUnionPanel()
 	{
 //		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Union"));
 		
 		String colorText ="ff0000"; // цвет текста в форме
-		
+		th=this;
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
@@ -250,7 +257,6 @@ public class IssueUnionPanel extends JPanel
         //BUTTON Register
         buttonGBC.gridy = gridy;
         this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -330,7 +336,7 @@ public class IssueUnionPanel extends JPanel
 			//birthday = Long.parseLong(this.txtBirthday.getText());
 			// 1970-08-12 03:05:07
 			String bd = this.txtBirthday.getText();
-			if (bd.length() < 11) bd = bd + " 12:12:12 UTC";
+			if (bd.length() < 11) bd = bd + " 12:12:12";// UTC";
 			Timestamp ts = Timestamp.valueOf(bd);
 			birthday = ts.getTime();
 
@@ -365,16 +371,45 @@ public class IssueUnionPanel extends JPanel
 		//byte gender, String race, float birthLatitude, float birthLongitude,
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		Pair<Transaction, Integer> result = Controller.getInstance().issueUnion(
+		IssueUnionRecord issue_Union = (IssueUnionRecord) Controller.getInstance().issueUnion(
 				creator, this.txtName.getText(), birthday, parent, this.txtareaDescription.getText(), feePow);
+		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+		 String text = "<HTML><body>";
+		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+		    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_Union.getCreator() +"<br>";
+		    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issue_Union.getItem().getName() +"<br>";
+		   text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issue_Union.getItem().getDescription())+"<br>";
+		   text += Lang.getInstance().translate("Date") +":&nbsp;"+ ((UnionCls)issue_Union.getItem()).getBirthday() +"<br>";
+		   text += Lang.getInstance().translate("Parent") +":&nbsp;"+ ((UnionCls)issue_Union.getItem()).getParent() +"<br>";
+		    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issue_Union.viewSize(true)+" Bytes, ";
+		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issue_Union.getFee().toString()+" COMPU</b><br></body></HTML>";
+		    
 		
+	//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+	//	    UIManager.put("OptionPane.okButtonText", "Готово");
+		
+	//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+		
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		dd.setLocationRelativeTo(th);
+		dd.setVisible(true);
+		
+	//	JOptionPane.OK_OPTION
+		if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+			
+			this.issueButton.setEnabled(true);
+			
+			return;
+		}
+		//VALIDATE AND PROCESS
+		int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_Union, false);
 		//CHECK VALIDATE MESSAGE
-		if (result.getB() == Transaction.VALIDATE_OK) {
+		if (result == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Union issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 	//		this.dispose();
 			clearPanel();
 		} else {		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//ENABLE

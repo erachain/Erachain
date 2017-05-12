@@ -44,7 +44,9 @@ public  Union_Info() {
 		//date_birthday =  formatDate.format(new Date(Long.valueOf(union.getBirthday())));
 		date_birthday = union.getBirthdayStr();
 		message ="<html><div>#" + "<b>" + union.getKey() + " : " + date_birthday + "</b>"
-		+ "<br>" + union.getName().toString() + "</div>";
+		+ "<br>" + union.getName().toString() +  
+		"<br>" +
+		"</div>";
 
 	} else {
 		message = "<html><p>"+ Lang.getInstance().translate("Not found!") +"</p>";	

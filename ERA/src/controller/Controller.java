@@ -2420,7 +2420,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> issueUnion(PrivateKeyAccount creator,
+	public Transaction issueUnion(PrivateKeyAccount creator,
 			String name, long birthday, long parent, String description, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {

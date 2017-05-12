@@ -408,7 +408,7 @@ public class TransactionCreator
 		return issueStatusRecord;
 	}
 
-	public Pair<Transaction, Integer> createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 
+	public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -422,8 +422,8 @@ public class TransactionCreator
 		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueUnionRecord.sign(creator, false);
 										
-		//VALIDATE AND PROCESS
-		return new Pair<Transaction, Integer>(issueUnionRecord, this.afterCreate(issueUnionRecord, false));
+		return issueUnionRecord;
+		
 	}
 
 	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amounWant, int feePow)
