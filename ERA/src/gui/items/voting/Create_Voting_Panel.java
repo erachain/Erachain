@@ -1,6 +1,9 @@
 package gui.items.voting;
 
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.models.CreateOptionsTableModel;
 import lang.Lang;
@@ -38,7 +41,9 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
+import core.transaction.CreatePollTransaction;
 import core.transaction.Transaction;
+import core.voting.Poll;
 
 @SuppressWarnings("serial")
 public class Create_Voting_Panel extends JPanel
@@ -49,6 +54,7 @@ public class Create_Voting_Panel extends JPanel
 	private JTextArea txtareaDescription;
 	private JButton createButton;
 	private CreateOptionsTableModel optionsTableModel;
+	private Create_Voting_Panel th;
 
 	public Create_Voting_Panel()
 	{
@@ -62,7 +68,7 @@ public class Create_Voting_Panel extends JPanel
 		
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
-		
+		th = this;
 		//PADDING
 	//	((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
 		
@@ -180,7 +186,6 @@ public class Create_Voting_Panel extends JPanel
         //BUTTON Register
         buttonGBC.gridy = 6;
         createButton = new JButton(Lang.getInstance().translate("Create"));
-        createButton.setPreferredSize(new Dimension(80, 25));
         createButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -243,10 +248,56 @@ public class Create_Voting_Panel extends JPanel
 			
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions(), feePow);
+			CreatePollTransaction issue_voiting = (CreatePollTransaction) Controller.getInstance().createPoll(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions(), feePow);
+			Poll poll = issue_voiting.getPoll();
+
+			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+			 String text = "<HTML><body>";
+			 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+			    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_voiting.getCreator() +"<br>";
+			    text += Lang.getInstance().translate("Name") +":&nbsp;"+ poll.getName() +"<br>";
+			   text += "<br>"+Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(poll.getDescription())+"<br>";
+			    text += "<br>"+ Lang.getInstance().translate("Options")+":<br>";
+			    
+			    List<String> op = this.optionsTableModel.getOptions();
+			    
+			    int i;
+				for (i=0; i< op.size(); i++){
+					 text += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+ op.get(i);	
+			    	
+			    }
+				 text += "<br>    ";
+				
+			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issue_voiting.viewSize(true)+" Bytes, ";
+			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issue_voiting.getFee().toString()+" COMPU</b><br></body></HTML>";
+			    
+			
+		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+		//	    UIManager.put("OptionPane.okButtonText", "Готово");
+			
+		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+			
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+			dd.setLocationRelativeTo(th);
+			dd.setVisible(true);
+			
+		//	JOptionPane.OK_OPTION
+			if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+				
+				this.createButton.setEnabled(true);
+				
+				return;
+			}
+			
+					
+			//VALIDATE AND PROCESS
+			int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_voiting, false);
+			
+			
+			
 			
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
+			switch(result)
 			{
 			case Transaction.VALIDATE_OK:
 				

@@ -2278,7 +2278,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> createPoll(PrivateKeyAccount creator,
+	public Transaction createPoll(PrivateKeyAccount creator,
 			String name, String description, List<String> options,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME

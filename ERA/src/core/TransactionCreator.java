@@ -217,7 +217,7 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, false));
 	}
 		
-	public Pair<Transaction, Integer> createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow) 
+	public Transaction createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -228,9 +228,9 @@ public class TransactionCreator
 		//CREATE POLL CREATION
 		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, (byte)feePow, time, creator.getLastReference(this.fork));
 		pollCreation.sign(creator, false);
-						
-		//VALIDATE AND PROCESS
-		return new Pair<Transaction, Integer>(pollCreation, this.afterCreate(pollCreation, false));
+		
+		return pollCreation;
+		
 	}
 	
 
