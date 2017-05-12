@@ -40,6 +40,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import database.DBSet;
+import database.SortableList;
 import gui.MainFrame;
 import gui.library.MTable;
 
@@ -266,6 +267,7 @@ public class ExchangeFrame extends JDialog
 	//		this.setSize(new Dimension(wH,hG));
 	//		this.setPreferredSize(new Dimension(wH,hG));
 			this.setSize(MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100);
+			this.setMaximumSize(new Dimension(MainFrame.getInstance().getWidth()-10, MainFrame.getInstance().getHeight()-10));
 			this.setLocationRelativeTo(MainFrame.getInstance());
 			this.setVisible(true);
 	        
@@ -440,6 +442,8 @@ public class ExchangeFrame extends JDialog
 			JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
 			trades.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					if(sellOrdersTableModel.getSortableList().size()==0)return;
+					
 					int row = sellOrdersTable.getSelectedRow();
 					row = sellOrdersTable.convertRowIndexToModel(row);
 
@@ -451,6 +455,7 @@ public class ExchangeFrame extends JDialog
 			JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
 			cancel.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					if(sellOrdersTableModel.getSortableList().size()==0)return;
 					int row = sellOrdersTable.getSelectedRow();
 					row = sellOrdersTable.convertRowIndexToModel(row);
 
@@ -537,17 +542,22 @@ public class ExchangeFrame extends JDialog
 			JMenuItem buyTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
 			buyTrades.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					SortableList<BigInteger, Order> sl = buyOrdersTableModel.getSortableList();
+					if (sl.size()==0) return;
+					
 					int row = buyOrdersTable.getSelectedRow();
 					row = buyOrdersTable.convertRowIndexToModel(row);
 
 					Order order = buyOrdersTableModel.getOrder(row);
-					new TradesFrame(order);
+					if(order != null)	new TradesFrame(order);
 				}
 			});
 			buyOrdersMenu.add(buyTrades);
 			JMenuItem buyCancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
 			buyCancel.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					SortableList<BigInteger, Order> sl = buyOrdersTableModel.getSortableList();
+					if (sl.size()==0) return;
 					int row = buyOrdersTable.getSelectedRow();
 					row = buyOrdersTable.convertRowIndexToModel(row);
 
