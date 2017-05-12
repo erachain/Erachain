@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
@@ -23,19 +24,21 @@ import lang.Lang;
  */
 public class Issue_Confirm_Dialog extends javax.swing.JDialog {
 public boolean isConfirm = false;
-int insest = 0; 
+int insest = 0;
+private JLabel jStatus_Label; 
     /**
      * Creates new form Issue_Asset_Confirm_Dialog
      * @param th 
      * @param th 
      */
-    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, String text, int w, int h) {
+    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text) {
         super(parent, modal);
        // setUndecorated(true);
         insest = UIManager.getFont("Label.font").getSize();
         if (insest <=7) insest = 8;
         initComponents();
         jTextPane1.set_text(text);
+        jStatus_Label.setText(status_Text);
         setMaximumSize(new Dimension(350,200));
         setSize(w,h );
         jButton1.addActionListener(new ActionListener(){
@@ -74,6 +77,7 @@ int insest = 0;
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jStatus_Label = new JLabel();
        
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -96,12 +100,24 @@ int insest = 0;
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jButton1.setText(Lang.getInstance().translate("Confirm"));
+        jStatus_Label.setText(Lang.getInstance().translate("Status"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
+        jPanel1.add(jStatus_Label, gridBagConstraints);
+        
+        
+        jButton1.setText(Lang.getInstance().translate("Confirm"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
         jPanel1.add(jButton1, gridBagConstraints);
 
         jButton2.setText(Lang.getInstance().translate("Cancel"));
+        gridBagConstraints.gridx = 2;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);

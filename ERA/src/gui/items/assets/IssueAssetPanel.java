@@ -496,8 +496,8 @@ public class IssueAssetPanel extends JPanel
 			    text += Lang.getInstance().translate("Divisible") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isDivisible()+"")+ "<br>";
 			    text += Lang.getInstance().translate("Scale") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
 			    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
-			    text += Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+"<br>";
-			    text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.getFee().toString()+"</b><br></body></HTML>";
+			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+" Bytes, ";
+			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 			    
 			  System.out.print("\n"+ text +"\n");
 		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -505,7 +505,7 @@ public class IssueAssetPanel extends JPanel
 			
 		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 			
-			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2));
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
 			dd.setLocationRelativeTo(th);
 			dd.setVisible(true);
 			
