@@ -1,7 +1,10 @@
 package gui.items.assets;
 
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
@@ -56,6 +59,7 @@ public class IssueAssetPanel extends JPanel
 	private JTextField txtQuantity;
 	private JCheckBox chkDivisible;
 	private MButton issueButton;
+	private IssueAssetPanel th;
 
 	public IssueAssetPanel()
 	{
@@ -63,7 +67,7 @@ public class IssueAssetPanel extends JPanel
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
+		th = this;
 		int gridy = 0;
 		
 		//ICON
@@ -366,9 +370,9 @@ public class IssueAssetPanel extends JPanel
          //gridBagConstraints.gridy = gridy;
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-    //     add(feeLabel, gridBagConstraints);
+         add(feeLabel, gridBagConstraints);
       	
-  ;
+  
       		
       	//TXT FEE
   //    	txtGBC.gridy = 6;
@@ -381,7 +385,7 @@ public class IssueAssetPanel extends JPanel
          gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
          gridBagConstraints.weightx = 1.0;
          gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-   //      add(this.txtFeePow, gridBagConstraints);
+         add(this.txtFeePow, gridBagConstraints);
  
 		           
         //BUTTON Register
@@ -452,7 +456,7 @@ public class IssueAssetPanel extends JPanel
 			if(!Controller.getInstance().unlockWallet(password))
 			{
 				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 				
 				//ENABLE
 				this.issueButton.setEnabled(true);
@@ -483,22 +487,30 @@ public class IssueAssetPanel extends JPanel
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(), feePow);			
 
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
-			 String text = "<HTML>";
-			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator()+"<br>";
-			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.viewItemName()+"<br>";
-			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
-			    text += "&nbsp;&nbsp;" +Lang.getInstance().translate("Description")+":&nbsp;"+ issueAssetTransaction.getItem().getDescription()+"<br>";
-			    text += "&nbsp;&nbsp;"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+"<br>";
-			    text += "&nbsp;&nbsp; <b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.viewFee()+"</b><br>";
+			 String text = "<HTML><body>";
+			 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+			    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator() +"<br>";
+			    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.getItem().getName() +"<br>";
+			    text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
+			    text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
+			    text += Lang.getInstance().translate("Divisible") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isDivisible()+"")+ "<br>";
+			    text += Lang.getInstance().translate("Scale") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
+			    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
+			    text += Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+"<br>";
+			    text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.getFee().toString()+"</b><br></body></HTML>";
 			    
-			  
+			  System.out.print("\n"+ text +"\n");
 		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
 		//	    UIManager.put("OptionPane.okButtonText", "Готово");
 			
-			int s = JOptionPane.showConfirmDialog(new JFrame(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+			
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2));
+			dd.setLocationRelativeTo(th);
+			dd.setVisible(true);
 			
 		//	JOptionPane.OK_OPTION
-			if (s!= JOptionPane.OK_OPTION)	{
+			if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
 				
 				this.issueButton.setEnabled(true);
 				
@@ -516,49 +528,43 @@ public class IssueAssetPanel extends JPanel
 			{
 			case Transaction.VALIDATE_OK:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Asset issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-	
-				this.txtName.setText("");
-				this.txtareaDescription.setText("");
-				this.txtQuantity.setText("");
-				this.txtScale.setText("");
-				this.txtFeePow.setText("");
-				
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Asset issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+					
 				break;	
 				
 			case Transaction.INVALID_QUANTITY:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.NOT_ENOUGH_FEE:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 								
 			case Transaction.INVALID_NAME_LENGTH:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.INVALID_DESCRIPTION_LENGTH:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.INVALID_PAYMENTS_LENGTH:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 				
 			case Transaction.CREATOR_NOT_PERSONALIZED:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 
 			default:
 				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Unknown error")
 						+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;		
 				
@@ -568,11 +574,11 @@ public class IssueAssetPanel extends JPanel
 		{
 			if(parse == 0)
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 			else
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 		

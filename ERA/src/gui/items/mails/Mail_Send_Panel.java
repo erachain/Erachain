@@ -441,7 +441,7 @@ public class Mail_Send_Panel extends JPanel
 		final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
 		feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		feeLabel.setVerticalAlignment(SwingConstants.TOP);
-	//	this.add(feeLabel, feelabelGBC);
+		this.add(feeLabel, feelabelGBC);
 		
 		//FEE TXT
 		GridBagConstraints feetxtGBC = new GridBagConstraints();
@@ -454,7 +454,7 @@ public class Mail_Send_Panel extends JPanel
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
 		txtFeePow.setPreferredSize(new Dimension(130,22));
-	//	this.add(txtFeePow, feetxtGBC);
+		this.add(txtFeePow, feetxtGBC);
 		
 		//BUTTON DECRYPTALL
 		GridBagConstraints decryptAllGBC = new GridBagConstraints();

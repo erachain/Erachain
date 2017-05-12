@@ -69,7 +69,7 @@ public class PasswordPane
 		//a JPanel containing the dialog components we want
 		
 		int n = JOptionPane.showOptionDialog(
-					null, 
+					MainFrame.getInstance(), 
 					userPanel, 
 					Lang.getInstance().translate("Unlock Wallet"),
 					JOptionPane.YES_NO_CANCEL_OPTION, 
@@ -101,7 +101,7 @@ public class PasswordPane
 			String password = PasswordPane.showUnlockWalletDialog(); 
 			if(!password.equals("") && !Controller.getInstance().unlockWallet(password))
 			{
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

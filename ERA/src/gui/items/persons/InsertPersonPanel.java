@@ -71,7 +71,7 @@ public class InsertPersonPanel extends IssuePersonPanel{
     //protected IssuePersonRecord issuePersonRecord;
     protected PersonHuman person;
 	
-	InsertPersonPanel(){
+	 public InsertPersonPanel(){
 		
 		super();
 		

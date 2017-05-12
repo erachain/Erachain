@@ -39,6 +39,7 @@ import gui.items.mails.Outcoming_Mails_SplitPanel;
 import gui.items.notes.IssueNotePanel;
 import gui.items.notes.Search_Notes_Tab;
 import gui.items.other.other_Panel;
+import gui.items.persons.InsertPersonPanel;
 import gui.items.persons.IssuePersonPanel;
 import gui.items.persons.Persons_My_SplitPanel;
 import gui.items.persons.Persons_Search_SplitPanel;
@@ -287,6 +288,15 @@ public class Main_Panel extends javax.swing.JPanel {
 			return;
 
 		}
+		
+		if ( str.equals( Lang.getInstance().translate("Insert Person"))  || str.equals("InsertPersonPanel")){
+			ccase1( Lang.getInstance().translate("Insert Person"), new InsertPersonPanel());
+			return;
+
+		}
+
+		
+		
 		
 		if ( str.equals( Lang.getInstance().translate("My Accounts")) || str.equals("My_Accounts_SplitPanel")){
 			ccase1( Lang.getInstance().translate("My Accounts"), new My_Accounts_SplitPanel());
