@@ -254,10 +254,15 @@ public class IssueItemFrame extends JFrame
 						
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueNote(creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow);
+			Transaction issue_tr = Controller.getInstance().issueNote(creator, this.txtName.getText(), this.txtareaDescription.getText(), feePow);
+			
+			
+			//VALIDATE AND PROCESS
+			int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_tr, false);
+			
 			
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
+			switch(result)
 			{
 			case Transaction.VALIDATE_OK:
 				
@@ -322,7 +327,7 @@ public class IssueItemFrame extends JFrame
 			default:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;		
 				
 			}

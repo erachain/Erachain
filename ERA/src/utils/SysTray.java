@@ -285,21 +285,7 @@ public class SysTray implements Observer{
 		});
 		menu.add(names);
 		
-		MenuItem voting = new MenuItem("Voting");
-		voting.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent e) {
-					JFrame frame = new JFrame("Voting");
-
-				    frame.setSize(800, 600);
-				    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				    frame.setVisible(true);
-					frame.getContentPane().add(
-							new VotingPanel());
-					
-			}
-		});
-		menu.add(voting);
-		
+				
 		MenuItem exit = new MenuItem("Exit");
 		exit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
