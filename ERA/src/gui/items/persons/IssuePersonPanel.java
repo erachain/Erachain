@@ -37,6 +37,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
@@ -106,6 +107,9 @@ public class IssuePersonPanel extends JPanel
     // End of variables declaration
 	
 	protected byte[] imgButes;
+	protected JPanel Panel;
+	protected JPanel mainPanel;
+	protected JScrollPane mainScrollPane1;
 
 	@SuppressWarnings({ "unchecked" })
 	public IssuePersonPanel()
@@ -502,6 +506,8 @@ public class IssuePersonPanel extends JPanel
         copyButton = new MButton(Lang.getInstance().translate("Copy"),2);
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
+        mainPanel = new javax.swing.JPanel();
+        mainScrollPane1 = new javax.swing.JScrollPane();
     	
         this.issueButton.addActionListener(new ActionListener()
 		{
@@ -529,11 +535,11 @@ public class IssuePersonPanel extends JPanel
         txtBirthday.setCalendar(ccc);
         txtDeathday = new JDateChooser("yyyy-MM-dd HH:mm 'UTC'", "####-##-## ##:##", '_');
 		TimeZone.setDefault(tz);
-
+		 this.setLayout(new java.awt.BorderLayout());
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
         layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         layout.rowHeights = new int[] {0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0};
-        setLayout(layout);
+        mainPanel.setLayout(layout);
 
         jLabel_Gender.setText("Pol");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -541,7 +547,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        add(jLabel_Gender, gridBagConstraints);
+        mainPanel.add(jLabel_Gender, gridBagConstraints);
 
         jLabel_Born.setText("born");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -549,7 +555,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        add(jLabel_Born, gridBagConstraints);
+        mainPanel.add(jLabel_Born, gridBagConstraints);
 
         jLabel_Dead.setText("Dead");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -557,7 +563,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel_Dead, gridBagConstraints);
+        mainPanel.add(jLabel_Dead, gridBagConstraints);
 
         jLabel_Race.setText("Person number");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -565,7 +571,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel_Race, gridBagConstraints);
+        mainPanel.add(jLabel_Race, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 8;
@@ -574,7 +580,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        add(txtRace, gridBagConstraints);
+        mainPanel.add(txtRace, gridBagConstraints);
 
         jLabel_SkinColor.setText("SkinColor");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -582,7 +588,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        add(jLabel_SkinColor, gridBagConstraints);
+        mainPanel.add(jLabel_SkinColor, gridBagConstraints);
 
         txtSkinColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -596,7 +602,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        add(txtSkinColor, gridBagConstraints);
+        mainPanel.add(txtSkinColor, gridBagConstraints);
 
         jLabel_EyeColor.setText("EyeColor");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -604,7 +610,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel_EyeColor, gridBagConstraints);
+        mainPanel.add(jLabel_EyeColor, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 10;
@@ -613,7 +619,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        add(txtEyeColor, gridBagConstraints);
+        mainPanel.add(txtEyeColor, gridBagConstraints);
 
         jLabel_HairСolor.setText("HairСolor");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -621,7 +627,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        add(jLabel_HairСolor, gridBagConstraints);
+        mainPanel.add(jLabel_HairСolor, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 12;
@@ -629,7 +635,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        add(txtHairСolor, gridBagConstraints);
+        mainPanel.add(txtHairСolor, gridBagConstraints);
 
         jLabel_Height.setText("Height");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -637,7 +643,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel_Height, gridBagConstraints);
+        mainPanel.add(jLabel_Height, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 12;
@@ -646,7 +652,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        add(txtHeight, gridBagConstraints);
+        mainPanel.add(txtHeight, gridBagConstraints);
 
         jLabel_BirthLatitude.setText("BirthLatitude");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -654,7 +660,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        add(jLabel_BirthLatitude, gridBagConstraints);
+        mainPanel.add(jLabel_BirthLatitude, gridBagConstraints);
 
         txtBirthLatitude.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -668,7 +674,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        add(txtBirthLatitude, gridBagConstraints);
+        mainPanel.add(txtBirthLatitude, gridBagConstraints);
 
         jLabel_BirthLongitude.setText("BirthLongitude");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -676,7 +682,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        add(jLabel_BirthLongitude, gridBagConstraints);
+        mainPanel.add(jLabel_BirthLongitude, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 14;
@@ -685,7 +691,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        add(txtBirthLongitude, gridBagConstraints);
+        mainPanel.add(txtBirthLongitude, gridBagConstraints);
 
         jLabel_Fee.setText("Fee");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -693,7 +699,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 16;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        add(jLabel_Fee, gridBagConstraints);
+        mainPanel.add(jLabel_Fee, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 16;
@@ -702,7 +708,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
-        add(txtFeePow, gridBagConstraints);
+        mainPanel.add(txtFeePow, gridBagConstraints);
 
         java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
         jPanel1Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
@@ -795,7 +801,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(10, 18, 0, 16);
-        add(jPanel1, gridBagConstraints);
+        mainPanel.add(jPanel1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 20;
@@ -803,7 +809,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.weighty = 0.2;
-        add(jLabel9, gridBagConstraints);
+        mainPanel.add(jLabel9, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
         
@@ -817,7 +823,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridwidth = 15;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        add(jPanel2, gridBagConstraints);
+        mainPanel.add(jPanel2, gridBagConstraints);
 
         jLabel_Title.setText("jLabel8");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -826,7 +832,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridwidth = 13;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
-        add(jLabel_Title, gridBagConstraints);
+        mainPanel.add(jLabel_Title, gridBagConstraints);
 
         txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -836,7 +842,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        add(txtGender, gridBagConstraints);
+        mainPanel.add(txtGender, gridBagConstraints);
 
      /*     
         try {
@@ -865,7 +871,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        add( txtBirthday, gridBagConstraints);        
+        mainPanel.add( txtBirthday, gridBagConstraints);        
         txtBirthday.setFont(UIManager.getFont("TextField.font"));
 
   //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
@@ -883,8 +889,11 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        add(txtDeathday, gridBagConstraints);
+        mainPanel.add(txtDeathday, gridBagConstraints);
         txtDeathday.setFont(UIManager.getFont("TextField.font"));
+        mainScrollPane1.setViewportView(mainPanel);
+   //   
+       this.add(mainScrollPane1,  java.awt.BorderLayout.CENTER);
     }// </editor-fold>                        
 
 }

@@ -157,7 +157,7 @@ private void init(){
     gridBagConstraints.gridy = 17;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
     gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-    add(label_Sign, gridBagConstraints);
+    mainPanel.add(label_Sign, gridBagConstraints);
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 17;
@@ -167,14 +167,14 @@ private void init(){
     gridBagConstraints.weightx = 0.2;
     gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
     txt_Sign.setEditable(false);
-    add(txt_Sign, gridBagConstraints);
+    mainPanel.add(txt_Sign, gridBagConstraints);
 	
      label_public_key.setText( Lang.getInstance().translate("Public Key")+ ":");
      gridBagConstraints.gridx = 0;
      gridBagConstraints.gridy = 18;
      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
      gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-     add(label_public_key, gridBagConstraints);
+     mainPanel.add(label_public_key, gridBagConstraints);
      gridBagConstraints = new java.awt.GridBagConstraints();
      gridBagConstraints.gridx = 2;
      gridBagConstraints.gridy = 18;
@@ -183,7 +183,7 @@ private void init(){
      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
      gridBagConstraints.weightx = 0.2;
      gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 1);
-     add(txt_public_key, gridBagConstraints);
+     mainPanel.add(txt_public_key, gridBagConstraints);
      
      gridBagConstraints = new java.awt.GridBagConstraints();
      gridBagConstraints.gridx = 2;
@@ -192,7 +192,7 @@ private void init(){
      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
      gridBagConstraints.weightx = 0.1;
-     add(txtGenderTxt, gridBagConstraints);
+     mainPanel.add(txtGenderTxt, gridBagConstraints);
      
      
     // txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
@@ -203,7 +203,7 @@ private void init(){
      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
      gridBagConstraints.weightx = 0.2;
-     add( txtBirthdayTxt, gridBagConstraints);
+     mainPanel.add( txtBirthdayTxt, gridBagConstraints);
 
 //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
 //      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
@@ -220,7 +220,7 @@ private void init(){
      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
      gridBagConstraints.weightx = 0.2;
      gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-     add(txtDeathdayTxt, gridBagConstraints);
+     mainPanel.add(txtDeathdayTxt, gridBagConstraints);
      
      
      gridBagConstraints = new java.awt.GridBagConstraints();
@@ -306,7 +306,7 @@ private void init(){
   //   gridBagConstraints1.gridwidth = ;
      gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
      gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 0);
-     add(pasteButton, gridBagConstraints1);
+     mainPanel.add(pasteButton, gridBagConstraints1);
 	
  
   
@@ -401,7 +401,7 @@ private void init(){
  //    gridBagConstraints1.gridwidth = 15;
      gridBagConstraints1.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
      gridBagConstraints1.insets = new java.awt.Insets(20, 0, 0, 16);
-     add(trans_Button, gridBagConstraints1);
+     mainPanel.add(trans_Button, gridBagConstraints1);
 	
 		
 		
