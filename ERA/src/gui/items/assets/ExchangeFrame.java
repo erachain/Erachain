@@ -40,6 +40,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import database.DBSet;
+import gui.MainFrame;
 import gui.library.MTable;
 
 
@@ -264,7 +265,8 @@ public class ExchangeFrame extends JDialog
 	//		 this.setMinimumSize(new Dimension(100,100));
 	//		this.setSize(new Dimension(wH,hG));
 	//		this.setPreferredSize(new Dimension(wH,hG));
-			this.setLocationRelativeTo(null);
+			this.setSize(MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100);
+			this.setLocationRelativeTo(MainFrame.getInstance());
 			this.setVisible(true);
 	        
 	        

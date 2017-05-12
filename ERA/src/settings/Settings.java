@@ -135,7 +135,7 @@ public class Settings {
 	private Settings()
 	{
 		this.localAddress = this.getCurrentIp();
-		JSONObject aa = read_setting_JSON();
+		settingsJSON = read_setting_JSON();
 				
 				
 		File file = new File("");
@@ -846,6 +846,18 @@ public class Settings {
 	public JSONObject  read_setting_JSON() {
 		int alreadyPassed = 0;
 		File file = new File(this.userPath + "settings.json");
+		if(!file.exists())
+		{
+			try {
+				file.createNewFile();
+				JSONObject json = new JSONObject();
+				json.put("!!!ver","3.0");
+				return json;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		try
 		{
 			while(alreadyPassed<2)
