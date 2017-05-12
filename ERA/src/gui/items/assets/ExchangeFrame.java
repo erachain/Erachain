@@ -351,7 +351,7 @@ public class ExchangeFrame extends JDialog
 			JLabel lblTitle = new JLabel(Lang.getInstance().translate("Buy %have%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));//this.have.toString() + " / " + this.want.toString());
 					
 		//	lblTitle.setFont(new Font("Serif", Font.PLAIN, 18));
-			jPanel_Trade.add(lblTitle, labelGBC);
+	//		jPanel_Trade.add(lblTitle, labelGBC);
 			if (action =="To sell") lblTitle.setVisible(false);
 			
 					
@@ -359,7 +359,7 @@ public class ExchangeFrame extends JDialog
 			labelGBC.gridy = 1;
 			JLabel lblBuy = new JLabel( Lang.getInstance().translate("Sell %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 		//	lblBuy.setFont(new Font("Serif", Font.PLAIN, 18));
-			jPanel_Trade.add(lblBuy, labelGBC);
+	//		jPanel_Trade.add(lblBuy, labelGBC);
 			if (action == "To sell")lblBuy.setVisible(false);
 			
 			//CREATE SELL LABEL
@@ -374,7 +374,7 @@ public class ExchangeFrame extends JDialog
 					JLabel lblTitle1 = new JLabel(Lang.getInstance().translate("Sell %have%" ).replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 							
 				//	lblTitle1.setFont(new Font("Serif", Font.PLAIN, 18));
-					jPanel_Trade.add(lblTitle1, labelGBC);
+	//				jPanel_Trade.add(lblTitle1, labelGBC);
 					if(action == "Buy" ) lblTitle1.setVisible(false);
 					
 					labelGBC.gridy = 1;
@@ -382,7 +382,7 @@ public class ExchangeFrame extends JDialog
 			JLabel lblSell = new JLabel( Lang.getInstance().translate("Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 
 		//	lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
-			jPanel_Trade.add(lblSell, labelGBC);
+	//		jPanel_Trade.add(lblSell, labelGBC);
 			if (action == "Buy")lblSell.setVisible(false);
 			
 			//CREATE BUY PANEL

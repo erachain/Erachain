@@ -116,13 +116,45 @@ public class OrderPanel extends JPanel
 	
 		assetHintGBC.gridx = 2;	
 		
+		labelGBC.gridy =0;
+		detailGBC.gridy =0;
+		
+	
+		// label buy
+		//DETAIL GBC
+				GridBagConstraints label_buy = new GridBagConstraints();
+				label_buy.insets = new Insets(0, 5, 5, 0);
+				label_buy.fill = GridBagConstraints.HORIZONTAL;  
+				label_buy.anchor = GridBagConstraints.NORTHWEST;
+				label_buy.gridx = 0;	
+				label_buy.gridwidth =3;
+				
+			
+				label_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
+				label_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+				label_buy.weightx = 1.0;
+		
+				label_buy.gridy = ++labelGBC.gridy;
+		detailGBC.gridy = ++detailGBC.gridy;
+		JLabel lblBuy = new JLabel( Lang.getInstance().translate("To Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
+		this.add(lblBuy, label_buy);
+		
+		
+		
+		// Label sell
+		label_buy.gridy = ++labelGBC.gridy;
+		detailGBC.gridy = ++detailGBC.gridy;
+		JLabel lblTitle = new JLabel(Lang.getInstance().translate("To Sell %have%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));//this.have.toString() + " / " + this.want.toString());
+		this.add(lblTitle, label_buy);	
+		
 		//LABEL FROM
-		labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
+		labelGBC.gridy = ++labelGBC.gridy;
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
-		detailGBC.gridy = 0;
+		detailGBC.gridy = ++detailGBC.gridy;
+		detailGBC.gridwidth = 2;
 		this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
 		this.cbxAccount.setRenderer(new AccountRenderer(this.have.getKey()));
 	// select accounts in combobox			
@@ -140,11 +172,11 @@ public class OrderPanel extends JPanel
 		
 		
 		this.add(this.cbxAccount, detailGBC);
-		
+		detailGBC.gridwidth = 1;
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
 		JLabel accountHintLabel = new JLabel( have.getName());//.getShort() );
-		this.add(accountHintLabel, assetHintGBC);
+		//this.add(accountHintLabel, assetHintGBC);
         
 		//LABEL PRICE
 		labelGBC.gridy++;
@@ -247,6 +279,8 @@ public class OrderPanel extends JPanel
 		detailGBC.gridy++;
 		txtBuyingAmount = new JTextField();
 		txtBuyingAmount.setEnabled(false);
+		txtBuyingAmount.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+		
 		this.add(txtBuyingAmount, detailGBC);
 			
 		//ASSET HINT

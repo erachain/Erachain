@@ -271,6 +271,7 @@
 	"Forging enabled":"Генерация блоков включена",
 	"Forging":"Генерация блоков",
 	"From":"От",
+	"From Account":"Со Счета",
 	"From Date":"С Даты",
 	"Fulfilled:":"Выполнено:",
 	"Gender":"Пол",
@@ -672,9 +673,11 @@
 	"Trade Volume":"Объем Торгов",
 	"Top":"Топ",
 	"To Answer":"Ответить"
+	"To Buy %want%":"Купить %want%",
 	"To Date":"По Дату"
 	"To do":"Действительно до",
 	"To sell":"Продать",
+	"To Sell %have%":"Продать %have%",
 	"Asset Trade": "Торговля Активом",
 	"Title":"Заголовок",
 	"Trades Count":"Количество Сделок",
