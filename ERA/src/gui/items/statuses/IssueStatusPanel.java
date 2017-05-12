@@ -1,6 +1,9 @@
 package gui.items.statuses;
 
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
 
@@ -28,6 +31,9 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.item.assets.AssetCls;
+import core.item.statuses.StatusCls;
+import core.transaction.IssueStatusRecord;
 import core.transaction.Transaction;
 import gui.transaction.OnDealClick;
 
@@ -40,6 +46,7 @@ public class IssueStatusPanel extends JPanel
 	private JTextArea txtareaDescription;
 	private JButton issueButton;
 	private JCheckBox jCheck_Unique;
+	private IssueStatusPanel th;
 
 	//@SuppressWarnings({ "unchecked", "rawtypes" })
 	public IssueStatusPanel()
@@ -47,7 +54,7 @@ public class IssueStatusPanel extends JPanel
 //		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Status"));
 		
 		String colorText ="ff0000"; // цвет текста в форме
-		
+		th = this;
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
@@ -210,7 +217,6 @@ public class IssueStatusPanel extends JPanel
         
         
         this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
@@ -303,19 +309,57 @@ public class IssueStatusPanel extends JPanel
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		boolean unique = jCheck_Unique.isSelected();
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		Pair<Transaction, Integer> result = Controller.getInstance().issueStatus(
+		IssueStatusRecord issue_Status = (IssueStatusRecord) Controller.getInstance().issueStatus(
 				creator, this.txtName.getText(), this.txtareaDescription.getText(),
 				unique, feePow
 				);
 		
+		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+		 String text = "<HTML><body>";
+		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+		    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_Status.getCreator() +"<br>";
+		    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issue_Status.getItem().getName() +"<br>";
+		    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issue_Status.getItem().getDescription())+"<br>";
+		   
+		    
+		    text += Lang.getInstance().translate("Unique")+": "+ ((StatusCls)issue_Status.getItem()).isUnique() + "<br>";
+		    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issue_Status.viewSize(true)+" Bytes, ";
+		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issue_Status.getFee().toString()+" COMPU</b><br></body></HTML>";
+		    
+		  System.out.print("\n"+ text +"\n");
+	//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+	//	    UIManager.put("OptionPane.okButtonText", "Готово");
+		
+	//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+		
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		dd.setLocationRelativeTo(th);
+		dd.setVisible(true);
+		
+	//	JOptionPane.OK_OPTION
+		if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+			
+			this.issueButton.setEnabled(true);
+			
+			return;
+		}
+		
+				
+		//VALIDATE AND PROCESS
+		int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_Status, false);
+		
+		
+		
+		
+		
 		//CHECK VALIDATE MESSAGE
-		if (result.getB() == Transaction.VALIDATE_OK) {
+		if (result == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Status issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 	//		this.dispose();
 			clearPanel();
 			
 		} else {		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//ENABLE

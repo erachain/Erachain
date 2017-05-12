@@ -390,7 +390,7 @@ public class TransactionCreator
 		
 	}
 
-	public Pair<Transaction, Integer> createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
+	public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
 			boolean unique, int feePow) 
 	{
 		//CHECK FOR UPDATES
@@ -405,8 +405,7 @@ public class TransactionCreator
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueStatusRecord.sign(creator, false);
 										
-		//VALIDATE AND PROCESS
-		return new Pair<Transaction, Integer>(issueStatusRecord, this.afterCreate(issueStatusRecord, false));
+		return issueStatusRecord;
 	}
 
 	public Pair<Transaction, Integer> createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 

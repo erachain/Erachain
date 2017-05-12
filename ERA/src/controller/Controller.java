@@ -2411,7 +2411,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> issueStatus(PrivateKeyAccount creator,
+	public Transaction issueStatus(PrivateKeyAccount creator,
 			String name, String description, boolean unique, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
