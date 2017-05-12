@@ -26,9 +26,14 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
+import core.transaction.CreatePollTransaction;
 import core.transaction.Transaction;
 import core.voting.Poll;
 import core.voting.PollOption;
+import gui.MainFrame;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.library;
+import lang.Lang;
 
 @Path("polls")
 @Produces(MediaType.APPLICATION_JSON)
@@ -45,6 +50,8 @@ public class PollsResource
 	@Consumes(MediaType.WILDCARD)
 	public String createPoll(String x)
 	{
+		
+		
 		try
 		{
 			//READ JSON
@@ -111,13 +118,55 @@ public class PollsResource
 			}
 				
 			//CREATE POLL
-			Pair<Transaction, Integer> result = Controller.getInstance().createPoll(account, name, description, options, feePow);
+			CreatePollTransaction issue_voiting = (CreatePollTransaction) Controller.getInstance().createPoll(account, name, description, options, feePow);
 				
-			if (result.getB() == Transaction.VALIDATE_OK)
-				return result.getA().toJson().toJSONString();
-			else
-				throw ApiErrorFactory.getInstance().createError(result.getB());
+			Poll poll = issue_voiting.getPoll();
+
+			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+			 String text = "<HTML><body>";
+			 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+			    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_voiting.getCreator() +"<br>";
+			    text += Lang.getInstance().translate("Name") +":&nbsp;"+ poll.getName() +"<br>";
+			   text += "<br>"+Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(poll.getDescription())+"<br>";
+			    text += "<br>"+ Lang.getInstance().translate("Options")+":<br>";
+			    
+			   
+				
+			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issue_voiting.viewSize(true)+" Bytes, ";
+			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issue_voiting.getFee().toString()+" COMPU</b><br></body></HTML>";
+			    
 			
+		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+		//	    UIManager.put("OptionPane.okButtonText", "Готово");
+			
+		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+			
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, 600, 400,Status_text);
+			dd.setLocationRelativeTo(null);
+			dd.setVisible(true);
+			
+		//	JOptionPane.OK_OPTION
+			if (dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+				
+				
+				
+				
+			
+			
+					
+			//VALIDATE AND PROCESS
+			int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_voiting, false);
+			
+			
+			
+			
+			
+			
+			if (result == Transaction.VALIDATE_OK)
+				return result +"";
+			else
+				throw ApiErrorFactory.getInstance().createError(result);
+			}
 		}
 		catch(NullPointerException | ClassCastException e)
 		{
@@ -125,6 +174,7 @@ public class PollsResource
 			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
+		return "ok";
 	}
 	
 	@POST
