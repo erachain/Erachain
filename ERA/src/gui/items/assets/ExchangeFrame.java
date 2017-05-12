@@ -217,6 +217,8 @@ public class ExchangeFrame extends JDialog
 					
 					jTextField_Asset_2.setText(want.getName());
 					jScrollPane_jPanel_RightPanel.setViewportView( new  pane_Tab(have, want, action, account));
+					
+					
 					}
 	
 					
@@ -249,7 +251,7 @@ public class ExchangeFrame extends JDialog
 	 //       jScrollPane_jPanel_RightPanel.setVerticalScrollBar(null);
 	        jScrollPane_jPanel_RightPanel.setViewportView( new  pane_Tab(have, want, action, account));
 	    //      tt = new  pane_Tab(have, want, action, account);
-	          getContentPane().add(new  pane_Tab(have, want, action, account), gridBagConstraints);
+	          getContentPane().add(jScrollPane_jPanel_RightPanel, gridBagConstraints);
 	          
 	           JPanel ee = new JPanel();
 	          
