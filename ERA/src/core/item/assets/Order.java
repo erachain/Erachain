@@ -2,6 +2,7 @@ package core.item.assets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,8 @@ import database.SortableList;
 
 public class Order implements Comparable<Order> {
 	
+	private static final MathContext rounding = new java.math.MathContext(8, RoundingMode.HALF_DOWN); 
+
 	private static final int ID_LENGTH = Crypto.SIGNATURE_LENGTH;
 	private static final int CREATOR_LENGTH = 25;
 	private static final int HAVE_LENGTH = 8;
@@ -181,14 +184,14 @@ public class Order implements Comparable<Order> {
 	public BigDecimal getAmountHaveLeft(DBSet db, BigDecimal newPrice)
 	{
 		if (this.isHaveDivisible(db))
-			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice).setScale(8, RoundingMode.HALF_DOWN);
-		return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice).setScale(0, RoundingMode.HALF_DOWN);
+			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
+		return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
 	}	
 	public BigDecimal getAmountWantLeft(DBSet db, BigDecimal newPrice)
 	{
 		if (this.isWantDivisible(db))
-			return this.amountWant.subtract(this.amountWant).multiply(newPrice).setScale(8, RoundingMode.HALF_DOWN);
-		return this.amountWant.subtract(this.amountWant).multiply(newPrice).setScale(0, RoundingMode.HALF_DOWN);
+			return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
+		return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
 	}	
 
 	//////// FULFILLED
@@ -215,7 +218,7 @@ public class Order implements Comparable<Order> {
 	{
 		BigDecimal temp;
 		if (this.amountHave.compareTo(this.amountWant) > 0){
-			temp = this.fulfilledHave.multiply(this.getPriceCalc()).setScale(8);
+			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(8);
 		} else {
 			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), 8, RoundingMode.HALF_DOWN);
 		}
@@ -483,7 +486,7 @@ public class Order implements Comparable<Order> {
 				{
 					tradeAmount = isReversePrice?
 							thisAmountHaveLeft.divide(orderPrice, 8, RoundingMode.HALF_DOWN):
-							thisAmountHaveLeft.multiply(orderReversePrice).setScale(8, RoundingMode.HALF_DOWN);
+							thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
 					if ( !isDivisibleWant && tradeAmount.stripTrailingZeros().scale() > 0) {
 						// rounding only DOWN !
 						tradeAmount = tradeAmount.setScale(0, RoundingMode.DOWN);
@@ -494,7 +497,7 @@ public class Order implements Comparable<Order> {
 						
 						// recalc
 						tradeAmountGet = isReversePrice?
-								tradeAmount.multiply(orderPrice).setScale(8, RoundingMode.HALF_DOWN):
+								tradeAmount.multiply(orderPrice, rounding).setScale(8, RoundingMode.HALF_DOWN):
 								tradeAmount.divide(orderReversePrice, 8, RoundingMode.HALF_DOWN);
 						if ( !isDivisibleHave && tradeAmountGet.stripTrailingZeros().scale() > 0) {
 							// wrong trade by non Divisible items
@@ -577,7 +580,7 @@ public class Order implements Comparable<Order> {
 		
 		//CALCULATE THE MINIMUM INCREMENT AT WHICH I CAN BUY USING GCD
 		BigInteger haveAmount = BigInteger.ONE.multiply(multiplier);
-		BigInteger priceAmount = order.getPriceCalc().multiply(new BigDecimal(multiplier))
+		BigInteger priceAmount = order.getPriceCalc().multiply(new BigDecimal(multiplier), rounding)
 				.setScale(8, RoundingMode.HALF_DOWN).toBigInteger();
 		BigInteger gcd = haveAmount.gcd(priceAmount);
 		haveAmount = haveAmount.divide(gcd);
