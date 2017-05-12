@@ -891,6 +891,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
         mainPanel.add(txtDeathday, gridBagConstraints);
         txtDeathday.setFont(UIManager.getFont("TextField.font"));
+   //     mainScrollPane1.setHorizontalScrollBar(null);
         mainScrollPane1.setViewportView(mainPanel);
    //   
        this.add(mainScrollPane1,  java.awt.BorderLayout.CENTER);

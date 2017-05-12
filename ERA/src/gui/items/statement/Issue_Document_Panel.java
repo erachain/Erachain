@@ -581,7 +581,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         jPanel_Attached_Files.add(jPanel_Other_Attached_Files_Work, gridBagConstraints);
 
-        jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
+        if (BlockChain.DEVELOP_USE == true)jTabbedPane_Message.addTab(Lang.getInstance().translate("Attached Files"), jPanel_Attached_Files);
 
         jPanel_Other_Hashes.setLayout(new java.awt.GridBagLayout());
 
@@ -945,6 +945,11 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		result = Controller.getInstance().signNote(asPack,
 				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
 				feePow, key, messageBytes, isTextByte, encrypted);
+		
+		
+		
+		
+		
 		
 		//CHECK VALIDATE MESSAGE
 		if (result.getB() == Transaction.VALIDATE_OK) {
