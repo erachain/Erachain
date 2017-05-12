@@ -1,6 +1,9 @@
 package gui.items.notes;
 
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
 
@@ -37,6 +40,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
+import core.transaction.IssueNoteRecord;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -50,6 +54,7 @@ public class IssueNotePanel extends JPanel
 //	private JTextField txtQuantity;
 //	private JCheckBox chkDivisible;
 	//private JButton jButton_Create;
+	private IssueNotePanel th;
 
 	public IssueNotePanel()
 	{
@@ -59,7 +64,7 @@ public class IssueNotePanel extends JPanel
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		
 		//ICON
-		
+		th =this;
 		this.jComboBox_Account_Creator = new JComboBox<Account>(new AccountsComboBoxModel());
 		initComponents();
 /*		
@@ -239,10 +244,44 @@ public class IssueNotePanel extends JPanel
 						
 			//CREATE NOTE
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(), feePow);
+			IssueNoteRecord issueNote = (IssueNoteRecord) Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(), feePow);
+		
+			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+			 String text = "<HTML><body>";
+			 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Template") + "<br><br><br>";
+			    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueNote.getCreator() +"<br>";
+			    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueNote.getItem().getName() +"<br>";
+			    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueNote.getItem().getDescription())+"<br>";
+			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueNote.viewSize(true)+" Bytes, ";
+			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueNote.getFee().toString()+" COMPU</b><br></body></HTML>";
+			    
+			  System.out.print("\n"+ text +"\n");
+		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+		//	    UIManager.put("OptionPane.okButtonText", "Готово");
+			
+		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+			
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+			dd.setLocationRelativeTo(th);
+			dd.setVisible(true);
+			
+		//	JOptionPane.OK_OPTION
+			if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+				
+				this.jButton_Create.setEnabled(true);
+				
+				return;
+			}
+			
+					
+			//VALIDATE AND PROCESS
+			int result = Controller.getInstance().getTransactionCreator().afterCreate(issueNote, false);
+			
+			
+			
 			
 			//CHECK VALIDATE MESSAGE
-			switch(result.getB())
+			switch(result)
 			{
 			case Transaction.VALIDATE_OK:
 				
@@ -275,7 +314,7 @@ public class IssueNotePanel extends JPanel
 			default:
 				
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;		
 				
 			}
@@ -440,10 +479,9 @@ public class IssueNotePanel extends JPanel
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 	        gridBagConstraints.weightx = 0.1;
-	        add(jCheckBox_Encrypted, gridBagConstraints);
+	   //     add(jCheckBox_Encrypted, gridBagConstraints);
 
 	        jButton_Create.setText(Lang.getInstance().translate("Create"));
-	        jButton_Create.setPreferredSize(new java.awt.Dimension(90, 28));
 	        jButton_Create.setRequestFocusEnabled(false);
 	        jButton_Create.addActionListener(new java.awt.event.ActionListener() {
 	            public void actionPerformed(java.awt.event.ActionEvent evt) {

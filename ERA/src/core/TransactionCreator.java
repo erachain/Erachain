@@ -305,7 +305,7 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
 	}
 
-	public Pair<Transaction, Integer> createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	public Transaction createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -320,7 +320,7 @@ public class TransactionCreator
 		issueNoteRecord.sign(creator, false);
 										
 		//VALIDATE AND PROCESS
-		return new Pair<Transaction, Integer>(issueNoteRecord, this.afterCreate(issueNoteRecord, false));
+		return issueNoteRecord;
 	}
 
 	public Pair<Transaction, Integer> createIssuePersonTransaction(
