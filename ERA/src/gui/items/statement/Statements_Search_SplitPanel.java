@@ -18,6 +18,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.image.ColorModel;
+import java.util.ArrayList;
+
 import javax.swing.Timer;
 import java.awt.*;
 
@@ -35,6 +37,8 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -74,7 +78,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 	private static final long serialVersionUID = 2717571093561259483L;
 
 	private Statements_Table_Model_Search search_Table_Model;
-	private MTable search_Table;
+//	private MTable search_Table;
 	private RowSorter<TableModelPersons> search_Sorter;
 	
 	// для прозрачности
@@ -95,13 +99,13 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		
 	//CREATE TABLE
 		search_Table_Model = new Statements_Table_Model_Search();
-		search_Table = new MTable(this.search_Table_Model);
-		TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
+	//	search_Table = new MTable(this.search_Table_Model);
+	//	TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
 	//		columnModel.getColumn(0).setMaxWidth((100));
 	
 	//Custom renderer for the String column;
 		
-		 this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
+	//	 this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION );
 		
 	/*		
 		//CHECKBOX FOR FAVORITE
@@ -118,8 +122,15 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 	// UPDATE FILTER ON TEXT CHANGE
 		searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener( new search_tab_filter());
 	// SET VIDEO			
-		jTable_jScrollPanel_LeftPanel.setModel(this.search_Table_Model);
-		jTable_jScrollPanel_LeftPanel = search_Table;
+		jTable_jScrollPanel_LeftPanel = new MTable(this.search_Table_Model);
+	//	jTable_jScrollPanel_LeftPanel = search_Table;
+		//sorter from 0 column
+		search_Sorter = new TableRowSorter(search_Table_Model);
+		ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
+		keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING)); 
+		search_Sorter.setSortKeys(keys);
+		((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
+		this.jTable_jScrollPanel_LeftPanel.setRowSorter(search_Sorter);
 		jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 	//	setRowHeightFormat(true);
 	// Event LISTENER		
@@ -147,10 +158,10 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				if (search_Table.getSelectedRow() < 0 )	return;
+				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0 )	return;
 					
 				
-				Transaction statement = search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+				Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				if (statement == null) return;
 				VouchRecordDialog vouch_panel = new VouchRecordDialog(statement.getBlockHeight(DBSet.getInstance()),statement.getSeqNo(DBSet.getInstance()));
 			
@@ -226,10 +237,10 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 		
-			if (search_Table.getSelectedRow() < 0 )
+			if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0 )
 				return;
 			
-			Transaction statement = search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+			Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 			Statement_Info info_panel = new Statement_Info(statement);
 			info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 			jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

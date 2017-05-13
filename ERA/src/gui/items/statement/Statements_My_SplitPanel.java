@@ -7,6 +7,8 @@
 	import javax.swing.event.DocumentListener;
 	import javax.swing.event.ListSelectionEvent;
 	import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableRowSorter;
+
 import core.transaction.Transaction;
 	import gui.Split_Panel;
 import gui.library.MTable;
@@ -88,7 +90,8 @@ import gui.library.MTable;
 			//this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
 			this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
 			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
-	
+			// sorter
+			this.jTable_jScrollPanel_LeftPanel.setRowSorter(new TableRowSorter(my_Statements_Model));
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);
