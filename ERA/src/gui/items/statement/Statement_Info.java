@@ -138,9 +138,9 @@ public class Statement_Info extends javax.swing.JPanel {
 					 
 				 }
 				 }
-				 jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+data.get("Title").toString());
+				 if(data.containsKey("Title"))jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+data.get("Title").toString());
 							 
-				 jTextArea_Body.setText(
+				 if (data.containsKey("Message"))jTextArea_Body.setText(
 						  	 description + "\n\n"
 							+    data.get("Message") + "\n\n"
 							+ hasHes + "\n\n"

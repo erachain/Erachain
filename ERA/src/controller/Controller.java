@@ -2491,7 +2491,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount sender,
+	public Transaction signNote(boolean asPack, PrivateKeyAccount sender,
 			int feePow,	long key, byte[] message, byte[] isText, byte[] encrypted) {
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.signNote(asPack, sender, feePow, key, message, isText, encrypted);

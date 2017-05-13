@@ -529,7 +529,7 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
 	
-	public Pair<Transaction, Integer> signNote(boolean asPack, PrivateKeyAccount creator,
+	public Transaction signNote(boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
 		
 		this.checkUpdate();
@@ -542,8 +542,8 @@ public class TransactionCreator
 		//recordNoteTx = new R_SignNote((byte)0,(byte)0,(byte)0, creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx = new R_SignNote(creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx.sign(creator, asPack);
-			
-		return new Pair<Transaction, Integer>(recordNoteTx, afterCreate(recordNoteTx, asPack));
+		return 	recordNoteTx;
+	
 	}
 
 	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack,

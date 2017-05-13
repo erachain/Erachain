@@ -115,17 +115,17 @@ public class Rec_StatementResource {
 			byte[] isTextByte = (isTextMessage) ? new byte[] { 1 }
 					: new byte[] { 0 };
 
-			Pair<Transaction, Integer> result = Controller.getInstance()
+		/*	Pair<Transaction, Integer> result = Controller.getInstance()
 					.signNote(false,
 							maker,
 							feePow, noteKey, messageBytes,
 							isTextByte, encrypted);
-
+	
 			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
 			else
 				throw ApiErrorFactory.getInstance().createError(result.getB());
-
+*/	return "";
 		}
 		catch(NullPointerException| ClassCastException e)
 		{

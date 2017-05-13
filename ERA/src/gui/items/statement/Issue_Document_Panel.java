@@ -60,17 +60,20 @@ import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
+import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.assets.ExchangeFrame;
 import gui.items.assets.TableModelItemAssets;
 import gui.items.imprints.Table_Model_Issue_Hashes;
 import gui.items.notes.ComboBoxModelItemsNotes;
+import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
 import gui.library.MImprintEDIT_Pane;
 import gui.library.MSplitPane;
 import gui.library.MTable;
 import gui.library.M_Fill_Template_Panel;
 import gui.library.My_JFileChooser;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
@@ -111,6 +114,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	protected NoteCls sel_note;
 	public MSplitPane sp_pan;
 	 M_Fill_Template_Panel fill_Template_Panel;
+	private Issue_Document_Panel th;
 
 	/**
      * Creates new form Issue_Document_Panel
@@ -118,7 +122,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     public Issue_Document_Panel() {
     	jTextPane_Message_Public = new MImprintEDIT_Pane();
     	jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener(){
-
+    		
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
 				// TODO Auto-generated method stub
@@ -141,7 +145,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			
 			
 		});
-    	
+    	th = this;
         initComponents();
        
   //  jLabel_Template.setText(Lang.getInstance().translate("Select Template") + ":");
@@ -486,7 +490,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        jPanel_Message_Public.add(jCheckBox_Message_Public, gridBagConstraints);
+     //   jPanel_Message_Public.add(jCheckBox_Message_Public, gridBagConstraints);
 
      //   jTabbedPane_Message.addTab(Lang.getInstance().translate("Public Part"), jPanel_Message_Public);
         fill_Template_Panel = new M_Fill_Template_Panel();
@@ -786,7 +790,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     }// </editor-fold>
     
 	@SuppressWarnings("null")
-	public Pair<Transaction, Integer> makeDeal(boolean asPack)
+	public Integer makeDeal(boolean asPack)
 	{
 		
 		//CHECK IF WALLET UNLOCKED
@@ -807,14 +811,14 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			}
 		}
 		
-		Pair<Transaction, Integer> result;
-
+		
 		//READ SENDER
 		Account sender = (Account) this.jComboBox_Account_Work.getSelectedItem();
 		int feePow = 0;
 		String message = "";
 		boolean isTextB = true;
 		byte[] messageBytes;
+		byte[] fileData;
 		long key = 0;
 		byte[] isTextByte;
 		byte[] encrypted;
@@ -822,6 +826,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		HashMap  out_Map = new HashMap();
 		HashMap hashes_Map = new HashMap();
 		int parsing = 0;
+		Integer result =0;
 		try
 		{
 			
@@ -854,6 +859,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			out_Map.put("Title", jTextField_Title_Message.getText());
 // files	
 			HashMap out_Files = new HashMap();
+		//	HashMap out_Files_data = new HashMap();
 			
 			int oF = attached_Files_Model.getRowCount();
 			for (int i=0; i<oF; i++){
@@ -867,22 +873,25 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				file_Attr.put("zip", attached_Files_Model.getValueAt(i,2));
 				byte[] ss = (byte[]) attached_Files_Model.getValueAt(i,5);
 				file_Attr.put("Data",Base64.encodeBase64String(ss));
-				
-				
 				out_Files.put(i, file_Attr);
-				
+				// files data
+				//HashMap file_Attr_data = new HashMap();
+				//file_Attr_data.put("Name", attached_Files_Model.getValueAt(i,0));
+				//file_Attr_data.put("zip", attached_Files_Model.getValueAt(i,2));
+				//file_Attr_data.put("Data",Base64.encodeBase64String(ss));
+				//out_Files_data.put(i, file_Attr_data);
 			}
 			out_Map.put("Files", out_Files);
-			message += this.jTextPane_Message_Public.getText();
+	//		message += this.jTextPane_Message_Public.getText();
 			
-			isTextB = this.jCheckBox_Message_Public.isSelected();
+	//		isTextB = this.jCheckBox_Message_Public.isSelected();
 						
 			
-			messageBytes = message.getBytes( Charset.forName("UTF-8") );
+	//		messageBytes = message.getBytes( Charset.forName("UTF-8") );
 			
 			 String sS = StrJSonFine.convert(out_Map);
 			 messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
-			
+		//	fileData = StrJSonFine.convert(out_Files_data).getBytes( Charset.forName("UTF-8") );
 			
 			
 			
@@ -942,22 +951,53 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 		//CREATE TX MESSAGE
 		
-		result = Controller.getInstance().signNote(asPack,
+		R_SignNote issueDoc = (R_SignNote) Controller.getInstance().signNote(asPack,
 				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
-				feePow, key, messageBytes, isTextByte, encrypted);
+				feePow, key, messageBytes,new byte[]{1}, encrypted);
+		
+		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+		 String text = "<HTML><body>";
+		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+		    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueDoc.getCreator() +"<br>";
+		//    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issueDoc.getItem().getName() +"<br>";
+		//    text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
+		//    text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
+		//    text += Lang.getInstance().translate("Divisible") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isDivisible()+"")+ "<br>";
+		//    text += Lang.getInstance().translate("Scale") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
+		//    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
+		    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueDoc.viewSize(true)+" Bytes, ";
+		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueDoc.getFee().toString()+" COMPU</b><br></body></HTML>";
+		    
+		  System.out.print("\n"+ text +"\n");
+	//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+	//	    UIManager.put("OptionPane.okButtonText", "Готово");
+		
+	//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+		
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		dd.setLocationRelativeTo(th);
+		dd.setVisible(true);
+		
+	//	JOptionPane.OK_OPTION
+		if (dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+			
+						
+		//VALIDATE AND PROCESS
+		result = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, asPack);
 		
 		
 		
-		
+		}
 		
 		
 		//CHECK VALIDATE MESSAGE
-		if (result.getB() == Transaction.VALIDATE_OK) {
+		if (result == Transaction.VALIDATE_OK) {
 			return result;
 		} else {		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
+		
 		
 		
 	}
@@ -966,7 +1006,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	{
 		this.jButton_Work_OK.setEnabled(false);
 		this.jButton_Work_OK1.setEnabled(false);
-		Pair<Transaction, Integer> result = makeDeal(false);
+		Integer result = makeDeal(false);
 		if (result != null) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Statement has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -975,15 +1015,16 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	}
 	public void onPackClick()
 	{
-		this.jButton_Work_OK.setEnabled(false);
+	/*	this.jButton_Work_OK.setEnabled(false);
 		this.jButton_Work_OK1.setEnabled(false);
-		Pair<Transaction, Integer> result = makeDeal(true);
+		 Integer result = makeDeal(true);
 		if (result != null) {
-			this.jCheckBox_Message_Public.setText( Base58.encode(result.getA().toBytes(true, null)));
+			this.jCheckBox_Message_Public.setText( Base58.encode(result.toBytes(true, null)));
 		}
 		
 		this.jButton_Work_OK.setEnabled(false);
 		this.jButton_Work_OK1.setEnabled(false);
+		*/
 	}
 
     
