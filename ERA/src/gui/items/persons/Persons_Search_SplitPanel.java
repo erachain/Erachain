@@ -206,8 +206,9 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	//			search_Table_Model.getSortableList().setFilter(".*" + search + ".*");
 	//			search_Table_Model.fireTableDataChanged();
 				
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-				((DefaultRowSorter) search_Sorter).setRowFilter(filter);
+				search_Table_Model.set_Filter_By_Name(search);
+	//			RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+	//			((DefaultRowSorter) search_Sorter).setRowFilter(filter);
 				
 				search_Table_Model.fireTableDataChanged();
 				

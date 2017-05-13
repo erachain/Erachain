@@ -166,6 +166,7 @@ public class ItemPersonMap extends Item_Map
 	//	Iterator iter = keys.iterator();
 		Iterator <Tuple2<String,Long>> iter = this.person_Name_Index.iterator();
 		List<PersonCls> txs = new ArrayList<>();
+		if (str.equals("") || str == null) return null;
 		
 		while ( iter.hasNext() )
 		{

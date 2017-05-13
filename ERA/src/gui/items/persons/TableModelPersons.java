@@ -3,6 +3,7 @@ package gui.items.persons;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -14,6 +15,7 @@ import controller.Controller;
 import core.item.persons.PersonCls;
 import utils.ObserverMessage;
 import database.DBSet;
+import database.ItemPersonMap;
 import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
@@ -32,10 +34,15 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday", "Publisher"});//, "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
+	private ItemPersonMap db;
+	private List<PersonCls> list;
+	private String filter_Name ="";
 	
 	public TableModelPersons()
 	{
-		Controller.getInstance().addObserver(this);
+		db = DBSet.getInstance().getItemPersonMap();
+		db.addObserver(this);
+		
 		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
 		//String sss = ss!=null?ss.getName():"--";	
 	}
@@ -45,7 +52,11 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 //	{
 //		return this.persons;
 //	}
-	
+	public void set_Filter_By_Name(String str){
+	 filter_Name = str;
+	 list = db.getPerson_By_Name(filter_Name);	
+		
+	}
 	
 	@Override
 	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
@@ -70,7 +81,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	public PersonCls getPerson(int row)
 	{
-		return this.persons.get(row).getB();
+		return this.list.get(row);
 	}
 	
 	@Override
@@ -88,19 +99,20 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	@Override
 	public int getRowCount() 
 	{
-		return this.persons.size();
+		if(this.list == null) return 0;;
+		return this.list.size();
 		
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.persons == null || row > this.persons.size() - 1 )
+		if(list == null || row > this.list.size() - 1 )
 		{
 			return null;
 		}
 		
-		PersonCls person = this.persons.get(row).getB();
+		PersonCls person = list.get(row);
 		
 		switch(column)
 		{
@@ -153,12 +165,12 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_PERSON_TYPE)
 		{			
-			if(this.persons == null)
+			if(this.list == null)
 			{
-			
-				this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-				this.persons.addFilterField("name");
-				this.persons.registerObserver();
+				list = db.getPerson_By_Name(filter_Name);
+		//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
+		//		this.persons.addFilterField("name");
+		//		this.persons.registerObserver();
 			}	
 			
 			this.fireTableDataChanged();
@@ -168,6 +180,8 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 	//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
+			list = db.getPerson_By_Name(filter_Name);
+			
 			this.fireTableDataChanged();
 		}
 	}
@@ -175,6 +189,6 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	public void removeObservers() 
 	{
 		this.persons.removeObserver();
-		Controller.getInstance().deleteObserver(this);
+		db.deleteObserver(this);
 	}
 }
