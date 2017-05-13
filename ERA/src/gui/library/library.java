@@ -223,6 +223,8 @@ public class library {
     	    UIManager.put("SplitPane.dividerSize",size_font);
     	    UIManager.put("SplitPaneDivider.oneTouchButtonSize",size_font*2);
     	    UIManager.put("SplitPane.centerOneTouchButtons",true);
+    	    
+    	    if (size_font >16) UIManager.put("ScrollBar.width", size_font);
 		
 		// .setUIFont(new javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
 		 
