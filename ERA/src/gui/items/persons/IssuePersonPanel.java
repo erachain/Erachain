@@ -25,9 +25,11 @@ import java.io.InputStream;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -160,7 +162,7 @@ public class IssuePersonPanel extends JPanel
         //can.set(1999, 11, 12, 13, 14);
 
        	txtRace.setText("");
-       	this.txtBirthLatitude.setText("0");
+   //    	this.txtBirthLatitude.setText("0");
        	this.txtBirthLongitude.setText("0");
        	this.txtHeight.setText("170");
        	this.txtFeePow.setText("0");
@@ -224,8 +226,8 @@ public class IssuePersonPanel extends JPanel
     	jLabel_HairСolor.setText(Lang.getInstance().translate("Hair Сolor") + ":");
         jLabel_Height.setText(Lang.getInstance().translate("Height") + ":");
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
-    	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Birth Longitude") + ":");
-    	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Birth Latitude") + ":");
+    	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
+    	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
     	jLabel_Race.setText(Lang.getInstance().translate("Person number") + ":");
     	jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
     	
@@ -378,11 +380,12 @@ public class IssuePersonPanel extends JPanel
 			}
 
 			parse++;
-			birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
-			
+	//		birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
+			 String[] numArr = this.txtBirthLatitude.getText().split(",");
+			 birthLatitude = Float.parseFloat(numArr[0]);
 			parse++;
-			birthLongitude = Float.parseFloat(this.txtBirthLongitude.getText());
-
+	//		birthLongitude = Float.parseFloat(this.txtBirthLongitude.getText());
+			birthLongitude = Float.parseFloat(numArr[1]);
 			parse++;
 			height = Integer.parseInt(this.txtHeight.getText());
 			
@@ -405,10 +408,10 @@ public class IssuePersonPanel extends JPanel
 				mess = "Invalid deathday [YYYY-MM-DD] or [YYYY-MM-DD hh:mm:ss]";
 				break;
 			case 4:
-				mess = "Invalid birth Latitude -180..180";
+				mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
 				break;
 			case 5:
-				mess = "Invalid birth Longitude -90..90";
+				mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
 				break;
 			case 6:
 				mess = "Invalid height 10..255 ";
@@ -612,11 +615,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
         mainPanel.add(jLabel_SkinColor, gridBagConstraints);
 
-        txtSkinColor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
- //               txtSkinColorActionPerformed(evt);
-            }
-        });
+      
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 10;
@@ -676,7 +675,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
         mainPanel.add(txtHeight, gridBagConstraints);
 
-        jLabel_BirthLatitude.setText("BirthLatitude");
+        jLabel_BirthLatitude.setText("Coordinates of Birth");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
@@ -684,11 +683,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
         mainPanel.add(jLabel_BirthLatitude, gridBagConstraints);
 
-        txtBirthLatitude.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-   //             txtBirthLatitudeActionPerformed(evt);
-            }
-        });
+   
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 14;
@@ -704,7 +699,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 14;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        mainPanel.add(jLabel_BirthLongitude, gridBagConstraints);
+     //   mainPanel.add(jLabel_BirthLongitude, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 14;
@@ -713,7 +708,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        mainPanel.add(txtBirthLongitude, gridBagConstraints);
+    //    mainPanel.add(txtBirthLongitude, gridBagConstraints);
 
         jLabel_Fee.setText("Fee");
         gridBagConstraints = new java.awt.GridBagConstraints();

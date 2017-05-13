@@ -299,8 +299,8 @@ private void init(){
  			
  			if (person.getRace() != null)
  				txtRace.setText(person.getRace());
- 			txtBirthLatitude.setText("" + person.getBirthLatitude());
- 			txtBirthLongitude.setText("" + person.getBirthLongitude());
+ 			txtBirthLatitude.setText("" + person.getBirthLatitude() +", " + person.getBirthLongitude());
+ 			//txtBirthLongitude.setText("" + person.getBirthLongitude());
  			if (person.getSkinColor()!= null)
  				txtSkinColor.setText(person.getSkinColor());
  			if (person.getEyeColor() != null)
