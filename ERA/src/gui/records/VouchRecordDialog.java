@@ -29,6 +29,7 @@ import core.crypto.Base58;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.MainFrame;
 import gui.library.MButton;
 //import gui.items.persons.RIPPersonFrame;
 import gui.models.AccountsComboBoxModel;
@@ -86,6 +87,7 @@ public class VouchRecordDialog extends JDialog  {
 		//PACK
 		this.pack();
  //       this.setResizable(false);
+		 this.setSize(MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 	    //MainFrame.this.add(comp, constraints).setFocusable(false);
@@ -399,7 +401,7 @@ public class VouchRecordDialog extends JDialog  {
 
 	        
 	        
-	        
+	       
 	        
 	    //    pack();
 	    }// <
