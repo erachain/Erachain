@@ -164,7 +164,7 @@ private void init(){
     gridBagConstraints = new java.awt.GridBagConstraints();
     gridBagConstraints.gridx = 2;
     gridBagConstraints.gridy = 17;
-    gridBagConstraints.gridwidth = 3;
+    gridBagConstraints.gridwidth = 13;
     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
     gridBagConstraints.weightx = 0.2;
@@ -181,7 +181,7 @@ private void init(){
      gridBagConstraints = new java.awt.GridBagConstraints();
      gridBagConstraints.gridx = 2;
      gridBagConstraints.gridy = 18;
-     gridBagConstraints.gridwidth = 3;
+     gridBagConstraints.gridwidth = 13;
      gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
      gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
      gridBagConstraints.weightx = 0.2;
@@ -259,7 +259,7 @@ private void init(){
  				return;
  			}
  			
- 						
+ 			txtName.setText(person.getName());			
 			// jLabel2.setText("jLabel2");
 			ImageIcon image = new ImageIcon(person.getImage());
 			int x = image.getIconWidth();
