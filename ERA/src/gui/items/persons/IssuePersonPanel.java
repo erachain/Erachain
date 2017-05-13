@@ -9,6 +9,7 @@ import ntp.NTP;
 import settings.Settings;
 
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -270,8 +271,29 @@ public class IssuePersonPanel extends JPanel
 			}
 	        InputStream inputStream = new ByteArrayInputStream(imgButes);
 	        try {
-				BufferedImage image = ImageIO.read(inputStream);
-				iconButton.setIcon(new ImageIcon(imgButes));
+				BufferedImage image1 = ImageIO.read(inputStream);
+				
+				// jLabel2.setText("jLabel2");
+				ImageIcon image = new ImageIcon(image1);
+				int x = image.getIconWidth();
+				int y = image.getIconHeight();
+
+				int x1 = 250;
+				double k = ((double) x / (double) x1);
+				y = (int) ((double) y / k);
+				
+
+				if (y != 0) {
+					Image Im = image.getImage().getScaledInstance(x1, y, 1);
+					iconButton.setIcon(new ImageIcon(Im));
+				}
+				
+				
+				
+				
+				
+				
+				
 				
 				
 			} catch (IOException e) {

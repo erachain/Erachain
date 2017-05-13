@@ -2,6 +2,7 @@ package gui.items.persons;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
@@ -9,9 +10,11 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.sql.Date;
 import java.util.TimeZone;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -256,8 +259,23 @@ private void init(){
  				return;
  			}
  			
- 			txtName.setText(person.getName());
- 			iconLabel.setIcon(new ImageIcon(person.getImage()));
+ 						
+			// jLabel2.setText("jLabel2");
+			ImageIcon image = new ImageIcon(person.getImage());
+			int x = image.getIconWidth();
+			int y = image.getIconHeight();
+
+			int x1 = 250;
+			double k = ((double) x / (double) x1);
+			y = (int) ((double) y / k);
+			
+
+			if (y != 0) {
+				Image Im = image.getImage().getScaledInstance(x1, y, 1);
+			
+ 			iconLabel.setIcon(new ImageIcon(Im));
+ 			
+			}
 
 
  	        // SET ONE TIME ZONE for Birthday 
