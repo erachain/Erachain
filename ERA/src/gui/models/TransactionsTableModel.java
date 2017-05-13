@@ -189,7 +189,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				
 			case COLUMN_FEE:
 				
-				return transaction.viewFee();//.getFee());		
+				return transaction.getFee();		
 			
 			case COLUMN_NO:
 				return row;
