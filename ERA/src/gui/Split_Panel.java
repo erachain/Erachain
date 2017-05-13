@@ -129,6 +129,7 @@ public class Split_Panel extends javax.swing.JPanel {
 
         searchToolBar_LeftPanel.setFloatable(false);
         searchToolBar_LeftPanel.setRollover(true);
+        searchToolBar_LeftPanel.setVisible(false); 
         
         
         searth_My_JCheckBox_LeftPanel = new JCheckBox();
@@ -313,7 +314,7 @@ public class Split_Panel extends javax.swing.JPanel {
         
         this.jTable_jScrollPanel_LeftPanel.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         //    this.jTable_jScrollPanel_LeftPanel.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
-           searchToolBar_LeftPanel.setVisible(true); 
+           
       
     }// </editor-fold>                        
 

@@ -88,9 +88,12 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	// not show buttons
 		jToolBar_RightPanel.setVisible(false);
 		toolBar_LeftPanel.setVisible(false);
+		
+		this.searchToolBar_LeftPanel.setVisible(true);
 // not show My filter
 		searth_My_JCheckBox_LeftPanel.setVisible(false);
-		
+		searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+	
 //CREATE TABLE
 		search_Table_Model = new TableModelPersons();
 		search_Table = new MTable(this.search_Table_Model);
