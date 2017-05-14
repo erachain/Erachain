@@ -82,6 +82,11 @@ public class R_SignNote extends Transaction {
 		// set props
 		this.setTypeBytes();
 	}
+	public R_SignNote(byte version, byte ptoperty1, byte ptoperty2, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+		this(new byte[]{TYPE_ID, version, ptoperty1, ptoperty2}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
+		// set props
+		this.setTypeBytes();
+	}
 	public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data,
 			byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature)
 	{
@@ -98,10 +103,6 @@ public class R_SignNote extends Transaction {
 		this.signers = signers;
 		this.signatures = signatures;
 		this.setTypeBytes();
-	}
-	public R_SignNote(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference)
-	{
-		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
 	}
 
 	//GETTERS/SETTERS
