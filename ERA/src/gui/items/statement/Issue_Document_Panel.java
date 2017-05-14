@@ -950,7 +950,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		}
 
 		//CREATE TX MESSAGE
-		byte version = (byte)1;
+		byte version = (byte)0;
 		byte property1 = (byte)0;
 		byte property2 = (byte)0;
 		
