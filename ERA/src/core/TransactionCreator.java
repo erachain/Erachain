@@ -512,7 +512,8 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
 
-	public Pair<Transaction, Integer> r_Send(byte version, PrivateKeyAccount creator,
+	public Pair<Transaction, Integer> r_Send(byte version, byte property1, byte property2,
+			PrivateKeyAccount creator,
 			Account recipient, long key, BigDecimal amount, int feePow, String head, byte[] isText,
 			byte[] message, byte[] encryptMessage) {
 		
@@ -523,7 +524,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new R_Send(version, creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx = new R_Send(version, property1, property2, creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
 			
 		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
