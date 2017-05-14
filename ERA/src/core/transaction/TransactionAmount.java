@@ -293,6 +293,8 @@ public abstract class TransactionAmount extends Transaction {
 
 			//CHECK IF AMOUNT IS DIVISIBLE
 			int amount_sign = this.amount.signum();
+			
+			// BACKWARD - CONFISCATE
 			boolean confiscate_credit = typeBytes[1] == 1 
 					|| typeBytes[1] > 1 && (typeBytes[2] & (byte)-64) > 0;
 			
@@ -328,7 +330,7 @@ public abstract class TransactionAmount extends Transaction {
 					
 					// 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 -> 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
 					if (confiscate_credit) {
-						// BORROW - CONFISCATE CREDIT
+						// BACKWARD - BORROW - CONFISCATE CREDIT
 						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
 								this.creator.getAddress(), absKey,
 								this.recipient.getAddress()); 
@@ -440,6 +442,7 @@ public abstract class TransactionAmount extends Transaction {
 						
 		long absKey = getAbsKey();
 
+		// BACKWARD - CONFISCATE
 		boolean confiscate_credit = typeBytes[1] == 1
 				|| typeBytes[1] > 1 && (typeBytes[2] & (byte)-64) > 0;
 
@@ -526,6 +529,7 @@ public abstract class TransactionAmount extends Transaction {
 						
 		long absKey = getAbsKey();
 
+		// BACKWARD - CONFISCATE
 		boolean confiscate_credit = typeBytes[1] == 1
 				|| typeBytes[1] > 1 && (typeBytes[2] & (byte)-64) > 0;
 		

@@ -103,7 +103,7 @@ public class R_Send extends TransactionAmount {
 		this(typeBytes, creator, (byte)0, recipient, key, amount, head, data, isText, encrypted, 0l, reference);
 		this.signature = signature;
 	}
-	// FOR CONFISCATE CREDIT
+	// FOR BACKWARDS - CONFISCATE CREDIT
 	public R_Send(byte version, byte property1, byte property2, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		this(new byte[]{TYPE_ID, version, property1, property2}, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
 	}
