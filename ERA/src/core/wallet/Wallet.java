@@ -78,7 +78,7 @@ public class Wallet extends Observable implements Observer
 	
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	private WalletDatabase database;
+	public WalletDatabase database;
 	private SecureWalletDatabase secureDatabase;
 	
 	private int secondsToUnlock = -1;

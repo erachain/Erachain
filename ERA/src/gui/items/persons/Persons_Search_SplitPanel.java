@@ -35,6 +35,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -123,6 +125,30 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 // Event LISTENER		
 		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 	
+		
+		this.addAncestorListener(new AncestorListener(){
+
+			@Override
+			public void ancestorAdded(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				search_Table_Model.addObservers();
+			}
+
+			@Override
+			public void ancestorMoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void ancestorRemoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				search_Table_Model.removeObservers();
+			}
+			
+			
+			
+		});
 		
 		JPopupMenu menu = new JPopupMenu();
 

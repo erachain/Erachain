@@ -40,9 +40,8 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	public TableModelPersons()
 	{
-		db = DBSet.getInstance().getItemPersonMap();
-		db.addObserver(this);
 		
+		addObservers() ;
 		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
 		//String sss = ss!=null?ss.getName():"--";	
 	}
@@ -186,9 +185,16 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		}
 	}
 	
+	public void addObservers() 
+	{
+		db = DBSet.getInstance().getItemPersonMap();
+		db.addObserver(this);
+	}
+	
+	
 	public void removeObservers() 
 	{
-		this.persons.removeObserver();
+	
 		db.deleteObserver(this);
 	}
 }

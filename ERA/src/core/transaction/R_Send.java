@@ -353,7 +353,7 @@ public class R_Send extends TransactionAmount {
 
 	}
 	
-	public static  Tuple4<String,String,JSONObject,HashMap <String,Tuple2<Boolean, byte[]>>> parse_Data_V3(byte[] data) throws Exception{
+	public static  Tuple4<String,String,JSONObject,HashMap <String,Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data) throws Exception{
 	//Version, Title, JSON, Files	
 		
 		//CHECK IF WE MATCH BLOCK LENGTH
@@ -409,7 +409,7 @@ public class R_Send extends TransactionAmount {
 		 return new Tuple4(version,title,json, out_Map);
 	}
 	
-	public static  byte[]  Json_Files_to_Byte_V3(String title, JSONObject json, HashMap<String,Tuple2<Boolean,byte[]>> files) throws Exception {
+	public static  byte[]  Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String,Tuple2<Boolean,byte[]>> files) throws Exception {
 	
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		outStream.write("v 3.00".getBytes()); // only 6 simbols!!!

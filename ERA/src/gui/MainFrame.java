@@ -191,6 +191,7 @@ public void initComponents() {
 
 				settingsJSON.put("Main_Frame_Div_Last_Loc", lDiv + "");
 				settingsJSON.put("Main_Frame_Div_Loc", div + "");
+				settingsJSON.remove("OpenTabbeds");
 				for (int i = 0; i < mainPanel.jTabbedPane1.getTabCount(); i++) {
 					// write in setting opet tabbs
 					Component comp = mainPanel.jTabbedPane1.getComponentAt(i);
@@ -214,7 +215,7 @@ public void initComponents() {
 						settingsJSON.put(comp.getClass().getSimpleName(),
 								outTabbedDiv);
 					}
-					settingsJSON.remove("OpenTabbeds");
+					
 					settingsJSON.put("OpenTabbeds", outOpenTabbeds);
 					
 

@@ -34,7 +34,9 @@
 	import javax.swing.JTextField;
 	import javax.swing.RowFilter;
 	import javax.swing.RowSorter;
-	import javax.swing.event.DocumentEvent;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.DocumentEvent;
 	import javax.swing.event.DocumentListener;
 	import javax.swing.event.ListSelectionEvent;
 	import javax.swing.event.ListSelectionListener;
@@ -95,7 +97,29 @@ import gui.models.Renderer_Boolean;
 			TableColumnModel columnModel = my_Person_table.getColumnModel(); // read column model
 			columnModel.getColumn(0).setMaxWidth((100));
 			
+			this.addAncestorListener(new AncestorListener(){
+
+				@Override
+				public void ancestorAdded(AncestorEvent arg0) {
+					// TODO Auto-generated method stub
+					my_PersonsModel.addObservers();
+				}
+
+				@Override
+				public void ancestorMoved(AncestorEvent arg0) {
+					// TODO Auto-generated method stub
 					
+				}
+
+				@Override
+				public void ancestorRemoved(AncestorEvent arg0) {
+					// TODO Auto-generated method stub
+					my_PersonsModel.removeObservers();
+				}
+				
+				
+				
+			});	
 					
 	//		my_Sorter = new TableRowSorter(my_PersonsModel);
 	//		my_Person_table.setRowSorter(my_Sorter);

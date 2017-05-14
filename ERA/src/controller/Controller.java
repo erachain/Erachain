@@ -135,7 +135,7 @@ public class Controller extends Observable {
 	private WebService webService;
 	private BlockChain blockChain;
 	private BlockGenerator blockGenerator;
-	private Wallet wallet;
+	public Wallet wallet;
 	private Synchronizer synchronizer;
 	private TransactionCreator transactionCreator;
 	private boolean needSync = false;

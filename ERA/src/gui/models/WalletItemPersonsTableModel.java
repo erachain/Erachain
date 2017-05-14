@@ -31,7 +31,8 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	
 	public WalletItemPersonsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		//Controller.getInstance().addWalletListener(this);
+		addObservers();
 	}
 	
 	@Override
@@ -161,5 +162,18 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
 			this.fireTableDataChanged();
 		}	
+	}
+	public void addObservers(){
+		Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
+		
+		
+	}
+	
+	
+	public void removeObservers() 
+	{
+		this.persons.removeObserver();
+		//Controller.getInstance().deleteWalletObserver(this);
+		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
 	}
 }
