@@ -241,7 +241,7 @@ public class Rec_Resource {
 		} 
 		
 
-		return webserver.LightWallet.toBytes(record_type,	version, feePow, timestamp, creator, reference, queryParameters);
+		return webserver.LightWallet.toBytes(record_type, version, 0, 0, feePow, timestamp, creator, reference, queryParameters);
 
 	}
 
@@ -264,10 +264,35 @@ public class Rec_Resource {
 		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
 		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 		
-		return webserver.LightWallet.toBytes(record_type, version, feePow, timestamp, creator, reference, queryParameters);
+		return webserver.LightWallet.toBytes(record_type, version, 0, 0, feePow, timestamp, creator, reference, queryParameters);
 
 	}
-	
+
+	@GET
+	@Path("/getraw/{type}/{version}/{property1}/{property2}/{creator}/{timestamp}/{feePow}")
+	public String getRaw(@PathParam("type") int record_type,
+			@PathParam("version") int version,
+			@PathParam("property1") int property1,
+			@PathParam("property2") int property2,
+			@PathParam("creator") String creator,
+			@PathParam("timestamp") long timestamp,
+			@PathParam("feePow") int feePow,
+			@PathParam("reference") long reference
+			) // throws JSONException
+	{
+
+		if (uriInfo == null) {
+			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_JSON).toString());
+		}
+		
+		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
+		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+		
+		return webserver.LightWallet.toBytes(record_type, version, property1, property2, feePow, timestamp, creator, reference, queryParameters);
+
+	}
+
 	@POST
 	@Path("/broadcast")
 	public String broadcastFromRaw(String rawDataBase58)
