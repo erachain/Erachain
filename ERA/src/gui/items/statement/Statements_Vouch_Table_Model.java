@@ -319,7 +319,7 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		 */
 
 		@SuppressWarnings("unchecked")
-		SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> rec = (SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message
+		SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal,  List<Tuple2<Integer, Integer>>>> rec = (SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message
 				.getValue();
 
 		Iterator<Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>> ss = rec
