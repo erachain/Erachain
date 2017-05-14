@@ -530,7 +530,8 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
 	
-	public Transaction signNote(boolean asPack, PrivateKeyAccount creator,
+	public Transaction r_SignNote(byte version, byte property1, byte property2, 
+			boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
 		
 		this.checkUpdate();
@@ -540,8 +541,8 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		//recordNoteTx = new R_SignNote((byte)0,(byte)0,(byte)0, creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
-		recordNoteTx = new R_SignNote(creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
+		recordNoteTx = new R_SignNote(version, property1, property1,
+				creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx.sign(creator, asPack);
 		return 	recordNoteTx;
 	

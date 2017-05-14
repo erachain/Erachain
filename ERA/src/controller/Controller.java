@@ -2493,10 +2493,12 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Transaction signNote(boolean asPack, PrivateKeyAccount sender,
+	public Transaction r_SignNote(byte version, byte property1, byte property2, 
+			boolean asPack, PrivateKeyAccount sender,
 			int feePow,	long key, byte[] message, byte[] isText, byte[] encrypted) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.signNote(asPack, sender, feePow, key, message, isText, encrypted);
+			return this.transactionCreator.r_SignNote(version, property1, property2,
+					asPack, sender, feePow, key, message, isText, encrypted);
 		}
 	}
 

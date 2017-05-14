@@ -950,8 +950,13 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		}
 
 		//CREATE TX MESSAGE
+		byte version = (byte)1;
+		byte property1 = (byte)0;
+		byte property2 = (byte)0;
 		
-		R_SignNote issueDoc = (R_SignNote) Controller.getInstance().signNote(asPack,
+		R_SignNote issueDoc = (R_SignNote) Controller.getInstance().r_SignNote(
+				version, property1, property2,
+				asPack,
 				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()),
 				feePow, key, messageBytes,new byte[]{1}, encrypted);
 		
