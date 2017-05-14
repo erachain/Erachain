@@ -287,6 +287,10 @@ public abstract class Transaction {
 	protected static final int SIMPLE_TYPE_LENGTH = 1;
 	protected static final int TYPE_LENGTH = 4;
 	protected static final int HEIGHT_LENGTH = 4;
+	protected static final int DATA_JSON_PART_LENGTH = 4;
+	protected static final int DATA_VERSION_PART_LENGTH = 6;
+	protected static final int DATA_TITLE_PART_LENGTH = 4;
+	protected static final int DATA_NUM_FILE_LENGTH = 4;
 	protected static final int SEQ_LENGTH = 4;
 	//protected static final int PROP_LENGTH = 2; // properties
 	public static final int TIMESTAMP_LENGTH = 8;

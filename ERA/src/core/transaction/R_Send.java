@@ -1,15 +1,26 @@
 package core.transaction;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -32,6 +43,7 @@ public class R_Send extends TransactionAmount {
 
 	private static final byte TYPE_ID = (byte)Transaction.SEND_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Send";
+	private static int position;
 
 	protected String head;
 	protected byte[] data;
@@ -317,6 +329,119 @@ public class R_Send extends TransactionAmount {
 		}
 
 	}
+	
+	public static  Tuple4<String,String,JSONObject,HashMap <String,Tuple2<Boolean, byte[]>>> parse_Data_V3(byte[] data) throws Exception{
+	//Version, Title, JSON, Files	
+		
+		//CHECK IF WE MATCH BLOCK LENGTH
+		if (data.length < Transaction.DATA_JSON_PART_LENGTH)
+		{
+			throw new Exception("Data does not match block length " + data.length);
+		}
+		int position = 0;
+		
+		// read version
+		byte[] version_Byte = Arrays.copyOfRange(data, position , Transaction.DATA_VERSION_PART_LENGTH);
+		position += Transaction.DATA_VERSION_PART_LENGTH;
+		// read title
+		byte[] titleSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_TITLE_PART_LENGTH);
+		int titleSize = Ints.fromByteArray(titleSizeBytes);
+		position += Transaction.DATA_TITLE_PART_LENGTH;
+		
+		byte[] titleByte = Arrays.copyOfRange(data, position , position + titleSize);
+		
+		position +=titleSize;
+		//READ Length JSON PART
+		byte[] dataSizeBytes = Arrays.copyOfRange(data, position , position + Transaction.DATA_JSON_PART_LENGTH);
+		int JSONSize = Ints.fromByteArray(dataSizeBytes);	
+		
+		position += Transaction.DATA_JSON_PART_LENGTH;
+		//READ JSON
+		byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
+		JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, Charset.forName("UTF-8")));
+		
+		String title = new String(titleByte, Charset.forName("UTF-8"));
+		String version = new String(version_Byte, Charset.forName("UTF-8"));
+		
+		if (!json.containsKey("&*&*%$$%_files_#$@%%%")) return new Tuple4(version,title,json, null);
+	
+		position += JSONSize;
+		HashMap<String,Tuple2<Boolean, byte[]>> out_Map = new HashMap<String,Tuple2<Boolean, byte[]>>();
+		JSONObject files =(JSONObject) json.get("&*&*%$$%_files_#$@%%%");
+		
+		
+		Set files_key_Set = files.keySet();
+		for (int i = 0; i < files_key_Set.size(); i++) {
+			JSONObject file = (JSONObject) files.get(i+"");
+			
+			
+				String name = (String) file.get("File_Name");
+				Boolean zip = new Boolean((String) file.get("ZIP"));
+				byte[] bb = Arrays.copyOfRange(data, position, position + new Integer((String) file.get("Size")));
+				position = position + new Integer((String) file.get("Size"));
+				out_Map.put(name, new Tuple2(zip,bb));	
+					
+		}
+			
+		 return new Tuple4(version,title,json, out_Map);
+	}
+	
+	public static  byte[]  Json_Files_to_Byte_V3(String title, JSONObject json, HashMap<String,Tuple2<Boolean,byte[]>> files) throws Exception {
+	
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		outStream.write("v 3.00".getBytes()); // only 6 simbols!!!
+		byte[] title_Bytes = "".getBytes();
+		if (title !=null){
+			title_Bytes = title.getBytes();
+		}
+		
+		
+		byte[] size_Title = ByteBuffer.allocate(Transaction.DATA_TITLE_PART_LENGTH).putInt(title_Bytes.length).array();
+		
+		outStream.write(size_Title);
+		outStream.write(title_Bytes);
+		
+		if (json == null || json.equals("") ) return outStream.toByteArray();
+		
+		byte[] JSON_Bytes ;
+		byte[] size_Json;
+		
+		if (files == null || files.size() == 0){
+			JSON_Bytes = json.toString().getBytes();
+			// convert int to byte
+			size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt( JSON_Bytes.length).array();
+			outStream.write(size_Json);
+			outStream.write(JSON_Bytes);
+			return outStream.toByteArray(); 
+		}
+		// if insert Files
+		Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it = files.entrySet().iterator();
+		JSONObject files_Json = new JSONObject();
+		int i = 0;
+		 ArrayList<byte[]> out_files = new ArrayList<byte[]>();
+		while(it.hasNext()){
+			Entry<String, Tuple2<Boolean, byte[]>> file = it.next();
+			JSONObject file_Json = new JSONObject();
+			file_Json.put("File_Name", file.getKey()); 
+			file_Json.put("ZIP", file.getValue().a.toString());
+			file_Json.put("Size", file.getValue().b.length+"");
+			files_Json.put(i+"", file_Json);
+			out_files.add(i,file.getValue().b);
+			i++;
+		}
+		json.put("&*&*%$$%_files_#$@%%%",files_Json);
+		JSON_Bytes = json.toString().getBytes();
+		// convert int to byte
+		size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt( JSON_Bytes.length).array();
+		outStream.write(size_Json);
+		outStream.write(JSON_Bytes);
+		for(i=0; i<out_files.size(); i++){
+				outStream.write(out_files.get(i));	
+		}
+		return outStream.toByteArray();
+
+	}
+	
 
 	@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference) {
