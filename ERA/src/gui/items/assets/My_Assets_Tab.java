@@ -21,6 +21,8 @@ import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
@@ -30,6 +32,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.items.assets.Search_Assets_Tab.search_listener;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -118,6 +121,8 @@ public class My_Assets_Tab extends Split_Panel {
 	this.jTable_jScrollPanel_LeftPanel.setModel(assetsModel);
 	this.jTable_jScrollPanel_LeftPanel = table;
 	jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+	
+	jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 	
 	// UPDATE FILTER ON TEXT CHANGE
 			searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
@@ -430,6 +435,19 @@ if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
 
 }
 }
+//listener select row	 
+class search_listener implements ListSelectionListener  {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			AssetCls asset = null;
+			if (table.getSelectedRow() >= 0 ) asset = assetsModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
+			if (asset == null) return;
+			AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
+				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+			
+		}
+	}
 
 
 }
