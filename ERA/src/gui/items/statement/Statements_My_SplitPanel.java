@@ -1,9 +1,15 @@
 	package gui.items.statement;
 
 	import java.awt.Dimension;
-	import javax.swing.JTable;
+import java.util.ArrayList;
+
+import javax.swing.DefaultRowSorter;
+import javax.swing.JTable;
 	import javax.swing.ListSelectionModel;
-	import javax.swing.event.DocumentEvent;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.event.DocumentEvent;
 	import javax.swing.event.DocumentListener;
 	import javax.swing.event.ListSelectionEvent;
 	import javax.swing.event.ListSelectionListener;
@@ -24,6 +30,10 @@ import gui.library.MTable;
 	     int alpha =255;
 	     int alpha_int;
 	     Statements_Table_Model_My my_Statements_Model;
+
+
+
+		private TableRowSorter search_Sorter;
 		
 		
 	public Statements_My_SplitPanel(){
@@ -91,7 +101,13 @@ import gui.library.MTable;
 			this.jTable_jScrollPanel_LeftPanel = new MTable(my_Statements_Model); //my_Statements_table;
 			//this.jTable_jScrollPanel_LeftPanel.setTableHeader(null);
 			// sorter
-			this.jTable_jScrollPanel_LeftPanel.setRowSorter(new TableRowSorter(my_Statements_Model));
+			search_Sorter = new TableRowSorter(my_Statements_Model);
+			ArrayList<SortKey> keys = new ArrayList<RowSorter.SortKey>();
+			keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING));
+			keys.add(new RowSorter.SortKey(0, SortOrder.DESCENDING)); 
+			search_Sorter.setSortKeys(keys);
+			((DefaultRowSorter<?, ?>) search_Sorter).setSortsOnUpdates(true);
+			this.jTable_jScrollPanel_LeftPanel.setRowSorter(search_Sorter);
 			this.jTable_jScrollPanel_LeftPanel.setEditingColumn(0);
 			this.jTable_jScrollPanel_LeftPanel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);

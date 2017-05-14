@@ -444,13 +444,13 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				// TODO Auto-generated method stub
 	
 			if (arg0.getType() != 0 && arg0.getColumn()<0 ) return;
-			System.out.print("\n row = " + arg0.getFirstRow() + "  Col="+ arg0.getColumn() + "   type =" + arg0.getType());
+		//	System.out.print("\n row = " + arg0.getFirstRow() + "  Col="+ arg0.getColumn() + "   type =" + arg0.getType());
 			String dd = params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()).toString();
-			System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
+		//	System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
 			
 			 jTextPane_Message_Public.pars.replace("{{"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +"}}",(String) params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
-			 System.out.print("\n");
-				System.out.print(jTextPane_Message_Public.pars);
+		//	 System.out.print("\n");
+		//		System.out.print(jTextPane_Message_Public.pars);
 			 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
 			arg0=arg0;
 			}});
@@ -973,7 +973,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueDoc.viewSize(true)+" Bytes, ";
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueDoc.getFee().toString()+" COMPU</b><br></body></HTML>";
 		    
-		  System.out.print("\n"+ text +"\n");
+	//	  System.out.print("\n"+ text +"\n");
 	//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
 	//	    UIManager.put("OptionPane.okButtonText", "Готово");
 		

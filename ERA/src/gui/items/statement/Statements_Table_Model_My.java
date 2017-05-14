@@ -2,34 +2,20 @@ package gui.items.statement;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
-
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple5;
-
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
-import core.block.Block;
-import core.block.GenesisBlock;
 import core.item.ItemCls;
-import core.item.assets.AssetCls;
 import core.transaction.R_SignNote;
-//import core.transaction.R_SignStatement_old;
 import core.transaction.Transaction;
 import database.DBSet;
 import lang.Lang;
@@ -45,25 +31,19 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 
 	public static final int COLUMN_TIMESTAMP = 0;
-//	public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_CREATOR = 1;
 	public static final int COLUMN_NOTE = 2;
 	public static final int COLUMN_BODY = 3;
-	//public static final int COLUMN_SIGNATURE = 3;
-//	public static final int COLUMN_FEE = 3;
 	List<Transaction> transactions;
-	
-//	private SortableList<byte[], Transaction> transactions;
-	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true,true,false};
-//	private Map<byte[], BlockingQueue<Block>> blocks;
+	Object[] collection;
+
 	
 	
 	public Statements_Table_Model_My(){
-	
 		transactions = new ArrayList<Transaction>();
-		Controller.getInstance().addObserver(this);	
+		addObserver();
 		transactions = read_Statement();
 	
 	}
@@ -92,15 +72,15 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 	public Transaction get_Statement(int row){
 		
-		if (this.transactions == null || this.transactions.size() <= row) {
+		if (this.collection == null || this.collection.length <= row) {
 			return null;
 		}
 
-		Transaction transaction = this.transactions.get(row);
+		Transaction transaction = (Transaction) this.collection[row];
 		if (transaction == null)
 			return null;
 
-		return transactions.get(row);
+		return transaction;
 	}
 	
 	@Override
@@ -112,20 +92,19 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	@Override
 	public int getRowCount() {
 		// TODO Auto-generated method stub
-		return transactions.size();
+		return collection.length;//transactions.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
-//		try
-//		{
-			if(this.transactions == null || this.transactions.size() == 0)
+		try
+		{
+			if(this.collection == null || this.collection.length == 0)
 			{
 				return null;
 			}
-			
-			Transaction trans = this.transactions.get(row);
+			Transaction trans =(Transaction) collection[row];
 			if (trans == null)
 				return null;
 			
@@ -138,12 +117,6 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 				
 				//return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
 				return record.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
-				
-		/*	case COLUMN_TYPE:
-				
-				//return Lang.transactionTypes[transaction.getType()];
-				return Lang.getInstance().translate(transaction.viewTypeName());
-		*/
 
 			case COLUMN_NOTE:
 				
@@ -168,20 +141,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 				 if (str == null) return "";
 				 if (str.length()>50) return str.substring(0,50)+"...";
 					return str ;//transaction.viewReference();//.viewProperies();
-				
-				
-				
-			//	return new String( record.getData() , Charset.forName("UTF-8") ) ;//transaction.viewReference();//.viewProperies();
-				
-				
-	//		case COLUMN_AMOUNT:
-				
-	//			return NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
-				
-	//		case COLUMN_FEE:
-				
-	//			return NumberAsString.getInstance().numberAsString(transaction.getFee());	
-			
+	
 			case COLUMN_CREATOR:
 				
 				creator = record.getCreator();
@@ -191,39 +151,34 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			return null;
 			
-	//	} catch (Exception e) {
-	//		LOGGER.error(e.getMessage(),e);
-	//		return null;
-	//	}
+		} catch (Exception e) {
+		//	LOGGER.error(e.getMessage(),e);
+			return null;
+		}
 	}
 	
 	
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		//try
-	//	{
+		try
+		{
 			this.syncUpdate(o, arg);
-	//	}
-	//	catch(Exception e)
-	//	{
+		}
+		catch(Exception e)
+		{
 			//GUI ERROR
-	//	}
+		}
 	}
 	
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-//		System.out.println( message.getType());
-		
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_STATEMENT_TYPE)
 		{
 			if(this.transactions == null)
 			{
-			//	this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			//	this.statusesMap .registerObserver();
-				//this.imprints.sort(PollMap.NAME_INDEX);
 				transactions = read_Statement();
 			}
 			
@@ -232,17 +187,15 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		
 		
 		//CHECK IF LIST UPDATED
-		if( //message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE 
-			//	||
-				message.getType() == ObserverMessage.ADD_BLOCK_TYPE 
-		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE
-		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
-		//		|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
-				
+		if(	message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE 
 				)
 		{
-			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			transactions = read_Statement();
+			Transaction trans = (Transaction) message.getValue();
+			if (trans.getType() != Transaction.SIGN_NOTE_TRANSACTION) return;
+			transactions.add(trans);
+			HashSet<Transaction> col = new HashSet<Transaction>(transactions);	
+			  collection = col.toArray();
+			
 			this.fireTableDataChanged();
 		}	
 	}	
@@ -265,9 +218,21 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		for (Account account : Controller.getInstance().getAccounts()) {
 			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
 		}
-				
+		
+			HashSet<Transaction> col = new HashSet<Transaction>(transactions);	
+		  collection = col.toArray();
+		 
 		return transactions;
 	
 	}
 
+	public void removeObserver(){
+		
+		Controller.getInstance().deleteObserver(this);	
+		
+	}
+	public void addObserver(){
+		Controller.getInstance().addObserver(this);	
+	}
+	
 }
