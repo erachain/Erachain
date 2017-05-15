@@ -797,14 +797,16 @@ public class Controller extends Observable {
 			return;
 		
 		// SEND FOUNDMYSELF MESSAGE
-		peer.sendMessage( MessageFactory.getInstance().createFindMyselfMessage( 
+		if (!peer.sendMessage( MessageFactory.getInstance().createFindMyselfMessage( 
 			Controller.getInstance().getFoundMyselfID() 
-			));
+			)))
+			return;
 
 		// SEND VERSION MESSAGE
-		peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
+		if (!peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
 			Controller.getVersion(),
-			getBuildTimestamp() ));
+			getBuildTimestamp() )))
+			return;
 		
 		// GET GENESIS BLOCK - TEST WRONG CHAIN
 		byte[]  genesisBlockSign = Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
@@ -855,8 +857,9 @@ public class Controller extends Observable {
 		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeight(dbSet, false);
 		// SEND HEIGTH MESSAGE
-		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
-				HWeight));
+		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(
+				HWeight)))
+			return;
 
 		// GET CURRENT WIN BLOCK
 		Block winBlock = this.blockChain.getWaitWinBuffer();
@@ -1331,7 +1334,10 @@ public class Controller extends Observable {
 		// CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
 		
-		// BROADCAST MESSAGE		
+		if (this.isOnStopping() || this.dbSet.isStoped())
+			return;
+
+		// BROADCAST MESSAGE
 		this.network.broadcast(message, excludes);
 		
 	}
@@ -1433,7 +1439,7 @@ public class Controller extends Observable {
 					}
 				} catch (Exception e) {
 					// error on peer - disconnect!
-					this.network.tryDisconnect(maxHW.c, 0, e.getMessage());
+					this.network.tryDisconnect(maxHW.c, 0, "core.Synchronizer.getBlock - " + e.getMessage());
 				}
 			}
 		}
@@ -1531,6 +1537,8 @@ public class Controller extends Observable {
 		
 		// send to ALL my HW
 		broadcastHWeight(null);
+		if (this.isStopping)
+			return;
 
 		// NOTIFY
 		this.setChanged();

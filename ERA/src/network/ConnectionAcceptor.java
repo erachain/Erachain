@@ -53,7 +53,7 @@ public class ConnectionAcceptor extends Thread{
 						socket.close();
 					}
 					
-					Thread.sleep(50);
+					//Thread.sleep(50);
 				}
 				else
 				{		
@@ -97,6 +97,8 @@ public class ConnectionAcceptor extends Thread{
 
 						//CREATE PEER
 						////new Peer(callback, connectionSocket);
+						LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress());
+
 						callback.startPeer(connectionSocket);
 					}
 				}

@@ -475,6 +475,10 @@ public class BlockGenerator extends Thread implements Observer
 				if (bchain.setWaitWinBuffer(dbSet, block)) {
 					// need to BROADCAST
 					ctrl.broadcastWinBlock(block, null);
+					
+					if (ctrl.isOnStopping() || dbSet.isStoped())
+						return;
+
 				}
 			}
 		}

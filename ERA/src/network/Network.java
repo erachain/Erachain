@@ -348,6 +348,10 @@ public class Network extends Observable implements ConnectionCallback {
 		{
 			for(int i=0; i < this.knownPeers.size() ; i++)
 			{
+				
+				if (!this.run)
+					return;
+				
 				Peer peer = this.knownPeers.get(i);
 				if (!peer.isUsed()) {
 					continue;

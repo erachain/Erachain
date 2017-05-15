@@ -225,7 +225,7 @@ public class Synchronizer
 	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer) throws Exception
 	{
 
-		if (dbSet.isStoped())
+		if (!this.run)
 			return;
 
 		/*
@@ -251,7 +251,10 @@ public class Synchronizer
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
 		Block common = dbSet.getBlockMap().get(signatures.a);
 		int commonBlockHeight = common.getHeight(dbSet);
-				
+
+		if (!this.run || dbSet.isStoped())
+			return;
+
 		LOGGER.info("Synchronizing from COMMON blockHeight " + commonBlockHeight);
 		
 		//CHECK COMMON BLOCK EXISTS
@@ -293,6 +296,9 @@ public class Synchronizer
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
 				{
+					if (!this.run)
+						return;
+
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dbSet);
 					peer.ban(10 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, mess);
@@ -542,6 +548,9 @@ public class Synchronizer
 			if(block.isValid(dbSet) && block.isSignatureValid())
 			{
 				//PROCESS
+				if (!this.run)
+					return true;
+				
 				dbSet.getBlockMap().setProcessing(true);
 				block.process(dbSet);
 				dbSet.getBlockMap().setProcessing(false);
