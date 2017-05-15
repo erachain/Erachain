@@ -180,9 +180,10 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			if(this.transactions == null)
 			{
 				transactions = read_Statement();
+				this.fireTableDataChanged();
 			}
 			
-			this.fireTableDataChanged();
+			
 		}
 		
 		
@@ -226,7 +227,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 	}
 
-	public void removeObservers(){
+	public void removeObserver(){
 		
 		Controller.getInstance().deleteObserver(this);	
 		
