@@ -67,8 +67,14 @@ public class Statement_Info extends javax.swing.JPanel {
 	public Statement_Info(Transaction transaction) {
 		if (transaction == null)
 			return;
-		
 		this.transaction = transaction;
+		statement = (R_SignNote) transaction;
+		if (statement.getVersion() ==2) return;
+		//view version 1
+		view_V1();
+	}
+		
+	private void view_V1(){
 		
 
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap()
@@ -78,7 +84,7 @@ public class Statement_Info extends javax.swing.JPanel {
 
 		}
 
-		statement = (R_SignNote) transaction;
+		
 		
 		initComponents();
 		
@@ -306,7 +312,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
-		jPanel1.add(file_Panel, gridBagConstraints);
+	//	jPanel1.add(file_Panel, gridBagConstraints);
 		
 		
 		

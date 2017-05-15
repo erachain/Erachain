@@ -48,6 +48,8 @@ import javax.swing.table.TableColumnModel;
 import javax.validation.constraints.Null;
 
 import org.apache.commons.net.util.Base64;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 
 import com.github.rjeschke.txtmark.Processor;
 
@@ -58,6 +60,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
+import core.transaction.R_Send;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import gui.MainFrame;
@@ -860,7 +863,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 // files	
 			HashMap out_Files = new HashMap();
 		//	HashMap out_Files_data = new HashMap();
-			
+			 HashMap<String,Tuple2<Boolean,byte[]>>files_1 = new  HashMap<String,Tuple2<Boolean,byte[]>>();
 			int oF = attached_Files_Model.getRowCount();
 			for (int i=0; i<oF; i++){
 				/*
@@ -874,6 +877,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				byte[] ss = (byte[]) attached_Files_Model.getValueAt(i,5);
 				file_Attr.put("Data",Base64.encodeBase64String(ss));
 				out_Files.put(i, file_Attr);
+				files_1.put( (String)attached_Files_Model.getValueAt(i,0), new Tuple2(attached_Files_Model.getValueAt(i,2),(byte[]) attached_Files_Model.getValueAt(i,5)));
 				// files data
 				//HashMap file_Attr_data = new HashMap();
 				//file_Attr_data.put("Name", attached_Files_Model.getValueAt(i,0));
@@ -881,7 +885,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				//file_Attr_data.put("Data",Base64.encodeBase64String(ss));
 				//out_Files_data.put(i, file_Attr_data);
 			}
-			out_Map.put("Files", out_Files);
+		//	out_Map.put("Files", out_Files);
 	//		message += this.jTextPane_Message_Public.getText();
 			
 	//		isTextB = this.jCheckBox_Message_Public.isSelected();
@@ -893,7 +897,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			 messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
 		//	fileData = StrJSonFine.convert(out_Files_data).getBytes( Charset.forName("UTF-8") );
 			
-			
+			byte[] data_byte = R_Send.Json_Files_to_Byte_V2(jTextField_Title_Message.getText(), new JSONObject(out_Map), files_1);
 			
 			
 			
@@ -950,7 +954,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		}
 
 		//CREATE TX MESSAGE
-		byte version = (byte)0;
+		byte version = (byte)2;
 		byte property1 = (byte)0;
 		byte property2 = (byte)0;
 		

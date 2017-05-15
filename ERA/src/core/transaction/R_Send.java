@@ -412,7 +412,7 @@ public class R_Send extends TransactionAmount {
 	public static  byte[]  Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String,Tuple2<Boolean,byte[]>> files) throws Exception {
 	
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		outStream.write("v 3.00".getBytes()); // only 6 simbols!!!
+		outStream.write("v 2.00".getBytes()); // only 6 simbols!!!
 		byte[] title_Bytes = "".getBytes();
 		if (title !=null){
 			title_Bytes = title.getBytes();
