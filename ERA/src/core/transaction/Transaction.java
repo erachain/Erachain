@@ -736,12 +736,15 @@ public abstract class Transaction {
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
 		transaction.put("confirmations", this.getConfirmations(DBSet.getInstance()));
+		int height;
 		if (this.creator == null )
 		{
 			transaction.put("creator", "genesis");
 			transaction.put("reference", "genesis");
 			transaction.put("signature", "genesis");
+			height = 1;
 		} else {
+			height = this.getBlockHeight(DBSet.getInstance());
 			transaction.put("reference", this.reference==null?"null":"" + this.reference);
 			transaction.put("signature", this.signature==null?"null":Base58.encode(this.signature));
 			transaction.put("fee", this.fee.toPlainString());
@@ -751,6 +754,10 @@ public abstract class Transaction {
 			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
 			transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
 		}
+		
+		transaction.put("height", height);
+		if (height > 0)
+			transaction.put("sequence", this.getSeqNo(DBSet.getInstance()));
 		
 		return transaction;
 	}

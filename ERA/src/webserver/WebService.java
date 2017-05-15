@@ -21,6 +21,7 @@ public class WebService {
 	{
 		//CREATE CONFIG
 		Set<Class<?>> s = new HashSet<Class<?>>();
+        s.add(API.class);
         s.add(WebResource.class);
         s.add(LightWallet.class);
         

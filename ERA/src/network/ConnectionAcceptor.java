@@ -35,8 +35,6 @@ public class ConnectionAcceptor extends Thread{
 			try
 			{	
 				
-				Thread.sleep(10);	
-
 				if(socket == null)
 				{
 					//START LISTENING
@@ -105,6 +103,13 @@ public class ConnectionAcceptor extends Thread{
 			}
 			catch(Exception e)
 			{
+
+				try{ 
+					Thread.sleep(100);	
+				} catch(Exception es)
+				{
+				}
+
 				LOGGER.info(e.getMessage(),e);
 				LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());			
 			}

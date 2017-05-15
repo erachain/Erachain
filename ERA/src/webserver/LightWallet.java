@@ -85,7 +85,7 @@ import utils.APIUtils;
 import utils.Converter;
 import utils.Pair;
 
-@Path("/")
+@Path("lightwallet")
 public class LightWallet {
 	
 	@Context
@@ -95,7 +95,6 @@ public class LightWallet {
 	private static final Logger LOGGER = Logger
 			.getLogger(LightWallet.class);
 
-	/*
 	@GET
 	public Response Default() {
 
@@ -103,12 +102,11 @@ public class LightWallet {
 		return Response.status(302).header("Location", "lightwallet/main.html")
 				.build();
 	}
-	*/
 
 	/*@GET here defines, this method will process HTTP GET requests. */
 
 	@GET
-	@Path("lightwallet/test/")
+	@Path("test")
 	public String test()
 	{
 		String text = "";
