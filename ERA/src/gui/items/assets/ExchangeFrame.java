@@ -109,7 +109,7 @@ public class ExchangeFrame extends JDialog
 				
 				AssetPairSelect ss = new AssetPairSelect(have.getKey(),  action,  account);	
 			this.want = ss.pairAsset;
-			
+			ss.assetPairSelectTableModel.removeObservers();
 			}
 		   if(this.want == null) {
 			   this.dispose();
@@ -212,7 +212,7 @@ public class ExchangeFrame extends JDialog
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
 					AssetPairSelect ss = new AssetPairSelect(have.getKey(), "", "");
-					
+					ss.assetPairSelectTableModel.removeObservers();
 					if(ss.pairAsset!= null)	
 					{
 						want = ss.pairAsset;
