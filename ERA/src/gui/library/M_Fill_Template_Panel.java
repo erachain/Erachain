@@ -179,7 +179,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 8, 0);
-		add(jCheckBox_Is_Encripted, gridBagConstraints);
+//		add(jCheckBox_Is_Encripted, gridBagConstraints);
 
 		jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
 
