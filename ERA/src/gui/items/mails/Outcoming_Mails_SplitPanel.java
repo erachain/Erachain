@@ -226,7 +226,17 @@ import utils.TableMenuPopupUtil;
 
 			}
 		}
-		
+	
+		@Override
+		public void delay_on_close(){
+			// delete observer left panel
+			incoming_Mails_Model.removeObservers();
+			// get component from right panel
+			Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+			// if Person_Info 002 delay on close
+			  if (c1 instanceof Mail_Info) ( (Mail_Info)c1).delay_on_Close();
+			
+		}
 		
 	
 	}

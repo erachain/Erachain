@@ -19,6 +19,7 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.Split_Panel;
+import gui.items.imprints.Imprints_Info_Panel;
 import gui.library.MTable;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
@@ -206,5 +207,16 @@ public class Incoming_Mails_SplitPanel extends Split_Panel {
 
 		}
 	}
+	@Override
+	public void delay_on_close(){
+		// delete observer left panel
+		incoming_Mails_Model.removeObservers();
+		// get component from right panel
+		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+		// if Person_Info 002 delay on close
+		  if (c1 instanceof Mail_Info) ( (Mail_Info)c1).delay_on_Close();
+		
+	}
 
+	
 }

@@ -53,6 +53,7 @@ public class Mail_Info extends javax.swing.JPanel {
 	R_Send trans;
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	boolean encrypted;
+	private Voush_Library_Panel voush_Library_Panel;
     /**
      * Creates new form Mail_Info
      */
@@ -290,7 +291,8 @@ public class Mail_Info extends javax.swing.JPanel {
         
         
         javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
-        jTabbedPane1.add(new Voush_Library_Panel(trans));
+        voush_Library_Panel = new Voush_Library_Panel(trans);
+        jTabbedPane1.add(voush_Library_Panel);
         add(jTabbedPane1, gridBagConstraints);
         
         
@@ -416,4 +418,8 @@ public class Mail_Info extends javax.swing.JPanel {
 		return Converter.toHex(trans.viewData());		
 	}
     */
+	public void delay_on_Close(){
+		voush_Library_Panel.delay_on_close();
+	}
+	
 }
