@@ -1,5 +1,6 @@
 package gui.items.unions;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -150,4 +151,14 @@ public class Search_Union_Tab extends Split_Panel{
 		
 	}
 
+	@Override
+	public void delay_on_close(){
+		// delete observer left panel
+		tableModelUnions.removeObservers();
+		// get component from right panel
+	//	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+		// if Person_Info 002 delay on close
+		//  if (c1 instanceof Statement_Info) ( (Statement_Info)c1).delay_on_Close();
+		
+	}
 }

@@ -1,5 +1,6 @@
 package gui.items.statuses;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import controller.Controller;
 import core.item.ItemCls;
 import core.item.statuses.StatusCls;
 import gui.Split_Panel;
+import gui.items.statement.Statement_Info;
 import gui.library.MTable;
 import gui.models.WalletItemStatusesTableModel;
 import lang.Lang;
@@ -36,6 +38,7 @@ public class My_Statuses_Tab extends Split_Panel {
 	private TableColumn favoriteColumn;
 	private My_Statuses_Tab tSP;
 	private  TableModelItemStatuses tableModelItemStatuses;
+	private Status_Info info1;
 	
 
 	// My statuses		
@@ -129,7 +132,7 @@ public My_Statuses_Tab(){
 				
 				// select row table statuses
 				
-				 Status_Info info1 = new Status_Info();
+				info1 = new Status_Info();
 				 info1.setFocusable(false);
 			 
 				// обработка изменения положения курсора в таблице
@@ -275,5 +278,15 @@ public  void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
 				//	a = a+ " ";
 				}
 
+@Override
+public void delay_on_close(){
+	// delete observer left panel
+	tableModelItemStatuses.removeObservers();
+	// get component from right panel
+	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	// if Person_Info 002 delay on close
+//	  if (c1 instanceof Status_Info) ( (Status_Info)c1).delay_on_Close();
+	
+}
 
 }

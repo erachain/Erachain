@@ -1,6 +1,7 @@
 	package gui.items.statement;
 
-	import java.awt.Dimension;
+	import java.awt.Component;
+import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javax.swing.DefaultRowSorter;
@@ -17,6 +18,7 @@ import javax.swing.table.TableRowSorter;
 
 import core.transaction.Transaction;
 	import gui.Split_Panel;
+import gui.items.mails.Mail_Info;
 import gui.library.MTable;
 	import lang.Lang;
 
@@ -161,7 +163,16 @@ import gui.library.MTable;
 			}
 		}
 		
-		
+		@Override
+		public void delay_on_close(){
+			// delete observer left panel
+			my_Statements_Model.removeObservers();
+			// get component from right panel
+			Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+			// if Person_Info 002 delay on close
+			  if (c1 instanceof Statement_Info) ( (Statement_Info)c1).delay_on_Close();
+			
+		}
 	
 	}
 

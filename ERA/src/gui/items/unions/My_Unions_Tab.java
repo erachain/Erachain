@@ -1,5 +1,6 @@
 package gui.items.unions;
 
+import java.awt.Component;
 import java.text.SimpleDateFormat;
 
 import javax.swing.DefaultRowSorter;
@@ -15,6 +16,7 @@ import javax.swing.table.TableRowSorter;
 
 import core.item.unions.UnionCls;
 import gui.Split_Panel;
+import gui.items.statement.Statement_Info;
 import gui.library.MTable;
 import gui.models.WalletItemUnionsTableModel;
 import lang.Lang;
@@ -23,6 +25,7 @@ public class My_Unions_Tab extends Split_Panel {
 
 	private TableColumnModel columnModel;
 	private TableColumn favoriteColumn;
+	final WalletItemUnionsTableModel unionsModel;
 
 	public My_Unions_Tab(){
 	super("My_Unions_Tab");
@@ -36,7 +39,7 @@ public class My_Unions_Tab extends Split_Panel {
 		jButton1_jToolBar_RightPanel.setVisible(false);
 		jButton2_jToolBar_RightPanel.setVisible(false);
 	//TABLE
-		final WalletItemUnionsTableModel unionsModel = new WalletItemUnionsTableModel();
+		unionsModel = new WalletItemUnionsTableModel();
 		final MTable tableUnion = new MTable(unionsModel);
 		columnModel = tableUnion.getColumnModel(); // read column model
 		columnModel.getColumn(0).setMaxWidth((100));
@@ -119,4 +122,14 @@ public class My_Unions_Tab extends Split_Panel {
 			});
 			jScrollPane_jPanel_RightPanel.setViewportView(info1);
 }
+	@Override
+	public void delay_on_close(){
+		// delete observer left panel
+		unionsModel.removeObservers();
+		// get component from right panel
+		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+		// if Person_Info 002 delay on close
+		//  if (c1 instanceof Statement_Info) ( (Statement_Info)c1).delay_on_Close();
+		
+	}
 }

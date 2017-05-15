@@ -38,7 +38,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	public Statements_Table_Model_Search() {
 
 		transactions = new ArrayList<Transaction>();
-		addObserver();
+		addObservers();
 		transactions = read_Statement();
 	}
 
@@ -206,13 +206,13 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 
 	}
 
-	public void removeObserver() {
+	public void removeObservers() {
 
 		// Controller.getInstance().deleteObserver(this);
 		DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
 	}
 
-	public void addObserver() {
+	public void addObservers() {
 		// Controller.getInstance().addObserver(this);
 		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
 	}

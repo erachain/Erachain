@@ -247,5 +247,15 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		//	jSplitPanel.setRightComponent(info_panel);
 		}
 	}
+	@Override
+	public void delay_on_close(){
+		// delete observer left panel
+		search_Table_Model.removeObservers();
+		// get component from right panel
+		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+		// if Person_Info 002 delay on close
+		  if (c1 instanceof Statement_Info) ( (Statement_Info)c1).delay_on_Close();
+		
+	}
 
 }

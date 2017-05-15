@@ -226,7 +226,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	
 	}
 
-	public void removeObserver(){
+	public void removeObservers(){
 		
 		Controller.getInstance().deleteObserver(this);	
 		

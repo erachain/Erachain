@@ -30,7 +30,9 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 	
 	public WalletItemUnionsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		
+		addObservers();
+		
 	}
 	
 	@Override
@@ -150,4 +152,13 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 			this.fireTableDataChanged();
 		}	
 	}
+	public void removeObservers(){
+		
+		Controller.getInstance().deleteObserver(this);
+		
+	}
+	public void addObservers(){
+		Controller.getInstance().addWalletListener(this);
+	}
+	
 }

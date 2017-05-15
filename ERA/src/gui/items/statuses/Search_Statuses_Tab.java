@@ -1,5 +1,6 @@
 package gui.items.statuses;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -285,6 +286,16 @@ public  void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
 				//	a = a+ " ";
 				}
 
+@Override
+public void delay_on_close(){
+	// delete observer left panel
+	tableModelItemStatuses.removeObservers();
+	// get component from right panel
+	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	// if Person_Info 002 delay on close
+//	  if (c1 instanceof Status_Info) ( (Status_Info)c1).delay_on_Close();
+	
+}
 
 	
 }

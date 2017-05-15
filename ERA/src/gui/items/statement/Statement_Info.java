@@ -62,6 +62,7 @@ public class Statement_Info extends javax.swing.JPanel {
 	R_SignNote statement;
 	Transaction transaction;
 	private M_Attached_Files_Panel file_Panel;
+	private Voush_Library_Panel voush_Library_Panel;
 
 	public Statement_Info(Transaction transaction) {
 		if (transaction == null)
@@ -322,8 +323,8 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(0, 11, 11, 11);
-
-		jPanel2.add(new Voush_Library_Panel(transaction), gridBagConstraints);
+		voush_Library_Panel =new Voush_Library_Panel(transaction);
+		jPanel2.add(voush_Library_Panel, gridBagConstraints);
 		//
 
 		jSplitPane1.setRightComponent(jPanel2);
@@ -338,6 +339,15 @@ public class Statement_Info extends javax.swing.JPanel {
 		add(jSplitPane1, gridBagConstraints);
 	}// </editor-fold>
 
+	public void  delay_on_Close(){
+		voush_Library_Panel.delay_on_close();
+		
+		
+		
+		
+	}
+	
+	
 	private javax.swing.JLabel jLabel_Title;
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JPanel jPanel2;

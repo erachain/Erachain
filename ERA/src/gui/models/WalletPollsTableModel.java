@@ -31,7 +31,8 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 	
 	public WalletPollsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		
+		addObservers();
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -145,5 +146,13 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 		{
 			this.fireTableDataChanged();
 		}	
+	}
+	public void removeObservers(){
+		
+		Controller.getInstance().deleteObserver(this);
+		
+	}
+	public void addObservers(){
+		Controller.getInstance().addWalletListener(this);
 	}
 }
