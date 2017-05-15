@@ -11,6 +11,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -126,7 +128,14 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			case COLUMN_BODY:				
 				
 				if (record.getData() == null)
-					return null;
+					return "";
+				if(record.getVersion() == 2){
+					Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
+					
+					
+					
+					return a.b;
+				}
 				
 				String str = "";
 				 try {

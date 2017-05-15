@@ -903,7 +903,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			 messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
 		//	fileData = StrJSonFine.convert(out_Files_data).getBytes( Charset.forName("UTF-8") );
 			
-			 messageBytes = R_Send.Json_Files_to_Byte_V2(jTextField_Title_Message.getText(), new JSONObject(out_Map), files_1);
+			 messageBytes = R_SignNote.Json_Files_to_Byte_V2(jTextField_Title_Message.getText(), new JSONObject(out_Map), files_1);
 			
 			
 			

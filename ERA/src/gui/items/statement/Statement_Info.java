@@ -344,7 +344,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		initComponents();
 		
 			 try {
-				map = R_Send.parse_Data_V2(data);
+				map = R_SignNote.parse_Data_V2(data);
 			
 			 JSONObject jSON = map.c;
 		
