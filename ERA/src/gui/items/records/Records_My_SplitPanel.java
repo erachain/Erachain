@@ -14,6 +14,7 @@ import org.mapdb.Fun.Tuple2;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.Split_Panel;
+import gui.items.mails.Mail_Info;
 import gui.library.Voush_Library_Panel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
@@ -28,7 +29,10 @@ public class Records_My_SplitPanel extends Split_Panel {
 	// для прозрачности
 	int alpha = 255;
 	int alpha_int;
+	private JPanel records_Info_Panel;
 	// VotingDetailPanel votingDetailsPanel ;
+
+	public Voush_Library_Panel voush_Library_Panel;
 
 	public Records_My_SplitPanel() {
 		super("Records_My_SplitPanel");
@@ -65,6 +69,8 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 	// listener select row
 	class search_listener implements ListSelectionListener {
+		
+
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
 			Transaction voting = null;
@@ -72,8 +78,8 @@ public class Records_My_SplitPanel extends Split_Panel {
 				voting = (Transaction) allVotingsPanel.records_model.getItem(allVotingsPanel.records_Table
 						.convertRowIndexToModel(allVotingsPanel.records_Table.getSelectedRow()));
 
-				JPanel panel = new JPanel();
-				panel.setLayout(new GridBagLayout());
+				records_Info_Panel = new JPanel();
+				records_Info_Panel.setLayout(new GridBagLayout());
 
 				// TABLE GBC
 				GridBagConstraints tableGBC = new GridBagConstraints();
@@ -83,7 +89,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 				tableGBC.weighty = 1;
 				tableGBC.gridx = 0;
 				tableGBC.gridy = 0;
-				panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting), tableGBC);
+				records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting), tableGBC);
 
 				Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap()
 						.get(voting.getBlockHeight(DBSet.getInstance()), voting.getSeqNo(DBSet.getInstance()));
@@ -98,7 +104,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 					gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
 					gridBagConstraints.gridx = 0;
 					gridBagConstraints.gridy = 1;
-					panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
+					records_Info_Panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
 					gridBagConstraints = new java.awt.GridBagConstraints();
 					gridBagConstraints.gridx = 0;
 					gridBagConstraints.gridy = 2;
@@ -106,11 +112,12 @@ public class Records_My_SplitPanel extends Split_Panel {
 					gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 					gridBagConstraints.weightx = 1.0;
 					gridBagConstraints.weighty = 1.0;
-					panel.add(new Voush_Library_Panel(voting), gridBagConstraints);
+					voush_Library_Panel = new Voush_Library_Panel(voting);
+					records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
 				}
 
-				jScrollPane_jPanel_RightPanel.setViewportView(panel);
+				jScrollPane_jPanel_RightPanel.setViewportView(records_Info_Panel);
 
 			}
 		}
@@ -126,6 +133,16 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 		if (allVotingsPanel.records_Table.getSelectedRow() >= 0) {
 		}
+	}
+	@Override
+	public void delay_on_close(){
+		// delete observer left panel
+		allVotingsPanel.records_model.removeObservers();
+		// get component from right panel
+		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+		// if Person_Info 002 delay on close
+		  if (c1.getClass() == this.records_Info_Panel.getClass()) voush_Library_Panel.delay_on_close();
+		
 	}
 
 }

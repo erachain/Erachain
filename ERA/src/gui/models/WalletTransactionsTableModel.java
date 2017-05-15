@@ -60,7 +60,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 	public WalletTransactionsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		addObservers();
+		
 		//dbItemAssetMap = DBSet.getInstance().getItemAssetMap();
 		
 	}
@@ -334,5 +335,18 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		{
 			this.fireTableDataChanged();
 		}
+	}
+	
+	public void addObservers() 
+	{
+		
+		Controller.getInstance().addWalletListener(this);
+	}
+	
+	
+	public void removeObservers() 
+	{
+	
+		Controller.getInstance().deleteObserver(this);
 	}
 }

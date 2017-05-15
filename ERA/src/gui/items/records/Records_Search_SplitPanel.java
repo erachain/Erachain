@@ -81,6 +81,8 @@ import utils.MenuPopupUtil;
 		TransactionsTableModel transactionsTableModel;
 		JScrollPane jScrollPane4;
 		private JTextField sender_address;
+		public JPanel info_Panel;
+		public Voush_Library_Panel voush_Library_Panel;
 
 		    public Records_Search_SplitPanel() {
 		   super("Records_Search_SplitPanel");
@@ -226,8 +228,8 @@ import utils.MenuPopupUtil;
 								
 		     //   TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
 				  
-				JPanel panel = new JPanel();
-		        panel.setLayout(new GridBagLayout());
+				info_Panel = new JPanel();
+		        info_Panel.setLayout(new GridBagLayout());
 		      //  panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 				
 				//TABLE GBC
@@ -239,7 +241,7 @@ import utils.MenuPopupUtil;
 				tableGBC.gridx = 0;	
 				tableGBC.gridy= 0;	
 			//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
-				panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting),tableGBC);						
+				info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting),tableGBC);						
 				  
 		        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(DBSet.getInstance()),voting.getSeqNo(DBSet.getInstance()));
 		        GridBagConstraints gridBagConstraints = null;
@@ -253,7 +255,7 @@ import utils.MenuPopupUtil;
 			        gridBagConstraints.insets = new java.awt.Insets(12, 11, 0, 11);
 			        gridBagConstraints.gridx = 0;
 			        gridBagConstraints.gridy = 1;
-			        panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
+			        info_Panel.add(jLabelTitlt_Table_Sign, gridBagConstraints);
 			  	  
 			  	  
 			  											
@@ -265,13 +267,24 @@ import utils.MenuPopupUtil;
 			        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 			        gridBagConstraints.weightx = 1.0;
 			        gridBagConstraints.weighty = 1.0;
-			        panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
+			        voush_Library_Panel=new  Voush_Library_Panel(voting);
+			        info_Panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
 				
 		        }
 			     
-		        jScrollPane_jPanel_RightPanel.setViewportView( panel);
+		        jScrollPane_jPanel_RightPanel.setViewportView( info_Panel);
 
 			}
 		}
 	}
+	 @Override
+		public void delay_on_close(){
+			// delete observer left panel
+		 transactionsTableModel.removeObservers();
+			// get component from right panel
+			Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+			// if Person_Info 002 delay on close
+			  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.delay_on_close();
+			
+		}
 }
