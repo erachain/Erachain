@@ -77,7 +77,7 @@ public class M_Attached_Files_Panel extends JPanel{
   		        {
   		            // перевод строки в байты
   					String ssst = model.getValueAt(row, 2).toString();
-  		            byte[] buffer = Base64.decodeBase64( model.getValueAt(row, 2).toString());
+  		            byte[] buffer =(byte[]) model.getValueAt(row, 2);
   		            
   		           if ((boolean)model.getValueAt(row, 1)){
   		            	
@@ -155,8 +155,8 @@ public class M_Attached_Files_Panel extends JPanel{
 		
 		// TODO Auto-generated constructor stub
 	}
-	public void insert_Row (String name,boolean zip, String data){
-		model.addRow(new Object[] {name, zip, data});
+	public void insert_Row (String name,boolean zip, byte[] data){
+		model.addRow(new Object[] {name, zip,  data});
 		model.fireTableDataChanged();
 	
 	}

@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.zip.DataFormatException;
@@ -22,12 +24,14 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
 
 import com.github.rjeschke.txtmark.Processor;
 
 import core.blockexplorer.WEB_Transactions_HTML;
 import core.item.ItemCls;
 import core.item.notes.NoteCls;
+import core.transaction.R_Send;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -69,7 +73,11 @@ public class Statement_Info extends javax.swing.JPanel {
 			return;
 		this.transaction = transaction;
 		statement = (R_SignNote) transaction;
-		if (statement.getVersion() ==2) return;
+		if (statement.getVersion() ==2) {
+			
+			view_V2();
+			return;
+		}
 		//view version 1
 		view_V1();
 	}
@@ -129,22 +137,7 @@ public class Statement_Info extends javax.swing.JPanel {
 					 hasHes += i + " " + s + " " + params.get(s) + "\n";
 				 }
 				 }
-				 // files
-				 files ="";
 				
-				 if (data.containsKey("Files")){
-					 file_Panel.setVisible(true);
-				str = data.get("Files").toString();
-				 JSONObject files_json = (JSONObject) JSONValue.parseWithException(str);
-				 kS = files_json.keySet();
-				 for (String ff:kS){
-					 String fff = files_json.get(ff).toString();
-					JSONObject file_json = (JSONObject) JSONValue.parseWithException(fff);
-					 files += file_json.get("Name") +"\n";
-					 file_Panel.insert_Row(file_json.get("Name").toString(), ((boolean) file_json.get("zip")), file_json.get("Data").toString()); 
-					 
-				 }
-				 }
 				 if(data.containsKey("Title"))jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+data.get("Title").toString());
 							 
 				 if (data.containsKey("Message"))jTextArea_Body.setText(
@@ -158,23 +151,9 @@ public class Statement_Info extends javax.swing.JPanel {
 				 
 				
 						
-						
-				 
-				 
-			if (files != null){
+			} catch (ParseException e) {
 				
-				
-				
-				
-			}
-			 
-			 
-			 
-			 
-			 
-			 
-			 } catch (ParseException e) {
-				// TODO Auto-generated catch block
+			
 			//	e.printStackTrace();
 				List<String> vars = note.getVarNames();
 				if (vars != null && !vars.isEmpty()) {
@@ -312,7 +291,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.1;
 		gridBagConstraints.weighty = 0.1;
 		gridBagConstraints.insets = new java.awt.Insets(11, 11, 11, 11);
-	//	jPanel1.add(file_Panel, gridBagConstraints);
+		jPanel1.add(file_Panel, gridBagConstraints);
 		
 		
 		
@@ -353,6 +332,99 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 	}
 	
+	private void view_V2(){
+		Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map = null;
+		byte[] data = statement.getData();
+		
+		
+		initComponents();
+		
+			 try {
+				map = R_Send.parse_Data_V2(data);
+			
+			 JSONObject jSON = map.c;
+		
+
+		HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+		Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+		while (it_Files.hasNext()){
+			Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
+			boolean zip = new Boolean(file.getValue().a);
+			String name_File = (String) file.getKey();
+			byte[] file_byte = (byte[]) file.getValue().b;
+			file_Panel.insert_Row(name_File, zip, file_byte); 
+		}
+		 if(jSON.containsKey("Title"))jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+jSON.get("Title").toString());
+		
+		 String description;
+		if(jSON.containsKey("Template")){
+			
+		 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("Template")) );
+		 if (note != null){
+			 description = note.getDescription();
+		 String str;
+		JSONObject params;
+		Set<String> kS;
+		if (jSON.containsKey("Statement_Params")){
+				str = jSON.get("Statement_Params").toString();
+				
+					params = (JSONObject) JSONValue.parseWithException(str);
+				
+				 kS =  params.keySet();
+				 for (String s:kS){
+						description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+				 }
+				
+		 
+		 
+				 // hashes
+				String hasHes = "";
+				 
+		if (jSON.containsKey("Hashes")){
+				 str = jSON.get("Hashes").toString();
+				
+				
+					params = (JSONObject) JSONValue.parseWithException(str);
+				
+				 kS = params.keySet();
+				 
+				 int i = 1;
+				 for (String s:kS){
+					 hasHes += i + " " + s + " " + params.get(s) + "\n";
+				 }
+				 }
+				
+			
+							 
+				String message;
+				if (jSON.containsKey("Message")) message = (String) jSON.get("Message");
+				
+				 jTextArea_Body.setText(
+					  	 description + "\n\n"
+						+    jSON.get("Message") + "\n\n"
+						+ hasHes + "\n\n"
+				//		+ files +"\n"
+						
+									 
+					 );
+		}
+		 }	
+		}
+			 } catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
+				
+		 
+		 
+		 
+		
+	
+		 
+		
+	}
 	
 	private javax.swing.JLabel jLabel_Title;
 	private javax.swing.JPanel jPanel1;

@@ -353,6 +353,7 @@ public class R_Send extends TransactionAmount {
 
 	}
 	
+	
 	public static  Tuple4<String,String,JSONObject,HashMap <String,Tuple2<Boolean, byte[]>>> parse_Data_V2(byte[] data) throws Exception{
 	//Version, Title, JSON, Files	
 		

@@ -32,14 +32,16 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1L;
 	Params_Template_Model params_Template_Model;
 	public JComboBox<NoteCls> jComboBox_Template;
-	protected NoteCls sel_note;
+	public NoteCls sel_note;
+	private ComboBoxModelItemsNotes comboBoxModelNotes;
 	
 	
 	
 	public M_Fill_Template_Panel() {
 		jTextPane_Message_Public = new MImprintEDIT_Pane();
+		comboBoxModelNotes = new ComboBoxModelItemsNotes();
     	jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener(){
-
+    		
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
 				// TODO Auto-generated method stub
@@ -74,7 +76,9 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		
 		
 		initComponents();
-
+		
+		set_Tamplate(comboBoxModelNotes.getElementAt(0));
+		
 		 jComboBox_Template.addItemListener(new ItemListener(){
 
 				@Override
@@ -84,28 +88,9 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 					
 					if(e.getStateChange() == ItemEvent.SELECTED) 
 					{		
-						sel_note = (NoteCls) jComboBox_Template.getSelectedItem();
-						String ww = Processor.process(sel_note.getDescription().replace("\n\n", "\n").replace("\n", "  \n"));
 						
-						int ee = params_Template_Model.getRowCount()-1;
-						int ccc;
-						for (ccc = params_Template_Model.getRowCount()-1; ccc>=0; ccc--){
-							params_Template_Model.removeRow(ccc);
-							
-						}
-						jTextPane_Message_Public.pars.clear();
-						jTextPane_Message_Public.set_Text(ww);
-						HashMap<String, String> ss = jTextPane_Message_Public.get_Params();
-						Set<String> sk = ss.keySet();
-						
-						for (String s:sk){
-							ss.get(s);
-							params_Template_Model.addRow(new Object[] { s, ss.get(s)});
-									
-						}
-						
-						
-					} 	
+						set_Tamplate((NoteCls) jComboBox_Template.getSelectedItem());
+					}
 					
 					
 				}
@@ -130,7 +115,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		jLabel_Template1 = new javax.swing.JLabel();
-		jComboBox_Template = new JComboBox<NoteCls>(new ComboBoxModelItemsNotes());
+		jComboBox_Template = new JComboBox<NoteCls>(comboBoxModelNotes);
 		jCheckBox_Is_Text = new javax.swing.JCheckBox();
 		jCheckBox_Is_Encripted = new javax.swing.JCheckBox();
 		sp_pan = new MSplitPane();
@@ -271,4 +256,30 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	   
 
 }
+	 private void set_Tamplate(NoteCls item){
+		 if (item == null)return;
+		 sel_note = item; //(NoteCls) jComboBox_Template.getSelectedItem();
+			String ww = Processor.process(sel_note.getDescription().replace("\n\n", "\n").replace("\n", "  \n"));
+			
+			int ee = params_Template_Model.getRowCount()-1;
+			int ccc;
+			for (ccc = params_Template_Model.getRowCount()-1; ccc>=0; ccc--){
+				params_Template_Model.removeRow(ccc);
+				
+			}
+			jTextPane_Message_Public.pars.clear();
+			jTextPane_Message_Public.set_Text(ww);
+			HashMap<String, String> ss = jTextPane_Message_Public.get_Params();
+			Set<String> sk = ss.keySet();
+			
+			for (String s:sk){
+				ss.get(s);
+				params_Template_Model.addRow(new Object[] { s, ss.get(s)});
+						
+			}
+		 
+		 
+		 
+		 
+	 }
 }

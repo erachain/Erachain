@@ -841,12 +841,16 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			parsing = 2;
 			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());		
 			Set<Entry<String, String>> param_keys = this.fill_Template_Panel.get_Params().entrySet();
-// template params			 
+
+			if (this.fill_Template_Panel.sel_note !=null){
+// template params
+			out_Map.put("Template", fill_Template_Panel.sel_note.getKey()+"");
+			
 			for (Entry<String, String> key1:param_keys){
 			message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
 			params_Map.put( key1.getKey(), key1.getValue());
 			}
-			
+			}
 // hashes			
 			
 			int hR = hashes_Table_Model.getRowCount();
@@ -854,6 +858,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				hashes_Map.put(hashes_Table_Model.getValueAt(i, 0),hashes_Table_Model.getValueAt(i, 1));
 				
 			}
+			
+			
 			
 			out_Map.put("Hashes", hashes_Map);
 			out_Map.put("Statement_Params", params_Map);
@@ -897,7 +903,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			 messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
 		//	fileData = StrJSonFine.convert(out_Files_data).getBytes( Charset.forName("UTF-8") );
 			
-			byte[] data_byte = R_Send.Json_Files_to_Byte_V2(jTextField_Title_Message.getText(), new JSONObject(out_Map), files_1);
+			 messageBytes = R_Send.Json_Files_to_Byte_V2(jTextField_Title_Message.getText(), new JSONObject(out_Map), files_1);
 			
 			
 			
