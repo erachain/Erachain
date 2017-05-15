@@ -333,6 +333,10 @@ public class Statement_Info extends javax.swing.JPanel {
 	}
 	
 	private void view_V2(){
+		String description ="";
+		 String str ="";
+			JSONObject params;
+			Set<String> kS;
 		Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map = null;
 		byte[] data = statement.getData();
 		
@@ -346,6 +350,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 
 		HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+		if (files != null){
 		Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
 		while (it_Files.hasNext()){
 			Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
@@ -354,17 +359,16 @@ public class Statement_Info extends javax.swing.JPanel {
 			byte[] file_byte = (byte[]) file.getValue().b;
 			file_Panel.insert_Row(name_File, zip, file_byte); 
 		}
+		}
 		 if(jSON.containsKey("Title"))jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+jSON.get("Title").toString());
 		
-		 String description;
+		 
 		if(jSON.containsKey("Template")){
 			
 		 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("Template")) );
 		 if (note != null){
 			 description = note.getDescription();
-		 String str;
-		JSONObject params;
-		Set<String> kS;
+		
 		if (jSON.containsKey("Statement_Params")){
 				str = jSON.get("Statement_Params").toString();
 				
@@ -375,7 +379,9 @@ public class Statement_Info extends javax.swing.JPanel {
 						description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
 				 }
 				
-		 
+		}
+		 }
+		}
 		 
 				 // hashes
 				String hasHes = "";
@@ -392,28 +398,28 @@ public class Statement_Info extends javax.swing.JPanel {
 				 for (String s:kS){
 					 hasHes += i + " " + s + " " + params.get(s) + "\n";
 				 }
-				 }
+		}
 				
 			
 							 
-				String message;
+				String message="";
 				if (jSON.containsKey("Message")) message = (String) jSON.get("Message");
 				
 				 jTextArea_Body.setText(
 					  	 description + "\n\n"
-						+    jSON.get("Message") + "\n\n"
+						+    message + "\n\n"
 						+ hasHes + "\n\n"
 				//		+ files +"\n"
 						
 									 
 					 );
-		}
-		 }	
-		}
+		
+		 	
+		
 			 } catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+			 }
 				
 				
 				

@@ -933,7 +933,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			parsing = 5;
 			//CHECK IF PAYMENT OR ASSET TRANSFER
 			NoteCls note = (NoteCls) this.fill_Template_Panel.jComboBox_Template.getSelectedItem();
-			key = note.getKey(); 
+			if (note != null) key = note.getKey(); 
+			
 
 		}
 		catch(Exception e)
