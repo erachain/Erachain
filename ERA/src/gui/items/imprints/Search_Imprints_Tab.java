@@ -1,5 +1,6 @@
 package gui.items.imprints;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -155,4 +156,15 @@ public Search_Imprints_Tab(){
 	*/
 	
 }
+@Override
+public void delay_on_close(){
+	// delete observer left panel
+	tableModelImprints.removeObservers();
+	// get component from right panel
+	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	// if Person_Info 002 delay on close
+	  if (c1 instanceof Imprints_Info_Panel) ( (Imprints_Info_Panel)c1).delay_on_Close();
+	
+}
+
 }

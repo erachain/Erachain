@@ -29,7 +29,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 	
 	public WalletItemImprintsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		addObservers();
 	}
 	// читаем колонки которые изменяем высоту	   
 		public Boolean[] get_Column_AutoHeight(){
@@ -142,5 +142,17 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		{
 			this.fireTableDataChanged();
 		}	
+	}
+	public void addObservers() 
+	{
+		
+		Controller.getInstance().addWalletListener(this);
+	}
+	
+	
+	public void removeObservers() 
+	{
+	
+		Controller.getInstance().deleteObserver(this);
 	}
 }

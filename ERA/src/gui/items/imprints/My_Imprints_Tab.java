@@ -1,5 +1,6 @@
 package gui.items.imprints;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ import javax.swing.table.TableColumn;
 import core.item.imprints.ImprintCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.items.persons.Person_Info_002;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -30,6 +32,7 @@ public class My_Imprints_Tab extends Split_Panel{
 
 
 	private static final long serialVersionUID = 1L;
+	private WalletItemImprintsTableModel imprintsModel;
 
 public My_Imprints_Tab(){
 	super ("My_Imprints_Tab");
@@ -43,7 +46,7 @@ public My_Imprints_Tab(){
 	jButton2_jToolBar_RightPanel.setVisible(false);
 	
 //TABLE
-	final WalletItemImprintsTableModel imprintsModel = new WalletItemImprintsTableModel();
+	 imprintsModel = new WalletItemImprintsTableModel();
 	final MTable tableImprints = new MTable(imprintsModel);
 //POLLS SORTER
 	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
@@ -147,7 +150,16 @@ public My_Imprints_Tab(){
 			
 		}	
 	
-	
+		@Override
+		public void delay_on_close(){
+			// delete observer left panel
+			imprintsModel.removeObservers();
+			// get component from right panel
+			Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+			// if Person_Info 002 delay on close
+			  if (c1 instanceof Imprints_Info_Panel) ( (Imprints_Info_Panel)c1).delay_on_Close();
+			
+		}
 	
 	
 	

@@ -26,7 +26,8 @@ import lang.Lang;
  */
 public class Imprints_Info_Panel extends javax.swing.JPanel {
 
-    /**
+    private BalancesTableModel table_model;
+	/**
      * Creates new form ImprintsInfoPanel
      */
     public Imprints_Info_Panel(ImprintCls imprint) {
@@ -156,7 +157,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
 
                 
       //BALANCES
-        BalancesTableModel table_model = new BalancesTableModel(imprint.getKey());
+       table_model = new BalancesTableModel(imprint.getKey());
         holders_jTable1 = new MTable(table_model);
              //CHECKBOX FOR FAVORITE
         		TableColumn to_Date_Column1 = holders_jTable1.getColumnModel().getColumn( BalancesTableModel.COLUMN_BALANCE);	
@@ -184,7 +185,13 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }                                              
 
-
+    public void  delay_on_Close(){
+    	table_model.removeObservers();
+		
+		
+	}
+    
+    
     // Variables declaration - do not modify                     
     private javax.swing.JLabel Name_jLabel;
     private javax.swing.JTextField Name_jTextField;
