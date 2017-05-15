@@ -157,9 +157,10 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		if (message.getType() == ObserverMessage.LIST_STATEMENT_TYPE) {
 			if (this.transactions == null) {
 				transactions = read_Statement();
+				this.fireTableDataChanged();
 			}
 
-			this.fireTableDataChanged();
+			
 		}
 
 		// CHECK IF LIST UPDATED
