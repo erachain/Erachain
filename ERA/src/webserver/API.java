@@ -42,6 +42,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.blockexplorer.BlockExplorer;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
@@ -79,6 +80,8 @@ import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
+import database.BlockHeightsMap;
+import database.BlockMap;
 import database.DBSet;
 import lang.Lang;
 import network.Peer;
@@ -108,11 +111,20 @@ public class API {
 		
 		Map help = new LinkedHashMap();
 
-		help.put("Last Block", "/lastblock");
+		help.put("height", "height");
+		help.put("BLOCK", "");
+		help.put("First Block", "firstblock");
+		help.put("Last Block", "lastblock");
 		help.put("Block", "block/{signature}");
 		help.put("Block by Height", "blockbyheight/{height}");
+		help.put("Child Block Signature", "childblocksignature/{signature}");
+		help.put("Child Block", "childblock/{signature}");
+		help.put("BLOCKS", "");
+		help.put("Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
+		help.put("Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");		
+		help.put("RECORD", "");
 		help.put("Record", "record/{signature}");
-		help.put("Record by Height and Sequence", "recordkbynumber/{height-sequence}");
+		help.put("Record by Height and Sequence", "recordbynumber/{height-sequence}");
 		
 		
 		return Response.status(200)
@@ -122,6 +134,28 @@ public class API {
 				.build();
 	}
 
+	@GET
+	@Path("height")
+	public static String getHeight() 
+	{
+		return String.valueOf(Controller.getInstance().getMyHeight());
+	}
+
+	@GET
+	@Path("firstblock")	
+	public Response getFirstBlock()
+	{
+		Map out = new LinkedHashMap();
+
+		out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+	
 	@GET
 	@Path("lastblock")
 	public Response lastBlock()
@@ -139,23 +173,75 @@ public class API {
 				.build();
 	}
 	
-	/*
 	@GET
-	@Path("lastblock.json")
-	public Response lastBlockJson()
+	@Path("/childblocksignature/{signature}")	
+	public Response getChildBlockSignature(@PathParam("signature") String signature)
 	{
-		
+		//DECODE SIGNATURE
+		byte[] signatureBytes;
 		Map out = new LinkedHashMap();
-
-		Block lastBlock = dbSet.getBlockMap().getLastBlock();
-		out = lastBlock.toJson();
 		
-		return Response.ok(out.toString())
-				.header("Content-Type", "application/txt; charset=utf-8")
+		int steep = 1;
+		try
+		{
+			signatureBytes = Base58.decode(signature);
+
+			++steep;
+			byte[] childSign = dbSet.getChildMap().get(signatureBytes);
+			out.put("child", Base58.encode(childSign));
+		}
+		catch(Exception e)
+		{
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "signature error, use Base58 value");
+			else if (steep == 2)
+				out.put("message", "child not found");
+			else
+				out.put("message", e.getMessage());
+		}
+				
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
 				.build();
 	}
-	*/
+
+	@GET
+	@Path("/childblock/{signature}")	
+	public Response getChildBlock(@PathParam("signature") String signature)
+	{
+		//DECODE SIGNATURE
+		byte[] signatureBytes;
+		Map out = new LinkedHashMap();
+		
+		int steep = 1;
+		try
+		{
+			signatureBytes = Base58.decode(signature);
+
+			++steep;
+			byte[] childSign = dbSet.getChildMap().get(signatureBytes);
+			out = dbSet.getBlockMap().get(childSign).toJson();
+		}
+		catch(Exception e)
+		{
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "signature error, use Base58 value");
+			else if (steep == 2)
+				out.put("message", "child not found");
+			else
+				out.put("message", e.getMessage());
+		}
+				
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
 
 	@GET
 	@Path("block/{signature}")
@@ -235,7 +321,101 @@ public class API {
 				.build();
 	}
 
-	
+	@GET
+	@Path("/blocksfromheight/{height}/{limit}")
+	public Response getBlocksFromHeight(@PathParam("height") int height,
+			@PathParam("limit") int limit) 
+	{
+		
+		if (limit > 30)
+			limit = 30;
+
+		Map out = new LinkedHashMap();
+		int steep = 1;
+
+		try {
+			
+			JSONArray array = new JSONArray();
+			BlockHeightsMap blockHeightMap = dbSet.getBlockHeightsMap();
+			BlockMap blockMap = dbSet.getBlockMap();
+			for (int i = height; i < height + limit + 1; ++i) {
+				byte[] signature = blockHeightMap.get((long)i);
+				if (signature == null) {
+					out.put("end", 1);
+					break;
+				} else {
+					array.add(blockMap.get(signature).toJson());
+				}
+			}
+			out.put("blocks", array);
+			
+		} catch (Exception e) {
+			
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "height error, use integer value");
+			else if (steep == 2)
+				out.put("message", "block not found");
+			else
+				out.put("message", e.getMessage());
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+	@GET
+	@Path("/blockssignaturesfromheight/{height}/{limit}")
+	public Response getBlocksSignsFromHeight(@PathParam("height") int height,
+			@PathParam("limit") int limit) 
+	{
+		
+		if (limit > 100)
+			limit = 100;
+
+		Map out = new LinkedHashMap();
+		int steep = 1;
+
+		try {
+			
+			JSONArray array = new JSONArray();
+			BlockHeightsMap blockHeightMap = dbSet.getBlockHeightsMap();
+			for (int i = height; i < height + limit + 1; ++i) {
+				byte[] signature = blockHeightMap.get((long)i);
+				if (signature == null) {
+					out.put("end", 1);
+					break;
+				} else {
+					array.add(Base58.encode(signature));
+				}
+			}
+			out.put("signatures", array);
+			
+		} catch (Exception e) {
+			
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "height error, use integer value");
+			else if (steep == 2)
+				out.put("message", "block not found");
+			else
+				out.put("message", e.getMessage());
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+
+	/*
+	 * ************** RECORDS **********
+	 */
 	@GET
 	@Path("record/{signature}")
 	public Response record(@PathParam("signature") String signature)
