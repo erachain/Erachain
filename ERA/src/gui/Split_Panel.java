@@ -339,6 +339,15 @@ public class Split_Panel extends javax.swing.JPanel {
     	 
     }
     
+    
+    public void delay_on_close(){
+    	
+    	
+    	
+    	
+    	
+    }
+    
     // Variables declaration - do not modify                     
     public javax.swing.JButton button1_ToolBar_LeftPanel;
     public javax.swing.JButton button2_ToolBar_LeftPanel;

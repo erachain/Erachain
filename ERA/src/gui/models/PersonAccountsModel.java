@@ -48,7 +48,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	
 	public PersonAccountsModel(long person_Key)
 	{
-		Controller.getInstance().addWalletListener(this);
+		addObservers();
 		key_person_table = person_Key;
 		addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 	}
@@ -298,11 +298,16 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		
 	}
 	
-/*
-	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
+public void addObservers(){
+		
+	Controller.getInstance().addWalletListener(this);
 		
 	}
-	*/
+	
+	
+	public void removeObservers() 
+	{
+		
+		Controller.getInstance().deleteObserver(this);
+	}
 }

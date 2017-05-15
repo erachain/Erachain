@@ -128,6 +128,7 @@ public class ButtonTabComponent extends JPanel {
 
 					int lDiv = sP.jSplitPanel.getLastDividerLocation();
 					int div = sP.jSplitPanel.getDividerLocation();
+					
 
 					outTabbedDiv.put("Div_Last_Loc", lDiv + "");
 					outTabbedDiv.put("Div_Loc", div + "");
@@ -144,6 +145,7 @@ public class ButtonTabComponent extends JPanel {
 								+ Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
 								JOptionPane.ERROR_MESSAGE);
 					}
+					sP.delay_on_close();
 				}
                 pane.remove(i);
             }

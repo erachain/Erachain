@@ -40,7 +40,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	public TableModelPersons()
 	{
-		
+		db = DBSet.getInstance().getItemPersonMap();
 		addObservers() ;
 		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
 		//String sss = ss!=null?ss.getName():"--";	
@@ -164,15 +164,16 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_PERSON_TYPE)
 		{			
-			if(this.list == null)
+			if(this.list == null && !filter_Name.equals(""))
 			{
 				list = db.getPerson_By_Name(filter_Name);
+				this.fireTableDataChanged();
 		//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
 		//		this.persons.addFilterField("name");
 		//		this.persons.registerObserver();
 			}	
 			
-			this.fireTableDataChanged();
+			
 		}
 		
 		//CHECK IF LIST UPDATED
@@ -187,14 +188,14 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	
 	public void addObservers() 
 	{
-		db = DBSet.getInstance().getItemPersonMap();
-		db.addObserver(this);
+		
+		Controller.getInstance().addObserver(this);
 	}
 	
 	
 	public void removeObservers() 
 	{
 	
-		db.deleteObserver(this);
+		Controller.getInstance().deleteObserver(this);
 	}
 }

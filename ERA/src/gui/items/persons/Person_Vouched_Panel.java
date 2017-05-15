@@ -46,11 +46,12 @@ public class Person_Vouched_Panel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JScrollPane jScrollPane_Tab_Vouches;
 	private GridBagConstraints gridBagConstraints;
+	Person_Vouch_From_Table_Model model;
 
 	public Person_Vouched_Panel(PersonCls person) {
 
 		this.setName(Lang.getInstance().translate("Vouched for"));
-		 Person_Vouch_From_Table_Model model = new Person_Vouch_From_Table_Model(person);
+		  model = new Person_Vouch_From_Table_Model(person);
 		JTable jTable_Vouches = new MTable(model);
 		TableColumnModel column_mod = jTable_Vouches.getColumnModel();
 		TableColumn col_data = column_mod.getColumn(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);
@@ -223,5 +224,13 @@ public class Person_Vouched_Panel extends JPanel {
 		
 
 	}
+	public void delay_on_close(){
+		
+		model.removeObservers();
+			
+			
+			
+		}
+
 
 }

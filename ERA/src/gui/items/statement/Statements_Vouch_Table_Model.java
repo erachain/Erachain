@@ -81,9 +81,8 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		recNo = transaction.getSeqNo(DBSet.getInstance());
 		transactions = new ArrayList<R_Vouch>();
 		// transactions = read_Sign_Accoutns();
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
-		DBSet.getInstance().getTransactionMap().addObserver(this);
-		DBSet.getInstance().getVouchRecordMap().addObserver(this);
+		addObservers();
+		
 
 	}
 
@@ -344,5 +343,23 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		}
 		return trans;
 	}
+	
+	public void addObservers(){
+		
+		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+		DBSet.getInstance().getTransactionMap().addObserver(this);
+		DBSet.getInstance().getVouchRecordMap().addObserver(this);
+			
+		}
+		
+		
+		public void removeObservers() 
+		{
+			
+			DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
+			DBSet.getInstance().getTransactionMap().deleteObserver(this);
+			DBSet.getInstance().getVouchRecordMap().deleteObserver(this);
+	
 
+}
 }

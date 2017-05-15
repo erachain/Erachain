@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,6 +34,7 @@ import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.items.assets.Search_Assets_Tab.search_listener;
+import gui.items.persons.Person_Info_002;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Left;
@@ -435,6 +437,9 @@ if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
 
 }
 }
+
+
+
 //listener select row	 
 class search_listener implements ListSelectionListener  {
 		@Override
@@ -449,5 +454,14 @@ class search_listener implements ListSelectionListener  {
 		}
 	}
 
-
+@Override
+public void delay_on_close(){
+	// delete observer left panel
+	assetsModel.removeObservers();
+	// get component from right panel
+	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	// if Person_Info 002 delay on close
+	  if (c1 instanceof AssetDetailsPanel001) ( (AssetDetailsPanel001)c1).delay_on_Close();
+	
+}
 }

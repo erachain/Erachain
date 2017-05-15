@@ -48,6 +48,7 @@ public class AssetDetailsPanel001 extends javax.swing.JPanel {
      * @param asset 
      */
 	 Transaction transaction;
+	private BalancesTableModel balancesTableModel;
 	
     public AssetDetailsPanel001(AssetCls asset) {
     	
@@ -281,7 +282,7 @@ this.setVisible(false);
         jPanel_Tab_Holders.setLayout(new java.awt.GridBagLayout());
         
 
-        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
+        balancesTableModel = new BalancesTableModel(asset.getKey());
   		MTable  jTable1 = new MTable(balancesTableModel);
   		
          
@@ -326,6 +327,12 @@ this.setVisible(false);
         this.setVisible(true);
     }// </editor-fold>                        
 
+    public void  delay_on_Close(){
+    	balancesTableModel.removeObservers();
+			
+	} 
+    
+    
 
     // Variables declaration - do not modify                     
     private javax.swing.JCheckBox jCheckBox1;

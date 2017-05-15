@@ -38,6 +38,7 @@ public class Statuses_Library_Panel extends JPanel {
 private MTable jTable_Statuses;
 private JScrollPane jScrollPane_Tab_Status;
 private GridBagConstraints gridBagConstraints;
+public PersonStatusesModel statusModel;
 
 public Statuses_Library_Panel(PersonCls person){
 
@@ -46,7 +47,7 @@ public Statuses_Library_Panel(PersonCls person){
     this.setLayout(new java.awt.GridBagLayout());
 
 
-	   PersonStatusesModel statusModel = new PersonStatusesModel (person.getKey());
+	   statusModel = new PersonStatusesModel (person.getKey());
        jTable_Statuses = new MTable(statusModel);
        
        //CHECKBOX FOR FAVORITE
@@ -189,20 +190,16 @@ public Statuses_Library_Panel(PersonCls person){
 	////////////////////
 	TableMenuPopupUtil.installContextMenu(jTable_Statuses, menu); // SELECT
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
+public void delay_on_close(){
+	
+	statusModel.removeObservers();
+	
+	
+	
+}
+
 
 
 

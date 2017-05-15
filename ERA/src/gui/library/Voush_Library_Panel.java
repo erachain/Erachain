@@ -42,11 +42,12 @@ public class Voush_Library_Panel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JScrollPane jScrollPane_Tab_Vouches;
 	private GridBagConstraints gridBagConstraints;
+	Statements_Vouch_Table_Model model;
 
 	public Voush_Library_Panel(Transaction transaction) {
 
 		this.setName(Lang.getInstance().translate("Certified"));
-		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
+		model = new Statements_Vouch_Table_Model(transaction);
 		JTable jTable_Vouches = new MTable(model);
 		TableColumnModel column_mod = jTable_Vouches.getColumnModel();
 		TableColumn col_data = column_mod.getColumn(Statements_Vouch_Table_Model.COLUMN_TIMESTAMP);
@@ -216,6 +217,13 @@ public class Voush_Library_Panel extends JPanel {
 
 		
 
+	}
+public void delay_on_close(){
+		
+		model.removeObservers();
+		
+		
+		
 	}
 
 }

@@ -33,7 +33,8 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 	
 	public WalletItemAssetsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		addObservers();
+		
 	}
 	
 	@Override
@@ -171,5 +172,18 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		{
 			this.fireTableDataChanged();
 		}	
+	}
+	
+	public void addObservers() 
+	{
+		
+		Controller.getInstance().addWalletListener(this);
+	}
+	
+	
+	public void removeObservers() 
+	{
+	
+		Controller.getInstance().deleteObserver(this);
 	}
 }

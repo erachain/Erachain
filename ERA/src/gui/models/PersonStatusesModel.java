@@ -65,7 +65,8 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	{
 		
 		itemKey = person_Key;
-		Controller.getInstance().addWalletListener(this);
+		addObservers();
+		
 		statuses = dbSet.getPersonStatusMap().get(itemKey);
 		statusesMap = dbSet.getItemStatusMap();
 		setRows();
@@ -304,6 +305,19 @@ public Account get_Creator_Account(int row){
 			Collections.sort(statusesRows, comparator);
 			
 		}
+	}
+	
+	public void addObservers(){
+		
+		Controller.getInstance().addWalletListener(this);
+		
+	}
+	
+	
+	public void removeObservers() 
+	{
+		
+		Controller.getInstance().deleteObserver(this);
 	}
 
 }

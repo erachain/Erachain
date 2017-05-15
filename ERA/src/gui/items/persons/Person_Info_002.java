@@ -56,6 +56,11 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
 	private PersonHuman human;
 	private PublicKeyAccount publisher;
+	public Statuses_Library_Panel statuses_Library_Panel;
+	public Accounts_Library_Panel accounts_Library_Panel;
+	public Voush_Library_Panel voush_Library_Panel;
+	public Person_Owner_Panel person_Owner_Panel;
+	public Person_Vouched_Panel person_Vouched_Panel;
 
 	public Person_Info_002(PersonCls person, boolean full) {
 		if (person != null)	initComponents(person, full);
@@ -470,18 +475,26 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		add(jTabbedPane1, gridBagConstraints);
 
 		// statuses panel
+		
+		statuses_Library_Panel = new Statuses_Library_Panel(person);
 
-		jTabbedPane1.add(new Statuses_Library_Panel(person));
+		jTabbedPane1.add(statuses_Library_Panel);
 
 		// Accounts panel
-		jTabbedPane1.add(new Accounts_Library_Panel(person));
+		accounts_Library_Panel = new Accounts_Library_Panel(person);
+		jTabbedPane1.add(accounts_Library_Panel);
 
 		// vouch panel
-		jTabbedPane1.add(new Voush_Library_Panel(issue_record));
+		voush_Library_Panel = new Voush_Library_Panel(issue_record);
+		jTabbedPane1.add(voush_Library_Panel);
+		
+		
 		// created person panel
-		jTabbedPane1.add(new Person_Owner_Panel(person));
+		person_Owner_Panel = new Person_Owner_Panel(person);
+		jTabbedPane1.add(person_Owner_Panel);
 		// vouched person
-		jTabbedPane1.add(new Person_Vouched_Panel(person));
+		person_Vouched_Panel = new Person_Vouched_Panel(person);
+		jTabbedPane1.add(person_Vouched_Panel);
 
 	}// </editor-fold>
 
@@ -554,6 +567,17 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			
 		}
 		}
+	
+	public void  delay_on_Close(){
+		statuses_Library_Panel.delay_on_close();
+		accounts_Library_Panel.delay_on_close();
+		voush_Library_Panel.delay_on_close();
+		person_Owner_Panel.delay_on_close();
+		person_Vouched_Panel.delay_on_close();
+		
+		
+		
+	}
 	
 	
 }

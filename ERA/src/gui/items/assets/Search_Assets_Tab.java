@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -449,5 +450,16 @@ class search_listener implements ListSelectionListener  {
 			
 		}
 	}
+
+@Override
+public void delay_on_close(){
+	// delete observer left panel
+	tableModelItemAssets.removeObservers();
+	// get component from right panel
+	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	// if Person_Info 002 delay on close
+	  if (c1 instanceof AssetDetailsPanel001) ( (AssetDetailsPanel001)c1).delay_on_Close();
+	
+}
 
 }

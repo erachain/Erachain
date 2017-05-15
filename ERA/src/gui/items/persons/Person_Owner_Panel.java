@@ -43,13 +43,14 @@ public class Person_Owner_Panel extends JPanel {
 	private JTable jTable_My_Persons;
 	private JScrollPane jScrollPane_Tab_My_Persons;
 	private GridBagConstraints gridBagConstraints;
+	TableModelOwnerPersons person_Accounts_Model;
 
 	@SuppressWarnings("rawtypes")
 	public  Person_Owner_Panel(PersonCls person) {
 
 		this.setName(Lang.getInstance().translate("Created person"));
 		
-		TableModelOwnerPersons person_Accounts_Model = new TableModelOwnerPersons(person.getKey());
+		person_Accounts_Model = new TableModelOwnerPersons(person.getKey());
 		jTable_My_Persons = new MTable(person_Accounts_Model);
 	
 		jScrollPane_Tab_My_Persons = new JScrollPane();
@@ -142,6 +143,13 @@ public class Person_Owner_Panel extends JPanel {
 																		// RIGHT
 																		// BUTTON
 
+	}
+public void delay_on_close(){
+		
+	person_Accounts_Model.removeObservers();
+		
+		
+		
 	}
 
 }

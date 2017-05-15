@@ -82,8 +82,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 		this.person=person;
 		transactions = new ArrayList<R_SertifyPubKeys>();
 		// transactions = read_Sign_Accoutns();
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
-		DBSet.getInstance().getTransactionMap().addObserver(this);
+		addObservers();
 		
 
 	}
@@ -254,6 +253,21 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 		}
 	}
 
+public void addObservers(){
+		
+	DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+	DBSet.getInstance().getTransactionMap().addObserver(this);
 	
+		
+	}
+	
+	
+	public void removeObservers() 
+	{
+		
+		
+		DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
+		DBSet.getInstance().getTransactionMap().deleteObserver(this);
+	}
 
 }

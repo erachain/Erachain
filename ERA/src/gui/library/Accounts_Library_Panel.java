@@ -32,12 +32,13 @@ public class Accounts_Library_Panel extends JPanel {
 	private JTable jTable_Accounts;
 	private JScrollPane jScrollPane_Tab_Accounts;
 	private GridBagConstraints gridBagConstraints;
+	public PersonAccountsModel person_Accounts_Model;
 
 	public Accounts_Library_Panel(PersonCls person) {
 
 		this.setName(Lang.getInstance().translate("Accounts"));
 		
-		PersonAccountsModel person_Accounts_Model = new PersonAccountsModel(person.getKey());
+		person_Accounts_Model = new PersonAccountsModel(person.getKey());
 		jTable_Accounts = new MTable(person_Accounts_Model);
 
 		
@@ -203,6 +204,14 @@ public class Accounts_Library_Panel extends JPanel {
 																		// RIGHT
 																		// BUTTON
 
+	}
+	
+	public void delay_on_close(){
+		
+		person_Accounts_Model.removeObservers();
+		
+		
+		
 	}
 
 }
