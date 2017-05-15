@@ -139,9 +139,9 @@ public class Records_My_SplitPanel extends Split_Panel {
 		// delete observer left panel
 		allVotingsPanel.records_model.removeObservers();
 		// get component from right panel
-		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	//	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 		// if Person_Info 002 delay on close
-		  if (c1.getClass() == this.records_Info_Panel.getClass()) voush_Library_Panel.delay_on_close();
+	//	  if (c1.getClass() == this.records_Info_Panel.getClass()) voush_Library_Panel.delay_on_close();
 		
 	}
 

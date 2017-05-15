@@ -268,7 +268,7 @@ import utils.MenuPopupUtil;
 			        gridBagConstraints.weightx = 1.0;
 			        gridBagConstraints.weighty = 1.0;
 			        voush_Library_Panel=new  Voush_Library_Panel(voting);
-			        info_Panel. add(new  Voush_Library_Panel(voting), gridBagConstraints);
+			        info_Panel. add( voush_Library_Panel, gridBagConstraints);
 				
 		        }
 			     
@@ -284,7 +284,7 @@ import utils.MenuPopupUtil;
 			// get component from right panel
 			Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 			// if Person_Info 002 delay on close
-			  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.delay_on_close();
+	//		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.delay_on_close();
 			
 		}
 }
