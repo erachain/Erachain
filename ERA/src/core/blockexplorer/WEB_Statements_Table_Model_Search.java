@@ -259,7 +259,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 					Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
 					return a.b;
 				}
-				
+				 
 				String str = "";
 				 try {
 					JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
