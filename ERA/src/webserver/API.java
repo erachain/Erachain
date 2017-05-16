@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +84,7 @@ import core.transaction.VoteOnPollTransaction;
 import database.BlockHeightsMap;
 import database.BlockMap;
 import database.DBSet;
+import database.SortableList;
 import lang.Lang;
 import network.Peer;
 import ntp.NTP;
@@ -111,21 +113,35 @@ public class API {
 		
 		Map help = new LinkedHashMap();
 
-		help.put("height", "height");
+		help.put("GET Height", "height");
 		help.put("BLOCK", "");
-		help.put("First Block", "firstblock");
-		help.put("Last Block", "lastblock");
-		help.put("Block", "block/{signature}");
-		help.put("Block by Height", "blockbyheight/{height}");
-		help.put("Child Block Signature", "childblocksignature/{signature}");
-		help.put("Child Block", "childblock/{signature}");
+		help.put("GET First Block", "firstblock");
+		help.put("GET Last Block", "lastblock");
+		help.put("GET Block", "block/{signature}");
+		help.put("GET Block by Height", "blockbyheight/{height}");
+		help.put("GET Child Block Signature", "childblocksignature/{signature}");
+		help.put("GET Child Block", "childblock/{signature}");
+
 		help.put("BLOCKS", "");
-		help.put("Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
-		help.put("Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");		
+		help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
+		help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");		
+
 		help.put("RECORD", "");
-		help.put("Record", "record/{signature}");
-		help.put("Record by Height and Sequence", "recordbynumber/{height-sequence}");
+		help.put("GET Record", "record/{signature}");
+		help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
 		
+		help.put("ADDRESS", "");
+		help.put("GET Address Validate", "addressvalidate/{address}");
+		help.put("GET Address Last Reference", "addresslastreference/{address}");
+		help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}");
+		help.put("GET Address Generating Balance", "addressgeneratingbalance/{address}");
+		help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
+		help.put("GET Address Assets", "addressassets/{address}");
+		help.put("GET Address Public Key", "addresspublickey/{address}");
+		
+		
+		help.put("TOOLS", "");
+		help.put("POST Verify Signature for JSON {\"message\": ..., \"signature\": Base58, \"publickey\": Base58)", "verifysignature");
 		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -486,5 +502,292 @@ public class API {
 				.entity(StrJSonFine.convert(out))
 				.build();
 	}
+
+	/*
+	 * ********** ADDRESS **********
+	 */
+	@GET
+	@Path("addresslastreference/{address}")
+	public Response getAddressLastReference(@PathParam("address") String address) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+		}
+		
+		// GET ACCOUNT
+		Account account = new Account(address);
+
+		Long lastTimestamp = account.getLastReference();
+		
+		String out;
+		if(lastTimestamp == null) {
+			out = "-"; 
+		} else {
+			out = ""+lastTimestamp;
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(out)
+				.build();
+
+	}
+	
+	@GET
+	@Path("addressunconfirmedlastreference/{address}/")
+	public Response getUnconfirmedLastReferenceUnconfirmed(@PathParam("address") String address) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+		}
+		
+		// GET ACCOUNT
+		Account account = new Account(address);
+
+		HashSet<byte[]> isSomeoneReference = new HashSet<byte[]>();
+		
+		Controller cntrl = Controller.getInstance();
+
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		
+		DBSet db = DBSet.getInstance();
+		Long lastTimestamp = account.getLastReference();
+		byte[] signature;
+		if(!(lastTimestamp == null)) 
+		{
+			signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
+			transactions.add(cntrl.getTransaction(signature));
+		}	
+		
+		for (Transaction tx : transactions)
+		{
+			if (tx.getCreator().equals(account))
+			{
+				for (Transaction tx2 : transactions)
+				{
+					if (tx.getTimestamp() == tx2.getReference()
+							& tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())){
+						// if same address and parent timestamp
+						isSomeoneReference.add(tx.getSignature());
+						break;
+					}
+				}
+			}	
+		}
+		
+		String out = "-";
+		if(isSomeoneReference.isEmpty())
+		{
+			return getAddressLastReference(address);
+		}
+		
+		for (Transaction tx : cntrl.getUnconfirmedTransactions())
+		{
+			if (tx.getCreator().equals(account))
+			{
+				if(!isSomeoneReference.contains(tx.getSignature()))
+				{
+					//return Base58.encode(tx.getSignature());
+					out =  ""+tx.getTimestamp();
+					break;
+				}
+			}
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(out)
+				.build();
+	}
+
+	
+	@GET
+	@Path("addressvalidate/{address}")
+	public Response validate(@PathParam("address") String address) {
+		// CHECK IF VALID ADDRESS
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(String.valueOf(Crypto.getInstance().isValidAddress(address)))
+				.build();
+	}
+
+	@GET
+	@Path("addressgeneratingbalance/{address}")
+	public Response getAddressGeneratingBalanceOfAddress(
+			@PathParam("address") String address) {
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity("" + Block.calcGeneratingBalance(DBSet.getInstance(),
+						new Account(address), Controller.getInstance().getBlockChain().getHeight(DBSet.getInstance()) ))
+				.build();
+	}
+
+	@GET
+	@Path("addressassetbalance/{address}/{assetid}")
+	public Response getAddressAssetBalance(@PathParam("address") String address,
+			@PathParam("assetid") String assetid) {
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		Long assetAsLong = null;
+
+		// HAS ASSET NUMBERFORMAT
+		try {
+			assetAsLong = Long.valueOf(assetid);
+
+		} catch (NumberFormatException e) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+		}
+
+		// DOES ASSETID EXIST
+		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+
+		}
+		
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = dbSet.getAssetBalanceMap().get(address, assetAsLong);
+		JSONArray array = new JSONArray();
+		array.add(balance.a);
+		array.add(balance.b);
+		array.add(balance.c);
+
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(array))
+				.build();
+	}
+	
+	@GET
+	@Path("addressassets/{address}")
+	public Response getAddressAssetBalance(@PathParam("address") String address) {
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+
+		JSONObject out = new JSONObject();
+		
+		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
+		{
+			JSONArray array = new JSONArray();
+			array.add(assetsBalance.getB().a);
+			array.add(assetsBalance.getB().b);
+			array.add(assetsBalance.getB().c);
+			out.put(assetsBalance.getA().b, array);
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+	@GET
+	@Path("addresspublickey/{address}")
+	public Response getPublicKey(@PathParam("address") String address) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(address);
+
+		if (publicKey == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					Transaction.INVALID_PUBLIC_KEY);
+		} else {
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(Base58.encode(publicKey))
+					.build();
+		}
+	}
+
+	/*
+	 * ************* TOOLS **************
+	 */
+	@POST
+	@Path("verifysignature")
+	public String verifysignature(String x) {
+		try {
+			// READ JSON
+			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
+			String message = (String) jsonObject.get("message");
+			String signature = (String) jsonObject.get("signature");
+			String publicKey = (String) jsonObject.get("publickey");
+
+			// DECODE SIGNATURE
+			byte[] signatureBytes;
+			try {
+				signatureBytes = Base58.decode(signature);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						Transaction.INVALID_SIGNATURE);
+
+			}
+
+			// DECODE PUBLICKEY
+			byte[] publicKeyBytes;
+			try {
+				publicKeyBytes = Base58.decode(publicKey);
+			} catch (Exception e) {
+				throw ApiErrorFactory.getInstance().createError(
+						//ApiErrorFactory.ERROR_INVALID_PUBLIC_KEY);
+						Transaction.INVALID_PUBLIC_KEY);
+
+			}
+
+			return String.valueOf(Crypto.getInstance().verify(publicKeyBytes,
+					signatureBytes, message.getBytes(StandardCharsets.UTF_8)));
+		} catch (NullPointerException e) {
+			// JSON EXCEPTION
+			throw ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_JSON);
+		} catch (ClassCastException e) {
+			// JSON EXCEPTION
+			throw ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_JSON);
+		}
+	}
+
 
 }
