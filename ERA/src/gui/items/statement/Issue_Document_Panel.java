@@ -845,13 +845,15 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
 			if (this.fill_Template_Panel.sel_note !=null){
 // template params
-			out_Map.put("Template", fill_Template_Panel.sel_note.getKey()+"");
+			out_Map.put("TM", fill_Template_Panel.sel_note.getKey()+"");
 			
 			for (Entry<String, String> key1:param_keys){
 			message += key1.getKey() + " = " + key1.getValue() + "  \n"; // for MarkDown need "  "
 			params_Map.put( key1.getKey(), key1.getValue());
 			}
+			
 			}
+			if (params_Map.size()>0) out_Map.put("PR", params_Map);
 // hashes			
 			
 			int hR = hashes_Table_Model.getRowCount();
@@ -859,14 +861,13 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				hashes_Map.put(hashes_Table_Model.getValueAt(i, 0),hashes_Table_Model.getValueAt(i, 1));
 				
 			}
+			if (hashes_Map.size()>0) out_Map.put("HS", hashes_Map);
 			
 			
 			
-			out_Map.put("Hashes", hashes_Map);
-			out_Map.put("Statement_Params", params_Map);
-			out_Map.put("Version", "2.01");
-			out_Map.put("Message", this.jTextPane_Message_Private.getDocument().getText(0, this.jTextPane_Message_Private.getDocument().getLength()));
-			out_Map.put("Title", jTextField_Title_Message.getText());
+			if (this.jTextPane_Message_Private.getDocument().getLength()>0)
+				out_Map.put("MS", this.jTextPane_Message_Private.getDocument().getText(0, this.jTextPane_Message_Private.getDocument().getLength()));
+		
 // files	
 			HashMap out_Files = new HashMap();
 		//	HashMap out_Files_data = new HashMap();

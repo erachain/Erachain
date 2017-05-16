@@ -362,7 +362,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		}
 		 if(jSON.containsKey("Title"))jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+jSON.get("Title").toString());
 		
-		 
+		//v2.0 
 		if(jSON.containsKey("Template")){
 			
 		 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("Template")) );
@@ -382,10 +382,30 @@ public class Statement_Info extends javax.swing.JPanel {
 		}
 		 }
 		}
+		// v 2.1
+		if(jSON.containsKey("TM")){
+			
+			 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("TM")) );
+			 if (note != null){
+				 description = note.getDescription();
+			
+			if (jSON.containsKey("PR")){
+					str = jSON.get("PR").toString();
+					
+						params = (JSONObject) JSONValue.parseWithException(str);
+					
+					 kS =  params.keySet();
+					 for (String s:kS){
+							description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
+					 }
+					
+			}
+			 }
+			}
 		 
 				 // hashes
 				String hasHes = "";
-				 
+	// v2.0			 
 		if (jSON.containsKey("Hashes")){
 				 str = jSON.get("Hashes").toString();
 				
@@ -399,11 +419,28 @@ public class Statement_Info extends javax.swing.JPanel {
 					 hasHes += i + " " + s + " " + params.get(s) + "\n";
 				 }
 		}
-				
+	// 2.1
+		if (jSON.containsKey("HS")){
+			 str = jSON.get("HS").toString();
+			
+			
+				params = (JSONObject) JSONValue.parseWithException(str);
+			
+			 kS = params.keySet();
+			 
+			 int i = 1;
+			 for (String s:kS){
+				 hasHes += i + " " + s + " " + params.get(s) + "\n";
+			 }
+	}
+		
 			
 							 
 				String message="";
+		// v 2.0
 				if (jSON.containsKey("Message")) message = (String) jSON.get("Message");
+		// v 2.1
+				if (jSON.containsKey("MS")) message = (String) jSON.get("MS");
 				
 				 jTextArea_Body.setText(
 					  	 description + "\n\n"

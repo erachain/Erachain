@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -31,6 +32,7 @@ import org.json.simple.parser.ParseException;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple6;
 import com.github.rjeschke.txtmark.Processor;
 import at.AT;
@@ -3473,7 +3475,7 @@ if ( asset_1 == null) {
 		Map output=new LinkedHashMap();
 		
 		R_SignNote trans = (R_SignNote) DBSet.getInstance().getTransactionFinalMap().getTransaction(new Integer(block), new Integer(seg_No));
-		NoteCls statement = (NoteCls)ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, trans.getKey());
+		
 		
 		
 	//	output.put("Label_title", Lang.getInstance().translate_from_langObj("Title",langObj));
@@ -3487,22 +3489,107 @@ if ( asset_1 == null) {
 		output.put("block",block);
 		output.put("Seg_No",seg_No);
 		
-		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
-		//jTextArea_Body.setContentType("text/html");
+		NoteCls statement = (NoteCls)ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, trans.getKey());
+			NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 		
-		
-		
-		String description = note.getDescription(); 
 		if (!trans.isEncrypted()) {
+			
+			
+			
+			if (trans.getVersion()==2){
+// version 2	
+				Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map_Data;
+				output.put("Version","2");
+				try {
+					map_Data = trans.parse_Data_V2();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return null;
+				}
+				
+				if ( map_Data.b != null) output.put("Title",  map_Data.b);
+					
+				JSONObject jSON = map_Data.c;
+				// parse JSON
+				if (jSON != null){
+	// parse Ffiles
+					if (jSON.containsKey("&*&*%$$%_files_#$@%%%") || jSON.containsKey("F")){
+					
+					}
+	// Template
+					if (jSON.containsKey("Template") || jSON.containsKey("TM")){
+						
+					
+	// Template Params
+						if (jSON.containsKey("Statement_Params") || jSON.containsKey("PR")){
+						
+	
+					
+					
+					
+						}
+					}
+	// Hashes
+					if (jSON.containsKey("Hashes")){
+					
+					HashMap <String, Object>hashes_Out = new HashMap();
+					JSONObject hashesJSON = (JSONObject) jSON.get("Hashes");
+					Iterator it_Hs = hashesJSON.keySet().iterator();
+					int i = 0;
+					while(it_Hs.hasNext()){
+						HashMap <String, String>hash_Out = new HashMap();
+						String hash = (String) it_Hs.next();
+						hash_Out.put(hash, (String) hashesJSON.get(hash));
+						hashes_Out.put(i+"", hash_Out);
+					i++;	
+					}
+					if (hashes_Out.size() > 0)output.put("Hashes",hashes_Out); 
+					}
+					if (jSON.containsKey("HS")){
+						
+						HashMap <String, Object>hashes_Out = new HashMap();
+						JSONObject hashesJSON = (JSONObject) jSON.get("HS");
+						Iterator it_Hs = hashesJSON.keySet().iterator();
+						int i = 0;
+						while(it_Hs.hasNext()){
+							HashMap <String, String>hash_Out = new HashMap();
+							String hash = (String) it_Hs.next();
+							hash_Out.put(hash, (String) hashesJSON.get(hash));
+							hashes_Out.put(i+"", hash_Out);
+						i++;	
+						}
+						if (hashes_Out.size() > 0)output.put("Hashes",hashes_Out); 
+						}
+	// Message
+					if (jSON.containsKey("Message")) output.put("Message", jSON.get("Message"));
+					if (jSON.containsKey("MS")) output.put("Message", jSON.get("MS"));
+					
+				}
+				
+				
+				return output;
+			}
 		
+			
+// version 1
 		 try {
-			 JSONObject data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
-				String str = data.get("Statement_Params").toString();
-				 JSONObject params = (JSONObject) JSONValue.parseWithException(str);
-				 Set<String> kS = params.keySet();
+			 
+			 Set<String> kS;
+			 String description ="";
+			 String str;
+			 JSONObject params = new JSONObject();
+			 JSONObject data = new JSONObject();
+			 if (note != null){
+			 description = note.getDescription(); 
+			 data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
+				str = data.get("Statement_Params").toString();
+				 params = (JSONObject) JSONValue.parseWithException(str);
+				  kS = params.keySet();
 				 for (String s:kS){
 						description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
 				 }
+			 }
 				String hasHes = "";
 				 str = data.get("Hashes").toString();
 				 params = (JSONObject) JSONValue.parseWithException(str);
@@ -3532,6 +3619,7 @@ if ( asset_1 == null) {
 		
 		
 		output.put("statement", Processor.process(new String( trans.getData(), Charset.forName("UTF-8") )));
+		
 		
 		 }
 		
