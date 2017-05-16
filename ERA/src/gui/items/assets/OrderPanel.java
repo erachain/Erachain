@@ -490,7 +490,7 @@ public class OrderPanel extends JPanel
 			
 			//READ PRICE
 			parse = 2;
-			price = new BigDecimal(this.txtPrice.getText()).setScale(8);			
+			price = new BigDecimal(this.txtPrice.getText()).setScale(10);			
 
 		}
 		catch(Exception e)
