@@ -20,6 +20,7 @@ import javax.validation.constraints.Null;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
@@ -248,10 +249,16 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		*/
 
 			case COLUMN_NOTE:
-				
-				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
+				ItemCls it = ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				if (it == null) return "";
+				return it.toString();
 				
 			case COLUMN_BODY:				
+				
+				if(record.getVersion() == 2){
+					Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
+					return a.b;
+				}
 				
 				String str = "";
 				 try {

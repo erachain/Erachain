@@ -1602,7 +1602,7 @@ if ( asset_1 == null) {
 	private Map jsonQueryPerson(String first) {
 		// TODO Auto-generated method stub
 		Map output=new LinkedHashMap();
-		TableModelPersons search_Table_Model = new TableModelPersons();
+		WEB_TableModelPersons search_Table_Model = new WEB_TableModelPersons();
 		
 		PersonCls person = search_Table_Model.getPerson(new Integer(first)-1);
 		byte[] b = person.getImage();
@@ -1778,7 +1778,7 @@ if ( asset_1 == null) {
 		}
 */
 		Map output=new LinkedHashMap();
-		TableModelPersons search_Table_Model = new TableModelPersons();
+		WEB_TableModelPersons search_Table_Model = new WEB_TableModelPersons();
 		
 
 		output.put("row", search_Table_Model.getRowCount());

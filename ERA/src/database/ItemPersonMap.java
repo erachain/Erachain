@@ -179,6 +179,29 @@ public class ItemPersonMap extends Item_Map
 		return txs;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<PersonCls> getPersonsAll()
+	{
+	//	Iterable keys = Fun.filter(this.person_Name_Index, str);
+	//	Iterator iter = keys.iterator();
+	//	Iterator <Tuple2<String,Long>> iter = this.person_Name_Index.iterator();
+		List<PersonCls> txs = new ArrayList<>();
+		
+		Iterator<Long> iter = this.getIterator(0,false);
+		while ( iter.hasNext() )
+		{
+			 Long iterator_Step = iter.next();
+			
+			
+		txs.add((PersonCls)this.person_Map.get(iterator_Step));
+			
+		}
+		
+		
+		
+		
+		return txs;
+	}
 	/*
 	protected long getKey()
 	{
