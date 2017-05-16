@@ -127,11 +127,15 @@ public class Main_Panel extends javax.swing.JPanel {
 				if( cc.getClass().getSimpleName().equals("M_TabbedPanel")){
 				M_TabbedPanel mt = (M_TabbedPanel)cc;	
 				
-		// find path from name node		
-				DefaultMutableTreeNode ss = getNodeByName(jTabbedPane1.getTitleAt(mt.getSelectedIndex()), (DefaultMutableTreeNode) mlp.tree.tree.getModel().getRoot());
-		// set select from tree
-				if (ss != null)	mlp.tree.tree.setSelectionPath( new TreePath(ss.getPath()) );
-				}	
+		// find path from name node
+				int index = mt.getSelectedIndex();
+				if (index >=0 ) {	
+					DefaultMutableTreeNode ss = getNodeByName(jTabbedPane1.getTitleAt(mt.getSelectedIndex()), (DefaultMutableTreeNode) mlp.tree.tree.getModel().getRoot());
+			// set select from tree
+					if (ss != null)
+						mlp.tree.tree.setSelectionPath( new TreePath(ss.getPath()) );
+					}
+				}
 			}
 
 			@Override
