@@ -181,18 +181,21 @@ public class Order implements Comparable<Order> {
 		return this.amountWant.subtract(this.fulfilledWant);
 	}
 
+	/*
 	public BigDecimal getAmountHaveLeft(DBSet db, BigDecimal newPrice)
 	{
 		if (this.isHaveDivisible(db))
 			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
 		return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
-	}	
+	}
+	
 	public BigDecimal getAmountWantLeft(DBSet db, BigDecimal newPrice)
 	{
 		if (this.isWantDivisible(db))
 			return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
 		return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
 	}	
+	*/
 
 	//////// FULFILLED
 	public BigDecimal getFulfilledHave()
@@ -237,11 +240,11 @@ public class Order implements Comparable<Order> {
 	///////// PRICE
 	public BigDecimal getPriceCalc() 
 	{
-		return this.amountWant.divide(amountHave, 8, RoundingMode.HALF_DOWN);
+		return this.amountWant.divide(amountHave, 10, RoundingMode.HALF_DOWN);
 	}	
 	public BigDecimal getPriceCalcReverse() 
 	{
-		return this.amountHave.divide(amountWant, 8, RoundingMode.HALF_UP);
+		return this.amountHave.divide(amountWant, 10, RoundingMode.HALF_UP);
 	}	
 	public String viewPrice() 
 	{
@@ -484,9 +487,12 @@ public class Order implements Comparable<Order> {
 					tradeAmount = orderAmountHaveLeft;
 				else
 				{
+					
 					tradeAmount = isReversePrice?
 							thisAmountHaveLeft.divide(orderPrice, 8, RoundingMode.HALF_DOWN):
 							thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
+					
+							//tradeAmount.
 					if ( !isDivisibleWant && tradeAmount.stripTrailingZeros().scale() > 0) {
 						// rounding only DOWN !
 						tradeAmount = tradeAmount.setScale(0, RoundingMode.DOWN);

@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
 
@@ -39,8 +40,8 @@ public class OrderTestsMy
 	private byte[] icon = new byte[0]; // default value
 	private byte[] image = new byte[0]; // default value
 
-	DBSet db = DBSet.createEmptyDatabaseSet();
-	private GenesisBlock gb = new GenesisBlock();
+	DBSet db;
+	GenesisBlock gb;
 
 
 	//CREATE KNOWN ACCOUNT
@@ -85,7 +86,10 @@ public class OrderTestsMy
 	BigInteger orderID_H;
 	
 	private void init() {
-						
+
+		db = DBSet.createEmptyDatabaseSet();
+		gb = new GenesisBlock();
+
 		gb.process(db);
 
 		byte[] seed = Crypto.getInstance().digest("test_A".getBytes());
@@ -128,6 +132,30 @@ public class OrderTestsMy
 				db.getCompletedOrderMap().get(order.getId()):
 					db.getOrderMap().get(order.getId());
 	
+	}
+
+	@Test
+	public void tails() 
+	{
+		
+		MathContext rounding = new java.math.MathContext(8, RoundingMode.HALF_DOWN); 
+
+		BigDecimal price01 = new BigDecimal("0.3");
+		BigDecimal price02 = BigDecimal.ONE.divide(price01, 10, RoundingMode.HALF_DOWN);;
+
+		BigDecimal big02 = new BigDecimal("1.8");
+		//thisAmountHaveLeft.divide(orderPrice, 8, RoundingMode.HALF_DOWN):
+		//thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
+
+		BigDecimal big03 = big02.divide(price01, 8, RoundingMode.HALF_DOWN);
+		BigDecimal big04 = big02.multiply(price02, rounding).setScale(8, RoundingMode.HALF_DOWN);
+		
+		BigDecimal big1 = new BigDecimal("89.999999999999");
+		BigDecimal big2 = big1.setScale(8, RoundingMode.HALF_DOWN);
+		BigDecimal big3 = big2.scaleByPowerOfTen(5);
+		BigDecimal big4 = big3.subtract(big2);
+		
+		
 	}
 	
 	@Test
