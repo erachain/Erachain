@@ -93,12 +93,12 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 			
 		case COLUMN_BALANCE:
 			
-			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(this.key));
+			return account.getBalanceUSE(this.key);  // NumberAsString.getInstance().numberAsString(account.getBalanceUSE(this.key));
 
 		case COLUMN_OWN:
 			
 			Tuple3<BigDecimal, BigDecimal, BigDecimal> val = account.getBalance(this.key);
-			return NumberAsString.getInstance().numberAsString(val.a);
+			return  val.a; // NumberAsString.getInstance().numberAsString(val.a);
 		}
 		
 		return null;

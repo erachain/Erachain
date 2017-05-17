@@ -307,18 +307,18 @@ public class Main_Panel extends javax.swing.JPanel {
 			return;
 
 		}
-		if ( str.equals( Lang.getInstance().translate("My Statements"))  || str.equals("Statements_My_SplitPanel")){
-			ccase1( Lang.getInstance().translate("My Statements"), new Statements_My_SplitPanel());
+		if ( str.equals( Lang.getInstance().translate("My Documents"))  || str.equals("Statements_My_SplitPanel")){
+			ccase1( Lang.getInstance().translate("My Documents"), new Statements_My_SplitPanel());
 			return;
 
 		}
-		if ( str.equals( Lang.getInstance().translate("Search Statements"))  || str.equals("Statements_Search_SplitPanel")){
-			ccase1( Lang.getInstance().translate("Search Statements"), new Statements_Search_SplitPanel());
+		if ( str.equals( Lang.getInstance().translate("Search Documents"))  || str.equals("Statements_Search_SplitPanel")){
+			ccase1( Lang.getInstance().translate("Search Documents"), new Statements_Search_SplitPanel());
 			return;
 
 		}
-		if ( str.equals( Lang.getInstance().translate("Issue Statement"))  || str.equals("Issue_Document_Panel")){
-			ccase1( Lang.getInstance().translate("Issue Statement"), new Issue_Document_Panel());
+		if ( str.equals( Lang.getInstance().translate("Issue Document"))  || str.equals("Issue_Document_Panel")){
+			ccase1( Lang.getInstance().translate("Issue Document"), new Issue_Document_Panel());
 			return;
 
 		}
