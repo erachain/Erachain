@@ -3531,6 +3531,7 @@ if ( asset_1 == null) {
 						}
 					}
 	// Hashes
+		// v2.0
 					if (jSON.containsKey("Hashes")){
 					
 					HashMap <String, Object>hashes_Out = new HashMap();
@@ -3546,6 +3547,7 @@ if ( asset_1 == null) {
 					}
 					if (hashes_Out.size() > 0)output.put("Hashes",hashes_Out); 
 					}
+	// v2.1
 					if (jSON.containsKey("HS")){
 						
 						HashMap <String, Object>hashes_Out = new HashMap();
@@ -3561,16 +3563,19 @@ if ( asset_1 == null) {
 						}
 						if (hashes_Out.size() > 0)output.put("Hashes",hashes_Out); 
 						}
-	// Message
+	// Message v2.0
 					if (jSON.containsKey("Message")) output.put("Message", jSON.get("Message"));
+	// v 2.1
 					if (jSON.containsKey("MS")) output.put("Message", jSON.get("MS"));
 					
 				}
 				
 				
-				return output;
+				
+				
+				
 			}
-		
+			else{
 			
 // version 1
 		 try {
@@ -3620,7 +3625,7 @@ if ( asset_1 == null) {
 		
 		output.put("statement", Processor.process(new String( trans.getData(), Charset.forName("UTF-8") )));
 		
-		
+		 }
 		 }
 		
 		} else {

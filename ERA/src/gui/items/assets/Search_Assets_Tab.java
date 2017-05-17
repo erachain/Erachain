@@ -444,7 +444,7 @@ class search_listener implements ListSelectionListener  {
 			AssetCls asset = null;
 			if (assetsTable.getSelectedRow() >= 0 ) asset = tableModelItemAssets.getAsset(assetsTable.convertRowIndexToModel(assetsTable.getSelectedRow()));
 			if (asset == null) return;
-			AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
+			Asset_Detail_Panel_003 info_panel = new Asset_Detail_Panel_003(asset);
 				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 			
@@ -458,7 +458,7 @@ public void delay_on_close(){
 	// get component from right panel
 	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 	// if Person_Info 002 delay on close
-	  if (c1 instanceof AssetDetailsPanel001) ( (AssetDetailsPanel001)c1).delay_on_Close();
+	//  if (c1 instanceof AssetDetailsPanel001) ( (AssetDetailsPanel001)c1).delay_on_Close();
 	
 }
 

@@ -46,8 +46,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
 				// TODO Auto-generated method stub
 				String str = null;
-				EventType i = arg0.getEventType();
-				 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
+				if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
 				 if(arg0.getDescription().toString().indexOf('!')==0) {
     //		System.out.print(arg0.getDescription());
     		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition()); 
