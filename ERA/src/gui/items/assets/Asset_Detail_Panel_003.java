@@ -72,7 +72,7 @@ private Transaction transaction;
 	    
 	    
 	    
-	    this.addHyperlinkListener(new HyperlinkListener(){
+	    this.addHyperlinkListener(new HyperlinkListener(){ 
 
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
