@@ -38,15 +38,10 @@ public class MTextPane extends JScrollPane {
 		str = Processor.process(str);
 		int font_saze = UIManager.getFont("Label.font").getSize();
 		str = "<head><style>" 
-				+ " h1{ font-size: " + font_saze + "px;  } " 
-				+ " h2{ font-size: " + font_saze + "px;  }"
-				+ " h3{ font-size: " + font_saze + "px;  }" 
-				+ " h4{ font-size: " + font_saze + "px;  }"
-				+ " h5{ font-size: " + font_saze + "px;  }" 
 				+ " body{ font-family:"
 				+ UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px;"
 				+ "word-wrap:break-word;}"
-				+ "</style> </head><body>" + str + "</body>";
+				+ "</style> </head><body><div style='style='word-wrap: break-word; '>" + str + "</body>";
 		text_pane.setText(str);
 		
 		

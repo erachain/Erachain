@@ -38,6 +38,7 @@ import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
 import gui.items.notes.IssueNotePanel;
 import gui.items.notes.Search_Notes_Tab;
+import gui.items.other.Other_Split_Panel;
 import gui.items.other.other_Panel;
 import gui.items.persons.InsertPersonPanel;
 import gui.items.persons.IssuePersonPanel;
@@ -414,8 +415,8 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Unconfirmed Records"), new Records_UnConfirmed_Panel());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("Other"))   || str.equals("other_Panel")){
-			ccase1( Lang.getInstance().translate("Other"), new other_Panel());
+		if ( str.equals( Lang.getInstance().translate("Other"))   || str.equals("Other_Split_Panel")){
+			ccase1( Lang.getInstance().translate("Other"), new Other_Split_Panel()); // new other_Panel());
 			return;
 		}
 		
