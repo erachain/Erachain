@@ -240,7 +240,7 @@ public class IssueUnionPanel extends JPanel
       	//TXT PARENT
       	txtGBC.gridy = gridy++;
       	this.txtParent = new JTextField();
-      	this.txtParent.setText("-1");
+      	this.txtParent.setText("0");
         this.add(this.txtParent, txtGBC);      	
 
         //LABEL FEE POW
