@@ -100,9 +100,9 @@ this.setVisible(false);
       //  jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         jPanel2.setOpaque(false);
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
-        jPanel2Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        jPanel2Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 0, 0};
         jPanel2Layout.rowHeights = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
-        jPanel2Layout.columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0};
+        jPanel2Layout.columnWeights = new double[] {0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0};
         jPanel2Layout.rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
         jPanel2.setLayout(jPanel2Layout);
 
@@ -124,6 +124,7 @@ this.setVisible(false);
         gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField1, gridBagConstraints);
                 
@@ -144,6 +145,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField_Block, gridBagConstraints);
         
@@ -164,6 +166,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField2, gridBagConstraints);
 
@@ -189,6 +192,7 @@ this.setVisible(false);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.15;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         jPanel2.add(jTextArea1, gridBagConstraints);
 
         jLabel4.setText(Lang.getInstance().translate("Owner") + ":");
@@ -211,6 +215,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField3, gridBagConstraints);
 
@@ -230,6 +235,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 12;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         gridBagConstraints.weightx = 1.0;
         jPanel2.add(jTextField4, gridBagConstraints);
 
@@ -249,6 +255,7 @@ this.setVisible(false);
         gridBagConstraints.gridy = 14;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.PAGE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         jPanel2.add(jCheckBox1, gridBagConstraints);
 
      //  jScrollPane1.setViewportView(jPanel2);
@@ -257,12 +264,12 @@ this.setVisible(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 15;
-        gridBagConstraints.gridwidth = 11;
+        gridBagConstraints.gridwidth = 10;
       // gridBagConstraints.gridheight = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.4;
+        gridBagConstraints.weighty = 0.3;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
        // add(jScrollPane2, gridBagConstraints);
   

@@ -52,11 +52,12 @@ public class My_Assets_Tab extends Split_Panel {
 	private static final long serialVersionUID = 1L;
 	RowSorter<WalletItemAssetsTableModel> sorter;
 	final MTable table;
+	private My_Assets_Tab th;
 
 	public My_Assets_Tab()
 	{
 		super("My_Assets_Tab");
-	
+	th= this;
 	this.setName(Lang.getInstance().translate("My Assets"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
@@ -447,9 +448,14 @@ class search_listener implements ListSelectionListener  {
 			AssetCls asset = null;
 			if (table.getSelectedRow() >= 0 ) asset = assetsModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
 			if (asset == null) return;
+			int div = th.jSplitPanel.getDividerLocation();
+			int or = th.jSplitPanel.getOrientation();
 			AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
 				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				//jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+				jSplitPanel.setRightComponent(info_panel);
+				jSplitPanel.setDividerLocation(div);
+				jSplitPanel.setOrientation(or);
 			
 		}
 	}

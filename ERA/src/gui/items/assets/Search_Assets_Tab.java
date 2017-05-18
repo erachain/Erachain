@@ -69,11 +69,12 @@ import lang.Lang;
 public class Search_Assets_Tab extends Split_Panel {
 	private TableModelItemAssets tableModelItemAssets;
 	final MTable assetsTable;
+	private Search_Assets_Tab th;
 	
 	
 	public Search_Assets_Tab(){
 		super("Search_Assets_Tab");
-		
+		th =this;
 		setName(Lang.getInstance().translate("Search Assets"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 		// not show buttons
@@ -444,10 +445,14 @@ class search_listener implements ListSelectionListener  {
 			AssetCls asset = null;
 			if (assetsTable.getSelectedRow() >= 0 ) asset = tableModelItemAssets.getAsset(assetsTable.convertRowIndexToModel(assetsTable.getSelectedRow()));
 			if (asset == null) return;
+			int div = th.jSplitPanel.getDividerLocation();
+			int or = th.jSplitPanel.getOrientation();
 			Asset_Detail_Panel_003 info_panel = new Asset_Detail_Panel_003(asset);
 				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-			
+				//jSplitPanel.setRightComponent(info_panel);
+				jSplitPanel.setDividerLocation(div);
+				jSplitPanel.setOrientation(or);
 		}
 	}
 
