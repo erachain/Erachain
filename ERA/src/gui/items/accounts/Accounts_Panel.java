@@ -29,6 +29,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -53,6 +54,7 @@ import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
 import gui.Gui;
+import gui.PasswordPane;
 @SuppressWarnings("serial")
 public class Accounts_Panel extends JPanel // implements ItemListener
 
@@ -123,8 +125,23 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				Controller.getInstance().generateNewAccount();
-			}
+				  //CHECK IF WALLET UNLOCKED
+				  if(!Controller.getInstance().isWalletUnlocked())
+				  {
+				   //ASK FOR PASSWORD
+				   String password = PasswordPane.showUnlockWalletDialog(); 
+				   if(!Controller.getInstance().unlockWallet(password))
+				   {
+				    //WRONG PASSWORD
+				    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+				    return;
+				   }
+				  }
+				  
+				  //GENERATE NEW ACCOUNT
+				  Controller.getInstance().generateNewAccount();
+				 }
+			
 			
 		});
 		
