@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +49,8 @@ import core.blockexplorer.BlockExplorer;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.BuyNameTransaction;
@@ -114,7 +117,7 @@ public class API {
 		Map help = new LinkedHashMap();
 
 		help.put("GET Height", "height");
-		help.put("BLOCK", "");
+		help.put("BLOCK", "--------------");
 		help.put("GET First Block", "firstblock");
 		help.put("GET Last Block", "lastblock");
 		help.put("GET Block", "block/{signature}");
@@ -122,15 +125,15 @@ public class API {
 		help.put("GET Child Block Signature", "childblocksignature/{signature}");
 		help.put("GET Child Block", "childblock/{signature}");
 
-		help.put("BLOCKS", "");
+		help.put("BLOCKS", "----------------");
 		help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
 		help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");		
 
-		help.put("RECORD", "");
+		help.put("RECORD", "----------------");
 		help.put("GET Record", "record/{signature}");
 		help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
 		
-		help.put("ADDRESS", "");
+		help.put("ADDRESS", "---------------");
 		help.put("GET Address Validate", "addressvalidate/{address}");
 		help.put("GET Address Last Reference", "addresslastreference/{address}");
 		help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}");
@@ -139,6 +142,14 @@ public class API {
 		help.put("GET Address Assets", "addressassets/{address}");
 		help.put("GET Address Public Key", "addresspublickey/{address}");
 		
+		help.put("ASSET", "-----------------");
+		help.put("GET Asset Height", "assetheight");
+		help.put("GET Asset", "asset/{key}");
+		help.put("GET Asset Data", "assetdata/{key}");
+		
+		help.put("ASSETS", "-----------------");
+		help.put("GET Assets", "assets");
+		help.put("GET Asset Full", "assetsfull");
 		
 		help.put("TOOLS", "");
 		help.put("POST Verify Signature for JSON {\"message\": ..., \"signature\": Base58, \"publickey\": Base58)", "verifysignature");
@@ -740,6 +751,88 @@ public class API {
 					.entity(Base58.encode(publicKey))
 					.build();
 		}
+	}
+
+	/*
+	 * ************* ASSETS **************
+	 */
+	@GET
+	@Path("assetheight")
+	public Response assetHeight() {
+		
+		long height = dbSet.getItemAssetMap().getSize();
+
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity("" + height)
+				.build();
+		
+	}
+
+	@GET
+	@Path("asset/{key}")
+	public Response asset(@PathParam("key") long key) {
+		
+		// DOES ASSETID EXIST
+		if (!DBSet.getInstance().getItemAssetMap().contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+		}
+		
+		AssetCls asset = (AssetCls)DBSet.getInstance().getItemAssetMap().get(key);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(asset.toJson()))
+				.build();
+		
+	}
+	@GET
+
+	@Path("assetdata/{key}")
+	public Response assetData(@PathParam("key") long key) {
+		
+		// DOES ASSETID EXIST
+		if (!DBSet.getInstance().getItemAssetMap().contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ASSET_DOES_NOT_EXIST);
+		}
+		
+		AssetCls asset = (AssetCls)DBSet.getInstance().getItemAssetMap().get(key);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(asset.toJsonData()))
+				.build();
+		
+	}
+
+	@GET
+	@Path("assets")
+	public Response assets() {
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(core.blockexplorer.BlockExplorer.getInstance().jsonQueryAssetsLite()))
+				.build();
+		
+	}
+
+	@Path("assetsfull")
+	public Response assetsFull() {
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(core.blockexplorer.BlockExplorer.getInstance().jsonQueryAssets())
+				.build();
+		
 	}
 
 	/*

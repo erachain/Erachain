@@ -6,10 +6,13 @@ import java.nio.charset.StandardCharsets;
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple6;
 
+import com.github.rjeschke.txtmark.Processor;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
@@ -28,7 +31,7 @@ import database.Item_Map;
 import database.wallet.FavoriteItem;
 import lang.Lang;
 import database.Issue_ItemMap;
-
+import utils.NumberAsString;
 import utils.Pair;
 
 public abstract class ItemCls {
@@ -178,6 +181,16 @@ public abstract class ItemCls {
 		resolveKey(db);
 		return this.key;
 	}
+	
+	public long getHeight(DBSet db)
+	{
+		//INSERT INTO DATABASE
+		Item_Map dbMap = this.getDBMap(db);
+		long key = dbMap.getSize();
+		return key;
+		
+	}
+
 	public long resolveKey(DBSet db) {
 		if (this.key == 0 // & this.reference != null
 				) {
@@ -296,6 +309,23 @@ public abstract class ItemCls {
 		
 		return data;
 	}
+	
+	/*
+	@SuppressWarnings("unchecked")
+	protected JSONObject getJsonBase()
+	{
+		JSONObject out=new JSONObject();
+
+		out.put("key", this.getKey());
+		out.put("name", this.getName());
+		out.put("description", this.getDescription());
+		out.put("owner", this.getOwner().getAddress());
+		
+		return out;
+	}
+
+	public abstract JSONObject toJson();
+	*/
 
 	public int getDataLength(boolean includeReference) 
 	{
