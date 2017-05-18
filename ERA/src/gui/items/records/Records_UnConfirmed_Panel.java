@@ -2,7 +2,9 @@ package gui.items.records;
 
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.items.accounts.Account_Send_Dialog;
 import gui.items.assets.AssetDetailsPanel001;
+import gui.items.mails.Mail_Send_Dialog;
 import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Debug_Transactions_Table_Model;
@@ -12,10 +14,13 @@ import gui.models.Renderer_Right;
 import gui.models.WalletTransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 //import java.awt.ScrollPaneLayout;
 //import java.awt.la
 import java.awt.event.MouseAdapter;
@@ -28,7 +33,9 @@ import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -41,6 +48,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.item.unions.UnionCls;
 import core.transaction.Transaction;
 import database.wallet.TransactionMap;
@@ -226,6 +234,36 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
 		
 		
 		this.add(record_stpit, tableGBC);
+		
+		
+		
+		JPopupMenu menu = new JPopupMenu();
+
+	
+    	    	
+    	    	JMenuItem item_Rebroadcast= new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
+    	    
+    	    	item_Rebroadcast.addActionListener(new ActionListener(){
+    	  		@Override
+    	    	public void actionPerformed(ActionEvent e) {
+    	  			// code Rebroadcast
+    				
+    	  						
+    	  		}	
+    	  		});
+    	    	
+    	    	menu.add(item_Rebroadcast);
+    	    	JMenuItem item_Delete= new JMenuItem(Lang.getInstance().translate("Delete"));
+    	    	item_Delete.addActionListener(new ActionListener(){
+    	  		@Override
+    	    	public void actionPerformed(ActionEvent e) {
+    	   
+    	  			// code delete
+    	  			
+    				}});
+    	    	
+    	    	menu.add(item_Delete);
+   	    	TableMenuPopupUtil.installContextMenu(record_stpit.jTable_jScrollPanel_LeftPanel, menu);
 
 		//this.add(this.transactionsTable);       
 		
