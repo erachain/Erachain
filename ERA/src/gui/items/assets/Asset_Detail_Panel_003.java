@@ -2,13 +2,16 @@ package gui.items.assets;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import javax.swing.JButton;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -26,6 +29,7 @@ import javax.swing.text.StyledDocument;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.items.persons.Person_Work_Dialog;
 import gui.library.MTable;
 import gui.library.M_Accoutn_Text_Field;
 import gui.library.Voush_Library_Panel;
@@ -39,28 +43,30 @@ public class Asset_Detail_Panel_003 extends JTextPane {
 
    private AssetCls asset;
 private Transaction transaction;
+private Asset_Detail_Panel_003 th;
 /**
     * Creates new form Asset_Info003
     */
 	
    public Asset_Detail_Panel_003(AssetCls asset) {
     //   initComponents();
+	   th=this;
 	   this.asset = asset;
 	   byte[] recordReference = asset.getReference();
        transaction = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
 	   this.setMinimumSize(new Dimension(0, 0)); 	
        String text ="<body style= 'font-family:"
 				+ UIManager.getFont("Label.font").getFamily() + "; font-size: "+UIManager.getFont("Label.font").getSize() +"pt;'>";
-       text += "<DIV>" + Lang.getInstance().translate("Key")+ ": <a href='key'> " + asset.getKey() + "</a><DIV>";
+       text += "<DIV>" + Lang.getInstance().translate("Key")+ ": <a href='!key'> " + asset.getKey() + "</a><DIV>";
 	    Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
        
-	    text += "<div>"+ Lang.getInstance().translate("Block-SeqNo") + ": <a href='block'>" + record.viewHeightSeq(DBSet.getInstance()) +"</a></div>";
+	    text += "<div>"+ Lang.getInstance().translate("Block-SeqNo") + ": <a href='!Block'>" + record.viewHeightSeq(DBSet.getInstance()) +"</a></div>";
 	    text += "<div>"+ Lang.getInstance().translate("Name") + ": " + asset.getName() + "</div>";
 	    text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
-	    text += "<div >" + Lang.getInstance().translate("Owner") + ": <a href = 'Owner'>" + asset.getOwner() + "</a></div>";
+	    text += "<div >" + Lang.getInstance().translate("Owner") + ": <a href = '!Owner'>" + asset.getOwner() + "</a></div>";
 	    text += "<div>" + Lang.getInstance().translate("Divisible") + ": " + Lang.getInstance().translate(asset.isDivisible()+"") +"</div>";
-	    text += "<div>" + Lang.getInstance().translate("Quantity") + ": " + asset.getQuantity() +"</div>"; 
-	    text +="<br><a href='fsdfsdfsd'> проверка ссылки</a><br></body>";
+	    text += "<div>" + Lang.getInstance().translate("Quantity") + ": " + asset.getQuantity() +"</div><<BR>"; 
+	   
 	   
        	   
 	    this.setContentType("text/html");
@@ -74,10 +80,24 @@ private Transaction transaction;
 	    
 	    this.addHyperlinkListener(new HyperlinkListener(){ 
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
 				// TODO Auto-generated method stub
-				System.out.print(arg0.getURL());
+				if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
+				 if(arg0.getDescription().toString().indexOf('!')==0) {
+				System.out.print(arg0.getDescription());
+				
+				
+				JPopupMenu menu = new JPopupMenu();
+				JMenuItem item = new JMenuItem("2232");
+				menu.add(item);
+				
+				
+				 }
+			
+			
+			
 			}
 	    	
 	    	
@@ -87,7 +107,7 @@ private Transaction transaction;
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				System.out.print("\nMouse" + getComponentAt(e.getPoint()) +"\n");
+		//		System.out.print("\nMouse" + getComponentAt(e.getPoint()) +"\n");
 				
 			}
 
@@ -181,9 +201,11 @@ private Transaction transaction;
        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
  		MTable  jTable1 = new MTable(balancesTableModel);
  		
-        
+       //  jTable1.setMinimumSize(new Dimension(0,0));
  	
- 		
+         Dimension d = jTable1.getPreferredSize();
+         d.height = 300;
+         jTable1.setPreferredScrollableViewportSize(d);
  		
  		
        
@@ -199,6 +221,8 @@ private Transaction transaction;
        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
        jPanel_Tab_Holders.add(jScrollPane_Tab_Holders, gridBagConstraints);
 
+       
+      
       
 
        jTabbedPane1.addTab(Lang.getInstance().translate("Holders"), jPanel_Tab_Holders);
@@ -213,8 +237,9 @@ private Transaction transaction;
        doc.insertString(doc.getLength(), "ignored text", style);
        
        Style style1 = doc.addStyle("StyleName1", null);
-       
-       StyleConstants.setComponent(style1,new M_Accoutn_Text_Field(asset.getOwner() ));
+       M_Accoutn_Text_Field pane = new M_Accoutn_Text_Field(asset.getOwner() );
+     //  pane.setMinimumSize(new Dimension(0,0));
+       StyleConstants.setComponent(style1,pane);
      //  doc.insertString(10, "ignored text", style1);
        
       

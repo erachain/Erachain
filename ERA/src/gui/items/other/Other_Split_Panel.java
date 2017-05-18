@@ -149,7 +149,7 @@ public class Other_Split_Panel extends Split_Panel{
      //    jSplitPane5.setRightComponent(jScrollPane_My_Block_Table);
          
         jScrollPane_jPanel_RightPanel.setViewportView(jSplitPane5);
-        jSplitPanel.setDividerLocation(0.5);
+        jSplitPane5.setDividerLocation(0.5);
 	}
 	
 
