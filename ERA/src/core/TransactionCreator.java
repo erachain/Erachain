@@ -73,8 +73,8 @@ public class TransactionCreator
 	private DBSet fork;
 	private Block lastBlock;
 	
-	private byte[] icon = new byte[0]; // default value
-	private byte[] image = new byte[0]; // default value
+	//private byte[] icon = new byte[0]; // default value
+	//private byte[] image = new byte[0]; // default value
 	
 	private void checkUpdate()
 	{
@@ -269,7 +269,9 @@ public class TransactionCreator
 	}
 	
 	
-	public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description, boolean movable, long quantity, byte scale, boolean divisible, int feePow) 
+	public Transaction createIssueAssetTransaction(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image,
+			boolean movable, long quantity, byte scale, boolean divisible, int feePow) 
 	{
 		//CHECK FOR UPDATES
 		// all unconfirmed records insert in FORK for calc last account REFERENCE 
@@ -287,7 +289,9 @@ public class TransactionCreator
 		return issueAssetTransaction;
 	}
 
-	public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	public Pair<Transaction, Integer> createIssueImprintTransaction(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image,
+			int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -305,7 +309,9 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
 	}
 
-	public Transaction createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description, int feePow) 
+	public Transaction createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image,
+			int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -391,6 +397,7 @@ public class TransactionCreator
 	}
 
 	public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image,
 			boolean unique, int feePow) 
 	{
 		//CHECK FOR UPDATES
@@ -408,7 +415,9 @@ public class TransactionCreator
 		return issueStatusRecord;
 	}
 
-	public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description, int feePow) 
+	public Transaction createIssueUnionTransaction(PrivateKeyAccount creator, String name, long birthday, long parent, String description,
+			byte[] icon, byte[] image,
+			int feePow) 
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();

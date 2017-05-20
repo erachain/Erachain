@@ -327,7 +327,8 @@ public class IssueImprintPanel extends JPanel
 						
 			//CREATE IMPRINT
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, name_total, description, feePow);
+			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, name_total, description,
+					icon, image, feePow);
 			
 			//CHECK VALIDATE MESSAGE
 			if (result.getB() == Transaction.VALIDATE_OK) {

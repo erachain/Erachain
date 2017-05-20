@@ -244,7 +244,8 @@ public class IssueNotePanel extends JPanel
 						
 			//CREATE NOTE
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			IssueNoteRecord issueNote = (IssueNoteRecord) Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(), feePow);
+			IssueNoteRecord issueNote = (IssueNoteRecord) Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(),
+					icon, image, feePow);
 		
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 			 String text = "<HTML><body>";

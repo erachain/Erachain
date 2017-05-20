@@ -372,7 +372,9 @@ public class IssueUnionPanel extends JPanel
 		//String skinColor, String eyeColor, String hairСolor, int height, String description
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		IssueUnionRecord issue_Union = (IssueUnionRecord) Controller.getInstance().issueUnion(
-				creator, this.txtName.getText(), birthday, parent, this.txtareaDescription.getText(), feePow);
+				creator, this.txtName.getText(), birthday, parent, this.txtareaDescription.getText(),
+				icon, image,
+				feePow);
 		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 		 String text = "<HTML><body>";
 		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";

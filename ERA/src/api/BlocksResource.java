@@ -36,10 +36,11 @@ public class BlocksResource
 
 	@SuppressWarnings("unchecked")
 	@GET
-	public String getBlocks()
+	@Path("/addresses/{limit}")	
+	public String getLastAccountsBlocks(@PathParam("limit") int limit)
 	{
-		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET blocks", request);
+		//String password = null;
+		//APIUtils.askAPICallAllowed(password, "GET blocks", request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())
@@ -47,7 +48,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
 		
-		List<Pair<Account, Block>> blocks = Controller.getInstance().getLastBlocks();
+		List<Pair<Account, Block>> blocks = Controller.getInstance().getLastBlocks(limit);
 		JSONArray array = new JSONArray();
 		
 		for(Pair<Account, Block> block: blocks)
@@ -60,8 +61,8 @@ public class BlocksResource
 	
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("/address/{address}")	
-	public String getBlocks(@PathParam("address") String address)
+	@Path("/address/{address}/{limit}")	
+	public String getBlocks(@PathParam("address") String address, @PathParam("limit") int limit)
 	{
 
 		//CHECK ADDRESS
@@ -69,9 +70,6 @@ public class BlocksResource
 		{
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 		}
-
-		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET blocks/address/" + address, request);
 
 		//CHECK IF WALLET EXISTS
 		if(!Controller.getInstance().doesWalletExists())
@@ -87,7 +85,7 @@ public class BlocksResource
 		}
 		
 		JSONArray array = new JSONArray();
-		for(Block block: Controller.getInstance().getLastBlocks(account))
+		for(Block block: Controller.getInstance().getLastBlocks(account, limit))
 		{
 			array.add(block.toJson());
 		}

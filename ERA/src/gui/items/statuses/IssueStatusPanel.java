@@ -311,8 +311,9 @@ public class IssueStatusPanel extends JPanel
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		IssueStatusRecord issue_Status = (IssueStatusRecord) Controller.getInstance().issueStatus(
 				creator, this.txtName.getText(), this.txtareaDescription.getText(),
-				unique, feePow
-				);
+				unique,
+				icon, image,
+				feePow);
 		
 		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 		 String text = "<HTML><body>";

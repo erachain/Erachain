@@ -46,6 +46,7 @@ public class Start {
 		}
 		
 		boolean cli = false;
+		boolean nogui = false;
 		
 		for(String arg: args)
 		{
@@ -55,6 +56,9 @@ public class Start {
 			} 
 			else 
 			{
+				if(arg.equals("-nogui"))
+					nogui = true;
+					
 				if(arg.startsWith("-peers=") && arg.length() > 7) 
 				{
 					Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
@@ -103,11 +107,15 @@ public class Start {
 				//STARTING NETWORK/BLOCKCHAIN/RPC
 				Controller.getInstance().start();
 				
-				try
-				{
+				if (nogui) {
+					LOGGER.info("-nogui used");
+				} else {
+					
+					try
+					{
 						Thread.sleep(100);
 
-						//START GUI
+					//START GUI
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					
 							SysTray.getInstance().createTrayIcon();
@@ -126,8 +134,9 @@ public class Start {
 								Controller.getInstance().setWalletLicense(note.getKey());
 							}
 						}
-				} catch(Exception e1) {
-					LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
+					} catch(Exception e1) {
+						LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
+					}
 				}
 				
 				//Controller.getInstance().isTestnet();

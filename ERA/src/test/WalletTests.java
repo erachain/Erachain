@@ -69,7 +69,7 @@ public class WalletTests {
 		assertEquals(10, wallet.getprivateKeyAccounts().size());
 		
 		//CHECK LAST BLOCKS
-		assertNotNull(wallet.getLastBlocks());
+		assertNotNull(wallet.getLastBlocks(50));
 		
 		//CHECK LAST TRANSACTIONS
 		assertNotNull(wallet.getLastTransactions(100));

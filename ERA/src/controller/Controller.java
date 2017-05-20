@@ -1860,12 +1860,12 @@ public class Controller extends Observable {
 		return this.wallet.getLastTransactions(account, limit);
 	}
 
-	public List<Pair<Account, Block>> getLastBlocks() {
-		return this.wallet.getLastBlocks();
+	public List<Pair<Account, Block>> getLastBlocks(int limit) {
+		return this.wallet.getLastBlocks(limit);
 	}
 
-	public List<Block> getLastBlocks(Account account) {
-		return this.wallet.getLastBlocks(account);
+	public List<Block> getLastBlocks(Account account, int limit) {
+		return this.wallet.getLastBlocks(account, limit);
 	}
 
 	public List<Pair<Account, Name>> getNames() {
@@ -2364,30 +2364,36 @@ public class Controller extends Observable {
 	}
 
 	public Transaction issueAsset(PrivateKeyAccount creator,
-			String name, String description, boolean movable, long quantity, byte scale, boolean divisible,
+			String name, String description,
+			byte[] icon, byte[] image,
+			boolean movable, long quantity, byte scale, boolean divisible,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueAssetTransaction(creator,
-					name, description, movable, quantity, scale, divisible, feePow);
+					name, description, icon, image, movable, quantity, scale, divisible, feePow);
 		}
 	}
 
 	public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator,
-			String name, String description, int feePow) {
+			String name, String description,
+			byte[] icon, byte[] image,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueImprintTransaction(creator,
-					name, description, feePow);
+					name, description, icon, image, feePow);
 		}
 	}
 
 	public Transaction issueNote(PrivateKeyAccount creator,
-			String name, String description, int feePow) {
+			String name, String description,
+			byte[] icon, byte[] image,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueNoteTransaction(creator,
-					name, description, feePow);
+					name, description, icon, image, feePow);
 		}
 	}
 
@@ -2420,20 +2426,24 @@ public class Controller extends Observable {
 	}
 
 	public Transaction issueStatus(PrivateKeyAccount creator,
-			String name, String description, boolean unique, int feePow) {
+			String name, String description, boolean unique,
+			byte[] icon, byte[] image,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueStatusTransaction(creator,
-					name, description, unique, feePow);
+					name, description, icon, image, unique, feePow);
 		}
 	}
 
 	public Transaction issueUnion(PrivateKeyAccount creator,
-			String name, long birthday, long parent, String description, int feePow) {
+			String name, long birthday, long parent, String description,
+			byte[] icon, byte[] image,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssueUnionTransaction(creator,
-					name, birthday, parent, description, feePow);
+					name, birthday, parent, description, icon, image, feePow);
 		}
 	}
 

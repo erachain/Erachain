@@ -167,8 +167,9 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		return this.observableData;
 	}
 
+	// TODO - SORT by HEIGHT !!!
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Block> get(Account account)
+	public List<Block> get(Account account, int limit)
 	{
 		List<Block> blocks = new ArrayList<Block>();
 		
@@ -181,8 +182,10 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 			//GET ITERATOR
 			Iterator<Block> iterator = accountBlocks.values().iterator();
 			
-			while(iterator.hasNext())
+			int i = 0;
+			while(iterator.hasNext() && i < limit)
 			{
+				i++;
 				blocks.add(iterator.next());
 			}
 		}
@@ -195,7 +198,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		return blocks;
 	}
 	
-	public List<Pair<Account, Block>> get(List<Account> accounts)
+	public List<Pair<Account, Block>> get(List<Account> accounts, int limit)
 	{
 		List<Pair<Account, Block>> blocks = new ArrayList<Pair<Account, Block>>();
 		
@@ -206,7 +209,8 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 			{
 				for(Account account: accounts)
 				{
-					List<Block> accountBlocks = get(account);
+					
+					List<Block> accountBlocks = get(account, limit);
 					for(Block block: accountBlocks)
 					{
 						blocks.add(new Pair<Account, Block>(account, block));
