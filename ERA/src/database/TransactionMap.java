@@ -198,6 +198,14 @@ public class TransactionMap extends DBMap<byte[],  Transaction> implements Obser
 		
 	}
 	
+	public void delete(byte[] signature) {
+		// delete BROADCASTS
+		if (!this.peersBroadcasted.containsKey(signature)) {
+			this.peersBroadcasted.remove(signature);
+		}
+		super.delete(signature);
+	}
+
 	public void delete(Transaction transaction) {
 		this.delete(transaction.getSignature());
 	}

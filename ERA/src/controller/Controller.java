@@ -1387,7 +1387,7 @@ public class Controller extends Observable {
 		*/
 	}
 
-	private void broadcastTransaction(Transaction transaction) {
+	public void broadcastTransaction(Transaction transaction) {
 
 		if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 			// CREATE MESSAGE

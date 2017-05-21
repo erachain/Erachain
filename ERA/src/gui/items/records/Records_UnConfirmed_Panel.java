@@ -47,10 +47,12 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.unions.UnionCls;
 import core.transaction.Transaction;
+import database.DBSet;
 import database.wallet.TransactionMap;
 
 @SuppressWarnings("serial")
@@ -248,6 +250,11 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
     	    	public void actionPerformed(ActionEvent e) {
     	  			// code Rebroadcast
     				
+					int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
+					row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+					Transaction trans = transactionsModel.getTransaction(row);
+					// DBSet db = DBSet.getInstance();
+    	  			Controller.getInstance().broadcastTransaction(trans);
     	  						
     	  		}	
     	  		});
@@ -259,6 +266,10 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
     	    	public void actionPerformed(ActionEvent e) {
     	   
     	  			// code delete
+					int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
+					row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+					Transaction trans = transactionsModel.getTransaction(row);
+					DBSet.getInstance().getTransactionMap().delete(trans);
     	  			
     				}});
     	    	
