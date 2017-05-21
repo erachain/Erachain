@@ -4,9 +4,11 @@ import java.io.DataInputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -14,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  import org.apache.log4j.Logger;
 
 import controller.Controller;
+import core.transaction.Transaction;
 import database.DBSet;
 import lang.Lang;
 import network.message.Message;
@@ -223,6 +226,12 @@ public class Peer extends Thread{
 			}
 
 			this.runed = true;
+			
+			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+			if (transactions != null && !transactions.isEmpty())
+				this.callback.broadcastUnconfirmedToPeer(transactions, this);
+
 		}
 		catch(Exception e)
 		{

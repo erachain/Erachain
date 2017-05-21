@@ -48,7 +48,7 @@ public class AddressesResource {
 	public String getAddresses() {
 
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET addresses", request);
+		//APIUtils.askAPICallAllowed(password, "GET addresses", request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -171,19 +171,6 @@ public class AddressesResource {
 	@Path("/seed/{address}")
 	public String getSeed(@PathParam("address") String address) {
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET addresses/seed/" + address+ "\nWARNING, your seed will be revealed to the caller!", request);
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
-
-		// CHECK WALLET UNLOCKED
-		if (!Controller.getInstance().isWalletUnlocked()) {
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_WALLET_LOCKED);
-		}
 		
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
@@ -192,6 +179,20 @@ public class AddressesResource {
 					Transaction.INVALID_ADDRESS);
 		}
 
+		// CHECK IF WALLET EXISTS
+		if (!Controller.getInstance().doesWalletExists()) {
+			throw ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+		}
+
+		APIUtils.askAPICallAllowed(password, "GET addresses/seed/" + address+ "\nWARNING, your seed will be revealed to the caller!", request);
+
+		// CHECK WALLET UNLOCKED
+		if (!Controller.getInstance().isWalletUnlocked()) {
+			throw ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_WALLET_LOCKED);
+		}
+		
 		// CHECK ACCOUNT IN WALLET
 		Account account = Controller.getInstance().getAccountByAddress(address);
 		if (account == null) {
@@ -287,6 +288,7 @@ public class AddressesResource {
 	@DELETE
 	@Path("/{address}")
 	public String deleteAddress(@PathParam("address") String address) {
+		
 		String password = null;
 		APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request );
 
@@ -419,6 +421,7 @@ public class AddressesResource {
 	@POST
 	@Path("sign/{address}")
 	public String sign(String x, @PathParam("address") String address) {
+		
 		String password = null;
 		APIUtils.askAPICallAllowed(password, "POST addresses/sign/"+ address, request);
 

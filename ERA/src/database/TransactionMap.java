@@ -1,6 +1,7 @@
 package database;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,12 @@ import utils.ObserverMessage;
 import utils.ReverseComparator;
 import database.DBSet;
 import database.serializer.TransactionSerializer;
+import network.Peer;
 
 // memory pool for unconfirmed transaction
-// tx.signature -> transaction
+// tx.signature -> <<broadcasted peers>, transaction>
 // ++ seek by TIMESTAMP
-public class TransactionMap extends DBMap<byte[], Transaction> implements Observer
+public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transaction>> implements Observer
 {
 	public static final int TIMESTAMP_INDEX = 1;
 	
@@ -61,16 +63,16 @@ public class TransactionMap extends DBMap<byte[], Transaction> implements Observ
 				.comparator(new ReverseComparator(comparator))
 				.makeOrGet();
 				
-		createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Long, byte[], Transaction>() {
+		createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Long, byte[], Tuple2<List<byte[]>, Transaction>>() {
 		   	@Override
-		    public Long run(byte[] key, Transaction value) {
-		   		return value.getTimestamp();
+		    public Long run(byte[] key, Tuple2<List<byte[]>, Transaction> value) {
+		   		return value.b.getTimestamp();
 		    }
 		});
 	}
 
 	@Override
-	protected Map<byte[], Transaction> getMap(DB database) 
+	protected Map<byte[], Tuple2<List<byte[]>, Transaction>> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.createTreeMap("transactions")
@@ -82,13 +84,13 @@ public class TransactionMap extends DBMap<byte[], Transaction> implements Observ
 	}
 
 	@Override
-	protected Map<byte[], Transaction> getMemoryMap() 
+	protected Map<byte[], Tuple2<List<byte[]>, Transaction>> getMemoryMap() 
 	{
-		return new TreeMap<byte[], Transaction>(UnsignedBytes.lexicographicalComparator());
+		return new TreeMap<byte[], Tuple2<List<byte[]>, Transaction>>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override
-	protected Transaction getDefaultValue() 
+	protected Tuple2<List<byte[]>, Transaction> getDefaultValue() 
 	{
 		return null;
 	}
@@ -108,31 +110,49 @@ public class TransactionMap extends DBMap<byte[], Transaction> implements Observ
 		if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE)
 		{			
 			//CLEAN UP
-			for(Transaction transaction: this.getValues())
+			for(Tuple2<List<byte[]>, Transaction> item: this.getValues())
 			{
 				//CHECK IF DEADLINE PASSED
-				if(transaction.getDeadline() < NTP.getTime())
+				if(item.b.getDeadline() < NTP.getTime())
 				{
-					this.delete(transaction.getSignature());
+					this.delete(item.b.getSignature());
 					
 					//NOTIFY
-					/*this.setChanged();
-					this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_TRANSACTION_TYPE, transaction));*/
+					this.setChanged();
+					this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_TRANSACTION_TYPE, item));
 				}
 			}
 		}
 	}
 
 	public void add(Transaction transaction) {
-		this.set(transaction.getSignature(), transaction);
+		
+		Tuple2<List<byte[]>, Transaction> item = new Tuple2<List<byte[]>, Transaction>(new ArrayList<byte[]>(), transaction);
+		this.set(transaction.getSignature(), item);
+		
 	}
 
-	public List<Transaction> getTransactions() {
-		return new ArrayList<Transaction>(this.getValues());
+	// ADD broadcasted PEER
+	public void addBroadcastedPeer(Transaction transaction, byte[] newPeer) {
+		
+		Tuple2<List<byte[]>, Transaction> item = this.get(transaction.getSignature());
+		for (byte[] peer: item.a) {
+			if (Arrays.equals(peer, newPeer))
+				return;
+		}
+
+		if (item.a.add(newPeer)) {
+			Tuple2<List<byte[]>, Transaction>newItem = new Tuple2<List<byte[]>, Transaction>(item.a, item.b); 
+			this.set(item.b.getSignature(), newItem);
+		}
+	}
+
+	public List<Tuple2<List<byte[]>, Transaction>> getTransactions() {
+		return new ArrayList<Tuple2<List<byte[]>, Transaction>>(this.getValues());
 	}
 
 	public void delete(Transaction transaction) {
-		this.delete(transaction.getSignature());		
+		this.delete(transaction.getSignature());
 	}
 
 	public boolean contains(Transaction transaction) {

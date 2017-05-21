@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import controller.Controller;
 import core.BlockChain;
+import core.transaction.Transaction;
 import lang.Lang;
 import network.message.FindMyselfMessage;
 import network.message.Message;
@@ -83,6 +84,9 @@ public class Network extends Observable implements ConnectionCallback {
 		//PASS TO CONTROLLER
 		Controller.getInstance().onConnect(peer);
 		
+		if(Controller.getInstance().isOnStopping())
+			return;
+
 		//NOTIFY OBSERVERS
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, peer));		
@@ -372,7 +376,38 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
 	}
+
+	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) 
+	{		
+		
+		try
+		{
+				
+			for (Transaction transaction: transactions) {
+				Message message = MessageFactory.getInstance()
+						.createTransactionMessage(transaction);
 	
+				if (!this.run)
+					return;
+				
+				if (!peer.isUsed()) {
+					continue;
+				}
+				
+				if (peer.sendMessage(message)) {
+					
+				}
+			}
+		}
+		catch(Exception e)
+		{
+			//error broadcasting
+			//LOGGER.error(e.getMessage(),e);
+		}
+		
+		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
+	}
+
 	@Override
 	public void addObserver(Observer o)
 	{

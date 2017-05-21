@@ -139,9 +139,9 @@ public class BlockGenerator extends Thread implements Observer
 		db.getTransactionMap().add(transaction);
 	}
 	
-	public List<Transaction> getUnconfirmedTransactions()
+	public List<Tuple2<List<byte[]>, Transaction>> getUnconfirmedTransactions()
 	{
-		return new ArrayList<Transaction>(DBSet.getInstance().getTransactionMap().getValues());
+		return new ArrayList<Tuple2<List<byte[]>, Transaction>>(DBSet.getInstance().getTransactionMap().getValues());
 	}
 	
 	private List<PrivateKeyAccount> getKnownAccounts()
@@ -519,7 +519,7 @@ public class BlockGenerator extends Thread implements Observer
 		DBSet newBlockDb = db.fork();
 					
 		//ORDER TRANSACTIONS BY FEE PER BYTE
-		List<Transaction> orderedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
+		List<Tuple2<List<byte[]>, Transaction>> orderedTransactions = new ArrayList<Tuple2<List<byte[]>, Transaction>>(db.getTransactionMap().getValues());
 		
 		Collections.sort(orderedTransactions, new TransactionFeeComparator());
 		
@@ -531,8 +531,11 @@ public class BlockGenerator extends Thread implements Observer
 		{
 			transactionProcessed = false;
 						
-			for(Transaction transaction: orderedTransactions)
+			for(Tuple2<List<byte[]>, Transaction> item: orderedTransactions)
 			{
+				
+				Transaction transaction = item.b;
+				
 				//CHECK TRANSACTION TIMESTAMP AND DEADLINE
 				if(transaction.getTimestamp() <= timestamp && transaction.getDeadline() > timestamp)
 				{

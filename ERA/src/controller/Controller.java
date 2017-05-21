@@ -793,7 +793,7 @@ public class Controller extends Observable {
 		
 	public void onConnect(Peer peer) {
 
-		if(this.dbSet.isStoped())
+		if(this.isStopping)
 			return;
 		
 		// SEND FOUNDMYSELF MESSAGE
@@ -868,6 +868,9 @@ public class Controller extends Observable {
 			peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock));
 		}
 
+		if (this.isStopping)
+			return;
+		
 		if (this.status == STATUS_NO_CONNECTIONS) {
 			// UPDATE STATUS
 			this.status = STATUS_OK;
@@ -2094,7 +2097,7 @@ public class Controller extends Observable {
 	}
 
 	
-	public List<Transaction> getUnconfirmedTransactions() {
+	public List<Tuple2<List<byte[]>, Transaction>> getUnconfirmedTransactions() {
 		return this.blockGenerator.getUnconfirmedTransactions();
 	}
 
