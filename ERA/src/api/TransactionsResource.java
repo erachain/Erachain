@@ -178,13 +178,13 @@ public class TransactionsResource {
 	@Path("/network")
 	public String getNetworkTransactions()
 	{
-		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		JSONArray array = new JSONArray();
 		
-		for(Tuple2<List<byte[]>, Transaction> transaction: transactions)
+		for(Transaction transaction: transactions)
 		{
 			//JSONArray peersList = new JSONArray<List<byte[]>>(transaction.a);
-			array.add(transaction.b.toJson());
+			array.add(transaction.toJson());
 		}
 		
 		return array.toJSONString();
@@ -195,13 +195,13 @@ public class TransactionsResource {
 	@Path("/unconfirmedof/{address}")
 	public String getNetworkTransactions(@PathParam("address") String address)
 	{
-		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		JSONArray array = new JSONArray();
 		
-		for(Tuple2<List<byte[]>, Transaction> transaction: transactions)
+		for(Transaction transaction: transactions)
 		{
-			if(transaction.b.getCreator().getAddress().equals(address))
-			array.add(transaction.b.toJson());
+			if(transaction.getCreator().getAddress().equals(address))
+			array.add(transaction.toJson());
 		}
 		
 		return array.toJSONString();

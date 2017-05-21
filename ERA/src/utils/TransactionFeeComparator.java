@@ -7,11 +7,11 @@ import org.mapdb.Fun.Tuple2;
 
 import core.transaction.Transaction;
 
-public class TransactionFeeComparator implements Comparator<Tuple2<List<byte[]>, Transaction>> {
+public class TransactionFeeComparator implements Comparator<Transaction> {
 	
 	@Override
-	public int compare(Tuple2<List<byte[]>, Transaction> one, Tuple2<List<byte[]>, Transaction> two) 
+	public int compare(Transaction one, Transaction two) 
 	{
-		return two.b.getFee().compareTo(one.b.getFee());
+		return two.getFee().compareTo(one.getFee());
 	}
 }

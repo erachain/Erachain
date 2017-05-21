@@ -104,14 +104,14 @@ public class TransactionCreator
 		this.lastBlock = Controller.getInstance().getLastBlock();
 			
 		//SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
-		List<Tuple2<List<byte[]>, Transaction>> transactions = DBSet.getInstance().getTransactionMap().getTransactions();
+		List<Transaction> transactions = DBSet.getInstance().getTransactionMap().getTransactions();
 		List<Transaction> accountTransactions = new ArrayList<Transaction>();
 			
-		for(Tuple2<List<byte[]>, Transaction> transaction: transactions)
+		for(Transaction transaction: transactions)
 		{
-			if(Controller.getInstance().getAccounts().contains(transaction.b.getCreator()))
+			if(Controller.getInstance().getAccounts().contains(transaction.getCreator()))
 			{
-				accountTransactions.add(transaction.b);
+				accountTransactions.add(transaction);
 			}
 		}
 			

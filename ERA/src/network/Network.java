@@ -19,6 +19,7 @@ import controller.Controller;
 import core.BlockChain;
 import core.transaction.Transaction;
 import database.DBSet;
+import database.TransactionMap;
 import lang.Lang;
 import network.message.FindMyselfMessage;
 import network.message.Message;
@@ -378,43 +379,34 @@ public class Network extends Observable implements ConnectionCallback {
 		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
 	}
 
-	public void broadcastUnconfirmedToPeer(List<Tuple2<List<byte[]>, Transaction>> transactions, Peer peer) 
+	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) 
 	{		
-		
-		try
-		{
-				
-			byte[] peerThis = peer.getAddress().getAddress();
-			for (Tuple2<List<byte[]>, Transaction> item: transactions) {
-	
-				if (!this.run || !peer.isUsed()) {
-					return;
-				}
-				
-				Message message = MessageFactory.getInstance()
-						.createTransactionMessage(item.b);
 
-				boolean isBroadcastedToThisPeer = false;
-				if (item.a !=null && !item.a.isEmpty()) {
-					for (byte[] peerItem: item.a ) {
-						if (Arrays.equals(peerItem, peerThis)) {
-							isBroadcastedToThisPeer = true;
-							break;
-						}					
-					}
-				}
-
-				if (isBroadcastedToThisPeer)
-					continue;
+		byte[] peerByte = peer.getAddress().getAddress();
+		DBSet dbSet = DBSet.getInstance();
+		TransactionMap dbMap = dbSet.getTransactionMap();
 				
-				if (peer.sendMessage(message)) {
-					DBSet.getInstance().getTransactionMap().addBroadcastedPeer(item.b, peerThis);
-				}
+		for (Transaction transaction: transactions) {
+
+			if (!this.run || !peer.isUsed()) {
+				return;
 			}
-		}
-		catch(Exception e)
-		{
-			LOGGER.error(e.getMessage(),e);
+							
+			Message message = MessageFactory.getInstance()
+					.createTransactionMessage(transaction);
+
+			if (dbMap.isBroadcastedToPeer(transaction, peerByte))
+				continue;
+			
+			try
+			{
+				if (peer.sendMessage(message)) {
+					dbMap.addBroadcastedPeer(transaction, peerByte);
+				}
+			} catch(Exception e)
+			{
+				LOGGER.error(e.getMessage(),e);
+			}
 		}
 		
 		LOGGER.info(Lang.getInstance().translate("Broadcasting end"));

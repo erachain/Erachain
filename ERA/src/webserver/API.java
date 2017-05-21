@@ -566,7 +566,7 @@ public class API {
 		
 		Controller cntrl = Controller.getInstance();
 
-		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		
 		DBSet db = DBSet.getInstance();
 		Long lastTimestamp = account.getLastReference();
@@ -574,19 +574,19 @@ public class API {
 		if(!(lastTimestamp == null)) 
 		{
 			signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-			transactions.add(new Tuple2<List<byte[]>, Transaction>(null, cntrl.getTransaction(signature)));
+			transactions.add(cntrl.getTransaction(signature));
 		}	
 		
-		for (Tuple2<List<byte[]>, Transaction> item: transactions)
+		for (Transaction item: transactions)
 		{
-			if (item.b.getCreator().equals(account))
+			if (item.getCreator().equals(account))
 			{
-				for (Tuple2<List<byte[]>, Transaction> item2 : transactions)
+				for (Transaction item2 : transactions)
 				{
-					if (item.b.getTimestamp() == item2.b.getReference()
-							& item.b.getCreator().getAddress().equals(item2.b.getCreator().getAddress())){
+					if (item.getTimestamp() == item2.getReference()
+							& item.getCreator().getAddress().equals(item2.getCreator().getAddress())){
 						// if same address and parent timestamp
-						isSomeoneReference.add(item.b.getSignature());
+						isSomeoneReference.add(item.getSignature());
 						break;
 					}
 				}
@@ -599,14 +599,14 @@ public class API {
 			return getAddressLastReference(address);
 		}
 		
-		for (Tuple2<List<byte[]>, Transaction> item : cntrl.getUnconfirmedTransactions())
+		for (Transaction item : cntrl.getUnconfirmedTransactions())
 		{
-			if (item.b.getCreator().equals(account))
+			if (item.getCreator().equals(account))
 			{
-				if(!isSomeoneReference.contains(item.b.getSignature()))
+				if(!isSomeoneReference.contains(item.getSignature()))
 				{
 					//return Base58.encode(tx.getSignature());
-					out =  ""+item.b.getTimestamp();
+					out =  ""+item.getTimestamp();
 					break;
 				}
 			}

@@ -356,6 +356,6 @@ public class BlockExplorerTest {
 		}
 		
 		// CHECK IF IN TRANSACTION DATABASE
-		return database.getTransactionMap().get(signature).b;
+		return database.getTransactionMap().get(signature);
 	}
 }

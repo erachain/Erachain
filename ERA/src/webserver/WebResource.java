@@ -275,14 +275,14 @@ public class WebResource {
 	@GET
 	public Response doDeleteUnconfirmedTxs() {
 		
-		 Collection<Tuple2<List<byte[]>, Transaction>> values = DBSet.getInstance().getTransactionMap().getValues();
+		 Collection<Transaction> values = DBSet.getInstance().getTransactionMap().getValues();
 		 
 		 List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
 		 
-		 for (Tuple2<List<byte[]>, Transaction> transaction : values) {
-			 if(privateKeyAccounts.contains(transaction.b.getCreator()))
+		 for (Transaction transaction : values) {
+			 if(privateKeyAccounts.contains(transaction.getCreator()))
 			 {
-				 DBSet.getInstance().getTransactionMap().delete(transaction.b);
+				 DBSet.getInstance().getTransactionMap().delete(transaction);
 			 }
 		}
 		 

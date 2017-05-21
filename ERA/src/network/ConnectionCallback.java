@@ -20,6 +20,6 @@ public interface ConnectionCallback {
 	Peer getKnownPeer(Peer peer);
 	void onMessage(Message message);
 	Peer startPeer(Socket socket);
-	void broadcastUnconfirmedToPeer(List<Tuple2<List<byte[]>, Transaction>> transactions, Peer peer);
+	void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer);
 	
 }

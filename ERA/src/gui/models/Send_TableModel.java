@@ -93,10 +93,10 @@ public class Send_TableModel extends JTable implements Observer{
 		
 		List<Transaction> transactions = new ArrayList<Transaction>();
 
-		for (Tuple2<List<byte[]>, Transaction> transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.b.getType() == Transaction.SEND_ASSET_TRANSACTION)
+		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
-				transactions.add(transaction.b);
+				transactions.add(transaction);
 			}
 		}
 		

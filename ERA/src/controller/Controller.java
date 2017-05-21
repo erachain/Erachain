@@ -1854,7 +1854,7 @@ public class Controller extends Observable {
 		
 		// CHECK IF IN TRANSACTION DATABASE
 		if (database.getTransactionMap().contains(signature)) {
-			return database.getTransactionMap().get(signature).b;
+			return database.getTransactionMap().get(signature);
 		}
 		return null;
 	}
@@ -2097,7 +2097,7 @@ public class Controller extends Observable {
 	}
 
 	
-	public List<Tuple2<List<byte[]>, Transaction>> getUnconfirmedTransactions() {
+	public List<Transaction> getUnconfirmedTransactions() {
 		return this.blockGenerator.getUnconfirmedTransactions();
 	}
 

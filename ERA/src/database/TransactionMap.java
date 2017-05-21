@@ -20,6 +20,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import core.payment.Payment;
 import core.transaction.Transaction;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
@@ -32,13 +33,14 @@ import network.Peer;
 // ++ seek by TIMESTAMP
 // тут надо запминать каким пирам мы уже разослали транзакцию неподтвержденную
 // так что бы при подключении делать автоматически broadcast
-public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transaction>> implements Observer
+public class TransactionMap extends DBMap<byte[],  Transaction> implements Observer
 {
 	public static final int TIMESTAMP_INDEX = 1;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	private Map<byte[]> peersBroadcasted = new Map<byte[]>();
-	
+	// PEERS for transaction signature
+	private Map<byte[], List<byte[]>> peersBroadcasted = new HashMap<byte[], List<byte[]>>();
+
 	public TransactionMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
@@ -66,16 +68,16 @@ public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transacti
 				.comparator(new ReverseComparator(comparator))
 				.makeOrGet();
 				
-		createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Long, byte[], Tuple2<List<byte[]>, Transaction>>() {
+		createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Long, byte[],  Transaction>() {
 		   	@Override
-		    public Long run(byte[] key, Tuple2<List<byte[]>, Transaction> value) {
-		   		return value.b.getTimestamp();
+		    public Long run(byte[] key,  Transaction value) {
+		   		return value.getTimestamp();
 		    }
 		});
 	}
 
 	@Override
-	protected Map<byte[], Tuple2<List<byte[]>, Transaction>> getMap(DB database) 
+	protected Map<byte[],  Transaction> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.createTreeMap("transactions")
@@ -87,13 +89,13 @@ public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transacti
 	}
 
 	@Override
-	protected Map<byte[], Tuple2<List<byte[]>, Transaction>> getMemoryMap() 
+	protected Map<byte[],  Transaction> getMemoryMap() 
 	{
-		return new TreeMap<byte[], Tuple2<List<byte[]>, Transaction>>(UnsignedBytes.lexicographicalComparator());
+		return new TreeMap<byte[],  Transaction>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override
-	protected Tuple2<List<byte[]>, Transaction> getDefaultValue() 
+	protected  Transaction getDefaultValue() 
 	{
 		return null;
 	}
@@ -113,12 +115,12 @@ public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transacti
 		if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE)
 		{			
 			//CLEAN UP
-			for(Tuple2<List<byte[]>, Transaction> item: this.getValues())
+			for( Transaction item: this.getValues())
 			{
 				//CHECK IF DEADLINE PASSED
-				if(item.b.getDeadline() < NTP.getTime())
+				if(item.getDeadline() < NTP.getTime())
 				{
-					this.delete(item.b.getSignature());
+					this.delete(item.getSignature());
 					
 					//NOTIFY
 					this.setChanged();
@@ -130,39 +132,71 @@ public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transacti
 
 	public void add(Transaction transaction) {
 		
-		Tuple2<List<byte[]>, Transaction> item = new Tuple2<List<byte[]>, Transaction>(new ArrayList<byte[]>(), transaction);
-		this.set(transaction.getSignature(), item);
+		this.set(transaction.getSignature(), transaction);
 		
 	}
 
 	// ADD broadcasted PEER
-	public void addBroadcastedPeer(Transaction transaction, byte[] newPeer) {
+	public void addBroadcastedPeer(Transaction transaction, byte[] peer) {
 		
-		Tuple2<List<byte[]>, Transaction> item = this.get(transaction.getSignature());
-		for (byte[] peer: item.a) {
-			if (Arrays.equals(peer, newPeer))
-				return;
+		byte[] signature = transaction.getSignature();
+		
+		List<byte[]> peers;
+		if (!this.peersBroadcasted.containsKey(signature)) {
+			peers = new ArrayList<byte[]>();
+		} else {		
+			peers = this.peersBroadcasted.get(signature);
+			if (peers == null)
+				peers = new ArrayList<byte[]>();
 		}
 
-		if (item.a.add(newPeer)) {
-			Tuple2<List<byte[]>, Transaction>newItem = new Tuple2<List<byte[]>, Transaction>(item.a, item.b); 
-			this.set(item.b.getSignature(), newItem);
-		}
+		if (peers.add(peer))
+			this.peersBroadcasted.put(signature, peers);
 	}
 
-	public List<Tuple2<List<byte[]>, Transaction>> getTransactions() {
-		return new ArrayList<Tuple2<List<byte[]>, Transaction>>(this.getValues());
+	public List< Transaction> getTransactions() {
+		return new ArrayList< Transaction>(this.getValues());
 	}
 
 	// HOW many PEERS broadcasted by this TRANSACTION
 	public int getBroadcasts(Transaction transaction) {
-		Tuple2<List<byte[]>, Transaction> item = this.get(transaction.getSignature());
-		if (item.a == null)
-			return 0;
 		
-		return item.a.size();
+		byte[] signature = transaction.getSignature();
+		if (!this.peersBroadcasted.containsKey(signature)) {
+			return 0;
+		} else {		
+			List<byte[]> peers = this.peersBroadcasted.get(signature);
+			if (peers == null || peers.isEmpty())
+				return 0;
+			
+			return peers.size();
+		}
+		
 	}
-	
+
+	// HOW many PEERS broadcasted by this TRANSACTION
+	public List<byte[]> getBroadcastedPeers(Transaction transaction) {
+		
+		byte[] signature = transaction.getSignature();
+		if (!this.peersBroadcasted.containsKey(signature)) {
+			return new ArrayList<byte[]>();
+		} else {		
+			return this.peersBroadcasted.get(signature);
+		}
+		
+	}
+
+	// is this TRANSACTION is broadcasted to this PEER 
+	public boolean isBroadcastedToPeer(Transaction transaction, byte[] peer) {
+		
+		byte[] signature = transaction.getSignature();
+		if (!this.peersBroadcasted.containsKey(signature)) {
+			return false;
+		} else {	
+			return this.peersBroadcasted.get(signature).contains(peer);
+		}
+		
+	}
 	
 	public void delete(Transaction transaction) {
 		this.delete(transaction.getSignature());

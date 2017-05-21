@@ -1213,12 +1213,12 @@ public class Block {
 		}
 
 		//DELETE CONFIRMED TRANSACTIONS FROM UNCONFIRMED TRANSACTIONS LIST
-		List<Tuple2<List<byte[]>, Transaction>> unconfirmedTransactions = new ArrayList<Tuple2<List<byte[]>, Transaction>>(dbSet.getTransactionMap().getValues());
-		for(Tuple2<List<byte[]>, Transaction> transaction: unconfirmedTransactions)
+		List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>(dbSet.getTransactionMap().getValues());
+		for(Transaction transaction: unconfirmedTransactions)
 		{
-			if(dbSet.getTransactionRef_BlockRef_Map().contains(transaction.b.getSignature()))
+			if(dbSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature()))
 			{
-				dbSet.getTransactionMap().delete(transaction.b);
+				dbSet.getTransactionMap().delete(transaction);
 			}
 		}
 

@@ -229,7 +229,7 @@ public class Peer extends Thread{
 			this.runed = true;
 			
 			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
+			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 			if (transactions != null && !transactions.isEmpty())
 				this.callback.broadcastUnconfirmedToPeer(transactions, this);
 
