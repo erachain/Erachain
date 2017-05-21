@@ -4,11 +4,14 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
+
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -155,9 +158,9 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 					.getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
 		}
 
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-				all_transactions.add(transaction);
+		for (Tuple2<List<byte[]>, Transaction> transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+			if (transaction.b.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+				all_transactions.add(transaction.b);
 			}
 		}
 		

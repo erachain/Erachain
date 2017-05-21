@@ -4056,7 +4056,7 @@ if ( asset_1 == null) {
 	public Map jsonQueryUnconfirmedTXs()
 	{
 		Map output=new LinkedHashMap();
-		List<Transaction> all = new ArrayList<Transaction>();
+		List<Tuple2<List<byte[]>, Transaction>> all = new ArrayList<Tuple2<List<byte[]>, Transaction>>();
 
 		AssetNames assetNames = new AssetNames();
 

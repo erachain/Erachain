@@ -4,6 +4,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.List;
 
+import org.mapdb.Fun.Tuple2;
+
 import core.transaction.Transaction;
 import network.message.Message;
 
@@ -18,6 +20,6 @@ public interface ConnectionCallback {
 	Peer getKnownPeer(Peer peer);
 	void onMessage(Message message);
 	Peer startPeer(Socket socket);
-	void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer);
+	void broadcastUnconfirmedToPeer(List<Tuple2<List<byte[]>, Transaction>> transactions, Peer peer);
 	
 }

@@ -151,6 +151,16 @@ public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transacti
 		return new ArrayList<Tuple2<List<byte[]>, Transaction>>(this.getValues());
 	}
 
+	// HOW many PEERS broadcasted by this TRANSACTION
+	public int getBroadcasts(Transaction transaction) {
+		Tuple2<List<byte[]>, Transaction> item = this.get(transaction.getSignature());
+		if (item.a == null)
+			return 0;
+		
+		return item.a.size();
+	}
+	
+	
 	public void delete(Transaction transaction) {
 		this.delete(transaction.getSignature());
 	}

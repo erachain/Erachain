@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -177,12 +178,13 @@ public class TransactionsResource {
 	@Path("/network")
 	public String getNetworkTransactions()
 	{
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		JSONArray array = new JSONArray();
 		
-		for(Transaction transaction: transactions)
+		for(Tuple2<List<byte[]>, Transaction> transaction: transactions)
 		{
-			array.add(transaction.toJson());
+			//JSONArray peersList = new JSONArray<List<byte[]>>(transaction.a);
+			array.add(transaction.b.toJson());
 		}
 		
 		return array.toJSONString();
@@ -193,13 +195,13 @@ public class TransactionsResource {
 	@Path("/unconfirmedof/{address}")
 	public String getNetworkTransactions(@PathParam("address") String address)
 	{
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		JSONArray array = new JSONArray();
 		
-		for(Transaction transaction: transactions)
+		for(Tuple2<List<byte[]>, Transaction> transaction: transactions)
 		{
-			if(transaction.getCreator().getAddress().equals(address))
-			array.add(transaction.toJson());
+			if(transaction.b.getCreator().getAddress().equals(address))
+			array.add(transaction.b.toJson());
 		}
 		
 		return array.toJSONString();

@@ -36,6 +36,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -95,10 +96,10 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		
 		 transactions = new ArrayList<Transaction>();
 
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
+		for (Tuple2<List<byte[]>, Transaction> transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+			if(transaction.b.getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
-				transactions.add(transaction);
+				transactions.add(transaction.b.getConfirmations(db));
 			}
 		}
 		

@@ -13,11 +13,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 // import org.apache.log4j.Logger;
 import org.apache.log4j.Logger;
-
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
 import core.transaction.Transaction;
+import database.DBSet;
 import lang.Lang;
 import network.message.FindMyselfMessage;
 import network.message.Message;
@@ -377,15 +378,13 @@ public class Network extends Observable implements ConnectionCallback {
 		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
 	}
 
-	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) 
+	public void broadcastUnconfirmedToPeer(List<Tuple2<List<byte[]>, Transaction>> transactions, Peer peer) 
 	{		
 		
 		try
 		{
 				
-			for (Transaction transaction: transactions) {
-				Message message = MessageFactory.getInstance()
-						.createTransactionMessage(transaction);
+			for (Tuple2<List<byte[]>, Transaction> item: transactions) {
 	
 				if (!this.run)
 					return;
@@ -394,8 +393,22 @@ public class Network extends Observable implements ConnectionCallback {
 					continue;
 				}
 				
+				Message message = MessageFactory.getInstance()
+						.createTransactionMessage(item.b);
+
+				boolean isBroadcastedToThisPeer = false;
+				for (byte[] peerByte: item.a ) {
+					if (Arrays.equals(peerByte, peer.getAddress().getAddress())) {
+						isBroadcastedToThisPeer = true;
+						break;
+					}					
+				}
+
+				if (isBroadcastedToThisPeer)
+					continue;
+				
 				if (peer.sendMessage(message)) {
-					
+					DBSet.getInstance().getTransactionMap().addBroadcastedPeer(item, newPeer);
 				}
 			}
 		}

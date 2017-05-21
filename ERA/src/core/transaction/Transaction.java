@@ -652,7 +652,7 @@ public abstract class Transaction {
 			// soft or hard confirmations
 			key = db.getTransactionFinalMapSigns().get(dbRef);
 			if (key == null) {
-				return db.getTransactionMap().get(dbRef);
+				return db.getTransactionMap().get(dbRef).b;
 			}
 		} else {
 			int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
@@ -1069,10 +1069,10 @@ public abstract class Transaction {
 		
 		try
 		{
-		//CHECK IF IN TRANSACTIONDATABASE
+		//CHECK IF IN UNCONFIRMED TRANSACTION
 		if(db.getTransactionMap().contains(this))
 		{
-			return 0;
+			return -db.getTransactionMap().getBroadcasts(this);
 		}
 		
 		//CALCULATE CONFIRMATIONS

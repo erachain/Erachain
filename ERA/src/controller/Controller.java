@@ -1854,7 +1854,7 @@ public class Controller extends Observable {
 		
 		// CHECK IF IN TRANSACTION DATABASE
 		if (database.getTransactionMap().contains(signature)) {
-		return database.getTransactionMap().get(signature);
+			return database.getTransactionMap().get(signature).b;
 		}
 		return null;
 	}

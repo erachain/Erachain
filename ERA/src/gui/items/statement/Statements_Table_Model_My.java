@@ -11,6 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
@@ -218,10 +219,10 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		tran = new ArrayList<Transaction>();
 		transactions.clear();
 		// база данных	
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
+		for (Tuple2<List<byte[]>, Transaction> transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+			if(transaction.b.getType() == Transaction.SIGN_NOTE_TRANSACTION)
 			{
-				transactions.add(transaction);
+				transactions.add(transaction.b);
 			}
 		}
 		

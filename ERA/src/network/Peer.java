@@ -14,6 +14,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
  import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.transaction.Transaction;
@@ -228,7 +229,7 @@ public class Peer extends Thread{
 			this.runed = true;
 			
 			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+			List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
 			if (transactions != null && !transactions.isEmpty())
 				this.callback.broadcastUnconfirmedToPeer(transactions, this);
 

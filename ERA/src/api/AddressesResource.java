@@ -112,7 +112,7 @@ public class AddressesResource {
 		
 		Controller cntrl = Controller.getInstance();
 
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		
 		DBSet db = DBSet.getInstance();
 		Long lastTimestamp = account.getLastReference();
@@ -120,19 +120,19 @@ public class AddressesResource {
 		if(!(lastTimestamp == null)) 
 		{
 			signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-			transactions.add(cntrl.getTransaction(signature));
+			transactions.add(new Tuple2<List<byte[]>, Transaction>(null, cntrl.getTransaction(signature)));
 		}	
 		
-		for (Transaction tx : transactions)
+		for (Tuple2<List<byte[]>, Transaction> tx : transactions)
 		{
-			if (tx.getCreator().equals(account))
+			if (tx.b.getCreator().equals(account))
 			{
-				for (Transaction tx2 : transactions)
+				for (Tuple2<List<byte[]>, Transaction> tx2 : transactions)
 				{
-					if (tx.getTimestamp() == tx2.getReference()
-							& tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())){
+					if (tx.b.getTimestamp() == tx2.b.getReference()
+							& tx.b.getCreator().getAddress().equals(tx2.b.getCreator().getAddress())){
 						// if same address and parent timestamp
-						isSomeoneReference.add(tx.getSignature());
+						isSomeoneReference.add(tx.b.getSignature());
 						break;
 					}
 				}
@@ -144,14 +144,14 @@ public class AddressesResource {
 			return getLastReference(address);
 		}
 		
-		for (Transaction tx : cntrl.getUnconfirmedTransactions())
+		for (Tuple2<List<byte[]>, Transaction> tx : cntrl.getUnconfirmedTransactions())
 		{
-			if (tx.getCreator().equals(account))
+			if (tx.b.getCreator().equals(account))
 			{
-				if(!isSomeoneReference.contains(tx.getSignature()))
+				if(!isSomeoneReference.contains(tx.b.getSignature()))
 				{
 					//return Base58.encode(tx.getSignature());
-					return ""+tx.getTimestamp();
+					return ""+tx.b.getTimestamp();
 				}
 			}
 		}
