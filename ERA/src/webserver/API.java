@@ -566,7 +566,7 @@ public class API {
 		
 		Controller cntrl = Controller.getInstance();
 
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Tuple2<List<byte[]>, Transaction>> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		
 		DBSet db = DBSet.getInstance();
 		Long lastTimestamp = account.getLastReference();
@@ -574,19 +574,19 @@ public class API {
 		if(!(lastTimestamp == null)) 
 		{
 			signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-			transactions.add(cntrl.getTransaction(signature));
+			transactions.add(new Tuple2<List<byte[]>, Transaction>(null, cntrl.getTransaction(signature)));
 		}	
 		
-		for (Transaction tx : transactions)
+		for (Tuple2<List<byte[]>, Transaction> item: transactions)
 		{
-			if (tx.getCreator().equals(account))
+			if (item.b.getCreator().equals(account))
 			{
-				for (Transaction tx2 : transactions)
+				for (Tuple2<List<byte[]>, Transaction> item2 : transactions)
 				{
-					if (tx.getTimestamp() == tx2.getReference()
-							& tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())){
+					if (item.b.getTimestamp() == item2.b.getReference()
+							& item.b.getCreator().getAddress().equals(item2.b.getCreator().getAddress())){
 						// if same address and parent timestamp
-						isSomeoneReference.add(tx.getSignature());
+						isSomeoneReference.add(item.b.getSignature());
 						break;
 					}
 				}
@@ -599,14 +599,14 @@ public class API {
 			return getAddressLastReference(address);
 		}
 		
-		for (Transaction tx : cntrl.getUnconfirmedTransactions())
+		for (Tuple2<List<byte[]>, Transaction> item : cntrl.getUnconfirmedTransactions())
 		{
-			if (tx.getCreator().equals(account))
+			if (item.b.getCreator().equals(account))
 			{
-				if(!isSomeoneReference.contains(tx.getSignature()))
+				if(!isSomeoneReference.contains(item.b.getSignature()))
 				{
 					//return Base58.encode(tx.getSignature());
-					out =  ""+tx.getTimestamp();
+					out =  ""+item.b.getTimestamp();
 					break;
 				}
 			}

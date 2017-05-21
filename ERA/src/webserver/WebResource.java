@@ -51,6 +51,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.mapdb.Fun.Tuple2;
 
 import com.google.common.base.Charsets;
 import com.mitchellbosecke.pebble.error.PebbleException;
@@ -274,14 +275,14 @@ public class WebResource {
 	@GET
 	public Response doDeleteUnconfirmedTxs() {
 		
-		 Collection<Transaction> values = DBSet.getInstance().getTransactionMap().getValues();
+		 Collection<Tuple2<List<byte[]>, Transaction>> values = DBSet.getInstance().getTransactionMap().getValues();
 		 
 		 List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
 		 
-		 for (Transaction transaction : values) {
-			 if(privateKeyAccounts.contains(transaction.getCreator()))
+		 for (Tuple2<List<byte[]>, Transaction> transaction : values) {
+			 if(privateKeyAccounts.contains(transaction.b.getCreator()))
 			 {
-				 DBSet.getInstance().getTransactionMap().delete(transaction);
+				 DBSet.getInstance().getTransactionMap().delete(transaction.b);
 			 }
 		}
 		 

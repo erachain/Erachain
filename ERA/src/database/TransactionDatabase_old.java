@@ -20,16 +20,16 @@ import core.transaction.TransactionFactory;
 import utils.ObserverMessage;
 import utils.TransactionsList;
 
-public class TransactionDatabase extends Observable implements Observer {
+public class TransactionDatabase_old extends Observable implements Observer {
 	
-	private TransactionDatabase parent;
+	private TransactionDatabase_old parent;
 	private DBSet databaseSet;	
 	private Map<byte[], byte[]> transactionMap;	
 	
-	static Logger LOGGER = Logger.getLogger(TransactionDatabase.class.getName());
+	static Logger LOGGER = Logger.getLogger(TransactionDatabase_old.class.getName());
 
 	
-	public TransactionDatabase(DBSet databaseSet, DB database)
+	public TransactionDatabase_old(DBSet databaseSet, DB database)
 	{
 		this.databaseSet = databaseSet;
 		
@@ -40,7 +40,7 @@ public class TransactionDatabase extends Observable implements Observer {
 			.makeOrGet();
 	}
 	
-	public TransactionDatabase(TransactionDatabase parent)
+	public TransactionDatabase_old(TransactionDatabase_old parent)
 	{
 		this.parent = parent;
 	    

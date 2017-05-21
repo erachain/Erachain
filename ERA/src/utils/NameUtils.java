@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 
 import api.ApiErrorFactory;
 import controller.Controller;
@@ -96,6 +97,7 @@ public class NameUtils {
 		return getWebsitesbyValueInternal(null);
 	}
 
+	/*
 	@SuppressWarnings("unchecked")
 	public static JSONObject getJsonForNameOpt(Name name) {
 
@@ -151,7 +153,7 @@ public class NameUtils {
 	}
 
 	public static List<Transaction> getOwnUnconfirmedTX() {
-		List<Transaction> transactions = DBSet.getInstance()
+		List<Tuple2<List<byte[]>, Transaction>> transactions = DBSet.getInstance()
 				.getTransactionMap().getTransactions();
 		List<Transaction> accountTransactions = new ArrayList<Transaction>();
 
@@ -171,6 +173,7 @@ public class NameUtils {
 		Collections.reverse(accountTransactions);
 		return accountTransactions;
 	}
+	*/
 
 	public static List<Pair<String, String>> getWebsitesbyValueInternal(
 			String searchValueOpt) {

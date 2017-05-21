@@ -25,7 +25,8 @@ public class TransactionsList extends AbstractList<Transaction>
 	{
 		if(!this.transactions.containsKey(this.transactionSignatures.get(index)))
 		{
-			this.transactions.put(this.transactionSignatures.get(index), DBSet.getInstance().getTransactionMap().get(this.transactionSignatures.get(index)));
+			this.transactions.put(this.transactionSignatures.get(index), DBSet.getInstance().getTransactionMap()
+					.get(this.transactionSignatures.get(index)).b);
 		}
 		
 		return this.transactions.get(this.transactionSignatures.get(index));

@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.mapdb.Fun.Tuple2;
+
 import com.google.common.primitives.Bytes;
 
 import controller.Controller;
@@ -102,14 +104,14 @@ public class TransactionCreator
 		this.lastBlock = Controller.getInstance().getLastBlock();
 			
 		//SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
-		List<Transaction> transactions = DBSet.getInstance().getTransactionMap().getTransactions();
+		List<Tuple2<List<byte[]>, Transaction>> transactions = DBSet.getInstance().getTransactionMap().getTransactions();
 		List<Transaction> accountTransactions = new ArrayList<Transaction>();
 			
-		for(Transaction transaction: transactions)
+		for(Tuple2<List<byte[]>, Transaction> transaction: transactions)
 		{
-			if(Controller.getInstance().getAccounts().contains(transaction.getCreator()))
+			if(Controller.getInstance().getAccounts().contains(transaction.b.getCreator()))
 			{
-				accountTransactions.add(transaction);
+				accountTransactions.add(transaction.b);
 			}
 		}
 			

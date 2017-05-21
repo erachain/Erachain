@@ -79,6 +79,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	int fontHeight;
 	List<Transaction> transactions;
 	
+	DBSet dbSet = DBSet.getInstance();
+	
 	public Account_Transactions_Table()
 	{
 		this.setShowGrid(false);
@@ -94,19 +96,19 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		topRenderer.setVerticalAlignment(DefaultTableCellRenderer.TOP);
 		this.getColumn("").setCellRenderer( topRenderer );
 		
-		 transactions = new ArrayList<Transaction>();
+		transactions = new ArrayList<Transaction>();
 
 		for (Tuple2<List<byte[]>, Transaction> transaction : Controller.getInstance().getUnconfirmedTransactions()) {
 			if(transaction.b.getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
-				transactions.add(transaction.b.getConfirmations(db));
+				transactions.add(transaction.b);
 			}
 		}
 		
 		
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+			transactions.addAll(dbSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		}
 		
 		for (Transaction messagetx : transactions) {
@@ -313,8 +315,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		messageBufs.clear();	
 		transactions.clear();
 		if (account != null) 	{
-		transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.GENESIS_SEND_ASSET_TRANSACTION, 0));
-		transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+		transactions.addAll(dbSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.GENESIS_SEND_ASSET_TRANSACTION, 0));
+		transactions.addAll(dbSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		
 		
 		}
@@ -781,7 +783,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		public int getConfirmations()
 		{
 			
-			if( DBSet.getInstance().getTransactionMap().contains(this.signature) )
+			if( dbSet.getTransactionMap().contains(this.signature) )
 			{
 				return 0;
 			}
@@ -790,7 +792,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				Transaction tx = Controller.getInstance().getTransaction(this.signature);
 				if(tx != null)
 				{
-					return tx.getConfirmations(DBSet.getInstance());	
+					return tx.getConfirmations(dbSet);	
 				}
 				else
 				{
@@ -908,7 +910,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				amountStr = /*"<font" + fontSize + ">" +send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "
 						+  */ NumberAsString.getInstance().numberAsString(this.amount) /*+ "</font>"
-						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance())*/;
+						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(dbSet)*/;
 			}
 			
 		if(sender == null)	{
@@ -921,7 +923,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Genesis Block")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=green><b> " + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(dbSet)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" // +   this.recipient.asPerson()
 					
 					
@@ -953,7 +955,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Sent")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(DBSet.getInstance())
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(dbSet)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.getPersonAsString()
 					
 					

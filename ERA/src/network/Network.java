@@ -384,41 +384,40 @@ public class Network extends Observable implements ConnectionCallback {
 		try
 		{
 				
+			byte[] peerThis = peer.getAddress().getAddress();
 			for (Tuple2<List<byte[]>, Transaction> item: transactions) {
 	
-				if (!this.run)
+				if (!this.run || !peer.isUsed()) {
 					return;
-				
-				if (!peer.isUsed()) {
-					continue;
 				}
 				
 				Message message = MessageFactory.getInstance()
 						.createTransactionMessage(item.b);
 
 				boolean isBroadcastedToThisPeer = false;
-				for (byte[] peerByte: item.a ) {
-					if (Arrays.equals(peerByte, peer.getAddress().getAddress())) {
-						isBroadcastedToThisPeer = true;
-						break;
-					}					
+				if (item.a !=null && !item.a.isEmpty()) {
+					for (byte[] peerItem: item.a ) {
+						if (Arrays.equals(peerItem, peerThis)) {
+							isBroadcastedToThisPeer = true;
+							break;
+						}					
+					}
 				}
 
 				if (isBroadcastedToThisPeer)
 					continue;
 				
 				if (peer.sendMessage(message)) {
-					DBSet.getInstance().getTransactionMap().addBroadcastedPeer(item, newPeer);
+					DBSet.getInstance().getTransactionMap().addBroadcastedPeer(item.b, peerThis);
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			//error broadcasting
-			//LOGGER.error(e.getMessage(),e);
+			LOGGER.error(e.getMessage(),e);
 		}
 		
-		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
+		LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
 	}
 
 	@Override
