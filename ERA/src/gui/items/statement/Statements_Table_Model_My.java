@@ -219,10 +219,10 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		tran = new ArrayList<Transaction>();
 		transactions.clear();
 		// база данных	
-		for (Tuple2<List<byte[]>, Transaction> transaction : Controller.getInstance().getUnconfirmedTransactions()) {
-			if(transaction.b.getType() == Transaction.SIGN_NOTE_TRANSACTION)
+		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+			if(transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
 			{
-				transactions.add(transaction.b);
+				transactions.add(transaction);
 			}
 		}
 		
