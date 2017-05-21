@@ -546,26 +546,19 @@ public class Account_Send_Panel extends JPanel
 	{
 		String toValue = txtTo.getText();
 		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
-		
-		if(toValue.isEmpty())
+
+		if(toValue == null || toValue.isEmpty())
 		{
 			txtRecDetails.setText("");
 			return;
 		}
+		
 		if (txtTo.getText().equals("has no Accounts")){
 			txtRecDetails.setText(person.getName() + " " + Lang.getInstance().translate("has no Accounts"));
 			return;
 		}
-		
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
-			txtRecDetails.setText(Lang.getInstance().translate("Status must be OK to show receiver details."));
-			return;
-		}
-		
+				
 		//READ RECIPIENT
-		
-		
 		
 		Tuple2<Account, String> resultAccount = Account.tryMakeAccount(txtTo.getText());
 		Account account = resultAccount.a;

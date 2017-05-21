@@ -40,6 +40,7 @@ import core.blockexplorer.BlockExplorer.BigDecimalComparator;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
@@ -574,7 +575,11 @@ public class Account {
 			personStr = personChar(personRes) + personRes.b.getShort();
 			addressStr = this.getAddress().substring(0, 8);
 		}
-		return NumberAsString.getInstance().numberAsString(this.getBalanceUSE(key))
+		
+		boolean statusBad = Controller.getInstance().getStatus() != Controller.STATUS_OK;
+
+		return (statusBad?"??? ":"")
+				+ NumberAsString.getInstance().numberAsString(this.getBalanceUSE(key))
 				+ " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
 				+ " " + addressStr + " " + personStr;
 	}
@@ -618,6 +623,49 @@ public class Account {
 		}
 	}
 
+	public static String getDetails(String toValue, AssetCls asset) {
+
+		String out = "";
+		
+		if(toValue.isEmpty())
+		{
+			return out;
+		}
+
+		boolean statusBad = Controller.getInstance().getStatus() != Controller.STATUS_OK;
+		
+		Account account = null;
+		
+		//CHECK IF RECIPIENT IS VALID ADDRESS
+		if(!Crypto.getInstance().isValidAddress(toValue))
+		{
+			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
+					
+			if(nameToAdress.getB() == NameResult.OK)
+			{
+				account = nameToAdress.getA();
+				return (statusBad?"??? ":"") + account.toString(asset.getKey());
+			}
+			else
+			{
+				return (statusBad?"??? ":"") + nameToAdress.getB().getShortStatusMessage();
+			}
+		} else
+		{
+			account = new Account(toValue);
+			
+			
+			if(account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
+					&& account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0)
+			{
+				return Lang.getInstance().translate("Warning!") + " "
+						+ (statusBad?"???":"") + account.toString(asset.getKey());
+			} else {
+				return (statusBad?"???":"") + account.toString(asset.getKey());
+			}
+		}
+		
+	}
 	@Override
 	public int hashCode()
 	{

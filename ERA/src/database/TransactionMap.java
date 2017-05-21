@@ -30,11 +30,14 @@ import network.Peer;
 // memory pool for unconfirmed transaction
 // tx.signature -> <<broadcasted peers>, transaction>
 // ++ seek by TIMESTAMP
+// тут надо запминать каким пирам мы уже разослали транзакцию неподтвержденную
+// так что бы при подключении делать автоматически broadcast
 public class TransactionMap extends DBMap<byte[], Tuple2<List<byte[]>, Transaction>> implements Observer
 {
 	public static final int TIMESTAMP_INDEX = 1;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+	private Map<byte[]> peersBroadcasted = new Map<byte[]>();
 	
 	public TransactionMap(DBSet databaseSet, DB database)
 	{

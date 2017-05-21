@@ -505,48 +505,9 @@ public class Send_Panel extends JPanel
 		String toValue = txtTo.getText();
 		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
 		
-		if(toValue.isEmpty())
-		{
-			txtRecDetails.setText("");
-			return;
-		}
+		txtRecDetails.setText(Account.getDetails(toValue, asset));
 		
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
-			txtRecDetails.setText(Lang.getInstance().translate("Status must be OK to show receiver details."));
-			return;
-		}
-		
-		Account account = null;
-		
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(toValue))
-		{
-			Pair<Account, NameResult> nameToAdress = NameUtils.nameToAdress(toValue);
-					
-			if(nameToAdress.getB() == NameResult.OK)
-			{
-				account = nameToAdress.getA();
-				txtRecDetails.setText(account.toString(asset.getKey()));
-			}
-			else
-			{
-				txtRecDetails.setText(nameToAdress.getB().getShortStatusMessage());
-			}
-		} else
-		{
-			account = new Account(toValue);
-			
-			txtRecDetails.setText(account.toString(asset.getKey()));
-			
-			if(account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
-					&& account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0)
-			{
-				txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
-			}
-		}
-		
-		if(false && account!=null && account.getAddress().startsWith(wrongFirstCharOfAddress))
+		if(false && toValue!=null && toValue.startsWith(wrongFirstCharOfAddress))
 		{
 			encrypted.setEnabled(false);
 			encrypted.setSelected(false);
