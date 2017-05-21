@@ -2,13 +2,22 @@ package gui.items.assets;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.Image;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -26,10 +35,14 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
+import org.apache.commons.net.util.Base64;
+
+import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.persons.Person_Work_Dialog;
+import gui.library.HyperLinkAccount;
 import gui.library.MTable;
 import gui.library.M_Accoutn_Text_Field;
 import gui.library.Voush_Library_Panel;
@@ -44,6 +57,8 @@ public class Asset_Detail_Panel_003 extends JTextPane {
    private AssetCls asset;
 private Transaction transaction;
 private Asset_Detail_Panel_003 th;
+private PublicKeyAccount owner;
+private JLabel image_Label;
 /**
     * Creates new form Asset_Info003
     */
@@ -52,20 +67,71 @@ private Asset_Detail_Panel_003 th;
     //   initComponents();
 	   th=this;
 	   this.asset = asset;
+	   owner = asset.getOwner();
+	   HyperLinkAccount hl_Owner = new HyperLinkAccount(owner);
+		
+	
 	   byte[] recordReference = asset.getReference();
        transaction = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
 	   this.setMinimumSize(new Dimension(0, 0)); 	
+	   // image +
+	   String img_HTML = "";
+	   image_Label = new JLabel("");
+	   byte[] image_Byte = asset.getImage();
+	   if (image_Byte.length > 0){
+		 //base 64  
+	   String a = Base64.encodeBase64String(image_Byte);
+	//   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
+	   // label
+	   InputStream inputStream = new ByteArrayInputStream(asset.getImage());
+       try {
+			BufferedImage image1 = ImageIO.read(inputStream);
+			
+			// jLabel2.setText("jLabel2");
+			ImageIcon image = new ImageIcon(image1);
+			int x = image.getIconWidth();
+			int y = image.getIconHeight();
+
+			int x1 = 250;
+			double k = ((double) x / (double) x1);
+			y = (int) ((double) y / k);
+			
+
+			if (y != 0) {
+				Image Im = image.getImage().getScaledInstance(x1, y, 1);
+				ImageIcon ic = new ImageIcon(Im);
+				image_Label.setIcon(ic);
+				image_Label.setSize(ic.getIconWidth(), ic.getIconHeight());
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	   
+	   }
+	   
+	   
        String text ="<body style= 'font-family:"
 				+ UIManager.getFont("Label.font").getFamily() + "; font-size: "+UIManager.getFont("Label.font").getSize() +"pt;'>";
-       text += "<DIV>" + Lang.getInstance().translate("Key")+ ": <a href='!key'> " + asset.getKey() + "</a><DIV>";
+      text +="<div>" + img_HTML + "</div>";
+       text += "<DIV><b>" + Lang.getInstance().translate("Key")+ ": </b>" + asset.getKey() + "<DIV>";
 	    Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
        
-	    text += "<div>"+ Lang.getInstance().translate("Block-SeqNo") + ": <a href='!Block'>" + record.viewHeightSeq(DBSet.getInstance()) +"</a></div>";
-	    text += "<div>"+ Lang.getInstance().translate("Name") + ": " + asset.getName() + "</div>";
+	    text += "<div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DBSet.getInstance()) +"</div>";
+	    text += "<div><b>"+ Lang.getInstance().translate("Name") + ": </b>" + asset.getName() + "</div>";
 	    text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
-	    text += "<div >" + Lang.getInstance().translate("Owner") + ": <a href = '!Owner'>" + asset.getOwner() + "</a></div>";
-	    text += "<div>" + Lang.getInstance().translate("Divisible") + ": " + Lang.getInstance().translate(asset.isDivisible()+"") +"</div>";
-	    text += "<div>" + Lang.getInstance().translate("Quantity") + ": " + asset.getQuantity() +"</div><<BR>"; 
+	    text += "<div><b>" + Lang.getInstance().translate("Owner") + ": </b><a href = '!!Owner'>" + hl_Owner.get_Text() + "</a></div>";
+	    text += "<div><b>" + Lang.getInstance().translate("Divisible") + ": </b>" + Lang.getInstance().translate(asset.isDivisible()+"") +"</div>";
+	    text += "<div></b>" + Lang.getInstance().translate("Quantity") + ": </b>" + asset.getQuantity() +"</div><<BR>"; 
 	   
 	   
        	   
@@ -85,16 +151,12 @@ private Asset_Detail_Panel_003 th;
 			public void hyperlinkUpdate(HyperlinkEvent arg0) {
 				// TODO Auto-generated method stub
 				if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-				 if(arg0.getDescription().toString().indexOf('!')==0) {
-				System.out.print(arg0.getDescription());
-				
-				
-				JPopupMenu menu = new JPopupMenu();
-				JMenuItem item = new JMenuItem("2232");
-				menu.add(item);
-				
-				
-				 }
+				 if(arg0.getDescription().toString().equals("!!Owner")) {
+					 Point location = MouseInfo.getPointerInfo().getLocation();
+				        int x = (int) location.x - th.getLocationOnScreen().x;
+				        int y = (int) location.y - th.getLocationOnScreen().y;
+					 hl_Owner.get_PopupMenu().show(th, x, y);
+				}
 			
 			
 			
@@ -188,6 +250,10 @@ private Asset_Detail_Panel_003 th;
        
        GridBagConstraints gridBagConstraints;
 	
+   
+       
+       
+       
      
     // vouches
        jTabbedPane1.add(new Voush_Library_Panel(transaction));
@@ -203,9 +269,9 @@ private Asset_Detail_Panel_003 th;
  		
        //  jTable1.setMinimumSize(new Dimension(0,0));
  	
-         Dimension d = jTable1.getPreferredSize();
-         d.height = 300;
-         jTable1.setPreferredScrollableViewportSize(d);
+     //    Dimension d = jTable1.getPreferredSize();
+     //    d.height = 300;
+    //     jTable1.setPreferredScrollableViewportSize(d);
  		
  		
        
@@ -242,7 +308,17 @@ private Asset_Detail_Panel_003 th;
        StyleConstants.setComponent(style1,pane);
      //  doc.insertString(10, "ignored text", style1);
        
-      
+       // image
+       Style imageStyle = doc.addStyle("StyleImage", null);
+       
+       StyleConstants.setComponent(imageStyle,image_Label);
+       image_Label.setVisible(true);
+       image_Label.setSize(300, 300);
+       doc.insertString(1, "ignored text", imageStyle);
+    
+       
+       
+       
    } catch (BadLocationException e) {
    }
    }

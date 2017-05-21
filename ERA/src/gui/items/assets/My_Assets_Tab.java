@@ -448,14 +448,16 @@ class search_listener implements ListSelectionListener  {
 			AssetCls asset = null;
 			if (table.getSelectedRow() >= 0 ) asset = assetsModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
 			if (asset == null) return;
-			int div = th.jSplitPanel.getDividerLocation();
-			int or = th.jSplitPanel.getOrientation();
-			AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
+			//AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
 				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-				//jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-				jSplitPanel.setRightComponent(info_panel);
-				jSplitPanel.setDividerLocation(div);
-				jSplitPanel.setOrientation(or);
+				int div = th.jSplitPanel.getDividerLocation();
+				int or = th.jSplitPanel.getOrientation();
+				Asset_Detail_Panel_003 info_panel = new Asset_Detail_Panel_003(asset);
+					//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+					//jSplitPanel.setRightComponent(info_panel);
+					jSplitPanel.setDividerLocation(div);
+					jSplitPanel.setOrientation(or);
 			
 		}
 	}

@@ -1,453 +1,349 @@
 package gui.items.assets;
 
-import gui.MainFrame;
-import gui.PasswordPane;
-import gui.library.Issue_Confirm_Dialog;
-import gui.library.MButton;
-import gui.library.library;
-import gui.models.AccountsComboBoxModel;
-import gui.transaction.TransactionDetailsFactory;
-import lang.Lang;
-
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-//import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import javax.swing.AbstractButton;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
-import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-//import settings.Settings;
-import utils.DateTimeFormat;
-import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
+import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
+import gui.MainFrame;
+import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.My_JFileChooser;
+import gui.library.library;
+import gui.models.AccountsComboBoxModel;
+import lang.Lang;
 
-@SuppressWarnings("serial")
-public class IssueAssetPanel extends JPanel
-{
-	private JComboBox<Account> cbxFrom;
-	private JTextField txtScale;
-	private JTextField txtFeePow;
-	private JTextField txtName;
-	private JTextArea txtareaDescription;
-	private JCheckBox chkMovable;
-	private JTextField txtQuantity;
-	private JCheckBox chkDivisible;
-	private MButton issueButton;
-	private IssueAssetPanel th;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
-	public IssueAssetPanel()
-	{
-//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Issue Asset"));
-		
-		//CLOSE
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		th = this;
-		int gridy = 0;
-		
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-//		this.setIconImages(icons);
-		
-		//LAYOUT
-		  java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-	        layout.columnWidths = new int[] {0, 7, 0};
-	        layout.rowHeights = new int[] {0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0, 6, 0};
-	        setLayout(layout);
+/**
+ *
+ * @author Саша
+ */
+public class IssueAssetPanel extends javax.swing.JPanel {
 
-	        JLabel jLabel1 = new JLabel();
-			jLabel1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
-	        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-	        jLabel1.setText(Lang.getInstance().translate("Issue Asset"));
-	        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-	        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-	        gridBagConstraints.gridx = 0;
-	        //gridBagConstraints.gridy = gridy;
-	        gridBagConstraints.gridwidth = 3;
-	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-	        gridBagConstraints.weightx = 1.3;
-	        gridBagConstraints.insets = new java.awt.Insets(8, 15, 8, 15);
-	        add(jLabel1, gridBagConstraints);
-		
-		//PADDING
-//		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
-	/*	
-		//LABEL GBC
-		GridBagConstraints labelGBC = new GridBagConstraints();
-		labelGBC.insets = new Insets(5,5,5,5);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
-		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
-		labelGBC.gridx = 0;
-		
-		//COMBOBOX GBC
-		GridBagConstraints cbxGBC = new GridBagConstraints();
-		cbxGBC.insets = new Insets(5,5,5,5);
-		cbxGBC.fill = GridBagConstraints.NONE;  
-		cbxGBC.anchor = GridBagConstraints.NORTHWEST;
-		cbxGBC.weightx = 0;	
-		cbxGBC.gridx = 1;	
-		
-		//TEXTFIELD GBC
-		GridBagConstraints txtGBC = new GridBagConstraints();
-		txtGBC.insets = new Insets(5,5,5,5);
-		txtGBC.fill = GridBagConstraints.HORIZONTAL;  
-		txtGBC.anchor = GridBagConstraints.NORTHWEST;
-		txtGBC.weightx = 1;	
-		txtGBC.gridwidth = 2;
-		txtGBC.gridx = 1;		
-		
-		//BUTTON GBC
-		GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,5,5,5);
-		buttonGBC.fill = GridBagConstraints.NONE;  
-		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-		buttonGBC.gridwidth = 2;
-		buttonGBC.gridx = 0;		
-*/		
-		//LABEL FROM
-		//labelGBC.gridy = 0;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-		
-		gridy += 2;
-		gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(fromLabel, gridBagConstraints);
-		
-	
-		
-		//COMBOBOX FROM
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-     
-		this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
-        this.add(this.cbxFrom,  gridBagConstraints);
-        
-        //LABEL NAME
-      
-      	
-      	JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-      	gridy += 2;
-      	 gridBagConstraints = new java.awt.GridBagConstraints();
-         gridBagConstraints.gridx = 0;
-         //gridBagConstraints.gridy = gridy;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-         add(nameLabel, gridBagConstraints);
-      	
-      	
-      	
-     
-      		
-      	//TXT NAME
-      	
-      	this.txtName = new JTextField();
-      	gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        //gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
+    private IssueAssetPanel th;
+    protected byte[] imgButes;
+    protected byte[] iconButes;
     
-        this.add(this.txtName, gridBagConstraints);
+	/**
+     * Creates new form Issue_Asset_Panel_01
+     */
+    public IssueAssetPanel() {
+    	th = this;
+        initComponents();
         
-        //LABEL DESCRIPTION
-  //    	labelGBC.gridy = 2;
-      	JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-      	
-      	gridy += 2;
-      	descriptionLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-      	descriptionLabel.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(descriptionLabel, gridBagConstraints);
-      	
-      	
-     // 	this.add(descriptionLabel, labelGBC);
-      		
-      	//TXTAREA DESCRIPTION
-   //   	txtGBC.gridy = 2;
-      	this.txtareaDescription = new JTextArea();
-      	
-      
-       	
-  //    	this.txtareaDescription.setRows(6);
-  //    	this.txtareaDescription.setColumns(20);
-  //    	this.txtareaDescription.setBorder(this.txtName.getBorder());
-
-      	JScrollPane scrollDescription = new JScrollPane(this.txtareaDescription);
-  //    	scrollDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-  //    	scrollDescription.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-      	
-      	
-   //   	this.txtareaDescription.setColumns(20);
-      	this.txtareaDescription.setLineWrap(true);
-    //  	this.txtareaDescription.setRows(5);
-      	scrollDescription.setViewportView(this.txtareaDescription);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        //gridBagConstraints.gridy;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.9;
-        gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-        add(scrollDescription, gridBagConstraints);
-      	
-      	
-      	
-      	
-    //  	this.add(scrollDescription, txtGBC);
-      	
-      	
-
-        //LABEL MOVABLE
-   //   	labelGBC.gridy = 5;
-      	gridy++;
-      	JLabel movableLabel = new JLabel(Lang.getInstance().translate("Movable") + ":");
-      	gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(movableLabel, gridBagConstraints);
-      	
-      	
-     // 	this.add(divisibleLabel, labelGBC);
-      		
-      	//CHECKBOX MOVABLE
-    //  	txtGBC.gridy = 5;
-      	this.chkMovable = new JCheckBox();
-      	this.chkMovable.setSelected(true);
-      	
-      	 gridBagConstraints = new java.awt.GridBagConstraints();
-         gridBagConstraints.gridx = 2;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
-         add(this.chkMovable, gridBagConstraints);
-
-
+        account_jLabel.setText(Lang.getInstance().translate("Account") + ":");
         
-      	//LABEL QUANTITY
-      //	labelGBC.gridy = 3;
-      	JLabel quantityLabel = new JLabel(Lang.getInstance().translate("Quantity") + ":");
+        name_jLabel.setText(Lang.getInstance().translate("Name") + ":");
+        txtName.setText("");
+        icon_jButton.setText(Lang.getInstance().translate("Add Icon") + ":");
+        icon_jButton.addActionListener(new ActionListener(){
 
-      	gridy++;
-      	gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(quantityLabel, gridBagConstraints);
-      	
-      	
-   //   	this.add(quantityLabel, labelGBC);
-      		
-      	//TXT QUANTITY
-    //  	txtGBC.gridy = 3;
-      	this.txtQuantity = new JTextField();
-      	this.txtQuantity.setText("0");
-      	
-      	 gridBagConstraints.gridx = 2;
-         //gridBagConstraints.gridy = 8;
-         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.weightx = 1.0;
-         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-         add(this.txtQuantity, gridBagConstraints);
-      	
-      	
-     //   this.add(this.txtQuantity, txtGBC);
-        
-        //LABEL SCALE
-    //  	labelGBC.gridy = 4;
-      	JLabel scaleLabel = new JLabel(Lang.getInstance().translate("Scale") + ":");
-      	
-      	gridy +=2;
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(scaleLabel, gridBagConstraints);
-      	
-      	
-   //   	this.add(scaleLabel, labelGBC);
-      		
-      	//TXT SCALE
-  //    	txtGBC.gridy = 4;
-      	this.txtScale = new JTextField();
-      	this.txtScale.setText("0");
-      	
-      	 gridBagConstraints = new java.awt.GridBagConstraints();
-         gridBagConstraints.gridx = 2;
-         //gridBagConstraints.gridy = 10;
-         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.weightx = 1.0;
-         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-         add(this.txtScale, gridBagConstraints);
-      
-
-        //LABEL DIVISIBLE
-   //   	labelGBC.gridy = 5;
-       	gridy +=2;
-      	JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divisible") + ":");
-      	gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-        add(divisibleLabel, gridBagConstraints);
-      	
-      	
-     // 	this.add(divisibleLabel, labelGBC);
-      		
-      	//CHECKBOX DIVISIBLE
-    //  	txtGBC.gridy = 5;
-      	this.chkDivisible = new JCheckBox();
-      	this.chkDivisible.setSelected(true);
-      	
-      	 gridBagConstraints = new java.awt.GridBagConstraints();
-         gridBagConstraints.gridx = 2;
-         //gridBagConstraints.gridy = 12;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 0);
-         add(this.chkDivisible, gridBagConstraints);
-
-      	
-     // 	this.add(this.chkDivisible, txtGBC);
-      	
-        //LABEL FEE POW
-    //  	labelGBC.gridy = 6;
-       	gridy +=2;
-      	JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Power") + ":");
-      	 gridBagConstraints = new java.awt.GridBagConstraints();
-         gridBagConstraints.gridx = 0;
-         //gridBagConstraints.gridy = gridy;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
-         add(feeLabel, gridBagConstraints);
-      	
-  
-      		
-      	//TXT FEE
-  //    	txtGBC.gridy = 6;
-      	this.txtFeePow = new JTextField();
-      	this.txtFeePow.setText("0");
-      	 gridBagConstraints = new java.awt.GridBagConstraints();
-         gridBagConstraints.gridx = 2;
-         //gridBagConstraints.gridy = 14;
-         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-         gridBagConstraints.weightx = 1.0;
-         gridBagConstraints.insets = new java.awt.Insets(0, 3, 0, 15);
-         add(this.txtFeePow, gridBagConstraints);
- 
-		           
-        //BUTTON Register
-        
-        this.issueButton = new MButton(Lang.getInstance().translate("Issue"),2);
-    //    this.issueButton.setPreferredSize(new Dimension(100, 25));
-        this.issueButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onIssueClick();
-		    }
-		});
-    	
-      	gridy +=2;
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(8, 0, 0, 15);
-        add(this.issueButton, gridBagConstraints);
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				addicon();
+			}
+        	
+        });
+       
+        chkDivisible.setText("");
+        devisible_jLabel.setText(Lang.getInstance().translate("Divisible") + ":");
+        movable_jLabel.setText(Lang.getInstance().translate("Movable") + ":");
+        chkMovable.setText("");
         
         
+        Title_jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        Title_jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Title_jLabel.setText(Lang.getInstance().translate("Issue Asset"));
+        Title_jLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+         description_jLabel.setText(Lang.getInstance().translate("Description") + ":");
+         
+         txtareaDescription.setLineWrap(true);
+         txtareaDescription.setText("");
+        quantity_jLabel.setText(Lang.getInstance().translate("Quantity") + ":");
+        txtQuantity.setText("0");
+        scale_jLabel.setText(Lang.getInstance().translate("Scale") + ":");
+        txtScale.setText("0");
+        fee_jLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
+        txtFeePow.setText("0"); 
+        issue_jButton.setText(Lang.getInstance().translate("Issue"));
+        issue_jButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				onIssueClick();
+			}
+        });
         
-       JLabel jLabel9 = new JLabel();
-     	gridy +=2;
-		jLabel9.setText("");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        //gridBagConstraints.gridy = gridy;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-     //   add(jLabel9, gridBagConstraints);
-     //   this.add(this.issueButton, buttonGBC);
-        
-        //PACK
-	//	this.pack();
-   //     this.setResizable(false);
-   //     this.setLocationRelativeTo(null);
-        this.setMinimumSize(new Dimension(0,0));
-        this.setVisible(true);
-	}
+        image_jButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
+        image_jButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
+        image_jButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        image_jButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);
+        image_jButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        image_jButton.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+			addimage();
+			}
+        });
+            
 	
-	public void onIssueClick()
+        
+        
+        
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        account_jLabel = new javax.swing.JLabel();
+        cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
+        name_jLabel = new javax.swing.JLabel();
+        txtName = new javax.swing.JTextField();
+        icon_jButton = new javax.swing.JButton();
+        image_jButton = new javax.swing.JButton();
+        chkDivisible = new javax.swing.JCheckBox();
+        devisible_jLabel = new javax.swing.JLabel();
+        movable_jLabel = new javax.swing.JLabel();
+        chkMovable = new javax.swing.JCheckBox();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtareaDescription = new javax.swing.JTextArea();
+        Title_jLabel = new javax.swing.JLabel();
+        description_jLabel = new javax.swing.JLabel();
+        quantity_jLabel = new javax.swing.JLabel();
+        txtQuantity = new javax.swing.JTextField();
+        scale_jLabel = new javax.swing.JLabel();
+        txtScale = new javax.swing.JTextField();
+        fee_jLabel = new javax.swing.JLabel();
+        txtFeePow = new javax.swing.JTextField();
+        issue_jButton = new javax.swing.JButton();
+
+        setLayout(new java.awt.GridBagLayout());
+
+        account_jLabel.setText("jLabel2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
+        add(account_jLabel, gridBagConstraints);
+
+       
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
+        add(cbxFrom, gridBagConstraints);
+
+        name_jLabel.setText("jLabel3");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
+        add(name_jLabel, gridBagConstraints);
+
+        txtName.setText("jTextField1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
+        add(txtName, gridBagConstraints);
+
+        icon_jButton.setText("jButton1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
+        add(icon_jButton, gridBagConstraints);
+
+        image_jButton.setText("jButton2");
+        image_jButton.setPreferredSize(new java.awt.Dimension(250, 350));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
+        add(image_jButton, gridBagConstraints);
+
+        chkDivisible.setText("jCheckBox1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
+        add(chkDivisible, gridBagConstraints);
+
+        devisible_jLabel.setText("jLabel4");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 10, 7);
+        add(devisible_jLabel, gridBagConstraints);
+
+        movable_jLabel.setText("jLabel5");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 10, 7);
+        add(movable_jLabel, gridBagConstraints);
+
+        chkMovable.setText("jCheckBox2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 10);
+        add(chkMovable, gridBagConstraints);
+
+        txtareaDescription.setColumns(20);
+        txtareaDescription.setRows(5);
+        jScrollPane1.setViewportView(txtareaDescription);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.3;
+        gridBagConstraints.weighty = 0.5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
+        add(jScrollPane1, gridBagConstraints);
+
+        Title_jLabel.setText("jLabel1");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(8, 6, 6, 9);
+        add(Title_jLabel, gridBagConstraints);
+
+        description_jLabel.setText("jLabel9");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
+        add(description_jLabel, gridBagConstraints);
+
+        quantity_jLabel.setText("jLabel6");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
+        add(quantity_jLabel, gridBagConstraints);
+
+        txtQuantity.setText("jTextField2");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 10);
+        add(txtQuantity, gridBagConstraints);
+
+        scale_jLabel.setText("jLabel7");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
+        add(scale_jLabel, gridBagConstraints);
+
+        txtScale.setText("jTextField3");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 0);
+        add(txtScale, gridBagConstraints);
+
+        fee_jLabel.setText("jLabel8");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        add(fee_jLabel, gridBagConstraints);
+
+        txtFeePow.setText("jTextField4");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
+        add(txtFeePow, gridBagConstraints);
+
+        issue_jButton.setText("jButton3");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        add(issue_jButton, gridBagConstraints);
+    }// </editor-fold>                        
+
+    public void onIssueClick()
 	{
 		//DISABLE
-		this.issueButton.setEnabled(false);
+    	issue_jButton.setEnabled(false);
 	
-		//CHECK IF NETWORK OK
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
-			//NETWORK NOT OK
-			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are unable to send a transaction while synchronizing or while having no connections!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
-			//ENABLE
-			this.issueButton.setEnabled(true);
-			
-			return;
-		}
-		
 		//CHECK IF WALLET UNLOCKED
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
@@ -459,7 +355,7 @@ public class IssueAssetPanel extends JPanel
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 				
 				//ENABLE
-				this.issueButton.setEnabled(true);
+				issue_jButton.setEnabled(true);
 				
 				return;
 			}
@@ -484,8 +380,8 @@ public class IssueAssetPanel extends JPanel
 			
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
-					icon, image, feePow);			
+			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(),  iconButes, imgButes, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
+					 feePow);			
 
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 			 String text = "<HTML><body>";
@@ -513,7 +409,7 @@ public class IssueAssetPanel extends JPanel
 		//	JOptionPane.OK_OPTION
 			if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
 				
-				this.issueButton.setEnabled(true);
+				issue_jButton.setEnabled(true);
 				
 				return;
 			}
@@ -584,6 +480,205 @@ public class IssueAssetPanel extends JPanel
 		}
 		
 		//ENABLE
-		this.issueButton.setEnabled(true);
+		issue_jButton.setEnabled(true);
 	}
+    
+    
+    protected void addimage() {
+		// TODO Auto-generated method stub
+		
+		
+		// открыть диалог для файла
+		//JFileChooser chooser = new JFileChooser();
+		My_JFileChooser chooser = new My_JFileChooser();
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setMultiSelectionEnabled(false);
+		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                 "Image", "png", "jpg", "gif");
+		 chooser.setFileFilter(filter);
+		 chooser.setDialogTitle(Lang.getInstance().translate("Open Image")+ "...");
+		 
+	    int returnVal = chooser.showOpenDialog(getParent());
+	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+	       System.out.println("You chose to open this file: " +
+	            chooser.getSelectedFile().getName());
+	    
+	
+	       
+	       File file = new File(chooser.getSelectedFile().getPath());
+// если размер больше 30к то не вставляем	       
+	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
+	    	   
+	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
+	    	   
+	    	   return;
+	       }
+	       
+// его надо в базу вставлять
+	        imgButes = null; 
+			try {
+				imgButes = getBytesFromFile(file);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        InputStream inputStream = new ByteArrayInputStream(imgButes);
+	        try {
+				BufferedImage image1 = ImageIO.read(inputStream);
+				
+				// jLabel2.setText("jLabel2");
+				ImageIcon image = new ImageIcon(image1);
+				int x = image.getIconWidth();
+				int y = image.getIconHeight();
+
+				int x1 = 250;
+				double k = ((double) x / (double) x1);
+				y = (int) ((double) y / k);
+				
+
+				if (y != 0) {
+					Image Im = image.getImage().getScaledInstance(x1, y, 1);
+					image_jButton.setIcon(new ImageIcon(Im));
+				}
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	          
+	    }
+		
+	}
+    
+    protected void addicon() {
+  		// TODO Auto-generated method stub
+  		
+  		
+  		// открыть диалог для файла
+  		//JFileChooser chooser = new JFileChooser();
+  		My_JFileChooser chooser = new My_JFileChooser();
+  		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+  		chooser.setMultiSelectionEnabled(false);
+  		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                   "Image", "png", "jpg", "gif");
+  		 chooser.setFileFilter(filter);
+  		 chooser.setDialogTitle(Lang.getInstance().translate("Open Image")+ "...");
+  		 
+  	    int returnVal = chooser.showOpenDialog(getParent());
+  	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+  	       System.out.println("You chose to open this file: " +
+  	            chooser.getSelectedFile().getName());
+  	    
+  	
+  	       
+  	       File file = new File(chooser.getSelectedFile().getPath());
+  // если размер больше 30к то не вставляем	       
+  	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
+  	    	   
+  	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
+  	    	   
+  	    	   return;
+  	       }
+  	       
+  // его надо в базу вставлять
+  	        iconButes = null; 
+  			try {
+  				iconButes = getBytesFromFile(file);
+  			} catch (IOException e) {
+  				// TODO Auto-generated catch block
+  				e.printStackTrace();
+  			}
+  	        InputStream inputStream = new ByteArrayInputStream(iconButes);
+  	        try {
+  				BufferedImage image1 = ImageIO.read(inputStream);
+  				
+  				// jLabel2.setText("jLabel2");
+  				ImageIcon image = new ImageIcon(image1);
+  				int x = image.getIconWidth();
+  				int y = image.getIconHeight();
+
+  				int x1 = 30;
+  				double k = ((double) x / (double) x1);
+  				y = (int) ((double) y / k);
+  				
+
+  				if (y != 0) {
+  					Image Im = image.getImage().getScaledInstance(x1, y, 1);
+  					icon_jButton.setIcon(new ImageIcon(Im));
+  				}
+  				
+  				
+  				
+  				
+  				
+  				
+  				
+  				
+  				
+  			} catch (IOException e) {
+  				// TODO Auto-generated catch block
+  				e.printStackTrace();
+  			}
+  	          
+  	    }
+  		
+  	}
+    
+    
+    
+    @SuppressWarnings("resource")
+  	protected static byte[] getBytesFromFile(File file) throws IOException {
+          InputStream is = new FileInputStream(file);
+          long length = file.length();
+          if (length > Integer.MAX_VALUE) {
+              // File is too large
+          }
+          byte[] bytes = new byte[(int)length];
+          int offset = 0;
+          int numRead = 0;
+          while (offset < bytes.length
+                 && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+              offset += numRead;
+          }
+          if (offset < bytes.length) {
+              throw new IOException("Could not completely read file "+file.getName());
+          }
+          is.close();
+          return bytes;
+      }
+    
+    
+    
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JLabel Title_jLabel;
+    private javax.swing.JLabel account_jLabel;
+    private javax.swing.JTextArea txtareaDescription;
+    private javax.swing.JLabel description_jLabel;
+    private javax.swing.JCheckBox chkDivisible;
+    private javax.swing.JLabel devisible_jLabel;
+    private javax.swing.JLabel fee_jLabel;
+    private javax.swing.JTextField txtFeePow;
+    private javax.swing.JButton icon_jButton;
+    private javax.swing.JButton image_jButton;
+    private javax.swing.JButton issue_jButton;
+    private JComboBox<Account> cbxFrom;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JCheckBox chkMovable;
+    private javax.swing.JLabel movable_jLabel;
+    private javax.swing.JLabel name_jLabel;
+    private javax.swing.JTextField txtName;
+    private javax.swing.JLabel quantity_jLabel;
+    private javax.swing.JTextField txtQuantity;
+    private javax.swing.JLabel scale_jLabel;
+    private javax.swing.JTextField txtScale;
+    // End of variables declaration                   
 }
