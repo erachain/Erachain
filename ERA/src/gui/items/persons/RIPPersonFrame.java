@@ -212,7 +212,7 @@ public class RIPPersonFrame extends JInternalFrame  {
 		
 		long personKey = Long.parseLong(pubKeyTxt.getText());
 		
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		if(false && Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			pubKeyDetails.setText(Lang.getInstance().translate("Status must be OK to show public key details."));
 			return null;

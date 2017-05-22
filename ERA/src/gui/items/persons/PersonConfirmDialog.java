@@ -96,7 +96,7 @@ public class PersonConfirmDialog extends JDialog  {
 		// SHOW PubKey for BANK
 		String personDetails = "+" + account.getBase32() + "<br>";
 
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		if(false && Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			pubKeyDetails.setText("<html>" + personDetails
 					+ Lang.getInstance().translate("Status must be OK to show public key details.")

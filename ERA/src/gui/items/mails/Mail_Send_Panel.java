@@ -577,7 +577,7 @@ public class Mail_Send_Panel extends JPanel
 			return;
 		}
 		
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
+		if(false && Controller.getInstance().getStatus() != Controller.STATUS_OK)
 		{
 			txtRecDetails.setText(Lang.getInstance().translate("Status must be OK to show receiver details."));
 			return;
