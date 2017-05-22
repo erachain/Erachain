@@ -59,6 +59,7 @@ private Transaction transaction;
 private Asset_Detail_Panel_003 th;
 private PublicKeyAccount owner;
 private JLabel image_Label;
+private BalancesTableModel balancesTableModel;
 /**
     * Creates new form Asset_Info003
     */
@@ -264,7 +265,7 @@ private JLabel image_Label;
        jPanel_Tab_Holders.setLayout(new java.awt.GridBagLayout());
        
 
-       BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
+        balancesTableModel = new BalancesTableModel(asset.getKey());
  		MTable  jTable1 = new MTable(balancesTableModel);
  		
        //  jTable1.setMinimumSize(new Dimension(0,0));
@@ -323,6 +324,10 @@ private JLabel image_Label;
    }
    }
 
+   public void  delay_on_Close(){
+   	balancesTableModel.removeObservers();
+			
+	}
    // Variables declaration - do not modify                     
    private javax.swing.JPanel jPanel1;
    private javax.swing.JScrollPane jScrollPane1;

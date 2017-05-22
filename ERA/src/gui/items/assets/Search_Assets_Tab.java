@@ -279,22 +279,6 @@ public class Search_Assets_Tab extends Split_Panel {
 	nameSalesMenu.add(favorite);
 	
 	
-	
-	
-	
-	
-	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
-	details.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int row = assetsTable.getSelectedRow();
-			row = assetsTable.convertRowIndexToModel(row);
-
-			AssetCls asset = tableModelItemAssets.getAsset(row);
-			new AssetFrame(asset);
-		}
-	});
-//	nameSalesMenu.add(details);
-	
 	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
 	excahge.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {

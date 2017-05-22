@@ -2,7 +2,6 @@ package gui.records;
 
 import gui.CoreRowSorter;
 import gui.Split_Panel;
-import gui.items.assets.AssetDetailsPanel001;
 import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;

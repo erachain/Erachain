@@ -3,7 +3,6 @@ package gui.items.records;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.items.accounts.Account_Send_Dialog;
-import gui.items.assets.AssetDetailsPanel001;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
