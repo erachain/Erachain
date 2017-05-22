@@ -538,7 +538,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 
 				if (y != 0) {
 					Image Im = image.getImage().getScaledInstance(x1, y, 1);
-					image_jButton.setIcon(new ImageIcon(Im));
+					image_jButton.setIcon((image));
 				}
 				
 				
@@ -612,7 +612,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 
   				if (y != 0) {
   					Image Im = image.getImage().getScaledInstance(x1, y, 1);
-  					icon_jButton.setIcon(new ImageIcon(Im));
+  					//icon_jButton.setIcon(new ImageIcon(Im));
+  					icon_jButton.setIcon(image);
   				}
   				
   				

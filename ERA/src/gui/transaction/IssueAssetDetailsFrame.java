@@ -19,6 +19,7 @@ import javax.swing.border.EmptyBorder;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
+import gui.items.assets.Asset_Detail_Panel_003;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -29,7 +30,18 @@ public class IssueAssetDetailsFrame extends Rec_DetailsFrame
 	public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue)
 	{
 		super(assetIssue);
-				
+		
+		Asset_Detail_Panel_003 as_info = new Asset_Detail_Panel_003((AssetCls) assetIssue.getItem());
+		//LABEL NAME
+		++labelGBC.gridy;
+		labelGBC.gridwidth=4;
+		labelGBC.fill = labelGBC.BOTH;
+		labelGBC.weightx = 0.1;
+		labelGBC.weightx = 0.1;
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+		this.add(as_info, labelGBC);
+		
+	/*	
 		//LABEL NAME
 		++labelGBC.gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
@@ -91,7 +103,7 @@ public class IssueAssetDetailsFrame extends Rec_DetailsFrame
 				movable.setSelected(((AssetCls)assetIssue.getItem()).isMovable());
 				movable.setEnabled(false);
 				this.add(movable, detailGBC);	
-				           
+*/				           
         //PACK
 	//	this.pack();
     //    this.setResizable(false);

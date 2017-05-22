@@ -853,7 +853,9 @@ public class BlockExplorer
 			a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
 			assetJSON.put("isMovable", a);
-
+			
+			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 			List<Order> orders = DBSet.getInstance().getOrderMap().getOrders(asset.getKey());
 			List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(asset.getKey());
 
@@ -1223,6 +1225,8 @@ if ( asset_1 == null) {
 		String divis = Lang.getInstance().translate_from_langObj("False", langObj);
 		if (asset.isDivisible()) divis = Lang.getInstance().translate_from_langObj("True", langObj);
 		assetJSON.put("isDivisible",divis );
+		assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+		assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
 		
 		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
