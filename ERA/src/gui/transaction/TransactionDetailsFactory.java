@@ -83,7 +83,7 @@ public class TransactionDetailsFactory
 			
 			R_SignNote statement = (R_SignNote) transaction;
 			
-			RecStatementDetailsFrame recStatementDetailsFrame = new RecStatementDetailsFrame(statement); 
+		//	RecStatementDetailsFrame recStatementDetailsFrame = new RecStatementDetailsFrame(statement); 
 			// gridBagConstraints.gridy =recStatementDetailsFrame.labelGBC.gridy+1; 
 			// recStatementDetailsFrame. add(jLabel9, gridBagConstraints);
 			

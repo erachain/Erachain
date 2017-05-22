@@ -794,13 +794,15 @@ function assets(data)
 	// style="background: #f4f4f4;"
 	
 	var table = '<table width=100% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-	table += '<td><b>'+data.label_table_key+'<td><b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
+	table += '<td><b>'+data.label_table_key+'<td><td><b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
 	table += '<td><b>'+ data.label_table_asset_movable+'<td><b>'+data.label_table_asset_amount+'<td><b>'+data.label_table_asset_divisible;
 
 	for(key in data.assets) {
 		table += '<tr>';
 		table += '<td>' + key;
-		
+		table += '<td>';
+		if (data.assets[key].img.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].img+ '" width="100" />'; 
+		table += '</td>';
 		table += '<td>' + '<a href=?asset='+encodeURIComponent(key)+get_lang()+'>' + htmlFilter(data.assets[key].name) + '</a>';
 		
 		table += '<td>' + data.assets[key].operations;
@@ -845,6 +847,13 @@ function asset(data)
 	output += '<b>'+ data.asset.label_Key + ':</b> ' + data.asset.this.key;
 	
 	output += '<br><br>';
+	
+	if (data.asset.this.img.length>0) output += '<img src="data:image/gif;base64,' + data.asset.this.img+ '"  />'; 
+	
+	if (data.asset.this.icon.length>0) output += '<img src="data:image/gif;base64,' + data.asset.this.icon+ '"  />'; 
+	
+	output += '<br><br>';
+	
 	
 	output += '<b>' + data.asset.label_Creator + ':</b> <a href=?addr='+data.asset.this.owner+get_lang()+'>' + data.asset.this.owner + '</a>';
 	
