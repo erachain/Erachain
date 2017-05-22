@@ -242,88 +242,92 @@ public class IssueNotePanel extends JPanel
 
 		}
 						
-			//CREATE NOTE
-			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			IssueNoteRecord issueNote = (IssueNoteRecord) Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(),
-					icon, image, feePow);
-		
-			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
-			 String text = "<HTML><body>";
-			 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Template") + "<br><br><br>";
-			    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueNote.getCreator() +"<br>";
-			    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueNote.getItem().getName() +"<br>";
-			    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueNote.getItem().getDescription())+"<br>";
-			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueNote.viewSize(true)+" Bytes, ";
-			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueNote.getFee().toString()+" COMPU</b><br></body></HTML>";
-			    
-			  System.out.print("\n"+ text +"\n");
+		byte[] icon = null;
+		byte[] image = null;
+
+		//CREATE NOTE
+		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
+		IssueNoteRecord issueNote = (IssueNoteRecord) Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(),
+				icon, image, feePow);
+	
+		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+		String text = "<HTML><body>";
+		text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Template") + "<br><br><br>";
+	    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueNote.getCreator() +"<br>";
+	    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueNote.getItem().getName() +"<br>";
+	    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueNote.getItem().getDescription())+"<br>";
+	    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueNote.viewSize(true)+" Bytes, ";
+	    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueNote.getFee().toString()+" COMPU</b><br></body></HTML>";
+		    
+	    //System.out.print("\n"+ text +"\n");
 		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
 		//	    UIManager.put("OptionPane.okButtonText", "Готово");
 			
 		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 			
-			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
-			dd.setLocationRelativeTo(th);
-			dd.setVisible(true);
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		dd.setLocationRelativeTo(th);
+		dd.setVisible(true);
 			
 		//	JOptionPane.OK_OPTION
-			if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+		if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
 				
-				this.jButton_Create.setEnabled(true);
-				
-				return;
-			}
+			this.jButton_Create.setEnabled(true);
 			
-					
-			//VALIDATE AND PROCESS
-			int result = Controller.getInstance().getTransactionCreator().afterCreate(issueNote, false);
+			return;
+		}
+		
+				
+		//VALIDATE AND PROCESS
+		int result = Controller.getInstance().getTransactionCreator().afterCreate(issueNote, false);
+		
+		
+		
+		
+		//CHECK VALIDATE MESSAGE
+		switch(result)
+		{
+		case Transaction.VALIDATE_OK:
+			
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Template issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+		//	this.dispose();
 			
 			
+			break;	
 			
+		case Transaction.NOT_ENOUGH_FEE:
 			
-			//CHECK VALIDATE MESSAGE
-			switch(result)
-			{
-			case Transaction.VALIDATE_OK:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Template issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-			//	this.dispose();
-				
-				
-				break;	
-				
-			case Transaction.NOT_ENOUGH_FEE:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-												
-			case Transaction.INVALID_NAME_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-				
-			case Transaction.INVALID_DESCRIPTION_LENGTH:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
-								
-			case Transaction.CREATOR_NOT_PERSONALIZED:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;	
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			break;	
+											
+		case Transaction.INVALID_NAME_LENGTH:
+			
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			break;	
+			
+		case Transaction.INVALID_DESCRIPTION_LENGTH:
+			
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Description must be between 1 and 1000 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			break;	
+							
+		case Transaction.CREATOR_NOT_PERSONALIZED:
+			
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Issuer account not personalized!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			break;	
 
-			default:
-				
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-				break;		
-				
-			}
+		default:
+			
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
+					+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			break;		
+			
+		}
 		
 		//ENABLE
 		this.jButton_Create.setEnabled(true);
 	}
-	   private void initComponents() {
+
+	private void initComponents() {
 	        java.awt.GridBagConstraints gridBagConstraints;
 
 	        jLabel_Title = new javax.swing.JLabel();

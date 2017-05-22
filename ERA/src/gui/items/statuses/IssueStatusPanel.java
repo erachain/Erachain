@@ -303,6 +303,8 @@ public class IssueStatusPanel extends JPanel
 			return;
 		}
 						
+		byte[] icon = null;
+		byte[] image = null;
 		//CREATE ASSET
 		//PrivateKeyAccount creator, String fullName, int feePow, long birthday,
 		//byte gender, String race, float birthLatitude, float birthLongitude,

@@ -324,7 +324,9 @@ public class IssueImprintPanel extends JPanel
 			// CUT BYTES LEN
 			name_total = Imprint.hashNameToBase58(name_total);
 			String description = ""; //this.txtareaDescription.getText();
-						
+
+			byte[] icon = null;
+			byte[] image = null;
 			//CREATE IMPRINT
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, name_total, description,
