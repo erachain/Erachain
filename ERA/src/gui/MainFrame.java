@@ -25,6 +25,7 @@ import org.json.simple.JSONObject;
 import controller.Controller;
 import gui.library.Menu_Deals;
 import gui.library.Menu_Files;
+import gui.library.My_JFileChooser;
 import gui.status.StatusPanel;
 import gui2.Main_Panel;
 import lang.Lang;
@@ -223,6 +224,9 @@ public void initComponents() {
 				settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex()+ "");
 				
 				settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
+				settingsJSONbuf.put("FileChooser_Path", My_JFileChooser.get_Default_Path());
+				
+				
 				// save setting to setting file
 				try {
 					SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);

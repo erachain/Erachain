@@ -812,6 +812,17 @@ public class Settings {
 		
 	}
 	
+	public String get_File_Chooser_Paht(){
+		if(this.settingsJSON.containsKey("FileChooser_Path"))
+		{
+			return ((String) this.settingsJSON.get("FileChooser_Path").toString());
+		}
+		
+		return getUserPath();
+		
+		
+	}
+	
 	public String get_Font_Name(){
 		if(this.settingsJSON.containsKey("font_name"))
 		{

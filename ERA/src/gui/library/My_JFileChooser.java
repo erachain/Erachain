@@ -1,14 +1,30 @@
 package gui.library;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
+import controller.Controller;
 import lang.Lang;
+import settings.Settings;
 
 public class My_JFileChooser extends JFileChooser{
+	
+	private static String default_path = Settings.getInstance().get_File_Chooser_Paht();
 
 // настройка диалога файлового на русский язык
 	public My_JFileChooser () {
+		super(default_path);
+		
+		
 		UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
 		UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate( "Cancel"));
 		UIManager.put("FileChooser.lookInLabelText",Lang.getInstance().translate( "Look in"));
@@ -43,6 +59,7 @@ public class My_JFileChooser extends JFileChooser{
 
 		UIManager.put("FileChooser.detailsViewButtonAccessibleName",  Lang.getInstance().translate("All Files"));
 		this.updateUI();
+	
 		
 		/*
 		      FileChooser.acceptAllFileFilterText=Все файлы
@@ -99,7 +116,28 @@ public class My_JFileChooser extends JFileChooser{
     FileChooser.upFolderToolTipText=Вверх
 		 */
 
-		} 
+//   My_JFileChooser.set_Default_Path(chooser.getCurrentDirectory().getPath());
+		
+		addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)){
+                    // была нажата кнопка OK
+            	  default_path = getCurrentDirectory().getPath();
+            	  default_path=default_path;
+              } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) {
+                    // была нажата кнопка Cancel
+              }
+            }
+        });
+		
+	} 
+	
 
+	public static String get_Default_Path(){
+		return default_path;
+	}
+	
+	
+	
 
 }
