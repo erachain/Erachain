@@ -258,7 +258,8 @@ public class IssuePersonPanel extends JPanel
 // если размер больше 30к то не вставляем	       
 	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
 	    	   
-	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
+	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
+	    			   Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
 	    	   
 	    	   return;
 	       }

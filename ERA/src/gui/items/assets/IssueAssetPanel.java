@@ -21,6 +21,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssuePersonRecord;
@@ -101,9 +102,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			}
         });
         
-        image_jButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
-        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
-        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
+        image_jButton.setText(Lang.getInstance().translate("Add Image (max %1%kB)")
+        		.replace("%1%", "1024")); // "" + (ItemCls.MAX_IMAGE_LENGTH>>10)));
         image_jButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
         image_jButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         image_jButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);
@@ -507,9 +507,10 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 	       
 	       File file = new File(chooser.getSelectedFile().getPath());
 // если размер больше 30к то не вставляем	       
-	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
+	       if (file.length()>ItemCls.MAX_IMAGE_LENGTH) {
 	    	   
-	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
+	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
+	    			   Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
 	    	   
 	    	   return;
 	       }
@@ -581,9 +582,10 @@ public class IssueAssetPanel extends javax.swing.JPanel {
   	       
   	       File file = new File(chooser.getSelectedFile().getPath());
   // если размер больше 30к то не вставляем	       
-  	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
+  	       if (file.length()>ItemCls.MAX_ICON_LENGTH) {
   	    	   
-  	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File Large"), Lang.getInstance().translate("File Large"), JOptionPane.ERROR_MESSAGE);
+  	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
+  	    			   Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
   	    	   
   	    	   return;
   	       }
