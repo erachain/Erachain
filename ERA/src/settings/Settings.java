@@ -822,6 +822,28 @@ public class Settings {
 		
 		
 	}
+	public int get_File_Chooser_Wight(){
+		if(this.settingsJSON.containsKey("FileChooser_Wight"))
+		{
+			return new Integer( this.settingsJSON.get("FileChooser_Wight").toString());
+		}
+		
+		return 0;
+		
+		
+	}
+	public int get_File_Chooser_Height(){
+		if(this.settingsJSON.containsKey("FileChooser_Height"))
+		{
+			return new Integer(this.settingsJSON.get("FileChooser_Height").toString());
+		}
+		
+		return 0;
+		
+		
+	}
+	
+	
 	
 	public String get_Font_Name(){
 		if(this.settingsJSON.containsKey("font_name"))

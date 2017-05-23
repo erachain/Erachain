@@ -225,7 +225,8 @@ public void initComponents() {
 				
 				settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
 				settingsJSONbuf.put("FileChooser_Path", My_JFileChooser.get_Default_Path());
-				
+				settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
+				settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
 				
 				// save setting to setting file
 				try {

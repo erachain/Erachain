@@ -1,5 +1,6 @@
 package gui.library;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -19,11 +20,15 @@ import settings.Settings;
 public class My_JFileChooser extends JFileChooser{
 	
 	private static String default_path = Settings.getInstance().get_File_Chooser_Paht();
+	private My_JFileChooser th;
+	protected static int default_Wight = Settings.getInstance().get_File_Chooser_Wight();
+	protected static int default_Height = Settings.getInstance().get_File_Chooser_Height();
 
 // настройка диалога файлового на русский язык
 	public My_JFileChooser () {
 		super(default_path);
-		
+		th = this;
+		if (default_Wight != 0 || default_Height != 0) this.setPreferredSize(new Dimension(default_Wight, default_Height)); 
 		
 		UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
 		UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate( "Cancel"));
@@ -117,13 +122,18 @@ public class My_JFileChooser extends JFileChooser{
 		 */
 
 //   My_JFileChooser.set_Default_Path(chooser.getCurrentDirectory().getPath());
-		
+	// save path	
 		addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
               if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)){
                     // была нажата кнопка OK
+            	  // save path
             	  default_path = getCurrentDirectory().getPath();
-            	  default_path=default_path;
+            	  // save size
+            	  default_Wight = th.getWidth();
+            	  default_Height= th.getHeight();
+            	  
+            	  
               } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) {
                     // была нажата кнопка Cancel
               }
@@ -137,6 +147,12 @@ public class My_JFileChooser extends JFileChooser{
 		return default_path;
 	}
 	
+	public static int get_Default_Width(){
+		return default_Wight;
+	}
+	public static int get_Default_Height(){
+		return default_Height;
+	}
 	
 	
 
