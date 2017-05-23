@@ -48,9 +48,9 @@ public abstract class ItemCls {
 	protected static final int NAME_SIZE_LENGTH = 1;
 	public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
 	protected static final int ICON_SIZE_LENGTH = 2;
-	public static final int MAX_ICON_LENGTH = (int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
+	public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
 	protected static final int IMAGE_SIZE_LENGTH = 4;
-	public static final int MAX_IMAGE_LENGTH = (int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+	public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
 	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
 	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
