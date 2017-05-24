@@ -799,12 +799,11 @@ function assets(data)
 
 	for(key in data.assets) {
 		table += '<tr>';
-		table += '<td>' + key;
-		table += '<td>';
-		if (data.assets[key].icon.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].icon+ '" width="150" />'; 
-		table += '</td>';
-		table += '<td>' + '<a href=?asset='+encodeURIComponent(key)+get_lang()+'>' + htmlFilter(data.assets[key].name) + '</a>';
-		
+		table += '<td> <a href=?asset='+encodeURIComponent(key)+get_lang()+'>';
+		table += '<b>' + key + '</b>: ' + htmlFilter(data.assets[key].name);
+		if (data.assets[key].icon.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].icon+ '" width="150" /> <br>'; 
+		table += '</a>';
+		 
 		table += '<td>' + data.assets[key].operations;
 	
 		table += '<td>' + data.assets[key].description.substr(0, 100);
