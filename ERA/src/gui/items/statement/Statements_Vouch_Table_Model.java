@@ -268,6 +268,9 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			while (s.hasNext()){
 				Pair<byte[], Transaction> a = s.next();
 				Transaction t = a.getB();
+				if (t == null)
+					continue;
+				
 				if (t.getType()== Transaction.VOUCH_TRANSACTION ){
 					R_Vouch tt = (R_Vouch)t;
 					if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
