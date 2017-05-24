@@ -144,14 +144,14 @@ public abstract class Issue_ItemRecord extends Transaction
 
 		//CHECK ICON LENGTH
 		int iconLength = this.item.getIcon().length;
-		if(iconLength > ItemCls.MAX_ICON_LENGTH)
+		if(iconLength < 0 || iconLength > ItemCls.MAX_ICON_LENGTH)
 		{
 			return INVALID_ICON_LENGTH;
 		}
 
 		//CHECK IMAGE LENGTH
 		int imageLength = this.item.getImage().length;
-		if(imageLength > ItemCls.MAX_IMAGE_LENGTH)
+		if(imageLength < 0 || imageLength > ItemCls.MAX_IMAGE_LENGTH)
 		{
 			return INVALID_IMAGE_LENGTH;
 		}

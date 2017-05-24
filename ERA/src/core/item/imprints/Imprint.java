@@ -82,7 +82,7 @@ public class Imprint extends ImprintCls {
 		int iconLength = Ints.fromBytes( (byte)0, (byte)0, iconLengthBytes[0], iconLengthBytes[1]);
 		position += ICON_SIZE_LENGTH;
 		
-		if(iconLength > MAX_ICON_LENGTH)
+		if(iconLength < 0 || iconLength > MAX_ICON_LENGTH)
 		{
 			throw new Exception("Invalid icon length");
 		}
@@ -95,7 +95,7 @@ public class Imprint extends ImprintCls {
 		int imageLength = Ints.fromByteArray(imageLengthBytes);
 		position += IMAGE_SIZE_LENGTH;
 		
-		if(imageLength > MAX_IMAGE_LENGTH)
+		if(imageLength < 0 || imageLength > MAX_IMAGE_LENGTH)
 		{
 			throw new Exception("Invalid image length");
 		}
