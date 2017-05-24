@@ -310,8 +310,13 @@ public void initComponents() {
 					String value = (String) openTabes.get(i + "");
 					mainPanel.dylay(value);
 				}
+				
 				if (main_Frame_settingsJSON.containsKey("Main_Frame_Selected_Tab"))
-					mainPanel.jTabbedPane1.setSelectedIndex(new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Selected_Tab")));
+					try {
+					mainPanel.jTabbedPane1.setSelectedIndex(
+							new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Selected_Tab")));
+					} catch (Exception e) {
+					}
 			}
 		
 		

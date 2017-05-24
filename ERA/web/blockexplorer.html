@@ -801,13 +801,13 @@ function assets(data)
 		table += '<tr>';
 		table += '<td>' + key;
 		table += '<td>';
-		if (data.assets[key].img.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].img+ '" width="100" />'; 
+		if (data.assets[key].icon.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].icon+ '" width="150" />'; 
 		table += '</td>';
 		table += '<td>' + '<a href=?asset='+encodeURIComponent(key)+get_lang()+'>' + htmlFilter(data.assets[key].name) + '</a>';
 		
 		table += '<td>' + data.assets[key].operations;
 	
-		table += '<td>' + htmlFilter(data.assets[key].description);
+		table += '<td>' + data.assets[key].description.substr(0, 100);
 		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
 		table += '<td>' + htmlFilter(data.assets[key].isMovable);
 		table += '<td>' +data.assets[key].quantity;
@@ -848,7 +848,7 @@ function asset(data)
 	
 	output += '<br><br>';
 	
-	if (data.asset.this.img.length>0) output += '<img src="data:image/gif;base64,' + data.asset.this.img+ '"  />'; 
+	if (data.asset.this.img.length>0) output += '<img src="data:image/gif;base64,' + data.asset.this.img+ '" style=" max-width: 100%;" />'; 
 	
 	if (data.asset.this.icon.length>0) output += '<img src="data:image/gif;base64,' + data.asset.this.icon+ '"  />'; 
 	
