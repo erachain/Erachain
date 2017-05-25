@@ -155,7 +155,7 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
+			String password = PasswordPane.showUnlockWalletDialog(this); 
 			if(password.equals(""))
 			{
 				this.sendButton.setEnabled(true);

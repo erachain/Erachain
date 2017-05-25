@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Image;
@@ -68,15 +69,18 @@ public class InsertPersonPanel extends IssuePersonPanel{
     protected javax.swing.JPanel jPanel_Paste;
     protected MButton pasteButton;
     
-    
+   
     
     
     //protected IssuePersonRecord issuePersonRecord;
     protected PersonHuman person;
+
+	private InsertPersonPanel th;
 	
 	 public InsertPersonPanel(){
 		
 		super();
+		th = this;
 		
 		init();	
 		this.setMinimumSize(new Dimension(0,0));
@@ -332,6 +336,8 @@ private void init(){
     
      trans_Button.addActionListener(new ActionListener(){
 
+		
+
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 
@@ -342,7 +348,7 @@ private void init(){
 			if(!Controller.getInstance().isWalletUnlocked())
 			{
 				//ASK FOR PASSWORD
-				String password = PasswordPane.showUnlockWalletDialog(); 
+				String password = PasswordPane.showUnlockWalletDialog(th); 
 				if(!Controller.getInstance().unlockWallet(password))
 				{
 					//WRONG PASSWORD

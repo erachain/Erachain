@@ -41,6 +41,7 @@ public class Menu_Popup_File_button extends JButton{
 		private ImageIcon unlockedIcon;
 		private Menu_Popup_File_button this_component;
 		final JPopupMenu fileMenu ;
+		private Menu_Popup_File_button th;
 		
 
 	
@@ -49,7 +50,7 @@ public class Menu_Popup_File_button extends JButton{
 		
 			
 			super();
-			
+			th = this;
 		this_component = this;
 		this.setText(Lang.getInstance().translate("File"));
 			//     button1_MainToolBar.setActionCommand("button1_Main_Panel");
@@ -109,7 +110,7 @@ public class Menu_Popup_File_button extends JButton{
 		        	
 		        	public void actionPerformed(ActionEvent e)
 		        	{
-						PasswordPane.switchLockDialog();
+						PasswordPane.switchLockDialog(th);
 		        	}
 		        });
 		        fileMenu.add(lockItem);

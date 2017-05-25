@@ -457,9 +457,9 @@ public class ExchangeFrame extends JDialog
 				public void actionPerformed(ActionEvent e) {
 					if(sellOrdersTableModel.getSortableList().size()==0)return;
 					int row = sellOrdersTable.getSelectedRow();
-					row = sellOrdersTable.convertRowIndexToModel(row);
+					int row1 = sellOrdersTable.convertRowIndexToModel(row);
 
-					Order order = sellOrdersTableModel.getOrder(row);
+					Order order = sellOrdersTableModel.getOrder(row1);
 					new CancelOrderFrame(order);
 				}
 			});

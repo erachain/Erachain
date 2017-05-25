@@ -46,13 +46,15 @@ import core.transaction.R_SignNote;
 public class RecStatementDetailsFrame extends Rec_DetailsFrame
 {
 	private JTextPane messageText;
+
+	private RecStatementDetailsFrame th;
 	
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	
 	public RecStatementDetailsFrame(final R_SignNote r_Statement)
 	{
 		super(r_Statement);
-		
+		th = this;
 		if (r_Statement.getKey() > 0) {
 			++labelGBC.gridy;
 			++detailGBC.gridy;
@@ -129,7 +131,7 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 		        		if(!Controller.getInstance().isWalletUnlocked())
 		        		{
 		        			//ASK FOR PASSWORD
-		        			String password = PasswordPane.showUnlockWalletDialog(); 
+		        			String password = PasswordPane.showUnlockWalletDialog(th); 
 		        			if(!Controller.getInstance().unlockWallet(password))
 		        			{
 		        				//WRONG PASSWORD

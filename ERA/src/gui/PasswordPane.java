@@ -19,7 +19,7 @@ import lang.Lang;
 
 public class PasswordPane 
 {
-	public static String showUnlockWalletDialog()
+	public static String showUnlockWalletDialog(Component parent)
 	{
 		JPanel userPanel = new JPanel();
 		userPanel.setLayout(new GridLayout(2,2));
@@ -69,7 +69,7 @@ public class PasswordPane
 		//a JPanel containing the dialog components we want
 		
 		int n = JOptionPane.showOptionDialog(
-					MainFrame.getInstance(), 
+				(Component) parent, 
 					userPanel, 
 					Lang.getInstance().translate("Unlock Wallet"),
 					JOptionPane.YES_NO_CANCEL_OPTION, 
@@ -90,7 +90,7 @@ public class PasswordPane
 		return new String(passwordFld.getPassword());
 	}
 	
-	public static void switchLockDialog()
+	public static void switchLockDialog(Object parent)
 	{
 		if(Controller.getInstance().isWalletUnlocked())
 		{
@@ -98,7 +98,7 @@ public class PasswordPane
 		}
 		else
 		{
-			String password = PasswordPane.showUnlockWalletDialog(); 
+			String password = PasswordPane.showUnlockWalletDialog((Component) parent); 
 			if(!password.equals("") && !Controller.getInstance().unlockWallet(password))
 			{
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);

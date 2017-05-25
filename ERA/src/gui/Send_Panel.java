@@ -541,7 +541,7 @@ public class Send_Panel extends JPanel
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
+			String password = PasswordPane.showUnlockWalletDialog(this); 
 			if(password.equals(""))
 			{
 				this.sendButton.setEnabled(true);

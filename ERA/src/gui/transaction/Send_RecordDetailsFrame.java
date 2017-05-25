@@ -52,13 +52,15 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 	private JScrollPane jScrollPane1;
 
 	private MTextPane jTextArea_Messge;
+
+	private Send_RecordDetailsFrame th;
 	
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	
 	public Send_RecordDetailsFrame(final R_Send r_Send)
 	{
 		super(r_Send);
-				
+				th = this;
 		//LABEL RECIPIENT
 		++labelGBC.gridy;
 		JLabel recipientLabel = new JLabel(Lang.getInstance().translate("Recipient") + ":");
@@ -157,7 +159,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        		if(!Controller.getInstance().isWalletUnlocked())
 		        		{
 		        			//ASK FOR PASSWORD
-		        			String password = PasswordPane.showUnlockWalletDialog(); 
+		        			String password = PasswordPane.showUnlockWalletDialog(th); 
 		        			if(!Controller.getInstance().unlockWallet(password))
 		        			{
 		        				//WRONG PASSWORD

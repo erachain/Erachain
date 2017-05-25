@@ -461,7 +461,7 @@ public class Send_TableModel extends JTable implements Observer{
 				if( !Controller.getInstance().isWalletUnlocked() )
 				{
 					//ASK FOR PASSWORD
-					String password = PasswordPane.showUnlockWalletDialog(); 
+					String password = PasswordPane.showUnlockWalletDialog(this); 
 					if( password.equals("") )
 					{
 						return;

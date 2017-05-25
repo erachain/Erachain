@@ -38,10 +38,11 @@ public class Menu_Files extends JMenu {
 	public static JMenuItem lockItem;
 	public ImageIcon lockedIcon;
 	public ImageIcon unlockedIcon;
+	private Menu_Files th;
 	
 	public Menu_Files(){
 		super();
-	 
+	 th = this;
 		 addMenuListener(new MenuListener(){
 
 				@Override
@@ -103,7 +104,7 @@ public class Menu_Files extends JMenu {
         	
         	public void actionPerformed(ActionEvent e)
         	{
-				PasswordPane.switchLockDialog();
+				PasswordPane.switchLockDialog(th);
         	}
         });
         add(lockItem);

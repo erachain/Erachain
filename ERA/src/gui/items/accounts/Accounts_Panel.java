@@ -62,15 +62,17 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 //JInternalFrame
 {
 	//private JFrame parent;
-
+	
 	public JComboBox<AssetCls> cbxFavorites;
 	public AccountsTableModel tableModel;
 	public JButton newAccount_Button;
 	MTable table;
+	private Accounts_Panel th;
 
 	@SuppressWarnings("unchecked")
 	public Accounts_Panel()
 	{
+		th  = this;
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
 		
@@ -129,7 +131,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 				  if(!Controller.getInstance().isWalletUnlocked())
 				  {
 				   //ASK FOR PASSWORD
-				   String password = PasswordPane.showUnlockWalletDialog(); 
+				   String password = PasswordPane.showUnlockWalletDialog(th); 
 				   if(!Controller.getInstance().unlockWallet(password))
 				   {
 				    //WRONG PASSWORD

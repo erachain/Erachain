@@ -317,7 +317,7 @@ public class InitiateAcctFrame extends JFrame {
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
+			String password = PasswordPane.showUnlockWalletDialog(this); 
 			if(!Controller.getInstance().unlockWallet(password))
 			{
 				//WRONG PASSWORD

@@ -162,7 +162,7 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
+			String password = PasswordPane.showUnlockWalletDialog(this); 
 			if(password.equals(""))
 			{
 				this.sendButton.setEnabled(true);

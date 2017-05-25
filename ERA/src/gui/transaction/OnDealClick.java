@@ -14,6 +14,7 @@ import core.account.PrivateKeyAccount;
 //import javax.swing.JOptionPane;
 
 import core.transaction.Transaction;
+import gui.MainFrame;
 //import lang.Lang;
 import gui.PasswordPane;
 import lang.Lang;
@@ -43,7 +44,7 @@ public class OnDealClick
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(); 
+			String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance()); 
 			if(!Controller.getInstance().unlockWallet(password))
 			{
 				//WRONG PASSWORD

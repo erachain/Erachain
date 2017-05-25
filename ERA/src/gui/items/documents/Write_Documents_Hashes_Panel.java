@@ -151,7 +151,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 		// CHECK IF WALLET UNLOCKED
 		if (!Controller.getInstance().isWalletUnlocked()) {
 			// ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog();
+			String password = PasswordPane.showUnlockWalletDialog(this);
 			if (!Controller.getInstance().unlockWallet(password)) {
 				// WRONG PASSWORD
 				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),

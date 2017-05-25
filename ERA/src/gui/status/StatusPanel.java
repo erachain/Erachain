@@ -11,9 +11,12 @@ import gui.PasswordPane;
 @SuppressWarnings("serial")
 public class StatusPanel extends JPanel 
 {
+	private StatusPanel th;
+
 	public StatusPanel()
 	{
 		super();
+		th = this;
 		
 		this.add(new NetworkStatus(), BorderLayout.EAST);
 		
@@ -24,7 +27,7 @@ public class StatusPanel extends JPanel
 			{
 				if(e.getClickCount() == 2) 
 				{
-					PasswordPane.switchLockDialog();
+					PasswordPane.switchLockDialog(th);
 			    }
 			}
 		});

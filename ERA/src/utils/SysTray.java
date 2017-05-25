@@ -34,6 +34,7 @@ import database.wallet.TransactionMap;
 import gui.ClosingDialog;
 import gui.ConsolePanel;
 import gui.Gui;
+import gui.MainFrame;
 import gui.PasswordPane;
 import gui.CoreRowSorter;
 import gui.Send_Panel;
@@ -160,7 +161,7 @@ public class SysTray implements Observer{
 					Controller.getInstance().lockWallet();
 				}else
 				{
-					String password = PasswordPane.showUnlockWalletDialog(); 
+					String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance()); 
 					if(!password.equals("") && !Controller.getInstance().unlockWallet(password))
 					{
 						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet", JOptionPane.ERROR_MESSAGE);
