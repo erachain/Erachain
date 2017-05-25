@@ -29,6 +29,7 @@ import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
+import gui.library.My_Add_Image_Panel;
 import gui.library.My_JFileChooser;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
@@ -61,16 +62,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         
         name_jLabel.setText(Lang.getInstance().translate("Name") + ":");
         txtName.setText("");
-        icon_jButton.setText(Lang.getInstance().translate("Add Icon") + ":");
-        icon_jButton.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				addicon();
-			}
-        	
-        });
+        
        
         chkDivisible.setText("");
         devisible_jLabel.setText(Lang.getInstance().translate("Divisible") + ":");
@@ -102,22 +94,11 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			}
         });
         
-        image_jButton.setText(Lang.getInstance().translate("Add Image (max %1%kB)")
-        		.replace("%1%", "1024")); // "" + (ItemCls.MAX_IMAGE_LENGTH>>10)));
-        image_jButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
-        image_jButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        image_jButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);
-        image_jButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        image_jButton.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-			addimage();
-			}
-        });
-            
-	
+               
+     
+     
+        
+           add_Logo_Icon_Panel.setPreferredSize(new Dimension(250,50));
         
         
         
@@ -137,8 +118,6 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
         name_jLabel = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
-        icon_jButton = new javax.swing.JButton();
-        image_jButton = new javax.swing.JButton();
         chkDivisible = new javax.swing.JCheckBox();
         devisible_jLabel = new javax.swing.JLabel();
         movable_jLabel = new javax.swing.JLabel();
@@ -154,6 +133,10 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         fee_jLabel = new javax.swing.JLabel();
         txtFeePow = new javax.swing.JTextField();
         issue_jButton = new javax.swing.JButton();
+        // size from widht
+        add_Image_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Image (max %1%kB)").replace("%1%", "1024"), 250 , 0); 
+        // size from height
+        add_Logo_Icon_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 0 , 50);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -191,24 +174,27 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
         add(txtName, gridBagConstraints);
 
-        icon_jButton.setText("jButton1");
+   
+        
+      
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
-        add(icon_jButton, gridBagConstraints);
-
-        image_jButton.setText("jButton2");
-        image_jButton.setPreferredSize(new java.awt.Dimension(250, 350));
+      
+        add(add_Logo_Icon_Panel, gridBagConstraints);
+      
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 8);
-        add(image_jButton, gridBagConstraints);
-
+        gridBagConstraints.insets = new java.awt.Insets(0, 12, 8, 8);
+      
+        
+        add_Image_Panel.setPreferredSize(new Dimension(250,350));
+        add(add_Image_Panel, gridBagConstraints);
         chkDivisible.setText("jCheckBox1");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
@@ -329,7 +315,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         add(txtFeePow, gridBagConstraints);
 
-        issue_jButton.setText("jButton3");
+       // issue_jButton.setText("jButton3");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 6;
@@ -380,7 +366,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			
 			//CREATE ASSET
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(),  iconButes, imgButes, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
+			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(),  add_Logo_Icon_Panel.imgButes, add_Image_Panel.imgButes, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
 					 feePow);			
 
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
@@ -484,181 +470,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 	}
     
     
-    protected void addimage() {
-		// TODO Auto-generated method stub
-		
-		
-		// открыть диалог для файла
-		//JFileChooser chooser = new JFileChooser();
-		My_JFileChooser chooser = new My_JFileChooser();
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setMultiSelectionEnabled(false);
-		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                 "Image", "png", "jpg", "gif");
-		 chooser.setFileFilter(filter);
-		 chooser.setDialogTitle(Lang.getInstance().translate("Open Image")+ "...");
-		 
-	    int returnVal = chooser.showOpenDialog(getParent());
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	       System.out.println("You chose to open this file: " +
-	            chooser.getSelectedFile().getName());
-	    
-	
-	       
-	       File file = new File(chooser.getSelectedFile().getPath());
-// если размер больше 30к то не вставляем	       
-	       if (file.length()>ItemCls.MAX_IMAGE_LENGTH) {
-	    	   
-	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
-	    			   Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
-	    	   
-	    	   return;
-	       }
-	       
-// его надо в базу вставлять
-	        imgButes = null; 
-			try {
-				imgButes = getBytesFromFile(file);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        InputStream inputStream = new ByteArrayInputStream(imgButes);
-	        try {
-				BufferedImage image1 = ImageIO.read(inputStream);
-				
-				// jLabel2.setText("jLabel2");
-				ImageIcon image = new ImageIcon(image1);
-				int x = image.getIconWidth();
-				int y = image.getIconHeight();
-
-				int x1 = 250;
-				double k = ((double) x / (double) x1);
-				y = (int) ((double) y / k);
-				
-
-				if (y != 0) {
-					Image Im = image.getImage().getScaledInstance(x1, y, 1);
-					image_jButton.setIcon((image));
-				}
-				
-				
-				
-				
-				
-				
-				
-				
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	          
-	    }
-		
-	}
-    
-    protected void addicon() {
-  		// TODO Auto-generated method stub
-  		
-  		
-  		// открыть диалог для файла
-  		//JFileChooser chooser = new JFileChooser();
-  		My_JFileChooser chooser = new My_JFileChooser();
-  		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-  		chooser.setMultiSelectionEnabled(false);
-  		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                   "Image", "png", "jpg", "gif");
-  		 chooser.setFileFilter(filter);
-  		 chooser.setDialogTitle(Lang.getInstance().translate("Open Image")+ "...");
-  		 
-  	    int returnVal = chooser.showOpenDialog(getParent());
-  	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-  	       System.out.println("You chose to open this file: " +
-  	            chooser.getSelectedFile().getName());
-  	    
-  	
-  	       
-  	       File file = new File(chooser.getSelectedFile().getPath());
-  // если размер больше 30к то не вставляем	       
-  	       if (file.length()>ItemCls.MAX_ICON_LENGTH) {
-  	    	   
-  	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
-  	    			   Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
-  	    	   
-  	    	   return;
-  	       }
-  	       
-  // его надо в базу вставлять
-  	        iconButes = null; 
-  			try {
-  				iconButes = getBytesFromFile(file);
-  			} catch (IOException e) {
-  				// TODO Auto-generated catch block
-  				e.printStackTrace();
-  			}
-  	        InputStream inputStream = new ByteArrayInputStream(iconButes);
-  	        try {
-  				BufferedImage image1 = ImageIO.read(inputStream);
-  				
-  				// jLabel2.setText("jLabel2");
-  				ImageIcon image = new ImageIcon(image1);
-  				int x = image.getIconWidth();
-  				int y = image.getIconHeight();
-
-  				int x1 = 30;
-  				double k = ((double) x / (double) x1);
-  				y = (int) ((double) y / k);
-  				
-
-  				if (y != 0) {
-  					Image Im = image.getImage().getScaledInstance(x1, y, 1);
-  					//icon_jButton.setIcon(new ImageIcon(Im));
-  					icon_jButton.setIcon(image);
-  				}
-  				
-  				
-  				
-  				
-  				
-  				
-  				
-  				
-  				
-  			} catch (IOException e) {
-  				// TODO Auto-generated catch block
-  				e.printStackTrace();
-  			}
-  	          
-  	    }
-  		
-  	}
-    
-    
-    
-    @SuppressWarnings("resource")
-  	protected static byte[] getBytesFromFile(File file) throws IOException {
-          InputStream is = new FileInputStream(file);
-          long length = file.length();
-          if (length > Integer.MAX_VALUE) {
-              // File is too large
-          }
-          byte[] bytes = new byte[(int)length];
-          int offset = 0;
-          int numRead = 0;
-          while (offset < bytes.length
-                 && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-              offset += numRead;
-          }
-          if (offset < bytes.length) {
-              throw new IOException("Could not completely read file "+file.getName());
-          }
-          is.close();
-          return bytes;
-      }
-    
-    
+  
     
 
     // Variables declaration - do not modify                     
@@ -670,8 +482,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JLabel devisible_jLabel;
     private javax.swing.JLabel fee_jLabel;
     private javax.swing.JTextField txtFeePow;
-    private javax.swing.JButton icon_jButton;
-    private javax.swing.JButton image_jButton;
+ //   private javax.swing.JButton icon_jButton;
+ //   private javax.swing.JButton image_jButton;
     private javax.swing.JButton issue_jButton;
     private JComboBox<Account> cbxFrom;
     private javax.swing.JScrollPane jScrollPane1;
@@ -683,5 +495,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JTextField txtQuantity;
     private javax.swing.JLabel scale_jLabel;
     private javax.swing.JTextField txtScale;
+    private My_Add_Image_Panel add_Image_Panel;
+    private My_Add_Image_Panel add_Logo_Icon_Panel;
     // End of variables declaration                   
 }

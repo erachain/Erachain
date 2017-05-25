@@ -2,6 +2,7 @@ package gui.items.persons;
 
 import gui.PasswordPane;
 import gui.library.MButton;
+import gui.library.My_Add_Image_Panel;
 import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
@@ -75,7 +76,7 @@ public class IssuePersonPanel extends JPanel
 	protected JTextArea txtareaDescription;
 	protected JDateChooser txtBirthday;
 	protected JDateChooser txtDeathday;
-	protected JButton iconButton;
+//	protected JButton iconButton;
 	@SuppressWarnings("rawtypes")
 	protected JComboBox txtGender;
 	protected JTextField txtRace;
@@ -106,6 +107,7 @@ public class IssuePersonPanel extends JPanel
     protected javax.swing.JPanel jPanel1;
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JScrollPane jScrollPane1;
+    protected My_Add_Image_Panel add_Image_Panel;
   
     // End of variables declaration
 	
@@ -166,25 +168,7 @@ public class IssuePersonPanel extends JPanel
        	this.txtBirthLongitude.setText("0");
        	this.txtHeight.setText("170");
        	this.txtFeePow.setText("0");
- // issue buton
-       
-
-// add icin
-        iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
-        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
-        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
-        iconButton.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);//.LEADING);
-        iconButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        iconButton.setVerticalAlignment(javax.swing.SwingConstants.CENTER);//.TOP);
-        iconButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        iconButton.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-			addimage();
-			}
-        });
+ 
         this.setMinimumSize(new Dimension(0,0)); 
         this.setVisible(true);
         
@@ -233,80 +217,7 @@ public class IssuePersonPanel extends JPanel
     	
     }
 	
-	protected void addimage() {
-		// TODO Auto-generated method stub
-		
-		
-		// открыть диалог для файла
-		//JFileChooser chooser = new JFileChooser();
-		My_JFileChooser chooser = new My_JFileChooser();
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		chooser.setMultiSelectionEnabled(false);
-		 FileNameExtensionFilter filter = new FileNameExtensionFilter(
-                 "Image", "png", "jpg", "gif");
-		 chooser.setFileFilter(filter);
-		 chooser.setDialogTitle(Lang.getInstance().translate("Open Image")+ "...");
-		 
-	    int returnVal = chooser.showOpenDialog(getParent());
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	       System.out.println("You chose to open this file: " +
-	            chooser.getSelectedFile().getName());
-	    
-	
-	       
-	       File file = new File(chooser.getSelectedFile().getPath());
-// если размер больше 30к то не вставляем	       
-	       if (file.length()>IssuePersonRecord.MAX_IMAGE_LENGTH) {
-	    	   
-	    	   JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
-	    			   Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
-	    	   
-	    	   return;
-	       }
-	       
-// его надо в базу вставлять
-	        imgButes = null; 
-			try {
-				imgButes = getBytesFromFile(file);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        InputStream inputStream = new ByteArrayInputStream(imgButes);
-	        try {
-				BufferedImage image1 = ImageIO.read(inputStream);
-				
-				// jLabel2.setText("jLabel2");
-				ImageIcon image = new ImageIcon(image1);
-				int x = image.getIconWidth();
-				int y = image.getIconHeight();
 
-				int x1 = 250;
-				double k = ((double) x / (double) x1);
-				y = (int) ((double) y / k);
-				
-
-				if (y != 0) {
-					Image Im = image.getImage().getScaledInstance(x1, y, 1);
-					iconButton.setIcon(new ImageIcon(Im));
-				}
-				
-				
-				
-				
-				
-				
-				
-				
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	          
-	    }
-		
-	}
 
 	@SuppressWarnings("deprecation")
 	public void onIssueClick(boolean forIssue)
@@ -437,7 +348,7 @@ public class IssuePersonPanel extends JPanel
 				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
 				this.txtHairСolor.getText(), height,
-				null, this.imgButes, this.txtareaDescription.getText(),
+				null, add_Image_Panel.imgButes, this.txtareaDescription.getText(),
 				owner, null);
 		
 		//CHECK VALIDATE MESSAGE
@@ -485,12 +396,7 @@ public class IssuePersonPanel extends JPanel
 		//txtEyeColor.setText("");
 		//txtHairСolor.setText("");
 		//txtHeight.setText("");
-		iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
-        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
-        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
-		imgButes = null;
-		iconButton.setIcon(null);
-
+		add_Image_Panel.reset();
 	}
                              
     @SuppressWarnings({ "unchecked", "null" })
@@ -518,7 +424,6 @@ public class IssuePersonPanel extends JPanel
         jLabel_Fee = new javax.swing.JLabel();
         txtFeePow = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
-        iconButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtareaDescription = new javax.swing.JTextArea();
         txtName = new javax.swing.JTextField();
@@ -534,6 +439,9 @@ public class IssuePersonPanel extends JPanel
         txtGender = new javax.swing.JComboBox<>();
         mainPanel = new javax.swing.JPanel();
         mainScrollPane1 = new javax.swing.JScrollPane();
+        add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
+        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350,0);
     	
         this.issueButton.addActionListener(new ActionListener()
 		{
@@ -732,15 +640,7 @@ public class IssuePersonPanel extends JPanel
         jPanel1Layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
         jPanel1Layout.rowHeights = new int[] {0, 4, 0, 4, 0};
         jPanel1.setLayout(jPanel1Layout);
-
-        iconButton.setText(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
-        		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
-        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH));
-        iconButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-     //           iconButtonActionPerformed(evt);
-            }
-        });
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -749,8 +649,9 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.05;
-        jPanel1.add(iconButton, gridBagConstraints);
-
+     //   jPanel1.add(iconButton, gridBagConstraints);
+        
+        jPanel1.add(add_Image_Panel, gridBagConstraints);
         txtareaDescription.setColumns(20);
         txtareaDescription.setRows(5);
         jScrollPane1.setViewportView(txtareaDescription);

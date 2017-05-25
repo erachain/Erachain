@@ -139,7 +139,7 @@ private void init(){
 	copyButton.setVisible(false);
 	
 	
-	iconButton.setVisible(false);
+	add_Image_Panel.setVisible(false);
 	txtGender.setVisible(false);
 	txtGenderTxt.setEditable(false);
 	txtRace.setEditable(false);
@@ -442,7 +442,7 @@ private void init(){
 		txtHairСolor.setText("");
 		txtHeight.setText("");
 		imgButes = null;
-		iconButton.setIcon(null);
+		add_Image_Panel.reset();
 	
 	}
 
