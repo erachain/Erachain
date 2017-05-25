@@ -121,8 +121,8 @@ public class MenuPopupUtil {
 				if (e.isPopupTrigger()) {
 					component.requestFocus();
 					if(!component.isEditable() && component.getSelectedText() == null){
-						component.selectAll();
-						component.moveCaretPosition(0);
+					//	component.selectAll();
+						//component.moveCaretPosition(0);
 					}
 					final JPopupMenu menu = new JPopupMenu();
 					JMenuItem item;

@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import gui.MainFrame;
 import gui.PasswordPane;
 
 @SuppressWarnings("serial")
@@ -27,7 +28,7 @@ public class StatusPanel extends JPanel
 			{
 				if(e.getClickCount() == 2) 
 				{
-					PasswordPane.switchLockDialog(th);
+					PasswordPane.switchLockDialog(MainFrame.getInstance());
 			    }
 			}
 		});

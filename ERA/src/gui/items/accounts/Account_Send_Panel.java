@@ -124,7 +124,7 @@ public class Account_Send_Panel extends JPanel
 		favoritesGBC.gridy = y;	
 		
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
-		this.add(cbxFavorites, favoritesGBC);
+	//	this.add(cbxFavorites, favoritesGBC);
 		if (asset != null) cbxFavorites.setSelectedItem(asset);
 		
 		this.accountsModel = new AccountsComboBoxModel();
@@ -387,6 +387,36 @@ public class Account_Send_Panel extends JPanel
 		encrypted = new JCheckBox();
 		encrypted.setSelected(true);
 		this.add(encrypted, ChkEncGBC);
+		
+		 //LABEL Coin
+      	GridBagConstraints labelCoin = new GridBagConstraints();
+      	labelCoin.insets = new Insets(5,5,5,5);
+      	labelCoin.fill = GridBagConstraints.HORIZONTAL;   
+      	labelCoin.anchor = GridBagConstraints.NORTHWEST;
+      	labelCoin.weightx = 0;	
+      	labelCoin.gridx = 0;
+      	labelCoin.gridy = ++y;
+      	
+      	JLabel coin_Label = new JLabel(Lang.getInstance().translate("Coin") + ":");
+      	coin_Label.setHorizontalAlignment(SwingConstants.RIGHT);
+      	this.add(coin_Label, labelCoin);
+      	
+		//TXT TITLE
+		GridBagConstraints coinMessageGBC = new GridBagConstraints();
+		coinMessageGBC.gridwidth = 4;
+		coinMessageGBC.insets = new Insets(5, 5, 5, 0);
+		coinMessageGBC.fill = GridBagConstraints.HORIZONTAL;   
+		coinMessageGBC.anchor = GridBagConstraints.NORTHWEST;
+		coinMessageGBC.weightx = 0;	
+		coinMessageGBC.gridx = 1;
+		coinMessageGBC.gridy = y;
+        
+       // txt_Title = new JTextField()
+       
+      	this.add(cbxFavorites, coinMessageGBC);
+		
+		
+		
 		
     	//LABEL AMOUNT
 		GridBagConstraints amountlabelGBC = new GridBagConstraints();

@@ -164,7 +164,7 @@ jTextArea_Title.setText(Lang.getInstance().translate("Title"));
 		favoritesGBC.gridy = ++y;	
 		
 		cbxFavorites = new JComboBox();
-		this.add(cbxFavorites, favoritesGBC);
+	//	this.add(cbxFavorites, favoritesGBC);
 		
 		
 		this.accountsModel = new AccountsComboBoxModel();
@@ -372,6 +372,35 @@ jTextArea_Title.setText(Lang.getInstance().translate("Title"));
 		encrypted = new JCheckBox();
 		encrypted.setSelected(true);
 		this.add(encrypted, ChkEncGBC);
+		
+		
+		 //coin TITLE
+      	GridBagConstraints labecoin = new GridBagConstraints();
+      	labecoin.insets = new Insets(5,5,5,5);
+      	labecoin.fill = GridBagConstraints.HORIZONTAL;   
+      	labecoin.anchor = GridBagConstraints.NORTHWEST;
+      	labecoin.weightx = 0;	
+      	labecoin.gridx = 0;
+      	labecoin.gridy = ++y;
+      	
+      	JLabel coin_Label = new JLabel(Lang.getInstance().translate("Coin") + ":");
+      	coin_Label.setHorizontalAlignment(SwingConstants.RIGHT);
+      	this.add(coin_Label, labecoin);
+      	
+		//TXT TITLE
+		GridBagConstraints txtCoin= new GridBagConstraints();
+		txtCoin.gridwidth = 4;
+		txtCoin.insets = new Insets(5, 5, 5, 0);
+		txtCoin.fill = GridBagConstraints.HORIZONTAL;   
+		txtCoin.anchor = GridBagConstraints.NORTHWEST;
+		txtCoin.weightx = 0;	
+		txtCoin.gridx = 1;
+		txtCoin.gridy = y;
+        
+        
+        
+      	this.add(cbxFavorites, txtCoin);
+		
 		
     	//LABEL AMOUNT
 		GridBagConstraints amountlabelGBC = new GridBagConstraints();
