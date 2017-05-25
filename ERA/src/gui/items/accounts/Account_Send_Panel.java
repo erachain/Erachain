@@ -397,7 +397,7 @@ public class Account_Send_Panel extends JPanel
       	labelCoin.gridx = 0;
       	labelCoin.gridy = ++y;
       	
-      	JLabel coin_Label = new JLabel(Lang.getInstance().translate("Coin") + ":");
+      	JLabel coin_Label = new JLabel(Lang.getInstance().translate("Asset") + ":");
       	coin_Label.setHorizontalAlignment(SwingConstants.RIGHT);
       	this.add(coin_Label, labelCoin);
       	

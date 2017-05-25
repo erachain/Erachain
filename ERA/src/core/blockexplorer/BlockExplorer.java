@@ -2015,7 +2015,7 @@ if ( asset_1 == null) {
 		output.put("Label_Title",(Lang.getInstance().translate_from_langObj("Top %limit% %assetName% Richest",langObj).replace("%limit%",String.valueOf(limit))).replace("%assetName%", asset.getName()));
 		output.put("Label_All_non", (Lang.getInstance().translate_from_langObj("All non-empty %assetName% accounts (%count%)",langObj).replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
 		output.put("Label_All_accounts",(Lang.getInstance().translate_from_langObj("All %assetName% accounts (%count%)",langObj).replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
-		output.put("Label_Total_coins_in_the_system", Lang.getInstance().translate_from_langObj("Total coins in the system", langObj));
+		output.put("Label_Total_coins_in_the_system", Lang.getInstance().translate_from_langObj("Total asset units in the system", langObj));
 		
 		return output;
 	}	

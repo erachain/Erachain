@@ -383,7 +383,7 @@ jTextArea_Title.setText(Lang.getInstance().translate("Title"));
       	labecoin.gridx = 0;
       	labecoin.gridy = ++y;
       	
-      	JLabel coin_Label = new JLabel(Lang.getInstance().translate("Coin") + ":");
+      	JLabel coin_Label = new JLabel(Lang.getInstance().translate("Asset") + ":");
       	coin_Label.setHorizontalAlignment(SwingConstants.RIGHT);
       	this.add(coin_Label, labecoin);
       	
