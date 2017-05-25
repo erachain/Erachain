@@ -260,7 +260,11 @@ private void init(){
  			try {
  				person = (PersonHuman)PersonFactory.getInstance().parse(dataPerson, false);		
  			} catch (Exception ee) {
- 				return;
+				JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				
+				issueButton.setEnabled(true);
+				copyButton.setEnabled(true);
+				return;
  			}
  			
  			txtName.setText(person.getName());			
