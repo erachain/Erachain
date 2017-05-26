@@ -452,7 +452,7 @@ class search_listener implements ListSelectionListener  {
 				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				int div = th.jSplitPanel.getDividerLocation();
 				int or = th.jSplitPanel.getOrientation();
-				Asset_Detail_Panel_003 info_panel = new Asset_Detail_Panel_003(asset);
+				Asset_Info info_panel = new Asset_Info(asset);
 					//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 					//jSplitPanel.setRightComponent(info_panel);
@@ -469,7 +469,7 @@ public void delay_on_close(){
 	// get component from right panel
 	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 	// if Person_Info 002 delay on close
-	  if (c1 instanceof Asset_Detail_Panel_003) ( (Asset_Detail_Panel_003)c1).delay_on_Close();
+	  if (c1 instanceof Asset_Info) ( (Asset_Info)c1).delay_on_Close();
 	
 }
 }

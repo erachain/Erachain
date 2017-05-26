@@ -60,11 +60,11 @@ import lang.Lang;
 import utils.MenuPopupUtil;
 
 
-public class Asset_Detail_Panel_003 extends JTextPane {
+public class Asset_Info extends JTextPane {
 
    private AssetCls asset;
 private Transaction transaction;
-private Asset_Detail_Panel_003 th;
+private Asset_Info th;
 private PublicKeyAccount owner;
 private JLabel image_Label;
 private BalancesTableModel balancesTableModel;
@@ -77,7 +77,7 @@ private Image Im;
     * Creates new form Asset_Info003
     */
 	
-   public Asset_Detail_Panel_003(AssetCls asset) {
+   public Asset_Info(AssetCls asset) {
     //   initComponents();
 	   th=this;
 	   this.asset = asset;
