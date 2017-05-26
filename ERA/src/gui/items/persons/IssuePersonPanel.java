@@ -326,7 +326,7 @@ public class IssuePersonPanel extends JPanel
 				mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
 				break;
 			case 6:
-				mess = "Invalid height 10..255 ";
+				mess = "Invalid height 10..255";
 				break;
 			}
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -567,7 +567,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.2;
         mainPanel.add(txtHairСolor, gridBagConstraints);
 
-        jLabel_Height.setText("Height");
+        jLabel_Height.setText("P.Height");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 12;
