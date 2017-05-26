@@ -329,7 +329,7 @@ public class IssuePersonPanel extends JPanel
 				mess = "Invalid height 10..255 ";
 				break;
 			}
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			this.issueButton.setEnabled(true);
 			this.copyButton.setEnabled(true);
@@ -433,8 +433,8 @@ public class IssuePersonPanel extends JPanel
         cbxFrom = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        issueButton = new MButton(Lang.getInstance().translate("Issue"),2);
-        copyButton = new MButton(Lang.getInstance().translate("Copy"),2);
+        issueButton = new MButton(Lang.getInstance().translate("Create and insert Person"), 2);
+        copyButton = new MButton(Lang.getInstance().translate("Create Person and copy to clipboard"), 2);
         jLabel_Title = new javax.swing.JLabel();
         txtGender = new javax.swing.JComboBox<>();
         mainPanel = new javax.swing.JPanel();
@@ -732,9 +732,10 @@ public class IssuePersonPanel extends JPanel
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
         
-        jPanel2.add(copyButton, new java.awt.GridBagConstraints());
-       
         jPanel2.add(issueButton, new java.awt.GridBagConstraints());
+
+        jPanel2.add(copyButton, new java.awt.GridBagConstraints());
+        
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

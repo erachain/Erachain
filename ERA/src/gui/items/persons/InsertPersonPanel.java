@@ -242,7 +242,7 @@ private void init(){
  	 
     
      
-	 pasteButton = new MButton(Lang.getInstance().translate("Paste"),2);
+	 pasteButton = new MButton(Lang.getInstance().translate("Paste Person from clipboard"), 2);
      pasteButton.addActionListener(new ActionListener(){
 
  		@Override
@@ -256,8 +256,9 @@ private void init(){
  			reset();
  			
  			String base58str = getClipboardContents();
- 			byte[] dataPerson = Base58.decode(base58str);
+ 			byte[] dataPerson;
  			try {
+ 	 			dataPerson = Base58.decode(base58str);
  				person = (PersonHuman)PersonFactory.getInstance().parse(dataPerson, false);		
  			} catch (Exception ee) {
 				JOptionPane.showMessageDialog(null, ee.getMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
@@ -336,7 +337,7 @@ private void init(){
 	
  
   
-     trans_Button = new MButton(Lang.getInstance().translate("Check")+ " & " + Lang.getInstance().translate("Issue"), 2);
+     trans_Button = new MButton(Lang.getInstance().translate("Check Person and insert"), 2);
     
      trans_Button.addActionListener(new ActionListener(){
 
@@ -389,7 +390,7 @@ private void init(){
 					mess = "Invalid fee power 0..6";
 					break;
 				}
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(e + mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				
 				issueButton.setEnabled(true);
 				copyButton.setEnabled(true);
