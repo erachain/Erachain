@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Image;
@@ -10,13 +11,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -42,6 +49,7 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.items.persons.Person_Work_Dialog;
+import gui.library.Holders_Library_Panel;
 import gui.library.HyperLinkAccount;
 import gui.library.MTable;
 import gui.library.M_Accoutn_Text_Field;
@@ -60,6 +68,11 @@ private Asset_Detail_Panel_003 th;
 private PublicKeyAccount owner;
 private JLabel image_Label;
 private BalancesTableModel balancesTableModel;
+private static String img_Local_URL = "http:\\img";
+BufferedImage image1;
+private int max_Widht;
+private int max_Height;
+private Image Im;
 /**
     * Creates new form Asset_Info003
     */
@@ -71,6 +84,8 @@ private BalancesTableModel balancesTableModel;
 	   owner = asset.getOwner();
 	   HyperLinkAccount hl_Owner = new HyperLinkAccount(owner);
 		
+	   
+	   
 	
 	   byte[] recordReference = asset.getReference();
        transaction = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
@@ -86,20 +101,20 @@ private BalancesTableModel balancesTableModel;
 	   // label
 	   InputStream inputStream = new ByteArrayInputStream(asset.getImage());
        try {
-			BufferedImage image1 = ImageIO.read(inputStream);
+			image1 = ImageIO.read(inputStream);
 			
 			// jLabel2.setText("jLabel2");
 			ImageIcon image = new ImageIcon(image1);
 			int x = image.getIconWidth();
-			int y = image.getIconHeight();
+			max_Height = image.getIconHeight();
 
-			int x1 = 250;
-			double k = ((double) x / (double) x1);
-			y = (int) ((double) y / k);
+			max_Widht = 350;
+			double k = ((double) x / (double) max_Widht);
+			max_Height = (int) ((double) max_Height / k);
 			
 
-			if (y != 0) {
-				Image Im = image.getImage().getScaledInstance(x1, y, 1);
+			if (max_Height != 0) {
+				Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
 				ImageIcon ic = new ImageIcon(Im);
 				image_Label.setIcon(ic);
 				image_Label.setSize(ic.getIconWidth(), ic.getIconHeight());
@@ -119,25 +134,29 @@ private BalancesTableModel balancesTableModel;
 		}
 	   
 	   }
+	 
+	   String color = "#" + Integer.toHexString( UIManager.getColor("Panel.background").getRGB()).substring(2) ;
 	   
 	   
        String text ="<body style= 'font-family:"
 				+ UIManager.getFont("Label.font").getFamily() + "; font-size: "+UIManager.getFont("Label.font").getSize() +"pt;'>";
-      text +="<div>" + img_HTML + "</div>";
-       text += "<DIV><b>" + Lang.getInstance().translate("Key")+ ": </b>" + asset.getKey() + "<DIV>";
+      
+      text +="<table><tr valign='top' align = 'left'><td>";
+       text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key")+ ": </b>" + asset.getKey() + "</DIV>";
 	    Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
-       
-	    text += "<div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DBSet.getInstance()) +"</div>";
+      if (image1 !=null) text +="<div><a href ='!!img'  style='color: "+ color  +"' ><img src=\""+img_Local_URL +"\"></a></div>";
+	    text += "<td><div  style='float:left'><div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DBSet.getInstance()) +"</div>";
 	    text += "<div><b>"+ Lang.getInstance().translate("Name") + ": </b>" + asset.getName() + "</div>";
 	    text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
 	    text += "<div><b>" + Lang.getInstance().translate("Owner") + ": </b><a href = '!!Owner'>" + hl_Owner.get_Text() + "</a></div>";
 	    text += "<div><b>" + Lang.getInstance().translate("Divisible") + ": </b>" + Lang.getInstance().translate(asset.isDivisible()+"") +"</div>";
-	    text += "<div></b>" + Lang.getInstance().translate("Quantity") + ": </b>" + asset.getQuantity() +"</div><<BR>"; 
-	   
+	    text += "<div></b>" + Lang.getInstance().translate("Quantity") + ": </b>" + asset.getQuantity() +"</div><<BR></td></tr></table>"; 
+	    text +="<div>"; 
 	   
        	   
 	    this.setContentType("text/html");
 	    this.setText(text);
+	    HTML_Add_Local_Images();
 	    this.setEditable(false);
 	    MenuPopupUtil.installContextMenu(this);
 	    add_comp();
@@ -157,9 +176,11 @@ private BalancesTableModel balancesTableModel;
 				        int x = (int) location.x - th.getLocationOnScreen().x;
 				        int y = (int) location.y - th.getLocationOnScreen().y;
 					 hl_Owner.get_PopupMenu().show(th, x, y);
+					 return;
 				}
-			
-			
+				 if(arg0.getDescription().toString().equals("!!img")) {
+				  
+				 }
 			
 			}
 	    	
@@ -203,125 +224,47 @@ private BalancesTableModel balancesTableModel;
 	    this.setOpaque(false);
    }
 
-   /**
-    * This method is called from within the constructor to initialize the form.
-    * WARNING: Do NOT modify this code. The content of this method is always
-    * regenerated by the Form Editor.
-    */
-   @SuppressWarnings("unchecked")
-   // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
-   private void initComponents() {
-       java.awt.GridBagConstraints gridBagConstraints;
-
-       jScrollPane1 = new javax.swing.JScrollPane();
-       jPanel1 = new javax.swing.JPanel();
-       jScrollPane3 = new javax.swing.JScrollPane();
-     
-
-       setLayout(new java.awt.BorderLayout());
-
-       jScrollPane1.setBorder(null);
-
-       jPanel1.setLayout(new java.awt.GridBagLayout());
-
-   
-
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-       gridBagConstraints.weightx = 0.1;
-       gridBagConstraints.weighty = 0.1;
-       jPanel1.add(jScrollPane3, gridBagConstraints);
-
-       jScrollPane1.setViewportView(jPanel1);
-
-   
-   }// </editor-fold>                        
+              
 
    private void add_comp()
+   // TODO add component SWING to JTEXTPANE
    {    
    try {
-       // Get the text pane's document
-      // JTextPane textPane = new JTextPane();
-       StyledDocument doc = (StyledDocument)this.getDocument();
-
-      
-      // JButton BB = new JButton("sdfsd");
-    
        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
-       
-       GridBagConstraints gridBagConstraints;
-	
-   
-       
-       
-       
-     
     // vouches
        jTabbedPane1.add(new Voush_Library_Panel(transaction));
-       
-       JPanel jPanel_Tab_Holders = new javax.swing.JPanel();
-       JScrollPane jScrollPane_Tab_Holders = new javax.swing.JScrollPane();
-    
-       jPanel_Tab_Holders.setLayout(new java.awt.GridBagLayout());
-       
-
-        balancesTableModel = new BalancesTableModel(asset.getKey());
- 		MTable  jTable1 = new MTable(balancesTableModel);
- 		
-       //  jTable1.setMinimumSize(new Dimension(0,0));
- 	
-     //    Dimension d = jTable1.getPreferredSize();
-     //    d.height = 300;
-    //     jTable1.setPreferredScrollableViewportSize(d);
- 		
- 		
-       
-       jScrollPane_Tab_Holders.setViewportView(jTable1);
-
-       gridBagConstraints = new java.awt.GridBagConstraints();
-       gridBagConstraints.gridx = 0;
-       gridBagConstraints.gridy = 1;
-               gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-       gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-       gridBagConstraints.weightx = 0.1;
-       gridBagConstraints.weighty = 0.1;
-       gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-       jPanel_Tab_Holders.add(jScrollPane_Tab_Holders, gridBagConstraints);
-
-       
-      
-      
-
-       jTabbedPane1.addTab(Lang.getInstance().translate("Holders"), jPanel_Tab_Holders);
-       
-    
+    // holders 
+       jTabbedPane1.add(new Holders_Library_Panel(asset));
+      // Get the text pane's document
+      // JTextPane textPane = new JTextPane();
+       StyledDocument doc = (StyledDocument)this.getDocument();
        // The component must first be wrapped in a style
        Style style = doc.addStyle("StyleName", null);
-    
        StyleConstants.setComponent(style,jTabbedPane1);
-
-       // Insert the component at the end of the text
+      // Insert the component at the end of the text
        doc.insertString(doc.getLength(), "ignored text", style);
-       
-       Style style1 = doc.addStyle("StyleName1", null);
-       M_Accoutn_Text_Field pane = new M_Accoutn_Text_Field(asset.getOwner() );
-     //  pane.setMinimumSize(new Dimension(0,0));
-       StyleConstants.setComponent(style1,pane);
-     //  doc.insertString(10, "ignored text", style1);
-       
-       // image
-       Style imageStyle = doc.addStyle("StyleImage", null);
-       
-       StyleConstants.setComponent(imageStyle,image_Label);
-       image_Label.setVisible(true);
-       image_Label.setSize(300, 300);
-       doc.insertString(1, "ignored text", imageStyle);
-    
-       
-       
-       
-   } catch (BadLocationException e) {
+    } catch (BadLocationException e) {
    }
+   }
+   
+   public void HTML_Add_Local_Images() {
+    // TODO ADD image into URL 
+       try {
+           Dictionary cache=(Dictionary)this.getDocument().getProperty("imageCache");
+           if (cache==null) {
+               cache=new Hashtable();
+               this.getDocument().putProperty("imageCache",cache);
+           }
+
+           URL u = new URL(img_Local_URL);
+          if (Im != null)  cache.put(u, Im);
+          
+           
+       } catch (MalformedURLException e) {
+           e.printStackTrace();
+       }
+
+
    }
 
    public void  delay_on_Close(){
@@ -329,9 +272,9 @@ private BalancesTableModel balancesTableModel;
 			
 	}
    // Variables declaration - do not modify                     
-   private javax.swing.JPanel jPanel1;
-   private javax.swing.JScrollPane jScrollPane1;
-   private javax.swing.JScrollPane jScrollPane3;
+ //  private javax.swing.JPanel jPanel1;
+  // private javax.swing.JScrollPane jScrollPane1;
+ //  private javax.swing.JScrollPane jScrollPane3;
   
    // End of variables declaration                   
 }
