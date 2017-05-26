@@ -19,7 +19,7 @@ import javax.swing.border.EmptyBorder;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
-import gui.items.assets.Asset_Detail_Panel_003;
+import gui.items.assets.Asset_Info;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -31,7 +31,7 @@ public class IssueAssetDetailsFrame extends Rec_DetailsFrame
 	{
 		super(assetIssue);
 		
-		Asset_Detail_Panel_003 as_info = new Asset_Detail_Panel_003((AssetCls) assetIssue.getItem());
+		Asset_Info as_info = new Asset_Info((AssetCls) assetIssue.getItem());
 		//LABEL NAME
 		++labelGBC.gridy;
 		labelGBC.gridwidth=4;
