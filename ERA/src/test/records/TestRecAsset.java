@@ -620,7 +620,7 @@ public class TestRecAsset {
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, messageTransaction.isValid(db, releaserReference));	
+		assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, messageTransaction.isValid(db, releaserReference));	
 
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(8),
@@ -895,7 +895,7 @@ public class TestRecAsset {
 				timestamp++, maker.getLastReference(db));
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, rsend.isValid(db, releaserReference));	
+		assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, rsend.isValid(db, releaserReference));	
 
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		rsend = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(8),

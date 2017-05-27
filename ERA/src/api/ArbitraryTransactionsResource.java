@@ -64,7 +64,7 @@ public class ArbitraryTransactionsResource
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-						Transaction.ASSET_DOES_NOT_EXIST);
+						Transaction.ITEM_ASSET_NOT_EXIST);
 
 			}
 			

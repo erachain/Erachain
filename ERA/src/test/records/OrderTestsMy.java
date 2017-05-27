@@ -227,13 +227,13 @@ public class OrderTestsMy
 		orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERM_KEY, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
-		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(db, releaserReference));
+		assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(db, releaserReference));
 
 		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
 		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 114l, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, accountA.getLastReference(db), new byte[64]);		
 					
 		//CHECK IF ORDER CREATION INVALID
-		assertEquals(Transaction.ASSET_DOES_NOT_EXIST, orderCreation.isValid(db, releaserReference));
+		assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(db, releaserReference));
 		
 		//CREATE ORDER CREATION INVALID REFERENCE
 		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERM_KEY, BigDecimal.valueOf(0.1).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timeStamp, -12345L, new byte[64]);		

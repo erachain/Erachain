@@ -247,7 +247,7 @@ public class CreateOrderTransaction extends Transaction
 		if(haveAsset == null)
 		{
 			//WANT DOES NOT EXIST
-			return ASSET_DOES_NOT_EXIST;
+			return ITEM_ASSET_NOT_EXIST;
 		}
 
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
@@ -292,7 +292,7 @@ public class CreateOrderTransaction extends Transaction
 		if(wantAsset == null)
 		{
 			//WANT DOES NOT EXIST
-			return ASSET_DOES_NOT_EXIST;
+			return ITEM_ASSET_NOT_EXIST;
 		}
 		
 		//

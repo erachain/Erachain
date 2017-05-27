@@ -204,9 +204,9 @@ public class OnDealClick
 		case Transaction.INVALID_QUANTITY:
 			mess = "Invalid quantity";
 			break;
-		case Transaction.ASSET_DOES_NOT_EXIST:
-			mess = "asset does not exist";
-			break;
+//		case Transaction.ITEM_ASSET_NOT_EXIST:
+//			mess = "asset does not exist";
+//			break;
 		case Transaction.INVALID_RETURN:
 			mess = "Invalid return";
 			break;
@@ -286,7 +286,7 @@ public class OnDealClick
 			mess = "Invalis creator";
 			break;
 			
-		case Transaction.ITEM_ASSET_DOES_NOT_EXIST:
+		case Transaction.ITEM_ASSET_NOT_EXIST:
 			mess = "Item asset does not exist";
 			break;
 		case Transaction.ITEM_IMPRINT_DOES_NOT_EXIST:

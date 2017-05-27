@@ -51,6 +51,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.naming.Name;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.BuyNameTransaction;
@@ -87,6 +88,8 @@ import core.transaction.VoteOnPollTransaction;
 import database.BlockHeightsMap;
 import database.BlockMap;
 import database.DBSet;
+import database.ItemAssetMap;
+import database.ItemPersonMap;
 import database.SortableList;
 import lang.Lang;
 import network.Peer;
@@ -150,7 +153,16 @@ public class API {
 		help.put("ASSETS", "-----------------");
 		help.put("GET Assets", "assets");
 		help.put("GET Asset Full", "assetsfull");
+
+		help.put("PERSON", "-----------------");
+		help.put("GET Person Height", "personheight");
+		help.put("GET Person", "person/{key}");
+		help.put("GET Person Data", "persondata/{key}");
 		
+		help.put("PERSONS", "-----------------");
+		//help.put("GET Persons", "persons");
+		//help.put("GET Persons Full", "personsfull");
+
 		help.put("TOOLS", "");
 		help.put("POST Verify Signature for JSON {\"message\": ..., \"signature\": Base58, \"publickey\": Base58)", "verifysignature");
 		
@@ -672,14 +684,14 @@ public class API {
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 
 		// DOES ASSETID EXIST
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 		
@@ -774,14 +786,15 @@ public class API {
 	@Path("asset/{key}")
 	public Response asset(@PathParam("key") long key) {
 		
+		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getItemAssetMap().contains(key)) {
+		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 		
-		AssetCls asset = (AssetCls)DBSet.getInstance().getItemAssetMap().get(key);
+		AssetCls asset = (AssetCls)map.get(key);
 		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -795,14 +808,15 @@ public class API {
 	@Path("assetdata/{key}")
 	public Response assetData(@PathParam("key") long key) {
 		
+		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getItemAssetMap().contains(key)) {
+		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 		
-		AssetCls asset = (AssetCls)DBSet.getInstance().getItemAssetMap().get(key);
+		AssetCls asset = (AssetCls)map.get(key);
 		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -834,6 +848,68 @@ public class API {
 				.build();
 		
 	}
+
+	/*
+	 * ************* PERSONS **************
+	 */
+	@GET
+	@Path("personheight")
+	public Response personHeight() {
+		
+		long height = dbSet.getItemPersonMap().getSize();
+
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity("" + height)
+				.build();
+		
+	}
+
+	@GET
+	@Path("person/{key}")
+	public Response person(@PathParam("key") long key) {
+		
+		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		PersonCls person = (PersonCls)map.get(key);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(person.toJson()))
+				.build();
+		
+	}
+	@GET
+
+	@Path("persondata/{key}")
+	public Response personData(@PathParam("key") long key) {
+		
+		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES ASSETID EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		PersonCls person = (PersonCls)map.get(key);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(person.toJsonData()))
+				.build();
+		
+	}
+
 
 	/*
 	 * ************* TOOLS **************

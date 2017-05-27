@@ -43,7 +43,7 @@ public class AssetsResource
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 
@@ -51,7 +51,7 @@ public class AssetsResource
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 		
@@ -71,7 +71,7 @@ public class AssetsResource
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 
@@ -79,7 +79,7 @@ public class AssetsResource
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 		
 		return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryAsset(assetAsLong));

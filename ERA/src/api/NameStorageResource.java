@@ -230,7 +230,7 @@ public class NameStorageResource {
 							paymentAsset = Controller.getInstance().getAsset(new Long(amountAssetJsonObject.get(ASSET_JSON_KEY).toString()));
 						} catch (Exception e) {
 							throw ApiErrorFactory.getInstance().createError(
-									Transaction.ASSET_DOES_NOT_EXIST);
+									Transaction.ITEM_ASSET_NOT_EXIST);
 						}
 					}
 					

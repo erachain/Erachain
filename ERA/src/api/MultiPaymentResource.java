@@ -61,7 +61,7 @@ public class MultiPaymentResource
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 			}
 
 			List<Payment> payments = jsonPaymentParser((JSONArray)jsonObject.get("payments"), defaultAsset);

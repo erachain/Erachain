@@ -72,7 +72,7 @@ public abstract class Transaction {
 
 	// ASSETS
 	public static final int INVALID_QUANTITY = 30;
-	public static final int ASSET_DOES_NOT_EXIST = 31;
+	//public static final int ASSET_DOES_NOT_EXIST = 31;
 	public static final int NEGATIVE_AMOUNT = 32;
 	public static final int INVALID_AMOUNT = 33;
 	public static final int INVALID_RETURN = 34;
@@ -128,7 +128,7 @@ public abstract class Transaction {
 	// ITEMS
 	public static final int INVALID_ITEM_VALUE = 100;
 	public static final int ITEM_DOES_NOT_EXIST = 101;
-	public static final int ITEM_ASSET_DOES_NOT_EXIST = 102;
+	public static final int ITEM_ASSET_NOT_EXIST = 102;
 	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 103;
 	public static final int ITEM_NOTE_NOT_EXIST = 104;
 	public static final int ITEM_PERSON_NOT_EXIST = 105;

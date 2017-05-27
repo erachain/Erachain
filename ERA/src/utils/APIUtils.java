@@ -52,13 +52,13 @@ public class APIUtils {
 				asset = Controller.getInstance().getAsset(new Long(assetKeyString));
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-						Transaction.ASSET_DOES_NOT_EXIST);
+						Transaction.ITEM_ASSET_NOT_EXIST);
 			}
 		}
 		
 		if (asset == null )
 			throw ApiErrorFactory.getInstance().createError(
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		
 		// PARSE AMOUNT
 		BigDecimal bdAmount;

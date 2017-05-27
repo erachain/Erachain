@@ -362,14 +362,14 @@ public class AddressesResource {
 		} catch (NumberFormatException e) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 
 		// DOES ASSETID EXIST
 		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ASSET_DOES_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 

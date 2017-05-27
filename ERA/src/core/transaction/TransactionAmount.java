@@ -288,7 +288,7 @@ public abstract class TransactionAmount extends Transaction {
 
 			AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
 			if (asset == null) {
-				return ASSET_DOES_NOT_EXIST;
+				return ITEM_ASSET_NOT_EXIST;
 			}
 
 			//CHECK IF AMOUNT IS DIVISIBLE
