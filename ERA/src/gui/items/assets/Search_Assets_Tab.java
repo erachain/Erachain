@@ -17,6 +17,8 @@ import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.print.PageFormat;
+import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -48,13 +51,19 @@ import javax.swing.table.TableRowSorter;
 
 import org.json.simple.JSONObject;
 
+import com.activetree.common.report.PageNoPainter;
+import com.activetree.common.report.printer.JavaDocumentPrinter;
+import com.activetree.common.resource.AtImageList;
+
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.Issue_ItemMap;
+import demo.activetree.jreport.SimpleHeaderFooterRenderer;
 import gui.CoreRowSorter;
+import gui.MainFrame;
 import gui.Split_Panel;
 import gui.items.persons.Person_Info_002;
 import gui.items.unions.TableModelUnions;
@@ -70,6 +79,7 @@ public class Search_Assets_Tab extends Split_Panel {
 	private TableModelItemAssets tableModelItemAssets;
 	final MTable assetsTable;
 	private Search_Assets_Tab th;
+	Asset_Info info_panel;
 	
 	
 	public Search_Assets_Tab(){
@@ -80,9 +90,36 @@ public class Search_Assets_Tab extends Split_Panel {
 		// not show buttons
 			button1_ToolBar_LeftPanel.setVisible(false);
 			button2_ToolBar_LeftPanel.setVisible(false);
-			jButton1_jToolBar_RightPanel.setVisible(false);
-			jButton2_jToolBar_RightPanel.setVisible(false);
+			jButton1_jToolBar_RightPanel.setVisible(true);
+			jButton1_jToolBar_RightPanel.setText(Lang.getInstance().translate("Print"));
+			jButton2_jToolBar_RightPanel.setVisible(true);
+		jToolBar_RightPanel.setVisible(false);
 			
+			
+
+				  //button pane
+		jButton1_jToolBar_RightPanel.setIcon(AtImageList.IMAGE_LIST.PRINT);
+		jButton1_jToolBar_RightPanel.addActionListener(new ActionListener() {
+			      public void actionPerformed(ActionEvent evt) {
+			        JavaDocumentPrinter docPrinter = new JavaDocumentPrinter();
+			        docPrinter.setPageHeaderFooterListener(new SimpleHeaderFooterRenderer(SimpleHeaderFooterRenderer.DEFAULT_HEADER_TEXT, SimpleHeaderFooterRenderer.DEFAULT_FOOTER_TEXT));
+			        boolean showPrinterDialog = true;
+			        boolean showPageDialog = false;
+			        PageFormat defaultPageFormat = new PageFormat();
+			        HashPrintRequestAttributeSet pAttrs = null;
+			        docPrinter.print(info_panel, PageNoPainter.PAGE_NONE, showPrinterDialog, showPageDialog, defaultPageFormat, pAttrs);
+			      }
+			    });
+		
+		jButton2_jToolBar_RightPanel.setIcon(AtImageList.IMAGE_LIST.PREVIEW);
+		 jButton2_jToolBar_RightPanel.addActionListener(new ActionListener() {
+		      public void actionPerformed(ActionEvent evt) {
+		        JavaDocumentPrinter docPrinter = new JavaDocumentPrinter();
+		        boolean showPageDialog = true;
+		        docPrinter.setPageHeaderFooterListener(new SimpleHeaderFooterRenderer(SimpleHeaderFooterRenderer.DEFAULT_HEADER_TEXT, SimpleHeaderFooterRenderer.DEFAULT_FOOTER_TEXT));
+		        docPrinter.preview(info_panel, PageNoPainter.PAGE_NONE, showPageDialog, MainFrame.getInstance());
+		      }
+		    });
 
 	//CREATE TABLE
 	tableModelItemAssets = new TableModelItemAssets();
@@ -431,12 +468,13 @@ class search_listener implements ListSelectionListener  {
 			if (asset == null) return;
 			int div = th.jSplitPanel.getDividerLocation();
 			int or = th.jSplitPanel.getOrientation();
-			Asset_Info info_panel = new Asset_Info(asset);
+			info_panel = new Asset_Info(asset);
 				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
 				//jSplitPanel.setRightComponent(info_panel);
 				jSplitPanel.setDividerLocation(div);
 				jSplitPanel.setOrientation(or);
+				jToolBar_RightPanel.setVisible(true);
 		}
 	}
 
@@ -447,7 +485,7 @@ public void delay_on_close(){
 	// get component from right panel
 	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 	// if Person_Info 002 delay on close
-	  if (c1 instanceof Asset_Info) ( (Asset_Info)c1).delay_on_Close();
+//	  if (c1 instanceof Asset_Info) ( (Asset_Info)c1).delay_on_Close();
 	
 }
 
