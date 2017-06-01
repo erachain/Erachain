@@ -33,8 +33,10 @@ import java.util.TreeSet;
 
 // import org.apache.log4j.Logger;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -84,6 +86,7 @@ import database.Item_Map;
 import database.LocalDataMap;
 import database.SortableList;
 import gui.Gui;
+import gui.library.My_JFileChooser;
 import lang.Lang;
 import network.Network;
 import network.Peer;
@@ -102,6 +105,7 @@ import settings.Settings;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
+import utils.SaveStrToFile;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import utils.SysTray;
 import utils.UpdateUtil;
@@ -152,6 +156,9 @@ public class Controller extends Observable {
 
 	private static Controller instance;
 	private DBSet dbSet; // = DBSet.getInstance();
+
+
+	private JSONObject Setting_Json;
 
 	public boolean isProcessingWalletSynchronize() {
 		return processingWalletSynchronize;
@@ -370,7 +377,41 @@ public class Controller extends Observable {
 		this.peersVersions = new LinkedHashMap<Peer, Pair<String, Long>>();
 		
 		this.transactionCreator = new TransactionCreator();
-
+		
+		
+		Setting_Json = new JSONObject();
+		Setting_Json = Settings.getInstance().read_setting_JSON();
+		if (Setting_Json.containsKey("DB_OPEN")){
+			
+			String js = (String) Setting_Json.get("DB_OPEN");
+			if(js.equals("Open Error")){
+				File dataDir = new File(Settings.getInstance().getDataDir());
+				if (dataDir.exists()) {
+					File dataBak = getDataBakDir(dataDir);
+					Setting_Json.put("DB_OPEN", "Restore_DataBak");
+					if (dataBak.exists()) {
+						FileUtils.copyDirectory(dataBak, dataDir);
+						 
+						LOGGER.error(Lang.getInstance().translate("restoring backup database"));
+				}else {
+					dataDir.delete();
+									
+				}
+				
+				
+			}
+				
+			}
+			
+			if(js.equals("Restore_DataBak")){
+				File dataDir = new File(Settings.getInstance().getDataDir());
+				File dataBak = getDataBakDir(dataDir);
+				if (dataDir.exists()) dataDir.delete();
+				if (dataBak.exists()) dataBak.delete();
+			}
+			
+		}
+		
 		// OPENING DATABASES
 		try {
 			this.dbSet = DBSet.getInstance();
@@ -390,6 +431,16 @@ public class Controller extends Observable {
 			}
 			reCreateDB();
 		}
+		
+		
+		createDataCheckpoint();
+		Setting_Json.put("DB_OPEN", "Open OK");
+		// save setting to setting file
+					try {
+						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
+					} catch (IOException e) {
+						
+					}
 		
 		//CHECK IF DB NEEDS UPDATE
 
@@ -534,7 +585,7 @@ public class Controller extends Observable {
 	}
 	
 	public void reCreateDB(boolean useDataBak) throws IOException, Exception {
-		
+	
 		File dataDir = new File(Settings.getInstance().getDataDir());
 		if (dataDir.exists()) {
 			// delete data folder
@@ -570,11 +621,49 @@ public class Controller extends Observable {
 		}
 
 		if (this.dbSet.getBlockMap().isProcessing()) {
+			
+			
+			if ( Setting_Json.containsKey("DB_OPEN")){
+			String js = (String) Setting_Json.get("DB_OPEN");
+			Setting_Json.put("DB_OPEN", "Open Error");
+			if (js.equals( "Restore_DataBak"))	{
+				Setting_Json.put("DB_OPEN", "Restore_DataBak");
+			}
+				
+
+			}
+			
+			// save setting to setting file
+			try {
+				SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
+			} catch (IOException e) {
+				
+			}
+			
+			
+			
+			
 			throw new Exception(
 					Lang.getInstance().translate("The application was not closed correctly! Delete the folder ")
 							+ dataDir.getAbsolutePath()
 							+ Lang.getInstance().translate(" and start the application again."));
 		}
+		if ( Setting_Json.containsKey("DB_OPEN")){
+			String js = (String) Setting_Json.get("DB_OPEN");
+			Setting_Json.put("DB_OPEN", "Open Ok");
+			if (js.equals( "Restore_DataBak"))	{
+				Setting_Json.put("DB_OPEN", "Restore_DataBak");
+			}
+				
+
+			}
+		
+		// save setting to setting file
+					try {
+						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
+					} catch (IOException e) {
+						
+					}
 	}
 
 	public void startFromScratchOnDemand() throws IOException {
@@ -724,8 +813,7 @@ public class Controller extends Observable {
 			// CLOSE WALLET
 			LOGGER.info(Lang.getInstance().translate("Closing wallet"));
 			this.wallet.close();
-
-			createDataCheckpoint();
+		
 
 			LOGGER.info(Lang.getInstance().translate("Closed."));
 			// FORCE CLOSE
@@ -734,9 +822,9 @@ public class Controller extends Observable {
 	}
 
 	private void createDataCheckpoint() {
-		if (!this.dbSet.getBlockMap().isProcessing()
-				&& Settings.getInstance().isCheckpointingEnabled()) {
-			this.dbSet.close();
+		if (!this.dbSet.getBlockMap().isProcessing()){
+	//			&& Settings.getInstance().isCheckpointingEnabled()) {
+	//		this.dbSet.close();
 
 			File dataDir = new File(Settings.getInstance().getDataDir());
 
