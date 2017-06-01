@@ -250,7 +250,8 @@ public class IssuePersonPanel extends JPanel
 				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 				
 				//ENABLE
-				this.issueButton.setEnabled(true);
+				this.issueButton.setEnabled(false);
+				this.copyButton.setEnabled(false);
 				
 				return;
 			}
