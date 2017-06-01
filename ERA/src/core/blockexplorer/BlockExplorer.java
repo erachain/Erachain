@@ -3455,14 +3455,11 @@ if ( asset_1 == null) {
 			out_statement.put("person_key", model_Statements.get_person_key(row));
 			
 			for (int column=0; column < column_Count; column++ ){
+				String value = model_Statements.getValueAt(row, column).toString();
+				if (value == null || value.isEmpty())
+					value = "***";
 				
-				
-				
-				
-				
-				
-				out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), model_Statements.getValueAt(row, column).toString());
-				
+				out_statement.put(model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'), value);
 			}
 			out_Statements.put(row, out_statement);			
 		}
