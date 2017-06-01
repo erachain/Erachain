@@ -117,14 +117,14 @@
 	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>
 	<classpathentry kind="lib" path="libs/txtmark-0.16.jar"/>
 	<classpathentry kind="lib" path="libs/tinycp.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/jai_codec.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/jai_core.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/poi.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/smartjcommon.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/smartjpdfwriter.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/smartjpdfwriter_license.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/smartjreport.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/smartjreport_demo.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Саша/git/ARONICLE/ERA/libs/SmartJReport/smartjreport_license.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/jai_codec.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/jai_core.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/poi.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/smartjcommon.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/smartjpdfwriter_license.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/smartjpdfwriter.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/smartjreport_demo.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/smartjreport_license.jar"/>
+	<classpathentry kind="lib" path="libs/SmartJReport/smartjreport.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
