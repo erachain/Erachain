@@ -3514,7 +3514,7 @@ if ( asset_1 == null) {
 				}
 				
 				String str_HTML = "";
-				if ( map_Data.b != null) str_HTML = "<b>"+Lang.getInstance().translate("Title") + ": </b>" +  map_Data.b +"\n";
+				if ( map_Data.b != null) str_HTML = "<b>"+Lang.getInstance().translate("Title") + ": </b>" +  map_Data.b +"<br>";
 					
 				JSONObject jSON = map_Data.c;
 				// parse JSON
@@ -3544,13 +3544,9 @@ if ( asset_1 == null) {
 							 for (String s:kS){
 									description = description.replace("{{" + s + "}}", (CharSequence) params.get(s));
 							 }
-
-				
-					
-					
 					
 						}
-						str_HTML+= description + "\n";
+						str_HTML+= description + "<br>";
 					}
 					}
 	// V2.1 Template
@@ -3579,18 +3575,20 @@ if ( asset_1 == null) {
 					
 					
 						}
-							 str_HTML+= description + "\n";
+							 //str_HTML+= description + "<br>";
+							 str_HTML += Processor.process(description) + "<br>"; 
+
 					}
 						 
 					}
 // Message v2.0
-					if (jSON.containsKey("Message")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b>\n"+ jSON.get("Message") +"\n";
+					if (jSON.containsKey("Message")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b><br>"+ jSON.get("Message") +"<br>";
 	// v 2.1
-					if (jSON.containsKey("MS")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b>\n"+jSON.get("MS") +"\n";
+					if (jSON.containsKey("MS")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b><br>"+jSON.get("MS") +"<br>";
 	// Hashes
 		// v2.0
 					if (jSON.containsKey("Hashes")){
-						str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Hashes", langObj) + ": </b>\n";
+						str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Hashes", langObj) + ": </b><br>";
 						String hasHes = "";
 						String str = jSON.get("Hashes").toString();
 						 JSONObject params = new JSONObject();
@@ -3604,15 +3602,15 @@ if ( asset_1 == null) {
 						 
 						 int i = 1;
 						 for (String s:kS){
-							hasHes += i + " " + s + " " + params.get(s) + "\n";
+							hasHes += i + " " + s + " " + params.get(s) + "<br>";
 						 }
 						 
-						 str_HTML += hasHes + "\n";
+						 str_HTML += hasHes + "<br>";
 					}
 	// v2.1
 					if (jSON.containsKey("HS")){
 						
-						str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Hashes", langObj) + ": <b>\n";
+						str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Hashes", langObj) + ": <b><br>";
 						String hasHes = "";
 						String str = jSON.get("HS").toString();
 						 JSONObject params = new JSONObject();
@@ -3626,10 +3624,10 @@ if ( asset_1 == null) {
 						 
 						 int i = 1;
 						 for (String s:kS){
-							hasHes += i + " " + s + " " + params.get(s) + "\n";
+							hasHes += i + " " + s + " " + params.get(s) + "<br>";
 						 }
 						 
-						 str_HTML += hasHes + "\n";
+						 str_HTML += hasHes + "<br>";
 					
 					}
 	
@@ -3638,7 +3636,7 @@ if ( asset_1 == null) {
 // parse Ffiles
 	// v2.0
 				if (jSON.containsKey("&*&*%$$%_files_#$@%%%") ){
-					str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Files", langObj) + ": </b>\n";
+					str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Files", langObj) + ": </b><br>";
 					String hasHes = "";
 					String str = jSON.get("&*&*%$$%_files_#$@%%%").toString();
 					 JSONObject params = new JSONObject();
@@ -3657,16 +3655,16 @@ if ( asset_1 == null) {
 							
 							ss = (JSONObject) params.get(s);
 						
-						hasHes += i + " "  + ss.get("File_Name") + "\n";
+						hasHes += i + " "  + ss.get("File_Name") + "<br>";
 					 }
 					
-					 str_HTML += hasHes + "\n";
+					 str_HTML += hasHes + "<br>";
 				
 				}	
 //	v 2.1
 				if (jSON.containsKey("F") ){
 					
-					str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Files", langObj) + ": </b>\n";
+					str_HTML += "<b>"+Lang.getInstance().translate_from_langObj("Files", langObj) + ": </b><br>";
 					String hasHes = "";
 					String str = jSON.get("F").toString();
 					 JSONObject params = new JSONObject();
@@ -3684,16 +3682,17 @@ if ( asset_1 == null) {
 						
 							ss = (JSONObject) params.get(s);
 						
-						hasHes += i + " "  + ss.get("FN") + "\n";
+						hasHes += i + " "  + ss.get("FN") + "<br>";
 					 }
 					 
-					 str_HTML += hasHes + "\n";
+					 str_HTML += hasHes + "<br>";
 					
 				}	
 				
 				
 				
-				output.put("statement", library.to_HTML(str_HTML));	
+				//output.put("statement", library.to_HTML(str_HTML));	
+				output.put("statement", str_HTML);	
 			}
 			
 			
@@ -3725,20 +3724,22 @@ if ( asset_1 == null) {
 				 
 				 int i = 1;
 				 for (String s:kS){
-					 hasHes += i + " " + s + " " + params.get(s) + "\n";
+					 hasHes += i + " " + s + " " + params.get(s) + "<br>";
 				 }
 				 
 				 
 				 
 				 String sT =
-						  data.get("Title") + "\n\n"
-							+  description + "\n\n"
-							+    data.get("Message") + "\n\n"
+						  data.get("Title") + "<br><br>"
+							+  description + "<br><br>"
+							+    data.get("Message") + "<br><br>"
 							+ hasHes;
 			
 			
 			
-			output.put("statement", library.to_HTML(sT));
+				 //output.put("statement", library.to_HTML(sT));
+				 output.put("statement", Processor.process(sT)); 
+				 
 			 
 		 } catch (ParseException e) {
 		
