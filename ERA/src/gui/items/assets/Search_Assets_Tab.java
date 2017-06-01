@@ -99,7 +99,7 @@ public class Search_Assets_Tab extends Split_Panel {
 
 				  //button pane
 		jButton1_jToolBar_RightPanel.setIcon(AtImageList.IMAGE_LIST.PRINT);
-		jButton1_jToolBar_RightPanel.addActionListener(new ActionListener() {
+		jButton1_jToolBar_RightPanel.addActionListener(new ActionListener() { 
 			      public void actionPerformed(ActionEvent evt) {
 			        JavaDocumentPrinter docPrinter = new JavaDocumentPrinter();
 			        docPrinter.setPageHeaderFooterListener(new SimpleHeaderFooterRenderer(SimpleHeaderFooterRenderer.DEFAULT_HEADER_TEXT, SimpleHeaderFooterRenderer.DEFAULT_FOOTER_TEXT));
