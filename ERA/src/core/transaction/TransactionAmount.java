@@ -47,11 +47,11 @@ if backward - CONFISCATE CREDIT
 ## version 2
 
 #### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT
-typeBytes[2].1 = -64 if backward - CONFISCATE CREDIT
+typeBytes[2].0 = -128 if NO AMOUNT - check sign
+typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
 
 #### PROPERTY 2
-typeBytes[3].0 = -128 if NO DATA
+typeBytes[3].0 = -128 if NO DATA - check sign
 
 */
 
@@ -65,6 +65,8 @@ public abstract class TransactionAmount extends Transaction {
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key = Transaction.FEE_KEY;
+
+	public static final byte BACKWARD_MASK = 64;
 
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
@@ -171,17 +173,33 @@ public abstract class TransactionAmount extends Transaction {
 	public String viewSendType() {
 		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
 		
-		if (this.key > 0) {
-			if (amo_sign > 0) {
-				return "PROPERTY";
-			} else { 
-				return "HOLD";
+		if ((this.typeBytes[2] & BACKWARD_MASK) > 0) {
+			if (this.key > 0) {
+				if (amo_sign > 0) {
+					return "backward PROPERTY";
+				} else { 
+					return "backward HOLD";
+				}
+			} else {
+				if (amo_sign > 0) {
+					return "backward CREDIT";
+				} else { 
+					return "backward SPEND";
+				}
 			}
 		} else {
-			if (amo_sign > 0) {
-				return "CREDIT";
-			} else { 
-				return "SPEND";
+			if (this.key > 0) {
+				if (amo_sign > 0) {
+					return "PROPERTY";
+				} else { 
+					return "HOLD";
+				}
+			} else {
+				if (amo_sign > 0) {
+					return "CREDIT";
+				} else { 
+					return "SPEND";
+				}
 			}
 		}
 		// return "SPEND";
@@ -296,7 +314,7 @@ public abstract class TransactionAmount extends Transaction {
 			
 			// BACKWARD - CONFISCATE
 			boolean confiscate_credit = typeBytes[1] == 1 
-					|| typeBytes[1] > 1 && (typeBytes[2] & (byte)-64) > 0;
+					|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 			
 			if (amount_sign != 0) {
 
@@ -444,7 +462,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		// BACKWARD - CONFISCATE
 		boolean confiscate_credit = typeBytes[1] == 1
-				|| typeBytes[1] > 1 && (typeBytes[2] & (byte)-64) > 0;
+				|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
 		//UPDATE SENDER
 		this.creator.changeBalance(db, !confiscate_credit, key, this.amount);
@@ -531,7 +549,7 @@ public abstract class TransactionAmount extends Transaction {
 
 		// BACKWARD - CONFISCATE
 		boolean confiscate_credit = typeBytes[1] == 1
-				|| typeBytes[1] > 1 && (typeBytes[2] & (byte)-64) > 0;
+				|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 		
 		//UPDATE SENDER
 		this.creator.changeBalance(db, confiscate_credit, key, this.amount);

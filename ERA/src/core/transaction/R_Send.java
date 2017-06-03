@@ -43,11 +43,11 @@ import utils.Converter;
 3 = property 2
 
 ## version 0
-// typeBytes[2] = -128 if NO AMOUNT
-// typeBytes[3] = -128 if NO DATA
+typeBytes[2] = -128 if NO AMOUNT
+typeBytes[3] = -128 if NO DATA
 
 ## version 1
-// typeBytes[1] (version) = 1 - if backward - CONFISCATE CREDIT
+typeBytes[1] (version) = 1 - if backward - CONFISCATE CREDIT
 
 ## version 2
 typeBytes[1] - version

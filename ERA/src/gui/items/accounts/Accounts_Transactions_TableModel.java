@@ -152,11 +152,13 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		
 			
 		case COLUMN_AMOUNT:
-			if (r_Tran.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)		return r_Tran.getAmount();
-			if (r_Tran.getCreator().getAddress().equals(this.sender.getAddress())) return r_Tran.getAmount().multiply(new BigDecimal(-1));
+			if (r_Tran.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
+				return r_Tran.getAmount();
+			if (r_Tran.getCreator().getAddress().equals(this.sender.getAddress())) 
+				return r_Tran.getAmount().multiply(new BigDecimal(-1));
 			return r_Tran.getAmount();
 		case COLUMN_ASSET:
-			return Controller.getInstance().getAsset(r_Tran.getAssetKey()).toString();
+			return Controller.getInstance().getAsset(r_Tran.getAbsKey()).toString();
 		case COLUMN_RECIPIENT:
 			return r_Tran.viewRecipient();
 		case COLUMN_CONFIRM:
@@ -174,7 +176,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			
 			 //IF SENDER ANOTHER
      	//	if(account == null)
-     			if (!r_Tran.getCreator().getAddress().equals(this.sender.getAddress()))	
+ 			if (!r_Tran.getCreator().getAddress().equals(this.sender.getAddress()))	
      			
      			
      		{
@@ -193,16 +195,13 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
      		}
 
      		try {
-	        		byte[] ddd = AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey);
-	        		String sss = new String(ddd, "UTF-8");
-     			 String str1 = (new String(AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey), "UTF-8"));
-     			 return str1; //"{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
+        		byte[] ddd = AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey);
+        		String sss = new String(ddd, "UTF-8");
+					String str1 = (new String(AEScrypto.dataDecrypt(rs.getData(), privateKey, publicKey), "UTF-8"));
+					return str1; //"{{" +  str.substring(0,R_Send.MAX_DATA_VIEW) + "...}}"); 
 				} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-     			return ("unknown password");
-					
+					return ("unknown password");
 				}
-		
-		
 			
 		}
 		
@@ -274,25 +273,29 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		while (s_it.hasNext()){
 			Pair<Tuple2<String, String>, Transaction> tt = s_it.next();
 			Transaction ttt = tt.getB();
+			long absKey; 
 			if (ttt.getType() == Transaction.SEND_ASSET_TRANSACTION){
 				R_Send tttt = (R_Send) ttt;
-				if (tttt.getAssetKey()!=0){
+				absKey = tttt.getAbsKey(); 
+				if (absKey != 0){
 					String a = tttt.getCreator().getAddress();
 					String b = this.sender.getAddress();
 					String c = tttt.getRecipient().getAddress();
 					if (tttt.getCreator().getAddress().equals( this.sender.getAddress()) || tttt.getRecipient().getAddress().equals(this.sender.getAddress()))
-						if (!this.r_Trans.contains(tttt) && tttt.getAssetKey() == this.asset.getKey())this.r_Trans.add(tttt);
+						if (!this.r_Trans.contains(tttt) && absKey == this.asset.getKey())
+							this.r_Trans.add(tttt);
 				}
 				
-			}
-			if (ttt.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION){
+			} else if (ttt.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION){
 				GenesisTransferAssetTransaction ttt1 =  (GenesisTransferAssetTransaction) ttt;
-				if (ttt1.getAssetKey()!=0){
+				absKey = ttt1.getAbsKey(); 
+				if (absKey != 0){
 				//	String a = ttt1.getCreator().getAddress();
 					String b = this.sender.getAddress();
 					String c = ttt1.getRecipient().getAddress();
 					if ( ttt1.getRecipient().getAddress().equals(this.sender.getAddress()))
-						if (!this.r_Trans.contains(ttt1) && ttt1.getAssetKey() == this.asset.getKey())this.r_Trans.add(ttt1);
+						if (!this.r_Trans.contains(ttt1) && absKey == this.asset.getKey())
+							this.r_Trans.add(ttt1);
 				}
 			
 			
