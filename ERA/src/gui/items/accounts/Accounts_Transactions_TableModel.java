@@ -218,7 +218,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		case COLUMN_SENDER:
 			if (r_Tran.owner == null)
 				return "GENESIS";
-			return r_Tran.owner.viewPerson();
+			return r_Tran.transaction.viewCreator();
 
 		case COLUMN_CONFIRM:
 			return r_Tran.transaction.isConfirmed(DBSet.getInstance());
@@ -320,7 +320,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		// CHECK IF LIST UPDATED
 		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
 				|| message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
-			get_R_Send();
+			//get_R_Send();
+			Object sss = message.getValue();
+			sss = sss;
+			trans_Parse((Transaction) message.getValue());
 
 		}
 	}
@@ -333,73 +336,80 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		trans_Hash_Map = new HashMap<String, Trans>();
 		trans_List = null;
 		Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = ss.iterator();
-	Main:	while (s_it.hasNext()) {
+		while (s_it.hasNext()) {
 			Pair<Tuple2<String, String>, Transaction> tt = s_it.next();
 			Transaction ttt = tt.getB();
-			
-			if (ttt.getAbsKey() != this.asset.getKey()) continue Main ;
-			
-			Trans trr = new Trans();
-			if (ttt.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-				R_Send tttt = (R_Send) ttt;
-				if (!this.sender.getAddress().equals(tttt.getCreator().getAddress()) 
-						&& !this.sender.getAddress().equals(tttt.getRecipient().getAddress()))	continue Main ;
-					trr.owner = tttt.getCreator();
-					trr.recipient = tttt.getRecipient();
-					trr.transaction = tttt;
-					trr.ammount = tttt.getAmount();
-// if send for *-1
-					if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
-						trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));
-
-				
-					trans_Hash_Map.put(ttt.viewSignature(), trr);		
-				
-				
-			} 
-			else if (ttt.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
-				GenesisTransferAssetTransaction ttt1 = (GenesisTransferAssetTransaction) ttt;
-				
-					// String a = ttt1.getCreator().getAddress();
-				
-				String cr = "";
-				if (ttt1.getCreator() != null) cr = ttt1.getCreator().getAddress();
-				// if is owner
-				String own = "";
-				if (ttt1.getOwner() != null) own = ttt1.getOwner().getAddress();
-				
-				if ( this.sender.getAddress().equals(cr) ||
-						this.sender.getAddress().equals(own) ||
-						this.sender.getAddress().equals(ttt1.getRecipient().getAddress()))	{
-					
-					trr.transaction = ttt1;
-					trr.ammount = ttt1.getAmount();
-					// if send
-					
-					
-					
-					if (!ttt1.getRecipient().getAddress().equals(this.sender.getAddress()))	
-							trr.ammount = ttt1.getAmount().multiply(new BigDecimal("-1"));
-					// if is creator
-					if (ttt1.getCreator() != null) trr.owner = ttt1.getCreator();
-					// if is owner
-					if (ttt1.getOwner() != null) trr.owner = ttt1.getOwner();
-					trr.recipient = ttt1.getRecipient();
-						
-										
-
-				
-					trans_Hash_Map.put(ttt.viewSignature(), trr);	
-				}
-			}
-			
-			
+			trans_Parse(ttt);
 		}
 
 		trans_List = trans_Hash_Map.values().toArray();
 
 		this.fireTableDataChanged();
 	}
+	
+	private void trans_Parse(Transaction ttt){
+	
+	
+	
+	
+	if (ttt.getAbsKey() != this.asset.getKey()) return;
+	
+	Trans trr = new Trans();
+	if (ttt.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+		R_Send tttt = (R_Send) ttt;
+		if (!this.sender.getAddress().equals(tttt.getCreator().getAddress()) 
+				&& !this.sender.getAddress().equals(tttt.getRecipient().getAddress()))	return ;
+			trr.owner = tttt.getCreator();
+			trr.recipient = tttt.getRecipient();
+			trr.transaction = tttt;
+			trr.ammount = tttt.getAmount();
+//if send for *-1
+			if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
+				trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));
+
+		
+			trans_Hash_Map.put(ttt.viewSignature(), trr);		
+		
+		
+	} 
+	else if (ttt.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION) {
+		GenesisTransferAssetTransaction ttt1 = (GenesisTransferAssetTransaction) ttt;
+		
+			// String a = ttt1.getCreator().getAddress();
+		
+		String cr = "";
+		if (ttt1.getCreator() != null) cr = ttt1.getCreator().getAddress();
+		// if is owner
+		String own = "";
+		if (ttt1.getOwner() != null) own = ttt1.getOwner().getAddress();
+		
+		if ( this.sender.getAddress().equals(cr) ||
+				this.sender.getAddress().equals(own) ||
+				this.sender.getAddress().equals(ttt1.getRecipient().getAddress()))	{
+			
+			trr.transaction = ttt1;
+			trr.ammount = ttt1.getAmount();
+			// if send
+			
+			
+			
+			if (!ttt1.getRecipient().getAddress().equals(this.sender.getAddress()))	
+					trr.ammount = ttt1.getAmount().multiply(new BigDecimal("-1"));
+			// if is creator
+			if (ttt1.getCreator() != null) trr.owner = ttt1.getCreator();
+			// if is owner
+			if (ttt1.getOwner() != null) trr.owner = ttt1.getOwner();
+			trr.recipient = ttt1.getRecipient();
+				
+								
+
+		
+			trans_Hash_Map.put(ttt.viewSignature(), trr);	
+		}
+	}
+				
+}
+	
 
 	class Trans {
 		public BigDecimal ammount;
