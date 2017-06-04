@@ -1,15 +1,9 @@
 package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
-import gui.items.persons.TableModelPersons;
 import gui.library.MTable;
 import gui.models.AccountsTableModel;
-import gui.models.Renderer_Boolean;
-import gui.models.Renderer_Left;
-import gui.models.Renderer_Right;
 import lang.Lang;
-
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -23,8 +17,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -33,26 +25,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
+import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
-import utils.BigDecimalStringComparator;
 import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base32;
 import core.item.assets.AssetCls;
-import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import core.wallet.Wallet;
 import gui.Gui;
 import gui.PasswordPane;
 @SuppressWarnings("serial")
@@ -127,6 +114,10 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
+				// check synchronize Walet 
+				if(Controller.getInstance().isProcessingWalletSynchronize()) {
+					return;
+				}
 				  //CHECK IF WALLET UNLOCKED
 				  if(!Controller.getInstance().isWalletUnlocked())
 				  {
@@ -141,7 +132,22 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 				  }
 				  
 				  //GENERATE NEW ACCOUNT
-				  Controller.getInstance().generateNewAccount();
+				  newAccount_Button.setText(Lang.getInstance().translate("Wait")+"...");
+				  newAccount_Button.setEnabled(false);
+				// creane new thread
+					 new Thread()
+					{
+						@Override
+						public void run() {
+					
+									Controller.getInstance().generateNewAccount();
+									newAccount_Button.setText(Lang.getInstance().translate("New Account"));					
+									newAccount_Button.setEnabled(true);
+						}
+					}.start();
+					
+				  
+				  
 				 }
 			
 			
@@ -153,8 +159,10 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		tableModel.setAsset( (AssetCls) cbxFavorites.getSelectedItem());
 		 table = Gui.createSortableTable(tableModel, 1);
 		
-		TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-		//sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
+		//TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
+		//sorter.setComparator(0, new IntegerComparator());
+		RowSorter sorter =   new TableRowSorter(tableModel);
+		table.setRowSorter(sorter);	
 		//sorter.setComparator(AccountsTableModel.COLUMN_NO, new BigDecimalStringComparator());
 		//sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
 		
