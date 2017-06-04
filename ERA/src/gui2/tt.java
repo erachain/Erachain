@@ -120,6 +120,7 @@ public tt() {
    records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));
    
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
+   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
    
    
 
