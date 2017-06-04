@@ -132,7 +132,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 				  }
 				  
 				  //GENERATE NEW ACCOUNT
-				  newAccount_Button.setText(Lang.getInstance().translate("Wait")+"...");
+				  newAccount_Button.setText(Lang.getInstance().translate("Waiting...")+"...");
 				  newAccount_Button.setEnabled(false);
 				// creane new thread
 					 new Thread()
