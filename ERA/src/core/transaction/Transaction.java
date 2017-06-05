@@ -762,6 +762,36 @@ public abstract class Transaction {
 		return transaction;
 	}
 	
+	public abstract JSONObject toJson();
+
+	@SuppressWarnings("unchecked")
+	public JSONObject rawToJson() {
+		
+		JSONObject transaction = new JSONObject();
+		
+		transaction.put("confirmations", this.getConfirmations(DBSet.getInstance()));
+		
+		int height;
+		if (this.creator == null )
+		{
+			height = 1;
+		} else {
+			height = this.getBlockHeight(DBSet.getInstance());
+			transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
+		}
+
+		transaction.put("height", height);
+		if (height > 0)
+			transaction.put("sequence", this.getSeqNo(DBSet.getInstance()));
+		
+		boolean isSigned = this.signature==null;
+		transaction.put("signature", isSigned?Base58.encode(this.signature):"null");
+		
+		transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
+		
+		return transaction;
+	}
+
 	public void sign(PrivateKeyAccount creator, boolean asPack)
 	{
 		
@@ -782,8 +812,6 @@ public abstract class Transaction {
 			this.calcFee();
 	}
 
-	public abstract JSONObject toJson();
-	
 	// releaserReference == null - not as pack
 	// releaserReference = reference of releaser - as pack
 	public byte[] toBytes(boolean withSign, Long releaserReference) {

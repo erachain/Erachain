@@ -135,6 +135,8 @@ public class API {
 		help.put("RECORD", "----------------");
 		help.put("GET Record", "record/{signature}");
 		help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
+		help.put("GET Record RAW", "recordraw/{signature}");
+		help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{height-sequence}");
 		
 		help.put("ADDRESS", "---------------");
 		help.put("GET Address Validate", "addressvalidate/{address}");
@@ -506,6 +508,77 @@ public class API {
 			++steep;	
 			Transaction record = dbSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.toJson();
+						
+		} catch (Exception e) {
+			
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "height-sequence error, use integer-integer value");
+			else if (steep == 2)
+				out.put("message", "record not found");
+			else
+				out.put("message", e.getMessage());
+		}
+
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+	@GET
+	@Path("recordraw/{signature}")
+	public Response recordRaw(@PathParam("signature") String signature)
+	{
+		
+		Map out = new LinkedHashMap();
+
+		int steep = 1;
+
+		try {
+			byte[] key = Base58.decode(signature);
+
+			++steep;
+			Transaction record = cntrl.getTransaction(key, dbSet);		
+			out = record.rawToJson();
+			
+		} catch (Exception e) {
+			
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "signature error, use Base58 value");
+			else if (steep == 2)
+				out.put("message", "record not found");
+			else
+				out.put("message", e.getMessage());
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+	@GET
+	@Path("recordrawbynumber/{number}")
+	public Response recodRawByNumber(@PathParam("number") String numberStr)
+	{
+		
+		Map out = new LinkedHashMap();
+		int steep = 1;
+
+		try {
+			
+			String[] strA = numberStr.split("\\-");
+			int height = Integer.parseInt(strA[0]);
+			int seq = Integer.parseInt(strA[1]);
+			
+			++steep;	
+			Transaction record = dbSet.getTransactionFinalMap().getTransaction(height, seq);
+			out = record.rawToJson();
 						
 		} catch (Exception e) {
 			
