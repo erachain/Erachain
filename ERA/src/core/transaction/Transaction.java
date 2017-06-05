@@ -784,7 +784,7 @@ public abstract class Transaction {
 		if (height > 0)
 			transaction.put("sequence", this.getSeqNo(DBSet.getInstance()));
 		
-		boolean isSigned = this.signature==null;
+		boolean isSigned = this.signature!=null;
 		transaction.put("signature", isSigned?Base58.encode(this.signature):"null");
 		
 		transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
