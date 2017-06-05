@@ -20,6 +20,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -133,6 +134,8 @@ public class API {
 		help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");		
 
 		help.put("RECORD", "----------------");
+		help.put("GET Record Parse from RAW", "recordparse/{raw}");
+		help.put("POST Record Parse from RAW", "recordparse?raw=...");
 		help.put("GET Record", "record/{signature}");
 		help.put("GET Record by Height and Sequence", "recordbynumber/{height-sequence}");
 		help.put("GET Record RAW", "recordraw/{signature}");
@@ -457,6 +460,38 @@ public class API {
 	/*
 	 * ************** RECORDS **********
 	 */
+	
+	@POST
+	@Path("recordparse")
+	public Response recordParse(@QueryParam("raw") String raw) // throws JSONException
+	{
+
+		JSONObject out = new JSONObject();
+		
+		//CREATE TRANSACTION FROM RAW
+		Transaction transaction;
+		try {			
+			transaction = TransactionFactory.getInstance().parse(Base58.decode(raw), null);
+			out = transaction.toJson();
+		} catch (Exception e) {
+			out.put("error", -1);
+			out.put("message", APIUtils.errorMess(-1, e.toString()));
+		}
+
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+	@GET
+	@Path("recordparse/{raw}")
+	public Response recordParseGET(@PathParam("raw") String raw) // throws JSONException
+	{
+		return recordParse(raw);
+	}
+
 	@GET
 	@Path("record/{signature}")
 	public Response record(@PathParam("signature") String signature)
