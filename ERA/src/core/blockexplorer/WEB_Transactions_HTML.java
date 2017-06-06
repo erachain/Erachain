@@ -91,79 +91,72 @@ public class WEB_Transactions_HTML {
 		int type = transaction.getType();
 		switch (type) {
 		case Transaction.SEND_ASSET_TRANSACTION:
-			return out+ r_Send_HTML(transaction, langObj) + get_Vouches(transaction);
+			out = out + r_Send_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_ASSET_TRANSACTION:
-			return out+ issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_PERSON_TRANSACTION:
-			return out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_IMPRINT_TRANSACTION:
-			return out+ issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_NOTE_TRANSACTION:
-			return out+ issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_STATUS_TRANSACTION:
-			return out+ issue_Status_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ issue_Status_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_UNION_TRANSACTION:
-			return out+ issue_Union_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ issue_Union_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.VOUCH_TRANSACTION:
-			return out+ vouch_HTML(transaction, langObj) + get_Vouches(transaction);
+			out = out+ vouch_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.SIGN_NOTE_TRANSACTION:
-			return out+ sign_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ sign_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-			return out+ serttify_Pub_Key_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ serttify_Pub_Key_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-			return out+ set_Status_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ set_Status_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.HASHES_RECORD:
-			return out+ hash_Record_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ hash_Record_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.CREATE_ORDER_TRANSACTION:
-			return out+ create_Order_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ create_Order_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.CANCEL_ORDER_TRANSACTION:
-			return out+ cancel_Order_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ cancel_Order_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.CREATE_POLL_TRANSACTION:
-			return out+ create_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ create_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.VOTE_ON_POLL_TRANSACTION:
-			return out+ vate_On_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ vate_On_Poll_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:
-			return out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-			return out+ genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
-			return out+ genesis_Issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ genesis_Issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-			return out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			out= out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-			return out+ genesis_Send_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
-/*
-			
-			public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
-			public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5; //
-			public static final int GENESIS_SIGN_NOTE_TRANSACTION = 7; //
-			public static final int GENESIS_ASSIGN_STATUS_TRANSACTION = 9;//
-			public static final int GENESIS_ADOPT_UNION_TRANSACTION = 10;//
-			// ISSUE ITEMS
-			public static final int ISSUE_STATEMENT_TRANSACTION = 27; // not in gui
-			// RENT ASSET
-			public static final int RENT_ASSET_TRANSACTION = 32; // not in gui
-			// HOLD ASSET
-			public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
-			
-			// OTHER
-			public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
-			public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39; // not in gui
-			
-			public static final int RELEASE_PACK = 70;
-
-			// old
-			public static final int REGISTER_NAME_TRANSACTION = 6 + 130;
-			public static final int UPDATE_NAME_TRANSACTION = 7 + 130;
-			public static final int SELL_NAME_TRANSACTION = 8 + 130;
-			public static final int CANCEL_SELL_NAME_TRANSACTION = 9 + 130;
-			public static final int BUY_NAME_TRANSACTION = 10 + 130;
-			public static final int ARBITRARY_TRANSACTION = 12 + 130;
-			public static final int MULTI_PAYMENT_TRANSACTION = 13 + 130;
-			public static final int DEPLOY_AT_TRANSACTION = 14 + 130;
-*/	
+			out= out+ genesis_Send_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
+		default:	out += "<br>" +transaction.toJson();
 		}
-		out += "<br>" +transaction.toJson();
+		//		out += "<br>" +transaction.toJson();
+		out += "<br><a href ='/api/recordrawbynumber/" + tras_json.get("block") + "-" +  tras_json.get("seq") + "'> RAW </a>";
 		return out;
 	}
 
