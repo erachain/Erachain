@@ -63,11 +63,11 @@ import gui.models.Renderer_Boolean;
 	import lang.Lang;
 
 
-	public class Persons_My_SplitPanel extends Split_Panel{
+	public class Persons_Favorite_SplitPanel extends Split_Panel{
 		private static final long serialVersionUID = 2717571093561259483L;
 
 		
-		private WalletItemPersonsTableModel my_PersonsModel;
+		private Persons_Favorite_TableModel my_PersonsModel;
 		private MTable my_Person_table;
 		private TableRowSorter my_Sorter;
 		
@@ -76,10 +76,10 @@ import gui.models.Renderer_Boolean;
 	     int alpha_int;
 		
 		
-	public Persons_My_SplitPanel(){
-		super("Persons_My_SplitPanel");
+	public Persons_Favorite_SplitPanel(){
+		super("Persons_Favorite_SplitPanel");
 	
-		this.setName(Lang.getInstance().translate("My Persons"));
+		this.setName(Lang.getInstance().translate("Favorite Persons"));
 			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 			// not show buttons
 			this.button1_ToolBar_LeftPanel.setVisible(false);
@@ -92,7 +92,7 @@ import gui.models.Renderer_Boolean;
 			this.searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
 			//TABLE
-			my_PersonsModel = new WalletItemPersonsTableModel();
+			my_PersonsModel = new Persons_Favorite_TableModel();
 			my_Person_table = new MTable(my_PersonsModel);
 			
 			TableColumnModel columnModel = my_Person_table.getColumnModel(); // read column model
@@ -103,7 +103,7 @@ import gui.models.Renderer_Boolean;
 				@Override
 				public void ancestorAdded(AncestorEvent arg0) {
 					// TODO Auto-generated method stub
-					my_PersonsModel.addObservers();
+					//my_PersonsModel.addObservers();
 				}
 
 				@Override

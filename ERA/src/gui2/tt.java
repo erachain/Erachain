@@ -72,6 +72,7 @@ public tt() {
    root.add(other_Node);
 
    // ��������� �������� �������� (������) ������ �����
+   person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Person")));

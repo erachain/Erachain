@@ -44,6 +44,7 @@ import gui.items.other.Other_Split_Panel;
 import gui.items.other.other_Panel;
 import gui.items.persons.InsertPersonPanel;
 import gui.items.persons.IssuePersonPanel;
+import gui.items.persons.Persons_Favorite_SplitPanel;
 import gui.items.persons.Persons_My_SplitPanel;
 import gui.items.persons.Persons_Search_SplitPanel;
 import gui.items.records.Records_My_SplitPanel;
@@ -281,6 +282,11 @@ public class Main_Panel extends javax.swing.JPanel {
 	// add tab from name
 	public void dylay(String str){
 		
+		
+		if(str.equals( Lang.getInstance().translate("Favorite Persons")) || str.equals("Persons_Favorite_SplitPanel") ){
+			ccase1(Lang.getInstance().translate("Favorite Persons"), new Persons_Favorite_SplitPanel());
+			return;
+		}
 		
 		if(str.equals( Lang.getInstance().translate("My Persons")) || str.equals("Persons_My_SplitPanel") ){
 			ccase1(Lang.getInstance().translate("My Persons"), new Persons_My_SplitPanel());

@@ -32,7 +32,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 //	private SortableList<Long, PersonCls> persons;
 	private SortableList<Tuple2<String, String>, PersonCls> persons;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday", "Publisher"});//, "Favorite"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"});//, "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	private ItemPersonMap db;
 	private List<PersonCls> list;
