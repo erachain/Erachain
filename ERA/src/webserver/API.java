@@ -634,6 +634,42 @@ public class API {
 				.build();
 	}
 
+	@POST
+	@Path("broadcast")
+	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public Response broadcastFromRawPost(@QueryParam("raw") String raw58)
+	{
+		byte[] transactionBytes = Base58.decode(raw58);
+		
+		Pair<Transaction, Integer> result = Controller.getInstance().createTransactionFromRaw(transactionBytes);
+		if(result.getB() == Transaction.VALIDATE_OK) {
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(StrJSonFine.convert(result.getA().toJson()))
+					.build();
+		} else {
+			
+			Map out = new LinkedHashMap();
+			out.put("error", result.getB());
+			out.put("message", gui.transaction.OnDealClick.resultMess(result.getB()));
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(StrJSonFine.convert(result.getA().toJson()))
+					.build();
+		}
+	}
+
+	@GET
+	@Path("broadcast/{raw}")
+	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public Response broadcastRaw(@PathParam("raw") String raw)
+	{
+		
+		return broadcastFromRawPost(raw);
+	}
+
 	/*
 	 * ********** ADDRESS **********
 	 */
