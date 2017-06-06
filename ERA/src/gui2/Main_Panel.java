@@ -27,6 +27,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import core.BlockChain;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.assets.IssueAssetPanel;
@@ -420,9 +421,11 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Other"), new Other_Split_Panel()); // new other_Panel());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("Wallets Manager")) || str.equals("Wallets_Manager_SplitPanel")){
+		if (BlockChain.DEVELOP_USE )
+			{if ( str.equals( Lang.getInstance().translate("Wallets Manager")) || str.equals("Wallets_Manager_SplitPanel")){
 			ccase1( Lang.getInstance().translate("Wallets Manager"), new Wallets_Manager_SplitPanel());
 			return;
+		}
 		}
 		
 			
