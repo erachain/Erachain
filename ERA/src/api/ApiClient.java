@@ -26,7 +26,7 @@ public class ApiClient {
 	
 
 	private static List<String> allowedcalls = new CopyOnWriteArrayList<>();
-	private static final String ERM_ABBREV = AssetCls.ERA_ABBREV;
+	private static final String ERA_ABBREV = AssetCls.ERA_ABBREV;
 	
 	
 	private static final Logger LOGGER = Logger.getLogger(ApiClient.class);

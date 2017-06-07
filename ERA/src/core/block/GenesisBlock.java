@@ -121,11 +121,11 @@ public class GenesisBlock extends Block{
 				this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address +  " / POST addresses " + Base58.encode(accountSeed);
 
 				// SEND GENESIS ASSETS
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 		    }
 			this.testnetInfo += "\nStart the other nodes with command" + ":";
-			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERM.jar -testnet=" + genesisTimestamp;
+			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERA.jar -testnet=" + genesisTimestamp;
 			
 		} else {
 
@@ -382,7 +382,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account((String)item.get(0));
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 				
 				// buffer for CREDIT sends
@@ -408,7 +408,7 @@ public class GenesisBlock extends Block{
 				}
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 
 
@@ -428,7 +428,7 @@ public class GenesisBlock extends Block{
 				recipient = new Account((String)item.get(0));
 				
 				bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERM_KEY, bdAmount0));
+				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 
 				addDebt(recipient.getAddress(), 1, genesisDebtors);
@@ -437,7 +437,7 @@ public class GenesisBlock extends Block{
 
 			// ADJUST end
 			transactions.add(new GenesisTransferAssetTransaction(
-					new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERM_KEY,
+					new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERA_KEY,
 					new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(8)));
 
 
@@ -465,7 +465,7 @@ public class GenesisBlock extends Block{
 						BigDecimal diffLimit = bufferAmount.subtract(limitOwned);
 						bdAmount0 = bdAmount0.subtract(diffLimit);
 						
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERM_KEY,
+						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
 								diffLimit, bufferCreditor));
 						i++;
 						limitOwned = limitOwned.subtract(BigDecimal.ONE);
@@ -473,7 +473,7 @@ public class GenesisBlock extends Block{
 						bufferAmount = sends_toUsers.get(i).b;
 						continue;
 					} else {
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERM_KEY,
+						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
 								bdAmount0, bufferCreditor));
 						bufferAmount = bufferAmount.subtract(bdAmount0);
 						break;
@@ -492,8 +492,8 @@ public class GenesisBlock extends Block{
 	{
 		
 		///// ASSETS
-		//CREATE ERM ASSET
-		//asset0 = makeAsset(AssetCls.ERM_KEY);
+		//CREATE ERA ASSET
+		//asset0 = makeAsset(AssetCls.ERA_KEY);
 		//transactions.add(new GenesisIssueAssetTransaction(asset0));
 		//CREATE JOB ASSET
 		//asset1 = makeAsset(AssetCls.FEE_KEY);
@@ -516,8 +516,8 @@ public class GenesisBlock extends Block{
 	{
 		switch((int)key)
 		{
-		case (int)AssetCls.ERM_KEY:
-			return new AssetVenture(CREATOR, AssetCls.ERM_NAME, icon, image, AssetCls.ERM_DESCR, false, 0l, (byte)8, true);
+		case (int)AssetCls.ERA_KEY:
+			return new AssetVenture(CREATOR, AssetCls.ERA_NAME, icon, image, AssetCls.ERA_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.FEE_KEY:
 			return new AssetVenture(CREATOR, AssetCls.FEE_NAME, icon, image, AssetCls.FEE_DESCR, false, 0l, (byte)8, true);
 		case (int)AssetCls.TRUST_KEY:

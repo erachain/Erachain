@@ -37,7 +37,7 @@ public class TestRecStatus {
 	Long releaserReference = null;
 
 	boolean asPack = false;
-	long ERM_KEY = AssetCls.ERM_KEY;
+	long ERM_KEY = AssetCls.ERA_KEY;
 	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] statusReference = new byte[64];

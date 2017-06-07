@@ -477,9 +477,9 @@ public class R_SertifyPubKeys extends Transaction {
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 		}
 
-		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(
-						//BlockChain.MINOR_ERM_BALANCE_BD
+		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+		if ( balERA.compareTo(
+						//BlockChain.MINOR_ERA_BALANCE_BD
 						BlockChain.MIN_GENERATING_BALANCE_BD
 					)<0
 				)

@@ -76,8 +76,8 @@ public class IssueNoteRecord extends Issue_ItemRecord
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
-		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(BlockChain.MAJOR_ERA_BALANCE_BD)<0 )
+		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+		if ( balERA.compareTo(BlockChain.MAJOR_ERA_BALANCE_BD)<0 )
 		{
 			return Transaction.NOT_ENOUGH_RIGHTS;
 		}

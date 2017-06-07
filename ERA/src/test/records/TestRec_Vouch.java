@@ -42,7 +42,7 @@ public class TestRec_Vouch {
 
 	Long releaserReference = null;
 
-	long ERM_KEY = AssetCls.ERM_KEY;
+	long ERM_KEY = AssetCls.ERA_KEY;
 	long FEE_KEY = AssetCls.FEE_KEY;
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];

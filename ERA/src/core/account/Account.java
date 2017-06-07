@@ -59,7 +59,7 @@ import utils.NameUtils.NameResult;
 public class Account {
 	
 	public static final int ADDRESS_LENGTH = 25;
-	//private static final long ERM_KEY = Transaction.RIGHTS_KEY;
+	//private static final long ERA_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	//public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
 	//public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
@@ -432,15 +432,15 @@ public class Account {
 	// take current balance
 	public void calculateGeneratingBalance(DBSet db)
 	{
-		long balance = this.getConfirmedBalance(ERM_KEY, db).setScale(0).longValue();
+		long balance = this.getConfirmedBalance(ERA_KEY, db).setScale(0).longValue();
 		this.generatingBalance = balance;
 	}
 
 	// balance FOR generation
 	public void calculateGeneratingBalance_old(DBSet db)
 	{
-		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS - for ERM_KEY only
-		BigDecimal balance = this.getConfirmedBalance(ERM_KEY, db);
+		//CONFIRMED BALANCE + ALL NEGATIVE AMOUNTS IN LAST 9 BLOCKS - for ERA_KEY only
+		BigDecimal balance = this.getConfirmedBalance(ERA_KEY, db);
 		
 		Block block = db.getBlockMap().getLastBlock();
 		
@@ -457,7 +457,7 @@ public class Account {
 				{
 					TransactionAmount ta = (TransactionAmount)transaction;
 					
-					if(ta.getKey() == ERM_KEY & transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1)
+					if(ta.getKey() == ERA_KEY & transaction.getAmount(this).compareTo(BigDecimal.ZERO) == 1)
 					{
 						balance = balance.subtract(transaction.getAmount(this));
 					}

@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="ERM Web Server">
+    <meta name="description" content="ERA Web Server">
     <link rel="shortcut icon" href="favicon.ico">
-    <title>ERM Blog</title>
+    <title>ERA Blog</title>
     <link href="/index/libs/bootstrap/3/css/theme.css" rel="stylesheet">
     <link href="/index/libs/css/style.css" rel="stylesheet">
     <link href="/index/libs/css/sidebar.css" rel="stylesheet">
@@ -265,7 +265,7 @@
           {%endif%}
 
           {% if blogprofile.getAvatarOpt() is empty%}
-            <img align="left" src="/index/img/ERM-user.png" alt="" class="tl-image-profile thumbnail">
+            <img align="left" src="/index/img/ERA-user.png" alt="" class="tl-image-profile thumbnail">
           {%else%}
             <img align="left" src="{{blogprofile.getAvatarOpt()}}" alt="" class="tl-image-profile thumbnail">
             {%endif%}
@@ -349,7 +349,7 @@
                       <a href="#">
                   	{%endif%}
                      {%if comment.getAvatar() is empty%}
-                        <img class="media-object commenterImage" src="/index/img/ERM-user.png" alt="user image">
+                        <img class="media-object commenterImage" src="/index/img/ERA-user.png" alt="user image">
           			{%else%}
                         <img class="media-object commenterImage" src="{{comment.getAvatar()}}" alt="user image">
           			{%endif%}

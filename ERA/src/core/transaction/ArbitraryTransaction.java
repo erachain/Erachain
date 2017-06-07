@@ -163,7 +163,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
-			// IF ERM ASSET
+			// IF ERA ASSET
 			if (payment.getAsset() == FEE_KEY) {
 				// IF SENDER
 				if (address.equals(this.creator.getAddress())) {

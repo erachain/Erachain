@@ -35,8 +35,8 @@
                       <div class="menu"><span class="glyphicon glyphicon-file"></span><a href="/index/namestorage.html">Namestorage</a></div></a></div>
                   <div class="col-sm-4 col-xs-6"><a href="/index/namestoragehistory.html">
                       <div class="menu"><span class="glyphicon glyphicon-floppy-disk"></span><a href="/index/namestoragehistory.html">StorageHistory</a></div></a></div>
-                  <div class="col-sm-4 col-xs-6"><a href="/index/hashtag.html?hashtag=ERM">
-                      <div class="menu"><span class="glyphicon glyphicon-fire"></span><a href="/index/hashtag.html?hashtag=ERM">Hashtag</a></div></a></div>
+                  <div class="col-sm-4 col-xs-6"><a href="/index/hashtag.html?hashtag=ERA">
+                      <div class="menu"><span class="glyphicon glyphicon-fire"></span><a href="/index/hashtag.html?hashtag=ERA">Hashtag</a></div></a></div>
                 </div>
               </div>
             </div>
@@ -55,7 +55,7 @@
 		{% else %}
 		{% for profile in profiles %}
             <li><a href="/index/blog.html?blogname={{profile.getName().getName()}}&amp;switchprofile={{profile.getName().getName()}}"><span class="item"><span class="item-left">
-              {% if profile.getAvatarOpt() is empty%}<img src="/index/img/ERM-user.png" alt="" class="prof-pic"/>
+              {% if profile.getAvatarOpt() is empty%}<img src="/index/img/ERA-user.png" alt="" class="prof-pic"/>
               {%else%}
               <img src="{{profile.getAvatarOpt()}}" alt="" class="prof-pic"/>
               {%endif%}
@@ -75,7 +75,7 @@
           <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="dropdown-toggle">{{activeProfile.getName().getName()}} <span class="caret"></span></a>
           <ul role="menu" class="dropdown-menu">{% for profile in profiles %}
             <li><a href="/index/blog.html?blogname={{profile.getName().getName()}}&amp;switchprofile={{profile.getName().getName()}}"><span class="item"><span class="item-left">
-              {% if profile.getAvatarOpt() is empty%}<img src="/index/img/ERM-user.png" alt="" class="prof-pic"/>
+              {% if profile.getAvatarOpt() is empty%}<img src="/index/img/ERA-user.png" alt="" class="prof-pic"/>
               {%else%}
               <img src="{{profile.getAvatarOpt()}}" alt="" class="prof-pic"/>
               {%endif%}

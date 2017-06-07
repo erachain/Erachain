@@ -111,7 +111,7 @@
 	<classpathentry kind="lib" path="libs/jcalendar-1.4.jar"/>
 	<classpathentry kind="lib" path="libs/json-io-4.8.0.jar" sourcepath="libs/sourceandjavadoc/json-io-4.8.0-sources.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="jar:platform:/resource/ERM/libs/sourceandjavadoc/json-io-4.8.0-javadoc.jar!/"/>
+			<attribute name="javadoc_location" value="jar:platform:/resource/ERA/libs/sourceandjavadoc/json-io-4.8.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/gson-2.3.1.jar"/>

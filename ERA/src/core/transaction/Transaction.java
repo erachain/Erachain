@@ -227,7 +227,7 @@ public abstract class Transaction {
 	//public static final int JSON_TRANSACTION = 27;
 
 	// FEE PARAMETERS
-	public static final long RIGHTS_KEY = AssetCls.ERM_KEY;
+	public static final long RIGHTS_KEY = AssetCls.ERA_KEY;
 
 	// FEE PARAMETERS	public static final int FEE_PER_BYTE = 1;
 

@@ -247,7 +247,7 @@ public class Block {
 			for(Transaction transaction: txs)
 			{				
 				if (false && transaction instanceof R_SertifyPubKeys) {
-				//	amount = BlockChain.GIFTED_ERM_AMOUNT.intValue();
+				//	amount = BlockChain.GIFTED_ERA_AMOUNT.intValue();
 				//	incomed_amount += amount;
 				} else if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
 					int amo_sign = transaction.getAmount().signum();

@@ -678,8 +678,8 @@ public class R_SetStatusToItem extends Transaction {
 				}
 			}
 		} else {
-			BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-			if ( balERM.compareTo(BlockChain.MINOR_ERA_BALANCE_BD)<0 )
+			BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+			if ( balERA.compareTo(BlockChain.MINOR_ERA_BALANCE_BD)<0 )
 				return Transaction.NOT_ENOUGH_RIGHTS;
 		}
 		
