@@ -26,7 +26,7 @@ public class ApiClient {
 	
 
 	private static List<String> allowedcalls = new CopyOnWriteArrayList<>();
-	private static final String ERM_ABBREV = AssetCls.ERM_ABBREV;
+	private static final String ERM_ABBREV = AssetCls.ERA_ABBREV;
 	
 	
 	private static final Logger LOGGER = Logger.getLogger(ApiClient.class);
@@ -636,12 +636,12 @@ public class ApiClient {
 			},
 			{
 				"GET blog",
-				"Equivalent to blog/posts/ERM",
+				"Equivalent to blog/posts/ERA",
 				""
 			},
 			{
 				"GET blog/posts/<blogname>",
-				"List posts to a blog by transaction signature. If <blogname> is omitted, ERM is provided.",
+				"List posts to a blog by transaction signature. If <blogname> is omitted, ERA is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled."
 			},
 			{
@@ -651,7 +651,7 @@ public class ApiClient {
 			},
 			{
 				"GET blog/entries/<blogname>",
-				"Returns the content of the entries for the blog.  If <blogname> is omitted, ERM is provided.",
+				"Returns the content of the entries for the blog.  If <blogname> is omitted, ERA is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled."
 			},
 			{
@@ -661,12 +661,12 @@ public class ApiClient {
 			},
 			{
 				"GET blog/lastentry/<blogname>",
-				"Returns the content of the last entry of the blog.  If <blogname> is omitted, ERM is provided.",
+				"Returns the content of the last entry of the blog.  If <blogname> is omitted, ERA is provided.",
 				"Errors: 401 - Name does not exist. 902 - Blog disabled. 906 - This blog is empty."
 			},
 			{
 				"POST multipayment {\"sender\":\"<sender>\", \"asset\":<defaultkey>, \"payments\": [{\"recipient\":\"<recipient 1>\", \"amount\": \"<amount 1>\", \"asset\":<key>},{\"recipient\":\"<recipient 2>\", \"amount\": \"<amount 2>\"}]}",
-				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERM).",
+				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERA).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 		};

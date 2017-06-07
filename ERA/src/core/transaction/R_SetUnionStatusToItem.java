@@ -307,7 +307,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 		}
 		
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(BlockChain.MINOR_ERM_BALANCE_BD)<0 )
+		if ( balERM.compareTo(BlockChain.MINOR_ERA_BALANCE_BD)<0 )
 			return Transaction.NOT_ENOUGH_RIGHTS;
 		
 		return Transaction.VALIDATE_OK;

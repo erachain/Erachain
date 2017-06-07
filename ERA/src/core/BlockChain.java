@@ -40,9 +40,9 @@ public class BlockChain
 	
 	// RIGHTs 
 	public static final int GENESIS_ERA_TOTAL = 10000000;
-	public static final int GENERAL_ERM_BALANCE = GENESIS_ERA_TOTAL / 100;
-	public static final int MAJOR_ERM_BALANCE = 33000;
-	public static final int MINOR_ERM_BALANCE = 1000;
+	public static final int GENERAL_ERA_BALANCE = GENESIS_ERA_TOTAL / 100;
+	public static final int MAJOR_ERA_BALANCE = 33000;
+	public static final int MINOR_ERA_BALANCE = 1000;
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
@@ -86,13 +86,13 @@ public class BlockChain
 	public static final int FEE_FOR_ANONIMOUSE = 33;
 
 	// issue PERSON
-	//public static final BigDecimal PERSON_MIN_ERM_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
+	//public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000).setScale(8);
 
 	// SERTIFY
 	// need RIGHTS for non PERSON account
-	public static final BigDecimal MAJOR_ERM_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERM_BALANCE).setScale(8);
+	public static final BigDecimal MAJOR_ERA_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERA_BALANCE).setScale(8);
 	// need RIGHTS for PERSON account
-	public static final BigDecimal MINOR_ERM_BALANCE_BD = BigDecimal.valueOf(MINOR_ERM_BALANCE).setScale(8);
+	public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE).setScale(8);
 	// GIFTS for R_SertifyPubKeys
 	public static final int GIFTED_COMPU_AMOUNT = FEE_PER_BYTE<<8;
 	public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);

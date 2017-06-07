@@ -77,7 +77,7 @@ public class IssueStatusRecord extends Issue_ItemRecord
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		BigDecimal balERM = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERM.compareTo(BlockChain.MAJOR_ERM_BALANCE_BD)<0 )
+		if ( balERM.compareTo(BlockChain.MAJOR_ERA_BALANCE_BD)<0 )
 		{
 			return Transaction.NOT_ENOUGH_RIGHTS;
 		}

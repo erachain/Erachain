@@ -19,18 +19,18 @@ public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
 	public static final long ERM_KEY = 1l;
-	public static final String ERM_ABBREV = "ERA"; // ERM (main rights units)
+	public static final String ERA_ABBREV = "ERA"; // ERM (main rights units)
 	public static final String ERM_NAME = "ERA";
 	public static final String ERM_DESCR = "Основная учётная единица, мера собственности и управления данной средой - \"правовая\", \"управляющая\"" + ": "
-			+ ERM_NAME + "(" + ERM_ABBREV + "). "
+			+ ERM_NAME + "(" + ERA_ABBREV + "). "
 			+ "Именно единицы Эра позволяют собирать блоки и получать комиссию с упакованных в них транзакций"
 			+ ". "
 			+ ("Более чем %MIN% ЭРА, находящихся в пользовании на счету позволяет собирать блоки (форжить) с этого счёта, а более чем %MINOR% позволяет удостоверять других участников среды"
 				.replace("%MIN%", "" + BlockChain.MIN_GENERATING_BALANCE)
-				.replace("%MINOR%", "" + BlockChain.MINOR_ERM_BALANCE))
+				.replace("%MINOR%", "" + BlockChain.MINOR_ERA_BALANCE))
 			+ ". "
 			+ "Число единиц %GENERAL% ЭРА дает права создавать новые статусы и другие сущности в среде"
-			.replace("%GENERAL%", "" + BlockChain.GENERAL_ERM_BALANCE)
+			.replace("%GENERAL%", "" + BlockChain.GENERAL_ERA_BALANCE)
 			+ "."
 			;
 
