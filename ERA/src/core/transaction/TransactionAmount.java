@@ -160,6 +160,12 @@ public abstract class TransactionAmount extends Transaction {
 		return getAmount(address);
 	}
 	
+	// BACKWARD AMOUNT
+	public boolean isBackward() {
+		return typeBytes[1] == 1
+			|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+	}
+
 	@Override
 	public String viewAmount(Account account) {
 		String address = account.getAddress();
