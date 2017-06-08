@@ -76,6 +76,8 @@ public class ObserverMessage {
 	public static final int REMOVE_PERSON_TYPE = 54;
 	public static final int LIST_PERSON_TYPE = 55;
 	public static final int LIST_PERSON_FAVORITES_TYPE = 56;
+	public static final int ADD_PERSON_FAVORITES_TYPE = 56001;
+	public static final int DELETE_PERSON_FAVORITES_TYPE = 56002;
 
 	public static final int ADD_STATUS_TYPE = 57;
 	public static final int REMOVE_STATUS_TYPE = 58;

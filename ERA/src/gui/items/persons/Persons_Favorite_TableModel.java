@@ -1,6 +1,10 @@
 package gui.items.persons;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 ////////
 import java.util.Observable;
@@ -30,7 +34,9 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
 	
-	private List<PersonCls> persons;
+	private List <PersonCls> persons;
+	
+	
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
@@ -38,7 +44,8 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	@SuppressWarnings("unchecked")
 	public Persons_Favorite_TableModel()
 	{
-		persons = new ArrayList();
+		
+		
 		Controller.getInstance().addWalletListener(this);
 		//addObservers();
 		//fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
@@ -150,26 +157,37 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_PERSON_FAVORITES_TYPE)
+		if(message.getType() == ObserverMessage.LIST_PERSON_FAVORITES_TYPE && persons==null)
 		{
-			
-			fill( (Set<Long>) message.getValue());
-			
-			
-			}
-			
+			persons = new ArrayList<PersonCls>();
+			fill((Set<Long>) message.getValue());
 			this.fireTableDataChanged();
-		}
+			}
+		if(message.getType() == ObserverMessage.ADD_PERSON_FAVORITES_TYPE){
+			persons.add(  Controller.getInstance().getPerson((long) message.getValue()));
+			this.fireTableDataChanged();
+			}
+		if(message.getType() == ObserverMessage.DELETE_PERSON_FAVORITES_TYPE){
+			persons.remove( Controller.getInstance().getPerson((long) message.getValue()));
+			this.fireTableDataChanged();
+			}
+	
+	
+	}
+			
+		
 		
 	public void fill(Set<Long> set){
 		
-		persons.clear();
+	//	persons.clear();
 			
 		for(Long s:set){
-			 persons.add(Controller.getInstance().getPerson(s));
-		
+			
+				persons.add ( Controller.getInstance().getPerson(s));
+			
 			
 		}
+		
 		
 	}
 			

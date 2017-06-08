@@ -50,10 +50,15 @@ import javax.swing.event.DocumentEvent;
 	import controller.Controller;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
-	import gui.Main_Internal_Frame;
+import gui.MainFrame;
+import gui.Main_Internal_Frame;
 	import gui.Split_Panel;
-	import gui.items.assets.IssueAssetPanel;
+import gui.items.accounts.Account_Send_Dialog;
+import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
+import gui.items.mails.Mail_Send_Dialog;
+import gui.items.persons.Persons_Search_SplitPanel.search_listener;
+import gui.items.persons.Persons_Search_SplitPanel.search_tab_filter;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
@@ -61,15 +66,17 @@ import gui.models.Renderer_Boolean;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
 	import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 
 	public class Persons_Favorite_SplitPanel extends Split_Panel{
 		private static final long serialVersionUID = 2717571093561259483L;
 
 		
-		private Persons_Favorite_TableModel my_PersonsModel;
-		private MTable my_Person_table;
-		private TableRowSorter my_Sorter;
+		private Persons_Favorite_TableModel search_Table_Model;
+		private MTable search_Table;
+	
+		private RowSorter<Persons_Favorite_TableModel> search_Sorter;
 		
 	// для прозрачности
 	     int alpha =255;
@@ -82,253 +89,378 @@ import gui.models.Renderer_Boolean;
 		this.setName(Lang.getInstance().translate("Favorite Persons"));
 			this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 			// not show buttons
-			this.button1_ToolBar_LeftPanel.setVisible(false);
-			this.button2_ToolBar_LeftPanel.setVisible(false);
-			this.jButton1_jToolBar_RightPanel.setVisible(false);
-			this.jButton2_jToolBar_RightPanel.setVisible(false);
-			
+		
 
-			// not show My filter
-			this.searth_My_JCheckBox_LeftPanel.setVisible(false);
 			
-			//TABLE
-			my_PersonsModel = new Persons_Favorite_TableModel();
-			my_Person_table = new MTable(my_PersonsModel);
+		
 			
-			TableColumnModel columnModel = my_Person_table.getColumnModel(); // read column model
-			columnModel.getColumn(0).setMaxWidth((100));
 			
-			this.addAncestorListener(new AncestorListener(){
+		
+			// not show buttons
+				jToolBar_RightPanel.setVisible(false);
+				toolBar_LeftPanel.setVisible(true);
+				button2_ToolBar_LeftPanel.setVisible(false);
+				button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search Persons"));
+				button1_ToolBar_LeftPanel.addActionListener(new ActionListener(){
 
-				@Override
-				public void ancestorAdded(AncestorEvent arg0) {
-					// TODO Auto-generated method stub
-					//my_PersonsModel.addObservers();
-				}
-
-				@Override
-				public void ancestorMoved(AncestorEvent arg0) {
-					// TODO Auto-generated method stub
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+						// TODO Auto-generated method stub
+						JDialog dd = new JDialog(MainFrame.getInstance());
+						dd.setModal(true);
+						dd.add(new Persons_Search_SplitPanel());
+						dd.setPreferredSize(new Dimension(MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100));
 					
-				}
-
-				@Override
-				public void ancestorRemoved(AncestorEvent arg0) {
-					// TODO Auto-generated method stub
-					my_PersonsModel.removeObservers();
-				}
+						dd.pack();
+						//	this.setSize( size.width-(size.width/8), size.height-(size.width/8));
+							
+							dd.setResizable(true);
+							dd.setSize(MainFrame.getInstance().getWidth()-300, MainFrame.getInstance().getHeight()-300);
+							dd.setLocationRelativeTo(MainFrame.getInstance());
+							dd.setVisible(true);
+					
+					
+					}
+					
+					
+				});
 				
 				
-				
-			});	
-					
-	//		my_Sorter = new TableRowSorter(my_PersonsModel);
-	//		my_Person_table.setRowSorter(my_Sorter);
-	//		my_Person_table.getRowSorter();
-	//		if (my_PersonsModel.getRowCount() > 0) my_PersonsModel.fireTableDataChanged();
-			
-			//CHECKBOX FOR CONFIRMED
-			TableColumn confirmedColumn = my_Person_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
-			// confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-			
-			confirmedColumn.setMinWidth(50);
-			confirmedColumn.setMaxWidth(50);
-			confirmedColumn.setPreferredWidth(50);//.setWidth(30);
 			
 			
-			//CHECKBOX FOR FAVORITE
-			TableColumn favoriteColumn = my_Person_table.getColumnModel().getColumn(WalletItemPersonsTableModel.COLUMN_FAVORITE);
-			//favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
+		// not show My filter
+				searth_My_JCheckBox_LeftPanel.setVisible(false);
+				searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
 			
-			favoriteColumn.setMinWidth(50);
-			favoriteColumn.setMaxWidth(50);
-			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
-			
-			my_Person_table.addMouseMotionListener(new MouseMotionListener() {
-			    public void mouseMoved(MouseEvent e) {
-			       
-			        if(my_Person_table.columnAtPoint(e.getPoint())==WalletItemPersonsTableModel.COLUMN_FAVORITE)
-			        {
-			     
-			        	my_Person_table.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			        } else {
-			        	my_Person_table.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-			        }
-			    }
+		//CREATE TABLE
+				search_Table_Model = new Persons_Favorite_TableModel();
+				search_Table = new MTable(this.search_Table_Model);
+				TableColumnModel columnModel = search_Table.getColumnModel(); // read column model
+				columnModel.getColumn(0).setMaxWidth((100));
+		//CHECKBOX FOR FAVORITE	
+				TableColumn favorite_Column = search_Table.getColumnModel().getColumn(Persons_Favorite_TableModel.COLUMN_FAVORITE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
+				favorite_Column.setMinWidth(50);
+				favorite_Column.setMaxWidth(1000);
+				favorite_Column.setPreferredWidth(50);
+				// hand cursor  for Favorite column
+				search_Table.addMouseMotionListener(new MouseMotionListener() {
+				    public void mouseMoved(MouseEvent e) {
+				       
+				        if(search_Table.columnAtPoint(e.getPoint())==Persons_Favorite_TableModel.COLUMN_FAVORITE)
+				        {
+				     
+				        	search_Table.setCursor(new Cursor(Cursor.HAND_CURSOR));
+				        } else {
+				        	search_Table.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+				        }
+				    }
 
-			    public void mouseDragged(MouseEvent e) {
-			    }
-			});
+				    public void mouseDragged(MouseEvent e) {
+				    }
+				});
+				
+				
+
+//				TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(search_Table_Model.COLUMN_BORN);	
+//				favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
+			//	 int ss = search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN).length();
+//				int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth(search_Table_Model.getColumnName(search_Table_Model.COLUMN_BORN)));	
+//				favoriteColumn.setMinWidth(rr+1);
+//				favoriteColumn.setMaxWidth(rr*10);
+//				favoriteColumn.setPreferredWidth(rr+5);
+				//Sorter
+				 search_Sorter = new TableRowSorter<Persons_Favorite_TableModel>(this.search_Table_Model);
+				search_Table.setRowSorter(search_Sorter);	
 			
+		// UPDATE FILTER ON TEXT CHANGE
+				searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener( new search_tab_filter());
+		// SET VIDEO			
+				jTable_jScrollPanel_LeftPanel.setModel(this.search_Table_Model);
+				jTable_jScrollPanel_LeftPanel = search_Table;
+				jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+//				setRowHeightFormat(true);
+		// Event LISTENER		
+				jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 			
-			
-			
-			// UPDATE FILTER ON TEXT CHANGE
-			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
-			// SET VIDEO			
-			this.jTable_jScrollPanel_LeftPanel.setModel(my_PersonsModel);
-			this.jTable_jScrollPanel_LeftPanel = my_Person_table;
-			this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);		
-	//		this.setRowHeightFormat(true);
-			 
-			// EVENTS on CURSOR
-			my_Person_table.getSelectionModel().addListSelectionListener(new My_Tab_Listener());
-			
-			jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() 
-			{
-				@Override
-				public void mousePressed(MouseEvent e) 
-				{
-					Point p = e.getPoint();
-					int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-					jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
-					
-					
-					if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-					{
-						
-						if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == TableModelPersons.COLUMN_FAVORITE){
-							row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-							 PersonCls asset = my_PersonsModel.getItem(row);
-							favorite_set( jTable_jScrollPanel_LeftPanel);	
-							
-							
-							
-						}
-						
+				
+				this.addAncestorListener(new AncestorListener(){
+
+					@Override
+					public void ancestorAdded(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						//search_Table_Model.addObservers();
+					}
+
+					@Override
+					public void ancestorMoved(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
 						
 					}
-			     }
-			});
-		
 
-	//		 Dimension size = MainFrame.getInstance().desktopPane.getSize();
-	//		 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-			// jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
-			
-		  
-		    
-		}
-	
-	// set favorine My
-		void favorite_my(JTable table){
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
-			PersonCls person = my_PersonsModel.getItem(row);
-			//new AssetPairSelect(asset.getKey());
-
-			
-				//CHECK IF FAVORITES
-				if(Controller.getInstance().isItemFavorite(person))
-				{
+					@Override
+					public void ancestorRemoved(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						search_Table_Model.removeObservers();
+					}
 					
-					Controller.getInstance().removeItemFavorite(person);
-				}
-				else
-				{
 					
-					Controller.getInstance().addItemFavorite(person);
-				}
 					
-
-				table.repaint();
-
-		}
-
-		
-	
-	
-	
-
-	
-
-
-		class My_Tab_Listener implements ListSelectionListener {
-			
-			//@SuppressWarnings("deprecation")
-			@Override
-			public void valueChanged(ListSelectionEvent arg0) {
+				});
 				
-				PersonCls person = null;
-				if (my_Person_table.getSelectedRow() >= 0 )	person = my_PersonsModel.getItem(my_Person_table.convertRowIndexToModel(my_Person_table.getSelectedRow()));
-				if (person == null) return;
-				Person_Info_002 info_panel = new Person_Info_002(person, false);
-				info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-				jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-			}
-			
-		}
-		
-		class My_Search implements DocumentListener {
-			public void changedUpdate(DocumentEvent e) {
-				onChange();
-			}
-		
-			public void removeUpdate(DocumentEvent e) {
-				onChange();
-			}
-		
-			public void insertUpdate(DocumentEvent e) {
-				onChange();
-			}
-		
-			public void onChange() {
-				// GET VALUE
-				String search = searchTextField_SearchToolBar_LeftPanel.getText();
-				// SET FILTER
-				my_PersonsModel.fireTableDataChanged();
-			
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-				((DefaultRowSorter)  my_Sorter).setRowFilter(filter);
+				jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() 
+					{
+						@Override
+						public void mousePressed(MouseEvent e) 
+						{
+							Point p = e.getPoint();
+							int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+							
+							
+							if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+							{
+								
+								if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == Persons_Favorite_TableModel.COLUMN_FAVORITE){
+									row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+									 PersonCls asset = search_Table_Model.getItem(row);
+									favorite_set( jTable_jScrollPanel_LeftPanel);	
+									
+									
+									
+								}
+								
+								
+							}
+					     }
+					});
 					
-				my_PersonsModel.fireTableDataChanged();
+				
+				
+				JPopupMenu menu = new JPopupMenu();
+
+				JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("&&"));
+				favorite.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						
+						favorite_set( jTable_jScrollPanel_LeftPanel);
+						
+					}
+				});
+			
+		    	    	
+		    	    	JMenuItem vsend_Coins_Item= new JMenuItem(Lang.getInstance().translate("Send Asset"));
+		    	    
+		    	    	vsend_Coins_Item.addActionListener(new ActionListener(){
+		    	  		@Override
+		    	    	public void actionPerformed(ActionEvent e) {
+		    	  			
+		    				
+		    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+		    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+		    	    		
+		    				PersonCls person = search_Table_Model.getItem(row);
+		    	  			Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
+		    				}});
+		    	    	
+		    	    	menu.add(vsend_Coins_Item);
+		    	    	JMenuItem send_Mail_Item= new JMenuItem(Lang.getInstance().translate("Send Mail"));
+		    	    	send_Mail_Item.addActionListener(new ActionListener(){
+		    	  		@Override
+		    	    	public void actionPerformed(ActionEvent e) {
+		    	   
+
+		    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+		    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+		    	    		
+		    				PersonCls person = search_Table_Model.getItem(row);
+		    	  				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+		    				}});
+		    	    	
+		    	    	menu.add(send_Mail_Item);
+		    	    	
+		    	    	
+		    	    	menu.addPopupMenuListener(new PopupMenuListener(){
+
+		    	    		@Override
+		    	    		public void popupMenuCanceled(PopupMenuEvent arg0) {
+		    	    			// TODO Auto-generated method stub
+		    	    			
+		    	    		}
+
+		    	    		@Override
+		    	    		public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+		    	    			// TODO Auto-generated method stub
+		    	    			
+		    	    		}
+
+		    	    		@Override
+		    	    		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+		    	    			// TODO Auto-generated method stub
+		    	    			
+		    	    			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+		    	    			row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+		    	    			 PersonCls person = search_Table_Model.getItem(row);
+		    	    			
+		    	    			//IF ASSET CONFIRMED AND NOT ERM
+		    	    			
+		    	    				favorite.setVisible(true);
+		    	    				//CHECK IF FAVORITES
+		    	    				if(Controller.getInstance().isItemFavorite(person))
+		    	    				{
+		    	    					favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+		    	    				}
+		    	    				else
+		    	    				{
+		    	    					favorite.setText(Lang.getInstance().translate("Add Favorite"));
+		    	    				}
+		    	    				/*	
+		    	    				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+		    	    				this.favoritesButton.addActionListener(new ActionListener()
+		    	    				{
+		    	    					public void actionPerformed(ActionEvent e)
+		    	    					{
+		    	    						onFavoriteClick();
+		    	    					}
+		    	    				});	
+		    	    				this.add(this.favoritesButton, labelGBC);
+		    	    				*/
+		    	    			
+		    	    		
+		    	    		
+		    	    		
+		    	    		
+		    	    		}
+		    	    		
+		    	    	}
+		    	    	
+		    	    	);
+		    	    	
+		    	    	
+		    	    	menu.add(favorite);
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		    	    	
+		   	    	TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
+			}
+		// set favorite Search	
+			void favorite_all(JTable personsTable){
+				int row = personsTable.getSelectedRow();
+				row = personsTable.convertRowIndexToModel(row);
+
+				PersonCls person = search_Table_Model.getItem(row);
+				//new AssetPairSelect(asset.getKey());
+
+				
+					//CHECK IF FAVORITES
+					if(Controller.getInstance().isItemFavorite(person))
+					{
+						
+						Controller.getInstance().removeItemFavorite(person);
+					}
+					else
+					{
+						
+						Controller.getInstance().addItemFavorite(person);
+					}
+						
+
+					personsTable.repaint();
 
 			}
+
+		// filter search
+			 class search_tab_filter implements DocumentListener {
+					
+					public void changedUpdate(DocumentEvent e) {
+						onChange();
+					}
+
+					public void removeUpdate(DocumentEvent e) {
+						onChange();
+					}
+
+					public void insertUpdate(DocumentEvent e) {
+						onChange();
+					}
+
+					public void onChange() {
+
+						// GET VALUE
+						String search = searchTextField_SearchToolBar_LeftPanel.getText();
+
+					 	// SET FILTER
+			//			search_Table_Model.getSortableList().setFilter(".*" + search + ".*");
+			//			search_Table_Model.fireTableDataChanged();
+						
+			//			search_Table_Model.set_Filter_By_Name(search);
+			//			RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
+			//			((DefaultRowSorter) search_Sorter).setRowFilter(filter);
+						
+						search_Table_Model.fireTableDataChanged();
+						
+					}
+				}
+			
+		// listener select row	 
+			 class search_listener implements ListSelectionListener  {
+					@Override
+					public void valueChanged(ListSelectionEvent arg0) {
+						PersonCls person = null;
+						if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getItem(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
+						if (person == null) return;
+							Person_Info_002 info_panel = new Person_Info_002(person, true);
+							info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+							jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+						
+					}
+				}
+
+			 @Override
+				public void delay_on_close(){
+					// delete observer left panel
+				 search_Table_Model.removeObservers();
+					// get component from right panel
+					Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+					// if Person_Info 002 delay on close
+					  if (c1 instanceof Person_Info_002) ( (Person_Info_002)c1).delay_on_Close();
+					
+				}
+			 
+			 public void favorite_set(JTable personsTable){
+
+
+				 int row = personsTable.getSelectedRow();
+				 row = personsTable.convertRowIndexToModel(row);
+
+				  PersonCls person = search_Table_Model.getItem(row);
+				 //new AssetPairSelect(asset.getKey());
+
+				
+				 	//CHECK IF FAVORITES
+				 	if(Controller.getInstance().isItemFavorite(person))
+				 	{
+				 		
+				 		Controller.getInstance().removeItemFavorite(person);
+				 	}
+				 	else
+				 	{
+				 		
+				 		Controller.getInstance().addItemFavorite(person);
+				 	}
+				 		
+
+				 	personsTable.repaint();
+
+				 
+				 }
+			
+
 		}
-		
-	@Override
-	public void delay_on_close(){
-		// delete observer left panel
-		my_PersonsModel.removeObservers();
-		// get component from right panel
-		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-		// if Person_Info 002 delay on close
-		  if (c1 instanceof Person_Info_002) ( (Person_Info_002)c1).delay_on_Close();
-		
-	}
-	
-	 public void favorite_set(JTable personsTable){
-
-
-		 int row = personsTable.getSelectedRow();
-		 row = personsTable.convertRowIndexToModel(row);
-
-		  PersonCls person = my_PersonsModel.getItem(row);
-		 //new AssetPairSelect(asset.getKey());
-
-		
-		 	//CHECK IF FAVORITES
-		 	if(Controller.getInstance().isItemFavorite(person))
-		 	{
-		 		
-		 		Controller.getInstance().removeItemFavorite(person);
-		 	}
-		 	else
-		 	{
-		 		
-		 		Controller.getInstance().addItemFavorite(person);
-		 	}
-		 		
-
-		 	personsTable.repaint();
-
-		 
-		 }
-	
-	
-	}
-
-
-
-
