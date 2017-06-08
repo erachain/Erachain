@@ -1800,6 +1800,14 @@ public class Controller extends Observable {
 		return this.wallet.generateNewAccount();
 	}
 
+	public String generateNewAccountWithSynch() {
+		String ss = this.wallet.generateNewAccount();
+		this.wallet.synchronize();
+		return ss;
+	}
+	
+	
+	
 	public PrivateKeyAccount getPrivateKeyAccountByAddress(String address) {
 		if(this.doesWalletExists()) {
 			return this.wallet.getPrivateKeyAccount(address);

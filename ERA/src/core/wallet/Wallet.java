@@ -556,7 +556,7 @@ public class Wallet extends Observable implements Observer
 		    //NOTIFY
 		    this.setChanged();
 		    this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
-		    this.synchronize();
+		    
 	    }
 	    
 	    return account.getAddress();
@@ -565,6 +565,13 @@ public class Wallet extends Observable implements Observer
 	public static byte[] generateAccountSeed(byte[] seed, int nonce) 
 	{		
 		byte[] nonceBytes = Ints.toByteArray(nonce);
+		byte[] accountSeed = Bytes.concat(nonceBytes, seed, nonceBytes);
+		return Crypto.getInstance().doubleDigest(accountSeed);		
+	}
+	
+	public static byte[] generateAccountSeed(byte[] seed, String nonce) 
+	{		
+		byte[] nonceBytes = nonce.getBytes();
 		byte[] accountSeed = Bytes.concat(nonceBytes, seed, nonceBytes);
 		return Crypto.getInstance().doubleDigest(accountSeed);		
 	}

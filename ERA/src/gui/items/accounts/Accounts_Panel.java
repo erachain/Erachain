@@ -140,7 +140,8 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 						@Override
 						public void run() {
 					
-									Controller.getInstance().generateNewAccount();
+									Controller.getInstance().generateNewAccountWithSynch();
+									
 									newAccount_Button.setText(Lang.getInstance().translate("New Account"));					
 									newAccount_Button.setEnabled(true);
 						}
@@ -421,6 +422,21 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		});
 		menu.add(copyBankKey);
 		
+	/*	JMenuItem hiddenAccountKey = new JMenuItem(Lang.getInstance().translate("Hidden Account"));
+		hiddenAccountKey.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				int row = table.getSelectedRow();
+				row = table.convertRowIndexToModel(row);
+				
+				Account account = tableModel.getAccount(row);
+				Controller.getInstance().deleteAddress(account.getAddress());
+				
+			}
+		});
+		menu.add(hiddenAccountKey);
+	*/	
 		
 
 		////////////////////
