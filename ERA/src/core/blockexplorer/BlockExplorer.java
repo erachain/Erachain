@@ -3511,7 +3511,7 @@ if ( asset_1 == null) {
 				}
 				
 				String str_HTML = "";
-				if ( map_Data.b != null) str_HTML = "<b>"+Lang.getInstance().translate("Title") + ": </b>" +  map_Data.b +"<br>";
+				if ( map_Data.b != null) str_HTML = "<b>"+Lang.getInstance().translate_from_langObj("Title",langObj) + ": </b>" +  map_Data.b +"<br>";
 					
 				JSONObject jSON = map_Data.c;
 				// parse JSON
