@@ -11,6 +11,8 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
 
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
@@ -45,8 +47,9 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public Persons_Favorite_TableModel()
 	{
 		
+	//	addObservers();
 		
-		Controller.getInstance().addWalletListener(this);
+		
 		//addObservers();
 		//fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
 		
@@ -199,8 +202,12 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public void removeObservers() 
 	{
 		//this.persons.removeObserver();
-		Controller.getInstance().deleteWalletObserver(this);
+		Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
 		//Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
+	}
+	public void addObservers(){
+		
+		Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
 	}
 
 	

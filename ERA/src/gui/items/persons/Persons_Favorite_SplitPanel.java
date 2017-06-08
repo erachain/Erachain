@@ -183,12 +183,12 @@ import utils.TableMenuPopupUtil;
 				jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 			
 				
-				this.addAncestorListener(new AncestorListener(){
+				jTable_jScrollPanel_LeftPanel.addAncestorListener(new AncestorListener(){
 
 					@Override
 					public void ancestorAdded(AncestorEvent arg0) {
 						// TODO Auto-generated method stub
-						//search_Table_Model.addObservers();
+						search_Table_Model.addObservers();
 					}
 
 					@Override
@@ -426,7 +426,7 @@ import utils.TableMenuPopupUtil;
 			 @Override
 				public void delay_on_close(){
 					// delete observer left panel
-				 search_Table_Model.removeObservers();
+				// search_Table_Model.removeObservers();
 					// get component from right panel
 					Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 					// if Person_Info 002 delay on close
