@@ -353,7 +353,7 @@ public abstract class TransactionAmount extends Transaction {
 								this.creator.getAddress(), absKey,
 								this.recipient.getAddress()); 
 						BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
-						if (creditAmount.compareTo(amount) < 1) {
+						if (creditAmount.compareTo(amount) < 0) {
 							// NOT ENOUGHT DEBT from recipient to creator
 							return NO_DEBT_BALANCE;
 						}
