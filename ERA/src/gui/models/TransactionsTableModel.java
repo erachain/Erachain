@@ -20,6 +20,7 @@ import controller.Controller;
 import core.account.Account;
 import core.block.Block;
 import core.item.assets.AssetCls;
+import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
@@ -31,18 +32,19 @@ import lang.Lang;
 // IN gui.DebugTabPane used
 public class TransactionsTableModel extends TableModelCls<byte[], Transaction> implements Observer {
 	
-	public static final int COLUMN_NO = 0;
-	public static final int COLUMN_TIMESTAMP = 1;
-	public static final int COLUMN_TYPE = 2;
-	public static final int COLUMN_AMOUNT = 3;
-	public static final int COLUMN_FEE = 4;
+	//public static final int COLUMN_NO = 0;
+	public static final int COLUMN_TIMESTAMP = 0;
+	public static final int COLUMN_TYPE = 1;
+	public static final int COLUMN_AMOUNT = 2;
+	public static final int COLUMN_FEE = 3;
 	
 	//private SortableList<byte[], Transaction> transactions;
 	private Integer blockNo = null;
 	Long block_Height;
 	Integer block_No;
 	List<Transaction> transactions;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{ "Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
+	private String ac;
 
 	static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());
 
@@ -92,14 +94,43 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		int offset;
 		int limit;
 		
+		if (address == null || address.equals(""))return;
 		Tuple2<Account, String> accountResult = Account.tryMakeAccount(address);
 		Account account = accountResult.a;
+
+		
+		
 		if (account != null) {
-			transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
-			this.fireTableDataChanged();
+			transactions = new ArrayList();
+			// read Genessis block
+			List<Transaction> genesisTransactions = new ArrayList();
+			genesisTransactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(1));
+			int k =0;
+			for (Transaction gT:genesisTransactions){
+				if(gT.getType() ==Transaction.GENESIS_SEND_ASSET_TRANSACTION){
+					GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) gT;
+					if(assetTransfer.getOwner()!=null){
+						Account ow = assetTransfer.getOwner();
+						ac = assetTransfer.getOwner().getAddress();
+		//				System.out.print("\n k="+ k + "ac="+ac);
+					if (ac.equals(address)) {
+						transactions.add(gT);
+					}
+					}
+					
+				}
+				k++;
+			}
+			
+			
+			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
+		
+
+		this.fireTableDataChanged();
 		} else {
 			;
 		}
+		
 	
 	}
 	
@@ -185,14 +216,14 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				
 			case COLUMN_AMOUNT:
 				
-				return transaction.viewAmount();//.getAmount(transaction.getCreator()));
+				return transaction.getAmount();//.getAmount(transaction.getCreator()));
 				
 			case COLUMN_FEE:
 				
 				return transaction.getFee();		
 			
-			case COLUMN_NO:
-				return row;
+	//		case COLUMN_NO:
+	//			return row;
 			}
 		
 			

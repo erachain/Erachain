@@ -97,9 +97,9 @@ import utils.MenuPopupUtil;
 		    	sender_address = new JTextField();
 		    	sender_address.setToolTipText("");
 		    	sender_address.setAlignmentX(1.0F);
-		    	sender_address.setMinimumSize(new java.awt.Dimension(50, 20));
+		    	sender_address.setMinimumSize(new java.awt.Dimension(350, 20));
 		    	sender_address.setName(""); // NOI18N
-		    	sender_address.setPreferredSize(new java.awt.Dimension(200, 20));
+		    	sender_address.setPreferredSize(new java.awt.Dimension(350, 20));
 		    	sender_address.setMaximumSize(new java.awt.Dimension(2000, 20));
 		       	
 		    	MenuPopupUtil.installContextMenu(sender_address);
@@ -170,10 +170,10 @@ import utils.MenuPopupUtil;
 				this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 				
 				//TRANSACTIONS SORTER
-				Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-				indexes.put(TransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-				CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
-				this.jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
+		//		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
+		//		indexes.put(TransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+		//		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
+		//		this.jTable_jScrollPanel_LeftPanel.setRowSorter(sorter);
 				
 				//TRANSACTION DETAILS
 				this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() 
