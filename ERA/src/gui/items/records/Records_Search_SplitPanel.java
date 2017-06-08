@@ -85,7 +85,7 @@ import utils.MenuPopupUtil;
 		public Voush_Library_Panel voush_Library_Panel;
 
 		    public Records_Search_SplitPanel() {
-		   super("Records_Search_SplitPanel");
+		   super("Records_Search_SplitPanel"); 
 		    	
 		    	this.searchToolBar_LeftPanel.setVisible(true);
 		    	jScrollPane4 = new  JScrollPane();
