@@ -282,6 +282,9 @@ public class OnDealClick
 		case Transaction.ITEM_DUPLICATE_KEY:
 			mess = "Duplicate key";
 			break;
+		case Transaction.ITEM_DUPLICATE:
+			mess = "Invalid duplicte item";
+			break;
 		case Transaction.INVALID_CREATOR:
 			mess = "Invalis creator";
 			break;

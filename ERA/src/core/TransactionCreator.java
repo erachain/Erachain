@@ -64,6 +64,7 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import database.DBSet;
+import database.TransactionMap;
 import ntp.NTP;
 //import settings.Settings;
 import utils.Pair;
@@ -342,6 +343,19 @@ public class TransactionCreator
 		//CHECK FOR UPDATES
 		if (forIssue) {
 			this.checkUpdate();
+
+			// IF has not DUPLICATE in UNCONFIRMED RECORDS
+			TransactionMap unconfirmedMap = DBSet.getInstance().getTransactionMap();
+			for (Transaction record: unconfirmedMap.getTransactions()) {
+				if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
+					if (record instanceof IssuePersonRecord) {
+						IssuePersonRecord issuePerson = (IssuePersonRecord) record;
+						if (issuePerson.getItem().getName().equals(fullName)) {
+							return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+						}
+					}
+				}
+			}
 		}
 								
 		//TIME
@@ -354,6 +368,7 @@ public class TransactionCreator
 		long lastReference;
 		if (forIssue) {
 			lastReference = creator.getLastReference(this.fork);
+			
 		} else {
 			lastReference = time - 1000l;
 		}
@@ -372,6 +387,7 @@ public class TransactionCreator
 					|| valid == Transaction.CREATOR_NOT_PERSONALIZED) {
 				valid = Transaction.VALIDATE_OK;
 			}
+						
 			return new Pair<Transaction, Integer>(issuePersonRecord, valid);
 		}
 	}
@@ -381,7 +397,20 @@ public class TransactionCreator
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
-								
+							
+		// IF has not DUPLICATE in UNCONFIRMED RECORDS
+		TransactionMap unconfirmedMap = DBSet.getInstance().getTransactionMap();
+		for (Transaction record: unconfirmedMap.getTransactions()) {
+			if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
+				if (record instanceof IssuePersonRecord) {
+					IssuePersonRecord issuePerson = (IssuePersonRecord) record;
+					if (issuePerson.getItem().getName().equals(human.getName())) {
+						return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+					}
+				}
+			}
+		}
+
 		//TIME
 		long time = NTP.getTime();
 

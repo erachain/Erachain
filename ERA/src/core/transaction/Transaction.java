@@ -137,6 +137,7 @@ public abstract class Transaction {
 	public static final int ITEM_DOES_NOT_STATUSED = 108;
 	public static final int ITEM_DOES_NOT_UNITED = 109;
 	public static final int ITEM_DUPLICATE_KEY = 110;
+	public static final int ITEM_DUPLICATE = 111;
 
 	public static final int AMOUNT_DIVISIBLE = 115;
 
