@@ -638,10 +638,10 @@ public class R_SignNote extends Transaction {
 	public static  byte[]  Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String,Tuple2<Boolean,byte[]>> files) throws Exception {
 	
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		outStream.write("v 2.00".getBytes()); // only 6 simbols!!!
-		byte[] title_Bytes = "".getBytes();
+		outStream.write("v 2.00".getBytes(Charset.forName("UTF-8"))); // only 6 simbols!!!
+		byte[] title_Bytes = "".getBytes(Charset.forName("UTF-8"));
 		if (title !=null){
-			title_Bytes = title.getBytes();
+			title_Bytes = title.getBytes(Charset.forName("UTF-8"));
 		}
 		
 		

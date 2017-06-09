@@ -139,6 +139,8 @@ public class Statement_Info extends javax.swing.JPanel {
 				 }
 				
 				 if(data.containsKey("Title"))jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+data.get("Title").toString());
+				 
+				 
 							 
 				 if (data.containsKey("Message"))jTextArea_Body.setText(
 						  	 description + "\n\n"
@@ -388,6 +390,7 @@ public class Statement_Info extends javax.swing.JPanel {
 			 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("TM")) );
 			 if (note != null){
 				 description = note.getDescription();
+				 jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+ map.b);
 			
 			if (jSON.containsKey("PR")){
 					str = jSON.get("PR").toString();
