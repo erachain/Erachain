@@ -1,5 +1,6 @@
 import gui.Gui;
 import gui.create.License_JFrame;
+import gui.library.Issue_Confirm_Dialog;
 
 // 30/03
 import java.io.File;
@@ -146,6 +147,12 @@ public class Start {
 				
 				LOGGER.error(e.getMessage(),e);
 				
+				 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage() , 600, 400, Lang.getInstance().translate(" "));
+				 dd.jButton1.setVisible(false);
+				 dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
+				 dd.setLocationRelativeTo(null);
+				 dd.setVisible(true);
+				
 				//USE SYSTEM STYLE
 		        try {
 					UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -160,6 +167,8 @@ public class Start {
 				{
 					JOptionPane.showMessageDialog(null, e.getMessage(), Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
 				}
+				
+				
 				
 				//FORCE SHUTDOWN
 				System.exit(0);
