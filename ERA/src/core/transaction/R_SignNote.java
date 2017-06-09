@@ -677,7 +677,7 @@ public class R_SignNote extends Transaction {
 			files_Json.put(i+"", file_Json);
 			out_files.add(i,file.getValue().b);
 			i++;
-		}
+		} 
 		json.put("F",files_Json);
 		JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
 		// convert int to byte
