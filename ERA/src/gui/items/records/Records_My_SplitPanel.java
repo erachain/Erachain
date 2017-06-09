@@ -6,11 +6,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.awt.*;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.mapdb.Fun.Tuple2;
+
+import controller.Controller;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.Split_Panel;
@@ -18,6 +24,7 @@ import gui.items.mails.Mail_Info;
 import gui.library.Voush_Library_Panel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 public class Records_My_SplitPanel extends Split_Panel {
 
@@ -25,7 +32,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 	JScrollPane jScrollPane4;
 
-	All_Records_Panel allVotingsPanel;
+	All_Records_Panel my_Records_Panel;
 	// для прозрачности
 	int alpha = 255;
 	int alpha_int;
@@ -34,11 +41,17 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 	public Voush_Library_Panel voush_Library_Panel;
 
+	private JPopupMenu menu;
+
+	private JMenuItem item_Delete;
+
+	private JMenuItem item_Rebroadcast;
+
 	public Records_My_SplitPanel() {
 		super("Records_My_SplitPanel");
 		this.leftPanel.setVisible(false);
-		allVotingsPanel = new All_Records_Panel();
-		this.jSplitPanel.setLeftComponent(allVotingsPanel);
+		my_Records_Panel = new All_Records_Panel();
+		this.jSplitPanel.setLeftComponent(my_Records_Panel);
 
 		setName(Lang.getInstance().translate("My Records"));
 
@@ -64,7 +77,78 @@ public class Records_My_SplitPanel extends Split_Panel {
 		});
 
 		jButton2_jToolBar_RightPanel.setVisible(false);
-		allVotingsPanel.records_Table.getSelectionModel().addListSelectionListener(new search_listener());
+		my_Records_Panel.records_Table.getSelectionModel().addListSelectionListener(new search_listener());
+	
+		 menu = new JPopupMenu();
+    	
+    	 item_Rebroadcast= new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
+    
+    	item_Rebroadcast.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+  			// code Rebroadcast
+			
+			int row = my_Records_Panel.records_Table.getSelectedRow();
+			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+			// DBSet db = DBSet.getInstance();
+  			Controller.getInstance().broadcastTransaction(trans);
+  						
+  		}	
+  		});
+    	
+    	menu.add(item_Rebroadcast);
+    	 item_Delete= new JMenuItem(Lang.getInstance().translate("Delete"));
+    	item_Delete.addActionListener(new ActionListener(){
+  		@Override
+    	public void actionPerformed(ActionEvent e) {
+   
+  			// code delete
+			int row = my_Records_Panel.records_Table.getSelectedRow();
+			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+			DBSet.getInstance().getTransactionMap().delete(trans);
+  			
+			}});
+    	
+    	menu.add(item_Delete);
+   	TableMenuPopupUtil.installContextMenu(my_Records_Panel.records_Table, menu);
+	menu.addAncestorListener(new AncestorListener(){
+
+		@Override
+		public void ancestorAdded(AncestorEvent event) {
+			// TODO Auto-generated method stub
+			int row = my_Records_Panel.records_Table.getSelectedRow();
+			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+			item_Delete.setEnabled(true);
+			item_Rebroadcast.setEnabled(true);
+			if (trans.isConfirmed(DBSet.getInstance())) {
+				item_Delete.setEnabled(false);
+				item_Rebroadcast.setEnabled(false);
+				
+			}
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+	});
+	
+	
+	
+	
+	
 	}
 
 	// listener select row
@@ -73,10 +157,10 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			Transaction voting = null;
-			if (allVotingsPanel.records_Table.getSelectedRow() >= 0) {
-				voting = (Transaction) allVotingsPanel.records_model.getItem(allVotingsPanel.records_Table
-						.convertRowIndexToModel(allVotingsPanel.records_Table.getSelectedRow()));
+			Transaction trans = null;
+			if (my_Records_Panel.records_Table.getSelectedRow() >= 0) {
+				trans = (Transaction) my_Records_Panel.records_model.getItem(my_Records_Panel.records_Table
+						.convertRowIndexToModel(my_Records_Panel.records_Table.getSelectedRow()));
 
 				records_Info_Panel = new JPanel();
 				records_Info_Panel.setLayout(new GridBagLayout());
@@ -89,10 +173,10 @@ public class Records_My_SplitPanel extends Split_Panel {
 				tableGBC.weighty = 1;
 				tableGBC.gridx = 0;
 				tableGBC.gridy = 0;
-				records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting), tableGBC);
+				records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(trans), tableGBC);
 
 				Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap()
-						.get(voting.getBlockHeight(DBSet.getInstance()), voting.getSeqNo(DBSet.getInstance()));
+						.get(trans.getBlockHeight(DBSet.getInstance()), trans.getSeqNo(DBSet.getInstance()));
 				GridBagConstraints gridBagConstraints = null;
 				if (signs != null) {
 
@@ -112,7 +196,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 					gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 					gridBagConstraints.weightx = 1.0;
 					gridBagConstraints.weighty = 1.0;
-					voush_Library_Panel = new Voush_Library_Panel(voting);
+					voush_Library_Panel = new Voush_Library_Panel(trans);
 					records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
 				}
@@ -125,19 +209,19 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 	public void onClick() {
 		// GET SELECTED OPTION
-		int row = allVotingsPanel.records_Table.getSelectedRow();
+		int row = my_Records_Panel.records_Table.getSelectedRow();
 		if (row == -1) {
 			row = 0;
 		}
-		row = allVotingsPanel.records_Table.convertRowIndexToModel(row);
+		row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
 
-		if (allVotingsPanel.records_Table.getSelectedRow() >= 0) {
+		if (my_Records_Panel.records_Table.getSelectedRow() >= 0) {
 		}
 	}
 	@Override
 	public void delay_on_close(){
 		// delete observer left panel
-		allVotingsPanel.records_model.removeObservers();
+		my_Records_Panel.records_model.removeObservers();
 		// get component from right panel
 	//	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 		// if Person_Info 002 delay on close

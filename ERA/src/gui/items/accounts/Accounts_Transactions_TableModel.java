@@ -318,14 +318,22 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		}
 
 		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
-				|| message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
+		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE) {
 			//get_R_Send();
-			Object sss = message.getValue();
-			sss = sss;
 			trans_Parse((Transaction) message.getValue());
 
 		}
+		// CHECK IF LIST UPDATED
+				if ( message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
+					//get_R_Send();
+					Object sss = message.getValue();
+				
+		trans_Hash_Map.remove((Transaction) message.getValue());
+
+				}
+		
+		
+		
 	}
 
 	public void get_R_Send() {
