@@ -656,7 +656,7 @@ public class R_SignNote extends Transaction {
 		byte[] size_Json;
 		
 		if (files == null || files.size() == 0){
-			JSON_Bytes = json.toString().getBytes();
+			JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
 			// convert int to byte
 			size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt( JSON_Bytes.length).array();
 			outStream.write(size_Json);
@@ -679,7 +679,7 @@ public class R_SignNote extends Transaction {
 			i++;
 		}
 		json.put("F",files_Json);
-		JSON_Bytes = json.toString().getBytes();
+		JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
 		// convert int to byte
 		size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt( JSON_Bytes.length).array();
 		outStream.write(size_Json);
