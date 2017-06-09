@@ -146,7 +146,7 @@ public class Start {
 			} catch(Exception e) {
 				
 				LOGGER.error(e.getMessage(),e);
-				
+			// show error dialog	
 				 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage() , 600, 400, Lang.getInstance().translate(" "));
 				 dd.jButton1.setVisible(false);
 				 dd.jButton2.setText(Lang.getInstance().translate("Cancel"));

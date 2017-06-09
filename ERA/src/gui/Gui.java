@@ -37,9 +37,9 @@ public class Gui extends JFrame{
 	{
 		
         
-		gui.library.library.Set_GUI_Look_And_Feel("");
+		
 			
-    
+		 gui.library.library.Set_GUI_Look_And_Feel("");
         
         if(Settings.getInstance().Dump().containsKey("lang"))
         {
@@ -55,6 +55,8 @@ public class Gui extends JFrame{
         {
         	new SettingLangFrame();
         } 
+        
+        gui.library.library.Set_GUI_Look_And_Feel("");
         
         //CHECK IF WALLET EXISTS
         if(!Controller.getInstance().doesWalletExists())

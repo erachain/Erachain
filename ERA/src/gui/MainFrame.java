@@ -275,8 +275,8 @@ public void initComponents() {
 		int y =0;
 		Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screens = kit.getScreenSize();
-		int h = screens.height;
-		int w = screens.width;
+		int h = screens.height-50;
+		int w = screens.width-50;
 		int orientation=1;
 
 		if (settingsJSONbuf.containsKey("Main_Frame_Setting")) {

@@ -1,6 +1,7 @@
 package gui.create;
 // 30/03
 import java.awt.Dialog;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -8,6 +9,8 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -19,12 +22,17 @@ import java.util.List;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,6 +43,7 @@ import org.json.simple.JSONValue;
 import com.google.common.base.Charsets;
 
 import controller.Controller;
+import core.item.assets.AssetCls;
 import lang.Lang;
 import lang.LangFile;
 import settings.Settings;
@@ -47,13 +56,19 @@ public class SettingLangFrame extends JDialog {
 	private static final Logger LOGGER = Logger
 			.getLogger(SettingLangFrame.class);
 	private  JList<LangFile> listLang;
+	private JComboBox<String> size_Font;
+	private JButton nextButton;
+	private SettingLangFrame th;
+	private JLabel labelSelect;
+	private JLabel label_font_size;
 	
 	public SettingLangFrame()
 	{
 		super();
 		this.setTitle("ARONICLE.com" + " - " + "Language select");
 		this.setModal(true);
-
+		this.isAlwaysOnTop();
+		th = this;
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -84,15 +99,40 @@ public class SettingLangFrame extends JDialog {
 		listLangGBC.gridy = 1;	
 		listLangGBC.gridx = 1;	
 		
+		
+		//LANGS GBC
+				GridBagConstraints font_LabelGBC = new GridBagConstraints();
+				font_LabelGBC.insets = new Insets(0,0,5,0);
+				font_LabelGBC.fill = GridBagConstraints.BOTH;  
+				font_LabelGBC.anchor = GridBagConstraints.NORTHWEST;
+				font_LabelGBC.gridy = 2;	
+				font_LabelGBC.gridx = 1;
+				
+				label_font_size = new JLabel("Font Size:");
+				this.add(label_font_size, font_LabelGBC);
+				//LANGS GBC
+				GridBagConstraints fontGBC = new GridBagConstraints();
+				fontGBC.insets = new Insets(0,0,5,0);
+				fontGBC.fill = GridBagConstraints.BOTH;  
+				fontGBC.anchor = GridBagConstraints.NORTHWEST;
+				fontGBC.gridy = 3;	
+				fontGBC.gridx = 1;	
+				
+				 size_Font = new javax.swing.JComboBox<String>();
+			        size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[] { "11", "12", "14" ,"16","18", "20","24" }));
+			        this.add(size_Font, fontGBC);
+			        
+			       
+			        
 		//BUTTON GBC
 		GridBagConstraints buttonGBC = new GridBagConstraints();
 		buttonGBC.insets = new Insets(0,0,0,0);
 		buttonGBC.fill = GridBagConstraints.BOTH;  
 		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-		buttonGBC.gridy = 2;	
+		buttonGBC.gridy = 4;	
 		buttonGBC.gridx = 1;		
 		
-        JLabel labelSelect = new JLabel(Lang.getInstance().translate("Language") + ":");
+        labelSelect = new JLabel(Lang.getInstance().translate("Language") + ":");
 		this.add(labelSelect, labelGBC);	
 
       	// read internet 
@@ -129,6 +169,9 @@ public class SettingLangFrame extends JDialog {
 		listLang.setSelectedIndex(0);
 		listLang.setFocusable(false);
 		
+		
+		
+		
 	    JScrollPane scrollPaneLang = new JScrollPane(listLang);
 	    
 		this.add(scrollPaneLang, listLangGBC);	
@@ -140,7 +183,7 @@ public class SettingLangFrame extends JDialog {
 		}
 		
         //BUTTON OK
-	    JButton nextButton = new JButton("OK");
+	    nextButton = new JButton("OK");
 	    nextButton.addActionListener(new ActionListener()
 			{
 				public void actionPerformed(ActionEvent e)
@@ -159,6 +202,33 @@ public class SettingLangFrame extends JDialog {
 	    		System.exit(0);
 	        }
 	    });
+	    
+	    size_Font.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+			
+				
+				if(e.getStateChange() == ItemEvent.SELECTED) 
+				{		
+					String size = size_Font.getSelectedItem().toString();
+					 
+				    //  nextButton.repaint();
+				    //  SwingUtilities.updateComponentTreeUI(nextButton);
+				      Font font = listLang.getFont();
+				      listLang.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+				      labelSelect.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+				      label_font_size.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+				      size_Font.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+				      nextButton.setFont(new Font(font.getName(), Font.PLAIN, new Integer(size)));
+				      pack();
+				      th.repaint();
+				} 	
+				
+				
+			}
+		});
 	    
       	this.pack();
 	    this.setResizable(false);
@@ -180,6 +250,9 @@ public class SettingLangFrame extends JDialog {
 			}
 			JSONObject settingsLangJSON = Settings.getInstance().Dump();
 			settingsLangJSON.put("lang", langFileName);
+			if (size_Font.getSelectedItem().toString() != "") {
+			settingsLangJSON.put("font_size", size_Font.getSelectedItem().toString());
+			}
 			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
 			Settings.FreeInstance();
 			Lang.getInstance().loadLang();
