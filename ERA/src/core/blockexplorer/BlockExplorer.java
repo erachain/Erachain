@@ -3579,9 +3579,18 @@ if ( asset_1 == null) {
 						 
 					}
 // Message v2.0
-					if (jSON.containsKey("Message")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b><br>"+ jSON.get("Message") +"<br>";
+					if (jSON.containsKey("Message")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj)
+							+ ": </b><br>"+ jSON.get("Message") +"<br>";
 	// v 2.1
-					if (jSON.containsKey("MS")) str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj) + ": </b><br>"+jSON.get("MS") +"<br>";
+					if (jSON.containsKey("MS")) {
+						String mess = (String)jSON.get("MS");
+						if (mess.startsWith("#"))
+							mess = Processor.process(mess);
+						
+						str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj)
+								+ ": </b><br>" + mess + "<br><br>";
+
+					}
 	// Hashes
 		// v2.0
 					if (jSON.containsKey("Hashes")){
