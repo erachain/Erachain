@@ -261,7 +261,7 @@ public void initComponents() {
 			}
 
 			@Override
-			public void windowOpened(WindowEvent arg0) {
+			public void windowOpened(WindowEvent arg0) { 
 				// TODO Auto-generated method stub
 			}
 
