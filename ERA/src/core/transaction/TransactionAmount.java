@@ -184,7 +184,7 @@ public abstract class TransactionAmount extends Transaction {
 	public String viewSendType() {
 		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
 		
-		if ((this.typeBytes[2] & BACKWARD_MASK) > 0) {
+		if (this.isBackward()) {
 			if (this.key > 0) {
 				if (amo_sign > 0) {
 					return "backward PROPERTY";
