@@ -141,7 +141,7 @@ public class PollsResource
 			
 		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 			
-			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, 600, 400,Status_text);
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, 600, 400,Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 			dd.setLocationRelativeTo(null);
 			dd.setVisible(true);
 			

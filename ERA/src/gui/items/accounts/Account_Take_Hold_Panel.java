@@ -366,7 +366,7 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(th);

@@ -825,7 +825,7 @@ public class Mail_Send_Panel extends JPanel
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 		
 		 Mail_Info ww = new Mail_Info((R_Send) transaction);
 		 ww.jTabbedPane1.setVisible(false);

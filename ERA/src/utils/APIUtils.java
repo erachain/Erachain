@@ -126,7 +126,7 @@ public class APIUtils {
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450),Status_text);
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 		 
 		// ww.jTabbedPane1.setVisible(false);

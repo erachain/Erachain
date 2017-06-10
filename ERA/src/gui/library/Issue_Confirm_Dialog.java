@@ -25,18 +25,29 @@ import lang.Lang;
 public class Issue_Confirm_Dialog extends javax.swing.JDialog {
 public boolean isConfirm = false;
 int insest = 0;
-private JLabel jStatus_Label; 
+private JLabel jStatus_Label;
+private JLabel jTitle_Label; 
     /**
      * Creates new form Issue_Asset_Confirm_Dialog
      * @param th 
      * @param th 
      */
+	 public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text, String title_Text){
+		 super(parent, modal);
+		Init(parent,  modal,  text, w,  h, status_Text, title_Text);
+	}
+
     public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text) {
         super(parent, modal);
+        Init( parent,  modal,  text, w,  h, status_Text, "");
+    }
+    
+    public void Init(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text, String title_Text){
        // setUndecorated(true);
         insest = UIManager.getFont("Label.font").getSize();
         if (insest <=7) insest = 8;
         initComponents();
+        jTitle_Label.setText(title_Text);
         jTextPane1.set_text(text);
         jStatus_Label.setText(status_Text);
         setMaximumSize(new Dimension(350,200));
@@ -78,11 +89,22 @@ private JLabel jStatus_Label;
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jStatus_Label = new JLabel();
+        jTitle_Label = new JLabel();
        
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
+        jTitle_Label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+      //  gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(insest, insest, insest, insest);
+        getContentPane().add(jTitle_Label, gridBagConstraints);
+        
         jScrollPane1.setBorder(null);
         jScrollPane1.setOpaque(false);
 
@@ -91,7 +113,7 @@ private JLabel jStatus_Label;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
@@ -102,7 +124,7 @@ private JLabel jStatus_Label;
 
         jStatus_Label.setText(Lang.getInstance().translate("Status"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, 0, 0);
@@ -125,7 +147,7 @@ private JLabel jStatus_Label;
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.insets = new java.awt.Insets(0, insest, insest, insest);
         getContentPane().add(jPanel1, gridBagConstraints);
 
