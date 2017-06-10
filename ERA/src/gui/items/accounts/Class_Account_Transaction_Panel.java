@@ -224,7 +224,20 @@ jTextArea_Title.setText(Lang.getInstance().translate("Title"));
 		txtTo = new JTextField();
 		this.add(txtTo, txtToGBC);
 		
-       
+		txtTo.getDocument().addDocumentListener(new DocumentListener() {
+            
+			@Override
+			public void changedUpdate(DocumentEvent arg0) {
+			}
+			@Override
+			public void insertUpdate(DocumentEvent arg0) {
+				refreshReceiverDetails();
+			}
+			@Override
+			public void removeUpdate(DocumentEvent arg0) {
+				refreshReceiverDetails();
+			}
+        });
       	
 		//LABEL RECEIVER
 		GridBagConstraints labelDetailsGBC = new GridBagConstraints();
@@ -511,6 +524,25 @@ jTextArea_Title.setText(Lang.getInstance().translate("Title"));
 	
 
 	
+	}
+	
+	private void refreshReceiverDetails()
+	{
+		String toValue = txtTo.getText();
+		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
+		
+		txtRecDetails.setText(Account.getDetails(toValue, asset));
+		
+		if(false && toValue!=null && toValue.startsWith(wrongFirstCharOfAddress))
+		{
+			encrypted.setEnabled(false);
+			encrypted.setSelected(false);
+			isText.setSelected(false);
+		}
+		else
+		{
+			encrypted.setEnabled(true);
+		}
 	}
 	
 }
