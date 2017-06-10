@@ -10,6 +10,7 @@ import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
+import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import ntp.NTP;
 
@@ -818,9 +819,7 @@ public class Account_Send_Panel extends JPanel
 		
 		
 		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (this.getWidth()/1.2), (int) (this.getHeight()/1.2),Status_text);
-		 Mail_Info ww = new Mail_Info((R_Send) transaction);
-		 
-		 ww.jTabbedPane1.setVisible(false);
+		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(this);
 		dd.setVisible(true);

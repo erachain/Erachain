@@ -27,6 +27,7 @@ import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
+import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import settings.Settings;
 //import test.records.TestRecNote;
@@ -126,9 +127,9 @@ public class APIUtils {
 		
 		
 		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450),Status_text);
-		 Mail_Info ww = new Mail_Info((R_Send) transaction);
+		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 		 
-		 ww.jTabbedPane1.setVisible(false);
+		// ww.jTabbedPane1.setVisible(false);
 		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(null);
 		dd.setVisible(true);
