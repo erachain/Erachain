@@ -135,8 +135,8 @@ private JLabel jStatus_Label;
                
     public javax.swing.JButton jButton1;
     public javax.swing.JButton jButton2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private MTextPane jTextPane1;
+    public javax.swing.JPanel jPanel1;
+    public javax.swing.JScrollPane jScrollPane1;
+    public MTextPane jTextPane1;
   
 }

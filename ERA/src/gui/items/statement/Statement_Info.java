@@ -474,7 +474,7 @@ public class Statement_Info extends javax.swing.JPanel {
 	
 	private javax.swing.JLabel jLabel_Title;
 	private javax.swing.JPanel jPanel1;
-	private javax.swing.JPanel jPanel2;
+	public javax.swing.JPanel jPanel2;
 	private javax.swing.JScrollPane jScrollPane3;
 
 	private MSplitPane jSplitPane1;

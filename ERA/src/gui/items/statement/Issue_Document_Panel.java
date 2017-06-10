@@ -993,6 +993,10 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 		
 		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+	
+		Statement_Info ww = new Statement_Info(issueDoc);
+		ww.jPanel2.setVisible(false);
+		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(th);
 		dd.setVisible(true);
 		
@@ -1005,7 +1009,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 		
 		
 		
-		}
+		
 		
 		
 		//CHECK VALIDATE MESSAGE
@@ -1015,9 +1019,9 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
+		}
 		
-		
-		
+		return null;
 	}
 
 	public void onSendClick()
