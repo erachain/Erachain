@@ -432,7 +432,6 @@ public class Controller extends Observable {
 			reCreateDB();
 		}
 		
-		
 		createDataCheckpoint();
 		Setting_Json.put("DB_OPEN", "Open OK");
 		// save setting to setting file
@@ -505,7 +504,7 @@ public class Controller extends Observable {
 		
 		// CREATE BLOCKGENERATOR
 		this.blockGenerator = new BlockGenerator(true);
-		// START BLOCKGENERATOR
+		// START UPDATES and BLOCK BLOCKGENERATOR
 		this.blockGenerator.start();
 
 		// CREATE NETWORK
@@ -2107,6 +2106,10 @@ public class Controller extends Observable {
 
 	public void onDatabaseCommit() {
 		this.wallet.commit();
+	}
+
+	public void startBlockGenerator() {
+		this.blockGenerator.start();
 	}
 
 	public ForgingStatus getForgingStatus() {

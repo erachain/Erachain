@@ -429,7 +429,7 @@ public class Synchronizer
 			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer);
 		} catch (Exception e) {
 			String mess = "Dishonest peer - error in PEER: " + peer.getAddress().getHostAddress();
-			peer.ban(BAN_BLOCK_TIMES>>3, mess);
+			//// banned in getBlock -- peer.ban(BAN_BLOCK_TIMES>>3, mess);
 			throw new Exception(mess);
 		}
 
