@@ -181,7 +181,7 @@ public abstract class TransactionAmount extends Transaction {
 		return NumberAsString.getInstance().numberAsString(getAmount(address));
 	}
 
-	public String viewSendType() {
+	public String viewActionType() {
 		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
 		
 		if (this.isBackward()) {
