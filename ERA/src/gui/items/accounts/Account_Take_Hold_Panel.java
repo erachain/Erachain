@@ -1,8 +1,11 @@
 package gui.items.accounts;
 
 import gui.AccountRenderer;
+import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.assets.AssetsComboBoxModel;
+import gui.items.mails.Mail_Info;
+import gui.library.Issue_Confirm_Dialog;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
@@ -62,6 +65,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -71,9 +75,14 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 	//private final MessagesTableModel messagesTableModel;
    
 	
+	private Account_Take_Hold_Panel th;
+
+
+
 	public Account_Take_Hold_Panel(AssetCls asset, Account account)
 	{
 		String a;	
+		th = this;
 	if (asset == null) a = "";	
 	else a = asset.getName();
 	
@@ -301,7 +310,7 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 			key = asset.getKey();
 		}
 		
-		Pair<Transaction, Integer> result;
+		Integer result;
 		
 		if(messageBytes != null)
 		{
@@ -347,13 +356,33 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 		
 
 		//CREATE TX MESSAGE
-		result = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+		Transaction transaction = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
 				key, BigDecimal.ZERO.subtract(amount).setScale(8),
 				head, messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
+	
+		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
+		
+		
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text);
+		 Mail_Info ww = new Mail_Info((R_Send) transaction);
+		 
+		 ww.jTabbedPane1.setVisible(false);
+		dd.jScrollPane1.setViewportView(ww);
+		dd.setLocationRelativeTo(th);
+		dd.setVisible(true);
+		
+	//	JOptionPane.OK_OPTION
+		if (dd.isConfirm){
+		
+		
+		
+		
+		result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
 		
 		//CHECK VALIDATE MESSAGE
-		if (result.getB() ==  Transaction.VALIDATE_OK)
+		if (result ==  transaction.VALIDATE_OK)
 		{
 			//RESET FIELDS
 			
@@ -376,9 +405,9 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			}
 		} else {		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-		
+		}
 		//ENABLE
 		this.sendButton.setEnabled(true);
 	}

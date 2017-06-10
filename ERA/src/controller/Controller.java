@@ -2584,14 +2584,14 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
+	public Transaction r_Send(PrivateKeyAccount sender,
 			int feePow, Account recipient, long key, BigDecimal amount) {
 		synchronized (this.transactionCreator) {
 			return this.r_Send(sender, feePow, recipient,
 					key, amount, "", null, null, null);
 		}
 	}
-	public Pair<Transaction, Integer> r_Send(PrivateKeyAccount sender,
+	public Transaction r_Send(PrivateKeyAccount sender,
 			int feePow, Account recipient, long key,BigDecimal amount,
 			String head, byte[] isText, byte[] message, byte[] encryptMessage) {
 		synchronized (this.transactionCreator) {
@@ -2599,7 +2599,7 @@ public class Controller extends Observable {
 					key, amount, feePow, head, message, isText, encryptMessage);
 		}
 	}
-	public Pair<Transaction, Integer> r_Send(byte version, byte property1, byte property2, 
+	public Transaction r_Send(byte version, byte property1, byte property2, 
 			PrivateKeyAccount sender,
 			int feePow, Account recipient, long key,BigDecimal amount,
 			String head, byte[] isText, byte[] message, byte[] encryptMessage) {

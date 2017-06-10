@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -53,7 +54,8 @@ public class Mail_Info extends javax.swing.JPanel {
 	R_Send trans;
 	private static final Logger LOGGER = Logger.getLogger(Send_RecordDetailsFrame.class);
 	boolean encrypted;
-	private Voush_Library_Panel voush_Library_Panel;
+	public Voush_Library_Panel voush_Library_Panel;
+	public JTabbedPane jTabbedPane1;
     /**
      * Creates new form Mail_Info
      */
@@ -290,7 +292,7 @@ public class Mail_Info extends javax.swing.JPanel {
        // add(jScrollPane2, gridBagConstraints);
         
         
-        javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
+         jTabbedPane1 = new javax.swing.JTabbedPane();
         voush_Library_Panel = new Voush_Library_Panel(trans);
         jTabbedPane1.add(voush_Library_Panel);
         add(jTabbedPane1, gridBagConstraints);
