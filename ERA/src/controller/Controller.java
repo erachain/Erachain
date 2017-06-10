@@ -520,30 +520,34 @@ public class Controller extends Observable {
 		});
 		
 		
-		//TIMER TO SEND HEIGHT TO NETWORK EVERY 5 MIN 
+		if (false) {
+			//TIMER TO SEND HEIGHT TO NETWORK EVERY 5 MIN 
+			
+			this.timerPeerHeightUpdate.cancel();
+			this.timerPeerHeightUpdate = new Timer();
+			
+			TimerTask action = new TimerTask() {
+		        public void run() {
+		        	
+		        	if(Controller.getInstance().getStatus() == STATUS_OK)
+		        	{
+			        	List<Peer> peers = Controller.getInstance().getActivePeers();
+			        	int peersCounter = peers.size();
+		        		if( peersCounter > 0)
+		        		{
+		        			Peer peer = peers.get(random.nextInt(peers.size()));
+		        			if(peer != null){
+		        				Controller.getInstance().sendMyHWeightToPeer(peer);
+		        			}
+		        		}
+		        	}
+		        }
+			};
+			
+			this.timerPeerHeightUpdate.schedule(action, 
+					Block.GENERATING_MIN_BLOCK_TIME>>4, Block.GENERATING_MIN_BLOCK_TIME>>2);
+		}
 		
-		this.timerPeerHeightUpdate.cancel();
-		this.timerPeerHeightUpdate = new Timer();
-		
-		TimerTask action = new TimerTask() {
-	        public void run() {
-	        	if(Controller.getInstance().getStatus() == STATUS_OK)
-	        	{
-	        		if(Controller.getInstance().getActivePeers().size() > 0)
-	        		{
-	        			Peer peer = Controller.getInstance().getActivePeers().get(
-	        				random.nextInt( Controller.getInstance().getActivePeers().size() )
-	        				);
-	        			if(peer != null){
-	        				Controller.getInstance().sendMyHWeightToPeer(peer);
-	        			}
-	        		}
-	        	}
-	        }
-		};
-		
-		this.timerPeerHeightUpdate.schedule(action, 
-				Block.GENERATING_MIN_BLOCK_TIME>>4, Block.GENERATING_MIN_BLOCK_TIME>>2);
 
 		if( Settings.getInstance().isTestnet()) 
 			this.status = STATUS_OK;
@@ -857,6 +861,11 @@ public class Controller extends Observable {
 	public List<Peer> getActivePeers() {
 		// GET ACTIVE PEERS
 		return this.network.getActivePeers(false);
+	}
+
+	public int getActivePeersCounter() {
+		// GET ACTIVE PEERS
+		return this.network.getActivePeersCounter(false);
 	}
 
 	public void walletSyncStatusUpdate(int height) {
@@ -1249,7 +1258,7 @@ public class Controller extends Observable {
 				if (newBlockHeight < 1) {
 					// BLOCK NOT FOUND!!!
 					String mess = "Block NOT FOUND on NODE" + ": " + message.getSender().getAddress().getHostAddress();
-					banPeerOnError(message.getSender(), mess);
+					//banPeerOnError(message.getSender(), mess);
 					return;
 				}
 
@@ -1407,7 +1416,10 @@ public class Controller extends Observable {
 	}
 
 	public void banPeerOnError(Peer peer, String mess) {
-		this.network.tryDisconnect(peer, 30, "ban PeerOnError - " + mess);
+		if ( Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1 ) {
+			// BAN if ALL connection USED
+			this.network.tryDisconnect(peer, 30, "ban PeerOnError - " + mess);			
+		}
 	}
 
 	public void addActivePeersObserver(Observer o) {
