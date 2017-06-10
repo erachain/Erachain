@@ -529,6 +529,8 @@ public class BlockChain
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
 		else if ( height < BlockChain.TARGET_COUNT <<5)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+		else if ( height < 32100)
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
 		else
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
 
