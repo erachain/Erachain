@@ -530,7 +530,7 @@ public class BlockChain
 		else if ( height < BlockChain.TARGET_COUNT <<5)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
 		else
-			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
 
 		return base;
 

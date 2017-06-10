@@ -160,6 +160,11 @@ public abstract class TransactionAmount extends Transaction {
 		return getAmount(address);
 	}
 	
+	public int getActionType() {
+		int type = core.account.Account.actionType(this.key, this.amount);
+		return type * (isBackward()?-1:1);
+	}
+	
 	// BACKWARD AMOUNT
 	public boolean isBackward() {
 		return typeBytes[1] == 1
