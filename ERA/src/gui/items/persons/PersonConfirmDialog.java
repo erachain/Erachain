@@ -30,11 +30,17 @@ import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.MainFrame;
+import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
+import gui.transaction.Send_RecordDetailsFrame;
+import gui.transaction.SertifyPubKeysDetailsFrame;
 import lang.Lang;
 import ntp.NTP;
 import utils.Pair;
@@ -197,19 +203,39 @@ public class PersonConfirmDialog extends JDialog  {
 
 		int version = 0; // without user signs
 		
-		Pair<Transaction, Integer> result = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
+		Transaction transaction = Controller.getInstance().r_SertifyPerson(version, false, authenticator,
 				feePow, person.getKey(), 
 				sertifiedPublicKeys, toDate);
 		
+
+		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
+		
+		
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (this.getWidth()/1.2), (int) (this.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+		SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame( (R_SertifyPubKeys) transaction);
+		dd.jScrollPane1.setViewportView(ww);
+		dd.setLocationRelativeTo(this);
+		dd.setVisible(true);
+		
+	//	JOptionPane.OK_OPTION
+		if (dd.isConfirm){
+		
+		
+		
+		
+		Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+		
+		
 		//CHECK VALIDATE MESSAGE
-		if (result.getB() == Transaction.VALIDATE_OK) {
+		if (result == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Person has been authenticated!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-					+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+					+ "[" + result + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-		
+		}
 		//ENABLE
 		Button_Confirm.setEnabled(true);
 		

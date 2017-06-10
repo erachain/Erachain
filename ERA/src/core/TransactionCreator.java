@@ -590,7 +590,7 @@ public class TransactionCreator
 	
 	}
 
-	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack,
+	public Transaction r_SertifyPerson(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key,
 			List<PublicKeyAccount> userAccounts,
 			int add_day) {
@@ -608,10 +608,10 @@ public class TransactionCreator
 				add_day,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
-		return new Pair<Transaction, Integer>(record, afterCreate(record, asPack));
+		return record;
 	}
 
-	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
+	public Transaction r_Vouch(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow,
 			int height, int seq) {
 		
@@ -628,7 +628,7 @@ public class TransactionCreator
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
-		return new Pair<Transaction, Integer>(record, afterCreate(record, asPack));
+		return record;
 	}
 
 	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount creator, int feePow,
@@ -695,7 +695,7 @@ public class TransactionCreator
 	*/
 	
 	// version 2
-	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack,
+	public Transaction r_SetStatusToItem(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow, long key, ItemCls item,
 			Long beg_date, Long end_date,
 			long value_1, long value_2, byte[] data_1, byte[] data_2, long refParent, byte[] descr
@@ -714,7 +714,7 @@ public class TransactionCreator
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
 			
-		return new Pair<Transaction, Integer>(record, afterCreate(record, asPack));
+		return  record;
 	}
 
 	/*

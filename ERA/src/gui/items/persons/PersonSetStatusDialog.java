@@ -29,15 +29,21 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.transaction.R_Send;
+import core.transaction.R_SetStatusToItem;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.models.AccountsComboBoxModel;
 import gui.records.Record_Info;
 import gui.records.VouchRecordDialog;
+import gui.MainFrame;
 import gui.items.statuses.ComboBoxModelItemsStatuses;
+import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
 import gui.transaction.OnDealClick;
+import gui.transaction.Send_RecordDetailsFrame;
+import gui.transaction.SetStatusToItemDetailsFrame;
 import jersey.repackaged.com.google.common.primitives.Ints;
 import lang.Lang;
 import utils.Pair;
@@ -308,21 +314,41 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			refParent = Longs.fromByteArray(bytesParent);
 		}
 		
-		Pair<Transaction, Integer> result = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
+		Transaction transaction = Controller.getInstance().r_SetStatusToItem(version, false, authenticator,
 				feePow, status.getKey(), 
 				person, fromDate, toDate,
 				value_1, value_2, data_1, data_2, refParent, description
 				);
+
+		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
+		
+		
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (this.getWidth()/1.2), (int) (this.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+		
+		SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((R_SetStatusToItem) transaction);
+		dd.jScrollPane1.setViewportView(ww);
+		dd.setLocationRelativeTo(this);
+		dd.setVisible(true);
+		
+	//	JOptionPane.OK_OPTION
+		if (dd.isConfirm){
+		
+		
+		
+		
+		Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+		
 		
 		//CHECK VALIDATE MESSAGE
-		if (result.getB() == Transaction.VALIDATE_OK) {
+		if (result == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Status assigned!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 		} else {
 		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-		
+		}
 		//ENABLE
 		Button_Confirm.setEnabled(true);
 		

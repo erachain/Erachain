@@ -2619,7 +2619,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
+	public Transaction r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
 			List<PublicKeyAccount> userAccounts, int add_day) {
 		synchronized (this.transactionCreator) {
@@ -2629,7 +2629,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> r_Vouch(int version, boolean asPack,
+	public Transaction r_Vouch(int version, boolean asPack,
 			PrivateKeyAccount creator, int feePow,
 			int height, int seq) {
 		synchronized (this.transactionCreator) {
@@ -2672,7 +2672,7 @@ public class Controller extends Observable {
 	}
 	*/
 	// ver2 
-	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
+	public Transaction r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
 			int feePow, long key,
 			ItemCls item, Long beg_date, Long end_date,
 			long value_1, long value_2, byte[] data_1, byte[] data_2, long refParent, byte[] description
