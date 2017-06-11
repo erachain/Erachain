@@ -184,9 +184,6 @@ public class BlockGenerator extends Thread implements Observer
 		Controller ctrl = Controller.getInstance();
 		BlockChain bchain = ctrl.getBlockChain();
 
-		if(!ctrl.doesWalletExists())
-			return;
-
 		DBSet dbSet = DBSet.getInstance();
 		//boolean isGenesisStart = false;
 
@@ -212,7 +209,6 @@ public class BlockGenerator extends Thread implements Observer
 			if (ctrl.isOnStopping() || dbSet.isStoped())
 				return;
 			
-
 			if (dbSet.getBlockMap().isProcessing()
 					|| ctrl.isProcessingWalletSynchronize()) {
 				
@@ -234,7 +230,11 @@ public class BlockGenerator extends Thread implements Observer
 				// IF not update by error - try anew update
 				continue;
 			}
-							
+			
+			// NO WALLET - loop
+			if(!ctrl.doesWalletExists())
+				continue;
+
 			if (dbSet.getBlockMap().isProcessing()
 					|| ctrl.isProcessingWalletSynchronize()) {
 				// NOT run in core.Synchronizer.process(DBSet, Block)
