@@ -138,8 +138,6 @@ public class Synchronizer
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 
-				//cnt.closePeerOnError(peer, "Dishonest peer by not valid block.heigh: " + heigh); // icreator
-
 				block.isValid(fork);
 				block.isSignatureValid();
 				

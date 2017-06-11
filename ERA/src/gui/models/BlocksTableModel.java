@@ -153,7 +153,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return null;
 		
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage() + "\n block.size:" + blocks.size() +  " row:" + row, e);
+			LOGGER.error(e.getMessage() + "\n row:" + row, e);
 			return null;
 		}
 	}

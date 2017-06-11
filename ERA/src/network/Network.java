@@ -422,7 +422,7 @@ public class Network extends Observable implements ConnectionCallback {
 			}
 		}
 		
-		LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
+		//LOGGER.info("Broadcasting end");
 	}
 
 	@Override

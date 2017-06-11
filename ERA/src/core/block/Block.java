@@ -1072,7 +1072,7 @@ public class Block {
 		int targetedWinValue = this.calcWinValueTargeted(db); 
 		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
 			targetedWinValue = this.calcWinValueTargeted(db);
-			LOGGER.error("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET");
+			LOGGER.error("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
 			return false;
 		}
 		
