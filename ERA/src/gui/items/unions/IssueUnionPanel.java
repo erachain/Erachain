@@ -196,7 +196,7 @@ public class IssueUnionPanel extends JPanel
 				feePow);
 		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 		 String text = "<HTML><body>";
-		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Union") + "<br><br><br>";
 		    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_Union.getCreator() +"<br>";
 		    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issue_Union.getItem().getName() +"<br>";
 		   text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issue_Union.getItem().getDescription())+"<br>";

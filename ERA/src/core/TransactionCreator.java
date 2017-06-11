@@ -466,7 +466,7 @@ public class TransactionCreator
 		
 	}
 
-	public Pair<Transaction, Integer> createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amounWant, int feePow)
+	public Transaction createOrderTransaction(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amounWant, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -479,12 +479,12 @@ public class TransactionCreator
 		
 		int res = createOrderTransaction.isValid(this.fork, null);
 		if (res != Transaction.VALIDATE_OK)
-			return new Pair<Transaction, Integer>(null, res);
+			return null;
 				
 		//VALIDATE AND PROCESS
 		createOrderTransaction.sign(creator, false);
 		
-		return new Pair<Transaction, Integer>(createOrderTransaction, this.afterCreate(createOrderTransaction, false));
+		return createOrderTransaction;
 	}
 		
 	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow)

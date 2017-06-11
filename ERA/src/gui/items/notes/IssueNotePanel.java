@@ -2,9 +2,11 @@ package gui.items.notes;
 
 import gui.MainFrame;
 import gui.PasswordPane;
+import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.IssueNoteDetailsFrame;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -41,6 +43,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.IssueNoteRecord;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -264,11 +267,17 @@ public class IssueNotePanel extends JPanel
 		//	    UIManager.put("OptionPane.okButtonText", "Готово");
 			
 		//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
-			
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+		
+	    
+	    
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction") + " "  + Lang.getInstance().translate("Issue Template") );
+		IssueNoteDetailsFrame ww =   new IssueNoteDetailsFrame(issueNote);
+		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(th);
 		dd.setVisible(true);
-			
+		
+	
+		
 		//	JOptionPane.OK_OPTION
 		if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
 				

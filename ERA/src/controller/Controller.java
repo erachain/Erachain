@@ -2546,7 +2546,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Pair<Transaction, Integer> createOrder(PrivateKeyAccount creator,
+	public Transaction createOrder(PrivateKeyAccount creator,
 			AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amountWant,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME

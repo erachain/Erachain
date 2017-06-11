@@ -382,7 +382,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(true)+" Bytes, ";
 			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 			    
-			  System.out.print("\n"+ text +"\n");
+		//	  System.out.print("\n"+ text +"\n");
 		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
 		//	    UIManager.put("OptionPane.okButtonText", "Готово");
 			

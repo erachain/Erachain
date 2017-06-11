@@ -106,7 +106,7 @@ public tt() {
    
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Statuses")));
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Statuses")));
-   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Status")));
+   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Create Status")));
    
    unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unions")));
    unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unions")));

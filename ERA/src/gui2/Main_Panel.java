@@ -375,8 +375,8 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Issue Template"), new IssueNotePanel());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("Issue Status")) || str.equals("IssueStatusPanel") ){
-			ccase1( Lang.getInstance().translate("Issue Status"), new IssueStatusPanel());
+		if ( str.equals( Lang.getInstance().translate("Create Status")) || str.equals("IssueStatusPanel") ){
+			ccase1( Lang.getInstance().translate("Create Status"), new IssueStatusPanel());
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("My Statuses"))  || str.equals("My_Statuses_Tab")){

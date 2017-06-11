@@ -319,7 +319,7 @@ public class IssueStatusPanel extends JPanel
 		
 		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 		 String text = "<HTML><body>";
-		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
+		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Create Status") + "<br><br><br>";
 		    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_Status.getCreator() +"<br>";
 		    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issue_Status.getItem().getName() +"<br>";
 		    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issue_Status.getItem().getDescription())+"<br>";
