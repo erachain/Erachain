@@ -1003,6 +1003,8 @@ public class Block {
 		int repeat_win = 0;
 		if (height < BlockChain.REPEAT_WIN<<1) {
 			repeat_win = BlockChain.REPEAT_WIN;
+		}
+		else if (height > 32400) {
 		} else {
 			return 0;
 		}
@@ -1077,7 +1079,8 @@ public class Block {
 		}
 		
 		// STOP IF SO RAPIDLY			
-		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(), Controller.getInstance().getBlockChain().getLastBlocksForTarget(db)) > 0) {
+		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(),
+				Controller.getInstance().getBlockChain().getLastBlocksForTarget(db)) > 0) {
 			LOGGER.error("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}

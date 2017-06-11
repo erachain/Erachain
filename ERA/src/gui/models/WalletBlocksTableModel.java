@@ -30,7 +30,9 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	
 	private SortableList<Tuple2<String, String>, Block> blocks;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator", "Generating Balance", "Transactions", "Fee"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
+			"GB pH VW tVW", //"Generating Balance",
+			"Transactions", "Fee"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,true,false};
 	
 	static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());

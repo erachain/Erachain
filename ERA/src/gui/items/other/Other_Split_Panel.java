@@ -59,6 +59,7 @@ public class Other_Split_Panel extends Split_Panel{
  				int row = jTable_Peers.getSelectedRow();
 				row = jTable_Peers.convertRowIndexToModel(row);
 				Peer peer = peersTableModel.get_Peers(row);
+				peer.ban(10, "banned by user");
 				
  			}
        	
@@ -73,6 +74,7 @@ public class Other_Split_Panel extends Split_Panel{
  				int row = jTable_Peers.getSelectedRow();
 				row = jTable_Peers.convertRowIndexToModel(row);
 				Peer peer = peersTableModel.get_Peers(row);	
+				peer.ban(60, "banned by user");
  			}
        	
          });
@@ -86,6 +88,7 @@ public class Other_Split_Panel extends Split_Panel{
  				int row = jTable_Peers.getSelectedRow();
 				row = jTable_Peers.convertRowIndexToModel(row);
 				Peer peer = peersTableModel.get_Peers(row);	
+				peer.ban(180, "banned by user");
  			}
        	
          });
@@ -99,6 +102,7 @@ public class Other_Split_Panel extends Split_Panel{
  				int row = jTable_Peers.getSelectedRow();
 				row = jTable_Peers.convertRowIndexToModel(row);
 				Peer peer = peersTableModel.get_Peers(row);
+				peer.ban(1440, "banned by user");
  			}
        	
          });
@@ -113,10 +117,12 @@ public class Other_Split_Panel extends Split_Panel{
  				int row = jTable_Peers.getSelectedRow();
 				row = jTable_Peers.convertRowIndexToModel(row);
 				Peer peer = peersTableModel.get_Peers(row);
+				peer.ban(999999, "banned by user");
  			}
        	
          });
          peers_Menu.add(Baned_Allways_Item);
+
          peers_Menu.add(new JSeparator());
          JMenuItem allow_Item = new JMenuItem(Lang.getInstance().translate("Allow"));
          allow_Item.addActionListener(new ActionListener(){
