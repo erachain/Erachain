@@ -23,6 +23,7 @@ import gui.models.BlocksTableModel;
 import gui.models.PeersTableModel;
 import gui.models.WalletBlocksTableModel;
 import lang.Lang;
+import network.Peer;
 import utils.TableMenuPopupUtil;
 
 public class Other_Split_Panel extends Split_Panel{
@@ -55,7 +56,10 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				
+ 				int row = jTable_Peers.getSelectedRow();
+				row = jTable_Peers.convertRowIndexToModel(row);
+				Peer peer = peersTableModel.get_Peers(row);
+				
  			}
        	
          });
@@ -66,7 +70,9 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				
+ 				int row = jTable_Peers.getSelectedRow();
+				row = jTable_Peers.convertRowIndexToModel(row);
+				Peer peer = peersTableModel.get_Peers(row);	
  			}
        	
          });
@@ -77,7 +83,9 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				
+ 				int row = jTable_Peers.getSelectedRow();
+				row = jTable_Peers.convertRowIndexToModel(row);
+				Peer peer = peersTableModel.get_Peers(row);	
  			}
        	
          });
@@ -88,7 +96,9 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				
+ 				int row = jTable_Peers.getSelectedRow();
+				row = jTable_Peers.convertRowIndexToModel(row);
+				Peer peer = peersTableModel.get_Peers(row);
  			}
        	
          });
@@ -100,7 +110,9 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				
+ 				int row = jTable_Peers.getSelectedRow();
+				row = jTable_Peers.convertRowIndexToModel(row);
+				Peer peer = peersTableModel.get_Peers(row);
  			}
        	
          });
@@ -112,7 +124,9 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				
+ 				int row = jTable_Peers.getSelectedRow();
+				row = jTable_Peers.convertRowIndexToModel(row);
+				Peer peer = peersTableModel.get_Peers(row);
  			}
        	
          });
