@@ -40,8 +40,11 @@ import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
+import gui.transaction.IssuePersonDetailsFrame;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import settings.Settings;
@@ -405,11 +408,45 @@ private void init(){
 			
 			//CHECK VALIDATE MESSAGE
 			if (result.getB() == Transaction.VALIDATE_OK) {
+				 String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ result.getA().viewSize(true)+" Bytes, ";
+				    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ result.getA().getFee().toString()+" COMPU</b><br></body></HTML>";
+				    
+			//	  System.out.print("\n"+ text +"\n");
+			//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+			//	    UIManager.put("OptionPane.okButtonText", "Готово");
+				
+			//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+				
+				Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true," ", (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction") +" " + Lang.getInstance().translate("Issue Person"));
 			
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
-						"Person issue has been sent!"),
-						Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				reset();
+				IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
+			//	ww.jPanel2.setVisible(false);
+				dd.jScrollPane1.setViewportView(ww);
+				dd.setLocationRelativeTo(th);
+				dd.setVisible(true);
+//				JOptionPane.OK_OPTION
+					if (dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+						//VALIDATE AND PROCESS
+						Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), false);
+						if (result1 != Transaction.VALIDATE_OK){
+								JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result1)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						}
+						else{
+							JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+									"Person issue has been sent!"),
+									Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+							
+						}
+						
+						
+						
+						
+						
+						}	
+				
+				
+				
+				
 				
 			} else {		
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

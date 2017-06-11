@@ -379,7 +379,7 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS
 		if (forIssue) {
 			boolean asPack = false;
-			return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+			return new Pair<Transaction, Integer>(issuePersonRecord, 1);//this.afterCreate(issuePersonRecord, asPack));
 		} else {
 			// for COPY -
 			int valid = issuePersonRecord.isValid(DBSet.getInstance(), lastReference);
@@ -423,7 +423,7 @@ public class TransactionCreator
 		
 		//VALIDATE AND PROCESS
 		boolean asPack = false;
-		return new Pair<Transaction, Integer>(issuePersonRecord, this.afterCreate(issuePersonRecord, asPack));
+		return new Pair<Transaction, Integer>(issuePersonRecord, 1);
 		
 	}
 
