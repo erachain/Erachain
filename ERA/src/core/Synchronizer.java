@@ -34,6 +34,8 @@ public class Synchronizer
 	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)146, (byte)168, (byte)226};
 	
 	private boolean run = true;
+	private Peer fromPeer;
+	
 	
 	public Synchronizer()
 	{
@@ -42,6 +44,10 @@ public class Synchronizer
 	
 	static boolean USE_AT_ORPHAN = false;
 	static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 30;
+	
+	public Peer getPeer() {
+		return fromPeer;
+	}
 	
 	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
@@ -224,14 +230,19 @@ public class Synchronizer
 	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer) throws Exception
 	{
 
-		if (!this.run)
+		if (!this.run) {
+			fromPeer = null;
 			return;
+		}
+
 
 		/*
 		LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
 					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());
 					*/
 
+		fromPeer = peer;
+		
 		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 				
 		// FIND HEADERS for common CHAIN
@@ -251,8 +262,10 @@ public class Synchronizer
 		Block common = dbSet.getBlockMap().get(signatures.a);
 		int commonBlockHeight = common.getHeight(dbSet);
 
-		if (!this.run || dbSet.isStoped())
+		if (!this.run || dbSet.isStoped()) {
+			fromPeer = null;
 			return;
+		}
 
 		LOGGER.info("Synchronizing from COMMON blockHeight " + commonBlockHeight);
 		
@@ -280,6 +293,7 @@ public class Synchronizer
 				Block blockFromPeer = blockBuffer.getBlock(signature);
 				
 				if (!this.run) {
+					fromPeer = null;
 					return;
 				}
 				
@@ -295,8 +309,10 @@ public class Synchronizer
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
 				{
-					if (!this.run)
+					if (!this.run) {
+						fromPeer = null;
 						return;
+					}
 
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dbSet);
@@ -315,6 +331,7 @@ public class Synchronizer
 			List<Block> blocks = this.getBlocks(dbSet, signatures.b, peer);
 
 			if (!this.run) {
+				fromPeer = null;
 				return;
 			}
 
@@ -324,6 +341,7 @@ public class Synchronizer
 			*/
 			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks, peer);
 			if (!this.run) {
+				fromPeer = null;
 				return;
 			}
 
@@ -331,6 +349,7 @@ public class Synchronizer
 			for(Transaction transaction: orphanedTransactions)
 			{
 				if (!this.run) {
+					fromPeer = null;
 					return;
 				}
 
@@ -340,6 +359,8 @@ public class Synchronizer
 		}
 		
 		//dbSet.commitHard();
+		fromPeer = null;
+
 	}
 	
 	/*
