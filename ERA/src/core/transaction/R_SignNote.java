@@ -31,6 +31,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -38,6 +39,7 @@ import core.crypto.Base58;
 import core.item.ItemCls;
 //import database.BalanceMap;
 import database.DBSet;
+import database.wallet.FavoriteDocument;
 
 
 
@@ -689,6 +691,13 @@ public class R_SignNote extends Transaction {
 		}
 		return outStream.toByteArray();
 
+	}
+	public boolean isFavorite(){
+			
+		return Controller.getInstance().wallet.database.getDocumentFavoritesSet().contains(this);
+		
+		
+		
 	}
 	
 

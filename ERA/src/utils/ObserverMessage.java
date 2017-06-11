@@ -132,7 +132,10 @@ public class ObserverMessage {
 	public static final int ADD_STATEMENT_TYPE = 97;
 	public static final int REMOVE_STATEMENT_TYPE = 98;
 	public static final int LIST_STATEMENT_TYPE = 99;
-	public static final int LIST_STATEMENT_FAVORITES_TYPE = 100;
+	public static final int LIST_STATEMENT_FAVORITES_TYPE =   100000;
+	public static final int ADD_STATEMENT_FAVORITES_TYPE =    100001;
+	public static final int DELETE_STATEMENT_FAVORITES_TYPE = 100002;
+	
 	
 	public static final int ADD_VOUCH_TYPE = 101;
 	public static final int REMOVE_VOUCH_TYPE = 102;

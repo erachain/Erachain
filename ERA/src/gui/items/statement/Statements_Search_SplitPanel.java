@@ -53,6 +53,7 @@ import controller.Controller;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
 import gui.Main_Internal_Frame;
@@ -172,6 +173,36 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		
 		TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
 	
+		jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() 
+		{
+			@Override
+			public void mousePressed(MouseEvent e) 
+			{
+				Point p = e.getPoint();
+				int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+				jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+				
+				
+				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
+				{
+					
+					if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == TableModelPersons.COLUMN_FAVORITE){
+					//	row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+					//	 PersonCls asset = search_Table_Model.getPerson(row);
+						favorite_set( jTable_jScrollPanel_LeftPanel);	
+						
+						
+						
+					}
+					
+					
+				}
+		     }
+		});
+	
+	
+	
+	
 	}
 
 	// set favorite Search	
@@ -257,5 +288,32 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		  if (c1 instanceof Statement_Info) ( (Statement_Info)c1).delay_on_Close();
 		
 	}
+	 public void favorite_set(JTable personsTable){
+
+
+		 int row = personsTable.getSelectedRow();
+		 row = personsTable.convertRowIndexToModel(row);
+
+		    Transaction person = search_Table_Model.get_Statement(row);
+		 //new AssetPairSelect(asset.getKey());
+
+		
+		 	//CHECK IF FAVORITES
+		 	if(((R_SignNote) person).isFavorite())
+		 	{
+		 		
+		 		Controller.getInstance().wallet.database.getDocumentFavoritesSet().delete(person);
+		 	}
+		 	else
+		 	{
+		 		
+		 		Controller.getInstance().wallet.database.getDocumentFavoritesSet().add(person);
+		 	}
+		 		
+
+		 	personsTable.repaint();
+
+		 
+		 }
 
 }

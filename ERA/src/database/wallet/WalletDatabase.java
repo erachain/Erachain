@@ -48,6 +48,8 @@ public class WalletDatabase implements IDB
 	private FavoriteItemPerson personFavoritesSet;
 	private FavoriteItemStatus statusFavoritesSet;
 	private FavoriteItemUnion unionFavoritesSet;
+
+	private FavoriteDocument statementFavoritesSet;
 	
 	public static boolean exists()
 	{
@@ -90,6 +92,8 @@ public class WalletDatabase implements IDB
 	    this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
 	    this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
 	    this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
+	    this.statementFavoritesSet = new FavoriteDocument(this, this.database);
+	    
 	}
 	
 	public void setVersion(int version)
@@ -303,6 +307,10 @@ public class WalletDatabase implements IDB
 	public FavoriteItemPerson getPersonFavoritesSet()
 	{
 		return this.personFavoritesSet;
+	}
+	public FavoriteDocument getDocumentFavoritesSet()
+	{
+		return this.statementFavoritesSet;
 	}
 	public FavoriteItemStatus getStatusFavoritesSet()
 	{

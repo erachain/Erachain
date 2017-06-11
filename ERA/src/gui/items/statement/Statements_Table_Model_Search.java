@@ -32,8 +32,9 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	public static final int COLUMN_CREATOR = 1;
 	public static final int COLUMN_NOTE = 2;
 	public static final int COLUMN_BODY = 3;
+	public static final int COLUMN_FAVORITE = 4;
 	List<Transaction> transactions;
-	private String[] columnNames = new String[] { "Timestamp", "Creator", "Template", "Statement" };// ,
+	private String[] columnNames = new String[] { "Timestamp", "Creator", "Template", "Statement" , "Favorite"};// ,
 																									// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, false };
 
@@ -94,7 +95,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	@Override
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
-		try {
+	//	try {
 			if (this.transactions == null || this.transactions.size() - 1 < row) {
 				return null;
 			}
@@ -116,8 +117,14 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 					return "";
 				
 				if(record.getVersion() == 2){
-					Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
-					return a.b;
+					Tuple3<String, String, JSONObject> a;
+					try {
+						a = record.parse_Data_V2_Without_Files();
+					
+					return a.b;} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 							
 				
@@ -141,14 +148,16 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 			case COLUMN_CREATOR:
 
 				return record.getCreator().getPersonAsString();
+			case COLUMN_FAVORITE:
+				return record.isFavorite();
 			}
 
 			return null;
 
-		} catch (Exception e) {
+		//} catch (Exception e) {
 			// LOGGER.error(e.getMessage(),e);
-			return null;
-		}
+		//	return null;
+		//}
 	}
 
 	@Override
