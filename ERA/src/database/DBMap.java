@@ -130,6 +130,11 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public U get(T key)
 	{
+
+		if (DBSet.getInstance().isStoped()) {
+			return null;
+		}
+		
 		this.addUses();
 		
 		//try
@@ -188,6 +193,10 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public boolean set(T key, U value)
 	{
+		if (DBSet.getInstance().isStoped()) {
+			return false;
+		}
+		
 		this.addUses();
 		try
 		{
@@ -222,7 +231,8 @@ public abstract class DBMap<T, U> extends Observable {
 				}
 				else
 				{
-					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
+					if (!DBSet.getInstance().isStoped())
+						this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
 				}
 			}
 			
@@ -247,6 +257,11 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public void delete(T key) 
 	{
+		
+		if (DBSet.getInstance().isStoped()) {
+			return;
+		}
+
 		this.addUses();
 
 		try
@@ -302,6 +317,10 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public boolean contains(T key)
 	{
+		
+		if (DBSet.getInstance().isStoped()) {
+			return false;
+		}
 		
 		this.addUses();
 

@@ -290,6 +290,11 @@ public class Synchronizer
 			//GET AND PROCESS BLOCK BY BLOCK
 			for(byte[] signature: signatures.b)
 			{
+				if (!this.run) {
+					fromPeer = null;
+					return;
+				}
+				
 				//GET BLOCK
 				Block blockFromPeer = blockBuffer.getBlock(signature);
 				
@@ -306,6 +311,11 @@ public class Synchronizer
 					throw new Exception(mess);
 				}
 				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
+
+				if (!this.run) {
+					fromPeer = null;
+					return;
+				}
 				
 				//PROCESS BLOCK
 				if(!this.process(dbSet, blockFromPeer))
@@ -463,7 +473,7 @@ public class Synchronizer
 		}
 
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
-		int steep = BlockChain.MAX_ORPHAN>>2;
+		int steep = BlockChain.SYNCHRONIZE_PACKET>>2;
 		byte[] lastBlockSignatureCommon;
 		do {
 			maxChainHeight -= steep;

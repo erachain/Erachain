@@ -105,8 +105,11 @@ public class BlockSignsMap extends DBMap<byte[], Tuple2<Integer, Integer>>
 	}
 	public Integer getHeight(byte[] signature)
 	{
-		if (this.contains(signature))
-			return this.get(signature).a;
+		if (this.contains(signature)) {
+			Tuple2<Integer, Integer> o = this.get(signature);
+			if (o != null)
+				return this.get(signature).a;
+		}
 		return -1;
 	}
 	public Integer getWeight(Block block)

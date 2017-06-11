@@ -34,6 +34,7 @@ public class BlockChain
 	//public static final String TIME_ZONE = "GMT+3";
 	//
 	public static final int MAX_ORPHAN = 10000; // max orphan blocks in chain
+	public static final int SYNCHRONIZE_PACKET = 100; // when synchronize - get blocks packet
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
@@ -239,7 +240,9 @@ public class BlockChain
 
 	public int getCheckPoint(DBSet dbSet) {
 		
-		int checkPoint = getHeight(dbSet) - BlockChain.MAX_ORPHAN; 
+		int checkPoint = getHeight(dbSet) - BlockChain.MAX_ORPHAN;
+		checkPoint = 32400;
+		
 		if ( checkPoint > this.checkPoint)
 			this.checkPoint = checkPoint;
 		
@@ -272,7 +275,8 @@ public class BlockChain
 			Block childBlock = dbSet.getBlockMap().get(parent).getChild(dbSet);
 			
 			int counter = 0;
-			while(childBlock != null && counter < MAX_ORPHAN)
+			//while(childBlock != null && counter < MAX_ORPHAN)
+			while(childBlock != null && counter < SYNCHRONIZE_PACKET)
 			{
 				headers.add(childBlock.getSignature());
 				

@@ -1510,6 +1510,9 @@ public class Controller extends Observable {
 			return false;
 		}
 
+		if (isStopping)
+			return true;
+		
 		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight();
 		if (maxHW.c == null)
 			return true;
@@ -1611,6 +1614,9 @@ public class Controller extends Observable {
 						// SYNCHRONIZE FROM PEER
 						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
 					}
+
+					blockchainSyncStatusUpdate(getMyHeight());
+					
 				}
 			} while (!dbSet.isStoped() && !this.isUpToDate());
 			

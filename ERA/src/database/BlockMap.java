@@ -192,6 +192,9 @@ public class BlockMap extends DBMap<byte[], Block>
 	{
 		if(this.processingVar != null)
 		{
+			if (DBSet.getInstance().isStoped()) {
+				return;
+			}
 			this.processingVar.set(processing);
 		}
 		
