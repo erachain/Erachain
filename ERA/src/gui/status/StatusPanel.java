@@ -1,6 +1,7 @@
 package gui.status;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -22,6 +23,7 @@ public class StatusPanel extends JPanel
 		this.add(new NetworkStatus(), BorderLayout.EAST);
 		
 		WalletStatus walletStatus = new WalletStatus();
+		walletStatus.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		walletStatus.addMouseListener(new MouseAdapter() 
 		{
 			public void mouseClicked(MouseEvent e) 
@@ -35,6 +37,7 @@ public class StatusPanel extends JPanel
 		
 		this.add(walletStatus, BorderLayout.EAST);
 		this.add(new ForgingStatus(), BorderLayout.EAST);
+		this.add(new UnconfirmTransactionStatus(), BorderLayout.EAST);
 		
 	}
 }

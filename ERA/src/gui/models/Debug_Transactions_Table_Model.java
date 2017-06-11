@@ -157,7 +157,7 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 		else if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 			//CHECK IF LIST UPDATED
-			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
+//			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 //			this.transactions.add(value);
 			this.fireTableDataChanged();
 		}	
