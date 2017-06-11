@@ -2565,7 +2565,7 @@ public class Controller extends Observable {
 			AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amountWant,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
+		synchronized (this.transactionCreator) { 
 			return this.transactionCreator.createOrderTransaction(creator,
 					have, want, amountHave, amountWant, feePow);
 		}
