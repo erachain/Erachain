@@ -51,6 +51,7 @@ import gui.items.records.Records_My_SplitPanel;
 import gui.items.records.Records_Search_SplitPanel;
 import gui.items.records.Records_UnConfirmed_Panel;
 import gui.items.statement.Issue_Document_Panel;
+import gui.items.statement.Statements_Favorite_SplitPanel;
 import gui.items.statement.Statements_My_SplitPanel;
 import gui.items.statement.Statements_Search_SplitPanel;
 import gui.items.statuses.IssueStatusPanel;
@@ -315,6 +316,12 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("My Accounts"), new My_Accounts_SplitPanel());
 			return;
 
+		}
+		
+		
+		if ( str.equals( Lang.getInstance().translate("Favorite Documents"))  || str.equals("Statements_Favorite_SplitPanel")){
+			ccase1( Lang.getInstance().translate("Favorite Documents"), new Statements_Favorite_SplitPanel());
+			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("My Documents"))  || str.equals("Statements_My_SplitPanel")){
 			ccase1( Lang.getInstance().translate("My Documents"), new Statements_My_SplitPanel());

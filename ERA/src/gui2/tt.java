@@ -83,6 +83,8 @@ public tt() {
   // account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Accounts")));
    //account_Node.add(new DefaultMutableTreeNode("Issue Account"));
    
+   
+   document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Documents")));
    document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Documents")));
    document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Documents")));
    document_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Document")));

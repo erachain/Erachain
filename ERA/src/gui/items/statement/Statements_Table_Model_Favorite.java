@@ -9,8 +9,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
 import core.block.Block;
 import core.item.ItemCls;
 import core.transaction.R_SignNote;
@@ -21,7 +23,7 @@ import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Table_Model_Search extends AbstractTableModel implements Observer {
+public class Statements_Table_Model_Favorite extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
@@ -30,19 +32,19 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-//	public static final int COLUMN_NOTE = 2;
-	public static final int COLUMN_BODY = 2;
-	public static final int COLUMN_FAVORITE = 3;
-	List<Transaction> transactions;
-	private String[] columnNames = new String[] { "Timestamp", "Creator"/*, "Template"*/, "Statement" , "Favorite"};// ,
+	public static final int COLUMN_NOTE = 2;
+	public static final int COLUMN_BODY = 3;
+	public static final int COLUMN_FAVORITE = 4;
+	SortableList<Tuple2<String,String>,Transaction> transactions;
+	private String[] columnNames = new String[] { "Timestamp", "Creator", "Template", "Statement" , "Favorite"};// ,
 																									// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, false };
 
-	public Statements_Table_Model_Search() {
+	public Statements_Table_Model_Favorite() {
 
-		transactions = new ArrayList<Transaction>();
+		
 		addObservers();
-		transactions = read_Statement();
+		
 	}
 
 	// set class
@@ -74,7 +76,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		if (transactions == null || row < 0 || transactions.size() <= row)
 			return null;
 
-		return transactions.get(row);
+		return transactions.get(row).getB();
 	}
 
 	@Override
@@ -89,6 +91,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	@Override
 	public int getRowCount() {
 		// TODO Auto-generated method stub
+		if (transactions == null) return 0;
 		return transactions.size();
 	}
 
@@ -100,26 +103,16 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 				return null;
 			}
 
-			R_SignNote record = (R_SignNote) this.transactions.get(row);
+			R_SignNote record = (R_SignNote) this.transactions.get(row).getB();
 
 			switch (column) {
 			case COLUMN_TIMESTAMP:
 
 				return record.viewTimestamp(); 
-	/*			
+				
 			case COLUMN_NOTE:
 
-				if (record.getVersion() ==2) {
-					
-					
-					return " ";
-				}
-				//view version 1
-				
-				
-				
 				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
-			*/	
 
 			case COLUMN_BODY:
 
@@ -184,9 +177,11 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		// System.out.println( message.getType());
 
 		// CHECK IF NEW LIST
-		if (message.getType() == ObserverMessage.LIST_STATEMENT_TYPE) {
+		if (message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE) {
 			if (this.transactions == null) {
-				transactions = read_Statement();
+				transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+				transactions.registerObserver();
+				SortableList<Tuple2<String, String>, Transaction> sss = Controller.getInstance().wallet.database.getDocumentFavoritesSet().getList();
 				this.fireTableDataChanged();
 			}
 
@@ -194,20 +189,20 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		}
 
 		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE) {
-			Transaction trans = (Transaction) message.getValue();
-			if (trans.getType() != Transaction.SIGN_NOTE_TRANSACTION)
-				return;
-			for (Transaction tr : transactions) {
-				if (tr.viewSignature().equals(trans.viewSignature())) {
-					transactions.remove(tr);
-				}
-
-			}
-			transactions.add(trans);
+		if (message.getType() == ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE) {
+	//		transactions.add( (Pair<Tuple2<String, String>, Transaction>) message.getValue());
+			this.fireTableDataChanged();
+		}
+	
+		if (message.getType() == ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE) {
+			Object mm = message.getValue();
+			Transaction ss = (Transaction) message.getValue();
+		//	transactions.remove(ss);
+			
 
 			this.fireTableDataChanged();
 		}
+	
 	}
 
 	private List<Transaction> read_Statement() {
@@ -240,12 +235,13 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	public void removeObservers() {
 
 		// Controller.getInstance().deleteObserver(this);
-		DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
+		Controller.getInstance().wallet.database.getDocumentFavoritesSet().deleteObserver(this);
+		transactions.removeObserver();
 	}
 
 	public void addObservers() {
 		// Controller.getInstance().addObserver(this);
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+		Controller.getInstance().wallet.database.getDocumentFavoritesSet().addObserver(this);
 	}
 
 }
