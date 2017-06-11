@@ -154,13 +154,22 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 			
 			this.fireTableDataChanged();
 		}
-		else if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+		else if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 			//CHECK IF LIST UPDATED
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
-			this.transactions.add(value);
+//			this.transactions.add(value);
 			this.fireTableDataChanged();
 		}	
+		
+		else if( message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+		{
+			//CHECK IF LIST UPDATED
+//			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
+//			this.transactions.remove(value);
+			this.fireTableDataChanged();
+		}	
+		
 	}
 
 	public void removeObservers() 

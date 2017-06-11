@@ -437,18 +437,8 @@ private void init(){
 									Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 							
 						}
-						
-						
-						
-						
-						
 						}	
-				
-				
-				
-				
-				
-			} else {		
+				} else {		
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 			

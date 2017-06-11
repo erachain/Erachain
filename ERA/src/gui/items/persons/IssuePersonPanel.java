@@ -378,7 +378,9 @@ public class IssuePersonPanel extends JPanel
 						"Person issue has been copy to buffer!"),
 						Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			
-			    
+			  //ENABLE
+				this.issueButton.setEnabled(true);
+				this.copyButton.setEnabled(true); 
 			return;
 			}
 			
