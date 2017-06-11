@@ -76,8 +76,9 @@ public class Synchronizer
 			
 			int lastHeight = lastBlock.getHeight(fork);
 			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock["
-					+ lastHeight + "]"
-					+ " search common block in FORK"
+					+ lastHeight + "]\n"
+					+ "newBlocks.size = " + newBlocks.size()
+					+ "\n search common block in FORK"
 					+ " in mainDB: " + lastBlock.getHeight(fork.getParent()));
 
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
