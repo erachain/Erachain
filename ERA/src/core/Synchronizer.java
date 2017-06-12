@@ -596,6 +596,6 @@ public class Synchronizer
 	public void stop() {
 		
 		this.run = false;
-		//this.process(DBSet.getInstance(), null);
+		this.process(DBSet.getInstance(), null);
 	}
 }
