@@ -308,7 +308,7 @@ public class WalletDatabase implements IDB
 	{
 		return this.personFavoritesSet;
 	}
-	public FavoriteDocument getDocumentFavoritesSet()
+	public FavoriteDocument getDocumentFavoritesSet() 
 	{
 		return this.statementFavoritesSet;
 	}
