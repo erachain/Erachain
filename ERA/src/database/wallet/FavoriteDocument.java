@@ -1,4 +1,4 @@
-package database.serializer;
+package database.wallet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction>
 		
 		
 
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+		DBSet.getInstance().getTransactionFinalMap().addObserver(this); 
 		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE);
