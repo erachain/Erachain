@@ -98,7 +98,7 @@ import utils.TableMenuPopupUtil;
 				jToolBar_RightPanel.setVisible(false);
 				toolBar_LeftPanel.setVisible(true);
 				button2_ToolBar_LeftPanel.setVisible(false);
-				button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search Persons"));
+				button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Search Assets"));
 				button1_ToolBar_LeftPanel.addActionListener(new ActionListener(){
 
 					@Override
@@ -106,7 +106,7 @@ import utils.TableMenuPopupUtil;
 						// TODO Auto-generated method stub
 						JDialog dd = new JDialog(MainFrame.getInstance());
 						dd.setModal(true);
-						dd.add(new Search_Assets_Tab());
+						dd.add(new Search_Assets_Tab(false));
 						dd.setPreferredSize(new Dimension(MainFrame.getInstance().getWidth()-100, MainFrame.getInstance().getHeight()-100));
 					
 						dd.pack();

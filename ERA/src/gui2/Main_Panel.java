@@ -363,7 +363,7 @@ public class Main_Panel extends javax.swing.JPanel {
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Search Assets"))     || str.equals("Search_Assets_Tab")){
-			ccase1( Lang.getInstance().translate("Search Assets"), new Search_Assets_Tab());
+			ccase1( Lang.getInstance().translate("Search Assets"), new Search_Assets_Tab(true));
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("My Balance")) || str.equals("My_Balance_Tab")){

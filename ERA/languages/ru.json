@@ -252,6 +252,8 @@
 	"False":"Нет",
 	"false":"нет",
 	"Favorite":"Избранные",
+	"Favorite Assets":"Избранные Активы",
+	"Favorite Documents":"Избранные Документы",
 	"Favorite Persons":"Избранные Персоны",
 	"Fee":"Сбор",
 	"Fee below the minimum for this size of a transaction!":"Сбор ниже минимального для такого размера сделки!",

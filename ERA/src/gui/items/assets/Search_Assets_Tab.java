@@ -82,7 +82,7 @@ public class Search_Assets_Tab extends Split_Panel {
 	Asset_Info info_panel;
 	
 	
-	public Search_Assets_Tab(){
+	public Search_Assets_Tab(boolean search_and_exchange){
 		super("Search_Assets_Tab");
 		th =this;
 		setName(Lang.getInstance().translate("Search Assets"));
@@ -313,7 +313,7 @@ public class Search_Assets_Tab extends Split_Panel {
 
 	
 	
-	nameSalesMenu.add(favorite);
+	
 	
 	
 	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
@@ -327,7 +327,7 @@ public class Search_Assets_Tab extends Split_Panel {
 			new ExchangeFrame(asset,null,  "", "");	
 		}
 	});
-	 nameSalesMenu.add(excahge);
+	
 	
 	
 	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
@@ -361,8 +361,9 @@ public class Search_Assets_Tab extends Split_Panel {
 	});
 	
 	
-	
-	
+//	nameSalesMenu.add(favorite);
+	if (search_and_exchange){
+	 nameSalesMenu.add(excahge);
 	nameSalesMenu.addSeparator();
 	nameSalesMenu.add(buy);
 	
@@ -374,6 +375,11 @@ public class Search_Assets_Tab extends Split_Panel {
 	nameSalesMenu.addSeparator();
 	
 	nameSalesMenu.add(vouch_menu);
+	} else {
+		nameSalesMenu.add(favorite);
+	}
+	
+	
 	
 	assetsTable.setComponentPopupMenu(nameSalesMenu);
 	assetsTable.addMouseListener(new MouseAdapter() {
@@ -383,7 +389,7 @@ public class Search_Assets_Tab extends Split_Panel {
 			int row = assetsTable.rowAtPoint(p);
 			assetsTable.setRowSelectionInterval(row, row);
 			
-			if(e.getClickCount() == 2)
+			if(e.getClickCount() == 2 && search_and_exchange)
 			{
 				row = assetsTable.convertRowIndexToModel(row);
 				AssetCls asset = tableModelItemAssets.getAsset(row);
