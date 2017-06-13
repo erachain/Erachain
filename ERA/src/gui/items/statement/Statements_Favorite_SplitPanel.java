@@ -277,8 +277,11 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
 		 	//CHECK IF FAVORITES
 		 	if(((R_SignNote) person).isFavorite())
 		 	{
-		 		
+		 		row = personsTable.getSelectedRow();
 		 		Controller.getInstance().wallet.database.getDocumentFavoritesSet().delete(person);
+		 		if (search_Table_Model.getRowCount() == 0)  return;
+		 		if (row > 0)	personsTable.addRowSelectionInterval(row-1,row-1);
+		 		else personsTable.addRowSelectionInterval(0,0);
 		 	}
 		 	else
 		 	{

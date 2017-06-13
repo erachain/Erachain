@@ -447,8 +447,13 @@ import utils.TableMenuPopupUtil;
 				 	//CHECK IF FAVORITES
 				 	if(Controller.getInstance().isItemFavorite(person))
 				 	{
-				 		
+				 	//select row in table	
+				 		row = personsTable.getSelectedRow();
 				 		Controller.getInstance().removeItemFavorite(person);
+				 		if (search_Table_Model.getRowCount() == 0)  return;
+				 		if (row > 0)	personsTable.addRowSelectionInterval(row-1,row-1);
+				 		else personsTable.addRowSelectionInterval(0,0);
+				 		
 				 	}
 				 	else
 				 	{
