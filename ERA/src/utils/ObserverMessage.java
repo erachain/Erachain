@@ -36,6 +36,7 @@ public class ObserverMessage {
 	public static final int REMOVE_ASSET_TYPE = 24;
 	public static final int LIST_ASSET_TYPE = 25;
 	
+	
 	public static final int ADD_ORDER_TYPE = 26;
 	public static final int REMOVE_ORDER_TYPE = 27;
 	public static final int LIST_ORDER_TYPE = 28;
@@ -49,6 +50,8 @@ public class ObserverMessage {
 	public static final int LIST_BALANCE_TYPE = 34;
 	
 	public static final int LIST_ASSET_FAVORITES_TYPE = 35;
+	public static final int ADD_ASSET_FAVORITES_TYPE = 35001;
+	public static final int DELETE_ASSET_FAVORITES_TYPE = 35002;
 	
 	public static final int FORGING_STATUS = 36;
 
@@ -83,6 +86,7 @@ public class ObserverMessage {
 	public static final int REMOVE_STATUS_TYPE = 58;
 	public static final int LIST_STATUS_TYPE = 59;
 	public static final int LIST_STATUS_FAVORITES_TYPE = 60;
+	
 
 	public static final int ADD_UNION_TYPE = 61;
 	public static final int REMOVE_UNION_TYPE = 62;
@@ -93,6 +97,7 @@ public class ObserverMessage {
 	public static final int REMOVE_ASSET_STATUS_TYPE = 66;
 	public static final int LIST_ASSET_STATUS_TYPE = 67;
 	public static final int LIST_ASSET_STATUS_FAVORITES_TYPE = 68;
+	
 
 	public static final int ADD_PERSON_STATUS_TYPE = 69;
 	public static final int REMOVE_PERSON_STATUS_TYPE = 70;

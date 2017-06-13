@@ -30,6 +30,7 @@ import javax.swing.tree.TreePath;
 import core.BlockChain;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
+import gui.items.assets.Assets_Favorite_SplitPanel;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.My_Assets_Tab;
 import gui.items.assets.My_Balance_Tab;
@@ -350,6 +351,13 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Send Mail"), new Mail_Send_Panel(null,null,null,null));
 			return;
 		}
+		
+		if ( str.equals( Lang.getInstance().translate("Favorite Assets"))    || str.equals("Assets_Favorite_SplitPanel")){
+			ccase1( Lang.getInstance().translate("Favorite Assets"), new Assets_Favorite_SplitPanel());
+			return;
+		}
+		
+		
 		if ( str.equals( Lang.getInstance().translate("My Assets"))    || str.equals("My_Assets_Tab")){
 			ccase1( Lang.getInstance().translate("My Assets"), new My_Assets_Tab());
 			return;

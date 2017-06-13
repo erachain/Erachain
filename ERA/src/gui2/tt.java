@@ -93,6 +93,7 @@ public tt() {
    mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Outcoming Mails")));
    mails_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Mail")));
    
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Assets")));
    assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Assets")));
    assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Assets")));
    assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Asset")));
