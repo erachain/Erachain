@@ -214,7 +214,7 @@ import utils.TableMenuPopupUtil;
 						{
 							Point p = e.getPoint();
 							int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+				//			jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 							
 							
 							if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
