@@ -50,6 +50,8 @@ import javax.swing.event.DocumentEvent;
 	import controller.Controller;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
+import core.transaction.Transaction;
+import database.DBSet;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 	import gui.Split_Panel;
@@ -63,7 +65,8 @@ import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Right;
 	import gui.models.WalletItemAssetsTableModel;
 	import gui.models.WalletItemPersonsTableModel;
-	import lang.Lang;
+import gui.records.VouchRecordDialog;
+import lang.Lang;
 import utils.TableMenuPopupUtil;
 
 
@@ -236,78 +239,177 @@ import utils.TableMenuPopupUtil;
 				
 				JPopupMenu menu = new JPopupMenu();
 
-				JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("&&"));
+				
+				
+				JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
 				favorite.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						
-						favorite_set( jTable_jScrollPanel_LeftPanel);
+						favorite_set( search_Table);
 						
 					}
 				});
+				
+				
+				JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
+				sell.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int row = search_Table.getSelectedRow();
+						row = search_Table.convertRowIndexToModel(row);
+
+						AssetCls asset = search_Table_Model.getAsset(row);
+					//	new AssetPairSelect(asset.getKey(), "To sell",  "");
+						new ExchangeFrame(asset,null,  "To sell", "");	
+					}
+				});
+				
+				
+				
+				
+				
+				
+				menu.addPopupMenuListener(new PopupMenuListener(){
+
+					@Override
+					public void popupMenuCanceled(PopupMenuEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+						// TODO Auto-generated method stub
+						
+						int row = search_Table.getSelectedRow();
+						row = search_Table.convertRowIndexToModel(row);
+						AssetCls asset = search_Table_Model.getAsset(row);
+						
+						//IF ASSET CONFIRMED AND NOT ERM
+						if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
+						{
+							favorite.setVisible(true);
+							//CHECK IF FAVORITES
+							if(Controller.getInstance().isItemFavorite(asset))
+							{
+								favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+							}
+							else
+							{
+								favorite.setText(Lang.getInstance().translate("Add Favorite"));
+							}
+							/*	
+							//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
+							this.favoritesButton.addActionListener(new ActionListener()
+							{
+								public void actionPerformed(ActionEvent e)
+								{
+									onFavoriteClick();
+								}
+							});	
+							this.add(this.favoritesButton, labelGBC);
+							*/
+						} else {
+							
+							favorite.setVisible(false);
+						}
+					//	sell.setVisible(false);
+					//	boolean a = Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress());
+					//	if (Controller.getInstance().isAddressIsMine(asset.getCreator().getAddress())) 
+					//	{
+					//		sell.setVisible(true);
+					//	}
+						
+				
+					
+					
+					
+					
+					}
+					
+				}
+				
+				);
+				
+				
+				
+				
+
+				
+				
+				
+				
+				
+				JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
+				excahge.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int row = search_Table.getSelectedRow();
+						row = search_Table.convertRowIndexToModel(row);
+
+						AssetCls asset = search_Table_Model.getAsset(row);
+					//	new AssetPairSelect(asset.getKey(), "","");
+						new ExchangeFrame(asset,null,  "", "");	
+					}
+				});
+				
+				
+				
+				JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
+				buy.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int row = search_Table.getSelectedRow();
+						row = search_Table.convertRowIndexToModel(row);
+
+						AssetCls asset = search_Table_Model.getAsset(row);
+					//	new AssetPairSelect(asset.getKey(), "Buy","");
+						new ExchangeFrame(asset,null, "Buy", "");	
+					}
+				});
+				
+					
+				JMenuItem vouch_menu= new JMenuItem(Lang.getInstance().translate("Vouch"));
+				vouch_menu.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						
+						int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+						row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+						AssetCls asset = search_Table_Model.getAsset(row);
+						
+						DBSet db = DBSet.getInstance();
+						Transaction trans = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
+											.get(asset.getReference()));
+					
+						new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
+						
+					}
+				});
+				
+				
+
+				
+				menu.add(excahge);
+				menu.addSeparator();
+				menu.add(buy);
+				
+				menu.add(sell);
+				menu.addSeparator();
+				
+				menu.add(favorite);
+				
+				menu.addSeparator();
+				
+				menu.add(vouch_menu);
+				
+				
+				
+				
 			
-		    	    	
-		    	    	
-		    	    	
-		    	    	menu.addPopupMenuListener(new PopupMenuListener(){
 
-		    	    		@Override
-		    	    		public void popupMenuCanceled(PopupMenuEvent arg0) {
-		    	    			// TODO Auto-generated method stub
-		    	    			
-		    	    		}
-
-		    	    		@Override
-		    	    		public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-		    	    			// TODO Auto-generated method stub
-		    	    			
-		    	    		}
-
-		    	    		@Override
-		    	    		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-		    	    			// TODO Auto-generated method stub
-		    	    			
-		    	    			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-		    	    			row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-		    	    			 AssetCls person = search_Table_Model.getAsset(row);
-		    	    			
-		    	    			//IF ASSET CONFIRMED AND NOT ERM
-		    	    			
-		    	    				favorite.setVisible(true);
-		    	    				//CHECK IF FAVORITES
-		    	    				if(Controller.getInstance().isItemFavorite(person))
-		    	    				{
-		    	    					favorite.setText(Lang.getInstance().translate("Remove Favorite"));
-		    	    				}
-		    	    				else
-		    	    				{
-		    	    					favorite.setText(Lang.getInstance().translate("Add Favorite"));
-		    	    				}
-		    	    				/*	
-		    	    				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
-		    	    				this.favoritesButton.addActionListener(new ActionListener()
-		    	    				{
-		    	    					public void actionPerformed(ActionEvent e)
-		    	    					{
-		    	    						onFavoriteClick();
-		    	    					}
-		    	    				});	
-		    	    				this.add(this.favoritesButton, labelGBC);
-		    	    				*/
-		    	    			
-		    	    		
-		    	    		
-		    	    		
-		    	    		
-		    	    		}
-		    	    		
-		    	    	}
-		    	    	
-		    	    	);
-		    	    	
-		    	    	
-		    	    	menu.add(favorite);
-		    	    	
-		    	    	
 		    	    	
 		    	    	
 		    	    	
