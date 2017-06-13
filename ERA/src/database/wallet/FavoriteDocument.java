@@ -29,13 +29,13 @@ import database.serializer.TransactionSerializer;
 // тут надо запминать каким пирам мы уже разослали транзакцию неподтвержденную
 // так что бы при подключении делать автоматически broadcast
 
-public class FavoriteDocument1 extends DBMap<Tuple2<String, String>, Transaction> implements Observer {
+public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction> implements Observer {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
 	static Logger LOGGER = Logger.getLogger(TransactionMap.class.getName());
 
-	public FavoriteDocument1(WalletDatabase walletDatabase, DB database) {
+	public FavoriteDocument(WalletDatabase walletDatabase, DB database) {
 		super(walletDatabase, database);
 		
 		
@@ -46,7 +46,7 @@ public class FavoriteDocument1 extends DBMap<Tuple2<String, String>, Transaction
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE);
 	}   
 
-	public FavoriteDocument1(TransactionMap parent) { 
+	public FavoriteDocument(TransactionMap parent) { 
 		super(parent, null);
 	}
 
