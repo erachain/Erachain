@@ -25,13 +25,28 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public class AboutFrame extends JDialog{
 
+	private static AboutFrame instance;
 	private AboutPanel aboutPanel;
+	protected  boolean user_close = true;
 	
-	public AboutFrame() 
+	public static AboutFrame getInstance(){
+		
+		if(instance == null)
+		{
+			instance = new AboutFrame();
+		}
+		
+		return instance;
+		
+		
+	}
+	
+	private AboutFrame() 
 	{
 		//CREATE FRAME
 		setTitle(Lang.getInstance().translate("ARONICLE.com")+ " - " + Lang.getInstance().translate("Debug"));
-		setModal(true);
+		setModal(false);
+		setAlwaysOnTop(true);
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -48,15 +63,19 @@ public class AboutFrame extends JDialog{
         this.aboutPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+            	if (user_close ){
             	setVisible(false);
                 dispose();
+            	}
             }
         });
         
         this.addKeyListener(new KeyAdapter() {
 		    public void keyPressed(KeyEvent e) {
+		    	if (user_close){
 		    	setVisible(false);
                 dispose();
+		    	}
 		    }
 		});
         
@@ -109,4 +128,8 @@ public class AboutFrame extends JDialog{
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 	}	
+	public void setUserClose(boolean uc){
+		user_close = uc;
+		
+	}
 }

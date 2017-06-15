@@ -1,3 +1,4 @@
+import gui.AboutFrame;
 import gui.Gui;
 import gui.create.License_JFrame;
 import gui.library.Issue_Confirm_Dialog;
@@ -27,11 +28,13 @@ import utils.SysTray;
 
 public class Start {
 	
+	
 	static Logger LOGGER = Logger.getLogger(Start.class.getName());
 
 	public static void main(String args[]) throws IOException
 	{	
-		
+		 AboutFrame.getInstance();
+		 AboutFrame.getInstance().setUserClose(false);
 		////
 		File log4j = new File("log4j.properties");
 		if(log4j.exists())
@@ -117,10 +120,12 @@ public class Start {
 						Thread.sleep(100);
 
 					//START GUI
+						
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					
 							SysTray.getInstance().createTrayIcon();
-
+							 AboutFrame.getInstance().setVisible(false);
+							 AboutFrame.getInstance().dispose();
 							//Controller.getInstance().setWalletLicense(0); // TEST
 							if (Controller.getInstance().doesWalletExists() &&
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
@@ -136,6 +141,8 @@ public class Start {
 							}
 						}
 					} catch(Exception e1) {
+						 AboutFrame.getInstance().setVisible(false);
+						 AboutFrame.getInstance().dispose();
 						LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
 					}
 				}
@@ -171,8 +178,9 @@ public class Start {
 				}
 				
 				
-				
-				//FORCE SHUTDOWN
+				 AboutFrame.getInstance().setVisible(false);
+				 AboutFrame.getInstance().dispose();
+				 //FORCE SHUTDOWN
 				System.exit(0);
 			}
 		}
@@ -189,6 +197,9 @@ public class Start {
 				
 				if(command.equals("quit"))
 				{
+
+					 AboutFrame.getInstance().setVisible(false);
+					 AboutFrame.getInstance().dispose();
 					scanner.close();
 					System.exit(0);
 				}

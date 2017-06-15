@@ -190,7 +190,9 @@ public class Menu_Files extends JMenu {
         {
         	public void actionPerformed(ActionEvent e)
         	{
-                new AboutFrame();
+        		
+        		AboutFrame.getInstance().setVisible(true);;
+        		AboutFrame.getInstance().setUserClose(true);
         	}
         });
         add(aboutItem);

@@ -196,7 +196,7 @@ public class Menu_Popup_File_button extends JButton{
 		        {
 		        	public void actionPerformed(ActionEvent e)
 		        	{
-		                new AboutFrame();
+		                AboutFrame.getInstance();
 		        	}
 		        });
 		        fileMenu.add(aboutItem);
