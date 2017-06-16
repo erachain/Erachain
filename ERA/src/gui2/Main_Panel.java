@@ -28,6 +28,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import core.BlockChain;
+import gui.MainFrame;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.assets.Assets_Favorite_SplitPanel;
@@ -80,12 +81,24 @@ import lang.Lang;
  */
 public class Main_Panel extends javax.swing.JPanel {
 
+	private static Main_Panel instance;
 	private MainLeftPanel mlp;
 
 	/**
 	 * Creates new form split_1
 	 */
-	public Main_Panel() {
+	
+	public static Main_Panel getInstance(){
+		if(instance == null)
+		{
+			instance = new Main_Panel();
+		}
+		
+		return instance;
+		
+	}
+	
+	private Main_Panel() {
 		initComponents();
 		jSplitPane1.M_setDividerSize(20);
 	}
@@ -427,7 +440,7 @@ public class Main_Panel extends javax.swing.JPanel {
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("My Records"))    || str.equals("Records_My_SplitPanel")){
-			ccase1( Lang.getInstance().translate("My Records"), new Records_My_SplitPanel());
+			ccase1( Lang.getInstance().translate("My Records"), Records_My_SplitPanel.getInstance());
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Search Records"))   || str.equals("Records_Search_SplitPanel")){

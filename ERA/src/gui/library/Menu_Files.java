@@ -1,5 +1,7 @@
 package gui.library;
 
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
@@ -10,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.imageio.ImageIO;
@@ -190,9 +194,21 @@ public class Menu_Files extends JMenu {
         {
         	public void actionPerformed(ActionEvent e)
         	{
-        		
-        		AboutFrame.getInstance().setVisible(true);;
+        		AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
         		AboutFrame.getInstance().setUserClose(true);
+        		AboutFrame.getInstance().setModal(true);
+        		AboutFrame.getInstance().setVisible(true);
+        		try {
+					Desktop.getDesktop().browse(new URI("https://aronicle.ru/"));
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+        		
+        		
         	}
         });
         add(aboutItem);

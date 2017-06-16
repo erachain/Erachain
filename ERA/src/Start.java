@@ -33,7 +33,7 @@ public class Start {
 
 	public static void main(String args[]) throws IOException
 	{	
-		 AboutFrame.getInstance();
+		
 		 AboutFrame.getInstance().setUserClose(false);
 		////
 		File log4j = new File("log4j.properties");

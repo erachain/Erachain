@@ -19,6 +19,7 @@ import org.mapdb.Fun.Tuple2;
 import controller.Controller;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.MainFrame;
 import gui.Split_Panel;
 import gui.items.mails.Mail_Info;
 import gui.library.Voush_Library_Panel;
@@ -29,6 +30,8 @@ import utils.TableMenuPopupUtil;
 public class Records_My_SplitPanel extends Split_Panel {
 
 	private static final long serialVersionUID = 2717571093561259483L;
+
+	private static Records_My_SplitPanel instance;
 
 	JScrollPane jScrollPane4;
 
@@ -47,7 +50,20 @@ public class Records_My_SplitPanel extends Split_Panel {
 
 	private JMenuItem item_Rebroadcast;
 
-	public Records_My_SplitPanel() {
+	
+	public static Records_My_SplitPanel getInstance(){
+		
+		if(instance == null)
+		{
+			instance = new Records_My_SplitPanel();
+		}
+		
+		return instance;
+		
+		
+	}
+	
+	private Records_My_SplitPanel() {
 		super("Records_My_SplitPanel");
 		this.leftPanel.setVisible(false);
 		my_Records_Panel = new All_Records_Panel();

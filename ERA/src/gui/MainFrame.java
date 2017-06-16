@@ -100,7 +100,7 @@ public void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		jTabbedPane1 = new javax.swing.JTabbedPane();
-		mainPanel = new Main_Panel();
+		mainPanel = Main_Panel.getInstance();
 		//statusPanel = new StatusPanel();
 		jMenuBar1 = new javax.swing.JMenuBar();
 		jMenu1 = new Menu_Files();
