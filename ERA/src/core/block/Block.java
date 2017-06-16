@@ -1248,6 +1248,9 @@ public class Block {
 
 		//UPDATE GENERATOR BALANCE WITH FEE
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).add(blockFee), dbSet);
+		if (Controller.getInstance().isOnStopping())
+			return;
+		
 		this.creator.changeBalance(dbSet, false, Transaction.FEE_KEY, blockFee);
 
 		//ADD TO DB
