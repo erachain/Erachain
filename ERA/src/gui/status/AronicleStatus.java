@@ -15,7 +15,7 @@ public class AronicleStatus extends JLabel {
 
 	
 	public AronicleStatus(){
-	super("<HTML><a href =''> Aronicle.ru </a> |");
+	super("<HTML><a href =''> Aronicle.ru </a>&nbsp;|");
 	this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	
 	this.addMouseListener(new MouseListener(){

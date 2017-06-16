@@ -2,6 +2,7 @@ package gui.items.persons;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Observable;
@@ -38,6 +39,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	private ItemPersonMap db;
 	private List<PersonCls> list;
 	private String filter_Name = "";
+	private long key_filter =0;
 
 	public TableModelPersons() {
 		db = DBSet.getInstance().getItemPersonMap();
@@ -151,7 +153,11 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	@SuppressWarnings("unchecked")
 	public synchronized void syncUpdate(Observable o, Object arg) {
 		ObserverMessage message = (ObserverMessage) arg;
-
+		if (key_filter >0){
+			
+		return;	
+		}
+		
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
 			if (this.list == null && !filter_Name.equals("")) {
@@ -196,5 +202,19 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 
 		// Controller.getInstance().deleteObserver(this);
 		DBSet.getInstance().getItemPersonMap().deleteObserver(this);
+	}
+
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		if (text.equals("") || text == null) return;
+		if (!text.matches("[0-9]*"))return;
+			key_filter = new Long(text);
+			list =new ArrayList<PersonCls>();
+			PersonCls pers = Controller.getInstance().getPerson(key_filter);
+			if ( pers == null) return;
+			list.add(pers);
+			this.fireTableDataChanged();
+		
+		
 	}
 }

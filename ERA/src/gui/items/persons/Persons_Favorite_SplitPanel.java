@@ -58,7 +58,7 @@ import gui.items.assets.IssueAssetPanel;
 	import gui.items.assets.TableModelItemAssets;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.items.persons.Persons_Search_SplitPanel.search_listener;
-import gui.items.persons.Persons_Search_SplitPanel.search_tab_filter;
+
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 	import gui.models.Renderer_Left;
