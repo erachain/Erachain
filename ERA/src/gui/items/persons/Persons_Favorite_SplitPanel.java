@@ -1,39 +1,18 @@
 	package gui.items.persons;
 
-	import java.awt.Color;
 	import java.awt.Component;
 	import java.awt.Cursor;
 	import java.awt.Dimension;
-	import java.awt.GridLayout;
 	import java.awt.Point;
-	import java.awt.Rectangle;
 	import java.awt.event.ActionEvent;
 	import java.awt.event.ActionListener;
-	import java.awt.event.FocusEvent;
-	import java.awt.event.FocusListener;
 	import java.awt.event.MouseAdapter;
 	import java.awt.event.MouseEvent;
-	import java.awt.event.MouseListener;
 	import java.awt.event.MouseMotionListener;
-	import java.awt.event.WindowEvent;
-	import java.awt.event.WindowFocusListener;
-	import java.awt.image.ColorModel;
-	import javax.swing.Timer;
-	import java.awt.*;
-
-import javax.swing.AbstractButton;
-import javax.swing.DefaultRowSorter;
-	import javax.swing.JButton;
 	import javax.swing.JDialog;
-	import javax.swing.JFrame;
-	import javax.swing.JInternalFrame;
 	import javax.swing.JMenuItem;
-	import javax.swing.JPanel;
 	import javax.swing.JPopupMenu;
-	import javax.swing.JScrollPane;
 	import javax.swing.JTable;
-	import javax.swing.JTextField;
-	import javax.swing.RowFilter;
 	import javax.swing.RowSorter;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
@@ -48,24 +27,13 @@ import javax.swing.event.DocumentEvent;
 	import javax.swing.table.TableRowSorter;
 
 	import controller.Controller;
-	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import gui.MainFrame;
-import gui.Main_Internal_Frame;
-	import gui.Split_Panel;
+import gui.Split_Panel;
 import gui.items.accounts.Account_Send_Dialog;
-import gui.items.assets.IssueAssetPanel;
-	import gui.items.assets.TableModelItemAssets;
 import gui.items.mails.Mail_Send_Dialog;
-import gui.items.persons.Persons_Search_SplitPanel.search_listener;
-
 import gui.library.MTable;
-import gui.models.Renderer_Boolean;
-	import gui.models.Renderer_Left;
-	import gui.models.Renderer_Right;
-	import gui.models.WalletItemAssetsTableModel;
-	import gui.models.WalletItemPersonsTableModel;
-	import lang.Lang;
+import lang.Lang;
 import utils.TableMenuPopupUtil;
 
 
@@ -74,7 +42,7 @@ import utils.TableMenuPopupUtil;
 
 		
 		private Persons_Favorite_TableModel search_Table_Model;
-		private MTable search_Table;
+		private MTable<?, ?> search_Table;
 	
 		private RowSorter<Persons_Favorite_TableModel> search_Sorter;
 		
@@ -222,8 +190,7 @@ import utils.TableMenuPopupUtil;
 								
 								if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == Persons_Favorite_TableModel.COLUMN_FAVORITE){
 									row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-									 PersonCls asset = search_Table_Model.getItem(row);
-									favorite_set( jTable_jScrollPanel_LeftPanel);	
+									 favorite_set( jTable_jScrollPanel_LeftPanel);	
 									
 									
 									
@@ -259,7 +226,7 @@ import utils.TableMenuPopupUtil;
 		    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 		    	    		
 		    				PersonCls person = search_Table_Model.getItem(row);
-		    	  			Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
+		    	  			new Account_Send_Dialog(null,null,null, person);				
 		    				}});
 		    	    	
 		    	    	menu.add(vsend_Coins_Item);
@@ -273,7 +240,7 @@ import utils.TableMenuPopupUtil;
 		    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 		    	    		
 		    				PersonCls person = search_Table_Model.getItem(row);
-		    	  				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
+		    	  				 new Mail_Send_Dialog(null,null,null, person);
 		    				}});
 		    	    	
 		    	    	menu.add(send_Mail_Item);

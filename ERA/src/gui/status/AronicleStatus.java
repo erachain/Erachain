@@ -15,7 +15,7 @@ public class AronicleStatus extends JLabel {
 
 	
 	public AronicleStatus(){
-	super("<HTML><a href =''> Aronicle.ru </a>&nbsp;|");
+	super("<HTML><a href =''> Erachain.org </a>&nbsp;|");
 	this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	
 	this.addMouseListener(new MouseListener(){
@@ -51,7 +51,7 @@ public class AronicleStatus extends JLabel {
 			 Desktop d=Desktop.getDesktop();
 
 	          try {
-				d.browse(new URI("https://aronicle.ru/"));
+				d.browse(new URI("http://Erachain.org/"));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
