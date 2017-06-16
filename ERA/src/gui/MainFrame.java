@@ -290,10 +290,17 @@ public void initComponents() {
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Height")) h = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Width")) w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
 			
+			
+			setLocation(x, y);
+			setSize(w, h);
+			
+			
+			
 			if(main_Frame_settingsJSON.containsKey("Main_Frame_is_Max")){
 				Boolean bb = new Boolean((String)main_Frame_settingsJSON.get("Main_Frame_is_Max"));
-				if (bb)this.setExtendedState(MAXIMIZED_BOTH);
-				
+				if (bb){
+					this.setExtendedState(MAXIMIZED_BOTH);
+				}
 			}
 			
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Orientation")) orientation = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Orientation"));
@@ -329,9 +336,7 @@ public void initComponents() {
 	//		mainPanel.jSplitPane1.setLastDividerLocation(300);
 
 	//	}
-		
-		setLocation(x, y);
-		setSize(w, h);
+	
 		mainPanel.jSplitPane1.setOrientation(orientation);
 		mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
 		mainPanel.jSplitPane1.setDividerLocation(devLoc);
