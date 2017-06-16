@@ -93,12 +93,14 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 			if (!s.isConfirmed(DBSet.getInstance())) k++;
 			
 		}
-		setText("| "+Lang.getInstance().translate("Unconfirmed Records") + ": " + k +" |");
+		
 		if (k > 0){
 			this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			setText("<HTML>| <A href = ' '>"+Lang.getInstance().translate("Unconfirmed Records") + ": " + k +"</a> |");
 			return;
 		}
 		this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+		setText("| "+Lang.getInstance().translate("Unconfirmed Records") + ": " + k +" |");
 		
 		}	
 		
