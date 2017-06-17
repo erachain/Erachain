@@ -27,7 +27,7 @@ public class AboutFrame extends JDialog{
 
 	private static AboutFrame instance;
 	private AboutPanel aboutPanel;
-	protected  boolean user_close = true;
+	protected boolean user_close = true;
 	
 	public static AboutFrame getInstance(){
 		
@@ -45,8 +45,10 @@ public class AboutFrame extends JDialog{
 	{
 		//CREATE FRAME
 		setTitle(Lang.getInstance().translate("ARONICLE.com")+ " - " + Lang.getInstance().translate("Debug"));
-		setModal(false);
-		setAlwaysOnTop(true);
+		//setModalityType(DEFAULT_MODALITY_TYPE);
+		setModalityType(ModalityType.MODELESS);
+
+		setAlwaysOnTop(false);
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
