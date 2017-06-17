@@ -23,6 +23,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.mapdb.Fun.Tuple2;
 
+import com.github.rjeschke.txtmark.Processor;
+
 import de.muntjak.tinylookandfeel.Theme;
 import de.muntjak.tinylookandfeel.ThemeDescription;
 
@@ -300,10 +302,9 @@ public class library {
 	 */
 
 	public static String to_HTML(String str){
-		String out= null;
-		out = str.replaceAll(" ", "&ensp;").replaceAll("\t", "&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;").replaceAll("\n","<br>");
 		
-		return out;
+		return core.exdata.ExData.viewDescriptionHTML(str);
+		
 		}
 	
 }

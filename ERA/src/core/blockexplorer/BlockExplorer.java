@@ -44,6 +44,7 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.exdata.ExData;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
@@ -3584,11 +3585,8 @@ if ( asset_1 == null) {
 	// v 2.1
 					if (jSON.containsKey("MS")) {
 						String mess = (String)jSON.get("MS");
-						if (mess.startsWith("#"))
-							mess = Processor.process(mess);
-						
 						str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj)
-								+ ": </b><br>" + mess + "<br><br>";
+								+ ": </b><br>" + ExData.viewDescriptionHTML(mess) + "<br><br>";
 
 					}
 	// Hashes
@@ -3697,8 +3695,8 @@ if ( asset_1 == null) {
 				
 				
 				
-				//output.put("statement", library.to_HTML(str_HTML));	
-				output.put("statement", str_HTML);	
+				output.put("statement", library.to_HTML(str_HTML));	
+				//output.put("statement", str_HTML);	
 			}
 			
 			
