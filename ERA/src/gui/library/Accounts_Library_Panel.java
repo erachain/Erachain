@@ -33,6 +33,7 @@ public class Accounts_Library_Panel extends JPanel {
 	private JScrollPane jScrollPane_Tab_Accounts;
 	private GridBagConstraints gridBagConstraints;
 	public PersonAccountsModel person_Accounts_Model;
+	private Account selected;
 
 	public Accounts_Library_Panel(PersonCls person) {
 
@@ -41,7 +42,9 @@ public class Accounts_Library_Panel extends JPanel {
 		person_Accounts_Model = new PersonAccountsModel(person.getKey());
 		jTable_Accounts = new MTable(person_Accounts_Model);
 
-		
+		int row = jTable_Accounts.getSelectedRow();
+		row = jTable_Accounts.convertRowIndexToModel(row);
+		selected = person_Accounts_Model.getAccount(row);
 		
 		TableColumn to_Date_Column = jTable_Accounts.getColumnModel().getColumn(PersonAccountsModel.COLUMN_TO_DATE);
 		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
@@ -69,11 +72,9 @@ public class Accounts_Library_Panel extends JPanel {
 		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copyAddress.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int row = jTable_Accounts.getSelectedRow();
-				row = jTable_Accounts.convertRowIndexToModel(row);
 
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(person_Accounts_Model.getAccount_String(row));
+				StringSelection value = new StringSelection(selected.getAddress());
 				clipboard.setContents(value, null);
 			}
 		});
@@ -83,13 +84,8 @@ public class Accounts_Library_Panel extends JPanel {
 		menu_copyPublicKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_Accounts.getSelectedRow();
-				row = jTable_Accounts.convertRowIndexToModel(row);
 
-				byte[] publick_Key = Controller.getInstance()
-						.getPublicKeyByAddress(person_Accounts_Model.getAccount_String(row));
+				byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(selected.getAddress());
 				PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
@@ -105,7 +101,6 @@ public class Accounts_Library_Panel extends JPanel {
 				// StringSelection(person.getCreator().getAddress().toString());
 				int row = jTable_Accounts.getSelectedRow();
 				row = jTable_Accounts.convertRowIndexToModel(row);
-
 	
 				@SuppressWarnings("static-access")
 				StringSelection value = new StringSelection((String) person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_CREATOR_NAME));
@@ -114,9 +109,6 @@ public class Accounts_Library_Panel extends JPanel {
 			}
 		});
 		menu.add(menu_copyName);
-
-		
-		
 		
 		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Account"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
@@ -209,9 +201,7 @@ public class Accounts_Library_Panel extends JPanel {
 	public void delay_on_close(){
 		
 		person_Accounts_Model.removeObservers();
-		
-		
-		
+
 	}
 
 }
