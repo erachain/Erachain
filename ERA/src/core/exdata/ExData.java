@@ -6,6 +6,7 @@ public class ExData {
 
 	
 	public static String viewDescriptionHTML(String descr) {
+		
 		if (descr.startsWith("#"))
 			// MARK DOWN
 			return Processor.process(descr);
@@ -14,6 +15,11 @@ public class ExData {
 			// FORUM CKeditor
 			// TODO CK_editor INSERT
 			return Processor.process(descr);
+
+		if (descr.startsWith("}"))
+			// it is DOCX
+			// TODO DOCX insert
+			return descr;
 
 		if (descr.startsWith(">"))
 			// it is HTML
