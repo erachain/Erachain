@@ -843,8 +843,9 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());		
 			Set<Entry<String, String>> param_keys = this.fill_Template_Panel.get_Params().entrySet();
 
-			if (this.fill_Template_Panel.sel_note !=null){
+			if (this.fill_Template_Panel.sel_note !=null && fill_Template_Panel.add_Tamplate.isSelected()){
 // template params
+				
 			out_Map.put("TM", fill_Template_Panel.sel_note.getKey()+"");
 			
 			for (Entry<String, String> key1:param_keys){

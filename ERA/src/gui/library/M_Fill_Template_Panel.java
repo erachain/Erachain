@@ -1,11 +1,14 @@
 package gui.library;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.Set;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
@@ -21,6 +24,7 @@ import javax.validation.constraints.Null;
 import com.github.rjeschke.txtmark.Processor;
 
 import core.item.notes.NoteCls;
+import gui.MainFrame;
 import gui.items.notes.ComboBoxModelItemsNotes;
 import lang.Lang;
 
@@ -34,6 +38,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	public JComboBox<NoteCls> jComboBox_Template;
 	public NoteCls sel_note;
 	private ComboBoxModelItemsNotes comboBoxModelNotes;
+	public JCheckBox add_Tamplate;
 	
 	
 	
@@ -47,24 +52,24 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 				// TODO Auto-generated method stub
 				String str = null;
 				if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED) return;
-				 if(arg0.getDescription().toString().indexOf('!')==0) {
+				 if(arg0.getDescription().toString().indexOf("!$@!")!=0) {
     //		System.out.print(arg0.getDescription());
-    		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition()); 
-				str =d.tp.getText();
+    //		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition()); 
+	//			str =d.tp.getText();
     		    	}
-    	else{	 str = JOptionPane.showInputDialog(jTextPane_Message_Public.th, Lang.getInstance().translate("Insert") + " "+arg0.getDescription(), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
+    	else{	 str = JOptionPane.showInputDialog(MainFrame.getInstance(), Lang.getInstance().translate("Insert") + " "+arg0.getDescription().replace("!$@!", ""), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
     	
     	}
 				 if (str==null || str.equals("")) return;
-				 jTextPane_Message_Public.pars.replace("{{"+ arg0.getDescription()+"}}", str);
+				 jTextPane_Message_Public.pars.replace("{{"+ arg0.getDescription().replace("!$@!","")+"}}", str);
 				 jTextPane_Message_Public.init_view(jTextPane_Message_Public.text, jTextPane_Message_Public.get_Params());
 				 for ( int i1=0; i1 < params_Template_Model.getRowCount(); i1++){
-					 if (arg0.getDescription().equals(params_Template_Model.getValueAt(i1, 0))) params_Template_Model.setValueAt(str, i1, 1);
+					 if (arg0.getDescription().replace("!$@!", "").equals(params_Template_Model.getValueAt(i1, 0))) params_Template_Model.setValueAt(str, i1, 1);
 					 
     		
     		
     	}
-				 System.out.print("\n"+ jTextPane_Message_Public.getText());	
+				// System.out.print("\n"+ jTextPane_Message_Public.getText());	
 			
 			}
 			
@@ -141,23 +146,48 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 				arg0=arg0;
 				}});
 	        
-	        
-	        
+	        jComboBox_Template.setEnabled(false);
+	        jTextPane_Message_Public.setVisible(false);
+			jTable_Params_Message_Public.setVisible(false);
+	    add_Tamplate = new JCheckBox();    
 	        
 		jLabel1 = new javax.swing.JLabel();
 
 		setLayout(new java.awt.GridBagLayout());
+		
+		add_Tamplate.setText(Lang.getInstance().translate("Insert Template?"));
+		add_Tamplate.addActionListener ( new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				jComboBox_Template.setEnabled(add_Tamplate.isSelected());
+				jTextPane_Message_Public.setVisible(add_Tamplate.isSelected());
+				jTable_Params_Message_Public.setVisible(add_Tamplate.isSelected());
+			}
+			
+		
+		}
+				);
+		
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+		gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
+		add(add_Tamplate, gridBagConstraints);
+		
 		jLabel_Template1.setText(Lang.getInstance().translate("Select Template") + ":");
 		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
 		gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
 		add(jLabel_Template1, gridBagConstraints);
 
 		
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 5;
+		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 		gridBagConstraints.weightx = 0.1;
