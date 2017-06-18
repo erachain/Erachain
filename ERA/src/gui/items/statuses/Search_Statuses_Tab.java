@@ -293,7 +293,7 @@ public void delay_on_close(){
 	// get component from right panel
 	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 	// if Person_Info 002 delay on close
-//	  if (c1 instanceof Status_Info) ( (Status_Info)c1).delay_on_Close();
+	  if (c1 instanceof Status_Info) ( (Status_Info)c1).delay_on_Close();
 	
 }
 

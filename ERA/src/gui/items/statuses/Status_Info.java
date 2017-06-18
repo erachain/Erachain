@@ -61,5 +61,9 @@ public class Status_Info extends MTextPane {
 		
 		return;
 	}	
+	public void delay_on_Close(){
+		
+		
+	}
 
 }

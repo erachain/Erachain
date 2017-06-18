@@ -37,7 +37,7 @@ public class My_Statuses_Tab extends Split_Panel {
 	private MTable table;
 	private TableColumn favoriteColumn;
 	private My_Statuses_Tab tSP;
-	private  TableModelItemStatuses tableModelItemStatuses;
+//	private  TableModelItemStatuses tableModelItemStatuses;
 	private Status_Info info1;
 	
 
@@ -222,7 +222,7 @@ public  void favorite_set(JTable assetsTable){
 	int row = assetsTable.getSelectedRow();
 	row = assetsTable.convertRowIndexToModel(row);
 
-	 StatusCls status = tableModelItemStatuses.getStatus(row);
+	 StatusCls status = statusesModel.getItem(row);
 	//new AssetPairSelect(asset.getKey());
 
 	if(status.getKey() >= StatusCls.INITIAL_FAVORITES)
@@ -251,18 +251,18 @@ public  void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
 					String search = search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
 
 				 	RowFilter<Object,Object> fooBarFilter;
-					tableModelItemStatuses.fireTableDataChanged();
+				 	statusesModel.fireTableDataChanged();
 					
 					if (search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected()) {
 						
 						ArrayList<RowFilter<Object, Object>> filters = new ArrayList<RowFilter<Object,Object>>(2);
-						   filters.add(RowFilter.regexFilter(".*" + search + ".*", tableModelItemStatuses.COLUMN_NAME));
-						   filters.add(RowFilter.regexFilter(".*true*",tableModelItemStatuses.COLUMN_FAVORITE));
+						   filters.add(RowFilter.regexFilter(".*" + search + ".*", statusesModel.COLUMN_NAME));
+						   filters.add(RowFilter.regexFilter(".*true*",statusesModel.COLUMN_FAVORITE));
 						    fooBarFilter = RowFilter.andFilter(filters);	
 												
 					} else {
 						
-						fooBarFilter  = RowFilter.regexFilter(".*" + search + ".*", tableModelItemStatuses.COLUMN_NAME);	
+						fooBarFilter  = RowFilter.regexFilter(".*" + search + ".*", statusesModel.COLUMN_NAME);	
 					}
 					
 					
@@ -273,7 +273,7 @@ public  void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
 					   
 					((DefaultRowSorter) sorter).setRowFilter(fooBarFilter);
 					
-					tableModelItemStatuses.fireTableDataChanged();
+					statusesModel.fireTableDataChanged();
 				//	String a = search_Status_SplitPanel.searth_Favorite_JCheckBox_LeftPanel.isSelected().get.getText();
 				//	a = a+ " ";
 				}
@@ -281,11 +281,11 @@ public  void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
 @Override
 public void delay_on_close(){
 	// delete observer left panel
-//	tableModelItemStatuses.removeObservers();
+	statusesModel.removeObservers();
 	// get component from right panel
-//	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
+	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 	// if Person_Info 002 delay on close
-//	  if (c1 instanceof Status_Info) ( (Status_Info)c1).delay_on_Close();
+	  if (c1 instanceof Status_Info) ( (Status_Info)c1).delay_on_Close();
 	
 }
 
