@@ -15,6 +15,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowSorter.SortKey;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
@@ -47,6 +49,7 @@ public class Person_Vouched_Panel extends JPanel {
 	private JScrollPane jScrollPane_Tab_Vouches;
 	private GridBagConstraints gridBagConstraints;
 	Person_Vouch_From_Table_Model model;
+	protected int row;
 
 	public Person_Vouched_Panel(PersonCls person) {
 
@@ -115,7 +118,38 @@ public class Person_Vouched_Panel extends JPanel {
 		
 
 		JPopupMenu menu = new JPopupMenu();
-		
+menu.addAncestorListener(new AncestorListener(){
+
+			
+
+			@Override
+			public void ancestorAdded(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				row = jTable_Vouches.getSelectedRow();
+				if (row < 1 ) {
+				menu.disable();
+			}
+			
+			row = jTable_Vouches.convertRowIndexToModel(row);
+				
+				
+			}
+
+			@Override
+			public void ancestorMoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void ancestorRemoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			
+			
+		});
 		/*
 		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
 		menu_copyName.addActionListener(new ActionListener() {
@@ -141,9 +175,6 @@ public class Person_Vouched_Panel extends JPanel {
 		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int row = jTable_Vouches.getSelectedRow();
-				row = jTable_Vouches.convertRowIndexToModel(row);
-
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				StringSelection value = new StringSelection(model.get_Public_Account(row).getAddress());
 				clipboard.setContents(value, null);
@@ -155,11 +186,6 @@ public class Person_Vouched_Panel extends JPanel {
 		menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_Vouches.getSelectedRow();
-				row = jTable_Vouches.convertRowIndexToModel(row);
-
 				PublicKeyAccount public_Account = model.get_Public_Account(row);
 				StringSelection value = new StringSelection(public_Account.getBase58());
 				clipboard.setContents(value, null);
@@ -173,12 +199,6 @@ public class Person_Vouched_Panel extends JPanel {
 		menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_Vouches.getSelectedRow();
-				row = jTable_Vouches.convertRowIndexToModel(row);
-
-				
 				StringSelection value = new StringSelection(model.get_No_Trancaction(row));
 				clipboard.setContents(value, null);
 			}
@@ -191,9 +211,6 @@ public class Person_Vouched_Panel extends JPanel {
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Person"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				int row = jTable_Vouches.getSelectedRow();
-				row = jTable_Vouches.convertRowIndexToModel(row);
 				Account account =(Account) model.get_Public_Account(row);
 				new Account_Send_Dialog(null, null, account, null);
 
@@ -204,9 +221,6 @@ public class Person_Vouched_Panel extends JPanel {
 		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Person"));
 		Send_Mail_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				int row = jTable_Vouches.getSelectedRow();
-				row = jTable_Vouches.convertRowIndexToModel(row);
 				Account account =(Account) model.get_Public_Account(row);
 
 			new Mail_Send_Dialog(null, null, account, null);
