@@ -16,6 +16,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.table.TableColumn;
 
 import org.mapdb.Fun.Tuple3;
@@ -44,6 +46,7 @@ public class Person_Owner_Panel extends JPanel {
 	private JScrollPane jScrollPane_Tab_My_Persons;
 	private GridBagConstraints gridBagConstraints;
 	TableModelOwnerPersons person_Accounts_Model;
+	protected int row;
 
 	@SuppressWarnings("rawtypes")
 	public  Person_Owner_Panel(PersonCls person) {
@@ -68,16 +71,45 @@ public class Person_Owner_Panel extends JPanel {
 		this.add(jScrollPane_Tab_My_Persons, gridBagConstraints);
 
 		JPopupMenu menu = new JPopupMenu();
+menu.addAncestorListener(new AncestorListener(){
+
+			
+
+			@Override
+			public void ancestorAdded(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				row = jTable_My_Persons.getSelectedRow();
+				if (row < 1 ) {
+				menu.disable();
+			}
+			
+			row = jTable_My_Persons.convertRowIndexToModel(row);
+				
+				
+			}
+
+			@Override
+			public void ancestorMoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void ancestorRemoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			
+			
+		});
+		
+		
 
 		JMenuItem copyKey = new JMenuItem(Lang.getInstance().translate("Copy Key"));
 		copyKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				
-				
 				Object a = person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_KEY).toString();
 				StringSelection value = new StringSelection(person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_KEY).toString());
 				clipboard.setContents(value, null);
@@ -89,12 +121,6 @@ public class Person_Owner_Panel extends JPanel {
 		menu_copyName.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				// StringSelection value = new
-				// StringSelection(person.getCreator().getAddress().toString());
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-
-	
 				@SuppressWarnings("static-access")
 				StringSelection value = new StringSelection((String) person_Accounts_Model.getValueAt(row, person_Accounts_Model.COLUMN_NAME));
 				clipboard.setContents(value, null);
@@ -103,17 +129,10 @@ public class Person_Owner_Panel extends JPanel {
 		});
 		menu.add(menu_copyName);
 
-		
-	
-		
-	
 
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
 				new Account_Send_Dialog(null, null,null, person_Accounts_Model.getPerson(row));
 
 			}
@@ -123,11 +142,6 @@ public class Person_Owner_Panel extends JPanel {
 		JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
 		Send_Mail_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				int row = jTable_My_Persons.getSelectedRow();
-				row = jTable_My_Persons.convertRowIndexToModel(row);
-	//			Account account = person_Accounts_Model.getAccount(row);
-
 				new Mail_Send_Dialog(null, null, null, person_Accounts_Model.getPerson(row));
 
 			}
