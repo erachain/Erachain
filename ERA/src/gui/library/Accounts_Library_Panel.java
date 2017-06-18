@@ -42,9 +42,9 @@ public class Accounts_Library_Panel extends JPanel {
 		person_Accounts_Model = new PersonAccountsModel(person.getKey());
 		jTable_Accounts = new MTable(person_Accounts_Model);
 
-		int row = jTable_Accounts.getSelectedRow();
-		row = jTable_Accounts.convertRowIndexToModel(row);
-		selected = person_Accounts_Model.getAccount(row);
+	//	int row = jTable_Accounts.getSelectedRow();
+	//	row = jTable_Accounts.convertRowIndexToModel(row);
+	//	selected = person_Accounts_Model.getAccount(row);
 		
 		TableColumn to_Date_Column = jTable_Accounts.getColumnModel().getColumn(PersonAccountsModel.COLUMN_TO_DATE);
 		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
