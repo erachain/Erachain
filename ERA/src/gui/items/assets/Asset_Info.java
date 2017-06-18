@@ -67,7 +67,7 @@ private Transaction transaction;
 private Asset_Info th;
 private PublicKeyAccount owner;
 private JLabel image_Label;
-private BalancesTableModel balancesTableModel;
+//private BalancesTableModel balancesTableModel;
 private static String img_Local_URL = "http:\\img";
 BufferedImage image1;
 private int max_Widht;
@@ -268,7 +268,7 @@ private Image Im;
    }
 
    public void  delay_on_Close(){
-   	balancesTableModel.removeObservers();
+  // 	balancesTableModel.removeObservers();
 			
 	}
    // Variables declaration - do not modify                     

@@ -20,6 +20,8 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -53,6 +55,7 @@ public class My_Assets_Tab extends Split_Panel {
 	RowSorter<WalletItemAssetsTableModel> sorter;
 	final MTable table;
 	private My_Assets_Tab th;
+	protected int row;
 
 	public My_Assets_Tab()
 	{
@@ -193,6 +196,40 @@ public class My_Assets_Tab extends Split_Panel {
 	
 	//MENU
 	JPopupMenu assetsMenu = new JPopupMenu();
+	assetsMenu.addAncestorListener(new AncestorListener(){
+
+		
+
+		@Override
+		public void ancestorAdded(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			row = table.getSelectedRow();
+			if (row < 1 ) {
+				assetsMenu.disable();
+		}
+		
+		row = table.convertRowIndexToModel(row);
+			
+			
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+		
+	});
+	
+	
 	
 	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
 	favorite.addActionListener(new ActionListener() {
@@ -206,26 +243,19 @@ public class My_Assets_Tab extends Split_Panel {
 	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 	sell.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			if (row >=0 ) {
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = assetsModel.getAsset(row);
 		//	String account = assetsModel..getAccount(row);
 		//	AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
 			new ExchangeFrame(asset,null, "To sell", "");
 			}
 			
-		}
+		
 	});
 	
 	
 	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
 	excahge.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = assetsModel.getAsset(row);
 		//	new AssetPairSelect(asset.getKey(), "","");
 			new ExchangeFrame(asset,null, "", "");
@@ -237,9 +267,6 @@ public class My_Assets_Tab extends Split_Panel {
 	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
 	buy.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = assetsModel.getAsset(row);
 		//	new AssetPairSelect(asset.getKey(), "Buy","");
 			new ExchangeFrame(asset,null,  "Buy", "");	
@@ -323,9 +350,6 @@ public class My_Assets_Tab extends Split_Panel {
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = assetsModel.getAsset(row);
 //			new AssetFrame(asset);
 		}
@@ -334,9 +358,6 @@ public class My_Assets_Tab extends Split_Panel {
 	JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
 	dividend.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = assetsModel.getAsset(row);	
 			new PayDividendFrame(asset);
 		}
@@ -362,7 +383,7 @@ public class My_Assets_Tab extends Split_Panel {
 		public void mousePressed(MouseEvent e) 
 		{
 			Point p = e.getPoint();
-			int row = table.rowAtPoint(p);
+			row = table.rowAtPoint(p);
 			table.setRowSelectionInterval(row, row);
 			
 			if(e.getClickCount() == 2)
@@ -412,9 +433,6 @@ public void onMyOrdersClick()
 
 public void favorite_set(JTable assetsTable){
 
-
-int row = assetsTable.getSelectedRow();
-row = assetsTable.convertRowIndexToModel(row);
 
 AssetCls asset = assetsModel.getAsset(row);
 //new AssetPairSelect(asset.getKey());

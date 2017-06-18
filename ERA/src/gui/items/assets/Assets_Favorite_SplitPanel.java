@@ -82,6 +82,9 @@ import utils.TableMenuPopupUtil;
 	// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
+
+
+		protected int row;
 		
 		
 	public Assets_Favorite_SplitPanel(){
@@ -214,7 +217,7 @@ import utils.TableMenuPopupUtil;
 						public void mousePressed(MouseEvent e) 
 						{
 							Point p = e.getPoint();
-							int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+							row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
 							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 							
 							
@@ -224,7 +227,8 @@ import utils.TableMenuPopupUtil;
 								if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == TableModelItemAssetsFavorute.COLUMN_FAVORITE){
 									row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 									 AssetCls asset = search_Table_Model.getAsset(row);
-									favorite_set( jTable_jScrollPanel_LeftPanel);	
+									//favorite_set( jTable_jScrollPanel_LeftPanel)	
+									favorite_set( search_Table);
 									
 									
 									
@@ -238,7 +242,40 @@ import utils.TableMenuPopupUtil;
 				
 				
 				JPopupMenu menu = new JPopupMenu();
+				menu.addAncestorListener(new AncestorListener(){
 
+					
+
+					@Override
+					public void ancestorAdded(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						row = search_Table.getSelectedRow();
+						if (row < 1 ) {
+						menu.disable();
+					}
+					
+					row = search_Table.convertRowIndexToModel(row);
+						
+						
+					}
+
+					@Override
+					public void ancestorMoved(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void ancestorRemoved(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					
+					
+				});
+				
+				
 				
 				
 				JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
@@ -254,9 +291,6 @@ import utils.TableMenuPopupUtil;
 				JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 				sell.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						int row = search_Table.getSelectedRow();
-						row = search_Table.convertRowIndexToModel(row);
-
 						AssetCls asset = search_Table_Model.getAsset(row);
 					//	new AssetPairSelect(asset.getKey(), "To sell",  "");
 						new ExchangeFrame(asset,null,  "To sell", "");	
@@ -286,7 +320,7 @@ import utils.TableMenuPopupUtil;
 					public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 						// TODO Auto-generated method stub
 						
-						int row = search_Table.getSelectedRow();
+						row = search_Table.getSelectedRow();
 						row = search_Table.convertRowIndexToModel(row);
 						AssetCls asset = search_Table_Model.getAsset(row);
 						
@@ -348,9 +382,6 @@ import utils.TableMenuPopupUtil;
 				JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
 				excahge.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						int row = search_Table.getSelectedRow();
-						row = search_Table.convertRowIndexToModel(row);
-
 						AssetCls asset = search_Table_Model.getAsset(row);
 					//	new AssetPairSelect(asset.getKey(), "","");
 						new ExchangeFrame(asset,null,  "", "");	
@@ -362,9 +393,6 @@ import utils.TableMenuPopupUtil;
 				JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
 				buy.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						int row = search_Table.getSelectedRow();
-						row = search_Table.convertRowIndexToModel(row);
-
 						AssetCls asset = search_Table_Model.getAsset(row);
 					//	new AssetPairSelect(asset.getKey(), "Buy","");
 						new ExchangeFrame(asset,null, "Buy", "");	
@@ -375,9 +403,6 @@ import utils.TableMenuPopupUtil;
 				JMenuItem vouch_menu= new JMenuItem(Lang.getInstance().translate("Vouch"));
 				vouch_menu.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						
-						int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-						row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 						AssetCls asset = search_Table_Model.getAsset(row);
 						
 						DBSet db = DBSet.getInstance();
@@ -423,9 +448,6 @@ import utils.TableMenuPopupUtil;
 			}
 		// set favorite Search	
 			void favorite_all(JTable personsTable){
-				int row = personsTable.getSelectedRow();
-				row = personsTable.convertRowIndexToModel(row);
-
 				AssetCls asset = search_Table_Model.getAsset(row);
 				//new AssetPairSelect(asset.getKey());
 
@@ -509,10 +531,7 @@ import utils.TableMenuPopupUtil;
 			 public void favorite_set(JTable assetsTable){
 
 
-				 int row = assetsTable.getSelectedRow();
-				 row = assetsTable.convertRowIndexToModel(row);
-
-				  AssetCls asset = search_Table_Model.getAsset(row);
+				 AssetCls asset = search_Table_Model.getAsset(row);
 				 //new AssetPairSelect(asset.getKey());
 				  if(asset.getKey() >= AssetCls.INITIAL_FAVORITES)
 					{

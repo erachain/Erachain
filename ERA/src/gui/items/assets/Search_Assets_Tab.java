@@ -40,6 +40,8 @@ import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -80,6 +82,7 @@ public class Search_Assets_Tab extends Split_Panel {
 	final MTable assetsTable;
 	private Search_Assets_Tab th;
 	Asset_Info info_panel;
+	protected int row;
 	
 	
 	public Search_Assets_Tab(boolean search_and_exchange){
@@ -212,6 +215,39 @@ public class Search_Assets_Tab extends Split_Panel {
 	// MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();
 	
+	nameSalesMenu.addAncestorListener(new AncestorListener(){
+
+		
+
+		@Override
+		public void ancestorAdded(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			row = assetsTable.getSelectedRow();
+			if (row < 1 ) {
+				nameSalesMenu.disable();
+		}
+		
+		row = assetsTable.convertRowIndexToModel(row);
+			
+			
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+		
+	});
+	
 	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
 	favorite.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -225,9 +261,6 @@ public class Search_Assets_Tab extends Split_Panel {
 	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 	sell.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = assetsTable.getSelectedRow();
-			row = assetsTable.convertRowIndexToModel(row);
-
 			AssetCls asset = tableModelItemAssets.getAsset(row);
 		//	new AssetPairSelect(asset.getKey(), "To sell",  "");
 			new ExchangeFrame(asset,null,  "To sell", "");	
@@ -257,7 +290,7 @@ public class Search_Assets_Tab extends Split_Panel {
 		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 			// TODO Auto-generated method stub
 			
-			int row = assetsTable.getSelectedRow();
+			row = assetsTable.getSelectedRow();
 			row = assetsTable.convertRowIndexToModel(row);
 			AssetCls asset = tableModelItemAssets.getAsset(row);
 			
@@ -319,9 +352,6 @@ public class Search_Assets_Tab extends Split_Panel {
 	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
 	excahge.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = assetsTable.getSelectedRow();
-			row = assetsTable.convertRowIndexToModel(row);
-
 			AssetCls asset = tableModelItemAssets.getAsset(row);
 		//	new AssetPairSelect(asset.getKey(), "","");
 			new ExchangeFrame(asset,null,  "", "");	
@@ -333,9 +363,6 @@ public class Search_Assets_Tab extends Split_Panel {
 	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
 	buy.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = assetsTable.getSelectedRow();
-			row = assetsTable.convertRowIndexToModel(row);
-
 			AssetCls asset = tableModelItemAssets.getAsset(row);
 		//	new AssetPairSelect(asset.getKey(), "Buy","");
 			new ExchangeFrame(asset,null, "Buy", "");	
@@ -346,9 +373,6 @@ public class Search_Assets_Tab extends Split_Panel {
 	JMenuItem vouch_menu= new JMenuItem(Lang.getInstance().translate("Vouch"));
 	vouch_menu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			
-			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-			row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 			AssetCls asset = tableModelItemAssets.getAsset(row);
 			
 			DBSet db = DBSet.getInstance();
@@ -386,7 +410,7 @@ public class Search_Assets_Tab extends Split_Panel {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			Point p = e.getPoint();
-			int row = assetsTable.rowAtPoint(p);
+			row = assetsTable.rowAtPoint(p);
 			assetsTable.setRowSelectionInterval(row, row);
 			
 			if(e.getClickCount() == 2 && search_and_exchange)
@@ -440,8 +464,6 @@ public class Search_Assets_Tab extends Split_Panel {
 public void favorite_set(JTable assetsTable){
 
 
-int row = assetsTable.getSelectedRow();
-row = assetsTable.convertRowIndexToModel(row);
 
 AssetCls asset = tableModelItemAssets.getAsset(row);
 //new AssetPairSelect(asset.getKey());

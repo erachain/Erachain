@@ -27,6 +27,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
@@ -55,6 +57,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 	public JButton newAccount_Button;
 	MTable table;
 	private Accounts_Panel th;
+	protected Integer row;
 
 	@SuppressWarnings("unchecked")
 	public Accounts_Panel()
@@ -204,15 +207,44 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
+		menu.addAncestorListener(new AncestorListener(){
+
+			
+
+			@Override
+			public void ancestorAdded(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				row = table.getSelectedRow();
+				if (row < 1 ) {
+				menu.disable();
+			}
+			
+			row = table.convertRowIndexToModel(row);
+				
+				
+			}
+
+			@Override
+			public void ancestorMoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void ancestorRemoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			
+			
+		});
 		
 		JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
 		sendAsset.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
@@ -229,9 +261,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
@@ -250,9 +279,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
@@ -270,9 +296,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
@@ -289,9 +312,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
 				Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
@@ -316,9 +336,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -333,9 +350,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -352,9 +366,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -389,9 +400,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
 				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
 				//		account.getAddress());
@@ -408,9 +416,6 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
 				 String bankKeyAccount = "+" + Base32.encode(tableModel.getPublicKeyAccount(row).getPublicKey());
 				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
 				//		account.getAddress());

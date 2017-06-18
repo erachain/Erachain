@@ -35,6 +35,8 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -79,6 +81,8 @@ public class My_Balance_Tab extends Split_Panel {
 	
 	Balance_from_Adress_TableModel BalancesModel;
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
+
+	protected int row;
 	
 	@SuppressWarnings({ "null", "unchecked", "rawtypes" })
 	public My_Balance_Tab()
@@ -207,22 +211,49 @@ public class My_Balance_Tab extends Split_Panel {
 	//MENU
 	JPopupMenu assetsMenu = new JPopupMenu();
 	
-	
+	assetsMenu.addAncestorListener(new AncestorListener(){
+
+		
+
+		@Override
+		public void ancestorAdded(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			row = table.getSelectedRow();
+			if (row < 1 ) {
+				assetsMenu.disable();
+		}
+		
+		row = table.convertRowIndexToModel(row);
+			
+			
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+		
+	});
 	
 	
 	
 	JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
 	sell.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			if (row >=0 ) {
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = BalancesModel.getAsset(row);
 			String account = BalancesModel.getAccount(row);
 			//AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", account);
 			new ExchangeFrame(asset,null, "To sell", account);
-			}
+			
 			
 		}
 	});
@@ -231,9 +262,6 @@ public class My_Balance_Tab extends Split_Panel {
 	JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
 	excahge.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = BalancesModel.getAsset(row);
 		//	new AssetPairSelect(asset.getKey(), "","");
 			new ExchangeFrame(asset,null, "", "");			
@@ -245,9 +273,6 @@ public class My_Balance_Tab extends Split_Panel {
 	JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
 	buy.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
 			AssetCls asset = BalancesModel.getAsset(row);
 	//		new AssetPairSelect(asset.getKey(), "Buy","");
 			new ExchangeFrame(asset,null,  "Buy", "");	
@@ -282,7 +307,7 @@ public class My_Balance_Tab extends Split_Panel {
 		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 			// TODO Auto-generated method stub
 			
-			int row = table.getSelectedRow();
+			row = table.getSelectedRow();
 			row = table.convertRowIndexToModel(row);
 			 Class<? extends Object> order = BalancesModel.getColumnClass(row);
 			
@@ -330,9 +355,7 @@ public class My_Balance_Tab extends Split_Panel {
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
+			
 	//		AssetCls asset = assetsModel.getAsset(row);
 //			new AssetFrame(asset);
 		}
@@ -341,9 +364,7 @@ public class My_Balance_Tab extends Split_Panel {
 	JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
 	dividend.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
+			
 	//		AssetCls asset = assetsModel.getAsset(row);	
 	//		new PayDividendFrame(asset);
 		}

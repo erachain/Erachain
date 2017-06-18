@@ -21,6 +21,8 @@ import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.PopupMenuEvent;
@@ -47,6 +49,7 @@ public class My_Order_Tab extends Split_Panel {
 	 * 
 	 */
 	WalletOrdersTableModel ordersModel;
+	protected int row;
 	private static final long serialVersionUID = 1L;
 
 	public My_Order_Tab()
@@ -156,6 +159,40 @@ public class My_Order_Tab extends Split_Panel {
 	
 	//MENU
 	JPopupMenu assetsMenu = new JPopupMenu();
+assetsMenu.addAncestorListener(new AncestorListener(){
+
+		
+
+		@Override
+		public void ancestorAdded(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			row = table.getSelectedRow();
+			if (row < 1 ) {
+				assetsMenu.disable();
+		}
+		
+		row = table.convertRowIndexToModel(row);
+			
+			
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+		
+	});
+	
+	
 	
 	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
 	favorite.addActionListener(new ActionListener() {
@@ -184,7 +221,7 @@ public class My_Order_Tab extends Split_Panel {
 		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 			// TODO Auto-generated method stub
 			
-			int row = table.getSelectedRow();
+			row = table.getSelectedRow();
 			row = table.convertRowIndexToModel(row);
 			 Order order = ordersModel.getOrder(row);
 			
@@ -232,9 +269,7 @@ public class My_Order_Tab extends Split_Panel {
 	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
+			
 	//		AssetCls asset = assetsModel.getAsset(row);
 //			new AssetFrame(asset);
 		}
@@ -243,9 +278,7 @@ public class My_Order_Tab extends Split_Panel {
 	JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
 	dividend.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = table.getSelectedRow();
-			row = table.convertRowIndexToModel(row);
-
+			
 	//		AssetCls asset = assetsModel.getAsset(row);	
 	//		new PayDividendFrame(asset);
 		}
@@ -321,8 +354,6 @@ public void onMyOrdersClick()
 public void favorite_set(JTable assetsTable){
 
 
-int row = assetsTable.getSelectedRow();
-row = assetsTable.convertRowIndexToModel(row);
 
 Order order = ordersModel.getOrder(row);
 //new AssetPairSelect(asset.getKey());
