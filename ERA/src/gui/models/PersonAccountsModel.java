@@ -229,7 +229,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		}
 		*/
 		//CHECK IF LIST UPDATED
-		if( message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
+		if( message.getType() == ObserverMessage.ADD_ALL_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE || message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE)
 		{
 			addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 			this.fireTableDataChanged();

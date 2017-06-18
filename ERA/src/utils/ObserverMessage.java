@@ -17,6 +17,11 @@ public class ObserverMessage {
 	public static final int ADD_ACCOUNT_TYPE = 10;
 	public static final int REMOVE_ACCOUNT_TYPE = 11;
 	
+	
+	public static final int LIST_ALL_ACCOUNT_TYPE = 11002;
+	public static final int REMOVE_ALL_ACCOUNT_TYPE = 11001;
+	public static final int ADD_ALL_ACCOUNT_TYPE = 11000;
+	
 	public static final int WALLET_STATUS = 12;
 	public static final int NETWORK_STATUS = 13;
 	

@@ -13,6 +13,7 @@ import org.mapdb.Fun.Tuple3;
 import core.naming.Name;
 //import database.DBSet;
 import database.serializer.NameSerializer;
+import utils.ObserverMessage;
 
 // Person contains an addresses
 public class PersonAddressMap extends DBMap<
@@ -34,6 +35,10 @@ public class PersonAddressMap extends DBMap<
 	public PersonAddressMap(PersonAddressMap parent) 
 	{
 		super(parent, null);
+		
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ALL_ACCOUNT_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
 	}
 	
 	protected void createIndexes(DB database){}
