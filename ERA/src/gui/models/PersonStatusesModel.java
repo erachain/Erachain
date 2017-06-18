@@ -254,11 +254,11 @@ public Account get_Creator_Account(int row){
 		
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE
-				|| message.getType() == ObserverMessage.REMOVE_STATUS_TYPE
-				|| message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
-				|| message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE
-				|| message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
+		if(//message.getType() == ObserverMessage.ADD_STATUS_TYPE
+			//	|| message.getType() == ObserverMessage.REMOVE_STATUS_TYPE ||
+				 message.getType() == ObserverMessage.ADD_PERSON_STATUS_TYPE
+				|| message.getType() == ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
+			//	|| message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
 			statuses= dbSet.getPersonStatusMap().get(itemKey);

@@ -14,6 +14,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.UIManager;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.table.TableColumn;
 
 import controller.Controller;
@@ -39,6 +41,7 @@ private MTable jTable_Statuses;
 private JScrollPane jScrollPane_Tab_Status;
 private GridBagConstraints gridBagConstraints;
 public PersonStatusesModel statusModel;
+protected int row;
 
 public Statuses_Library_Panel(PersonCls person){
 
@@ -81,17 +84,46 @@ public Statuses_Library_Panel(PersonCls person){
 
     
    	JPopupMenu menu = new JPopupMenu();
+   	
+   	menu.addAncestorListener(new AncestorListener(){
+
+		
+
+		@Override
+		public void ancestorAdded(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			row = jTable_Statuses.getSelectedRow();
+			if (row < 1 ) {
+			menu.disable();
+		}
+		
+		row = jTable_Statuses.convertRowIndexToModel(row);
+			
+			
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+		
+	});
+	
+	
 
    	JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
 	menu_copyName.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			// StringSelection value = new
-			// StringSelection(person.getCreator().getAddress().toString());
-			int row = jTable_Statuses.getSelectedRow();
-			row = jTable_Statuses.convertRowIndexToModel(row);
-
-
 			@SuppressWarnings("static-access")
 			StringSelection value = new StringSelection((String) statusModel.getValueAt(row, statusModel.COLUMN_CREATOR_NAME));
 			clipboard.setContents(value, null);
@@ -107,9 +139,6 @@ public Statuses_Library_Panel(PersonCls person){
 	JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Account"));
 	copy_Creator_Address.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-			int row = jTable_Statuses.getSelectedRow();
-			row = jTable_Statuses.convertRowIndexToModel(row);
-
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			StringSelection value = new StringSelection( statusModel.get_Creator_Account(row).getAddress());
 			clipboard.setContents(value, null);
@@ -121,11 +150,6 @@ public Statuses_Library_Panel(PersonCls person){
 	menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			// StringSelection value = new
-			// StringSelection(person.getCreator().getAddress().toString());
-			int row = jTable_Statuses.getSelectedRow();
-			row = jTable_Statuses.convertRowIndexToModel(row);
-
 			byte[] publick_Key = Controller.getInstance()
 					.getPublicKeyByAddress(statusModel.get_Creator_Account(row).getAddress());
 			PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
@@ -141,12 +165,6 @@ public Statuses_Library_Panel(PersonCls person){
 	menu_copy_Block_PublicKey.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-			// StringSelection value = new
-			// StringSelection(person.getCreator().getAddress().toString());
-			int row = jTable_Statuses.getSelectedRow();
-			row = jTable_Statuses.convertRowIndexToModel(row);
-
-			
 			StringSelection value = new StringSelection(statusModel.get_No_Trancaction(row));
 			clipboard.setContents(value, null);
 		}
@@ -159,11 +177,7 @@ public Statuses_Library_Panel(PersonCls person){
 	JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset to Creator"));
 	Send_Coins_item_Menu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-
-			int row = jTable_Statuses.getSelectedRow();
-			row = jTable_Statuses.convertRowIndexToModel(row);
 			Account account = statusModel.get_Creator_Account(row);
-
 			new Account_Send_Dialog(null, null, account, null);
 
 		}
@@ -173,11 +187,7 @@ public Statuses_Library_Panel(PersonCls person){
 	JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail to Creator"));
 	Send_Mail_item_Menu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
-
-			int row = jTable_Statuses.getSelectedRow();
-			row = jTable_Statuses.convertRowIndexToModel(row);
 			Account account = statusModel.get_Creator_Account(row);
-
 		new Mail_Send_Dialog(null, null, account, null);
 
 		}
