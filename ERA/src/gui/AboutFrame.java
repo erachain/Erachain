@@ -17,6 +17,7 @@ import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import controller.Controller;
@@ -28,6 +29,7 @@ public class AboutFrame extends JDialog{
 	private static AboutFrame instance;
 	private AboutPanel aboutPanel;
 	protected boolean user_close = true;
+	private JTextField console_Text;
 	
 	public static AboutFrame getInstance(){
 		
@@ -59,7 +61,7 @@ public class AboutFrame extends JDialog{
 		
 		//DEBUG TABPANE
         this.aboutPanel = new AboutPanel();
-        this.getContentPane().setPreferredSize(new Dimension(802,336));
+        this.getContentPane().setPreferredSize(new Dimension(802,380));
         this.setUndecorated(true);
      
         this.aboutPanel.addMouseListener(new MouseAdapter() {
@@ -85,9 +87,9 @@ public class AboutFrame extends JDialog{
         getContentPane().add(this.aboutPanel);
         GridBagLayout gbl_aboutPanel = new GridBagLayout();
         gbl_aboutPanel.columnWidths = new int[]{483, 181, 70, 0};
-        gbl_aboutPanel.rowHeights = new int[]{252, 0, 0, 0, 0};
+        gbl_aboutPanel.rowHeights = new int[]{252, 0, 0, 0, 0, 0};
         gbl_aboutPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_aboutPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_aboutPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         aboutPanel.setLayout(gbl_aboutPanel);
 
         JLabel lblAuthorsLabel = new JLabel(Lang.getInstance().translate("Author") + ": "
@@ -125,6 +127,21 @@ public class AboutFrame extends JDialog{
         gbc_label.gridy = 3;
         aboutPanel.add(label, gbc_label);
 
+       
+        console_Text = new JTextField();
+        console_Text.setEditable(false);
+        console_Text.setText("");
+      //  console_Text.setSize(100,26);
+        console_Text.setFont(new Font("Tahoma", Font.PLAIN, 13));
+        GridBagConstraints gbc_Console = new GridBagConstraints();
+        gbc_Console.insets = new Insets(5, 5, 5, 5);
+        gbc_Console.gridx = 0;
+        gbc_Console.gridy = 4;
+        gbc_Console.fill = GridBagConstraints.HORIZONTAL;
+        gbc_Console.weightx =1.0;
+        gbc_Console.gridwidth = 3;
+        aboutPanel.add(console_Text, gbc_Console);
+        
         //SHOW FRAME
         this.pack();
         this.setLocationRelativeTo(null);
@@ -132,6 +149,10 @@ public class AboutFrame extends JDialog{
 	}	
 	public void setUserClose(boolean uc){
 		user_close = uc;
+		
+	}
+	public void set_console_Text(String str){
+		console_Text.setText(str);
 		
 	}
 }

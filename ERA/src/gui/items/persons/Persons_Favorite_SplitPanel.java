@@ -49,6 +49,9 @@ import utils.TableMenuPopupUtil;
 	// для прозрачности
 	     int alpha =255;
 	     int alpha_int;
+
+
+		protected int row;
 		
 		
 	public Persons_Favorite_SplitPanel(){
@@ -204,6 +207,38 @@ import utils.TableMenuPopupUtil;
 				
 				
 				JPopupMenu menu = new JPopupMenu();
+				menu.addAncestorListener(new AncestorListener(){
+
+					
+
+					@Override
+					public void ancestorAdded(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						row = search_Table.getSelectedRow();
+						if (row < 1 ) {
+						menu.disable();
+					}
+					
+					row = search_Table.convertRowIndexToModel(row);
+						
+						
+					}
+
+					@Override
+					public void ancestorMoved(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void ancestorRemoved(AncestorEvent arg0) {
+						// TODO Auto-generated method stub
+						
+					}
+					
+					
+					
+				});
 
 				JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("&&"));
 				favorite.addActionListener(new ActionListener() {
@@ -220,12 +255,7 @@ import utils.TableMenuPopupUtil;
 		    	    	vsend_Coins_Item.addActionListener(new ActionListener(){
 		    	  		@Override
 		    	    	public void actionPerformed(ActionEvent e) {
-		    	  			
-		    				
-		    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-		    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-		    	    		
-		    				PersonCls person = search_Table_Model.getItem(row);
+		    	  			PersonCls person = search_Table_Model.getItem(row);
 		    	  			new Account_Send_Dialog(null,null,null, person);				
 		    				}});
 		    	    	
@@ -234,12 +264,7 @@ import utils.TableMenuPopupUtil;
 		    	    	send_Mail_Item.addActionListener(new ActionListener(){
 		    	  		@Override
 		    	    	public void actionPerformed(ActionEvent e) {
-		    	   
-
-		    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-		    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-		    	    		
-		    				PersonCls person = search_Table_Model.getItem(row);
+		    	  			PersonCls person = search_Table_Model.getItem(row);
 		    	  				 new Mail_Send_Dialog(null,null,null, person);
 		    				}});
 		    	    	
@@ -264,7 +289,7 @@ import utils.TableMenuPopupUtil;
 		    	    		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 		    	    			// TODO Auto-generated method stub
 		    	    			
-		    	    			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+		    	    			row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
 		    	    			row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 		    	    			 PersonCls person = search_Table_Model.getItem(row);
 		    	    			
@@ -319,9 +344,6 @@ import utils.TableMenuPopupUtil;
 			}
 		// set favorite Search	
 			void favorite_all(JTable personsTable){
-				int row = personsTable.getSelectedRow();
-				row = personsTable.convertRowIndexToModel(row);
-
 				PersonCls person = search_Table_Model.getItem(row);
 				//new AssetPairSelect(asset.getKey());
 
@@ -403,11 +425,7 @@ import utils.TableMenuPopupUtil;
 			 
 			 public void favorite_set(JTable personsTable){
 
-
-				 int row = personsTable.getSelectedRow();
-				 row = personsTable.convertRowIndexToModel(row);
-
-				  PersonCls person = search_Table_Model.getItem(row);
+				 PersonCls person = search_Table_Model.getItem(row);
 				 //new AssetPairSelect(asset.getKey());
 
 				

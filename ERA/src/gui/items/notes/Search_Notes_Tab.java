@@ -36,6 +36,8 @@ import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -65,6 +67,7 @@ import lang.Lang;
 public class Search_Notes_Tab extends Split_Panel {
 	private TableModelNotes tableModelNotes;
 	final MTable notesTable;
+	protected int row;
 	
 	
 	public Search_Notes_Tab(){
@@ -185,6 +188,38 @@ public class Search_Notes_Tab extends Split_Panel {
 	
 	// MENU
 	JPopupMenu search_notes_menu = new JPopupMenu();
+	search_notes_menu.addAncestorListener(new AncestorListener(){
+
+		
+
+		@Override
+		public void ancestorAdded(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			row = notesTable.getSelectedRow();
+			if (row < 1 ) {
+				search_notes_menu.disable();
+		}
+		
+		row = notesTable.convertRowIndexToModel(row);
+			
+			
+		}
+
+		@Override
+		public void ancestorMoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void ancestorRemoved(AncestorEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		
+		
+	});
 	
 	JMenuItem favorite = new JMenuItem(Lang.getInstance().translate(""));
 	favorite.addActionListener(new ActionListener() {
@@ -214,7 +249,7 @@ public class Search_Notes_Tab extends Split_Panel {
 		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 			// TODO Auto-generated method stub
 			
-			int row = notesTable.getSelectedRow();
+			row = notesTable.getSelectedRow();
 			row = notesTable.convertRowIndexToModel(row);
 			NoteCls note = tableModelNotes.getNote(row);
 			
@@ -242,10 +277,10 @@ public class Search_Notes_Tab extends Split_Panel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			if (notesTable.getSelectedRow() < 0 )	return;
+		
 				
 			
-			 NoteCls note = tableModelNotes.getNote(notesTable.convertRowIndexToModel(notesTable.getSelectedRow()));
+			 NoteCls note = tableModelNotes.getNote(row);
 			if (note == null) return;
 			
 			Transaction trans = DBSet.getInstance().getTransactionFinalMap().get(DBSet.getInstance().getTransactionFinalMapSigns()
@@ -265,7 +300,7 @@ public class Search_Notes_Tab extends Split_Panel {
 		@Override
 		public void mousePressed(MouseEvent e) {
 			Point p = e.getPoint();
-			int row = notesTable.rowAtPoint(p);
+			row = notesTable.rowAtPoint(p);
 			notesTable.setRowSelectionInterval(row, row);
 			
 			if(e.getClickCount() == 2)
@@ -320,9 +355,6 @@ public void removeObservers() {
 
 public void favorite_set(JTable assetsTable){
 
-
-int row = assetsTable.getSelectedRow();
-row = assetsTable.convertRowIndexToModel(row);
 
 NoteCls note = tableModelNotes.getNote(row);
 //new AssetPairSelect(asset.getKey());

@@ -85,6 +85,7 @@ import database.DBSet;
 import database.Item_Map;
 import database.LocalDataMap;
 import database.SortableList;
+import gui.AboutFrame;
 import gui.Gui;
 import gui.library.My_JFileChooser;
 import lang.Lang;
@@ -159,6 +160,9 @@ public class Controller extends Observable {
 
 
 	private JSONObject Setting_Json;
+
+
+	private AboutFrame about_frame;
 
 	public boolean isProcessingWalletSynchronize() {
 		return processingWalletSynchronize;
@@ -338,7 +342,7 @@ public class Controller extends Observable {
 	public void start() throws Exception {
 		
 		this.toOfflineTime = NTP.getTime();
-		
+		about_frame = AboutFrame.getInstance();
 		this.foundMyselfID = new byte[128];
 		this.random.nextBytes(this.foundMyselfID);
 		
@@ -393,6 +397,7 @@ public class Controller extends Observable {
 						FileUtils.copyDirectory(dataBak, dataDir);
 						 
 						LOGGER.error(Lang.getInstance().translate("restoring backup database"));
+						about_frame.set_console_Text(Lang.getInstance().translate("restoring backup database"));
 				}else {
 					dataDir.delete();
 									
@@ -404,6 +409,7 @@ public class Controller extends Observable {
 			}
 			
 			if(js.equals("Restore_DataBak")){
+				about_frame.set_console_Text(Lang.getInstance().translate("restoring backup database"));
 				File dataDir = new File(Settings.getInstance().getDataDir());
 				File dataBak = getDataBakDir(dataDir);
 				if (dataDir.exists()) dataDir.delete();
@@ -415,6 +421,7 @@ public class Controller extends Observable {
 		// OPENING DATABASES
 		try {
 			this.dbSet = DBSet.getInstance();
+			about_frame.set_console_Text(Lang.getInstance().translate("Open database"));
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(),e);
 			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
@@ -431,7 +438,7 @@ public class Controller extends Observable {
 			}
 			reCreateDB();
 		}
-		
+		about_frame.set_console_Text(Lang.getInstance().translate("Database Ok"));
 		createDataCheckpoint();
 		Setting_Json.put("DB_OPEN", "Open OK");
 		// save setting to setting file
@@ -481,17 +488,20 @@ public class Controller extends Observable {
 		
 		// START API SERVICE
 		if (Settings.getInstance().isRpcEnabled()) {
+			about_frame.set_console_Text(Lang.getInstance().translate("Start API Service"));
 			this.rpcService = new ApiService();
 			this.rpcService.start();
 		}
 
 		// START WEB SERVICE
 		if (Settings.getInstance().isWebEnabled()) {
+			about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Servoce"));
 			this.webService = new WebService();
 			this.webService.start();
 		}
 
 		// CREATE WALLET
+		about_frame.set_console_Text(Lang.getInstance().translate("Open Wallet"));
 		this.wallet = new Wallet();
 
 	    if(this.wallet.isWalletDatabaseExisting()){
@@ -791,6 +801,9 @@ public class Controller extends Observable {
 	}
 
 	private boolean isStopping = false;
+
+
+	private String info;
 
 	public boolean isOnStopping() {
 		return this.isStopping;
@@ -1172,9 +1185,12 @@ public class Controller extends Observable {
 
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockWinMessage.getBlock();
-				LOGGER.debug("mess from " + blockWinMessage.getSender().getAddress());
-				LOGGER.debug(" received new WIN Block " + newBlock.toString(dbSet));
-
+				info = "mess from " + blockWinMessage.getSender().getAddress();
+				LOGGER.debug(info);
+				about_frame.set_console_Text(info);
+				info = " received new WIN Block " + newBlock.toString(dbSet);
+				LOGGER.debug(info);
+				about_frame.set_console_Text(info);
 				
 				Block lastBlock = this.blockChain.getLastBlock(dbSet);
 				byte[] lastBlockReference = lastBlock.getReference();
@@ -1608,9 +1624,10 @@ public class Controller extends Observable {
 				if (peerHW != null) {
 					peer = peerHW.c;
 					if (peer != null) {
-						LOGGER.info("update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
-								+ " WH: " + getHWeightOfPeer(peer));
-
+						info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
+								+ " WH: " + getHWeightOfPeer(peer);
+						LOGGER.info(info);
+						about_frame.set_console_Text(info);
 						// SYNCHRONIZE FROM PEER
 						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
 					}

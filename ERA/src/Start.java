@@ -30,11 +30,14 @@ public class Start {
 	
 	
 	static Logger LOGGER = Logger.getLogger(Start.class.getName());
+	private static AboutFrame about_frame;
+	private static String info;
 
 	public static void main(String args[]) throws IOException
 	{	
 		
-		 AboutFrame.getInstance().setUserClose(false);
+		about_frame = AboutFrame.getInstance();
+		about_frame.setUserClose(false);
 		////
 		File log4j = new File("log4j.properties");
 		if(log4j.exists())
@@ -102,11 +105,13 @@ public class Start {
 					throw new Exception(Lang.getInstance().translate("Both gui and rpc cannot be disabled!"));
 				}
 				
-				LOGGER.info(Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
+				info = Lang.getInstance().translate("Starting %app% / version: %version% / build date: %builddate% / ...")
 						.replace("%app%", Lang.getInstance().translate(controller.Controller.APP_NAME))
 						.replace("%version%", Controller.getVersion())
-						.replace("%builddate%", Controller.getBuildDateString())
+						.replace("%builddate%", Controller.getBuildDateString());
+				LOGGER.info(info
 						);
+				about_frame.set_console_Text(info);
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC
 				Controller.getInstance().start();
@@ -124,8 +129,8 @@ public class Start {
 						if(Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled())
 						{					
 							SysTray.getInstance().createTrayIcon();
-							 AboutFrame.getInstance().setVisible(false);
-							 AboutFrame.getInstance().dispose();
+							about_frame.setVisible(false);
+							about_frame.getInstance().dispose();
 							//Controller.getInstance().setWalletLicense(0); // TEST
 							if (Controller.getInstance().doesWalletExists() &&
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
@@ -141,8 +146,8 @@ public class Start {
 							}
 						}
 					} catch(Exception e1) {
-						 AboutFrame.getInstance().setVisible(false);
-						 AboutFrame.getInstance().dispose();
+						about_frame.setVisible(false);
+						about_frame.dispose();
 						LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
 					}
 				}
@@ -178,8 +183,8 @@ public class Start {
 				}
 				
 				
-				 AboutFrame.getInstance().setVisible(false);
-				 AboutFrame.getInstance().dispose();
+				about_frame.setVisible(false);
+				about_frame.dispose();
 				 //FORCE SHUTDOWN
 				System.exit(0);
 			}
@@ -198,8 +203,8 @@ public class Start {
 				if(command.equals("quit"))
 				{
 
-					 AboutFrame.getInstance().setVisible(false);
-					 AboutFrame.getInstance().dispose();
+					about_frame.setVisible(false);
+					about_frame.dispose();
 					scanner.close();
 					System.exit(0);
 				}

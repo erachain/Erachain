@@ -88,6 +88,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
      int alpha_int;
 
 	private JTextField key_Item;
+
+	protected int row;
 	public Persons_Search_SplitPanel(){
 		super("Persons_Search_SplitPanel");
 		setName(Lang.getInstance().translate("Search Persons"));
@@ -245,6 +247,38 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 		
 		
 		JPopupMenu menu = new JPopupMenu();
+		menu.addAncestorListener(new AncestorListener(){
+
+			
+
+			@Override
+			public void ancestorAdded(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				row = search_Table.getSelectedRow();
+				if (row < 1 ) {
+				menu.disable();
+			}
+			
+			row = search_Table.convertRowIndexToModel(row);
+				
+				
+			}
+
+			@Override
+			public void ancestorMoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void ancestorRemoved(AncestorEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			
+			
+		});
 
 		JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("&&"));
 		favorite.addActionListener(new ActionListener() {
@@ -261,12 +295,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	    	vsend_Coins_Item.addActionListener(new ActionListener(){
     	  		@Override
     	    	public void actionPerformed(ActionEvent e) {
-    	  			
-    				
-    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-    	    		
-    				PersonCls person = search_Table_Model.getPerson(row);
+    	  			PersonCls person = search_Table_Model.getPerson(row);
     	  			Account_Send_Dialog fm = new Account_Send_Dialog(null,null,null, person);				
     				}});
     	    	
@@ -275,12 +304,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	    	send_Mail_Item.addActionListener(new ActionListener(){
     	  		@Override
     	    	public void actionPerformed(ActionEvent e) {
-    	   
-
-    	  			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-    				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-    	    		
-    				PersonCls person = search_Table_Model.getPerson(row);
+    	   PersonCls person = search_Table_Model.getPerson(row);
     	  				Mail_Send_Dialog fm = new Mail_Send_Dialog(null,null,null, person);
     				}});
     	    	
@@ -305,7 +329,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
     	    		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
     	    			// TODO Auto-generated method stub
     	    			
-    	    			int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+    	    			row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
     	    			row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
     	    			 PersonCls person = search_Table_Model.getPerson(row);
     	    			
@@ -360,9 +384,6 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	}
 // set favorite Search	
 	void favorite_all(JTable personsTable){
-		int row = personsTable.getSelectedRow();
-		row = personsTable.convertRowIndexToModel(row);
-
 		PersonCls person = search_Table_Model.getPerson(row);
 		//new AssetPairSelect(asset.getKey());
 
