@@ -61,7 +61,7 @@ public class AboutFrame extends JDialog{
 		
 		//DEBUG TABPANE
         this.aboutPanel = new AboutPanel();
-        this.getContentPane().setPreferredSize(new Dimension(802,380));
+        this.getContentPane().setPreferredSize(new Dimension(802,370));
         this.setUndecorated(true);
      
         this.aboutPanel.addMouseListener(new MouseAdapter() {

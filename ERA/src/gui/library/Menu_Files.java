@@ -195,18 +195,11 @@ public class Menu_Files extends JMenu {
         	public void actionPerformed(ActionEvent e)
         	{
         		AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
+        		AboutFrame.getInstance().set_console_Text("");
         		AboutFrame.getInstance().setUserClose(true);
         		AboutFrame.getInstance().setModal(true);
         		AboutFrame.getInstance().setVisible(true);
-        		try {
-					Desktop.getDesktop().browse(new URI("https://aronicle.ru/"));
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+        		
         		
         		
         	}
