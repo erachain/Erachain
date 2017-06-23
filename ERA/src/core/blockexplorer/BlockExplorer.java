@@ -1610,8 +1610,7 @@ if ( asset_1 == null) {
 	private Map jsonQueryPerson(String first) {
 		// TODO Auto-generated method stub
 		Map output=new LinkedHashMap();
-				
-		PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get(new Long(first)-1);
+		PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get(new Long(first));
 		byte[] b = person.getImage();
 		String a = Base64.encodeBase64String(b);
 		
@@ -1785,7 +1784,10 @@ if ( asset_1 == null) {
 		}
 */
 		Map output=new LinkedHashMap();
-				
+		
+		
+
+		
 
 		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
 		
@@ -1884,7 +1886,7 @@ if ( asset_1 == null) {
 		}
 		while(i < k);
 		
-
+		output.put("maxHeight",DBSet.getInstance().getItemPersonMap().getSize());
 		output.put("row", i);
 		output.put("view_Row", view_Row);
 		
