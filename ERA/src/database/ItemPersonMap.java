@@ -53,17 +53,10 @@ public class ItemPersonMap extends Item_Map
 				);
 			}
 
-
 	public ItemPersonMap(Item_Map parent) 
 	{
 		super(parent);
 	}
-
-
-	
-	
-	
-	
 	
 	// type+name not initialized yet! - it call as Super in New
 	@SuppressWarnings("unchecked")
@@ -129,145 +122,19 @@ public class ItemPersonMap extends Item_Map
 	
 	public NavigableSet<Tuple2<String, Long>> name_descending_Index(){
 		
-		return name_descending_Index;
-		
+		return name_descending_Index;	
 	}
-	
-	
-	@SuppressWarnings("rawtypes")
-	public PersonCls get_Indexes(String str){
-		PersonCls sss = null;
-		 Iterator<Tuple2<String, Long>> ssi = this.name_Index.iterator();	
-		
-		 Pattern pat = Pattern.compile(".*" + str + ".*");
-		 while (ssi.hasNext()){
-			 Tuple2<String, Long> as = ssi.next(); 
-			 Matcher matcher = pat.matcher(as.a);
-				if(matcher.find())
-				{
-					sss = (PersonCls) this.get(as.b);
-					sss=sss;
-				}
-		
-		 
-		 }
 			
-		
-		
-		return sss;
-		
-		
-	}
-	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<PersonCls> getPerson_By_Name(String str)
 	{
-	//	Iterable keys = Fun.filter(this.person_Name_Index, str);
-	//	Iterator iter = keys.iterator();
-		Iterator <Tuple2<String,Long>> iter = this.person_Name_Index.iterator();
-		List<PersonCls> txs = new ArrayList<>();
+	List<PersonCls> txs = new ArrayList<>();
 		if (str.equals("") || str == null) return null;
-		
-		while ( iter.hasNext() )
+		long row = this.getSize();
+		for (long i = 0; i<row; i++)
 		{
-			Tuple2<String, Long> iterator_Step = iter.next();
-			
-			
-			if(iterator_Step.a.contains(str))	txs.add((PersonCls)this.person_Map.get(iterator_Step.b));
-			
+			if(this.get(i+1).getName().contains(str))	txs.add((PersonCls)this.get(i+1));
 		}
 		return txs;
 	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<PersonCls> getPersonsAll()
-	{
-	//	Iterable keys = Fun.filter(this.person_Name_Index, str);
-	//	Iterator iter = keys.iterator();
-	//	Iterator <Tuple2<String,Long>> iter = this.person_Name_Index.iterator();
-		List<PersonCls> txs = new ArrayList<>();
-		
-		Iterator<Long> iter = this.getIterator(0,false);
-		while ( iter.hasNext() )
-		{
-			 Long iterator_Step = iter.next();
-			
-			
-		txs.add((PersonCls)this.person_Map.get(iterator_Step));
-			
-		}
-		
-		
-		
-		
-		return txs;
-	}
-	/*
-	protected long getKey()
-	{
-		return this.key;
-	}
-	
-	protected void createIndexes(DB database){}
-
-	@Override
-	protected Map<Long, PersonCls> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap("item_persons")
-				.valueSerializer(new PersonSerializer())
-				.makeOrGet();
-	}
-
-	@Override
-	protected Map<Long, PersonCls> getMemoryMap() 
-	{
-		return new HashMap<Long, PersonCls>();
-	}
-
-	@Override
-	protected PersonCls getDefaultValue() 
-	{
-		return null;
-	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
-	
-	public long add(PersonCls person)
-	{
-		//INCREMENT ATOMIC KEY IF EXISTS
-		if(this.atomicKey != null)
-		{
-			this.atomicKey.incrementAndGet();
-		}
-		
-		//INCREMENT KEY
-		this.key++;
-		
-		//INSERT WITH NEW KEY
-		this.set(this.key, person);
-		
-		//RETURN KEY
-		return this.key;
-	}
-	
-	
-	public void delete(long key)
-	{
-		super.delete(key);
-		
-		//DECREMENT ATOMIC KEY IF EXISTS
-		if(this.atomicKey != null)
-		{
-			this.atomicKey.decrementAndGet();
-		}
-		
-		//DECREMENT KEY
-		 this.key = key - 1;
-	}
-	*/
 }
