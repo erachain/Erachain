@@ -3492,7 +3492,7 @@ var output = '';
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
 	row = data.row;
-	for(var i = 0; i < row; i++)
+	for(var i = data.start_row; i < row; i++)
 	{
 		output += '<tr>';
 	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
@@ -3505,23 +3505,25 @@ var output = '';
 	}
 	
 	output += '<tr><td colspan=4>';
-/*	if(data.maxHeight != data.lastBlock.height)
-	{
-		if(data.lastBlock.height < data.maxHeight + 21)
-		{
-			output += '<a href=?startBlock='+(data.lastBlock.height)+'>'+data.Label_Later;
-		}
-		else
-		{
-			output += '<a href=?startBlock='+(data.maxHeight+21)+'>'+data.Label_Later;
-		}
+//	if(data.maxHeight != data.lastBlock.height)
+//	{
+		if( data.start_row > 0) {
+		output += '<a href=?persons&startPerson='+(data.start_row - data.view_Row)  + get_lang()+'>'+data.Label_Previous;
 	}
+		//else
+		//{
+		//	output += '<a href=?startPerson='+(data.maxHeight+21)+'>'+data.Label_Later;
+		//}
+//	}
 	
 	output += '<td colspan=4 align=right>';
-	if(minHeight > 1) {
-		output += '<a href=?startBlock='+(data.maxHeight-21)+'>'+data.Label_Previous;
-	}
-*/	
+	if(data.row != data.maxHeight)
+		{
+			output += '<a href=?persons&startPerson='+ data.row   + get_lang()+'>'+data.Label_Later;
+		}
+	
+	
+	
 	return output;
 
 
@@ -3570,7 +3572,7 @@ function start() {
 	document.getElementById('home2').href = document.location.pathname +'?lang='+ params['lang'] ;
 	
 	document.getElementById('menu_top_100').href ='?top=100&lang='+ params['lang'] ;
-	document.getElementById('menu_percons').href ='?persons&lang='+ params['lang'] ;
+	document.getElementById('menu_percons').href ='?persons&startPerson=0&lang='+ params['lang'] ;
 	document.getElementById('menu_pals_asset').href ='?polls&asset=1&lang='+ params['lang'] ;
 	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
 	document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
@@ -3893,7 +3895,7 @@ function start() {
 	
 	if(params.hasOwnProperty('persons'))
 	{
-		asyncAjax('blockexplorer.json?persons'+'&lang='+params['lang'] , 'persons');
+		asyncAjax('blockexplorer.json?persons'+'&lang='+params['lang']+'&startPerson=' + params['startPerson'] , 'persons');
 		document.title = title + ' - Search - ' + decodeURIComponent(params['persons']);
 		return;
 	}
@@ -4036,7 +4038,7 @@ function Lang_setting(){
               <ul role="tablist" class="nav nav-tabs">
                 <li id=menuBlocks><a href="#" id=home2><translate>Blocks</translate></a></li>
 				<li id=menuTop100Richest><a href="?top=100" id=menu_top_100><translate>Top 100 Richest</translate></a></li>
-				<li id=menuPersons><a href="?persons" id =menu_percons><translate>Persons</translate></a></li>
+				<li id=menuPersons><a href="?persons&startPerson=0" id =menu_percons><translate>Persons</translate></a></li>
 				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>
 				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
 				<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	

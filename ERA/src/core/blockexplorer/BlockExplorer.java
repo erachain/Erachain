@@ -476,9 +476,9 @@ public class BlockExplorer
 			{
 				int start = -1;
 
-				if(info.getQueryParameters().containsKey("start"))
+				if(info.getQueryParameters().containsKey("startPerson"))
 				{
-					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+					start = Integer.valueOf((info.getQueryParameters().getFirst("startPerson")));
 				}
 
 				output.put("lastBlock", jsonQueryLastBlock());
@@ -1789,7 +1789,7 @@ if ( asset_1 == null) {
 		WEB_TableModelPersons search_Table_Model = new WEB_TableModelPersons();
 		
 
-		output.put("row", search_Table_Model.getRowCount());
+		
 
 		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
 		
@@ -1798,6 +1798,10 @@ if ( asset_1 == null) {
 		output.put("Label_key", Lang.getInstance().translate_from_langObj("Key",langObj));
 		output.put("Label_name", Lang.getInstance().translate_from_langObj("Name",langObj));
 		output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+		output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+		
+		
 		
 	/*	
 		output.put("Label_Unconfirmed_transactions", "Unconfirmed transactions");
@@ -1815,13 +1819,19 @@ if ( asset_1 == null) {
 		int counter = start; 
  */
 		
+		int row = 0;
+		long k  = -1 ; 
+		int view_Row = 21;
 		
-		int k = search_Table_Model.getRowCount();
-		int i =0;
+		int i = start;
+		if (i <0)i =0;
+			k =  i + view_Row;
 		
+		if (k> DBSet.getInstance().getItemPersonMap().getSize()) k= DBSet.getInstance().getItemPersonMap().getSize();
+		output.put("start_row", i);
 		do{
 			
-			PersonCls person = search_Table_Model.getPerson(i);
+			PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get((long) i+1);
 			
 			
 			
@@ -1874,10 +1884,17 @@ if ( asset_1 == null) {
 		*/	
 			output.put(i, blockJSON);
 			i++;
+			
 		}
 		while(i < k);
-
-
+		
+		output.put("maxHeight",search_Table_Model.getRowCount());
+		output.put("row", i);
+		output.put("view_Row", view_Row);
+		
+		
+		
+		
 		return output;
 	}
 
