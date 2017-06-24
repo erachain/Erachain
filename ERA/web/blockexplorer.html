@@ -793,7 +793,7 @@ function assets(data)
 	
 	// style="background: #f4f4f4;"
 	
-	var table = '<table width=100% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
+	var table = '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
 	table += '<td><b>'+data.label_table_key+'<td><td><b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
 	table += '<td><b>'+ data.label_table_asset_movable+'<td><b>'+data.label_table_asset_amount+'<td><b>'+data.label_table_asset_divisible;
 
@@ -801,7 +801,7 @@ function assets(data)
 		table += '<tr>';
 		table += '<td> <a href=?asset='+encodeURIComponent(key)+get_lang()+'>';
 		table += '<b>' + key + '</b>: ' + htmlFilter(data.assets[key].name);
-		if (data.assets[key].icon.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].icon+ '" width="150" /> <br>'; 
+		if (data.assets[key].icon.length>0) table += '<img src="data:image/gif;base64,' + data.assets[key].icon+ '" width="100" /> <br>'; 
 		table += '</a>';
 		 
 		table += '<td>' + data.assets[key].operations;
@@ -812,6 +812,26 @@ function assets(data)
 		table += '<td>' +data.assets[key].quantity;
 		table += '<td>' + htmlFilter(data.assets[key].isDivisible);
 	}
+		table += '<tr><td colspan=4>';
+//	if(data.maxHeight != data.lastBlock.height)
+//	{
+		if( data.start_row > 0) {
+		table += '<a href=?assets&start='+(data.start_row - data.view_Row)  + get_lang()+'>'+data.Label_Previous;
+	}
+		//else
+		//{
+		//	output += '<a href=?startPerson='+(data.maxHeight+21)+'>'+data.Label_Later;
+		//}
+//	}
+	
+	table += '<td colspan=4 align=right>';
+	if(data.row != data.maxHeight)
+		{
+			table += '<a href=?assets&start='+ data.row   + get_lang()+'>'+data.Label_Later;
+		}
+	
+	
+	
 	table += '</table>';
 
 	output += table;
@@ -3624,7 +3644,8 @@ function start() {
 	
 	if(params.hasOwnProperty('assets'))
 	{
-		asyncAjax('blockexplorer.json?assets'+'&lang='+params['lang'], 'assets')
+		asyncAjax('blockexplorer.json?assets'+'&lang='+params['lang']+'&start=' + params['start'], 'assets')
+		
 		
 		document.title = title + ' - Assets';
 		

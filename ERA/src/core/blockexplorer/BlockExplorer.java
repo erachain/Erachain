@@ -1,6 +1,7 @@
 package core.blockexplorer;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 // 30/03 ++ asset - Trans_Amount
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -213,20 +214,21 @@ public class BlockExplorer
 
 			if(info.getQueryParameters().containsKey("assets"))
 			{
+				
 				output.put("lastBlock", jsonQueryLastBlock());
-
-				output.put("assets", jsonQueryAssets());
-				output.put("label_Title",  Lang.getInstance().translate_from_langObj("Assets",langObj));
-				output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
-				output.put("label_table_asset_name", Lang.getInstance().translate_from_langObj("Name",langObj));
-				output.put("label_table_asset_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
-				output.put("label_table_asset_movable", Lang.getInstance().translate_from_langObj("Movable",langObj));
-				output.put("label_table_asset_description", Lang.getInstance().translate_from_langObj("Description",langObj));
-				output.put("label_table_asset_divisible", Lang.getInstance().translate_from_langObj("Divisible",langObj));
-				output.put("label_table_asset_amount", Lang.getInstance().translate_from_langObj("Amount",langObj));
+				int start = 0;
+				if(info.getQueryParameters().containsKey("start"))
+				{
+					if (info.getQueryParameters().getFirst("start").matches("[0-9]*"))
+						start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+				}
+				
+				output.putAll(jsonQueryAssets(start));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
+				
+				
 			}
 
 			if(info.getQueryParameters().containsKey("aTs"))
@@ -872,6 +874,81 @@ public class BlockExplorer
 		return output;
 	}
 
+	public Map jsonQueryAssets(int start)
+	{
+		Map output=new LinkedHashMap();
+
+		   
+		SortableList<Long, ItemCls> it = DBSet.getInstance().getItemAssetMap().getList();
+		
+	
+		 int view_Row = 21;
+		 int end = start + view_Row;
+		 if (end > it.size()) end = it.size();
+		
+		 output.put("start_row", start);
+		 int i ;
+		 Map assetsJSON=new LinkedHashMap();
+		 for (i=start ; i< end; i++){
+			 
+			  AssetCls asset = (AssetCls) it.get(i).getB();
+			 
+	//	 }
+	//	while (ItemCls item : items) {
+			
+	//		AssetCls asset = (AssetCls) item; 
+			
+			Map assetJSON=new LinkedHashMap();
+			
+			assetJSON.put("key", asset.getKey());
+			assetJSON.put("name", asset.getName());
+			assetJSON.put("description", Processor.process(asset.getDescription()));
+			assetJSON.put("owner", asset.getOwner().getAddress());
+			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
+			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			assetJSON.put("isDivisible", a);
+			a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			assetJSON.put("isMovable", a);
+			
+			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
+			List<Order> orders = DBSet.getInstance().getOrderMap().getOrders(asset.getKey());
+			List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(asset.getKey());
+
+			assetJSON.put("operations", orders.size() + trades.size());
+
+			assetsJSON.put(asset.getKey(), assetJSON);
+			
+			
+		}
+		 output.put("assets", assetsJSON);
+		 	output.put("maxHeight",it.size());
+			output.put("row", i);
+			output.put("view_Row", view_Row);
+			output.put("label_Title",  Lang.getInstance().translate_from_langObj("Assets",langObj));
+			output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
+			output.put("label_table_asset_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+			output.put("label_table_asset_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+			output.put("label_table_asset_movable", Lang.getInstance().translate_from_langObj("Movable",langObj));
+			output.put("label_table_asset_description", Lang.getInstance().translate_from_langObj("Description",langObj));
+			output.put("label_table_asset_divisible", Lang.getInstance().translate_from_langObj("Divisible",langObj));
+			output.put("label_table_asset_amount", Lang.getInstance().translate_from_langObj("Amount",langObj));
+			output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+			output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+			
+			
+
+			
+
+			
+			
+			
+		return output;
+	}
+	
+	
 
 	public Map jsonQueryATs()
 	{
