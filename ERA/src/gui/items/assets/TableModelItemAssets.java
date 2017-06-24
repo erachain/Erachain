@@ -31,7 +31,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public static final int COLUMN_FAVORITE = 6;
 	public static final int COLUMN_I_OWNER = 7;
 
-	private SortableList<Long, AssetCls> assets;
+	//private SortableList<Long, AssetCls> assets;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Movable", "Quantity", "Divisible", "Favorite", "I Owner"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false,false,false,false};
@@ -71,7 +71,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	@Override
 	public SortableList<Long, AssetCls> getSortableList() 
 	{
-		return this.assets;
+		return null;
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -235,7 +235,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	
 	public void removeObservers() 
 	{
-		this.assets.removeObserver();
+	//	this.assets.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
 	

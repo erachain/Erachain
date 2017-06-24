@@ -315,7 +315,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 	{	
 		try
 		{
-			this.syncUpdate(o, arg);
+//			this.syncUpdate(o, arg);
 		}
 		catch(Exception e)
 		{
@@ -329,7 +329,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 //		System.out.println( message.getType());
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_STATEMENT_TYPE)
+	/*	if(message.getType() == ObserverMessage.LIST_STATEMENT_TYPE)
 		{
 			if(this.transactions == null)
 			{
@@ -341,22 +341,26 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 			
 			this.fireTableDataChanged();
 		}
-		
+	*/	
 		
 		//CHECK IF LIST UPDATED
-		if( //message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE 
-			//	||
-				message.getType() == ObserverMessage.ADD_BLOCK_TYPE 
-		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE
-		//		|| message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
-		//		|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
-				
-				)
+		if( message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
-			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			transactions = read_Statement();
+		//	this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
+			//transactions = read_Statement();
+			Transaction trans = (Transaction) message.getValue();
+			 if(trans.getType() == Transaction.SIGN_NOTE_TRANSACTION)	transactions.add(trans);	
 			this.fireTableDataChanged();
 		}	
+		
+		if( message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE ){
+			Transaction trans = (Transaction) message.getValue();
+			if(trans.getType() == Transaction.SIGN_NOTE_TRANSACTION && transactions.contains(trans)){
+				transactions.remove(trans);
+				this.fireTableDataChanged();
+			}
+			
+		}
 	}	
 	
 	
