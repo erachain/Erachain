@@ -202,9 +202,17 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
-				 onChange(); 
-				if (search_Table_Model.getRowCount() < 1) return;
-				search_Table.setRowSelectionInterval(0, 0);
+				// GET VALUE
+					String search = searchTextField_SearchToolBar_LeftPanel.getText();
+					if (search.equals("")){jScrollPane_jPanel_RightPanel.setViewportView(null);
+					search_Table_Model.clear();
+					return;
+				}
+					if (search.length()<3) return;
+					key_Item.setText("");
+					search_Table_Model.set_Filter_By_Name(search);
+					if (search_Table_Model.getRowCount() < 1) return;
+					search_Table.setRowSelectionInterval(0, 0);
 				
 			}
     		
@@ -217,32 +225,6 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 //		setRowHeightFormat(true);
 // Event LISTENER		
 		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
-	
-		
-		this.addAncestorListener(new AncestorListener(){
-
-			@Override
-			public void ancestorAdded(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				search_Table_Model.addObservers();
-			}
-
-			@Override
-			public void ancestorMoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void ancestorRemoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				search_Table_Model.removeObservers();
-			}
-			
-			
-			
-		});
-		
 		jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() 
 			{
 				@Override
@@ -431,25 +413,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 
 	}
 
-// filter search
-
-
-			public void onChange() {
-
-				// GET VALUE
-				String search = searchTextField_SearchToolBar_LeftPanel.getText();
-
-			 	// SET FILTER
-	//			search_Table_Model.getSortableList().setFilter(".*" + search + ".*");
-	//			search_Table_Model.fireTableDataChanged();
-				key_Item.setText("");
-				search_Table_Model.set_Filter_By_Name(search);
-	//			RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-	//			((DefaultRowSorter) search_Sorter).setRowFilter(filter);
-				
-				search_Table_Model.fireTableDataChanged();
-				
-			}
+		
 		
 	
 // listener select row	 
@@ -470,7 +434,6 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	 @Override
 		public void delay_on_close(){
 			// delete observer left panel
-		 search_Table_Model.removeObservers();
 			// get component from right panel
 			Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 			// if Person_Info 002 delay on close

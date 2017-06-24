@@ -83,6 +83,7 @@ public class Search_Assets_Tab extends Split_Panel {
 	private Search_Assets_Tab th;
 	Asset_Info info_panel;
 	protected int row;
+	private int selected_Item;
 	
 	
 	public Search_Assets_Tab(boolean search_and_exchange){

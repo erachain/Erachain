@@ -37,9 +37,9 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 		// restore key from dbase
 		this.key = this.atomicKey.get();
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
-		this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+		if (observeAdd !=0 )this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+		if (observeRemove !=0 )this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+		if (observeList != 0) this.observableData.put(DBMap.NOTIFY_LIST, observeList);
 	}
 
 	

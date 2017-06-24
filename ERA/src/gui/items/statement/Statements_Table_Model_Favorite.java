@@ -32,11 +32,11 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-	public static final int COLUMN_NOTE = 2;
-	public static final int COLUMN_BODY = 3;
-	public static final int COLUMN_FAVORITE = 4;
+//	public static final int COLUMN_NOTE = 2;
+	public static final int COLUMN_BODY = 2;
+	public static final int COLUMN_FAVORITE = 3;
 	SortableList<Tuple2<String,String>,Transaction> transactions;
-	private String[] columnNames = new String[] { "Timestamp", "Creator", "Template", "Statement" , "Favorite"};// ,
+	private String[] columnNames = new String[] { "Timestamp", "Creator"/*, "Template"*/, "Statement" , "Favorite"};// ,
 																									// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, false };
 
@@ -110,9 +110,9 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
 				return record.viewTimestamp(); 
 				
-			case COLUMN_NOTE:
+		//	case COLUMN_NOTE:
 
-				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
+			//	return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
 
 			case COLUMN_BODY:
 

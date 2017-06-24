@@ -4,21 +4,14 @@ import java.util.Map;
 import java.util.NavigableSet;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
-
-//import java.util.HashMap;
-//import java.util.Map;
-
-//import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
 import database.DBSet;
-//import database.serializer.PersonSerializer;
 import database.serializer.ItemSerializer;
 
 public class ItemPersonMap extends Item_Map
@@ -114,6 +107,6 @@ public class ItemPersonMap extends Item_Map
 		
 		return name_descending_Index;	
 	}
-			
 	
+		
 }
