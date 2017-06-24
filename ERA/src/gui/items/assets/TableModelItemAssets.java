@@ -1,12 +1,18 @@
 package gui.items.assets;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.validation.constraints.Null;
 
 import controller.Controller;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
+import database.DBSet;
+import database.ItemAssetMap;
 import database.SortableList;
 import gui.models.TableModelCls;
 import utils.NumberAsString;
@@ -29,10 +35,26 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Movable", "Quantity", "Divisible", "Favorite", "I Owner"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false,false,false,false};
+	private List<ItemCls> list;
+	private String filter_Name = "";
+	private long key_filter =0;
+	private ItemAssetMap db;
 	
 	public TableModelItemAssets()
 	{
-		Controller.getInstance().addObserver(this);
+		//Controller.getInstance().addObserver(this);
+		db = DBSet.getInstance().getItemAssetMap();
+	}
+	public void set_Filter_By_Name(String str) {
+		filter_Name = str;
+		list = db.get_By_Name(filter_Name);
+		this.fireTableDataChanged();
+
+	}
+	public void clear(){
+		list =new ArrayList<ItemCls>();
+		this.fireTableDataChanged();
+		
 	}
 	
 	// читаем колонки которые изменяем высоту	   
@@ -59,7 +81,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	
 	public AssetCls getAsset(int row)
 	{
-		return this.assets.get(row).getB();
+		return (AssetCls) this.list.get(row);
 	}
 	
 	@Override
@@ -77,19 +99,22 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	@Override
 	public int getRowCount() 
 	{
-		return this.assets.size();
+		if (this.list == null)
+			return 0;
+		;
+		return this.list.size();
 		
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.assets == null || row > this.assets.size() - 1 )
+		if(this.list == null || row > this.list.size() - 1 )
 		{
 			return null;
 		}
 		
-		AssetCls asset = this.assets.get(row).getB();
+		AssetCls asset = (AssetCls) this.list.get(row);
 		
 		switch(column)
 		{
@@ -148,7 +173,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
+		/*
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_ASSET_TYPE)
 		{			
@@ -167,11 +192,64 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		{
 			this.fireTableDataChanged();
 		}
+		*/
+		if (key_filter >0){
+			
+			return;	
+			}
+			
+			// CHECK IF NEW LIST
+			if (message.getType() == ObserverMessage.LIST_ASSET_TYPE) {
+				if (this.list == null && !filter_Name.equals("")) {
+					list = db.get_By_Name(filter_Name);
+					this.fireTableDataChanged();
+					// this.persons = (SortableList<Tuple2<String, String>,
+					// PersonCls>) message.getValue();
+					// this.persons.addFilterField("name");
+					// this.persons.registerObserver();
+				}
+
+			}
+
+			// CHECK IF LIST UPDATED
+			if (message.getType() == ObserverMessage.ADD_ASSET_TYPE) {
+				AssetCls ppp = (AssetCls) message.getValue();
+				if (ppp.getName().contains(filter_Name))
+					list.add(ppp);
+				// list = db.getPerson_By_Name(filter_Name);
+
+				this.fireTableDataChanged();
+			}
+
+			// CHECK IF LIST UPDATED
+			if (message.getType() == ObserverMessage.REMOVE_ASSET_TYPE) {
+				 AssetCls ppp = (AssetCls) message.getValue();
+				if (ppp.getName().contains(filter_Name))
+					list.remove(ppp);
+				// list = db.getPerson_By_Name(filter_Name);
+
+				this.fireTableDataChanged();
+			}
+		
 	}
 	
 	public void removeObservers() 
 	{
 		this.assets.removeObserver();
 		Controller.getInstance().deleteObserver(this);
+	}
+	
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		if (text.equals("") || text == null) return;
+		if (!text.matches("[0-9]*"))return;
+			key_filter = new Long(text);
+			list =new ArrayList<ItemCls>();
+			 AssetCls pers = Controller.getInstance().getAsset(key_filter);
+			if ( pers == null) return;
+			list.add(pers);
+			this.fireTableDataChanged();
+		
+		
 	}
 }

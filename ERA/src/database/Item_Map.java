@@ -2,6 +2,7 @@ package database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.mapdb.DB;
 import core.item.ItemCls;
 //import utils.ObserverMessage;
 import database.DBSet;
+import utils.Pair;
 
 public abstract class Item_Map extends DBMap<Long, ItemCls> 
 {
@@ -136,12 +138,13 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	{
 	List<ItemCls> txs = new ArrayList<>();
 		if (str.equals("") || str == null) return null;
-		
-		for (long i = 0; i< this.getSize(); i++)
-		{
-			ItemCls item = this.get(i+1);
-			if(item.getName().contains(str)) txs.add(item);
+		Iterator<Pair<Long, ItemCls>> it = this.getList().iterator();
+		while (it.hasNext()){
+			Pair<Long, ItemCls> a = it.next();
+			if (a.getB().getName().contains(str))txs.add(a.getB());
+			
 		}
+		
 		return txs;
 	}
 }
