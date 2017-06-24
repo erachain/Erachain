@@ -67,6 +67,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		setName(Lang.getInstance().translate("Search Statements"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 		this.searchToolBar_LeftPanel.setVisible(true);
+		this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
 		
 		// not show buttons
 		jToolBar_RightPanel.setVisible(false);
