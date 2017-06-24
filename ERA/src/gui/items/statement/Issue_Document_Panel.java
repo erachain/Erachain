@@ -796,7 +796,12 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 	@SuppressWarnings("null")
 	public Integer makeDeal(boolean asPack)
 	{
-		
+		// check title
+		if (jTextField_Title_Message.getText()==null || jTextField_Title_Message.getText().length() < 5){
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Title"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			return null;
+			
+		}
 		//CHECK IF WALLET UNLOCKED
 		if(!Controller.getInstance().isWalletUnlocked())
 		{

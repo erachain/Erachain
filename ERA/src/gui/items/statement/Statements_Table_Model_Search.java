@@ -11,8 +11,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
 
+import controller.Controller;
 import core.block.Block;
 import core.item.ItemCls;
+import core.item.persons.PersonCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import database.DBSet;
@@ -33,16 +35,17 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 //	public static final int COLUMN_NOTE = 2;
 	public static final int COLUMN_BODY = 2;
 	public static final int COLUMN_FAVORITE = 3;
-	List<Transaction> transactions;
+	List<R_SignNote> transactions;
 	private String[] columnNames = new String[] { "Timestamp", "Creator"/*, "Template"*/, "Statement" , "Favorite"};// ,
 																									// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, false };
 
 	public Statements_Table_Model_Search() {
 
-		transactions = new ArrayList<Transaction>();
-		addObservers();
-		transactions = read_Statement();
+		//transactions = new ArrayList<Transaction>();
+		//addObservers();
+		//transactions = read_Statement("", (long) -1);
+		clear();
 	}
 
 	// set class
@@ -186,7 +189,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_STATEMENT_TYPE) {
 			if (this.transactions == null) {
-				transactions = read_Statement();
+				transactions = read_Statement("",(long) -1);
 				this.fireTableDataChanged();
 			}
 
@@ -204,17 +207,17 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 				}
 
 			}
-			transactions.add(trans);
+			transactions.add((R_SignNote) trans);
 
 			this.fireTableDataChanged();
 		}
 	}
 
-	private List<Transaction> read_Statement() {
-		List<Transaction> tran;
+	private List<R_SignNote> read_Statement(String str, Long key) {
+		List<R_SignNote> tran;
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
-		tran = new ArrayList<Transaction>();
+		tran = new ArrayList<R_SignNote>();
 		// база данных
 		DBSet dbSet = DBSet.getInstance();
 		// читаем все блоки
@@ -227,12 +230,28 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 			// проходим по транзакциям
 			for (Transaction transaction : db_transactions) {
 				// если ноте то пишем в transactions
-				if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION)
-					tran.add(transaction);
-
+				
+				if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION){
+					R_SignNote statement = (R_SignNote) transaction;
+					// filter Title
+					statement = (R_SignNote) transaction;
+					if (str != null && !str.equals("")){
+						if (filter_str(str, statement ))	tran.add(statement);
+					}
+					if (key >0){
+						if(statement.getKey() == key) tran.add(statement);
+						
+					}
+				}
 			}
 
 		}
+		
+		// filter key
+		if (key >0){
+			
+		}
+		
 		return tran;
 
 	}
@@ -246,6 +265,68 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	public void addObservers() {
 		// Controller.getInstance().addObserver(this);
 		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+	}
+	
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		if (text.equals("") || text == null) return;
+		if (!text.matches("[0-9]*"))return;
+		if (new Long(text) < 1) return;
+		transactions = read_Statement("", new Long (text));
+		fireTableDataChanged();
+		
+		
+	}
+	public void clear(){
+		transactions = new ArrayList<R_SignNote>();
+		fireTableDataChanged();
+		
+		
+	}
+	public void set_Filter_By_Name(String str){
+		transactions = read_Statement(str, (long) -1);
+		fireTableDataChanged();
+		
+		
+	}
+	private boolean filter_str(String filter, R_SignNote record){
+		if (record.getData() == null)
+			return false;
+		
+		if(record.getVersion() == 2){
+			Tuple3<String, String, JSONObject> a;
+			try {
+				a = record.parse_Data_V2_Without_Files();
+			
+				if (a.b.contains(filter)) return true;
+				return false;
+					} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+		}
+					
+		
+		String str = "";
+		try {
+			JSONObject data = (JSONObject) JSONValue
+					.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
+			str = (String) data.get("!!&_Title");
+			if (str == null)
+				str = (String) data.get("Title");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+
+			str = new String(record.getData(), Charset.forName("UTF-8"));
+		}
+		if (str == null)
+			return false;
+		if (str.contains(filter)) return true;
+		return false;// t
+		
+		
+		
 	}
 
 }
