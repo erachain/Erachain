@@ -38,6 +38,7 @@ import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
@@ -82,7 +83,7 @@ public class IssuePersonPanel extends JPanel
 //	protected JButton iconButton;
 	@SuppressWarnings("rawtypes")
 	protected JComboBox txtGender;
-	protected JTextField txtRace;
+	protected JTextField txtSNILS;
 	protected JTextField txtBirthLatitude;
 	protected JTextField txtBirthLongitude;
 	protected JTextField txtSkinColor;
@@ -104,13 +105,14 @@ public class IssuePersonPanel extends JPanel
     protected javax.swing.JLabel jLabel_HairСolor;
     protected javax.swing.JLabel jLabel_Height;
     protected javax.swing.JLabel jLabel_Name;
-    protected javax.swing.JLabel jLabel_Race;
+    protected javax.swing.JLabel jLabel_SNILS;
     protected javax.swing.JLabel jLabel_SkinColor;
     protected javax.swing.JLabel jLabel_Title;
     protected javax.swing.JPanel jPanel1;
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JScrollPane jScrollPane1;
     protected My_Add_Image_Panel add_Image_Panel;
+    protected JCheckBox alive_CheckBox ;
   
     // End of variables declaration
 	
@@ -167,7 +169,7 @@ public class IssuePersonPanel extends JPanel
         //Calendar can = txtBirthday.getJCalendar().getCalendar();
         //can.set(1999, 11, 12, 13, 14);
 
-       	txtRace.setText("");
+       	txtSNILS.setText("");
    //    	this.txtBirthLatitude.setText("0");
        	this.txtBirthLongitude.setText("0");
        	this.txtHeight.setText("170");
@@ -216,8 +218,31 @@ public class IssuePersonPanel extends JPanel
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
     	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
     	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
-    	jLabel_Race.setText(Lang.getInstance().translate("Person number") + ":");
+    	jLabel_SNILS.setText(Lang.getInstance().translate("Person number") + ":");
     	jLabel_Dead.setText(Lang.getInstance().translate("Deathday") + ":");
+    	alive_CheckBox.setText(Lang.getInstance().translate("Alive") + "?");
+    	alive_CheckBox.setSelected(true);
+    	alive_CheckBox.addActionListener(new ActionListener(){
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				if (alive_CheckBox.isSelected()){
+					txtDeathday.setEnabled(false);
+					jLabel_Dead.setEnabled(false);
+				}
+				else {
+					txtDeathday.setEnabled(true);
+					jLabel_Dead.setEnabled(true);
+				}
+			}
+    		
+    		
+    		
+    		
+    	});
+    	txtDeathday.setEnabled(false);
+    	jLabel_Dead.setEnabled(false);
     	
     }
 	
@@ -350,7 +375,7 @@ public class IssuePersonPanel extends JPanel
 		Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(
 				forIssue,
 				creator, this.txtName.getText(), feePow, birthday, deathday,
-				gender, this.txtRace.getText(), birthLatitude, birthLongitude,
+				gender, this.txtSNILS.getText(), birthLatitude, birthLongitude,
 				this.txtSkinColor.getText(), this.txtEyeColor.getText(),
 				this.txtHairСolor.getText(), height,
 				null, add_Image_Panel.imgButes, this.txtareaDescription.getText(),
@@ -456,8 +481,8 @@ public class IssuePersonPanel extends JPanel
         jLabel_Gender = new javax.swing.JLabel();
         jLabel_Born = new javax.swing.JLabel();
         jLabel_Dead = new javax.swing.JLabel();
-        jLabel_Race = new javax.swing.JLabel();
-        txtRace = new javax.swing.JTextField();
+        jLabel_SNILS = new javax.swing.JLabel();
+        txtSNILS = new javax.swing.JTextField();
         jLabel_SkinColor = new javax.swing.JLabel();
         txtSkinColor = new javax.swing.JTextField();
         jLabel_EyeColor = new javax.swing.JLabel();
@@ -491,6 +516,7 @@ public class IssuePersonPanel extends JPanel
         add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
         		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
         		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350,0);
+        alive_CheckBox = new JCheckBox();
     	
         this.issueButton.addActionListener(new ActionListener()
 		{
@@ -524,14 +550,8 @@ public class IssuePersonPanel extends JPanel
         layout.rowHeights = new int[] {0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0, 4, 0};
         mainPanel.setLayout(layout);
 
-        jLabel_Gender.setText("Pol");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        mainPanel.add(jLabel_Gender, gridBagConstraints);
-
+      
+// born
         jLabel_Born.setText("born");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -539,22 +559,71 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
         mainPanel.add(jLabel_Born, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.2;
+        mainPanel.add( txtBirthday, gridBagConstraints);        
+        txtBirthday.setFont(UIManager.getFont("TextField.font"));
 
-        jLabel_Dead.setText("Dead");
+// dead
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        mainPanel.add(jLabel_Dead, gridBagConstraints);
-
-        jLabel_Race.setText("Person number");
+        mainPanel.add(alive_CheckBox, gridBagConstraints);
+        
+        
+        jLabel_Dead.setText("Dead");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        mainPanel.add(jLabel_Dead, gridBagConstraints);
+      
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
+        mainPanel.add(txtDeathday, gridBagConstraints);
+        txtDeathday.setFont(UIManager.getFont("TextField.font"));
+// gender
+        jLabel_Gender.setText("Pol");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
+        mainPanel.add(jLabel_Gender, gridBagConstraints);
+        
+        txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        mainPanel.add(txtGender, gridBagConstraints);
+        
+// CNILS
+        
+        jLabel_SNILS.setText("Person number");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        mainPanel.add(jLabel_Race, gridBagConstraints);
+        mainPanel.add(jLabel_SNILS, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 8;
@@ -563,8 +632,8 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        mainPanel.add(txtRace, gridBagConstraints);
-
+        mainPanel.add(txtSNILS, gridBagConstraints);
+// SkinColor
         jLabel_SkinColor.setText("SkinColor");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -582,10 +651,10 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         mainPanel.add(txtSkinColor, gridBagConstraints);
-
+// EyeColor
         jLabel_EyeColor.setText("EyeColor");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
@@ -599,7 +668,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
         mainPanel.add(txtEyeColor, gridBagConstraints);
-
+//HairСolor
         jLabel_HairСolor.setText("HairСolor");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -615,10 +684,10 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         mainPanel.add(txtHairСolor, gridBagConstraints);
-
+// Height
         jLabel_Height.setText("P.Height");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 12;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
@@ -632,7 +701,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
         mainPanel.add(txtHeight, gridBagConstraints);
-
+// BirthLatitude
         jLabel_BirthLatitude.setText("Coordinates of Birth");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -651,22 +720,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.weightx = 0.2;
         mainPanel.add(txtBirthLatitude, gridBagConstraints);
 
-        jLabel_BirthLongitude.setText("BirthLongitude");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-     //   mainPanel.add(jLabel_BirthLongitude, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 14;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-    //    mainPanel.add(txtBirthLongitude, gridBagConstraints);
+// Fee
 
         jLabel_Fee.setText("Fee");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -803,15 +857,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
         mainPanel.add(jLabel_Title, gridBagConstraints);
 
-        txtGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        mainPanel.add(txtGender, gridBagConstraints);
+      
 
      /*     
         try {
@@ -833,16 +879,7 @@ public class IssuePersonPanel extends JPanel
       
         
    //     txtBirthday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
-        mainPanel.add( txtBirthday, gridBagConstraints);        
-        txtBirthday.setFont(UIManager.getFont("TextField.font"));
-
+      
   //      txtDeathday.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(new java.text.SimpleDateFormat("yyyy-MM-dd"))));
   //      txtDeathday.addActionListener(new java.awt.event.ActionListener() {
  //           public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -851,15 +888,7 @@ public class IssuePersonPanel extends JPanel
  //       });
         
         ///txtDeathday.setDateFormatString("yyyy-MM-dd");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 8;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 7;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 16);
-        mainPanel.add(txtDeathday, gridBagConstraints);
-        txtDeathday.setFont(UIManager.getFont("TextField.font"));
+      
    //     mainScrollPane1.setHorizontalScrollBar(null);
         mainScrollPane1.setViewportView(mainPanel);
    //   

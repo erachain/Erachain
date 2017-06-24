@@ -44,6 +44,7 @@
 	"All Persons":"Все персоны",
 	"All Polls":"Все Опросы",
 	"All Votes":"Сумма Голосов",
+	"Alive":"Живой",
 	"Allow for all":"Разрешить для всех",
 	"Allows forging even when your wallet is locked. You need to unlock it once.":"<html>Позволяет генерировать блоки даже когда Ваш кошелек заблокирован.<br>Вы должны разблокировать его один раз.</html>",
 	"Allows you to change the amount of simultaneous connections to the server.":"Позволяет изменить количество одновременных подключений к серверу.",

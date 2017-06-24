@@ -60,6 +60,19 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 		birtday.setEditable(false);
 		this.add(birtday, detailGBC);	
 		
+		//LABEL Birthday
+				++labelGBC.gridy;
+				JLabel deadLabel = new JLabel(Lang.getInstance().translate("Deathday") + ":");
+				this.add(deadLabel, labelGBC);
+						
+				//Birthday
+				++detailGBC.gridy;
+				JTextField dead = new JTextField(person.getDeathdayStr());
+				birtday.setEditable(false);
+				this.add(dead, detailGBC);	
+				
+		
+		
 		//LABEL GENDER
 		++labelGBC.gridy;
 		JLabel genderLabel = new JLabel(Lang.getInstance().translate("Gender") + ":");

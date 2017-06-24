@@ -86,6 +86,10 @@ public class InsertPersonPanel extends IssuePersonPanel{
 		th = this;
 		
 		init();	
+		alive_CheckBox.setSelected(false);
+		alive_CheckBox.setVisible(false);
+		jLabel_Dead.setEnabled(true);
+		
 		this.setMinimumSize(new Dimension(0,0));
 	}
 	
@@ -127,7 +131,7 @@ private void init(){
 	//txtBirthday = new javax.swing.JTextField();
 	//txtDeathday = new javax.swing.JTextField();
 
-   	txtRace.setText("");
+   	txtSNILS.setText("");
    	this.txtBirthLatitude.setText("");
    	this.txtBirthLongitude.setText("");
    	this.txtHeight.setText("");
@@ -149,7 +153,7 @@ private void init(){
 	add_Image_Panel.setVisible(false);
 	txtGender.setVisible(false);
 	txtGenderTxt.setEditable(false);
-	txtRace.setEditable(false);
+	txtSNILS.setEditable(false);
 	txtBirthLatitude.setEditable(false);
 	txtBirthLongitude.setEditable(false);
 	txtSkinColor.setEditable(false);
@@ -310,7 +314,7 @@ private void init(){
  			
  			
  			if (person.getRace() != null)
- 				txtRace.setText(person.getRace());
+ 				txtSNILS.setText(person.getRace());
  			txtBirthLatitude.setText("" + person.getBirthLatitude() +", " + person.getBirthLongitude());
  			//txtBirthLongitude.setText("" + person.getBirthLongitude());
  			if (person.getSkinColor()!= null)
@@ -472,7 +476,7 @@ private void init(){
 		
 		txtGender.setSelectedIndex(2);
 		txtGenderTxt.setText("");
-		txtRace.setText("");
+		txtSNILS.setText("");
 		txtBirthLatitude.setText("");
 		txtBirthLongitude.setText("");
 		txtSkinColor.setText("");
