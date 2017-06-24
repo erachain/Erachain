@@ -1,9 +1,6 @@
 package gui.items.persons;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -13,6 +10,7 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import utils.ObserverMessage;
 import database.DBSet;
@@ -37,7 +35,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 																							// "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[] { false, true, true, false };
 	private ItemPersonMap db;
-	private List<PersonCls> list;
+	private List<ItemCls> list;
 	private String filter_Name = "";
 	private long key_filter =0;
 
@@ -56,7 +54,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	// }
 	public void set_Filter_By_Name(String str) {
 		filter_Name = str;
-		list = db.getPerson_By_Name(filter_Name);
+		list = db.get_By_Name(filter_Name);
 
 	}
 
@@ -82,7 +80,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	}
 
 	public PersonCls getPerson(int row) {
-		return this.list.get(row);
+		return (PersonCls) this.list.get(row);
 	}
 
 	@Override
@@ -110,7 +108,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 			return null;
 		}
 
-		PersonCls person = list.get(row);
+		PersonCls person = (PersonCls) list.get(row);
 
 		switch (column) {
 		case COLUMN_KEY:
@@ -161,7 +159,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
 			if (this.list == null && !filter_Name.equals("")) {
-				list = db.getPerson_By_Name(filter_Name);
+				list = db.get_By_Name(filter_Name);
 				this.fireTableDataChanged();
 				// this.persons = (SortableList<Tuple2<String, String>,
 				// PersonCls>) message.getValue();
@@ -209,7 +207,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		if (text.equals("") || text == null) return;
 		if (!text.matches("[0-9]*"))return;
 			key_filter = new Long(text);
-			list =new ArrayList<PersonCls>();
+			list =new ArrayList<ItemCls>();
 			PersonCls pers = Controller.getInstance().getPerson(key_filter);
 			if ( pers == null) return;
 			list.add(pers);

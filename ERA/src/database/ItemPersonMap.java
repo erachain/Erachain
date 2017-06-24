@@ -1,13 +1,7 @@
 package database;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 
@@ -17,15 +11,11 @@ import org.mapdb.Bind;
 //import org.mapdb.Atomic;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 
-import core.account.Account;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
-import core.transaction.Transaction;
 import utils.ObserverMessage;
-import utils.Pair;
 import utils.ReverseComparator;
 import database.DBSet;
 //import database.serializer.PersonSerializer;
@@ -125,16 +115,5 @@ public class ItemPersonMap extends Item_Map
 		return name_descending_Index;	
 	}
 			
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<PersonCls> getPerson_By_Name(String str)
-	{
-	List<PersonCls> txs = new ArrayList<>();
-		if (str.equals("") || str == null) return null;
-		long row = this.getSize();
-		for (long i = 0; i<row; i++)
-		{
-			if(this.get(i+1).getName().contains(str))	txs.add((PersonCls)this.get(i+1));
-		}
-		return txs;
-	}
+	
 }

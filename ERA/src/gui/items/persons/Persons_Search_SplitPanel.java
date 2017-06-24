@@ -44,6 +44,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
@@ -82,6 +84,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 	private TableModelPersons search_Table_Model;
 	private MTable search_Table;
 	private RowSorter<TableModelPersons> search_Sorter;
+	private int selected_Item;
 	
 // для прозрачности
      int alpha =255;
@@ -120,6 +123,10 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 				// TODO Auto-generated method stub
 				searchTextField_SearchToolBar_LeftPanel.setText("");
 				search_Table_Model.Find_item_from_key(key_Item.getText());	
+				if (search_Table_Model.getRowCount() < 1) return;
+				selected_Item = 0;
+				search_Table.setRowSelectionInterval(selected_Item, selected_Item);
+				
 				
 			}
     		
@@ -158,7 +165,24 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 		    }
 		});
 		
-		
+		search_Table_Model.addTableModelListener(new TableModelListener(){
+
+			@Override
+			public void tableChanged(TableModelEvent arg0) {
+				// TODO Auto-generated method stub
+				
+				if (search_Table_Model.getRowCount() ==0){
+					jScrollPane_jPanel_RightPanel.setViewportView(null);
+					return;
+				}
+				if (selected_Item == 0 ) return;
+				if (selected_Item + 1 > search_Table_Model.getRowCount()) selected_Item = search_Table_Model.getRowCount()-1;
+				search_Table.setRowSelectionInterval(selected_Item, selected_Item);
+				
+			}
+			
+			
+		});
 
 //		TableColumn favoriteColumn = search_Table.getColumnModel().getColumn(search_Table_Model.COLUMN_BORN);	
 //		favoriteColumn.setCellRenderer(new Renderer_Boolean()); 
@@ -179,6 +203,8 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				 onChange(); 
+				if (search_Table_Model.getRowCount() < 1) return;
+				search_Table.setRowSelectionInterval(0, 0);
 				
 			}
     		
@@ -433,6 +459,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 				PersonCls person = null;
 				if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getPerson(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
 				if (person == null) return;
+					selected_Item = search_Table.getSelectedRow();
 					Person_Info_002 info_panel = new Person_Info_002(person, true);
 					info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

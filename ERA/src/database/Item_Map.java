@@ -1,6 +1,8 @@
 package database;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.mapdb.Atomic;
@@ -126,5 +128,20 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 		 
 		} while ( !super.map.containsKey(key)  || key == 0l );
 		 
+	}
+	
+	// get list items in name substring str
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public List<ItemCls> get_By_Name(String str)
+	{
+	List<ItemCls> txs = new ArrayList<>();
+		if (str.equals("") || str == null) return null;
+		
+		for (long i = 0; i< this.getSize(); i++)
+		{
+			ItemCls item = this.get(i+1);
+			if(item.getName().contains(str)) txs.add(item);
+		}
+		return txs;
 	}
 }
