@@ -71,7 +71,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		
 		// not show buttons
 		jToolBar_RightPanel.setVisible(false);
-		toolBar_LeftPanel.setVisible(true);
+		toolBar_LeftPanel.setVisible(false);
 		this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key")+":"));
     	key_Item = new JTextField();
     	key_Item.setToolTipText("");
