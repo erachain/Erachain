@@ -228,12 +228,13 @@ public class IssuePersonPanel extends JPanel
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				if (alive_CheckBox.isSelected()){
-					txtDeathday.setEnabled(false);
-					jLabel_Dead.setEnabled(false);
+					txtDeathday.setVisible(false);
+					jLabel_Dead.setVisible(false);
+	
 				}
 				else {
-					txtDeathday.setEnabled(true);
-					jLabel_Dead.setEnabled(true);
+					txtDeathday.setVisible(true);
+					jLabel_Dead.setVisible(true);
 				}
 			}
     		
@@ -241,8 +242,8 @@ public class IssuePersonPanel extends JPanel
     		
     		
     	});
-    	txtDeathday.setEnabled(false);
-    	jLabel_Dead.setEnabled(false);
+    	txtDeathday.setVisible(false);
+    	jLabel_Dead.setVisible(false);
     	
     }
 	
@@ -320,7 +321,7 @@ public class IssuePersonPanel extends JPanel
 			} catch(Exception ed1) {
 				deathday = birthday - 1;
 			}
-
+			if (alive_CheckBox.isSelected())deathday = birthday - 1;
 			parse++;
 	//		birthLatitude = Float.parseFloat(this.txtBirthLatitude.getText());
 			 String[] numArr = this.txtBirthLatitude.getText().split(",");

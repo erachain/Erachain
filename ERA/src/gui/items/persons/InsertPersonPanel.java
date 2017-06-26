@@ -88,7 +88,8 @@ public class InsertPersonPanel extends IssuePersonPanel{
 		init();	
 		alive_CheckBox.setSelected(false);
 		alive_CheckBox.setVisible(false);
-		jLabel_Dead.setEnabled(true);
+	//	jLabel_Dead.setVisible(false);
+	//	txtDeathdayTxt.setVisible(false);
 		
 		this.setMinimumSize(new Dimension(0,0));
 	}
@@ -144,8 +145,9 @@ private void init(){
 	txtareaDescription.setEditable(false);
 	txtBirthday.setVisible(false); //setEnabled(false);
 	txtDeathday.setVisible(false); //setEnabled(false);
-	txtBirthdayTxt.setEnabled(false);
-	txtDeathdayTxt.setEnabled(false);
+	txtBirthdayTxt.setEditable(false);
+	txtDeathdayTxt.setVisible(false);
+	txtDeathdayTxt.setEditable(false);
 	
 	copyButton.setVisible(false);
 	
@@ -300,10 +302,16 @@ private void init(){
 
  			///txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
  			txtBirthdayTxt.setText(person.getBirthdayStr());
+ 			txtDeathdayTxt.setText(person.getDeathdayStr());
  			long dayTimestamp = person.getDeathday();
- 			if ( dayTimestamp/10 > person.getBirthday()/10) {
+ 			long bb = person.getBirthday();
+ 		//	if ( dayTimestamp/10 > person.getBirthday()/10) {
+ 			txtDeathdayTxt.setVisible(false);
+				jLabel_Dead.setVisible(false);
+ 			if (person.getBirthday() < person.getDeathday()){
  				//txtDeathdayTxt.setText(new Date(person.getDeathday())+"");
- 				txtDeathdayTxt.setText(person.getDeathdayStr());
+ 				txtDeathdayTxt.setVisible(true);
+ 				jLabel_Dead.setVisible(true);
  			}
  			TimeZone.setDefault(tz);
  
@@ -324,6 +332,8 @@ private void init(){
  			if (person.getHairСolor() != null)
  				txtHairСolor.setText(person.getHairСolor());
  			txtHeight.setText("" + person.getHeight());
+ 			
+ 				
 
  			
  			txt_Sign.setText(Base58.encode(person.getOwnerSignature()));
@@ -407,6 +417,7 @@ private void init(){
 			// TODO Auto-generated method stub
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(creatorAccount.getAddress());
 			//PublicKeyAccount owner = (PublicKeyAccount)creator;
+			PersonHuman pp = person;
 			Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(
 					creator, feePow, person);
 			
