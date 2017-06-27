@@ -159,6 +159,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 				jScrollPane_jPanel_RightPanel.setViewportView(null);
 				if (search.equals("")) {
 					search_Table_Model.clear();
+					jScrollPanel_LeftPanel.setViewportView(new JLabel("Edit search Field..."));
 					return;
 				}
 				// if (search.length()<3) return;

@@ -186,7 +186,7 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
 				if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
 				{
 					
-					if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == TableModelPersons.COLUMN_FAVORITE){
+					if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == Statements_Table_Model_Favorite.COLUMN_FAVORITE){
 					//	row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 					//	 PersonCls asset = search_Table_Model.getPerson(row);
 						favorite_set( jTable_jScrollPanel_LeftPanel);	
