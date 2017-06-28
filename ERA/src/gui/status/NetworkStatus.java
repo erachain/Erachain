@@ -48,9 +48,9 @@ public class NetworkStatus extends JLabel implements Observer
 				if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
 					mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight(false).a;
 				} else if( Controller.getInstance().getWalletSyncHeight() > 0 ) {
-					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight();
+					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight(false);
 				} else {
-					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight().a;
+					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(false).a;
 				}
 				setToolTipText(mess);
 		}});
@@ -88,7 +88,7 @@ public class NetworkStatus extends JLabel implements Observer
 		if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue(); 
-			int height = Controller.getInstance().getMaxPeerHWeight().a;
+			int height = Controller.getInstance().getMaxPeerHWeight(true).a;
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{

@@ -1529,7 +1529,8 @@ public class Controller extends Observable {
 		if (isStopping)
 			return true;
 		
-		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight();
+		// withWinBuffer
+		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(true);
 		if (maxHW.c == null)
 			return true;
 		
@@ -1620,7 +1621,8 @@ public class Controller extends Observable {
 			// WHILE NOT UPTODATE
 			do {
 				// START UPDATE FROM HIGHEST HEIGHT PEER
-				Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight();				
+				// withWinBuffer = true
+				Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(true);				
 				if (peerHW != null) {
 					peer = peerHW.c;
 					if (peer != null) {
@@ -1709,12 +1711,12 @@ public class Controller extends Observable {
 	}
 	*/
 
-	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight() {
+	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(boolean withWinBuffer) {
 		
 		if (this.dbSet.isStoped())
 			return null;
 		
-		Tuple2<Integer, Long> myHWeight = this.getMyHWeight(false);
+		Tuple2<Integer, Long> myHWeight = this.getMyHWeight(withWinBuffer);
 		int height = myHWeight.a;
 		long weight = myHWeight.b;
 		Peer maxPeer = null;

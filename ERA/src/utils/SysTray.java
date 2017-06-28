@@ -342,7 +342,7 @@ public class SysTray implements Observer{
 			syncProcent = 100 * currentHeight/Controller.getInstance().getMyHWeight(false).a + "%";
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight().a;
+			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight(false).a;
 			setToolTipText(toolTipText);
 			
 		} else if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
@@ -350,11 +350,11 @@ public class SysTray implements Observer{
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{
-				syncProcent = 100 * currentHeight/Controller.getInstance().getMaxPeerHWeight().a + "%";	
+				syncProcent = 100 * currentHeight/Controller.getInstance().getMaxPeerHWeight(false).a + "%";	
 			}
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight();
+			toolTipText += "\nHeight: " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(false);
 			setToolTipText(toolTipText);
 			
 		} else {
