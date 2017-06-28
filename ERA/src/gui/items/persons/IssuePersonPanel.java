@@ -51,7 +51,7 @@ public class IssuePersonPanel extends JPanel
 	protected JComboBox<Account> cbxFrom;
 	protected JTextField txtFeePow;
 	protected JTextField txtName;
-	protected JTextArea txtareaDescription;
+	protected JTextArea txtareaDescription; 
 	protected JDateChooser txtBirthday;
 	protected JDateChooser txtDeathday;
 //	protected JButton iconButton;
