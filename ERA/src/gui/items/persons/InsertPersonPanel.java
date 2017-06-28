@@ -1,45 +1,28 @@
 package gui.items.persons;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.sql.Date;
 import java.util.TimeZone;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
-
-import com.toedter.calendar.JDateChooser;
-
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
-import core.transaction.TransactionFactory;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
@@ -47,7 +30,6 @@ import gui.library.MButton;
 import gui.transaction.IssuePersonDetailsFrame;
 import gui.transaction.OnDealClick;
 import lang.Lang;
-import settings.Settings;
 import utils.Pair;
 
 public class InsertPersonPanel extends IssuePersonPanel{
@@ -113,7 +95,6 @@ public class InsertPersonPanel extends IssuePersonPanel{
 	    return result;
 	  }
 	 
-@SuppressWarnings("deprecation")
 private void init(){
 	
 	
@@ -303,9 +284,7 @@ private void init(){
  			///txtBirthdayTxt.setText(new Date(person.getBirthday())+ "");
  			txtBirthdayTxt.setText(person.getBirthdayStr());
  			txtDeathdayTxt.setText(person.getDeathdayStr());
- 			long dayTimestamp = person.getDeathday();
- 			long bb = person.getBirthday();
- 		//	if ( dayTimestamp/10 > person.getBirthday()/10) {
+ 			//	if ( dayTimestamp/10 > person.getBirthday()/10) {
  			txtDeathdayTxt.setVisible(false);
 				jLabel_Dead.setVisible(false);
  			if (person.getBirthday() < person.getDeathday()){
@@ -416,8 +395,6 @@ private void init(){
 
 			// TODO Auto-generated method stub
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(creatorAccount.getAddress());
-			//PublicKeyAccount owner = (PublicKeyAccount)creator;
-			PersonHuman pp = person;
 			Pair<Transaction, Integer> result = Controller.getInstance().issuePersonHuman(
 					creator, feePow, person);
 			

@@ -12,35 +12,26 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 
 import javax.swing.DefaultRowSorter;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import database.DBSet;
-import gui.MainFrame;
 import gui.Split_Panel;
 import gui.items.persons.TableModelPersons;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MTable;
-import gui.records.VouchRecordDialog;
 import lang.Lang;
 import utils.MenuPopupUtil;
 import utils.TableMenuPopupUtil;
@@ -106,11 +97,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		// CREATE TABLE
 		search_Table_Model = new Statements_Table_Model_Search();
 		jTable_jScrollPanel_LeftPanel = new MTable(this.search_Table_Model);
-		// search_Table = new MTable(this.search_Table_Model);
-		TableColumnModel columnModel = jTable_jScrollPanel_LeftPanel.getColumnModel(); // read
-																						// column
-																						// model
-		// columnModel.getColumn(0).setMaxWidth((100));
+		
 
 		// Custom renderer for the String column;
 
@@ -231,8 +218,6 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 						.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				if (statement == null)
 					return;
-				VouchRecordDialog vouch_panel = new VouchRecordDialog(statement.getBlockHeight(DBSet.getInstance()),
-						statement.getSeqNo(DBSet.getInstance()));
 
 			}
 		});
@@ -248,7 +233,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 				int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
 				jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 
-				if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
+				if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
 					if (jTable_jScrollPanel_LeftPanel
 							.getSelectedColumn() == Statements_Table_Model_Search.COLUMN_FAVORITE) {

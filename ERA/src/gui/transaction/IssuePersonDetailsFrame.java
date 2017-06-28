@@ -1,14 +1,8 @@
 package gui.transaction;
 
-import java.awt.datatransfer.StringSelection;
-import java.util.Date;
-
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-
-import controller.Controller;
-import core.account.PublicKeyAccount;
 import core.item.persons.PersonCls;
 import core.transaction.IssuePersonRecord;
 import lang.Lang;

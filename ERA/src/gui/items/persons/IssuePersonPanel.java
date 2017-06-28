@@ -2,46 +2,26 @@ package gui.items.persons;
 
 import gui.MainFrame;
 import gui.PasswordPane;
-import gui.items.statement.Statement_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
 import gui.library.My_Add_Image_Panel;
-import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
-import ntp.NTP;
-import settings.Settings;
-
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.TimeZone;
-import java.util.stream.Stream;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,20 +29,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.MaskFormatter;
-
-import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
-
 import utils.Pair;
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
@@ -304,8 +278,6 @@ public class IssuePersonPanel extends JPanel
 			//READ FEE POW
 			feePow = Integer.parseInt(this.txtFeePow.getText());
 			
-			String b = this.txtFeePow.getText();
-
 			//READ GENDER
 			parse++;
 			gender = (byte) (this.txtGender.getSelectedIndex());
@@ -474,7 +446,7 @@ public class IssuePersonPanel extends JPanel
 		add_Image_Panel.reset();
 	}
                              
-    @SuppressWarnings({ "unchecked", "null" })
+    @SuppressWarnings({ "unchecked" })
     // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     protected void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
