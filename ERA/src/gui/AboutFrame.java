@@ -93,7 +93,8 @@ public class AboutFrame extends JDialog{
         aboutPanel.setLayout(gbl_aboutPanel);
 
         JLabel lblAuthorsLabel = new JLabel(Lang.getInstance().translate("Author") + ": "
-        		+ "Ермолаев Дмитрий Сергеевич");
+        		//+ "Ермолаев Дмитрий Сергеевич");
+        		+ Lang.getInstance().translate("Dmitrii Ermolaev"));
         lblAuthorsLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblAuthorsLabel.setForeground(Color.WHITE);
         lblAuthorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -105,7 +106,7 @@ public class AboutFrame extends JDialog{
         gbc_lblAuthorsLabel.gridy = 1;
         aboutPanel.add(lblAuthorsLabel, gbc_lblAuthorsLabel);
 
-        JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getInstance().getVersion());
+        JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getVersion());
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblversionLabel.setForeground(Color.WHITE);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -117,7 +118,7 @@ public class AboutFrame extends JDialog{
         gbc_lbllversionLabel.gridy = 2;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
         
-        JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getInstance().getBuildDateString());
+        JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getBuildDateString());
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.WHITE);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));
