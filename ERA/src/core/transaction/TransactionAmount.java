@@ -416,9 +416,14 @@ public abstract class TransactionAmount extends Transaction {
 						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-						BigDecimal balance = this.creator.getBalance(db, absKey, actionType);
+						//BigDecimal balance = this.creator.getBalance(db, absKey, actionType);
+						BigDecimal balance = this.creator.getBalanceUSE(absKey, db);
+						
 						if (amount.compareTo(balance) > 0) {
-							return NO_BALANCE;
+							// TODO: delete wrong check in new CHAIN
+							// ONE PAYMENT is WRONG
+							//if (!this.signature.equals(Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh")))
+									return NO_BALANCE;
 						}
 							
 					}
@@ -435,7 +440,8 @@ public abstract class TransactionAmount extends Transaction {
 				}
 				
 				// IF send from PERSON to ANONIMOUSE
-				if (actionType != 2 && isPerson && !this.recipient.isPerson(db)) {
+				// TODO: PERSON RULE 1
+				if (false && actionType != 2 && isPerson && !this.recipient.isPerson(db)) {
 					return RECEIVER_NOT_PERSONALIZED;
 				}
 			}
