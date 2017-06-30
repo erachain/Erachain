@@ -85,7 +85,7 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 	jTextArea_Title.setText(Lang.getInstance().translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", a));
 
 	//	icon.setIcon(null);	
-		
+	sendButton.setText(Lang.getInstance().translate("Repay Debt"));
 	toLabel.setText(Lang.getInstance().translate("Lender Account") + ":");
   	recDetailsLabel.setText(Lang.getInstance().translate("Lender Details") + ":");
 

@@ -85,7 +85,7 @@ public class Account_Lend_Panel extends  Class_Account_Transaction_Panel
 	jTextArea_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form").replace("%asset%", a));
 
 	//	icon.setIcon(null);
-	
+	sendButton.setText(Lang.getInstance().translate("Lend"));
 	toLabel.setText(Lang.getInstance().translate("Debtor Account") + ":");
   	recDetailsLabel.setText(Lang.getInstance().translate("Debtor Details") + ":");
 		

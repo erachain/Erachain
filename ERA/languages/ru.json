@@ -306,6 +306,7 @@
 	"If You want to confiscate in debt issued asset %asset%, fill in this form":"Если Вы хотите конфисковать выданный в долг актив %asset%, заполните эту форму ",
 	"If You want to give a loan asset %asset%, fill in this form":"Если Вы хотите дать в долг актив %asset%, заполните эту форму",
 	"If You want to give the borrowed asset %asset%, fill in this form":"Если Вы хотите отдать взятый в долг актив %asset%, заполните эту форму",
+	"If You want to take on hold issued asset %asset%, fill in this form":"",
 	"Import Hashs":"Импортировать Хэшы из файла",
 	"Imprints":"Отпечатки",
 	"INCOMING API CALL":"ВХОДЯЩИЙ API ЗАПРОС",

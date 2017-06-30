@@ -90,7 +90,7 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 	jTextArea_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
 	
 //	icon.setIcon(null);	
-	
+	sendButton.setText(Lang.getInstance().translate("Hold Asset"));
 	toLabel.setText(Lang.getInstance().translate("Vendor Account") + ":");
   	recDetailsLabel.setText(Lang.getInstance().translate("Vendor Details") + ":");
 	
