@@ -25,6 +25,7 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	public static final boolean DEVELOP_USE = true;
+	public static final boolean PERSON_SEND_PROTECT = true;
 
 	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
 	public static final int MAINNET_PORT = DEVELOP_USE?9066:9046;

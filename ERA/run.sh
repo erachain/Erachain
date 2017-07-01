@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar ERA.jar
+java -jar erachain.jar

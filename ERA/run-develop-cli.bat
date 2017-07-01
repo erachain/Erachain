@@ -1,5 +1,5 @@
 @ECHO OFF
-set app=ERA-DEVELOP
+set app=erachain-dev
 set args=-cli
 
 IF EXIST java (

@@ -422,7 +422,7 @@ public abstract class TransactionAmount extends Transaction {
 						if (amount.compareTo(balance) > 0) {
 							// TODO: delete wrong check in new CHAIN
 							// ONE PAYMENT is WRONG
-							//if (!this.signature.equals(Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh")))
+							if (!this.signature.equals(Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh")))
 									return NO_BALANCE;
 						}
 							
@@ -441,7 +441,7 @@ public abstract class TransactionAmount extends Transaction {
 				
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
-				if (false && actionType != 2 && isPerson && !this.recipient.isPerson(db)) {
+				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && !this.recipient.isPerson(db)) {
 					return RECEIVER_NOT_PERSONALIZED;
 				}
 			}
