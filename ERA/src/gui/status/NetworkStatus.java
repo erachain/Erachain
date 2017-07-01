@@ -11,10 +11,13 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.ToolTipManager;
 
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.BlockChain;
 import database.DBSet;
 import lang.Lang;
+import network.Peer;
 import utils.GUIUtils;
 import utils.ObserverMessage;
 
@@ -87,8 +90,12 @@ public class NetworkStatus extends JLabel implements Observer
 		
 		if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
-			currentHeight = (int)message.getValue(); 
-			int height = Controller.getInstance().getMaxPeerHWeight(true).a;
+			currentHeight = (int)message.getValue();
+			Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(true);
+			if(heightW == null)
+				return;
+			
+			int height = heightW.a;
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{

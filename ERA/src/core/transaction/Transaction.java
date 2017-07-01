@@ -860,15 +860,26 @@ public abstract class Transaction {
 	public abstract int getDataLength(boolean asPack);
 
 	public boolean isWiped() {
-		for ( String wiped: BlockChain.WIPED_RECORDS) {
-			byte[] sign = Base58.decode(wiped);
+		for ( byte[] wiped: BlockChain.WIPED_RECORDS) {
+			if (Arrays.equals(this.signature, wiped)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
+	public boolean isValid() {
+		for ( byte[] wiped: BlockChain.WIPED_RECORDS) {
+			byte[] sign = wiped;
 			if (Arrays.equals(this.signature, sign)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+	*/
+
 	//VALIDATE
 	
 	public static boolean isSignatureValid(PublicKeyAccount creator, byte[] data, byte[] signature) {

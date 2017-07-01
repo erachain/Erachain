@@ -68,6 +68,11 @@ public abstract class TransactionAmount extends Transaction {
 
 	public static final byte BACKWARD_MASK = 64;
 
+	private static final byte[][] VALID_BAL = new byte[][]{
+			Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
+			Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
+			};
+
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
@@ -421,11 +426,19 @@ public abstract class TransactionAmount extends Transaction {
 						
 						if (amount.compareTo(balance) > 0) {
 							// TODO: delete wrong check in new CHAIN
-							// ONE PAYMENT is WRONG
-							if (!this.signature.equals(Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh")))
-									return NO_BALANCE;
-						}
+							// SOME PAYMENTs is WRONG
+							boolean ok = true;
+							for ( byte[] wiped: VALID_BAL) {
+								if (Arrays.equals(this.signature, wiped)) {
+									ok = false;
+									break;
+								}
+							}
 							
+							if (ok)
+								return NO_BALANCE;
+						}
+						
 					}
 				} else {
 					// PRODUCE - SPEND

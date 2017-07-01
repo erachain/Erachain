@@ -327,8 +327,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				if ( message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
 					//get_R_Send();
 					Object sss = message.getValue();
-				
-		trans_Hash_Map.remove((Transaction) message.getValue());
+					if (sss != null && trans_Hash_Map != null)
+						trans_Hash_Map.remove((Transaction) message.getValue());
 
 				}
 		
