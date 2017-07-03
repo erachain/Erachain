@@ -328,7 +328,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 					//get_R_Send();
 					Object sss = message.getValue();
 					if (sss != null && trans_Hash_Map != null)
-						trans_Hash_Map.remove((Transaction) message.getValue());
+						trans_Hash_Map.remove((Transaction) sss);
 
 				}
 		
