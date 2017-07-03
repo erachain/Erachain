@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
@@ -7,11 +9,14 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 //import org.apache.log4j.Logger;
 
+import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 
+import core.BlockChain;
 import core.transaction.Transaction;
 import database.BlockMap;
 import database.TransactionMap;
@@ -96,6 +101,27 @@ public class DebugTabPane extends JTabbedPane{
 		
 		//ADD BLOCK TABLE
 		this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
+		// 
+		if(BlockChain.DEVELOP_USE){
+			JPanel pppp = new JPanel();
+			JButton bb = new JButton("OffRun");
+			bb.addActionListener(new ActionListener( ){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				
+				
+			});
+			pppp.add(bb);
+			
+			this.addTab(Lang.getInstance().translate("OffRun"), new JScrollPane(pppp)); 
+			
+			
+		}
 		
         this.loggerTextArea = new LoggerTextArea(LOGGER);
         JScrollPane scrollPane = new JScrollPane(this.loggerTextArea);
