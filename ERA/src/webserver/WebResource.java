@@ -1046,7 +1046,7 @@ public class WebResource {
 	}
 
 	String[] imgsArray = { "ARONICLE.com.png", "logo_header.png", "ARONICLE.com-user.png",
-			"logo_bottom.png", "banner_01.png", "loading.gif",
+			"logo_bottom.svg", "banner_01.png", "loading.gif",
 			"00_generating.png", "01_genesis.jpg", "02_payment_in.png",
 			"02_payment_out.png", "03_name_registration.png",
 			"04_name_update.png", "05_name_sale.png",
@@ -1088,6 +1088,8 @@ public class WebResource {
 		case "jpg":
 			type = "image/jpeg";
 			break;
+		case "svg":
+			type = "image/svg+xml";	
 		}
 
 		if (file.exists()) {
@@ -3084,7 +3086,9 @@ public class WebResource {
 			    		break;
 			    	case "gif":
 			    		type = "image/gif";
-			    		break;			    		
+			    		break;	
+			    	case "svg":
+						type = "image/svg+xml";
 			    }
 			}	
 		}
