@@ -291,8 +291,7 @@ public void initComponents() {
 			if( main_Frame_settingsJSON.containsKey("Main_Frame_Width")) w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
 			
 			
-			setLocation(x, y);
-			setSize(w, h);
+			
 			
 			
 			
@@ -330,13 +329,16 @@ public void initComponents() {
 		
 		
 		} 
-		//else {
+		else {
+			this.setExtendedState(MAXIMIZED_BOTH);
+			
 	//		setExtendedState(MAXIMIZED_BOTH);
 			// mainPanel.jSplitPane1.setDividerLocation(250);
 	//		mainPanel.jSplitPane1.setLastDividerLocation(300);
 
-	//	}
-	
+		}
+		setLocation(x, y);
+		setSize(w, h);
 		mainPanel.jSplitPane1.setOrientation(orientation);
 		mainPanel.jSplitPane1.setLastDividerLocation(devLastLoc);
 		mainPanel.jSplitPane1.setDividerLocation(devLoc);
