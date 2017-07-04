@@ -246,7 +246,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 					
 					
 					
-					search_Table_Model.set_Filter_By_Name(search);
+				//	search_Table_Model.set_Filter_By_Name(search);
 					
 					new Thread() {
 						@Override

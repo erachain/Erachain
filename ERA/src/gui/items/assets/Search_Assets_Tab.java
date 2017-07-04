@@ -115,11 +115,35 @@ public class Search_Assets_Tab extends Split_Panel {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					// TODO Auto-generated method stub
+					
+										
+					
 					searchTextField_SearchToolBar_LeftPanel.setText("");
-					tableModelItemAssets.Find_item_from_key(key_Item.getText());	
-					if (tableModelItemAssets.getRowCount() < 1) return;
-					selected_Item = 0;
-					assetsTable.setRowSelectionInterval(selected_Item, selected_Item);
+					
+					
+					Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+					jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+					
+					
+					
+					
+				
+					
+					new Thread() {
+						@Override
+						public void run() {
+							tableModelItemAssets.Find_item_from_key(key_Item.getText());	
+							if (tableModelItemAssets.getRowCount() < 1) {
+								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
+								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+								return;
+							}
+							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+							// ddd.dispose();
+							jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+						}
+					}.start();
+					
 					
 					
 				}
@@ -232,13 +256,48 @@ public class Search_Assets_Tab extends Split_Panel {
 					String search = searchTextField_SearchToolBar_LeftPanel.getText();
 					if (search.equals("")){jScrollPane_jPanel_RightPanel.setViewportView(null);
 					tableModelItemAssets.clear();
+					 Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+					 jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 					return;
 				}
+					if (search.length()<3) {
+						Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+						 jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+						
+						
+						
+						return;
+					}
 					key_Item.setText("");
-					tableModelItemAssets.set_Filter_By_Name(search);
-					if (tableModelItemAssets.getRowCount() < 1) return;
-					assetsTable.setRowSelectionInterval(0, 0);
-				
+					
+					Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+					jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+					
+					
+					
+					
+				//	search_Table_Model.set_Filter_By_Name(search);
+					
+					new Thread() {
+						@Override
+						public void run() {
+							tableModelItemAssets.set_Filter_By_Name(search);
+							if (tableModelItemAssets.getRowCount() < 1) {
+								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
+								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+								return;
+							}
+							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+							// ddd.dispose();
+							jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+						}
+					}.start();
+			
+			
+					
+					
+			
+			
 			}
 		});
 		
