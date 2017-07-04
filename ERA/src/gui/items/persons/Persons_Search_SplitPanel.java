@@ -122,10 +122,30 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
 				searchTextField_SearchToolBar_LeftPanel.setText("");
-				search_Table_Model.Find_item_from_key(key_Item.getText());	
-				if (search_Table_Model.getRowCount() < 1) return;
-				selected_Item = 0;
-				search_Table.setRowSelectionInterval(selected_Item, selected_Item);
+				
+				
+				Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+				jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+				
+				
+				
+				
+			
+				
+				new Thread() {
+					@Override
+					public void run() {
+						search_Table_Model.Find_item_from_key(key_Item.getText());	
+						if (search_Table_Model.getRowCount() < 1) {
+							Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
+							jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+							return;
+						}
+						jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+						// ddd.dispose();
+						jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+					}
+				}.start();
 				
 				
 			}
