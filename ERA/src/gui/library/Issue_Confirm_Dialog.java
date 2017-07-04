@@ -6,6 +6,7 @@ package gui.library;
  */
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -50,7 +51,7 @@ private JLabel jTitle_Label;
         jTitle_Label.setText(title_Text);
         jTextPane1.set_text(text);
         jStatus_Label.setText(status_Text);
-        setMaximumSize(new Dimension(350,200));
+      //  setMaximumSize(new Dimension(350,200));
         setSize(w,h );
         jButton1.addActionListener(new ActionListener(){
 
@@ -92,6 +93,7 @@ private JLabel jTitle_Label;
         jTitle_Label = new JLabel();
        
 
+        setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridBagLayout());
 

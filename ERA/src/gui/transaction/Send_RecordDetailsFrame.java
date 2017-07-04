@@ -171,8 +171,8 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        			}
 		        		}
 
-	        			encrypted.setEnabled(false);
-
+	        		//	encrypted.setEnabled(false);
+		        		if (!encrypted.isSelected()){
 		        		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());	
 		        		
 		        		byte[] privateKey = null; 
@@ -203,6 +203,11 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
 		        			jTextArea_Messge.set_text("unknown password");
 							LOGGER.error(e1.getMessage(), e1);
 						}
+		        	}else
+		        	{
+		        		 jTextArea_Messge.set_text(r_Send.viewData());	
+		        		
+		        	}
 		        	}
 		        });
 	        }
