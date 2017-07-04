@@ -476,11 +476,11 @@ public class BlockExplorer
 			
 			if(info.getQueryParameters().containsKey("persons"))
 			{
-				int start = -1;
+				String start = null;
 
 				if(info.getQueryParameters().containsKey("startPerson"))
 				{
-					start = Integer.valueOf((info.getQueryParameters().getFirst("startPerson")));
+					start = info.getQueryParameters().getFirst("startPerson");
 				}
 
 				output.put("lastBlock", jsonQueryLastBlock());
@@ -1847,7 +1847,7 @@ if ( asset_1 == null) {
 	}
 	
 	
-	public Map jsonQueryPersons(int start)
+	public Map jsonQueryPersons(String start_Web)
 	{
 	/*	Block block;
 		if(start > 0)
@@ -1893,20 +1893,38 @@ if ( asset_1 == null) {
 		
 		int counter = start; 
  */
+				
+		long maxRow = DBSet.getInstance().getItemPersonMap().getSize();
+		long view_Row = 21;	
+			Long startRow;
+			try {
+				startRow = Long.valueOf(start_Web);
+				if(startRow> maxRow) startRow = maxRow;
+				
+			} catch (NumberFormatException e) {
+				// TODO Auto-generated catch block
+			
+				startRow = maxRow;
+			}
 		
-		int row = 0;
-		long k  = -1 ; 
-		int view_Row = 21;
 		
-		int i = start;
-		if (i <0)i =0;
-			k =  i + view_Row;
 		
-		if (k> DBSet.getInstance().getItemPersonMap().getSize()) k= DBSet.getInstance().getItemPersonMap().getSize();
+		 
+		if (startRow <1) startRow = view_Row;
+		
+		long i = startRow;
+		long k  = i - view_Row;
+		if(startRow-view_Row < 0 ) k = 0;
+	//	if (i <0) i =i + maxRow - start_Web;
+	//		k =  maxRow - i;
+		
+		
+		
+	//	if (k> DBSet.getInstance().getItemPersonMap().getSize()) k= DBSet.getInstance().getItemPersonMap().getSize();
 		output.put("start_row", i);
 		do{
 			
-			PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get((long) i+1);
+			PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get((long) i);
 			
 			
 			
@@ -1958,10 +1976,10 @@ if ( asset_1 == null) {
 			block = block.getParent(DBSet.getInstance());
 		*/	
 			output.put(i, blockJSON);
-			i++;
+			i--;
 			
 		}
-		while(i < k);
+		while(i > k);
 		
 		output.put("maxHeight",DBSet.getInstance().getItemPersonMap().getSize());
 		output.put("row", i);
