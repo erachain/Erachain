@@ -1894,7 +1894,7 @@ if ( asset_1 == null) {
 		int counter = start; 
  */
 				
-		long maxRow = DBSet.getInstance().getItemPersonMap().getSize();
+		long maxRow = DBSet.getInstance().getItemPersonMap().getSize(); 
 		long view_Row = 21;	
 			Long startRow;
 			try {
