@@ -17,6 +17,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
@@ -41,6 +42,8 @@ public class Split_Panel extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1L;
 	private int spt;
 	private JSONObject settingsJSONbuf;
+	public JPanel search_Info_Panel;
+	public JLabel Label_search_Info_Panel;
 	/**
      * Creates new form Doma2
      */
@@ -49,6 +52,12 @@ public class Split_Panel extends javax.swing.JPanel {
     	super();
     
         initComponents();
+        search_Info_Panel = new JPanel();
+	     search_Info_Panel.setLayout(new java.awt.BorderLayout());
+	     Label_search_Info_Panel = new javax.swing.JLabel();
+	     Label_search_Info_Panel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+	     search_Info_Panel.add(Label_search_Info_Panel, java.awt.BorderLayout.CENTER);
+        
         set_Divider_Parameters(str);
     }
   

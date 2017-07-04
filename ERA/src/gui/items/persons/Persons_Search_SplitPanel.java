@@ -206,14 +206,64 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 					String search = searchTextField_SearchToolBar_LeftPanel.getText();
 					if (search.equals("")){jScrollPane_jPanel_RightPanel.setViewportView(null);
 					search_Table_Model.clear();
+					 Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+					 jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 					return;
 				}
-					if (search.length()<3) return;
+					if (search.length()<3) {
+						Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+						 jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+						
+						
+						
+						return;
+					}
 					key_Item.setText("");
+					
+					Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+					jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+					
+					
+					
+					
 					search_Table_Model.set_Filter_By_Name(search);
-					if (search_Table_Model.getRowCount() < 1) return;
-					search_Table.setRowSelectionInterval(0, 0);
+					
+					new Thread() {
+						@Override
+						public void run() {
+							search_Table_Model.set_Filter_By_Name(search);
+							if (search_Table_Model.getRowCount() < 1) {
+								Label_search_Info_Panel.setText("Not Found Persons contains in name '" + search + "'");
+								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+								return;
+							}
+							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+							// ddd.dispose();
+							jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+						}
+					}.start();
+			
+			
+					
+					
+					
 				
+					
+					
+					
+				//	jScrollPanel_LeftPanel.setViewportView(null);
+				//	jScrollPane_jPanel_RightPanel.setViewportView(null);
+					
+					
+					// if (search.length()<3) return;
+				
+					// show message
+					// jTable_jScrollPanel_LeftPanel.setVisible(false);//
+					
+
+					
+			
+			
 			}
     		
     	});

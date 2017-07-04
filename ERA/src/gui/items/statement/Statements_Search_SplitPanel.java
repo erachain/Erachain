@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -44,6 +45,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 	// private MTable search_Table;
 	private RowSorter<TableModelPersons> search_Sorter;
 	private int selected_Item;
+	
 
 	// для прозрачности
 	int alpha = 255;
@@ -75,6 +77,9 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		MenuPopupUtil.installContextMenu(key_Item);
 
 		this.toolBar_LeftPanel.add(key_Item);
+		
+		
+		
 		key_Item.addActionListener(new ActionListener() {
 
 			@Override
@@ -137,6 +142,8 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 		// UPDATE FILTER ON TEXT CHANGE
 		searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
 
+			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub
@@ -144,24 +151,28 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 				String search = searchTextField_SearchToolBar_LeftPanel.getText();
 				jScrollPanel_LeftPanel.setViewportView(null);
 				jScrollPane_jPanel_RightPanel.setViewportView(null);
+				
 				if (search.equals("")) {
 					search_Table_Model.clear();
-					jScrollPanel_LeftPanel.setViewportView(new JLabel("Edit search Field..."));
+					   Label_search_Info_Panel.setText(Lang.getInstance().translate("Fill field Search"));
+					jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+									     
 					return;
 				}
 				// if (search.length()<3) return;
 				key_Item.setText("");
 				// show message
 				// jTable_jScrollPanel_LeftPanel.setVisible(false);//
-				jScrollPanel_LeftPanel.setViewportView(new JLabel("Wait..."));
+				Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+				jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 
 				new Thread() {
 					@Override
 					public void run() {
 						search_Table_Model.set_Filter_By_Name(search);
 						if (search_Table_Model.getRowCount() < 1) {
-							jScrollPanel_LeftPanel.setViewportView(
-									new JLabel("Not Found Documents contains In title '" + search + "'"));
+							Label_search_Info_Panel.setText("Not Found Documents contains In title '" + search + "'");
+							jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 							return;
 						}
 						jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
