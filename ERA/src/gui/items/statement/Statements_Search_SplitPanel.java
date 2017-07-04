@@ -171,7 +171,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 					public void run() {
 						search_Table_Model.set_Filter_By_Name(search);
 						if (search_Table_Model.getRowCount() < 1) {
-							Label_search_Info_Panel.setText("Not Found Documents contains In title '" + search + "'");
+							Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
 							jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 							return;
 						}
