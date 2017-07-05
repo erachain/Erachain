@@ -225,7 +225,7 @@ public void initComponents() {
 				settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex()+ "");
 				
 				settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
-				settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path().getBytes(Charset.forName("UTF-8"))));
+				settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path()));
 				settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
 				settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
 				
