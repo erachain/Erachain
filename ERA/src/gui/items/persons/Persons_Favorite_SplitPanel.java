@@ -184,7 +184,7 @@ import utils.TableMenuPopupUtil;
 						public void mousePressed(MouseEvent e) 
 						{
 							Point p = e.getPoint();
-							int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+							row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
 				//			jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 							
 							
