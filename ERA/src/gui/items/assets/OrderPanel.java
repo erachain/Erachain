@@ -554,27 +554,21 @@ public class OrderPanel extends JPanel
 		
 	//	JOptionPane.OK_OPTION
 		if (dd.isConfirm){
-		
-		
-		
-		
-		Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
-		
-		
-		
-		
-		//CHECK VALIDATE MESSAGE
-		if (result == Transaction.VALIDATE_OK) {
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
 			
-			this.txtFeePow.setText("0");
-			this.txtAmount.setText("");
-			this.txtPrice.setText("");
-			
-		} else {		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-		}
+			//CHECK VALIDATE MESSAGE
+			if (result == Transaction.VALIDATE_OK) {
+				
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Order has been sent") + "!", Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+				
+				//this.txtFeePow.setText("0");
+				this.txtAmount.setText("0");
+				//this.txtPrice.setText("0");
+				
+			} else {		
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		//ENABLE
 		this.sellButton.setEnabled(true);

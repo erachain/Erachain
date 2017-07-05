@@ -477,9 +477,11 @@ public class TransactionCreator
 		//CREATE ORDER TRANSACTION
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amountHave, amounWant, (byte)feePow, time, creator.getLastReference(this.fork));
 		
+		/*
 		int res = createOrderTransaction.isValid(this.fork, null);
 		if (res != Transaction.VALIDATE_OK)
 			return null;
+		*/
 				
 		//VALIDATE AND PROCESS
 		createOrderTransaction.sign(creator, false);
