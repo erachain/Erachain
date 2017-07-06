@@ -354,4 +354,23 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		
 		return assetAmount;
 	}
+	public String viewActionType() {
+		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+		
+		if (this.key > 0) {
+				if (amo_sign > 0) {
+					return TransactionAmount.NAME_ACTION_TYPE_PROPERTY;
+				} else { 
+					return TransactionAmount.NAME_ACTION_TYPE_HOLD;
+				}
+			} else {
+				if (amo_sign > 0) {
+					return TransactionAmount.NAME_CREDIT;
+				} else { 
+					return TransactionAmount.NAME_SPEND;
+				}
+			}
+		}
+	
+	
 }

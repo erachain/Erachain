@@ -31,6 +31,7 @@ import core.BlockChain;
 import gui.MainFrame;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
+import gui.items.accounts.My_Loans_SplitPanel;
 import gui.items.assets.Assets_Favorite_SplitPanel;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.My_Assets_Tab;
@@ -82,7 +83,7 @@ import lang.Lang;
 public class Main_Panel extends javax.swing.JPanel {
 
 	private static Main_Panel instance;
-	private MainLeftPanel mlp;
+	public MainLeftPanel mlp;
 
 	/**
 	 * Creates new form split_1
@@ -331,6 +332,15 @@ public class Main_Panel extends javax.swing.JPanel {
 			return;
 
 		}
+		
+		if ( str.equals( Lang.getInstance().translate("My Loans")) || str.equals("My_Loans_SplitPanel")){
+			ccase1( Lang.getInstance().translate("My Loans"), new My_Loans_SplitPanel());
+			return;
+
+		}
+		
+		
+	
 		
 		
 		if ( str.equals( Lang.getInstance().translate("Favorite Documents"))  || str.equals("Statements_Favorite_SplitPanel")){

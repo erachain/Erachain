@@ -65,7 +65,17 @@ public abstract class TransactionAmount extends Transaction {
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key = Transaction.FEE_KEY;
-
+	public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY = "backward PROPERTY";
+	public static final String NAME_ACTION_TYPE_BACKWARD_HOLD = "backward HOLD";
+	public static final String NAME_ACTION_TYPE_BACKWARD_CREDIT = "backward CREDIT";
+	public static final String NAME_ACTION_TYPE_BACKWARD_SPEND = "backward SPEND";
+	public static final String NAME_ACTION_TYPE_PROPERTY = "PROPERTY";
+	public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
+	public static final String NAME_CREDIT= "CREDIT";
+	
+	public static final String NAME_SPEND = "SPEND";
+	
+	
 	public static final byte BACKWARD_MASK = 64;
 
 	private static final byte[][] VALID_BAL = new byte[][]{
@@ -192,29 +202,29 @@ public abstract class TransactionAmount extends Transaction {
 		if (this.isBackward()) {
 			if (this.key > 0) {
 				if (amo_sign > 0) {
-					return "backward PROPERTY";
+					return NAME_ACTION_TYPE_BACKWARD_PROPERTY;
 				} else { 
-					return "backward HOLD";
+					return NAME_ACTION_TYPE_BACKWARD_HOLD;
 				}
 			} else {
 				if (amo_sign > 0) {
-					return "backward CREDIT";
+					return NAME_ACTION_TYPE_BACKWARD_CREDIT;
 				} else { 
-					return "backward SPEND";
+					return NAME_ACTION_TYPE_BACKWARD_SPEND;
 				}
 			}
 		} else {
 			if (this.key > 0) {
 				if (amo_sign > 0) {
-					return "PROPERTY";
+					return NAME_ACTION_TYPE_PROPERTY;
 				} else { 
-					return "HOLD";
+					return NAME_ACTION_TYPE_HOLD;
 				}
 			} else {
 				if (amo_sign > 0) {
-					return "CREDIT";
+					return NAME_CREDIT;
 				} else { 
-					return "SPEND";
+					return NAME_SPEND;
 				}
 			}
 		}

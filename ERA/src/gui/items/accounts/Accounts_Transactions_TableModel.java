@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 ////////
 import java.util.Observable;
 import java.util.Observer;
+import java.util.TreeSet;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -53,6 +55,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	public static final int COLUMN_RECIPIENT = 7;
 	public static final int COLUMN_MESSAGE = 8;
 	public static final int COLUMN_CONFIRM = 9;
+	public static final int COLUMN_ACTION_TYPE = 10;
 
 	private List<Transaction> r_Trans;
 	private HashMap<String, Trans> trans_Hash_Map;
@@ -60,7 +63,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	private boolean isEncrypted = true;
 
 	private String[] columnNames = Lang.getInstance().translate(new String[] { "Date", "Block", "RecNo", "Amount",
-			"Asset", "Type", "Sender", "Recipient", "Title", "Confirmation" });
+			"Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "type1" });
 	private Boolean[] column_AutuHeight = new Boolean[] { false, true, true, false, false };
 
 	private SortableList<Tuple2<String, String>, Transaction> ss;
@@ -71,6 +74,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	private byte[] privateKey;
 
 	private byte[] publicKey;
+
+	private HashSet actionTypes;
 
 	public Accounts_Transactions_TableModel() {
 		sender = new Account("");
@@ -267,6 +272,17 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
 				return ("unknown password");
 			}
+		case COLUMN_ACTION_TYPE:
+			if (r_Tran.transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
+				R_Send rs1 = ((R_Send) r_Tran.transaction);
+				return rs1.viewActionType();
+				
+			}else{
+				GenesisTransferAssetTransaction rs2 = (GenesisTransferAssetTransaction)r_Tran.transaction;
+				
+				return rs2.viewActionType();
+			}
+			
 
 		}
 
@@ -314,7 +330,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				get_R_Send();
 			}
 
-			this.fireTableDataChanged();
+		//	this.fireTableDataChanged();
 		}
 
 		// CHECK IF LIST UPDATED
@@ -334,6 +350,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		
 		
 		
+	}
+	public void set_ActionTypes(HashSet str){
+		actionTypes = str;
+				
 	}
 
 	public void get_R_Send() {
@@ -373,11 +393,26 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				trr.transaction = tttt;
 				trr.ammount = tttt.getAmount();
 	//if send for *-1
+				// view all types
+				if (actionTypes == null || actionTypes.size() == 0 ){
+				
 				if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
 					trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));
 	
 			
-				trans_Hash_Map.put(ttt.viewSignature(), trr);		
+				trans_Hash_Map.put(ttt.viewSignature(), trr);
+				return;
+				}
+				// view set types
+				if (actionTypes.contains(tttt.viewActionType())){
+					
+					if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
+						trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));
+		
+				
+					trans_Hash_Map.put(ttt.viewSignature(), trr);
+					}
+					
 			
 			
 		} 
@@ -410,10 +445,16 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				if (ttt1.getOwner() != null) trr.owner = ttt1.getOwner();
 				trr.recipient = ttt1.getRecipient();
 					
-									
-	
+				// view all types					
+				if (actionTypes == null || actionTypes.size() == 0 ){
 			
-				trans_Hash_Map.put(ttt.viewSignature(), trr);	
+				trans_Hash_Map.put(ttt.viewSignature(), trr);
+				return;
+				}
+				// view set types
+				if (actionTypes.contains(ttt1.viewTypeName())){
+					trans_Hash_Map.put(ttt.viewSignature(), trr);
+				}
 			}
 		}
 					
