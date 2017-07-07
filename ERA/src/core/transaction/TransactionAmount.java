@@ -434,7 +434,7 @@ public abstract class TransactionAmount extends Transaction {
 						BigDecimal balanceOWN = this.creator.getBalance(db, absKey, actionType);
 						BigDecimal balanceUSE = this.creator.getBalanceUSE(absKey, db);
 						
-						if (amount.compareTo(balanceOWN) > 0 && amount.compareTo(balanceUSE) > 0) {
+						if (amount.compareTo(balanceOWN) > 0 || amount.compareTo(balanceUSE) > 0) {
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
 							boolean ok = true;
