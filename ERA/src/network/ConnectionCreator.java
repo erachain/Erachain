@@ -36,7 +36,7 @@ public class ConnectionCreator extends Thread {
 			try
 			{	
 
-				Thread.sleep(100);
+				Thread.sleep(1000);
 
 				int maxReceivePeers = 4; // Settings.getInstance().getMaxReceivePeers();
 				
