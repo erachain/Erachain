@@ -396,7 +396,7 @@ public abstract class ItemCls {
 		itemJSON.put("item_type_sub", this.getItemSubType());
 		itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
 		itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-		itemJSON.put("key", this.key);
+		itemJSON.put("key", this.getKey());
 		itemJSON.put("name", this.name);
 		itemJSON.put("description", this.description);
 		itemJSON.put("creator", this.owner.getAddress());
