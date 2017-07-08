@@ -1552,7 +1552,7 @@ public class Controller extends Observable {
 				byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
 
 				try {
-					Block maxBlock = core.Synchronizer.getBlock(lastBlockSignature, maxHW.c);
+					Block maxBlock = core.Synchronizer.getBlock(lastBlockSignature, maxHW.c, true);
 					if (maxBlock != null) {
 						// SAME LAST BLOCK
 						//this.blockChain.getHWeight(dbSet, false);
@@ -1617,38 +1617,37 @@ public class Controller extends Observable {
 		//int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
 		int checkPointHeight = this.getBlockChain().getCheckPoint(dbSet);
 		
-		try {
-			// WHILE NOT UPTODATE
-			do {
-				// START UPDATE FROM HIGHEST HEIGHT PEER
-				// withWinBuffer = true
-				Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(true);				
-				if (peerHW != null) {
-					peer = peerHW.c;
-					if (peer != null) {
-						info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
-								+ " WH: " + getHWeightOfPeer(peer);
-						LOGGER.info(info);
-						about_frame.set_console_Text(info);
+		// WHILE NOT UPTODATE
+		do {
+			// START UPDATE FROM HIGHEST HEIGHT PEER
+			// withWinBuffer = true
+			Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(true);				
+			if (peerHW != null) {
+				peer = peerHW.c;
+				if (peer != null) {
+					info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
+							+ " WH: " + getHWeightOfPeer(peer);
+					LOGGER.info(info);
+					about_frame.set_console_Text(info);
+					try {
 						// SYNCHRONIZE FROM PEER
 						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
+					} catch (Exception e) {
+						LOGGER.error(e.getMessage(), e);
+
+						/*
+						if (peer != null && peer.isUsed()) {
+							// DISHONEST PEER
+							this.network.tryDisconnect(peer, 2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, e.getMessage());
+						}
+						*/
 					}
-
-					blockchainSyncStatusUpdate(getMyHeight());
-					
 				}
-			} while (!dbSet.isStoped() && !this.isUpToDate());
-			
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
 
-			/*
-			if (peer != null && peer.isUsed()) {
-				// DISHONEST PEER
-				this.network.tryDisconnect(peer, 2 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60, e.getMessage());
+				blockchainSyncStatusUpdate(getMyHeight());
+				
 			}
-			*/
-		}
+		} while (!dbSet.isStoped() && !this.isUpToDate());			
 
 		if (this.peerHWeight.size() == 0
 				|| peer == null) {

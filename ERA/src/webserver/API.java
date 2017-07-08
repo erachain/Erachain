@@ -157,16 +157,16 @@ public class API {
 		
 		help.put("ASSETS", "-----------------");
 		help.put("GET Assets", "assets");
-		help.put("GET Asset Full", "assetsfull");
+		help.put("GET Assets Full", "assetsfull");
+		help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");		
 
 		help.put("PERSON", "-----------------");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
 		help.put("GET Person Data", "persondata/{key}");
-		
+
 		help.put("PERSONS", "-----------------");
-		//help.put("GET Persons", "persons");
-		//help.put("GET Persons Full", "personsfull");
+		help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
 
 		help.put("TOOLS", "");
 		help.put("POST Verify Signature for JSON {\"message\": ..., \"signature\": Base58, \"publickey\": Base58)", "verifysignature");
@@ -910,7 +910,7 @@ public class API {
 	}
 
 	/*
-	 * ************* ASSETS **************
+	 * ************* ASSET **************
 	 */
 	@GET
 	@Path("assetheight")
@@ -947,8 +947,8 @@ public class API {
 				.build();
 		
 	}
+	
 	@GET
-
 	@Path("assetdata/{key}")
 	public Response assetData(@PathParam("key") long key) {
 		
@@ -969,6 +969,10 @@ public class API {
 				.build();
 		
 	}
+	
+	/*
+	 * ************* ASSETS **************
+	 */
 
 	@GET
 	@Path("assets")
@@ -993,8 +997,41 @@ public class API {
 		
 	}
 
+	@GET
+	@Path("assetsfilter/{filter_name_string}")
+	public Response assetsFilter(@PathParam("filter_name_string") String filter) {
+		
+		
+		if (filter == null || filter.length() < 3) {
+			return Response.status(501)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity("error - so small filter length")
+					.build();
+		}
+		
+		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
+		List<ItemCls> list = map.get_By_Name(filter);
+
+		JSONArray array = new JSONArray();
+		
+		if (list != null) {
+			for(ItemCls item: list)
+			{
+				array.add(item.toJson());
+			}
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(array))
+				.build();
+		
+	}
+
 	/*
-	 * ************* PERSONS **************
+	 * ************* PERSON **************
 	 */
 	@GET
 	@Path("personheight")
@@ -1031,8 +1068,8 @@ public class API {
 				.build();
 		
 	}
+	
 	@GET
-
 	@Path("persondata/{key}")
 	public Response personData(@PathParam("key") long key) {
 		
@@ -1054,10 +1091,48 @@ public class API {
 		
 	}
 
+	/*
+	 * ************* PERSONS **************
+	 */
+
+	@GET
+	@Path("personsfilter/{filter_name_string}")
+	public Response personsFilter(@PathParam("filter_name_string") String filter) {
+		
+		if (filter == null || filter.length() < 3) {
+			return Response.status(501)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity("error - so small filter length")
+					.build();
+		}
+
+		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES ASSETID EXIST
+		List<ItemCls> list = map.get_By_Name(filter);
+
+		JSONArray array = new JSONArray();
+		
+		if (list != null) {
+			for(ItemCls item: list)
+			{
+				array.add(item.toJson());
+			}
+		}
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(array))
+				.build();
+		
+	}
+
 
 	/*
 	 * ************* TOOLS **************
 	 */
+	
 	@POST
 	@Path("verifysignature")
 	public String verifysignature(String x) {

@@ -244,7 +244,7 @@ public class BlockChain
 	public int getCheckPoint(DBSet dbSet) {
 		
 		int checkPoint = getHeight(dbSet) - BlockChain.MAX_ORPHAN;
-		checkPoint = 32400;
+		checkPoint = DEVELOP_USE?1:32400;
 		
 		if ( checkPoint > this.checkPoint)
 			this.checkPoint = checkPoint;

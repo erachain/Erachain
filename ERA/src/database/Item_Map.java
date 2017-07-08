@@ -137,7 +137,9 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	public List<ItemCls> get_By_Name(String str)
 	{
 	List<ItemCls> txs = new ArrayList<>();
-		if (str.equals("") || str == null) return null;
+		if (str == null || str.length() < 3)
+			return null;
+		
 		Iterator<Pair<Long, ItemCls>> it = this.getList().iterator();
 		while (it.hasNext()){
 			Pair<Long, ItemCls> a = it.next();

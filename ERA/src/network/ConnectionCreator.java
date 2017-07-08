@@ -30,23 +30,31 @@ public class ConnectionCreator extends Thread {
 
 		int sleep_time = 0;
 
+		List<Peer> knownPeers = null;
+		int needloadCountMax = 1000;
+		int needloadCount = needloadCountMax;
+		
 		while(isRun)
 		{
 			
 			try
 			{	
 
-				Thread.sleep(1000);
+				Thread.sleep(100);
 
 				int maxReceivePeers = 4; // Settings.getInstance().getMaxReceivePeers();
 				
-				//CHECK IF WE NEED NEW CONNECTIONS
+				//CHECK IF WE NEED NEW CONNECTIONS				
 				if(this.isRun && Settings.getInstance().getMinConnections() >= callback.getActivePeersCounter(true))
 				{			
 					
-					// try update banned peers each minute 
-					//GET LIST OF KNOWN PEERS
-					List<Peer> knownPeers = PeerManager.getInstance().getKnownPeers();
+					needloadCount++;
+					if (needloadCount > needloadCountMax) {
+						// try update banned peers each minute 
+						//GET LIST OF KNOWN PEERS
+						knownPeers = PeerManager.getInstance().getKnownPeers();
+						needloadCount = 0;
+					}
 										
 					//ITERATE knownPeers
 					for(Peer peer: knownPeers)
