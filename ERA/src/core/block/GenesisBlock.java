@@ -613,7 +613,8 @@ public class GenesisBlock extends Block{
 		Account recipient;
 		if (address.equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
 			|| address.equals("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap")
-			//|| address.equals("7GWr8njMyjkDs1gdRAgQ6MaEp2DMkK26h7") // Бобылева Оксана
+			//|| address.equals("7GWr8njMyjkDs1gdRAgQ6MaEp2DMkK26h7") Матюхин
+			// Бобылева Оксана
 			)
 			return;
 				

@@ -1206,6 +1206,11 @@ public class Block {
 			//PROCESS
 			if (!transaction.isWiped()) {
 				transaction.process(dbSet, this, false);
+			} else {
+				//UPDATE REFERENCE OF SENDER
+				if (transaction.isReferenced() )
+					// IT IS REFERENCED RECORD?
+					transaction.getCreator().setLastReference(transaction.getTimestamp(), dbSet);
 			}
 
 			//SET PARENT
@@ -1401,6 +1406,11 @@ public class Block {
 			Transaction transaction = transactions.get(i);
 			if (!transaction.isWiped()) {
 					transaction.orphan(db, false);
+			} else {
+				//UPDATE REFERENCE OF SENDER
+				if (transaction.isReferenced() )
+					// IT IS REFERENCED RECORD?
+					transaction.getCreator().setLastReference(transaction.getReference(), db);
 			}
 		}
 	}

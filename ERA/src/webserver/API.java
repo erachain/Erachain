@@ -121,7 +121,7 @@ public class API {
 		Map help = new LinkedHashMap();
 
 		help.put("GET Height", "height");
-		help.put("BLOCK", "--------------");
+		help.put("*** BLOCK ***", "");
 		help.put("GET First Block", "firstblock");
 		help.put("GET Last Block", "lastblock");
 		help.put("GET Block", "block/{signature}");
@@ -129,11 +129,11 @@ public class API {
 		help.put("GET Child Block Signature", "childblocksignature/{signature}");
 		help.put("GET Child Block", "childblock/{signature}");
 
-		help.put("BLOCKS", "----------------");
+		help.put("*** BLOCKS ***", "");
 		help.put("GET Blocks from Height by Limit (end:1 if END is reached)", "blocksfromheight/{height}/{limit}");
 		help.put("GET Blocks Signatures from Height by Limit (end:1 if END id reached)", "/blockssignaturesfromheight/{height}/{limit}");		
 
-		help.put("RECORD", "----------------");
+		help.put("*** RECORD ***", "");
 		help.put("GET Record Parse from RAW", "recordparse/{raw}");
 		help.put("POST Record Parse from RAW", "recordparse?raw=...");
 		help.put("GET Record", "record/{signature}");
@@ -141,7 +141,7 @@ public class API {
 		help.put("GET Record RAW", "recordraw/{signature}");
 		help.put("GET Record RAW by Height and Sequence", "recordrawbynumber/{height-sequence}");
 		
-		help.put("ADDRESS", "---------------");
+		help.put("*** ADDRESS ***", "");
 		help.put("GET Address Validate", "addressvalidate/{address}");
 		help.put("GET Address Last Reference", "addresslastreference/{address}");
 		help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}");
@@ -150,25 +150,25 @@ public class API {
 		help.put("GET Address Assets", "addressassets/{address}");
 		help.put("GET Address Public Key", "addresspublickey/{address}");
 		
-		help.put("ASSET", "-----------------");
+		help.put("*** ASSET ***", "");
 		help.put("GET Asset Height", "assetheight");
 		help.put("GET Asset", "asset/{key}");
 		help.put("GET Asset Data", "assetdata/{key}");
 		
-		help.put("ASSETS", "-----------------");
+		help.put("*** ASSETS ***", "");
 		help.put("GET Assets", "assets");
 		help.put("GET Assets Full", "assetsfull");
 		help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");		
 
-		help.put("PERSON", "-----------------");
+		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
 		help.put("GET Person Data", "persondata/{key}");
 
-		help.put("PERSONS", "-----------------");
+		help.put("*** PERSONS ***", "");
 		help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
 
-		help.put("TOOLS", "");
+		help.put("*** TOOLS ***", "");
 		help.put("POST Verify Signature for JSON {\"message\": ..., \"signature\": Base58, \"publickey\": Base58)", "verifysignature");
 		
 		return Response.status(200)

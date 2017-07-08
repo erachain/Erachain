@@ -869,8 +869,8 @@ public abstract class Transaction {
 	}
 
 	/*
-	public boolean isValid() {
-		for ( byte[] wiped: BlockChain.WIPED_RECORDS) {
+	public boolean isValidated() {
+		for ( byte[] wiped: BlockChain.VALID_RECORDS) {
 			byte[] sign = wiped;
 			if (Arrays.equals(this.signature, sign)) {
 				return true;
