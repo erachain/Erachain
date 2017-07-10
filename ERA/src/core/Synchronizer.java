@@ -43,7 +43,7 @@ public class Synchronizer
 	}
 	
 	static boolean USE_AT_ORPHAN = false;
-	static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 30;
+	public static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 32;
 	
 	public Peer getPeer() {
 		return fromPeer;
@@ -308,7 +308,7 @@ public class Synchronizer
 					
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block null";
-					peer.ban(10, mess);
+					peer.ban(BAN_BLOCK_TIMES>>2, mess);
 					throw new Exception(mess);
 				}
 				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
@@ -328,7 +328,7 @@ public class Synchronizer
 
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dbSet);
-					peer.ban(BAN_BLOCK_TIMES, mess);
+					peer.ban(BAN_BLOCK_TIMES>>1, mess);
 					throw new Exception(mess);
 				}
 			}
@@ -468,7 +468,7 @@ public class Synchronizer
 				|| checkPointHeightSignature == null) {
 			String mess = "Dishonest peer: my block[" + checkPointHeight
 					+ "\n -> common BLOCK not found";
-			peer.ban(BAN_BLOCK_TIMES, mess);
+			peer.ban(BAN_BLOCK_TIMES>>1, mess);
 
 			throw new Exception(mess);
 		}
@@ -502,7 +502,7 @@ public class Synchronizer
 		if (false && headers.isEmpty()) {
 			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
 			
-			peer.ban(BAN_BLOCK_TIMES, mess);
+			peer.ban(BAN_BLOCK_TIMES>>1, mess);
 			throw new Exception(mess);
 		}
 
@@ -556,7 +556,7 @@ public class Synchronizer
 		Block block = response.getBlock();
 		if(block == null)
 		{
-			int banTime = 600;
+			int banTime = BAN_BLOCK_TIMES>>2;
 			String mess = "*** Dishonest peer - Block is NULL. Ban for " + banTime;
 			peer.ban(banTime, mess);
 			throw new Exception(mess);
@@ -565,7 +565,7 @@ public class Synchronizer
 		//CHECK BLOCK SIGNATURE
 		if(!block.isSignatureValid())
 		{
-			int banTime = 600;
+			int banTime = BAN_BLOCK_TIMES;
 			String mess = "*** Dishonest peer - Invalid block --signature. Ban for " + banTime;
 			peer.ban(banTime, mess);
 			throw new Exception(mess);

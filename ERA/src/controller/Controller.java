@@ -1433,7 +1433,7 @@ public class Controller extends Observable {
 	public void banPeerOnError(Peer peer, String mess) {
 		if ( Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1 ) {
 			// BAN if ALL connection USED
-			this.network.tryDisconnect(peer, 30, "ban PeerOnError - " + mess);			
+			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES>>2, "ban PeerOnError - " + mess);			
 		}
 	}
 
