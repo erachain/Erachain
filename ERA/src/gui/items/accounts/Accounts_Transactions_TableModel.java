@@ -203,11 +203,20 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return r_Tran.transaction.viewTimestamp();
 		case COLUMN_BLOCK:
 
-			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())) return r_Tran.transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance());
+			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())){
+			String m = r_Tran.transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "";
+			String d = r_Tran.transaction.getSeqNo(DBSet.getInstance())+ "";
+			int zz = 5 - d.length();
+			for (int z = 0; z<zz; z++ ){
+				d = "0"+ d;
+			}
+			String bd = m+"."+ d;
+				return new BigDecimal(bd).setScale(5);
+			}
 			return -1;
 		case COLUMN_TRANSACTION:
 
-			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())) return r_Tran.transaction.getSeqNo(DBSet.getInstance());
+			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())) return r_Tran.transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "-" + r_Tran.transaction.getSeqNo(DBSet.getInstance());
 			return -1;
 		case COLUMN_AMOUNT:
 		//	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
