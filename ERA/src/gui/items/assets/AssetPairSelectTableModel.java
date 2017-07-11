@@ -21,6 +21,7 @@ import core.blockexplorer.BlockExplorer;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import database.DBSet;
+import database.ItemAssetMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -42,12 +43,15 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all; 
 	
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,false,false,false,false};
+	private String filter_Name;
+	private ItemAssetMap db;
 	
-	public AssetPairSelectTableModel(long key, String action)
+	public AssetPairSelectTableModel(long key)//, String action)
 	{
 		this.key = key;
+		db = DBSet.getInstance().getItemAssetMap();
 		//Controller.getInstance().addObserver(this);
-		Collection<ItemCls> assetsBuf = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
+		/*	Collection<ItemCls> assetsBuf = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
 		this.assets = new ArrayList<ItemCls>();
 		
 		for (ItemCls item : assetsBuf) {
@@ -60,10 +64,10 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 						assets.add(asset);
 				}else 
 					*/
-					assets.add(asset);
+	/*				assets.add(asset);
 			}
 		}
-				
+	*/			
 		this.all = 
 				BlockExplorer.getInstance().calcForAsset(
 						DBSet.getInstance().getOrderMap().getOrders(this.key, true), 
@@ -110,7 +114,8 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	@Override
 	public int getRowCount() 
 	{
-		 return this.assets.size();
+		if (assets == null) return 0;
+		return this.assets.size();
 	}
 
 	@Override
@@ -202,7 +207,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 		if(( message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK )
 				||	(Controller.getInstance().getStatus() == Controller.STATUS_OK && (message.getType() == ObserverMessage.ADD_BALANCE_TYPE || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE)))
 		{
-			this.fireTableDataChanged();
+		//	this.fireTableDataChanged();
 		}
 	}
 	
@@ -210,5 +215,31 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	{
 		//this.balances.removeObserver();
 		Controller.getInstance().deleteObserver(this);
+	}
+
+
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		// TODO Auto-generated method stub
+				if (text.equals("") || text == null) return;
+				if (!text.matches("[0-9]*"))return;
+					Long key_filter = new Long(text);
+					assets =new ArrayList<ItemCls>();
+					 AssetCls asset = Controller.getInstance().getAsset(key_filter);
+					if ( asset == null || asset.getKey() == this.key) return;
+					assets.add(asset);
+					this.fireTableDataChanged();
+	}
+	
+	public void set_Filter_By_Name(String str) {
+		filter_Name = str;
+		assets = db.get_By_Name(filter_Name);
+		this.fireTableDataChanged();
+
+	}
+	public void clear(){
+		assets =new ArrayList<ItemCls>();
+		this.fireTableDataChanged();
+		
 	}
 }

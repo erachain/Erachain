@@ -30,6 +30,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JComponent;
@@ -38,6 +39,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
@@ -70,6 +72,7 @@ public class AssetPairSelect extends JDialog{
 	 AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
 	 RowSorter sorter;
 	 public AssetCls pairAsset;
+	private JTextField key_Item;
 
 	public AssetPairSelect(long key, String action, String account) {
 		
@@ -145,7 +148,117 @@ public class AssetPairSelect extends JDialog{
 		pair_Panel.jButton1_jToolBar_RightPanel.setVisible(false);
 		pair_Panel.jButton2_jToolBar_RightPanel.setVisible(false);
 		
-		assetPairSelectTableModel = new AssetPairSelectTableModel(key, action);
+		pair_Panel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+					
+		pair_Panel.searchToolBar_LeftPanel.setVisible(true);
+		pair_Panel.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key")+":"));
+	    	key_Item = new JTextField();
+	    	key_Item.setToolTipText("");
+	    	key_Item.setAlignmentX(1.0F);
+	    	key_Item.setMinimumSize(new java.awt.Dimension(100, 20));
+	    	key_Item.setName(""); // NOI18N
+	    	key_Item.setPreferredSize(new java.awt.Dimension(100, 20));
+	    	key_Item.setMaximumSize(new java.awt.Dimension(2000, 20));
+	       	
+	    	MenuPopupUtil.installContextMenu(key_Item);
+	    	
+	    	pair_Panel.toolBar_LeftPanel.add(key_Item);
+	    	key_Item.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					
+										
+					
+					pair_Panel.searchTextField_SearchToolBar_LeftPanel.setText("");
+					
+					
+					pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+				
+					
+					
+				
+					
+					new Thread() {
+						@Override
+						public void run() {
+							assetPairSelectTableModel.Find_item_from_key(key_Item.getText());	
+							if (assetPairSelectTableModel.getRowCount() < 1) {
+								pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
+								pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.search_Info_Panel);
+								return;
+							}
+							pair_Panel.jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+							// ddd.dispose();
+							pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.jTable_jScrollPanel_LeftPanel);
+						}
+					}.start();
+					
+					
+					
+				}
+	    		
+	    	});
+		
+	    	
+			
+	    	pair_Panel.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					// GET VALUE
+						String search = pair_Panel.searchTextField_SearchToolBar_LeftPanel.getText();
+						if (search.equals("")){pair_Panel.jScrollPane_jPanel_RightPanel.setViewportView(null);
+						assetPairSelectTableModel.clear();
+						pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+						pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.search_Info_Panel);
+						return;
+					}
+						if (search.length()<3) {
+							pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+							pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.search_Info_Panel);
+							
+							
+							
+							return;
+						}
+						key_Item.setText("");
+						
+						pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+						pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.search_Info_Panel);
+						
+						
+						
+						
+					//	search_Table_Model.set_Filter_By_Name(search);
+						
+						new Thread() {
+							@Override
+							public void run() {
+								assetPairSelectTableModel.set_Filter_By_Name(search);
+								if (assetPairSelectTableModel.getRowCount() < 1) {
+									pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Assets"));
+									pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.search_Info_Panel);
+									return;
+								}
+								pair_Panel.jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+								// ddd.dispose();
+								pair_Panel.jScrollPanel_LeftPanel.setViewportView(pair_Panel.jTable_jScrollPanel_LeftPanel);
+							}
+						}.start();
+				
+				
+						
+						
+				
+				
+				}
+			});
+	    	
+		
+		assetPairSelectTableModel = new AssetPairSelectTableModel(key); //, action);
 				
 		final MTable assetsPairTable = new MTable(assetPairSelectTableModel);
 		
