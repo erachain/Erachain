@@ -429,6 +429,30 @@ public abstract class TransactionAmount extends Transaction {
 					}
 
 				} else if (actionType == 1) {
+					
+					// SPEND ASSET
+					
+					if (absKey == 1) {
+						
+						int height = this.getBlockHeightByParentOrLast(db);
+						if (height > Transaction.FREEZE_FROM) {
+							// LOCK PAYMENTS
+							boolean ok = true;
+							for ( String address: Transaction.TRUE_ADDRESSES) {
+								if (this.creator.equals(address)
+										|| this.recipient.equals(address)) {
+									ok = false;
+									break;
+								}
+							}
+							
+							if (ok)
+								return INVALID_ADDRESS;
+
+						}
+						
+					}
+					
 					// if asset is unlimited and me is creator of this asset 
 					boolean unLimited = 
 							absKey > AssetCls.REAL_KEY // not genesis assets!

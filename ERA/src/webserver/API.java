@@ -34,6 +34,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -149,6 +150,7 @@ public class API {
 		help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
 		help.put("GET Address Assets", "addressassets/{address}");
 		help.put("GET Address Public Key", "addresspublickey/{address}");
+		help.put("GET Address Person Key", "addresspersonkey/{address}");
 		
 		help.put("*** ASSET ***", "");
 		help.put("GET Asset Height", "assetheight");
@@ -163,6 +165,7 @@ public class API {
 		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
+		help.put("GET Person by Address", "personbyaddress/{address}");
 		help.put("GET Person Data", "persondata/{key}");
 
 		help.put("*** PERSONS ***", "");
@@ -909,6 +912,33 @@ public class API {
 		}
 	}
 
+	@GET
+	@Path("addresspersonkey/{address}")
+	public Response getPersonKey(@PathParam("address") String address) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(address);		
+		
+		if (personItem == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.CREATOR_NOT_PERSONALIZED);
+		} else {
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity("" + personItem.a)
+					.build();
+		}
+	}
+
 	/*
 	 * ************* ASSET **************
 	 */
@@ -1091,6 +1121,46 @@ public class API {
 		
 	}
 
+	@GET
+	@Path("personbyaddress/{address}")
+	public Response personbyaddress(@PathParam("address") String address) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(address);		
+		
+		if (personItem == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+
+		long key = personItem.a;
+		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		PersonCls person = (PersonCls)map.get(key);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(person.toJson()))
+				.build();
+		
+	}
+	
+	
 	/*
 	 * ************* PERSONS **************
 	 */

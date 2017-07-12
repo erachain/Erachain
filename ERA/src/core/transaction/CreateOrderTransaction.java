@@ -227,6 +227,23 @@ public class CreateOrderTransaction extends Transaction
 	@Override
 	public int isValid(DBSet db, Long releaserReference) 
 	{
+		
+		int height = this.getBlockHeightByParentOrLast(db);
+		if (height > Transaction.FREEZE_FROM) {
+			// LOCK PAYMENTS
+			boolean ok = true;
+			for ( String address: TRUE_ADDRESSES) {
+				if (this.creator.equals(address)) {
+					ok = false;
+					break;
+				}
+			}
+			
+			if (ok)
+				return INVALID_ADDRESS;
+
+		}
+
 		//CHECK IF ASSETS NOT THE SAME
 		long have = this.order.getHave();
 		long want = this.order.getWant();
