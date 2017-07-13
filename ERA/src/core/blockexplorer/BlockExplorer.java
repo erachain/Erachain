@@ -2220,7 +2220,7 @@ if ( asset_1 == null) {
 					transactionJSON.put("size",trans.viewSize(false));
 					transactionJSON.put("fee",trans.getFee());
 					transactionJSON.put("confirmations",trans.getConfirmations(db));
-					transactionJSON.put("type",Lang.getInstance().translate_from_langObj(trans.viewTypeName(),langObj));
+					transactionJSON.put("type",Lang.getInstance().translate_from_langObj(trans.viewFullTypeName(),langObj));
 					
 					
 					String amount = "-";
