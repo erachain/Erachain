@@ -215,7 +215,7 @@ public class Send_RecordDetailsFrame extends Rec_DetailsFrame
         
 		if (r_Send.getAmount() != null) {
 			
-			String sendType = Lang.getInstance().translate(r_Send.viewActionType());
+			String sendType = Lang.getInstance().translate(r_Send.viewFullTypeName());
 			//LABEL AMOUNT
 			++labelGBC.gridy;
 			JLabel amountLabel = new JLabel(sendType + ":");

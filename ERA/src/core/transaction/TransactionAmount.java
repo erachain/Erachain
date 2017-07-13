@@ -65,14 +65,15 @@ public abstract class TransactionAmount extends Transaction {
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key = Transaction.FEE_KEY;
+	/*
 	public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY = "backward PROPERTY";
 	public static final String NAME_ACTION_TYPE_BACKWARD_HOLD = "backward HOLD";
 	public static final String NAME_ACTION_TYPE_BACKWARD_CREDIT = "backward CREDIT";
 	public static final String NAME_ACTION_TYPE_BACKWARD_SPEND = "backward SPEND";
+	*/
 	public static final String NAME_ACTION_TYPE_PROPERTY = "PROPERTY";
 	public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
 	public static final String NAME_CREDIT= "CREDIT";
-	
 	public static final String NAME_SPEND = "SPEND";
 	
 	
@@ -190,6 +191,33 @@ public abstract class TransactionAmount extends Transaction {
 			|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 	}
 
+	/* ************** VIEW
+	 */
+	
+	@Override
+	public String viewTypeName() {
+		if (this.amount == null
+				|| this.amount.signum() == 0) 
+			return "LETTER";
+
+		if (this.isBackward()) {
+			return "backward";
+		} else {
+			return "SEND";			
+		}
+	}
+	@Override
+	public String viewSubTypeName() {
+		return viewActionType();
+	}
+	@Override
+	public String viewAmount() {
+		if (this.amount.signum() < 0) {
+			return this.amount.negate().toPlainString();
+		} else {
+			return this.amount.toPlainString();
+		}
+	}
 	@Override
 	public String viewAmount(Account account) {
 		String address = account.getAddress();
@@ -200,36 +228,25 @@ public abstract class TransactionAmount extends Transaction {
 		return NumberAsString.getInstance().numberAsString(getAmount(address));
 	}
 
-	public String viewActionType() {
-		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
+	private String viewActionType() {
 		
-		if (this.isBackward()) {
-			if (this.key > 0) {
-				if (amo_sign > 0) {
-					return NAME_ACTION_TYPE_BACKWARD_PROPERTY;
-				} else { 
-					return NAME_ACTION_TYPE_BACKWARD_HOLD;
-				}
-			} else {
-				if (amo_sign > 0) {
-					return NAME_ACTION_TYPE_BACKWARD_CREDIT;
-				} else { 
-					return NAME_ACTION_TYPE_BACKWARD_SPEND;
-				}
+		if (this.amount == null
+				|| this.amount.signum() == 0) 
+			return "";
+		
+		int amo_sign = this.amount.signum();
+		
+		if (this.key > 0) {
+			if (amo_sign > 0) {
+				return NAME_ACTION_TYPE_PROPERTY;
+			} else { 
+				return NAME_ACTION_TYPE_HOLD;
 			}
 		} else {
-			if (this.key > 0) {
-				if (amo_sign > 0) {
-					return NAME_ACTION_TYPE_PROPERTY;
-				} else { 
-					return NAME_ACTION_TYPE_HOLD;
-				}
-			} else {
-				if (amo_sign > 0) {
-					return NAME_CREDIT;
-				} else { 
-					return NAME_SPEND;
-				}
+			if (amo_sign > 0) {
+				return NAME_CREDIT;
+			} else { 
+				return NAME_SPEND;
 			}
 		}
 		// return "SPEND";
@@ -268,8 +285,10 @@ public abstract class TransactionAmount extends Transaction {
 		
 		transaction.put("recipient", this.recipient.getAddress());
 		if (this.amount != null) {
-			transaction.put("asset", this.key);
-			transaction.put("amount", this.amount.toPlainString());
+			transaction.put("asset", this.getAbsKey());
+			transaction.put("amount", this.viewAmount());
+			//transaction.put("action_type", this.viewActionType());
+			transaction.put("action_key", this.getActionType());
 		}
 		
 		return transaction;

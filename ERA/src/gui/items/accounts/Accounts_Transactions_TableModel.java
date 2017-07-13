@@ -225,8 +225,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return Controller.getInstance().getAsset(r_Tran.transaction.getAbsKey()).toString();
 			
 		case COLUMN_TYPE:
-			
-			return r_Tran.transaction.viewTypeName();
+			return r_Tran.transaction.viewFullTypeName();
 		case COLUMN_RECIPIENT:
 			return r_Tran.transaction.viewRecipient();
 		case COLUMN_SENDER:
@@ -282,16 +281,20 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				return ("unknown password");
 			}
 		case COLUMN_ACTION_TYPE:
+			
+			/*
 			if (r_Tran.transaction.getType() == Transaction.SEND_ASSET_TRANSACTION){
 				R_Send rs1 = ((R_Send) r_Tran.transaction);
-				return rs1.viewActionType();
+				return rs1.viewFullTypeName();
 				
 			}else{
 				GenesisTransferAssetTransaction rs2 = (GenesisTransferAssetTransaction)r_Tran.transaction;
 				
-				return rs2.viewActionType();
+				return rs2.viewFullTypeName();
 			}
+			*/
 			
+			return r_Tran.transaction.viewFullTypeName();
 
 		}
 
@@ -413,7 +416,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				return;
 				}
 				// view set types
-				if (actionTypes.contains(tttt.viewActionType())){
+				if (actionTypes.contains(tttt.viewFullTypeName())){
 					
 					if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
 						trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));

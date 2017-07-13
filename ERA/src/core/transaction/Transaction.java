@@ -755,6 +755,9 @@ public abstract class Transaction {
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
 		transaction.put("confirmations", this.getConfirmations(DBSet.getInstance()));
+		transaction.put("type_name", this.viewTypeName());
+		transaction.put("sub_type_name", this.viewSubTypeName());
+		
 		int height;
 		if (this.creator == null )
 		{

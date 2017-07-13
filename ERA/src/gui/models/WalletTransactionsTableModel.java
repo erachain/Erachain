@@ -220,7 +220,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 							
 			case COLUMN_TYPE:
 				
-				return Lang.getInstance().translate(transaction.viewTypeName());
+				return Lang.getInstance().translate(transaction.viewFullTypeName());
 				
 			case COLUMN_CREATOR:
 				
