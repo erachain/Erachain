@@ -608,7 +608,7 @@ public class R_SignNote extends Transaction {
 				out_Map.put(name, new Tuple2(zip,bb));	
 					
 		}
-		 return new Tuple4(version,title,json, out_Map);
+		 return new Tuple4(version, title, json, out_Map);
 		}
 		// v 2.1
 		if (json.containsKey("F")) { // return new Tuple4(version,title,json, null);
@@ -632,9 +632,9 @@ public class R_SignNote extends Transaction {
 		}
 		
 			
-		 return new Tuple4(version,title,json, out_Map);
+		 return new Tuple4(version, title, json, out_Map);
 		}
-		return new Tuple4(version,title,json, null);
+		return new Tuple4(version, title, json, null);
 	}
 	
 	public static  byte[]  Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String,Tuple2<Boolean,byte[]>> files) throws Exception {

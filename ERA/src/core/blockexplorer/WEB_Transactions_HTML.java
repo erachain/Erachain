@@ -543,12 +543,11 @@ public class WEB_Transactions_HTML {
 		}
 		
 		if (!tr.getHead().equals(""))
-			out += "<b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ":</b> " + Processor.process(tr.getHead())
-					+ "<BR>";
-		if (!tr.viewData().equals(""))
-			out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> " + Processor.process(tr.viewData());
-
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ":</b> " + tr.getHead();
 		
+		if (!tr.viewData().equals(""))	
+			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
+					+ core.exdata.ExData.viewDescriptionHTML(tr.viewData());
 
 		
 		return out;

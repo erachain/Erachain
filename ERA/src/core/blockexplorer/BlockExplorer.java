@@ -2141,9 +2141,9 @@ if ( asset_1 == null) {
 		for (Transaction trans:transactions){
 			LinkedHashMap transactionJSON = new LinkedHashMap();
 				
-					
+					/*
 					String itemName = "-";
-					Long itemKey = new Long("-1");
+					Long itemKey = 0L;
 					if (trans instanceof TransactionAmount && trans.getAbsKey() >0)
 					{
 						TransactionAmount transAmo = (TransactionAmount)trans;
@@ -2151,7 +2151,7 @@ if ( asset_1 == null) {
 						ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
 						if (item==null){
 							itemName = "-";
-							itemKey = (long) -1;
+							itemKey = 0L;
 							
 						}
 						itemName = item.toString();
@@ -2192,24 +2192,29 @@ if ( asset_1 == null) {
 						itemKey  = (long) -1;
 					}
 					
+					transactionJSON.put("amount",amount);
+					transactionJSON.put("item_name", itemName);		
+					transactionJSON.put("item_key", itemKey);
+					*/
+					
 					// 
 					transactionJSON.put("block",trans.getBlockHeight(db));//.getSeqNo(db));
 					
 					transactionJSON.put("seq",trans.getSeqNo(db));
 					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
-					transactionJSON.put("reference",trans.getReference());
+					//transactionJSON.put("reference",trans.getReference());
 					transactionJSON.put("date",DateTimeFormat.timestamptoString(trans.getTimestamp()));
 					transactionJSON.put("creator",trans.viewCreator());
 					
 					
 					if (trans.getCreator() == null){
-						transactionJSON.put("creator_key","-");
-						transactionJSON.put("creator_addr","");
+						transactionJSON.put("creator_key", "-");
+						transactionJSON.put("creator_addr", "-");
 						}
 					else {
-						transactionJSON.put("creator_addr",trans.getCreator().getAddress());	
+						transactionJSON.put("creator_addr", trans.getCreator().getAddress());	
 					if (trans.getCreator().getPerson() == null){
-						transactionJSON.put("creator_key","+");
+						transactionJSON.put("creator_key", "+");
 						
 					}
 					else {
@@ -2223,22 +2228,24 @@ if ( asset_1 == null) {
 					transactionJSON.put("type",Lang.getInstance().translate_from_langObj(trans.viewFullTypeName(),langObj));
 					
 					
-					String amount = "-";
-					if (trans.getAmount() != null) amount = trans.getAmount().toString();
+					//String amount = "-";
+					//if (trans.getAmount() != null) amount = trans.getAmount().toString();					
 					
-					
-					transactionJSON.put("item_name",itemName);		
-					transactionJSON.put("item_key",itemKey);
-					
-					
-					transactionJSON.put("key",trans.getKey());
+					long absKey = trans.getAbsKey();
+					String amount = trans.viewAmount();
+					if (absKey > 0) {
+						if (amount.length() > 0) {
+						transactionJSON.put("amount_key", trans.viewAmount() + ":" + absKey);
+						} else {
+						transactionJSON.put("amount_key", "" + absKey);
+						}
+					} else {
+						transactionJSON.put("amount_key", "");
+					}
 					
 					if (trans.viewRecipient() == null){transactionJSON.put("recipient","-");}
 					else {transactionJSON.put("recipient",trans.viewRecipient());}
-					
-					transactionJSON.put("amount",amount);
-					
-					
+										
 					transactionsJSON.put(i1, transactionJSON);
 					i1++;
 		}
@@ -2256,7 +2263,8 @@ if ( asset_1 == null) {
 		output.put("label_size",Lang.getInstance().translate_from_langObj("Size",langObj));
 		output.put("label_seq",Lang.getInstance().translate_from_langObj("Seq",langObj));
 		output.put("label_signature",Lang.getInstance().translate_from_langObj("Signature",langObj));
-		output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
+		//output.put("label_reference",Lang.getInstance().translate_from_langObj("Reference",langObj));
+		output.put("label_amount_key",Lang.getInstance().translate_from_langObj("Amount:Key", langObj));		
 		output.put("label_fee",Lang.getInstance().translate_from_langObj("Fee",langObj));
 		output.put("label_transactions_table",Lang.getInstance().translate_from_langObj("Transactions",langObj));
 		
@@ -3621,8 +3629,8 @@ if ( asset_1 == null) {
 					return null;
 				}
 				
-				String str_HTML = "";
-				if ( map_Data.b != null) str_HTML = "<b>"+Lang.getInstance().translate_from_langObj("Title",langObj) + ": </b>" +  map_Data.b +"<br>";
+				String str_HTML = "<br>";
+				if ( map_Data.b != null) str_HTML = "<b>"+Lang.getInstance().translate_from_langObj("Title", langObj) + ": </b>" +  map_Data.b +"<br>";
 					
 				JSONObject jSON = map_Data.c;
 				// parse JSON
@@ -3843,10 +3851,10 @@ if ( asset_1 == null) {
 				 
 				 
 				 
-				 String sT =
-						  data.get("Title") + "<br><br>"
-							+  description + "<br><br>"
-							+    data.get("Message") + "<br><br>"
+				 String sT = "<br>"
+						  	+ data.get("Title") + "<br><br>"
+							+ description + "<br><br>"
+							+ data.get("Message") + "<br><br>"
 							+ hasHes;
 			
 			
