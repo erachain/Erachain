@@ -164,9 +164,11 @@ public class API {
 		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
+		help.put("GET Person Data", "persondata/{key}");
 		help.put("GET Person Key by Address", "personkeybyaddress/{address}");
 		help.put("GET Person by Address", "personbyaddress/{address}");
-		help.put("GET Person Data", "persondata/{key}");
+		help.put("GET Person Key by Public Key", "personkeybypublickey/{publickey}");
+		help.put("GET Person by Public Key", "personbypublickey/{publickey}");
 
 		help.put("*** PERSONS ***", "");
 		help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
@@ -1149,8 +1151,37 @@ public class API {
 	}
 
 	@GET
+	@Path("personkeybypublickey/{publickey}")
+	public Response getPersonKeyByPublicKey(@PathParam("publickey") String publicKey) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!core.account.PublicKeyAccount.isValidPublicKey(publicKey)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_PUBLIC_KEY);
+
+		}
+		
+		PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
+
+		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());		
+		
+		if (personItem == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.CREATOR_NOT_PERSONALIZED);
+		} else {
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity("" + personItem.a)
+					.build();
+		}
+	}
+
+	@GET
 	@Path("personbyaddress/{address}")
-	public Response personbyaddress(@PathParam("address") String address) {
+	public Response personByAddress(@PathParam("address") String address) {
 		
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
@@ -1187,6 +1218,47 @@ public class API {
 		
 	}
 	
+	@GET
+	@Path("personbypublickey/{publickey}")
+	public Response personByPublicKey(@PathParam("publickey") String publicKey) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!core.account.PublicKeyAccount.isValidPublicKey(publicKey)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_PUBLIC_KEY);
+
+		}
+		
+		PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
+
+		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());		
+		
+		if (personItem == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+
+		long key = personItem.a;
+		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		PersonCls person = (PersonCls)map.get(key);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(person.toJson()))
+				.build();
+		
+	}
+
 	
 	/*
 	 * ************* PERSONS **************

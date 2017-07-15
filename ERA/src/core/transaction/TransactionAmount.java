@@ -212,6 +212,9 @@ public abstract class TransactionAmount extends Transaction {
 	}
 	@Override
 	public String viewAmount() {
+		if (this.amount == null)
+			return "";
+		
 		if (this.amount.signum() < 0) {
 			return this.amount.negate().toPlainString();
 		} else {
@@ -220,11 +223,15 @@ public abstract class TransactionAmount extends Transaction {
 	}
 	@Override
 	public String viewAmount(Account account) {
+		if (this.amount == null)
+			return "";
 		String address = account.getAddress();
 		return NumberAsString.getInstance().numberAsString(getAmount(address));
 	}
 	@Override
 	public String viewAmount(String address) {
+		if (this.amount == null)
+			return "";
 		return NumberAsString.getInstance().numberAsString(getAmount(address));
 	}
 

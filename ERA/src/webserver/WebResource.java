@@ -183,6 +183,28 @@ public class WebResource {
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			String ss = "";
+			for ( StackTraceElement item: e.getStackTrace() ) {
+				ss += item.toString() + "<br>";
+			}
+					
+			return Response.status(501)
+					.header("Content-Type", "text/html; charset=utf-8")
+					.entity(ss + "<br>" + e.getMessage())
+					.build();
+		} catch (Exception ee) {
+			// TODO Auto-generated catch block
+			ee.printStackTrace();
+			String ss = "";
+			for ( StackTraceElement item: ee.getStackTrace() ) {
+				ss += item.toString() + "<br>";
+			}
+					
+			return Response.status(501)
+					//.header("Content-Type", "application/json; charset=utf-8")
+					.header("Content-Type", "text/html; charset=utf-8")
+					.entity(ss + "<br>" + ee.getMessage())
+					.build();
 		}
 
 		return Response.status(200)
