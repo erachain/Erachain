@@ -150,7 +150,6 @@ public class API {
 		help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
 		help.put("GET Address Assets", "addressassets/{address}");
 		help.put("GET Address Public Key", "addresspublickey/{address}");
-		help.put("GET Address Person Key", "addresspersonkey/{address}");
 		
 		help.put("*** ASSET ***", "");
 		help.put("GET Asset Height", "assetheight");
@@ -165,6 +164,7 @@ public class API {
 		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
+		help.put("GET Person Key by Address", "personkeybyaddress/{address}");
 		help.put("GET Person by Address", "personbyaddress/{address}");
 		help.put("GET Person Data", "persondata/{key}");
 
@@ -1119,6 +1119,33 @@ public class API {
 				.entity(StrJSonFine.convert(person.toJsonData()))
 				.build();
 		
+	}
+
+	@GET
+	@Path("personkeybyaddress/{address}")
+	public Response getPersonKeyByAddres(@PathParam("address") String address) {
+		
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(address);		
+		
+		if (personItem == null) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.CREATOR_NOT_PERSONALIZED);
+		} else {
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity("" + personItem.a)
+					.build();
+		}
 	}
 
 	@GET
