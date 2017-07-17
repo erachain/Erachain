@@ -20,7 +20,7 @@ public class DebugFrame extends JDialog{
 	public DebugFrame() 
 	{
 		//CREATE FRAME
-		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Debug"));
+		setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
 		setModal(true);
 		
 		//ICON

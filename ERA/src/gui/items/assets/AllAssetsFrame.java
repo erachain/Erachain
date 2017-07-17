@@ -42,7 +42,7 @@ public class AllAssetsFrame extends JFrame{
 
 	public AllAssetsFrame() {
 		
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("All Assets"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("All Assets"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

@@ -57,7 +57,7 @@ public class Voting_Dialog extends JDialog
 	
 	public Voting_Dialog(Poll poll, int option, AssetCls asset)
 	{
-//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Vote"));
+//		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Vote"));
 		
 		this.poll = poll;
 		

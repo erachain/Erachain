@@ -41,8 +41,8 @@ public class CancelOrderFrame extends JDialog
 	
 	public CancelOrderFrame(Order order)
 	{
-		//super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Cancel Order"));
-		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Cancel Order"));
+		//super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
+		setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
 		this.order = order;
 		setAlwaysOnTop(true);
 		setModal(true);

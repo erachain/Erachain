@@ -19,7 +19,7 @@ public class ItemFrame extends JFrame
 	
 	public ItemFrame(ItemCls item)
 	{
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.item = item;
 		

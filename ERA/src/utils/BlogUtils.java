@@ -235,7 +235,7 @@ public class BlogUtils {
 		List<BlogEntry> results = new ArrayList<>();
 
 		List<byte[]> blogPostList = DBSet.getInstance().getBlogPostMap()
-				.get(blogOpt == null ? "ARONICLE.com" : blogOpt);
+				.get(blogOpt == null ? "Erachain.org" : blogOpt);
 
 		List<byte[]> list = blogPostList != null ? Lists
 				.newArrayList(blogPostList) : new ArrayList<byte[]>();

@@ -76,8 +76,8 @@ public class AssetPairSelect extends JDialog{
 
 	public AssetPairSelect(long key, String action, String account) {
 		
-	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
-		this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+	//	super(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
+		this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Controller.getInstance().getAsset(key).toString() + " - " + Lang.getInstance().translate("Select pair"));
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));

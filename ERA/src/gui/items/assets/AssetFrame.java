@@ -19,7 +19,7 @@ public class AssetFrame extends JFrame
 	
 	public AssetFrame(AssetCls asset)
 	{
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Details"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Details"));
 		
 		this.asset = asset;
 		

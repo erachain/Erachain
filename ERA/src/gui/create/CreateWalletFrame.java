@@ -40,7 +40,7 @@ public class CreateWalletFrame extends JFrame {
 	
 	public CreateWalletFrame(NoWalletFrame parent)
 	{
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Create Wallet"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Create Wallet"));
 		
 		//RANDOM
 		this.random = new SecureRandom();

@@ -86,7 +86,7 @@ public class ExchangeFrame extends JDialog
 		
 		
 		
-	//	this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
+	//	this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
 		initComponents();
 	}
 	
@@ -119,8 +119,8 @@ public class ExchangeFrame extends JDialog
 	        this.setModal(true);
 	//		this.setAlwaysOnTop(true); 
 	        
-	//		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange"));
-				this.setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Check Exchange"));      
+	//		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Exchange"));
+				this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Exchange"));      
 	        
 	      //ICON
 			List<Image> icons = new ArrayList<Image>();

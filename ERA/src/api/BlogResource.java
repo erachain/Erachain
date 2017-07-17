@@ -28,7 +28,7 @@ public class BlogResource {
 	
 	@GET
 	public String getBlogList() {
-		return getBlogList("ARONICLE.com");
+		return getBlogList("Erachain.org");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -36,7 +36,7 @@ public class BlogResource {
 	@Path("/posts/{blogname}")
 	public String getBlogList(@PathParam("blogname") String blogname) {
 
-		if(blogname.equals("ARONICLE.com"))
+		if(blogname.equals("Erachain.org"))
 		{
 			blogname = null;
 		}
@@ -59,7 +59,7 @@ public class BlogResource {
 		}
 		
 		List<byte[]> txlist = DBSet.getInstance().getBlogPostMap()
-				.get(blogname == null ? "ARONICLE.com" : blogname);
+				.get(blogname == null ? "Erachain.org" : blogname);
 
 		JSONArray outputJSON = new JSONArray();
 		
@@ -112,7 +112,7 @@ public class BlogResource {
 	
 		JSONObject outputJSON = new JSONObject();
 		
-		if(blogname.equals("ARONICLE.com"))
+		if(blogname.equals("Erachain.org"))
 		{
 			blogname = null;
 		}
@@ -153,7 +153,7 @@ public class BlogResource {
 	@GET
 	@Path("/entries")
 	public String getBlogEntry() {
-		return getBlogEntry("ARONICLE.com", -1);
+		return getBlogEntry("Erachain.org", -1);
 	}
 	
 	@GET
@@ -165,13 +165,13 @@ public class BlogResource {
 	@GET
 	@Path("/lastentry")
 	public String getLastEntry() {
-		return getLastEntry("ARONICLE.com");
+		return getLastEntry("Erachain.org");
 	}
 	
 	@GET
 	@Path("/lastentry/{blogname}")
 	public String getLastEntry(@PathParam("blogname") String blogname) {
-		if(blogname.equals("ARONICLE.com"))
+		if(blogname.equals("Erachain.org"))
 		{
 			blogname = null;
 		}
@@ -194,7 +194,7 @@ public class BlogResource {
 		}
 		
 		List<byte[]> txlist = DBSet.getInstance().getBlogPostMap()
-				.get(blogname == null ? "ARONICLE.com" : blogname);
+				.get(blogname == null ? "Erachain.org" : blogname);
 		
 		if(txlist.size() == 0)
 		{

@@ -31,7 +31,7 @@ public class PollFrame extends JFrame{
 	public PollFrame(Poll poll, AssetCls asset) 
 	{
 		//CREATE FRAME
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Poll Details"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Poll Details"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

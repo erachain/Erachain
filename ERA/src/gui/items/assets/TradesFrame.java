@@ -26,8 +26,8 @@ public class TradesFrame extends JDialog{
 
 	public TradesFrame(Order order) {
 		
-		//super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Trades"));
-		setTitle(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Trades"));
+		//super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
+		setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
 		setModal(true);
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

@@ -65,7 +65,7 @@ public class SettingLangFrame extends JDialog {
 	public SettingLangFrame()
 	{
 		super();
-		this.setTitle("ARONICLE.com" + " - " + "Language select");
+		this.setTitle("Erachain.org" + " - " + "Language select");
 		this.setModal(true);
 		this.isAlwaysOnTop();
 		th = this;

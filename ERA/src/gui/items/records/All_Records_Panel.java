@@ -55,7 +55,7 @@ public class All_Records_Panel extends JPanel{
 	public All_Records_Panel() 
 	{
 		//CREATE FRAME
-	//	super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("All Polls"));
+	//	super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("All Polls"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

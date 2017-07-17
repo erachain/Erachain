@@ -37,7 +37,7 @@ public class NoWalletFrame extends JFrame {
 	
 	public NoWalletFrame(Gui parent) throws Exception
 	{
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("No Wallet"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("No Wallet"));
 		
 		//ICON
 		List<Image> icons = new ArrayList<Image>();

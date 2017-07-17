@@ -80,7 +80,7 @@ public class SysTray implements Observer{
 				LOGGER.info("SystemTray is not supported");
 			} else {
 				
-				//String toolTipText = "ARONICLE.com "	+ Controller.getInstance().getVersion();
+				//String toolTipText = "Erachain.org "	+ Controller.getInstance().getVersion();
 				createPopupMenu = createPopupMenu();
 				TrayIcon icon = new TrayIcon(createImage(
 						"images/icons/icon32.png", "tray icon"), "erachain.org"

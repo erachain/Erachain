@@ -66,7 +66,7 @@ public class ResponseAcctFrame extends JFrame {
 
 	public ResponseAcctFrame()
 	{
-		super(Lang.getInstance().translate("ARONICLE.com") + " - " + Lang.getInstance().translate("Response ACCT"));
+		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Response ACCT"));
 
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -141,7 +141,7 @@ public class ResponseAcctFrame extends JFrame {
 		//LABEL NAME
 		labelGBC.gridy = 1;
 		labelGBC.gridx = 2;
-		JLabel coreLabel = new JLabel(Lang.getInstance().translate("ARONICLE.com for"));
+		JLabel coreLabel = new JLabel(Lang.getInstance().translate("Erachain.org for"));
 		this.add(coreLabel, labelGBC);
 
 		//TXT AMOUNT
