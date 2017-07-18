@@ -72,6 +72,18 @@ public class CreateOrderTransaction extends Transaction
 	}
 	*/
 
+	@Override
+	public BigDecimal getAmount() 
+	{
+		return this.order.getAmountHave();
+	}
+	
+	@Override
+	public long getKey() 
+	{
+		return this.order.getHave();
+	}
+
 	public Order getOrder()
 	{
 		return this.order;
@@ -384,12 +396,12 @@ public class CreateOrderTransaction extends Transaction
 	}
 
 
-	//@Override
+	@Override
 	public BigDecimal getAmount(Account account) 
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(8);
+			return this.order.getAmountHave();
 		}
 		
 		return BigDecimal.ZERO.setScale(8);

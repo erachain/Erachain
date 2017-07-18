@@ -37,9 +37,11 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.transaction.CreateOrderTransaction;
 import core.transaction.DeployATTransaction;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import core.transaction.TransactionFactory;
 
 import com.google.common.primitives.Bytes;
@@ -209,7 +211,7 @@ public class Block {
 		
 		long incomed_amount = 0l;
 		long amount;
-		
+				
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, creator, height);
 		if (previousForgingHeight == -1)
 			return 0;
@@ -217,26 +219,35 @@ public class Block {
 		previousForgingHeight++;
 		if (previousForgingHeight < height) {
 			
-			// for recipient
+			// for recipient only
 			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
+			amount = 0l;
 			for(Transaction transaction: txs)
-			{				
-				 if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
-					int amo_sign = transaction.getAmount().signum();
-					if (transaction.getKey() > 0 && amo_sign > 0) {
-						// SEND
-						amount = transaction.getAmount().longValue();						
-					} else if (transaction.getKey() < 0 && amo_sign > 0) {
-						// DEBT
-						amount = transaction.getAmount().longValue();						
+			{
+				if ( transaction.getAbsKey() != Transaction.RIGHTS_KEY )
+					continue;
+				
+				if (transaction instanceof TransactionAmount) {
+					TransactionAmount recordAmount = (TransactionAmount) transaction;
+					if (recordAmount.isBackward())
+						continue;
+					
+					int amo_sign = recordAmount.getAmount().signum();
+					if (amo_sign > 0) {
+						// SEND and DEBT
+						amount = recordAmount.getAmount().longValue();						
 					} else {
-						amount = 0l;
+						continue;
 					}
-				incomed_amount += amount;
+				//} else if (transaction instanceof CreateOrderTransaction) {
+				//	amount = transaction.getAmount().longValue();											
+				} else {
+					continue;
 				}
+				incomed_amount += amount;
 			}
 
 			// for creator
@@ -244,21 +255,30 @@ public class Block {
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
+			amount = 0l;
 			for(Transaction transaction: txs)
 			{				
 				if (false && transaction instanceof R_SertifyPubKeys) {
 				//	amount = BlockChain.GIFTED_ERA_AMOUNT.intValue();
 				//	incomed_amount += amount;
-				} else if ( transaction.getAbsKey() == Transaction.RIGHTS_KEY ) {
-					int amo_sign = transaction.getAmount().signum();
-					if (transaction.getKey() < 0 && amo_sign < 0) {
+
+				} else if (transaction instanceof TransactionAmount) {
+
+					if ( transaction.getAbsKey() != Transaction.RIGHTS_KEY )
+						continue;
+						
+					TransactionAmount recordAmount = (TransactionAmount) transaction;
+					if (recordAmount.isBackward()
+							&& Account.actionType(recordAmount.getKey(), recordAmount.getAmount()) == 2) {
 						// RE DEBT to me
 						amount = -transaction.getAmount().longValue();						
 					} else {
-						amount = 0l;
+						continue;
 					}
-				incomed_amount += amount;
+				} else {
+					continue;
 				}
+				incomed_amount += amount;
 			}
 		}
 		

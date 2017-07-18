@@ -120,7 +120,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1006l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
-	private static final String version = "3.06.01 alpha";
+	private static final String version = "3.07.01 alpha";
 	private static final String buildTime = "2017-05-21 15:33:33 UTC";
 	private static long buildTimestamp;
 	
@@ -253,7 +253,7 @@ public class Controller extends Observable {
 	public void statusInfo()
 	{
 		LOGGER.info(
-			"STATUS OK\n" 
+			"STATUS " + this.getStatus() + "\n" 
 			+ "| Last Block Signature: " + Base58.encode(this.blockChain.getLastBlock(dbSet).getSignature()) + "\n"
 			+ "| Last Block Height: " + this.blockChain.getLastBlock(dbSet).getHeight(this.dbSet) + "\n"
 			+ "| Last Block Time: " + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(dbSet).getTimestamp(this.dbSet)) + "\n"
