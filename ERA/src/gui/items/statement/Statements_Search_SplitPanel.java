@@ -29,10 +29,12 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.Split_Panel;
 import gui.items.persons.TableModelPersons;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MTable;
+import gui.records.VouchRecordDialog;
 import lang.Lang;
 import utils.MenuPopupUtil;
 import utils.TableMenuPopupUtil;
@@ -229,6 +231,8 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 						.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				if (statement == null)
 					return;
+				DBSet db = DBSet.getInstance();
+				new VouchRecordDialog(statement.getBlockHeight(db), statement.getSeqNo(db));
 
 			}
 		});
