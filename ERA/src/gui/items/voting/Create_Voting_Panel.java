@@ -131,24 +131,36 @@ public class Create_Voting_Panel extends JPanel
       	this.add(descriptionLabel, labelGBC);
       		
       	//TXTAREA NAME
-      	txtGBC.gridy = 2;
+      	      //TABLE OPTIONS
+      	GridBagConstraints txtGBC2 = new GridBagConstraints();
+      	txtGBC2.gridy = 2;
+      	txtGBC2.weighty= 0.3;
+      	txtGBC2.gridwidth = 2;
+      	txtGBC2.fill = GridBagConstraints.BOTH;  
+		txtGBC2.anchor = GridBagConstraints.NORTHWEST;
       	this.txtareaDescription = new JTextArea();
-      	this.txtareaDescription.setRows(4);
+     // 	this.txtareaDescription.setRows(4);
       	this.txtareaDescription.setBorder(this.txtName.getBorder());
-      	this.add(this.txtareaDescription, txtGBC);
+      	this.add(this.txtareaDescription, txtGBC2);
         
       	//LABEL OPTIONS
       	labelGBC.gridy = 3;
-      	labelGBC.weighty = 0.1;
+      	labelGBC.weighty = 0.5;
       	JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
       	this.add(optionsLabel, labelGBC);
       	
       	//TABLE OPTIONS
-      	txtGBC.gridy = 3;
+      	GridBagConstraints txtGBC1 = new GridBagConstraints();
+      	txtGBC1.gridy = 3;
+      	txtGBC1.weighty= 0.1;
+      	txtGBC1.gridwidth = 2;
+      	txtGBC1.fill = GridBagConstraints.BOTH;  
+		txtGBC1.anchor = GridBagConstraints.NORTHWEST;
       	this.optionsTableModel = new CreateOptionsTableModel(new Object[] { Lang.getInstance().translate("Name") }, 0);
       	final JTable table = new JTable(optionsTableModel);
-      	
-      	this.add(new JScrollPane(table), txtGBC);
+      	JScrollPane scroll = new JScrollPane();
+      	scroll.setViewportView(table);
+      	this.add(scroll, txtGBC1);
       	
       	//TABLE OPTIONS DELETE
       	txtGBC.gridy = 4;
