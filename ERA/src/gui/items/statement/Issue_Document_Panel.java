@@ -907,7 +907,6 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 			
 	//		messageBytes = message.getBytes( Charset.forName("UTF-8") );
 			
-			 String sS = StrJSonFine.convert(out_Map);
 			 messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
 		//	fileData = StrJSonFine.convert(out_Files_data).getBytes( Charset.forName("UTF-8") );
 			

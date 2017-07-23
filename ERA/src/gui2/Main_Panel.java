@@ -30,6 +30,7 @@ import javax.swing.tree.TreePath;
 import core.BlockChain;
 import gui.MainFrame;
 import gui.Wallets.Wallets_Manager_SplitPanel;
+import gui.bank.Issue_Send_Payment_Order;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.accounts.My_Loans_SplitPanel;
 import gui.items.assets.Assets_Favorite_SplitPanel;
@@ -298,6 +299,11 @@ public class Main_Panel extends javax.swing.JPanel {
 	// add tab from name
 	public void dylay(String str){
 		
+		
+		if(str.equals( Lang.getInstance().translate("Send payment order")) || str.equals("Issue_Send_Payment_Order") ){
+			ccase1(Lang.getInstance().translate("Send payment order"), new Issue_Send_Payment_Order());
+			return;
+		}
 		
 		if(str.equals( Lang.getInstance().translate("Favorite Persons")) || str.equals("Persons_Favorite_SplitPanel") ){
 			ccase1(Lang.getInstance().translate("Favorite Persons"), new Persons_Favorite_SplitPanel());

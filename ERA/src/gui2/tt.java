@@ -20,6 +20,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import core.BlockChain;
 import lang.Lang;
 
 /**
@@ -55,10 +56,13 @@ public tt() {
    DefaultMutableTreeNode votings_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Votings"));
    DefaultMutableTreeNode records_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Records"));
    DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
+   DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
    
    
 
    // ���������� �� �������� �����
+   
+  if(BlockChain.DEVELOP_USE) root.add(bank_Tree);
    root.add(account_Node);
    root.add(person_Node);
    root.add(document_Node);
@@ -71,12 +75,18 @@ public tt() {
    root.add(records_Node);
    root.add(other_Node);
 
+  
+   bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send payment order")));
+   
    // ��������� �������� �������� (������) ������ �����
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Person")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Insert Person")));
+   
+   person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Insert Person")));
+   
    
    
    account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Accounts")));

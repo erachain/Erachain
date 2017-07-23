@@ -307,4 +307,14 @@ public class library {
 		
 		}
 	
+	public static String isNum_And_Length(String str, int length){
+		try {
+			Long a = Long.valueOf(str);
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			return "Not Namber";
+		}
+		if (str.length() != length) return "Error Size";
+		return "ok";
+	}
 }
