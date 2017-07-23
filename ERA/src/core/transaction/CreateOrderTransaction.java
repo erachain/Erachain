@@ -244,7 +244,7 @@ public class CreateOrderTransaction extends Transaction
 		long have = this.order.getHave();
 		long want = this.order.getWant();
 
-		if (have == RIGHTS_KEY) {
+		if (have == RIGHTS_KEY && want != FEE_KEY) {
 			// have ERA
 			int height = this.getBlockHeightByParentOrLast(db);
 			if (height > Transaction.FREEZE_FROM ) {
