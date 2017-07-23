@@ -459,7 +459,7 @@ public abstract class TransactionAmount extends Transaction {
 					
 					// SPEND ASSET
 					
-					if (absKey == 1) {
+					if (absKey == RIGHTS_KEY) {
 						
 						int height = this.getBlockHeightByParentOrLast(db);
 						if (height > Transaction.FREEZE_FROM) {
@@ -532,7 +532,7 @@ public abstract class TransactionAmount extends Transaction {
 				
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
-				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && !this.recipient.isPerson(db)) {
+				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(db)) {
 					return RECEIVER_NOT_PERSONALIZED;
 				}
 			}
