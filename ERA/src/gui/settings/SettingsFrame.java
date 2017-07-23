@@ -1,7 +1,5 @@
 package gui.settings;
 
-// 16 03
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -15,8 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -28,14 +24,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import controller.Controller;
-import gui.library.Menu_Popup_File_button;
-import gui.naming.SellNameFrame;
+import gui.library.Menu_Files;
 import lang.Lang;
 import lang.LangFile;
 import network.Network;
 import settings.Settings;
 import utils.SaveStrToFile;
-import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JDialog{
@@ -206,10 +200,7 @@ public class SettingsFrame extends JDialog{
 		String path = Settings.getInstance().getUserPath();
 		 File source = new File( path +"themes/" +settingsTabPane.uI_Settings_Panel.jComboBox_Thems.getSelectedItem().toString(), "Default.theme");
 	     File dest = new File(path  +  "Default.theme");
-	 //   C:/Users/РЎР°С€Р°/git/ARONICLE/ERM
-	    String a = dest.getAbsolutePath();
-		
-	     try {
+	 try {
 			FileUtils.copyFile(source, dest);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -436,8 +427,8 @@ public class SettingsFrame extends JDialog{
 		{
 			Controller.getInstance().webServiceRestart();
 			
-			Menu_Popup_File_button.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
-			Menu_Popup_File_button.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
+			Menu_Files.webServerItem.setVisible(Settings.getInstance().isWebEnabled());
+			Menu_Files.blockExplorerItem.setVisible(Settings.getInstance().isWebEnabled());
 		}
 		Lang.getInstance().loadLang();
 		
