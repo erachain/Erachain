@@ -84,6 +84,7 @@ import ntp.NTP;
 import utils.APIUtils;
 import utils.Converter;
 import utils.Pair;
+import utils.StrJSonFine;
 
 @Path("lightwallet")
 public class LightWallet {
@@ -98,8 +99,24 @@ public class LightWallet {
 	@GET
 	public Response Default() {
 
-		// REDIRECT
-		return Response.status(302).header("Location", "lightwallet/main.html")
+		Map help = new LinkedHashMap();
+
+		help.put("help forum", "http://datachainsworld.ru/index.php?topic=156.msg734");
+		help.put("*** LiteWallet ***", "");
+		help.put("GET Test", "test");
+
+		help.put("GET Parse Test", "parsetest");
+		help.put("GET Parse", "parse?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM");
+		
+		help.put("GET Get RAW", "getraw/{type}/{creator}");
+		help.put("GET Get RAW", "getraw/{type}/{version}/{creator}/{timestamp}/{feePow}/{reference}/");
+		help.put("GET Broadcast", "broadcast");
+
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(help))
 				.build();
 	}
 
@@ -137,7 +154,7 @@ public class LightWallet {
 
 	// short data without Signature
 	@GET
-	@Path("lightwallet/parsetest/")
+	@Path("parsetest")
 	// for test raw without Signature
 	// http://127.0.0.1:9047/lightwallet/parsetest?data=GqEobyneRFcbLSrNnvQtYiL2QNnRGehvZoMRKPe3A6Uxzav61PXFo3ir8UPBtGiYDMXx6Ngv6yMa1ENUqZP88ew8QXNvawJ1La7QV67vhAy4Rkc3szs79Gt144UtwZnBULCxHhs
 	//
@@ -174,7 +191,7 @@ public class LightWallet {
 	}
 
 	@POST
-	@Path("lightwallet/parse/")
+	@Path("parse")
 	// http://127.0.0.1:9047/lightwallet/parse?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	//
 	public String parse() // throws JSONException
@@ -204,7 +221,7 @@ public class LightWallet {
 	}
 
 	@GET
-	@Path("lightwallet/getraw/{type}/{creator}")
+	@Path("getraw/{type}/{creator}")
 	//@Consumes(MediaType.APPLICATION_JSON)
 	//@Produces("application/json")
 	//
@@ -264,7 +281,7 @@ public class LightWallet {
 	}
 
 	@GET
-	@Path("lightwallet/getraw/{type}/{version}/{creator}/{timestamp}/{feePow}/{reference}/")
+	@Path("getraw/{type}/{version}/{creator}/{timestamp}/{feePow}/{reference}/")
 	// http://127.0.0.1:9047/lightwallet/getraw/31/0/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF/0/2?amount=12.12345678
 	public String getRaw(@PathParam("type") int record_type,
 			@PathParam("version") int version,
@@ -288,7 +305,7 @@ public class LightWallet {
 	}
 
 	@GET
-	@Path("lightwallet/getraw/{type}/{version}/{property1}/{property2}/{creator}/{timestamp}/{feePow}/{reference}/")
+	@Path("getraw/{type}/{version}/{property1}/{property2}/{creator}/{timestamp}/{feePow}/{reference}/")
 	// http://127.0.0.1:9047/lightwallet/getraw/31/0/5mgpEGqUGpfme4W2tHJmG7Ew21Te2zNY7Ju3e9JfUmRF/0/2?amount=12.12345678
 	public String getRaw(@PathParam("type") int record_type,
 			@PathParam("version") int version,
@@ -601,7 +618,7 @@ public class LightWallet {
 	}
 	
 	@GET
-	@Path("lightwallet/broadcast")
+	@Path("broadcast")
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public String broadcastFromRaw1()
 	{
@@ -632,7 +649,7 @@ public class LightWallet {
 	}
 
 	@POST
-	@Path("lightwallet/broadcast")
+	@Path("broadcast")
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public String broadcastFromRaw(String rawDataBase58)
 	{

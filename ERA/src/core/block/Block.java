@@ -210,7 +210,7 @@ public class Block {
 	{
 		
 		long incomed_amount = 0l;
-		long amount;
+		//long amount;
 				
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, creator, height);
 		if (previousForgingHeight == -1)
@@ -224,7 +224,7 @@ public class Block {
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
-			amount = 0l;
+			//amount = 0l;
 			for(Transaction transaction: txs)
 			{
 				if ( transaction.getAbsKey() != Transaction.RIGHTS_KEY )
@@ -237,8 +237,8 @@ public class Block {
 					
 					int amo_sign = recordAmount.getAmount().signum();
 					if (amo_sign > 0) {
-						// SEND and DEBT
-						amount = recordAmount.getAmount().longValue();						
+						// SEND or DEBT
+						incomed_amount += recordAmount.getAmount().longValue();						
 					} else {
 						continue;
 					}
@@ -247,7 +247,7 @@ public class Block {
 				} else {
 					continue;
 				}
-				incomed_amount += amount;
+				//incomed_amount += amount;
 			}
 
 			// for creator
@@ -255,7 +255,7 @@ public class Block {
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
-			amount = 0l;
+			//amount = 0l;
 			for(Transaction transaction: txs)
 			{				
 				if (false && transaction instanceof R_SertifyPubKeys) {
@@ -271,14 +271,22 @@ public class Block {
 					if (recordAmount.isBackward()
 							&& Account.actionType(recordAmount.getKey(), recordAmount.getAmount()) == 2) {
 						// RE DEBT to me
-						amount = -transaction.getAmount().longValue();						
+						long amount = transaction.getAmount().abs().longValue();
+						if (amount < 200) {
+							continue;
+						} else if (amount < 1000) {
+							amount >>=2;
+						} else {
+							amount >>=1;			
+						}
+						incomed_amount += amount;						
 					} else {
 						continue;
 					}
 				} else {
 					continue;
 				}
-				incomed_amount += amount;
+				//incomed_amount += amount;
 			}
 		}
 		

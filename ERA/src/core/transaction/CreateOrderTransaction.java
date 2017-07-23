@@ -240,25 +240,29 @@ public class CreateOrderTransaction extends Transaction
 	public int isValid(DBSet db, Long releaserReference) 
 	{
 		
-		int height = this.getBlockHeightByParentOrLast(db);
-		if (height > Transaction.FREEZE_FROM) {
-			// LOCK PAYMENTS
-			boolean ok = true;
-			for ( String address: TRUE_ADDRESSES) {
-				if (this.creator.equals(address)) {
-					ok = false;
-					break;
-				}
-			}
-			
-			if (ok)
-				return INVALID_ADDRESS;
-
-		}
-
 		//CHECK IF ASSETS NOT THE SAME
 		long have = this.order.getHave();
 		long want = this.order.getWant();
+
+		if (have == RIGHTS_KEY) {
+			// have ERA
+			int height = this.getBlockHeightByParentOrLast(db);
+			if (height > Transaction.FREEZE_FROM ) {
+				// LOCK ERA sell
+				boolean ok = true;
+				for ( String address: TRUE_ADDRESSES) {
+					if (this.creator.equals(address)) {
+						ok = false;
+						break;
+					}
+				}
+				
+				if (ok)
+					return INVALID_ADDRESS;
+
+			}
+		}
+
 		if(have == want)
 		{
 			return HAVE_EQUALS_WANT;
