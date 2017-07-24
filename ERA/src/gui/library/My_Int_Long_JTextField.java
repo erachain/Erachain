@@ -17,42 +17,38 @@ import org.apache.commons.lang3.math.NumberUtils;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
-public class My_INN_JTextField extends JTextField {
+public class My_Int_Long_JTextField extends JTextField {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private My_INN_JTextField th;
+	private My_Int_Long_JTextField th;
 	private Color text_Color;
 
-	public My_INN_JTextField(){
+	public My_Int_Long_JTextField(){
 		super();
 		th = this;
-		th.setToolTipText(Lang.getInstance().translate("Must be 10 or 12 numbers"));
+		th.setToolTipText(Lang.getInstance().translate("Must be digital"));
 		text_Color = this.getForeground();
-		th.setForeground(Color.RED);
 		MenuPopupUtil.installContextMenu(this);
+		th.setForeground(Color.RED);
 		
 		addCaretListener(new CaretListener(){
 
 			@Override
 			public void caretUpdate(CaretEvent arg0) {
-				if (!NumberUtils.isNumber(th.getText()))	{
-					th.setForeground(Color.RED);
-				return ;
-				}
-				if (th.getText().length() != 10 && th.getText().length()!=12) {
+				
 					
-					th.setForeground(Color.RED);
+					if (!NumberUtils.isNumber(th.getText()))	{
+						th.setForeground(Color.RED);
 					return ;
-				}
+					}
 				th.setForeground(text_Color);
 			}
 			
 			
 		});
 	
-		
 	}
 
 }

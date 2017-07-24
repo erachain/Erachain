@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.HashMap;
 
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -17,6 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.text.MaskFormatter;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -34,15 +37,18 @@ import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
+import gui.library.My_Ammount_JTextField;
 import gui.library.My_BIK_JTextField;
 import gui.library.My_Bank_Account_JTextField;
 import gui.library.My_INN_JTextField;
+import gui.library.My_Int_Long_JTextField;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import utils.Converter;
+import utils.MenuPopupUtil;
 import utils.StrJSonFine;
 
 public class Issue_Send_Payment_Order extends javax.swing.JPanel {
@@ -53,8 +59,7 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1L;
 	private Issue_Send_Payment_Order1 issue_Panel;
 	private Issue_Send_Payment_Order th;
-	private Color jTextField_Ammount_Foreground;
-
+	
 	/*
 	 * To change this license header, choose License Headers in Project
 	 * Properties. To change this template file, choose Tools | Templates and
@@ -65,8 +70,6 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 		setLayout(new java.awt.BorderLayout());
 		JScrollPane scroll = new JScrollPane();
 		issue_Panel = new Issue_Send_Payment_Order1();
-		jTextField_Ammount_Foreground = issue_Panel.jTextField_Ammount.getForeground();
-		issue_Panel.jTextField_Ammount.setForeground(Color.RED);
 		scroll.setViewportView(issue_Panel);
 		add(scroll);
 
@@ -81,24 +84,7 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 
 		});
 		
-		issue_Panel.jTextField_Ammount.addCaretListener(new CaretListener(){
-
-			@Override
-			public void caretUpdate(CaretEvent arg0) {
-				// TODO Auto-generated method stub
-				try {
-					BigDecimal a = new BigDecimal(issue_Panel.jTextField_Ammount.getText());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					issue_Panel.jTextField_Ammount.setForeground(Color.RED);
-					return;
-				}
-				issue_Panel.jTextField_Ammount.setForeground(jTextField_Ammount_Foreground);
-			}
-			
-			
-		});
+		
 
 	}
 
@@ -125,6 +111,8 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 		if(issue_Panel.jTextField_Reciever_BIK.getForeground()== Color.RED) error_mes+="\n Error Reciever BIK";
 		if(issue_Panel.jTextField_Reciever_INN.getForeground()== Color.RED) error_mes+="\n Error Reciever INN";
 		if(issue_Panel.jTextField_Recivier_Account_in_Bank1.getForeground()== Color.RED) error_mes+="\n Error Reciever Account in Bank";
+		if(issue_Panel.jTextField_Doc_Num.getForeground()== Color.RED) error_mes+="\n Error Document Number";
+		if(issue_Panel.jTextField_Doc_Date.getForeground()== Color.RED) error_mes+="\n Error Document Date";
 		// READ RECIPIENT
 				String recipientAddress = issue_Panel.jComboBox_ACCOUNT_ERA_Of_Bank.getText();
 
@@ -327,8 +315,8 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 		jSON_Message.put("14", issue_Panel.jTextField_Reciever_BIK.getText()); // reciever bik
 		jSON_Message.put("61", issue_Panel.jTextField_Reciever_INN.getText()); // reciever inn
 		jSON_Message.put("15", issue_Panel.jTextField_Recivier_Account_in_Bank1.getText()); // reciever chet
-		jSON_Message.put("3", issue_Panel.jTextField1.getText());
-		jSON_Message.put("4", issue_Panel.jTextField2.getText()); // date
+		jSON_Message.put("3", issue_Panel.jTextField_Doc_Num.getText());
+		jSON_Message.put("4", issue_Panel.jTextField_Doc_Date.getText()); // date
 		
 		 byte[] messageBytes = StrJSonFine.convert(jSON_Message).getBytes( Charset.forName("UTF-8") );
 		
@@ -345,6 +333,9 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		this.accountsModel = new AccountsComboBoxModel();
 		this.jComboBox_Account = new JComboBox<Account>(accountsModel);
 		initComponents();
+		// menu
+		MenuPopupUtil.installContextMenu(this.jComboBox_ACCOUNT_ERA_Of_Bank);
+		MenuPopupUtil.installContextMenu(this.jTextArea_Description);		
 
 	}
 
@@ -377,7 +368,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		jLabel_Recivier_in_Bank1 = new javax.swing.JLabel();
 		jTextField_Recivier_Account_in_Bank1 = new My_Bank_Account_JTextField();
 		jLabel_Ammount = new javax.swing.JLabel();
-		jTextField_Ammount = new javax.swing.JTextField();
+		jTextField_Ammount = new My_Ammount_JTextField();
 		jLabel_Description = new javax.swing.JLabel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		jTextArea_Description = new javax.swing.JTextArea();
@@ -385,9 +376,19 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		jLabel_Title = new javax.swing.JLabel();
 		jLabel_Payment_info = new javax.swing.JLabel();
 		jLabel_Number = new javax.swing.JLabel();
-		jTextField1 = new javax.swing.JTextField();
+		jTextField_Doc_Num = new My_Int_Long_JTextField();
 		jLabel_Date = new javax.swing.JLabel();
-		jTextField2 = new javax.swing.JTextField();
+		
+		MaskFormatter mf = null;
+		try {
+			mf = new MaskFormatter("##.##.####");
+			mf.setPlaceholderCharacter('_');
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		jTextField_Doc_Date = new JFormattedTextField (mf);
 		jSeparator1 = new javax.swing.JSeparator();
 		jSeparator2 = new javax.swing.JSeparator();
 		jSeparator3 = new javax.swing.JSeparator();
@@ -409,7 +410,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		add(jLabel_4_Data, gridBagConstraints);
 
 		jTextField_INN.setText("");
-		jTextField_INN.setToolTipText("");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 10;
@@ -532,7 +532,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		add(jLabel_Reciever_INN, gridBagConstraints);
 
 		jTextField_Reciever_INN.setText("");
-		jTextField_Reciever_INN.setToolTipText("");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 18;
@@ -666,7 +665,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		add(jLabel_Number, gridBagConstraints);
 
-		jTextField1.setText("");
+		jTextField_Doc_Num.setText("");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 26;
@@ -674,7 +673,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-		add(jTextField1, gridBagConstraints);
+		add(jTextField_Doc_Num, gridBagConstraints);
 
 		jLabel_Date.setText("Date");
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -684,7 +683,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		add(jLabel_Date, gridBagConstraints);
 
-		jTextField2.setText("");
+		//jTextField_Doc_Date.setText("");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 6;
 		gridBagConstraints.gridy = 26;
@@ -692,7 +691,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-		add(jTextField2, gridBagConstraints);
+		add(jTextField_Doc_Date, gridBagConstraints);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 6;
@@ -762,10 +761,10 @@ class Issue_Send_Payment_Order1 extends JPanel {
 	javax.swing.JSeparator jSeparator2;
 	javax.swing.JSeparator jSeparator3;
 	javax.swing.JTextArea jTextArea_Description;
-	javax.swing.JTextField jTextField1;
-	javax.swing.JTextField jTextField2;
+	My_Int_Long_JTextField jTextField_Doc_Num;
+	JFormattedTextField  jTextField_Doc_Date;
 	My_Bank_Account_JTextField jTextField_Account_in_Bank;
-	javax.swing.JTextField jTextField_Ammount;
+	My_Ammount_JTextField jTextField_Ammount;
 	My_BIK_JTextField jTextField_BIK;
 	My_INN_JTextField jTextField_INN;
 	My_BIK_JTextField jTextField_Reciever_BIK;

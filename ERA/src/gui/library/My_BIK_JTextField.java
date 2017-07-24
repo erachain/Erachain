@@ -12,7 +12,10 @@ import javax.swing.JTextField;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 public class My_BIK_JTextField extends JTextField {
 	/**
@@ -27,24 +30,15 @@ public class My_BIK_JTextField extends JTextField {
 		th = this;
 		text_Color = this.getForeground();
 		th.setForeground(Color.RED);
-		addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-		
-	});	
+		th.setToolTipText(Lang.getInstance().translate("Must be 9 numbers"));
+		MenuPopupUtil.installContextMenu(this);
 		addCaretListener(new CaretListener(){
 
 			@Override
 			public void caretUpdate(CaretEvent arg0) {
-				try {
-				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
+				if (!NumberUtils.isNumber(th.getText()))	{
 					th.setForeground(Color.RED);
-					return ;
+				return ;
 				}
 				if (th.getText().length() != 9) {
 					
