@@ -308,7 +308,7 @@ public class Synchronizer
 					
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block null";
-					peer.ban(BAN_BLOCK_TIMES>>2, mess);
+					peer.ban(BAN_BLOCK_TIMES>>4, mess);
 					throw new Exception(mess);
 				}
 				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it

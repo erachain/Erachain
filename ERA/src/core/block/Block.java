@@ -268,6 +268,7 @@ public class Block {
 						continue;
 						
 					TransactionAmount recordAmount = (TransactionAmount) transaction;
+					// TODO: delete  on new CHAIN
 					if (height > 45281 && recordAmount.isBackward()
 							&& Account.actionType(recordAmount.getKey(), recordAmount.getAmount()) == 2) {
 						// RE DEBT to me
@@ -291,7 +292,15 @@ public class Block {
 		}
 		
 		// OWN + RENT balance - in USE
-		return (int)(creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue() - incomed_amount);
+		long used_amount = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue();
+		if (used_amount < BlockChain.MIN_GENERATING_BALANCE)
+			return 0;
+		
+		if (used_amount - incomed_amount < BlockChain.MIN_GENERATING_BALANCE ) {
+			return BlockChain.MIN_GENERATING_BALANCE;
+		} else {
+			return (int)(used_amount - incomed_amount);			
+		}
 	}
 
 	// CALCULATE and SET
