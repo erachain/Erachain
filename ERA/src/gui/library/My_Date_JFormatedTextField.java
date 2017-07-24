@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.JFormattedTextField;
@@ -30,40 +31,49 @@ public class My_Date_JFormatedTextField extends JFormattedTextField {
 	private My_Date_JFormatedTextField th;
 	private Color text_Color;
 
-	public My_Date_JFormatedTextField(){
-		super();
+	public My_Date_JFormatedTextField(MaskFormatter mf){
+		super(mf);
 		th = this;
-		MaskFormatter mf = null;
-		try {
-			mf = new MaskFormatter("##.##.####");
-			mf.setPlaceholderCharacter('_');
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
-		this.setFormatter(mf);
+		
 		
 		text_Color = this.getForeground();
 		th.setForeground(Color.RED);
-		th.setToolTipText(Lang.getInstance().translate("Must be Date (dd.mm.yyyy)"));
+		th.setToolTipText(Lang.getInstance().translate("Must be Date (dd/mm/yyyy)"));
 		MenuPopupUtil.installContextMenu(this);
 		addCaretListener(new CaretListener(){
 
+			@SuppressWarnings("deprecation")
 			@Override
 			public void caretUpdate(CaretEvent arg0) {
-				if (new Date(th.getText()) != null)	{
+				
+				String d = th.getText();
+					
+					SimpleDateFormat formatter = new SimpleDateFormat("dd/mm/yyyy");
+			        String dateInString = d;
+
+			        try {
+
+			            Date date = formatter.parse(dateInString);
+			            System.out.println(date);
+			            System.out.println(formatter.format(date));
+
+			      
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
 					th.setForeground(Color.RED);
-				return ;
+					return ;
 				}
-				if (th.getText().length() != 9) {
+					
+				
+				if (d.replace("_", "").length() != 10) {
 					
 					th.setForeground(Color.RED);
 					return ;
 				}
 				th.setForeground(text_Color);
-			}
 			
+			}
 			
 		});
 	

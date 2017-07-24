@@ -76,7 +76,7 @@ public tt() {
    root.add(other_Node);
 
   
-   bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send payment order")));
+   bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Payment Order")));
    
    // ��������� �������� �������� (������) ������ �����
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Persons")));
@@ -84,11 +84,6 @@ public tt() {
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Persons")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Person")));
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Insert Person")));
-   
-   person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Insert Person")));
-   
-   
-   
    account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Accounts")));
    account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Loans")));
    
