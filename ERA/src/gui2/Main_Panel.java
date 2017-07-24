@@ -300,8 +300,8 @@ public class Main_Panel extends javax.swing.JPanel {
 	public void dylay(String str){
 		
 		
-		if(str.equals( Lang.getInstance().translate("Send payment order")) || str.equals("Issue_Send_Payment_Order") ){
-			ccase1(Lang.getInstance().translate("Send payment order"), new Issue_Send_Payment_Order());
+		if(str.equals( Lang.getInstance().translate("Send Payment Order")) || str.equals("Issue_Send_Payment_Order") ){
+			ccase1(Lang.getInstance().translate("Send Payment Order"), new Issue_Send_Payment_Order());
 			return;
 		}
 		
