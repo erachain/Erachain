@@ -40,6 +40,7 @@ import gui.library.Issue_Confirm_Dialog;
 import gui.library.My_Ammount_JTextField;
 import gui.library.My_BIK_JTextField;
 import gui.library.My_Bank_Account_JTextField;
+import gui.library.My_Date_JFormatedTextField;
 import gui.library.My_INN_JTextField;
 import gui.library.My_Int_Long_JTextField;
 import gui.library.library;
@@ -272,9 +273,9 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 				+ " COMPU</b><br></body></HTML>";
 
 		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
-				Lang.getInstance().translate("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
+				Lang.getInstance().translate("Send Payment Order"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
 				Status_text, Lang.getInstance().translate("Confirmation Transaction") + " "
-						+ Lang.getInstance().translate("Send Mail"));
+						+ Lang.getInstance().translate("Send Payment Order"));
 
 		Mail_Info ww = new Mail_Info((R_Send) transaction);
 		ww.jTabbedPane1.setVisible(false);
@@ -290,7 +291,7 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 			// CHECK VALIDATE MESSAGE
 			if (result == transaction.VALIDATE_OK) {
 				JOptionPane.showMessageDialog(new JFrame(),
-						Lang.getInstance().translate("Message and/or payment has been sent!"),
+						Lang.getInstance().translate("Payment Order has been sent!"),
 						Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 
 			} else {
@@ -381,14 +382,15 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		
 		MaskFormatter mf = null;
 		try {
-			mf = new MaskFormatter("##.##.####");
+			mf = new MaskFormatter("##/##/####");
 			mf.setPlaceholderCharacter('_');
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		jTextField_Doc_Date = new JFormattedTextField (mf);
+		
+		jTextField_Doc_Date = new My_Date_JFormatedTextField (mf);
 		jSeparator1 = new javax.swing.JSeparator();
 		jSeparator2 = new javax.swing.JSeparator();
 		jSeparator3 = new javax.swing.JSeparator();
@@ -762,7 +764,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 	javax.swing.JSeparator jSeparator3;
 	javax.swing.JTextArea jTextArea_Description;
 	My_Int_Long_JTextField jTextField_Doc_Num;
-	JFormattedTextField  jTextField_Doc_Date;
+	My_Date_JFormatedTextField  jTextField_Doc_Date;
 	My_Bank_Account_JTextField jTextField_Account_in_Bank;
 	My_Ammount_JTextField jTextField_Ammount;
 	My_BIK_JTextField jTextField_BIK;
