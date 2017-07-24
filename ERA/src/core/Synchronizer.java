@@ -43,7 +43,7 @@ public class Synchronizer
 	}
 	
 	static boolean USE_AT_ORPHAN = false;
-	public static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 32;
+	public static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 8;
 	
 	public Peer getPeer() {
 		return fromPeer;
