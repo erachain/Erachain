@@ -268,7 +268,7 @@ public class Block {
 						continue;
 						
 					TransactionAmount recordAmount = (TransactionAmount) transaction;
-					if (recordAmount.isBackward()
+					if (height > 45281 && recordAmount.isBackward()
 							&& Account.actionType(recordAmount.getKey(), recordAmount.getAmount()) == 2) {
 						// RE DEBT to me
 						long amount = transaction.getAmount().abs().longValue();
