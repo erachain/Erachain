@@ -49,7 +49,7 @@ public class My_Date_JFormatedTextField extends JFormattedTextField {
 				
 				String d = th.getText();
 					
-					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+					SimpleDateFormat formatter = new SimpleDateFormat("dd-mm-yyyy");
 			  //      String dateInString = d;
 			        Date t; 
 			        try {

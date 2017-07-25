@@ -403,7 +403,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
 		
 		MaskFormatter mf = null;
 		try {
-			mf = new MaskFormatter("####-##-##");
+			mf = new MaskFormatter("##-##-####");
 			mf.setPlaceholderCharacter('_');
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block

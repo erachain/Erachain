@@ -44,7 +44,7 @@ public class CancelOrderFrame extends JDialog
 		//super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
 		setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
 		this.order = order;
-		setAlwaysOnTop(true);
+	//	setAlwaysOnTop(true);
 		setModal(true);
 		
 		//ICON
@@ -229,7 +229,7 @@ public class CancelOrderFrame extends JDialog
 		}
 		catch(Exception e)
 		{
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
 			this.cancelOrderButton.setEnabled(true);
 
@@ -245,38 +245,38 @@ public class CancelOrderFrame extends JDialog
 		{
 		case Transaction.VALIDATE_OK:
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Cancel order has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Cancel order has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 			this.dispose();
 			break;		
 			
 		case Transaction.ORDER_DOES_NOT_EXIST:
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("That order does not exist or has already been completed!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("That order does not exist or has already been completed!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			break;	
 		
 		case Transaction.INVALID_ADDRESS:
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid creator!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid creator!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			break;	
 			
 		case Transaction.INVALID_ORDER_CREATOR:
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("You are not the creator this order!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("You are not the creator this order!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			break;	
 			
 		case Transaction.NOT_ENOUGH_FEE:
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			break;	
 							
 		case Transaction.NO_BALANCE:
 		
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Not enough balance!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			break;	
 			
 		default:
 			
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			break;	
 			
 		}

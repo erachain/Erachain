@@ -445,6 +445,7 @@ public class ExchangeFrame extends JDialog
 					if(sellOrdersTableModel.getSortableList().size()==0)return;
 					
 					int row = sellOrdersTable.getSelectedRow();
+					if (row <0) return;
 					row = sellOrdersTable.convertRowIndexToModel(row);
 
 					Order order = sellOrdersTableModel.getOrder(row);
@@ -457,6 +458,7 @@ public class ExchangeFrame extends JDialog
 				public void actionPerformed(ActionEvent e) {
 					if(sellOrdersTableModel.getSortableList().size()==0)return;
 					int row = sellOrdersTable.getSelectedRow();
+					if (row <0) return;
 					int row1 = sellOrdersTable.convertRowIndexToModel(row);
 
 					Order order = sellOrdersTableModel.getOrder(row1);
@@ -546,6 +548,7 @@ public class ExchangeFrame extends JDialog
 					if (sl.size()==0) return;
 					
 					int row = buyOrdersTable.getSelectedRow();
+					if (row <0) return;
 					row = buyOrdersTable.convertRowIndexToModel(row);
 
 					Order order = buyOrdersTableModel.getOrder(row);
@@ -559,6 +562,7 @@ public class ExchangeFrame extends JDialog
 					SortableList<BigInteger, Order> sl = buyOrdersTableModel.getSortableList();
 					if (sl.size()==0) return;
 					int row = buyOrdersTable.getSelectedRow();
+					if (row <0) return;
 					row = buyOrdersTable.convertRowIndexToModel(row);
 
 					Order order = buyOrdersTableModel.getOrder(row);
