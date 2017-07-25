@@ -31,6 +31,7 @@ import core.BlockChain;
 import gui.MainFrame;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.bank.Issue_Send_Payment_Order;
+import gui.bank.My_Order_Pauments_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.accounts.My_Loans_SplitPanel;
 import gui.items.assets.Assets_Favorite_SplitPanel;
@@ -304,6 +305,14 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1(Lang.getInstance().translate("Send Payment Order"), new Issue_Send_Payment_Order());
 			return;
 		}
+		
+		if(str.equals( Lang.getInstance().translate("My Payments Orders")) || str.equals("My_Order_Pauments_SplitPanel") ){
+			ccase1(Lang.getInstance().translate("My Payments Orders"), new My_Order_Pauments_SplitPanel());
+			return;
+		}
+		
+		
+		
 		
 		if(str.equals( Lang.getInstance().translate("Favorite Persons")) || str.equals("Persons_Favorite_SplitPanel") ){
 			ccase1(Lang.getInstance().translate("Favorite Persons"), new Persons_Favorite_SplitPanel());

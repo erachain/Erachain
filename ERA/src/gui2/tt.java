@@ -77,6 +77,7 @@ public tt() {
 
   
    bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Payment Order")));
+   bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Payments Orders")));
    
    // ��������� �������� �������� (������) ������ �����
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Persons")));

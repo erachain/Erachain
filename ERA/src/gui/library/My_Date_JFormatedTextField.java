@@ -39,7 +39,7 @@ public class My_Date_JFormatedTextField extends JFormattedTextField {
 		
 		text_Color = this.getForeground();
 		th.setForeground(Color.RED);
-		th.setToolTipText(Lang.getInstance().translate("Must be Date (dd/mm/yyyy)"));
+		th.setToolTipText(Lang.getInstance().translate("Must be Date (dd-mm-yyyy)"));
 		MenuPopupUtil.installContextMenu(this);
 		addCaretListener(new CaretListener(){
 
@@ -49,14 +49,14 @@ public class My_Date_JFormatedTextField extends JFormattedTextField {
 				
 				String d = th.getText();
 					
-					SimpleDateFormat formatter = new SimpleDateFormat("dd/mm/yyyy");
-			        String dateInString = d;
-
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+			  //      String dateInString = d;
+			        Date t; 
 			        try {
-
-			            Date date = formatter.parse(dateInString);
-			            System.out.println(date);
-			            System.out.println(formatter.format(date));
+			        	 t = formatter.parse(d); 
+			     //       Date date = formatter.parse(dateInString);
+			        	 System.out.println(t);
+			      //      System.out.println(formatter.format(date));
 
 			      
 				} catch (Exception e) {
@@ -64,7 +64,16 @@ public class My_Date_JFormatedTextField extends JFormattedTextField {
 					th.setForeground(Color.RED);
 					return ;
 				}
-					
+			        
+
+			       
+
+			       
+
+			       
+
+			      
+			           
 				
 				if (d.replace("_", "").length() != 10) {
 					
