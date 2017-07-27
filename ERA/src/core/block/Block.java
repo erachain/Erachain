@@ -1165,7 +1165,7 @@ public class Block {
 						LOGGER.error("*** Block[" + height
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 						+ transaction.viewFullTypeName() + "]"
-						+ "invalid code: " + transaction.isValid(fork, null));
+						+ "signature not valid!");
 						return false;
 					}
 		

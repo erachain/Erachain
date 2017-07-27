@@ -526,7 +526,7 @@ public class BlockGenerator extends Thread implements Observer
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
-		
+
 		do
 		{
 			transactionProcessed = false;
@@ -539,7 +539,8 @@ public class BlockGenerator extends Thread implements Observer
 				{
 					try{
 						//CHECK IF VALID
-						if(transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
+						if(transaction.isSignatureValid() &&
+								transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
 						{
 							//CHECK IF ENOUGH ROOM
 							if(totalBytes + transaction.getDataLength(false) <= GenesisBlock.MAX_TRANSACTION_BYTES)
@@ -560,6 +561,9 @@ public class BlockGenerator extends Thread implements Observer
 								transactionProcessed = true;
 								break;
 							}
+						} else {
+							// INVALID TRANSACTION
+							db.getTransactionMap().delete(transaction);
 						}
 					} catch (Exception e) {
                         orderedTransactions.remove(transaction);
