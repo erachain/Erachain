@@ -163,6 +163,12 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		return data;
 	}
 	
+	public List<Transaction> getTransactions()
+	{
+		return transactions;
+	}
+	
+	
 	@Override
 	public int getColumnCount() 
 	{

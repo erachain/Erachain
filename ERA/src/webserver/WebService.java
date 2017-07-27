@@ -24,6 +24,7 @@ public class WebService {
         s.add(API.class);
         s.add(WebResource.class);
         s.add(LightWallet.class);
+        s.add(API_TransactionsResource.class);
         
         ResourceConfig config = new ResourceConfig(s);
 		config.register(MultiPartFeature.class);
