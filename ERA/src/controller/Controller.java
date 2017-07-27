@@ -1192,6 +1192,12 @@ public class Controller extends Observable {
 				info = " received new WIN Block " + newBlock.toString(dbSet);
 				LOGGER.debug(info);
 				about_frame.set_console_Text(info);
+
+				if (!newBlock.isValid(dbSet)) {
+					info = "Block (" + newBlock.toString(dbSet) + ") is Invalid";
+					banPeerOnError(message.getSender(), info);
+					about_frame.set_console_Text(info);
+				}
 				
 				Block lastBlock = this.blockChain.getLastBlock(dbSet);
 				byte[] lastBlockReference = lastBlock.getReference();
