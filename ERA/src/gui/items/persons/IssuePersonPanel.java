@@ -808,7 +808,7 @@ public class IssuePersonPanel extends JPanel
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
         
-        jPanel2.add(issueButton, new java.awt.GridBagConstraints());
+     //   jPanel2.add(issueButton, new java.awt.GridBagConstraints());
 
         jPanel2.add(copyButton, new java.awt.GridBagConstraints());
         
