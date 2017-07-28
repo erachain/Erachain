@@ -47,7 +47,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	}
 	public void set_Filter_By_Name(String str) {
 		filter_Name = str;
-		list = db.get_By_Name(filter_Name);
+		list = db.get_By_Name(filter_Name, false);
 		this.fireTableDataChanged();
 
 	}
@@ -201,7 +201,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 			// CHECK IF NEW LIST
 			if (message.getType() == ObserverMessage.LIST_ASSET_TYPE) {
 				if (this.list == null && !filter_Name.equals("")) {
-					list = db.get_By_Name(filter_Name);
+					list = db.get_By_Name(filter_Name, false);
 					this.fireTableDataChanged();
 					// this.persons = (SortableList<Tuple2<String, String>,
 					// PersonCls>) message.getValue();

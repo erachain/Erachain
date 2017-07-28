@@ -189,7 +189,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_STATEMENT_TYPE) {
 			if (this.transactions == null) {
-				transactions = read_Statement("",(long) -1);
+				transactions = read_Statement("",(long) -1, false);
 				this.fireTableDataChanged();
 			}
 
@@ -213,7 +213,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		}
 	}
 
-	private List<R_SignNote> read_Statement(String str, Long key) {
+	private List<R_SignNote> read_Statement(String str, Long key, boolean b) {
 		List<R_SignNote> tran;
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
@@ -236,7 +236,8 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 					// filter Title
 					statement = (R_SignNote) transaction;
 					if (str != null && !str.equals("")){
-						if (filter_str(str, statement ))	tran.add(statement);
+						
+						if (filter_str(str, statement, b ))	tran.add(statement);
 					}
 					if (key >0){
 						if(statement.getKey() == key) tran.add(statement);
@@ -272,7 +273,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		if (text.equals("") || text == null) return;
 		if (!text.matches("[0-9]*"))return;
 		if (new Long(text) < 1) return;
-		transactions = read_Statement("", new Long (text));
+		transactions = read_Statement("", new Long (text), false);
 		fireTableDataChanged();
 		
 		
@@ -283,13 +284,13 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		
 		
 	}
-	public void set_Filter_By_Name(String str){
-		transactions = read_Statement(str, (long) -1);
+	public void set_Filter_By_Name(String str, boolean b){
+		transactions = read_Statement(str, (long) -1, b);
 		fireTableDataChanged();
 		
 		
 	}
-	private boolean filter_str(String filter, R_SignNote record){
+	private boolean filter_str(String filter, R_SignNote record, boolean case1){
 		if (record.getData() == null)
 			return false;
 		
@@ -297,14 +298,20 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 			Tuple3<String, String, JSONObject> a;
 			try {
 				a = record.parse_Data_V2_Without_Files();
-			
-				if (a.b.contains(filter)) return true;
+				String base = a.b;
+				if (!case1){
+				filter = filter.toLowerCase();
+				base = base.toLowerCase();
+				}
+				if (base.contains(filter)) return true;
+				
 				return false;
 					} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
 			}
+			
 		}
 					
 		

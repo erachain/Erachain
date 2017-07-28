@@ -57,7 +57,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	// }
 	public void set_Filter_By_Name(String str) {
 		filter_Name = str;
-		list = db.get_By_Name(filter_Name);
+		list = db.get_By_Name(filter_Name, false);
 		this.fireTableDataChanged();
 
 	}
@@ -168,7 +168,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
 			if (this.list == null && !filter_Name.equals("")) {
-				list = db.get_By_Name(filter_Name);
+				list = db.get_By_Name(filter_Name, false);
 				this.fireTableDataChanged();
 				// this.persons = (SortableList<Tuple2<String, String>,
 				// PersonCls>) message.getValue();

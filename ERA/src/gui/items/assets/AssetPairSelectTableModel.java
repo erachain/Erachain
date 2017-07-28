@@ -233,7 +233,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	
 	public void set_Filter_By_Name(String str) {
 		filter_Name = str;
-		assets = db.get_By_Name(filter_Name);
+		assets = db.get_By_Name(filter_Name, false);
 		this.fireTableDataChanged();
 
 	}

@@ -1041,7 +1041,7 @@ public class API {
 		}
 		
 		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
-		List<ItemCls> list = map.get_By_Name(filter);
+		List<ItemCls> list = map.get_By_Name(filter, false);
 
 		JSONArray array = new JSONArray();
 		
@@ -1276,7 +1276,7 @@ public class API {
 
 		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
 		// DOES ASSETID EXIST
-		List<ItemCls> list = map.get_By_Name(filter);
+		List<ItemCls> list = map.get_By_Name(filter, false);
 
 		JSONArray array = new JSONArray();
 		
