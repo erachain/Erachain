@@ -619,6 +619,7 @@ public class LightWallet {
 	
 	@GET
 	@Path("broadcast")
+	// response with JSON
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public String broadcastFromRaw1()
 	{
@@ -653,14 +654,33 @@ public class LightWallet {
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public String broadcastFromRaw(String rawDataBase58)
 	{
-		byte[] transactionBytes = Base58.decode(rawDataBase58);
+
+		int steep = 1;
+
+		try {
+			byte[] transactionBytes = Base58.decode(rawDataBase58);
+	
+			steep++;
+			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
+			if(result.getB() == Transaction.VALIDATE_OK) {
+				return "+";
+			} else {
+				return APIUtils.errorMess(result.getB(), gui.transaction.OnDealClick.resultMess(result.getB()));
+			}
+
+		} catch (Exception e) {
+			//LOGGER.info(e);
+			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
+		}
 		
+		/*
 		Pair<Transaction, Integer> result = Controller.getInstance().createTransactionFromRaw(transactionBytes);
 		if(result.getB() == Transaction.VALIDATE_OK) {
 			return result.getA().toJson().toJSONString();
 		} else {
 			return APIUtils.errorMess(result.getB(), gui.transaction.OnDealClick.resultMess(result.getB()));
 		}
+		*/
 	}
 
 }

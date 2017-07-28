@@ -2476,6 +2476,7 @@ public class Controller extends Observable {
 		}
 	}
 
+	/*
 	public Pair<Transaction, Integer> createTransactionFromRaw(
 			byte[] rawData) {
 		
@@ -2483,6 +2484,7 @@ public class Controller extends Observable {
 			return this.transactionCreator.createTransactionFromRaw(rawData);
 		}
 	}
+	*/
 
 	public Pair<Transaction, Integer> lightCreateTransactionFromRaw(
 			byte[] rawData) {

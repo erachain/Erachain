@@ -297,13 +297,22 @@ public class Rec_Resource {
 	@Path("/broadcast")
 	public String broadcastFromRaw(String rawDataBase58)
 	{
-		byte[] transactionBytes = Base58.decode(rawDataBase58);
-		
-		Pair<Transaction, Integer> result = Controller.getInstance().createTransactionFromRaw(transactionBytes);
-		if(result.getB() == Transaction.VALIDATE_OK) {
-			return result.getA().toJson().toJSONString();
-		} else {
-			return APIUtils.errorMess(result.getB(), gui.transaction.OnDealClick.resultMess(result.getB()));
+		int steep = 1;
+
+		try {
+			byte[] transactionBytes = Base58.decode(rawDataBase58);
+	
+			steep++;
+			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
+			if(result.getB() == Transaction.VALIDATE_OK) {
+				return "+";
+			} else {
+				return APIUtils.errorMess(result.getB(), gui.transaction.OnDealClick.resultMess(result.getB()));
+			}
+
+		} catch (Exception e) {
+			//LOGGER.info(e);
+			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
 		}
 	}
 
