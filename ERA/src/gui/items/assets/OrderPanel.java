@@ -517,7 +517,7 @@ public class OrderPanel extends JPanel
 		
 		//CREATE ORDER
 		
-		BigDecimal amountWant = amountHave.multiply(price);
+		BigDecimal amountWant = amountHave.multiply(price); 
 		if (buying) {
 			price = amountWant;
 			amountWant = amountHave;
