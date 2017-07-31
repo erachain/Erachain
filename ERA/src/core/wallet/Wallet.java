@@ -630,7 +630,8 @@ public class Wallet extends Observable implements Observer
 		Controller.getInstance().setNeedSync(false);
 		Controller.getInstance().setProcessingWalletSynchronize(true);
 
-		LOGGER.info("Resetted maps");
+		LOGGER.info("  *** Synchronizing wallet...");
+		LOGGER.info("      Resetted maps");
 				
 		//RESET MAPS
 		this.database.getTransactionMap().reset();
@@ -1195,7 +1196,9 @@ public class Wallet extends Observable implements Observer
 		
 		//CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
-		if(lastBlockSignature == null || !Arrays.equals(lastBlockSignature, block.getReference()))
+		if(lastBlockSignature == null
+				// TODO: make check deep some blocks
+				|| false && !Arrays.equals(lastBlockSignature, block.getReference()))
 		{
 			LOGGER.info("Wallet not synchronized with current blockchain: synchronizing wallet.");
 			this.synchronize();
