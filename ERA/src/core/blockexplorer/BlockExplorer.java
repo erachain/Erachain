@@ -2201,8 +2201,8 @@ if ( asset_1 == null) {
 					transactionJSON.put("block",trans.getBlockHeight(db));//.getSeqNo(db));
 					
 					transactionJSON.put("seq",trans.getSeqNo(db));
-					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
 					//transactionJSON.put("reference",trans.getReference());
+					transactionJSON.put("signature",Base58.encode(trans.getSignature()));
 					transactionJSON.put("date",DateTimeFormat.timestamptoString(trans.getTimestamp()));
 					transactionJSON.put("creator",trans.viewCreator());
 					
@@ -2212,6 +2212,7 @@ if ( asset_1 == null) {
 						transactionJSON.put("creator_addr", "-");
 						}
 					else {
+						transactionJSON.put("pub_key",Base58.encode(trans.getCreator().getPublicKey()));
 						transactionJSON.put("creator_addr", trans.getCreator().getAddress());	
 					if (trans.getCreator().getPerson() == null){
 						transactionJSON.put("creator_key", "+");

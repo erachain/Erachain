@@ -73,6 +73,7 @@ public class WEB_Transactions_HTML {
 			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Confirmations", langObj)       + ": </b>" +  tras_json.get("confirmations"); 
 			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Date", langObj)       + ": </b>" + tras_json.get("date");
 			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Size", langObj)        + ": </b>" + tras_json.get("size"); 
+			out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Publick Key", langObj)   + ": </b>" + tras_json.get("pub_key");
 			out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Signature", langObj)   + ": </b>" + tras_json.get("signature");
 			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" +  tras_json.get("reference");
 			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
