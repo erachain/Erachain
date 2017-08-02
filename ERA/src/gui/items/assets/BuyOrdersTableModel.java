@@ -33,12 +33,16 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 	
 	BigDecimal sumAmount;
 	BigDecimal sumTotal;
+	private AssetCls have;
+	private AssetCls want;
 	
 	public BuyOrdersTableModel(AssetCls have, AssetCls want)
 	{
+		this.have = have;
+		this.want= want;
 		Controller.getInstance().addObserver(this);
 		this.orders = Controller.getInstance().getOrders(have, want, true);
-		this.orders.registerObserver();
+		//this.orders.registerObserver();
 		
 		columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
 		columnNames[COLUMN_BUYING_AMOUNT] += " " + want.getShort();
@@ -185,6 +189,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE)
 		{
+			this.orders = Controller.getInstance().getOrders(this.have, want, true);
 			totalCalc();
 			this.fireTableDataChanged();
 		}
