@@ -448,6 +448,8 @@ public class OrderPanel extends JPanel
 	
 	public void onSellClick(boolean buying)
 	{
+	
+		
 		//DISABLE
 		this.sellButton.setEnabled(false);
 	
@@ -463,22 +465,7 @@ public class OrderPanel extends JPanel
 			return;
 		}
 		
-		//CHECK IF WALLET UNLOCKED
-		if(!Controller.getInstance().isWalletUnlocked())
-		{
-			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(this); 
-			if(!Controller.getInstance().unlockWallet(password))
-			{
-				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-				
-				//ENABLE
-				this.sellButton.setEnabled(true);
-				
-				return;
-			}
-		}
+		
 		
 		//READ CREATOR
 		Account sender = (Account) this.cbxAccount.getSelectedItem();
@@ -521,9 +508,16 @@ public class OrderPanel extends JPanel
 			return;
 		}
 
+		if (price.compareTo(new BigDecimal(0))==0||amountHave.compareTo(new BigDecimal(0))==0) {
+			
+			//DISABLE
+			this.sellButton.setEnabled(true);
+			return;
+		}
+		
 		//CREATE ORDER
 		
-		BigDecimal amountWant = amountHave.multiply(price);
+		BigDecimal amountWant = amountHave.multiply(price); 
 		if (buying) {
 			price = amountWant;
 			amountWant = amountHave;
@@ -538,6 +532,23 @@ public class OrderPanel extends JPanel
 			this.sellButton.setEnabled(true);
 			return;
 		}
+		
+		//CHECK IF WALLET UNLOCKED
+				if(!Controller.getInstance().isWalletUnlocked())
+				{
+					//ASK FOR PASSWORD
+					String password = PasswordPane.showUnlockWalletDialog(this); 
+					if(!Controller.getInstance().unlockWallet(password))
+					{
+						//WRONG PASSWORD
+						JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+						
+						//ENABLE
+						this.sellButton.setEnabled(true);
+						
+						return;
+					}
+				}
 
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave.setScale(8, RoundingMode.HALF_DOWN), amountWant.setScale(8, RoundingMode.HALF_DOWN), feePow);
