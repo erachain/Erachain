@@ -203,7 +203,7 @@ public class WEB_Transactions_HTML {
 		GenesisIssueNoteRecord noteIssue =(GenesisIssueNoteRecord)transaction;
 		NoteCls note = (NoteCls)noteIssue.getItem();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +note.getName();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + Processor.process(note.getDescription());
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + core.exdata.ExData.viewDescriptionHTML(note.getDescription());
 		return out;
 	}
 
@@ -258,7 +258,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 					+ pollCreation.getPoll().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-					+ Processor.process(pollCreation.getPoll().getDescription()) + "<br>";
+					+ core.exdata.ExData.viewDescriptionHTML(pollCreation.getPoll().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Options", langObj) + ":</b><br>";
 			
 			//OPTIONS
@@ -324,7 +324,7 @@ public class WEB_Transactions_HTML {
 		StatusCls status = Controller.getInstance().getItemStatus(status_key);
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Name", langObj) + ":</b> "
 					+ status.getName()+ "<br>";
-		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Description", langObj) + ":</b> " + Processor.process(status.getDescription())+ "<br>";
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Description", langObj) + ":</b> " + core.exdata.ExData.viewDescriptionHTML(status.getDescription())+ "<br>";
 		long beginDate = setStatusToItem.getBeginDate();
 		long endDate = setStatusToItem.getEndDate();
 		out += "<b>" + Lang.getInstance().translate_from_langObj("From - To", langObj) + ":</b> "
@@ -340,11 +340,11 @@ public class WEB_Transactions_HTML {
 		}
 		if (setStatusToItem.getData1() != null) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 1:</b> "
-						+ Processor.process(new String(setStatusToItem.getData1(), Charset.forName("UTF-8"))) + "<br>";
+						+ core.exdata.ExData.viewDescriptionHTML(new String(setStatusToItem.getData1(), Charset.forName("UTF-8"))) + "<br>";
 		}
 		if (setStatusToItem.getData2() != null) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 2:</b> "
-						+ Processor.process(new String(setStatusToItem.getData2(), Charset.forName("UTF-8"))) + "<br>";
+						+ core.exdata.ExData.viewDescriptionHTML(new String(setStatusToItem.getData2(), Charset.forName("UTF-8"))) + "<br>";
 		}
 		if (setStatusToItem.getRefParent() != 0l) {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
@@ -352,13 +352,13 @@ public class WEB_Transactions_HTML {
 		}
 		if (setStatusToItem.getDescription() != null) {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-						+ Processor.process( new String(setStatusToItem.getDescription(), Charset.forName("UTF-8"))) + "<br>";
+						+ core.exdata.ExData.viewDescriptionHTML( new String(setStatusToItem.getDescription(), Charset.forName("UTF-8"))) + "<br>";
 		}
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Name", langObj) + ":</b> "
 					+ item.getItemTypeStr() + " - " + item.getItemSubType()
 					+ ": " + item.getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Description", langObj) + ":</b> "
-					+ Processor.process( item.getDescription()) + "<br>";
+					+ core.exdata.ExData.viewDescriptionHTML( item.getDescription()) + "<br>";
 		return out;
 	}
 
@@ -389,7 +389,7 @@ public class WEB_Transactions_HTML {
 						+ Controller.getInstance().getNote( r_Statement.getKey()).toString() + "<br>";
 			}
 			if (r_Statement.getData() != null) {
-				String ss = (( r_Statement.isText() ) ? Processor.process(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
+				String ss = (( r_Statement.isText() ) ? core.exdata.ExData.viewDescriptionHTML(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : core.exdata.ExData.viewDescriptionHTML(Converter.toHex(r_Statement.getData())));
 				ss = "<div  style='word-wrap: break-word;'>" +ss;
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
 						+ ss + "<br>";
@@ -423,7 +423,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ unionIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ Processor.process(unionIssue.getItem().getDescription()) + "<br>";
+				+ core.exdata.ExData.viewDescriptionHTML(unionIssue.getItem().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Birthday", langObj) + ":</b> "
 				+ union.getBirthdayStr() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
@@ -438,7 +438,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ statusIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ Processor.process(statusIssue.getItem().getDescription()) + "<br>";
+				+ core.exdata.ExData.viewDescriptionHTML(statusIssue.getItem().getDescription()) + "<br>";
 
 		return out;
 	}
@@ -450,7 +450,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ noteIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ Processor.process(noteIssue.getItem().getDescription()) + "<br>";
+				+ core.exdata.ExData.viewDescriptionHTML(noteIssue.getItem().getDescription()) + "<br>";
 
 		return out;
 	}
@@ -462,7 +462,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
 				+ imprintIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ Processor.process(imprintIssue.getItem().getDescription()) + "<br>";
+				+ core.exdata.ExData.viewDescriptionHTML(imprintIssue.getItem().getDescription()) + "<br>";
 		
 		return out;
 	}
@@ -483,7 +483,7 @@ public class WEB_Transactions_HTML {
 			out += Lang.getInstance().translate_from_langObj("Female", langObj);
 		out += "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ Processor.process(personIssue.getItem().getDescription()) + "<br>";
+				+ core.exdata.ExData.viewDescriptionHTML(personIssue.getItem().getDescription()) + "<br>";
 		if (person.getOwner().getPerson() != null) {
 			// out += "<b>" + Lang.getInstance().translate_from_langObj("Owner",
 			// langObj) + ":</b> <a href=?person="
@@ -507,7 +507,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?asset="
 				+ tr.getAssetKey() + get_Lang(langObj) + ">" + tr.getItem().getName() + "</a><br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ Processor.process(tr.getItem().getDescription()) + "<br>";
+				+ core.exdata.ExData.viewDescriptionHTML(tr.getItem().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
 				+ ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ":</b> "

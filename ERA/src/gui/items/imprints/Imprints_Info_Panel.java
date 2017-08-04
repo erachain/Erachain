@@ -114,7 +114,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         add(description_jLabel, gridBagConstraints);
         
         description_jTextArea.setEditable(false);
-        description_jTextArea.setText(Processor.process(imprint.getDescription()));
+        description_jTextArea.setText(core.exdata.ExData.viewDescriptionHTML(imprint.getDescription()));
         description_jTextArea.setColumns(20);
         description_jTextArea.setRows(5);
         jScrollPane1.setViewportView(description_jTextArea);

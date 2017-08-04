@@ -1297,7 +1297,7 @@ if ( asset_1 == null) {
 
 		assetJSON.put("key", asset.getKey());
 		assetJSON.put("name", asset.getName());
-		assetJSON.put("description", Processor.process(asset.getDescription()));
+		assetJSON.put("description", asset.getDescription());
 		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
 		String divis = Lang.getInstance().translate_from_langObj("False", langObj);

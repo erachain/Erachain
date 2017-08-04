@@ -599,7 +599,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 				else
 				{
 					messageBufs.get(row).setDecryptedMessage(( messageBufs.get(row).isText() )?
-							Processor.process(new String(decrypt, Charset.forName("UTF-8")))
+							new String(decrypt, Charset.forName("UTF-8"))
 							: Converter.toHex(decrypt));
 					messageBufs.get(row).setOpend(true);
 					menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
@@ -707,7 +707,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 				if( !this.encrypted )
 				{
 					this.decryptedMessage = ( isText )?
-							Processor.process(new String( this.rawMessage, Charset.forName("UTF-8")))
+							new String( this.rawMessage, Charset.forName("UTF-8"))
 							: Converter.toHex( this.rawMessage );
 				}
 			}

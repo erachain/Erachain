@@ -81,7 +81,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		
 		initComponents();
 		
-		set_Tamplate(comboBoxModelNotes.getElementAt(0));
+		set_Template(comboBoxModelNotes.getElementAt(0));
 		
 		 jComboBox_Template.addItemListener(new ItemListener(){
 
@@ -93,7 +93,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 					if(e.getStateChange() == ItemEvent.SELECTED) 
 					{		
 						
-						set_Tamplate((NoteCls) jComboBox_Template.getSelectedItem());
+						set_Template((NoteCls) jComboBox_Template.getSelectedItem());
 					}
 					
 					
@@ -285,10 +285,10 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	   
 
 }
-	 private void set_Tamplate(NoteCls item){
+	 private void set_Template(NoteCls item){
 		 if (item == null)return;
 		 sel_note = item; //(NoteCls) jComboBox_Template.getSelectedItem();
-			String ww = Processor.process(sel_note.getDescription().replace("\n\n", "\n").replace("\n", "  \n"));
+			String ww = sel_note.getDescription();
 			
 			int ee = params_Template_Model.getRowCount()-1;
 			int ccc;

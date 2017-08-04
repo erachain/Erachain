@@ -51,7 +51,7 @@ public class IssueNoteDetailsFrame extends Rec_DetailsFrame
 				
 		//DESCRIPTION
 		++detailGBC.gridy;
-		JTextArea txtAreaDescription = new JTextArea(Processor.process(noteIssue.getItem().getDescription()));
+		JTextArea txtAreaDescription = new JTextArea(noteIssue.getItem().getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
