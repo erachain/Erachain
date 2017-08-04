@@ -20,7 +20,8 @@ import core.transaction.Transaction;
 import database.DBSet;
 import database.SortableList;
 
-public class Order implements Comparable<Order> {
+public class Order implements Comparable<Order> 
+{
 	
 	private static final MathContext rounding = new java.math.MathContext(8, RoundingMode.HALF_DOWN); 
 
@@ -43,7 +44,7 @@ public class Order implements Comparable<Order> {
 	private BigDecimal fulfilledHave;
 	private BigDecimal amountWant;
 	private BigDecimal fulfilledWant;
-	private long timestamp;
+	protected long timestamp;
 	private int haveDivisible;
 	private int wantDivisible;
 	private boolean isExecutable = true;
@@ -616,11 +617,26 @@ public class Order implements Comparable<Order> {
 
 	//COMPARE
 	
-	@Override
+	//@Override
 	public int compareTo(Order order) 
 	{	
 		//COMPARE ONLY BY PRICE
-		return this.getPriceCalc().compareTo(order.getPriceCalc());	
+		int result = this.getPriceCalc().compareTo(order.getPriceCalc());
+		if (result != 0)
+			return result;
+
+		// TODO: REMOVE it in new CHAIN
+		//if (this.timestamp < 1501816130973000l)
+		//	return 0;
+		
+		long orderTimestamp = order.getTimestamp();
+		if (this.timestamp < orderTimestamp)
+			return -1;
+		else if (this.timestamp > orderTimestamp)
+			return 1;
+		
+		return 0;
+		
 	}
 	
 	//COPY
