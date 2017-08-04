@@ -188,7 +188,7 @@ public class IssuePersonPanel extends JPanel
     	jLabel_SkinColor.setText(Lang.getInstance().translate("Skin Color") + ":");
     	jLabel_EyeColor.setText(Lang.getInstance().translate("Eye Color") + ":");
     	jLabel_HairСolor.setText(Lang.getInstance().translate("Hair Сolor") + ":");
-        jLabel_Height.setText(Lang.getInstance().translate("Height") + ":");
+        jLabel_Height.setText(Lang.getInstance().translate("Growth") + ":");
         jLabel_Fee.setText(Lang.getInstance().translate("Fee Power") + ":");
     	jLabel_BirthLongitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
     	jLabel_BirthLatitude.setText(Lang.getInstance().translate("Coordinates of Birth") + ":");
@@ -329,7 +329,7 @@ public class IssuePersonPanel extends JPanel
 				mess = "Invalid Coordinates of Birth, example: 43.123032, 131.917828";
 				break;
 			case 6:
-				mess = "Invalid height 10..255";
+				mess = "Invalid growth 10..255";
 				break;
 			}
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(mess), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
