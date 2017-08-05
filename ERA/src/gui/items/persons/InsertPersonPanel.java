@@ -427,7 +427,8 @@ private void init(){
 							JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
 									"Person issue has been sent!"),
 									Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-							
+							erase_Fields();
+						
 						}
 						}	
 				} else {		
@@ -455,14 +456,10 @@ private void init(){
 		
 	}
 	
-	protected void reset() {
-		//txtFeePow.setText("0");
+	protected void erase_Fields() {
+		txtFeePow.setText("0");
 		txtName.setText("");
 		txtareaDescription.setText("");
-		//txtBirthday.setText("0000-00-00");
-		//txtDeathday.setText("0000-00-00");
-		
-		txtGender.setSelectedIndex(2);
 		txtGenderTxt.setText("");
 		txtSNILS.setText("");
 		txtBirthLatitude.setText("");
@@ -473,7 +470,13 @@ private void init(){
 		txtHeight.setText("");
 		imgButes = null;
 		add_Image_Panel.reset();
-	
+		txt_Sign.setText("");
+		txt_public_key.setText("");
+		txtBirthdayTxt.setText("");
+		txtDeathdayTxt.setText("");
+		txtGenderTxt.setText("");
+		imgButes =null;
+		iconLabel.setIcon(null);
 	}
 
 
