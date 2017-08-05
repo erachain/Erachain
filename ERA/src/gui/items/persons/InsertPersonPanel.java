@@ -345,6 +345,7 @@ private void init(){
 			issueButton.setEnabled(false);
 			copyButton.setEnabled(false);
 
+			if(person == null) return;
 			//CHECK IF WALLET UNLOCKED
 			if(!Controller.getInstance().isWalletUnlocked())
 			{
@@ -427,6 +428,7 @@ private void init(){
 							JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
 									"Person issue has been sent!"),
 									Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+							person = null;
 							erase_Fields();
 						
 						}
@@ -477,6 +479,7 @@ private void init(){
 		txtGenderTxt.setText("");
 		imgButes =null;
 		iconLabel.setIcon(null);
+		
 	}
 
 
