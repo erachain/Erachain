@@ -333,7 +333,7 @@ private void init(){
 	
  
   
-     trans_Button = new MButton(Lang.getInstance().translate("Check Person and insert"), 2);
+     trans_Button = new MButton(Lang.getInstance().translate("Check Person and insert"), 2); 
     
      trans_Button.addActionListener(new ActionListener(){
 
