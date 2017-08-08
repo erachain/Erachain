@@ -1394,8 +1394,8 @@ if ( asset_1 == null) {
 	{
 		Map output=new LinkedHashMap();
 
-		List<Order> ordersHave = DBSet.getInstance().getOrderMap().getOrders(have, want);
-		List<Order> ordersWant = DBSet.getInstance().getOrderMap().getOrders(want, have);
+		List<Order> ordersHave = DBSet.getInstance().getOrderMap().getOrders(have, want, false);
+		List<Order> ordersWant = DBSet.getInstance().getOrderMap().getOrders(want, have, true);
 
 		//Collections.reverse(ordersWant); 
 

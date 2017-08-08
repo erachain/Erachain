@@ -982,7 +982,7 @@ public class OrderTestsMy
 		Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2).setScale(8));
 		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(50000).setScale(8));
 
-		assertEquals(0, db.getOrderMap().getOrders(keyB, keyA).size());
+		assertEquals(0, db.getOrderMap().getOrders(keyB, keyA, false).size());
 		/*
 		assertEquals(BigDecimal.valueOf(23000).setScale(8), db.getOrderMap().getOrders(keyB, keyA).get(0).getPriceCalcReverse());
 		assertEquals(BigDecimal.valueOf(26000).setScale(8), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountHaveLeft());
@@ -1139,10 +1139,10 @@ public class OrderTestsMy
 		Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1).setScale(8));
 		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165).setScale(8));
 
-		assertEquals(1, db.getOrderMap().getOrders(keyB, keyA).size());
-		assertEquals(BigDecimal.valueOf(23000).setScale(8), db.getOrderMap().getOrders(keyB, keyA).get(0).getPriceCalcReverse());
-		assertEquals(BigDecimal.valueOf(25999.835).setScale(8), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountHaveLeft());
-		assertEquals(BigDecimal.valueOf(1).setScale(8), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountWantLeft());
+		assertEquals(1, db.getOrderMap().getOrders(keyB, keyA, false).size());
+		assertEquals(BigDecimal.valueOf(23000).setScale(8), db.getOrderMap().getOrders(keyB, keyA, false).get(0).getPriceCalcReverse());
+		assertEquals(BigDecimal.valueOf(25999.835).setScale(8), db.getOrderMap().getOrders(keyB, keyA, false).get(0).getAmountHaveLeft());
+		assertEquals(BigDecimal.valueOf(1).setScale(8), db.getOrderMap().getOrders(keyB, keyA, false).get(0).getAmountWantLeft());
 
 	}
 	
@@ -1231,7 +1231,7 @@ public class OrderTestsMy
 				15000 + 15000 + 20000).setScale(8)); //BALANCE B FOR ACCOUNT A
 		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3).setScale(8)); //BALANCE A FOR ACCOUNT B
 		
-		assertEquals(2, db.getOrderMap().getOrders(keyB, keyA).size());
+		assertEquals(2, db.getOrderMap().getOrders(keyB, keyA, true).size());
 		
 		//CREATE ORDER _I  SELL 3A for 24000 = 48000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,

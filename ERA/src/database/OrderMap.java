@@ -22,6 +22,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple4;
 
 import core.item.assets.Order;
+import core.item.assets.OrderReverse;
 import utils.ObserverMessage;
 import database.DBSet;
 import database.serializer.OrderSerializer;
@@ -270,16 +271,24 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		
 	}
 	
-	public List<Order> getOrders(long have, long want) 
+	public List<Order> getOrders(long have, long want, boolean orderReverse) 
 	{
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = this.getKeys(have, want);
-				
+
 		//GET ALL ORDERS FOR KEYS
 		List<Order> orders = new ArrayList<Order>();
-		for(BigInteger key: keys)
-		{
-			orders.add(this.get(key));
+
+		if (orderReverse) {
+			for(BigInteger key: keys)
+			{
+				orders.add((OrderReverse)this.get(key));
+			}			
+		} else {
+			for(BigInteger key: keys)
+			{
+				orders.add(this.get(key));
+			}
 		}
 		
 		//IF THIS IS A FORK
@@ -311,10 +320,11 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		if(filter){
 			List<BigInteger> keys2 = new ArrayList<BigInteger>();
 			
+			DBSet db = DBSet.getInstance();
 			Iterator<BigInteger> iter = keys.iterator();
 			while (iter.hasNext()) {
 				BigInteger key = iter.next();
-				if(isExecutable(DBSet.getInstance(), key))
+				if(isExecutable(db, key))
 					keys2.add(key);
 			}
 			keys = keys2;
