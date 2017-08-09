@@ -173,7 +173,7 @@ public class OrderPanel extends JPanel
 		this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
 		this.cbxAccount.setRenderer(new AccountRenderer(this.have.getKey()));
 	// select accounts in combobox			
-		if (account !="")
+		if (account !="" && account != null)
 		{
 		 for (int i=0; this.cbxAccount.getModel().getSize()>i;i++){
 				 Account elem = this.cbxAccount.getModel().getElementAt(i);

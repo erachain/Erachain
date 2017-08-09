@@ -6,12 +6,15 @@ import java.awt.event.ActionListener;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
+import core.item.assets.AssetCls;
+import database.DBSet;
 import gui.Send_Frame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;
 import gui.items.accounts.Account_Repay_Debt_Dialog;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.accounts.Account_Take_Hold_Dialog;
+import gui.items.assets.ExchangeFrame;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
 
@@ -20,6 +23,18 @@ public class Menu_Deals extends JMenu {
 	public Menu_Deals(){
 		
 		// DEALS
+		// Send
+        JMenuItem BueCompyItem = new JMenuItem(Lang.getInstance().translate("Buy COMPU"));
+        BueCompyItem.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        BueCompyItem.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		// 
+        		new ExchangeFrame((AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null) ;
+        	}
+        });
+       add(BueCompyItem);
 		// Send
 		        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
 		        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
