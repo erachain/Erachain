@@ -145,15 +145,22 @@ public class OrderPanel extends JPanel
 				label_buy.gridy = ++labelGBC.gridy;
 		detailGBC.gridy = ++detailGBC.gridy;
 		JLabel lblBuy = new JLabel( Lang.getInstance().translate("To Buy %want%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
-		this.add(lblBuy, label_buy);
-		
+		JLabel lblTitle = new JLabel(Lang.getInstance().translate("To Sell %have%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));//this.have.toString() + " / " + this.want.toString());
+
+		if(buying) 
+			this.add(lblBuy, label_buy);
+		else
+			this.add(lblTitle, label_buy);
+			
 		
 		
 		// Label sell
 		label_buy.gridy = ++labelGBC.gridy;
 		detailGBC.gridy = ++detailGBC.gridy;
-		JLabel lblTitle = new JLabel(Lang.getInstance().translate("To Sell %have%").replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));//this.have.toString() + " / " + this.want.toString());
-		this.add(lblTitle, label_buy);	
+		if(buying) 
+			this.add(lblTitle, label_buy);	
+		else
+			this.add(lblBuy, label_buy);
 		
 		//LABEL FROM
 		labelGBC.gridy = ++labelGBC.gridy;
