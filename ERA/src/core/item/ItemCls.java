@@ -46,6 +46,7 @@ public abstract class ItemCls {
 	protected static final int TYPE_LENGTH = 2;
 	protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
 	protected static final int NAME_SIZE_LENGTH = 1;
+	public static final int MIN_NAME_LENGTH = 10;
 	public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
 	protected static final int ICON_SIZE_LENGTH = 2;
 	public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
@@ -74,7 +75,7 @@ public abstract class ItemCls {
 	{
 		this.typeBytes = typeBytes;
 		this.owner = owner;
-		this.name = name;
+		this.name = name.trim();
 		this.description = description;
 		this.icon = icon == null? new byte[0]: icon;
 		this.image = image == null? new byte[0]: image;

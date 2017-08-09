@@ -79,9 +79,9 @@ public class IssueAssetPanel extends javax.swing.JPanel {
          txtareaDescription.setLineWrap(true);
          txtareaDescription.setText("");
         quantity_jLabel.setText(Lang.getInstance().translate("Quantity") + ":");
-        txtQuantity.setText("0");
+        txtQuantity.setText("1");
         scale_jLabel.setText(Lang.getInstance().translate("Scale") + ":");
-        txtScale.setText("0");
+        txtScale.setText("8");
         fee_jLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
         txtFeePow.setText("0"); 
         issue_jButton.setText(Lang.getInstance().translate("Issue"));
@@ -146,7 +146,6 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 7);
         add(account_jLabel, gridBagConstraints);
-
        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -173,16 +172,12 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
         add(txtName, gridBagConstraints);
-
-   
-        
       
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
-      
         add(add_Logo_Icon_Panel, gridBagConstraints);
       
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -350,21 +345,24 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 		//READ CREATOR
 		Account sender = (Account) this.cbxFrom.getSelectedItem();
 		
-		long parse = 0;
+		int parseSteep = 0;
 		try
 		{
-			//READ SCALSE
-			byte scale = Byte.parseByte(this.txtScale.getText());
-			
+
 			//READ FEE POW
 			int feePow = Integer.parseInt(this.txtFeePow.getText());
-			
+
+			//READ SCALE
+			parseSteep++;
+			byte scale = Byte.parseByte(this.txtScale.getText());
+						
 			//READ QUANTITY
-			parse = 1;
+			parseSteep++;
 			long quantity = Long.parseLong(this.txtQuantity.getText());
 			boolean asPack = false;
 			
 			//CREATE ASSET
+			parseSteep++;
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(),  add_Logo_Icon_Panel.imgButes, add_Image_Panel.imgButes, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
 					 feePow);			
@@ -427,7 +425,11 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 								
 			case Transaction.INVALID_NAME_LENGTH:
 				
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance()
+						.translate("Name must be between %m and %M characters!")
+						.replace("%m", ""+ItemCls.MIN_NAME_LENGTH)
+						.replace("%M", ""+ItemCls.MAX_NAME_LENGTH),
+						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.INVALID_DESCRIPTION_LENGTH:
@@ -455,13 +457,21 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 		}
 		catch(Exception e)
 		{
-			if(parse == 0)
+			switch(parseSteep)
 			{
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			case 0:				
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Fee Power!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+			case 1:
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Scale!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+			case 2:
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+				
+			default:
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Asset!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
 			}
 		}
 		

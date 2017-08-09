@@ -43,6 +43,7 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
@@ -325,7 +326,7 @@ public class IssueAssetPanel1 extends JPanel
       	//TXT SCALE
   //    	txtGBC.gridy = 4;
       	this.txtScale = new JTextField();
-      	this.txtScale.setText("0");
+      	this.txtScale.setText("8");
       	
       	 gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 2;
@@ -473,21 +474,24 @@ public class IssueAssetPanel1 extends JPanel
 		//READ CREATOR
 		Account sender = (Account) this.cbxFrom.getSelectedItem();
 		
-		long parse = 0;
+		int parseSteep = 0;
 		try
 		{
-			//READ SCALSE
-			byte scale = Byte.parseByte(this.txtScale.getText());
 			
 			//READ FEE POW
 			int feePow = Integer.parseInt(this.txtFeePow.getText());
 			
+			//READ SCALSE
+			parseSteep++;
+			byte scale = Byte.parseByte(this.txtScale.getText());
+
 			//READ QUANTITY
-			parse = 1;
+			parseSteep++;
 			long quantity = Long.parseLong(this.txtQuantity.getText());
 			boolean asPack = false;
 			
 			//CREATE ASSET
+			parseSteep++;
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), null, null, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
 					 feePow);			
@@ -550,7 +554,11 @@ public class IssueAssetPanel1 extends JPanel
 								
 			case Transaction.INVALID_NAME_LENGTH:
 				
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Name must be between 1 and 100 characters!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance()
+						.translate("Name must be between %m and %M characters!")
+						.replace("%m", ""+ItemCls.MIN_NAME_LENGTH)
+						.replace("%M", ""+ItemCls.MAX_NAME_LENGTH),
+						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	
 				
 			case Transaction.INVALID_DESCRIPTION_LENGTH:
@@ -578,13 +586,21 @@ public class IssueAssetPanel1 extends JPanel
 		}
 		catch(Exception e)
 		{
-			if(parse == 0)
+			switch(parseSteep)
 			{
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
-			else
-			{
-				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			case 0:				
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Fee Power!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+			case 1:
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Scale!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+			case 2:
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
+				
+			default:
+				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Asset!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				break;
 			}
 		}
 		

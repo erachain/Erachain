@@ -131,7 +131,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//CHECK NAME LENGTH
 		String name = this.item.getName();
-		if(name.length() < 12)
+		if(name.length() < ItemCls.MIN_NAME_LENGTH)
 		{
 			// TEST OMLY CHARS
 			return INVALID_NAME_LENGTH;
