@@ -279,7 +279,7 @@ public class OrderMap extends DBMap<BigInteger, Order>
 		//GET ALL ORDERS FOR KEYS
 		List<Order> orders = new ArrayList<Order>();
 
-		if (orderReverse) {
+		if (false && orderReverse) {
 			for(BigInteger key: keys)
 			{
 				orders.add((OrderReverse)this.get(key));

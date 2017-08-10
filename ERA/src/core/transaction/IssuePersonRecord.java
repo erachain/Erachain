@@ -21,6 +21,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.BlockChain;
+import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
@@ -86,6 +87,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		return true;
 	}
 	*/
+
 
 	//@Override
 	public int isValid(DBSet db, Long releaserReference) 

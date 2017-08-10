@@ -266,7 +266,7 @@ public abstract class PersonCls extends ItemCls {
 		personJSON.put("eyeColor", this.eyeColor);
 		personJSON.put("hairСolor", this.hairСolor);
 		personJSON.put("height", this.height);
-				
+
 		return personJSON;
 	}
 	

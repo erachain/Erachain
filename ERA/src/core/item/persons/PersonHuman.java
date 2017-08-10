@@ -4,6 +4,7 @@ package core.item.persons;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
  import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -74,6 +75,18 @@ public class PersonHuman extends PersonCls {
 		}
 		
 		return data;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject toJson() {
+		
+		JSONObject personJSON = super.toJson();
+
+		if (this.ownerSignature != null) {
+			personJSON.put("ownerSignature", Base58.encode(this.ownerSignature));
+		}
+
+		return personJSON;
 	}
 
 	//PARSE
@@ -288,6 +301,13 @@ public class PersonHuman extends PersonCls {
 				|| Arrays.equals(this.ownerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
 			return false;
 		
+		// for skip NOT VALID SIGNs
+		for ( byte[] valid_item: Transaction.VALID_SIGN) {
+			if (Arrays.equals(this.reference, valid_item)) {
+				return true;
+			}
+		}
+
 		boolean includeReference = false;
 		boolean forOwnerSign = true;
 		// not use SIGNATURE here
