@@ -1,33 +1,23 @@
 package webserver;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,68 +26,26 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-
 import api.ApiErrorFactory;
 import controller.Controller;
-import core.TransactionCreator;
 import core.account.Account;
-import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.block.GenesisBlock;
-import core.blockexplorer.BlockExplorer;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
-import core.naming.Name;
-import core.transaction.ArbitraryTransaction;
-import core.transaction.BuyNameTransaction;
-import core.transaction.CancelOrderTransaction;
-import core.transaction.CancelSellNameTransaction;
-import core.transaction.CreateOrderTransaction;
-import core.transaction.CreatePollTransaction;
-import core.transaction.DeployATTransaction;
-import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteRecord;
-import core.transaction.GenesisIssuePersonRecord;
-import core.transaction.GenesisIssueStatusRecord;
-import core.transaction.GenesisTransferAssetTransaction;
-import core.transaction.IssueAssetTransaction;
-import core.transaction.IssueImprintRecord;
-import core.transaction.IssueNoteRecord;
-import core.transaction.IssuePersonRecord;
-import core.transaction.IssueStatusRecord;
-import core.transaction.IssueUnionRecord;
-import core.transaction.MultiPaymentTransaction;
-import core.transaction.R_Hashes;
-import core.transaction.R_Send;
-import core.transaction.R_SertifyPubKeys;
-import core.transaction.R_SetStatusToItem;
-import core.transaction.R_SetUnionToItem;
-import core.transaction.R_SignNote;
-import core.transaction.R_Vouch;
-import core.transaction.RegisterNameTransaction;
-import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import core.transaction.UpdateNameTransaction;
-import core.transaction.VoteOnPollTransaction;
 import database.BlockHeightsMap;
 import database.BlockMap;
 import database.DBSet;
 import database.ItemAssetMap;
 import database.ItemPersonMap;
 import database.SortableList;
-import lang.Lang;
-import network.Peer;
-import ntp.NTP;
 import utils.APIUtils;
-import utils.Converter;
 import utils.Pair;
 import utils.StrJSonFine;
 
@@ -175,6 +123,9 @@ public class API {
 
 		help.put("*** TOOLS ***", "");
 		help.put("POST Verify Signature for JSON {\"message\": ..., \"signature\": Base58, \"publickey\": Base58)", "verifysignature");
+		
+		help.put("POST Broadcast" , "/broadcast JSON {raw=raw(BASE58)}");
+		help.put("GET Broadcast" , "/broadcast/{raw(BASE58)}");
 		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -645,18 +596,29 @@ public class API {
 	public String broadcastRaw(@PathParam("raw") String raw)
 	{
 		
-		return broadcastFromRawPost(raw);
+		return broadcastFromRawPost1(raw);
 	}
 
 	@POST
 	@Path("broadcast")
+	public String broadcastFromRawPost (@Context HttpServletRequest request,
+			MultivaluedMap<String, String> form){
+		
+		String raw = form.getFirst("raw");
+		return broadcastFromRawPost1(raw);
+		
+	}
+	
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-	public String broadcastFromRawPost(@QueryParam("raw") String rawDataBase58)
+	public String broadcastFromRawPost1( String rawDataBase58)
 	{
 		int steep = 1;
 
 		try {
+		//	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
+		//	String rawDataBase58 = (String) jsonObject.get("raw");
 			byte[] transactionBytes = Base58.decode(rawDataBase58);
+		
 	
 			steep++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
