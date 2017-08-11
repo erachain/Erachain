@@ -107,7 +107,7 @@ public tt() {
    assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Asset")));
    assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Orders")));
    assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Balance")));
-   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Check Exchange")));
+   assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Exchange")));
    
   
  //  templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Templates")));

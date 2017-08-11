@@ -69,7 +69,7 @@ public class Exchange_Panel extends JPanel
 		this.want = want;
 		
 		
-		
+		 install();
 	//	this.setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Check Exchange")+" - " + this.have.toString() + " / " + this.want.toString());
 		initComponents();
 	}
@@ -81,11 +81,19 @@ public class Exchange_Panel extends JPanel
 		this.action = "";
 		this.have = have;
 		this.want = have;
-	
+		 install();
 		initComponents();
 		
 	}
 	
+	private void install()	{
+		if (have == null){
+			have = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 1);
+		}
+		if (want == null){
+			want = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 2);
+		}
+	}
 	   private void initComponents() {
 			//LAYOUT
 			this.setLayout(new GridBagLayout());
@@ -122,13 +130,28 @@ public class Exchange_Panel extends JPanel
 	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
 	        jSelect_Trade.add(jTextField_Asset_1, gridBagConstraints);
 
-	        jButton_Change_Asset_1.setText("jButton1");
+	        jButton_Change_Asset_1.setText(Lang.getInstance().translate("Search"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 1;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-	   //     jSelect_Trade.add(jButton_Change_Asset_1, gridBagConstraints);
+	        jSelect_Trade.add(jButton_Change_Asset_1, gridBagConstraints);
+	        jButton_Change_Asset_1.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					AssetPairSelect ss = new AssetPairSelect(want.getKey(), "", "");
+					ss.assetPairSelectTableModel.removeObservers();
+					if(ss.pairAsset!= null)	
+					{
+						have = ss.pairAsset;
+					jTextField_Asset_1.setText(have.getName());
+					jScrollPane_jPanel_RightPanel.setViewportView( new  Echange_Sell_Buy_Panel(have, want, action, account));
+					}
+				}
+	        });
 
 	        jTextField_Asset_2.setText(want.getName());
 	        jTextField_Asset_2.setEditable(false);
@@ -141,7 +164,7 @@ public class Exchange_Panel extends JPanel
 	        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
 	        jSelect_Trade.add(jTextField_Asset_2, gridBagConstraints);
 
-	        jButton_Change_Asset_2.setText(Lang.getInstance().translate("Asset"));
+	        jButton_Change_Asset_2.setText(Lang.getInstance().translate("Search"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 6;
 	        gridBagConstraints.gridy = 1;

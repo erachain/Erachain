@@ -35,6 +35,7 @@ import gui.bank.My_Order_Pauments_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.accounts.My_Loans_SplitPanel;
 import gui.items.assets.Assets_Favorite_SplitPanel;
+import gui.items.assets.Exchange_Panel;
 import gui.items.assets.IssueAssetPanel;
 import gui.items.assets.My_Assets_Tab;
 import gui.items.assets.My_Balance_Tab;
@@ -416,8 +417,8 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Issue Asset"), new IssueAssetPanel());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("Check Exchange"))){
-	//		ccase1( Lang.getInstance().translate("Exchange"), new ExchangePanel(null,null,null,null));
+		if ( str.equals( Lang.getInstance().translate("Exchange")) || str.equals("Exchange_Panel")){
+			ccase1( Lang.getInstance().translate("Exchange"), new Exchange_Panel(null,null,null,null));
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Search Templates"))   || str.equals("Search_Notes_Tab")){
