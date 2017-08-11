@@ -597,8 +597,8 @@ public class Controller extends Observable {
 		reCreateDB(true);
 	}
 	
-	public void reCreateDB(boolean useDataBak) throws IOException, Exception {
-	
+	public DBSet reCreateDB(boolean useDataBak) throws IOException, Exception {
+
 		File dataDir = new File(Settings.getInstance().getDataDir());
 		if (dataDir.exists()) {
 			// delete data folder
@@ -626,40 +626,42 @@ public class Controller extends Observable {
 					} 
 					DBSet.reCreateDatabase();
 				}
-				
+
 			} else {
 				DBSet.reCreateDatabase();
 			}
 
 		}
 
+		this.dbSet = DBSet.getInstance();
+		
 		if (this.dbSet.getBlockMap().isProcessing()) {
-			
-			
+
+
 			if ( Setting_Json.containsKey("DB_OPEN")){
-			String js = (String) Setting_Json.get("DB_OPEN");
-			Setting_Json.put("DB_OPEN", "Open Error");
-			if (js.equals( "Restore_DataBak"))	{
-				Setting_Json.put("DB_OPEN", "Restore_DataBak");
-			}
-				
+				String js = (String) Setting_Json.get("DB_OPEN");
+				Setting_Json.put("DB_OPEN", "Open Error");
+				if (js.equals( "Restore_DataBak"))	{
+					Setting_Json.put("DB_OPEN", "Restore_DataBak");
+				}
+
 
 			}
-			
+
 			// save setting to setting file
 			try {
 				SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
 			} catch (IOException e) {
-				
+
 			}
-			
-			
-			
-			
+
+
+
+
 			throw new Exception(
 					Lang.getInstance().translate("The application was not closed correctly! Delete the folder ")
-							+ dataDir.getAbsolutePath()
-							+ Lang.getInstance().translate(" and start the application again."));
+					+ dataDir.getAbsolutePath()
+					+ Lang.getInstance().translate(" and start the application again."));
 		}
 		if ( Setting_Json.containsKey("DB_OPEN")){
 			String js = (String) Setting_Json.get("DB_OPEN");
@@ -667,16 +669,18 @@ public class Controller extends Observable {
 			if (js.equals( "Restore_DataBak"))	{
 				Setting_Json.put("DB_OPEN", "Restore_DataBak");
 			}
-				
 
-			}
-		
+
+		}
+
 		// save setting to setting file
-					try {
-						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
-					} catch (IOException e) {
-						
-					}
+		try {
+			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
+		} catch (IOException e) {
+
+		}
+		
+		return this.dbSet;
 	}
 
 	public void startFromScratchOnDemand() throws IOException {

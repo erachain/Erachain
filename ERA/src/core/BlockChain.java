@@ -146,7 +146,7 @@ public class BlockChain
 		
 	        	try {
 	        		dbSet.close();
-					Controller.getInstance().reCreateDB(false);
+	        		dbSet = Controller.getInstance().reCreateDB(false);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage(),e);
 				}
