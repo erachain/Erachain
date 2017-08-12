@@ -37,6 +37,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
+import core.item.ItemCls;
 import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
@@ -379,7 +380,7 @@ public class IssuePersonPanel extends JPanel
 			  //ENABLE
 				this.issueButton.setEnabled(true);
 				this.copyButton.setEnabled(true); 
-			return;
+				return;
 			}
 			
 		    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ result.getA().viewSize(true)+" Bytes, ";
@@ -389,39 +390,42 @@ public class IssuePersonPanel extends JPanel
 	//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
 	//	    UIManager.put("OptionPane.okButtonText", "Готово");
 		
-	//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+		    //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 		
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true," ", (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction") +" " + Lang.getInstance().translate("Issue Person"));
-	
-		IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
-	//	ww.jPanel2.setVisible(false);
-		dd.jScrollPane1.setViewportView(ww);
-		dd.setLocationRelativeTo(th);
-		dd.setVisible(true);
-//		JOptionPane.OK_OPTION
-			if (dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
-				
-							
-			//VALIDATE AND PROCESS
-			Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), false);
-			if (result1 != Transaction.VALIDATE_OK){
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result1)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-			}
-			else{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
-						"Person issue has been sent!"),
-						Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-				
-			}
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true," ", (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction") +" " + Lang.getInstance().translate("Issue Person"));
 		
-			}	
-		//	reset();
+			IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
+		//	ww.jPanel2.setVisible(false);
+			dd.jScrollPane1.setViewportView(ww);
+			dd.setLocationRelativeTo(th);
+			dd.setVisible(true);
+	//		JOptionPane.OK_OPTION
+			if (dd.isConfirm) { //s!= JOptionPane.OK_OPTION)	{
+											
+				//VALIDATE AND PROCESS
+				Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(), false);
+				if (result1 != Transaction.VALIDATE_OK) {
+						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result1)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(
+							"Person issue has been sent!"),
+							Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+					
+				}
 			
+			}
+		//	reset();
+
+		} else if (result.getB() == Transaction.INVALID_NAME_LENGTH ) {
+			JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance()
+					.translate("Name must be between %m and %M characters!")
+					.replace("%m", "" + core.item.persons.PersonCls.MIN_NAME_LENGTH)
+					.replace("%M", "" + core.item.persons.PersonCls.MAX_NAME_LENGTH),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 		}
-		
-		
 		
 		//ENABLE
 		this.issueButton.setEnabled(true);

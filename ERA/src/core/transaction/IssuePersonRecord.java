@@ -89,7 +89,6 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	*/
 
 
-	//@Override
 	public int isValid(DBSet db, Long releaserReference) 
 	{
 
