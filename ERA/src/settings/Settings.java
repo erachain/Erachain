@@ -194,7 +194,7 @@ public class Settings {
 	
 	public String getPeersPath()
 	{
-		return this.userPath + "peers.json";
+		return this.userPath + (core.BlockChain.DEVELOP_USE?"peers-dev.json":"peers.json");
 	}
 	
 	public String getWalletDir()
@@ -277,7 +277,7 @@ public class Settings {
 			
 			knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 			
-			if(knownPeers.size() == 0 || loadPeersFromInternet)
+			if(!core.BlockChain.DEVELOP_USE && (knownPeers.size() == 0 || loadPeersFromInternet))
 			{
 				knownPeers.addAll(getKnownPeersFromInternet());
 			}
