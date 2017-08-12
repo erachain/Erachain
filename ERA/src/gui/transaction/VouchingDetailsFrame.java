@@ -47,17 +47,23 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame
 		Transaction record = DBSet.getInstance().getTransactionFinalMap().
 				getTransaction(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeq());
 		
-		String message = "<div>"
-				+ ", time: " + record.viewTimestamp() + "</div>";
+		String message = "<div>";
+		if (record == null) {
+			message += "NULL</div>";			
+		} else {
+			message += ", time: " + record.viewTimestamp() + "</div>";
 			message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(false) + ", fee:" + record.viewFee() + "</div>";
-		
+			
 			message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
 			message += "<div>SIGN: <font size='2'>" + record.viewSignature() + "</font></div>";
-
+			
 			message += "<div>Creator: <font size='4'>" + record.viewCreator() + "</font></div>";
 			message += "<div>Item: <font size='4'>" + record.viewItemName() + "</font></div>";
 			message += "<div>Amount: <font size='4'>" + record.viewAmount() + "</font></div>";
-			message += "<div>Recipient: <font size='4'>" + record.viewRecipient() + "</font></div>";
+			message += "<div>Recipient: <font size='4'>" + record.viewRecipient() + "</font></div>";			
+		}
+	
+		
 
 		//LABEL DESCRIPTION
 		++labelGBC.gridy;

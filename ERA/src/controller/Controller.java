@@ -442,43 +442,49 @@ public class Controller extends Observable {
 		createDataCheckpoint();
 		Setting_Json.put("DB_OPEN", "Open OK");
 		// save setting to setting file
-					try {
-						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
-					} catch (IOException e) {
-						
-					}
+		try {
+			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), Setting_Json);
+		} catch (IOException e) {
+			
+		}
 		
 		//CHECK IF DB NEEDS UPDATE
 
-		if(this.dbSet.getBlockMap().getLastBlockSignature() != null)
-		{
-			//CHECK IF NAME STORAGE NEEDS UPDATE
-			if (this.dbSet.getLocalDataMap().get("nsupdate") == null )
+		try {
+			if(this.dbSet.getBlockMap().getLastBlockSignature() != null)
 			{
-				//FIRST NAME STORAGE UPDATE
-				UpdateUtil.repopulateNameStorage( 70000 );
+				//CHECK IF NAME STORAGE NEEDS UPDATE
+				if (this.dbSet.getLocalDataMap().get("nsupdate") == null )
+				{
+					//FIRST NAME STORAGE UPDATE
+					UpdateUtil.repopulateNameStorage( 70000 );
+					this.dbSet.getLocalDataMap().set("nsupdate", "1");
+				}
+				//CREATE TRANSACTIONS FINAL MAP
+				if (this.dbSet.getLocalDataMap().get("txfinalmap") == null
+						|| !this.dbSet.getLocalDataMap().get("txfinalmap").equals("2"))
+				{
+					//FIRST NAME STORAGE UPDATE
+					UpdateUtil.repopulateTransactionFinalMap(  );
+					this.dbSet.getLocalDataMap().set("txfinalmap", "2");
+				}
+				
+				if (this.dbSet.getLocalDataMap().get("blogpostmap") == null ||  !this.dbSet.getLocalDataMap().get("blogpostmap").equals("2"))
+				{
+					//recreate comment postmap
+					UpdateUtil.repopulateCommentPostMap();
+					this.dbSet.getLocalDataMap().set("blogpostmap", "2");
+				}
+			} else {
 				this.dbSet.getLocalDataMap().set("nsupdate", "1");
-			}
-			//CREATE TRANSACTIONS FINAL MAP
-			if (this.dbSet.getLocalDataMap().get("txfinalmap") == null
-					|| !this.dbSet.getLocalDataMap().get("txfinalmap").equals("2"))
-			{
-				//FIRST NAME STORAGE UPDATE
-				UpdateUtil.repopulateTransactionFinalMap(  );
 				this.dbSet.getLocalDataMap().set("txfinalmap", "2");
-			}
-			
-			if (this.dbSet.getLocalDataMap().get("blogpostmap") == null ||  !this.dbSet.getLocalDataMap().get("blogpostmap").equals("2"))
-			{
-				//recreate comment postmap
-				UpdateUtil.repopulateCommentPostMap();
 				this.dbSet.getLocalDataMap().set("blogpostmap", "2");
 			}
-		} else {
-			this.dbSet.getLocalDataMap().set("nsupdate", "1");
-			this.dbSet.getLocalDataMap().set("txfinalmap", "2");
-			this.dbSet.getLocalDataMap().set("blogpostmap", "2");
+		} catch (Exception e12) {
+			createDataCheckpoint();
+			Setting_Json.put("DB_OPEN", "Open BAD - try reCreate");			
 		}
+
 		
 		// CREATE SYNCHRONIZOR
 		this.synchronizer = new Synchronizer();

@@ -1198,7 +1198,7 @@ public class Wallet extends Observable implements Observer
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if(lastBlockSignature == null
 				// TODO: make check deep some blocks
-				|| false && !Arrays.equals(lastBlockSignature, block.getReference()))
+				|| !Arrays.equals(lastBlockSignature, block.getReference()))
 		{
 			LOGGER.info("Wallet not synchronized with current blockchain: synchronizing wallet.");
 			this.synchronize();
