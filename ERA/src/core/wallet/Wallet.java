@@ -62,7 +62,7 @@ import core.voting.Poll;
 import core.wallet.AssetsFavorites;
 import core.wallet.NotesFavorites;
 import core.wallet.PersonsFavorites;
-
+import database.BlockMap;
 import database.DBSet;
 import database.wallet.SecureWalletDatabase;
 import database.wallet.WalletDatabase;
@@ -1185,6 +1185,26 @@ public class Wallet extends Observable implements Observer
 			}
 		}
 	}
+	
+	
+	private boolean findLastBlockOff(byte[] lastBlockSignature, Block block) {
+		
+		BlockMap blockMap = DBSet.getInstance().getBlockMap();
+		
+		int i = 0;
+		byte[] reference = block.getReference();
+		while (i++ < 1000) {
+			if (Arrays.equals(lastBlockSignature, reference))
+				return true;
+			
+			LOGGER.info("Wallet orphanBlock for find lastBlockSignature." + block.getHeight(DBSet.getInstance()));
+			block = blockMap.get(reference);
+			this.orphanBlock(block);
+			reference = block.getReference();
+		}
+		
+		return false;
+	}
 
 	private void processBlock(Block block)
 	{
@@ -1197,8 +1217,7 @@ public class Wallet extends Observable implements Observer
 		//CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.database.getLastBlockSignature();
 		if(lastBlockSignature == null
-				// TODO: make check deep some blocks
-				|| !Arrays.equals(lastBlockSignature, block.getReference()))
+				|| !findLastBlockOff(lastBlockSignature, block))
 		{
 			LOGGER.info("Wallet not synchronized with current blockchain: synchronizing wallet.");
 			this.synchronize();
