@@ -617,7 +617,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridy = 10;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 18, 0, 0);
-        mainPanel.add(jLabel_SkinColor, gridBagConstraints);
+    //    mainPanel.add(jLabel_SkinColor, gridBagConstraints);
 
       
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -627,7 +627,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
-        mainPanel.add(txtSkinColor, gridBagConstraints);
+    //    mainPanel.add(txtSkinColor, gridBagConstraints);
 // EyeColor
         jLabel_EyeColor.setText("EyeColor");
         gridBagConstraints = new java.awt.GridBagConstraints();
