@@ -626,7 +626,7 @@ public class IssuePersonPanel extends JPanel
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weightx = 0.2; 
     //    mainPanel.add(txtSkinColor, gridBagConstraints);
 // EyeColor
         jLabel_EyeColor.setText("EyeColor");
