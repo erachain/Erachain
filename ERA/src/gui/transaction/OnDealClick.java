@@ -103,7 +103,7 @@ public class OnDealClick
 			break;
 
 		case Transaction.INVALID_NAME_LENGTH:
-			mess = "Invalid  name length";
+			mess = "Invalid name length";
 			break;
 		case Transaction.INVALID_VALUE_LENGTH:
 			mess = "Invalid value length";

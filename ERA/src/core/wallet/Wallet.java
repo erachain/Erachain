@@ -1643,6 +1643,9 @@ public class Wallet extends Observable implements Observer
 
 			// FIND person
 			ItemCls person = db.getItemPersonMap().get(sertifyPubKeys.getKey());
+			if (person == null)
+				return;
+			
 			// FIND issue record
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
