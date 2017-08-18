@@ -131,7 +131,7 @@ public class Accounts_Library_Panel extends JPanel {
 		});
 		menu.add(menu_copyPublicKey);
 
-		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
+		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Verifier Name"));
 		menu_copyName.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -144,7 +144,7 @@ public class Accounts_Library_Panel extends JPanel {
 		});
 		menu.add(menu_copyName);
 		
-		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Creator Account"));
+		JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Account Verifier"));
 		copy_Creator_Address.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -154,7 +154,7 @@ public class Accounts_Library_Panel extends JPanel {
 		});
 		menu.add(copy_Creator_Address);
 
-		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Creator Public Key"));
+		JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Verifier Public Key"));
 		menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();

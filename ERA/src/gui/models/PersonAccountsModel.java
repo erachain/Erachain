@@ -42,7 +42,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	long key_person_table;
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","To Date", "Creator"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","To Date", "Verifier"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true};
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	

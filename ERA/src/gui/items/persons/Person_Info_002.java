@@ -303,10 +303,12 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		}else{
 			
 			//descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
-			descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + biStr;
+			descript = descript+ "\n" + Lang.getInstance().translate("Birthday") + ":" + biStr;
 			
 			
 		}
+		
+		descript = descript + "\n" + Lang.getInstance().translate("Coordinates Birth") + ": " + ((Float)person.getBirthLatitude()).toString() + "," +	((Float)person.getBirthLongitude()).toString();
 		
 		descript = descript+"\n" + person.getDescription();
 		jTextArea_Description.setText(descript);
@@ -327,7 +329,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		int gridy = 8;
 		if (human.isMustBeSigned() && owner != null && !owner.equals(publisher)) {
 
-			jLabel_Owner.setText(Lang.getInstance().translate("Creator of data") + ":");
+			jLabel_Owner.setText(Lang.getInstance().translate("Data Creator") + ":");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = gridy++;
@@ -381,7 +383,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		//	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
 		}
 	
-		jLabel_Creator.setText(Lang.getInstance().translate("Publisher") + ":");
+		jLabel_Creator.setText(Lang.getInstance().translate("Registrator") + ":");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = gridy++;
