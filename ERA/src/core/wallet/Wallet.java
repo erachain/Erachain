@@ -1199,6 +1199,10 @@ public class Wallet extends Observable implements Observer
 			
 			LOGGER.info("Wallet orphanBlock for find lastBlockSignature." + block.getHeight(DBSet.getInstance()));
 			block = blockMap.get(reference);
+			if (block == null) {
+				return false;
+			}
+			
 			this.orphanBlock(block);
 			reference = block.getReference();
 		}
@@ -1220,6 +1224,8 @@ public class Wallet extends Observable implements Observer
 				|| !findLastBlockOff(lastBlockSignature, block))
 		{
 			LOGGER.info("Wallet not synchronized with current blockchain: synchronizing wallet.");
+			// TODO: worked?
+			//Controller.getInstance().setNeedSync(true);
 			this.synchronize();
 		}
 		
@@ -2082,7 +2088,7 @@ public class Wallet extends Observable implements Observer
 	{
 		return this.database.getLastBlockSignature();
 	}
-	
+
 	public long getLicenseKey()
 	{
 		if (this.database == null || this.database.getAccountMap().getLicenseKey() == null) {

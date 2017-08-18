@@ -83,7 +83,9 @@ public class WalletResource {
 				
 		if(!Controller.getInstance().isProcessingWalletSynchronize()) {
 			
+			// TODO: was 
 			Controller.getInstance().synchronizeWallet();
+			Controller.getInstance().setNeedSync(true);
 			
 			return String.valueOf(true);
 		} else {
