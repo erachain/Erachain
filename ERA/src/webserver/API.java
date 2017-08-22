@@ -1,11 +1,15 @@
 package webserver;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -32,6 +36,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.AEScrypto;
+import core.crypto.Base32;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -117,6 +122,7 @@ public class API {
 		help.put("GET Person by Address", "personbyaddress/{address}");
 		help.put("GET Person Key by Public Key", "personkeybypublickey/{publickey}");
 		help.put("GET Person by Public Key", "personbypublickey/{publickey}");
+		help.put("GET Person by Public Key Base32", "personbypublickeybase32/{publickeybase32}");
 
 		help.put("*** PERSONS ***", "");
 		help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
@@ -1218,7 +1224,38 @@ public class API {
 				.build();
 		
 	}
-
+	@GET
+	@Path("personbypublickeybase32/{publickeybase32}")
+	public Response personByBankKey(@PathParam("publickeybase32") String bankkey) {
+		byte[] publicKey = Base32.decode(bankkey);
+			JSONObject ansver = new JSONObject();		
+				   Iterator<Pair<Long, ItemCls>> tt = DBSet.getInstance().getItemPersonMap().getList().iterator();
+				while(tt.hasNext())
+				{
+					  Pair<Long, ItemCls> s = tt.next();
+					PersonCls p = (PersonCls) s.getB();
+					PublicKeyAccount own = p.getOwner();
+					 byte[] ow = own.getPublicKey();
+					if (Arrays.equals(ow,publicKey)){
+						 ansver = p.toJson();
+						
+					}
+				}
+				
+			if (ansver.size()== 0) {
+				
+				ansver.put("Error", "Public Key Not Found");
+			}
+		
+		
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(ansver))
+				.build();
+		
+	}
 	
 	/*
 	 * ************* PERSONS **************
