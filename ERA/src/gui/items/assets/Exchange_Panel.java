@@ -45,7 +45,7 @@ public class Exchange_Panel extends JPanel
 	String action;
 	String account;
 
-	private JLabel jLabel_Icon;
+	private JButton change_Button;
 
 	private JTextField jTextField_Asset_1;
 
@@ -88,10 +88,10 @@ public class Exchange_Panel extends JPanel
 	
 	private void install()	{
 		if (have == null){
-			have = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 1);
+			have = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 2);
 		}
 		if (want == null){
-			want = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 2);
+			want = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 1);
 		}
 	}
 	   private void initComponents() {
@@ -100,7 +100,7 @@ public class Exchange_Panel extends JPanel
 			// select panel  
 	        jSelect_Trade = new javax.swing.JPanel();
 	        jSelect_Trade.setLayout(new java.awt.GridBagLayout());
-	        jLabel_Icon = new javax.swing.JLabel();
+	        change_Button = new JButton();
 	        jTextField_Asset_1 = new javax.swing.JTextField();
 	        jButton_Change_Asset_1 = new javax.swing.JButton();
 	        jTextField_Asset_2 = new javax.swing.JTextField();
@@ -108,16 +108,44 @@ public class Exchange_Panel extends JPanel
 
 	        setLayout(new java.awt.GridBagLayout());
 
-	        jLabel_Icon.setText("");
+	        change_Button.setText("");
 	        ImageIcon ic = new ImageIcon(Toolkit.getDefaultToolkit().getImage("images/icons/exchange.png"));
+	        change_Button.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+				AssetCls a = have;
+				have = want;
+				want = a;
+			
+				
+				jTextField_Asset_1.setText(have.getName());
+				jScrollPane_jPanel_RightPanel.setViewportView( new  Echange_Sell_Buy_Panel(have, want, action, account));
+				
+								
+				jTextField_Asset_2.setText(want.getName());
+				jScrollPane_jPanel_RightPanel.setViewportView( new  Echange_Sell_Buy_Panel(have, want, action, account));
+				
+				
+				
+				}
+	        	
+	        	
 	        
-	        jLabel_Icon.setIcon( new ImageIcon(ic.getImage().getScaledInstance(20, 20, 1)));
+	        	
+	        	
+	        	
+	        });
+	        
+	        
+	        change_Button.setIcon( new ImageIcon(ic.getImage().getScaledInstance(20, 20, 1)));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 3;
 	        gridBagConstraints.gridy = 1;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
 	        gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 0);
-	        jSelect_Trade.add(jLabel_Icon, gridBagConstraints);
+	        jSelect_Trade.add(change_Button, gridBagConstraints);
 
 	        jTextField_Asset_1.setText(have.getName());
 	        jTextField_Asset_1.setEditable(false);
