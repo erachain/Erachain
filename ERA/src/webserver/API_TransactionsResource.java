@@ -33,7 +33,7 @@ public class API_TransactionsResource {
 		
 		Map<String, String> help = new LinkedHashMap<String, String>();
 
-		help.put("apirecords/getbyaddress?address={address}", Lang.getInstance().translate("Get all Records for Address"));
+		help.put("apirecords/getbyaddress?address={address}&asset={asset}", Lang.getInstance().translate("Get all Records for Address & Asset Key"));
 		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 	//	help.put("apirecords/find?address={address}&startblock={start block}&endblock={end_block}&limit={limit}",Lang.getInstance().translate("Get {limit} Record for the {start blok}....{end block}"));
 		
@@ -47,7 +47,7 @@ public class API_TransactionsResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("getbyaddress")
-	public String getByAddress(@QueryParam("address") String address )
+	public String getByAddress(@QueryParam("address") String address, @QueryParam("asset") String asset )
 	{
 		List<Transaction> result;
 		if (address ==null || address.equals("")) {
@@ -55,18 +55,28 @@ public class API_TransactionsResource {
 			ff.put("Error", "Invalid Address");
 			return  ff.toJSONString();
 		}
-		TransactionsTableModel a = new TransactionsTableModel();
-		a.Find_Transactions_from_Address(address);
-		result =a.getTransactions();
+		//TransactionsTableModel a = new TransactionsTableModel();
+		//a.Find_Transactions_from_Address(address);
+		//result =a.getTransactions();
+		result = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
+		
 		if (result == null){
 				JSONObject ff = new JSONObject();
 				ff.put("message", "null");
 				return  ff.toJSONString();
 		};
+		
+		
 		JSONArray array = new JSONArray();
 		for(Transaction transaction: result)
 		{
+			if(asset !=null){
+				if(transaction.getAssetKey() == new Long (asset)){
+					array.add(transaction.toJson());
+				}
+			}else{
 			array.add(transaction.toJson());
+			}
 		}
 		//json.put("transactions", array);
 		return array.toJSONString();
