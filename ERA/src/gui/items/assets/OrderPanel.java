@@ -164,7 +164,7 @@ public class OrderPanel extends JPanel
 		
 		//LABEL FROM
 		labelGBC.gridy = ++labelGBC.gridy;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("From Account") + ":");
+		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
 		this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
@@ -192,17 +192,33 @@ public class OrderPanel extends JPanel
 		assetHintGBC.gridy = detailGBC.gridy;
 		JLabel accountHintLabel = new JLabel( have.getName());//.getShort() );
 		//this.add(accountHintLabel, assetHintGBC);
-        
+		//LABEL AMOUNT
+				labelGBC.gridy++;
+				
+				String mes = buying?Lang.getInstance().translate("Quantity want to Buy"):Lang.getInstance().translate("Quantity want Sell");
+				
+				JLabel amountLabel = new JLabel(mes + ":");
+				this.add(amountLabel, labelGBC);
+						
+				//AMOUNT
+				detailGBC.gridy++;
+				this.txtAmount = new JTextField();
+				this.add(this.txtAmount, detailGBC);	
+				
+				//ASSET HINT
+				assetHintGBC.gridy = detailGBC.gridy;
+				JLabel amountHintLabel = new JLabel( buying?want.getName():have.getName() );
+
+				this.add(amountHintLabel, assetHintGBC);
+				
 		//LABEL PRICE
 		labelGBC.gridy++;
-		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
+		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price for one") + " " + (buying?want.getName():have.getName()) + ":");
 		this.add(priceLabel, labelGBC);
-		
 		//PRICE
 		detailGBC.gridy++;
 		txtPrice = new JTextField();
 		this.add(txtPrice, detailGBC);	
-		
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
 		JLabel priceHintLabel = new JLabel( buying?have.getName():want.getName() );
@@ -269,25 +285,14 @@ public class OrderPanel extends JPanel
 			});
 		}
 		
-		//LABEL AMOUNT
-		labelGBC.gridy++;
-		JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
-		this.add(amountLabel, labelGBC);
-				
-		//AMOUNT
-		detailGBC.gridy++;
-		this.txtAmount = new JTextField();
-		this.add(this.txtAmount, detailGBC);	
 		
-		//ASSET HINT
-		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel amountHintLabel = new JLabel( buying?want.getName():have.getName() );
-
-		this.add(amountHintLabel, assetHintGBC);
 		
 		//LABEL AMOUNT
 		labelGBC.gridy++;
-		JLabel buyingAmountLabel = new JLabel(Lang.getInstance().translate("Total") + ":");
+		
+		mes =  buying?Lang.getInstance().translate("Total Sell"):Lang.getInstance().translate("Total Buy");
+		
+		JLabel buyingAmountLabel = new JLabel(mes + ":");
 		this.add(buyingAmountLabel, labelGBC);
 					
 		//AMOUNT
