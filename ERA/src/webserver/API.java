@@ -915,6 +915,12 @@ public class API {
 	@Path("getaccountsfromperson/{key}")
 	public Response getAccountsFromPerson(@PathParam("key") String key) {
 		JSONObject out = new JSONObject();
+		ItemCls cls = DBSet.getInstance().getItemPersonMap().get(new Long(key));
+		if (DBSet.getInstance().getItemPersonMap().get(new Long(key)) == null){
+			out.put("error", "Person not Found");
+		}
+		else
+		{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(new Long(key));
 		if (addresses.size() == 0){
 			out.put("null", "null");
@@ -924,6 +930,7 @@ public class API {
 		for (String a:ad){
 			out.put(i,a);
 			i++;
+		}
 		}
 		}
 		return Response.status(200)
