@@ -10,6 +10,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -123,6 +126,7 @@ public class API {
 		help.put("GET Person Key by Public Key", "personkeybypublickey/{publickey}");
 		help.put("GET Person by Public Key", "personbypublickey/{publickey}");
 		help.put("GET Person by Public Key Base32", "personbypublickeybase32/{publickeybase32}");
+		help.put("GET Accounts From Person", "getaccountsfromperson/{key}");
 
 		help.put("*** PERSONS ***", "");
 		help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
@@ -905,6 +909,28 @@ public class API {
 					.entity("" + personItem.a)
 					.build();
 		}
+	}
+	
+	@GET
+	@Path("getaccountsfromperson/{key}")
+	public Response getAccountsFromPerson(@PathParam("key") String key) {
+		JSONObject out = new JSONObject();
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(new Long(key));
+		if (addresses.size() == 0){
+			out.put("null", "null");
+		}else{
+		Set<String> ad = addresses.keySet();
+		int i = 0;
+		for (String a:ad){
+			out.put(i,a);
+			i++;
+		}
+		}
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();	
 	}
 
 	/*
