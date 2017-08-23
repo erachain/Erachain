@@ -545,7 +545,7 @@
 	"Poll":"Опрос",
 	"Price must be positive!":"Цена должна быть положительной!",
 	"Price:":"Цена:",
-	"Price for one":"Цена за Одну",
+	"Price per unit":"Цена за единицу",
 	"Private Part":"Приватная часть",
 	"Public Key":"Открытый ключ",
 	"public key not found":"публичный ключ не найден",

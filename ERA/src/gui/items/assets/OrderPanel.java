@@ -213,7 +213,7 @@ public class OrderPanel extends JPanel
 				
 		//LABEL PRICE
 		labelGBC.gridy++;
-		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price for one") + " " + (buying?want.getName():have.getName()) + ":");
+		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price per unit") + " " + (buying?want.getName():have.getName()) + ":");
 		this.add(priceLabel, labelGBC);
 		//PRICE
 		detailGBC.gridy++;
