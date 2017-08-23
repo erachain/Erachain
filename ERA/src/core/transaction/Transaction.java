@@ -802,7 +802,7 @@ public abstract class Transaction {
 		transaction.put("height", height);
 		if (height > 0)
 			transaction.put("sequence", this.getSeqNo(DBSet.getInstance()));
-		
+		transaction.put("size", this.viewSize(false));
 		return transaction;
 	}
 	
@@ -832,6 +832,9 @@ public abstract class Transaction {
 		transaction.put("signature", isSigned?Base58.encode(this.signature):"null");
 		
 		transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
+		
+		transaction.put("block", block);
+		transaction.put("nom_in_block", viewHeightSeq(DBSet.getInstance()));
 		
 		return transaction;
 	}
