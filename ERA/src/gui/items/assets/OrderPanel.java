@@ -76,6 +76,7 @@ public class OrderPanel extends JPanel
 		th = this;
 		this.have = have;
 		this.want = want;
+
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -197,7 +198,7 @@ public class OrderPanel extends JPanel
 				
 				String mes = buying?Lang.getInstance().translate("Quantity want to Buy"):Lang.getInstance().translate("Quantity want Sell");
 				
-				JLabel amountLabel = new JLabel(mes + ":");
+				JLabel amountLabel = new JLabel(mes + "(1):");
 				this.add(amountLabel, labelGBC);
 						
 				//AMOUNT
@@ -213,7 +214,7 @@ public class OrderPanel extends JPanel
 				
 		//LABEL PRICE
 		labelGBC.gridy++;
-		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price per unit") + " " + (buying?want.getName():have.getName()) + ":");
+		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price per unit") + " " + (buying?want.getName():have.getName()) + "(2):");
 		this.add(priceLabel, labelGBC);
 		//PRICE
 		detailGBC.gridy++;
@@ -298,7 +299,7 @@ public class OrderPanel extends JPanel
 		//AMOUNT
 		detailGBC.gridy++;
 		txtBuyingAmount = new JTextField();
-		txtBuyingAmount.setEnabled(false);
+		txtBuyingAmount.setEditable(false);
 		txtBuyingAmount.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 		
 		this.add(txtBuyingAmount, detailGBC);
@@ -373,7 +374,7 @@ public class OrderPanel extends JPanel
 			this.sellButton.setBackground(new Color (255,153,153));
 		}
 			
-		
+		sellButton.setEnabled(false);
 	//	this.sellButton.setPreferredSize(new Dimension(125, 25));
 		this.sellButton.addActionListener(new ActionListener()
 		{
@@ -432,10 +433,15 @@ public class OrderPanel extends JPanel
 	
 	public void calculateBuyingAmount(JTextField target, boolean buying) 
 	{
+		int i = 1;
 	    try
 	    {
-	    	BigDecimal price = new BigDecimal(txtPrice.getText());		    	
+	    		
+	    	
 	    	BigDecimal amount = new BigDecimal(txtAmount.getText());
+	    	i++;
+	    	BigDecimal price = new BigDecimal(txtPrice.getText());
+	    	
 	    	if (buying) {
 	    		if (this.have.isDivisible()) {
 	    	    	target.setText(price.multiply(amount).setScale(8, RoundingMode.HALF_UP).toPlainString());
@@ -449,10 +455,15 @@ public class OrderPanel extends JPanel
 	    	    	target.setText(price.multiply(amount).setScale(3, RoundingMode.HALF_UP).toPlainString());
 	    		}
 	    	}
+	    	BigDecimal r = new BigDecimal(target.getText());
+	    	if (!r.equals(new BigDecimal("0.00000000"))) sellButton.setEnabled(true);
 	    }
 	    catch(Exception e)
 	    {
-	    	target.setText("0");
+	    	if (i ==1) target.setText("Error: Field 1 must be number. Format ###.#");
+	    	if (i ==2) target.setText("Error: Field 2 must be number. Format ###.#");
+	    	//target.setText("0");
+	    	sellButton.setEnabled(false);
 	    }
 	    
 	    //calculateHint();

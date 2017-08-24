@@ -25,6 +25,8 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
@@ -33,14 +35,17 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import core.transaction.CreateOrderTransaction;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.items.assets.My_Balance_Tab.search_listener;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemImprintsTableModel;
 import gui.models.WalletOrdersTableModel;
+import gui.transaction.CreateOrderDetailsFrame;
 import lang.Lang;
 
 public class My_Order_Tab extends Split_Panel {
@@ -51,11 +56,13 @@ public class My_Order_Tab extends Split_Panel {
 	WalletOrdersTableModel ordersModel;
 	protected int row;
 	private static final long serialVersionUID = 1L;
+	final MTable table;
+	private My_Order_Tab th;
 
 	public My_Order_Tab()
 	{
 		super("My_Order_Tab");
-	
+	th = this;
 	this.setName(Lang.getInstance().translate("My Orders"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
@@ -66,7 +73,7 @@ public class My_Order_Tab extends Split_Panel {
 		
 	//TABLE
 		ordersModel = new WalletOrdersTableModel();
-	final MTable table = new MTable(ordersModel);
+	 table = new MTable(ordersModel);
 	
 	
 	
@@ -120,6 +127,7 @@ public class My_Order_Tab extends Split_Panel {
 // show	
 	this.jTable_jScrollPanel_LeftPanel.setModel(ordersModel);
 	this.jTable_jScrollPanel_LeftPanel = table;
+	jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 	jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 	
 	// UPDATE FILTER ON TEXT CHANGE
@@ -378,6 +386,29 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
 }
 */
 }
-
+//CreateOrderDetailsFrame
+//listener select row	 
+class search_listener implements ListSelectionListener  {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			
+			
+			 Order order = null;
+			if (table.getSelectedRow() >= 0 ) order = ordersModel.getOrder(table.convertRowIndexToModel(table.getSelectedRow()));
+			if (order == null) return;
+			//AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
+				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+				int div = th.jSplitPanel.getDividerLocation();
+				int or = th.jSplitPanel.getOrientation();
+		
+		//		 CreateOrderDetailsFrame info_panel = new CreateOrderDetailsFrame(order);
+					//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+			//		jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+					//jSplitPanel.setRightComponent(info_panel);
+					jSplitPanel.setDividerLocation(div);
+					jSplitPanel.setOrientation(or);
+			
+		}
+	}
 
 }
