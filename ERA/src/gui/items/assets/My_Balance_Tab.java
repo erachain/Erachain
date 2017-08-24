@@ -60,6 +60,7 @@ import database.DBSet;
 import database.SortableList;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
+import gui.items.assets.My_Assets_Tab.search_listener;
 import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
 import gui.models.Renderer_Boolean;
@@ -83,12 +84,14 @@ public class My_Balance_Tab extends Split_Panel {
 	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
 
 	protected int row;
+	final MTable table;
+	private My_Balance_Tab th;
 	
 	@SuppressWarnings({ "null", "unchecked", "rawtypes" })
 	public My_Balance_Tab()
 	{
 		super("My_Balance_Tab");
-	
+	th= this;
 	this.setName(Lang.getInstance().translate("My Balance"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
@@ -100,7 +103,7 @@ public class My_Balance_Tab extends Split_Panel {
 	//TABLE
 		
 		  BalancesModel = new Balance_from_Adress_TableModel();
-	final MTable table = new MTable(BalancesModel);
+	table = new MTable(BalancesModel);
 	
 	
 	
@@ -173,6 +176,7 @@ public class My_Balance_Tab extends Split_Panel {
 // show	
 	this.jTable_jScrollPanel_LeftPanel.setModel(BalancesModel);
 	this.jTable_jScrollPanel_LeftPanel = table;
+	jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 	jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 	
 	// UPDATE FILTER ON TEXT CHANGE
@@ -467,5 +471,25 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
 */
 }
 
+//listener select row	 
+class search_listener implements ListSelectionListener  {
+		@Override
+		public void valueChanged(ListSelectionEvent arg0) {
+			AssetCls asset = null;
+			if (table.getSelectedRow() >= 0 ) asset = BalancesModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
+			if (asset == null) return;
+			//AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
+				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+				int div = th.jSplitPanel.getDividerLocation();
+				int or = th.jSplitPanel.getOrientation();
+				Asset_Info info_panel = new Asset_Info(asset);
+					//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
+					jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
+					//jSplitPanel.setRightComponent(info_panel);
+					jSplitPanel.setDividerLocation(div);
+					jSplitPanel.setOrientation(or);
+			
+		}
+	}
 
 }
