@@ -1,6 +1,11 @@
 package webserver;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -16,6 +21,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.ImageIcon;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -56,6 +62,7 @@ import database.DBSet;
 import database.ItemAssetMap;
 import database.ItemPersonMap;
 import database.SortableList;
+import gui.library.Images_Work;
 import utils.APIUtils;
 import utils.Pair;
 import utils.StrJSonFine;
@@ -1108,8 +1115,9 @@ public class API {
 	@Path("personimage/{key}")
 	@GET
 	@Produces({"image/png", "image/jpg"})
-	public Response getFullImage(@PathParam("key") long key) {
+	public Response getFullImage(@PathParam("key") long key) throws IOException {
 		
+		int weight = 0;
 	 if (key <=0) {
 		 throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
@@ -1125,19 +1133,10 @@ public class API {
 		}
 		
 		PersonCls person = (PersonCls)map.get(key);
-		JSONObject jj = new JSONObject();
-		byte[] b = person.getImage();
-		if (b.length<=0){	
-			throw ApiErrorFactory.getInstance().createError(
-					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					"Invalid Image");
-			
 		
-		}
-		
-	return Response.ok(new ByteArrayInputStream(b)).build();
-	
-		
+	// image to byte[] hot scale (param2 =0)
+		byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+		return Response.ok(new ByteArrayInputStream(b)).build();
 	}
 	
 	
