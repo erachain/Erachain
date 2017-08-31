@@ -1,5 +1,6 @@
 package webserver;
 
+import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -19,12 +20,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -127,6 +130,7 @@ public class API {
 		help.put("GET Person by Public Key", "personbypublickey/{publickey}");
 		help.put("GET Person by Public Key Base32", "personbypublickeybase32/{publickeybase32}");
 		help.put("GET Accounts From Person", "getaccountsfromperson/{key}");
+		help.put("Get Person Image", "personimage/{key}");
 
 		help.put("*** PERSONS ***", "");
 		help.put("GET Persons by Name Filter", "personsfilter/{filter_name_string}");
@@ -1099,6 +1103,43 @@ public class API {
 				.build();
 		
 	}
+	
+	
+	@Path("personimage/{key}")
+	@GET
+	@Produces({"image/png", "image/jpg"})
+	public Response getFullImage(@PathParam("key") long key) {
+		
+	 if (key <=0) {
+		 throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Error key");
+	 }
+		
+	 ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		PersonCls person = (PersonCls)map.get(key);
+		JSONObject jj = new JSONObject();
+		byte[] b = person.getImage();
+		if (b.length<=0){	
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Invalid Image");
+			
+		
+		}
+		
+	return Response.ok(new ByteArrayInputStream(b)).build();
+	
+		
+	}
+	
 	
 	@GET
 	@Path("persondata/{key}")

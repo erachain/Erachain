@@ -1,6 +1,8 @@
 package webserver;
+import java.awt.image.BufferedImage;
 // 30/03
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,12 +28,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -66,6 +70,7 @@ import core.blockexplorer.BlockExplorer;
 import core.crypto.Base58;
 import core.crypto.Base64;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransaction;
@@ -82,6 +87,7 @@ import core.web.ServletUtils;
 import core.web.WebNameStorageHistoryHelper;
 import core.web.blog.BlogEntry;
 import database.DBSet;
+import database.ItemPersonMap;
 import database.NameMap;
 import lang.Lang;
 import ntp.NTP;
@@ -218,7 +224,10 @@ public class WebResource {
 	public Response blockexplorer() {
 		return blockexplorerhtml();
 	}
+	
 
+	
+	
 	@Path("index/blockexplorer.html")
 	@GET
 	public Response blockexplorerhtml() {
@@ -1125,6 +1134,41 @@ public class WebResource {
 		int dotPos = filename.lastIndexOf(".") + 1;
 		return filename.substring(dotPos);
 	}
+	
+	@Path("index/personimage")
+	@GET
+	@Produces({"image/png", "image/jpg"})
+	public Response getFullImage() {
+		
+		long key = new Long(request.getParameter("key"));
+	 if (key <=0) {
+		  return error404(request, null);
+	 }
+		
+	 ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		PersonCls person = (PersonCls)map.get(key);
+		JSONObject jj = new JSONObject();
+		byte[] b = person.getImage();
+		if (b.length<=0){	
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Invalid Image");
+			
+		
+		}
+		
+	return Response.ok(new ByteArrayInputStream(b)).build();
+	//	return Response.ok(file, "image/png").build();
+		
+	}
+
 
 	@Path("index/libs/css/style.css")
 	@GET

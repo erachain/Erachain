@@ -1318,7 +1318,9 @@ function mainQuery(data) {
 			output +=  '<table width="1280" border=0><tr><td align=left>';	
 			if (data.person_key != -10){
 			
-			output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">'; 
+			//output +='<tr><td><br><img src="data:image/gif;base64,' + data.person_Img+ '" width="100"/></td><td style ="padding-left:20px">';
+			//	<img src="personimage?key=1" style="vertical-align: middle;">; 
+			output +='<tr><td><br><img src="personimage?key=' + data.person_key+ '" width="100"/></td><td style ="padding-left:20px">';
 			output +='<td><font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
 			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a></tr>';
 			
@@ -3518,7 +3520,8 @@ var output = '';
 	//	output += '<td><a href=?block='+i+'>'+i+'</a><td>'+data[i].dateTime+'<td>'+'<a href=?addr='+data[i].generator+'>'+data[i].generator;
 	//	output += '<td>'+addCommas(data[i].generatingBalance)+'<td>'+data[i].transactionCount;
 	//	output += '<td>'+addCommas(data[i].totalFee)+'<td>'+addCommas(data[i].totalATAmount)+'<td>'+addCommas(data[i].totalAmount);
-	output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>'; 
+	//output += '<td><img src="data:image/gif;base64,' + data[i].img+ '" width="100" /></td>'; 
+	output +=' <td><img src="personimage?key=' + data[i].key + '" width="100"/></td>';
 	output += '<td>'+addCommas(data[i].key)+'<td><a href=?person='+data[i].key + get_lang() + '>'+data[i].name +'</a>';
 	//output += '<td><a href ="?person='+ 1 +'"><b> ' + data[i].creator + '</b></a><br>';
 	output += '<td><a href=?addr='+data[i].creator + get_lang() + '>' + data[i].creator + '</a>';
