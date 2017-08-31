@@ -1257,28 +1257,38 @@ public class API {
 				.build();
 		
 	}
+	
 	@GET
-	@Path("personbypublickeybase32/{publickeybase32}")
-	public Response personByBankKey(@PathParam("publickeybase32") String bankkey) {
-		byte[] publicKey = Base32.decode(bankkey);
-			JSONObject ansver = new JSONObject();		
-				   Iterator<Pair<Long, ItemCls>> tt = DBSet.getInstance().getItemPersonMap().getList().iterator();
-				while(tt.hasNext())
-				{
-					  Pair<Long, ItemCls> s = tt.next();
-					PersonCls p = (PersonCls) s.getB();
-					PublicKeyAccount own = p.getOwner();
-					 byte[] ow = own.getPublicKey();
-					if (Arrays.equals(ow,publicKey)){
-						 ansver = p.toJson();
-						
+	@Path("personbypublickeybase32/{publickeybase}")
+	public Response personsByBankKey(@PathParam("publickeybase") String bankkey) {
+
+		JSONObject ansver;
+		ansver = new JSONObject();	
+		try {
+			byte[] publicKey = Base32.decode(bankkey);
+					
+					   Iterator<Pair<Long, ItemCls>> tt = DBSet.getInstance().getItemPersonMap().getList().iterator();
+					while(tt.hasNext())
+					{
+						  Pair<Long, ItemCls> s = tt.next();
+						PersonCls p = (PersonCls) s.getB();
+						PublicKeyAccount own = p.getOwner();
+						 byte[] ow = own.getPublicKey();
+						if (Arrays.equals(ow,publicKey)){
+							 ansver = p.toJson();
+							
+						}
 					}
+					
+				if (ansver.size()== 0) {
+					
+					ansver.put("Error", "Public Key Not Found");
 				}
-				
-			if (ansver.size()== 0) {
-				
-				ansver.put("Error", "Public Key Not Found");
-			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			ansver.put("Error", "Invalid Base32 Key");
+		}
 		
 		
 		
