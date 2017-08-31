@@ -1135,8 +1135,8 @@ public class API {
 		PersonCls person = (PersonCls)map.get(key);
 		
 	// image to byte[] hot scale (param2 =0)
-		byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
-		return Response.ok(new ByteArrayInputStream(b)).build();
+	//	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+		return Response.ok(new ByteArrayInputStream(person.getImage())).build();
 	}
 	
 	
