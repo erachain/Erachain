@@ -614,27 +614,37 @@ public class API {
 	@GET
 	@Path("broadcast/{raw}")
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-	public String broadcastRaw(@PathParam("raw") String raw)
+	public Response broadcastRaw(@PathParam("raw") String raw)
 	{
 		
-		return broadcastFromRawPost1(raw);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(broadcastFromRawPost1(raw)))
+				.build();
 	}
 
 	@POST
 	@Path("broadcast")
-	public String broadcastFromRawPost (@Context HttpServletRequest request,
+	public Response broadcastFromRawPost (@Context HttpServletRequest request,
 			MultivaluedMap<String, String> form){
 		
 		String raw = form.getFirst("raw");
-		return broadcastFromRawPost1(raw);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(broadcastFromRawPost1(raw)))
+				.build();
 		
 	}
 	
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-	public String broadcastFromRawPost1( String rawDataBase58)
+	public JSONObject broadcastFromRawPost1( String rawDataBase58)
 	{
 		int steep = 1;
-
+		JSONObject out = new JSONObject();
 		try {
 		//	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 		//	String rawDataBase58 = (String) jsonObject.get("raw");
@@ -644,14 +654,18 @@ public class API {
 			steep++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 			if(result.getB() == Transaction.VALIDATE_OK) {
-				return "+";
+				out.put("status", "ok");
+				return out;
 			} else {
-				return APIUtils.errorMess(result.getB(), gui.transaction.OnDealClick.resultMess(result.getB()));
+				out.put("error",result.getB());
+				out.put("message", gui.transaction.OnDealClick.resultMess(result.getB()));
+				return out;
 			}
 
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " on steep: " + steep));
+			return out;
 		}
 	}
 
