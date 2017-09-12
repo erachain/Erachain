@@ -40,8 +40,9 @@ public class API_TransactionsResource {
 		Map<String, String> help = new LinkedHashMap<String, String>();
 
 		help.put("apirecords/getbyaddress?address={address}&asset={asset}", Lang.getInstance().translate("Get all Records for Address & Asset Key"));
+		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
-		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end_record}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
+		
 		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
