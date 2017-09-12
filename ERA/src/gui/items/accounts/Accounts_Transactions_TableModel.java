@@ -39,6 +39,7 @@ import database.SortableList;
 import database.wallet.NameMap;
 import database.wallet.TransactionMap;
 import gui.items.accounts.Account_Transactions_Table.MessageBuf;
+import gui.library.library;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -203,17 +204,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return r_Tran.transaction.viewTimestamp();
 		case COLUMN_BLOCK:
 
-			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())){
-			String m = r_Tran.transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "";
-			String d = r_Tran.transaction.getSeqNo(DBSet.getInstance())+ "";
-			int zz = 5 - d.length();
-			for (int z = 0; z<zz; z++ ){
-				d = "0"+ d;
-			}
-			String bd = m+"."+ d;
-				return new BigDecimal(bd).setScale(5);
-			}
-			return -1;
+			// return Block + segNo from bigdecimal block.segNo
+			return library.getBlockSegToBigInteger(r_Tran.transaction);
 		case COLUMN_TRANSACTION:
 
 			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())) return r_Tran.transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "-" + r_Tran.transaction.getSeqNo(DBSet.getInstance());

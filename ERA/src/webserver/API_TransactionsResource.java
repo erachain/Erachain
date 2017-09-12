@@ -1,7 +1,11 @@
 package webserver;
+import java.math.BigDecimal;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -11,11 +15,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.mapdb.Fun.Tuple2;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import core.transaction.Transaction;
 import database.DBSet;
+import gui.library.library;
 import gui.models.TransactionsTableModel;
 import lang.Lang;
 import utils.StrJSonFine;
@@ -35,7 +41,7 @@ public class API_TransactionsResource {
 
 		help.put("apirecords/getbyaddress?address={address}&asset={asset}", Lang.getInstance().translate("Get all Records for Address & Asset Key"));
 		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
-	//	help.put("apirecords/find?address={address}&startblock={start block}&endblock={end_block}&limit={limit}",Lang.getInstance().translate("Get {limit} Record for the {start blok}....{end block}"));
+		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end_record}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -71,7 +77,7 @@ public class API_TransactionsResource {
 		for(Transaction transaction: result)
 		{
 			if(asset !=null){
-				if(transaction.getAssetKey() == new Long (asset)){
+				if(transaction.getAbsKey() == new Long (asset)){
 					array.add(transaction.toJson());
 				}
 			}else{
@@ -83,7 +89,61 @@ public class API_TransactionsResource {
 		
 	}
 	
+	
+	
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("getbyaddressfromtransactionlimit")
+	public String getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset, @QueryParam("start") long start, @QueryParam("end") long end)
+	{
+		List<Transaction> result;
 		
+		if (address ==null || address.equals("")) {
+			JSONObject ff = new JSONObject();
+			ff.put("Error", "Invalid Address");
+			return  ff.toJSONString();
+		}
+		//TransactionsTableModel a = new TransactionsTableModel();
+		//a.Find_Transactions_from_Address(address);
+		//result =a.getTransactions();
+		result = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
+		
+		if (result == null){
+				JSONObject ff = new JSONObject();
+				ff.put("message", "null");
+				return  ff.toJSONString();
+		};
+		
+		// 7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
+		
+		// read transactions from treeMap
+		TreeMap<BigDecimal, Transaction> rec = new TreeMap<BigDecimal, Transaction>();
+		for(Transaction transaction: result)
+		{
+			if(asset !=null){
+				if(transaction.getAbsKey() == new Long (asset) ){
+					rec.put(library.getBlockSegToBigInteger(transaction), transaction);
+				}
+			
+			}
+		}
+		// read tree map from 1...n
+		TreeMap<Long, JSONObject> k_Map = new TreeMap<Long, JSONObject>();
+		long i=0;
+		for( Entry<BigDecimal, Transaction> transaction: rec.entrySet())
+		{
+			k_Map.put(i++, transaction.getValue().toJson());
+		}
+		
+		
+		
+		//json.put("transactions", array);
+		return new JSONObject(k_Map.subMap(start, end)).toJSONString();
+		
+	}
+	
+	
+	
 	
 	@SuppressWarnings("unchecked")
 	@GET

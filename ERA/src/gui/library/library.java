@@ -8,6 +8,7 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -25,6 +26,8 @@ import org.mapdb.Fun.Tuple2;
 
 import com.github.rjeschke.txtmark.Processor;
 
+import core.transaction.Transaction;
+import database.DBSet;
 import de.muntjak.tinylookandfeel.Theme;
 import de.muntjak.tinylookandfeel.ThemeDescription;
 
@@ -316,5 +319,20 @@ public class library {
 		}
 		if (str.length() != length) return "Error Size";
 		return "ok";
+	}
+	public static BigDecimal getBlockSegToBigInteger(Transaction transaction){
+		if (transaction.isConfirmed(DBSet.getInstance())){
+			String m = transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "";
+			String d = transaction.getSeqNo(DBSet.getInstance())+ "";
+			int zz = 5 - d.length();
+			for (int z = 0; z<zz; z++ ){
+				d = "0"+ d;
+			}
+			String bd = m+"."+ d;
+				return new BigDecimal(bd).setScale(5);
+			}
+			return new BigDecimal(-1);
+		
+		
 	}
 }
