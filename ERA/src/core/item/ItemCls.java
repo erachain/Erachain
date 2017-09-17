@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple6;
 
@@ -24,6 +25,7 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import core.transaction.Issue_ItemRecord;
 import core.transaction.Transaction;
 import database.DBSet;
 //import database.DBMap;
@@ -71,6 +73,8 @@ public abstract class ItemCls {
 	protected byte[] icon;
 	protected byte[] image;
 	
+	static Logger LOGGER = Logger.getLogger(ItemCls.class.getName());
+
 	public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		this.typeBytes = typeBytes;
@@ -449,12 +453,19 @@ public abstract class ItemCls {
 		//DELETE FROM DATABASE
 		Issue_ItemMap issueDB = this.getDBIssueMap(db);
 		//long key = ;
-		this.getDBMap(db).delete(this.getKey());	
+		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1, key: " + key);
+
+		long thisKey = this.getKey(db);
+		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
+		this.getDBMap(db).delete(thisKey);	
 				
 		//DELETE ORPHAN DATA
+		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
 		issueDB.delete(this.reference);
 		
-		return key;
+		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+
+		return thisKey;
 
 	}
 

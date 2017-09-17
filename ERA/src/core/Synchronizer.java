@@ -79,7 +79,8 @@ public class Synchronizer
 					+ lastHeight + "]\n"
 					+ "newBlocks.size = " + newBlocks.size()
 					+ "\n search common block in FORK"
-					+ " in mainDB: " + lastBlock.getHeight(fork.getParent()));
+					+ " in mainDB: " + lastBlock.getHeight(fork.getParent())
+					+ "\n for lastCommonBlock = " + lastCommonBlock.getHeight(fork));
 
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
@@ -93,13 +94,13 @@ public class Synchronizer
 					peer.ban(BAN_BLOCK_TIMES>>2, mess);
 					throw new Exception(mess);
 				}
+				//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan: " + lastBlock.getHeight(fork));
 				lastBlock.orphan(fork);
+				//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 
-			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock["
-					+ lastHeight + "]"
-					+ " run AT_TRANSACTION in FORK");
+			//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]"	+ " run AT_TRANSACTION in FORK");
 
 			if (USE_AT_ORPHAN) {
 				// AT_TRANSACTION - not from GENESIS BLOCK

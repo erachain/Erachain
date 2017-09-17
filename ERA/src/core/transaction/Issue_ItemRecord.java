@@ -10,6 +10,8 @@ import java.util.List;
 //import java.util.Map;
 // import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
+
 //import ntp.NTP;
 
 import org.json.simple.JSONObject;
@@ -32,6 +34,8 @@ import database.DBSet;
 
 public abstract class Issue_ItemRecord extends Transaction 
 {
+
+	static Logger LOGGER = Logger.getLogger(Issue_ItemRecord.class.getName());
 
 	//private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
 	//private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
@@ -189,8 +193,10 @@ public abstract class Issue_ItemRecord extends Transaction
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
 
+		//LOGGER.debug("<<<<< core.transaction.Issue_ItemRecord.orphan 1");
 		//DELETE FROM DATABASE		
 		long key = this.item.removeFromMap(db);
+		//LOGGER.debug("<<<<< core.transaction.Issue_ItemRecord.orphan 2");
 	}
 
 	@Override

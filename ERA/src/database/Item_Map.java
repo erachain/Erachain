@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 
@@ -23,6 +24,8 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	
 	protected Atomic.Long atomicKey;
 	protected long key;
+	
+	static Logger LOGGER = Logger.getLogger(Item_Map.class.getName());
 	
 	public Item_Map(DBSet databaseSet, DB database,
 			//int type,
@@ -111,12 +114,16 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 	{
 		super.delete(key);
 		
+		//LOGGER.debug("<<<<< delete 1, key: " + key);
+
 		//DECREMENT ATOMIC KEY IF EXISTS
 		if(this.atomicKey != null)
 		{
 			this.atomicKey.decrementAndGet();
 		}
 		
+		//LOGGER.debug("<<<<< delete 2");
+
 		// delete empty KEYS (run to GENESIS inserted keys)
 		do {
 			//DECREMENT ATOMIC KEY IF EXISTS
@@ -126,9 +133,15 @@ public abstract class Item_Map extends DBMap<Long, ItemCls>
 			}
 			
 			//DECREMENT KEY
-			this.key = key - 1;
-		 
-		} while ( !super.map.containsKey(key)  || key == 0l );
+			this.key = --key;
+			
+			//LOGGER.debug("<<<<< delete 3 current key = " + key);
+			
+			// FOR IF core.transaction.Issue_ItemRecord.getStartKey() = 1000
+			break;
+
+		// TODO 1000 - for not ASSET may be other
+		} while (  key > 1000l && !super.map.containsKey(key) );
 		 
 	}
 	
