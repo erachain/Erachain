@@ -40,7 +40,7 @@ public class API_TransactionsResource {
 		Map<String, String> help = new LinkedHashMap<String, String>();
 
 		help.put("apirecords/getbyaddress?address={address}&asset={asset}", Lang.getInstance().translate("Get all Records for Address & Asset Key"));
-		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
+		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 		
 		
@@ -95,7 +95,7 @@ public class API_TransactionsResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("getbyaddressfromtransactionlimit")
-	public String getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset, @QueryParam("start") long start, @QueryParam("end") long end)
+	public String getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset, @QueryParam("start") long start, @QueryParam("end") long end,  @QueryParam("type") String type1)
 	{
 		List<Transaction> result;
 		
@@ -107,7 +107,16 @@ public class API_TransactionsResource {
 		//TransactionsTableModel a = new TransactionsTableModel();
 		//a.Find_Transactions_from_Address(address);
 		//result =a.getTransactions();
-		result = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
+		Integer type;
+		try {
+			type = Integer.valueOf(type1);
+			result = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, type,0);
+			
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			result = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
+			//e.printStackTrace();
+		}
 		
 		if (result == null){
 				JSONObject ff = new JSONObject();
