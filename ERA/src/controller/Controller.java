@@ -120,7 +120,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
-	private static final String version = "3.08.02 alpha";
+	private static final String version = "3.09.01 alpha";
 	private static final String buildTime = "2017-05-21 15:33:33 UTC";
 	private static long buildTimestamp;
 	
@@ -501,7 +501,7 @@ public class Controller extends Observable {
 
 		// START WEB SERVICE
 		if (Settings.getInstance().isWebEnabled()) {
-			about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Servoce"));
+			about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Service"));
 			this.webService = new WebService();
 			this.webService.start();
 		}
@@ -2299,13 +2299,13 @@ public class Controller extends Observable {
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {
 		return this.dbSet.getOrderMap()
-				.getOrdersSortableList(have.getKey(), want.getKey(), filter);
+				.getOrdersSortableList(have.getKey(this.dbSet), want.getKey(this.dbSet), filter);
 	}
 	
 	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(
 			AssetCls have, AssetCls want) {
 		return this.dbSet.getTradeMap()
-				.getTradesSortableList(have.getKey(), want.getKey());
+				.getTradesSortableList(have.getKey(this.dbSet), want.getKey(this.dbSet));
 	}
 
 	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(

@@ -51,7 +51,7 @@ public abstract class Transaction {
 			"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv",
 			"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ",
-			"7H5GTyxv4h5GKeDUiSPBMKAgpFb8EKTbvj",
+			//"7H5GTyxv4h5GKeDUiSPBMKAgpFb8EKTbvj", vlad
 		};
 	
 	public static final byte[][] VALID_SIGN = new byte[][]{
@@ -1053,7 +1053,7 @@ public abstract class Transaction {
 
 			}
 						
-			if (!db.isFork()) {
+			if (true || !db.isFork()) {
 				// calc INVITED FEE if its not a FORK
 				process_gifts(db, 0, getInvitedFee(), this.creator, false);
 			}
@@ -1083,7 +1083,7 @@ public abstract class Transaction {
 
 			}
 			
-			if (!db.isFork()) {
+			if (true || !db.isFork()) {
 				// calc INVITED FEE if its not a FORK
 				process_gifts(db, 0, getInvitedFee(), this.creator, true);
 			}

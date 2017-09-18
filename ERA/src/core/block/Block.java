@@ -1341,6 +1341,7 @@ public class Block {
 	public void orphan(DBSet dbSet)
 	{
 
+		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #0");
 		int height = this.getHeight(dbSet);
 		if (height == 1) {
 			// GENESIS BLOCK cannot be orphanED
@@ -1348,6 +1349,8 @@ public class Block {
 		}
 				
 		//ORPHAN AT TRANSACTIONS
+		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #1 ORPHAN AT TRANSACTIONS");
+
 		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);
 
 		Iterator<AT_Transaction> iter = atTxs.values().iterator();
@@ -1373,7 +1376,10 @@ public class Block {
 		}
 
 		//ORPHAN TRANSACTIONS
+		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2 ORPHAN TRANSACTIONS");
 		this.orphanTransactions(this.getTransactions(), dbSet);
+
+		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2f FEE");
 
 		//REMOVE FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess();
@@ -1394,6 +1400,8 @@ public class Block {
 				
 			}
 		}
+
+		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
 
 		//UPDATE GENERATOR BALANCE WITH FEE
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).subtract(blockFee), dbSet);
@@ -1419,6 +1427,8 @@ public class Block {
 		}
 		*/
 
+		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
+
 		for(Transaction transaction: this.getTransactions())
 		{
 			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE
@@ -1441,6 +1451,8 @@ public class Block {
 		for(int i=transactions.size() -1; i>=0; i--)
 		{
 			Transaction transaction = transactions.get(i);
+			//LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
+
 			if (!transaction.isWiped()) {
 					transaction.orphan(db, false);
 			} else {
