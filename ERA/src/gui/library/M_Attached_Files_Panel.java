@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -65,30 +66,25 @@ public class M_Attached_Files_Panel extends JPanel{
   			if (table.getSelectedRow() < 0 ) return;
   				int row = table.convertRowIndexToModel(table.getSelectedRow());
   			My_JFileChooser chooser = new My_JFileChooser();
-  			chooser.setDialogTitle(Lang.getInstance().translate("Save File")+": " + model.getValueAt(row, 0) );
-  			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+  			String str = (String) model.getValueAt(row, 0);
+  			chooser.setDialogTitle(Lang.getInstance().translate("Save File")+": " + str );
+  			//chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+  			chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
   			chooser.setMultiSelectionEnabled(false);
   			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-  			chooser.setAcceptAllFileFilterUsed(false); 
+  			//chooser.setAcceptAllFileFilterUsed(false); 
+  			
   			 if ( chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
   	          
   				String pp = chooser.getSelectedFile().getPath();
-  				 try(FileOutputStream fos=new FileOutputStream(pp + model.getValueAt(row, 0)))
+  				 try(FileOutputStream fos=new FileOutputStream(pp + File.separatorChar +  str))
   		        {
   		            // перевод строки в байты
   					String ssst = model.getValueAt(row, 2).toString();
   		            byte[] buffer =(byte[]) model.getValueAt(row, 2);
-  		            
+  		            // if ZIP
   		           if ((boolean)model.getValueAt(row, 1)){
-  		            	
-  		            	
-  		            
-  		            
-  		      //      	ZIP_File.compressGzipFile(pp + model.getValueAt(row, 0), "temp");	
-  		      //      	FileOutputStream fos_ZIP=new FileOutputStream("temp");
-  		            	
-  		     //       	try {
-							byte[] buffer1 = null;
+  		         		byte[] buffer1 = null;
 							try {
 								buffer1 = Zip_Bytes.decompress(buffer);
 							} catch (DataFormatException e1) {
@@ -96,16 +92,7 @@ public class M_Attached_Files_Panel extends JPanel{
 								e1.printStackTrace();
 							}
 							fos.write(buffer1, 0, buffer1.length);
-			//			} catch (Exception e1) {
-			//				// TODO Auto-generated catch block
-			//				e1.printStackTrace();
-			//			} 	
-  		       //     	MyByteArrayDecompress dc = new MyByteArrayDecompress();
-  		       //     	byte[] buffer1 = dc.decompressByteArray(buffer);
-  		            	
-  		            	
-  		            	
-  		           }
+  		           	}
   		          else {
   		            fos.write(buffer, 0, buffer.length);
   		           }

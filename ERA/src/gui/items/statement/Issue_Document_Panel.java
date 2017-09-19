@@ -768,7 +768,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(8, 16, 8, 16);
-        jPanel_Work.add(jButton_Clear, gridBagConstraints);
+   //     jPanel_Work.add(jButton_Clear, gridBagConstraints);
 
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -776,7 +776,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 16, 8, 16);
-        jPanel_Work.add(jButton_Work_OK1, gridBagConstraints);
+   //     jPanel_Work.add(jButton_Work_OK1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
