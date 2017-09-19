@@ -18,6 +18,7 @@ import java.util.zip.ZipFile;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -46,6 +47,7 @@ public class M_Attached_Files_Panel extends JPanel{
 	private Attache_Files_Model model;
 	private MTable table;
 	private JScrollPane scrollPane;
+	private My_JFileChooser chooser;
 
 	public M_Attached_Files_Panel() {
 		
@@ -60,12 +62,14 @@ public class M_Attached_Files_Panel extends JPanel{
     	JMenuItem vsend_Coins_Item= new JMenuItem(Lang.getInstance().translate("Save File"));
     
     	vsend_Coins_Item.addActionListener(new ActionListener(){
-  		@Override
+  		
+
+		@Override
     	public void actionPerformed(ActionEvent e) {
   			
   			if (table.getSelectedRow() < 0 ) return;
   				int row = table.convertRowIndexToModel(table.getSelectedRow());
-  			My_JFileChooser chooser = new My_JFileChooser();
+  			chooser = new My_JFileChooser();
   			String str = (String) model.getValueAt(row, 0);
   			chooser.setDialogTitle(Lang.getInstance().translate("Save File")+": " + str );
   			//chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -76,8 +80,22 @@ public class M_Attached_Files_Panel extends JPanel{
   			
   			 if ( chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
   	          
-  				String pp = chooser.getSelectedFile().getPath();
-  				 try(FileOutputStream fos=new FileOutputStream(pp + File.separatorChar +  str))
+  				String pp = chooser.getSelectedFile().getPath() + File.separatorChar +  str;
+  				
+  				File ff = new File (pp);
+  				// if file  
+  				if (ff.exists() && ff.isFile()) {
+  					int aaa = JOptionPane.showConfirmDialog(chooser, Lang.getInstance().translate("File") + " " + str+ " " +  Lang.getInstance().translate("Exists") + "! " + Lang.getInstance().translate("Overwrite") + "?",  Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
+  				System.out.print("\n gggg " + aaa);	
+  				if (aaa != 0){
+  					return;
+  				}
+  				ff.delete();
+  				
+  				}
+  				
+  				
+  				 try(FileOutputStream fos=new FileOutputStream(pp))
   		        {
   		            // перевод строки в байты
   					String ssst = model.getValueAt(row, 2).toString();
@@ -99,7 +117,7 @@ public class M_Attached_Files_Panel extends JPanel{
   		        
   		        }
   		        catch(IOException ex){
-  		             
+  
   		            System.out.println(ex.getMessage());
   		        } 
   	           
@@ -162,7 +180,9 @@ public class M_Attached_Files_Panel extends JPanel{
 		   return bos.toByteArray();
 		  }
 		
-	        
+	public My_JFileChooser getchooser(){
+		return chooser;
+	}        
 	       
 	
 	
@@ -226,4 +246,5 @@ public byte[] decompressByteArray(byte[] bytes){
          
         return baos.toByteArray();
     }
+	
 }
