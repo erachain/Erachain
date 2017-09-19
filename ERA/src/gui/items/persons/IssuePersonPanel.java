@@ -182,7 +182,7 @@ public class IssuePersonPanel extends JPanel
     	
     	jLabel_Title.setText("");
 		jLabel_Account.setText(Lang.getInstance().translate("Account") + ":")	;
-		jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
+		jLabel_Name.setText(Lang.getInstance().translate("Full Name") + ":");
 		jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
     	jLabel_Gender.setText(Lang.getInstance().translate("Gender") + ":");
      	jLabel_Born.setText(Lang.getInstance().translate("Birthday") + ":");
