@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class API_TransactionsResource {
 		Map<String, String> help = new LinkedHashMap<String, String>();
 
 		help.put("apirecords/getbyaddress?address={address}&asset={asset}", Lang.getInstance().translate("Get all Records for Address & Asset Key"));
-		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
+		help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 		 
 		
@@ -95,7 +96,7 @@ public class API_TransactionsResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("getbyaddressfromtransactionlimit")
-	public String getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset, @QueryParam("start") long start, @QueryParam("end") long end,  @QueryParam("type") String type1)
+	public String getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset, @QueryParam("start") long start, @QueryParam("end") long end,  @QueryParam("type") String type1, @QueryParam("sort") String sort)
 	{
 		List<Transaction> result;
 		
@@ -139,8 +140,16 @@ public class API_TransactionsResource {
 		}
 		// read tree map from 1...n
 		TreeMap<Long, JSONObject> k_Map = new TreeMap<Long, JSONObject>();
+		// if descending = 1 sort descending
+		NavigableMap<BigDecimal, Transaction> rec1;
+		if (sort == null || !sort.equals("des")){
+			rec1 = rec;
+		}
+		else {
+		rec1 = rec.descendingMap();
+		}
 		long i=0;
-		for( Entry<BigDecimal, Transaction> transaction: rec.entrySet())
+		for( Entry<BigDecimal, Transaction> transaction: rec1.entrySet())
 		{
 			k_Map.put(i++, transaction.getValue().toJson());
 		}
