@@ -132,7 +132,7 @@ public class Create_Voting_Panel extends JPanel
       		
       	//TXTAREA NAME
       	      //TABLE OPTIONS
-      	GridBagConstraints txtGBC2 = new GridBagConstraints();
+      	GridBagConstraints txtGBC2 = new GridBagConstraints(); 
       	txtGBC2.gridy = 2;
       	txtGBC2.weighty= 0.3;
       	txtGBC2.gridwidth = 2;
