@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -113,12 +114,20 @@ public class Voting_Dialog extends JDialog
 		this.add(descriptionLabel, labelGBC);
 				
 		//DESCRIPTION
-		detailGBC.gridy = 2;
+		GridBagConstraints descrGBC = new GridBagConstraints();
+		descrGBC.gridy = 2;
+		descrGBC.weighty = 0.1;
+		descrGBC.gridwidth = 2;
+		descrGBC.insets = new Insets(0, 5, 5, 0);
+		descrGBC.fill = GridBagConstraints.BOTH;
 		JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
-		this.add(txtAreaDescription, detailGBC);		
+		JScrollPane ss = new JScrollPane();
+		ss.setViewportView(txtAreaDescription);
+		
+		this.add(ss, descrGBC);		
 
 		//ASSET LABEL GBC
 		GridBagConstraints assetLabelGBC = new GridBagConstraints();
@@ -233,7 +242,7 @@ public class Voting_Dialog extends JDialog
 		setModal(true);
 		//PACK
 		this.pack();
-        this.setResizable(false);
+        this.setResizable(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         

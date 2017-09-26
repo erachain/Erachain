@@ -136,12 +136,15 @@ public class Create_Voting_Panel extends JPanel
       	txtGBC2.gridy = 2;
       	txtGBC2.weighty= 0.3;
       	txtGBC2.gridwidth = 2;
+      	txtGBC2.insets = new Insets(0, 5, 5, 0);
       	txtGBC2.fill = GridBagConstraints.BOTH;  
 		txtGBC2.anchor = GridBagConstraints.NORTHWEST;
       	this.txtareaDescription = new JTextArea();
      // 	this.txtareaDescription.setRows(4);
       	this.txtareaDescription.setBorder(this.txtName.getBorder());
-      	this.add(this.txtareaDescription, txtGBC2);
+      	JScrollPane ss = new JScrollPane();
+		ss.setViewportView(this.txtareaDescription);
+      	this.add(ss, txtGBC2);
         
       	//LABEL OPTIONS
       	labelGBC.gridy = 3;
