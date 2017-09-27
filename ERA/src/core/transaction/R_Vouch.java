@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
@@ -18,9 +19,11 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import database.ItemAssetBalanceMap;
@@ -41,6 +44,8 @@ public class R_Vouch extends Transaction {
 	protected int seq;
 	
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + HEIGHT_LENGTH + SEQ_LENGTH;
+
+	static Logger LOGGER = Logger.getLogger(R_Vouch.class.getName());
 
 	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
@@ -329,6 +334,11 @@ public class R_Vouch extends Transaction {
 		HashSet<Account> accounts = new HashSet<Account>();
 
 		Transaction record = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+		if (record == null) {
+			LOGGER.debug("core.transaction.R_Vouch.getRecipientAccounts() not found record: " + height + "-" + seq);
+			return accounts;
+		}
+		
 		accounts.addAll(record.getInvolvedAccounts());
 		
 		return accounts;

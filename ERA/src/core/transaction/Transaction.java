@@ -52,8 +52,8 @@ public abstract class Transaction {
 			"7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv",
 			"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ",
 			//"7H5GTyxv4h5GKeDUiSPBMKAgpFb8EKTbvj", vlad
-			"77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
-			"7BCyDxeXC8eeqxVZSe4BpasKw4dGxL77H5",
+			//"77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
+			//"7BCyDxeXC8eeqxVZSe4BpasKw4dGxL77H5",
 		};
 	
 	public static final byte[][] VALID_SIGN = new byte[][]{

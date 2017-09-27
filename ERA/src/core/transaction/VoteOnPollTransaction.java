@@ -346,7 +346,10 @@ public class VoteOnPollTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 
+	/*
 	public int calcBaseFee() {
-		return 0; //calcCommonFee(); // - Transaction.FEE_PER_BYTE * 70;
+		//return 0; //calcCommonFee(); // - Transaction.FEE_PER_BYTE * 70;
+		return calcCommonFee();
 	}
+	*/
 }
