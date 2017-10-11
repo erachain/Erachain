@@ -49,7 +49,7 @@ public class VoteOnPollTransaction extends Transaction
 	{
 		this(typeBytes, creator, poll, option, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public VoteOnPollTransaction(byte[] typeBytes, PublicKeyAccount creator, String poll, int option, Long reference, byte[] signature) 
@@ -346,10 +346,12 @@ public class VoteOnPollTransaction extends Transaction
 		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
 	}
 
-	/*
+	@Override
 	public int calcBaseFee() {
-		//return 0; //calcCommonFee(); // - Transaction.FEE_PER_BYTE * 70;
-		return calcCommonFee();
+		
+		// TODO delete IT
+		if (this.getBlockHeightByParent(this.dbSet) > TODO_h1)
+			return calcCommonFee();
+		return 0;
 	}
-	*/
 }

@@ -73,7 +73,7 @@ public class DeployATTransaction extends Transaction
 		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.signature = signature;
 		this.feePow = feePow;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference) 
 	{

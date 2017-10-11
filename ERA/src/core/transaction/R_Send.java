@@ -96,7 +96,7 @@ public class R_Send extends TransactionAmount {
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
@@ -126,7 +126,7 @@ public class R_Send extends TransactionAmount {
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, recipient, key, amount, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public R_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount) {

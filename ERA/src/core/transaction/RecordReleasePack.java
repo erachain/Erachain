@@ -45,7 +45,7 @@ public class RecordReleasePack extends Transaction {
 	{
 		this(typeBytes, creator, transactions, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack - calcFee not needed
 	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, Long reference, byte[] signature)

@@ -43,7 +43,7 @@ public class SellNameTransaction extends Transaction
 	{
 		this(typeBytes, creator, nameSale, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public SellNameTransaction(PublicKeyAccount creator, NameSale nameSale, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{

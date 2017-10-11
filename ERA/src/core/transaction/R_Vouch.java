@@ -56,7 +56,7 @@ public class R_Vouch extends Transaction {
 	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, height, seq, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, int height, int seq, Long reference, byte[] signature) {

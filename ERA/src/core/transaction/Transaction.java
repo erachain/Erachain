@@ -46,6 +46,9 @@ import utils.DateTimeFormat;
 
 public abstract class Transaction {
 	
+	protected static final int TODO_h1 = 62000;
+
+	
 	protected static final int FREEZE_FROM = BlockChain.DEVELOP_USE?9999999:41800;
 	protected static final String[] TRUE_ADDRESSES = new String[]{
 			"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
@@ -343,6 +346,7 @@ public abstract class Transaction {
 	protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH + /*REFERENCE_LENGTH*/ + SIGNATURE_LENGTH;
 
 		
+	protected DBSet dbSet;
 	protected String TYPE_NAME = "unknown";
 	//protected int type;
 	protected byte[] typeBytes;
@@ -381,7 +385,13 @@ public abstract class Transaction {
 	}
 
 	//GETTERS/SETTERS
-	
+	public void setDB(DBSet db, boolean asPack)
+	{
+		this.dbSet = db;
+		if (!asPack)
+			this.calcFee();
+	}
+
 	
 	public int getType()
 	{
@@ -856,9 +866,6 @@ public abstract class Transaction {
 		data = Bytes.concat(data, Ints.toByteArray(port));
 
 		this.signature = Crypto.getInstance().sign(creator, data);
-		if (!asPack)
-			 // need for recalc! if not as a pack
-			this.calcFee();
 	}
 
 	// releaserReference == null - not as pack

@@ -46,7 +46,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	{
 		this(typeBytes, creator, payments, service, data, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public ArbitraryTransactionV3(
 			PublicKeyAccount creator, List<Payment> payments, int service, byte[] data,

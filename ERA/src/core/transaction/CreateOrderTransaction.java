@@ -48,7 +48,7 @@ public class CreateOrderTransaction extends Transaction
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.signature = signature;
 		this.order = new Order(new BigInteger(signature), creator, have, want, amountHave, amountWant, timestamp);
-		this.calcFee();
+		//this.calcFee();
 		
 	}
 	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) 

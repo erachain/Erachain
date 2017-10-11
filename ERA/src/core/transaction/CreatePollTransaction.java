@@ -49,7 +49,7 @@ public class CreatePollTransaction extends Transaction
 		this(typeBytes, creator, poll, feePow, timestamp, reference);
 		
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{

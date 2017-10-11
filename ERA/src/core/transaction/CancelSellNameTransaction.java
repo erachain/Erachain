@@ -41,7 +41,7 @@ public class CancelSellNameTransaction extends Transaction
 	public CancelSellNameTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, name, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public CancelSellNameTransaction(PublicKeyAccount creator, String name, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference, signature);

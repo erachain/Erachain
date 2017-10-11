@@ -44,7 +44,7 @@ public class BuyNameTransaction extends Transaction
 	public BuyNameTransaction(byte[] typeBytes, PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, nameSale, seller, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public BuyNameTransaction(PublicKeyAccount creator, NameSale nameSale, Account seller, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, nameSale, seller, feePow, timestamp, reference, signature);

@@ -101,7 +101,7 @@ public class R_SignNote2 extends Transaction {
 			byte[] encryptedData, boolean encData_isText, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, feePow, noteKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	public R_SignNote2(PublicKeyAccount creator, byte feePow, long noteKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference) {

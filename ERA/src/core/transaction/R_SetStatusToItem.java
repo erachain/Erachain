@@ -132,7 +132,7 @@ public class R_SetStatusToItem extends Transaction {
 				value_1, value_2, data_1, data_2, ref_to_parent, description,
 				timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, int itemType, long itemKey,

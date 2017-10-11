@@ -83,7 +83,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 		this(typeBytes, creator, feePow, key, itemType, itemKey,
 				beg_date, end_date, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public R_SetUnionStatusToItem(byte[] typeBytes, PublicKeyAccount creator, long key, int itemType, long itemKey,

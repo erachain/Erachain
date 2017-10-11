@@ -45,7 +45,7 @@ public class MultiPaymentTransaction extends Transaction {
 	{
 		this(typeBytes, creator, payments, feePow, timestamp, reference);
 		this.signature = signature;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public MultiPaymentTransaction(byte[] typeBytes, PublicKeyAccount creator, List<Payment> payments, Long reference, byte[] signature) 

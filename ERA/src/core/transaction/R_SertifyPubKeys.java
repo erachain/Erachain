@@ -106,7 +106,7 @@ public class R_SertifyPubKeys extends Transaction {
 				add_day, timestamp, reference);
 		this.signature = signature;
 		this.sertifiedSignatures = sertifiedSignatures;
-		this.calcFee();
+		//this.calcFee();
 	}
 	// as pack
 	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, long key,
@@ -531,7 +531,7 @@ public class R_SertifyPubKeys extends Transaction {
 					.get(person.getReference()));
 
 			// GET FEE from that record
-			transPersonIssue.calcFee(); // NEED to RECAL?? if from DB
+			transPersonIssue.setDB(db, false); // NEED to RECAL?? if from DB
 			
 			// ISSUE NEW COMPU in chain
 			BigDecimal issued_FEE_BD = transPersonIssue.getFee();
@@ -625,7 +625,7 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
 					.get(person.getReference()));
 			// GET FEE from that record
-			transPersonIssue.calcFee(); // NEED to RECAL?? if from DB
+			transPersonIssue.setDB(db, false); // NEED to RECAL?? if from DB
 			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			//if (true || BlockChain.START_LEVEL == 1)
 			//	issueFEE = issueFEE>>2;

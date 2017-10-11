@@ -53,7 +53,7 @@ public abstract class Issue_ItemRecord extends Transaction
 		this.signature = signature;
 		if (item.getReference() == null) item.setReference(signature); // set reference
 		//item.resolveKey(DBSet.getInstance());
-		if (timestamp > 1000 ) this.calcFee(); // not asPaack
+		//if (timestamp > 1000 ) this.calcFee(); // not asPaack
 	}
 	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) 
 	{
