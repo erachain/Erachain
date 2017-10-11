@@ -120,7 +120,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
-	private static final String version = "3.10.01 alpha";
+	private static final String version = "3.11.01 alpha";
 	private static final String buildTime = "2017-05-21 15:33:33 UTC";
 	private static long buildTimestamp;
 	
@@ -2644,10 +2644,8 @@ public class Controller extends Observable {
 
 	public Transaction r_Send(PrivateKeyAccount sender,
 			int feePow, Account recipient, long key, BigDecimal amount) {
-		synchronized (this.transactionCreator) {
-			return this.r_Send(sender, feePow, recipient,
-					key, amount, "", null, null, null);
-		}
+		return this.r_Send(sender, feePow, recipient,
+				key, amount, "", null, null, null);
 	}
 	public Transaction r_Send(PrivateKeyAccount sender,
 			int feePow, Account recipient, long key,BigDecimal amount,
