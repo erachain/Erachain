@@ -1169,7 +1169,8 @@ public class Block {
 						return false;
 					}
 		
-		
+					transaction.setDB(fork, false);
+
 					//CHECK IF VALID
 					if ( transaction instanceof DeployATTransaction)
 					{
@@ -1185,8 +1186,7 @@ public class Block {
 							LOGGER.error("*** Block[" + height + "].atTx invalid");
 							return false;
 						}
-					}
-					else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
+					} else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 					{
 						LOGGER.error("*** Block[" + height
 							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
@@ -1242,6 +1242,7 @@ public class Block {
 		{
 			//PROCESS
 			if (!transaction.isWiped()) {
+				transaction.setDB(dbSet, false);
 				transaction.process(dbSet, this, false);
 			} else {
 				//UPDATE REFERENCE OF SENDER
@@ -1454,7 +1455,8 @@ public class Block {
 			//LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
 			if (!transaction.isWiped()) {
-					transaction.orphan(db, false);
+				transaction.setDB(db, false);
+				transaction.orphan(db, false);
 			} else {
 				//UPDATE REFERENCE OF SENDER
 				if (transaction.isReferenced() )

@@ -498,6 +498,7 @@ public class TestRecAsset {
 		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
 		Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
+		assetTransfer.setDB(db, false);
 		assetTransfer.process(db, gb, false);
 		assetTransfer.orphan(db, false);
 		
@@ -802,6 +803,7 @@ public class TestRecAsset {
 				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		messageTransaction.sign(maker, false);
+		messageTransaction.setDB(db, false);
 		messageTransaction.process(db, gb, false);
 		messageTransaction.orphan(db, false);
 		

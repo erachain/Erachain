@@ -539,32 +539,39 @@ public class BlockGenerator extends Thread implements Observer
 				{
 					try{
 						//CHECK IF VALID
-						if(transaction.isSignatureValid() &&
-								transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
-						{
-							//CHECK IF ENOUGH ROOM
-							if(totalBytes + transaction.getDataLength(false) <= GenesisBlock.MAX_TRANSACTION_BYTES)
-							{
-								
-								totalBytes += transaction.getDataLength(false);
-
-								////ADD INTO LIST
-								transactionsList.add(transaction);
-											
-								//REMOVE FROM LIST
-								orderedTransactions.remove(transaction);
-											
-								//PROCESS IN NEWBLOCKDB
-								transaction.process(newBlockDb, null, false);
-											
-								//TRANSACTION PROCESSES
-								transactionProcessed = true;
-								break;
-							}
-						} else {
+						if(!transaction.isSignatureValid()) {
 							// INVALID TRANSACTION
 							db.getTransactionMap().delete(transaction);
+						} else {
+							transaction.setDB(db, false);
+							if (transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
+							{
+								//CHECK IF ENOUGH ROOM
+								if(totalBytes + transaction.getDataLength(false) <= GenesisBlock.MAX_TRANSACTION_BYTES)
+								{
+									
+									totalBytes += transaction.getDataLength(false);
+		
+									////ADD INTO LIST
+									transactionsList.add(transaction);
+												
+									//REMOVE FROM LIST
+									orderedTransactions.remove(transaction);
+												
+									//PROCESS IN NEWBLOCKDB
+									transaction.process(newBlockDb, null, false);
+												
+									//TRANSACTION PROCESSES
+									transactionProcessed = true;
+									break;
+								}
+							} else {
+								// INVALID TRANSACTION
+								db.getTransactionMap().delete(transaction);
+							}
+							
 						}
+							
 					} catch (Exception e) {
                         orderedTransactions.remove(transaction);
                         transactionProcessed = true;

@@ -46,7 +46,7 @@ import utils.DateTimeFormat;
 
 public abstract class Transaction {
 	
-	protected static final int TODO_h1 = 62000;
+	protected static final int TODO_h1 = 69000;
 
 	
 	protected static final int FREEZE_FROM = BlockChain.DEVELOP_USE?9999999:41800;
@@ -1054,7 +1054,7 @@ public abstract class Transaction {
 		this.block = block;
 		
 		if (!asPack) {
-			this.calcFee();
+			//this.calcFee();
 	
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
 				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(this.fee), db);

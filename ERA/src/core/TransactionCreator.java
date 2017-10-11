@@ -122,15 +122,18 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
 		for(Transaction transaction: accountTransactions)
 		{
-			if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK
-					&& transaction.isSignatureValid())
-			{
-				transaction.process(this.fork, null, false);
-			}
-			else
-			{
+			if(!transaction.isSignatureValid()) {
 				//THE TRANSACTION BECAME INVALID LET 
-				DBSet.getInstance().getTransactionMap().delete(transaction);
+				DBSet.getInstance().getTransactionMap().delete(transaction);			
+			} else {
+				transaction.setDB(this.fork, false);
+				if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK)
+				{
+					transaction.process(this.fork, null, false);
+				} else {
+					//THE TRANSACTION BECAME INVALID LET 
+					DBSet.getInstance().getTransactionMap().delete(transaction);
+				}
 			}
 		}
 		
@@ -789,6 +792,7 @@ public class TransactionCreator
 	public Integer afterCreate(Transaction transaction, boolean asPack)
 	{
 		//CHECK IF PAYMENT VALID
+		transaction.setDB(this.fork, asPack);
 		int valid = transaction.isValid(this.fork, null);
 		
 		if(valid == Transaction.VALIDATE_OK)

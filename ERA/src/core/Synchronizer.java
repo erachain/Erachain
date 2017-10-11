@@ -137,7 +137,7 @@ public class Synchronizer
 			int heigh = block.getHeightByParent(fork);
 
 			//CHECK IF VALID
-			if(block.isValid(fork) && block.isSignatureValid())
+			if(block.isSignatureValid() && block.isValid(fork))
 			{
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				block.process(fork);
@@ -146,8 +146,8 @@ public class Synchronizer
 			{
 				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 
-				block.isValid(fork);
-				block.isSignatureValid();
+				//block.isSignatureValid();
+				//block.isValid(fork);
 				
 				//INVALID BLOCK THROW EXCEPTION
 				String mess = "Dishonest peer by not is Valid block, heigh: " + heigh;

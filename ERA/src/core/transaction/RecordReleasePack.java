@@ -268,6 +268,7 @@ public class RecordReleasePack extends Transaction {
 		//ORPHAN PAYMENTS
 		for(Transaction transaction: this.transactions)
 		{
+			transaction.setDB(db, true);
 			transaction.orphan(db, true); // as Pack in body
 		}
 	}
