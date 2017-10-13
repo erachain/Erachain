@@ -354,9 +354,11 @@ public class TransactionCreator
 			byte[] icon, byte[] image, String description,
 			PublicKeyAccount owner, byte[] ownerSignature)
 	{
+
+		this.checkUpdate();
+		
 		//CHECK FOR UPDATES
 		if (forIssue) {
-			this.checkUpdate();
 
 			// IF has not DUPLICATE in UNCONFIRMED RECORDS
 			TransactionMap unconfirmedMap = DBSet.getInstance().getTransactionMap();
