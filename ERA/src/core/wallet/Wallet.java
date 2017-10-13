@@ -1192,7 +1192,7 @@ public class Wallet extends Observable implements Observer
 		BlockMap blockMap = DBSet.getInstance().getBlockMap();
 		
 		int i = 0;
-		byte[] reference = block.getReference();
+		byte[] reference = block.getSignature();
 		while (i++ < 1000) {
 			if (Arrays.equals(lastBlockSignature, reference))
 				return true;
@@ -1203,8 +1203,12 @@ public class Wallet extends Observable implements Observer
 				return false;
 			}
 			
+			this.update(this, new ObserverMessage(ObserverMessage.REMOVE_BLOCK_TYPE, block));
+			/*
 			this.orphanBlock(block);
-			reference = block.getReference();
+			*/
+			
+			reference = block.getSignature();
 		}
 		
 		return false;
