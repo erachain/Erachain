@@ -1291,7 +1291,7 @@ public class Wallet extends Observable implements Observer
 			this.database.getBlockMap().delete(block);
 			
 			//SET AS LAST BLOCK
-			this.database.setLastBlockSignature(block.getSignature());
+			this.database.setLastBlockSignature(block.getReference());
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
 			BigDecimal blockFee = block.getTotalFeeForProcess();
