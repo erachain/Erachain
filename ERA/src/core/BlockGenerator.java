@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -512,6 +513,9 @@ public class BlockGenerator extends Thread implements Observer
 	
 	public static List<Transaction> getUnconfirmedTransactions(DBSet db, long timestamp)
 	{
+		
+		Date timrans1 = new Date();
+		
 		long totalBytes = 0;
 		boolean transactionProcessed;
 			
@@ -596,6 +600,9 @@ public class BlockGenerator extends Thread implements Observer
 		// sort by TIMESTAMP
 		Collections.sort(transactionsList,  new TransactionTimestampComparator());
 
+		long dd = (new Date().getTime() -timrans1.getTime()) / 1000;
+		LOGGER.debug("core.BlockGenerator.getUnconfirmedTransactions(DBSet, long) ######## =" + dd +"sec");
+		
 		return transactionsList;
 	}
 	
