@@ -1289,10 +1289,7 @@ public class Wallet extends Observable implements Observer
 		{
 			//DELETE BLOCK
 			this.database.getBlockMap().delete(block);
-			
-			//SET AS LAST BLOCK
-			this.database.setLastBlockSignature(block.getReference());
-			
+						
 			//KEEP TRACK OF UNCONFIRMED BALANCE
 			BigDecimal blockFee = block.getTotalFeeForProcess();
 			BigDecimal blockTotalFee = block.getTotalFee(DBSet.getInstance());
@@ -1318,6 +1315,10 @@ public class Wallet extends Observable implements Observer
 			this.database.getAccountMap().changeBalance(
 					blockGenerator.getAddress(), true, FEE_KEY, blockFee);
 		}
+		
+		//SET AS LAST BLOCK
+		this.database.setLastBlockSignature(block.getReference());
+
 	}
 	
 	private void processNameRegistration(RegisterNameTransaction nameRegistration)
