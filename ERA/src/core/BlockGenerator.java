@@ -521,7 +521,11 @@ public class BlockGenerator extends Thread implements Observer
 		//ORDER TRANSACTIONS BY FEE PER BYTE
 		List<Transaction> orderedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
 		
-		Collections.sort(orderedTransactions, new TransactionFeeComparator());
+		// TODO make SORT by FEE to!
+		// toBYTE / FEE + TIMESTAMP !!
+		////Collections.sort(orderedTransactions, new TransactionFeeComparator());
+		// sort by TIMESTAMP
+		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
 		
@@ -546,6 +550,7 @@ public class BlockGenerator extends Thread implements Observer
 							transaction.setDB(newBlockDb, false);
 							if (transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
 							{
+																
 								//CHECK IF ENOUGH ROOM
 								if(totalBytes + transaction.getDataLength(false) <= GenesisBlock.MAX_TRANSACTION_BYTES)
 								{
@@ -563,6 +568,8 @@ public class BlockGenerator extends Thread implements Observer
 												
 									//TRANSACTION PROCESSES
 									transactionProcessed = true;
+									
+									// GO TO NEXT TRANSACTION
 									break;
 								}
 							} else {
