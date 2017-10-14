@@ -543,7 +543,7 @@ public class BlockGenerator extends Thread implements Observer
 							// INVALID TRANSACTION
 							db.getTransactionMap().delete(transaction);
 						} else {
-							transaction.setDB(db, false);
+							transaction.setDB(newBlockDb, false);
 							if (transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
 							{
 								//CHECK IF ENOUGH ROOM
