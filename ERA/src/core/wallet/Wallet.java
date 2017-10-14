@@ -1280,7 +1280,7 @@ public class Wallet extends Observable implements Observer
 		{
 			return;
 		}
-		
+				
 		Account blockGenerator = block.getCreator();
 		String blockGeneratorStr = blockGenerator.getAddress(); 
 
@@ -1289,6 +1289,9 @@ public class Wallet extends Observable implements Observer
 		{
 			//DELETE BLOCK
 			this.database.getBlockMap().delete(block);
+			
+			//SET AS LAST BLOCK
+			this.database.setLastBlockSignature(block.getSignature());
 			
 			//KEEP TRACK OF UNCONFIRMED BALANCE
 			BigDecimal blockFee = block.getTotalFeeForProcess();
