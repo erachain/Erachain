@@ -209,8 +209,7 @@ public abstract class DBMap<T, U> extends Observable {
 				this.deleted.remove(key);
 			}
 			
-			//COMMIT
-			//if(this.databaseSet != null)
+			//COMMIT and NOTIFY if not FORKED
 			if(this.parent == null)
 			{
 				// IT IS NOT FORK
@@ -219,29 +218,31 @@ public abstract class DBMap<T, U> extends Observable {
 				{
 					this.databaseSet.commit();
 				}
+
+				//NOTIFY ADD
+				if(this.getObservableData().containsKey(NOTIFY_ADD))
+				{
+					this.setChanged();
+					if ( this.getObservableData().get(NOTIFY_ADD).equals( ObserverMessage.ADD_AT_TX_TYPE ) )
+					{
+						this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), new Tuple2<T,U>(key,value)));
+					}
+					else
+					{
+						if (!DBSet.getInstance().isStoped())
+							this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
+					}
+				}
+				
+				//NOTIFY LIST
+				if(this.getObservableData().containsKey(NOTIFY_LIST))
+				{
+					this.setChanged();
+					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), new SortableList<T, U>(this)));
+				}
+
 			}
 		
-			//NOTIFY ADD
-			if(this.getObservableData().containsKey(NOTIFY_ADD))
-			{
-				this.setChanged();
-				if ( this.getObservableData().get(NOTIFY_ADD).equals( ObserverMessage.ADD_AT_TX_TYPE ) )
-				{
-					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), new Tuple2<T,U>(key,value)));
-				}
-				else
-				{
-					if (!DBSet.getInstance().isStoped())
-						this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
-				}
-			}
-			
-			//NOTIFY LIST
-			if(this.getObservableData().containsKey(NOTIFY_LIST))
-			{
-				this.setChanged();
-				this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), new SortableList<T, U>(this)));
-			}
 
 			this.outUses();
 			return old != null;
@@ -272,7 +273,7 @@ public abstract class DBMap<T, U> extends Observable {
 				U value = this.map.remove(key);
 				
 				//NOTIFY REMOVE
-				if(this.getObservableData().containsKey(NOTIFY_REMOVE))
+				if(this.parent == null && this.getObservableData().containsKey(NOTIFY_REMOVE))
 				{
 					this.setChanged();
 					if ( this.getObservableData().get(NOTIFY_REMOVE).equals( ObserverMessage.REMOVE_AT_TX ))
@@ -350,12 +351,17 @@ public abstract class DBMap<T, U> extends Observable {
 	@Override
 	public void addObserver(Observer o) 
 	{
+
+		// NOT ADD for FORK
+		if(this.parent != null)
+			return;
+
 		this.addUses();
 
 		//ADD OBSERVER
 		super.addObserver(o);	
 		
-		//NOTIFY LIST
+		//NOTIFY LIST if this not FORK
 		if(this.getObservableData().containsKey(NOTIFY_LIST))
 		{
 			//CREATE LIST

@@ -514,7 +514,7 @@ public class BlockGenerator extends Thread implements Observer
 	public static List<Transaction> getUnconfirmedTransactions(DBSet db, long timestamp)
 	{
 		
-		Date timrans1 = new Date();
+		//Date timrans1 = new Date();
 		
 		long totalBytes = 0;
 		boolean transactionProcessed;
@@ -600,8 +600,8 @@ public class BlockGenerator extends Thread implements Observer
 		// sort by TIMESTAMP
 		Collections.sort(transactionsList,  new TransactionTimestampComparator());
 
-		long dd = (new Date().getTime() -timrans1.getTime()) / 1000;
-		LOGGER.debug("core.BlockGenerator.getUnconfirmedTransactions(DBSet, long) ######## =" + dd +"sec");
+		//long dd = (new Date().getTime() -timrans1.getTime()) / 1000;
+		//LOGGER.debug("core.BlockGenerator.getUnconfirmedTransactions(DBSet, long) ######## =" + dd +"sec");
 		
 		return transactionsList;
 	}
