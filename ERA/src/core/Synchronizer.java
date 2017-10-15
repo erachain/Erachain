@@ -31,7 +31,7 @@ import database.DBSet;
 public class Synchronizer
 {
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
-	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)146, (byte)168, (byte)226};
+	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)195, (byte)26, (byte)245}; // 185.195.26.245
 	
 	private boolean run = true;
 	private Peer fromPeer;
@@ -229,7 +229,7 @@ public class Synchronizer
 		return orphanedTransactions;
 	}
 	
-	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer) throws Exception
+	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception
 	{
 
 		if (!this.run) {
@@ -253,7 +253,7 @@ public class Synchronizer
 					//+ ", ping: " + peer.getPing()
 					);			
 		}
-		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, lastBlockSignature, checkPointHeight);
+		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
 		if (signatures.b.size() == 0) {
 			//String mess = "Dishonest peer - signatures == []: " + peer.getAddress().getHostAddress();
 			//peer.ban(BAN_BLOCK_TIMES, mess);
@@ -419,7 +419,7 @@ public class Synchronizer
 		return response.getSignatures();
 	}
 	
-	private Tuple2<byte[], List<byte[]>> findHeaders(Peer peer, byte[] lastBlockSignature, int checkPointHeight) throws Exception
+	private Tuple2<byte[], List<byte[]>> findHeaders(Peer peer, int peerHeight, byte[] lastBlockSignature, int checkPointHeight) throws Exception
 	{
 
 		DBSet dbSet = DBSet.getInstance();
@@ -434,7 +434,10 @@ public class Synchronizer
 		//int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
 		int maxChainHeight = dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
 		if (maxChainHeight < checkPointHeight) {
-			maxChainHeight = checkPointHeight;
+			String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight
+					+ "\n -> not found";
+			peer.ban(BAN_BLOCK_TIMES<<1, mess);
+			throw new Exception(mess);
 		}
 
 		LOGGER.info("findLastCommonBlock(Peer) for: "
@@ -475,23 +478,31 @@ public class Synchronizer
 		}
 
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
-		int steep = BlockChain.SYNCHRONIZE_PACKET>>2;
+		//int steep = BlockChain.SYNCHRONIZE_PACKET>>2;
+		int steep = 2;
 		byte[] lastBlockSignatureCommon;
 		do {
 			maxChainHeight -= steep;
+			
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
 				lastBlockSignatureCommon = checkPointHeightCommonBlock.getSignature();
-				break;
 			} else {
 				lastBlockSignatureCommon = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
 			}
 				
 			headers = this.getBlockSignatures(lastBlockSignatureCommon, peer);
-			if (headers.size() > 0)
+			if (headers.size() > 0) {
+				if (maxChainHeight == checkPointHeight) {
+					String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();				
+					peer.ban(BAN_BLOCK_TIMES, mess);
+					throw new Exception(mess);
+				}
 				break;
-			// x2
-			//steep <<= 1;
+			}
+
+			if (steep < 1000)
+				steep <<= 1;
 			
 		} while ( maxChainHeight > checkPointHeight && headers.isEmpty());
 

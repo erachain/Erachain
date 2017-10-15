@@ -119,7 +119,7 @@ public class Controller extends Observable {
 	
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
-	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
+	public static final String APP_NAME = BlockChain.DEVELOP_USE?"ErachainTEST-dev":"ErachainTEST";
 	private static final String version = "3.11.01 alpha";
 	private static final String buildTime = "2017-05-21 15:33:33 UTC";
 	private static long buildTimestamp;
@@ -1648,7 +1648,7 @@ public class Controller extends Observable {
 					about_frame.set_console_Text(info);
 					try {
 						// SYNCHRONIZE FROM PEER
-						this.synchronizer.synchronize(dbSet, checkPointHeight, peer);						
+						this.synchronizer.synchronize(dbSet, checkPointHeight, peer, peerHW.a);						
 					} catch (Exception e) {
 						LOGGER.error(e.getMessage(), e);
 
