@@ -1,4 +1,5 @@
 *.class
+/data*
 /wallet*
 ERA/settings.json
 ERA/*.jar
