@@ -146,7 +146,7 @@ public class AboutFrame extends JDialog{
         //SHOW FRAME
         this.pack();
         this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        this.setVisible(false);
 	}	
 	public void setUserClose(boolean uc){
 		user_close = uc;
