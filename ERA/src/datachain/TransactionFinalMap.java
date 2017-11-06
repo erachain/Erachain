@@ -546,30 +546,19 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign){
 		
-		if (true) {
-			if (signature_key2.containsKey(sign)) {
-				return signature_key2.get(sign);
-			} else {
-				return null;
-			}
-			
+		int dd = signature_key2.size();
+		
+		if (signature_key2.containsKey(sign)) {
+			return signature_key2.get(sign);
 		} else {
-			Iterator<Tuple2<String, Tuple2<Integer, Integer>>> it = signature_key.iterator();
-				while (it.hasNext()){
-					Tuple2<String, Tuple2<Integer, Integer>> a = it.next();
-					if(a.a.equals(Base58.encode(sign))) return a.b;
-							
-				}
 			return null;
 		}
+					
+	}
+	public Transaction getTransaction(byte[] signature) {
 		
-		
+		return this.get(this.getHeightSegBySignature(signature));
 		
 	}
-	public Transaction getTransaction(byte[] seg){
-		return this.get(getHeightSegBySignature(seg));
-		
-	}
-	
 
 }
