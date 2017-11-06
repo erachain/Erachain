@@ -1,6 +1,6 @@
 /data*
 /Data Files
-/wallet
+/wallet*
 /bin/
 /ACCOUNTS.txt
 /*.jar
