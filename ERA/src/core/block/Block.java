@@ -1449,7 +1449,7 @@ public class Block {
 
 		long tickets = System.currentTimeMillis() - start;
 		if (tickets > 1000) {
-			LOGGER.error("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
+			LOGGER.info("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
 		}
 
