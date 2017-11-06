@@ -1249,7 +1249,7 @@ public class Block {
 		if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dcSet);
 			long tickets = System.currentTimeMillis() - start;
-			LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );
+			//LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );
 		}
 
 		//ADD TO DB
@@ -1344,8 +1344,10 @@ public class Block {
 			cnt.blockchainSyncStatusUpdate(heightBlock);
 		}
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.error("[" + this.heightBlock + "] processing time: " +  tickets*0.001
+		if (tickets > 1000) {
+			LOGGER.info("[" + this.heightBlock + "] processing time: " +  tickets*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
+		}
 		
 	}
 
