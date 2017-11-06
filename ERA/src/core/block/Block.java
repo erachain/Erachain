@@ -1448,8 +1448,10 @@ public class Block {
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
 
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.error("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
+		if (tickets > 1000) {
+			LOGGER.error("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
+		}
 
 		this.heightBlock = -1;
 		this.parentBlock = null;
