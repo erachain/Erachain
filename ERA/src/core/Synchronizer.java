@@ -539,7 +539,7 @@ public class Synchronizer
 
 		if (response == null) {
 			// cannot retrieve headers
-			peer.ban(0, "Cannot retrieve headers");
+			peer.ban(20, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
 		}
 
@@ -614,7 +614,7 @@ public class Synchronizer
 
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
 		//int steep = BlockChain.SYNCHRONIZE_PACKET>>2;
-		int steep = 2;
+		int steep = 4;
 		byte[] lastBlockSignatureCommon;
 		do {
 			if (cnt.isOnStopping()) {
