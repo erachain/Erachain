@@ -437,12 +437,12 @@ public class BlockMap extends DCMap<byte[], Block>
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_RESET_BLOCK_TYPE, null));
 	}
 	public void notifyProcessChain(Block block) {
-		LOGGER.error("&&&&&&&&&&&&& NOTEFY CHAIN_ADD_BLOCK_TYPE");
+		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_ADD_BLOCK_TYPE");
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
 	}
 	public void notifyOrphanChain(Block block) {
-		LOGGER.error("&&&&&&&&&&&&& NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
+		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
 	}

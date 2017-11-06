@@ -326,7 +326,7 @@ public class Synchronizer
 			throw new Exception("on stoping");
 
 		/*
-		LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
+		LOGGER.debug("Synchronizing from peer: " + peer.toString() + ":"
 					+ peer.getAddress().getHostAddress() + " - " + peer.getPing());
 					*/
 
@@ -397,14 +397,14 @@ public class Synchronizer
 				}
 				
 				//GET BLOCK
-				LOGGER.debug("synchronize try get BLOCK"
-						+ " for: " + signature.toString()
-						);
+				///LOGGER.debug("synchronize try get BLOCK"
+				///		+ " for: " + signature.toString()
+				///		);
 
 				Block blockFromPeer = blockBuffer.getBlock(signature);
 
-				LOGGER.debug("synchronize BLOCK getted"
-						);
+				///LOGGER.debug("synchronize BLOCK getted"
+				///		);
 
 				if (cnt.isOnStopping()) {
 					//STOP BLOCKBUFFER
@@ -430,8 +430,8 @@ public class Synchronizer
 				}
 				
 				//PROCESS BLOCK
-				LOGGER.debug("synchronize - simple ADD NEW BLOCK process..."
-						+ " height:" + blockFromPeer.getHeightByParent(dcSet));
+				///LOGGER.debug("synchronize - simple ADD NEW BLOCK process..."
+				///		+ " height:" + blockFromPeer.getHeightByParent(dcSet));
 				
 				if(blockFromPeer.isSignatureValid() && blockFromPeer.isValid(dcSet))
 				{
@@ -456,8 +456,8 @@ public class Synchronizer
 					throw new Exception(mess);
 				}
 				
-				LOGGER.debug("synchronize BLOCK END process"
-						);
+				///LOGGER.debug("synchronize BLOCK END process"
+				///		);
 
 			}
 
@@ -476,7 +476,7 @@ public class Synchronizer
 
 			//SYNCHRONIZE BLOCKS
 			/*
-			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
+			LOGGER.debug("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			*/
 			
 			List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, common, blocks, peer);
@@ -552,13 +552,13 @@ public class Synchronizer
 		DCSet dcSet = DCSet.getInstance();
 		Controller cnt = Controller.getInstance();
 
-		LOGGER.info("findHeaders(Peer: " + peer.getAddress().getHostAddress()
+		LOGGER.debug("findHeaders(Peer: " + peer.getAddress().getHostAddress()
 				+ ", peerHeight: " + peerHeight
 				+ ", checkPointHeight: " + checkPointHeight);
 
 		List<byte[]> headers = this.getBlockSignatures(lastBlockSignature, peer);
 
-		LOGGER.info("findHeaders(Peer) headers.size: " + headers.size());
+		LOGGER.debug("findHeaders(Peer) headers.size: " + headers.size());
 
 		if (headers.size() > 0) {
 			// end of my CHAIN is common
@@ -575,7 +575,7 @@ public class Synchronizer
 			throw new Exception(mess);
 		}
 
-		LOGGER.info("findHeaders "
+		LOGGER.debug("findHeaders "
 				+ " maxChainHeight: " + maxChainHeight
 				+ " to minHeight: " + checkPointHeight);
 
@@ -630,13 +630,13 @@ public class Synchronizer
 				lastBlockSignatureCommon = dcSet.getBlockMap().getSignByHeight(maxChainHeight);				
 			}
 
-			LOGGER.info("findHeaders try found COMMON header"
+			LOGGER.debug("findHeaders try found COMMON header"
 					+ " steep: " + steep
 					+ " maxChainHeight: " + maxChainHeight);
 
 			headers = this.getBlockSignatures(lastBlockSignatureCommon, peer);
 
-			LOGGER.info("findHeaders try found COMMON header"
+			LOGGER.debug("findHeaders try found COMMON header"
 					+ " founded headers: " + headers.size()
 					);
 
@@ -654,7 +654,7 @@ public class Synchronizer
 			
 		} while ( maxChainHeight > checkPointHeight && headers.isEmpty());
 
-		LOGGER.info("findHeaders AFTER try found COMMON header"
+		LOGGER.debug("findHeaders AFTER try found COMMON header"
 				+ " founded headers: " + headers.size()
 				);
 
@@ -670,7 +670,7 @@ public class Synchronizer
 			throw new Exception(mess);
 		}
 
-		LOGGER.info("findHeaders headers CLEAR"
+		LOGGER.debug("findHeaders headers CLEAR"
 				+ "now headers: " + headers.size()
 				);
 		

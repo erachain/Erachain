@@ -815,10 +815,10 @@ public class DCSet implements Observer, IDB {
 		this.actions += b.getDataLength(true);
 		if (this.actions > 1000000){// ACTIONS_BEFORE_COMMIT) {
 			long start = System.currentTimeMillis();
-			LOGGER.error("%%%%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% actions:" + actions);
+			LOGGER.debug("%%%%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% actions:" + actions);
 			this.database.getEngine().commit();
 
-			LOGGER.error("%%%%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
+			LOGGER.debug("%%%%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
 			this.actions = 0l;
 			
 			
