@@ -26,7 +26,7 @@ import utils.ObserverMessage;
 public class DCSet implements Observer, IDB {
 
 	private static final Logger LOGGER = Logger.getLogger(DCSet.class);
-	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?100000:10000;
+	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?1000000:10000;
 	private static final int CASH_SIZE = BlockChain.HARD_WORK?2048<<3:2048;
 	
 	private static DCSet instance;
@@ -813,14 +813,13 @@ public class DCSet implements Observer, IDB {
 		this.addUses();
 
 		this.actions += b.getDataLength(true);
-		if (this.actions > 1000000){// ACTIONS_BEFORE_COMMIT) {
+		if (this.actions > ACTIONS_BEFORE_COMMIT) {
 			long start = System.currentTimeMillis();
-			LOGGER.debug("%%%%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% actions:" + actions);
+			LOGGER.debug("%%%%%%%%% getEngineeSize:"+ this.getEngineeSize() +" %%%%%%%%%% actions:" + actions);
 			this.database.getEngine().commit();
 
-			LOGGER.debug("%%%%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
+			LOGGER.debug("%%%%%%%% getEngineeSize:"+ this.getEngineeSize() +" %%%%%%%%% commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
 			this.actions = 0l;
-			
 			
 		}
 

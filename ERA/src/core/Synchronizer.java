@@ -539,7 +539,7 @@ public class Synchronizer
 
 		if (response == null) {
 			// cannot retrieve headers
-			if (false) peer.ban(0, "Cannot retrieve headers");
+			peer.ban(0, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
 		}
 
