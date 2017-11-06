@@ -333,7 +333,7 @@ public class Network extends Observable implements ConnectionCallback {
 			//SEND BACK TO SENDER
 			boolean result = message.getSender().sendMessage(response);
 			if (!result) {
-				LOGGER.error("error on response PING_TYPE to " + message.getSender());
+				LOGGER.error("error on response PING_TYPE to " + message.getSender().getAddress());
 			}
 				
 			

@@ -1804,6 +1804,7 @@ public class Controller extends Observable {
 							// on closing this.dcSet.rollback();
 							return;
 						} else {
+							this.banPeerOnError(peer, e.getMessage());
 							LOGGER.error(e.getMessage(), e);
 							return;
 						}
@@ -1890,7 +1891,8 @@ public class Controller extends Observable {
 		Peer maxPeer = null;
 
 		try {
-			synchronized (this.peerHWeight) {
+			//synchronized (this.peerHWeight) {
+			if (true) {
 				for (Peer peer : this.peerHWeight.keySet()) {
 					Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
 					if (height + 1 < whPeer.a
