@@ -1893,8 +1893,13 @@ public class Controller extends Observable {
 			synchronized (this.peerHWeight) {
 				for (Peer peer : this.peerHWeight.keySet()) {
 					Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-					if (height < whPeer.a
-							&& weight < whPeer.b) {
+					if (height + 1 < whPeer.a
+							// TODO getMaxPeerHWeight - && weight < whPeer.b
+							|| height < whPeer.a
+							&& weight + 3000 < whPeer.b
+							|| height == whPeer.a
+							&& weight < whPeer.b
+							) {
 						height = whPeer.a;
 						weight = whPeer.b;
 						maxPeer = peer;
