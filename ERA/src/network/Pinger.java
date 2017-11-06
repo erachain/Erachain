@@ -52,7 +52,7 @@ public class Pinger extends Thread
 			//SLEEP
 			try 
 			{
-				Thread.sleep(Settings.getInstance().getPingInterval());
+				Thread.sleep(100000 + Settings.getInstance().getPingInterval());
 			} 
 			catch (InterruptedException e)
 			{

@@ -19,10 +19,13 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.HTreeMap;
+import org.mapdb.Serializer;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.SignedBytes;
 
 import core.account.Account;
 import core.block.Block;
@@ -52,6 +55,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	@SuppressWarnings("rawtypes")
 	private NavigableSet block_Key;
 	private NavigableSet <Tuple2<String,Tuple2<Integer, Integer>>>signature_key;
+	private BTreeMap <byte[], Tuple2<Integer, Integer>> signature_key2;
 	
 	public TransactionFinalMap(DCSet databaseSet, DB database)
 	{
@@ -96,6 +100,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 				return account == null? "genesis": account.getAddress();
 			}
 		});
+		
 		
 		this.block_Key = database.createTreeSet("Block_txs")
 				.comparator(Fun.COMPARATOR)
@@ -161,8 +166,16 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			}
 		});
 		
+		this.signature_key2 = database.createTreeMap("signature_key2")
+				.comparator(SignedBytes.lexicographicalComparator())
+				.makeOrGet();
 		
-		
+		Bind.secondaryKey(map, this.signature_key2, new Fun.Function2<byte[], Tuple2<Integer, Integer>, Transaction>(){
+			@Override
+			public byte[] run(Tuple2<Integer, Integer> key, Transaction val) {
+				return  val.getSignature();
+			}
+		});
 		
 		
 		
@@ -371,7 +384,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	{
 		Iterable senderKeys = Fun.filter(this.senderKey, address);
 		Iterable recipientKeys = Fun.filter(this.recipientKey, address);
-
+		
 		Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
 		
 		treeKeys.addAll(Sets.newTreeSet(senderKeys));
@@ -533,13 +546,22 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign){
 		
-		 Iterator<Tuple2<String, Tuple2<Integer, Integer>>> it = signature_key.iterator();
-			while (it.hasNext()){
-				 Tuple2<String, Tuple2<Integer, Integer>> a = it.next();
-				 if(a.a.equals(Base58.encode(sign))) return a.b;
-						
+		if (true) {
+			if (signature_key2.containsKey(sign)) {
+				return signature_key2.get(sign);
+			} else {
+				return null;
 			}
+			
+		} else {
+			Iterator<Tuple2<String, Tuple2<Integer, Integer>>> it = signature_key.iterator();
+				while (it.hasNext()){
+					Tuple2<String, Tuple2<Integer, Integer>> a = it.next();
+					if(a.a.equals(Base58.encode(sign))) return a.b;
+							
+				}
 			return null;
+		}
 		
 		
 		
