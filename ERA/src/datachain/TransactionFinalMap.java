@@ -168,6 +168,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		
 		this.signature_key2 = database.createTreeMap("signature_key2")
 				.comparator(SignedBytes.lexicographicalComparator())
+				//.comparator(BTreeKeySerializer.BASIC)
 				.makeOrGet();
 		
 		Bind.secondaryKey(map, this.signature_key2, new Fun.Function2<byte[], Tuple2<Integer, Integer>, Transaction>(){
