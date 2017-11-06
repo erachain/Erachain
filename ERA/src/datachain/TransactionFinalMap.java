@@ -26,6 +26,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.SignedBytes;
+import com.google.common.primitives.UnsignedBytes;
 
 import core.account.Account;
 import core.block.Block;
@@ -167,9 +168,8 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		});
 		
 		this.signature_key2 = database.createTreeMap("signature_key2")
-				//.comparator(SignedBytes.lexicographicalComparator())
 				.comparator(Fun.BYTE_ARRAY_COMPARATOR)
-				//.comparator(BTreeKeySerializer.BASIC)
+				//.comparator(UnsignedBytes.lexicographicalComparator())
 				.makeOrGet();
 		
 		Bind.secondaryKey(map, this.signature_key2, new Fun.Function2<byte[], Tuple2<Integer, Integer>, Transaction>(){
@@ -549,17 +549,39 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		}
 		return null;
 	}
-	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign){
-		
-		int dd = signature_key2.size();
-		
-		if (signature_key2.containsKey(sign)) {
-			return signature_key2.get(sign);
-		} else {
-			return null;
-		}
-					
+	
+	public  BTreeMap<byte[], Tuple2<Integer, Integer>> getSignatureKey(){
+		return signature_key2;
 	}
+
+	
+	// USE PAREN for FORKED TABLE
+	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign) {
+		
+		if (this.parent == null) {
+			if (this.signature_key2.containsKey(sign)) {
+				return signature_key2.get(sign);
+			} else {
+				return null;
+			}
+		} else {
+			// THIS is FORKED TABLE
+			
+			Tuple2<Integer, Integer> mainKey;
+			if (signature_key2.containsKey(sign)) {
+				return signature_key2.get(sign);				
+			} else {
+				mainKey = this.parent.getDCSet().getTransactionFinalMap().getHeightSegBySignature(sign);
+				// MAY BE DELETED?
+				if (this.deleted.contains(mainKey)) {
+					return null;
+				} else {
+					return mainKey;
+				}
+			}
+		}		
+	}
+	
 	public Transaction getTransaction(byte[] signature) {
 		
 		return this.get(this.getHeightSegBySignature(signature));
