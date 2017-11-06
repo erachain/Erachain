@@ -47,7 +47,7 @@ import org.apache.commons.net.util.Base64;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.items.persons.Person_Work_Dialog;
 import gui.library.Holders_Library_Panel;
 import gui.library.HyperLinkAccount;
@@ -88,7 +88,7 @@ private Image Im;
 	   
 	
 	   byte[] recordReference = asset.getReference();
-       transaction = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+       transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
 	   this.setMinimumSize(new Dimension(0, 0)); 	
 	   // image +
 	   String img_HTML = "";
@@ -143,9 +143,9 @@ private Image Im;
       
       text +="<table><tr valign='top' align = 'left'><td>";
        text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key")+ ": </b>" + asset.getKey() + "</DIV>";
-	    Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
+	    Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
       if (image1 !=null) text +="<div><a href ='!!img'  style='color: "+ color  +"' ><img src=\""+img_Local_URL +"\"></a></div>";
-	    text += "<td><div  style='float:left'><div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DBSet.getInstance()) +"</div>";
+	    text += "<td><div  style='float:left'><div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DCSet.getInstance()) +"</div>";
 	    text += "<div><b>"+ Lang.getInstance().translate("Name") + ": </b>" + asset.getName() + "</div>";
 	    text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
 	    text += "<div><b>" + Lang.getInstance().translate("Owner") + ": </b><a href = '!!Owner'>" + hl_Owner.get_Text() + "</a></div>";

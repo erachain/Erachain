@@ -56,12 +56,11 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import database.BlockHeightsMap;
-import database.BlockMap;
-import database.DBSet;
-import database.ItemAssetMap;
-import database.ItemPersonMap;
-import database.SortableList;
+import datachain.BlockMap;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
+import datachain.ItemPersonMap;
+import datachain.SortableList;
 import gui.library.Images_Work;
 import utils.APIUtils;
 import utils.Pair;
@@ -79,7 +78,7 @@ public class API {
 	private static final Logger LOGGER = Logger
 			.getLogger(API.class);
 
-	private DBSet dbSet = DBSet.getInstance();
+	private DCSet dcSet = DCSet.getInstance();
 	private Controller cntrl = Controller.getInstance();
 
 	@GET
@@ -121,6 +120,8 @@ public class API {
 		help.put("GET Asset Height", "assetheight");
 		help.put("GET Asset", "asset/{key}");
 		help.put("GET Asset Data", "assetdata/{key}");
+		help.put("GET Asset Image", "assetimage/{key}");
+		help.put("GET Asset Icon", "asseticon/{key}");
 		
 		help.put("*** ASSETS ***", "");
 		help.put("GET Assets", "assets");
@@ -184,7 +185,7 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		Block lastBlock = dbSet.getBlockMap().getLastBlock();
+		Block lastBlock = dcSet.getBlockMap().getLastBlock();
 		out = lastBlock.toJson();
 		
 		return Response.status(200)
@@ -208,7 +209,7 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++steep;
-			byte[] childSign = dbSet.getChildMap().get(signatureBytes);
+			byte[] childSign = dcSet.getBlockMap().getChildBlock(signatureBytes);
 			out.put("child", Base58.encode(childSign));
 		}
 		catch(Exception e)
@@ -243,8 +244,8 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++steep;
-			byte[] childSign = dbSet.getChildMap().get(signatureBytes);
-			out = dbSet.getBlockMap().get(childSign).toJson();
+			byte[] childSign = dcSet.getBlockMap().getChildBlock(signatureBytes);
+			out = dcSet.getBlockMap().get(childSign).toJson();
 		}
 		catch(Exception e)
 		{
@@ -277,11 +278,11 @@ public class API {
 			byte[] key = Base58.decode(signature);
 
 			++steep;
-			Block block = dbSet.getBlockMap().get(key);			
+			Block block = dcSet.getBlockMap().get(key);			
 			out.put("block", block.toJson());
 			
 			++steep;
-			byte[] childSign = dbSet.getChildMap().get(block.getSignature());
+			byte[] childSign = dcSet.getBlockMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -315,11 +316,11 @@ public class API {
 			int height = Integer.parseInt(heightStr);
 			
 			++steep;
-			Block block = cntrl.getBlockByHeight(dbSet, height);
+			Block block = cntrl.getBlockByHeight(dcSet, height);
 			out.put("block", block.toJson());
 			
 			++steep;
-			byte[] childSign = dbSet.getChildMap().get(block.getSignature());
+			byte[] childSign = dcSet.getBlockMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
@@ -357,10 +358,10 @@ public class API {
 		try {
 			
 			JSONArray array = new JSONArray();
-			BlockHeightsMap blockHeightMap = dbSet.getBlockHeightsMap();
-			BlockMap blockMap = dbSet.getBlockMap();
+			
+			BlockMap blockMap = dcSet.getBlockMap();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = blockHeightMap.get((long)i);
+				byte[] signature = blockMap.getSignByHeight(i);
 				if (signature == null) {
 					out.put("end", 1);
 					break;
@@ -403,9 +404,9 @@ public class API {
 		try {
 			
 			JSONArray array = new JSONArray();
-			BlockHeightsMap blockHeightMap = dbSet.getBlockHeightsMap();
+			BlockMap blockMap = dcSet.getBlockMap();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = blockHeightMap.get((long)i);
+				byte[] signature = blockMap.getSignByHeight(i);
 				if (signature == null) {
 					out.put("end", 1);
 					break;
@@ -482,7 +483,7 @@ public class API {
 			byte[] key = Base58.decode(signature);
 
 			++steep;
-			Transaction record = cntrl.getTransaction(key, dbSet);		
+			Transaction record = cntrl.getTransaction(key, dcSet);		
 			out = record.toJson();
 			
 		} catch (Exception e) {
@@ -518,7 +519,7 @@ public class API {
 			int seq = Integer.parseInt(strA[1]);
 			
 			++steep;	
-			Transaction record = dbSet.getTransactionFinalMap().getTransaction(height, seq);
+			Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.toJson();
 						
 		} catch (Exception e) {
@@ -553,7 +554,7 @@ public class API {
 			byte[] key = Base58.decode(signature);
 
 			++steep;
-			Transaction record = cntrl.getTransaction(key, dbSet);		
+			Transaction record = cntrl.getTransaction(key, dcSet);		
 			out = record.rawToJson();
 			
 		} catch (Exception e) {
@@ -589,7 +590,7 @@ public class API {
 			int seq = Integer.parseInt(strA[1]);
 			
 			++steep;	
-			Transaction record = dbSet.getTransactionFinalMap().getTransaction(height, seq);
+			Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.rawToJson();
 						
 		} catch (Exception e) {
@@ -724,7 +725,7 @@ public class API {
 
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 		Long lastTimestamp = account.getLastReference();
 		byte[] signature;
 		if(!(lastTimestamp == null)) 
@@ -739,7 +740,7 @@ public class API {
 			{
 				for (Transaction item2 : transactions)
 				{
-					if (item.getTimestamp() == item2.getReference()
+					if (item.getTimestamp() == item2.getTimestamp()
 							& item.getCreator().getAddress().equals(item2.getCreator().getAddress())){
 						// if same address and parent timestamp
 						isSomeoneReference.add(item.getSignature());
@@ -802,8 +803,8 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity("" + Block.calcGeneratingBalance(DBSet.getInstance(),
-						new Account(address), Controller.getInstance().getBlockChain().getHeight(DBSet.getInstance()) ))
+				.entity("" + Block.calcGeneratingBalance(DCSet.getInstance(),
+						new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) ))
 				.build();
 	}
 
@@ -832,14 +833,14 @@ public class API {
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+		if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 		
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = dbSet.getAssetBalanceMap().get(address, assetAsLong);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
 		JSONArray array = new JSONArray();
 		array.add(balance.a);
 		array.add(balance.b);
@@ -863,7 +864,7 @@ public class API {
 
 		}
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		JSONObject out = new JSONObject();
 		
@@ -921,7 +922,7 @@ public class API {
 
 		}
 
-		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(address);		
+		Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(address);		
 		
 		if (personItem == null) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -940,13 +941,13 @@ public class API {
 	@Path("getaccountsfromperson/{key}")
 	public Response getAccountsFromPerson(@PathParam("key") String key) {
 		JSONObject out = new JSONObject();
-		ItemCls cls = DBSet.getInstance().getItemPersonMap().get(new Long(key));
-		if (DBSet.getInstance().getItemPersonMap().get(new Long(key)) == null){
+		ItemCls cls = DCSet.getInstance().getItemPersonMap().get(new Long(key));
+		if (DCSet.getInstance().getItemPersonMap().get(new Long(key)) == null){
 			out.put("error", "Person not Found");
 		}
 		else
 		{
-		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(new Long(key));
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
 		if (addresses.size() == 0){
 			out.put("null", "null");
 		}else{
@@ -972,7 +973,7 @@ public class API {
 	@Path("assetheight")
 	public Response assetHeight() {
 		
-		long height = dbSet.getItemAssetMap().getSize();
+		long height = dcSet.getItemAssetMap().getSize();
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -986,7 +987,7 @@ public class API {
 	@Path("asset/{key}")
 	public Response asset(@PathParam("key") long key) {
 		
-		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
+		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 		// DOES ASSETID EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -995,7 +996,10 @@ public class API {
 		}
 		
 		AssetCls asset = (AssetCls)map.get(key);
-		
+		if (asset == null){
+			
+			
+		}
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
@@ -1008,7 +1012,7 @@ public class API {
 	@Path("assetdata/{key}")
 	public Response assetData(@PathParam("key") long key) {
 		
-		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
+		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 		// DOES ASSETID EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1066,7 +1070,7 @@ public class API {
 					.build();
 		}
 		
-		ItemAssetMap map = DBSet.getInstance().getItemAssetMap();
+		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 		List<ItemCls> list = map.get_By_Name(filter, false);
 
 		JSONArray array = new JSONArray();
@@ -1093,7 +1097,7 @@ public class API {
 	@Path("personheight")
 	public Response personHeight() {
 		
-		long height = dbSet.getItemPersonMap().getSize();
+		long height = dcSet.getItemPersonMap().getSize();
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -1107,7 +1111,7 @@ public class API {
 	@Path("person/{key}")
 	public Response person(@PathParam("key") long key) {
 		
-		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1125,6 +1129,58 @@ public class API {
 		
 	}
 	
+	@Path("assetimage/{key}")
+	@GET
+	@Produces({"image/png", "image/jpg"})
+	public Response assetImage(@PathParam("key") long key) throws IOException {
+		
+		int weight = 0;
+	 if (key <=0) {
+		 throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Error key");
+	 }
+		
+	 ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+		
+		AssetCls asset = (AssetCls)map.get(key);
+		
+	// image to byte[] hot scale (param2 =0)
+	//	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+		return Response.ok(new ByteArrayInputStream(asset.getImage())).build();
+	}
+	
+	@Path("asseticon/{key}")
+	@GET
+	@Produces({"image/png", "image/jpg"})
+	public Response assetIcon(@PathParam("key") long key) throws IOException {
+		
+		if (key <=0) {
+		 throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Error key");
+	 }
+		
+	 ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+		
+		AssetCls asset = (AssetCls)map.get(key);
+		
+	// image to byte[] hot scale (param2 =0)
+	//	byte[] b = Images_Work.ImageToByte(new ImageIcon(person.getImage()).getImage(), 0);
+		return Response.ok(new ByteArrayInputStream(asset.getIcon())).build();
+	}
 	
 	@Path("personimage/{key}")
 	@GET
@@ -1138,7 +1194,7 @@ public class API {
 					"Error key");
 	 }
 		
-	 ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+	 ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1158,7 +1214,7 @@ public class API {
 	@Path("persondata/{key}")
 	public Response personData(@PathParam("key") long key) {
 		
-		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES ASSETID EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1188,7 +1244,7 @@ public class API {
 
 		}
 
-		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(address);		
+		Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(address);		
 		
 		if (personItem == null) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1217,7 +1273,7 @@ public class API {
 		
 		PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());		
+		Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());		
 		
 		if (personItem == null) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1244,7 +1300,7 @@ public class API {
 
 		}
 
-		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(address);		
+		Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(address);		
 		
 		if (personItem == null) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1253,7 +1309,7 @@ public class API {
 		}
 
 		long key = personItem.a;
-		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1285,7 +1341,7 @@ public class API {
 		
 		PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-		Tuple4<Long, Integer, Integer, Integer> personItem = DBSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());		
+		Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());		
 		
 		if (personItem == null) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1294,7 +1350,7 @@ public class API {
 		}
 
 		long key = personItem.a;
-		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1321,7 +1377,7 @@ public class API {
 		try {
 			byte[] publicKey = Base32.decode(bankkey);
 					
-					   Iterator<Pair<Long, ItemCls>> tt = DBSet.getInstance().getItemPersonMap().getList().iterator();
+					   Iterator<Pair<Long, ItemCls>> tt = DCSet.getInstance().getItemPersonMap().getList().iterator();
 					while(tt.hasNext())
 					{
 						  Pair<Long, ItemCls> s = tt.next();
@@ -1370,7 +1426,7 @@ public class API {
 					.build();
 		}
 
-		ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+		ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES ASSETID EXIST
 		List<ItemCls> list = map.get_By_Name(filter, false);
 

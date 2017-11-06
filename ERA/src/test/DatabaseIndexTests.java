@@ -7,8 +7,9 @@ import org.mapdb.DBMaker;
 
 import core.account.Account;
 import core.naming.Name;
-import database.NameMap;
-import database.SortableList;
+import database.DBMap;
+import datachain.NameMap;
+import datachain.SortableList;
 
 public class DatabaseIndexTests {
 
@@ -42,7 +43,7 @@ public class DatabaseIndexTests {
 		Assert.assertEquals(list.get(0).getA(), "a");
 		
 		//GET VALUES BY OWNER INDEX
-		list.sort(NameMap.DEFAULT_INDEX);
+		list.sort(DBMap.DEFAULT_INDEX);
 		Assert.assertEquals(list.get(0).getA(), "b");
 		Assert.assertEquals(list.get(1).getA(), "a");
 		Assert.assertEquals(list.get(0).getA(), "b");

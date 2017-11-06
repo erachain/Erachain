@@ -8,8 +8,8 @@ import javax.swing.JEditorPane;
 import org.mapdb.Fun.Tuple3;
 
 import core.item.unions.UnionCls;
+import datachain.DCSet;
 import core.item.statuses.StatusCls;
-import database.DBSet;
 import lang.Lang;
 
 // Info for union

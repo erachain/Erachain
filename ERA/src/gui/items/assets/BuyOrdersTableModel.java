@@ -11,11 +11,11 @@ import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import datachain.DCSet;
+import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-import database.DBSet;
-import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -153,7 +153,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
 				
 				// It shows unacceptably small amount of red.
-				BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
+				BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
 				BigDecimal amount = order.getAmountHaveLeft();
 				String amountStr = NumberAsString.getInstance().numberAsString(amount);
 				amount = amount.subtract(amount.remainder(increment));
@@ -187,7 +187,8 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE)
+		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
 			this.orders = Controller.getInstance().getOrders(this.have, want, true);
 			totalCalc();

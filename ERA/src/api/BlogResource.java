@@ -17,8 +17,8 @@ import core.naming.Name;
 import core.transaction.Transaction;
 import core.web.Profile;
 import core.web.blog.BlogEntry;
-import database.DBSet;
-import database.NameMap;
+import datachain.DCSet;
+import datachain.NameMap;
 import utils.BlogUtils;
 import webserver.WebResource;
 
@@ -42,7 +42,7 @@ public class BlogResource {
 		}
 		else
 		{
-			NameMap nameMap = DBSet.getInstance().getNameMap();
+			NameMap nameMap = DCSet.getInstance().getNameMap();
 			Name name = nameMap.get(blogname);
 			
 			if(name == null){
@@ -58,7 +58,7 @@ public class BlogResource {
 			}
 		}
 		
-		List<byte[]> txlist = DBSet.getInstance().getBlogPostMap()
+		List<byte[]> txlist = DCSet.getInstance().getBlogPostMap()
 				.get(blogname == null ? "Erachain.org" : blogname);
 
 		JSONArray outputJSON = new JSONArray();
@@ -118,7 +118,7 @@ public class BlogResource {
 		}
 		else
 		{
-			NameMap nameMap = DBSet.getInstance().getNameMap();
+			NameMap nameMap = DCSet.getInstance().getNameMap();
 			Name name = nameMap.get(blogname);
 			
 			if(name == null){
@@ -177,7 +177,7 @@ public class BlogResource {
 		}
 		else
 		{
-			NameMap nameMap = DBSet.getInstance().getNameMap();
+			NameMap nameMap = DCSet.getInstance().getNameMap();
 			Name name = nameMap.get(blogname);
 			
 			if(name == null){
@@ -193,7 +193,7 @@ public class BlogResource {
 			}
 		}
 		
-		List<byte[]> txlist = DBSet.getInstance().getBlogPostMap()
+		List<byte[]> txlist = DCSet.getInstance().getBlogPostMap()
 				.get(blogname == null ? "Erachain.org" : blogname);
 		
 		if(txlist.size() == 0)

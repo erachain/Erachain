@@ -31,8 +31,8 @@ public class ClosingDialog extends JFrame{
 		
 		//CREATE WAIT DIALOG
 	//	JOptionPane optionPane = new JOptionPane(Lang.getInstance().translate("Saving database. Please wait..."), JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
-		about_Frame = AboutFrame.getInstance();
-		about_Frame.set_console_Text(Lang.getInstance().translate("Saving database. Please wait..."));
+		if (Controller.useGui) about_Frame = AboutFrame.getInstance();
+		if (Controller.useGui) about_Frame.set_console_Text(Lang.getInstance().translate("Saving database. Please wait..."));
 		this.waitDialog =  AboutFrame.getInstance();//new JDialog();
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));

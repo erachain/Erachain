@@ -34,10 +34,10 @@ import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
-import database.DBSet;
-import database.SortableList;
 import database.wallet.NameMap;
 import database.wallet.TransactionMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.items.accounts.Account_Transactions_Table.MessageBuf;
 import gui.library.library;
 import gui.models.TableModelCls;
@@ -83,7 +83,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		// trans_List = new ArrayList<Trans>();
 
 		r_Trans = new ArrayList<Transaction>();
-		Controller.getInstance().addWalletListener(this);
+		Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
 		// Controller.getInstance().addObserver(this);
 	}
 
@@ -99,6 +99,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	public void set_Account(Account sender) {
 
 		this.sender = sender;
+		ss.setFilter(this.sender.getAddress());
 	}
 
 	public void set_Asset(AssetCls asset) {
@@ -208,7 +209,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return library.getBlockSegToBigInteger(r_Tran.transaction);
 		case COLUMN_TRANSACTION:
 
-			if (r_Tran.transaction.isConfirmed(DBSet.getInstance())) return r_Tran.transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "-" + r_Tran.transaction.getSeqNo(DBSet.getInstance());
+			if (r_Tran.transaction.isConfirmed(DCSet.getInstance())) return r_Tran.transaction.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()) + "-" + r_Tran.transaction.getSeqNo(DCSet.getInstance());
 			return -1;
 		case COLUMN_AMOUNT:
 		//	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
@@ -226,7 +227,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return r_Tran.transaction.viewCreator();
 
 		case COLUMN_CONFIRM:
-			return r_Tran.transaction.isConfirmed(DBSet.getInstance());
+			return r_Tran.transaction.isConfirmed(DCSet.getInstance());
 
 		case COLUMN_MESSAGE:
 
@@ -315,7 +316,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			// if(status == Wallet.STATUS_LOCKED)
 			// {
 			// cryptoCloseAll();
-			get_R_Send();
+	//		get_R_Send();
 			// }
 		}
 
@@ -325,11 +326,12 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		// }
 
 		// CHECK IF NEW LIST
-		if (message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE) {
+		if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
 			if (this.r_Trans.size() == 0) {
 				ss = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-				ss.registerObserver();
-				ss.sort(TransactionMap.TIMESTAMP_INDEX, true);
+				//ss.registerObserver();
+				Controller.getInstance().wallet.database.getTransactionMap().addObserver(ss);
+				ss.sort(TransactionMap.ADDRESS_INDEX, true);
 				// this.r_Trans.sort(NameMap.NAME_INDEX);
 				get_R_Send();
 			}
@@ -338,21 +340,19 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		}
 
 		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE) {
+		if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
 			//get_R_Send();
 			trans_Parse((Transaction) message.getValue());
 
 		}
 		// CHECK IF LIST UPDATED
-				if ( message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
-					//get_R_Send();
-					Object sss = message.getValue();
-					if (sss != null && trans_Hash_Map != null)
-						trans_Hash_Map.remove((Transaction) sss);
+		if ( message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+			//get_R_Send();
+			Object sss = message.getValue();
+			if (sss != null && trans_Hash_Map != null)
+				trans_Hash_Map.remove((Transaction) sss);
 
-				}
-		
-		
+		}		
 		
 	}
 	public void set_ActionTypes(HashSet str){
@@ -390,8 +390,6 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		Trans trr = new Trans();
 		if (ttt.getType() == Transaction.SEND_ASSET_TRANSACTION) {
 			R_Send tttt = (R_Send) ttt;
-			if (!this.sender.getAddress().equals(tttt.getCreator().getAddress()) 
-					&& !this.sender.getAddress().equals(tttt.getRecipient().getAddress()))	return ;
 				trr.owner = tttt.getCreator();
 				trr.recipient = tttt.getRecipient();
 				trr.transaction = tttt;
@@ -431,10 +429,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			String own = "";
 			if (ttt1.getOwner() != null) own = ttt1.getOwner().getAddress();
 			
-			if ( this.sender.getAddress().equals(cr) ||
-					this.sender.getAddress().equals(own) ||
-					this.sender.getAddress().equals(ttt1.getRecipient().getAddress()))	{
-				
+						
 				trr.transaction = ttt1;
 				trr.ammount = ttt1.getAmount();
 				// if send
@@ -459,7 +454,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				if (actionTypes.contains(ttt1.viewTypeName())){
 					trans_Hash_Map.put(ttt.viewSignature(), trr);
 				}
-			}
+			
 		}
 					
 	}
@@ -471,6 +466,10 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		public Account recipient;
 		public Transaction transaction;
 
+	}
+	public void deleteObserver(){
+		Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+		
 	}
 
 }

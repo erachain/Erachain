@@ -7,6 +7,8 @@ import java.net.Socket;
 import controller.Controller;
 import core.transaction.Transaction;
 import database.DBSet;
+import database.PeerMap;
+import datachain.DCSet;
 import gui.status.WalletStatus;
 import lang.Lang;
 import ntp.NTP;
@@ -30,6 +32,8 @@ public class ConnectionAcceptor extends Thread{
 	public void run()
 	{
 		this.isRun = true;
+		
+		PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
 		while(isRun)
 		{
 			try
@@ -79,7 +83,7 @@ public class ConnectionAcceptor extends Thread{
 							)
 							||
 							*/
-							DBSet.getInstance().getPeerMap().isBanned(connectionSocket.getInetAddress().getAddress())
+							map.isBanned(connectionSocket.getInetAddress().getAddress())
 							)
 						
 					{
@@ -95,7 +99,9 @@ public class ConnectionAcceptor extends Thread{
 
 						//CREATE PEER
 						////new Peer(callback, connectionSocket);
-						LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress());
+						LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
+								+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
+								+ " my:" + Network.getMyselfAddress());
 
 						callback.startPeer(connectionSocket);
 					}
@@ -105,13 +111,13 @@ public class ConnectionAcceptor extends Thread{
 			{
 
 				try{ 
-					Thread.sleep(100);	
+					Thread.sleep(1000);	
 				} catch(Exception es)
 				{
 				}
 
-				LOGGER.info(e.getMessage(),e);
-				LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());			
+				//LOGGER.info(e.getMessage(),e);
+				//LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());			
 			}
 		}
 	}

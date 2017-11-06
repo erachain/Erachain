@@ -12,7 +12,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import database.DBSet;
+import datachain.DCSet;
 
 public class Payment {
 
@@ -115,7 +115,7 @@ public class Payment {
 	
 	//PROCESS/ORPHAN
 
-	public void process(PublicKeyAccount sender, DBSet db) 
+	public void process(PublicKeyAccount sender, DCSet db) 
 	{
 		//UPDATE SENDER
 		//sender.setBalance(this.asset, sender.getBalance(db, this.asset).subtract(this.amount), db);
@@ -126,7 +126,7 @@ public class Payment {
 		this.recipient.changeBalance(db, false, this.asset, this.amount);
 	}	
 	
-	public void orphan(PublicKeyAccount sender, DBSet db) 
+	public void orphan(PublicKeyAccount sender, DCSet db) 
 	{
 		//UPDATE SENDER
 		//sender.setBalance(this.asset, sender.getBalance(db, this.asset).add(this.amount), db);

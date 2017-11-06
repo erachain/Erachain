@@ -33,7 +33,7 @@ import core.transaction.R_Send;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.models.AccountsComboBoxModel;
 import gui.records.Record_Info;
 import gui.records.VouchRecordDialog;
@@ -190,7 +190,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			return record;
 		}
 		
-		record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jParentRecTxt.getText());
+		record = R_Vouch.getVouchingRecord(DCSet.getInstance(), jParentRecTxt.getText());
 		if (record == null) {
 			infoPanel.show_mess(Lang.getInstance().translate("Error")+" - use 1233-321.");
 	        jLabel_RecordInfo.setViewportView(infoPanel);
@@ -307,8 +307,8 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		int version = 0;
 		if (PersonSetStatusDialog.parentRecord != null) {
-			int blockID = PersonSetStatusDialog.parentRecord.getBlockHeight(DBSet.getInstance());
-			int seqNo = PersonSetStatusDialog.parentRecord.getSeqNo(DBSet.getInstance());
+			int blockID = PersonSetStatusDialog.parentRecord.getBlockHeight(DCSet.getInstance());
+			int seqNo = PersonSetStatusDialog.parentRecord.getSeqNo(DCSet.getInstance());
 			byte[] bytesParent = Ints.toByteArray(blockID);
 			bytesParent = Bytes.concat(bytesParent, Ints.toByteArray(seqNo));
 			refParent = Longs.fromByteArray(bytesParent);

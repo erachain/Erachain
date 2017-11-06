@@ -26,9 +26,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.ItemFactory;
-import database.Item_Map;
-//import database.BalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.Item_Map;
 
 public class Genesis_Record extends Transaction 
 {

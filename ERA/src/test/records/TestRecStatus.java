@@ -22,13 +22,9 @@ import core.item.statuses.StatusCls;
 import core.transaction.IssueStatusRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-
+import datachain.DCSet;
+import datachain.ItemStatusMap;
 import utils.Corekeys;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
-import database.ItemStatusMap;
 
 public class TestRecStatus {
 
@@ -47,7 +43,7 @@ public class TestRecStatus {
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -60,12 +56,17 @@ public class TestRecStatus {
 	// INIT STATUSS
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(db), db);
+		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		statusMap = db.getItemStatusMap();
@@ -156,7 +157,7 @@ public class TestRecStatus {
 			assertEquals(issueStatusRecord.getFee(), parsedIssueStatusTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(issueStatusRecord.getReference(), parsedIssueStatusTransaction.getReference());	
+			//assertEquals(issueStatusRecord.getReference(), parsedIssueStatusTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueStatusRecord.getTimestamp(), parsedIssueStatusTransaction.getTimestamp());				
@@ -215,7 +216,7 @@ public class TestRecStatus {
 		assertEquals(false, db.getItemStatusMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(issueStatusRecord.getReference(), maker.getLastReference(db));
+		//assertEquals(issueStatusRecord.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999

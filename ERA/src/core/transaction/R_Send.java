@@ -30,8 +30,8 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 import utils.Converter;
 
 /*
@@ -396,7 +396,7 @@ public class R_Send extends TransactionAmount {
 	}
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		if (head.getBytes(StandardCharsets.UTF_8).length >256) 
 			return INVALID_HEAD_LENGTH;

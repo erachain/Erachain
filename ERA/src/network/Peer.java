@@ -17,8 +17,10 @@ import java.util.concurrent.TimeUnit;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.BlockChain;
 import core.transaction.Transaction;
 import database.DBSet;
+import database.PeerMap;
 import lang.Lang;
 import network.message.Message;
 import network.message.MessageFactory;
@@ -31,6 +33,9 @@ public class Peer extends Thread{
 	private InetAddress address;
 	private ConnectionCallback callback;
 	private Socket socket;
+	// KEEP_ALIVE = false - as web browser - getConnectionTimeout will break connection
+	private static boolean KEEP_ALIVE = true;
+	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<12:1024<<10;
 	private OutputStream out;
 	private Pinger pinger;
 	private boolean white;
@@ -63,10 +68,13 @@ public class Peer extends Thread{
 			this.errors = 0;
 			
 			//ENABLE KEEPALIVE
-			//this.socket.setKeepAlive(true);
+			this.socket.setKeepAlive(KEEP_ALIVE);
 			
 			//TIMEOUT
 			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
+			
+			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
+			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 			
 			//CREATE STRINGWRITER
 			this.out = socket.getOutputStream();
@@ -111,8 +119,11 @@ public class Peer extends Thread{
 			this.errors = 0;
 			
 			//ENABLE KEEPALIVE
-			//this.socket.setKeepAlive(true);
-			
+			this.socket.setKeepAlive(KEEP_ALIVE);
+
+			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
+			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
+
 			//TIMEOUT
 			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
 			
@@ -169,6 +180,11 @@ public class Peer extends Thread{
 		return this.pinger.getPing();
 	}
 	
+	public void setPing(long ping)
+	{		
+		this.pinger.setPing(ping);
+	}
+	
 	public boolean isPinger()
 	{
 		return this.pinger != null;
@@ -181,7 +197,7 @@ public class Peer extends Thread{
 	// connect and run
 	public void connect(ConnectionCallback callback)
 	{
-		if(DBSet.getInstance().isStoped()){
+		if(Controller.getInstance().isOnStopping()){
 			return;
 		}
 		
@@ -199,13 +215,16 @@ public class Peer extends Thread{
 			this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 			
 			//ENABLE KEEPALIVE
-			//steep++;
-			//this.socket.setKeepAlive(true);
-			
+			steep++;
+			this.socket.setKeepAlive(true);
+
 			//TIMEOUT
 			steep++;
 			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
 			
+			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
+			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
+
 			//CREATE STRINGWRITER
 			steep++;
 			this.out = socket.getOutputStream();
@@ -253,19 +272,26 @@ public class Peer extends Thread{
 		while(true)
 		{
 
-			try {
-				Thread.sleep(10);
-			}
-			catch (Exception e) {		
-			}
-
 			// CHECK connection
 			if (socket == null || !socket.isConnected() || socket.isClosed()
 					|| !runed
 					) {
 				
+				try {
+					Thread.sleep(1000);
+				}
+				catch (Exception e) {		
+				}
+
 				in = null;				
 				continue;
+			} else {
+				try {
+					Thread.sleep(network.Network.PEER_SLEEP_TIME);
+				}
+				catch (Exception e) {		
+				}
+
 			}
 			
 			// CHECH stream
@@ -369,6 +395,8 @@ public class Peer extends Thread{
 				return false;
 			}
 			
+			//LOGGER.debug("try sendMessage to: " + this.socket.getInetAddress() + " " + message.viewType());
+
 			//SEND MESSAGE
 			synchronized(this.out)
 			{
@@ -376,15 +404,20 @@ public class Peer extends Thread{
 				this.out.flush();
 			}
 			
+			//LOGGER.debug("try sendMessage OK ");
+
 			//RETURN
 			return true;
 		}
 		catch (Exception e) 
 		{
 			//ERROR
+			//LOGGER.debug("try sendMessage ERROR to " + this.address + " " + Message.viewType(message.getType()));
 			//LOGGER.debug(e.getMessage(),e);
+			//callback.tryDisconnect(this, 0, e.getMessage());
 			callback.tryDisconnect(this, 0, e.getMessage());
-			
+			//LOGGER.debug("ERROR sendMessage to: " + this.socket.getInetAddress() + " " + message.viewType());
+
 			//RETURN
 			return false;
 		}
@@ -446,11 +479,11 @@ public class Peer extends Thread{
 	
 	public boolean isBad()
 	{
-		return DBSet.getInstance().getPeerMap().isBad(this.getAddress()); 
+		return Controller.getInstance().getDBSet().getPeerMap().isBad(this.getAddress()); 
 	}
 	public boolean isBanned()
 	{
-		return DBSet.getInstance().getPeerMap().isBanned(address.getAddress());
+		return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
 	}
 	
 

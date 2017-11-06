@@ -13,8 +13,8 @@ import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.Gui;
 import utils.ObserverMessage;
 import utils.Pair;		
@@ -53,7 +53,7 @@ public class AssetsFavorites implements Observer{
 		List<Long> favoritesUpadate = new ArrayList<Long>();
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balancesList = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
+			SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balancesList = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
 			
 			for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance : balancesList) {
 				if(balance.getB().a.compareTo(BigDecimal.ZERO) != 0

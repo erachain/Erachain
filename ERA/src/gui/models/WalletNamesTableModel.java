@@ -10,8 +10,8 @@ import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.naming.Name;
-import database.SortableList;
 import database.wallet.NameMap;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")

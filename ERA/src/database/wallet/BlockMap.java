@@ -23,11 +23,13 @@ import org.mapdb.BTreeMap;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.ReverseComparator;
-import database.DBMap;
-import database.DBSet;
 import database.serializer.BlockSerializer;
+import database.DBMap;
+import database.IDB;
+import datachain.DCMap;
+import datachain.DCSet;
 
-public class BlockMap extends DBMap<Tuple2<String, String>, Block>
+public class BlockMap extends DCMap<Tuple2<String, String>, Block>
 {
 	public static final int TIMESTAMP_INDEX = 1;
 	public static final int GENERATOR_INDEX = 2;
@@ -39,18 +41,14 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 	
 	static Logger LOGGER = Logger.getLogger(BlockMap.class.getName());
 
-	public BlockMap(WalletDatabase walletDatabase, DB database)
+	public BlockMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database);
+		super(dWSet, database);
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_BLOCK_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BLOCK_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BLOCK_TYPE);
-	}
-
-	public BlockMap(BlockMap parent) 
-	{
-		super(parent, null);
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -69,7 +67,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Long, Tuple2<String, String>, Block>() {
 		   	@Override
 		    public Long run(Tuple2<String, String> key, Block value) {
-		   		return value.getTimestamp(DBSet.getInstance());
+		   		return value.getTimestamp(DCSet.getInstance());
 		    }
 		});
 		
@@ -101,7 +99,7 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Tuple2<String, String>, Block>() {
 		   	@Override
 		    public Integer run(Tuple2<String, String> key, Block value) {
-		   		return value.getGeneratingBalance(DBSet.getInstance());
+		   		return value.getGeneratingBalance(DCSet.getInstance());
 		    }
 		});
 		
@@ -239,12 +237,14 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 		for(Tuple2<String, String> key: accountBlocks.keySet())
 		{
 			this.delete(key);
+			this.databaseSet.commit();
 		}
 	}
 	
 	public void delete(Block block)
 	{
 		this.delete(new Tuple2<String, String>(block.getCreator().getAddress(), new String(block.getSignature())));
+		this.databaseSet.commit();
 	}
 	
 	public void deleteAll(List<Account> accounts)
@@ -257,7 +257,9 @@ public class BlockMap extends DBMap<Tuple2<String, String>, Block>
 	
 	public boolean add(Block block)
 	{
-		return this.set(new Tuple2<String, String>(block.getCreator().getAddress(), new String(block.getSignature())), block);
+		boolean result = this.set(new Tuple2<String, String>(block.getCreator().getAddress(), new String(block.getSignature())), block);
+		this.databaseSet.commit();
+		return result;
 	}
 	
 	public void addAll(Map<Account, List<Block>> blocks)

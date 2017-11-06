@@ -3,11 +3,9 @@ package core.item.imprints;
 
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-//import database.DBMap;
-import database.DBSet;
-import database.Item_Map;
-//import database.wallet.FavoriteItemImprint;
-import database.Issue_ItemMap;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 
 public abstract class ImprintCls extends ItemCls {
 		
@@ -30,11 +28,11 @@ public abstract class ImprintCls extends ItemCls {
 	public String getItemTypeStr() { return "imprint"; }
 	
 	// DB
-	public Item_Map getDBMap(DBSet db)
+	public Item_Map getDBMap(DCSet db)
 	{
 		return db.getItemImprintMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
 		return db.getIssueImprintMap();
 	}	

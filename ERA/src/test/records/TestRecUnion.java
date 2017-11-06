@@ -33,13 +33,8 @@ import core.transaction.IssueUnionRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.wallet.Wallet;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
-//import database.AddressUnionMap;
-//import database.UnionAddressMap;
-import database.KKUnionStatusMap;
+import datachain.DCSet;
+import datachain.KKUnionStatusMap;
 
 public class TestRecUnion {
 
@@ -59,7 +54,7 @@ public class TestRecUnion {
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -99,10 +94,15 @@ public class TestRecUnion {
 	// INIT UNIONS
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		//dbPA = db.getUnionAddressMap();
 		//dbAP = db.getAddressUnionMap();
@@ -116,7 +116,7 @@ public class TestRecUnion {
 		//GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
 		//genesis_certify.process(db, false);
 		
-		certifier.setLastReference(gb.getTimestamp(db), db);
+		certifier.setLastTimestamp(gb.getTimestamp(db), db);
 		certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD);
 		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
@@ -277,7 +277,7 @@ public class TestRecUnion {
 		assertEquals(union.getName(), parsedUnion.getName());
 			
 		//CHECK REFERENCE
-		assertEquals(issueUnionTransaction.getReference(), parsedIssueUnionRecord.getReference());	
+		//assertEquals(issueUnionTransaction.getReference(), parsedIssueUnionRecord.getReference());	
 		
 		//CHECK TIMESTAMP
 		assertEquals(issueUnionTransaction.getTimestamp(), parsedIssueUnionRecord.getTimestamp());				
@@ -347,7 +347,7 @@ public class TestRecUnion {
 		assertEquals(false, db.getItemUnionMap().contains(unionKey));
 						
 		//CHECK REFERENCE ISSUER
-		assertEquals(issueUnionTransaction.getReference(), certifier.getLastReference(db));
+		//assertEquals(issueUnionTransaction.getReference(), certifier.getLastReference(db));
 	}
 	
 	

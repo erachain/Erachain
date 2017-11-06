@@ -21,14 +21,14 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
+
 import api.ApiErrorFactory;
 
 //import com.google.common.primitives.Bytes;
 
 import at.AT_Transaction;
-import database.Item_Map;
-import database.DBSet;
-import database.NameMap;
 import lang.Lang;
 import controller.Controller;
 import core.BlockChain;
@@ -48,6 +48,10 @@ import core.naming.Name;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
+import datachain.DCSet;
+import datachain.Item_Map;
+import datachain.NameMap;
+import datachain.ReferenceMap;
 import ntp.NTP;
 import settings.Settings;
 import utils.NameUtils;
@@ -145,9 +149,9 @@ public class Account {
 	*/
 	public BigDecimal getBalanceUSE(long key)
 	{
-		return this.getBalanceUSE(key, DBSet.getInstance());
+		return this.getBalanceUSE(key, DCSet.getInstance());
 	}	
-	public BigDecimal getBalanceUSE(long key, DBSet db)
+	public BigDecimal getBalanceUSE(long key, DCSet db)
 	{
 		if (key < 0)
 			key = -key;
@@ -226,9 +230,9 @@ public class Account {
 
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(long key)
 	{
-		return this.getBalance(DBSet.getInstance(), key);
+		return this.getBalance(DCSet.getInstance(), key);
 	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(DBSet db, long key)
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalance(DCSet db, long key)
 	{
 		if (key < 0)
 			key = -key;
@@ -236,7 +240,7 @@ public class Account {
 		return db.getAssetBalanceMap().get(getAddress(), key);
 	}
 	
-	public BigDecimal getBalance(DBSet db, long key, int actionType)
+	public BigDecimal getBalance(DCSet db, long key, int actionType)
 	{
 		if (key < 0)
 			key = -key;
@@ -280,7 +284,7 @@ public class Account {
 	}
 	
 	// change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DBSet db, boolean subtract, long key, BigDecimal amount) 
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean subtract, long key, BigDecimal amount) 
 	{
 		
 		int type = actionType(key, amount);
@@ -361,9 +365,9 @@ public class Account {
 	
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getConfBalance3(int confirmations, long key)
 	{
-		return this.getConfBalance3(confirmations, key, DBSet.getInstance());
+		return this.getConfBalance3(confirmations, key, DCSet.getInstance());
 	}
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getConfBalance3(int confirmations, long key, DBSet db)
+	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getConfBalance3(int confirmations, long key, DCSet db)
 	{
 		//CHECK IF UNCONFIRMED BALANCE
 		if(confirmations <= 0)
@@ -500,32 +504,57 @@ public class Account {
 	
 	public Long getLastReference()
 	{
-		return this.getLastReference(DBSet.getInstance());
+		return this.getLastReference(DCSet.getInstance());
 	}
 	
-	public Long getLastReference(DBSet db)
+	public Long getLastReference(DCSet db)
 	{
 		return db.getReferenceMap().get(this.getAddress());
 	}
-	
+
+	/*
 	public void setLastReference(Long timestamp)
 	{
 		this.setLastReference(timestamp, DBSet.getInstance());
 	}
+	*/
 	
-	public void setLastReference(Long timestamp, DBSet db)
+	public void setLastTimestamp(Long timestamp, DCSet db)
 	{
-		db.getReferenceMap().set(this.getAddress(), timestamp);
+		byte[] key = Base58.decode(this.getAddress());
+		ReferenceMap map = db.getReferenceMap();
+
+		// GET CURRENT REFERENCE
+		Long reference = map.get(key);
+		
+		// MAKE KEY for this TIMESTAMP
+		byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+		
+		// set NEW LAST TIMESTAMP as REFERENCE
+		map.set(keyTimestamp, reference);
+
+		// SET NEW REFERENCE
+		map.set(key, timestamp);
 	}
-	
-	public void removeReference() 
+		
+	public void removeLastTimestamp(DCSet db) 
 	{
-		this.removeReference(DBSet.getInstance());
-	}
-	
-	public void removeReference(DBSet db) 
-	{
-		db.getReferenceMap().delete(this.getAddress());
+		byte[] key = Base58.decode(this.getAddress());
+		ReferenceMap map = db.getReferenceMap();
+				
+		// GET LAST TIMESTAMP
+		Long timestamp = map.get(key);
+
+		// MAKE KEY for this TIMESTAMP
+		byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+
+		// GET REFERENCE
+		Long reference = map.get(keyTimestamp);
+		
+		// DELETE TIMESTAMP - REFERENCE
+		map.delete(keyTimestamp);
+		// SET OLD REFERENCE
+		map.set(key, reference);
 	}
 	
 	//TOSTRING
@@ -686,14 +715,14 @@ public class Account {
 	}
 
 	// personKey, days, block, reference
-	public static Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DBSet db, String address) {
+	public static Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db, String address) {
 		return db.getAddressPersonMap().getItem(address);				
 	}
-	public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DBSet db) {
+	public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
 		return getPersonDuration(db, this.address);
 	}
 	
-	public boolean isPerson(DBSet db) {
+	public boolean isPerson(DCSet db) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
 		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
@@ -720,7 +749,7 @@ public class Account {
 		return true;
 		
 	}
-	public Tuple2<Integer, PersonCls> getPerson(DBSet db) {
+	public Tuple2<Integer, PersonCls> getPerson(DCSet db) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
 		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
@@ -758,11 +787,11 @@ public class Account {
 		
 	}
 	public Tuple2<Integer, PersonCls> getPerson() {
-		return getPerson(DBSet.getInstance());
+		return getPerson(DCSet.getInstance());
 	}
 	
 	// previous forging block
-	public Integer getForgingData(DBSet db, int height) {
+	public Integer getForgingData(DCSet db, int height) {
 		return db.getAddressForging().get(this.address, height);
 	}
 	/*
@@ -770,13 +799,13 @@ public class Account {
 		db.getAddressForging().set(this.address, height, prevHeight);
 	}
 	*/
-	public void setForgingData(DBSet db, int height) {
+	public void setForgingData(DCSet db, int height) {
 		db.getAddressForging().set(this.address, height);
 	}
-	public void delForgingData(DBSet db, int height) {
+	public void delForgingData(DCSet db, int height) {
 		db.getAddressForging().delete(this.address, height);
 	}
-	public Integer getLastForgingData(DBSet db) {
+	public Integer getLastForgingData(DCSet db) {
 		return db.getAddressForging().getLast(this.address);
 	}
 	/*
@@ -786,9 +815,9 @@ public class Account {
 	*/
 	
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public long calcWinValue(DBSet dbSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {
+	public long calcWinValue(DCSet dcSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {
 		
-		int generatingBalance = Block.calcGeneratingBalance(dbSet, this, height);
+		int generatingBalance = Block.calcGeneratingBalance(dcSet, this, height);
 		
 		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
 			return 0l;
@@ -802,7 +831,7 @@ public class Account {
 		}
 		
 		// TEST STRONG of win Value
-		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dbSet, this, height);
+		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this, height);
 		if (previousForgingHeight < 1)
 			return 0l;
 
@@ -823,18 +852,18 @@ public class Account {
 		
 		Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
 
-		Collection<Tuple2<String, Long>> addrs = DBSet.getInstance().getAssetBalanceMap().getKeys();
+		Collection<Tuple2<String, Long>> addrs = DCSet.getInstance().getAssetBalanceMap().getKeys();
 		
 		for (Tuple2<String, Long> addr : addrs) {
 			if(addr.b == key)
 			{
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DBSet.getInstance().getAssetBalanceMap().get(addr);
+				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DCSet.getInstance().getAssetBalanceMap().get(addr);
 				values.put(addr.a, ball.a);
 			}
 		}
 
 		// add ORDER values
-		Collection<Order> orders = DBSet.getInstance().getOrderMap().getValues();
+		Collection<Order> orders = DCSet.getInstance().getOrderMap().getValues();
 
 		for (Order order : orders) {
 			if(order.getHave() == key)

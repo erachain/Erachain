@@ -19,10 +19,9 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import datachain.DCSet;
 
 import com.google.common.collect.Lists;
-
-import database.DBSet;
 
 public class ATWebResource {
 	
@@ -39,21 +38,21 @@ public class ATWebResource {
 	
 	private AT getAT(String id)
 	{
-		return DBSet.getInstance().getATMap().get(id);
+		return DCSet.getInstance().getATMap().get(id);
 	}
 	
 	public Collection<String> getIdsByType(String type)
 	{
-		return DBSet.getInstance().getATMap().getTypeATsList(type);
+		return DCSet.getInstance().getATMap().getTypeATsList(type);
 	}
 	
 	public Map<String, Collection<String>> getIdsByTypeAndTags(String type)
 	{
 		Map<String, Collection<String>> tagMap = new TreeMap<String, Collection<String>>();
-		Collection<String> ats = DBSet.getInstance().getATMap().getTypeATsList(type);
+		Collection<String> ats = DCSet.getInstance().getATMap().getTypeATsList(type);
 		for (String at : ats)
 		{
-			String[] tags = DBSet.getInstance().getATMap().get(at).getTags().split(",");
+			String[] tags = DCSet.getInstance().getATMap().get(at).getTags().split(",");
 			
 			for (String tag : tags)
 			{
@@ -80,17 +79,17 @@ public class ATWebResource {
 	
 	public String getIncTxCount(String atId)
 	{
-		return String.valueOf(DBSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId).size());
+		return String.valueOf(DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId).size());
 	}
 	
 	public List<Transaction> getIncomingTransactions(String atId)
 	{
-		return DBSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId);
+		return DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId);
 	}
 	
 	public List<AT_Transaction> getOutgoingTransactions(String atId)
 	{
-		return DBSet.getInstance().getATTransactionMap().getATTransactionsBySender( atId );
+		return DCSet.getInstance().getATTransactionMap().getATTransactionsBySender( atId );
 	}
 	
 	public List<AT_Transaction> getOutgoingTransactions(AT at)
@@ -100,12 +99,12 @@ public class ATWebResource {
 	
 	public Collection<String> getATsByCreator(String creator)
 	{
-		return Lists.newArrayList(DBSet.getInstance().getATMap().getATsByCreator(creator));
+		return Lists.newArrayList(DCSet.getInstance().getATMap().getATsByCreator(creator));
 	}
 	
 	public Collection<String> getOrderedATs(int height)
 	{
-		return Lists.newArrayList(DBSet.getInstance().getATMap().getOrderedATs(height));
+		return Lists.newArrayList(DCSet.getInstance().getATMap().getOrderedATs(height));
 	}
 	
 	public String getAsHex(String atId, String startPos, String endPos)
@@ -215,7 +214,7 @@ public class ATWebResource {
 	
 	public List<Transaction> getMessageTransactions(String address)
 	{
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.SEND_ASSET_TRANSACTION, 50);
+		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.SEND_ASSET_TRANSACTION, 50);
 		return txs;
 		
 	}

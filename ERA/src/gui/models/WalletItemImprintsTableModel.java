@@ -10,8 +10,8 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.imprints.ImprintCls;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -87,7 +87,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		{
 		case COLUMN_KEY:
 			
-			return imprint.getKey(DBSet.getInstance());
+			return imprint.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			

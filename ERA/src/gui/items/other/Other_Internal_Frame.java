@@ -14,9 +14,9 @@ import javax.swing.JTable;
 import controller.Controller;
 import core.BlockChain;
 import core.transaction.Transaction;
-import database.BlockMap;
-import database.DBSet;
-import database.TransactionMap;
+import datachain.BlockMap;
+import datachain.DCSet;
+import datachain.TransactionMap;
 import gui.CoreRowSorter;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
@@ -32,7 +32,7 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 	
 	private BlocksTableModel blocksTableModel;
 	private PeersTableModel peersTableModel;
-	private TransactionsTableModel transactionsTableModel;
+	
 
 	
 	public  Other_Internal_Frame(){
@@ -211,9 +211,8 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 	public void close() 
 	{
 		//REMOVE OBSERVERS/HANLDERS
-		this.peersTableModel.removeObservers();
+		this.peersTableModel.deleteObserver();
 		
-		this.transactionsTableModel.removeObservers();
 		
 		this.blocksTableModel.removeObservers();
 		

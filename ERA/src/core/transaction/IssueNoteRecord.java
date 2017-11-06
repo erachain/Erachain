@@ -25,8 +25,7 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
-//import database.ItemMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public class IssueNoteRecord extends Issue_ItemRecord 
 {
@@ -71,7 +70,7 @@ public class IssueNoteRecord extends Issue_ItemRecord
 	}
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {	
+	public int isValid(DCSet db, Long releaserReference) {	
 
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 

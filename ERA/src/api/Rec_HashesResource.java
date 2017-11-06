@@ -32,7 +32,7 @@ import core.crypto.Crypto;
 import core.naming.Name;
 import core.transaction.R_Hashes;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 import ntp.NTP;
 import utils.APIUtils;
@@ -118,7 +118,7 @@ public class Rec_HashesResource {
 			} else {
 				hashes = hashesStr.split(" ");
 			}
-			twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
+			twins = R_Hashes.findTwins(DCSet.getInstance(), hashes);
 			if (twins.size() > 0) {
 				JSONObject json_result = new JSONObject();
 				json_result.put("error", "twin hashes");

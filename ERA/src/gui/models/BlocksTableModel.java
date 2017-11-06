@@ -1,10 +1,14 @@
 package gui.models;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import utils.DateTimeFormat;
 import utils.NumberAsString;
@@ -14,13 +18,15 @@ import controller.Controller;
 import core.BlockChain;
 import core.block.Block;
 import core.transaction.Transaction;
-import database.BlockMap;
 import database.DBSet;
-import database.SortableList;
+import database.wallet.DWSet;
+import datachain.BlockMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class BlocksTableModel extends TableModelCls<byte[], Block> implements Observer{
+public class BlocksTableModel extends AbstractTableModel implements Observer{
 
 	public static final int COLUMN_HEIGHT = 0;
 	public static final int COLUMN_TIMESTAMP = 1;
@@ -29,7 +35,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 	public static final int COLUMN_TRANSACTIONS = 4;
 	public static final int COLUMN_FEE = 5;
 	
-	private SortableList<byte[], Block> blocks;
+	private List<Block> blocks;
 	private long winValue = 0l;
 	private boolean is_Select_Last_100_Block;
 	
@@ -42,8 +48,11 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 
 	public BlocksTableModel(boolean select_Last_100)
 	{
-		Controller.getInstance().addObserver(this);
-		is_Select_Last_100_Block = select_Last_100;
+	//	Controller.getInstance().addObserver(this);
+		DCSet.getInstance().getBlockMap().addObserver(this);
+
+		resetRows();
+
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -61,11 +70,15 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			this.column_AutuHeight = arg0;	
 		}
 		
-	
+	/*
 	@Override
 	public SortableList<byte[], Block> getSortableList() {
 		return this.blocks;
 	}
+	public SortableList<byte[], Block> getSortableList() {
+		return this.blocks;
+	}
+	*/
 	
 	@Override
 	public int getColumnCount() 
@@ -87,9 +100,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 			return 0;
 		}
 		
-		if (!is_Select_Last_100_Block || blocks.size()<100) return blocks.size();
-		
-		return 100; //blocks.size();
+		return blocks.size();
 	}
 
 	@Override
@@ -104,49 +115,82 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 				return null;
 			}
 			
-			Pair<byte[], Block> data = this.blocks.get(row);
-			if (data == null || data.getB() == null) {
+			Block block = this.blocks.get(row);
+			//Block block = data.getB();
+			if (block == null) {
 				//this.blocks.rescan();
 				//data = this.blocks.get(row);
-				return -1;
+			//	return -1;
 			}
 
-			Block block = data.getB();
-			DBSet dbSet = DBSet.getInstance();
+			DCSet dcSet = DCSet.getInstance();
 			
 			switch(column)
 			{
 			case COLUMN_HEIGHT:
 
+				if (block == null) {
+					//this.blocks.rescan();
+					//data = this.blocks.get(row);
+					return "-1";
+				}
 				if (row == 0) {
-					return block.getHeight(DBSet.getInstance())
-							+ " " + Controller.getInstance().getBlockChain().getFullWeight(dbSet);
+					return block.getHeight(dcSet)
+							+ " " + Controller.getInstance().getBlockChain().getFullWeight(dcSet);
 					
 				}
 				
-				return block.getHeight(dbSet)
-						 + " " + BlockChain.getTarget(dbSet, block);
+				
+				return block.getHeight(dcSet)
+						 + " " + BlockChain.getTarget(dcSet, block);
 				
 			case COLUMN_TIMESTAMP:
+				if (block == null) {
+					//this.blocks.rescan();
+					//data = this.blocks.get(row);
+					return "-1";
+				}
 				
-				return DateTimeFormat.timestamptoString(block.getTimestamp(dbSet));// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
+				return DateTimeFormat.timestamptoString(block.getTimestamp(dcSet));// + " " + block.getTimestamp(DBSet.getInstance())/ 1000;
 				
 			case COLUMN_GENERATOR:
 				
+				if (block == null) {
+					//this.blocks.rescan();
+					//data = this.blocks.get(row);
+					return "-1";
+				}
 				return block.getCreator().getPersonAsString();
+				
 				
 			case COLUMN_BASETARGET:
 				
-				return block.getGeneratingBalance(dbSet) + " "
-						+ Block.getPreviousForgingHeightForCalcWin(dbSet, block.getCreator(), block.getHeight(dbSet)) + " "
-						+ block.calcWinValue(dbSet) + " "
-						+ block.calcWinValueTargeted(dbSet);
+				if (block == null) {
+					//this.blocks.rescan();
+					//data = this.blocks.get(row);
+					return "-1";
+				}
+				
+				return block.getGeneratingBalance(dcSet) + " "
+						+ Block.getPreviousForgingHeightForCalcWin(dcSet, block.getCreator(), block.getHeight(dcSet)) + " "
+						+ block.calcWinValue(dcSet) + " "
+						+ block.calcWinValueTargeted(dcSet);
 				
 			case COLUMN_TRANSACTIONS:
+				if (block == null) {
+					//this.blocks.rescan();
+					//data = this.blocks.get(row);
+					return -1;
+				}
 				
 				return block.getTransactionCount();
 				
 			case COLUMN_FEE:	
+				if (block == null) {
+					//this.blocks.rescan();
+					//data = this.blocks.get(row);
+					return "-1";
+				}
 				
 				return NumberAsString.getInstance().numberAsString(block.getTotalFee());
 				
@@ -170,6 +214,7 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 		catch(Exception e)
 		{
 			//GUI ERROR
+			LOGGER.error(e.getMessage(), e);
 		}
 	}
 	
@@ -177,30 +222,58 @@ public class BlocksTableModel extends TableModelCls<byte[], Block> implements Ob
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
+		int type = message.getType();
 		
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
+		if(type == ObserverMessage.CHAIN_LIST_BLOCK_TYPE)
 		{			
-			if(this.blocks == null)
+			//CHECK IF NEW LIST
+
+			LOGGER.error("gui.models.BlocksTableModel.syncUpdate- CHAIN_LIST_BLOCK_TYPE");
+			if (blocks == null)
 			{
-				this.blocks = (SortableList<byte[], Block>) message.getValue();
-				this.blocks.registerObserver();
-				this.blocks.sort(BlockMap.HEIGHT_INDEX, true);
-			}	
-			
+			this.resetRows();
 			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE)
+			}
+			
+		} else if(type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)
 		{
+			//CHECK IF LIST UPDATED
+			this.blocks.add(0, (Block)message.getValue());
+			this.fireTableRowsInserted(0, 0);			
+			if (this.blocks.size() > 100) {
+				this.blocks.remove(100);
+				this.fireTableRowsDeleted(100, 100);							
+			}
+
+		} else if(type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)
+		{
+			//CHECK IF LIST UPDATED
+			this.blocks.remove(0);
+			this.fireTableRowsDeleted(0, 0);			
+
+		} else if(type == ObserverMessage.CHAIN_RESET_BLOCK_TYPE)
+		{
+			//CHECK IF LIST UPDATED
+			LOGGER.error("gui.models.BlocksTableModel.syncUpdate- CHAIN_RESET_BLOCK_TYPE");
+			resetRows();
 			this.fireTableDataChanged();
 		}
 	}
 
+	public void resetRows() {
+		this.blocks = new ArrayList<Block>();
+		Block block = Controller.getInstance().getLastBlock();
+		for (int i=0; i<100; i++) {
+			this.blocks.add(block);
+			block = Controller.getInstance().getBlock(block.getReference());
+			if (block == null)
+				return;
+		}
+	}
+		
 	public void removeObservers() 
 	{
-		this.blocks.removeObserver();
-		Controller.getInstance().deleteObserver(this);
+		//this.blocks.removeObserver();
+		DCSet.getInstance().getBlockMap().deleteObserver(this);
 	}
 }

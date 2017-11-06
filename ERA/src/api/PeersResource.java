@@ -23,8 +23,8 @@ import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
-import database.DBSet;
 import database.PeerMap.PeerInfo;
+import datachain.DCSet;
 import network.Peer;
 import network.PeerManager;
 import ntp.NTP;
@@ -74,7 +74,7 @@ public class PeersResource
 					ApiErrorFactory.ERROR_INVALID_NETWORK_ADDRESS);
 		}
 		peer.addPingCounter();
-		DBSet.getInstance().getPeerMap().addPeer(peer, 0);
+		Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 		
 		return "OK";
 	}
@@ -164,7 +164,7 @@ public class PeersResource
 		{
 			o.put("status", "connected");
 		}
-		else if(DBSet.getInstance().getPeerMap().contains(peer.getAddress().getAddress()))
+		else if(Controller.getInstance().getDBSet().getPeerMap().contains(peer.getAddress().getAddress()))
 		{
 			o.put("status", "known disconnected");
 		}
@@ -184,9 +184,9 @@ public class PeersResource
 		}
 		
 		
-		if(DBSet.getInstance().getPeerMap().contains(peer.getAddress().getAddress()))
+		if(Controller.getInstance().getDBSet().getPeerMap().contains(peer.getAddress().getAddress()))
 		{
-			PeerInfo peerInfo = DBSet.getInstance().getPeerMap().getInfo(peer.getAddress());
+			PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
 			
 			o.put("findingTime", DateTimeFormat.timestamptoString(peerInfo.getFindingTime()));
 			o.put("findingTimeStamp", peerInfo.getFindingTime());
@@ -236,7 +236,7 @@ public class PeersResource
 	@Path("known")
 	public String getKnown() throws UnknownHostException
 	{
-		List<String> addresses = DBSet.getInstance().getPeerMap().getAllPeersAddresses(-1);
+		List<String> addresses = Controller.getInstance().getDBSet().getPeerMap().getAllPeersAddresses(-1);
 		
 		JSONArray array = new JSONArray();
 
@@ -266,7 +266,7 @@ public class PeersResource
 	@Path("/known")
 	public String clearPeers()
 	{
-		DBSet.getInstance().getPeerMap().reset();
+		Controller.getInstance().getDBSet().getPeerMap().reset();
 		
 		return "OK";
 	}

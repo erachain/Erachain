@@ -28,12 +28,9 @@ import core.transaction.CreateOrderTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import datachain.DCSet;
 import core.transaction.R_Send;
 import core.transaction.R_Send;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
 
 public class TestRecAsset {
 
@@ -50,7 +47,7 @@ public class TestRecAsset {
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	private BlockChain bchain;
 	Controller cntrl;
@@ -74,7 +71,7 @@ public class TestRecAsset {
 	// INIT ASSETS
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		cntrl = Controller.getInstance();
 		cntrl.initBlockChain(db);
 		bchain = cntrl.getBlockChain();
@@ -82,10 +79,10 @@ public class TestRecAsset {
 		//gb.process(db);
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(db), db);
+		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
-		maker_1.setLastReference(gb.getTimestamp(db), db);
+		maker_1.setLastTimestamp(gb.getTimestamp(db), db);
 		
 		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
@@ -181,7 +178,7 @@ public class TestRecAsset {
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals((long)issueAssetTransaction.getReference(), (long)parsedIssueAssetTransaction.getReference());	
+			//assertEquals((long)issueAssetTransaction.getReference(), (long)parsedIssueAssetTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueAssetTransaction.getTimestamp(), parsedIssueAssetTransaction.getTimestamp());				
@@ -273,7 +270,7 @@ public class TestRecAsset {
 		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.longValue());
 				
 		//CHECK REFERENCE SENDER
-		assertEquals(issueAssetTransaction.getReference(), maker.getLastReference(db));
+		//assertEquals(issueAssetTransaction.getReference(), maker.getLastReference(db));
 	}
 	
 
@@ -409,7 +406,7 @@ public class TestRecAsset {
 			assertEquals(assetTransfer.getTimestamp(), parsedAssetTransfer.getTimestamp());				
 
 			//CHECK REFERENCE
-			assertEquals(assetTransfer.getReference(), parsedAssetTransfer.getReference());	
+			//assertEquals(assetTransfer.getReference(), parsedAssetTransfer.getReference());	
 
 			//CHECK CREATOR
 			assertEquals(assetTransfer.getCreator().getAddress(), parsedAssetTransfer.getCreator().getAddress());				
@@ -509,7 +506,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(assetTransfer.getReference(), maker.getLastReference(db));
+		//assertEquals(assetTransfer.getReference(), maker.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertNotEquals(assetTransfer.getTimestamp(), recipient.getLastReference(db));
@@ -711,7 +708,7 @@ public class TestRecAsset {
 			assertEquals(r_Send.getTimestamp(), parsedAssetTransfer.getTimestamp());				
 
 			//CHECK REFERENCE
-			assertEquals(r_Send.getReference(), parsedAssetTransfer.getReference());	
+			//assertEquals(r_Send.getReference(), parsedAssetTransfer.getReference());	
 
 			//CHECK CREATOR
 			assertEquals(r_Send.getCreator().getAddress(), parsedAssetTransfer.getCreator().getAddress());				
@@ -815,7 +812,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(messageTransaction.getReference(), maker.getLastReference(db));
+		//assertEquals(messageTransaction.getReference(), maker.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertNotEquals(messageTransaction.getTimestamp(), recipient.getLastReference(db));
@@ -1019,7 +1016,7 @@ public class TestRecAsset {
 		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(rsend.getReference(), maker.getLastReference(db));
+		//assertEquals(rsend.getReference(), maker.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertNotEquals(rsend.getTimestamp(), recipient.getLastReference(db));

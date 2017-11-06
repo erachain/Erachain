@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
+import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
 import core.naming.Name;
@@ -20,15 +21,15 @@ import core.transaction.ArbitraryTransactionV3;
 //import core.transaction.GenesisTransaction;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import utils.Pair;
 import utils.Corekeys;
 import utils.StorageUtils;
-import database.DBSet;
 
 @SuppressWarnings("unchecked")
 public class NameStorageTest {
 
-	private DBSet databaseSet;
+	private DCSet databaseSet;
 	private PrivateKeyAccount sender;
 	Long releaserReference = null;
 
@@ -43,7 +44,7 @@ public class NameStorageTest {
 	public void setup() {
 		//Ed25519.load();
 
-		databaseSet = DBSet.createEmptyDatabaseSet();
+		databaseSet = DCSet.createEmptyDatabaseSet();
 
 		// CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -401,7 +402,7 @@ public class NameStorageTest {
 
 		arbitraryTransaction.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
 		assertEquals(
 				"first",
@@ -421,7 +422,7 @@ public class NameStorageTest {
 
 		arbitraryTransaction2.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction2);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
 		assertEquals(
 				"first second",
@@ -464,7 +465,7 @@ public class NameStorageTest {
 		arbitraryTransaction.sign(sender, false);
 		arbitraryTransaction.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
 		// After first tx
 		// Profenable:yes
@@ -485,7 +486,7 @@ public class NameStorageTest {
 		arbitraryTransaction2.sign(sender, false);
 		arbitraryTransaction2.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction2);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
 		// After second tx
 		// Profenable:yes
@@ -506,7 +507,7 @@ public class NameStorageTest {
 		arbitraryTransaction3.sign(sender, false);
 		arbitraryTransaction3.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction3);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
 		// After second tx
 		// Profenable:yes
@@ -570,7 +571,7 @@ public class NameStorageTest {
 		arbitraryTransaction.sign(sender, false);
 		arbitraryTransaction.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
 		// After first tx
 		// Profenable:yes
@@ -591,7 +592,7 @@ public class NameStorageTest {
 		arbitraryTransaction2.sign(sender, false);
 		arbitraryTransaction2.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction2);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
 		// After second tx
 		// Profenable:yes
@@ -612,7 +613,7 @@ public class NameStorageTest {
 		arbitraryTransaction3.sign(sender, false);
 		arbitraryTransaction3.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction3);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
 		// After third tx
 		// Profenable:yes
@@ -693,7 +694,7 @@ public class NameStorageTest {
 		arbitraryTransaction.sign(sender, false);
 		arbitraryTransaction.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
 		// After first tx
 		// Profenable:yes
@@ -714,7 +715,7 @@ public class NameStorageTest {
 		arbitraryTransaction2.sign(sender, false);
 		arbitraryTransaction2.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction2);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
 		// After second tx
 		// Profenable:yes
@@ -735,7 +736,7 @@ public class NameStorageTest {
 		arbitraryTransaction3.sign(sender, false);
 		arbitraryTransaction3.process(databaseSet, null, false);
 
-		databaseSet.getTransactionMap().add(arbitraryTransaction3);
+		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
 		// After third tx
 		// Profenable:yes

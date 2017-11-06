@@ -23,7 +23,7 @@ import core.account.Account;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -53,16 +53,16 @@ public class ForgingStatus extends JLabel implements Observer {
 				long winBalance2 = 0;
 				Account winAccount = null;
 				BlockChain bchain = Controller.getInstance().getBlockChain();
-				List<Block> lastBlocksForTarget = bchain.getLastBlocksForTarget(DBSet.getInstance());
-				int newHeight = bchain.getHeight(DBSet.getInstance()) + 1;
-				long target = bchain.getTarget(DBSet.getInstance());
+				List<Block> lastBlocksForTarget = bchain.getLastBlocksForTarget(DCSet.getInstance());
+				int newHeight = bchain.getHeight(DCSet.getInstance()) + 1;
+				long target = bchain.getTarget(DCSet.getInstance());
 				if (target == 0l)
 					target = 1000l;
 
-				DBSet dbSet = DBSet.getInstance();
+				DCSet dcSet = DCSet.getInstance();
 	            for(Account account: Controller.getInstance().getAccounts())
 		        {
-	            	long win_value = account.calcWinValue(dbSet, bchain, lastBlocksForTarget, newHeight, target);
+	            	long win_value = account.calcWinValue(dcSet, bchain, lastBlocksForTarget, newHeight, target);
 	            	if (Math.abs(win_value) > winBalance) {
 	            		winBalance = Math.abs(win_value);
 	            		winAccount = account;

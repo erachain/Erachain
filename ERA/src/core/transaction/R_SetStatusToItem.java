@@ -33,11 +33,11 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
+import datachain.DCMap;
+import datachain.DCSet;
 import core.item.ItemCls;
 import ntp.NTP;
 import utils.DateTimeFormat;
-import database.DBSet;
-import database.DBMap;
 
 public class R_SetStatusToItem extends Transaction {
 
@@ -328,7 +328,7 @@ public class R_SetStatusToItem extends Transaction {
 	
 	@Override
 	public String viewItemName() {
-		ItemCls status = DBSet.getInstance().getItemStatusMap().get(this.key);
+		ItemCls status = DCSet.getInstance().getItemStatusMap().get(this.key);
 		return status==null?"null" : status.toString();
 	}
 	
@@ -339,7 +339,7 @@ public class R_SetStatusToItem extends Transaction {
 	
 	@Override
 	public String viewRecipient() {
-		ItemCls item = ItemCls.getItem(DBSet.getInstance(), this.itemType, this.itemKey);
+		ItemCls item = ItemCls.getItem(DCSet.getInstance(), this.itemType, this.itemKey);
 		return item==null?"null" : item.toString();
 	}
 	
@@ -613,7 +613,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	//VALIDATE
 
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) {
@@ -688,7 +688,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
 		super.process(db, block, asPack);
@@ -729,7 +729,7 @@ public class R_SetStatusToItem extends Transaction {
 
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);

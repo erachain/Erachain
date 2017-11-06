@@ -26,10 +26,9 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
-import database.ItemAssetMap;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
 import utils.NumberAsString;
-//import database.BalanceMap;
-import database.DBSet;
 
 // core.block.Block.isValid(DBSet) - check as false it
 public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord 

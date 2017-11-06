@@ -33,15 +33,14 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 import core.item.ItemCls;
 import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
-//import core.item.statuses.StatusCls;
-import database.ItemAssetBalanceMap;
 import ntp.NTP;
-import database.DBSet;
 import utils.Converter;
 import utils.DateTimeFormat;
 
@@ -439,7 +438,7 @@ public class R_SertifyPubKeys extends Transaction {
 	}
 
 	//
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		boolean creator_admin = false;
 		
@@ -490,7 +489,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
 		super.process(db, block, asPack);
@@ -527,8 +526,7 @@ public class R_SertifyPubKeys extends Transaction {
 			ItemCls person = db.getItemPersonMap().get(this.key);
 
 			// FIND issue record
-			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
-					.get(person.getReference()));
+			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 
 			// GET FEE from that record
 			transPersonIssue.setDB(db, false); // NEED to RECAL?? if from DB
@@ -586,15 +584,15 @@ public class R_SertifyPubKeys extends Transaction {
 		if (!asPack) {
 
 			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
-			if(pkAccount.getLastReference(db) == null)
+			if(false && pkAccount.getLastReference(db) == null)
 			{
-				pkAccount.setLastReference(this.timestamp, db);
+				pkAccount.setLastTimestamp(this.timestamp, db);
 			}
 		}
 
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);
@@ -622,8 +620,7 @@ public class R_SertifyPubKeys extends Transaction {
 			// FIND person
 			ItemCls person = db.getItemPersonMap().get(this.key);
 			// FIND issue record
-			Transaction transPersonIssue = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
-					.get(person.getReference()));
+			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 			// GET FEE from that record
 			transPersonIssue.setDB(db, false); // NEED to RECAL?? if from DB
 			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
@@ -650,9 +647,9 @@ public class R_SertifyPubKeys extends Transaction {
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(pkAccount.getLastReference(db).equals(this.timestamp))
+			if(false && pkAccount.getLastReference(db).equals(this.timestamp))
 			{
-				pkAccount.removeReference(db);
+				pkAccount.removeLastTimestamp(db);
 			}	
 		}
 	}

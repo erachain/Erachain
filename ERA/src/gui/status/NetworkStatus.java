@@ -15,7 +15,7 @@ import org.mapdb.Fun.Tuple3;
 
 import controller.Controller;
 import core.BlockChain;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 import network.Peer;
 import utils.GUIUtils;
@@ -37,7 +37,7 @@ public class NetworkStatus extends JLabel implements Observer
 		//CREATE ICONS
 		this.noConnectionsIcon = this.createIcon(Color.RED);
 		this.synchronizingIcon = this.createIcon(Color.ORANGE);
-		this.walletSynchronizingIcon = this.createIcon(Color.YELLOW);
+		this.walletSynchronizingIcon = this.createIcon(Color.MAGENTA);
 		this.okeIcon = this.createIcon(Color.GREEN);
 		
 		ToolTipManager.sharedInstance().setDismissDelay( (int) TimeUnit.SECONDS.toMillis(5));
@@ -46,7 +46,7 @@ public class NetworkStatus extends JLabel implements Observer
 			public void mouseEntered(MouseEvent mEvt) {
 				String mess = Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort()
 				+ ", " + Lang.getInstance().translate("target")
-				+ ": " + Controller.getInstance().getBlockChain().getTarget(DBSet.getInstance()) + ", ";
+				+ ": " + Controller.getInstance().getBlockChain().getTarget(DCSet.getInstance()) + ", ";
 
 				if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
 					mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight(false).a;
@@ -71,12 +71,13 @@ public class NetworkStatus extends JLabel implements Observer
 	public void update(Observable arg0, Object arg1) 
 	{
 		ObserverMessage message = (ObserverMessage) arg1;
+		int type = message.getType();
 		
-		if(message.getType() == ObserverMessage.WALLET_SYNC_STATUS)
+		if(type == ObserverMessage.WALLET_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue();
 			int height = Controller.getInstance().getMyHWeight(false).a;
-			if(currentHeight == height)
+			if(currentHeight== 0 || currentHeight == height)
 			{
 				this.update(null, new ObserverMessage(
 						ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
@@ -88,7 +89,10 @@ public class NetworkStatus extends JLabel implements Observer
 			this.setText(Lang.getInstance().translate("Wallet Synchronizing")+" " + 100 * currentHeight/height + "%");
 		}
 		
-		if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
+		//if (Controller.getInstance().isProcessingWalletSynchronize())
+		//	return;
+		
+		if(type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue();
 			Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(true);
@@ -101,9 +105,7 @@ public class NetworkStatus extends JLabel implements Observer
 			{
 				this.setText(Lang.getInstance().translate("Synchronizing") + " " + 100 * currentHeight/height + "%");	
 			}	
-		}
-		
-		if(message.getType() == ObserverMessage.NETWORK_STATUS)
+		} else if(type == ObserverMessage.NETWORK_STATUS)
 		{
 			int status = (int) message.getValue();
 			

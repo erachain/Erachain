@@ -9,7 +9,7 @@ import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import database.wallet.WalletDatabase;
+import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 import ntp.NTP;
 
@@ -31,7 +31,7 @@ public class WalletTests {
 	long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
-	private WalletDatabase database;
+	private DWSet database;
 	private SecureWalletDatabase secureDatabase;
 	private GenesisBlock gb;
 	String password = "test";
@@ -41,7 +41,7 @@ public class WalletTests {
 	// INIT NOTES
 	private void init() {
 		
-		database = new WalletDatabase();
+		database = new DWSet();
 		secureDatabase = new SecureWalletDatabase(password);
 
 		wallet = new Wallet();

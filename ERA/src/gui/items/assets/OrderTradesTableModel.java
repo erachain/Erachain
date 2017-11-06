@@ -13,8 +13,8 @@ import utils.ObserverMessage;
 import controller.Controller;
 import core.item.assets.Order;
 import core.item.assets.Trade;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -83,7 +83,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 		Order targetOrder = null;
 
 		if(trade != null) {
-			DBSet db = DBSet.getInstance();
+			DCSet db = DCSet.getInstance();
 			
 			initatorOrder = trade.getInitiatorOrder(db); 				
 			targetOrder = trade.getTargetOrder(db);
@@ -97,7 +97,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 			
 		case COLUMN_TYPE:
 			
-			return trade.getInitiatorOrder(DBSet.getInstance()).getHave() == this.order.getHave() ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
+			return trade.getInitiatorOrder(DCSet.getInstance()).getHave() == this.order.getHave() ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
 				
 		case COLUMN_AMOUNT:
 			

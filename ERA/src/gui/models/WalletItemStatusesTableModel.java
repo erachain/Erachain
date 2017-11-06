@@ -11,8 +11,8 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.item.statuses.StatusCls;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -96,7 +96,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		{
 		case COLUMN_KEY:
 			
-			return status.getKey(DBSet.getInstance());
+			return status.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			

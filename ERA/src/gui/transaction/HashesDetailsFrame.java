@@ -20,9 +20,9 @@ import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import core.transaction.R_Hashes;
 import core.transaction.R_Vouch;
-import database.DBSet;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;

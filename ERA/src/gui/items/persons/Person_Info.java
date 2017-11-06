@@ -15,8 +15,8 @@ import org.mapdb.Fun.Tuple5;
 
 import core.crypto.Base58;
 import core.item.persons.PersonCls;
-import database.ItemStatusMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemStatusMap;
 import lang.Lang;
 
 // Info for person
@@ -87,7 +87,7 @@ public class Person_Info extends JTextPane {
 		*/
 		
 		/// STATUSES
-		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DBSet.getInstance().getPersonStatusMap().get(person.getKey());
+		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DCSet.getInstance().getPersonStatusMap().get(person.getKey());
 		if ( statuses.isEmpty()){
 			message += "<div>" +  Lang.getInstance().translate("Not statuses")+ "</div";
 		} else {
@@ -95,14 +95,14 @@ public class Person_Info extends JTextPane {
 			String from_date_str;
 			String to_date_str;
 			Long dte;
-			ItemStatusMap statusesMap = DBSet.getInstance().getItemStatusMap();
+			ItemStatusMap statusesMap = DCSet.getInstance().getItemStatusMap();
 			for( Map.Entry<Long, java.util.Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> status: statuses.entrySet())
 			{
 				if (status == null) continue;
 				
 				Tuple5<Long, Long, byte[], Integer, Integer> dates = status.getValue().peek();
 
-				message += "<div>" + statusesMap.get(status.getKey()).toString(DBSet.getInstance(), dates.c) + " : ";
+				message += "<div>" + statusesMap.get(status.getKey()).toString(DCSet.getInstance(), dates.c) + " : ";
 				
 				dte = dates.a;
 				if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";

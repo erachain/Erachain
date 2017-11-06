@@ -18,13 +18,14 @@ public class WItemPersonMap extends WItem_Map
 	static final int TYPE = ItemCls.PERSON_TYPE;
 
 
-	public WItemPersonMap(WalletDatabase walletDatabase, DB database)
+	public WItemPersonMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database,
+		super(dWSet, database,
 				TYPE, "item_persons",
-				ObserverMessage.ADD_PERSON_TYPE,
-				ObserverMessage.REMOVE_PERSON_TYPE,
-				ObserverMessage.LIST_PERSON_TYPE
+				ObserverMessage.WALLET_RESET_PERSON_TYPE,
+				ObserverMessage.WALLET_ADD_PERSON_TYPE,
+				ObserverMessage.WALLET_REMOVE_PERSON_TYPE,
+				ObserverMessage.WALLET_LIST_PERSON_TYPE
 				);
 	}
 

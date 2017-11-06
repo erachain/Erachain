@@ -26,13 +26,12 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
-import database.ItemAssetBalanceMap;
-import database.DBSet;
 
 public class DeployATTransaction extends Transaction
 {
@@ -318,13 +317,13 @@ public class DeployATTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, Long releaserReference)
+	public int isValid(DCSet db, Long releaserReference)
 	{
 		return isValid(db, 0);
 	}
 
 	//
-	public int isValid(DBSet db, Integer forkHeight) 
+	public int isValid(DCSet db, Integer forkHeight) 
 	{
 		/*
 		//CHECK IF RELEASED
@@ -401,7 +400,7 @@ public class DeployATTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 		//UPDATE ISSUER
 		super.process(db, block, asPack);
@@ -417,9 +416,9 @@ public class DeployATTransaction extends Transaction
 		atAccount.changeBalance(db, false, Transaction.FEE_KEY, this.amount );
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		if( atAccount.getLastReference(db) == null)
+		if( true || atAccount.getLastReference(db) == null)
 		{
-			atAccount.setLastReference(this.timestamp, db);
+			atAccount.setLastTimestamp(this.timestamp, db);
 		}
 		
 		//CREATE AT - public key or address? Is that the correct height?
@@ -431,7 +430,7 @@ public class DeployATTransaction extends Transaction
 
 	}
 
-	public byte[] getBytesForAddress( DBSet db )
+	public byte[] getBytesForAddress( DCSet db )
 	{
 		byte[] name = StringUtil.getUtf8Bytes(this.name );
 		byte[] desc = StringUtil.getUtf8Bytes(this.description.replaceAll("\\s", "") );
@@ -446,7 +445,7 @@ public class DeployATTransaction extends Transaction
 		return bf.array().clone();
 	}
 	
-	public Account getATaccount(DBSet db)
+	public Account getATaccount(DCSet db)
 	{
 		byte[] name = StringUtil.getUtf8Bytes(this.name );
 		byte[] desc = StringUtil.getUtf8Bytes(this.description.replaceAll("\\s", "") );
@@ -466,7 +465,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		//UPDATE ISSUER
 		super.orphan(db, asPack);
@@ -482,14 +481,8 @@ public class DeployATTransaction extends Transaction
 		atAccount.changeBalance(db, true, Transaction.FEE_KEY, this.amount);
 			
 		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastReference(this.reference, db);
+		this.creator.setLastTimestamp(this.reference, db);
 				
-		///UPDATE REFERENCE OF RECIPIENT
-		if( atAccount.getLastReference(db).equals(this.timestamp))
-		{
-			atAccount.removeReference(db);
-		}	
-		
 	}
 
 	//REST
@@ -512,7 +505,7 @@ public class DeployATTransaction extends Transaction
 	public HashSet<Account> getRecipientAccounts()
 	{
 		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.getATaccount(DBSet.getInstance()));
+		accounts.add(this.getATaccount(DCSet.getInstance()));
 		return accounts;
 	}
 	
@@ -526,7 +519,7 @@ public class DeployATTransaction extends Transaction
 			return true;
 		}
 
-		if(address.equals(this.getATaccount(DBSet.getInstance()).getAddress()))
+		if(address.equals(this.getATaccount(DCSet.getInstance()).getAddress()))
 		{
 			return true;
 		}
@@ -552,7 +545,7 @@ public class DeployATTransaction extends Transaction
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.getATaccount(DBSet.getInstance()).getAddress(), FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.getATaccount(DCSet.getInstance()).getAddress(), FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

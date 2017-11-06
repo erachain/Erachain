@@ -9,18 +9,18 @@ import org.mapdb.DB;
 
 import com.google.common.primitives.SignedBytes;
 
-import database.DBMap;
-import database.DBSet;
+import datachain.DCMap;
+import datachain.DCSet;
 
-public class SharedPostsMap extends DBMap<byte[], List<String>> {
+public class SharedPostsMap extends DCMap<byte[], List<String>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public SharedPostsMap(DBSet dbSet, DB database) {
-		super(dbSet, database);
+	public SharedPostsMap(DCSet dcSet, DB database) {
+		super(dcSet, database);
 	}
 
-	public SharedPostsMap(DBMap<byte[], List<String>> parent) {
+	public SharedPostsMap(DCMap<byte[], List<String>> parent) {
 		super(parent, null);
 	}
 

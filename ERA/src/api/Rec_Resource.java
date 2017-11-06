@@ -72,7 +72,7 @@ import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 import network.Peer;
 import ntp.NTP;

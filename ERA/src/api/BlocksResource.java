@@ -24,8 +24,9 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.BlockMap;
-import database.DBSet;
+import datachain.BlockMap;
+import datachain.DCSet;
+import gui.status.ForgingStatus;
 
 @Path("blocks")
 @Produces(MediaType.APPLICATION_JSON)
@@ -156,7 +157,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
-		Block child = block.getChild(DBSet.getInstance());
+		Block child = block.getChild(DCSet.getInstance());
 		
 		//CHECK IF CHILD EXISTS
 		if(child == null)
@@ -198,7 +199,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
-		long generatingBalance = block.getGeneratingBalance(DBSet.getInstance());
+		long generatingBalance = block.getGeneratingBalance(DCSet.getInstance());
 		return String.valueOf(generatingBalance);
 	}
 	
@@ -233,9 +234,9 @@ public class BlocksResource
 	@Path("/fromheight/{height}")
 	public static String getFromHeight(@PathParam("height") int height) 
 	{
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 		
-		byte[] signature = db.getBlockHeightsMap().get((long)(height - 1));
+		byte[] signature = db.getBlockMap().getSignByHeight(height - 1);
 		if(signature == null)
 		{
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
@@ -275,7 +276,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 
-		Block block = DBSet.getInstance().getBlockMap().get(signatureBytes);
+		Block block = DCSet.getInstance().getBlockMap().get(signatureBytes);
 				
 		//CHECK IF BLOCK EXISTS
 		if(block == null)
@@ -283,7 +284,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
 		
-		return String.valueOf(block.getHeight(DBSet.getInstance()));
+		return String.valueOf(block.getHeight(DCSet.getInstance()));
 	}
 
 	/*
@@ -340,6 +341,40 @@ public class BlocksResource
 		{
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
 		}
+		return block.toJson().toJSONString();
+	}
+
+	@GET
+	@Path("/orphanto/{height}")
+	public static String orphanTo(@PathParam("height") int heightTo) 
+	{
+		Block block;
+		DCSet db = DCSet.getInstance();
+		Controller cnt = Controller.getInstance();
+		core.BlockGenerator.ForgingStatus forgingStatus = cnt.getForgingStatus();
+		cnt.setForgingStatus(core.BlockGenerator.ForgingStatus.FORGING_WAIT);
+
+		try
+		{
+			cnt.flushNewBlockGenerated();
+			int height = 0;
+			do {
+				block = Controller.getInstance().getLastBlock();
+				height = block.getHeightByParent(db);
+
+				cnt.orphanInPipe(block);
+				
+			} while (height > heightTo);			
+		}
+		catch(Exception e)
+		{
+			cnt.setForgingStatus(forgingStatus);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+		}
+
+		cnt.setForgingStatus(forgingStatus);
+		cnt.checkStatus(cnt.getStatus());
+
 		return block.toJson().toJSONString();
 	}
 }

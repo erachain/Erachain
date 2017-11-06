@@ -18,12 +18,12 @@ import org.jsoup.safety.Whitelist;
 import core.naming.Name;
 import core.wallet.Wallet;
 import core.web.Profile;
+import datachain.DCSet;
 import utils.BlogUtils;
 import utils.DateTimeFormat;
 import utils.LinkUtils;
 import utils.Pair;
 import webserver.WebResource;
-import database.DBSet;
 
 /**
  * This is the representation of an entry in a blog.
@@ -114,7 +114,7 @@ public class BlogEntry {
 
 	private void addAvatar() {
 		if (nameOpt != null) {
-			Name name = DBSet.getInstance().getNameMap().get(nameOpt);
+			Name name = DCSet.getInstance().getNameMap().get(nameOpt);
 			Profile profile = Profile.getProfileOpt(name);
 			if(profile != null)
 			{

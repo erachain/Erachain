@@ -34,8 +34,8 @@ import core.item.assets.AssetCls;
 import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
@@ -96,7 +96,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 	
 	//blockChain.getBlock(0)
 	
-	//	private DBSet dbSet;
+	//	private DBSet dcSet;
 		
 			
 			//CREATE GENESIS BLOCK
@@ -106,9 +106,9 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		Controller.getInstance().addObserver(this);	
 		transactions = read_Statement();	
 /*		// база данных	
-				DBSet dbSet = DBSet.getInstance();
+				DBSet dcSet = DBSet.getInstance();
 		// читаем все блоки
-			SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+			SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
 			for(Pair<byte[], Block> list: lists)
 			{
@@ -208,8 +208,8 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		String str ="";
 		R_SignNote record = (R_SignNote)this.transactions.get(row);
 		PublicKeyAccount creator = record.getCreator();
-		if (creator.isPerson(DBSet.getInstance())){
-		return creator.getPerson(DBSet.getInstance()).b.getKey()+"";
+		if (creator.isPerson(DCSet.getInstance())){
+		return creator.getPerson(DCSet.getInstance()).b.getKey()+"";
 		
 		
 		}
@@ -249,7 +249,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		*/
 
 			case COLUMN_NOTE:
-				ItemCls it = ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				ItemCls it = ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
 				if (it == null) return "";
 				return it.toString();
 				
@@ -370,9 +370,9 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		db_transactions = new ArrayList<Transaction>();
 		tran = new ArrayList<Transaction>();
 		// база данных	
-		DBSet dbSet = DBSet.getInstance();
+		DCSet dcSet = DCSet.getInstance();
 // читаем все блоки
-	SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+	SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
 // проходим по блокам
 	for(Pair<byte[], Block> list: lists)
 	{

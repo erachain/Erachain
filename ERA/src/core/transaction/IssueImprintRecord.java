@@ -23,9 +23,8 @@ import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.imprints.ImprintCls;
+import datachain.DCSet;
 import core.item.imprints.Imprint;
-//import database.ItemMap;
-import database.DBSet;
 
 // reference - as item.name
 // TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
@@ -157,7 +156,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//VALIDATE
 	//
 	@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH

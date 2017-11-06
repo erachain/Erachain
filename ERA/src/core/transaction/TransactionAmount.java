@@ -23,9 +23,8 @@ import core.BlockChain;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import database.AddressForging;
-//import database.BalanceMap;
-import database.DBSet;
+import datachain.AddressForging;
+import datachain.DCSet;
 import lang.Lang;
 import utils.NumberAsString;
 
@@ -337,7 +336,7 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override // - fee + balance - calculate here
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
@@ -347,7 +346,7 @@ public abstract class TransactionAmount extends Transaction {
 		
 		//CHECK IF REFERENCE IS OK
 		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
-		if (reference.compareTo(this.reference) != 0) {
+		if (false && reference.compareTo(this.reference) >= 0) {
 			// TODO delete REFERENCE from TRANSACTION - in DB insert
 			// TODO: delete wrong check in new CHAIN
 			// SOME PAYMENTs is WRONG
@@ -549,13 +548,22 @@ public abstract class TransactionAmount extends Transaction {
 		
 		// PUBLICK TEXT only from PERSONS
 		if (this.hasPublicText() && !isPerson) {
-			return CREATOR_NOT_PERSONALIZED;
+			if (BlockChain.DEVELOP_USE) {	
+				for ( String admin: BlockChain.GENESIS_ADMINS) {
+					if (this.creator.equals(admin)) {
+						return VALIDATE_OK;
+					}
+				}
+			}
+
+			
+			return VALIDATE_OK;
 		}
 		
 		return VALIDATE_OK;
 	}		
 
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		super.process(db, block, asPack);
 		
@@ -608,12 +616,9 @@ public abstract class TransactionAmount extends Transaction {
 		if (!asPack) {
 
 			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
-			if(absKey == FEE_KEY)
+			if(false && absKey == FEE_KEY)
 			{
-				if(this.recipient.getLastReference(db) == null)
-				{
-					this.recipient.setLastReference(this.timestamp, db);
-				}
+				this.recipient.setLastTimestamp(this.timestamp, db);
 			}
 		}
 
@@ -642,7 +647,7 @@ public abstract class TransactionAmount extends Transaction {
 		}
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		super.orphan(db, asPack);
 		
@@ -697,12 +702,9 @@ public abstract class TransactionAmount extends Transaction {
 		if (!asPack) {
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(absKey == FEE_KEY)
+			if(false && absKey == FEE_KEY)
 			{
-				if( this.recipient.getLastReference(db).equals(this.timestamp) )
-				{
-					this.recipient.removeReference(db);
-				}	
+				this.recipient.removeLastTimestamp(db);
 			}
 		}
 	

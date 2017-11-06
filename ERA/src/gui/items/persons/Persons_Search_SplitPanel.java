@@ -56,7 +56,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.Main_Internal_Frame;
 import gui.Split_Panel;
 import gui.items.accounts.Account_Send_Dialog;

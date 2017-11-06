@@ -32,14 +32,14 @@ import core.transaction.IssuePersonRecord;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
-import database.AddressPersonMap;
-import database.DBMap;
-import database.DBSet;
-import database.BlockSignsMap;
+import datachain.AddressPersonMap;
+import datachain.BlockSignsMap;
+import datachain.DCMap;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
+import datachain.KKPersonStatusMap;
+import datachain.PersonAddressMap;
 import ntp.NTP;
-import database.ItemAssetMap;
-import database.KKPersonStatusMap;
-import database.PersonAddressMap;
 import network.message.Message;
 
 
@@ -62,7 +62,7 @@ public class TestChain {
 	long timestamp = NTP.getTime();
 	
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet dbSet;
+	private DCSet dcSet;
 	private GenesisBlock gb;
 	Long last_ref;
 	boolean asPack = false;
@@ -84,8 +84,8 @@ public class TestChain {
 	// INIT PERSONS
 	private void init() {
 		
-		//dbSet = DBSet.createEmptyDatabaseSet();
-		dbSet = DBSet.getInstance();
+		//dcSet = DBSet.createEmptyDatabaseSet();
+		dcSet = DCSet.getInstance();
 
 	}
 
@@ -98,12 +98,12 @@ public class TestChain {
 		// CREATE BLOCKCHAIN
 		blockChain = Controller.getInstance().getBlockChain();
 
-		Block block = Controller.getInstance().getBlockByHeight(dbSet, 2081);
+		Block block = Controller.getInstance().getBlockByHeight(dcSet, 2081);
 		byte[] blockSignature = block.getSignature();
 		
 		// 	test controller.Controller.onMessage(Message) -> GET_SIGNATURES_TYPE
 		List<byte[]> headers = blockChain
-				.getSignatures(dbSet, blockSignature);
+				.getSignatures(dcSet, blockSignature);
 		
 		assertEquals(30, headers.size());
 
@@ -118,23 +118,28 @@ public class TestChain {
 		init();
 
 		// GET BLOCKCHAIN
-		Controller.getInstance().initBlockChain(dbSet);
+		Controller.getInstance().initBlockChain(dcSet);
 		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
 		blockChain = Controller.getInstance().getBlockChain();
 
-		Block block = blockChain.getLastBlock(dbSet);
-		int height = block.getHeight(dbSet);
+		Block block = blockChain.getLastBlock(dcSet);
+		int height = block.getHeight(dcSet);
 		Account creator = block.getCreator();
-		int forging = creator.getForgingData(dbSet, height);
-		int lastForging = creator.getLastForgingData(dbSet);
+		int forging = creator.getForgingData(dcSet, height);
+		int lastForging = creator.getLastForgingData(dcSet);
 
-		DBSet fork = dbSet.fork();
+		DCSet fork = dcSet.fork();
 		
-		block.orphan(fork);
+		try {
+			block.orphan(fork);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-		int forging_o = creator.getForgingData(dbSet, height);
-		int lastForging_o = creator.getLastForgingData(dbSet);
-		int height_0 = block.getHeight(dbSet);
+		int forging_o = creator.getForgingData(dcSet, height);
+		int lastForging_o = creator.getLastForgingData(dcSet);
+		int height_0 = block.getHeight(dcSet);
 
 		assertEquals(1, forging);
 
@@ -151,37 +156,37 @@ public class TestChain {
 		init();
 
 		// GET BLOCKCHAIN
-		Controller.getInstance().initBlockChain(dbSet);
+		Controller.getInstance().initBlockChain(dcSet);
 		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
 		blockChain = Controller.getInstance().getBlockChain();
-		BlockSignsMap dbHeight = dbSet.getBlockSignsMap();
+		BlockSignsMap dbHeight = dcSet.getBlockSignsMap();
 
 		int lastH = 0;
 		
 		Block block;
 		long totalWin = 0l;
 		int i = 1;
-		while (i <= blockChain.getHeight(dbSet)) {
-			block = blockChain.getBlock(dbSet, i);
-			int win_value = block.calcWinValueTargeted(dbSet);
+		while (i <= blockChain.getHeight(dcSet)) {
+			block = blockChain.getBlock(dcSet, i);
+			int win_value = block.calcWinValueTargeted(dcSet);
 			int www = dbHeight.getWeight(block);
 			if (www != win_value) {
 				//assertEquals(www, win_value);
 				int diff = www - win_value;
 				i = i + 1 - 1;
-				win_value = block.calcWinValueTargeted(dbSet);
-				lastH = block.getCreator().getForgingData(dbSet, i);
+				win_value = block.calcWinValueTargeted(dcSet);
+				lastH = block.getCreator().getForgingData(dcSet, i);
 				int h_i = lastH - 1;
 				do {
-					lastH = block.getCreator().getForgingData(dbSet, h_i--);
+					lastH = block.getCreator().getForgingData(dcSet, h_i--);
 				} while (lastH == -1);
-				lastH = block.getCreator().getForgingData(dbSet, i+1);
+				lastH = block.getCreator().getForgingData(dcSet, i+1);
 			}
 			totalWin += win_value;
 			i++;
 		}
 		
-		long realWeight = blockChain.getFullWeight(dbSet);
+		long realWeight = blockChain.getFullWeight(dcSet);
 		int diff = (int)(realWeight - totalWin);
 		assertEquals(0, diff);
 		

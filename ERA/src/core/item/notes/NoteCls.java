@@ -8,11 +8,9 @@ import java.util.regex.Pattern;
 
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-//import database.DBMap;
-import database.DBSet;
-import database.Item_Map;
-//import database.wallet.FavoriteItemNote;
-import database.Issue_ItemMap;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 
 public abstract class NoteCls extends ItemCls {
 	
@@ -64,11 +62,11 @@ public abstract class NoteCls extends ItemCls {
 	}	
 
 	// DB
-	public Item_Map getDBMap(DBSet db)
+	public Item_Map getDBMap(DCSet db)
 	{
 		return db.getItemNoteMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
 		return db.getIssueNoteMap();
 	}	

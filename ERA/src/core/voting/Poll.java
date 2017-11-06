@@ -15,7 +15,7 @@ import com.google.common.primitives.Ints;
 import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
-import database.DBSet;
+import datachain.DCSet;
 import utils.Pair;
 
 public class Poll 
@@ -58,7 +58,7 @@ public class Poll
 	
 	public boolean isConfirmed()
 	{
-		return DBSet.getInstance().getPollMap().contains(this);
+		return DCSet.getInstance().getPollMap().contains(this);
 	}
 	
 	public boolean hasVotes()

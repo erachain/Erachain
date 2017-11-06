@@ -45,6 +45,7 @@ import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import database.DBSet;
+import datachain.DCSet;
 import settings.Settings;
 import utils.Pair;
 
@@ -64,6 +65,7 @@ public class GenesisBlock extends Block{
 	List<Transaction> transactions = new ArrayList<Transaction>();
 	public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 
+	public static List<List<Object>> generalGenesisUsers;
 
 	public GenesisBlock()
 	{
@@ -134,7 +136,7 @@ public class GenesisBlock extends Block{
 			/*
 			 */
 			///////// GENEGAL
-			List<List<Object>> generalGenesisUsers = Arrays.asList(
+			generalGenesisUsers = Arrays.asList(
 					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "800000"),
 					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "900000"),
 					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "800000"),
@@ -644,7 +646,7 @@ public class GenesisBlock extends Block{
 	//GETTERS
 
 	@Override
-	public long getTimestamp(DBSet db)
+	public long getTimestamp(DCSet db)
 	{
 		return this.genesisTimestamp;
 	}
@@ -660,7 +662,7 @@ public class GenesisBlock extends Block{
 	}
 	
 	@Override
-	public Block getParent(DBSet db)
+	public Block getParent(DCSet db)
 	{
 		//PARENT DOES NOT EXIST
 		return null;
@@ -741,7 +743,7 @@ public class GenesisBlock extends Block{
 	*/
 	
 	@Override
-	public boolean isValid(DBSet db)
+	public boolean isValid(DCSet db)
 	{
 		//CHECK IF NO OTHER BLOCK IN DB
 		if(db.getBlockMap().getLastBlock() != null)

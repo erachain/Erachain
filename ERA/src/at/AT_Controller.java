@@ -24,7 +24,7 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 public abstract class AT_Controller {
 
@@ -139,7 +139,7 @@ public abstract class AT_Controller {
 	}
 	
 
-	public static int checkCreationBytes( byte[] creation , String type, long fee, int height, int forkHeight, DBSet db ) throws AT_Exception{
+	public static int checkCreationBytes( byte[] creation , String type, long fee, int height, int forkHeight, DCSet db ) throws AT_Exception{
 		if ( creation == null )
 			throw new AT_Exception( "Creation bytes cannot be null" );
 
@@ -269,7 +269,7 @@ public abstract class AT_Controller {
 
 		//HashMap<String, byte[]> states = new HashMap<String, byte[]>();
 
-		DBSet fork = DBSet.getInstance();
+		DCSet fork = DCSet.getInstance();
 
 		Iterator< String > orderedATs = AT.getOrderedATs( fork, blockHeight );
 
@@ -355,7 +355,7 @@ public abstract class AT_Controller {
 		return atBlock;
 	}
 
-	public static AT_Block validateATs( byte[] blockATs , int blockHeight , DBSet dbSet ) throws NoSuchAlgorithmException, AT_Exception {
+	public static AT_Block validateATs( byte[] blockATs , int blockHeight , DCSet dcSet ) throws NoSuchAlgorithmException, AT_Exception {
 
 		LOGGER.trace("Validate ATs");
 		if ( blockATs == null )
@@ -377,7 +377,7 @@ public abstract class AT_Controller {
 		for ( ByteBuffer atIdBuffer : ats.keySet() )
 		{
 			byte[] atId = atIdBuffer.array();
-			AT at = AT.getAT( atId , dbSet );
+			AT at = AT.getAT( atId , dcSet );
 
 			byte[] state = at.getState().clone();
 
@@ -387,7 +387,7 @@ public abstract class AT_Controller {
 				at.setHeight(blockHeight);
 				at.setWaitForNumberOfBlocks( at.getSleepBetween() );
 
-				long atAccountBalance = getATAccountBalance( atId , dbSet );
+				long atAccountBalance = getATAccountBalance( atId , dcSet );
 
 				if ( atAccountBalance < AT_Constants.getInstance().STEP_FEE( blockHeight ) )
 				{
@@ -402,7 +402,7 @@ public abstract class AT_Controller {
 
 				listCode( at , true , true );
 
-				AT_API_Platform_Impl.getInstance().setDBSet( dbSet );
+				AT_API_Platform_Impl.getInstance().setDBSet( dcSet );
 
 				runSteps( at , blockHeight );
 
@@ -444,12 +444,12 @@ public abstract class AT_Controller {
 		{
 			String atId = Base58.encode( at.getId() );
 			Account account = new Account(atId);
-			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getBalance(dbSet, Transaction.FEE_KEY));
+			LOGGER.trace("AT : " + account.getAddress() + " total balance: " + account.getBalance(dcSet, Transaction.FEE_KEY));
 			//atLastState.put( atId ,  tempAtStates.get( atId ) );
-			dbSet.getATMap().update( at , blockHeight );
-			dbSet.getATStateMap().addOrUpdate( blockHeight , at.getId(), at.getState() );
+			dcSet.getATMap().update( at , blockHeight );
+			dcSet.getATStateMap().addOrUpdate( blockHeight , at.getId(), at.getState() );
 			
-			Tuple2<Long, Long> results = makeTransactions( at , dbSet, blockHeight, seq, true);
+			Tuple2<Long, Long> results = makeTransactions( at , dcSet, blockHeight, seq, true);
 			totalAmount += results.a;
 			totalFee += results.b;
 			seq += at.getTransactions().size();
@@ -527,7 +527,7 @@ public abstract class AT_Controller {
 
 	//platform based implementations
 	//platform based 
-	private static Tuple2<Long, Long> makeTransactions( AT at , DBSet dbSet, int height, int seq, boolean yes) {
+	private static Tuple2<Long, Long> makeTransactions( AT at , DCSet dcSet, int height, int seq, boolean yes) {
 		long totalAmount = 0;
 		long totalFees = 0;
 		Account sender = new Account(Base58.encode(at.getId()));
@@ -539,23 +539,23 @@ public abstract class AT_Controller {
 			}
 			if (yes)
 			{
-				dbSet.getATTransactionMap().add( height , seq++ , tx);
+				dcSet.getATTransactionMap().add( height , seq++ , tx);
 				if ( tx.getRecipientId() != null && !Arrays.equals(tx.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]))
 				{
 					Account recipient = new Account( Base58.encode( tx.getRecipientId() ) );
-					if ( recipient.getLastReference(dbSet) == null)
+					if (false && recipient.getLastReference(dcSet) == null)
 					{
-						recipient.setLastReference(-1L, dbSet);
+						recipient.setLastTimestamp(-1L, dcSet);
 					}
-					//recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dbSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
+					//recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dcSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dcSet );
 				}
 				else
 				{
 					totalFees += tx.getAmount();
 				}
-				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dbSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dbSet );
-				sender.changeBalance( dbSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , 8 ) );
-				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dbSet, Transaction.FEE_KEY));
+				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dcSet );
+				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , 8 ) );
+				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dcSet, Transaction.FEE_KEY));
 			}
 
 		}
@@ -565,14 +565,14 @@ public abstract class AT_Controller {
 
 	private static long getATAccountBalance( byte[] id )
 	{
-		return getATAccountBalance( id , DBSet.getInstance() );
+		return getATAccountBalance( id , DCSet.getInstance() );
 	}
 
-	private static long getATAccountBalance( byte[] id , DBSet dbSet)
+	private static long getATAccountBalance( byte[] id , DCSet dcSet)
 	{
 		Account account = new Account( Base58.encode( id ) );
 
-		BigDecimal balance = account.getBalance( dbSet, Transaction.FEE_KEY ).a;
+		BigDecimal balance = account.getBalance( dcSet, Transaction.FEE_KEY ).a;
 
 		byte[] balanceBytes = balance.unscaledValue().toByteArray();
 		byte[] fill = new byte[8 - balanceBytes.length];

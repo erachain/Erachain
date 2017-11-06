@@ -21,7 +21,7 @@ import com.google.common.primitives.UnsignedBytes;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-import database.DBSet;
+import datachain.DCSet;
 import utils.ObserverMessage;
 
 // UNCONFIRMED balances for accounts in owner wallet only
@@ -39,7 +39,7 @@ public class AccountMap extends Observable {
 	//private List<Account> accounts;
 	//private List<PublicKeyAccount> publickKeys;
 	
-	public AccountMap(WalletDatabase walletDatabase, DB database) 
+	public AccountMap(DWSet dWSet, DB database) 
 	{
 		//this.publickKeys = new ArrayList<PublicKeyAccount>();
 		//OPEN MAP
@@ -326,7 +326,7 @@ public class AccountMap extends Observable {
 			if(!this.publickKeys.contains(account.getPublicKey()))
 			{
 				this.publickKeys.add(account.getPublicKey());
-				
+				this.setChanged();
 				this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
 				
 			}

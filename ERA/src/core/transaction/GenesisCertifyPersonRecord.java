@@ -27,8 +27,8 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class GenesisCertifyPersonRecord extends Genesis_Record {
 
@@ -128,7 +128,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -148,7 +148,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//PROCESS/ORPHAN
 	
 	@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 
 		//Block block = new GenesisBlock();
@@ -182,11 +182,11 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastReference(this.timestamp, db);
+		this.recipient.setLastTimestamp(this.timestamp, db);
 	}
 
 	@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 								
 		// UNDO ALIVE PERSON for DURATION
@@ -199,7 +199,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		//UPDATE REFERENCE OF CREATOR
 		// not needthis.creator.setLastReference(this.reference, db);		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.removeReference(db);
+		this.recipient.removeLastTimestamp(db);
 	}
 
 	//REST

@@ -21,11 +21,8 @@ import core.item.notes.NoteCls;
 import core.transaction.IssueNoteRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
-import database.ItemNoteMap;
+import datachain.DCSet;
+import datachain.ItemNoteMap;
 
 public class TestNoteAsPack {
 
@@ -44,7 +41,7 @@ public class TestNoteAsPack {
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -56,12 +53,17 @@ public class TestNoteAsPack {
 	// INIT NOTES
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(db), db);
+		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
 	}

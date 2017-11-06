@@ -12,28 +12,28 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
-import database.BlockMap;
-import database.DBSet;
-import database.SortableList;
+import datachain.BlockMap;
+import datachain.DCSet;
+import datachain.SortableList;
 
 public class UpdateUtil {
 
 	static Logger LOGGER = Logger.getLogger(UpdateUtil.class.getName());
 
 	public static void repopulateNameStorage(int height) {
-		DBSet.getInstance().getNameStorageMap().reset();
-		DBSet.getInstance().getOrphanNameStorageHelperMap().reset();
-		DBSet.getInstance().getOrphanNameStorageMap().reset();
-		DBSet.getInstance().getHashtagPostMap().reset();
+		DCSet.getInstance().getNameStorageMap().reset();
+		DCSet.getInstance().getOrphanNameStorageHelperMap().reset();
+		DCSet.getInstance().getOrphanNameStorageMap().reset();
+		DCSet.getInstance().getHashtagPostMap().reset();
 
-		SortableList<byte[], Block> blocks = DBSet.getInstance().getBlockMap()
+		SortableList<byte[], Block> blocks = DCSet.getInstance().getBlockMap()
 				.getList();
 		blocks.sort(BlockMap.HEIGHT_INDEX);
 
 		Block b = new GenesisBlock();
 		do
 		{
-			if ( b.getHeight(DBSet.getInstance()) >= height )
+			if ( b.getHeight(DCSet.getInstance()) >= height )
 			{
 				List<Transaction> txs = b.getTransactions();
 				for (Transaction tx : txs) {
@@ -43,7 +43,7 @@ public class UpdateUtil {
 						if (service == 10) {
 							StorageUtils.processUpdate(arbTx.getData(),
 									arbTx.getSignature(), arbTx.getCreator(),
-									DBSet.getInstance());
+									DCSet.getInstance());
 						} else if (service == 777) {
 							byte[] data = arbTx.getData();
 							String string = new String(data);
@@ -73,7 +73,7 @@ public class UpdateUtil {
 										List<String> hashTags = BlogUtils
 												.getHashTags(post);
 										for (String hashTag : hashTags) {
-											DBSet.getInstance()
+											DCSet.getInstance()
 											.getHashtagPostMap()
 											.add(hashTag,
 													arbTx.getSignature());
@@ -87,7 +87,7 @@ public class UpdateUtil {
 					}
 				}
 			}
-			b = b.getChild(DBSet.getInstance());
+			b = b.getChild(DCSet.getInstance());
 		}while ( b != null );
 
 	}
@@ -95,32 +95,34 @@ public class UpdateUtil {
 
 
 	public static void repopulateTransactionFinalMap() {
-		DBSet.getInstance().getTransactionFinalMap().reset();
-		DBSet.getInstance().commit();
+		DCSet.getInstance().getTransactionFinalMap().reset();
+		
 		Block b = new GenesisBlock();
+		DCSet.getInstance().flush(b);
 		do
 		{
 			List<Transaction> txs = b.getTransactions();
 			int counter = 1;
 			for (Transaction tx : txs)
 			{
-				DBSet.getInstance().getTransactionFinalMap().add(b.getHeight(DBSet.getInstance()), counter, tx);
+				DCSet.getInstance().getTransactionFinalMap().add(b.getHeight(DCSet.getInstance()), counter, tx);
 				counter++;
 			}
-			if ( b.getHeight(DBSet.getInstance())%2000 == 0 )
+			if ( b.getHeight(DCSet.getInstance())%2000 == 0 )
 			{
-				LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight(DBSet.getInstance()));
-				DBSet.getInstance().commit();
+				LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight(DCSet.getInstance()));
+				DCSet.getInstance().flush(b);
 			}
-			b = b.getChild(DBSet.getInstance());
+			b = b.getChild(DCSet.getInstance());
 		}while ( b != null );
 
 	}
 	
 	public static void repopulateCommentPostMap() {
-		DBSet.getInstance().getPostCommentMap().reset();
-		DBSet.getInstance().commit();
+		DCSet.getInstance().getPostCommentMap().reset();
+		
 		Block b = new GenesisBlock();
+		DCSet.getInstance().flush(b);
 		do
 		{
 			List<Transaction> txs = b.getTransactions();
@@ -131,16 +133,16 @@ public class UpdateUtil {
 					int service = ((ArbitraryTransaction) tx).getService();
 					if(service == BlogUtils.COMMENT_SERVICE_ID)
 					{
-						((ArbitraryTransaction) tx).addToCommentMapOnDemand(DBSet.getInstance());
+						((ArbitraryTransaction) tx).addToCommentMapOnDemand(DCSet.getInstance());
 					}
 				}
 			}
-			if ( b.getHeight(DBSet.getInstance())%2000 == 0 )
+			if ( b.getHeight(DCSet.getInstance())%2000 == 0 )
 			{
-				LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight(DBSet.getInstance()));
-				DBSet.getInstance().commit();
+				LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight(DCSet.getInstance()));
+				DCSet.getInstance().flush(b);
 			}
-			b = b.getChild(DBSet.getInstance());
+			b = b.getChild(DCSet.getInstance());
 		}while ( b != null );
 		
 	}

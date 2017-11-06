@@ -10,18 +10,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 
-import database.DBMap;
-import database.DBSet;
+import datachain.DCMap;
+import datachain.DCSet;
 
-public class NameStorageMap extends DBMap<String, Map<String, String>> {
+public class NameStorageMap extends DCMap<String, Map<String, String>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public NameStorageMap(DBSet dbSet, DB database) {
-		super(dbSet, database);
+	public NameStorageMap(DCSet dcSet, DB database) {
+		super(dcSet, database);
 	}
 
-	public NameStorageMap(DBMap<String, Map<String, String>> parent) {
+	public NameStorageMap(DCMap<String, Map<String, String>> parent) {
 		super(parent, null);
 	}
 

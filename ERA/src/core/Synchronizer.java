@@ -1,9 +1,12 @@
 package core;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+
 // import org.apache.log4j.Logger;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
@@ -14,7 +17,9 @@ import network.message.Message;
 import network.message.MessageFactory;
 import network.message.SignaturesMessage;
 import network.message.TransactionMessage;
+import ntp.NTP;
 import settings.Settings;
+import utils.ObserverMessage;
 import at.AT;
 import at.AT_API_Platform_Impl;
 import at.AT_Constants;
@@ -22,54 +27,57 @@ import controller.Controller;
 import core.block.Block;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.DCSet;
+import datachain.TransactionMap;
 import settings.Settings;
 
 import com.google.common.primitives.Bytes;
-
-import database.DBSet;
 
 public class Synchronizer
 {
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
 	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)195, (byte)26, (byte)245}; // 185.195.26.245
 	
-	private boolean run = true;
+	//private boolean run = true;
+	//private Block runedBlock;
 	private Peer fromPeer;
 	
 	
 	public Synchronizer()
 	{
-		this.run = true;
+		//this.run = true;
 	}
 	
-	static boolean USE_AT_ORPHAN = false;
 	public static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 8;
 	
 	public Peer getPeer() {
 		return fromPeer;
 	}
 	
-	private void checkNewBlocks(DBSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
+	private void checkNewBlocks(DCSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		
-		AT_API_Platform_Impl.getInstance().setDBSet( fork );
+		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
+
+		if (BlockChain.USE_AT_ATX) AT_API_Platform_Impl.getInstance().setDBSet( fork );
 	
 		Controller cnt = Controller.getInstance();
 		//int originalHeight = 0;
 		
 		//ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
+		Map<String, byte[]> states = new TreeMap<String, byte[]>();
+		int height_AT = 0;
 		if(lastCommonBlock != null)
 		{
-			//GET STATES TO RESTORE
-			Map<String, byte[]> states = fork.getParent().getATStateMap().getStates( lastCommonBlock.getHeight(fork) );
-			
-			//HEIGHT TO ROLL BACK
-	//		originalHeight = lastCommonBlock.getHeight();
-			int height_AT = lastCommonBlock.getHeight(fork);
-			if (USE_AT_ORPHAN) {
-				height_AT = (int)(Math.round( height_AT /AT_Constants.STATE_STORE_DISTANCE))
+			if (BlockChain.USE_AT_ATX) {
+				//GET STATES TO RESTORE
+				states = fork.getParent().getATStateMap().getStates( lastCommonBlock.getHeight(fork) );
+				
+				//HEIGHT TO ROLL BACK
+		//		originalHeight = lastCommonBlock.getHeight();
+				height_AT = (int)(Math.round( lastCommonBlock.getHeight(fork) /AT_Constants.STATE_STORE_DISTANCE))
 					*AT_Constants.STATE_STORE_DISTANCE;
-			} 
+			}
 	
 			//GET LAST BLOCK
 			Block lastBlock = fork.getBlockMap().getLastBlock();
@@ -85,6 +93,7 @@ public class Synchronizer
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
+				LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
 				if (cnt.getBlockChain().getCheckPoint(fork) > lastBlock.getHeightByParent(fork)) {
 					//cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
 					//		+ lastCommonBlock.getHeight(fork) + "]"); // icreator
@@ -95,26 +104,38 @@ public class Synchronizer
 					throw new Exception(mess);
 				}
 				//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan: " + lastBlock.getHeight(fork));
+				if (cnt.isOnStopping())
+					throw new Exception("on stoping");
+
+				//runedBlock = lastBlock; // FOR quick STOPPING
 				lastBlock.orphan(fork);
-				//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
+				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 				lastBlock = fork.getBlockMap().getLastBlock();
 			}
 
-			//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]"	+ " run AT_TRANSACTION in FORK");
+			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]"	+ " run AT_TRANSACTION in FORK");
 
-			if (USE_AT_ORPHAN) {
+			if (BlockChain.USE_AT_ATX) {
 				// AT_TRANSACTION - not from GENESIS BLOCK
 				while ( lastBlock.getHeight(fork) >= height_AT && lastBlock.getHeight(fork) > 1)
 				{
+					LOGGER.debug("*** ORPHAN AT BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
+					if (cnt.isOnStopping())
+						throw new Exception("on stoping");
+
 					newBlocks.add( 0 , lastBlock );
 					//Block tempBlock = fork.getBlockMap().getLastBlock();
+					//runedBlock = lastBlock; // FOR quick STOPPING
 					lastBlock.orphan(fork);
+					LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 					lastBlock = fork.getBlockMap().getLastBlock();
-					//lastBlock = tempBlock;
 				}
 				
 				for ( String id : states.keySet() )
 				{
+					if (cnt.isOnStopping())
+						throw new Exception("on stoping");
+
 					byte[] address = Base58.decode( id ); //25 BYTES
 					address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
 					AT at = fork.getATMap().getAT( address );
@@ -130,8 +151,11 @@ public class Synchronizer
 			}
 	
 		}
-		
+
 		//VALIDATE THE NEW BLOCKS
+
+		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
+
 		for(Block block: newBlocks)
 		{
 			int heigh = block.getHeightByParent(fork);
@@ -140,11 +164,12 @@ public class Synchronizer
 			if(block.isSignatureValid() && block.isValid(fork))
 			{
 				//PROCESS TO VALIDATE NEXT BLOCKS
+				//runedBlock = block;
 				block.process(fork);
 			}
 			else
 			{
-				AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
+				if (BlockChain.USE_AT_ATX) AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
 
 				//block.isSignatureValid();
 				//block.isValid(fork);
@@ -156,86 +181,149 @@ public class Synchronizer
 			}
 		}
 
-		AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
+		if (BlockChain.USE_AT_ATX) AT_API_Platform_Impl.getInstance().setDBSet( fork.getParent() );
+		
+		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - END");
+
 	}
 
 	// process new BLOCKS to DB and orphan DB
-	public List<Transaction> synchronize(DBSet dbSet, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
+	public List<Transaction> synchronize_blocks(DCSet dcSet, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
 	{
-		List<Transaction> orphanedTransactions = new ArrayList<Transaction>();
-		
+		TreeMap<String, Transaction> orphanedTransactions = new TreeMap<String, Transaction>();
+		Controller cnt = Controller.getInstance();
+
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-		checkNewBlocks(dbSet.fork(), lastCommonBlock, newBlocks, peer);	
+		checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);	
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
-		
+		Map<String, byte[]> states = new TreeMap<String, byte[]>();
+		int height_AT = 0;
+
 		if(lastCommonBlock != null)
 		{
-			//GET STATES TO RESTORE
-			Map<String, byte[]> states = dbSet.getATStateMap().getStates( lastCommonBlock.getHeight(dbSet) );
-			
-			//HEIGHT TO ROLL BACK
-			int height_AT = (int)(Math.round( lastCommonBlock.getHeight(dbSet)/AT_Constants.STATE_STORE_DISTANCE))
-					*AT_Constants.STATE_STORE_DISTANCE;
+			if (BlockChain.USE_AT_ATX) {
+				//GET STATES TO RESTORE
+				states = dcSet.getATStateMap().getStates( lastCommonBlock.getHeight(dcSet) );
+				
+				//HEIGHT TO ROLL BACK
+				height_AT = (int)(Math.round( lastCommonBlock.getHeight(dcSet)/AT_Constants.STATE_STORE_DISTANCE))
+						*AT_Constants.STATE_STORE_DISTANCE;
+			}
 
 			//GET LAST BLOCK
-			Block lastBlock = dbSet.getBlockMap().getLastBlock();
+			Block lastBlock = dcSet.getBlockMap().getLastBlock();
 			
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
 			{
+				if (cnt.isOnStopping())
+					throw new Exception("on stoping");
+
 				//ADD ORPHANED TRANSACTIONS
-				orphanedTransactions.addAll(lastBlock.getTransactions());
+				//orphanedTransactions.addAll(lastBlock.getTransactions());
+				for (Transaction transaction: lastBlock.getTransactions()) {
+					if (cnt.isOnStopping())
+						throw new Exception("on stoping");
+					orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);					
+				}
+				LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
 				
-				lastBlock.orphan(dbSet);
-				lastBlock = dbSet.getBlockMap().getLastBlock();
+				//runedBlock = lastBlock; // FOR quick STOPPING
+				LOGGER.debug("*** synchronize - orphan block...");
+				this.pipeProcessOrOrphan(dcSet, lastBlock, true);
+				lastBlock = dcSet.getBlockMap().getLastBlock();
 			}
 
-			if (USE_AT_ORPHAN) {
+			if (BlockChain.USE_AT_ATX) {
 				// THEN orphan next AT_height blocks
 				//NOT orphan GENESIS BLOCK
-				while ( lastBlock.getHeight(dbSet) >= height_AT && lastBlock.getHeight(dbSet) > 1 )
+				while ( lastBlock.getHeight(dcSet) >= height_AT && lastBlock.getHeight(dcSet) > 1 )
 				{
-					orphanedTransactions.addAll(lastBlock.getTransactions());
-					lastBlock.orphan(dbSet);
-					lastBlock = dbSet.getBlockMap().getLastBlock();
+					
+					if (cnt.isOnStopping())
+						throw new Exception("on stoping");
+
+					//orphanedTransactions.addAll(lastBlock.getTransactions());
+					for (Transaction transaction: lastBlock.getTransactions()) {
+						if (cnt.isOnStopping())
+							throw new Exception("on stoping");
+						orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);					
+					}
+					LOGGER.debug("*** synchronize - AT orphanedTransactions.size:" + orphanedTransactions.size());
+					
+					//runedBlock = lastBlock; // FOR quick STOPPING
+					LOGGER.debug("*** synchronize - orphan AT block...");
+					this.pipeProcessOrOrphan(dcSet, lastBlock, true);
+					lastBlock = dcSet.getBlockMap().getLastBlock();
 				}
 				
 				for ( String id : states.keySet() )
 				{
+					if (cnt.isOnStopping())
+						throw new Exception("on stoping");
+
 					byte[] address = Base58.decode( id ); //25 BYTES
 					address = Bytes.ensureCapacity( address , AT_Constants.AT_ID_SIZE, 0 ); // 32 BYTES
-					AT at = dbSet.getATMap().getAT( address );
+					AT at = dcSet.getATMap().getAT( address );
 					
 					at.setState( states.get( id ) );
 					
-					dbSet.getATMap().update( at , height_AT );
+					dcSet.getATMap().update( at , height_AT );
 					
 				}
 	
-				dbSet.getATMap().deleteAllAfterHeight( height_AT );
-				dbSet.getATStateMap().deleteStatesAfter( height_AT );
+				dcSet.getATMap().deleteAllAfterHeight( height_AT );
+				dcSet.getATStateMap().deleteStatesAfter( height_AT );
 			}
 
 		}
 		
 		//PROCESS THE NEW BLOCKS
+		LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
 		for(Block block: newBlocks)
 		{
+
+			if (cnt.isOnStopping())
+				throw new Exception("on stoping");
+
 			//SYNCHRONIZED PROCESSING
-			this.process(dbSet, block);
-		}	
+			this.pipeProcessOrOrphan(dcSet, block, false);
+			for (Transaction transaction: block.getTransactions()) {
+				if (cnt.isOnStopping())
+					throw new Exception("on stoping");
+				
+				String key = new BigInteger(1, transaction.getSignature()).toString(16);
+				if (orphanedTransactions.containsKey(key))
+						orphanedTransactions.remove(key);					
+			}
+		}
 		
-		return orphanedTransactions;
+		// CLEAR for DEADs
+		TransactionMap map = dcSet.getTransactionMap();
+		List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
+		for (Transaction transaction: orphanedTransactions.values()) {
+			if (cnt.isOnStopping())
+				throw new Exception("on stoping");
+						
+			//CHECK IF DEADLINE PASSED
+			if(!(transaction.getDeadline() < NTP.getTime() ||
+					map.contains(transaction.getSignature())))
+			{
+				orphanedTransactionsList.add(transaction);
+			}
+		}
+		
+		return orphanedTransactionsList;
 	}
 	
-	public void synchronize(DBSet dbSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception
+	public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception
 	{
 
-		if (!this.run) {
-			fromPeer = null;
-			return;
-		}
+		Controller cnt = Controller.getInstance();
+
+		if (cnt.isOnStopping())
+			throw new Exception("on stoping");
 
 		/*
 		LOGGER.error("Synchronizing from peer: " + peer.toString() + ":"
@@ -244,7 +332,7 @@ public class Synchronizer
 
 		fromPeer = peer;
 		
-		byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
+		byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
 				
 		// FIND HEADERS for common CHAIN
 		if (Arrays.equals(peer.getAddress().getAddress(), PEER_TEST)) {
@@ -262,13 +350,20 @@ public class Synchronizer
 		}
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
-		Block common = dbSet.getBlockMap().get(signatures.a);
-		int commonBlockHeight = common.getHeight(dbSet);
-
-		if (!this.run || dbSet.isStoped()) {
-			fromPeer = null;
-			return;
+		Block common = dcSet.getBlockMap().get(signatures.a);
+		if (common == null) { // icreator
+			
+			//INVALID BLOCK THROW EXCEPTION
+			String mess = "Dishonest peer on COMMON block not found!!";
+			peer.ban(BAN_BLOCK_TIMES>>4, mess);
+			//STOP BLOCKBUFFER
+			throw new Exception(mess);
 		}
+
+		int commonBlockHeight = common.getHeight(dcSet);
+
+		if (cnt.isOnStopping())
+			throw new Exception("on stoping");
 
 		LOGGER.info("Synchronizing from COMMON blockHeight " + commonBlockHeight);
 		
@@ -278,7 +373,7 @@ public class Synchronizer
 			
 			if (signatures.b.size() == 0) {
 				// TODO it is because incorrect calculate WIN_TARGET value
-				//dbSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
+				//dcSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
 				Tuple2<Integer, Long> myHW = Controller.getInstance().getMyHWeight(false);
 				Controller.getInstance().setWeightOfPeer(peer, myHW);
 				LOGGER.info("  set new Weight " + myHW + " for PEER " + peer.getAddress().getHostAddress());
@@ -287,22 +382,34 @@ public class Synchronizer
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
 			//CREATE BLOCK BUFFER
+			LOGGER.debug("synchronize try get BLOCKS in BUFFER"
+					+ " peer: " + peer.getAddress().getHostName()
+					+ " for blocks: " + signatures.b.size());
 			BlockBuffer blockBuffer = new BlockBuffer(signatures.b, peer);
-			
+
 			//GET AND PROCESS BLOCK BY BLOCK
 			for(byte[] signature: signatures.b)
 			{
-				if (!this.run) {
-					fromPeer = null;
-					return;
+				if (cnt.isOnStopping()) {
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
+					throw new Exception("on stoping");
 				}
 				
 				//GET BLOCK
+				LOGGER.debug("synchronize try get BLOCK"
+						+ " for: " + signature.toString()
+						);
+
 				Block blockFromPeer = blockBuffer.getBlock(signature);
-				
-				if (!this.run) {
-					fromPeer = null;
-					return;
+
+				LOGGER.debug("synchronize BLOCK getted"
+						);
+
+				if (cnt.isOnStopping()) {
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
+					throw new Exception("on stoping");
 				}
 				
 				if (blockFromPeer == null) { // icreator
@@ -310,30 +417,50 @@ public class Synchronizer
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block null";
 					peer.ban(BAN_BLOCK_TIMES>>4, mess);
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
 					throw new Exception(mess);
 				}
-				blockFromPeer.setCalcGeneratingBalance(dbSet); // NEED SET it
+				blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
 
-				if (!this.run) {
-					fromPeer = null;
-					return;
+				if (cnt.isOnStopping()) {
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
+					throw new Exception("on stoping");
 				}
 				
 				//PROCESS BLOCK
-				if(!this.process(dbSet, blockFromPeer))
+				LOGGER.debug("synchronize - simple ADD NEW BLOCK process..."
+						+ " height:" + blockFromPeer.getHeightByParent(dcSet));
+				
+				if(blockFromPeer.isSignatureValid() && blockFromPeer.isValid(dcSet))
 				{
-					if (!this.run) {
-						fromPeer = null;
-						return;
+					try {
+						this.pipeProcessOrOrphan(dcSet, blockFromPeer, false);
+					} catch (Exception e) {	
+						if (cnt.isOnStopping()) {
+							//STOP BLOCKBUFFER
+							blockBuffer.stopThread();
+							throw new Exception("on stoping");
+						} else {
+							LOGGER.error(e.getMessage(),e);
+						}
 					}
+				} else {
 
 					//INVALID BLOCK THROW EXCEPTION
-					String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dbSet);
+					String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dcSet);
 					peer.ban(BAN_BLOCK_TIMES>>1, mess);
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
 					throw new Exception(mess);
 				}
+				
+				LOGGER.debug("synchronize BLOCK END process"
+						);
+
 			}
-			
+
 			//STOP BLOCKBUFFER
 			blockBuffer.stopThread();
 		}
@@ -341,39 +468,37 @@ public class Synchronizer
 		{
 			
 			//GET THE BLOCKS FROM SIGNATURES
-			List<Block> blocks = this.getBlocks(dbSet, signatures.b, peer);
+			List<Block> blocks = this.getBlocks(dcSet, signatures.b, peer);
 
-			if (!this.run) {
-				fromPeer = null;
-				return;
+			if (cnt.isOnStopping()) {
+				throw new Exception("on stoping");
 			}
 
 			//SYNCHRONIZE BLOCKS
 			/*
 			LOGGER.error("core.Synchronizer.synchronize from common block for blocks: " + blocks.size());
 			*/
-			List<Transaction> orphanedTransactions = this.synchronize(dbSet, common, blocks, peer);
-			if (!this.run) {
-				fromPeer = null;
-				return;
+			
+			List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, common, blocks, peer);
+			if (cnt.isOnStopping()) {
+				throw new Exception("on stoping");
 			}
 
 			//SEND ORPHANED TRANSACTIONS TO PEER
+			TransactionMap map = dcSet.getTransactionMap();
 			for(Transaction transaction: orphanedTransactions)
 			{
-				if (!this.run) {
-					fromPeer = null;
-					return;
+				if (cnt.isOnStopping()) {
+					throw new Exception("on stoping");
 				}
 
-				TransactionMessage transactionMessage = new TransactionMessage(transaction);
-				peer.sendMessage(transactionMessage);
+				byte[] sign = transaction.getSignature();
+				if (!map.contains(sign))
+					map.set(sign, transaction);
 			}
 		}
 		
-		//dbSet.commitHard();
 		fromPeer = null;
-
 	}
 	
 	/*
@@ -413,7 +538,9 @@ public class Synchronizer
 		SignaturesMessage response = (SignaturesMessage) peer.getResponse(message);
 
 		if (response == null) {
-			throw new Exception("Failed to communicate with peer - response = null");
+			// cannot retrieve headers
+			if (false) peer.ban(0, "Cannot retrieve headers");
+			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
 		}
 
 		return response.getSignatures();
@@ -422,9 +549,17 @@ public class Synchronizer
 	private Tuple2<byte[], List<byte[]>> findHeaders(Peer peer, int peerHeight, byte[] lastBlockSignature, int checkPointHeight) throws Exception
 	{
 
-		DBSet dbSet = DBSet.getInstance();
-		
+		DCSet dcSet = DCSet.getInstance();
+		Controller cnt = Controller.getInstance();
+
+		LOGGER.info("findHeaders(Peer: " + peer.getAddress().getHostAddress()
+				+ ", peerHeight: " + peerHeight
+				+ ", checkPointHeight: " + checkPointHeight);
+
 		List<byte[]> headers = this.getBlockSignatures(lastBlockSignature, peer);
+
+		LOGGER.info("findHeaders(Peer) headers.size: " + headers.size());
+
 		if (headers.size() > 0) {
 			// end of my CHAIN is common
 			return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
@@ -432,7 +567,7 @@ public class Synchronizer
 
 		
 		//int myChainHeight = Controller.getInstance().getBlockChain().getHeight();
-		int maxChainHeight = dbSet.getBlockSignsMap().getHeight(lastBlockSignature);
+		int maxChainHeight = dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
 		if (maxChainHeight < checkPointHeight) {
 			String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight
 					+ "\n -> not found";
@@ -440,8 +575,8 @@ public class Synchronizer
 			throw new Exception(mess);
 		}
 
-		LOGGER.info("findLastCommonBlock(Peer) for: "
-				+ " getBlockMap().getLastBlock: " + maxChainHeight
+		LOGGER.info("findHeaders "
+				+ " maxChainHeight: " + maxChainHeight
 				+ " to minHeight: " + checkPointHeight);
 
 		// try get check point block from peer
@@ -450,13 +585,13 @@ public class Synchronizer
 		byte[] checkPointHeightSignature;
 		Block checkPointHeightCommonBlock = null;
 		if (checkPointHeight == 1) {
-			checkPointHeightCommonBlock = Controller.getInstance().getBlockChain().getGenesisBlock().getChild(dbSet);
+			checkPointHeightCommonBlock = cnt.getBlockChain().getGenesisBlock().getChild(dcSet);
 			if (checkPointHeightCommonBlock == null) {
 				return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);				
 			}
 			checkPointHeightSignature = checkPointHeightCommonBlock.getSignature();
 		} else {
-			checkPointHeightSignature = dbSet.getBlockHeightsMap().get((long)checkPointHeight);
+			checkPointHeightSignature = dcSet.getBlockMap().getSignByHeight(checkPointHeight);
 		}
 		
 		try {
@@ -482,16 +617,29 @@ public class Synchronizer
 		int steep = 2;
 		byte[] lastBlockSignatureCommon;
 		do {
+			if (cnt.isOnStopping()) {
+				throw new Exception("on stoping");
+			}
+
 			maxChainHeight -= steep;
 			
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
 				lastBlockSignatureCommon = checkPointHeightCommonBlock.getSignature();
 			} else {
-				lastBlockSignatureCommon = dbSet.getBlockHeightsMap().get((long)maxChainHeight);				
+				lastBlockSignatureCommon = dcSet.getBlockMap().getSignByHeight(maxChainHeight);				
 			}
-				
+
+			LOGGER.info("findHeaders try found COMMON header"
+					+ " steep: " + steep
+					+ " maxChainHeight: " + maxChainHeight);
+
 			headers = this.getBlockSignatures(lastBlockSignatureCommon, peer);
+
+			LOGGER.info("findHeaders try found COMMON header"
+					+ " founded headers: " + headers.size()
+					);
+
 			if (headers.size() > 0) {
 				if (maxChainHeight == checkPointHeight) {
 					String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();				
@@ -506,8 +654,12 @@ public class Synchronizer
 			
 		} while ( maxChainHeight > checkPointHeight && headers.isEmpty());
 
+		LOGGER.info("findHeaders AFTER try found COMMON header"
+				+ " founded headers: " + headers.size()
+				);
+
 		// CLEAR head of common headers
-		while ( !headers.isEmpty() && dbSet.getBlockMap().contains(headers.get(0))) {
+		while ( !headers.isEmpty() && dcSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignatureCommon = headers.remove(0);
 		}
 
@@ -518,25 +670,29 @@ public class Synchronizer
 			throw new Exception(mess);
 		}
 
+		LOGGER.info("findHeaders headers CLEAR"
+				+ "now headers: " + headers.size()
+				);
 		
 		return new Tuple2<byte[], List<byte[]>>(lastBlockSignatureCommon, headers);
 	}
 
-	private List<Block> getBlocks(DBSet dbSet, List<byte[]> signatures, Peer peer) throws Exception {
+	private List<Block> getBlocks(DCSet dcSet, List<byte[]> signatures, Peer peer) throws Exception {
 		
 		List<Block> blocks = new ArrayList<Block>();
+		Controller cnt = Controller.getInstance();
 		
 		for(byte[] signature: signatures)
 		{
-			if(!this.run) {
-				return new ArrayList<Block>();
+			if (cnt.isOnStopping()) {
+				throw new Exception("on stoping");
 			}
 
 			//ADD TO LIST
 			Block block = getBlock(signature, peer, false);
 			// NOW generating balance not was send by NET
 			// need to SET it!
-			block.setCalcGeneratingBalance(dbSet);
+			block.setCalcGeneratingBalance(dcSet);
 
 			blocks.add(block);	
 		}
@@ -590,32 +746,85 @@ public class Synchronizer
 	
 	
 	//SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
-	public synchronized boolean process(DBSet dbSet, Block block)
+	//SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
+	public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan) throws Exception
 	{
-		//CHECK IF WE ARE STILL PROCESSING BLOCKS
-		if(this.run)
-		{
-			//SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-			if(block.isValid(dbSet) && block.isSignatureValid())
-			{
-				//PROCESS
-				if (!this.run)
-					return true;
-				
-				dbSet.getBlockMap().setProcessing(true);
-				block.process(dbSet);
-				dbSet.getBlockMap().setProcessing(false);
-				
-				return true;
-			}
-		}
+		Controller cnt = Controller.getInstance();
 		
-		return false;
+		//CHECK IF WE ARE STILL PROCESSING BLOCKS
+		if (cnt.isOnStopping()) {
+			throw new Exception("on stoping");
+		}
+
+		dcSet.getBlockMap().setProcessing(true);
+		int count = block.getTransactionCount();
+		if (count < 100)
+			count = 100;
+
+		if(doOrphan)
+		{
+
+			try {
+				block.orphan(dcSet);
+				dcSet.getBlockMap().setProcessing(false);
+				dcSet.flush(block);
+				
+				if(Controller.getInstance().isOnStopping())
+					throw new Exception("on stoping");
+				
+				// NOTIFY to WALLET
+				if (!BlockChain.HARD_WORK && cnt.doesWalletExists() && cnt.useGui)
+					dcSet.getBlockMap().notifyOrphanChain(block);
+
+			} catch (Exception e) {
+				
+				dcSet.rollback();
+				
+				if (cnt.isOnStopping()) {
+					dcSet.getBlockMap().setProcessing(false);
+					throw new Exception("on stoping");
+				} else {
+					throw new Exception(e);					
+				}
+			}
+			
+		} else {
+			
+			//PROCESS
+			try {
+				block.process(dcSet);
+				dcSet.getBlockMap().setProcessing(false);
+				dcSet.flush(block);
+
+				if(Controller.getInstance().isOnStopping())
+					throw new Exception("on stoping");
+
+				// NOTIFY to WALLET
+				if (!BlockChain.HARD_WORK && cnt.doesWalletExists() && cnt.useGui)
+					dcSet.getBlockMap().notifyProcessChain(block);
+				
+			} catch (Exception e) {
+
+				dcSet.rollback();
+				
+				if (cnt.isOnStopping()) {
+					dcSet.getBlockMap().setProcessing(false);
+					throw new Exception("on stoping");
+				} else {
+					throw new Exception(e);					
+				}
+			}
+				
+		}
 	}
 
+	
 	public void stop() {
 		
-		this.run = false;
-		this.process(DBSet.getInstance(), null);
+		//this.run = false;
+		//if (runedBlock != null)
+		//	runedBlock.stop();
+		
+		//this.pipeProcessOrOrphan(DBSet.getInstance(), null, false);
 	}
 }

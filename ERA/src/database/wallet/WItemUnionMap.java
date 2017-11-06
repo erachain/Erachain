@@ -17,13 +17,14 @@ public class WItemUnionMap extends WItem_Map
 	static final int TYPE = ItemCls.UNION_TYPE;
 
 
-	public WItemUnionMap(WalletDatabase walletDatabase, DB database)
+	public WItemUnionMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database,
+		super(dWSet, database,
 				TYPE, "item_unions",
-				ObserverMessage.ADD_UNION_TYPE,
-				ObserverMessage.REMOVE_UNION_TYPE,
-				ObserverMessage.LIST_UNION_TYPE
+				ObserverMessage.WALLET_RESET_UNION_TYPE,
+				ObserverMessage.WALLET_ADD_UNION_TYPE,
+				ObserverMessage.WALLET_REMOVE_UNION_TYPE,
+				ObserverMessage.WALLET_LIST_UNION_TYPE
 				);
 	}
 

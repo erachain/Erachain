@@ -5,9 +5,9 @@ import java.util.Observer;
 
 import controller.Controller;
 import core.item.ItemCls;
+import datachain.SortableList;
 //import utils.NumberAsString;
 import utils.ObserverMessage;
-import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 

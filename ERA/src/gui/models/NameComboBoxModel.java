@@ -11,8 +11,8 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.naming.Name;
-import database.SortableList;
 import database.wallet.NameMap;
+import datachain.SortableList;
 
 @SuppressWarnings("serial")
 public class NameComboBoxModel extends DefaultComboBoxModel<Name> implements Observer {

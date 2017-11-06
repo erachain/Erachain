@@ -57,7 +57,7 @@ import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class UpdateNameFrame extends JFrame
@@ -489,7 +489,7 @@ public class UpdateNameFrame extends JFrame
 		
 		//READ NAME
 		Name name = (Name) this.cbxName.getSelectedItem();
-		name.setOwner(DBSet.getInstance().getNameMap().get(name.getName()).getOwner());
+		name.setOwner(DCSet.getInstance().getNameMap().get(name.getName()).getOwner());
 		
 		try
 		{

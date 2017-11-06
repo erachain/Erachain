@@ -22,10 +22,10 @@ import core.block.Block;
 import core.item.assets.AssetCls;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
-import database.TransactionFinalMap;
-import database.TransactionMap;
+import datachain.DCSet;
+import datachain.SortableList;
+import datachain.TransactionFinalMap;
+import datachain.TransactionMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -70,7 +70,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			block_No = Integer.parseInt(string);
 		} catch (NumberFormatException e) {
 			transactions = new ArrayList<>();
-			Transaction transaction = core.transaction.R_Vouch.getVouchingRecord(DBSet.getInstance(), string);
+			Transaction transaction = core.transaction.R_Vouch.getVouchingRecord(DCSet.getInstance(), string);
 			if (transaction != null) {
 				transactions.add(transaction);
 			}
@@ -78,7 +78,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			return;
 		}
 		
-		transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
+		transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
 		this.fireTableDataChanged();
 		
 	}
@@ -104,7 +104,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			transactions = new ArrayList();
 			// read Genessis block
 			List<Transaction> genesisTransactions = new ArrayList();
-			genesisTransactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(1));
+			genesisTransactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(1));
 			int k =0;
 			for (Transaction gT:genesisTransactions){
 				if(gT.getType() ==Transaction.GENESIS_SEND_ASSET_TRANSACTION){
@@ -123,7 +123,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			}
 			
 			
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
+			transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
 		
 
 		this.fireTableDataChanged();
@@ -139,7 +139,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	public void view_Transactioms_From_Adress(String str){
 		
-		transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(str);
+		transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(str);
 		 this.fireTableDataChanged();	
 		
 		
@@ -260,7 +260,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
 		{
 			if(this.transactions == null)
 			{
@@ -271,12 +271,13 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			
 			this.fireTableDataChanged();
 		}
-		
+		/*
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
 		{
 			this.fireTableDataChanged();
-		}	
+		}
+		*/	
 	}
 
 	public void removeObservers() 

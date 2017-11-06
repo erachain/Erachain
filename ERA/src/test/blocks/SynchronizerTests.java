@@ -20,8 +20,8 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import core.transaction.GenesisTransferAssetTransaction;
-import database.DBSet;
 
 public class SynchronizerTests {
 
@@ -32,7 +32,7 @@ public class SynchronizerTests {
 	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
-	DBSet databaseSet = DBSet.createEmptyDatabaseSet();
+	DCSet databaseSet = DCSet.createEmptyDatabaseSet();
 	GenesisBlock genesisBlock = new GenesisBlock();
 	
 	byte[] transactionsHash =  new byte[Crypto.HASH_LENGTH];
@@ -43,7 +43,12 @@ public class SynchronizerTests {
 		//GENERATE 5 BLOCKS FROM ACCOUNT 1
 		
 		//PROCESS GENESISBLOCK
-		genesisBlock.process(databaseSet);
+		try {
+			genesisBlock.process(databaseSet);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -69,7 +74,12 @@ public class SynchronizerTests {
 			newBlock.makeTransactionsHash();
 			
 			//PROCESS NEW BLOCK
-			newBlock.process(databaseSet);
+			try {
+				newBlock.process(databaseSet);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			//ADD TO LIST
 			firstBlocks.add(newBlock);
@@ -89,7 +99,7 @@ public class SynchronizerTests {
 		generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 
 		//FORK
-		DBSet fork = databaseSet.fork();	
+		DCSet fork = databaseSet.fork();	
 		
 		//GENERATE NEXT 5 BLOCKS
 		List<Block> newBlocks = new ArrayList<Block>();
@@ -103,7 +113,12 @@ public class SynchronizerTests {
 			newBlock.makeTransactionsHash();
 			
 			//PROCESS NEW BLOCK
-			newBlock.process(fork);
+			try {
+				newBlock.process(fork);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			//ADD TO LIST
 			newBlocks.add(newBlock);
@@ -117,7 +132,7 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize(databaseSet, null, newBlocks, null);
+			synchronizer.synchronize_blocks(databaseSet, null, newBlocks, null);
 			
 			//CHECK LAST 5 BLOCKS
 			lastBlock = databaseSet.getBlockMap().getLastBlock();
@@ -153,13 +168,18 @@ public class SynchronizerTests {
 	{	
 		
 		//GENERATE 5 BLOCKS FROM ACCOUNT 1
-		DBSet databaseSet = DBSet.createEmptyDatabaseSet();
-		DBSet databaseSet2 = DBSet.createEmptyDatabaseSet();
+		DCSet databaseSet = DCSet.createEmptyDatabaseSet();
+		DCSet databaseSet2 = DCSet.createEmptyDatabaseSet();
 		
 		//PROCESS GENESISBLOCK
 		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(databaseSet);
-		genesisBlock.process(databaseSet2);
+		try {
+			genesisBlock.process(databaseSet);
+			genesisBlock.process(databaseSet2);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -203,7 +223,12 @@ public class SynchronizerTests {
 			newBlock.makeTransactionsHash();
 			
 			//PROCESS NEW BLOCK
-			newBlock.process(databaseSet);
+			try {
+				newBlock.process(databaseSet);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			//LAST BLOCK IS NEW BLOCK
 			lastBlock = newBlock;
@@ -222,7 +247,12 @@ public class SynchronizerTests {
 			newBlock.makeTransactionsHash();
 			
 			//PROCESS NEW BLOCK
-			newBlock.process(databaseSet2);
+			try {
+				newBlock.process(databaseSet2);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 			//ADD TO LIST
 			newBlocks.add(newBlock);
@@ -236,7 +266,7 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize(databaseSet, genesisBlock, newBlocks, null);
+			synchronizer.synchronize_blocks(databaseSet, genesisBlock, newBlocks, null);
 		}
 		catch(Exception e)
 		{

@@ -27,9 +27,9 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
-import database.ItemAssetBalanceMap;
-import database.AddressForging;
-import database.DBSet;
+import datachain.AddressForging;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class GenesisTransferAssetTransaction extends Genesis_Record {
 
@@ -224,7 +224,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -257,7 +257,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//PROCESS/ORPHAN
 	
 	@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 
 		long key = this.key;
@@ -266,7 +266,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		this.recipient.changeBalance(db, false, key, this.amount);
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastReference(this.timestamp, db);
+		this.recipient.setLastTimestamp(this.timestamp, db);
 
 		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// PROCESS FORGING DATA
@@ -291,7 +291,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	}
 
 	@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		
 		/* IT CANNOT BE orphanED !!!

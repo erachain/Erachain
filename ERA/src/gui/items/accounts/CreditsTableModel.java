@@ -21,10 +21,10 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBMap;
-import database.DBSet;
-import database.SortableList;
 import database.wallet.TransactionMap;
+import datachain.DCMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -58,7 +58,7 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
 		for (PublicKeyAccount account:this.publicKeyAccounts){			
 			//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
-			cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
+			cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
 		}
 		
 		Controller.getInstance().addWalletListener(this);
@@ -101,9 +101,9 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		asset_Key = asset.getKey();
 		cred.clear();
 		for (PublicKeyAccount account:this.publicKeyAccounts){			
-			List<Transaction> trans = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());
+			List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress());
 			//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
-			cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
+			cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));	
 		}
 /*		for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
 			long a = trans.getB().getAssetKey();
@@ -277,12 +277,13 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 			
 		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 			
-			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
 			{
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				cred.clear();
 				for (PublicKeyAccount account:this.publicKeyAccounts){
-					cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+					cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
 					//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));	
 				}
 				

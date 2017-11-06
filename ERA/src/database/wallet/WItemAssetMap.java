@@ -22,9 +22,9 @@ import org.mapdb.BTreeMap;
 
 import utils.ObserverMessage;
 import utils.Pair;
-import database.DBMap;
 import database.serializer.ItemSerializer;
 import database.serializer.TransactionSerializer;
+import datachain.DCMap;
 public class WItemAssetMap extends WItem_Map
 {	
 	//static Logger LOGGER = Logger.getLogger(WItemAssetMap.class.getName());
@@ -32,13 +32,14 @@ public class WItemAssetMap extends WItem_Map
 	static final String NAME = "asset";
 	static final int TYPE = ItemCls.ASSET_TYPE;
 
-	public WItemAssetMap(WalletDatabase walletDatabase, DB database)
+	public WItemAssetMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database,
+		super(dWSet, database,
 				TYPE, NAME,
-				ObserverMessage.ADD_ASSET_TYPE,
-				ObserverMessage.REMOVE_ASSET_TYPE,
-				ObserverMessage.LIST_ASSET_TYPE
+				ObserverMessage.WALLET_RESET_ASSET_TYPE,
+				ObserverMessage.WALLET_ADD_ASSET_TYPE,
+				ObserverMessage.WALLET_REMOVE_ASSET_TYPE,
+				ObserverMessage.WALLET_LIST_ASSET_TYPE
 				);
 	}
 

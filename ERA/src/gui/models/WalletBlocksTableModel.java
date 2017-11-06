@@ -13,9 +13,9 @@ import utils.Pair;
 import controller.Controller;
 import core.block.Block;
 import core.wallet.Wallet;
-import database.DBSet;
-import database.SortableList;
 import database.wallet.BlockMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -39,8 +39,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 
 	public WalletBlocksTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
-		blocks.registerObserver();
+		//Controller.getInstance().addWalletListener(this);
+		Controller.getInstance().wallet.database.getBlockMap().addObserver(this);
 	}
 	
 	@Override
@@ -112,11 +112,11 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			{
 			case COLUMN_HEIGHT:
 				
-				return block.getHeight(DBSet.getInstance());
+				return block.getHeight(DCSet.getInstance());
 				
 			case COLUMN_TIMESTAMP:
 				
-				return DateTimeFormat.timestamptoString(block.getTimestamp(DBSet.getInstance())); // + " " + block.getTimestamp(DBSet.getInstance()) / 1000;
+				return DateTimeFormat.timestamptoString(block.getTimestamp(DCSet.getInstance())); // + " " + block.getTimestamp(DBSet.getInstance()) / 1000;
 				
 			case COLUMN_GENERATOR:
 				
@@ -124,8 +124,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			case COLUMN_BASETARGET:
 
-				long iii = block.calcWinValueTargeted(DBSet.getInstance());
-				return block.getGeneratingBalance(DBSet.getInstance()) + " "
+				long iii = block.calcWinValueTargeted(DCSet.getInstance());
+				return block.getGeneratingBalance(DCSet.getInstance()) + " "
 					+ iii;
 				
 			case COLUMN_TRANSACTIONS:
@@ -147,14 +147,14 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		try
-		{
+		//try
+		//{
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
+		//}
+		//catch(Exception e)
+	//	{
 			//GUI ERROR
-		}
+	//	}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -163,22 +163,32 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE)
 		{
-			if(this.blocks == null)
-			{
-				this.blocks = (SortableList<Tuple2<String, String>, Block>) message.getValue();
-				this.blocks.registerObserver();
-				this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
-			}
+			this.blocks = (SortableList<Tuple2<String, String>, Block>) message.getValue();
+			//this.blocks.registerObserver();
+			Controller.getInstance().wallet.database.getBlockMap().addObserver(this.blocks);
+			this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
+			this.fireTableDataChanged();
 			
+		} else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
+				|| message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+				) {
+			//CHECK IF LIST UPDATED
+			this.fireTableDataChanged();
+		} else if (message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
+				)
+		{
+			//CHECK IF LIST UPDATED
+			//this.blocks = new SortableList();
+			this.blocks.registerObserver();
+			this.blocks.sort(BlockMap.TIMESTAMP_INDEX, true);
 			this.fireTableDataChanged();
 		}
+	}
+	public void deleteObserver(){
+		Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this);	
+		Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this.blocks);
 		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE)
-		{
-			this.fireTableDataChanged();
-		}	
 	}
 }

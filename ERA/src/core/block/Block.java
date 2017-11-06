@@ -43,16 +43,19 @@ import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
 import core.transaction.TransactionFactory;
+import database.DBSet;
+import datachain.DCSet;
+import datachain.TransactionFinalMap;
+import datachain.TransactionMap;
+import datachain.TransactionRef_BlockRef_Map;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
-import database.DBSet;
-
 
 public class Block {
 
-	public static final int GENERATING_MIN_BLOCK_TIME = BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
+	private boolean run = true;
 	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
@@ -103,7 +106,7 @@ public class Block {
 		this.transactionCount = 0;
 		this.atBytes = atBytes;
 		
-		//this.setGeneratingBalance(dbSet);
+		//this.setGeneratingBalance(dcSet);
 		//BlockChain.getTarget();
 
 	}
@@ -128,7 +131,7 @@ public class Block {
 		return this.signature;
 	}
 
-	public int getHeight(DBSet db)
+	public int getHeight(DCSet db)
 	{
 
 		if (this instanceof GenesisBlock
@@ -154,7 +157,7 @@ public class Block {
 	}
 	*/
 
-	public Block getParent(DBSet db)
+	public Block getParent(DCSet db)
 	{
 		if (parentBlock == null) {
 			this.parentBlock = db.getBlockMap().get(this.reference);
@@ -162,12 +165,12 @@ public class Block {
 		return parentBlock;
 	}
 
-	public Block getChild(DBSet db)
+	public Block getChild(DCSet db)
 	{
-		return db.getChildMap().get(this);
+		return db.getBlockMap().getChildBlock(this);
 	}
 
-	public int getHeightByParent(DBSet db)
+	public int getHeightByParent(DCSet db)
 	{
 		
 		if (this instanceof GenesisBlock
@@ -184,7 +187,7 @@ public class Block {
 
 	}
 
-	public long getTimestamp(DBSet db)
+	public long getTimestamp(DCSet db)
 	{
 
 		int height = getHeightByParent(db);
@@ -195,7 +198,7 @@ public class Block {
 	}
 
 	// balance on creator account when making this block
-	public int getGeneratingBalance(DBSet dbSet)
+	public int getGeneratingBalance(DCSet dcSet)
 	{
 		return this.generatingBalance;
 	}
@@ -206,13 +209,13 @@ public class Block {
 		
 	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
 	// MABE used only in isValid and in Block Generator
-	public static int calcGeneratingBalance(DBSet dbSet, Account creator, int height)
+	public static int calcGeneratingBalance(DCSet dcSet, Account creator, int height)
 	{
 		
 		long incomed_amount = 0l;
 		//long amount;
 				
-		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, creator, height);
+		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, creator, height);
 		if (previousForgingHeight == -1)
 			return 0;
 				
@@ -220,7 +223,7 @@ public class Block {
 		if (previousForgingHeight < height) {
 			
 			// for recipient only
-			List<Transaction> txs = dbSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
+			List<Transaction> txs = dcSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
@@ -251,7 +254,7 @@ public class Block {
 			}
 
 			// for creator
-			txs = dbSet.getTransactionFinalMap().findTransactions(null, creator.getAddress(), null,
+			txs = dcSet.getTransactionFinalMap().findTransactions(null, creator.getAddress(), null,
 					previousForgingHeight, height,
 					0, 0, false, 0, 0);
 			
@@ -292,7 +295,7 @@ public class Block {
 		}
 		
 		// OWN + RENT balance - in USE
-		long used_amount = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dbSet).longValue();
+		long used_amount = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).longValue();
 		if (used_amount < BlockChain.MIN_GENERATING_BALANCE)
 			return 0;
 		
@@ -304,9 +307,9 @@ public class Block {
 	}
 
 	// CALCULATE and SET
-	public void setCalcGeneratingBalance(DBSet dbSet)
+	public void setCalcGeneratingBalance(DCSet dcSet)
 	{
-		 this.generatingBalance = calcGeneratingBalance(dbSet, this.creator, this.getHeightByParent(dbSet));
+		 this.generatingBalance = calcGeneratingBalance(dcSet, this.creator, this.getHeightByParent(dcSet));
 	}
 
 	public byte[] getReference()
@@ -319,9 +322,9 @@ public class Block {
 		return this.creator;
 	}
 
-	public BigDecimal getTotalFee(DBSet db)
+	public BigDecimal getTotalFee(DCSet db)
 	{
-		BigDecimal fee = this.getTotalFeeForProcess();
+		BigDecimal fee = this.getTotalFeeForProcess(db);
 
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
@@ -349,10 +352,10 @@ public class Block {
 	}
 	
 	public BigDecimal getTotalFee() {
-		return getTotalFee(DBSet.getInstance());
+		return getTotalFee(DCSet.getInstance());
 	}
 	
-	public BigDecimal getTotalFeeForProcess()
+	public BigDecimal getTotalFeeForProcess(DCSet db)
 	{
 		//BigDecimal fee = BigDecimal.ZERO;
 		int fee = 0;
@@ -360,7 +363,7 @@ public class Block {
 		for(Transaction transaction: this.getTransactions())
 		{
 			//fee = fee.add(transaction.getFee());
-			fee += transaction.getForgedFee();
+			fee += transaction.getForgedFee(db);
 		}
 
 		// TODO calculate AT FEE
@@ -654,16 +657,16 @@ public class Block {
 
 		block.put("version", this.version);
 		block.put("reference", Base58.encode(this.reference));
-		block.put("timestamp", this.getTimestamp(DBSet.getInstance()));
+		block.put("timestamp", this.getTimestamp(DCSet.getInstance()));
 		block.put("generatingBalance", this.generatingBalance);
 		//block.put("winValue", this.calcWinValue(DBSet.getInstance()));
-		block.put("winValueTargeted", this.calcWinValueTargeted(DBSet.getInstance()));
+		block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
 		block.put("fee", this.getTotalFee().toPlainString());
 		block.put("transactionsHash", Base58.encode(this.transactionsHash));
 		block.put("signature", Base58.encode(this.signature));
 		block.put("signature",  Base58.encode(this.getSignature()));
-		block.put("height", this.getHeight(DBSet.getInstance()));
+		block.put("height", this.getHeight(DCSet.getInstance()));
 
 		//CREATE TRANSACTIONS
 		JSONArray transactionsArray = new JSONArray();
@@ -820,13 +823,13 @@ public class Block {
 	}
 
 	/*
-	public static int getPreviousForgingHeightForIncomes(DBSet dbSet, Account creator, int height) {
+	public static int getPreviousForgingHeightForIncomes(DBSet dcSet, Account creator, int height) {
 		
 		// IF BLOCK in the MAP
-		int previousForgingHeight = creator.getForgingData(dbSet, height);
+		int previousForgingHeight = creator.getForgingData(dcSet, height);
 		if (previousForgingHeight == -1) {
 			// IF BLOCK not inserted in MAP
-			previousForgingHeight = creator.getLastForgingData(dbSet);
+			previousForgingHeight = creator.getLastForgingData(dcSet);
 			if (previousForgingHeight == -1) {
 				// if it is first payment to this account
 				return height;
@@ -838,13 +841,13 @@ public class Block {
 	}
 	*/
 
-	public static int getPreviousForgingHeightForCalcWin(DBSet dbSet, Account creator, int height) {
+	public static int getPreviousForgingHeightForCalcWin(DCSet dcSet, Account creator, int height) {
 		
 		// IF BLOCK in the MAP
-		int previousForgingHeight = creator.getForgingData(dbSet, height);
+		int previousForgingHeight = creator.getForgingData(dcSet, height);
 		if (previousForgingHeight == -1) {
 			// IF BLOCK not inserted in MAP
-			previousForgingHeight = creator.getLastForgingData(dbSet);			
+			previousForgingHeight = creator.getLastForgingData(dcSet);			
 		}
 		
 		if (previousForgingHeight > height) {
@@ -897,7 +900,7 @@ public class Block {
 	}
 
 	// may be calculated only for new BLOCK or last created BLOCK for this CREATOR
-	// because: creator.getLastForgingData(dbSet);
+	// because: creator.getLastForgingData(dcSet);
 	// see core.BlockChain.getMinTarget(int)
 	public static long calcWinValue(int previousForgingHeight, int height, int generatingBalance)
 	{
@@ -924,14 +927,14 @@ public class Block {
 
 	}
 	
-	public long calcWinValue(DBSet dbSet)
+	public long calcWinValue(DCSet dcSet)
 	{
 		if (this.version == 0) {
 			// GENESIS
 			return BlockChain.GENESIS_WIN_VALUE;
 		}
 
-		int height = this.getHeightByParent(dbSet);
+		int height = this.getHeightByParent(dcSet);
 		
 		if (this.creator == null) {
 			LOGGER.error("block.creator == null in BLOCK:" + height);
@@ -939,10 +942,10 @@ public class Block {
 		}
 		
 		if (this.generatingBalance <= 0) {
-			this.setCalcGeneratingBalance(dbSet);
+			this.setCalcGeneratingBalance(dcSet);
 		}
 		
-		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dbSet, this.creator, height);
+		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, this.creator, height);
 		if (previousForgingHeight == -1)
 			return 0l;
 		return calcWinValue(previousForgingHeight, height, this.generatingBalance);
@@ -974,7 +977,7 @@ public class Block {
 		
 	}
 	
-	public int calcWinValueTargeted(DBSet dbSet)
+	public int calcWinValueTargeted(DCSet dcSet)
 	{
 		
 		if (this.version == 0) {
@@ -982,8 +985,8 @@ public class Block {
 			return BlockChain.BASE_TARGET;
 		}
 		
-		long win_value = this.calcWinValue(dbSet);
-		long target = BlockChain.getTarget(dbSet, this);
+		long win_value = this.calcWinValue(dcSet);
+		long target = BlockChain.getTarget(dcSet, this);
 		return calcWinValueTargeted2(win_value, target);
 	}
 
@@ -1012,7 +1015,7 @@ public class Block {
 	}
 
 	// canonical definition of block version release schedule
-	public int getNextBlockVersion(DBSet db)
+	public int getNextBlockVersion(DCSet db)
 	{
 
 		return 1;
@@ -1065,10 +1068,11 @@ public class Block {
 	return 0;
 
 	}
-	public boolean isValid(DBSet db)
+	public boolean isValid(DCSet db)
 	{
 		
 		int height = this.getHeightByParent(db);
+		Controller cnt = Controller.getInstance();
 
 		/*
 		// FOR PROBE START !!!
@@ -1082,26 +1086,26 @@ public class Block {
 		//CHECK IF PARENT EXISTS
 		if(this.reference == null || this.getParent(db) == null)
 		{
-			LOGGER.error("*** Block[" + height + "].reference invalid");
+			LOGGER.debug("*** Block[" + height + "].reference invalid");
 			return false;
 		}
 
 		// TODO - show it to USER
-		if(this.getTimestamp(db) - 10000 > NTP.getTime()) {
-			LOGGER.error("*** Block[" + height + ":" + Base58.encode(this.signature) + "].timestamp invalid >NTP.getTime()"
-					+ " this.getTimestamp(db):" + this.getTimestamp(db) + " > NTP.getTime():" + NTP.getTime());
+		if(this.getTimestamp(db) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT>>2) > NTP.getTime()) {
+			LOGGER.debug("*** Block[" + height + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
+					+ NTP.getTime() + " + sec: " + (this.getTimestamp(db) - NTP.getTime())/1000);
 			return false;			
 		}
 		
 		//CHECK IF VERSION IS CORRECT
 		if(this.version != this.getParent(db).getNextBlockVersion(db))
 		{
-			LOGGER.error("*** Block[" + height + "].version invalid");
+			LOGGER.debug("*** Block[" + height + "].version invalid");
 			return false;
 		}
 		if(this.version < 2 && this.atBytes != null && this.atBytes.length > 0) // || this.atFees != 0))
 		{
-			LOGGER.error("*** Block[" + height + "].version AT invalid");
+			LOGGER.debug("*** Block[" + height + "].version AT invalid");
 			return false;
 		}
 		
@@ -1109,16 +1113,16 @@ public class Block {
 		// TEST STRONG of win Value
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = this.calcWinValueTargeted(db); 
-		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
+		if (!cnt.isTestNet() && base > targetedWinValue) {
 			targetedWinValue = this.calcWinValueTargeted(db);
-			LOGGER.error("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
+			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
 			return false;
 		}
 		
 		// STOP IF SO RAPIDLY			
-		if (!Controller.getInstance().isTestNet() && isSoRapidly(height, this.getCreator(),
-				Controller.getInstance().getBlockChain().getLastBlocksForTarget(db)) > 0) {
-			LOGGER.error("*** Block[" + height + "] REPEATED WIN invalid");
+		if (!cnt.isTestNet() && isSoRapidly(height, this.getCreator(),
+				cnt.getBlockChain().getLastBlocksForTarget(db)) > 0) {
+			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}
 
@@ -1143,7 +1147,7 @@ public class Block {
 		if (this.transactions == null || this.transactions.size() == 0) {
 			// empty transactions
 		} else {
-			DBSet fork = db.fork();
+			DCSet fork = db.fork();
 			byte[] transactionsSignatures = new byte[0];
 			
 			long timestampEnd = this.getTimestamp(db);
@@ -1152,6 +1156,9 @@ public class Block {
 
 			for(Transaction transaction: this.transactions)
 			{
+				if (cnt.isOnStopping())
+					return false;
+
 				if (!transaction.isWiped()) {
 					// NOT WIPERD
 	
@@ -1162,7 +1169,7 @@ public class Block {
 					
 					if(!transaction.isSignatureValid()) {
 						// 
-						LOGGER.error("*** Block[" + height
+						LOGGER.debug("*** Block[" + height
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 						+ transaction.viewFullTypeName() + "]"
 						+ "signature not valid!");
@@ -1183,12 +1190,12 @@ public class Block {
 						DeployATTransaction atTx = (DeployATTransaction)transaction;
 						if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
 						{
-							LOGGER.error("*** Block[" + height + "].atTx invalid");
+							LOGGER.debug("*** Block[" + height + "].atTx invalid");
 							return false;
 						}
 					} else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
 					{
-						LOGGER.error("*** Block[" + height
+						LOGGER.debug("*** Block[" + height
 							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 							+ transaction.viewFullTypeName() + "]"
 							+ "invalid code: " + transaction.isValid(fork, null));
@@ -1200,11 +1207,10 @@ public class Block {
 					if( transactionTimestamp > timestampEnd
 							|| transaction.getDeadline() <= timestampBeg)
 					{
-						LOGGER.error("*** Block[" + height + "].TX.timestamp invalid");
+						LOGGER.debug("*** Block[" + height + "].TX.timestamp invalid");
 						return false;
 					}
 		
-					
 					try{
 						//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
 						transaction.process(fork, this, false);
@@ -1219,7 +1225,7 @@ public class Block {
 			
 			transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
 			if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-				LOGGER.error("*** Block[" + height + "].digest(transactionsSignatures) invalid");
+				LOGGER.debug("*** Block[" + height + "].digest(transactionsSignatures) invalid");
 				return false;
 			}
 		}
@@ -1231,46 +1237,69 @@ public class Block {
 	//PROCESS/ORPHAN
 
 	// TODO - make it trownable
-	public void process(DBSet dbSet)
-	{	
+	public void process(DCSet dcSet) throws Exception
+	{			
 		
+		Controller cnt = Controller.getInstance();
+		if (cnt.isOnStopping())
+			throw new Exception("on stoping");
+		
+		long start = System.currentTimeMillis();
+
 		if (this.generatingBalance <= 0) {
-			this.setCalcGeneratingBalance(dbSet);
+			this.setCalcGeneratingBalance(dcSet);
+			long tickets = System.currentTimeMillis() - start;
+			LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );
 		}
+
+		//ADD TO DB
+		dcSet.getBlockMap().set(this);
+		
+		this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
+
 		//PROCESS TRANSACTIONS
-		for(Transaction transaction: this.getTransactions())
+		int seq = 1;
+		this.getTransactions();
+		//DBSet dbSet = Controller.getInstance().getDBSet();
+		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
+		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
+		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+		for(Transaction transaction: this.transactions)
 		{
+			
+			if (cnt.isOnStopping())
+				throw new Exception("on stoping");
+			
 			//PROCESS
 			if (!transaction.isWiped()) {
-				transaction.setDB(dbSet, false);
-				transaction.process(dbSet, this, false);
+				transaction.setDB(dcSet, false);
+				transaction.process(dcSet, this, false);
 			} else {
 				//UPDATE REFERENCE OF SENDER
 				if (transaction.isReferenced() )
 					// IT IS REFERENCED RECORD?
-					transaction.getCreator().setLastReference(transaction.getTimestamp(), dbSet);
+					transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
 			}
-
+			
 			//SET PARENT
-			dbSet.getTransactionRef_BlockRef_Map().set(transaction, this);
+			refsMap.set(transaction, this);
 
 			//REMOVE FROM UNCONFIRMED DATABASE
-			dbSet.getTransactionMap().delete(transaction);
-		}
+			unconfirmedMap.delete(transaction);
 
-		//DELETE CONFIRMED TRANSACTIONS FROM UNCONFIRMED TRANSACTIONS LIST
-		List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>(dbSet.getTransactionMap().getValues());
-		for(Transaction transaction: unconfirmedTransactions)
-		{
-			if(dbSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature()))
-			{
-				dbSet.getTransactionMap().delete(transaction);
-			}
+			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
+
+			if (cnt.isOnStopping())
+				throw new Exception("on stoping");
+			
+			finalMap.set( key, transaction);
+			seq++;
+
 		}
 
 		//PROCESS FEE
-		BigDecimal blockFee = this.getTotalFeeForProcess();
-		BigDecimal blockTotalFee = getTotalFee(dbSet);
+		BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
+		BigDecimal blockTotalFee = getTotalFee(dcSet);
 
 		
 		if (blockFee.compareTo(blockTotalFee) < 0) {
@@ -1283,108 +1312,95 @@ public class Block {
 				blockFee = blockTotalFee;
 				Account richAccount = new Account(rich);
 			
-				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).subtract(bonus_fee), dbSet);
-				richAccount.changeBalance(dbSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).subtract(bonus_fee), dcSet);
+				richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 				
 			}
 		}
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).add(blockFee), dbSet);
-		if (Controller.getInstance().isOnStopping())
-			return;
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dcSet, Transaction.FEE_KEY).add(blockFee), dcSet);
+		if (cnt.isOnStopping())
+			throw new Exception("on stoping");
 		
-		this.creator.changeBalance(dbSet, false, Transaction.FEE_KEY, blockFee);
-
-		//ADD TO DB
-		dbSet.getBlockMap().set(this);
-		
-		this.heightBlock = dbSet.getBlockSignsMap().getHeight(this.signature);
+		this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee);
 
 		/*
-		if (!dbSet.isFork()) {
-			int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
-			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dbSet) + 1)
+		if (!dcSet.isFork()) {
+			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
+			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dcSet) + 1)
 					+ "] SET new last Height: " + lastHeight
 					+ " getHeightMap().getHeight: " + this.height_process);
 		}
 		*/
 
-		BlockChain blockChain = Controller.getInstance().getBlockChain();
+		BlockChain blockChain = cnt.getBlockChain();
 		if (blockChain != null) {
-			Controller.getInstance().getBlockChain().setCheckPoint(this.heightBlock - BlockChain.MAX_ORPHAN);
-		}
-
-		//PROCESS TRANSACTIONS
-		int seq = 1;
-
-		List<Transaction> blockTransactions = this.getTransactions();
-
-		//SORT THEM BY TIMESTAMP
-		// for correct reference
-		Collections.sort(blockTransactions, new TransactionTimestampComparator());
-
-		for(Transaction transaction: blockTransactions)
-		{
-			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(heightBlock, seq);
-			dbSet.getTransactionFinalMap().set( key, transaction);
-			dbSet.getTransactionFinalMapSigns().set( transaction.getSignature(), key);
-			seq++;
+			cnt.getBlockChain().setCheckPoint(this.heightBlock - BlockChain.MAX_ORPHAN);
 		}
 
 		if(heightBlock % BlockChain.MAX_ORPHAN == 0) 
 		{
-			Controller.getInstance().blockchainSyncStatusUpdate(heightBlock);
+			cnt.blockchainSyncStatusUpdate(heightBlock);
 		}
+		long tickets = System.currentTimeMillis() - start;
+		LOGGER.error("[" + this.heightBlock + "] processing time: " +  tickets*0.001
+				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
 		
 	}
 
-	public void orphan(DBSet dbSet)
+	public void orphan(DCSet dcSet) throws Exception
 	{
 
+		Controller cnt = Controller.getInstance();
+		if (cnt.isOnStopping())
+			throw new Exception("on stoping");
+
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #0");
-		int height = this.getHeight(dbSet);
+		int height = this.getHeight(dcSet);
 		if (height == 1) {
 			// GENESIS BLOCK cannot be orphanED
 			return;
 		}
-				
+		
+		long start = System.currentTimeMillis();
+		
+
 		//ORPHAN AT TRANSACTIONS
-		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #1 ORPHAN AT TRANSACTIONS");
-
-		LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dbSet.getATTransactionMap().getATTransactions(height);
-
-		Iterator<AT_Transaction> iter = atTxs.values().iterator();
-
-		while ( iter.hasNext() )
-		{
-			AT_Transaction key = iter.next();
-			Long amount  = key.getAmount();
-			if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
+		if (BlockChain.USE_AT_ATX) {
+			//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #1 ORPHAN AT TRANSACTIONS");
+	
+			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dcSet.getATTransactionMap().getATTransactions(height);
+	
+			Iterator<AT_Transaction> iter = atTxs.values().iterator();
+	
+			while ( iter.hasNext() )
 			{
-				Account recipient = new Account( key.getRecipient() );
-				//recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(dbSet,  Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
-				recipient.changeBalance(dbSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ));
-				if ( recipient.getLastReference(dbSet) != null)
+				AT_Transaction key = iter.next();
+				Long amount  = key.getAmount();
+				if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
 				{
-					recipient.removeReference(dbSet);
+					Account recipient = new Account( key.getRecipient() );
+					//recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(dcSet,  Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dcSet );
+					recipient.changeBalance(dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ));
 				}
+				Account sender = new Account( key.getSender() );
+				//sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(dcSet,  Transaction.FEE_KEY ).add( BigDecimal.valueOf( amount, 8 ) ) , dcSet );
+				sender.changeBalance(dcSet, false, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ) );
+	
 			}
-			Account sender = new Account( key.getSender() );
-			//sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(dbSet,  Transaction.FEE_KEY ).add( BigDecimal.valueOf( amount, 8 ) ) , dbSet );
-			sender.changeBalance(dbSet, false, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ) );
-
 		}
+		
 
 		//ORPHAN TRANSACTIONS
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2 ORPHAN TRANSACTIONS");
-		this.orphanTransactions(this.getTransactions(), dbSet);
+		this.orphanTransactions(dcSet, height);
 
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2f FEE");
 
 		//REMOVE FEE
-		BigDecimal blockFee = this.getTotalFeeForProcess();
-		BigDecimal blockTotalFee = getTotalFee(dbSet); 
+		BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
+		BigDecimal blockTotalFee = getTotalFee(dcSet); 
 
 		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
@@ -1396,73 +1412,87 @@ public class Block {
 				blockFee = blockTotalFee;
 
 				Account richAccount = new Account(rich);
-				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dbSet, Transaction.FEE_KEY).add(bonus_fee), dbSet);
-				richAccount.changeBalance(dbSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
-				
+				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
+				richAccount.changeBalance(dcSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
 			}
 		}
 
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dbSet, Transaction.FEE_KEY).subtract(blockFee), dbSet);
-		this.creator.changeBalance(dbSet, true, Transaction.FEE_KEY, blockFee);
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dcSet, Transaction.FEE_KEY).subtract(blockFee), dcSet);
+		this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee);
 
 		//DELETE AT TRANSACTIONS FROM DB
-		dbSet.getATTransactionMap().delete(height);
+		if (BlockChain.USE_AT_ATX) dcSet.getATTransactionMap().delete(height);
 		
+		//// DELETE in orphanTransactions!
 		//DELETE TRANSACTIONS FROM FINAL MAP
-		dbSet.getTransactionFinalMap().delete(height);
-
-		int lastHeightThis = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
+		/////dcSet.getTransactionFinalMap().delete(height);
 
 		//DELETE BLOCK FROM DB
-		dbSet.getBlockMap().delete(this);
+		dcSet.getBlockMap().delete(this);
 		
 		/*
 		if (height > 1) {
-			int lastHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet);
+			int lastHeightThis = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
+			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
 			LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
 					+ "] DELETE -> new last Height: " + lastHeight
-					+ (dbSet.isFork()?" in FORK!": ""));
+					+ (dcSet.isFork()?" in FORK!": ""));
 		}
 		*/
 
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
 
-		for(Transaction transaction: this.getTransactions())
-		{
-			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-			dbSet.getTransactionMap().add(transaction);
+		long tickets = System.currentTimeMillis() - start;
+		LOGGER.error("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
+				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
 
-			dbSet.getTransactionFinalMapSigns()
-				.delete(transaction.getSignature());
-
-			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
-			dbSet.getTransactionRef_BlockRef_Map().delete(transaction.getSignature());
-		}
 		this.heightBlock = -1;
 		this.parentBlock = null;
 
 	}
 
-	private void orphanTransactions(List<Transaction> transactions, DBSet db)
+	private void orphanTransactions(DCSet dcSet, int height) throws Exception
 	{
+		
+		Controller cnt = Controller.getInstance();
+		//DBSet dbSet = Controller.getInstance().getDBSet();
+
+		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
+		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
+		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+
 		//ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
-		for(int i=transactions.size() -1; i>=0; i--)
+		for(int i=this.getTransactions().size() -1; i>=0; i--)
 		{
+			if (cnt.isOnStopping())
+				throw new Exception("on stoping");
+
 			Transaction transaction = transactions.get(i);
 			//LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
 			if (!transaction.isWiped()) {
-				transaction.setDB(db, false);
-				transaction.orphan(db, false);
+				transaction.setDB(dcSet, false);
+				transaction.orphan(dcSet, false);
 			} else {
-				//UPDATE REFERENCE OF SENDER
-				if (transaction.isReferenced() )
-					// IT IS REFERENCED RECORD?
-					transaction.getCreator().setLastReference(transaction.getReference(), db);
+				// IT IS REFERENCED RECORD?
+				if (transaction.isReferenced() ) {
+					//UPDATE REFERENCE OF SENDER
+					transaction.getCreator().removeLastTimestamp(dcSet);
+				}
 			}
+			
+			//ADD ORPHANED TRANASCTIONS BACK TO DATABASE
+			unconfirmedMap.add(transaction);
+	
+			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height, i);
+			finalMap.delete(key);
+	
+			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
+			refsMap.delete(transaction.getSignature());
+
 		}
 	}
 
@@ -1479,11 +1509,15 @@ public class Block {
 		return false;
 	}
 
-	public String toString(DBSet dbSet) {
-		return "H:" + this.getHeightByParent(dbSet)
-			+ " W: " + this.calcWinValue(dbSet)
-			+ "WT: " + this.calcWinValueTargeted(dbSet)
+	public String toString(DCSet dcSet) {
+		return "H:" + this.getHeightByParent(dcSet)
+			+ " W: " + this.calcWinValue(dcSet)
+			+ "WT: " + this.calcWinValueTargeted(dcSet)
 			+ " C: " + this.getCreator().getPersonAsString();
 	}
 	
+	public void stop() {		
+		this.run = false;
+	}
+
 }

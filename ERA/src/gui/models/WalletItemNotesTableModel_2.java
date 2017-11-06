@@ -6,10 +6,8 @@ import java.util.Observable;
 import org.mapdb.Fun.Tuple2;
 
 import core.item.ItemCls;
+import datachain.SortableList;
 import utils.ObserverMessage;
-//import controller.Controller;
-import database.SortableList;
-//import lang.Lang;
 
 @SuppressWarnings("serial")
 public class WalletItemNotesTableModel_2 extends WalletItem_TableModel

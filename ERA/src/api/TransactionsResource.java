@@ -26,7 +26,7 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import utils.APIUtils;
 import utils.Pair;
 
@@ -350,11 +350,11 @@ public class TransactionsResource {
 			
 			if(block != null)
 			{
-				json.put("amount", result.getA().getHeight(DBSet.getInstance()) - block.getHeight(DBSet.getInstance()) + 1);
+				json.put("amount", result.getA().getHeight(DCSet.getInstance()) - block.getHeight(DCSet.getInstance()) + 1);
 			}
 			else
 			{
-				json.put("amount", result.getA().getHeight(DBSet.getInstance()));
+				json.put("amount", result.getA().getHeight(DCSet.getInstance()));
 			}
 			
 			JSONArray transactions = new JSONArray();
@@ -381,7 +381,7 @@ public class TransactionsResource {
 	public String getTransactionsByRecipient(@PathParam("address") String address, @PathParam("limit") int limit)
 	{
 		JSONArray array = new JSONArray();
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(address, limit);
+		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(address, limit);
 		for(Transaction transaction: txs)
 		{
 			array.add(transaction.toJson());
@@ -520,11 +520,11 @@ public class TransactionsResource {
 		}
 		
 		if (count) {
-			return String.valueOf(DBSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit));
+			return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit));
 		}
 		
 		JSONArray array = new JSONArray();
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().findTransactions(address, sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
 		for(Transaction transaction: txs)
 		{
 			array.add(transaction.toJson());
@@ -540,7 +540,7 @@ public class TransactionsResource {
 	{
 		
 		JSONArray array = new JSONArray();
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsBySender(address, limit);
+		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender(address, limit);
 		for(Transaction transaction: txs)
 		{
 			array.add(transaction.toJson());
@@ -556,7 +556,7 @@ public class TransactionsResource {
 	{
 		
 		JSONArray array = new JSONArray();
-		List<Transaction> txs = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, type, limit);
+		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, type, limit);
 		for(Transaction transaction: txs)
 		{
 			array.add(transaction.toJson());

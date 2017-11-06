@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 public class AT extends AT_Machine_State {
 
@@ -44,25 +44,25 @@ public class AT extends AT_Machine_State {
 		this.tags = tags;
 	}
 
-	public static AT getAT( String id, DBSet dbSet ) 
+	public static AT getAT( String id, DCSet dcSet ) 
 	{
-		return getAT( Base58.decode( id ) , dbSet );
+		return getAT( Base58.decode( id ) , dcSet );
 	}
 	
-	public static AT getAT( byte[] atId, DBSet dbSet)
+	public static AT getAT( byte[] atId, DCSet dcSet)
 	{
-		AT at = dbSet.getATMap().getAT( atId );
+		AT at = dcSet.getATMap().getAT( atId );
 		
 		return at; 
 	}
 
 	public static AT getAT(byte[] atId) {
-		return getAT( atId, DBSet.getInstance() );
+		return getAT( atId, DCSet.getInstance() );
 	}
 
-	public static Iterator<String> getOrderedATs( DBSet dbSet, Integer height ) 
+	public static Iterator<String> getOrderedATs( DCSet dcSet, Integer height ) 
 	{
-		return dbSet.getATMap().getOrderedATs(height);
+		return dcSet.getATMap().getOrderedATs(height);
 	}
 
 	//public int getDataLength() {

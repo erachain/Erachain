@@ -7,7 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import core.item.assets.AssetCls;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 import utils.NumberAsString;
 
@@ -78,12 +78,12 @@ public class PollOptionsTableModel extends AbstractTableModel
 		
 		case COLUMN_VOTES:
 			
-			return NumberAsString.getInstance().numberAsString(option.getVotes(this.asset.getKey(DBSet.getInstance())));
+			return NumberAsString.getInstance().numberAsString(option.getVotes(this.asset.getKey(DCSet.getInstance())));
 			
 		case COLUMN_PERCENTAGE:
 			
-			BigDecimal total = this.poll.getTotalVotes(this.asset.getKey(DBSet.getInstance()));
-			BigDecimal votes = option.getVotes(this.asset.getKey(DBSet.getInstance()));
+			BigDecimal total = this.poll.getTotalVotes(this.asset.getKey(DCSet.getInstance()));
+			BigDecimal votes = option.getVotes(this.asset.getKey(DCSet.getInstance()));
 			
 			if(votes.compareTo(BigDecimal.ZERO) == 0)
 			{

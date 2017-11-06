@@ -8,8 +8,8 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.notes.NoteCls;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -72,7 +72,7 @@ public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, Stri
 		{
 		case COLUMN_KEY:
 			
-			return note.getKey(DBSet.getInstance());
+			return note.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			

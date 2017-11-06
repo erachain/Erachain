@@ -32,7 +32,7 @@ import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.Transaction;
 import core.transaction.R_Send;
 import core.web.blog.BlogEntry;
-import database.DBSet;
+import datachain.DCSet;
 
 public class BlockTests
 {
@@ -44,7 +44,7 @@ public class BlockTests
 
 	boolean forDB = true;
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db = DBSet.createEmptyDatabaseSet();
+	private DCSet db = DCSet.createEmptyDatabaseSet();
 	private GenesisBlock gb = new GenesisBlock();
 
 	List<Transaction> gbTransactions = gb.getTransactions();
@@ -68,7 +68,7 @@ public class BlockTests
 		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
 		gbTransactions = gb.getTransactions();
 
-		generator.setLastReference(gb.getTimestamp(db), db);
+		generator.setLastTimestamp(gb.getTimestamp(db), db);
 		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8)); // need for payments
 	}
@@ -129,7 +129,12 @@ public class BlockTests
 		assertEquals(true, gb.isValid(db));
 		
 		//PROCESS
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//CHECK IF INVALID
 		assertEquals(false, gb.isValid(db));
@@ -210,7 +215,12 @@ public class BlockTests
 		assertEquals(true, genesisBlock.isValid(db));
 		
 		//PROCESS BLOCK
-		genesisBlock.process(db);
+		try {
+			genesisBlock.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		Account recipient1 = new Account("73CcZe3PhwvqMvWxDznLAzZBrkeTZHvNzo");
 		Account recipient2 = new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd");
@@ -235,7 +245,12 @@ public class BlockTests
 		assertEquals(-1, (int)forgingData);
 
 		//ORPHAN BLOCK
-		genesisBlock.orphan(db);
+		try {
+			genesisBlock.orphan(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 				
 		assertEquals(true, recipient1.getLastReference(db) == null);
 		assertEquals(true, recipient2.getLastReference(db) == null);
@@ -255,7 +270,12 @@ public class BlockTests
 	{
 		
 		init();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 				
 						
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
@@ -335,7 +355,12 @@ public class BlockTests
 	public void validateBlock()
 	{
 		init();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 						
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -414,7 +439,12 @@ public class BlockTests
 	public void parseBlock()
 	{
 		init();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 								
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -424,7 +454,7 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(gb.getTimestamp(db), db);
+		generator.setLastTimestamp(gb.getTimestamp(db), db);
 		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8));
 
@@ -433,7 +463,7 @@ public class BlockTests
 		Block block = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
 						
 		//FORK
-		DBSet fork = db.fork();
+		DCSet fork = db.fork();
 				
 		//GENERATE PAYMENT 1
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -528,7 +558,7 @@ public class BlockTests
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS for generate
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.setLastReference(gb.getTimestamp(db), db);
+		generator.setLastTimestamp(gb.getTimestamp(db), db);
 		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100000).setScale(8));
 		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8));
 								
@@ -536,7 +566,7 @@ public class BlockTests
 		Block block = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
 		
 		//FORK
-		DBSet fork = db.fork();
+		DCSet fork = db.fork();
 		
 		//GENERATE PAYMENT 1
 		Account recipient1 = new Account("7JU8UTuREAJG2yht5ASn7o1Ur34P1nvTk5");
@@ -571,7 +601,12 @@ public class BlockTests
 		assertEquals(true, block.isValid(db));
 		
 		//PROCESS BLOCK
-		block.process(db);
+		try {
+			block.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//CHECK BALANCE GENERATOR
 		assertEquals(generator.getBalanceUSE(ERM_KEY, db), BigDecimal.valueOf(99990).setScale(8));
@@ -608,7 +643,12 @@ public class BlockTests
 		////////////////////////////////////
 		//ORPHAN BLOCK
 		//////////////////////////////////
-		block.orphan(db);
+		try {
+			block.orphan(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//CHECK BALANCE GENERATOR
 		assertEquals(generator.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(1000).setScale(8));

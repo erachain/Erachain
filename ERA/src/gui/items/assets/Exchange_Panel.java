@@ -26,8 +26,8 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.library.MTable;
 
 
@@ -88,10 +88,10 @@ public class Exchange_Panel extends JPanel
 	
 	private void install()	{
 		if (have == null){
-			have = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 2);
+			have = (AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2);
 		}
 		if (want == null){
-			want = (AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 1);
+			want = (AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 1);
 		}
 	}
 	   private void initComponents() {

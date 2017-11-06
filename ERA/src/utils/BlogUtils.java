@@ -28,8 +28,8 @@ import core.web.BlogProfile;
 import core.web.NameStorageMap;
 import core.web.Profile;
 import core.web.blog.BlogEntry;
-import database.DBSet;
-import database.PostCommentMap;
+import datachain.DCSet;
+import datachain.PostCommentMap;
 
 public class BlogUtils {
 
@@ -43,7 +43,7 @@ public class BlogUtils {
 	 */
 	public static List<BlogProfile> getEnabledBlogs(String searchvalueOpt) {
 
-		NameStorageMap nameMap = DBSet.getInstance().getNameStorageMap();
+		NameStorageMap nameMap = DCSet.getInstance().getNameStorageMap();
 		Set<String> names = nameMap.getKeys();
 
 		Map<String, List<String>> followMap = new HashMap<>();
@@ -132,7 +132,7 @@ public class BlogUtils {
 
 	public static List<BlogEntry> getHashTagPosts(String hashtag) {
 		List<BlogEntry> results = new ArrayList<BlogEntry>();
-		List<byte[]> list = DBSet.getInstance().getHashtagPostMap()
+		List<byte[]> list = DCSet.getInstance().getHashtagPostMap()
 				.get(hashtag);
 
 		if (list != null) {
@@ -182,7 +182,7 @@ public class BlogUtils {
 			String signatureOfBlogPost, int limit) {
 		List<BlogEntry> results = new ArrayList<>();
 
-		PostCommentMap commentPostMap = DBSet.getInstance().getPostCommentMap();
+		PostCommentMap commentPostMap = DCSet.getInstance().getPostCommentMap();
 
 		List<byte[]> list = commentPostMap.get(Base58
 				.decode(signatureOfBlogPost));
@@ -234,7 +234,7 @@ public class BlogUtils {
 	public static List<BlogEntry> getBlogPosts(String blogOpt, int limit) {
 		List<BlogEntry> results = new ArrayList<>();
 
-		List<byte[]> blogPostList = DBSet.getInstance().getBlogPostMap()
+		List<byte[]> blogPostList = DCSet.getInstance().getBlogPostMap()
 				.get(blogOpt == null ? "Erachain.org" : blogOpt);
 
 		List<byte[]> list = blogPostList != null ? Lists
@@ -292,7 +292,7 @@ public class BlogUtils {
 		
 		if(blogEntry.getBlognameOpt() == null || Profile.getProfileOpt(blogEntry.getBlognameOpt()) != null && Profile.getProfileOpt(blogEntry.getBlognameOpt()).isCommentingAllowed())
 		{
-			PostCommentMap commentPostMap = DBSet.getInstance().getPostCommentMap();
+			PostCommentMap commentPostMap = DCSet.getInstance().getPostCommentMap();
 			List<byte[]> comments = commentPostMap.get(transaction.getSignature());
 			if(comments != null)
 			{

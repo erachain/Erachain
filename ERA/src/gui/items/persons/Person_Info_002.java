@@ -31,7 +31,7 @@ import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.library.Accounts_Library_Panel;
 import gui.library.MButton;
 import gui.library.M_Accoutn_Text_Field;
@@ -101,7 +101,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 		human = null;
 		PublicKeyAccount owner = null;
 		byte[] recordReference = person.getReference();
-		Transaction issue_record = Transaction.findByDBRef(DBSet.getInstance(), recordReference);
+		Transaction issue_record = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
 		publisher = issue_record.getCreator();
 		if (person instanceof PersonHuman) {
 			human = (PersonHuman) person;
@@ -168,7 +168,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	        
 	        
 	    
-		JTextField txt_Block = new JTextField(issue_record.getBlockHeight(DBSet.getInstance())+"-"+issue_record.getSeqNo(DBSet.getInstance()));
+		JTextField txt_Block = new JTextField(issue_record.getBlockHeight(DCSet.getInstance())+"-"+issue_record.getSeqNo(DCSet.getInstance()));
 		
 		txt_Block.setEditable(false);
 		gridBagConstraints = new java.awt.GridBagConstraints();

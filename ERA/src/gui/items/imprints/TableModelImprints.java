@@ -7,9 +7,9 @@ import javax.validation.constraints.Null;
 
 import controller.Controller;
 import core.item.imprints.ImprintCls;
+import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 

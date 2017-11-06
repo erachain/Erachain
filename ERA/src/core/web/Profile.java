@@ -23,7 +23,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.payment.Payment;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("unchecked")
 public class Profile {
@@ -46,7 +46,7 @@ public class Profile {
 	public static Profile getProfileOpt(String name) {
 		Profile result = null;
 		if (name != null) {
-			Name nameObj = DBSet.getInstance().getNameMap().get(name);
+			Name nameObj = DCSet.getInstance().getNameMap().get(name);
 			result = Profile.getProfileOpt(nameObj);
 		}
 
@@ -58,7 +58,7 @@ public class Profile {
 		if (name == null || !isAllowedProfileName(name.getName())) {
 			return null;
 		}
-		Name nameReloaded = DBSet.getInstance().getNameMap()
+		Name nameReloaded = DCSet.getInstance().getNameMap()
 				.get(name.getName());
 		if (nameReloaded == null) {
 			return null;
@@ -80,7 +80,7 @@ public class Profile {
 		}
 
 		List<Name> results = new ArrayList<>();
-		Collection<Name> values = DBSet.getInstance().getNameMap().getValues();
+		Collection<Name> values = DCSet.getInstance().getNameMap().getValues();
 
 		for (Name name : values) {
 			Profile profileOpt = Profile.getProfileOpt(name);
@@ -195,7 +195,7 @@ public class Profile {
 	}
 
 	public void addRemoveFollowedInternal(String blogname, boolean isRemove) {
-		Name blogName = DBSet.getInstance().getNameMap().get(blogname);
+		Name blogName = DCSet.getInstance().getNameMap().get(blogname);
 		if (blogName != null) {
 			Profile profile = Profile.getProfileOpt(blogName);
 			// ADDING ONLY IF ENABLED REMOVE ALWAYS

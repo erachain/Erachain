@@ -8,9 +8,9 @@ import controller.Controller;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")

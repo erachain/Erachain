@@ -17,7 +17,7 @@ import org.mapdb.Fun.Tuple3;
 import controller.Controller;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.library.MButton;
@@ -87,9 +87,9 @@ public class Person_Work_Dialog extends JDialog {
     		
 			PersonCls per = person;
 			byte[] ref = per.getReference();
-			Transaction transaction = Transaction.findByDBRef(DBSet.getInstance(), ref);
-			int blockNo = transaction.getBlockHeight(DBSet.getInstance());
-			int recNo = transaction.getSeqNo(DBSet.getInstance());
+			Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
+			int blockNo = transaction.getBlockHeight(DCSet.getInstance());
+			int recNo = transaction.getSeqNo(DCSet.getInstance());
     		new VouchRecordDialog(blockNo, recNo);	
     		dispose();
   		}});
@@ -103,7 +103,7 @@ public class Person_Work_Dialog extends JDialog {
   	  		@Override
   	    	public void actionPerformed(ActionEvent e) {
   	  			
-  				TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+  				TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(person.getKey());
   				if (addresses.isEmpty()) {
   					
   				} else {
@@ -119,7 +119,7 @@ public class Person_Work_Dialog extends JDialog {
   	  		@Override
   	    	public void actionPerformed(ActionEvent e) {
   	  		
-  				TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
+  				TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(person.getKey());
   				if (addresses.isEmpty()) {
   					
   				} else {

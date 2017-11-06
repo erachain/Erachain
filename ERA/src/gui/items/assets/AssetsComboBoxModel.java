@@ -20,7 +20,12 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
 	
 	public AssetsComboBoxModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+	}
+	public void deleteObserver(){
+		
+		Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
+		
 	}
 	
 	@Override

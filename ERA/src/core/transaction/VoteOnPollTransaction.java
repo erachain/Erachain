@@ -22,8 +22,8 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class VoteOnPollTransaction extends Transaction 
 {
@@ -219,7 +219,7 @@ public class VoteOnPollTransaction extends Transaction
 	//VALIDATE
 	
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 
 		//CHECK POLL LENGTH
@@ -262,7 +262,7 @@ public class VoteOnPollTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -282,7 +282,7 @@ public class VoteOnPollTransaction extends Transaction
 
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
@@ -350,7 +350,7 @@ public class VoteOnPollTransaction extends Transaction
 	public int calcBaseFee() {
 		
 		// TODO delete IT
-		if (this.getBlockHeightByParentOrLast(this.dbSet) > TODO_h1)
+		if (this.getBlockHeightByParentOrLast(this.dcSet) > TODO_h1)
 			return calcCommonFee();
 		return 0;
 	}

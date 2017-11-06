@@ -17,15 +17,16 @@ import org.mapdb.Fun.Tuple2;
 
 import core.account.Account;
 import core.naming.NameSale;
+import database.DBMap;
+import datachain.DCMap;
 
 import org.mapdb.BTreeMap;
 
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.ReverseComparator;
-import database.DBMap;
 
-public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal>
+public class NameSaleMap extends DCMap<Tuple2<String, String>, BigDecimal>
 {
 	public static final int NAME_INDEX = 1;
 	public static final int SELLER_INDEX = 2;
@@ -35,13 +36,14 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal>
 
 	static Logger LOGGER = Logger.getLogger(NameSaleMap.class.getName());
 
-	public NameSaleMap(WalletDatabase walletDatabase, DB database)
+	public NameSaleMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database);
+		super(dWSet, database);
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_NAME_SALE_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
 	}
 
 	public NameSaleMap(NameSaleMap parent) 

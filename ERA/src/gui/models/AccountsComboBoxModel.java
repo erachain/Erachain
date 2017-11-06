@@ -25,8 +25,8 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
 	 		sortAndAdd();
 		}
 		
-		Controller.getInstance().addWalletListener(this);
-		Controller.getInstance().addObserver(this);
+		//Controller.getInstance().addWalletListener(this);
+		Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
 	}
 	
 	@Override
@@ -81,7 +81,6 @@ public class AccountsComboBoxModel extends DefaultComboBoxModel<Account> impleme
 	
 	public void removeObservers()
 	{
-		Controller.getInstance().deleteWalletObserver(this);
-		Controller.getInstance().deleteObserver(this);
+		Controller.getInstance().wallet.database.getAccountMap().deleteObserver(this);
 	}
 }

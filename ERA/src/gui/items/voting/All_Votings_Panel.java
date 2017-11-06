@@ -32,7 +32,8 @@ import javax.swing.event.DocumentListener;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.voting.Poll;
-import database.PollMap;
+import database.DBMap;
+import datachain.PollMap;
 import gui.CoreRowSorter;
 import gui.items.ComboBoxModelItemsAll;
 import gui.library.MTable;
@@ -122,7 +123,7 @@ public class All_Votings_Panel extends JPanel{
 				
 		//NAMESALES SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(PollsTableModel.COLUMN_NAME, PollMap.DEFAULT_INDEX);
+		indexes.put(PollsTableModel.COLUMN_NAME, DBMap.DEFAULT_INDEX);
 		CoreRowSorter sorter = new CoreRowSorter(this.pollsTableModel, indexes);
 		pollsTable.setRowSorter(sorter);
 

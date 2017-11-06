@@ -13,7 +13,7 @@ import org.mapdb.Fun.Tuple4;
 
 import core.crypto.Base58;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 //import gui.MainFrame;
 import lang.Lang;
 
@@ -35,7 +35,7 @@ public class Record_Info extends JTextPane {
 	static String Get_HTML_Record_Info_001(Transaction record)
 	{
 		
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 
 		String message = "";
 		SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
@@ -45,13 +45,13 @@ public class Record_Info extends JTextPane {
 		if (!record.isConfirmed(db)) {
 			message = Lang.getInstance().translate("Not confirmed");
 		} else {
-			message = "Block Height - SeqNo.: " + record.viewHeightSeq(db) + ", Confs.: " + record.getConfirmations(DBSet.getInstance()) + ", Block Ver.: " + record.getBlockVersion(db);
+			message = "Block Height - SeqNo.: " + record.viewHeightSeq(db) + ", Confs.: " + record.getConfirmations(DCSet.getInstance()) + ", Block Ver.: " + record.getBlockVersion(db);
 		}
 		message = "<div><b>" + message + "</b>"
 			+ ", time: " + record.viewTimestamp() + "</div>";
 		message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(false) + ", fee:" + record.viewFee() + "</div>";
 	
-		message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
+		//message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
 		message += "<div>SIGN: <font size='2'>" + record.viewSignature() + "</font></div>";
 
 		message += "<div>Creator: <font size='4'>" + record.viewCreator() + "</font></div>";

@@ -14,7 +14,7 @@ import com.google.common.base.Charsets;
 import controller.Controller;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import utils.GZIP;
 import utils.StorageUtils;
 
@@ -25,7 +25,7 @@ public class WebNameStorageHistoryHelper {
 	{
 		List<NameStorageTransactionHistory> results= new ArrayList<>();
 		
-		OrphanNameStorageHelperMap orphanNameStorageHelperMap = DBSet.getInstance().getOrphanNameStorageHelperMap();
+		OrphanNameStorageHelperMap orphanNameStorageHelperMap = DCSet.getInstance().getOrphanNameStorageHelperMap();
 		
 		List<byte[]> orphanMap = orphanNameStorageHelperMap.get(name);
 		
@@ -67,7 +67,7 @@ public class WebNameStorageHistoryHelper {
 		NameStorageTransactionHistory result = new NameStorageTransactionHistory(tx);
 		Set<String> keySet = jsonObject.keySet();
 
-		OrphanNameStorageMap orphanNameStorageMap = DBSet.getInstance()
+		OrphanNameStorageMap orphanNameStorageMap = DCSet.getInstance()
 				.getOrphanNameStorageMap();
 
 		Map<String, String> map = orphanNameStorageMap.get(tx.getSignature());

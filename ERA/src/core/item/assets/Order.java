@@ -17,8 +17,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 
 public class Order implements Comparable<Order> 
 {
@@ -101,10 +101,10 @@ public class Order implements Comparable<Order>
 	
 	public AssetCls getHaveAsset() 
 	{
-		return this.getHaveAsset(DBSet.getInstance());
+		return this.getHaveAsset(DCSet.getInstance());
 	}
 	
-	public AssetCls getHaveAsset(DBSet db)
+	public AssetCls getHaveAsset(DCSet db)
 	{
 		return (AssetCls)db.getItemAssetMap().get(this.have);
 	}
@@ -122,16 +122,16 @@ public class Order implements Comparable<Order>
 	
 	public AssetCls getWantAsset() 
 	{
-		return this.getWantAsset(DBSet.getInstance());
+		return this.getWantAsset(DCSet.getInstance());
 	}
 	
-	public AssetCls getWantAsset(DBSet db)
+	public AssetCls getWantAsset(DCSet db)
 	{
 		return (AssetCls)db.getItemAssetMap().get(this.want);
 	}
 	
 	//////////// DIVISIBLE
-	public boolean isHaveDivisible(DBSet db)
+	public boolean isHaveDivisible(DCSet db)
 	{
 		if (this.haveDivisible == 0)
 			this.haveDivisible = this.getHaveAsset(db).isDivisible()? 1:-1;
@@ -139,7 +139,7 @@ public class Order implements Comparable<Order>
 		return this.haveDivisible == 1;
 	}
 	
-	public boolean isHaveDivisibleGood(DBSet db, BigDecimal amount)
+	public boolean isHaveDivisibleGood(DCSet db, BigDecimal amount)
 	{
 		if(this.isHaveDivisible(db))
 			return true;
@@ -147,7 +147,7 @@ public class Order implements Comparable<Order>
 		return amount.stripTrailingZeros().scale() == 0;
 	}
 
-	public boolean isWantDivisible(DBSet db)
+	public boolean isWantDivisible(DCSet db)
 	{
 		if (this.wantDivisible == 0)
 			this.wantDivisible = this.getWantAsset(db).isDivisible()? 1:-1;
@@ -155,7 +155,7 @@ public class Order implements Comparable<Order>
 		return this.wantDivisible == 1;
 	}
 
-	public boolean isWantDivisibleGood(DBSet db, BigDecimal amount)
+	public boolean isWantDivisibleGood(DCSet db, BigDecimal amount)
 	{
 		if(this.isWantDivisible(db))
 			return true;
@@ -218,7 +218,7 @@ public class Order implements Comparable<Order>
 	}
 	
 	// need for process
-	public BigDecimal calcAmountWantLeft(DBSet db)
+	public BigDecimal calcAmountWantLeft(DCSet db)
 	{
 		BigDecimal temp;
 		if (this.amountHave.compareTo(this.amountWant) > 0){
@@ -263,18 +263,18 @@ public class Order implements Comparable<Order>
 			
 	public List<Trade> getInitiatedTrades()
 	{
-		return this.getInitiatedTrades(DBSet.getInstance());
+		return this.getInitiatedTrades(DCSet.getInstance());
 	}
 	
-	public List<Trade> getInitiatedTrades(DBSet db)
+	public List<Trade> getInitiatedTrades(DCSet db)
 	{
 		return db.getTradeMap().getInitiatedTrades(this);
 	}
 	
 	public boolean isConfirmed()
 	{
-		return DBSet.getInstance().getOrderMap().contains(this.id)
-				|| DBSet.getInstance().getCompletedOrderMap().contains(this.id);
+		return DCSet.getInstance().getOrderMap().contains(this.id)
+				|| DCSet.getInstance().getCompletedOrderMap().contains(this.id);
 	}
 	
 	//PARSE/CONVERT
@@ -420,7 +420,7 @@ public class Order implements Comparable<Order>
 	
 	//PROCESS/ORPHAN
 
-	public void process(DBSet db, Transaction transaction) 
+	public void process(DCSet db, Transaction transaction) 
 	{
 		//REMOVE HAVE
 		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
@@ -564,7 +564,7 @@ public class Order implements Comparable<Order>
 		}
 	}
 	
-	public void orphan(DBSet db) {
+	public void orphan(DCSet db) {
 		
 		//ORPHAN TRADES
 		for(Trade trade: this.getInitiatedTrades(db))
@@ -581,7 +581,7 @@ public class Order implements Comparable<Order>
 	}
 	
 	// TODO delete this
-	public BigDecimal calculateBuyIncrement(Order order, DBSet db)
+	public BigDecimal calculateBuyIncrement(Order order, DCSet db)
 	{
 		BigInteger multiplier = BigInteger.valueOf(100000000l);
 		

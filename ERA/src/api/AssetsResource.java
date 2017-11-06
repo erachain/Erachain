@@ -11,7 +11,7 @@ import org.json.simple.JSONValue;
 import controller.Controller;
 import core.blockexplorer.BlockExplorer;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 @Path("assets")
 @Produces(MediaType.APPLICATION_JSON)
@@ -48,7 +48,7 @@ public class AssetsResource
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+		if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					Transaction.ITEM_ASSET_NOT_EXIST);
@@ -76,7 +76,7 @@ public class AssetsResource
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+		if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					Transaction.ITEM_ASSET_NOT_EXIST);

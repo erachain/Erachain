@@ -7,9 +7,9 @@ import javax.validation.constraints.Null;
 
 import controller.Controller;
 import core.item.notes.NoteCls;
+import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 

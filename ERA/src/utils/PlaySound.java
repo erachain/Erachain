@@ -70,6 +70,7 @@ public class PlaySound {
 			    		LOGGER.error(exc.getMessage(),exc);
 			    	} catch (InterruptedException exc) {
 			    		LOGGER.debug(exc);
+			    	} catch (Exception e) {
 			    	}
 			    	
 			    }

@@ -31,14 +31,10 @@ import core.transaction.IssueNoteRecord;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-
+import datachain.DCSet;
+import datachain.ItemNoteMap;
 import utils.Corekeys;
 import webserver.WebResource;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
-import database.ItemNoteMap;
 
 public class TestRecNote {
 
@@ -61,7 +57,7 @@ public class TestRecNote {
 	byte[] encrypted = new byte[] { 0 };
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -79,14 +75,19 @@ public class TestRecNote {
 	// INIT NOTES
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		noteMap = db.getItemNoteMap();
 		
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(db), db);
+		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
 	}
@@ -181,7 +182,7 @@ public class TestRecNote {
 			assertEquals(issueNoteRecord.getFee(), parsedIssueNoteTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(issueNoteRecord.getReference(), parsedIssueNoteTransaction.getReference());	
+			//assertEquals(issueNoteRecord.getReference(), parsedIssueNoteTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(issueNoteRecord.getTimestamp(), parsedIssueNoteTransaction.getTimestamp());				
@@ -254,7 +255,7 @@ public class TestRecNote {
 		assertEquals(false, noteMap.contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(issueNoteRecord.getReference(), maker.getLastReference(db));
+		//assertEquals(issueNoteRecord.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999
@@ -329,7 +330,7 @@ public class TestRecNote {
 			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
@@ -379,7 +380,7 @@ public class TestRecNote {
 			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
@@ -429,7 +430,7 @@ public class TestRecNote {
 			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
@@ -479,7 +480,7 @@ public class TestRecNote {
 			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());	
 			
 			//CHECK REFERENCE
-			assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
+			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());	
 			
 			//CHECK TIMESTAMP
 			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());				
@@ -514,7 +515,7 @@ public class TestRecNote {
 		signNoteRecord.orphan(db, false);
 										
 		//CHECK REFERENCE SENDER
-		assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));
+		//assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));
 	}
 
 	private List<String> imagelinks = new ArrayList<String>();

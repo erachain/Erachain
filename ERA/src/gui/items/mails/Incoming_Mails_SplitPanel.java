@@ -17,7 +17,7 @@ import javax.swing.table.TableRowSorter;
 import core.account.Account;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.Split_Panel;
 import gui.items.imprints.Imprints_Info_Panel;
 import gui.library.MTable;
@@ -109,8 +109,8 @@ public class Incoming_Mails_SplitPanel extends Split_Panel {
 				int row = inciming_Mail_Table.getSelectedRow();
 				row = inciming_Mail_Table.convertRowIndexToModel(row);
 				Transaction trans = incoming_Mails_Model.getTransaction(row);
-				int blockNo = trans.getBlockHeight(DBSet.getInstance());
-				int recNo = trans.getSeqNo(DBSet.getInstance());
+				int blockNo = trans.getBlockHeight(DCSet.getInstance());
+				int recNo = trans.getSeqNo(DCSet.getInstance());
 				new VouchRecordDialog(blockNo, recNo, ((R_Send) trans).getRecipient());
 
 			}

@@ -19,6 +19,8 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 
+import database.DBMap;
+import database.DBSet;
 import network.Peer;
 import ntp.NTP;
 import settings.Settings;
@@ -38,11 +40,6 @@ public class PeerMap extends DBMap<byte[], byte[]>
 	public PeerMap(DBSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-	}
-
-	public PeerMap(PeerMap parent) 
-	{
-		super(parent, null);
 	}
 	
 	protected void createIndexes(DB database){}

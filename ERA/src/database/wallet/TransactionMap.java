@@ -25,8 +25,9 @@ import utils.Pair;
 import utils.ReverseComparator;
 import database.DBMap;
 import database.serializer.TransactionSerializer;
+import datachain.DCMap;
 
-public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction>
+public class TransactionMap extends DCMap<Tuple2<String, String>, Transaction>
 {
 	public static final int TIMESTAMP_INDEX = 1;
 	public static final int ADDRESS_INDEX = 2;
@@ -36,18 +37,15 @@ public class TransactionMap extends DBMap<Tuple2<String, String>, Transaction>
 	
 	static Logger LOGGER = Logger.getLogger(TransactionMap.class.getName());
 
-	public TransactionMap(WalletDatabase walletDatabase, DB database)
+	public TransactionMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database);
+		super(dWSet, database);
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);
-	}
-
-	public TransactionMap(TransactionMap parent) 
-	{
-		super(parent, null);
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TRANSACTION_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE);
+		this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.WALLET_COUNT_TRANSACTION_TYPE);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

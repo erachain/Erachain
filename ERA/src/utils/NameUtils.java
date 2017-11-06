@@ -16,8 +16,8 @@ import core.naming.Name;
 import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
 import core.web.NameStorageMap;
-import database.DBSet;
-import database.NameMap;
+import datachain.DCSet;
+import datachain.NameMap;
 
 public class NameUtils {
 
@@ -59,7 +59,7 @@ public class NameUtils {
 	}
 
 	public static Pair<Account, NameResult> nameToAdress(String name) {
-		NameMap names = DBSet.getInstance().getNameMap();
+		NameMap names = DCSet.getInstance().getNameMap();
 		// NAME NOT REGISTERED?
 		if (!names.contains(name)) {
 
@@ -75,7 +75,7 @@ public class NameUtils {
 		}
 
 		// NAME FOR SALE?
-		if (DBSet.getInstance().getNameExchangeMap().contains(name)) {
+		if (DCSet.getInstance().getNameExchangeMap().contains(name)) {
 			return new Pair<Account, NameUtils.NameResult>(null,
 					NameResult.NAME_FOR_SALE);
 		}
@@ -182,7 +182,7 @@ public class NameUtils {
 		List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
 
 		
-		NameStorageMap nameStorageMap = DBSet.getInstance().getNameStorageMap();
+		NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
 		Set<String> keys = nameStorageMap.getKeys();
 
 		for (String key : keys) {

@@ -34,7 +34,7 @@ import core.item.notes.NoteCls;
 import core.transaction.R_Send;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.library.MSplitPane;
 import gui.library.MTextPane;
 import gui.library.M_Attached_Files_Panel;
@@ -85,8 +85,8 @@ public class Statement_Info extends javax.swing.JPanel {
 	private void view_V1(){
 		
 
-		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap()
-				.get(transaction.getBlockHeight(DBSet.getInstance()), transaction.getSeqNo(DBSet.getInstance()));
+		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DCSet.getInstance().getVouchRecordMap()
+				.get(transaction.getBlockHeight(DCSet.getInstance()), transaction.getSeqNo(DCSet.getInstance()));
 
 		if (signs != null) {
 
@@ -96,7 +96,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		
 		initComponents();
 		
-		NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
+		NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 		//jTextArea_Body.setContentType("text/html");
 		
 		
@@ -367,7 +367,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		//v2.0 
 		if(jSON.containsKey("Template")){
 			
-		 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("Template")) );
+		 NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("Template")) );
 		 if (note != null){
 			 description = note.getDescription();
 		
@@ -387,7 +387,7 @@ public class Statement_Info extends javax.swing.JPanel {
 		// v 2.1
 		if(jSON.containsKey("TM")){
 			
-			 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("TM")) );
+			 NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,  new Long((String) jSON.get("TM")) );
 			 if (note != null){
 				 description = note.getDescription();
 				 jLabel_Title.setText(Lang.getInstance().translate("Title") + ": "+ map.b);

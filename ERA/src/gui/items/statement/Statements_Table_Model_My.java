@@ -20,7 +20,7 @@ import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 import utils.ObserverMessage;
 
@@ -123,7 +123,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 
 			case COLUMN_NOTE:
 				
-				ItemCls item = ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
 				return item==null?null:item.toString();
 				
 			case COLUMN_BODY:				
@@ -184,6 +184,8 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
+
+		/*
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_STATEMENT_TYPE)
 		{
@@ -195,11 +197,11 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			
 		}
+		*/
 		
 		
 		//CHECK IF LIST UPDATED
-		if(	message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE 
-				)
+		if(	message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE )
 		{
 			Transaction trans = (Transaction) message.getValue();
 			if (trans.getType() != Transaction.SIGN_NOTE_TRANSACTION) return;
@@ -227,7 +229,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 		}
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
+			transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION,0));//.SEND_ASSET_TRANSACTION, 0));	
 		}
 		
 			HashSet<Transaction> col = new HashSet<Transaction>(transactions);	

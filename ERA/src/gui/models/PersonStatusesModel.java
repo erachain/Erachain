@@ -31,9 +31,9 @@ import core.item.imprints.ImprintCls;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.ItemStatusMap;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.ItemStatusMap;
+import datachain.SortableList;
 import gui.models.Send_TableModel.MessageBuf;
 import lang.Lang;
 
@@ -52,7 +52,7 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	//TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 
-	private DBSet dbSet = DBSet.getInstance();
+	private DCSet dcSet = DCSet.getInstance();
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Status","Period","Creator"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
 	String from_date_str;
@@ -67,8 +67,8 @@ public  class PersonStatusesModel extends  AbstractTableModel implements Observe
 		itemKey = person_Key;
 		addObservers();
 		
-		statuses = dbSet.getPersonStatusMap().get(itemKey);
-		statusesMap = dbSet.getItemStatusMap();
+		statuses = dcSet.getPersonStatusMap().get(itemKey);
+		statusesMap = dcSet.getItemStatusMap();
 		setRows();
 	}
 
@@ -89,7 +89,7 @@ public Account get_Creator_Account(int row){
 	
 	int block = value.b.d;
 	int recNo = value.b.e;
-	Transaction record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+	Transaction record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
 	return (Account)record.getCreator();
 	
 }
@@ -174,7 +174,7 @@ public Account get_Creator_Account(int row){
 						
 		case COLUMN_STATUS_NAME:
 			
-			return statusesMap.get(value.a).toString(dbSet, value.b.c);
+			return statusesMap.get(value.a).toString(dcSet, value.b.c);
 									
 		case COLUMN_PERIOD:
 			
@@ -205,14 +205,14 @@ public Account get_Creator_Account(int row){
 
 			block = value.b.d;
 			recNo = value.b.e;
-			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+			record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
 			return record==null?"":((Account)record.getCreator()).getPersonAsString();
 			
 		case COLUMN_CREATOR_NAME:
 		
 			block = value.b.d;
 			recNo = value.b.e;
-			record = Transaction.findByHeightSeqNo(dbSet, block, recNo);
+			record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
 			return record==null?"":((Account)record.getCreator()).getPerson().b.getName();
 
 		
@@ -261,7 +261,7 @@ public Account get_Creator_Account(int row){
 			//	|| message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
 		{
 			//this.statuses = (TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>>) message.getValue();
-			statuses= dbSet.getPersonStatusMap().get(itemKey);
+			statuses= dcSet.getPersonStatusMap().get(itemKey);
 			setRows();
 			this.fireTableDataChanged();
 		}	

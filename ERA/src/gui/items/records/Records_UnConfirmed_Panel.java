@@ -42,6 +42,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -51,8 +52,8 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.unions.UnionCls;
 import core.transaction.Transaction;
-import database.DBSet;
 import database.wallet.TransactionMap;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class Records_UnConfirmed_Panel extends  JPanel // JPanel
@@ -61,9 +62,25 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
 
 	private Debug_Transactions_Table_Model transactionsModel;
 	private MTable transactionsTable;
+	private Records_UnConfirmed_Panel th;
+	
+	private static Records_UnConfirmed_Panel instance;
+	
+	public static Records_UnConfirmed_Panel getInstance(){
+		
+		if(instance == null)
+		{
+			instance = new Records_UnConfirmed_Panel();
+		}
+		
+		return instance;
+		
+		
+	}
 
 	public Records_UnConfirmed_Panel()
 	{
+		th = this;
 		setName(Lang.getInstance().translate("Unconfirmed Records"));
 		//this.parent = parent;
 		this.setLayout(new GridBagLayout());
@@ -268,7 +285,7 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
 					int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
 					row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 					Transaction trans = transactionsModel.getTransaction(row);
-					DBSet.getInstance().getTransactionMap().delete(trans);
+					DCSet.getInstance().getTransactionMap().delete(trans);
     	  			
     				}});
     	    	
@@ -276,6 +293,17 @@ public class Records_UnConfirmed_Panel extends  JPanel // JPanel
    	    	TableMenuPopupUtil.installContextMenu(record_stpit.jTable_jScrollPanel_LeftPanel, menu);
 
 		//this.add(this.transactionsTable);       
+   	    	
+   	    	transactionsModel.addTableModelListener(new TableModelListener(){
+
+				@Override
+				public void tableChanged(TableModelEvent arg0) {
+					// TODO Auto-generated method stub
+					th.setName(Lang.getInstance().translate("Unconfirmed Records:" + transactionsModel.getRowCount()));
+				}
+   	    		
+   	    		
+   	    	});
 		
 	}
 	

@@ -1,58 +1,49 @@
 package core;
 
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
-import utils.TransactionFeeComparator;
 import utils.TransactionTimestampComparator;
 import at.AT_Block;
 import at.AT_Constants;
 import at.AT_Controller;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Longs;
-
 import controller.Controller;
-import core.account.Account;
 import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.block.BlockFactory;
-import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
-import settings.Settings;
 
 public class BlockGenerator extends Thread implements Observer
 {	
 	
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
-	static final int wait_interval_flush = 60000;
+	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:1000;
+	private static final int MAX_BLOCK_SIZE_BYTE = 
+			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>2;
+
+	static final int wait_interval_flush = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
+	private PrivateKeyAccount acc_winner;
+	private List<Block> lastBlocksForTarget;
+	private byte[] solvingReference;
+	
+	private List<PrivateKeyAccount> cachedAccounts;
+	
+	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
+	private boolean walletOnceUnlocked = false;
+	private static int status;
 
 	
 	public enum ForgingStatus {
@@ -83,20 +74,38 @@ public class BlockGenerator extends Thread implements Observer
     public ForgingStatus getForgingStatus()
     {
         return forgingStatus;
-    }
-	
-	//private Map<PrivateKeyAccount, Block> blocks;
-	//private Map<PrivateKeyAccount, Long> winners;
-	private PrivateKeyAccount acc_winner;
-	private List<Block> lastBlocksForTarget;
-	private Block solvingBlock;
-	//private int solvingBlockHeight;
-	private List<PrivateKeyAccount> cachedAccounts;
-	
-	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
-	private boolean walletOnceUnlocked = false;
-	
-	
+    }	
+
+    public int getStatus()
+    {
+        return status;
+    }	
+
+    public static String viewStatus()
+    {
+    	
+		switch (status) {
+		case 1:
+			return "1:FLUSH, WAIT";
+		case 2:
+			return "2:FLUSH, TRY";
+		case 3:
+			return "3:UPDATE";
+		case 4:
+			return "4:FORGING";
+		case 5:
+			return "5:FORGING BY ACCOUNTS";
+		case 6:
+			return "6:MAKING NEW BLOCK";
+		case 7:
+			return "7:BROADCAST, WAIT";
+		case 8:
+			return "8:BROADCAST, TRY";
+		default:
+			return "unknown";
+		}
+    }	
+
 	public BlockGenerator(boolean withObserve)
 	{
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled())
@@ -117,7 +126,7 @@ public class BlockGenerator extends Thread implements Observer
 				while(!Controller.getInstance().doesWalletExists() || !Controller.getInstance().doesWalletDatabaseExists())
 				{
 					try {
-						Thread.sleep(250);
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 //						does not matter
 					}
@@ -132,9 +141,9 @@ public class BlockGenerator extends Thread implements Observer
 	
 	public void addUnconfirmedTransaction(Transaction transaction)
 	{
-		this.addUnconfirmedTransaction(DBSet.getInstance(), transaction, true);
+		this.addUnconfirmedTransaction(DCSet.getInstance(), transaction);
 	}
-	public void addUnconfirmedTransaction(DBSet db, Transaction transaction, boolean process) 
+	public void addUnconfirmedTransaction(DCSet db, Transaction transaction) 
 	{
 		//ADD TO TRANSACTION DATABASE 
 		db.getTransactionMap().add(transaction);
@@ -142,7 +151,7 @@ public class BlockGenerator extends Thread implements Observer
 	
 	public List<Transaction> getUnconfirmedTransactions()
 	{
-		return new ArrayList<Transaction>(DBSet.getInstance().getTransactionMap().getValues());
+		return new ArrayList<Transaction>(DCSet.getInstance().getTransactionMap().getValues());
 	}
 	
 	private List<PrivateKeyAccount> getKnownAccounts()
@@ -184,173 +193,128 @@ public class BlockGenerator extends Thread implements Observer
 
 		Controller ctrl = Controller.getInstance();
 		BlockChain bchain = ctrl.getBlockChain();
+		DCSet dcSet = DCSet.getInstance();
 
-		DBSet dbSet = DBSet.getInstance();
-		//boolean isGenesisStart = false;
-
-		int wait_interval_run = 1000;
-		//int wait_interval_flush = 60000;
-		//int wait_interval_run_gen = wait_interval_flush / 2;
-		int wait_interval = wait_interval_run;
-		
-		while(!ctrl.isOnStopping() && !dbSet.isStoped())
+		while(!ctrl.isOnStopping())
 		{
 			
-			boolean quickRun = false; 
-			
-			try 
-			{
+			status = 0;
+
+			try {
 				Thread.sleep(500);
 			}
-			catch (InterruptedException e) 
-			{
-				//LOGGER.error(e.getMessage(), e);
+			catch (InterruptedException e) {
 			}
 			
-			if (ctrl.isOnStopping() || dbSet.isStoped())
+			if (ctrl.isOnStopping())
 				return;
 			
-			if (dbSet.getBlockMap().isProcessing()
-					|| ctrl.isProcessingWalletSynchronize()) {
-				
-				wait_interval = wait_interval_run;
-				bchain.clearWaitWinBuffer();
-				continue;
-			}
+			////////////////////////////  FLUSH NEW BLOCK /////////////////////////
 
-			syncForgingStatus();
-			//CHECK IF WE ARE UP TO DATE
-			// NOT NEED isUpToDate! 
-			if(!ctrl.isUpToDate())
+			// try solve and flush new block from Win Buffer		
+			Block waitWin = bchain.getWaitWinBuffer();
+			while (waitWin != null) {
+				
+				status = 1;
+				
+				try {
+					Thread.sleep(1000);
+				}
+				catch (InterruptedException e) {
+				}
+
+				if (ctrl.isOnStopping())
+					return;
+				
+				// REFRESH
+				waitWin = bchain.getWaitWinBuffer();
+				//long diffTimeWinBlock =  NTP.getTime() - wait_interval_flush - waitWin.getTimestamp(dcSet);
+				//if (diffTimeWinBlock < 0 )
+				//	continue;
+				if(waitWin.getTimestamp(dcSet) + BlockChain.WIN_BLOCK_BROADCAST_WAIT > NTP.getTime()) {
+					continue;
+				}
+				
+				// FLUSH WINER to DB MAP
+				LOGGER.info("FLUSH WINER to DB MAP");
+
+				try {
+					
+					status = 2;
+					
+					ctrl.flushNewBlockGenerated();
+					
+					if (ctrl.isOnStopping())
+						return;
+						
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					if (ctrl.isOnStopping())
+						return;
+					LOGGER.error(e.getMessage(), e);
+				}
+				break;
+			}
+			
+			////////////////////////// UPDATE ////////////////////
+			//CHECK IF WE ARE NOT UP TO DATE
+			ctrl.checkStatus(ctrl.getStatus());
+			if(ctrl.needUpToDate())
 			{
-				if (dbSet.isStoped())
+				status = 3;
+
+				if (ctrl.isOnStopping())
 					return;
 				
 				bchain.clearWaitWinBuffer();
+				
 				ctrl.update();
-				// IF not update by error - try anew update
+				
+				try {
+					Thread.sleep(10000);
+				}
+				catch (InterruptedException e) {
+				}
+				
+				if (ctrl.isOnStopping())
+					return;
+
 				continue;
 			}
 			
+			if (ctrl.isOnStopping()) {
+				return;
+			}
+
 			// NO WALLET - loop
 			if(!ctrl.doesWalletExists())
 				continue;
 
-			if (dbSet.getBlockMap().isProcessing()
-					|| ctrl.isProcessingWalletSynchronize()) {
-				// NOT run in core.Synchronizer.process(DBSet, Block)
-				bchain.clearWaitWinBuffer();
-				continue;
-			}
-							
-			// try solve and flush new block from Win Buffer		
-			Block waitWin = bchain.getWaitWinBuffer();
-			if (waitWin != null ) {
-				
-				long diffTimeWinBlock =  NTP.getTime() - (waitWin.getTimestamp(dbSet) + wait_interval_flush);
-				
-				if (diffTimeWinBlock >0 ) {
-	
-					// start new SOLVE for WIN Blocks
-					this.solvingBlock = null;
-						
-					int wait_rand = 0;
-					// FLUSH WINER to DB MAP
-					if (ctrl.flushNewBlockGenerated()) {
-						// if flushed - broadcast it
-						wait_rand = (int) (20000 * Math.random());
-
-						try 
-						{
-							// IF quickRun ++ SLEEP
-							Thread.sleep(quickRun?(BlockChain.DEVELOP_USE?3000:13000):wait_rand);
-						} 
-						catch (InterruptedException e) 
-						{
-						}
-						
-						if (ctrl.isOnStopping() || dbSet.isStoped())
-							return;
-						
-						syncForgingStatus();
-						if(!ctrl.isUpToDate())
-							continue;
-
-					}
-
-					if (diffTimeWinBlock > Block.GENERATING_MIN_BLOCK_TIME) {
-						wait_interval = 1000;
-						quickRun = true;
-					} else {
-						wait_interval = (Block.GENERATING_MIN_BLOCK_TIME - wait_interval_flush - wait_rand);					
-					}
-				} else {
-					wait_interval = 2000;
-				}
-			} else {
-				// always 1sec
-				wait_interval = 2000;
-			}
-
-			try 
-			{
-				Thread.sleep(wait_interval);
-			} 
-			catch (InterruptedException e) 
-			{
-			}
-
-			if (ctrl.isOnStopping() || dbSet.isStoped())
-				return;
-
-			syncForgingStatus();
-			if(!ctrl.isUpToDate())
-				continue;
-
-			if(dbSet.isStoped()) {
-				return;
-			}
-
-			syncForgingStatus();
 			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-			if(forgingStatus != ForgingStatus.FORGING) {
-				continue;
-			}
-
-			if (dbSet.getBlockMap().isProcessing()) {
-				// IF core.Synchronizer.process(DBSet, Block))
-				bchain.clearWaitWinBuffer();
-				continue;
-			}
-
-			byte[] lastBlockSignature = dbSet.getBlockMap().getLastBlockSignature();
-			
-			//CHECK IF DIFFERENT FOR CURRENT SOLVING BLOCK
-			if(this.solvingBlock == null
-					|| waitWin == null
-					|| !Arrays.equals(this.solvingBlock.getSignature(), lastBlockSignature)
+			syncForgingStatus();
+			if (forgingStatus == ForgingStatus.FORGING // FORGING enabled
+					&& (this.solvingReference == null // AND GENERATING NOT MAKED
+						|| !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature()))
 					)
 			{
 				
-				if(dbSet.isStoped()) {
+				/////////////////////////////// TRY FORGING ////////////////////////
+
+				if(dcSet.isStoped()) {
 					return;
 				}
 
 				//SET NEW BLOCK TO SOLVE
-				this.solvingBlock = dbSet.getBlockMap().getLastBlock();
+				this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
+				Block solvingBlock = dcSet.getBlockMap().get(this.solvingReference);
+				
+				//set max block
+				if (BlockChain.BLOCK_COUNT >0 && solvingBlock.getHeight(dcSet) > BlockChain.BLOCK_COUNT ) return;
 
-				if(dbSet.isStoped()) {
+				if(dcSet.isStoped()) {
 					return;
 				}
 
-				this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dbSet);
-
-				//RESET BLOCKS
-				//this.blocks = new HashMap<PrivateKeyAccount, Block>();
-				//this.winners = new HashMap<PrivateKeyAccount, Long>();
-				
-				this.acc_winner = null;
-				
 				/*
 				 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
 				 * значть их ХЭШ - 
@@ -367,23 +331,30 @@ public class BlockGenerator extends Thread implements Observer
 				 * 
 				 */
 
+				status = 4;
+				
 				//GENERATE NEW BLOCKS
+				this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
+				this.acc_winner = null;
+				
 				List<Transaction> unconfirmedTransactions = null;
 				byte[] unconfirmedTransactionsHash = null;
 				long max_winned_value = 0;
 				long winned_value;				
-				int height = bchain.getHeight(dbSet) + 1;
-				long target = bchain.getTarget(dbSet);
+				int height = bchain.getHeight(dcSet) + 1;
+				long target = bchain.getTarget(dcSet);
 
 				//PREVENT CONCURRENT MODIFY EXCEPTION
 				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 				synchronized(knownAccounts)
 				{
 					
+					status = 5;
+					
 					for(PrivateKeyAccount account: knownAccounts)
 					{
 						
-						winned_value = account.calcWinValue(dbSet, bchain, this.lastBlocksForTarget, height, target);
+						winned_value = account.calcWinValue(dcSet, bchain, this.lastBlocksForTarget, height, target);
 						if(winned_value < 1l)
 							continue;
 						
@@ -396,105 +367,139 @@ public class BlockGenerator extends Thread implements Observer
 					}
 				}
 				
-				if(acc_winner == null || forgingStatus != ForgingStatus.FORGING)
+				if(acc_winner == null)
 					continue;
-					
-				// sleep by (TARGET / WIN_VALUE)
-				// for not to busy the NET
-				//int wait_new_good_block = (int) ((wait_interval_flush * (target>>1)) / (target / 10 + max_winned_value)); 
-				int wait_new_good_block;
-				if (target < max_winned_value) {
-					wait_new_good_block = (int)(wait_interval_flush
-							* Math.pow((double)target / (double)max_winned_value, 3))>>1;		
-				} else {
-					wait_new_good_block = (int)(wait_interval_flush * target / max_winned_value)>>1;
-				}
 				
-				if (quickRun) {
-					wait_new_good_block = BlockChain.DEVELOP_USE?5000:10000 + wait_new_good_block>>2;
-				}
-
-				LOGGER.info("for height and target: " + height + " : " + target
-						+ " Selected max_winned_value: " + max_winned_value + " " + acc_winner.getPersonAsString());
-				LOGGER.info("wait_new_good_block: " + wait_new_good_block);
-
-				// wait more good new block from NET
-				try 
-				{
-					Thread.sleep(wait_new_good_block);
-				} 
-				catch (InterruptedException e) 
-				{
-				}
-
-				if (ctrl.isOnStopping() || dbSet.isStoped())
+				if (ctrl.isOnStopping())
 					return;
 
-				syncForgingStatus();
-				if(!ctrl.isUpToDate())
-					continue;
+				status = 6;
 
-				if (dbSet.isStoped())
-					return;
+				int wait_new_block_broadcast = (int)(solvingBlock.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + wait_interval_flush - NTP.getTime());
+				
+				if (wait_new_block_broadcast + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0) {
+					wait_new_block_broadcast = -1;
+				} else {
+					// WAIT
+					if (target + (target>>1) < max_winned_value) {
+						wait_new_block_broadcast -= wait_interval_flush>>1 + wait_interval_flush>>3;
+					} else if (target + (target>>2) < max_winned_value) {
+						wait_new_block_broadcast -= wait_interval_flush>>2;
+					} else if (target + (target>>3) < max_winned_value) {
+						wait_new_block_broadcast -= wait_interval_flush>>3;
+					} else if (target + (target>>4) < max_winned_value) {
+						wait_new_block_broadcast -= wait_interval_flush>>4;
+					} else if (target < max_winned_value) {
+						wait_new_block_broadcast += wait_interval_flush>>4;
+					} else {
+						wait_new_block_broadcast += (wait_interval_flush>>4)
+								+ (long)wait_interval_flush * target / max_winned_value;
+					}
+				}	
+				
+				if (wait_new_block_broadcast > 0) {
+					LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast/1000);
+					// SLEEP and WATCH break
+					long wait_steep = wait_new_block_broadcast / 500;
+					long maxTime = solvingBlock.getTimestamp(dcSet) + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
+					boolean newWinner = false;
+					do {
+						try
+						{
+							Thread.sleep(500);
+						}
+						catch (InterruptedException e) 
+						{
+						}
+						
+						waitWin = bchain.getWaitWinBuffer();
+						if (waitWin != null && waitWin.calcWinValue(dcSet) > max_winned_value) {
+							// NEW WINNER received
+							newWinner = true;
+							break;
+						}
 
-				waitWin = bchain.getWaitWinBuffer();
-				if (waitWin != null)
-				{
-					long wait_winned_value = waitWin.calcWinValue(dbSet);
-					if (wait_winned_value > max_winned_value) {
-						// block in buffer is more good
+						if (ctrl.isOnStopping())
+							return;
+						
+					} while (wait_steep-- > 0 && NTP.getTime() < maxTime);
+
+					if (newWinner)
+					{
+						LOGGER.info("NEW WINER RECEIVED - drop my block");
 						continue;
 					}
 				}
 
-				/*
-				LOGGER.error("core.BlockGenerator.run() - selected account: "
-						+ max_winned_value + " " + acc_winner.getAddress());
-				*/
+				
+				// MAKING NEW BLOCK
+				status = 7;
 
 				// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-				long newTimestamp = Block.GENERATING_MIN_BLOCK_TIME + bchain.getTimestamp(dbSet);
-				unconfirmedTransactions = getUnconfirmedTransactions(dbSet, newTimestamp);
+				long newTimestamp = BlockChain.GENERATING_MIN_BLOCK_TIME_MS + bchain.getTimestamp(dcSet);
+				LOGGER.info("GENERATE my BLOCK after timePOINT: " + (NTP.getTime() - newTimestamp)/1000);
+
+				unconfirmedTransactions = getUnconfirmedTransactions(dcSet, newTimestamp);
 				// CALCULATE HASH for that transactions
 				byte[] winnerPubKey = acc_winner.getPublicKey();
 				byte[] atBytes = null;
 				unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
 
 				//ADD TRANSACTIONS
-				//this.addUnconfirmedTransactions(dbSet, block);
-				Block block = generateNextBlock(dbSet, acc_winner, 
-						this.solvingBlock, unconfirmedTransactionsHash);
-				block.setTransactions(unconfirmedTransactions);
+				//this.addUnconfirmedTransactions(dcSet, block);
+				Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
+						solvingBlock, unconfirmedTransactionsHash);
+				generatedBlock.setTransactions(unconfirmedTransactions);
 				
-				syncForgingStatus();
-				if(forgingStatus != ForgingStatus.FORGING) {
-					continue;
-				}
-
 				//PASS BLOCK TO CONTROLLER
 				///ctrl.newBlockGenerated(block);
-				if (bchain.setWaitWinBuffer(dbSet, block)) {
-					// need to BROADCAST
-					ctrl.broadcastWinBlock(block, null);
-					
-					if (ctrl.isOnStopping() || dbSet.isStoped())
-						return;
+				LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+				if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
 
+					// need to BROADCAST
+
+					// REFRESH
+					waitWin = bchain.getWaitWinBuffer();
+					if (waitWin != null)
+					{
+						long wait_winned_value = waitWin.calcWinValue(dcSet);
+						if (wait_winned_value > max_winned_value) {
+							// block in buffer is more good
+							LOGGER.info("wait_winned_value > max_winned_value (new): " + wait_winned_value + ">" + max_winned_value);
+							continue;
+						}
+					}
+					
+					status = 8;
+					
+					long timeBlock = generatedBlock.getTimestamp(dcSet) + BlockChain.WIN_BLOCK_BROADCAST_WAIT;
+					while(timeBlock > NTP.getTime()) {
+						try
+						{
+							Thread.sleep(500);
+						}
+						catch (InterruptedException e) 
+						{
+						}
+					}
+
+					ctrl.broadcastWinBlock(generatedBlock, null);
+	
 				}
 			}
 		}
 	}
 	
-	public static Block generateNextBlock(DBSet dbSet, PrivateKeyAccount account,
+	public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
 			Block parentBlock, byte[] transactionsHash)
 	{
 		
-		int version = parentBlock.getNextBlockVersion(dbSet);
+		int version = parentBlock.getNextBlockVersion(dcSet);
 		byte[] atBytes;
 		if ( version > 1 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
-					parentBlock.getHeight(dbSet)) , parentBlock.getHeight(dbSet) + 1 );
+					parentBlock.getHeight(dcSet)) , parentBlock.getHeight(dcSet) + 1 );
 			atBytes = atBlock.getBytesForBlock();
 		} else {
 			atBytes = new byte[0];
@@ -504,36 +509,46 @@ public class BlockGenerator extends Thread implements Observer
 		Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
 				transactionsHash, atBytes);
 		// SET GENERATING BALANCE here
-		newBlock.setCalcGeneratingBalance(dbSet);
+		newBlock.setCalcGeneratingBalance(dcSet);
 		newBlock.sign(account);
 		
 		return newBlock;
 
 	}
 	
-	public static List<Transaction> getUnconfirmedTransactions(DBSet db, long timestamp)
+	public static List<Transaction> getUnconfirmedTransactions(DCSet db, long timestamp)
 	{
 		
-		//Date timrans1 = new Date();
-		
-		long totalBytes = 0;
-		boolean transactionProcessed;
-			
+		long timrans1 = System.currentTimeMillis();
+					
 		//CREATE FORK OF GIVEN DATABASE
-		DBSet newBlockDb = db.fork();
+		DCSet newBlockDb = db.fork();
+		Controller ctrl = Controller.getInstance();
 					
 		//ORDER TRANSACTIONS BY FEE PER BYTE
-		List<Transaction> orderedTransactions = new ArrayList<Transaction>(db.getTransactionMap().getValues());
+		DCSet dcSet = DCSet.getInstance();
 		
+		long start = System.currentTimeMillis();
+		LOGGER.error("get orderedTransactions");
+		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValues());
+		long tickets = System.currentTimeMillis() - start;
+		LOGGER.error(" time " + tickets);
+
 		// TODO make SORT by FEE to!
 		// toBYTE / FEE + TIMESTAMP !!
 		////Collections.sort(orderedTransactions, new TransactionFeeComparator());
 		// sort by TIMESTAMP
 		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
+		long tickets2 = System.currentTimeMillis() - start - tickets;
+		LOGGER.error("sort time " + tickets2);
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
+
+		boolean transactionProcessed;
+		long totalBytes = 0;
+		int count = 0;
 
 		do
 		{
@@ -542,130 +557,91 @@ public class BlockGenerator extends Thread implements Observer
 			for(Transaction transaction: orderedTransactions)
 			{
 								
-				//CHECK TRANSACTION TIMESTAMP AND DEADLINE
-				if(transaction.getTimestamp() <= timestamp && transaction.getDeadline() > timestamp)
-				{
-					try{
-						//CHECK IF VALID
-						if(!transaction.isSignatureValid()) {
-							// INVALID TRANSACTION
-							db.getTransactionMap().delete(transaction);
-						} else {
-							transaction.setDB(newBlockDb, false);
-							if (transaction.isValid(newBlockDb, null) == Transaction.VALIDATE_OK)
-							{
-																
-								//CHECK IF ENOUGH ROOM
-								if(totalBytes + transaction.getDataLength(false) <= GenesisBlock.MAX_TRANSACTION_BYTES)
-								{
-									
-									totalBytes += transaction.getDataLength(false);
-		
-									////ADD INTO LIST
-									transactionsList.add(transaction);
-												
-									//REMOVE FROM LIST
-									orderedTransactions.remove(transaction);
-												
-									//PROCESS IN NEWBLOCKDB
-									transaction.process(newBlockDb, null, false);
-												
-									//TRANSACTION PROCESSES
-									transactionProcessed = true;
-									
-									// GO TO NEXT TRANSACTION
-									break;
-								}
-							} else {
-								// INVALID TRANSACTION
-								db.getTransactionMap().delete(transaction);
-							}
-							
-						}
-							
-					} catch (Exception e) {
-                        orderedTransactions.remove(transaction);
-                        transactionProcessed = true;
-
-                        LOGGER.error(e.getMessage(), e);
-                        //REMOVE FROM LIST
-
-                        break;                    
-					}
+				if (ctrl.isOnStopping()) {
+					return null;
 				}
+
+				try{
+
+					//CHECK TRANSACTION TIMESTAMP AND DEADLINE
+					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp) {
+						// OFF TIME
+						// REMOVE FROM LIST
+						transactionProcessed = true;
+						orderedTransactions.remove(transaction);
+						break;
+					}
+					
+					//CHECK IF VALID
+					if(!transaction.isSignatureValid()) {
+						// INVALID TRANSACTION
+						// REMOVE FROM LIST
+						transactionProcessed = true;
+						orderedTransactions.remove(transaction);
+						break;
+					}
+						
+					transaction.setDB(newBlockDb, false);
+					
+					if (transaction.isValid(newBlockDb, null) != Transaction.VALIDATE_OK) {
+						// INVALID TRANSACTION
+						// REMOVE FROM LIST
+						transactionProcessed = true;
+						orderedTransactions.remove(transaction);
+						break;
+					}
+														
+					//CHECK IF ENOUGH ROOM
+					totalBytes += transaction.getDataLength(false);
+
+					if(totalBytes > MAX_BLOCK_SIZE_BYTE
+							|| ++count> MAX_BLOCK_SIZE)
+						break;
+					
+					////ADD INTO LIST
+					transactionsList.add(transaction);
+								
+					//REMOVE FROM LIST
+					orderedTransactions.remove(transaction);
+								
+					//PROCESS IN NEWBLOCKDB
+					transaction.process(newBlockDb, null, false);
+								
+					//TRANSACTION PROCESSES
+					transactionProcessed = true;
+										
+					// GO TO NEXT TRANSACTION
+					break;
+						
+				} catch (Exception e) {
+					
+					if (ctrl.isOnStopping()) {
+						return null;
+					}
+
+                    transactionProcessed = true;
+
+                    LOGGER.error(e.getMessage(), e);
+                    //REMOVE FROM LIST
+
+                    break;                    
+				}
+				
 			}
 		}
-		while(transactionProcessed == true);
+		while(count < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
+
+		long start2 = System.currentTimeMillis();
 
 		// sort by TIMESTAMP
 		Collections.sort(transactionsList,  new TransactionTimestampComparator());
 
-		//long dd = (new Date().getTime() -timrans1.getTime()) / 1000;
-		//LOGGER.debug("core.BlockGenerator.getUnconfirmedTransactions(DBSet, long) ######## =" + dd +"sec");
+		long start22 = System.currentTimeMillis() - start2;
+
+		LOGGER.debug("get Unconfirmed Transactions =" + start22 +"milsec for trans: " + transactionsList.size() );
 		
 		return transactionsList;
-	}
-	
-	/*public void addObserver(Observer o)
-	{
-		o.update(null, new ObserverMessage(ObserverMessage.LIST_TRANSACTION_TYPE, DBSet.getInstance().getTransactionMap().getValues()));
-	}*/
-	
-	/*
-	public static long getNextBlockGeneratingBalance_old(DBSet db, Block block)
-	{
-		int height = block.getHeight(db);
-		if(height % GenesisBlock.GENERATING_RETARGET == 0)
-		{
-			//CALCULATE THE GENERATING TIME FOR LAST 10 BLOCKS
-			long generatingTime = block.getTimestamp();
-				
-			//GET FIRST BLOCK OF TARGET
-			Block firstBlock = block;
-			for(int i=1; i<GenesisBlock.GENERATING_RETARGET; i++)
-			{
-				firstBlock = firstBlock.getParent(db);
-			}
-					
-			generatingTime -= firstBlock.getTimestamp();
-			
-			//CALCULATE EXPECTED FORGING TIME
-			long expectedGeneratingTime = getBlockTime(block.getGeneratingBalance()) * GenesisBlock.GENERATING_RETARGET * 1000;
-			
-			//CALCULATE MULTIPLIER
-			double multiplier = (double) expectedGeneratingTime / (double) generatingTime;
-			
-			//CALCULATE NEW GENERATING BALANCE
-			long generatingBalance = (long) (block.getGeneratingBalance() * multiplier);
-			
-			return minMaxBalance(generatingBalance);
-		}
-		
-		return block.getGeneratingBalance();
-	}
-		
-	public static long getBaseTarget(long generatingBalance)
-	{
-		generatingBalance = minMaxBalance(generatingBalance);
-		
-		long baseTarget = generatingBalance * getBlockTime(generatingBalance);
-		
-		return baseTarget;
-	}
-	*/
-	/*
-	public static long getBlockTime_old(long generatingBalance)
-	{
-		generatingBalance = minMaxBalance(generatingBalance);
-		
-		double percentageOfTotal = (double) generatingBalance / GenesisBlock.MAX_GENERATING_BALANCE;
-		long actualBlockTime = (long) (GenesisBlock.GENERATING_MIN_BLOCK_TIME
-				+ ((GenesisBlock.GENERATING_MAX_BLOCK_TIME
-						- GenesisBlock.GENERATING_MIN_BLOCK_TIME) * (1 - percentageOfTotal)));
-		
-		return actualBlockTime;
-	}
-	*/
+	}	
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
@@ -690,6 +666,7 @@ public class BlockGenerator extends Thread implements Observer
 	
 	public void syncForgingStatus()
 	{
+		
 		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().size() == 0) {
 			setForgingStatus(ForgingStatus.FORGING_DISABLED);
 			return;
@@ -700,7 +677,9 @@ public class BlockGenerator extends Thread implements Observer
 		//CONNECTIONS OKE? -> FORGING
 		// CONNECTION not NEED now !!
 		// TARGET_WIN will be small
-		if(status != Controller.STATUS_OK || ctrl.isProcessingWalletSynchronize()) {
+		if(status != Controller.STATUS_OK
+				///|| ctrl.isProcessingWalletSynchronize()
+				) {
 			setForgingStatus(ForgingStatus.FORGING_ENABLED);
 			return;
 		}

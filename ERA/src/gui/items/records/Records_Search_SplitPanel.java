@@ -52,8 +52,8 @@ import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.item.unions.UnionCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.TransactionMap;
+import datachain.DCSet;
+import datachain.TransactionMap;
 import gui.CoreRowSorter;
 import gui.Main_Internal_Frame;
 	import gui.Split_Panel;
@@ -157,7 +157,7 @@ import utils.MenuPopupUtil;
 						int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
 						row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 						Transaction trans = transactionsTableModel.getTransaction(row);
-						DBSet db = DBSet.getInstance();
+						DCSet db = DCSet.getInstance();
 						new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
 						
 					}
@@ -243,7 +243,7 @@ import utils.MenuPopupUtil;
 			//	JPanel a = TransactionDetailsFactory.getInstance().createTransactionDetail(voting);
 				info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(voting),tableGBC);						
 				  
-		        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(DBSet.getInstance()),voting.getSeqNo(DBSet.getInstance()));
+		        Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DCSet.getInstance().getVouchRecordMap().get(voting.getBlockHeight(DCSet.getInstance()),voting.getSeqNo(DCSet.getInstance()));
 		        GridBagConstraints gridBagConstraints = null;
 		        if (signs != null) {
 			  	  

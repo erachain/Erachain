@@ -25,8 +25,8 @@ import core.account.Account;
 import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -50,7 +50,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 	{
 		addObservers();
 		key_person_table = person_Key;
-		addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
+		addresses = DCSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 	}
 
 	public String get_No_Trancaction(int row){
@@ -154,7 +154,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		Tuple3<Integer, Integer, Integer> value = entry.peek();
 		int height = value.b;
 		int seq = value.c;
-		Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+		Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
 		switch(column)
 		{
 		
@@ -231,7 +231,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		//CHECK IF LIST UPDATED
 		if( message.getType() == ObserverMessage.ADD_ALL_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE || message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE)
 		{
-			addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
+			addresses = DCSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 			this.fireTableDataChanged();
 		}	
 	}
@@ -254,7 +254,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 				Tuple3<Integer, Integer, Integer> value = entry.peek();
 				int height = value.b;
 				int seq = value.c;
-				Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+				Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
 				if (trans == null)
 					return null;
 				HashSet<core.account.Account> accounts = trans.getRecipientAccounts();
@@ -290,7 +290,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 		Tuple3<Integer, Integer, Integer> value = entry.peek();
 		int height = value.b;
 		int seq = value.c;
-		Transaction trans = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+		Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
 		if (trans == null)
 			return null;
 		

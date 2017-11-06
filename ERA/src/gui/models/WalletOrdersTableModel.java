@@ -12,8 +12,8 @@ import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.assets.Order;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -160,7 +160,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE)
+		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	

@@ -2,7 +2,9 @@ package network;
 // 30/03
 import org.apache.log4j.Logger;
 
+import controller.Controller;
 import database.DBSet;
+import datachain.DCSet;
 import network.message.Message;
 import network.message.MessageFactory;
 import settings.Settings;
@@ -28,6 +30,12 @@ public class Pinger extends Thread
 	{
 		return this.ping;
 	}
+
+	public void setPing(long ping)
+	{		
+		this.ping = ping;
+	}
+
 	/*
 	public boolean isRun()
 	{
@@ -40,16 +48,23 @@ public class Pinger extends Thread
 	
 		while(true)
 		{
-			
-			if(!this.peer.isUsed()) {
-				try {
-					Thread.sleep(100);
-				}
-				catch (Exception e) {		
-				}
+
+			//SLEEP
+			try 
+			{
+				Thread.sleep(Settings.getInstance().getPingInterval());
+			} 
+			catch (InterruptedException e)
+			{
+				//FAILED TO SLEEP
+			}
+
+			if(true || !this.peer.isUsed()) {
 				continue;
 			}
-			
+
+			this.peer.addPingCounter();
+
 			//CREATE PING
 			Message pingMessage = MessageFactory.getInstance().createPingMessage();
 						
@@ -63,7 +78,7 @@ public class Pinger extends Thread
 				//PING FAILES
 				this.peer.onPingFail(response == null?"response == null": "response.getType() != Message.PING_TYPE" );
 				try {
-					Thread.sleep(100);
+					Thread.sleep(30000);
 				}
 				catch (Exception e) {		
 				}
@@ -75,10 +90,9 @@ public class Pinger extends Thread
 
 				//UPDATE PING
 				this.ping = System.currentTimeMillis() - start;
-				this.peer.addPingCounter();
 								
-				if(!DBSet.getInstance().isStoped()){
-						DBSet.getInstance().getPeerMap().addPeer(this.peer, 0);
+				if(!Controller.getInstance().isOnStopping()){
+					Controller.getInstance().getDBSet().getPeerMap().addPeer(this.peer, 0);
 				}
 			}
 			catch(Exception e)
@@ -86,23 +100,13 @@ public class Pinger extends Thread
 				//PING FAILES
 				this.peer.onPingFail(e.getMessage());
 				try {
-					Thread.sleep(100);
+					Thread.sleep(30000);
 				}
 				catch (Exception e1) {		
 				}
 				continue;
 				
-			}
-			
-			//SLEEP
-			try 
-			{
-				Thread.sleep(Settings.getInstance().getPingInterval());
-			} 
-			catch (InterruptedException e)
-			{
-				//FAILED TO SLEEP
-			}
+			}			
 		}
 	}
 
@@ -134,9 +138,9 @@ public class Pinger extends Thread
 	public void goInterrupt_old()
 	{
 
-		DBSet dbSet = DBSet.getInstance(); 
+		DCSet dcSet = DCSet.getInstance(); 
 		//int i =0;
-		while(dbSet.getBlockMap().isProcessing() || dbSet.isBusy() ) {
+		while(dcSet.getBlockMap().isProcessing() || dcSet.isBusy() ) {
 			try {
 				LOGGER.info(" pinger.goInterrupt wait DB : " + this.peer.getAddress());
 				Thread.sleep(50);

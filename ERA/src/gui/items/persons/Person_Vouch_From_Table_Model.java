@@ -34,11 +34,11 @@ import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
-import database.DBMap;
-import database.DBSet;
-import database.SortableList;
-import database.TransactionFinalMap;
-import database.TransactionMap;
+import datachain.DCMap;
+import datachain.DCSet;
+import datachain.SortableList;
+import datachain.TransactionFinalMap;
+import datachain.TransactionMap;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
@@ -139,7 +139,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 		if (transaction == null)
 			return null;
 
-		return transaction.viewHeightSeq(DBSet.getInstance());
+		return transaction.viewHeightSeq(DCSet.getInstance());
 		
 	}
 
@@ -176,7 +176,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 				
 			case COLUMN_HEIGHT:
 				
-				return (int)(transaction.getBlockHeight(DBSet.getInstance()));
+				return (int)(transaction.getBlockHeight(DCSet.getInstance()));
 			
 			
 			}
@@ -205,7 +205,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 		message = (ObserverMessage) arg;
 
 		
-		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
 		{
 			//CHECK IF NEW LIST
 		
@@ -232,9 +232,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 				this.fireTableDataChanged();
 			fire = true;
 			}
-		}
-		
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
+		} else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
 		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
 		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
@@ -255,8 +253,8 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 
 public void addObservers(){
 		
-	DBSet.getInstance().getTransactionFinalMap().addObserver(this);
-	DBSet.getInstance().getTransactionMap().addObserver(this);
+	DCSet.getInstance().getTransactionFinalMap().addObserver(this);
+	DCSet.getInstance().getTransactionMap().addObserver(this);
 	
 		
 	}
@@ -266,8 +264,8 @@ public void addObservers(){
 	{
 		
 		
-		DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
-		DBSet.getInstance().getTransactionMap().deleteObserver(this);
+		DCSet.getInstance().getTransactionFinalMap().deleteObserver(this);
+		DCSet.getInstance().getTransactionMap().deleteObserver(this);
 	}
 
 }

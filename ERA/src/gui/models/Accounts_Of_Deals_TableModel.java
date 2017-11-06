@@ -17,7 +17,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -60,7 +60,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 	
 	BigDecimal ss = new BigDecimal(0);	
 	for (PublicKeyAccount acc:this.publicKeyAccounts){
-	ss = ss.add(acc.getBalance(this.asset.getKey(DBSet.getInstance())).a);	
+	ss = ss.add(acc.getBalance(this.asset.getKey(DCSet.getInstance())).a);	
 	
 	}
 		
@@ -75,10 +75,10 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		BigDecimal ss = new BigDecimal(0);	
 		BigDecimal sW = new BigDecimal(0);
 		for (PublicKeyAccount account:this.publicKeyAccounts){
-		ss = ss.add(account.getBalance(this.asset.getKey(DBSet.getInstance())).a);	
+		ss = ss.add(account.getBalance(this.asset.getKey(DCSet.getInstance())).a);	
 		
 		
-		sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance())).a);
+		sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance())).a);
 		
 		
 		}
@@ -171,13 +171,13 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 			return account.getPersonAsString();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(balance.a); // + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
-			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
+			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a));
 				//	+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 				//	+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
@@ -229,7 +229,8 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 			
 		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 			
-			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
 			{
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();	
 				
@@ -243,8 +244,6 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 				this.fireTableDataChanged();
 			}
 		}
-	
-		
 	
 	}
 
@@ -260,7 +259,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 			}
 			else
 			{
-				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DBSet.getInstance())));
+				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DCSet.getInstance())));
 			}
 		}
 		

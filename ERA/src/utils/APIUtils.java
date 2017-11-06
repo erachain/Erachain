@@ -22,7 +22,7 @@ import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.web.ServletUtils;
-import database.DBSet;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.mails.Mail_Info;
@@ -118,7 +118,7 @@ public class APIUtils {
 		Integer result;
 		// SEND ASSET PAYMENT
 		Transaction transaction = Controller.getInstance()
-			.r_Send(account, feePow, new Account(recipient), asset.getKey(DBSet.getInstance()), bdAmount);
+			.r_Send(account, feePow, new Account(recipient), asset.getKey(DCSet.getInstance()), bdAmount);
 			
 	
 

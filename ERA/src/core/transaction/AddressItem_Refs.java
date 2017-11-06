@@ -23,8 +23,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.item.ItemCls;
-//import database.ItemItemMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public abstract class AddressItem_Refs extends Transaction 
 {
@@ -116,7 +115,7 @@ public abstract class AddressItem_Refs extends Transaction
 	//VALIDATE
 		
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH
@@ -140,7 +139,7 @@ public abstract class AddressItem_Refs extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -154,7 +153,7 @@ public abstract class AddressItem_Refs extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);

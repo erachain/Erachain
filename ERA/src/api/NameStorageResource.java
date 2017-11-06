@@ -37,7 +37,7 @@ import core.item.assets.AssetCls;
 import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 @Path("namestorage")
 @Produces(MediaType.APPLICATION_JSON)
@@ -58,14 +58,14 @@ public class NameStorageResource {
 	@Path("/{name}/list")
 	public String listNameStorage(@PathParam("name") String name) {
 
-		Name nameObj = DBSet.getInstance().getNameMap().get(name);
+		Name nameObj = DCSet.getInstance().getNameMap().get(name);
 
 		if (nameObj == null) {
 			throw ApiErrorFactory.getInstance().createError(
 					Transaction.NAME_DOES_NOT_EXIST);
 		}
 
-		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
+		Map<String, String> map = DCSet.getInstance().getNameStorageMap()
 				.get(name);
 
 		JSONObject json = new JSONObject();
@@ -85,14 +85,14 @@ public class NameStorageResource {
 	@Path("/{name}/keys")
 	public String listKeysNameStorage(@PathParam("name") String name) {
 
-		Name nameObj = DBSet.getInstance().getNameMap().get(name);
+		Name nameObj = DCSet.getInstance().getNameMap().get(name);
 
 		if (nameObj == null) {
 			throw ApiErrorFactory.getInstance().createError(
 					Transaction.NAME_DOES_NOT_EXIST);
 		}
 
-		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
+		Map<String, String> map = DCSet.getInstance().getNameStorageMap()
 				.get(name);
 
 		JSONArray json = new JSONArray();
@@ -113,7 +113,7 @@ public class NameStorageResource {
 	public String getNameStorageValue(@PathParam("name") String name,
 			@PathParam("key") String key) {
 
-		Map<String, String> map = DBSet.getInstance().getNameStorageMap()
+		Map<String, String> map = DCSet.getInstance().getNameStorageMap()
 				.get(name);
 		
 		
@@ -135,7 +135,7 @@ public class NameStorageResource {
 	@Path("/update/{name}")
 	public String updateEntry(String x, @PathParam("name") String name) {
 		
-		DBSet dbSet = DBSet.getInstance();
+		DCSet dcSet = DCSet.getInstance();
 		
 		try {
 			APIUtils.disallowRemote(request);
@@ -155,7 +155,7 @@ public class NameStorageResource {
 						ApiErrorFactory.ERROR_WALLET_NOT_IN_SYNC);
 			}
 
-			Name nameObj = DBSet.getInstance().getNameMap().get(name);
+			Name nameObj = DCSet.getInstance().getNameMap().get(name);
 //			Controller.getInstance().getAccountByAddress(name)
 
 			String creator;
@@ -398,7 +398,7 @@ public class NameStorageResource {
 								Transaction.CREATOR_NOT_OWNER);
 					}
 					
-					if (account.getBalance(dbSet, Transaction.FEE_KEY).a.compareTo(
+					if (account.getBalance(dcSet, Transaction.FEE_KEY).a.compareTo(
 							completeFee) == -1) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.NO_BALANCE);

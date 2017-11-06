@@ -22,8 +22,8 @@ import utils.Pair;
 import controller.Controller;
 import core.item.persons.PersonCls;
 import core.wallet.Wallet;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -47,7 +47,7 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public Persons_Favorite_TableModel()
 	{
 		
-	//	addObservers();
+		addObservers();
 		
 		
 		//addObservers();
@@ -118,7 +118,7 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 		{
 		case COLUMN_KEY:
 			
-			return person.getKey(DBSet.getInstance());
+			return person.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			

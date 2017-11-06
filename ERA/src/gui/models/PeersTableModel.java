@@ -13,8 +13,8 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
-import database.DBSet;
 import database.PeerMap.PeerInfo;
+import datachain.DCSet;
 import lang.Lang;
 import network.Peer;
 import settings.Settings;
@@ -124,10 +124,10 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		
 		Peer peer = peers.get(row);
 		
-		if(peer == null || DBSet.getInstance().isStoped())
+		if(peer == null || DCSet.getInstance().isStoped())
 			return null;
 			
-		PeerInfo peerInfo = DBSet.getInstance().getPeerMap().getInfo(peer.getAddress());
+		PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
 		if (peerInfo == null)
 			return null;
 		
@@ -138,7 +138,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 
 			case COLUMN_HEIGHT:
 				if(!peer.isUsed()) {
-					int banMinutes = DBSet.getInstance().getPeerMap().getBanMinutes(peer);
+					int banMinutes = Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(peer);
 					if (banMinutes > 0) {
 						return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
 					} else {
@@ -205,13 +205,21 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		
 		if(message.getType() == ObserverMessage.LIST_PEER_TYPE)
 		{
+			
 			this.peers = (List<Peer>) message.getValue();
-		
 			this.fireTableDataChanged();
+			
+		} else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
+			
+				this.fireTableDataChanged();
+				
+		} else if (message.getType() == ObserverMessage.REMOVE_PEER_TYPE) {
+			
+				this.fireTableDataChanged();
 		}
 	}
 
-	public void removeObservers() 
+	public void deleteObserver() 
 	{
 		Controller.getInstance().removeActivePeersObserver(this);
 		

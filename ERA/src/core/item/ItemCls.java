@@ -27,12 +27,11 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Issue_ItemRecord;
 import core.transaction.Transaction;
-import database.DBSet;
-//import database.DBMap;
-import database.Item_Map;
 import database.wallet.FavoriteItem;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 import lang.Lang;
-import database.Issue_ItemMap;
 import utils.NumberAsString;
 import utils.Pair;
 
@@ -60,8 +59,8 @@ public abstract class ItemCls {
 		
 	protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
-	//protected DBMap dbMap;
-	//protected DBMap dbIssueMap;
+	//protected DCMap dbMap;
+	//protected DCMap dbIssueMap;
 	
 	protected String TYPE_NAME = "unknown";
 	protected byte[] typeBytes;
@@ -97,8 +96,8 @@ public abstract class ItemCls {
 	public abstract String getItemTypeStr();
 	public abstract String getItemSubType();
 
-	public abstract Item_Map getDBMap(DBSet db);
-	public abstract Issue_ItemMap getDBIssueMap(DBSet db);
+	public abstract Item_Map getDBMap(DCSet db);
+	public abstract Issue_ItemMap getDBIssueMap(DCSet db);
 	//public abstract FavoriteItem getDBFavoriteMap();
 
 	public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol)
@@ -179,15 +178,15 @@ public abstract class ItemCls {
 	
 	
 	public long getKey() {
-		return getKey(DBSet.getInstance());
+		return getKey(DCSet.getInstance());
 	}
-	public long getKey(DBSet db) {
+	public long getKey(DCSet db) {
 		// resolve key in that DB
 		resolveKey(db);
 		return this.key;
 	}
 	
-	public long getHeight(DBSet db)
+	public long getHeight(DCSet db)
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
@@ -196,7 +195,7 @@ public abstract class ItemCls {
 		
 	}
 
-	public long resolveKey(DBSet db) {
+	public long resolveKey(DCSet db) {
 		if (this.key == 0 // & this.reference != null
 				) {
 			if (this.getDBIssueMap(db).contains(this.reference)) {
@@ -212,7 +211,7 @@ public abstract class ItemCls {
 		this.key = 0;
 	}
 	
-	public static ItemCls getItem(DBSet db, int type, long key) {
+	public static ItemCls getItem(DCSet db, int type, long key) {
 		//return Controller.getInstance().getItem(db, type, key);
 		return db.getItem_Map(type).get(key);
 	}
@@ -231,10 +230,10 @@ public abstract class ItemCls {
 	}
 		
 	public boolean isConfirmed() {
-		return isConfirmed(DBSet.getInstance());
+		return isConfirmed(DCSet.getInstance());
 	}
 	
-	public boolean isConfirmed(DBSet db) {
+	public boolean isConfirmed(DCSet db) {
 		return this.getDBIssueMap(db).contains(this.reference);
 	}	
 
@@ -344,7 +343,7 @@ public abstract class ItemCls {
 
 	//OTHER
 	
-	public String toString(DBSet db)
+	public String toString(DCSet db)
 	{		
 		long key = this.getKey(db);
 		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
@@ -355,7 +354,7 @@ public abstract class ItemCls {
 	}
 	
 	
-	public String toString(DBSet db, byte[] data) {
+	public String toString(DCSet db, byte[] data) {
 		String str = this.toString(db);
 		
 		Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = core.transaction.R_SetStatusToItem.unpackData(data);
@@ -376,10 +375,10 @@ public abstract class ItemCls {
 
 	public String toString()
 	{
-		return toString(DBSet.getInstance());
+		return toString(DCSet.getInstance());
 	}
 	
-	public String getShort(DBSet db)
+	public String getShort(DCSet db)
 	{
 		long key = this.getKey(db);
 		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
@@ -388,7 +387,7 @@ public abstract class ItemCls {
 	}
 	public String getShort()
 	{
-		return getShort(DBSet.getInstance());
+		return getShort(DCSet.getInstance());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -429,7 +428,7 @@ public abstract class ItemCls {
 	}
 
 	//
-	public void insertToMap(DBSet db, long startKey)
+	public void insertToMap(DCSet db, long startKey)
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
@@ -448,7 +447,7 @@ public abstract class ItemCls {
 		
 	}
 	
-	public long removeFromMap(DBSet db)
+	public long removeFromMap(DCSet db)
 	{
 		//DELETE FROM DATABASE
 		Issue_ItemMap issueDB = this.getDBIssueMap(db);

@@ -11,16 +11,16 @@ import utils.ObserverMessage;
 
 public class FavoriteItem extends Observable {
 
-	protected WalletDatabase walletDatabase;
+	protected DWSet dWSet;
 	protected Set<Long> itemsSet;
 	
 	protected int observer_favorites;
 
 	// favorites init SET
-	public FavoriteItem(WalletDatabase walletDatabase, DB database, int observer_favorites,
+	public FavoriteItem(DWSet dWSet, DB database, int observer_favorites,
 			String treeSet, int initialAdd) 
 	{
-		this.walletDatabase = walletDatabase;
+		this.dWSet = dWSet;
 		this.observer_favorites = observer_favorites;
 		
 		//OPEN MAP
@@ -42,7 +42,7 @@ public class FavoriteItem extends Observable {
 	{
 		this.itemsSet.clear();
 		this.itemsSet.addAll(keys);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.notifyFavorites();
@@ -51,7 +51,7 @@ public class FavoriteItem extends Observable {
 	public void add(Long key)
 	{
 		this.itemsSet.add(key);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.notifyFavorites();
@@ -60,7 +60,7 @@ public class FavoriteItem extends Observable {
 	public void delete(Long key)
 	{
 		this.itemsSet.remove(key);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.notifyFavorites();

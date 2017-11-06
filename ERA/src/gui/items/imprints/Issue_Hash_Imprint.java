@@ -24,7 +24,7 @@ import core.account.PrivateKeyAccount;
 import core.item.imprints.Imprint;
 import core.transaction.R_Hashes;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.PasswordPane;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
@@ -128,7 +128,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
 			
 			List<String> hashes = this.table_Model.getValues(0);			
 			
-			List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
+			List<String> twins = R_Hashes.findTwins(DCSet.getInstance(), hashes);
 			if (twins.size() > 0) {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Twin hashes: ") + twins.toString(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.jButton.setEnabled(true);

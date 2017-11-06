@@ -6,11 +6,11 @@ import java.util.Observer;
 
 import controller.Controller;
 import core.naming.NameSale;
+import datachain.DCSet;
+import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-import database.DBSet;
-import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -136,6 +136,6 @@ public class NameSalesTableModel extends TableModelCls<String, BigDecimal> imple
 	public void removeObservers() 
 	{
 		this.nameSales.removeObserver();
-		DBSet.getInstance().getNameExchangeMap().deleteObserver(this);
+		DCSet.getInstance().getNameExchangeMap().deleteObserver(this);
 	}
 }

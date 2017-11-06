@@ -15,7 +15,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.payment.Payment;
-import database.DBSet;
+import datachain.DCSet;
 
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	protected static final int SERVICE_LENGTH = 4;
@@ -224,7 +224,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	*/
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 
 		// CHECK PAYMENTS SIZE
 		if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -237,7 +237,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		}
 
 		// REMOVE FEE
-		DBSet fork = db.fork();
+		DCSet fork = db.fork();
 		super.process(fork, this.block, false);
 		
 		// CHECK PAYMENTS

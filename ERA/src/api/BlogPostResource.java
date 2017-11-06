@@ -24,7 +24,7 @@ import core.naming.Name;
 import core.transaction.Transaction;
 import core.web.Profile;
 import core.web.blog.BlogEntry;
-import database.DBSet;
+import datachain.DCSet;
 import utils.APIUtils;
 import utils.BlogUtils;
 import utils.Pair;
@@ -205,7 +205,7 @@ public class BlogPostResource {
 			}
 
 			if (authorOpt != null) {
-				Name name = DBSet.getInstance().getNameMap().get(authorOpt);
+				Name name = DCSet.getInstance().getNameMap().get(authorOpt);
 
 				// Name is not owned by creator!
 				if (name == null
@@ -318,7 +318,7 @@ public class BlogPostResource {
 			}
 
 			if (authorOpt != null) {
-				Name name = DBSet.getInstance().getNameMap().get(authorOpt);
+				Name name = DCSet.getInstance().getNameMap().get(authorOpt);
 
 				// Name is not owned by creator!
 				if (name == null
@@ -391,7 +391,7 @@ public class BlogPostResource {
 			return;
 		}
 
-		String blogenable = DBSet.getInstance().getNameStorageMap()
+		String blogenable = DCSet.getInstance().getNameStorageMap()
 				.getOpt(blogname, Corekeys.BLOGENABLE.toString());
 
 		if (blogenable == null) {

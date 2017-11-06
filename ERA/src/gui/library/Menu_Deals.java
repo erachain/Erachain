@@ -7,7 +7,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import core.item.assets.AssetCls;
-import database.DBSet;
+import datachain.DCSet;
 import gui.Send_Frame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;
@@ -31,7 +31,7 @@ public class Menu_Deals extends JMenu {
         	public void actionPerformed(ActionEvent e)
         	{
         		// 
-        		new ExchangeFrame((AssetCls) DBSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null) ;
+        		new ExchangeFrame((AssetCls) DCSet.getInstance().getItemAssetMap().get((long) 2), null, "Buy", null) ;
         	}
         });
        add(BueCompyItem);

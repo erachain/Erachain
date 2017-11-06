@@ -16,7 +16,7 @@ import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -96,7 +96,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 			return account.getPersonAsString();
 		case COLUMN_NOTE_KEY:
 			if (this.note == null) return "-";
-			return this.note.getKey(DBSet.getInstance());			
+			return this.note.getKey(DCSet.getInstance());			
 		case COLUMN_NOTE_NAME:
 			if (this.note == null) return "-";
 			return this.note.getName();
@@ -147,7 +147,8 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 			
 		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 			
-			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
 			{
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();	
 				
@@ -156,8 +157,8 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 			
 			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
 					|| message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-					|| message.getType() == ObserverMessage.ADD_STATEMENT_TYPE
-					|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
+					//|| message.getType() == ObserverMessage.ADD_STATEMENT_TYPE
+					//|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
 					)
 			{
 				this.fireTableDataChanged();

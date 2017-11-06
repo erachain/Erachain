@@ -9,8 +9,8 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.ItemCls;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -82,7 +82,7 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
 		{
 		case COLUMN_KEY:
 			
-			return item.getKey(DBSet.getInstance());
+			return item.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			

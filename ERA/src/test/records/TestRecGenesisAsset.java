@@ -29,7 +29,7 @@ import core.transaction.IssueAssetTransaction;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import database.DBSet;;
+import datachain.DCSet;;
 
 public class TestRecGenesisAsset {
 
@@ -42,7 +42,7 @@ public class TestRecGenesisAsset {
 	byte[] assetReference = new byte[64];
 	
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -56,7 +56,7 @@ public class TestRecGenesisAsset {
 	private void initIssue(boolean toProcess) {
 	
 		//CREATE EMPTY MEMORY DATABASE
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		
 		//CREATE ASSET
 		asset = GenesisBlock.makeAsset(0);

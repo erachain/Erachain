@@ -7,19 +7,19 @@ import java.util.Map;
 
 import org.mapdb.DB;
 
+import datachain.DCMap;
+import datachain.DCSet;
 import utils.ByteArrayUtils;
-import database.DBMap;
-import database.DBSet;
 
-public class OrphanNameStorageHelperMap extends DBMap<String, List<byte[]>> {
+public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public OrphanNameStorageHelperMap(DBSet dbSet, DB database) {
-		super(dbSet, database);
+	public OrphanNameStorageHelperMap(DCSet dcSet, DB database) {
+		super(dcSet, database);
 	}
 
-	public OrphanNameStorageHelperMap(DBMap<String, List<byte[]>> parent) {
+	public OrphanNameStorageHelperMap(DCMap<String, List<byte[]>> parent) {
 		super(parent, null);
 	}
 

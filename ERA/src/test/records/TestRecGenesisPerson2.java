@@ -28,10 +28,10 @@ import core.item.statuses.StatusCls;
 import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import database.DBSet;
-import database.AddressPersonMap;
-import database.PersonAddressMap;
-import database.KKPersonStatusMap;
+import datachain.AddressPersonMap;
+import datachain.DCSet;
+import datachain.KKPersonStatusMap;
+import datachain.PersonAddressMap;
 
 public class TestRecGenesisPerson2 {
 
@@ -49,7 +49,7 @@ public class TestRecGenesisPerson2 {
 	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -67,7 +67,7 @@ public class TestRecGenesisPerson2 {
 	private void initIssue(boolean toProcess) {
 	
 		//CREATE EMPTY MEMORY DATABASE
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		dbPA = db.getPersonAddressMap();
 		dbAP = db.getAddressPersonMap();
 		dbPS = db.getPersonStatusMap();

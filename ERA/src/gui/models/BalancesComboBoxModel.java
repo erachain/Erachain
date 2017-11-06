@@ -13,7 +13,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.account.Account;
-import database.SortableList;
+import datachain.SortableList;
 
 @SuppressWarnings("serial")
 public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>> implements Observer {

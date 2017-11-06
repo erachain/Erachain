@@ -26,8 +26,8 @@ import core.crypto.Crypto;
 import core.naming.Name;
 import core.payment.Payment;
 import core.web.blog.BlogEntry;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 import utils.BlogUtils;
 import utils.StorageUtils;
 
@@ -198,21 +198,21 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 	// PROCESS/ORPHAN
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		
 		try {
 			// NAME STORAGE UPDATE
 			if (this.getService() == 10) {
 				StorageUtils.processUpdate(getData(), signature, this.getCreator(),
-						DBSet.getInstance());
+						DCSet.getInstance());
 				StorageUtils.processUpdate(getData(), signature, this.getCreator(), db);
 				// BLOGPOST?
 			} else if (this.getService() == 777) {
-				addToBlogMapOnDemand(DBSet.getInstance());
+				addToBlogMapOnDemand(DCSet.getInstance());
 				addToBlogMapOnDemand(db);
 			} else if (this.getService() == BlogUtils.COMMENT_SERVICE_ID) {
-				addToCommentMapOnDemand(DBSet.getInstance());
+				addToCommentMapOnDemand(DCSet.getInstance());
 				addToCommentMapOnDemand(db);
 			}
 		} catch (Throwable e) {
@@ -227,14 +227,14 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payment.process(this.getCreator(), db);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (payment.getRecipient().getLastReference(db) == null) {
-				payment.getRecipient().setLastReference(this.timestamp, db);
+			if (false && payment.getRecipient().getLastReference(db) == null) {
+				payment.getRecipient().setLastTimestamp(this.timestamp, db);
 			}
 		}
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		// NAME STORAGE UPDATE ORPHAN
 		// if (service == 10) {
@@ -252,13 +252,13 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payment.orphan(this.getCreator(), db);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (payment.getRecipient().getLastReference(db).equals(this.timestamp)) {
-				payment.getRecipient().removeReference(db);
+			if (false && payment.getRecipient().getLastReference(db).equals(this.timestamp)) {
+				payment.getRecipient().removeLastTimestamp(db);
 			}
 		}
 	}
 	
-	public void addToCommentMapOnDemand(DBSet db) {
+	public void addToCommentMapOnDemand(DCSet db) {
 
 		if (getService() == BlogUtils.COMMENT_SERVICE_ID) {
 			byte[] data = getData();
@@ -321,7 +321,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 	}
 	
-	private void addToBlogMapOnDemand(DBSet db) {
+	private void addToBlogMapOnDemand(DCSet db) {
 
 		if (getService() == 777) {
 			byte[] data = this.getData();
@@ -403,7 +403,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 	}
 	
-	public void deleteInternal(DBSet db, boolean isShare, BlogEntry blogEntryOpt) {
+	public void deleteInternal(DCSet db, boolean isShare, BlogEntry blogEntryOpt) {
 		if (isShare) {
 			byte[] sharesignature = Base58.decode(blogEntryOpt
 					.getShareSignatureOpt());
@@ -424,7 +424,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 	}
 	
-	public void deleteCommentInternal(DBSet db, BlogEntry commentEntry) {
+	public void deleteCommentInternal(DCSet db, BlogEntry commentEntry) {
 
 		byte[] signatureOfComment = Base58.decode(commentEntry.getSignature());
 		byte[] signatureOfBlogPostOpt = db.getCommentPostMap().get(
@@ -441,7 +441,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 	
 	// TODO implement readd delete if orphaned!
 	@SuppressWarnings("unused")
-	private void removeFromBlogMapOnDemand(DBSet db) {
+	private void removeFromBlogMapOnDemand(DCSet db) {
 		if (getService() == 777) {
 			byte[] data = getData();
 			String string = new String(data, Charsets.UTF_8);

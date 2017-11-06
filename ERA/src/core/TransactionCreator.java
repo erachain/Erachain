@@ -64,7 +64,8 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import database.DBSet;
-import database.TransactionMap;
+import datachain.DCSet;
+import datachain.TransactionMap;
 import ntp.NTP;
 //import settings.Settings;
 import utils.Pair;
@@ -73,7 +74,7 @@ import utils.TransactionTimestampComparator;
 /// icreator - 
 public class TransactionCreator
 {
-	private DBSet fork;
+	private DCSet fork;
 	private Block lastBlock;
 	
 	//private byte[] icon = new byte[0]; // default value
@@ -82,7 +83,7 @@ public class TransactionCreator
 	private void checkUpdate()
 	{
 		//CHECK IF WE ALREADY HAVE A FORK
-		if(this.lastBlock == null)
+		if(this.lastBlock == null || this.fork == null)
 		{
 			updateFork();
 		}
@@ -99,13 +100,13 @@ public class TransactionCreator
 	private void updateFork()
 	{
 		//CREATE NEW FORK
-		this.fork = DBSet.getInstance().fork();
+		this.fork = DCSet.getInstance().fork();
 		
 		//UPDATE LAST BLOCK
 		this.lastBlock = Controller.getInstance().getLastBlock();
 			
 		//SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
-		List<Transaction> transactions = DBSet.getInstance().getTransactionMap().getTransactions();
+		List<Transaction> transactions = this.fork.getTransactionMap().getTransactions();
 		List<Transaction> accountTransactions = new ArrayList<Transaction>();
 			
 		for(Transaction transaction: transactions)
@@ -118,13 +119,13 @@ public class TransactionCreator
 			
 		//SORT THEM BY TIMESTAMP
 		Collections.sort(accountTransactions, new TransactionTimestampComparator());
-			
+		
 		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
 		for(Transaction transaction: accountTransactions)
 		{
 			if(!transaction.isSignatureValid()) {
 				//THE TRANSACTION BECAME INVALID LET 
-				DBSet.getInstance().getTransactionMap().delete(transaction);			
+				this.fork.getTransactionMap().delete(transaction);			
 			} else {
 				transaction.setDB(this.fork, false);
 				if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK)
@@ -132,7 +133,7 @@ public class TransactionCreator
 					transaction.process(this.fork, null, false);
 				} else {
 					//THE TRANSACTION BECAME INVALID LET 
-					DBSet.getInstance().getTransactionMap().delete(transaction);
+					this.fork.getTransactionMap().delete(transaction);
 				}
 			}
 		}
@@ -361,7 +362,7 @@ public class TransactionCreator
 		if (forIssue) {
 
 			// IF has not DUPLICATE in UNCONFIRMED RECORDS
-			TransactionMap unconfirmedMap = DBSet.getInstance().getTransactionMap();
+			TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
 			for (Transaction record: unconfirmedMap.getTransactions()) {
 				if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
 					if (record instanceof IssuePersonRecord) {
@@ -416,7 +417,7 @@ public class TransactionCreator
 		this.checkUpdate();
 							
 		// IF has not DUPLICATE in UNCONFIRMED RECORDS
-		TransactionMap unconfirmedMap = DBSet.getInstance().getTransactionMap();
+		TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
 		for (Transaction record: unconfirmedMap.getTransactions()) {
 			if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
 				if (record instanceof IssuePersonRecord) {

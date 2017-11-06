@@ -40,6 +40,7 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import org.json.simple.JSONObject;
 
 import gui.Split_Panel;
+import gui.items.other.Other_Split_Panel;
 import settings.Settings;
 import utils.SaveStrToFile;
 
@@ -120,6 +121,10 @@ public class ButtonTabComponent extends JPanel {
             	   JSONObject settingsJSON = new JSONObject();
             		if(settingsJSONbuf.containsKey("Main_Frame_Setting")) settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
             		HashMap outTabbedDiv = new HashMap();
+            	if (p_Comp instanceof Other_Split_Panel) {
+            			Other_Split_Panel sP = ((Other_Split_Panel) p_Comp);
+            			sP.delay_on_close();
+            		}
             	if (p_Comp instanceof Split_Panel) {
 					Split_Panel sP = ((Split_Panel) p_Comp);
 					outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation()+"");

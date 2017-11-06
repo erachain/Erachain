@@ -18,6 +18,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
 
+import controller.Controller;
 import core.account.Account;
 import core.block.Block;
 import core.block.GenesisBlock;
@@ -26,7 +27,7 @@ import core.blockexplorer.BlockExplorer.Stopwatch;
 import core.crypto.Base58;
 import core.item.assets.AssetVenture;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import settings.Settings;
 import utils.Pair;
 
@@ -49,7 +50,7 @@ public class BlockExplorerTest {
 		LOGGER.error(amount.toPlainString());
 	}
 	
-	public static DBSet createRealEmptyDatabaseSet() {
+	public static DCSet createRealEmptyDatabaseSet() {
 		//OPEN DB
 		File dbFile = new File(Settings.getInstance().getDataDir(), "data2.dat");
 		dbFile.getParentFile().mkdirs();
@@ -63,15 +64,15 @@ public class BlockExplorerTest {
 				.make();
 		
 		//CREATE INSTANCE
-		return new DBSet(database);		
+		return new DCSet(database, false, false);		
 	}	
 	
-	public void minBalance() 
+	public void minBalance()
 	{
 		
 		Block block = new GenesisBlock();
 
-		DBSet databaseSet = createRealEmptyDatabaseSet();
+		DCSet databaseSet = createRealEmptyDatabaseSet();
 
 		List<Pair<Block, BigDecimal>> balancesBlocks =  new ArrayList<>();
 		
@@ -84,16 +85,21 @@ public class BlockExplorerTest {
     	
 		do {
 			
-			block.process(databaseSet);
+			try {
+				block.process(databaseSet);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
-			if ( block.getHeight(DBSet.getInstance())%2000 == 0 )
+			if ( block.getHeight(DCSet.getInstance())%2000 == 0 )
 			{
-				LOGGER.error(block.getHeight(DBSet.getInstance()));
+				LOGGER.error(block.getHeight(DCSet.getInstance()));
 			}
 			
 			balancesBlocks.add(new Pair<>(block, block.getCreator().getBalance(databaseSet, Transaction.FEE_KEY).a));
 			
-			block = block.getChild(DBSet.getInstance());
+			block = block.getChild(DCSet.getInstance());
 			
 		} while (block != null);
 		
@@ -126,7 +132,7 @@ public class BlockExplorerTest {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public void blockExplorer() throws Exception {
 		
-		DBSet.getInstance();
+		DCSet.getInstance();
 		
 		ArrayList<String> addrs = new ArrayList();
 		addrs.add("QXncuwPehVZ21ymE1jawXg1Uv3sZZ4TvYk");
@@ -171,7 +177,7 @@ public class BlockExplorerTest {
 		String showOnly = "";
 		String showWithout = "";
 		
-		DBSet.getInstance();
+		DCSet.getInstance();
 		
 		for(int i = 0; i < addrs.size(); i++) {
 			
@@ -211,25 +217,25 @@ public class BlockExplorerTest {
 			}
 		}
 		
-		DBSet.getInstance().close();
+		DCSet.getInstance().close();
 	}
 	
 	public void getTransactionsByAddress() {
 
-		DBSet.getInstance().getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(1, 1));
+		DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(1, 1));
 		
 		Stopwatch stopwatchAll = new Stopwatch();
 
 		List<Object> all = new ArrayList<Object>();
 
-		all.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4"));
+		all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4"));
 
 		LOGGER.error("getTransactionsByAddress QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4. " + all.size() + " " + stopwatchAll.elapsedTime());
 		
 		all.clear();
 		stopwatchAll = new Stopwatch();
 		
-		all.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU"));
+		all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU"));
 
 		LOGGER.error("getTransactionsByAddress QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU. " + all.size() + " " + stopwatchAll.elapsedTime());
 
@@ -239,7 +245,7 @@ public class BlockExplorerTest {
 
 	public void getTransactionsByTypeAndAddress() {
 		
-		DBSet.getInstance().getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(1, 1));
+		DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(1, 1));
 		
 		Stopwatch stopwatchAll = new Stopwatch();
 
@@ -247,7 +253,7 @@ public class BlockExplorerTest {
 
 		List<Transaction> transactions = new ArrayList<Transaction>();
 		for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", type, 0));
+			transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", type, 0));
 		}
 		
 		Map<String, Boolean> signatures = new LinkedHashMap<String, Boolean>();
@@ -268,7 +274,7 @@ public class BlockExplorerTest {
 		
 		transactions = new ArrayList<Transaction>();
 		for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", type, 0));
+			transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", type, 0));
 		}
 		
 		signatures = new LinkedHashMap<String, Boolean>();
@@ -291,7 +297,7 @@ public class BlockExplorerTest {
 		
 		transactions = new ArrayList<Transaction>();
 		for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", type, 0));
+			transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", type, 0));
 		}
 		
 		for (Transaction transaction : transactions) {
@@ -304,13 +310,13 @@ public class BlockExplorerTest {
 		
 		stopwatchAll = new Stopwatch();
 
-		all.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
+		all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
 
 		LOGGER.error("getTransactionsByAddress QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ. " + all.size() + " " + stopwatchAll.elapsedTime());
 		
 		stopwatchAll = new Stopwatch();
 		all.clear();
-		all.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsBySender("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
+		all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
 
 		for (Object transaction : all) {
 			LOGGER.error(Base58.encode(((Transaction)transaction).getSignature()));
@@ -320,7 +326,7 @@ public class BlockExplorerTest {
 		
 		all.clear();
 		
-		all.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
+		all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
 
 		for (Object transaction : all) {
 			LOGGER.error(Base58.encode(((Transaction)transaction).getSignature()));
@@ -343,10 +349,10 @@ public class BlockExplorerTest {
 	
 	public Transaction getTransaction(byte[] signature) {
 
-		return getTransaction(signature, DBSet.getInstance());
+		return getTransaction(signature, DCSet.getInstance());
 	}
 	
-	public Transaction getTransaction(byte[] signature, DBSet database) {
+	public Transaction getTransaction(byte[] signature, DCSet database) {
 		
 		// CHECK IF IN BLOCK
 		Block block = database.getTransactionRef_BlockRef_Map()
@@ -356,6 +362,6 @@ public class BlockExplorerTest {
 		}
 		
 		// CHECK IF IN TRANSACTION DATABASE
-		return database.getTransactionMap().get(signature);
+		return DCSet.getInstance().getTransactionMap().get(signature);
 	}
 }

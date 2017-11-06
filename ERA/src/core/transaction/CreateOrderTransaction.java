@@ -22,8 +22,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
-//import database.BalanceMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public class CreateOrderTransaction extends Transaction 
 {
@@ -237,7 +236,7 @@ public class CreateOrderTransaction extends Transaction
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK IF ASSETS NOT THE SAME
@@ -350,7 +349,7 @@ public class CreateOrderTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -362,7 +361,7 @@ public class CreateOrderTransaction extends Transaction
 
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);

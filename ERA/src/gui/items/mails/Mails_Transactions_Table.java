@@ -47,7 +47,7 @@ import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
-import database.DBSet;
+import datachain.DCSet;
 import gui.PasswordPane;
 import lang.Lang;
 import utils.Converter;
@@ -105,7 +105,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 		}
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+			transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		}
 		
 		for (Transaction messagetx : transactions) {
@@ -328,7 +328,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 			
 		messageBufs.clear();	
 		transactions.clear();
-		if (account != null) 	transactions.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+		if (account != null) 	transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		
 		
 		for (Transaction messagetx : transactions) {
@@ -436,18 +436,15 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 		
 		if( message.getType() == ObserverMessage.NETWORK_STATUS || (int)message.getValue() == Controller.STATUS_OK ) {
 			this.repaint();
-		}
-		
-		if( message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE
-				|| message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
+		} else if( message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+				//|| message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
+				)
 		{
 			if(Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 				
 				this.repaint();
 			} 
-		}
-
-		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
+		} else if(message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
 		{		
 			boolean is;
 			if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
@@ -775,7 +772,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 		public int getConfirmations()
 		{
 			
-			if( DBSet.getInstance().getTransactionMap().contains(this.signature) )
+			if( DCSet.getInstance().getTransactionMap().contains(this.signature) )
 			{
 				return 0;
 			}
@@ -784,7 +781,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 				Transaction tx = Controller.getInstance().getTransaction(this.signature);
 				if(tx != null)
 				{
-					return tx.getConfirmations(DBSet.getInstance());	
+					return tx.getConfirmations(DCSet.getInstance());	
 				}
 				else
 				{

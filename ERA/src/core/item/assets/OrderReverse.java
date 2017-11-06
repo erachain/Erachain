@@ -17,8 +17,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 
 public class OrderReverse extends Order {
 	

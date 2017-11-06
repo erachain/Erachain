@@ -9,10 +9,10 @@ import javax.validation.constraints.Null;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.voting.Poll;
+import datachain.DCSet;
+import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import database.DBSet;
-import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -102,7 +102,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 			
 		case COLUMN_VOTES:
 			
-			BigDecimal amo = poll.getTotalVotes(this.asset.getKey(DBSet.getInstance()));
+			BigDecimal amo = poll.getTotalVotes(this.asset.getKey(DCSet.getInstance()));
 			if (amo == null)
 				return BigDecimal.ZERO;
 			return amo;
@@ -153,6 +153,6 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 	public void removeObservers() 
 	{
 		this.polls.removeObserver();
-		DBSet.getInstance().getPollMap().deleteObserver(this);
+		DCSet.getInstance().getPollMap().deleteObserver(this);
 	}
 }

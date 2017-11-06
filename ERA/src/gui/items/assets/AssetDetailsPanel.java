@@ -20,7 +20,7 @@ import core.account.Account;
 import core.block.GenesisBlock;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 
 public class AssetDetailsPanel extends JPanel {
@@ -80,9 +80,9 @@ public class AssetDetailsPanel extends JPanel {
 		this.add(new JLabel(Lang.getInstance().translate("Block-SeqNo") + ":"), labelGBC);
 
 		// SEQ-NO
-        Transaction record = Transaction.findByDBRef(DBSet.getInstance(), asset.getReference());
+        Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
 		detailGBC.gridy = gridy;
-		JTextField txtSeqNo = new JTextField(record.viewHeightSeq(DBSet.getInstance()));
+		JTextField txtSeqNo = new JTextField(record.viewHeightSeq(DCSet.getInstance()));
 		txtSeqNo.setEditable(false);
 		this.add(txtSeqNo, detailGBC);	
 

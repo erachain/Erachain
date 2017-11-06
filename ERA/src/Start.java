@@ -20,13 +20,15 @@ import org.apache.log4j.PropertyConfigurator;
 import api.ApiClient;
 import controller.Controller;
 import core.BlockChain;
+import core.BlockGenerator.ForgingStatus;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
-import database.DBSet;
+import datachain.DCSet;
 import settings.Settings;
 import utils.SysTray;
+import webserver.Status;
 
-public class Start {
+public class Start { 
 	
 	
 	static Logger LOGGER = Logger.getLogger(Start.class.getName());
@@ -36,8 +38,7 @@ public class Start {
 	public static void main(String args[]) throws IOException
 	{	
 		
-		about_frame = AboutFrame.getInstance();
-		about_frame.setUserClose(false);
+		
 		////
 		File log4j = new File("log4j.properties");
 		if(log4j.exists())
@@ -53,7 +54,7 @@ public class Start {
 		}
 		
 		boolean cli = false;
-		boolean nogui = false;
+		
 		
 		for(String arg: args)
 		{
@@ -63,8 +64,11 @@ public class Start {
 			} 
 			else 
 			{
-				if(arg.equals("-nogui"))
-					nogui = true;
+				if(arg.equals("-nogui")){
+					
+				Controller.useGui = false;
+				
+				}
 					
 				if(arg.startsWith("-peers=") && arg.length() > 7) 
 				{
@@ -94,10 +98,16 @@ public class Start {
 			}
 		}
 		
+		if(Controller.useGui){
+			about_frame = AboutFrame.getInstance();
+			about_frame.setUserClose(false);
+			}
 		if(!cli)
 		{			
 			try
 			{
+				
+				///fff = Controller.getInstance(Settings.getInstance().isGuiEnabled(), Settings.getInstance().isGuiDynamic());
 				
 				//ONE MUST BE ENABLED
 				if(!Settings.getInstance().isGuiEnabled() && !Settings.getInstance().isRpcEnabled())
@@ -111,12 +121,16 @@ public class Start {
 						.replace("%builddate%", Controller.getBuildDateString());
 				LOGGER.info(info
 						);
-				about_frame.set_console_Text(info);
+				if (Controller.useGui) about_frame.set_console_Text(info);
+				
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC
 				Controller.getInstance().start();
+				//unlick wallet
+				Controller.getInstance().unlockWallet("1");
+				Status.getinstance();
 				
-				if (nogui) {
+				if (!Controller.useGui) {
 					LOGGER.info("-nogui used");
 				} else {
 					
@@ -136,18 +150,18 @@ public class Start {
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
 						        //ItemCls.NOTE_TYPE
-						        NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
+						        NoteCls note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
 						        if (note == null) {
 						        	// USE default LICENSE
-							        note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
+							        note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(2l);
 						        }
-								new License_JFrame(note);
+							//	new License_JFrame(note);
 								Controller.getInstance().setWalletLicense(note.getKey());
 							}
 						}
 					} catch(Exception e1) {
-						about_frame.setVisible(false);
-						about_frame.dispose();
+						if (Controller.useGui)	about_frame.setVisible(false);
+						if (Controller.useGui)  about_frame.dispose();
 						LOGGER.error(Lang.getInstance().translate("GUI ERROR - at Start") ,e1);
 					}
 				}
@@ -159,12 +173,14 @@ public class Start {
 				
 				LOGGER.error(e.getMessage(),e);
 			// show error dialog	
+				if (Controller.useGui){
 				if (Settings.getInstance().isGuiEnabled()){
 				 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage() , 600, 400, Lang.getInstance().translate(" "));
 				 dd.jButton1.setVisible(false);
 				 dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
 				 dd.setLocationRelativeTo(null);
 				 dd.setVisible(true);
+				}
 				}
 				
 				//USE SYSTEM STYLE
@@ -180,11 +196,13 @@ public class Start {
 				if(Gui.isGuiStarted())
 				{
 					JOptionPane.showMessageDialog(null, e.getMessage(), Lang.getInstance().translate("Startup Error"), JOptionPane.ERROR_MESSAGE);
-				}
 				
 				
-				about_frame.setVisible(false);
-				about_frame.dispose();
+			}
+				
+				
+				if (Controller.useGui) about_frame.setVisible(false);
+				if (Controller.useGui) about_frame.dispose();
 				 //FORCE SHUTDOWN
 				System.exit(0);
 			}
@@ -203,8 +221,8 @@ public class Start {
 				if(command.equals("quit"))
 				{
 
-					about_frame.setVisible(false);
-					about_frame.dispose();
+					if (Controller.useGui) about_frame.setVisible(false);
+					if (Controller.useGui) about_frame.dispose();
 					scanner.close();
 					System.exit(0);
 				}

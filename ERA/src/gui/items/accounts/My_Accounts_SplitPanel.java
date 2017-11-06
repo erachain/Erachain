@@ -17,7 +17,9 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 	
 	public Accounts_Panel accountPanel;
 	public Accounts_Right_Panel rightPanel;
-	private int spt=1;
+
+	private Account selecArg;
+	public AssetCls assetSelect;
 	
 	public My_Accounts_SplitPanel(){
 		super("My_Accounts_SplitPanel");
@@ -54,9 +56,18 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 	
 	}
 	
+	@Override
+	public void delay_on_close(){
+		rightPanel.table_Model.deleteObserver();
+		accountPanel.tableModel.deleteObserver();
+		
+		
+	}
 
 	class Account_Tab_Listener implements ListSelectionListener {
 		
+		
+
 		//@SuppressWarnings("deprecation")
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
@@ -66,6 +77,10 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 			if (accountPanel.table.getSelectedRow() >= 0 )
 				account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
 			//info1.show_001(person);
+			if ( account == null) return;
+			if (account.equals(selecArg) && asset.equals(assetSelect)) return;
+			selecArg = account;
+			assetSelect = asset;
 			if (account != null) rightPanel.table_Model.set_Account(account);
 			rightPanel.table_Model.set_Asset(asset);
 			rightPanel.table_Model.set_Encryption(false);

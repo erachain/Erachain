@@ -29,7 +29,7 @@ import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
@@ -113,9 +113,9 @@ public class VouchRecordDialog extends JDialog  {
 		Transaction record = null;
 		if (text.length() < 40) { 
 			//record = R_Vouch.getVouchingRecord(DBSet.getInstance(), jTextField_recordID.getText());
-			record = R_Vouch.getVouchingRecord(DBSet.getInstance(), text);
+			record = R_Vouch.getVouchingRecord(DCSet.getInstance(), text);
 		} else {
-			record = Transaction.findByDBRef(DBSet.getInstance(), Base58.decode(text));
+			record = Transaction.findByDBRef(DCSet.getInstance(), Base58.decode(text));
 		}
 
 		if (record == null) {
@@ -174,7 +174,7 @@ public class VouchRecordDialog extends JDialog  {
 		
 		Transaction transaction = Controller.getInstance().r_Vouch(0, false,
 				authenticator, feePow,
-				record.getBlockHeight(DBSet.getInstance()), record.getSeqNo(DBSet.getInstance()));
+				record.getBlockHeight(DCSet.getInstance()), record.getSeqNo(DCSet.getInstance()));
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 
 		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";

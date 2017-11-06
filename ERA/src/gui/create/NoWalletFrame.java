@@ -26,7 +26,7 @@ import javax.swing.border.EmptyBorder;
 
 import controller.Controller;
 import core.item.notes.NoteCls;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class NoWalletFrame extends JFrame {
@@ -163,10 +163,10 @@ public class NoWalletFrame extends JFrame {
 	public void onNextClick()
 	{
         
-		NoteCls note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
+		NoteCls note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
         if (note == null) {
         	// USE default LICENSE
-	        note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(2l);
+	        note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(2l);
         }
 
         if(createButton.isSelected())

@@ -7,18 +7,18 @@ import org.mapdb.DB;
 
 import com.google.common.primitives.SignedBytes;
 
-import database.DBMap;
-import database.DBSet;
+import datachain.DCMap;
+import datachain.DCSet;
 
-public class OrphanNameStorageMap extends DBMap<byte[], Map<String, String>> {
+public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public OrphanNameStorageMap(DBSet dbSet, DB database) {
-		super(dbSet, database);
+	public OrphanNameStorageMap(DCSet dcSet, DB database) {
+		super(dcSet, database);
 	}
 
-	public OrphanNameStorageMap(DBMap<byte[], Map<String, String>> parent) {
+	public OrphanNameStorageMap(DCMap<byte[], Map<String, String>> parent) {
 		super(parent, null);
 	}
 

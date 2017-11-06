@@ -2,7 +2,7 @@ package gui.models;
 
 import javax.swing.table.AbstractTableModel;
 
-import database.SortableList;
+import datachain.SortableList;
 
 @SuppressWarnings("serial")
 public abstract class TableModelCls<T, U> extends AbstractTableModel  {

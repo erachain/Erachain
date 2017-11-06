@@ -21,7 +21,7 @@ import core.account.Account;
 import core.crypto.Crypto;
 import core.naming.Name;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 /**
  * Used to determine which names or accounts are allowed to post in a blog
@@ -47,7 +47,7 @@ public class BlogBlackWhiteList {
 			return new BlogBlackWhiteList(false, new ArrayList<String>(), null);
 		}
 
-		Name blognameName = DBSet.getInstance().getNameMap().get(blogname);
+		Name blognameName = DCSet.getInstance().getNameMap().get(blogname);
 
 		// Name not registered, --> Default = Whitelist
 		if (blognameName == null) {

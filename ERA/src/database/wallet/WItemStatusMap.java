@@ -18,13 +18,14 @@ public class WItemStatusMap extends WItem_Map
 	static final int TYPE = ItemCls.STATUS_TYPE;
 
 
-	public WItemStatusMap(WalletDatabase walletDatabase, DB database)
+	public WItemStatusMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database,
+		super(dWSet, database,
 				TYPE, "item_statuses",
-				ObserverMessage.ADD_STATUS_TYPE,
-				ObserverMessage.REMOVE_STATUS_TYPE,
-				ObserverMessage.LIST_STATUS_TYPE
+				ObserverMessage.WALLET_RESET_STATUS_TYPE,
+				ObserverMessage.WALLET_ADD_STATUS_TYPE,
+				ObserverMessage.WALLET_REMOVE_STATUS_TYPE,
+				ObserverMessage.WALLET_LIST_STATUS_TYPE
 				);
 	}
 

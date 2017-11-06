@@ -31,10 +31,10 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
+import datachain.DCMap;
+import datachain.DCSet;
 import core.item.ItemCls;
 import ntp.NTP;
-import database.DBSet;
-import database.DBMap;
 
 // this.end_date == null -> MAX
 public class R_SetUnionStatusToItem extends Transaction {
@@ -279,7 +279,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 
 	//VALIDATE
 
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
@@ -315,7 +315,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
 		super.process(db, block, asPack);
@@ -344,7 +344,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);

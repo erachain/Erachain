@@ -26,9 +26,9 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.ItemAssetBalanceMap;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 import lang.Lang;
-import database.DBSet;
 import utils.Converter;
 
 
@@ -89,7 +89,7 @@ public class R_Vouch extends Transaction {
 		return this.seq;
 	}
 	
-	public static Transaction getVouchingRecord(DBSet db, String refStr) { 
+	public static Transaction getVouchingRecord(DCSet db, String refStr) { 
 		try {
 			String[] strA = refStr.split("\\-");
 			int height = Integer.parseInt(strA[0]);
@@ -98,7 +98,7 @@ public class R_Vouch extends Transaction {
 			return db.getTransactionFinalMap().getTransaction(height, seq);
 		} catch (Exception e1) {
 			try {
-				return db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns().get(Base58.decode(refStr)));
+				return db.getTransactionFinalMap().getTransaction(Base58.decode(refStr));
 			} catch (Exception e2) {
 				return null;
 			}
@@ -221,7 +221,7 @@ public class R_Vouch extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		if (this.height < 2 ) {
 			//CHECK HEIGHT - not 0 and NOT GENESIS
@@ -259,7 +259,7 @@ public class R_Vouch extends Transaction {
 
 	
 	
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		super.process(db, block, asPack);
 		
@@ -295,7 +295,7 @@ public class R_Vouch extends Transaction {
 		
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		super.orphan(db, asPack);
 		
@@ -333,7 +333,7 @@ public class R_Vouch extends Transaction {
 	public HashSet<Account> getRecipientAccounts() {
 		HashSet<Account> accounts = new HashSet<Account>();
 
-		Transaction record = DBSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+		Transaction record = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
 		if (record == null) {
 			LOGGER.debug("core.transaction.R_Vouch.getRecipientAccounts() not found record: " + height + "-" + seq);
 			return accounts;

@@ -24,7 +24,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Crypto;
 import core.naming.Name;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.transaction.OnDealClick;
 import lang.Lang;
 import ntp.NTP;

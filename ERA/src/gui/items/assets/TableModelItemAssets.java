@@ -11,9 +11,9 @@ import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
-import database.DBSet;
-import database.ItemAssetMap;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -43,7 +43,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public TableModelItemAssets()
 	{
 		//Controller.getInstance().addObserver(this);
-		db = DBSet.getInstance().getItemAssetMap();
+		db = DCSet.getInstance().getItemAssetMap();
 	}
 	public void set_Filter_By_Name(String str) {
 		filter_Name = str;

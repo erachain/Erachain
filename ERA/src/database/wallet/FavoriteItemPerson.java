@@ -10,16 +10,16 @@ import utils.ObserverMessage;
 public class FavoriteItemPerson extends FavoriteItem {
 	
 	// favorites init SET
-	public FavoriteItemPerson(WalletDatabase walletDatabase, DB database) 
+	public FavoriteItemPerson(DWSet dWSet, DB database) 
 	{
-		super(walletDatabase, database, ObserverMessage.LIST_PERSON_FAVORITES_TYPE, "person", 0);
+		super(dWSet, database, ObserverMessage.LIST_PERSON_FAVORITES_TYPE, "person", 0);
 	}
 	
 	public void replace(List<Long> keys)
 	{
 		this.itemsSet.clear();
 		this.itemsSet.addAll(keys);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.notifyFavorites();
@@ -28,7 +28,7 @@ public class FavoriteItemPerson extends FavoriteItem {
 	public void add(Long key)
 	{
 		this.itemsSet.add(key);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.setChanged();
@@ -38,7 +38,7 @@ public class FavoriteItemPerson extends FavoriteItem {
 	public void delete(Long key)
 	{
 		this.itemsSet.remove(key);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		//this.notifyFavorites();

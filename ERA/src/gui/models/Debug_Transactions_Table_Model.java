@@ -1,24 +1,32 @@
 package gui.models;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
+import core.block.Block;
 import core.transaction.Transaction;
+import datachain.DCSet;
+import datachain.SortableList;
+import datachain.TransactionMap;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
-import database.SortableList;
-import database.TransactionMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transaction> implements Observer {
+public class Debug_Transactions_Table_Model extends AbstractTableModel implements Observer {
 	
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_TYPE = 1;
@@ -26,13 +34,15 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 	
 	private static final Logger LOGGER = Logger
 			.getLogger(Debug_Transactions_Table_Model.class);
-	private SortableList<byte[], Transaction> transactions;
+	private List<Transaction> transactions;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Fee"});
 
 	public Debug_Transactions_Table_Model()
 	{
-		Controller.getInstance().addObserver(this);
+		DCSet.getInstance().getTransactionMap().addObserver(this);
+
+		resetRows();
 	}
 	
 	public Class<? extends Object> getColumnClass(int c)
@@ -41,11 +51,13 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 		return o==null?Null.class:o.getClass();
     }
 	
+	/*
 	@Override
 	public SortableList<byte[], Transaction> getSortableList() 
 	{
 		return this.transactions;
 	}
+	*/
 	
 	public Transaction getTransaction(int row)
 	{
@@ -53,11 +65,7 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 				|| row >= transactions.size())
 			return null;
 		
-		Pair<byte[], Transaction> record = transactions.get(row);
-		if (record == null)
-			return null;
-		
-		return record.getB();
+		return transactions.get(row);
 	}
 	
 	@Override
@@ -93,11 +101,7 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 				return null;
 			}
 			
-			Pair<byte[], Transaction> record = this.transactions.get(row);
-			if (record == null)
-				return null;
-			
-			Transaction transaction = record.getB();
+			Transaction transaction = this.transactions.get(row);
 			if (transaction == null)
 				return null;
 
@@ -134,6 +138,7 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 		catch(Exception e)
 		{
 			//GUI ERROR
+			LOGGER.error(e.getMessage(),e);
 		}
 	}
 	
@@ -141,40 +146,53 @@ public class Debug_Transactions_Table_Model extends TableModelCls<byte[], Transa
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
+		int type = message.getType();
 		
-		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		if(type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE)
 		{
 			//CHECK IF NEW LIST
-			if(this.transactions == null)
-			{
-				this.transactions = (SortableList<byte[], Transaction>) message.getValue();
-				this.transactions.registerObserver();
-				this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
-			}
-			
+
+			LOGGER.error("gui.models.Debug_Transactions_Table_Model.syncUpdate - LIST_UNC_TRANSACTION_TYPE");
+
+			this.resetRows();
 			this.fireTableDataChanged();
 		}
-		else if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
+		else if(type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
 		{
 			//CHECK IF LIST UPDATED
-//			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
-//			this.transactions.add(value);
-			this.fireTableDataChanged();
-		}	
-		
-		else if( message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+			this.transactions.add((Transaction)message.getValue());
+			this.fireTableRowsInserted(0, 0);			
+			if (this.transactions.size() > 100) {
+				this.transactions.remove(100);
+				this.fireTableDataChanged();							
+			}
+		}		
+		else if( message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
 		{
 			//CHECK IF LIST UPDATED
-//			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
-//			this.transactions.remove(value);
-			this.fireTableDataChanged();
+			Transaction transaction = (Transaction)message.getValue();
+			this.transactions.remove(transaction);
+			this.fireTableDataChanged();			
 		}	
 		
 	}
 
+	public void resetRows() {
+		this.transactions = new ArrayList<Transaction>();
+		TransactionMap map = DCSet.getInstance().getTransactionMap();
+		byte[] key;
+		Iterator<byte[]> iterator = map.getIterator(0, true);
+		int i = 0;
+		while (iterator.hasNext() && i++ < 100) {
+			
+			key = iterator.next();
+			this.transactions.add(map.get(key));
+		}
+	}
+
 	public void removeObservers() 
 	{
-		this.transactions.removeObserver();
-		Controller.getInstance().deleteObserver(this);		
+		//this.transactions.removeObserver();
+		DCSet.getInstance().getTransactionMap().deleteObserver(this);		
 	}
 }

@@ -41,7 +41,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class Rec_DetailsFrame extends JPanel //JFrame
@@ -56,7 +56,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 	{
 
 		this.record = record1;
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -118,7 +118,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		//Height + Seq
 		detailGBC.gridy = componentLevel++;
 		JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
-				+ " [" + record.viewHeightSeq(db) + " " + record.getReference() + "] "
+				+ " [" + record.viewHeightSeq(db) + " "
 				+ String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
 				+ "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
 				+ ">>" + record.getConfirmations(db));
@@ -219,16 +219,6 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 				
 				
 				JPopupMenu shorn_Info_Meny = new JPopupMenu();
-				JMenuItem copy_Transaction_Referencw = new JMenuItem(Lang.getInstance().translate("Copy Referince"));
-				copy_Transaction_Referencw.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-			
-						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-						StringSelection value = new StringSelection(record.getReference().toString());
-						clipboard.setContents(value, null);
-					}
-				});
-				shorn_Info_Meny.add(copy_Transaction_Referencw);	
 				
 				JMenuItem copy_Transaction_Sign = new JMenuItem(Lang.getInstance().translate("Copy Signature"));
 				copy_Transaction_Sign.addActionListener(new ActionListener() {

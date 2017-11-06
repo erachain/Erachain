@@ -21,8 +21,8 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.library.MTable;
 import lang.Lang;
 import utils.Pair;
@@ -353,7 +353,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 				if (trade == null)
 					return;
 				
-				boolean type = trade.getInitiatorOrder(DBSet.getInstance()).getHave() == have.getKey();
+				boolean type = trade.getInitiatorOrder(DCSet.getInstance()).getHave() == have.getKey();
 				
 				if (e.getClickCount() == 2) {
 

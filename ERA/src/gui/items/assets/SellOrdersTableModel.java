@@ -9,12 +9,12 @@ import java.util.Observer;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-import database.DBSet;
-import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -120,7 +120,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 				
 				
 				// It shows unacceptably small amount of red.
-				BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
+				BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
 				BigDecimal amount = order.getAmountHaveLeft();
 				String amountStr = NumberAsString.getInstance().numberAsString(order.getAmountHaveLeft());
 				amount = amount.subtract(amount.remainder(increment));
@@ -168,7 +168,8 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE)
+		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
 			totalCalc();
 			this.fireTableDataChanged();

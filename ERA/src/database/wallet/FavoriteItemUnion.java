@@ -12,9 +12,9 @@ import utils.ObserverMessage;
 public class FavoriteItemUnion extends FavoriteItem {
 	
 	// favorites init SET
-	public FavoriteItemUnion(WalletDatabase walletDatabase, DB database) 
+	public FavoriteItemUnion(DWSet dWSet, DB database) 
 	{
-		super(walletDatabase, database, ObserverMessage.LIST_UNION_FAVORITES_TYPE, "union", 3);
+		super(dWSet, database, ObserverMessage.LIST_UNION_FAVORITES_TYPE, "union", 3);
 	}
 	
 }

@@ -31,8 +31,8 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import utils.APIUtils;
 import utils.Pair;
 
@@ -114,8 +114,8 @@ public class AddressesResource {
 
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
 		
-		DBSet db = DBSet.getInstance();
-		Long lastTimestamp = account.getLastReference();
+		DCSet db = DCSet.getInstance();
+		Long lastTimestamp = account.getLastReference(db);
 		byte[] signature;
 		if(!(lastTimestamp == null)) 
 		{
@@ -129,7 +129,7 @@ public class AddressesResource {
 			{
 				for (Transaction tx2 : transactions)
 				{
-					if (tx.getTimestamp() == tx2.getReference()
+					if (tx.getTimestamp() > tx2.getTimestamp()
 							& tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())){
 						// if same address and parent timestamp
 						isSomeoneReference.add(tx.getSignature());
@@ -330,8 +330,8 @@ public class AddressesResource {
 
 		}
 
-		return "" + Block.calcGeneratingBalance(DBSet.getInstance(),
-				new Account(address), Controller.getInstance().getBlockChain().getHeight(DBSet.getInstance()) );
+		return "" + Block.calcGeneratingBalance(DCSet.getInstance(),
+				new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) );
 	}
 
 	@GET
@@ -366,14 +366,14 @@ public class AddressesResource {
 		}
 
 		// DOES ASSETID EXIST
-		if (!DBSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+		if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
 
-		return DBSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
+		return DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
 				.toString();
 	}
 	
@@ -389,7 +389,7 @@ public class AddressesResource {
 
 		}
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		JSONObject assetsBalancesJSON = new JSONObject();
 		

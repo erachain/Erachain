@@ -26,8 +26,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.ItemCls;
-//import database.BalanceMap;
-import database.DBSet;
+import datachain.DCSet;
 
 
 
@@ -462,7 +461,7 @@ public class R_SignNote2 extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		//CHECK DATA SIZE
 		if (publicData == null && key <= 0)

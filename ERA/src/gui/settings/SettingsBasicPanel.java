@@ -58,6 +58,7 @@ public class SettingsBasicPanel extends JPanel
 	public JButton btnLoadNewLang;
 	public JComboBox<String> size_Font;
 	public JComboBox<String> font_Name;
+	public JCheckBox chckbxGuiDynamic;
 	
 	public SettingsBasicPanel()
 	{
@@ -78,10 +79,26 @@ public class SettingsBasicPanel extends JPanel
         GridBagConstraints gbc_chckbxGuiEnabled = new GridBagConstraints();
         gbc_chckbxGuiEnabled.fill = GridBagConstraints.BOTH;
         gbc_chckbxGuiEnabled.insets = new Insets(0, 0, 5, 5);
-        gbc_chckbxGuiEnabled.gridwidth = 4;
+        gbc_chckbxGuiEnabled.gridwidth = 2;
         gbc_chckbxGuiEnabled.gridx = 1;
         gbc_chckbxGuiEnabled.gridy = 0;
         add(chckbxGuiEnabled, gbc_chckbxGuiEnabled);
+       
+        
+        chckbxGuiDynamic = new JCheckBox(Lang.getInstance().translate("GUI Dynamic"));
+        chckbxGuiDynamic.setHorizontalAlignment(SwingConstants.LEFT);
+        chckbxGuiDynamic.setSelected(Settings.getInstance().isGuiDynamic());
+        GridBagConstraints gbc_chckbxGuiDynamic = new GridBagConstraints();
+        gbc_chckbxGuiDynamic.fill = GridBagConstraints.BOTH;
+        gbc_chckbxGuiDynamic.insets = new Insets(0, 0, 5, 5);
+       // gbc_chckbxGuiDynamic.anchor = GridBagConstraints.EAST;
+        gbc_chckbxGuiDynamic.anchor = GridBagConstraints.WEST;
+       // gbc_chckbxGuiDynamic.gridwidth = 2;
+        gbc_chckbxGuiDynamic.gridx = 4;
+        gbc_chckbxGuiDynamic.gridy = 0;
+        add(chckbxGuiDynamic, gbc_chckbxGuiDynamic);
+        
+        
         
         JLabel lblGUIExplanatoryText = new JLabel(Lang.getInstance().translate("Enable/Disable the Graphical User Interface."));
         lblGUIExplanatoryText.setVerticalAlignment(SwingConstants.TOP);

@@ -16,7 +16,7 @@ import utils.AccountBalanceComparator;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.account.Account;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class Accounts_ComboBox_Model extends DefaultComboBoxModel implements Observer {
@@ -33,7 +33,7 @@ public class Accounts_ComboBox_Model extends DefaultComboBoxModel implements Obs
 		
 		Controller.getInstance().addWalletListener(this);
 		  key_person_table = person_Key;
-		addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
+		addresses = DCSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 		
 		
 		
@@ -66,9 +66,10 @@ public class Accounts_ComboBox_Model extends DefaultComboBoxModel implements Obs
 		ObserverMessage message = (ObserverMessage) arg;
 
 		//CHECK IF LIST UPDATED
-		if( message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
+		if( message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE
+				|| message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 		{
-			addresses = DBSet.getInstance().getPersonAddressMap().getItems(key_person_table);
+			addresses = DCSet.getInstance().getPersonAddressMap().getItems(key_person_table);
 		//	this.fireTableDataChanged();
 			
 			//GET SELECTED ITEM

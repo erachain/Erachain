@@ -15,10 +15,11 @@ import core.account.Account;
 import core.item.assets.Order;
 import utils.ObserverMessage;
 import database.DBMap;
-import database.IDB;
 import database.serializer.OrderSerializer;
+import datachain.DCMap;
+import datachain.IDB;
 
-public class OrderMap extends DBMap<Tuple2<String, BigInteger>, Order> 
+public class OrderMap extends DCMap<Tuple2<String, BigInteger>, Order> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
@@ -26,9 +27,10 @@ public class OrderMap extends DBMap<Tuple2<String, BigInteger>, Order>
 	{
 		super(databaseSet, database);
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ORDER_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ORDER_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
 	}
 
 	public OrderMap(OrderMap parent) 

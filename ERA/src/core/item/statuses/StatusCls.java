@@ -2,14 +2,9 @@ package core.item.statuses;
 
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-
-//import java.math.BigDecimal;
-// import org.apache.log4j.Logger;
-
-import database.DBSet;
-import database.Issue_ItemMap;
-import database.Item_Map;
-//import database.ItemStatusMap;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 
 public abstract class StatusCls extends ItemCls {
 
@@ -51,11 +46,11 @@ public abstract class StatusCls extends ItemCls {
 	public boolean isUnique() { return this.typeBytes[1]==(byte)1; }
 
 	// DB
-	public Item_Map getDBMap(DBSet db)
+	public Item_Map getDBMap(DCSet db)
 	{
 		return db.getItemStatusMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
 		return db.getIssueStatusMap();
 	}

@@ -20,23 +20,23 @@ import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
-import database.wallet.WalletDatabase;
+import datachain.DCSet;
+//import database.wallet.DWSet;
 import utils.ObserverMessage;
 
 public abstract class DBMap<T, U> extends Observable {
 	
-	protected static final int NOTIFY_ADD = 1;
-	protected static final int NOTIFY_REMOVE = 2;
-	protected static final int NOTIFY_LIST = 3;
+	public static final int NOTIFY_RESET = 1;
+	public static final int NOTIFY_ADD = 2;
+	public static final int NOTIFY_REMOVE = 3;
+	public static final int NOTIFY_LIST = 4;
+	public static final int NOTIFY_COUNT = 5;
 	
 	public static final int DEFAULT_INDEX = 0;
 	
-	protected DBMap<T, U> parent;
 	protected IDB databaseSet;
 	protected Map<T, U> map;
-	protected List<T> deleted;
 	private Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
-	private boolean worked;
 	
 	static Logger LOGGER = Logger.getLogger(DBMap.class.getName());
 
@@ -52,29 +52,12 @@ public abstract class DBMap<T, U> extends Observable {
 	    this.createIndexes(database);
 	}
 	
-	public DBMap(DBMap<T, U> parent, DBSet dbSet)
-	{
-
-		this.parent = parent;
-		
-		this.databaseSet = dbSet;
-	    
-	    //OPEN MAP
-	    this.map = this.getMemoryMap();
-	    this.deleted = new ArrayList<T>();
-	}
-
 	
-	public DBSet getDBSet()
+	public DCSet getDBSet()
 	{		
-		return (DBSet) this.databaseSet;
+		return (DCSet) this.databaseSet;
 	}
 
-	
-	public boolean isWorked()
-	{		
-		return this.worked;
-	}
 
 	protected abstract Map<T, U> getMap(DB database);
 	
@@ -108,14 +91,12 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public void addUses()
 	{
-		worked = true;
 		if (this.databaseSet!=null) {
 			this.databaseSet.addUses();
 		}
 	}
 	public void outUses()
 	{
-		worked = false;
 		if (this.databaseSet!=null) {
 			this.databaseSet.outUses();
 		}
@@ -131,14 +112,9 @@ public abstract class DBMap<T, U> extends Observable {
 	public U get(T key)
 	{
 
-		if (DBSet.getInstance().isStoped()) {
-			return null;
-		}
-		
 		this.addUses();
 		
-		//try
-		if (true)
+		try
 		{
 			if(this.map.containsKey(key))
 			{
@@ -146,25 +122,13 @@ public abstract class DBMap<T, U> extends Observable {
 				this.outUses();
 				return u;
 			}
-			else
-			{
-				if(this.deleted == null || !this.deleted.contains(key))
-				{
-					if(this.parent != null)
-					{
-						U u = this.parent.get(key);
-						this.outUses();
-						return u;
-					}
-				}
-			}
 			
 			U u = this.getDefaultValue();
 			this.outUses();
 			return u;
 		}
-		//catch(Exception e)
-		else
+		catch(Exception e)
+		//else
 		{
 			//LOGGER.error(e.getMessage(), e);
 			
@@ -173,10 +137,9 @@ public abstract class DBMap<T, U> extends Observable {
 			return u;
 		}			
 	}
-	
+
 	public Set<T> getKeys()
 	{
-		
 		this.addUses();
 		Set<T> u = this.map.keySet();
 		this.outUses();
@@ -193,57 +156,29 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public boolean set(T key, U value)
 	{
-		if (DBSet.getInstance().isStoped()) {
-			return false;
-		}
-		
 		this.addUses();
 		try
 		{
-			//Controller.getInstance().
 			
 			U old = this.map.put(key, value);
-			
-			if(this.deleted != null)
-			{
-				this.deleted.remove(key);
-			}
-			
+						
 			//COMMIT and NOTIFY if not FORKED
-			if(this.parent == null)
+			// TODO 
+			this.databaseSet.commit();
+
+			//NOTIFY ADD
+			if(this.getObservableData().containsKey(NOTIFY_ADD))
 			{
-				// IT IS NOT FORK
-				if(!(this.databaseSet instanceof WalletDatabase
-						&& Controller.getInstance().isProcessingWalletSynchronize()))
-				{
-					this.databaseSet.commit();
-				}
-
-				//NOTIFY ADD
-				if(this.getObservableData().containsKey(NOTIFY_ADD))
-				{
-					this.setChanged();
-					if ( this.getObservableData().get(NOTIFY_ADD).equals( ObserverMessage.ADD_AT_TX_TYPE ) )
-					{
-						this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), new Tuple2<T,U>(key,value)));
-					}
-					else
-					{
-						if (!DBSet.getInstance().isStoped())
-							this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
-					}
-				}
-				
-				//NOTIFY LIST
-				if(this.getObservableData().containsKey(NOTIFY_LIST))
-				{
-					this.setChanged();
-					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), new SortableList<T, U>(this)));
-				}
-
+				this.setChanged();
+				this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_ADD), value));
 			}
-		
 
+			if(this.getObservableData().containsKey(NOTIFY_COUNT))
+			{
+				this.setChanged();
+				this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this.map.size()));
+			}
+			
 			this.outUses();
 			return old != null;
 		}
@@ -259,10 +194,6 @@ public abstract class DBMap<T, U> extends Observable {
 	public void delete(T key) 
 	{
 		
-		if (DBSet.getInstance().isStoped()) {
-			return;
-		}
-
 		this.addUses();
 
 		try
@@ -273,39 +204,19 @@ public abstract class DBMap<T, U> extends Observable {
 				U value = this.map.remove(key);
 				
 				//NOTIFY REMOVE
-				if(this.parent == null && this.getObservableData().containsKey(NOTIFY_REMOVE))
-				{
+				if(this.getObservableData().containsKey(NOTIFY_REMOVE)) {
 					this.setChanged();
-					if ( this.getObservableData().get(NOTIFY_REMOVE).equals( ObserverMessage.REMOVE_AT_TX ))
-					{
-						this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_REMOVE), new Tuple2<T,U>(key,value)));
-					}
-					else
-					{
-						this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_REMOVE), value));
-					}
+					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_REMOVE), value));
 				}
-				
-				//NOTIFY LIST
-				/*if(this.getObservableData().containsKey(NOTIFY_LIST))
+
+				if(this.getObservableData().containsKey(NOTIFY_COUNT))
 				{
 					this.setChanged();
-					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), new SortableList<T, U>(this)));
-				}*/
+					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this.map.size()));
+				}
+
 			}
-			
-			if(this.deleted != null)
-			{
-				this.deleted.add(key);
-			}
-			
-			//COMMIT
-			//if(this.databaseSet != null)
-			if(this.parent == null)
-			{
-				// IT IS NOT FORK
-				this.databaseSet.commit();
-			}
+						
 		}
 		catch(Exception e)
 		{
@@ -318,30 +229,13 @@ public abstract class DBMap<T, U> extends Observable {
 	
 	public boolean contains(T key)
 	{
-		
-		if (DBSet.getInstance().isStoped()) {
-			return false;
-		}
-		
+				
 		this.addUses();
 
 		if(this.map.containsKey(key))
 		{
 			this.outUses();
 			return true;
-		}
-		else
-		{
-			if(this.deleted == null || !this.deleted.contains(key))
-			{
-				if(this.parent != null)
-				{
-					boolean u = this.parent.contains(key);
-					
-					this.outUses();
-					return u;
-				}
-			}
 		}
 		
 		this.outUses();
@@ -351,10 +245,6 @@ public abstract class DBMap<T, U> extends Observable {
 	@Override
 	public void addObserver(Observer o) 
 	{
-
-		// NOT ADD for FORK
-		if(this.parent != null)
-			return;
 
 		this.addUses();
 
@@ -370,6 +260,13 @@ public abstract class DBMap<T, U> extends Observable {
 			//UPDATE
 			o.update(null, new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), list));
 		}
+		
+		if(this.getObservableData().containsKey(NOTIFY_COUNT))
+		{
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this.map.size()));
+		}
+
 		this.outUses();
 	}
 	
@@ -410,21 +307,7 @@ public abstract class DBMap<T, U> extends Observable {
 		this.outUses();
 		return u;
 	}
-	
-	public SortableList<T, U> getParentList()
-	{
-		this.addUses();
-
-		if (this.parent!=null)
-		{
-			SortableList<T, U> u = new SortableList<T, U>(this.parent);
-			this.outUses();
-			return u;
-		}
-		this.outUses();
-		return null;
-	}
-	
+		
 	public void reset() 
 	{
 		this.addUses();
@@ -439,14 +322,20 @@ public abstract class DBMap<T, U> extends Observable {
 		}
 		
 		//NOTIFY LIST
-		if(this.getObservableData().containsKey(NOTIFY_LIST))
+		if(this.getObservableData().containsKey(NOTIFY_RESET))
 		{
 			//CREATE LIST
-			SortableList<T, U> list = new SortableList<T, U>(this);
+			/////SortableList<T, U> list = new SortableList<T, U>(this);
 			
 			//UPDATE
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_LIST), list));
+			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_RESET), null));
+		}
+
+		if(this.getObservableData().containsKey(NOTIFY_COUNT))
+		{
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), 0));
 		}
 
 		this.outUses();

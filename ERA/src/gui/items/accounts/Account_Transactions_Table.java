@@ -46,7 +46,7 @@ import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
-import database.DBSet;
+import datachain.DCSet;
 import gui.PasswordPane;
 import lang.Lang;
 import utils.Converter;
@@ -79,7 +79,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 	int fontHeight;
 	List<Transaction> transactions;
 	
-	DBSet dbSet = DBSet.getInstance();
+	DCSet dcSet = DCSet.getInstance();
 	
 	public Account_Transactions_Table()
 	{
@@ -108,7 +108,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			transactions.addAll(dbSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+			transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		}
 		
 		for (Transaction messagetx : transactions) {
@@ -315,8 +315,8 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		messageBufs.clear();	
 		transactions.clear();
 		if (account != null) 	{
-		transactions.addAll(dbSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.GENESIS_SEND_ASSET_TRANSACTION, 0));
-		transactions.addAll(dbSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
+		transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.GENESIS_SEND_ASSET_TRANSACTION, 0));
+		transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));	
 		
 		
 		}
@@ -428,8 +428,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			this.repaint();
 		}
 		
-		if( message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE
-				|| message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE)
 		{
 			if(Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 				
@@ -437,7 +436,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 			} 
 		}
 
-		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
 		{		
 			boolean is;
 			if(((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION)
@@ -783,7 +782,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		public int getConfirmations()
 		{
 			
-			if( dbSet.getTransactionMap().contains(this.signature) )
+			if( DCSet.getInstance().getTransactionMap().contains(this.signature) )
 			{
 				return 0;
 			}
@@ -792,7 +791,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				Transaction tx = Controller.getInstance().getTransaction(this.signature);
 				if(tx != null)
 				{
-					return tx.getConfirmations(dbSet);	
+					return tx.getConfirmations(dcSet);	
 				}
 				else
 				{
@@ -910,7 +909,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 				amountStr = /*"<font" + fontSize + ">" +send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "
 						+  */ NumberAsString.getInstance().numberAsString(this.amount) /*+ "</font>"
-						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(dbSet)*/;
+						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(dcSet)*/;
 			}
 			
 		if(sender == null)	{
@@ -923,7 +922,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Genesis Block")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=green><b> " + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(dbSet)
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(dcSet)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" // +   this.recipient.asPerson()
 					
 					
@@ -955,7 +954,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+  DateTimeFormat.timestamptoString(this.timestamp)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"+ Lang.getInstance().translate("Sent")
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=red><b> " + amountStr
-					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(dbSet)
+					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>" +  Controller.getInstance().getAsset(this.getAbsAssetKey()).getName()//.getShort(dcSet)
 					+"<td bgcolor='" + colorHeader + "' width='" + (width/2-1) + "'><font color=black>"  +   this.recipient.getPersonAsString()
 					
 					

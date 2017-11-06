@@ -23,7 +23,7 @@ import javax.swing.border.EmptyBorder;
 import utils.MenuPopupUtil;
 import core.crypto.Base58;
 import core.transaction.Genesis_Record;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class RecGenesis_DetailsFrame extends JPanel //JFrame
@@ -107,7 +107,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
 								
 		//CONFIRMATIONS
 		detailGBC.gridy = componentLevel;
-		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(DBSet.getInstance())));
+		JLabel confirmations = new JLabel(String.valueOf(record.getConfirmations(DCSet.getInstance())));
 		this.add(confirmations, detailGBC);	
 		  
 	}

@@ -37,13 +37,10 @@ import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.wallet.Wallet;
-import database.AddressPersonMap;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
-import database.PersonAddressMap;
-import database.KKPersonStatusMap;
+import datachain.AddressPersonMap;
+import datachain.DCSet;
+import datachain.KKPersonStatusMap;
+import datachain.PersonAddressMap;
 
 public class TestRecPerson {
 
@@ -64,7 +61,7 @@ public class TestRecPerson {
 	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	Long last_ref;
 	
@@ -107,13 +104,18 @@ public class TestRecPerson {
 	// INIT PERSONS
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		dbPA = db.getPersonAddressMap();
 		dbAP = db.getAddressPersonMap();
 		dbPS = db.getPersonStatusMap();
 
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 				
 		last_ref = gb.getTimestamp(db);
 		
@@ -133,7 +135,7 @@ public class TestRecPerson {
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
 		genesis_certify.process(db, gb, false);
 		
-		certifier.setLastReference(last_ref, db);
+		certifier.setLastTimestamp(last_ref, db);
 		certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
@@ -306,7 +308,7 @@ public class TestRecPerson {
 		assertEquals(person.getName(), parsedPerson.getName());
 			
 		//CHECK REFERENCE
-		assertEquals(issuePersonTransaction.getReference(), parsedIssuePersonRecord.getReference());	
+		//assertEquals(issuePersonTransaction.getReference(), parsedIssuePersonRecord.getReference());	
 		
 		//CHECK TIMESTAMP
 		assertEquals(issuePersonTransaction.getTimestamp(), parsedIssuePersonRecord.getTimestamp());				
@@ -384,7 +386,7 @@ public class TestRecPerson {
 		assertEquals(false, db.getItemPersonMap().contains(personKey));
 						
 		//CHECK REFERENCE ISSUER
-		assertEquals(issuePersonTransaction.getReference(), certifier.getLastReference(db));
+		//assertEquals(issuePersonTransaction.getReference(), certifier.getLastReference(db));
 	}
 	
 
@@ -523,7 +525,7 @@ public class TestRecPerson {
 			assertEquals(r_SertifyPubKeys.getTimestamp(), parsedPersonTransfer.getTimestamp());				
 
 			//CHECK REFERENCE
-			assertEquals(r_SertifyPubKeys.getReference(), parsedPersonTransfer.getReference());	
+			//assertEquals(r_SertifyPubKeys.getReference(), parsedPersonTransfer.getReference());	
 
 			//CHECK CREATOR
 			assertEquals(r_SertifyPubKeys.getCreator().getAddress(), parsedPersonTransfer.getCreator().getAddress());				
@@ -701,7 +703,7 @@ public class TestRecPerson {
 		assertEquals(BG_ZERO, userAccount3.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(db));
+		//assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(db));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(null, userAccount1.getLastReference(db));
@@ -821,7 +823,7 @@ public class TestRecPerson {
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
 		
-		DBSet fork = db.fork();
+		DCSet fork = db.fork();
 
 		PersonAddressMap dbPA_fork = fork.getPersonAddressMap();
 		AddressPersonMap dbAP_fork = fork.getAddressPersonMap();
@@ -937,7 +939,7 @@ public class TestRecPerson {
 		assertEquals(BG_ZERO, userAccount3.getBalanceUSE(FEE_KEY, fork));
 		
 		//CHECK REFERENCE SENDER
-		assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(fork));
+		//assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(fork));
 		
 		//CHECK REFERENCE RECIPIENT
 		assertEquals(null, userAccount1.getLastReference(fork));

@@ -11,8 +11,8 @@ import utils.ObserverMessage;
 import utils.Pair;
 import controller.Controller;
 import core.item.persons.PersonCls;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -31,7 +31,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	
 	public WalletItemPersonsTableModel()
 	{
-		Controller.getInstance().addWalletListener(this);
+		//Controller.getInstance().addWalletListener(this);
 		addObservers();
 	}
 	
@@ -78,7 +78,8 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	@Override
 	public int getRowCount() 
 	{
-		 return this.persons.size();
+		 
+		return this.persons==null?0:this.persons.size();
 	}
 
 	@Override
@@ -99,7 +100,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		{
 		case COLUMN_KEY:
 			
-			return person.getKey(DBSet.getInstance());
+			return person.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			
@@ -146,7 +147,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 			if(this.persons == null)
 			{
 				this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-				this.persons.registerObserver();
+				Controller.getInstance().wallet.database.getPersonMap().addObserver(persons);
 				//this.persons.sort(PollMap.NAME_INDEX);
 			}
 			
@@ -172,8 +173,9 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	
 	public void removeObservers() 
 	{
-		this.persons.removeObserver();
+		//this.persons.removeObserver();
 		//Controller.getInstance().deleteWalletObserver(this);
 		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
+		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(persons);
 	}
 }

@@ -15,10 +15,10 @@ import org.mapdb.Fun.Tuple2;
 import controller.Controller;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
+import datachain.DCSet;
+import datachain.ItemPersonMap;
+import datachain.SortableList;
 import utils.ObserverMessage;
-import database.DBSet;
-import database.ItemPersonMap;
-import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -43,7 +43,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	private long key_filter =0;
 
 	public TableModelPersons() {
-		db = DBSet.getInstance().getItemPersonMap();
+		db = DCSet.getInstance().getItemPersonMap();
 		// addObservers() ;
 		// PersonCls ss =
 		// DBSet.getInstance().getItemPersonMap().get_Indexes("v");
@@ -202,13 +202,13 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	public void addObservers() {
 
 		// Controller.getInstance()..addObserver(this);
-		DBSet.getInstance().getItemPersonMap().addObserver(this);
+		DCSet.getInstance().getItemPersonMap().addObserver(this);
 	}
 
 	public void removeObservers() {
 
 		// Controller.getInstance().deleteObserver(this);
-		DBSet.getInstance().getItemPersonMap().deleteObserver(this);
+		DCSet.getInstance().getItemPersonMap().deleteObserver(this);
 	}
 
 	public void Find_item_from_key(String text) {

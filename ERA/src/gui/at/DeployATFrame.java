@@ -42,7 +42,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 //import settings.Settings;
 import utils.Converter;
 import utils.Pair;
@@ -371,12 +371,12 @@ public class DeployATFrame extends JFrame {
 			balanceBytes = Bytes.concat(fill, balanceBytes);
 
 			long lFee = Longs.fromByteArray(balanceBytes);
-			DBSet dbSet = DBSet.getInstance();
+			DCSet dcSet = DCSet.getInstance();
 			
-			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( dbSet.getBlockMap().getLastBlock().getHeight(dbSet)) > lFee )
+			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( dcSet.getBlockMap().getLastBlock().getHeight(dcSet)) > lFee )
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fees should be at least ") + (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( 
-						dbSet.getBlockMap().getLastBlock().getHeight(dbSet)) + " !", "Error", JOptionPane.ERROR_MESSAGE);
+						dcSet.getBlockMap().getLastBlock().getHeight(dcSet)) + " !", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
@@ -400,7 +400,7 @@ public class DeployATFrame extends JFrame {
 			ByteBuffer creation = ByteBuffer.allocate(creationLength);
 			creation.order(ByteOrder.LITTLE_ENDIAN);
 			
-			creation.putShort(AT_Constants.getInstance().AT_VERSION( dbSet.getBlockMap().getLastBlock().getHeight(dbSet) ));
+			creation.putShort(AT_Constants.getInstance().AT_VERSION( dcSet.getBlockMap().getLastBlock().getHeight(dcSet) ));
 			creation.putShort((short)0);
 			creation.putShort((short)cpages);
 			creation.putShort((short)dpages);

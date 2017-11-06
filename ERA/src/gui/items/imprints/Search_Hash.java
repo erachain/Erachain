@@ -17,8 +17,8 @@ import javax.swing.event.AncestorListener;
 
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import database.DBSet;
-import database.HashesSignsMap;
+import datachain.DCSet;
+import datachain.HashesSignsMap;
 import gui.Split_Panel;
 import gui.library.My_JFileChooser;
 import lang.Lang;
@@ -56,7 +56,7 @@ public class Search_Hash extends Split_Panel {
 	
 	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
 	
-	DBSet db = DBSet.getInstance();
+	DCSet db = DCSet.getInstance();
 	HashesSignsMap map = db.getHashesSignsMap();
 	byte[] a = "3j2AAAJYRoYVEtdoXZeLZBhjA6eWmJyr4Ng9F6N3whwY".getBytes();
 	Object hashs = map.get("3j2AAAJYRoYVEtdoXZeLZBhjA6eWmJyr4Ng9F6N3whwY".getBytes());

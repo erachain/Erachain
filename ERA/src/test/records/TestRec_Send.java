@@ -27,7 +27,7 @@ import core.payment.Payment;
 import core.transaction.ArbitraryTransactionV3;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 
 
@@ -47,7 +47,7 @@ public class TestRec_Send {
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -66,13 +66,18 @@ public class TestRec_Send {
 	// INIT ASSETS
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
-		Controller.getInstance().setDBSet(db);
+		db = DCSet.createEmptyDatabaseSet();
+		Controller.getInstance().setDCSet(db);
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(db), db);
+		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(8));
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
@@ -323,7 +328,12 @@ public class TestRec_Send {
 		db.getItemAssetMap().set(61l, aTFundingAsset);
     	
 		GenesisBlock genesisBlock = new GenesisBlock();
-		genesisBlock.process(db);
+		try {
+			genesisBlock.process(db);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());

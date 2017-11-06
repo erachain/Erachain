@@ -16,12 +16,12 @@ import com.google.common.primitives.Longs;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.naming.Name;
-import database.DBSet;
-import database.Issue_ItemMap;
-import database.Item_Map;
-import database.NameMap;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.ItemPersonMap;
+import datachain.Item_Map;
+import datachain.NameMap;
 import settings.Settings;
-import database.ItemPersonMap;
 import utils.DateTimeFormat;
 import utils.NameUtils;
 import utils.Pair;
@@ -148,11 +148,11 @@ public abstract class PersonCls extends ItemCls {
 	}	
 
 	// DB
-	public Item_Map getDBMap(DBSet db)
+	public Item_Map getDBMap(DCSet db)
 	{
 		return db.getItemPersonMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
 		return db.getIssuePersonMap();
 	}
@@ -234,7 +234,7 @@ public abstract class PersonCls extends ItemCls {
 	//OTHER
 
 	@Override
-	public String toString(DBSet db)
+	public String toString(DCSet db)
 	{
 		long key = this.getKey(db);
 		return (key<0?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + " " + this.name + " "
@@ -242,7 +242,7 @@ public abstract class PersonCls extends ItemCls {
 	}
 	
 	@Override
-	public String getShort(DBSet db)
+	public String getShort(DCSet db)
 	{
 		long key = this.getKey(db);
 		return (key<1?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + " "
@@ -263,7 +263,7 @@ public abstract class PersonCls extends ItemCls {
 		personJSON.put("birthLatitude", this.birthLatitude);
 		personJSON.put("birthLongitude", this.birthLongitude);
 		personJSON.put("skinColor", this.skinColor);
-		personJSON.put("eyeColor", this.eyeColor);
+		personJSON.put("eyeColor", this.eyeColor); 
 		personJSON.put("hairColor", this.hairСolor);
 		personJSON.put("height", Byte.toUnsignedInt(this.height));
 

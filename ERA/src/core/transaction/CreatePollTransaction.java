@@ -25,8 +25,8 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class CreatePollTransaction extends Transaction 
 {
@@ -194,7 +194,7 @@ public class CreatePollTransaction extends Transaction
 	*/
 	
 	@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		/*
 		//CHECK IF RELEASED
@@ -275,7 +275,7 @@ public class CreatePollTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -286,7 +286,7 @@ public class CreatePollTransaction extends Transaction
 
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);

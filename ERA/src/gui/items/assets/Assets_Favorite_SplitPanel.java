@@ -51,7 +51,7 @@ import javax.swing.event.DocumentEvent;
 	import core.item.assets.AssetCls;
 	import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.Main_Internal_Frame;
 	import gui.Split_Panel;
@@ -405,9 +405,8 @@ import utils.TableMenuPopupUtil;
 					public void actionPerformed(ActionEvent e) {
 						AssetCls asset = search_Table_Model.getAsset(row);
 						
-						DBSet db = DBSet.getInstance();
-						Transaction trans = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
-											.get(asset.getReference()));
+						DCSet db = DCSet.getInstance();
+						Transaction trans = db.getTransactionFinalMap().getTransaction(asset.getReference());
 					
 						new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
 						

@@ -14,7 +14,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
-import database.DBSet;
+import datachain.DCSet;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import lang.Lang;
@@ -33,7 +33,7 @@ public class M_Accoutn_Text_Field  extends JTextField{
 	}
 	
 	public void set_account(Account account){
-		if(account.isPerson(DBSet.getInstance())){
+		if(account.isPerson(DCSet.getInstance())){
 			this.setText( account.getPersonAsString());
 		}
 		else if (GenesisBlock.CREATOR.equals(account)) this.setText("GENESIS");

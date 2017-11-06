@@ -19,9 +19,9 @@ import core.crypto.Crypto;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
-import database.ATTransactionMap;
-import database.DBSet;
-import database.TransactionFinalMap;
+import datachain.ATTransactionMap;
+import datachain.DCSet;
+import datachain.TransactionFinalMap;
 
 
 //CORE AT API IMPLEMENTATION
@@ -35,7 +35,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 	private final static int FIX_HEIGHT_0 = 142000;
 
-	private DBSet dbSet;
+	private DCSet dcSet;
 
 	AT_API_Platform_Impl()
 	{
@@ -47,17 +47,17 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		return instance;
 	}
 
-	public void setDBSet( DBSet newDBSet )
+	public void setDBSet( DCSet newDBSet )
 	{
-		dbSet = newDBSet;
+		dcSet = newDBSet;
 	}
 
 	@Override
 	public long get_Block_Timestamp( AT_Machine_State state ) 
 	{		
 
-		Block lastBlock = dbSet.getBlockMap().getLastBlock(); 
-		return AT_API_Helper.getLongTimestamp( lastBlock.getHeight(dbSet) + 1 , 0 );
+		Block lastBlock = dcSet.getBlockMap().getLastBlock(); 
+		return AT_API_Helper.getLongTimestamp( lastBlock.getHeight(dcSet) + 1 , 0 );
 	}
 
 	public long get_Creation_Timestamp( AT_Machine_State state ) 
@@ -68,14 +68,14 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	@Override
 	public long get_Last_Block_Timestamp( AT_Machine_State state ) 
 	{
-		Block block = dbSet.getBlockMap().getLastBlock(); 
-		return AT_API_Helper.getLongTimestamp( block.getHeight(dbSet) , 0 );
+		Block block = dcSet.getBlockMap().getLastBlock(); 
+		return AT_API_Helper.getLongTimestamp( block.getHeight(dcSet) , 0 );
 	}
 
 	@Override
 	public void put_Last_Block_Hash_In_A( AT_Machine_State state ) 
 	{
-		byte[] signature = dbSet.getBlockMap().getLastBlockSignature(); //128 BYTES
+		byte[] signature = dcSet.getBlockMap().getLastBlockSignature(); //128 BYTES
 		byte[] hash = Crypto.getInstance().digest(signature); //32 BYTES
 
 		state.set_A1(Arrays.copyOfRange(hash, 0, 8));
@@ -96,7 +96,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		clear_A( state );
 		try
 		{
-			long transactionIDNew = findTransactionAfterHeight(height , account , numOfTx, state, dbSet);
+			long transactionIDNew = findTransactionAfterHeight(height , account , numOfTx, state, dcSet);
 			state.set_A1( AT_API_Helper.getByteArray( transactionIDNew ) );	
 		}
 		catch ( Exception e)
@@ -117,7 +117,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	public long get_Type_for_Tx_in_A( AT_Machine_State state ) 
 	{
 		byte[] id = state.get_A1();
-		Object transaction = findTransaction(id, dbSet);
+		Object transaction = findTransaction(id, dcSet);
 
 		if ( transaction != null )
 		{
@@ -140,7 +140,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	public long get_Amount_for_Tx_in_A( AT_Machine_State state ) 
 	{
 		byte[] id = state.get_A1();
-		Object transaction = findTransaction(id, dbSet);
+		Object transaction = findTransaction(id, dcSet);
 		long amount = -1;
 
 
@@ -166,7 +166,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	public long get_Timestamp_for_Tx_in_A( AT_Machine_State state ) {
 
 		byte[] id = state.get_A1();
-		Object transaction = findTransaction(id, dbSet);
+		Object transaction = findTransaction(id, dcSet);
 		if ( transaction != null )
 		{
 			return AT_API_Helper.getLong( id );
@@ -177,18 +177,18 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	@Override
 	public long get_Random_Id_for_Tx_in_A( AT_Machine_State state ) 
 	{
-		Transaction transaction = (Transaction)findTransaction(state.get_A1(), dbSet);
+		Transaction transaction = (Transaction)findTransaction(state.get_A1(), dcSet);
 
 		if ( transaction != null )
 		{
 
 			int txBlockHeight; 
-			int blockHeight = dbSet.getBlockMap().getLastBlock().getHeight(dbSet) + 1;
+			int blockHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet) + 1;
 			byte[] senderPublicKey = new byte[32];
 
 			if ( !transaction.getClass().equals( AT_Transaction.class ))
 			{
-				txBlockHeight = transaction.getBlock(dbSet).getHeight(dbSet);
+				txBlockHeight = transaction.getBlock(dcSet).getHeight(dcSet);
 				senderPublicKey = transaction.getCreator().getPublicKey();
 			}
 			else
@@ -203,11 +203,11 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 				return 0;
 			}
 
-			byte[] sig = dbSet.getBlockMap().getLastBlockSignature();
+			byte[] sig = dcSet.getBlockMap().getLastBlockSignature();
 			ByteBuffer bf = ByteBuffer.allocate( sig.length + Long.SIZE + senderPublicKey.length );
 			bf.order( ByteOrder.LITTLE_ENDIAN );
 
-			bf.put( dbSet.getBlockMap().getLastBlockSignature() );
+			bf.put( dcSet.getBlockMap().getLastBlockSignature() );
 			bf.put( state.get_A1() );
 			bf.put( senderPublicKey );
 
@@ -223,7 +223,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	@Override
 	public void message_from_Tx_in_A_to_B( AT_Machine_State state ) 
 	{	
-		Object tx = findTransaction(state.get_A1(), dbSet); //25 BYTES
+		Object tx = findTransaction(state.get_A1(), dcSet); //25 BYTES
 
 
 		ByteBuffer b = ByteBuffer.allocate( state.get_B1().length * 4 );
@@ -278,7 +278,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	@Override
 	public void B_to_Address_of_Tx_in_A( AT_Machine_State state ) 
 	{
-		Object tx = findTransaction( state.get_A1(), dbSet );
+		Object tx = findTransaction( state.get_A1(), dcSet );
 
 		clear_B( state );
 
@@ -471,11 +471,11 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	public long add_Minutes_to_Timestamp( long val1 , long val2 , AT_Machine_State state) {
 		int height = AT_API_Helper.longToHeight( val1 );
 		int numOfTx = AT_API_Helper.longToNumOfTx( val1 );
-		int addHeight = height + (int) (val2 / AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(dbSet.getBlockMap().getLastBlock().getHeight(dbSet)));
+		int addHeight = height + (int) (val2 / AT_Constants.getInstance().AVERAGE_BLOCK_MINUTES(dcSet.getBlockMap().getLastBlock().getHeight(dcSet)));
 		return AT_API_Helper.getLongTimestamp( addHeight , numOfTx );
 	}
 
-	protected static long findTransactionAfterHeight(int startHeight, Account account, int numOfTx, AT_Machine_State state, DBSet dbSet)
+	protected static long findTransactionAfterHeight(int startHeight, Account account, int numOfTx, AT_Machine_State state, DCSet dcSet)
 	{ 	
 		//IF STARTHEIGHT IS VALID
 		if ( startHeight < 0 )
@@ -489,23 +489,23 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			startHeight = state.getCreationBlockHeight();
 		}
 
-		int forkHeight = getForkHeight(dbSet);
+		int forkHeight = getForkHeight(dcSet);
 
-		Tuple2<Integer, Integer > atTxT = dbSet.getATTransactionMap().getNextATTransaction( startHeight , numOfTx, account.getAddress());
+		Tuple2<Integer, Integer > atTxT = dcSet.getATTransactionMap().getNextATTransaction( startHeight , numOfTx, account.getAddress());
 
-		int atTxs = dbSet.getATTransactionMap().getATTransactions( startHeight ).size();
+		int atTxs = dcSet.getATTransactionMap().getATTransactions( startHeight ).size();
 
-		Tuple2<Integer, Integer> tx = dbSet.getTransactionFinalMap().getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs)?numOfTx-atTxs:0, account.getAddress());
+		Tuple2<Integer, Integer> tx = dcSet.getTransactionFinalMap().getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs)?numOfTx-atTxs:0, account.getAddress());
 
 		if ( forkHeight > 0 )
 		{
-			Tuple2<Integer, Integer > atTxTp = ((ATTransactionMap)dbSet.getATTransactionMap().getParent()).getNextATTransaction( startHeight , numOfTx, account.getAddress());
-			int atTxsp = ((ATTransactionMap)dbSet.getATTransactionMap().getParent()).getATTransactions( startHeight ).size();
+			Tuple2<Integer, Integer > atTxTp = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).getNextATTransaction( startHeight , numOfTx, account.getAddress());
+			int atTxsp = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).getATTransactions( startHeight ).size();
 
-			Tuple2<Integer, Integer> txp = ((TransactionFinalMap)dbSet.getTransactionFinalMap().getParent()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs)?numOfTx-atTxsp:0, account.getAddress());
+			Tuple2<Integer, Integer> txp = ((TransactionFinalMap)dcSet.getTransactionFinalMap().getParent()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs)?numOfTx-atTxsp:0, account.getAddress());
 			if ( atTxTp != null && ( txp == null || atTxTp.a <= txp.a ) && atTxTp.a < forkHeight )
 			{
-				AT_Transaction atTx = ((ATTransactionMap)dbSet.getATTransactionMap().getParent()).get(atTxTp);
+				AT_Transaction atTx = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).get(atTxTp);
 				if ( !atTx.getSender().equalsIgnoreCase( account.getAddress() ) && atTx.getRecipient().equalsIgnoreCase( account.getAddress() ) && atTx.getAmount() > state.minActivationAmount() )
 				{
 					return AT_API_Helper.getLongTimestamp( atTxTp.a , atTxTp.b + 1 );
@@ -514,8 +514,8 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			}
 			else if ( txp != null && txp.a < forkHeight )
 			{
-				atTxs = ((ATTransactionMap)dbSet.getATTransactionMap().getParent()).getATTransactions( txp.a ).size();
-				Transaction transaction = ((TransactionFinalMap)dbSet.getTransactionFinalMap().getParent()).get(txp);
+				atTxs = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).getATTransactions( txp.a ).size();
+				Transaction transaction = ((TransactionFinalMap)dcSet.getTransactionFinalMap().getParent()).get(txp);
 
 				long txAmount = getAmount((Transaction)transaction, new Account(Base58.encode(state.getId())), state.getHeight());
 				
@@ -527,7 +527,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		}
 		if ( atTxT != null &&  ( tx == null || atTxT.a <= tx.a ) )
 		{
-			AT_Transaction atTx = dbSet.getATTransactionMap().get(atTxT);
+			AT_Transaction atTx = dcSet.getATTransactionMap().get(atTxT);
 			if ( !atTx.getSender().equalsIgnoreCase( account.getAddress() ) && atTx.getRecipient().equalsIgnoreCase( account.getAddress() ) && atTx.getAmount() > state.minActivationAmount() )
 			{
 				return AT_API_Helper.getLongTimestamp( atTxT.a , atTxT.b + 1 );
@@ -535,8 +535,8 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		}
 		else if ( tx != null )
 		{
-			atTxs = dbSet.getATTransactionMap().getATTransactions( tx.a ).size();
-			Transaction transaction = dbSet.getTransactionFinalMap().get(tx);
+			atTxs = dcSet.getATTransactionMap().getATTransactions( tx.a ).size();
+			Transaction transaction = dcSet.getTransactionFinalMap().get(tx);
 
 			long txAmount = getAmount( transaction, new Account(Base58.encode(state.getId())), state.getHeight() );
 			
@@ -570,7 +570,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	}
 
 
-	public static int getForkHeight(DBSet db)
+	public static int getForkHeight(DCSet db)
 	{
 		//CHECK IF FORK
 		if ( db.getBlockMap().getParentList() != null )
@@ -590,7 +590,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	}
 
 
-	protected static Object findTransaction(byte[] id, DBSet db){
+	protected static Object findTransaction(byte[] id, DCSet db){
 		int height = AT_API_Helper.longToHeight(AT_API_Helper.getLong(id));
 		int position = AT_API_Helper.longToNumOfTx(AT_API_Helper.getLong(id));
 

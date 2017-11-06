@@ -17,8 +17,8 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -45,7 +45,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		
 		for (Pair<Tuple2<BigInteger, BigInteger>, Trade> tradePair : this.trades) 	
 		{
-			String type = tradePair.getB().getInitiatorOrder(DBSet.getInstance()).getHave() == this.have.getKey() ? "Sell" : "Buy";
+			String type = tradePair.getB().getInitiatorOrder(DCSet.getInstance()).getHave() == this.have.getKey() ? "Sell" : "Buy";
 
 			if(type.equals("Buy"))
 			{
@@ -128,7 +128,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		{
 			trade = this.trades.get(row).getB();
 			if(trade != null) {
-				DBSet db = DBSet.getInstance();
+				DCSet db = DCSet.getInstance();
 				
 				initatorOrder = trade.getInitiatorOrder(db); 				
 				targetOrder = trade.getTargetOrder(db); 

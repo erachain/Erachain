@@ -24,8 +24,9 @@ import utils.Pair;
 import utils.ReverseComparator;
 import database.DBMap;
 import database.serializer.PollSerializer;
+import datachain.DCMap;
 
-public class PollMap extends DBMap<Tuple2<String, String>, Poll>
+public class PollMap extends DCMap<Tuple2<String, String>, Poll>
 {
 	public static final int NAME_INDEX = 1;
 	public static final int CREATOR_INDEX = 2;
@@ -34,13 +35,14 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll>
 	
 	static Logger LOGGER = Logger.getLogger(PollMap.class.getName());
 
-	public PollMap(WalletDatabase walletDatabase, DB database)
+	public PollMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database);
+		super(dWSet, database);
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_POLL_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_POLL_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_POLL_TYPE);
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_POLL_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_POLL_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_POLL_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_POLL_TYPE);
 	}
 
 	public PollMap(PollMap parent) 

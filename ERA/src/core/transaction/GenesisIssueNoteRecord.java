@@ -26,9 +26,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
-import database.ItemNoteMap;
-//import database.BalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemNoteMap;
 
 public class GenesisIssueNoteRecord extends GenesisIssue_ItemRecord 
 {

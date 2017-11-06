@@ -17,9 +17,9 @@ import controller.Controller;
 import core.account.Account;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
-import database.DBSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -42,7 +42,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
 		this.incoming = incoming;
 		transactions = new ArrayList<R_Send>();
-		DBSet.getInstance().getTransactionMap().addObserver(this);
+		DCSet.getInstance().getTransactionMap().addObserver(this);
 
 	}
 
@@ -93,7 +93,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		switch (column) {
 		case COLUMN_CONFIRMATION:
 
-			return tran.getConfirmations(DBSet.getInstance());
+			return tran.getConfirmations(DCSet.getInstance());
 
 		case COLUMN_DATA:
 			
@@ -134,9 +134,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		ObserverMessage message = (ObserverMessage) arg;
 
 		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE
-				|| message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE
-				|| message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE) {
+		if (message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE ) {
 			filter(message);
 			this.fireTableDataChanged();
 		}
@@ -144,7 +142,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 	}
 
 	public void removeObservers() {
-		DBSet.getInstance().getTransactionMap().deleteObserver(this);
+		DCSet.getInstance().getTransactionMap().deleteObserver(this);
 	}
 
 	public void filter(ObserverMessage message) {
@@ -154,7 +152,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		
 
 		for (Account account : Controller.getInstance().getAccounts()) {
-			all_transactions.addAll(DBSet.getInstance().getTransactionFinalMap()
+			all_transactions.addAll(DCSet.getInstance().getTransactionFinalMap()
 					.getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
 		}
 

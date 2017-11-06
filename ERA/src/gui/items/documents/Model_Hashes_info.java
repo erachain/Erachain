@@ -15,9 +15,9 @@ import core.crypto.Base58;
 import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.HashesSignsMap;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.HashesSignsMap;
+import datachain.SortableList;
 import lang.Lang;
 import utils.DateTimeFormat;
 
@@ -29,7 +29,7 @@ public class Model_Hashes_info extends AbstractTableModel {
 	// public static final int COLUMN_AMOUNT = 3;
 	// public static final int COLUMN_DIVISIBLE = 4;
 	Stack<Tuple3<Long, Integer, Integer>> hashs = null;
-	DBSet db;
+	DCSet db;
 	HashesSignsMap map;
 	private String[] columnNames = Lang.getInstance().translate(new String[] { "Date", "Block", "Owner" });// ,
 	byte[] a;																								// "Quantity"});//,
@@ -37,7 +37,7 @@ public class Model_Hashes_info extends AbstractTableModel {
 
 	public Model_Hashes_info() {
 
-		db = DBSet.getInstance();
+		db = DCSet.getInstance();
 		map = db.getHashesSignsMap();
 		hashs = map.get(Base58.decode("a"));	
 

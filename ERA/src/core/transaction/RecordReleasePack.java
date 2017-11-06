@@ -23,8 +23,8 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class RecordReleasePack extends Transaction {
 
@@ -213,7 +213,7 @@ public class RecordReleasePack extends Transaction {
 	//VALIDATE
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK PAYMENTS SIZE
@@ -222,7 +222,7 @@ public class RecordReleasePack extends Transaction {
 			return INVALID_PAYMENTS_LENGTH;
 		}
 		
-		DBSet fork = db.fork();
+		DCSet fork = db.fork();
 
 		int counter = 0;
 		int result = 0;
@@ -247,7 +247,7 @@ public class RecordReleasePack extends Transaction {
 	//PROCESS/ORPHAN
 	
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -260,7 +260,7 @@ public class RecordReleasePack extends Transaction {
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);

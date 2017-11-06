@@ -18,7 +18,7 @@ import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.Split_Panel;
 import gui.items.mails.Mail_Info;
@@ -123,7 +123,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 			int row = my_Records_Panel.records_Table.getSelectedRow();
 			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
 			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
-			DBSet.getInstance().getTransactionMap().delete(trans);
+			DCSet.getInstance().getTransactionMap().delete(trans);
   			
 			}});
     	
@@ -139,7 +139,7 @@ public class Records_My_SplitPanel extends Split_Panel {
 			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
 			item_Delete.setEnabled(true);
 			item_Rebroadcast.setEnabled(true);
-			if (trans.isConfirmed(DBSet.getInstance())) {
+			if (trans.isConfirmed(DCSet.getInstance())) {
 				item_Delete.setEnabled(false);
 				item_Rebroadcast.setEnabled(false);
 				
@@ -191,8 +191,8 @@ public class Records_My_SplitPanel extends Split_Panel {
 				tableGBC.gridy = 0;
 				records_Info_Panel.add(TransactionDetailsFactory.getInstance().createTransactionDetail(trans), tableGBC);
 
-				Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DBSet.getInstance().getVouchRecordMap()
-						.get(trans.getBlockHeight(DBSet.getInstance()), trans.getSeqNo(DBSet.getInstance()));
+				Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs = DCSet.getInstance().getVouchRecordMap()
+						.get(trans.getBlockHeight(DCSet.getInstance()), trans.getSeqNo(DCSet.getInstance()));
 				GridBagConstraints gridBagConstraints = null;
 				if (signs != null) {
 

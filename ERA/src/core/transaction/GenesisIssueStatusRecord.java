@@ -26,10 +26,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.statuses.StatusCls;
 import core.item.statuses.StatusFactory;
-import database.ItemStatusMap;
-//import database.BalanceMap;
-import database.DBSet;
-import database.ItemStatusMap;
+import datachain.DCSet;
+import datachain.ItemStatusMap;
 
 public class GenesisIssueStatusRecord extends GenesisIssue_ItemRecord 
 {

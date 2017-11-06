@@ -194,12 +194,14 @@ public class Menu_Files extends JMenu {
         {
         	public void actionPerformed(ActionEvent e)
         	{
+        		if (Controller.useGui)
+        		{	
         		AboutFrame.getInstance().setCursor(new Cursor(Cursor.HAND_CURSOR));
         		AboutFrame.getInstance().set_console_Text("");
         		AboutFrame.getInstance().setUserClose(true);
         		AboutFrame.getInstance().setModal(true);
         		AboutFrame.getInstance().setVisible(true);
-        		
+        		}
         		
         		
         	}

@@ -23,7 +23,7 @@ import core.transaction.Transaction;
 import core.web.NameStorageMap;
 import core.web.OrphanNameStorageHelperMap;
 import core.web.OrphanNameStorageMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public class StorageUtils {
 
@@ -91,7 +91,7 @@ public class StorageUtils {
 	}
 
 	public static void processUpdate(byte[] data, byte[] signature,
-			PublicKeyAccount creator, DBSet db) {
+			PublicKeyAccount creator, DCSet db) {
 
 			String string = new String(data, Charsets.UTF_8 );
 			
@@ -300,7 +300,7 @@ public class StorageUtils {
 		}
 	}
 
-	public static void processOrphan(byte[] data, byte[] signature, DBSet db) {
+	public static void processOrphan(byte[] data, byte[] signature, DCSet db) {
 
 		String string = new String(data, Charsets.UTF_8 );
 		

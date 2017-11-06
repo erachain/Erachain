@@ -33,9 +33,9 @@ import core.transaction.R_Send;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
-import database.DBSet;
-import database.SortableList;
 import database.wallet.TransactionMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -143,7 +143,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				//recipient = transAmo.getRecipient();
-				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
+				ItemCls item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
 				if (item==null)
 					return null;
 				
@@ -152,7 +152,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 			{
 				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
 				//recipient = transGen.getRecipient();				
-				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
+				ItemCls item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
 				if (item==null)
 					return null;
 				
@@ -177,7 +177,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 			{
 				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
 				//recipient = transAmo.getRecipient();
-				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+				ItemCls item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
 				if (item == null)
 					return null;
 				
@@ -190,7 +190,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 			{
 			case COLUMN_CONFIRMATIONS:
 				
-				return transaction.getConfirmations(DBSet.getInstance());
+				return transaction.getConfirmations(DCSet.getInstance());
 				
 			case COLUMN_TIMESTAMP:
 				
@@ -254,9 +254,10 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
+		int messageType = message.getType();
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		if(false && messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
 		{
 			if(this.transactions == null)
 			{
@@ -267,21 +268,16 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 				this.fireTableDataChanged();
 			}
 			
-		
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+		} else if(messageType == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
 		{
+			//CHECK IF LIST UPDATED
 			read_trans();
 			this.fireTableDataChanged();
-		}	
-
-		//
-		if(Controller.getInstance().getStatus() == Controller.STATUS_OK && (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE ||  message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE))
-		{		
-			if(DBSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))
-			{
+			
+		} else if(message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
+				||  message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {		
+			if(Controller.getInstance().getStatus() == Controller.STATUS_OK
+					&& (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))) {
 				int type = ((Transaction) message.getValue()).getType(); 
 				if( type == Transaction.SEND_ASSET_TRANSACTION)
 				{
@@ -309,11 +305,13 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
 					PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
 				}
 			}
-		}	
-
+		}
 		
-		if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE
-				|| message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
+				|| message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+				|| message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
+				|| message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE
+				)
 		{
 			this.fireTableDataChanged();
 		}

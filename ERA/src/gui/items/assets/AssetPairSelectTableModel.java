@@ -20,8 +20,8 @@ import controller.Controller;
 import core.blockexplorer.BlockExplorer;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import database.DBSet;
-import database.ItemAssetMap;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -49,7 +49,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	public AssetPairSelectTableModel(long key)//, String action)
 	{
 		this.key = key;
-		db = DBSet.getInstance().getItemAssetMap();
+		db = DCSet.getInstance().getItemAssetMap();
 		//Controller.getInstance().addObserver(this);
 		/*	Collection<ItemCls> assetsBuf = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
 		this.assets = new ArrayList<ItemCls>();
@@ -70,8 +70,8 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 	*/			
 		this.all = 
 				BlockExplorer.getInstance().calcForAsset(
-						DBSet.getInstance().getOrderMap().getOrders(this.key, true), 
-						DBSet.getInstance().getTradeMap().getTrades(this.key));
+						DCSet.getInstance().getOrderMap().getOrders(this.key, true), 
+						DCSet.getInstance().getTradeMap().getTrades(this.key));
 		
 		
 	}

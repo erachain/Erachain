@@ -17,13 +17,13 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.Issue_ItemMap;
-import database.Item_Map;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.ItemUnionMap;
+import datachain.Item_Map;
 import settings.Settings;
 import utils.ByteArrayUtils;
 import utils.DateTimeFormat;
-import database.ItemUnionMap;
 
 public abstract class UnionCls extends ItemCls{
 
@@ -65,11 +65,11 @@ public abstract class UnionCls extends ItemCls{
 	}
 
 	// DB
-	public Item_Map getDBMap(DBSet db)
+	public Item_Map getDBMap(DCSet db)
 	{
 		return db.getItemUnionMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
 		return db.getIssueUnionMap();
 	}
@@ -102,7 +102,7 @@ public abstract class UnionCls extends ItemCls{
 	//OTHER
 
 	@Override
-	public String toString(DBSet db)
+	public String toString(DCSet db)
 	{
 		long key = this.getKey(db);
 		return (key<0?"?":key) + "." + this.typeBytes[0] + " " + this.name
@@ -110,7 +110,7 @@ public abstract class UnionCls extends ItemCls{
 	}
 	
 	@Override
-	public String getShort(DBSet db)
+	public String getShort(DCSet db)
 	{
 		long key = this.getKey(db);
 		return (key<0?"?":key) + "." + this.typeBytes[0] + " "

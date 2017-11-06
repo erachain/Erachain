@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.awt.TrayIcon.MessageType;
 import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,8 +27,11 @@ import org.mapdb.Fun.Tuple2;
 
 import com.github.rjeschke.txtmark.Processor;
 
+import controller.Controller;
+import core.account.Account;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import de.muntjak.tinylookandfeel.Theme;
 import de.muntjak.tinylookandfeel.ThemeDescription;
 
@@ -39,10 +43,33 @@ import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
 
 import lang.Lang;
 import settings.Settings;
+import utils.PlaySound;
+import utils.SysTray;
 
 public class library {
 
 
+	// PLAY SOUND 
+	public static void notifySysTrayRecord(Transaction record) {
+
+		R_Send r_Send = (R_Send) record;
+		Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());	
+		if(account != null)
+		{
+			if(Settings.getInstance().isSoundReceiveMessageEnabled())
+			{
+				PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) record).getSignature()) ;
+			}
+			
+			SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString()
+			+ "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
+			+ ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
+		} else if(Settings.getInstance().isSoundNewTransactionEnabled())
+		{
+			PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+		}
+
+	}
 
 	@SuppressWarnings("unchecked")
 	public static void Set_GUI_Look_And_Feel(String text) {
@@ -321,9 +348,9 @@ public class library {
 		return "ok";
 	}
 	public static BigDecimal getBlockSegToBigInteger(Transaction transaction){
-		if (transaction.isConfirmed(DBSet.getInstance())){
-			String m = transaction.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()) + "";
-			String d = transaction.getSeqNo(DBSet.getInstance())+ "";
+		if (transaction.isConfirmed(DCSet.getInstance())){
+			String m = transaction.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()) + "";
+			String d = transaction.getSeqNo(DCSet.getInstance())+ "";
 			int zz = 5 - d.length();
 			for (int z = 0; z<zz; z++ ){
 				d = "0"+ d;

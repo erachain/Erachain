@@ -9,6 +9,7 @@ import com.google.common.primitives.Ints;
 import core.block.Block;
 import core.block.BlockFactory;
 import database.DBSet;
+import datachain.DCSet;
 
 public class BlockMessage extends Message{
 
@@ -67,7 +68,7 @@ public class BlockMessage extends Message{
 			return data;
 		}
 		//WRITE BLOCK HEIGHT
-		byte[] heightBytes = Ints.toByteArray(this.block.getHeightByParent(DBSet.getInstance()));
+		byte[] heightBytes = Ints.toByteArray(this.block.getHeightByParent(DCSet.getInstance()));
 		data = Bytes.concat(data, heightBytes);
 		
 		//WRITE BLOCK

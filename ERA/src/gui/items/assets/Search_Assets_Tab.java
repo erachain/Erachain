@@ -61,8 +61,8 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.Issue_ItemMap;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
 import demo.activetree.jreport.SimpleHeaderFooterRenderer;
 import gui.CoreRowSorter;
 import gui.MainFrame;
@@ -467,9 +467,8 @@ public class Search_Assets_Tab extends Split_Panel {
 		public void actionPerformed(ActionEvent e) {
 			AssetCls asset = tableModelItemAssets.getAsset(row);
 			
-			DBSet db = DBSet.getInstance();
-			Transaction trans = db.getTransactionFinalMap().get(db.getTransactionFinalMapSigns()
-								.get(asset.getReference()));
+			DCSet db = DCSet.getInstance();
+			Transaction trans = db.getTransactionFinalMap().getTransaction(asset.getReference());
 		
 			new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
 			

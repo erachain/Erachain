@@ -3,7 +3,9 @@ package gui.models;
 import java.awt.TrayIcon.MessageType;
 import java.math.BigDecimal;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -30,9 +32,9 @@ import core.transaction.R_Send;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
-import database.DBSet;
-import database.SortableList;
 import database.wallet.TransactionMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -163,7 +165,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				TransactionAmount transAmo = (TransactionAmount)transaction;
 				//recipient = transAmo.getRecipient();
-				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
+				ItemCls item = DCSet.getInstance().getItemAssetMap().get(transAmo.getAbsKey());
 				if (item==null)
 					return null;
 				
@@ -172,7 +174,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				GenesisTransferAssetTransaction transGen = (GenesisTransferAssetTransaction)transaction;
 				//recipient = transGen.getRecipient();				
-				ItemCls item = DBSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
+				ItemCls item = DCSet.getInstance().getItemAssetMap().get(transGen.getAbsKey());
 				if (item==null)
 					return null;
 				
@@ -198,7 +200,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 				R_SertifyPubKeys sertifyPK = (R_SertifyPubKeys)transaction;
 				//recipient = transAmo.getRecipient();
-				ItemCls item = DBSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
+				ItemCls item = DCSet.getInstance().getItemPersonMap().get(sertifyPK.getAbsKey());
 				if (item == null)
 					return null;
 				
@@ -211,7 +213,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			{
 			case COLUMN_CONFIRMATIONS:
 				
-				return transaction.getConfirmations(DBSet.getInstance());
+				return transaction.getConfirmations(DCSet.getInstance());
 				
 			case COLUMN_TIMESTAMP:
 				
@@ -277,7 +279,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
 		{
 			if(this.transactions == null)
 			{
@@ -287,66 +289,62 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			}
 			
 			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
-		{
-			this.fireTableDataChanged();
-		}	
-
-		//
-		if(Controller.getInstance().getStatus() == Controller.STATUS_OK && (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE ||  message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE))
-		{		
-			if(DBSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))
+		} else
+		// INCOME
+		if(message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE)
+		{	
+			Transaction record = (Transaction) message.getValue(); 
+			
+			if(DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature()))
 			{
-				int type = ((Transaction) message.getValue()).getType(); 
-				if( type == Transaction.SEND_ASSET_TRANSACTION)
+				if( record.getType() == Transaction.SEND_ASSET_TRANSACTION)
 				{
-					R_Send r_Send = (R_Send) message.getValue();
-					Account account = Controller.getInstance().getAccountByAddress(((R_Send) message.getValue()).getRecipient().getAddress());	
-					if(account != null)
-					{
-						if(Settings.getInstance().isSoundReceiveMessageEnabled())
-						{
-							PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) message.getValue()).getSignature()) ;
-						}
-						
-						SysTray.getInstance().sendMessage("Payment received", "From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString()
-						+ "\n" + "Asset Key" + ": " + r_Send.getAbsKey()
-						+ ", " + "Amount" + ": " + r_Send.getAmount().toPlainString(), MessageType.INFO);
-					}
-					
-					else if(Settings.getInstance().isSoundNewTransactionEnabled())
-					{
-						PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
-					}
+					gui.library.library.notifySysTrayRecord(record);
 				}
 				else if(Settings.getInstance().isSoundNewTransactionEnabled())
 				{
-					PlaySound.getInstance().playSound("newtransaction.wav", ((Transaction) message.getValue()).getSignature());
+					PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
 				}
 			}
-		}	
+			
+			int i = this.transactions.size();
+			this.transactions.add((Pair<Tuple2<String, String>, Transaction>)message.getValue());
+			this.fireTableRowsInserted(i, i); //.fireTableDataChanged();			
+			
+		} else 
+		if(message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
 
-		
-		if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE
-				|| message.getType() == ObserverMessage.LIST_BLOCK_TYPE)
-		{
-			this.fireTableDataChanged();
+			Transaction record = (Transaction) message.getValue(); 
+			byte[] signKey = record.getSignature();
+			for (int i=0; i < this.transactions.size() - 1; i++) {
+				Transaction item = this.transactions.get(i).getB();
+				if (item == null)
+					return;
+				if (Arrays.equals(signKey, item.getSignature())) {
+					this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();			
+				}
+			}
+			
+			if (false)
+				this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
+					new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
 		}
 	}
 	
 	public void addObservers() 
 	{
 		
-		Controller.getInstance().addWalletListener(this);
+		/////Controller.getInstance().addWalletListener(this);
+		//REGISTER ON TRANSACTIONS
+		Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
+
 	}
 	
 	
 	public void removeObservers() 
 	{
 	
-		Controller.getInstance().deleteObserver(this);
+		////Controller.getInstance().deleteObserver(this);
+		Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
 	}
 }

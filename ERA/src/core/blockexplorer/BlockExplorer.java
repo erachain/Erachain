@@ -77,8 +77,8 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.items.persons.TableModelPersons;
 import gui.library.library;
 import gui.models.PeersTableModel;
@@ -132,6 +132,8 @@ public class BlockExplorer
 				
 			lang_file = 	info.getQueryParameters().getFirst("lang") +".json";
 			}
+
+		LOGGER.error("try lang file: " + lang_file);	
 
 		langObj = Lang.getInstance().openLangFile(lang_file);
 		
@@ -671,7 +673,7 @@ public class BlockExplorer
 			}
 		}
 		
-		if (signatureBytes != null && DBSet.getInstance().getBlockMap().contains(signatureBytes))
+		if (signatureBytes != null && DCSet.getInstance().getBlockMap().contains(signatureBytes))
 		{
 			i++;
 			foundList.put(i, "blockSignature");
@@ -688,26 +690,26 @@ public class BlockExplorer
 		}
 		else
 		{
-			if(!(signatureBytes == null) && (DBSet.getInstance().getTransactionRef_BlockRef_Map().contains(signatureBytes)))
+			if(!(signatureBytes == null) && (DCSet.getInstance().getTransactionRef_BlockRef_Map().contains(signatureBytes)))
 			{
 				i++;
 				foundList.put(i, "transactionSignature");
 			}
 		}
 
-		if (DBSet.getInstance().getNameMap().contains(query))
+		if (DCSet.getInstance().getNameMap().contains(query))
 		{
 			i++;
 			foundList.put(i, "name");
 		}	
 
-		if (query.matches("\\d+") && DBSet.getInstance().getItemAssetMap().contains(Long.valueOf(query)))
+		if (query.matches("\\d+") && DCSet.getInstance().getItemAssetMap().contains(Long.valueOf(query)))
 		{
 			i++;
 			foundList.put(i, "asset");
 		}	
 
-		if (DBSet.getInstance().getPollMap().contains(query))
+		if (DCSet.getInstance().getPollMap().contains(query))
 		{
 			i++;
 			foundList.put(i, "pool");
@@ -719,8 +721,8 @@ public class BlockExplorer
 
 			try
 			{
-				if(DBSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[0])) || 
-						DBSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[1])))
+				if(DCSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[0])) || 
+						DCSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[1])))
 				{
 					i++;
 					foundList.put(i, "trade");
@@ -739,7 +741,7 @@ public class BlockExplorer
 			int blockHeight = Integer.valueOf(query.split(":")[0]);
 			int seq = Integer.valueOf(query.split(":")[1]);
 
-			LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(blockHeight);
+			LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DCSet.getInstance().getATTransactionMap().getATTransactions(blockHeight);
 
 			if(atTxs.size()>seq)
 			{
@@ -766,7 +768,7 @@ public class BlockExplorer
 			if (Crypto.getInstance().isValidAddress(addr)) {
 				Account account = new Account(addr);
 
-				DBSet db = DBSet.getInstance();
+				DCSet db = DCSet.getInstance();
 				String address = account.getAddress();
 				// get reference to parent record for this account
 				Long timestampRef = db.getReferenceMap().get(address);
@@ -794,7 +796,8 @@ public class BlockExplorer
 						transactions.add(transaction);
 					}
 					// get reference to parent record for this account
-					timestampRef = transaction.getReference();
+					//timestampRef = transaction.getReference();
+					timestampRef = account.getLastReference();
 					// get signature for account + time
 					signatureBytes = db.getAddressTime_SignatureMap().get(address, timestampRef);
 
@@ -859,8 +862,8 @@ public class BlockExplorer
 			
 			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
 			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-			List<Order> orders = DBSet.getInstance().getOrderMap().getOrders(asset.getKey());
-			List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(asset.getKey());
+			List<Order> orders = DCSet.getInstance().getOrderMap().getOrders(asset.getKey());
+			List<Trade> trades = DCSet.getInstance().getTradeMap().getTrades(asset.getKey());
 
 			assetJSON.put("operations", orders.size() + trades.size());
 
@@ -879,7 +882,7 @@ public class BlockExplorer
 		Map output=new LinkedHashMap();
 
 		   
-		SortableList<Long, ItemCls> it = DBSet.getInstance().getItemAssetMap().getList();
+		SortableList<Long, ItemCls> it = DCSet.getInstance().getItemAssetMap().getList();
 		
 	
 		 int view_Row = 21;
@@ -914,8 +917,8 @@ public class BlockExplorer
 			
 			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
 			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-			List<Order> orders = DBSet.getInstance().getOrderMap().getOrders(asset.getKey());
-			List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(asset.getKey());
+			List<Order> orders = DCSet.getInstance().getOrderMap().getOrders(asset.getKey());
+			List<Trade> trades = DCSet.getInstance().getTradeMap().getTrades(asset.getKey());
 
 			assetJSON.put("operations", orders.size() + trades.size());
 
@@ -954,14 +957,14 @@ public class BlockExplorer
 	{
 		Map output=new LinkedHashMap();
 
-		Iterable<String> ids = DBSet.getInstance().getATMap().getATsLimited(100);
+		Iterable<String> ids = DCSet.getInstance().getATMap().getATsLimited(100);
 
 		Iterator<String> iter = ids.iterator();
 		while (iter.hasNext())
 		{
 			String atAddr = iter.next();
 
-			AT at = DBSet.getInstance().getATMap().getAT(atAddr);
+			AT at = DCSet.getInstance().getATMap().getAT(atAddr);
 
 			output.put(atAddr, at.toJSON());
 		}
@@ -981,7 +984,7 @@ if ( asset_1 == null) {
 	 asset_g = Long.valueOf(asset_1);
 }
 
-		List<Poll> pools = new ArrayList< Poll > (DBSet.getInstance().getPollMap().getValues());
+		List<Poll> pools = new ArrayList< Poll > (DCSet.getInstance().getPollMap().getValues());
 
 		if(pools.size() == 0)
 		{
@@ -1048,7 +1051,7 @@ if ( asset_1 == null) {
 		pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
 		
-		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
+		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			CreatePollTransaction createPollTransaction = ((CreatePollTransaction)transaction);
 			if(createPollTransaction.getPoll().getName().equals(poll.getName()))
@@ -1189,7 +1192,7 @@ if ( asset_1 == null) {
 
 		for (Trade trade : trades) 
 		{
-			if(!pairsTrades.containsKey(trade.getInitiatorOrder(DBSet.getInstance()).getWant()) )
+			if(!pairsTrades.containsKey(trade.getInitiatorOrder(DCSet.getInstance()).getWant()) )
 			{
 				count = 0;
 				volumePrice =  BigDecimal.ZERO.setScale(8);
@@ -1197,21 +1200,21 @@ if ( asset_1 == null) {
 			}
 			else
 			{
-				count = pairsTrades.get(trade.getInitiatorOrder(DBSet.getInstance()).getWant());
-				volumePrice =  volumePriceTrades.get(trade.getInitiatorOrder(DBSet.getInstance()).getWant());
-				volumeAmount =  volumeAmountTrades.get(trade.getInitiatorOrder(DBSet.getInstance()).getWant());
+				count = pairsTrades.get(trade.getInitiatorOrder(DCSet.getInstance()).getWant());
+				volumePrice =  volumePriceTrades.get(trade.getInitiatorOrder(DCSet.getInstance()).getWant());
+				volumeAmount =  volumeAmountTrades.get(trade.getInitiatorOrder(DCSet.getInstance()).getWant());
 			}	
 
 			count ++;
-			pairsTrades.put(trade.getInitiatorOrder(DBSet.getInstance()).getWant(), count);
+			pairsTrades.put(trade.getInitiatorOrder(DCSet.getInstance()).getWant(), count);
 
 			volumePrice = volumePrice.add(trade.getAmountWant());
 			volumeAmount = volumeAmount.add(trade.getAmountHave());
 
-			volumePriceTrades.put(trade.getInitiatorOrder(DBSet.getInstance()).getWant(), volumePrice);
-			volumeAmountTrades.put(trade.getInitiatorOrder(DBSet.getInstance()).getWant(), volumeAmount);
+			volumePriceTrades.put(trade.getInitiatorOrder(DCSet.getInstance()).getWant(), volumePrice);
+			volumeAmountTrades.put(trade.getInitiatorOrder(DCSet.getInstance()).getWant(), volumeAmount);
 
-			if(!pairsTrades.containsKey(trade.getTargetOrder(DBSet.getInstance()).getWant()))
+			if(!pairsTrades.containsKey(trade.getTargetOrder(DCSet.getInstance()).getWant()))
 			{
 				count = 0;
 				volumePrice =  BigDecimal.ZERO.setScale(8);
@@ -1219,19 +1222,19 @@ if ( asset_1 == null) {
 			}
 			else
 			{
-				count = pairsTrades.get(trade.getTargetOrder(DBSet.getInstance()).getWant());
-				volumePrice =  volumePriceTrades.get(trade.getTargetOrder(DBSet.getInstance()).getWant());
-				volumeAmount =  volumeAmountTrades.get(trade.getTargetOrder(DBSet.getInstance()).getWant());
+				count = pairsTrades.get(trade.getTargetOrder(DCSet.getInstance()).getWant());
+				volumePrice =  volumePriceTrades.get(trade.getTargetOrder(DCSet.getInstance()).getWant());
+				volumeAmount =  volumeAmountTrades.get(trade.getTargetOrder(DCSet.getInstance()).getWant());
 			}	
 
 			count ++;
-			pairsTrades.put(trade.getTargetOrder(DBSet.getInstance()).getWant(), count);
+			pairsTrades.put(trade.getTargetOrder(DCSet.getInstance()).getWant(), count);
 
 			volumePrice = volumePrice.add(trade.getAmountHave());
 			volumeAmount = volumeAmount.add(trade.getAmountWant());
 
-			volumePriceTrades.put(trade.getTargetOrder(DBSet.getInstance()).getWant(), volumePrice);
-			volumeAmountTrades.put(trade.getTargetOrder(DBSet.getInstance()).getWant(), volumeAmount);
+			volumePriceTrades.put(trade.getTargetOrder(DCSet.getInstance()).getWant(), volumePrice);
+			volumeAmountTrades.put(trade.getTargetOrder(DCSet.getInstance()).getWant(), volumeAmount);
 		}
 
 		Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = 
@@ -1287,9 +1290,9 @@ if ( asset_1 == null) {
 	{
 		Map output=new LinkedHashMap();
 
-		List<Order> orders = DBSet.getInstance().getOrderMap().getOrders(key);
+		List<Order> orders = DCSet.getInstance().getOrderMap().getOrders(key);
 
-		List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(key);
+		List<Trade> trades = DCSet.getInstance().getTradeMap().getTrades(key);
 
 		AssetCls asset = Controller.getInstance().getAsset(key);
 
@@ -1307,7 +1310,7 @@ if ( asset_1 == null) {
 		assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
 		
-		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction)transaction);
 			if(issueAssetTransaction.getItem().getName().equals(asset.getName()))
@@ -1394,12 +1397,12 @@ if ( asset_1 == null) {
 	{
 		Map output=new LinkedHashMap();
 
-		List<Order> ordersHave = DBSet.getInstance().getOrderMap().getOrders(have, want, false);
-		List<Order> ordersWant = DBSet.getInstance().getOrderMap().getOrders(want, have, true);
+		List<Order> ordersHave = DCSet.getInstance().getOrderMap().getOrders(have, want, false);
+		List<Order> ordersWant = DCSet.getInstance().getOrderMap().getOrders(want, have, true);
 
 		//Collections.reverse(ordersWant); 
 
-		List<Trade> trades = DBSet.getInstance().getTradeMap().getTrades(have, want);
+		List<Trade> trades = DCSet.getInstance().getTradeMap().getTrades(have, want);
 
 		AssetCls assetHave = Controller.getInstance().getAsset(have);
 		AssetCls assetWant = Controller.getInstance().getAsset(want);
@@ -1436,7 +1439,7 @@ if ( asset_1 == null) {
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
-			BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
+			BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
 			BigDecimal amount = order.getAmountHaveLeft();
 			amount = amount.subtract(amount.remainder(increment));
 			
@@ -1484,7 +1487,7 @@ if ( asset_1 == null) {
 
 			buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
-			BigDecimal increment = order.calculateBuyIncrement(order, DBSet.getInstance());
+			BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
 			BigDecimal amount = order.getAmountHaveLeft();
 			amount = amount.subtract(amount.remainder(increment));
 			
@@ -1522,9 +1525,9 @@ if ( asset_1 == null) {
 			i++;
 			Map tradeJSON = new LinkedHashMap();
 
-			Order orderInitiator = trade.getInitiatorOrder(DBSet.getInstance());
+			Order orderInitiator = trade.getInitiatorOrder(DCSet.getInstance());
 
-			Order orderTarget = trade.getTargetOrder(DBSet.getInstance());
+			Order orderTarget = trade.getTargetOrder(DCSet.getInstance());
 
 			tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
 			tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
@@ -1587,7 +1590,7 @@ if ( asset_1 == null) {
 		Map output=new LinkedHashMap();
 		Map namesJSON=new LinkedHashMap();
 
-		Collection<Name> names = DBSet.getInstance().getNameMap().getValues();
+		Collection<Name> names = DCSet.getInstance().getNameMap().getValues();
 
 		for (Name name : names) {
 			namesJSON.put(name.toString(), name.getOwner().getAddress());
@@ -1609,12 +1612,12 @@ if ( asset_1 == null) {
 		else
 		{
 			block = getLastBlock();	
-			start = block.getHeight(DBSet.getInstance()); 
+			start = block.getHeight(DCSet.getInstance()); 
 		}
 
 		Map output=new LinkedHashMap();
 
-		output.put("maxHeight", block.getHeight(DBSet.getInstance()));
+		output.put("maxHeight", block.getHeight(DCSet.getInstance()));
 
 		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
 		
@@ -1639,12 +1642,12 @@ if ( asset_1 == null) {
 			blockJSON.put("height", counter);
 			blockJSON.put("signature", Base58.encode(block.getSignature()));
 			blockJSON.put("generator", block.getCreator().getAddress());
-			blockJSON.put("generatingBalance", block.getGeneratingBalance(DBSet.getInstance()));
+			blockJSON.put("generatingBalance", block.getGeneratingBalance(DCSet.getInstance()));
 			//blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
-			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DBSet.getInstance()));
+			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DCSet.getInstance()));
 			blockJSON.put("transactionCount", block.getTransactionCount());
-			blockJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
-			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
+			blockJSON.put("timestamp", block.getTimestamp(DCSet.getInstance()));
+			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DCSet.getInstance())));
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
 			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
@@ -1660,7 +1663,7 @@ if ( asset_1 == null) {
 
 			blockJSON.put("totalAmount", totalAmount.toPlainString());
 
-			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DBSet.getInstance().getATTransactionMap().getATTransactions(counter);
+			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DCSet.getInstance().getATTransactionMap().getATTransactions(counter);
 
 			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
 
@@ -1675,7 +1678,7 @@ if ( asset_1 == null) {
 			output.put(counter, blockJSON);
 
 			counter --;
-			block = block.getParent(DBSet.getInstance());
+			block = block.getParent(DCSet.getInstance());
 		}
 		while(block != null && counter >= start - 20);
 
@@ -1687,7 +1690,7 @@ if ( asset_1 == null) {
 	private Map jsonQueryPerson(String first) {
 		// TODO Auto-generated method stub
 		Map output=new LinkedHashMap();
-		PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get(new Long(first));
+		PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get(new Long(first));
 		byte[] b = person.getImage();
 		String a = Base64.encodeBase64String(b);
 		
@@ -1801,7 +1804,7 @@ if ( asset_1 == null) {
 			accountsJSON.put(i, accountJSON);	
 			
 			String acc = personModel.getValueAt(i, 0).toString();
-			 my_Issue_Persons.addAll(DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
+			 my_Issue_Persons.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
 		
 
 		}
@@ -1894,7 +1897,7 @@ if ( asset_1 == null) {
 		int counter = start; 
  */
 				
-		long maxRow = DBSet.getInstance().getItemPersonMap().getSize(); 
+		long maxRow = DCSet.getInstance().getItemPersonMap().getSize(); 
 		long view_Row = 21;	
 			Long startRow;
 			try {
@@ -1924,7 +1927,7 @@ if ( asset_1 == null) {
 		output.put("start_row", i);
 		do{
 			
-			PersonCls person = (PersonCls) DBSet.getInstance().getItemPersonMap().get((long) i);
+			PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get((long) i);
 			
 			
 			
@@ -1981,7 +1984,7 @@ if ( asset_1 == null) {
 		}
 		while(i > k);
 		
-		output.put("maxHeight",DBSet.getInstance().getItemPersonMap().getSize());
+		output.put("maxHeight",DCSet.getInstance().getItemPersonMap().getSize());
 		output.put("row", i);
 		output.put("view_Row", view_Row);
 		
@@ -2000,9 +2003,9 @@ if ( asset_1 == null) {
 
 		Block lastBlock = getLastBlock();
 
-		output.put("height", lastBlock.getHeight(DBSet.getInstance()));
-		output.put("timestamp", lastBlock.getTimestamp(DBSet.getInstance()));
-		output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp(DBSet.getInstance())));
+		output.put("height", lastBlock.getHeight(DCSet.getInstance()));
+		output.put("timestamp", lastBlock.getTimestamp(DCSet.getInstance()));
+		output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp(DCSet.getInstance())));
 
 		output.put("timezone", Settings.getInstance().getTimeZone());
 		output.put("timeformat", Settings.getInstance().getTimeFormat());
@@ -2029,11 +2032,11 @@ if ( asset_1 == null) {
 		List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
 
-		Collection<Tuple2<String, Long>> addrs = DBSet.getInstance().getAssetBalanceMap().getKeys();
+		Collection<Tuple2<String, Long>> addrs = DCSet.getInstance().getAssetBalanceMap().getKeys();
 		for (Tuple2<String, Long> addr : addrs) {
 			if(addr.b == key)
 			{
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DBSet.getInstance().getAssetBalanceMap().get(addr.a, key);
+				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DCSet.getInstance().getAssetBalanceMap().get(addr.a, key);
 			//	all = all.add(ball.a);
 				Account account = new Account(addr.a);
 				 BigDecimal ballans = account.getBalanceUSE(key);
@@ -2050,7 +2053,7 @@ if ( asset_1 == null) {
 		LOGGER.info(listJSON);
 		*/
 
-		Collection<Order> orders = DBSet.getInstance().getOrderMap().getValues();
+		Collection<Order> orders = DCSet.getInstance().getOrderMap().getValues();
 
 		for (Order order : orders) {
 			if(order.getHave() == key)
@@ -2135,7 +2138,7 @@ if ( asset_1 == null) {
 	public LinkedHashMap Transactions_JSON(List<Transaction> transactions){
 		
 		LinkedHashMap output = new LinkedHashMap();
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 		int i1 = 0;
 		LinkedHashMap transactionsJSON = new LinkedHashMap();
 		for (Transaction trans:transactions){
@@ -2314,7 +2317,7 @@ if ( asset_1 == null) {
 	public Map jsonUnitPrint(Object unit, AssetNames assetNames)
 	{
 		
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 		Map transactionDataJSON = new LinkedHashMap();
 		Map transactionJSON = new LinkedHashMap();
 
@@ -2370,9 +2373,9 @@ if ( asset_1 == null) {
 			transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
 			transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getBlock(DBSet.getInstance()); 
-			transactionDataJSON.put("height", parentBlock.getHeight(DBSet.getInstance()));
-			transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(DBSet.getInstance()) + 1 );
+			Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.getId().toByteArray()).getBlock(DCSet.getInstance()); 
+			transactionDataJSON.put("height", parentBlock.getHeight(DCSet.getInstance()));
+			transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(DCSet.getInstance()) + 1 );
 
 			transactionDataJSON.put("timestamp", trade.getTimestamp());
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
@@ -2416,13 +2419,13 @@ if ( asset_1 == null) {
 			{
 				BigInteger key = ((CancelOrderTransaction)unit).getOrder();
 				Order order;
-				if(DBSet.getInstance().getCompletedOrderMap().contains(key))
+				if(DCSet.getInstance().getCompletedOrderMap().contains(key))
 				{
-					order =  DBSet.getInstance().getCompletedOrderMap().get(key);
+					order =  DCSet.getInstance().getCompletedOrderMap().get(key);
 				}
 				else
 				{
-					order =  DBSet.getInstance().getOrderMap().get(key);
+					order =  DCSet.getInstance().getOrderMap().get(key);
 				}	
 
 				Map orderJSON = new LinkedHashMap();
@@ -2537,14 +2540,14 @@ if ( asset_1 == null) {
 			
 			} else if(transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) 
 			{
-				transactionDataJSON.put("atAddress", ((DeployATTransaction)transaction).getATaccount(DBSet.getInstance()).getAddress());
+				transactionDataJSON.put("atAddress", ((DeployATTransaction)transaction).getATaccount(DCSet.getInstance()).getAddress());
 			}
 
 			if(transaction.isConfirmed(db))
 			{
-				Block parent = transaction.getBlock(DBSet.getInstance());
+				Block parent = transaction.getBlock(DCSet.getInstance());
 				transactionDataJSON.put("block", Base58.encode(parent.getSignature()));
-				transactionDataJSON.put("blockHeight", parent.getHeight(DBSet.getInstance()));
+				transactionDataJSON.put("blockHeight", parent.getHeight(DCSet.getInstance()));
 			}
 
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(transaction.getTimestamp()));
@@ -2559,10 +2562,10 @@ if ( asset_1 == null) {
 			Block block = (Block)unit;
 
 			transactionDataJSON = new LinkedHashMap();
-			transactionDataJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
-			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
+			transactionDataJSON.put("timestamp", block.getTimestamp(DCSet.getInstance()));
+			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DCSet.getInstance())));
 
-			int height = block.getHeight(DBSet.getInstance());
+			int height = block.getHeight(DCSet.getInstance());
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
 			transactionDataJSON.put("height", height);
 
@@ -2593,7 +2596,7 @@ if ( asset_1 == null) {
 			transactionDataJSON = aTtransaction.toJSON();
 
 			Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
-			long timestamp = block.getTimestamp(DBSet.getInstance());
+			long timestamp = block.getTimestamp(DCSet.getInstance());
 			transactionDataJSON.put("timestamp", timestamp);
 			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(timestamp));
 
@@ -2643,7 +2646,7 @@ if ( asset_1 == null) {
 				}
 				seq ++;
 			}
-			block = block.getChild(DBSet.getInstance());
+			block = block.getChild(DCSet.getInstance());
 			height ++;
 		}
 		while(block != null);
@@ -2740,7 +2743,7 @@ if ( asset_1 == null) {
 			return output; 
 		}
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
 		{
@@ -2759,7 +2762,7 @@ if ( asset_1 == null) {
 	{
 		Map<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> output = new LinkedHashMap();
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DBSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
 		{
@@ -2774,7 +2777,7 @@ if ( asset_1 == null) {
 	@SuppressWarnings({ "serial", "static-access" })
 	public Map jsonQueryAddress(List<String> addresses, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
 	{
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 		
 		List<Transaction> tt = db.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
 		
@@ -2854,14 +2857,14 @@ if ( asset_1 == null) {
 		{
 			String address = addresses.get(0);
 			
-			AT at = DBSet.getInstance().getATMap().getAT(address);
+			AT at = DCSet.getInstance().getATMap().getAT(address);
 			Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
-			long aTtimestamp = block.getTimestamp(DBSet.getInstance()); 
+			long aTtimestamp = block.getTimestamp(DCSet.getInstance()); 
 			BigDecimal aTbalanceCreation = BigDecimal.ZERO.setScale(8); 
 			for (Transaction transaction : block.getTransactions()) {
 				if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION )
 				{
-					Account atAccount = ((DeployATTransaction)transaction).getATaccount(DBSet.getInstance());
+					Account atAccount = ((DeployATTransaction)transaction).getATaccount(DCSet.getInstance());
 
 					if(atAccount.getAddress().equals(address))
 					{
@@ -2871,7 +2874,7 @@ if ( asset_1 == null) {
 				}
 			}
 
-			Set<BlExpUnit> atTransactions = DBSet.getInstance().getATTransactionMap().getBlExpATTransactionsBySender(address);
+			Set<BlExpUnit> atTransactions = DCSet.getInstance().getATTransactionMap().getBlExpATTransactionsBySender(address);
 			
 			all.addAll( atTransactions );
 
@@ -2892,23 +2895,23 @@ if ( asset_1 == null) {
 
 		for (String address : addresses) {
 			if (!address.startsWith("A")) {
-				Collection<byte[]> blocks = DBSet.getInstance().getBlockMap().getGeneratorBlocks(address);
+				Collection<byte[]> blocks = DCSet.getInstance().getBlockMap().getGeneratorBlocks(address);
 				
 				for (byte[] b : blocks)
 				{
-					Block block = DBSet.getInstance().getBlockMap().get(b);
-					all.add( new BlExpUnit( block.getHeight(DBSet.getInstance()), 0, block ) );
+					Block block = DCSet.getInstance().getBlockMap().get(b);
+					all.add( new BlExpUnit( block.getHeight(DCSet.getInstance()), 0, block ) );
 				}
 			}
 		
-			Set<BlExpUnit> transactions = DBSet.getInstance().getTransactionFinalMap().getBlExpTransactionsByAddress(address);
+			Set<BlExpUnit> transactions = DCSet.getInstance().getTransactionFinalMap().getBlExpTransactionsByAddress(address);
 			txsCountOfAddr.put(address, transactions.size());
 			all.addAll(transactions);
 		}
 		
 		for (String address : addresses) {
 			Map<Tuple2<BigInteger, BigInteger>, Trade> trades = new TreeMap<Tuple2<BigInteger, BigInteger>, Trade>();
-			List<Transaction> orders = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.CREATE_ORDER_TRANSACTION, 0);
+			List<Transaction> orders = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.CREATE_ORDER_TRANSACTION, 0);
 			for (Transaction transaction : orders)
 			{
 				Order order =  ((CreateOrderTransaction)transaction).getOrder();
@@ -2925,11 +2928,11 @@ if ( asset_1 == null) {
 				
 				Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 				
-				all.add( new BlExpUnit(txInitiator.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()),
-						txTarget.getBlock(DBSet.getInstance()).getHeight(DBSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
+				all.add( new BlExpUnit(txInitiator.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()),
+						txTarget.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 			}
 			
-			Set<BlExpUnit> atTransactions = DBSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);
+			Set<BlExpUnit> atTransactions = DCSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);
 			all.addAll( atTransactions );
 		}
 		
@@ -3002,23 +3005,23 @@ if ( asset_1 == null) {
 				Trade trade = (Trade)unit.getUnit();
 
 				Order orderInitiator;
-				if (DBSet.getInstance().getCompletedOrderMap().contains(trade.getInitiator())) 
+				if (DCSet.getInstance().getCompletedOrderMap().contains(trade.getInitiator())) 
 				{
-					orderInitiator =  DBSet.getInstance().getCompletedOrderMap().get(trade.getInitiator());
+					orderInitiator =  DCSet.getInstance().getCompletedOrderMap().get(trade.getInitiator());
 				} 
 				else 
 				{
-					orderInitiator =  DBSet.getInstance().getOrderMap().get(trade.getInitiator());
+					orderInitiator =  DCSet.getInstance().getOrderMap().get(trade.getInitiator());
 				}
 
 				Order orderTarget;
-				if (DBSet.getInstance().getCompletedOrderMap().contains(trade.getTarget())) 
+				if (DCSet.getInstance().getCompletedOrderMap().contains(trade.getTarget())) 
 				{
-					orderTarget =  DBSet.getInstance().getCompletedOrderMap().get(trade.getTarget());
+					orderTarget =  DCSet.getInstance().getCompletedOrderMap().get(trade.getTarget());
 				} 
 				else 
 				{
-					orderTarget =  DBSet.getInstance().getOrderMap().get(trade.getTarget());
+					orderTarget =  DCSet.getInstance().getOrderMap().get(trade.getTarget());
 				}
 
 				if(addresses.contains(orderInitiator.getCreator().getAddress())) 
@@ -3465,7 +3468,7 @@ if ( asset_1 == null) {
 
 		output.put("atTransaction", query);
 
-		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(blockHeight);
+		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DCSet.getInstance().getATTransactionMap().getATTransactions(blockHeight);
 
 		AssetNames assetNames = new AssetNames();
 		
@@ -3494,7 +3497,7 @@ if ( asset_1 == null) {
 
 		String[] signatures = query.split("/");
 
-		Trade trade = DBSet.getInstance().getTradeMap().get(Fun.t2(Base58.decodeBI(signatures[0]), Base58.decodeBI(signatures[1])));
+		Trade trade = DCSet.getInstance().getTradeMap().get(Fun.t2(Base58.decodeBI(signatures[0]), Base58.decodeBI(signatures[1])));
 		output.put("type", "trade");
 		output.put("trade", query);
 
@@ -3570,8 +3573,8 @@ if ( asset_1 == null) {
 		for (int row = 0; row< rowCount; row++ ){
 			Map out_statement=new LinkedHashMap();
 			Transaction statement = model_Statements.get_Statement(row);
-			out_statement.put("Block", statement.getBlockHeight(DBSet.getInstance()));
-			out_statement.put("Seg_No", statement.getSeqNo(DBSet.getInstance()));
+			out_statement.put("Block", statement.getBlockHeight(DCSet.getInstance()));
+			out_statement.put("Seg_No", statement.getSeqNo(DCSet.getInstance()));
 			out_statement.put("person_key", model_Statements.get_person_key(row));
 			
 			for (int column=0; column < column_Count; column++ ){
@@ -3596,7 +3599,7 @@ if ( asset_1 == null) {
 		// TODO Auto-generated method stub
 		Map output=new LinkedHashMap();
 		
-		R_SignNote trans = (R_SignNote) DBSet.getInstance().getTransactionFinalMap().getTransaction(new Integer(block), new Integer(seg_No));
+		R_SignNote trans = (R_SignNote) DCSet.getInstance().getTransactionFinalMap().getTransaction(new Integer(block), new Integer(seg_No));
 		
 		
 		
@@ -3611,7 +3614,7 @@ if ( asset_1 == null) {
 		output.put("block",block);
 		output.put("Seg_No",seg_No);
 		
-		NoteCls statement = (NoteCls)ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, trans.getKey());
+		NoteCls statement = (NoteCls)ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, trans.getKey());
 			
 		
 		if (!trans.isEncrypted()) {
@@ -3642,7 +3645,7 @@ if ( asset_1 == null) {
 	// V2.0 Template
 					if (jSON.containsKey("Template") ){
 						Long key = new Long(jSON.get("Template")+"");
-						NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,key);
+						NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,key);
 						 if (note != null){
 							 String description = note.getDescription(); 	
 					
@@ -3669,7 +3672,7 @@ if ( asset_1 == null) {
 	// V2.1 Template
 					if ( jSON.containsKey("TM")){
 						Long key = new Long(jSON.get("TM")+"");
-						NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE,key);
+						NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,key);
 						if (note != null){
 							 String description = note.getDescription(); 
 						 
@@ -3829,7 +3832,7 @@ if ( asset_1 == null) {
 			 String str;
 			 JSONObject params = new JSONObject();
 			 JSONObject data = new JSONObject();
-			 NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
+			 NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 			 if (note != null){
 			 description = note.getDescription(); 
 			 data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
@@ -3877,7 +3880,7 @@ if ( asset_1 == null) {
 		
 		} else {
 			
-			NoteCls note = (NoteCls) ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
+			NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
 			output.put("statement",note.getName() + "<br>"
 					+  Lang.getInstance().translate_from_langObj("Encrypted",langObj));			
 		}
@@ -3917,8 +3920,8 @@ if ( asset_1 == null) {
 				Transaction vouch_Tr = (Transaction)  table_sing_model.getValueAt(i, 3);
 				Map vouchJSON=new LinkedHashMap();
 				vouchJSON.put("date", vouch_Tr.viewTimestamp());
-				vouchJSON.put("block", "" + vouch_Tr.getBlockHeight(DBSet.getInstance()));
-				vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo(DBSet.getInstance()));			
+				vouchJSON.put("block", "" + vouch_Tr.getBlockHeight(DCSet.getInstance()));
+				vouchJSON.put("Seg_No", "" + vouch_Tr.getSeqNo(DCSet.getInstance()));			
 				vouchJSON.put("creator",  vouch_Tr.getCreator().getAddress());
 
 				Tuple2<Integer, PersonCls> personInfo = vouch_Tr.getCreator().getPerson();
@@ -3938,7 +3941,7 @@ if ( asset_1 == null) {
 
 	public Map jsonQueryTX(String query)
 	{
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 
 		Map output=new LinkedHashMap();
 		AssetNames assetNames = new AssetNames();
@@ -4003,7 +4006,7 @@ if ( asset_1 == null) {
 
 	public Map jsonQueryBlock(String query)
 	{
-		DBSet db = DBSet.getInstance();
+		DCSet db = DCSet.getInstance();
 
 		Map output=new LinkedHashMap();
 		List<Object> all = new ArrayList<Object>();
@@ -4036,7 +4039,7 @@ if ( asset_1 == null) {
 		
 		int txsCount = all.size();
 
-		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DBSet.getInstance().getATTransactionMap().getATTransactions(block.getHeight(DBSet.getInstance()));
+		LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = DCSet.getInstance().getATTransactionMap().getATTransactions(block.getHeight(DCSet.getInstance()));
 
 		for(Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet())
 		{	
@@ -4047,16 +4050,16 @@ if ( asset_1 == null) {
 		output.put("type", "block");
 
 		output.put("blockSignature", Base58.encode(block.getSignature()));
-		output.put("blockHeight", block.getHeight(DBSet.getInstance()));
+		output.put("blockHeight", block.getHeight(DCSet.getInstance()));
 
-		if(block.getParent(DBSet.getInstance()) != null)
+		if(block.getParent(DCSet.getInstance()) != null)
 		{
-			output.put("parentBlockSignature", Base58.encode(block.getParent(DBSet.getInstance()).getSignature()));
+			output.put("parentBlockSignature", Base58.encode(block.getParent(DCSet.getInstance()).getSignature()));
 		}
 
-		if(block.getChild(DBSet.getInstance()) != null)
+		if(block.getChild(DCSet.getInstance()) != null)
 		{
-			output.put("childBlockSignature", Base58.encode(block.getChild(DBSet.getInstance()).getSignature()));
+			output.put("childBlockSignature", Base58.encode(block.getChild(DCSet.getInstance()).getSignature()));
 		}
 
 		int size = all.size();
@@ -4135,17 +4138,17 @@ if ( asset_1 == null) {
 			Map transactionDataJSON = new LinkedHashMap();
 
 			transactionDataJSON = new LinkedHashMap();
-			transactionDataJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
-			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
+			transactionDataJSON.put("timestamp", block.getTimestamp(DCSet.getInstance()));
+			transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DCSet.getInstance())));
 
-			int height = block.getHeight(DBSet.getInstance());
+			int height = block.getHeight(DCSet.getInstance());
 			transactionDataJSON.put("confirmations", getHeight() - height + 1 );
 			transactionDataJSON.put("height", height);
 
 			transactionDataJSON.put("generator", block.getCreator().getAddress());
 			transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
 
-			transactionDataJSON.put("generatingBalance", block.getGeneratingBalance(DBSet.getInstance()));
+			transactionDataJSON.put("generatingBalance", block.getGeneratingBalance(DCSet.getInstance()));
 			//transactionDataJSON.put("atFees", block.getATfee().toPlainString());
 			transactionDataJSON.put("reference", Base58.encode(block.getReference()));
 			transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));
@@ -4377,10 +4380,10 @@ if ( asset_1 == null) {
 	public int getHeight() {
 		
 		//GET LAST BLOCK
-		byte[] lastBlockSignature = DBSet.getInstance().getBlockMap().getLastBlockSignature();
+		byte[] lastBlockSignature = DCSet.getInstance().getBlockMap().getLastBlockSignature();
 		
 		//RETURN HEIGHT
-		return DBSet.getInstance().getBlockSignsMap().getHeight(lastBlockSignature);
+		return DCSet.getInstance().getBlockSignsMap().getHeight(lastBlockSignature);
 	}
 	public Tuple2<Integer, Long> getHWeight() {
 		
@@ -4390,7 +4393,7 @@ if ( asset_1 == null) {
 	
 	public Block getLastBlock() 
 	{	
-		return DBSet.getInstance().getBlockMap().getLastBlock();
+		return DCSet.getInstance().getBlockMap().getLastBlock();
 	}
 	
 	public static class Stopwatch { 

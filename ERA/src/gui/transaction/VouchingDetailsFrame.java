@@ -19,8 +19,8 @@ import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import core.transaction.R_Vouch;
-import database.DBSet;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -44,7 +44,7 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);
 		
-		Transaction record = DBSet.getInstance().getTransactionFinalMap().
+		Transaction record = DCSet.getInstance().getTransactionFinalMap().
 				getTransaction(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeq());
 		
 		String message = "<div>";
@@ -54,7 +54,7 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame
 			message += ", time: " + record.viewTimestamp() + "</div>";
 			message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(false) + ", fee:" + record.viewFee() + "</div>";
 			
-			message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
+			//message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
 			message += "<div>SIGN: <font size='2'>" + record.viewSignature() + "</font></div>";
 			
 			message += "<div>Creator: <font size='4'>" + record.viewCreator() + "</font></div>";

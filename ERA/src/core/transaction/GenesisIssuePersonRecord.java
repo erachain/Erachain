@@ -36,8 +36,7 @@ import core.crypto.Crypto;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.statuses.StatusCls;
-//import database.ItemMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord 
 {
@@ -73,7 +72,7 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 	}
 	
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 						
 		int res = super.isValid(db, releaserReference);

@@ -42,7 +42,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.transaction.R_Hashes;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.PasswordPane;
 import gui.Split_Panel;
 import gui.library.My_JFileChooser;
@@ -195,7 +195,7 @@ public class Issue_Split_Panel extends Split_Panel {
 
 		List<String> hashes = this.table_Model.getValues(0);
 
-		List<String> twins = R_Hashes.findTwins(DBSet.getInstance(), hashes);
+		List<String> twins = R_Hashes.findTwins(DCSet.getInstance(), hashes);
 		if (twins.size() > 0) {
 			JOptionPane.showMessageDialog(new JFrame(),
 					Lang.getInstance().translate("Twin hashes")+": " + twins.toString(),

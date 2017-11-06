@@ -18,13 +18,14 @@ public class WItemNoteMap extends WItem_Map
 	static final int TYPE = ItemCls.NOTE_TYPE;
 
 
-	public WItemNoteMap(WalletDatabase walletDatabase, DB database)
+	public WItemNoteMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database,
+		super(dWSet, database,
 				TYPE, "item_notes",
-				ObserverMessage.ADD_NOTE_TYPE,
-				ObserverMessage.REMOVE_NOTE_TYPE,
-				ObserverMessage.LIST_NOTE_TYPE
+				ObserverMessage.WALLET_RESET_NOTE_TYPE,
+				ObserverMessage.WALLET_ADD_NOTE_TYPE,
+				ObserverMessage.WALLET_REMOVE_NOTE_TYPE,
+				ObserverMessage.WALLET_LIST_NOTE_TYPE
 				);
 	}
 

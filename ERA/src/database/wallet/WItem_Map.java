@@ -23,9 +23,10 @@ import utils.ObserverMessage;
 import utils.Pair;
 import database.DBMap;
 import database.serializer.ItemSerializer;
+import datachain.DCMap;
 
 // TODO reference as TIMESTAMP of transaction
-public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls>
+public class WItem_Map extends DCMap<Tuple2<String, String>, ItemCls>
 {
 
 	static Logger LOGGER = Logger.getLogger(WItem_Map.class.getName());
@@ -38,17 +39,19 @@ public class WItem_Map extends DBMap<Tuple2<String, String>, ItemCls>
 	protected int type;
 	protected String name;
 
-	public WItem_Map(WalletDatabase walletDatabase, DB database, int type, String name,
+	public WItem_Map(DWSet dWSet, DB database, int type, String name,
+			int observeReset,
 			int observeAdd,
 			int observeRemove,
 			int observeList
 			)
 	{
-		super(walletDatabase, database);
+		super(dWSet, database);
 		
 		this.type = type;
 		this.name = name;
 
+		this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
 		this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
 		this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
 		this.observableData.put(DBMap.NOTIFY_LIST, observeList);

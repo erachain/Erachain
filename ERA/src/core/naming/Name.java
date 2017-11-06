@@ -14,7 +14,7 @@ import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
-import database.DBSet;
+import datachain.DCSet;
 
 public class Name {
 
@@ -62,7 +62,7 @@ public class Name {
 	
 	public boolean isConfirmed()
 	{
-		return DBSet.getInstance().getNameMap().contains(this);
+		return DCSet.getInstance().getNameMap().contains(this);
 	}
 	
 	//PARSE

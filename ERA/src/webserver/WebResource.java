@@ -87,8 +87,9 @@ import core.web.ServletUtils;
 import core.web.WebNameStorageHistoryHelper;
 import core.web.blog.BlogEntry;
 import database.DBSet;
-import database.ItemPersonMap;
-import database.NameMap;
+import datachain.DCSet;
+import datachain.ItemPersonMap;
+import datachain.NameMap;
 import lang.Lang;
 import ntp.NTP;
 import settings.Settings;
@@ -255,6 +256,7 @@ public class WebResource {
 		
 		if (lang !=null){
 			
+			LOGGER.error("try lang file: " + lang+".json");	
 			langObj = Lang.openLangFile(lang+".json");
 			
 		
@@ -294,6 +296,49 @@ public class WebResource {
 
 	}
 	
+	@Path("index/test.html")
+	@GET
+	public Response test() {
+		String content;
+		JSONObject langObj;
+		String lang = request.getParameter("lang");
+		try {
+			content = readFile("web/test.html",
+					StandardCharsets.UTF_8);
+			
+			
+		} catch (IOException e) {
+			LOGGER.error(e.getMessage(),e);
+			return error404(request, null);
+		}
+		
+		Document doc = null;
+		
+		doc = Jsoup.parse(content);
+		
+	//	Element element = doc.getElementById("menu_top_100_");
+	//	if (element != null)	element.text("werwfyrtyryrtyrtyrtyrtyrtyrtyrtytyrerwer");
+		
+//		
+		
+		if (lang !=null){
+			
+			LOGGER.error("try lang file: " + lang+".json");	
+			langObj = Lang.openLangFile(lang+".json");
+			
+		
+			Elements el = doc.select("translate");
+			for (Element e:el){
+				e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
+			}
+		}
+		
+		return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
+		
+	}
+	
+	
+	
 	@Path("index/nsrepopulate.html")
 	@GET
 	public Response doNsRepopulate() {
@@ -306,14 +351,15 @@ public class WebResource {
 	@GET
 	public Response doDeleteUnconfirmedTxs() {
 		
-		 Collection<Transaction> values = DBSet.getInstance().getTransactionMap().getValues();
-		 
+		DCSet dcSet = DCSet.getInstance();
+		Collection<Transaction> values = dcSet.getTransactionMap().getValues();
+		
 		 List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
 		 
 		 for (Transaction transaction : values) {
 			 if(privateKeyAccounts.contains(transaction.getCreator()))
 			 {
-				 DBSet.getInstance().getTransactionMap().delete(transaction);
+				 dcSet.getTransactionMap().delete(transaction);
 			 }
 		}
 		 
@@ -360,11 +406,11 @@ public class WebResource {
 
 				String websiteOpt;
 				if (key != null) {
-					websiteOpt = DBSet.getInstance().getNameStorageMap()
+					websiteOpt = DCSet.getInstance().getNameStorageMap()
 							.getOpt(nameobj.getName(), key);
 					pebbleHelper.getContextMap().put("key", key);
 				} else {
-					websiteOpt = DBSet
+					websiteOpt = DCSet
 							.getInstance()
 							.getNameStorageMap()
 							.getOpt(nameobj.getName(),
@@ -696,7 +742,7 @@ public class WebResource {
 		} else {
 
 			try {
-				String source = DBSet.getInstance().getNameStorageMap()
+				String source = DCSet.getInstance().getNameStorageMap()
 						.getOpt(name, websitepair.getA());
 
 				if (StringUtils.isNotBlank(source)) {
@@ -1145,7 +1191,7 @@ public class WebResource {
 		  return error404(request, null);
 	 }
 		
-	 ItemPersonMap map = DBSet.getInstance().getItemPersonMap();
+	 ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -1658,7 +1704,7 @@ public class WebResource {
 
 			String blogname = form.getFirst(BlogPostResource.BLOGNAME_KEY);
 			String followString = form.getFirst("follow");
-			NameMap nameMap = DBSet.getInstance().getNameMap();
+			NameMap nameMap = DCSet.getInstance().getNameMap();
 			Profile activeProfileOpt = ProfileHelper.getInstance()
 					.getActiveProfileOpt(request);
 
@@ -1979,7 +2025,7 @@ public class WebResource {
 				} else if (blognameOpt != null
 						&& Controller.getInstance().getNamesAsListAsString()
 								.contains(blognameOpt)) {
-					Name name = DBSet.getInstance().getNameMap()
+					Name name = DCSet.getInstance().getNameMap()
 							.get(blognameOpt);
 					jsonBlogPost.put("creator", name.getOwner().getAddress());
 					jsonBlogPost.put(BlogPostResource.AUTHOR, blognameOpt);
@@ -2077,7 +2123,7 @@ public class WebResource {
 								.entity(json.toJSONString()).build();
 					}
 
-					List<String> list = DBSet.getInstance().getSharedPostsMap()
+					List<String> list = DCSet.getInstance().getSharedPostsMap()
 							.get(Base58.decode(signature));
 					if (list != null
 							&& list.contains(activeProfileOpt.getName()
@@ -2414,7 +2460,7 @@ public class WebResource {
 	}
 
 	public static void addSharingAndLiking(BlogEntry blogEntry, String signature) {
-		List<String> list = DBSet.getInstance().getSharedPostsMap()
+		List<String> list = DCSet.getInstance().getSharedPostsMap()
 				.get(Base58.decode(blogEntry.getSignature()));
 		if (list != null) {
 			for (String name : list) {
@@ -2422,7 +2468,7 @@ public class WebResource {
 			}
 		}
 
-		NameStorageMap nameStorageMap = DBSet.getInstance().getNameStorageMap();
+		NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
 		Set<String> keys = nameStorageMap.getKeys();
 
 		for (String name : keys) {
@@ -2515,7 +2561,7 @@ public class WebResource {
 				pebbleHelper.getContextMap().put("msg", msg);
 			}
 
-			NameMap nameMap = DBSet.getInstance().getNameMap();
+			NameMap nameMap = DCSet.getInstance().getNameMap();
 			if (blogname != null) {
 				if (!nameMap.contains(blogname)) {
 					return Response.ok(
@@ -3240,7 +3286,7 @@ public class WebResource {
 			PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
 					"web/main.mini.html", request);
 
-			NameStorageMap nameStorageMap = DBSet.getInstance()
+			NameStorageMap nameStorageMap = DCSet.getInstance()
 					.getNameStorageMap();
 			Map<String, String> map = nameStorageMap.get(name);
 
@@ -3295,7 +3341,7 @@ public class WebResource {
 		try {
 
 
-			String website = DBSet.getInstance().getNameStorageMap()
+			String website = DCSet.getInstance().getNameStorageMap()
 					.getOpt(nameName, key);
 
 			if (website == null) {
@@ -3327,7 +3373,7 @@ public class WebResource {
 				return error404(request, null);
 			}
 
-			String website = DBSet.getInstance().getNameStorageMap()
+			String website = DCSet.getInstance().getNameStorageMap()
 					.getOpt(nameName, Corekeys.WEBSITE.toString());
 
 			if (website == null) {
@@ -3400,7 +3446,7 @@ public class WebResource {
 			Elements inj = doc.select("inj");
 			Element element = inj.get(0);
 
-			NameStorageMap nameMap = DBSet.getInstance().getNameStorageMap();
+			NameStorageMap nameMap = DCSet.getInstance().getNameStorageMap();
 			String name = matcher.group(2);
 			String result = "";
 			if (nameMap.contains(name)) {

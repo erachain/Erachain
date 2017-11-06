@@ -28,7 +28,7 @@ import core.transaction.BuyNameTransaction;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
-import database.DBSet;
+import datachain.DCSet;
 import utils.APIUtils;
 import utils.GZIP;
 import utils.Pair;
@@ -94,21 +94,21 @@ public class NamesResource {
 
 			HashSet<Name> names = new HashSet<>();
 
-			for (Transaction transaction : DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.REGISTER_NAME_TRANSACTION, 0)) {
+			for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.REGISTER_NAME_TRANSACTION, 0)) {
 				if(((RegisterNameTransaction)transaction).getName().getOwner().getAddress().equals(address))
 				{
 					names.add(((RegisterNameTransaction)transaction).getName());
 				}
 			}
 
-			for (Transaction transaction : DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.UPDATE_NAME_TRANSACTION, 0)) {
+			for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.UPDATE_NAME_TRANSACTION, 0)) {
 				if(((UpdateNameTransaction)transaction).getName().getOwner().getAddress().equals(address))
 				{
 					names.add(((UpdateNameTransaction)transaction).getName());
 				}
 			}
 
-			for (Transaction transaction : DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.BUY_NAME_TRANSACTION, 0)) {
+			for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.BUY_NAME_TRANSACTION, 0)) {
 				if(((BuyNameTransaction)transaction).getNameSale().getName().getOwner().getAddress().equals(address))
 				{
 					names.add(((BuyNameTransaction)transaction).getNameSale().getName());

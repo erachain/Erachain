@@ -9,7 +9,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
 import core.crypto.Crypto;
-import database.DBSet;
+import datachain.DCSet;
 
 public class Trade {
 	
@@ -39,7 +39,7 @@ public class Trade {
 		return this.initiator;
 	}
 	
-	public Order getInitiatorOrder(DBSet db)
+	public Order getInitiatorOrder(DCSet db)
 	{
 		return this.getOrder(this.initiator, db);
 	}
@@ -49,12 +49,12 @@ public class Trade {
 		return this.target;
 	}
 	
-	public Order getTargetOrder(DBSet db)
+	public Order getTargetOrder(DCSet db)
 	{
 		return this.getOrder(this.target, db);
 	}
 	
-	public static Order getOrder(BigInteger key, DBSet db)
+	public static Order getOrder(BigInteger key, DCSet db)
 	{
 		if(db.getOrderMap().contains(key))
 		{
@@ -177,7 +177,7 @@ public class Trade {
 	
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db)
+	public void process(DCSet db)
 	{
 		Order initiator = this.getInitiatorOrder(db).copy();
 		Order target = this.getTargetOrder(db).copy();
@@ -230,7 +230,7 @@ public class Trade {
 		target.getCreator().changeBalance(db, false, target.getWant(), this.amountWant);
 	}
 
-	public void orphan(DBSet db) 
+	public void orphan(DCSet db) 
 	{
 		Order initiator = this.getInitiatorOrder(db).copy();
 		Order target = this.getTargetOrder(db).copy();

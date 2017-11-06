@@ -27,8 +27,8 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class IssueAssetTransaction extends Issue_ItemRecord 
 {
@@ -70,7 +70,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	//GETTERS/SETTERS
 	//public static String getName() { return "Issue Asset"; }
 
-	public long getAssetKey(DBSet db)
+	public long getAssetKey(DCSet db)
 	{
 		return this.getItem().getKey(db);
 	}
@@ -111,7 +111,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	//VALIDATE
 	
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		int result = super.isValid(db, releaserReference);
@@ -241,7 +241,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -254,7 +254,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
@@ -301,7 +301,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
 		AssetCls asset = (AssetCls)this.getItem();
-		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(DBSet.getInstance()),
+		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(DCSet.getInstance()),
 				new BigDecimal(asset.getQuantity()).setScale(8));
 
 		return assetAmount;

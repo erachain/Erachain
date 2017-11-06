@@ -32,10 +32,9 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
-//import database.BalanceMap;
-import database.DBSet;
-import database.HashesMap;
-import database.HashesSignsMap;
+import datachain.DCSet;
+import datachain.HashesMap;
+import datachain.HashesSignsMap;
 
 
 public class R_Hashes extends Transaction {
@@ -140,13 +139,13 @@ public class R_Hashes extends Transaction {
 	
 	}
 
-	public static byte[] findRecord(DBSet db, byte[] hash) 
+	public static byte[] findRecord(DCSet db, byte[] hash) 
 	{
 		return db.getHashesMap().get(hash);
 	}
 	
 	// find twins before insert a record
-	public static List<String> findTwins(DBSet db, List<String> hashes58) 
+	public static List<String> findTwins(DCSet db, List<String> hashes58) 
 	{
 		List<String> twins = new ArrayList<String>();
 		for (String hash58: hashes58) {
@@ -156,7 +155,7 @@ public class R_Hashes extends Transaction {
 		}
 		return twins;
 	}
-	public static List<String> findTwins(DBSet db, String[] hashes58) 
+	public static List<String> findTwins(DCSet db, String[] hashes58) 
 	{
 		List<String> twins = new ArrayList<String>();
 		for (String hash58: hashes58) {
@@ -344,7 +343,7 @@ public class R_Hashes extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		//CHECK DATA SIZE
 		if(url.length > MAX_URL_LENGTH)
@@ -381,7 +380,7 @@ public class R_Hashes extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
-	public void process(DBSet db, Block block, boolean asPack) {
+	public void process(DCSet db, Block block, boolean asPack) {
 
 		//UPDATE SENDER
 		super.process(db, block, asPack);
@@ -413,7 +412,7 @@ public class R_Hashes extends Transaction {
 		}
 	}
 
-	public void orphan(DBSet db, boolean asPack) {
+	public void orphan(DCSet db, boolean asPack) {
 
 		//UPDATE SENDER
 		super.orphan(db, asPack);

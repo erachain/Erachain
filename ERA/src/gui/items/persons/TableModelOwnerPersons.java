@@ -21,10 +21,10 @@ import org.mapdb.Fun.Tuple3;
 import controller.Controller;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
+import datachain.DCSet;
+import datachain.SortableList;
 import utils.ObserverMessage;
 import utils.Pair;
-import database.DBSet;
-import database.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -49,7 +49,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	
 	public TableModelOwnerPersons(Long key)
 	{
-		addresses = DBSet.getInstance().getPersonAddressMap().getItems(key);
+		addresses = DCSet.getInstance().getPersonAddressMap().getItems(key);
 		Controller.getInstance().addObserver(this);
 		
 		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");

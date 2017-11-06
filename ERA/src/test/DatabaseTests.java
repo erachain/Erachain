@@ -29,12 +29,12 @@ import core.transaction.IssuePersonRecord;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
 import core.wallet.Wallet;
-import database.AddressPersonMap;
-import database.DBSet;
+import datachain.AddressPersonMap;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
+import datachain.KKPersonStatusMap;
+import datachain.PersonAddressMap;
 import ntp.NTP;
-import database.ItemAssetMap;
-import database.KKPersonStatusMap;
-import database.PersonAddressMap;
 
 
 public class DatabaseTests {
@@ -58,7 +58,7 @@ public class DatabaseTests {
 	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet dbSet;
+	private DCSet dcSet;
 	private GenesisBlock gb;
 	Long last_ref;
 	boolean asPack = false;
@@ -80,12 +80,17 @@ public class DatabaseTests {
 	// INIT PERSONS
 	private void init() {
 		
-		dbSet = DBSet.createEmptyDatabaseSet();
+		dcSet = DCSet.createEmptyDatabaseSet();
 
 		gb = new GenesisBlock();
-		gb.process(dbSet);
+		try {
+			gb.process(dcSet);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		last_ref = gb.getTimestamp(dbSet);
+		last_ref = gb.getTimestamp(dcSet);
 		
 		// GET RIGHTS TO CERTIFIER
 		byte gender = 1;
@@ -95,20 +100,20 @@ public class DatabaseTests {
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-		genesis_issue_person.process(dbSet, gb, false);
+		genesis_issue_person.process(dcSet, gb, false);
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(maker, 0L);
-		genesis_certify.process(dbSet, gb, false);
+		genesis_certify.process(dcSet, gb, false);
 		
-		maker.setLastReference(last_ref, dbSet);
-		maker.changeBalance(dbSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		maker.changeBalance(dbSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		maker.setLastTimestamp(last_ref, dcSet);
+		maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
 		//CREATE ISSUE PERSON TRANSACTION
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(dbSet));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(dcSet));
 
 	}
 
@@ -119,21 +124,21 @@ public class DatabaseTests {
 		init();
 		
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dbSet, gb, asPack);
+		issuePersonTransaction.process(dcSet, gb, asPack);
 
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dbSet));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dcSet));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dbSet, gb, asPack);
+		issuePersonTransaction.process(dcSet, gb, asPack);
 
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dbSet));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dcSet));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dbSet, gb, asPack);
+		issuePersonTransaction.process(dcSet, gb, asPack);
 		
 
-		//assertEquals(dbSet.getItemPersonMap().getKeys().toString(), "");
-		//assertEquals(dbSet.getItemPersonMap().getValues().toString(), "");
+		//assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
+		//assertEquals(dcSet.getItemPersonMap().getValues().toString(), "");
 		//CREATE FORK
-		DBSet fork = dbSet.fork();
+		DCSet fork = dcSet.fork();
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(fork));
 		issuePersonTransaction.sign(maker, asPack);
@@ -146,10 +151,10 @@ public class DatabaseTests {
 		//assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 		
 		//SET BALANCE
-		dbSet.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
+		dcSet.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, dbSet.getAssetBalanceMap().get("test", 1L));
+		assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
 		
 		//CHECK VALUE IN FORK
 		assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test", 1L));
@@ -158,19 +163,19 @@ public class DatabaseTests {
 		fork.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN));
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, dbSet.getAssetBalanceMap().get("test", 1L));
+		assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
 				
 		//CHECK VALUE IN FORK
 		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
 		
 		//CREATE SECOND FORK
-		DBSet fork2 = fork.fork();
+		DCSet fork2 = fork.fork();
 		
 		//SET BALANCE IN FORK2
 		fork2.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
 		
 		//CHECK VALUE IN DB
-		assertEquals(BigDecimal.ONE, dbSet.getAssetBalanceMap().get("test", 1L));
+		assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
 						
 		//CHECK VALUE IN FORK
 		assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
@@ -183,17 +188,22 @@ public class DatabaseTests {
 	public void databaseAssets()
 	{
 		
-		DBSet.reCreateDatabase();
+		DCSet.reCreateDatabase(false, false);
 				
 		GenesisBlock gb = new GenesisBlock();
-		gb.process(dbSet);
+		try {
+			gb.process(dcSet);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		ItemAssetMap dbMap = dbSet.getItemAssetMap();
+		ItemAssetMap dbMap = dcSet.getItemAssetMap();
 		Collection<ItemCls> assets = dbMap.getValues();
 		for (ItemCls asset:assets) {
 			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
 			AssetCls aa = (AssetCls) asset;
-			LOGGER.info("ASSET - " + asset.getKey(dbSet) + " : " + asset.getName()
+			LOGGER.info("ASSET - " + asset.getKey(dcSet) + " : " + asset.getName()
 				+ " : " + aa.getQuantity()	
 				+ " - " + aa.getReference().length	
 				+ ": " + aa.getReference());	
@@ -216,14 +226,14 @@ public class DatabaseTests {
 		init();
 						
 		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, 50000l, (byte) 2, false);
-		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(dbSet));
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(dcSet));
 		issueAssetTransaction.sign(maker, false);
-		issueAssetTransaction.process(dbSet, gb, false);
+		issueAssetTransaction.process(dcSet, gb, false);
 		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 		
-		long key = asset.getKey(dbSet);
+		long key = asset.getKey(dcSet);
 		
-		ItemAssetMap assetDB = dbSet.getItemAssetMap();
+		ItemAssetMap assetDB = dcSet.getItemAssetMap();
 		Collection<ItemCls> assets = assetDB.getValues();
 		for (ItemCls asset_2:assets) {
 			AssetCls aa = (AssetCls) asset_2;

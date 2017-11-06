@@ -22,7 +22,7 @@ import core.item.assets.AssetCls;
 import core.transaction.CreatePollTransaction;
 import core.transaction.Transaction;
 import core.voting.Poll;
-import database.DBSet;
+import datachain.DCSet;
 import gui.Gui;
 import gui.models.PollOptionsTableModel;
 import gui.voting.VoteFrame;
@@ -96,7 +96,7 @@ public class VotingDetailsPanel extends JPanel
 		
 		String dateTime = "";
 		
-		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
+		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			CreatePollTransaction createPollTransaction = ((CreatePollTransaction)transaction);
 			if(createPollTransaction.getPoll().getName().equals(poll.getName()))

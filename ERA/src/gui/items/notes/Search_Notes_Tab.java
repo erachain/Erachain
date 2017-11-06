@@ -52,7 +52,7 @@ import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.items.unions.TableModelUnions;
@@ -283,17 +283,16 @@ public class Search_Notes_Tab extends Split_Panel {
 			 NoteCls note = tableModelNotes.getNote(row);
 			if (note == null) return;
 			
-			Transaction trans = DBSet.getInstance().getTransactionFinalMap().get(DBSet.getInstance().getTransactionFinalMapSigns()
-								.get(note.getReference()));
+			Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(note.getReference());
 			
 			
-			VouchRecordDialog vouch_panel = new VouchRecordDialog(trans.getBlockHeight(DBSet.getInstance()),trans.getSeqNo(DBSet.getInstance()));
+			VouchRecordDialog vouch_panel = new VouchRecordDialog(trans.getBlockHeight(DCSet.getInstance()),trans.getSeqNo(DCSet.getInstance()));
 		
 		}
 	});
 	
 	
-	search_notes_menu.add(favorite);
+	search_notes_menu.add(favorite); 
 	search_notes_menu.add(vouch_Item);
 	notesTable.setComponentPopupMenu(search_notes_menu);
 	notesTable.addMouseListener(new MouseAdapter() {

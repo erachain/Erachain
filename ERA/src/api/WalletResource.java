@@ -17,7 +17,7 @@ import utils.APIUtils;
 import controller.Controller;
 import core.crypto.Base58;
 import core.item.notes.NoteCls;
-import database.DBSet;
+import datachain.DCSet;
 
 @Path("wallet")
 @Produces(MediaType.APPLICATION_JSON)
@@ -85,7 +85,7 @@ public class WalletResource {
 			
 			// TODO: was 
 			Controller.getInstance().synchronizeWallet();
-			Controller.getInstance().setNeedSync(true);
+			Controller.getInstance().setNeedSyncWallet(true);
 			
 			return String.valueOf(true);
 		} else {

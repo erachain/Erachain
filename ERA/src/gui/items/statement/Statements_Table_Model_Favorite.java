@@ -17,8 +17,8 @@ import core.block.Block;
 import core.item.ItemCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
@@ -211,9 +211,9 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 		db_transactions = new ArrayList<Transaction>();
 		tran = new ArrayList<Transaction>();
 		// база данных
-		DBSet dbSet = DBSet.getInstance();
+		DCSet dcSet = DCSet.getInstance();
 		// читаем все блоки
-		SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+		SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
 		for (Pair<byte[], Block> list : lists) {
 

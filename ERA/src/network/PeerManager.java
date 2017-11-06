@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import controller.Controller;
 import database.DBSet;
 import ntp.NTP;
 import settings.Settings;
@@ -35,7 +36,7 @@ public class PeerManager {
 	
 	public List<Peer> getBestPeers()
 	{
-		return DBSet.getInstance().getPeerMap().getBestPeers(Settings.getInstance().getMaxSentPeers(), false);
+		return Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxSentPeers(), false);
 	}
 	
 	
@@ -43,8 +44,8 @@ public class PeerManager {
 	{
 		List<Peer> knownPeers = new ArrayList<Peer>();
 		//ASK DATABASE FOR A LIST OF PEERS
-		if(!DBSet.getInstance().isStoped()){
-			knownPeers = DBSet.getInstance().getPeerMap().getBestPeers(Settings.getInstance().getMaxReceivePeers(), true);
+		if(!Controller.getInstance().isOnStopping()){
+			knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxReceivePeers(), true);
 		}
 		
 		//RETURN
@@ -54,13 +55,13 @@ public class PeerManager {
 	public void addPeer(Peer peer, int banForMinutes)
 	{
 		//ADD TO DATABASE
-		if(!DBSet.getInstance().isStoped()){
-			DBSet.getInstance().getPeerMap().addPeer(peer, banForMinutes);
+		if(!Controller.getInstance().isOnStopping()){
+			Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, banForMinutes);
 		}
 	}
 		
 	public boolean isBanned(Peer peer)
 	{
-		return DBSet.getInstance().getPeerMap().isBanned(peer.getAddress());
+		return Controller.getInstance().getDBSet().getPeerMap().isBanned(peer.getAddress());
 	}
 }

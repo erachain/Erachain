@@ -31,10 +31,10 @@ import core.transaction.R_SignNote;
 //import core.transaction.R_SignStatement_old;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
-import database.DBMap;
-import database.DBSet;
-import database.SortableList;
-import database.TransactionFinalMap;
+import datachain.DCMap;
+import datachain.DCSet;
+import datachain.SortableList;
+import datachain.TransactionFinalMap;
 import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
@@ -71,13 +71,13 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
 	private String sss;
 
 	public WEB_Statements_Vouch_Table_Model(Transaction transaction) {
-		table = DBSet.getInstance().getTransactionFinalMap();
-		blockNo = transaction.getBlockHeight(DBSet.getInstance());
-		recNo = transaction.getSeqNo(DBSet.getInstance());
+		table = DCSet.getInstance().getTransactionFinalMap();
+		blockNo = transaction.getBlockHeight(DCSet.getInstance());
+		recNo = transaction.getSeqNo(DCSet.getInstance());
 		transactions = new ArrayList<Transaction>();
 		// transactions = read_Sign_Accoutns();
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
-		DBSet.getInstance().getVouchRecordMap().addObserver(this);
+		DCSet.getInstance().getTransactionFinalMap().addObserver(this);
+		DCSet.getInstance().getVouchRecordMap().addObserver(this);
 
 	}
 
@@ -220,7 +220,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
 		// db_transactions = new ArrayList<Transaction>();
 		// tran = new ArrayList<Transaction>();
 		// база данных
-		// DBSet dbSet = DBSet.getInstance();
+		// DBSet dcSet = DBSet.getInstance();
 
 		/*
 		 * Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs =

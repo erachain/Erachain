@@ -29,7 +29,7 @@ import javax.swing.table.TableRowSorter;
 import controller.Controller;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.Split_Panel;
 import gui.items.persons.TableModelPersons;
 import gui.library.Issue_Confirm_Dialog;
@@ -231,7 +231,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 						.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				if (statement == null)
 					return;
-				DBSet db = DBSet.getInstance();
+				DCSet db = DCSet.getInstance();
 				new VouchRecordDialog(statement.getBlockHeight(db), statement.getSeqNo(db));
 
 			}

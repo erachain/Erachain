@@ -12,8 +12,8 @@ import controller.Controller;
 import core.account.Account;
 import core.item.notes.NoteCls;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.Gui;
 import utils.ObserverMessage;
 

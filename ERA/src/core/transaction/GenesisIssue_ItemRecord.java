@@ -28,10 +28,9 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.ItemFactory;
-import database.Item_Map;
+import datachain.DCSet;
+import datachain.Item_Map;
 import utils.NumberAsString;
-//import database.BalanceMap;
-import database.DBSet;
 
 public class GenesisIssue_ItemRecord extends Genesis_Record 
 {
@@ -54,7 +53,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 		return this.item;
 	}
 
-	public long getAssetKey(DBSet db)
+	public long getAssetKey(DCSet db)
 	{
 		return this.getItem().getKey(db);
 	}
@@ -107,7 +106,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//VALIDATE
 		
 	@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK NAME LENGTH
@@ -130,7 +129,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//PROCESS/ORPHAN
 
 	@Override
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		
 		//INSERT INTO DATABASE
@@ -140,7 +139,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 
 
 	@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 																		
 		//DELETE FROM DATABASE

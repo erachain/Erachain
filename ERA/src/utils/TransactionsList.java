@@ -5,8 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import controller.Controller;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 public class TransactionsList extends AbstractList<Transaction> 
 {
@@ -25,7 +26,7 @@ public class TransactionsList extends AbstractList<Transaction>
 	{
 		if(!this.transactions.containsKey(this.transactionSignatures.get(index)))
 		{
-			this.transactions.put(this.transactionSignatures.get(index), DBSet.getInstance().getTransactionMap()
+			this.transactions.put(this.transactionSignatures.get(index), DCSet.getInstance().getTransactionMap()
 					.get(this.transactionSignatures.get(index)));
 		}
 		

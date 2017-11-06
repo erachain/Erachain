@@ -42,7 +42,7 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import core.voting.Poll;
 import core.voting.PollOption;
-import database.DBSet;
+import datachain.DCSet;
 
 @SuppressWarnings("serial")
 public class VoteFrame extends JFrame
@@ -152,7 +152,7 @@ public class VoteFrame extends JFrame
 
 		    	if(asset != null)
 		    	{
-		    		((AccountRenderer)cbxAccount.getRenderer()).setAsset(asset.getKey(DBSet.getInstance()));
+		    		((AccountRenderer)cbxAccount.getRenderer()).setAsset(asset.getKey(DCSet.getInstance()));
 		    		cbxAccount.repaint();
 		    		cbxOptions.repaint();
 		    		
@@ -168,7 +168,7 @@ public class VoteFrame extends JFrame
       	//CBX ACCOUNT
       	detailGBC.gridy = 4;
       	this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
-      	cbxAccount.setRenderer(new AccountRenderer(asset.getKey(DBSet.getInstance())));
+      	cbxAccount.setRenderer(new AccountRenderer(asset.getKey(DCSet.getInstance())));
       	
       	this.add(this.cbxAccount, detailGBC);
 		
@@ -193,7 +193,7 @@ public class VoteFrame extends JFrame
       	        
       	    	AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
       	    	
-      	    	value = employee.toString(asset.getKey(DBSet.getInstance()));
+      	    	value = employee.toString(asset.getKey(DCSet.getInstance()));
       	        return super.getListCellRendererComponent(list, value,
       	                index, isSelected, cellHasFocus);
       	    }

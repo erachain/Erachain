@@ -44,8 +44,8 @@ public class Settings {
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = 10000; // 10000 
-	private static final int DEFAULT_PING_INTERVAL = 60000;
+	private static final int DEFAULT_CONNECTION_TIMEOUT = 30000; // 10000 
+	private static final int DEFAULT_PING_INTERVAL = 150000;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
 	private static final String DEFAULT_FONT_NAME = "Arial";
@@ -71,9 +71,11 @@ public class Settings {
 	// 19 03	
 	//GUI
 	private static final boolean DEFAULT_GUI_ENABLED = true;
+	private static final boolean DEFAULT_GUI_DYNAMIC = true;
 	
 	//DATA
-	private static final String DEFAULT_DATA_DIR = "data";
+	private static final String DEFAULT_DATA_DIR = "datachain";
+	private static final String DEFAULT_LOCAL_DIR = "datalocal";
 	private static final String DEFAULT_WALLET_DIR = "wallet";
 		
 	
@@ -205,6 +207,10 @@ public class Settings {
 	public String getDataDir()
 	{
 		return this.getUserPath() + DEFAULT_DATA_DIR;
+	}
+	public String getLocalDir()
+	{
+		return this.getUserPath() + DEFAULT_LOCAL_DIR;
 	}
 	
 	public String getLangDir()
@@ -718,6 +724,16 @@ public class Settings {
 		}
 		
 		return DEFAULT_GUI_ENABLED;
+	}
+	
+	public boolean isGuiDynamic() 
+	{
+	if(this.settingsJSON.containsKey("guidynamic"))
+		{
+			return ((Boolean) this.settingsJSON.get("guidynamic")).booleanValue();
+		}
+		
+		return DEFAULT_GUI_DYNAMIC;
 	}
 	
 	public String getTimeZone()

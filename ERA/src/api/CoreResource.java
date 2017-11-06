@@ -59,7 +59,7 @@ public class CoreResource
 	@Path("/isuptodate")
 	public String isUpToDate() 
 	{ 
-		return String.valueOf(Controller.getInstance().isUpToDate());
+		return String.valueOf(Controller.getInstance().checkStatus());
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -3,7 +3,7 @@ package utils;
 import org.json.simple.JSONObject;
 
 import core.web.NameStorageMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public class ProfileUtils {
 	
@@ -11,7 +11,7 @@ public class ProfileUtils {
 	public static JSONObject getBlogBlackWhiteList(String blogname)
 	{
 		JSONObject json = new JSONObject();
-		NameStorageMap nameStorageMap = DBSet.getInstance().getNameStorageMap();
+		NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
 		
 		if(nameStorageMap.get(blogname) != null)
 		{
@@ -27,7 +27,7 @@ public class ProfileUtils {
 	public static JSONObject getProfile(String profilename)
 	{
 		JSONObject json = new JSONObject();
-		NameStorageMap nameStorageMap = DBSet.getInstance().getNameStorageMap();
+		NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
 		
 		if(nameStorageMap.get(profilename) != null)
 		{

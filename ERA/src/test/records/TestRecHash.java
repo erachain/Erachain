@@ -30,11 +30,8 @@ import core.item.assets.AssetCls;
 import core.transaction.R_Hashes;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-
-//import com.google.common.primitives.Longs;
-
-import database.DBSet;
-import database.HashesSignsMap;
+import datachain.DCSet;
+import datachain.HashesSignsMap;
 
 public class TestRecHash {
 
@@ -52,7 +49,7 @@ public class TestRecHash {
 	byte[][] hashes = new byte[12][32];
 
 	//CREATE EMPTY MEMORY DATABASE
-	private DBSet db;
+	private DCSet db;
 	private GenesisBlock gb;
 	
 	//CREATE KNOWN ACCOUNT
@@ -64,13 +61,18 @@ public class TestRecHash {
 	// INIT
 	private void init() {
 		
-		db = DBSet.createEmptyDatabaseSet();
+		db = DCSet.createEmptyDatabaseSet();
 		
 		gb = new GenesisBlock();
-		gb.process(db);
+		try {
+			gb.process(db);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// FEE FUND
-		maker.setLastReference(gb.getTimestamp(db), db);
+		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
 
 	}
@@ -132,7 +134,7 @@ public class TestRecHash {
 		assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());				
 
 		//CHECK REFERENCE
-		assertEquals(hashesRecord.getReference(), parsed.getReference());	
+		//assertEquals(hashesRecord.getReference(), parsed.getReference());	
 		
 		//CHECK ISSUER
 		assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
@@ -184,7 +186,7 @@ public class TestRecHash {
 		hashesRecord.orphan(db, false);
 										
 		//CHECK REFERENCE SENDER
-		assertEquals(hashesRecord.getReference(), maker.getLastReference(db));
+		//assertEquals(hashesRecord.getReference(), maker.getLastReference(db));
 
 		result = map.get(hash0);
 		assertEquals(result.size(), 0);

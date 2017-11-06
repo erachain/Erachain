@@ -12,16 +12,16 @@ public class FavoriteItemAsset extends FavoriteItem {
 
 	
 	// favorites init SET
-	public FavoriteItemAsset(WalletDatabase walletDatabase, DB database) 
+	public FavoriteItemAsset(DWSet dWSet, DB database) 
 	{
-		super(walletDatabase, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", AssetCls.INITIAL_FAVORITES);
+		super(dWSet, database, ObserverMessage.LIST_ASSET_FAVORITES_TYPE, "asset", AssetCls.INITIAL_FAVORITES);
 
 	}
 	public void replace(List<Long> keys)
 	{
 		this.itemsSet.clear();
 		this.itemsSet.addAll(keys);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.notifyFavorites();
@@ -30,7 +30,7 @@ public class FavoriteItemAsset extends FavoriteItem {
 	public void add(Long key)
 	{
 		this.itemsSet.add(key);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		this.setChanged();
@@ -40,7 +40,7 @@ public class FavoriteItemAsset extends FavoriteItem {
 	public void delete(Long key)
 	{
 		this.itemsSet.remove(key);
-		this.walletDatabase.commit();
+		this.dWSet.commit();
 		
 		//NOTIFY
 		//this.notifyFavorites();

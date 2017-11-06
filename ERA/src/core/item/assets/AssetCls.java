@@ -4,13 +4,10 @@ package core.item.assets;
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-
-// import org.apache.log4j.Logger;
-
-import database.DBSet;
-import database.Item_Map;
-import database.Issue_ItemMap;
-import database.wallet.WalletDatabase;
+import database.wallet.DWSet;
+import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 import lang.Lang;
 import database.wallet.FavoriteItem;
 
@@ -110,11 +107,11 @@ public abstract class AssetCls extends ItemCls {
 	public String getItemTypeStr() { return "asset"; }
 	
 	// DB
-	public Item_Map getDBMap(DBSet db)
+	public Item_Map getDBMap(DCSet db)
 	{
 		return db.getItemAssetMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DBSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
 		return db.getIssueAssetMap();
 	}

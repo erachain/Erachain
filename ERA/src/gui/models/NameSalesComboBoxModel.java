@@ -13,8 +13,8 @@ import utils.Pair;
 import controller.Controller;
 import core.naming.Name;
 import core.naming.NameSale;
-import database.SortableList;
 import database.wallet.NameSaleMap;
+import datachain.SortableList;
 
 @SuppressWarnings("serial")
 public class NameSalesComboBoxModel extends DefaultComboBoxModel<NameSale> implements Observer {

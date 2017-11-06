@@ -28,7 +28,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
 import core.transaction.R_Send;
-import database.DBSet;
+import datachain.DCSet;
 import gui.PasswordPane;
 import gui.library.MTextPane;
 import gui.library.M_Accoutn_Text_Field;
@@ -102,7 +102,7 @@ public class Mail_Info extends javax.swing.JPanel {
         
         jTextField_Block.setEditable(false);
         MenuPopupUtil.installContextMenu(jTextField_Block);
-        jTextField_Block.setText(trans.viewHeightSeq(DBSet.getInstance()));
+        jTextField_Block.setText(trans.viewHeightSeq(DCSet.getInstance()));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;

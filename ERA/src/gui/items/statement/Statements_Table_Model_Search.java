@@ -17,8 +17,8 @@ import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.SortableList;
+import datachain.DCSet;
+import datachain.SortableList;
 import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
@@ -186,18 +186,19 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		ObserverMessage message = (ObserverMessage) arg;
 		// System.out.println( message.getType());
 
+		/*
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_STATEMENT_TYPE) {
 			if (this.transactions == null) {
 				transactions = read_Statement("",(long) -1, false);
 				this.fireTableDataChanged();
 			}
-
 			
 		}
+		*/
 
 		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE) {
+		if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
 			Transaction trans = (Transaction) message.getValue();
 			if (trans.getType() != Transaction.SIGN_NOTE_TRANSACTION)
 				return;
@@ -219,9 +220,9 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		db_transactions = new ArrayList<Transaction>();
 		tran = new ArrayList<R_SignNote>();
 		// база данных
-		DBSet dbSet = DBSet.getInstance();
+		DCSet dcSet = DCSet.getInstance();
 		// читаем все блоки
-		SortableList<byte[], Block> lists = dbSet.getBlockMap().getList();
+		SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
 		for (Pair<byte[], Block> list : lists) {
 
@@ -260,12 +261,12 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 	public void removeObservers() {
 
 		// Controller.getInstance().deleteObserver(this);
-		DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
+		DCSet.getInstance().getTransactionFinalMap().deleteObserver(this);
 	}
 
 	public void addObservers() {
 		// Controller.getInstance().addObserver(this);
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this);
+		DCSet.getInstance().getTransactionFinalMap().addObserver(this);
 	}
 	
 	public void Find_item_from_key(String text) {

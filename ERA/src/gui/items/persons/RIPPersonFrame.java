@@ -29,7 +29,7 @@ import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;

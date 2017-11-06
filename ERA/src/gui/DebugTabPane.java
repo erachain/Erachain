@@ -18,8 +18,8 @@ import javax.swing.JTable;
 
 import core.BlockChain;
 import core.transaction.Transaction;
-import database.BlockMap;
-import database.TransactionMap;
+import datachain.BlockMap;
+import datachain.TransactionMap;
 import gui.library.MTable;
 import gui.models.BlocksTableModel;
 import gui.models.Debug_Transactions_Table_Model;
@@ -63,8 +63,8 @@ public class DebugTabPane extends JTabbedPane{
 		//TRANSACTIONS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		indexes.put(TransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
-		CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
-		transactionsTable.setRowSorter(sorter);
+		//CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
+		//transactionsTable.setRowSorter(sorter);
 		
 		//TRANSACTION DETAILS
 		this.transactionsTable.addMouseListener(new MouseAdapter() 
@@ -96,8 +96,8 @@ public class DebugTabPane extends JTabbedPane{
 		//BLOCKS SORTER
 		indexes = new TreeMap<Integer, Integer>();
 		indexes.put(BlocksTableModel.COLUMN_HEIGHT, BlockMap.HEIGHT_INDEX);
-		sorter = new CoreRowSorter(blocksTableModel, indexes);
-		blocksTable.setRowSorter(sorter);
+		//sorter = new CoreRowSorter(blocksTableModel, indexes);
+		//blocksTable.setRowSorter(sorter);
 		
 		//ADD BLOCK TABLE
 		this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
@@ -133,7 +133,7 @@ public class DebugTabPane extends JTabbedPane{
 	public void close() 
 	{
 		//REMOVE OBSERVERS/HANLDERS
-		this.peersTableModel.removeObservers();
+		this.peersTableModel.deleteObserver();
 		
 		this.transactionsTableModel.removeObservers();
 		

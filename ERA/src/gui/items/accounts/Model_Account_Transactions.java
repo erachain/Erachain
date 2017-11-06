@@ -21,10 +21,10 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBMap;
-import database.DBSet;
-import database.SortableList;
 import database.wallet.TransactionMap;
+import datachain.DCMap;
+import datachain.DCSet;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -100,7 +100,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 			asset_Key = asset.getKey();
 		}
 
-		List<Transaction> transactions = DBSet.getInstance().getTransactionFinalMap().getTransactionsByAddress( this.account.getAddress());
+		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress( this.account.getAddress());
 			
 			
 		this.transactions_Asset.clear();;
@@ -264,12 +264,13 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 			
 		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 			
-			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
 			{
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				cred.clear();
 				for (PublicKeyAccount account:this.publicKeyAccounts){
-					cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+					cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
 					//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));	
 					}
 				
@@ -304,7 +305,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 			}
 			else
 			{
-				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DBSet.getInstance())));
+				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DCSet.getInstance())));
 			}
 		}
 		

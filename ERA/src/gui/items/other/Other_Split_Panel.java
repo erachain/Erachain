@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -15,6 +17,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import gui.CoreRowSorter;
 import gui.Split_Panel;
@@ -253,6 +257,17 @@ public class Other_Split_Panel extends Split_Panel{
          
         jScrollPane_jPanel_RightPanel.setViewportView(jSplitPane5);
         jSplitPane5.setDividerLocation(0.5);
+	
+        
+      	
+	}
+	
+	@Override
+	 public void delay_on_close(){
+		
+		blocksModel.deleteObserver();	
+		peersTableModel.deleteObserver();
+		All_Blocks_TableModel.removeObservers();
 	}
 	
 

@@ -14,8 +14,8 @@ import org.mapdb.Fun.Tuple4;
 import core.account.Account;
 import core.block.GenesisBlock;
 import core.item.statuses.StatusCls;
-import database.ItemStatusMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemStatusMap;
 import gui.library.MTextPane;
 import lang.Lang;
 

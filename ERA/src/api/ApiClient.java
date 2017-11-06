@@ -278,7 +278,12 @@ public class ApiClient {
 				"GET blocks/fromheight/<height>", 
 				"Returns the block from given height.",
 				"Errors: 301 - Block does not exist."
-			},			
+			},
+			{
+				"GET blocks/orphanto/<height>", 
+				"Orphan to given height.",
+				"Errors: 301 - Block does not exist."
+			},
 			{
 				"GET addresses", 
 				"Returns an array of all the addresses in your wallet.",

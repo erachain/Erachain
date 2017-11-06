@@ -28,8 +28,7 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import core.transaction.Transaction;
-//import database.ItemMap;
-import database.DBSet;
+import datachain.DCSet;
 
 public class IssuePersonRecord extends Issue_ItemRecord 
 {
@@ -89,7 +88,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	*/
 
 
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 
 		PersonCls person = (PersonCls) this.getItem();

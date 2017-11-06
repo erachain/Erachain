@@ -30,7 +30,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 
 public class License_JFrame extends JDialog {
@@ -62,7 +62,7 @@ public class License_JFrame extends JDialog {
     }
     	
     public License_JFrame() {
-    	this.note = (NoteCls)DBSet.getInstance().getItemNoteMap().get(Controller.getInstance().getWalletLicense());
+    	this.note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(Controller.getInstance().getWalletLicense());
     	needAccept = false;
         initComponents();
     }

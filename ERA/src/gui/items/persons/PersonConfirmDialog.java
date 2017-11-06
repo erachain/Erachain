@@ -33,7 +33,7 @@ import core.item.statuses.StatusCls;
 import core.transaction.R_Send;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
@@ -111,7 +111,7 @@ public class PersonConfirmDialog extends JDialog  {
 		}
 		
 		// SHOW account for FEE asset
-		Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DBSet.getInstance());
+		Tuple4<Long, Integer, Integer, Integer> addressDuration = account.getPersonDuration(DCSet.getInstance());
 		
 		if (addressDuration == null) {
 			personDetails += "<b>" + Lang.getInstance().translate("Ready for personalize") + "</b>";

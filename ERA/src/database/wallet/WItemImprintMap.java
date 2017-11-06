@@ -18,13 +18,14 @@ public class WItemImprintMap extends WItem_Map
 	static final int TYPE = ItemCls.IMPRINT_TYPE;
 
 
-	public WItemImprintMap(WalletDatabase walletDatabase, DB database)
+	public WItemImprintMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database,
+		super(dWSet, database,
 				TYPE, "item_imprints",
-				ObserverMessage.ADD_IMPRINT_TYPE,
-				ObserverMessage.REMOVE_IMPRINT_TYPE,
-				ObserverMessage.LIST_IMPRINT_TYPE
+				ObserverMessage.WALLET_RESET_IMPRINT_TYPE,
+				ObserverMessage.WALLET_ADD_IMPRINT_TYPE,
+				ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE,
+				ObserverMessage.WALLET_LIST_IMPRINT_TYPE
 				);
 	}
 

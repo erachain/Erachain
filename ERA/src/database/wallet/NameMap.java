@@ -24,8 +24,9 @@ import utils.Pair;
 import utils.ReverseComparator;
 import database.DBMap;
 import database.serializer.NameSerializer;
+import datachain.DCMap;
 
-public class NameMap extends DBMap<Tuple2<String, String>, Name>
+public class NameMap extends DCMap<Tuple2<String, String>, Name>
 {
 	public static final int NAME_INDEX = 1;
 	public static final int OWNER_INDEX = 2;
@@ -34,13 +35,14 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name>
 	
 	static Logger LOGGER = Logger.getLogger(NameMap.class.getName());
 
-	public NameMap(WalletDatabase walletDatabase, DB database)
+	public NameMap(DWSet dWSet, DB database)
 	{
-		super(walletDatabase, database);
+		super(dWSet, database);
 		
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_TYPE);
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_ADD_NAME_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_TYPE);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_TYPE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_TYPE);
 	}
 
 	public NameMap(NameMap parent) 

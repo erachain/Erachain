@@ -63,6 +63,41 @@ public class Message {
 	{
 		return this.type;
 	}
+	public static String viewType(int type)
+	{
+		switch (type) {
+			case 1:
+				return "GET_PEERS_TYPE";
+			case 2:
+				return "PEERS_TYPE";
+			case 4:
+				return "HWEIGHT_TYPE";
+			case 5:
+				return "GET_SIGNATURES_TYPE";
+			case 6:
+				return "SIGNATURES_TYPE";
+			case 7:
+				return "GET_BLOCK_TYPE";
+			case 8:
+				return "WIN_BLOCK_TYPE";
+			case 9:
+				return "BLOCK_TYPE";
+			case 10:
+				return "TRANSACTION_TYPE";
+			case 11:
+				return "PING_TYPE";
+			case 12:
+				return "VERSION_TYPE";
+			case 13:
+				return "FIND_MYSELF_TYPE";
+			default:
+				return "none";
+		}
+	}
+	public String viewType()
+	{
+		return viewType(this.type);
+	}
 	
 	public void setSender(Peer sender)
 	{

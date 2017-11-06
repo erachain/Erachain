@@ -21,8 +21,8 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.Order;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class CancelOrderTransaction extends Transaction
 {
@@ -158,7 +158,7 @@ public class CancelOrderTransaction extends Transaction
 	//VALIDATE
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		//CHECK IF ORDER EXISTS
 		Order order = null;
@@ -180,7 +180,7 @@ public class CancelOrderTransaction extends Transaction
 	
 	//PROCESS/ORPHAN
 
-	public static void process_it(DBSet db, Order order) 
+	public static void process_it(DCSet db, Order order) 
 	{
 		//SET ORPHAN DATA
 		db.getCompletedOrderMap().add(order);
@@ -195,7 +195,7 @@ public class CancelOrderTransaction extends Transaction
 	}
 	
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -204,7 +204,7 @@ public class CancelOrderTransaction extends Transaction
 		process_it(db, order);
 	}
 
-	public static void orphan_it(DBSet db, Order order) 
+	public static void orphan_it(DCSet db, Order order) 
 	{
 		db.getOrderMap().add(order);	
 		
@@ -217,7 +217,7 @@ public class CancelOrderTransaction extends Transaction
 		db.getCompletedOrderMap().delete(order);
 	}
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
@@ -278,13 +278,13 @@ public class CancelOrderTransaction extends Transaction
 
 		Order order;
 
-		if(DBSet.getInstance().getCompletedOrderMap().contains(this.order))
+		if(DCSet.getInstance().getCompletedOrderMap().contains(this.order))
 		{
-			order =  DBSet.getInstance().getCompletedOrderMap().get(this.order);
+			order =  DCSet.getInstance().getCompletedOrderMap().get(this.order);
 		}
 		else
 		{
-			order =  DBSet.getInstance().getOrderMap().get(this.order);
+			order =  DCSet.getInstance().getOrderMap().get(this.order);
 		}	
 		
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHaveLeft());

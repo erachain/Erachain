@@ -37,8 +37,8 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
-import database.AddressTime_SignatureMap;
-import database.DBSet;
+import datachain.AddressTime_SignatureMap;
+import datachain.DCSet;
 import settings.Settings;
 //import lang.Lang;
 //import settings.Settings;
@@ -346,7 +346,7 @@ public abstract class Transaction {
 	protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH + /*REFERENCE_LENGTH*/ + SIGNATURE_LENGTH;
 
 		
-	protected DBSet dbSet;
+	protected DCSet dcSet;
 	protected String TYPE_NAME = "unknown";
 	//protected int type;
 	protected byte[] typeBytes;
@@ -385,9 +385,9 @@ public abstract class Transaction {
 	}
 
 	//GETTERS/SETTERS
-	public void setDB(DBSet db, boolean asPack)
+	public void setDB(DCSet db, boolean asPack)
 	{
-		this.dbSet = db;
+		this.dcSet = db;
 		if (!asPack)
 			this.calcFee();
 	}
@@ -508,10 +508,13 @@ public abstract class Transaction {
 		return this.signature;
 	}
 	
+	/*
 	public Long getReference()
 	{
 		return this.reference;
-	}			
+	}
+	*/
+	
 	// for isValid - check reference value
 	public boolean isReferenced()
 	{
@@ -578,16 +581,22 @@ public abstract class Transaction {
 	}
 
 	// GET forged FEE without invited FEE
-	public int getForgedFee()
+	public int getForgedFee(DCSet db)
 	{
+		if (this.dcSet == null)
+			this.setDB(db, false);
+		
 		int fee = this.fee.unscaledValue().intValue();
 		int fee_invited = fee>>BlockChain.FEE_INVITED_SHIFT;
 		return fee - fee_invited;
 	}
 	
 	// GET only INVITED FEE
-	public int getInvitedFee()
+	public int getInvitedFee(DCSet db)
 	{
+		if (this.dcSet == null)
+			this.setDB(db, false);
+
 		int fee = this.fee.unscaledValue().intValue();
 		return fee>>BlockChain.FEE_INVITED_SHIFT;		
 	}
@@ -601,7 +610,7 @@ public abstract class Transaction {
 		this.block = block;
 	}
 
-	public Block getBlock(DBSet db) {
+	public Block getBlock(DCSet db) {
 		
 		if (block != null)
 			return block;
@@ -611,7 +620,7 @@ public abstract class Transaction {
 		return block;
 	}
 	
-	public Tuple2<Integer, Integer> getHeightSeqNo(DBSet db, Block block) {
+	public Tuple2<Integer, Integer> getHeightSeqNo(DCSet db, Block block) {
 		int transactionIndex = -1;
 		int blockIndex = -1;
 		if (block == null) {
@@ -630,7 +639,7 @@ public abstract class Transaction {
 
 	}
 	
-	public int getBlockHeight(DBSet db)
+	public int getBlockHeight(DCSet db)
 	{
 		if(this.isConfirmed(db))
 		{
@@ -640,7 +649,7 @@ public abstract class Transaction {
 	}
 	
 	// get current or -1
-	public int getBlockHeightByParent(DBSet db)
+	public int getBlockHeightByParent(DCSet db)
 	{
 
 		if (block != null)
@@ -650,7 +659,7 @@ public abstract class Transaction {
 	}
 
 	// get current or last
-	public int getBlockHeightByParentOrLast(DBSet db)
+	public int getBlockHeightByParentOrLast(DCSet db)
 	{
 
 		if (block != null)
@@ -659,7 +668,7 @@ public abstract class Transaction {
 		return Controller.getInstance().getMyHeight() + 1;
 	}
 
-	public int getSeqNo(DBSet db)
+	public int getSeqNo(DCSet db)
 	{
 		Block block = this.getBlock(db);
 		if (block == null)
@@ -670,7 +679,7 @@ public abstract class Transaction {
 	}
 	
 	// reference in Map - or as signatire or as BlockHeight + seqNo
-	public byte[] getDBRef(DBSet db)
+	public byte[] getDBRef(DCSet db)
 	{
 		if(this.getConfirmations(db) < BlockChain.MAX_ORPHAN)
 		{
@@ -689,12 +698,12 @@ public abstract class Transaction {
 		
 	}
 	
-	public static Transaction findByHeightSeqNo(DBSet db, int height, int seq) {
+	public static Transaction findByHeightSeqNo(DCSet db, int height, int seq) {
 		return db.getTransactionFinalMap().getTransaction(height, seq);
 	}
 
 	// reference in Map - or as signatire or as BlockHeight + seqNo
-	public static Transaction findByDBRef(DBSet db, byte[] dbRef)
+	public static Transaction findByDBRef(DCSet db, byte[] dbRef)
 	{
 		
 		if (dbRef == null) return null;
@@ -703,7 +712,7 @@ public abstract class Transaction {
 		if(dbRef.length > 20)
 		{
 			// soft or hard confirmations
-			key = db.getTransactionFinalMapSigns().get(dbRef);
+			key = db.getTransactionFinalMap().getHeightSegBySignature(dbRef);
 			if (key == null) {
 				return db.getTransactionMap().get(dbRef);
 			}
@@ -735,7 +744,7 @@ public abstract class Transaction {
 		String sub = viewSubTypeName();
 		return sub.length() > 0? viewTypeName() + ":" + sub: viewTypeName();
 	}
-	public String viewHeightSeq(DBSet db) {
+	public String viewHeightSeq(DCSet db) {
 		int seq = this.getSeqNo(db);
 		if (seq <1)
 			return "???";
@@ -755,10 +764,12 @@ public abstract class Transaction {
 	public String viewRecipient() {
 		return "";
 	}
+	/*
 	public String viewReference() {
 		//return reference==null?"null":Base58.encode(reference);
 		return reference==null?"null":"" + reference;
 	}
+	*/
 	public String viewSignature() {
 		return signature==null?"null":Base58.encode(signature);
 	}
@@ -784,11 +795,12 @@ public abstract class Transaction {
 	@SuppressWarnings("unchecked")
 	protected JSONObject getJsonBase()
 	{
+		
 		JSONObject transaction = new JSONObject();
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
-		transaction.put("confirmations", this.getConfirmations(DBSet.getInstance()));
+		transaction.put("confirmations", this.getConfirmations(DCSet.getInstance()));
 		transaction.put("type_name", this.viewTypeName());
 		transaction.put("sub_type_name", this.viewSubTypeName());
 		
@@ -796,13 +808,16 @@ public abstract class Transaction {
 		if (this.creator == null )
 		{
 			transaction.put("creator", "genesis");
-			transaction.put("reference", "genesis");
+			//transaction.put("reference", "genesis");
 			transaction.put("signature", "genesis");
 			height = 1;
 		} else {
-			height = this.getBlockHeight(DBSet.getInstance());
-			transaction.put("reference", this.reference==null?"null":"" + this.reference);
+			height = this.getBlockHeight(DCSet.getInstance());
+			//transaction.put("reference", this.reference==null?"null":"" + this.reference);
 			transaction.put("signature", this.signature==null?"null":Base58.encode(this.signature));
+			if (this.fee.signum() == 0) {
+				this.setDB(DCSet.getInstance(), false);
+			}
 			transaction.put("fee", this.fee.toPlainString());
 			transaction.put("timestamp", this.timestamp<1000?"null":this.timestamp);
 			transaction.put("creator", this.creator.getAddress());
@@ -813,7 +828,7 @@ public abstract class Transaction {
 		
 		transaction.put("height", height);
 		if (height > 0)
-			transaction.put("sequence", this.getSeqNo(DBSet.getInstance()));
+			transaction.put("sequence", this.getSeqNo(DCSet.getInstance()));
 		transaction.put("size", this.viewSize(false));
 		return transaction;
 	}
@@ -825,20 +840,20 @@ public abstract class Transaction {
 		
 		JSONObject transaction = new JSONObject();
 		
-		transaction.put("confirmations", this.getConfirmations(DBSet.getInstance()));
+		transaction.put("confirmations", this.getConfirmations(DCSet.getInstance()));
 		
 		int height;
 		if (this.creator == null )
 		{
 			height = 1;
 		} else {
-			height = this.getBlockHeight(DBSet.getInstance());
+			height = this.getBlockHeight(DCSet.getInstance());
 			transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
 		}
 
 		transaction.put("height", height);
 		if (height > 0)
-			transaction.put("sequence", this.getSeqNo(DBSet.getInstance()));
+			transaction.put("sequence", this.getSeqNo(DCSet.getInstance()));
 		
 		boolean isSigned = this.signature!=null;
 		transaction.put("signature", isSigned?Base58.encode(this.signature):"null");
@@ -846,7 +861,7 @@ public abstract class Transaction {
 		transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
 		
 		transaction.put("block", block);
-		transaction.put("nom_in_block", viewHeightSeq(DBSet.getInstance()));
+		transaction.put("nom_in_block", viewHeightSeq(DCSet.getInstance()));
 		
 		return transaction;
 	}
@@ -964,16 +979,16 @@ public abstract class Transaction {
 	
 	public int isValid(Long releaserReference)
 	{
-		return isValid(DBSet.getInstance(), releaserReference);
+		return isValid(DCSet.getInstance(), releaserReference);
 	}
 	
-	public int isValid(DBSet db, Long releaserReference)
+	public int isValid(DCSet db, Long releaserReference)
 	{
 	
 		//CHECK IF REFERENCE IS OK
 		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
 		if (reference != null && this.isReferenced()) {
-			if (reference.compareTo(this.reference) != 0)
+			if (false && reference.compareTo(this.reference) >= 0)
 				return INVALID_REFERENCE;
 			else if (reference.compareTo(this.timestamp) >= 0)
 				return INVALID_TIMESTAMP;
@@ -1009,7 +1024,7 @@ public abstract class Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process_gifts(DBSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
+	public void process_gifts(DCSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
 		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(db);
 		//byte[] recordSignature = record.getSignature();
 		// TODO if PERSON die - skip it steep
@@ -1048,7 +1063,7 @@ public abstract class Transaction {
 	}
 
 	//public abstract void process(DBSet db);
-	public void process(DBSet db, Block block, boolean asPack)
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 	
 		this.block = block;
@@ -1062,10 +1077,7 @@ public abstract class Transaction {
 
 			}
 						
-			if (true || !db.isFork()) {
-				// calc INVITED FEE if its not a FORK
-				process_gifts(db, 0, getInvitedFee(), this.creator, false);
-			}
+			process_gifts(db, 0, getInvitedFee(db), this.creator, false);
 
 			String creatorAddress = this.creator.getAddress();
 			AddressTime_SignatureMap dbASmap = db.getAddressTime_SignatureMap();
@@ -1077,12 +1089,12 @@ public abstract class Transaction {
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() )
 				// IT IS REFERENCED RECORD?
-				this.creator.setLastReference(this.timestamp, db);
+				this.creator.setLastTimestamp(this.timestamp, db);
 		}
 
 	}
 	
-	public void orphan(DBSet db, boolean asPack)
+	public void orphan(DCSet db, boolean asPack)
 	{
 		
 		if (!asPack) {
@@ -1092,16 +1104,14 @@ public abstract class Transaction {
 
 			}
 			
-			if (true || !db.isFork()) {
-				// calc INVITED FEE if its not a FORK
-				process_gifts(db, 0, getInvitedFee(), this.creator, true);
-			}
+			// calc INVITED FEE
+			process_gifts(db, 0, getInvitedFee(db), this.creator, true);
 
 			//UPDATE REFERENCE OF SENDER
 			if (this.isReferenced() ) {
 				// IT IS REFERENCED RECORD?
-				this.creator.setLastReference(this.reference, db);
 				// set last transaction signature for this ACCOUNT
+				this.creator.removeLastTimestamp(db);
 			}
 
 			db.getAddressTime_SignatureMap().delete(creator, timestamp);
@@ -1150,12 +1160,12 @@ public abstract class Transaction {
 	}
 	*/
 	
-	public boolean isConfirmed(DBSet db)
+	public boolean isConfirmed(DCSet db)
 	{
 		return db.getTransactionRef_BlockRef_Map().contains(this.getSignature());
 	}
 	
-	public int getConfirmations(DBSet db)
+	public int getConfirmations(DCSet db)
 	{
 		
 		try
@@ -1184,7 +1194,7 @@ public abstract class Transaction {
 		}
 	}
 
-	public int getBlockVersion(DBSet db)
+	public int getBlockVersion(DCSet db)
 	{
 		// IF ALREADY IN THE BLOCK. CONFIRMED 
 		if(this.isConfirmed(db))
@@ -1194,7 +1204,7 @@ public abstract class Transaction {
 		}
 		
 		// IF UNCONFIRMED
-		return Controller.getInstance().getLastBlock().getNextBlockVersion(DBSet.getInstance());	
+		return Controller.getInstance().getLastBlock().getNextBlockVersion(DCSet.getInstance());	
 	}
 
 	public static Map<String, Map<Long, BigDecimal>> subAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount, String address, Long assetKey, BigDecimal amount) 

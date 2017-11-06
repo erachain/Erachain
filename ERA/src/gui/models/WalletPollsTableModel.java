@@ -13,8 +13,8 @@ import utils.Pair;
 import controller.Controller;
 import core.block.Block;
 import core.voting.Poll;
-import database.SortableList;
 import database.wallet.PollMap;
+import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")

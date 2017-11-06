@@ -38,7 +38,7 @@ import core.transaction.R_SignNote;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import core.transaction.VoteOnPollTransaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.Gui;
 import gui.items.statement.Statements_Vouch_Table_Model;
 import gui.models.PollOptionsTableModel;
@@ -401,7 +401,7 @@ public class WEB_Transactions_HTML {
 		// TODO Auto-generated method stub
 		String out = "";
 		R_Vouch vouchRecord = (R_Vouch) transaction;
-		Transaction record = DBSet.getInstance().getTransactionFinalMap().getTransaction(vouchRecord.getVouchHeight(),
+		Transaction record = DCSet.getInstance().getTransactionFinalMap().getTransaction(vouchRecord.getVouchHeight(),
 				vouchRecord.getVouchSeq());
 		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
@@ -574,7 +574,7 @@ public class WEB_Transactions_HTML {
 	out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>"+ Lang.getInstance().translate_from_langObj("Transaction", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Date", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Creator", langObj)+"</tr>";
 	for (int i = 0; i<row_count; i++){
 	out += "<tr>";
-	out += "<td><a href=?tx="+  Base58.encode(model.getTrancaction(i).getSignature())+ get_Lang(langObj) +  ">" + model.getTrancaction(i).getBlockHeight(DBSet.getInstance())+ "-" + model.getTrancaction(i).getSeqNo(DBSet.getInstance()) + "</a>";
+	out += "<td><a href=?tx="+  Base58.encode(model.getTrancaction(i).getSignature())+ get_Lang(langObj) +  ">" + model.getTrancaction(i).getBlockHeight(DCSet.getInstance())+ "-" + model.getTrancaction(i).getSeqNo(DCSet.getInstance()) + "</a>";
 	out +="<td>" + model.getValueAt(i, 0);
 	out +="<td>";
 	Transaction tr = model.getTrancaction(i);

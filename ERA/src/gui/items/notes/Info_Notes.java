@@ -3,7 +3,7 @@ package gui.items.notes;
 import core.block.GenesisBlock;
 import core.item.notes.NoteCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import gui.library.Accounts_Library_Panel;
 import gui.library.M_Accoutn_Text_Field;
 import gui.library.Statuses_Library_Panel;
@@ -149,7 +149,7 @@ public class Info_Notes extends javax.swing.JPanel {
 		
 
 		// vouch panel
-		Transaction trans = Transaction.findByDBRef(DBSet.getInstance(), note.getReference());
+		Transaction trans = Transaction.findByDBRef(DCSet.getInstance(), note.getReference());
 		jTabbedPane1.add(new Voush_Library_Panel(trans));
 
        

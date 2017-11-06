@@ -34,7 +34,7 @@ import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 
 @Path("at")
 @Produces(MediaType.APPLICATION_JSON)
@@ -47,7 +47,7 @@ public class ATResource
 	@Path("id/{id}")
 	public static String getAT(@PathParam("id") String id)
 	{
-		return DBSet.getInstance().getATMap().getAT(id).toJSON().toJSONString();
+		return DCSet.getInstance().getATMap().getAT(id).toJSON().toJSONString();
 	}
 	
 	@GET
@@ -61,7 +61,7 @@ public class ATResource
 	@Path("/transactions/id/{id}")
 	public static String getATTransactionsBySender(@PathParam("id") String id)
 	{
-		List<AT_Transaction> txs = DBSet.getInstance().getATTransactionMap().getATTransactionsBySender(id);
+		List<AT_Transaction> txs = DCSet.getInstance().getATTransactionMap().getATTransactionsBySender(id);
 		
 		JSONArray json = new JSONArray();
 		for ( AT_Transaction tx : txs )
@@ -77,7 +77,7 @@ public class ATResource
 	@Path("/creator/{creator}")
 	public static String getATsByCreator(@PathParam("creator") String creator)
 	{
-		Iterable<String> ats = DBSet.getInstance().getATMap().getATsByCreator(creator);
+		Iterable<String> ats = DCSet.getInstance().getATMap().getATsByCreator(creator);
 		Iterator<String> iter = ats.iterator();
 		
 		JSONArray json = new JSONArray();
@@ -93,7 +93,7 @@ public class ATResource
 	@Path("/type/{type}")
 	public String getATsByType(@PathParam("type") String type)
 	{
-		Iterable<String> ats = DBSet.getInstance().getATMap().getTypeATs(type);
+		Iterable<String> ats = DCSet.getInstance().getATMap().getTypeATs(type);
 		Iterator<String> iter = ats.iterator();
 		
 		JSONArray json = new JSONArray();
@@ -110,7 +110,7 @@ public class ATResource
 	@Path("/transactions/recipient/{id}")
 	public static String getATTransactionsByRecipient(@PathParam("id") String id)
 	{
-		List<AT_Transaction> txs = DBSet.getInstance().getATTransactionMap().getATTransactionsByRecipient(id);
+		List<AT_Transaction> txs = DCSet.getInstance().getATTransactionMap().getATTransactionsByRecipient(id);
 		
 		JSONArray json = new JSONArray();
 		for ( AT_Transaction tx : txs )
@@ -126,7 +126,7 @@ public class ATResource
 	@Path("limit/{limit}")
 	public String getATsLimited(@PathParam("limit") int limit)
 	{
-		Iterable<String> ids = DBSet.getInstance().getATMap().getATsLimited(limit);
+		Iterable<String> ids = DCSet.getInstance().getATMap().getATsLimited(limit);
 		JSONArray jsonArray = new JSONArray();
 		Iterator<String> iter = ids.iterator();
 		while (iter.hasNext())
@@ -276,8 +276,8 @@ public class ATResource
 			long lFee = Longs.fromByteArray(feePowBytes);
 			
 			
-			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DBSet.getInstance().getBlockMap().getLastBlock()
-					.getHeight(DBSet.getInstance())) > lFee )
+			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DCSet.getInstance().getBlockMap().getLastBlock()
+					.getHeight(DCSet.getInstance())) > lFee )
 			{
 				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_FEE_POWER );
 			}
@@ -301,8 +301,8 @@ public class ATResource
 			ByteBuffer creation = ByteBuffer.allocate(creationLength);
 			creation.order(ByteOrder.LITTLE_ENDIAN);
 			
-			creation.putShort(AT_Constants.getInstance().AT_VERSION( DBSet.getInstance().getBlockMap().getLastBlock()
-					.getHeight(DBSet.getInstance()) ));
+			creation.putShort(AT_Constants.getInstance().AT_VERSION( DCSet.getInstance().getBlockMap().getLastBlock()
+					.getHeight(DCSet.getInstance()) ));
 			creation.putShort((short)0);
 			creation.putShort((short)cpages);
 			creation.putShort((short)dpages);

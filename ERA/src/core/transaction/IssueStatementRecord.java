@@ -25,8 +25,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.item.ItemCls;
-//import database.BalanceMap;
-import database.DBSet;
+import datachain.DCSet;
 
 
 // issue statement
@@ -419,7 +418,7 @@ public class IssueStatementRecord extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) {
+	public int isValid(DCSet db, Long releaserReference) {
 		
 		//CHECK DATA SIZE
 		if(data.length > BlockChain.MAX_REC_DATA_BYTES || data.length < 1)

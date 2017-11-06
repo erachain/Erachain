@@ -27,7 +27,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import core.naming.NameSale;
-import database.NameExchangeMap;
+import database.DBMap;
+import datachain.NameExchangeMap;
 
 @SuppressWarnings("serial")
 public class AllNameSalesPanel extends JPanel {
@@ -78,7 +79,7 @@ public class AllNameSalesPanel extends JPanel {
 		
 		//NAMESALES SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(NameSalesTableModel.COLUMN_NAME, NameExchangeMap.DEFAULT_INDEX);
+		indexes.put(NameSalesTableModel.COLUMN_NAME, DBMap.DEFAULT_INDEX);
 		indexes.put(NameSalesTableModel.COLUMN_PRICE, NameExchangeMap.AMOUNT_INDEX);
 		CoreRowSorter sorter = new CoreRowSorter(this.nameSalesTableModel, indexes);
 		nameSalesTable.setRowSorter(sorter);

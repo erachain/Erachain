@@ -11,7 +11,7 @@ import javax.validation.constraints.Null;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
-import database.SortableList;
+import datachain.SortableList;
 import gui.models.TableModelCls;
 import utils.NumberAsString;
 import utils.ObserverMessage;

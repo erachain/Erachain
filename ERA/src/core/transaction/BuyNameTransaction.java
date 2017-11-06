@@ -22,8 +22,8 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.naming.Name;
 import core.naming.NameSale;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class BuyNameTransaction extends Transaction
 {
@@ -191,7 +191,7 @@ public class BuyNameTransaction extends Transaction
 	
 	//VALIDATE
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -257,7 +257,7 @@ public class BuyNameTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -279,7 +279,7 @@ public class BuyNameTransaction extends Transaction
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);

@@ -76,7 +76,7 @@ import core.transaction.Transaction;
 public class Account_Send_Panel extends JPanel
 {
 	//private final MessagesTableModel messagesTableModel;
-    private final JTable table;
+ //   private final JTable table;
     // TODO - "A" - &
     final static String wrongFirstCharOfAddress = "A";
     
@@ -516,15 +516,15 @@ public class Account_Send_Panel extends JPanel
     	
     	//MESSAGES HISTORY TABLE
 
-    	table = new Send_TableModel();
+    //	table = new Send_TableModel();
     	
-    	table.setTableHeader(null);
+    //	table.setTableHeader(null);
     
-    	table.setEditingColumn(0);
-    	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    	JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setPreferredSize(new Dimension(100, 100));
-        scrollPane.setWheelScrollingEnabled(true);
+    //	table.setEditingColumn(0);
+    //	table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+  //  	JScrollPane scrollPane = new JScrollPane(table);
+   //     scrollPane.setPreferredSize(new Dimension(100, 100));
+   //     scrollPane.setWheelScrollingEnabled(true);
 
         //BOTTOM GBC
 		GridBagConstraints messagesGBC = new GridBagConstraints();
@@ -550,7 +550,7 @@ public class Account_Send_Panel extends JPanel
 		MenuPopupUtil.installContextMenu(txtMessage);
 		MenuPopupUtil.installContextMenu(txtRecDetails);
 		
-		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+		/*ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
 		service.scheduleWithFixedDelay(	new Runnable() { 
 			public void run() {
 				
@@ -558,7 +558,7 @@ public class Account_Send_Panel extends JPanel
 				
 			}}, 0, 500, TimeUnit.MILLISECONDS);
 		
- 
+ */
         /*
         this.pack();
 		this.setLocationRelativeTo(null);

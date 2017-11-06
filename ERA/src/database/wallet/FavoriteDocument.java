@@ -20,8 +20,9 @@ import core.transaction.Transaction;
 import utils.ObserverMessage;
 import utils.Pair;
 import database.DBMap;
-import database.DBSet;
 import database.serializer.TransactionSerializer;
+import datachain.DCMap;
+import datachain.DCSet;
 
 // memory pool for unconfirmed transaction
 // tx.signature -> <<broadcasted peers>, transaction>
@@ -29,18 +30,17 @@ import database.serializer.TransactionSerializer;
 // тут надо запминать каким пирам мы уже разослали транзакцию неподтвержденную
 // так что бы при подключении делать автоматически broadcast
 
-public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction> implements Observer {
+public class FavoriteDocument extends DCMap<Tuple2<String, String>, Transaction> implements Observer {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
 	static Logger LOGGER = Logger.getLogger(TransactionMap.class.getName());
 
-	public FavoriteDocument(WalletDatabase walletDatabase, DB database) {
-		super(walletDatabase, database);
-		
-		
+	public FavoriteDocument(DWSet dWSet, DB database) {
+		super(dWSet, database);
 
-		DBSet.getInstance().getTransactionFinalMap().addObserver(this); 
+		DCSet.getInstance().getTransactionFinalMap().addObserver(this); 
+		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_STATEMENT_FAVORITES_TYPE);
@@ -158,7 +158,7 @@ public class FavoriteDocument extends DBMap<Tuple2<String, String>, Transaction>
 	}
 
 	public void removeObserver_FinalMap() {
-		DBSet.getInstance().getTransactionFinalMap().deleteObserver(this);
+		DCSet.getInstance().getTransactionFinalMap().deleteObserver(this);
 
 	}
 

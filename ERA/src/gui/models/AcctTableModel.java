@@ -10,10 +10,10 @@ import controller.Controller;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.SortableList;
 import utils.Converter;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import database.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -142,9 +142,10 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_AT_TYPE || message.getType() == ObserverMessage.REMOVE_AT_TYPE ||
-				message.getType() == ObserverMessage.REMOVE_AT_TX || message.getType() == ObserverMessage.ADD_AT_TX_TYPE ||
-				message.getType() == ObserverMessage.ADD_BLOCK_TYPE)
+		if(//message.getType() == ObserverMessage.ADD_AT_TYPE || message.getType() == ObserverMessage.REMOVE_AT_TYPE ||
+				//message.getType() == ObserverMessage.ADD_AT_TX_TYPE || message.getType() == ObserverMessage.REMOVE_AT_TX ||
+				message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
+				|| message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE)
 		{
 			
 			//CHECK IF LIST UPDATED
@@ -158,11 +159,9 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 			if(this.ats == null) {
 				this.ats = Controller.getInstance().getAcctATs(type, initiators);
 			}
-		}
-		
-		//STATUS_OK
-		if(message.getType() == ObserverMessage.NETWORK_STATUS )
+		} else if(message.getType() == ObserverMessage.NETWORK_STATUS )
 		{
+			//STATUS_OK
 			if((int)message.getValue() == Controller.STATUS_OK)
 			{
 				this.fireTableDataChanged();

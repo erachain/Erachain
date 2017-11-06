@@ -17,7 +17,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.DBSet;
+import datachain.DCSet;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -41,8 +41,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	public AccountsTableModel()
 	{
 		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-		Controller.getInstance().addWalletListener(this);
-		Controller.getInstance().addObserver(this);
+		Controller.getInstance().wallet.database.getAccountMap().addObserver(this);
+		
 	}
 	
 	
@@ -116,7 +116,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			return account.getPersonAsString();
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
-			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
+			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
 			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 	/*
@@ -174,26 +174,22 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 	{
 		ObserverMessage message = (ObserverMessage) arg;
 		
-		if( message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK ) {
-			
-			this.fireTableRowsUpdated(0, this.getRowCount()-1);
-			
-		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-			
-			if(message.getType() == ObserverMessage.ADD_BLOCK_TYPE || message.getType() == ObserverMessage.REMOVE_BLOCK_TYPE || message.getType() == ObserverMessage.ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE)
+		
+						
+			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE)
 			{
-				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();	
-				
-				this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
+				this.publicKeyAccounts.add(((PublicKeyAccount)message.getValue()));
+				this.fireTableDataChanged();	
 			}
-			
-			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
+					
+			if(message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 			{
 	// обновляем данные
-				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+				
+				this.publicKeyAccounts.remove(((PublicKeyAccount)message.getValue()));
 				this.fireTableDataChanged();
 			}
-		}
+		
 	
 		
 	
@@ -211,10 +207,16 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 			}
 			else
 			{
-				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DBSet.getInstance())));
+				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DCSet.getInstance())));
 			}
 		}
 		
 		return totalBalance;
+	}
+	
+	public void deleteObserver(){
+		
+		Controller.getInstance().wallet.database.getAccountMap().deleteObserver(this);
+		
 	}
 }

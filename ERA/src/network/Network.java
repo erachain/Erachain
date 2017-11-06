@@ -17,20 +17,24 @@ import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
+//import core.BlockChain;
 import core.transaction.Transaction;
-import database.DBSet;
-import database.TransactionMap;
-import lang.Lang;
+//import database.DBSet;
+//import database.TransactionMap;
+import datachain.DCSet;
+//import lang.Lang;
 import network.message.FindMyselfMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
 
 public class Network extends Observable implements ConnectionCallback {
 
 	
-	private static final int MAX_HANDLED_MESSAGES_SIZE = 10000;
+	public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK?1:4;
+	private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
 	
 	private ConnectionCreator creator;
 	private ConnectionAcceptor acceptor;
@@ -52,7 +56,12 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		this.start();
 	}
-	
+
+	public static InetAddress getMyselfAddress()
+	{	
+		return myselfAddress;
+	}
+
 	private void start()
 	{
 		this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
@@ -70,16 +79,15 @@ public class Network extends Observable implements ConnectionCallback {
 	public void onConnect(Peer peer, boolean asNew) {
 		
 		//LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
-		
+
 		if (asNew) {
 			//ADD TO CONNECTED PEERS
 			synchronized(this.knownPeers)
 			{
 				this.knownPeers.add(peer);
 			}
-			
 		}
-		
+					
 		//ADD TO DATABASE
 		PeerManager.getInstance().addPeer(peer, 0);
 		
@@ -91,10 +99,10 @@ public class Network extends Observable implements ConnectionCallback {
 
 		//NOTIFY OBSERVERS
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, peer));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));		
 		
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
 	}
 
 	@Override
@@ -103,14 +111,14 @@ public class Network extends Observable implements ConnectionCallback {
 		if (!peer.isUsed())
 			return;
 
-		LOGGER.info("tryDisconnect : " + peer.getAddress().getHostAddress());
+		///LOGGER.info("tryDisconnect : " + peer.getAddress().getHostAddress() + " - " + error);
 		if (banForMinutes != 0) { 
-			LOGGER.info("     ban for minutes: " + banForMinutes);
+			LOGGER.info(peer.getAddress().getHostAddress() + " ban for minutes: " + banForMinutes + " - " + error);
 			//ADD TO BLACKLIST
 			PeerManager.getInstance().addPeer(peer, banForMinutes);
 		}
-		if (error != null) 
-			LOGGER.info("     mess: " + error);
+		
+		//if (error != null) LOGGER.info("     mess: " + error);
 		
 		//CLOSE CONNECTION IF STILL ACTIVE
 		peer.close();
@@ -120,10 +128,10 @@ public class Network extends Observable implements ConnectionCallback {
 
 		//NOTIFY OBSERVERS
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, peer));		
-		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_PEER_TYPE, peer));		
+
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
 	}
 		
 	@Override
@@ -261,7 +269,7 @@ public class Network extends Observable implements ConnectionCallback {
 		
 	}
 	
-	private void addHandledMessage(byte[] hash)
+	private void addHandledMessage(String hash)
 	{
 		try
 		{
@@ -273,7 +281,7 @@ public class Network extends Observable implements ConnectionCallback {
 					this.handledMessages.remove(this.handledMessages.first());
 				}
 				
-				this.handledMessages.add(new String(hash));
+				this.handledMessages.add(hash);
 			}
 		}
 		catch(Exception e)
@@ -300,13 +308,14 @@ public class Network extends Observable implements ConnectionCallback {
 			synchronized(this.handledMessages)
 			{
 				//CHECK IF NOT HANDLED ALREADY
-				if(this.handledMessages.contains(new String(message.getHash())))
+				String key = new String(message.getHash());
+				if(this.handledMessages.contains(key))
 				{
 					return;
 				}
 				
 				//ADD TO HANDLED MESSAGES
-				this.addHandledMessage(message.getHash());
+				this.addHandledMessage(key);
 			}
 		}		
 		
@@ -319,10 +328,14 @@ public class Network extends Observable implements ConnectionCallback {
 			Message response = MessageFactory.getInstance().createPingMessage();
 			
 			//SET ID
-			response.setId(message.getId());
+			//////response.setId(message.getId());
 			
 			//SEND BACK TO SENDER
-			message.getSender().sendMessage(response);
+			boolean result = message.getSender().sendMessage(response);
+			if (!result) {
+				LOGGER.error("error on response PING_TYPE to " + message.getSender());
+			}
+				
 			
 			break;
 		
@@ -379,7 +392,16 @@ public class Network extends Observable implements ConnectionCallback {
 				//EXCLUDE PEERS
 				if(peer != null && (exclude == null || !exclude.contains(peer)))
 				{
+					long start = System.currentTimeMillis();
+					if (message.getType() == Message.WIN_BLOCK_TYPE) {
+						int length = message.toBytes().length;
+						LOGGER.error("SEND WIN_BLOCK_TYPE) to " + peer.getAddress().getHostAddress() + " bytes length (kB): " + (length>>10) );
+					}
 					peer.sendMessage(message);
+					if (message.getType() == Message.WIN_BLOCK_TYPE) {
+						long tickets = System.currentTimeMillis() - start;
+						LOGGER.error("SENDED time " + tickets);
+					}
 				}
 			}	
 		}
@@ -396,25 +418,38 @@ public class Network extends Observable implements ConnectionCallback {
 	{		
 
 		byte[] peerByte = peer.getAddress().getAddress();
-		DBSet dbSet = DBSet.getInstance();
-		TransactionMap dbMap = dbSet.getTransactionMap();
-				
+		DCSet dcSet = DCSet.getInstance();
+		datachain.TransactionMap dcMap = dcSet.getTransactionMap();
+		
+		int i = 0;
 		for (Transaction transaction: transactions) {
 
 			if (!this.run || !peer.isUsed()) {
 				return;
 			}
-							
+
+			/*
+			if(transaction.getDeadline() < NTP.getTime())
+			{
+				dcMap.delete(transaction.getSignature());
+				continue;
+			}
+			*/
+
+			i++;
+			if (i > 100)
+				return;
+			
 			Message message = MessageFactory.getInstance()
 					.createTransactionMessage(transaction);
 
-			if (dbMap.isBroadcastedToPeer(transaction, peerByte))
+			if (dcMap.isBroadcastedToPeer(transaction, peerByte))
 				continue;
 			
 			try
 			{
 				if (peer.sendMessage(message)) {
-					dbMap.addBroadcastedPeer(transaction, peerByte);
+					dcMap.addBroadcastedPeer(transaction, peerByte);
 				}
 			} catch(Exception e)
 			{

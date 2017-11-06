@@ -24,8 +24,8 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.payment.Payment;
-import database.ItemAssetBalanceMap;
-import database.DBSet;
+import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 
 public class MultiPaymentTransaction extends Transaction {
 
@@ -217,7 +217,7 @@ public class MultiPaymentTransaction extends Transaction {
 	//VALIDATE
 	
 	//@Override
-	public int isValid(DBSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
 		//CHECK PAYMENTS SIZE
@@ -227,7 +227,7 @@ public class MultiPaymentTransaction extends Transaction {
 		}
 		
 		//REMOVE FEE
-		DBSet fork = db.fork();
+		DCSet fork = db.fork();
 		//this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
 		this.creator.changeBalance(fork, true, FEE_KEY, this.fee);
 		
@@ -280,7 +280,7 @@ public class MultiPaymentTransaction extends Transaction {
 	//PROCESS/ORPHAN
 	
 	//@Override
-	public void process(DBSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -291,15 +291,15 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.process(this.creator, db);
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(payment.getRecipient().getLastReference(db) == null)
+			if(false && payment.getRecipient().getLastReference(db) == null)
 			{
-				payment.getRecipient().setLastReference(this.timestamp, db);
+				payment.getRecipient().setLastTimestamp(this.timestamp, db);
 			}		
 		}
 	}
 
 	//@Override
-	public void orphan(DBSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack) 
 	{
 		//UPDATE CREATOR
 		super.orphan(db, asPack);
@@ -310,9 +310,9 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.orphan(this.creator, db);
 								
 			//UPDATE REFERENCE OF RECIPIENT
-			if(payment.getRecipient().getLastReference(db).equals(this.timestamp))
+			if(false && payment.getRecipient().getLastReference(db).equals(this.timestamp))
 			{
-				payment.getRecipient().removeReference(db);
+				payment.getRecipient().setLastTimestamp(this.reference, db);
 			}
 		}
 	}
