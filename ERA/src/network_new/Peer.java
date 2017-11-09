@@ -35,7 +35,7 @@ public class Peer extends Thread{
 	private Socket socket;
 	// KEEP_ALIVE = false - as web browser - getConnectionTimeout will break connection
 	private static boolean KEEP_ALIVE = true;
-	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<10:1024<<6;
+	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<12:1024<<8;
 	private OutputStream out;
 	private Pinger pinger;
 	private boolean white;

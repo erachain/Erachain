@@ -1078,6 +1078,21 @@ public class Controller extends Observable {
 	public void actionAfterConnect() 
 	{
 		
+		///////// UNCONFIRMED MAP CLEAR
+		this.timerUnconfirmed.cancel();
+		this.timerUnconfirmed = new Timer();
+
+		TimerTask actionUnconfirmed = new TimerTask() {
+	        public void run() {
+	        	
+				LOGGER.debug("timerUnconfirmed ---------------- ");
+	       		Controller.getInstance().clearUnconfirmedRecords();	        	
+
+	        }
+		};
+			
+		this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
+
 		if (BlockChain.HARD_WORK || !this.doesWalletExists() || !this.useGui)
 			return;
 		
@@ -1113,21 +1128,6 @@ public class Controller extends Observable {
 			
 		this.timer.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1);
 		
-		///////// UNCONFIRMED MAP CLEAR
-		this.timerUnconfirmed.cancel();
-		this.timerUnconfirmed = new Timer();
-
-		TimerTask actionUnconfirmed = new TimerTask() {
-	        public void run() {
-	        	
-				LOGGER.debug("timerUnconfirmed ---------------- ");
-	       		Controller.getInstance().clearUnconfirmedRecords();	        	
-
-	        }
-		};
-			
-		this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
-
 	}
 	
 	

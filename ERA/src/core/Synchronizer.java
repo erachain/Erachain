@@ -539,11 +539,20 @@ public class Synchronizer
 
 		if (response == null) {
 			// cannot retrieve headers
-			peer.ban(20, "Cannot retrieve headers");
+			peer.ban(3, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
 		}
+		
+		List<byte[]> signatures = response.getSignatures();
+		if (signatures.size() == 0) {
+			//peer.ban(20, "result HEADERS is EMPTY");
+			//throw new Exception("result HEADERS is EMPTY");			
+		} else {
+			// remove my FINDED HEADER
+			signatures.remove(0);
+		}
 
-		return response.getSignatures();
+		return signatures;
 	}
 	
 	private Tuple2<byte[], List<byte[]>> findHeaders(Peer peer, int peerHeight, byte[] lastBlockSignature, int checkPointHeight) throws Exception
