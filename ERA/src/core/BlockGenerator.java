@@ -244,7 +244,6 @@ public class BlockGenerator extends Thread implements Observer
 					ctrl.setForgingStatus(ForgingStatus.FORGING_WAIT);
 					try
 					{
-						ctrl.clearWaitWinBufferProcessed();
 						while (bchain.getHeight(dcSet) > this.orphanto) {
 							ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
 						}

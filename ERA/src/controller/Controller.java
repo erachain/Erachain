@@ -1111,6 +1111,7 @@ public class Controller extends Observable {
 
     public void setOrphanTo(int height)
     {
+    	this.blockChain.clearWaitWinBuffer();
     	this.blockGenerator.setOrphanTo(height);
     }	
 
