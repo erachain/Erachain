@@ -687,18 +687,21 @@ public class Wallet extends Observable implements Observer
 		}
 
 		int steepHeight = BlockChain.BLOCKS_PER_DAY;
-		int maxHeight = Controller.getInstance().getMyHeight();
-		if (maxHeight < steepHeight)
-				steepHeight = maxHeight;
-		steepHeight /=100;
-		if (steepHeight <1)
-			steepHeight = 1;
 		
 		
 		try{
 			this.syncHeight = height;
 			do
 			{
+				int maxHeight = Controller.getInstance().getMyHeight();
+				if (maxHeight < steepHeight)
+						steepHeight = maxHeight;
+				steepHeight /=100;
+				if (steepHeight <10)
+					steepHeight = 3;
+				else if (steepHeight > BlockChain.BLOCKS_PER_DAY)
+					steepHeight = BlockChain.BLOCKS_PER_DAY;
+
 				//UPDATE
 				//this.update(this, new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
 				this.processBlock(block);
