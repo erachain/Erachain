@@ -348,33 +348,9 @@ public class BlocksResource
 	@Path("/orphanto/{height}")
 	public static String orphanTo(@PathParam("height") int heightTo) 
 	{
-		Block block;
-		DCSet db = DCSet.getInstance();
-		Controller cnt = Controller.getInstance();
-		core.BlockGenerator.ForgingStatus forgingStatus = cnt.getForgingStatus();
-		cnt.setForgingStatus(core.BlockGenerator.ForgingStatus.FORGING_WAIT);
+		
+		Controller.getInstance().setOrphanTo(heightTo);
 
-		try
-		{
-			cnt.flushNewBlockGenerated();
-			int height = 0;
-			do {
-				block = Controller.getInstance().getLastBlock();
-				height = block.getHeightByParent(db);
-
-				cnt.orphanInPipe(block);
-				
-			} while (height > heightTo);			
-		}
-		catch(Exception e)
-		{
-			cnt.setForgingStatus(forgingStatus);
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-		}
-
-		cnt.setForgingStatus(forgingStatus);
-		cnt.checkStatusAndObserve(0);
-
-		return block.toJson().toJSONString();
+		return "OK";
 	}
 }

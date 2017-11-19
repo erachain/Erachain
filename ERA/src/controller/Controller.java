@@ -1109,6 +1109,11 @@ public class Controller extends Observable {
 		return this.blockChain.getSignatures(dcSet, signature);
 	}
 
+    public void setOrphanTo(int height)
+    {
+    	this.blockGenerator.setOrphanTo(height);
+    }	
+
 	public void clearWaitWinBufferProcessed() {
 		waitWinBufferProcessed = new HashSet<byte[]>();
 	}

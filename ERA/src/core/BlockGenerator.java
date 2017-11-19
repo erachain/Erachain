@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.apache.log4j.Logger;
+
+import api.ApiErrorFactory;
 import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
@@ -52,6 +54,7 @@ public class BlockGenerator extends Thread implements Observer
 	private boolean walletOnceUnlocked = false;
 	private static int status = 0;
 
+	private int orphanto = 0;
 	
 	public enum ForgingStatus {
 	    
@@ -88,6 +91,11 @@ public class BlockGenerator extends Thread implements Observer
         return status;
     }	
 
+    public void setOrphanTo(int height)
+    {
+    	this.orphanto =  height;
+    }	
+
     public static String viewStatus()
     {
     	
@@ -112,6 +120,8 @@ public class BlockGenerator extends Thread implements Observer
 			return "7 MAKING NEW BLOCK";
 		case 8:
 			return "8 BROADCASTING";
+		case 9:
+			return "9 ORPHAN TO";
 		default:
 			return "0 WAIT";
 		}
@@ -227,6 +237,26 @@ public class BlockGenerator extends Thread implements Observer
 				if (ctrl.isOnStopping()) {
 					status = -1;
 					return;
+				}
+				
+				if (orphanto>0) {
+					status = 9;
+					ForgingStatus forgingStatus = ctrl.getForgingStatus();
+					ctrl.setForgingStatus(ForgingStatus.FORGING_WAIT);
+					try
+					{
+						ctrl.clearWaitWinBufferProcessed();
+						while (bchain.getHeight(dcSet) > orphanto) {
+							ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+						}
+					}
+					catch(Exception e)
+					{
+					}
+
+					ctrl.setForgingStatus(forgingStatus);
+					ctrl.checkStatusAndObserve(0);
+					continue;
 				}
 				
 				timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
