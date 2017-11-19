@@ -67,6 +67,20 @@ public class NetworkStatus extends JLabel implements Observer
 		return GUIUtils.createIcon(color, this.getBackground());
 	}
 
+	private void viewProgress() {
+		currentHeight = Controller.getInstance().getMyHeight();
+		Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0);
+		if(heightW == null)
+			return;
+		
+		int height = heightW.a;
+
+		if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
+		{
+			this.setText(Lang.getInstance().translate("Synchronizing") + " " + 100 * currentHeight/height + "%");	
+		}	
+
+	}
 	@Override
 	public void update(Observable arg0, Object arg1) 
 	{
@@ -94,17 +108,8 @@ public class NetworkStatus extends JLabel implements Observer
 		
 		if(type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
-			currentHeight = (int)message.getValue();
-			Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0);
-			if(heightW == null)
-				return;
+			viewProgress();
 			
-			int height = heightW.a;
-
-			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
-			{
-				this.setText(Lang.getInstance().translate("Synchronizing") + " " + 100 * currentHeight/height + "%");	
-			}	
 		} else if(type == ObserverMessage.NETWORK_STATUS)
 		{
 			int status = (int) message.getValue();
@@ -117,7 +122,8 @@ public class NetworkStatus extends JLabel implements Observer
 			if(status == Controller.STATUS_SYNCHRONIZING)
 			{
 				this.setIcon(synchronizingIcon);
-				this.setText(Lang.getInstance().translate("Synchronizing"));
+				//this.setText(Lang.getInstance().translate("Synchronizing"));
+				viewProgress();
 			}
 			if(status == Controller.STATUS_OK)
 			{

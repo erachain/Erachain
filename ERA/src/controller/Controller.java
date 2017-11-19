@@ -819,11 +819,11 @@ public class Controller extends Observable {
 
 			
 			// STOP MESSAGE PROCESSOR
-			LOGGER.info(Lang.getInstance().translate("Stopping message processor"));
+			LOGGER.info("Stopping message processor");
 			this.network.stop();
 
 			// STOP BLOCK PROCESSOR
-			LOGGER.info(Lang.getInstance().translate("Stopping block processor"));
+			LOGGER.info("Stopping block processor");
 			//boolean a = this.blockGenerator.isAlive() ;
 			//this.blockGenerator.interrupt();
 			//a = this.blockGenerator.isAlive() ;
@@ -832,15 +832,15 @@ public class Controller extends Observable {
 			this.synchronizer.stop();
 
 			// CLOSE DATABABASE
-			LOGGER.info(Lang.getInstance().translate("Closing database"));
+			LOGGER.info("Closing database");
 			this.dcSet.close();
 
 			// CLOSE WALLET
-			LOGGER.info(Lang.getInstance().translate("Closing wallet"));
+			LOGGER.info("Closing wallet");
 			this.wallet.close();
 		
 
-			LOGGER.info(Lang.getInstance().translate("Closed."));
+			LOGGER.info("Closed.");
 			// FORCE CLOSE
 			System.exit(0);
 		
