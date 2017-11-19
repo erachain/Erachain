@@ -46,7 +46,7 @@ public class ClosingDialog extends JFrame{
 		this.waitDialog.setModal(false);
 		this.waitDialog.pack();
 		this.waitDialog.setLocationRelativeTo(null);
-		this.waitDialog.setAlwaysOnTop(true);
+		this.waitDialog.setAlwaysOnTop(false);
 		this.waitDialog.setVisible(true);
 		
 		java.awt.EventQueue.invokeLater(new Runnable() {

@@ -42,7 +42,8 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
 		this.incoming = incoming;
 		transactions = new ArrayList<R_Send>();
-		DCSet.getInstance().getTransactionMap().addObserver(this);
+	//	DCSet.getInstance().getTransactionMap().addObserver(this);
+		Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
 
 	}
 
@@ -134,7 +135,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		ObserverMessage message = (ObserverMessage) arg;
 
 		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE ) {
+		if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE ) {
 			filter(message);
 			this.fireTableDataChanged();
 		}

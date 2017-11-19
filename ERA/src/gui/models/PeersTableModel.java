@@ -61,8 +61,10 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		};
 		
 		this.timer.schedule(action, 
-				Settings.getInstance().getPingInterval()>>1,
-				Settings.getInstance().getPingInterval()>>1
+				//Settings.getInstance().getPingInterval()>>1,
+				5000,
+				//Settings.getInstance().getPingInterval()
+				20000
 				);
 	}
 	

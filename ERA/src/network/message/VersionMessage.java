@@ -33,6 +33,11 @@ public class VersionMessage extends Message {
 		return this.buildDateTime;
 	}
 
+	public boolean isRequest()
+	{
+		return false;
+	}
+
 	public static VersionMessage parse(byte[] data) throws Exception
 	{
 		int position = 0;

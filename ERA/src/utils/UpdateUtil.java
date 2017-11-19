@@ -98,7 +98,7 @@ public class UpdateUtil {
 		DCSet.getInstance().getTransactionFinalMap().reset();
 		
 		Block b = new GenesisBlock();
-		DCSet.getInstance().flush(b);
+		DCSet.getInstance().flush(b.getDataLength(true)>>7, false);
 		do
 		{
 			List<Transaction> txs = b.getTransactions();
@@ -111,7 +111,7 @@ public class UpdateUtil {
 			if ( b.getHeight(DCSet.getInstance())%2000 == 0 )
 			{
 				LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight(DCSet.getInstance()));
-				DCSet.getInstance().flush(b);
+				DCSet.getInstance().flush(b.getDataLength(true)>>7, false);
 			}
 			b = b.getChild(DCSet.getInstance());
 		}while ( b != null );
@@ -122,7 +122,7 @@ public class UpdateUtil {
 		DCSet.getInstance().getPostCommentMap().reset();
 		
 		Block b = new GenesisBlock();
-		DCSet.getInstance().flush(b);
+		DCSet.getInstance().flush(b.getDataLength(true)>>7, false);
 		do
 		{
 			List<Transaction> txs = b.getTransactions();
@@ -140,7 +140,7 @@ public class UpdateUtil {
 			if ( b.getHeight(DCSet.getInstance())%2000 == 0 )
 			{
 				LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight(DCSet.getInstance()));
-				DCSet.getInstance().flush(b);
+				DCSet.getInstance().flush(b.getDataLength(true)>>7, false);
 			}
 			b = b.getChild(DCSet.getInstance());
 		}while ( b != null );

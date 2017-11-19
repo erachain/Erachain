@@ -26,6 +26,11 @@ public class SignaturesMessage extends Message{
 		return this.signatures;
 	}
 	
+	public boolean isRequest()
+	{
+		return false;
+	}
+
 	public static SignaturesMessage parse(byte[] data) throws Exception
 	{
 		//READ LENGTH

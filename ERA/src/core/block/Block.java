@@ -46,6 +46,7 @@ import core.transaction.TransactionFactory;
 import database.DBSet;
 import datachain.DCSet;
 import datachain.TransactionFinalMap;
+import datachain.TransactionFinalMapSigns;
 import datachain.TransactionMap;
 import datachain.TransactionRef_BlockRef_Map;
 
@@ -167,7 +168,7 @@ public class Block {
 
 	public Block getChild(DCSet db)
 	{
-		return db.getBlockMap().getChildBlock(this);
+		return db.getChildMap().getChildBlock(this);
 	}
 
 	public int getHeightByParent(DCSet db)
@@ -1091,7 +1092,7 @@ public class Block {
 		}
 
 		// TODO - show it to USER
-		if(this.getTimestamp(db) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT>>2) > NTP.getTime()) {
+		if(this.getTimestamp(db) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
 			LOGGER.debug("*** Block[" + height + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
 					+ NTP.getTime() + " + sec: " + (this.getTimestamp(db) - NTP.getTime())/1000);
 			return false;			
@@ -1249,7 +1250,7 @@ public class Block {
 		if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dcSet);
 			long tickets = System.currentTimeMillis() - start;
-			//LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );
+			LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );
 		}
 
 		//ADD TO DB
@@ -1264,6 +1265,7 @@ public class Block {
 		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
 		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
 		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+		TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 		for(Transaction transaction: this.transactions)
 		{
 			
@@ -1293,6 +1295,8 @@ public class Block {
 				throw new Exception("on stoping");
 			
 			finalMap.set( key, transaction);
+			transFinalMapSinds.set(transaction.getSignature(), key);
+			
 			seq++;
 
 		}
@@ -1344,10 +1348,8 @@ public class Block {
 			cnt.blockchainSyncStatusUpdate(heightBlock);
 		}
 		long tickets = System.currentTimeMillis() - start;
-		if (tickets > 1000) {
-			LOGGER.info("[" + this.heightBlock + "] processing time: " +  tickets*0.001
+		LOGGER.debug("[" + this.heightBlock + "] processing time: " +  tickets*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
-		}
 		
 	}
 
@@ -1367,33 +1369,6 @@ public class Block {
 		
 		long start = System.currentTimeMillis();
 		
-
-		//ORPHAN AT TRANSACTIONS
-		if (BlockChain.USE_AT_ATX) {
-			//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #1 ORPHAN AT TRANSACTIONS");
-	
-			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction > atTxs = dcSet.getATTransactionMap().getATTransactions(height);
-	
-			Iterator<AT_Transaction> iter = atTxs.values().iterator();
-	
-			while ( iter.hasNext() )
-			{
-				AT_Transaction key = iter.next();
-				Long amount  = key.getAmount();
-				if (key.getRecipientId() != null && !Arrays.equals(key.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]) && !key.getRecipient().equalsIgnoreCase("1") )
-				{
-					Account recipient = new Account( key.getRecipient() );
-					//recipient.setBalance(Transaction.FEE_KEY,  recipient.getBalance(dcSet,  Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( amount, 8 ) ) , dcSet );
-					recipient.changeBalance(dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ));
-				}
-				Account sender = new Account( key.getSender() );
-				//sender.setBalance(Transaction.FEE_KEY,  sender.getBalance(dcSet,  Transaction.FEE_KEY ).add( BigDecimal.valueOf( amount, 8 ) ) , dcSet );
-				sender.changeBalance(dcSet, false, Transaction.FEE_KEY, BigDecimal.valueOf( amount, 8 ) );
-	
-			}
-		}
-		
-
 		//ORPHAN TRANSACTIONS
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2 ORPHAN TRANSACTIONS");
 		this.orphanTransactions(dcSet, height);
@@ -1422,36 +1397,16 @@ public class Block {
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dcSet, Transaction.FEE_KEY).subtract(blockFee), dcSet);
 		this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee);
-
-		//DELETE AT TRANSACTIONS FROM DB
-		if (BlockChain.USE_AT_ATX) dcSet.getATTransactionMap().delete(height);
 		
-		//// DELETE in orphanTransactions!
-		//DELETE TRANSACTIONS FROM FINAL MAP
-		/////dcSet.getTransactionFinalMap().delete(height);
-
 		//DELETE BLOCK FROM DB
 		dcSet.getBlockMap().delete(this);
 		
-		/*
-		if (height > 1) {
-			int lastHeightThis = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
-			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
-			LOGGER.error("*** core.block.Block.orphan(DBSet)[" + height + ":" + lastHeightThis
-					+ "] DELETE -> new last Height: " + lastHeight
-					+ (dcSet.isFork()?" in FORK!": ""));
-		}
-		*/
-
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
 
 		long tickets = System.currentTimeMillis() - start;
-		if (tickets > 1000) {
-			LOGGER.info("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
+		LOGGER.debug("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
-		}
 
 		this.heightBlock = -1;
 		this.parentBlock = null;
@@ -1467,6 +1422,7 @@ public class Block {
 		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
 		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
 		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+		TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
 		//ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		for(int i=this.getTransactions().size() -1; i>=0; i--)
@@ -1493,6 +1449,7 @@ public class Block {
 	
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height, i);
 			finalMap.delete(key);
+			transFinalMapSinds.delete(transaction.getSignature());
 	
 			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
 			refsMap.delete(transaction.getSignature());

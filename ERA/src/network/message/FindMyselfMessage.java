@@ -22,6 +22,12 @@ public class FindMyselfMessage extends Message{
 		return this.foundMyselfID;
 	}
 	
+	public boolean isRequest()
+	{
+		return false;
+	}
+
+
 	public static FindMyselfMessage parse(byte[] data) throws Exception
 	{
 		//CHECK IF DATA MATCHES LENGTH

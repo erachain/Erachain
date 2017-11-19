@@ -39,7 +39,7 @@ public class FavoriteDocument extends DCMap<Tuple2<String, String>, Transaction>
 	public FavoriteDocument(DWSet dWSet, DB database) {
 		super(dWSet, database);
 
-		DCSet.getInstance().getTransactionFinalMap().addObserver(this); 
+	//	DCSet.getInstance().getTransactionFinalMap().addObserver(this); 
 		this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_STATEMENT_FAVORITES_TYPE);
 		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.DELETE_STATEMENT_FAVORITES_TYPE);
@@ -150,10 +150,10 @@ public class FavoriteDocument extends DCMap<Tuple2<String, String>, Transaction>
 		ObserverMessage message = (ObserverMessage) arg1;
 
 		// chech remove transaction from FinalMap and Favorite Map
-		if (message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
+		//if (message.getType() == ObserverMessage.REMOVE_TRANSACTION_TYPE) {
 			// if(this.contains((Transaction)message.getValue()))
 			// this.delete((Transaction)message.getValue());
-		}
+		//}
 
 	}
 

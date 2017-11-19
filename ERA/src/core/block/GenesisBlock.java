@@ -65,7 +65,6 @@ public class GenesisBlock extends Block{
 	List<Transaction> transactions = new ArrayList<Transaction>();
 	public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
 
-	public static List<List<Object>> generalGenesisUsers;
 
 	public GenesisBlock()
 	{
@@ -136,7 +135,7 @@ public class GenesisBlock extends Block{
 			/*
 			 */
 			///////// GENEGAL
-			generalGenesisUsers = Arrays.asList(
+			List<List<Object>> generalGenesisUsers = Arrays.asList(
 					Arrays.asList("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ", "800000"),
 					Arrays.asList("7EpDngzSLXrqnRBJ5x9YKTU395VEpsz5Mz", "900000"),
 					Arrays.asList("7Psb8dEDd4drdHxJvd4bFihembSWBJQDvC", "800000"),

@@ -266,7 +266,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 
 	public void addObservers() {
 		// Controller.getInstance().addObserver(this);
-		DCSet.getInstance().getTransactionFinalMap().addObserver(this);
+//		DCSet.getInstance().getTransactionFinalMap().addObserver(this);
 	}
 	
 	public void Find_item_from_key(String text) {

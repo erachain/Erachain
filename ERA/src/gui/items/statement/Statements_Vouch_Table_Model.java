@@ -346,8 +346,8 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	
 	public void addObservers(){
 		
-		DCSet.getInstance().getTransactionFinalMap().addObserver(this);
-		DCSet.getInstance().getTransactionMap().addObserver(this);
+	//	DCSet.getInstance().getTransactionFinalMap().addObserver(this);
+	//	DCSet.getInstance().getTransactionMap().addObserver(this);
 		DCSet.getInstance().getVouchRecordMap().addObserver(this);
 			
 		}

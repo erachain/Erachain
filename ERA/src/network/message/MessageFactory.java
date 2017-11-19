@@ -33,13 +33,19 @@ public class MessageFactory {
 	public Message createPingMessage()
 	{
 		//CREATE A MESSAGE WITH ping ACTION
-		return new Message(Message.PING_TYPE);
+		return new PingMessage();
+	}
+
+	public Message createGetHWeightMessage()
+	{
+		//CREATE A MESSAGE WITH ping ACTION
+		return new GetHWeightMessage();
 	}
 	
 	public Message createGetPeersMessage()
 	{	
 		//CREATE A MESSAGE WITH getPeers ACTION
-		return new Message(Message.GET_PEERS_TYPE);
+		return new GetPeersMessage();
 	}
 	
 	public Message createPeersMessage(List<Peer> peers)
@@ -161,16 +167,16 @@ public class MessageFactory {
 			
 		switch(type)
 		{
-		//PING
+		//TODO: delete PING and GET HWeight
 		case Message.PING_TYPE:
 			
-			message = new Message(type);
+			message = new PingMessage();
 			break;
 		
-		//GETPEERS
+		//GET PEERS
 		case Message.GET_PEERS_TYPE:
 						
-			message = new Message(type);
+			message = new GetPeersMessage();
 			break;
 			
 		//PEERS
@@ -179,7 +185,13 @@ public class MessageFactory {
 			//CREATE MESSAGE FROM DATA
 			message = PeersMessage.parse(data);
 			break;
-				
+
+		//PING and GET HWeight
+		case Message.GET_HWEIGHT_TYPE:
+			
+			message = new GetHWeightMessage();
+			break;
+
 		//HEIGHT
 		case Message.HWEIGHT_TYPE:
 							
@@ -247,7 +259,7 @@ public class MessageFactory {
 			
 			//UNKNOWN MESSAGE
 			LOGGER.info(Lang.getInstance().translate("Received unknown type message!"));
-			return new Message(type);
+			return null; //new Message(type);
 			
 		}
 		

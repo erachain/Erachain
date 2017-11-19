@@ -20,10 +20,9 @@ import org.mapdb.DBMaker;
 
 import settings.Settings;
 
-public class DWSet implements IDB 
+public class DWSet implements IDB
 {
 	private static final File WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.dat");
-	
 	
 	private static final String VERSION = "version";
 	private static final String LAST_BLOCK = "lastBlock";
@@ -68,11 +67,11 @@ public class DWSet implements IDB
 		
 	    this.database = DBMaker.newFileDB(WALLET_FILE)
 	    		.closeOnJvmShutdown()
-	    		.cacheSize(2048)
+	    		//.cacheSize(2048)
 	    		//.checksumEnable()
 				.mmapFileEnableIfSupported()
 				/// ICREATOR
-				///.commitFileSyncDisable()
+				.commitFileSyncDisable()
 	            .make();
 	    
 	    uses = 0;

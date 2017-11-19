@@ -1015,22 +1015,23 @@ public class WebResource {
 			String statustext = "";
 			//TODO this needs to be moved to another place
 			
+			Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
 			if(Controller.getInstance().getWalletSyncHeight() > 0) {
 				statustext = "<span class=\"translate\">Wallet Synchronizing</span> ";
-				statustext += 100 * Controller.getInstance().getWalletSyncHeight()/Controller.getInstance().getMyHWeight(false).a + "%<br>";
-				statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getWalletSyncHeight() + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight(false).a;
+				statustext += 100 * Controller.getInstance().getWalletSyncHeight()/HWeight.a + "%<br>";
+				statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getWalletSyncHeight() + "/" + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0).a;
 			} else if(status == Controller.STATUS_OK) {
 				statustext = "OK<br>";
-				statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getMyHWeight(false).a;
-				statustext += " <span class=\"translate\">Weight</span>: " + Controller.getInstance().getMyHWeight(false).b;
+				statustext += "<span class=\"translate\">Height</span>: " + HWeight.a;
+				statustext += " <span class=\"translate\">Weight</span>: " + HWeight.b;
 			} else if(status == Controller.STATUS_NO_CONNECTIONS) {
 				statustext = "<span class=\"translate\">No connections</span><br>";
-				statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getMyHWeight(false).a;
-				statustext += " <span class=\"translate\">Weight</span>: " + Controller.getInstance().getMyHWeight(false).b;
+				statustext += "<span class=\"translate\">Height</span>: " + HWeight.a;
+				statustext += " <span class=\"translate\">Weight</span>: " + HWeight.b;
 			} else if(status == Controller.STATUS_SYNCHRONIZING) {
 				statustext = "<span class=\"translate\">Synchronizing</span> ";
-				statustext += 100 * Controller.getInstance().getMyHWeight(false).a/Controller.getInstance().getMaxPeerHWeight(false).a + "%<br>";
-				statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight(false).a;
+				statustext += 100 * HWeight.a/Controller.getInstance().getMaxPeerHWeight(0).a + "%<br>";
+				statustext += "<span class=\"translate\">Height</span>: " + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0).a;
 			} 
 						
 			pebbleHelper.getContextMap().put(

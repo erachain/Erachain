@@ -26,8 +26,8 @@ import utils.ObserverMessage;
 public class DCSet implements Observer, IDB {
 
 	private static final Logger LOGGER = Logger.getLogger(DCSet.class);
-	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?1000000:10000;
-	private static final int CASH_SIZE = BlockChain.HARD_WORK?2048<<3:2048;
+	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?10000<<2:10000;
+	private static final int CASH_SIZE = BlockChain.HARD_WORK?1028<<2:2048;
 	
 	private static DCSet instance;
 	private DCSet parent;
@@ -55,9 +55,9 @@ public class DCSet implements Observer, IDB {
 	
 	private AddressTime_SignatureMap addressTime_SignatureMap;
 	private BlockMap blockMap;
-	//private ChildMap childMap;
+	private ChildMap childMap;
 	private BlockSignsMap blockSignsMap;
-//	private BlockHeightsMap blockHeightsMap;
+	private BlockHeightsMap blockHeightsMap;
 	private ReferenceMap referenceMap;
 	private NameMap nameMap;
 	private NameStorageMap nameStorageMap;
@@ -95,7 +95,7 @@ public class DCSet implements Observer, IDB {
 	private ATStateMap atStateMap;
 	private ATTransactionMap atTransactionMap;
 	private TransactionFinalMap transactionFinalMap;
-//	private TransactionFinalMapSigns transactionFinalMapSigns;
+	private TransactionFinalMapSigns transactionFinalMapSigns;
 	private TransactionMap transactionMap;
 
 	
@@ -161,13 +161,15 @@ public class DCSet implements Observer, IDB {
 		//CREATE DATABASE
 		DB database = DBMaker.newFileDB(dbFile)
 				.closeOnJvmShutdown()
-				.cacheSize(CASH_SIZE)
+				//.cacheSize(CASH_SIZE)
 				//.cacheDisable()
 				//.checksumEnable()
-				.mmapFileEnableIfSupported()
+				.mmapFileEnableIfSupported() // -- error on asyncWriteEnable
 				//.snapshotEnable()
 				/// ICREATOR
-				//.commitFileSyncDisable()
+				.commitFileSyncDisable()
+				//.asyncWriteEnable()
+				//.asyncWriteFlushDelay(100)
 				//.cacheHardRefEnable()
 
 				/*
@@ -221,7 +223,7 @@ public class DCSet implements Observer, IDB {
 			this.personAddressMap = new PersonAddressMap(this, database);
 			this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(this, database);
 			this.transactionFinalMap = new TransactionFinalMap(this, database);
-	//		this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
+			this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
 		    this.transactionMap = new TransactionMap(this, database);
 			this.vouchRecordMap = new VouchRecordMap(this, database);
 			this.hashesMap = new HashesMap(this, database);
@@ -229,9 +231,9 @@ public class DCSet implements Observer, IDB {
 			
 			this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
 			this.blockMap = new BlockMap(this, database);
-	//		this.childMap = new ChildMap(this, database);
+			this.childMap = new ChildMap(this, database);
 			this.blockSignsMap = new BlockSignsMap(this, database);
-	//		this.blockHeightsMap = new BlockHeightsMap(this, database);
+			this.blockHeightsMap = new BlockHeightsMap(this, database);
 			this.referenceMap = new ReferenceMap(this, database);
 			this.nameMap = new NameMap(this, database);
 			this.nameStorageMap = new NameStorageMap(this, database);
@@ -304,7 +306,7 @@ public class DCSet implements Observer, IDB {
 		this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
 		this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(parent.kK_KPersonStatusUnionMap);
 		this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
-	//	this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
+		this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
 	    this.transactionMap = new TransactionMap(parent.transactionMap, this);
 		this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
 		this.hashesMap = new HashesMap(parent.hashesMap);
@@ -312,9 +314,9 @@ public class DCSet implements Observer, IDB {
 		
 		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
 		this.blockMap = new BlockMap(parent.blockMap, this);
-	//	this.childMap = new ChildMap(parent.childMap, this);
+		this.childMap = new ChildMap(parent.childMap, this);
 		this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap);
-	//	this.blockHeightsMap = new BlockHeightsMap(parent.blockHeightsMap);
+		this.blockHeightsMap = new BlockHeightsMap(parent.blockHeightsMap);
 		this.referenceMap = new ReferenceMap(parent.referenceMap);
 		this.nameMap = new NameMap(parent.nameMap);
 		this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
@@ -378,10 +380,10 @@ public class DCSet implements Observer, IDB {
 		this.hashesSignsMap.reset();
 		
 		this.blockSignsMap.reset();
-	//	this.blockHeightsMap.reset();
+		this.blockHeightsMap.reset();
 		this.referenceMap.reset();
 		this.transactionFinalMap.reset();
-	//	this.transactionFinalMapSigns.reset();
+		this.transactionFinalMapSigns.reset();
 		this.transactionMap.reset();
 		this.nameMap.reset();
 		this.nameStorageMap.reset();
@@ -531,20 +533,20 @@ public class DCSet implements Observer, IDB {
 		return this.blockMap;
 	}
 
-//	public ChildMap getChildMap() 
-//	{
-//		return this.childMap;
-//	}
+	public ChildMap getChildMap() 
+	{
+		return this.childMap;
+	}
 
 	public BlockSignsMap getBlockSignsMap() 
 	{
 		return this.blockSignsMap;
 	}
 
-//	public BlockHeightsMap getBlockHeightsMap() 
-//	{
-//		return this.blockHeightsMap;
-//	}
+	public BlockHeightsMap getBlockHeightsMap() 
+	{
+		return this.blockHeightsMap;
+	}
 
 	public ReferenceMap getReferenceMap() 
 	{
@@ -560,10 +562,10 @@ public class DCSet implements Observer, IDB {
 		return this.transactionFinalMap;
 	}
 
-//	public TransactionFinalMapSigns getTransactionFinalMapSigns()
-//	{
-//		return this.transactionFinalMapSigns;
-//	}
+	public TransactionFinalMapSigns getTransactionFinalMapSigns()
+	{
+		return this.transactionFinalMapSigns;
+	}
 	
 	public TransactionMap getTransactionMap()
 	{
@@ -775,8 +777,12 @@ public class DCSet implements Observer, IDB {
 			{
 				this.addUses();
 
-				//this.database.rollback();
-				this.database.commit();
+				if (this.getBlockMap().isProcessing()) {
+					this.database.rollback();
+				} else {
+					this.database.commit();					
+				}
+					
 				this.database.close();
 				
 				this.uses = 0;
@@ -808,17 +814,17 @@ public class DCSet implements Observer, IDB {
 		this.outUses();
 	}
 	
-	public void flush(Block b)
+	public void flush(int size, boolean hardFlush)
 	{
 		this.addUses();
 
-		this.actions += b.getDataLength(true);
-		if (this.actions > ACTIONS_BEFORE_COMMIT) {
+		this.actions += size;
+		if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
 			long start = System.currentTimeMillis();
-			LOGGER.debug("%%%%%%%%% getEngineeSize:"+ this.getEngineeSize() +" %%%%%%%%%% actions:" + actions);
-			this.database.getEngine().commit();
+			LOGGER.debug("%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%% actions:" + actions);
+			this.database.commit();
 
-			LOGGER.debug("%%%%%%%% getEngineeSize:"+ this.getEngineeSize() +" %%%%%%%%% commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
+			LOGGER.debug("%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%  commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
 			this.actions = 0l;
 			
 		}

@@ -236,7 +236,7 @@ public class BlocksResource
 	{
 		DCSet db = DCSet.getInstance();
 		
-		byte[] signature = db.getBlockMap().getSignByHeight(height - 1);
+		byte[] signature = db.getBlockHeightsMap().getSignByHeight(height - 1);
 		if(signature == null)
 		{
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
@@ -373,7 +373,7 @@ public class BlocksResource
 		}
 
 		cnt.setForgingStatus(forgingStatus);
-		cnt.checkStatus(cnt.getStatus());
+		cnt.checkStatusAndObserve(0);
 
 		return block.toJson().toJSONString();
 	}

@@ -19,14 +19,10 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.HTreeMap;
-import org.mapdb.Serializer;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.SignedBytes;
-import com.google.common.primitives.UnsignedBytes;
 
 import core.account.Account;
 import core.block.Block;
@@ -55,8 +51,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
 	@SuppressWarnings("rawtypes")
 	private NavigableSet block_Key;
-	private NavigableSet <Tuple2<String,Tuple2<Integer, Integer>>>signature_key;
-	private BTreeMap <byte[], Tuple2<Integer, Integer>> signature_key2;
+//	private NavigableSet <Tuple2<String,Tuple2<Integer, Integer>>>signature_key;
 	
 	public TransactionFinalMap(DCSet databaseSet, DB database)
 	{
@@ -101,7 +96,6 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 				return account == null? "genesis": account.getAddress();
 			}
 		});
-		
 		
 		this.block_Key = database.createTreeSet("Block_txs")
 				.comparator(Fun.COMPARATOR)
@@ -156,34 +150,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			}
 		});
 
-		this.signature_key = database.createTreeSet("signature_key1")
-				.comparator(Fun.COMPARATOR)
-				.makeOrGet();
-		
-		Bind.secondaryKey(map, this.signature_key, new Fun.Function2<String, Tuple2<Integer,Integer>, Transaction>(){
-			@Override
-			public String run(Tuple2<Integer, Integer> key, Transaction val) {
-				return  val.viewSignature();
-			}
-		});
-		
-		this.signature_key2 = database.createTreeMap("signature_key2")
-				.comparator(Fun.BYTE_ARRAY_COMPARATOR)
-				//.comparator(UnsignedBytes.lexicographicalComparator())
-				.makeOrGet();
-		
-		Bind.secondaryKey(map, this.signature_key2, new Fun.Function2<byte[], Tuple2<Integer, Integer>, Transaction>(){
-			@Override
-			public byte[] run(Tuple2<Integer, Integer> key, Transaction val) {
-				byte[] sign = val.getSignature();
-				if (sign == null)
-					return new byte[0];
-				return sign;
-			}
-		});
-		
-		
-		
+			
 		return map;
 		
 	}
@@ -389,7 +356,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	{
 		Iterable senderKeys = Fun.filter(this.senderKey, address);
 		Iterable recipientKeys = Fun.filter(this.recipientKey, address);
-		
+
 		Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
 		
 		treeKeys.addAll(Sets.newTreeSet(senderKeys));
@@ -541,51 +508,15 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public byte[] getSignature(int hight, int seg){
 		
-		 Iterator<Tuple2<String, Tuple2<Integer, Integer>>> it = signature_key.iterator();
-		while (it.hasNext()){
-			 Tuple2<String, Tuple2<Integer, Integer>> a = it.next();
-			 if(a.b.equals(new Tuple2(hight,seg))) return Base58.decode(a.a);
-					
-		}
-		return null;
-	}
-	
-	public  BTreeMap<byte[], Tuple2<Integer, Integer>> getSignatureKey(){
-		return signature_key2;
-	}
-
-	
-	// USE PAREN for FORKED TABLE
-	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign) {
 		
-		if (this.parent == null) {
-			if (this.signature_key2.containsKey(sign)) {
-				return signature_key2.get(sign);
-			} else {
-				return null;
-			}
-		} else {
-			// THIS is FORKED TABLE
-			
-			Tuple2<Integer, Integer> mainKey;
-			if (signature_key2.containsKey(sign)) {
-				return signature_key2.get(sign);				
-			} else {
-				mainKey = this.parent.getDCSet().getTransactionFinalMap().getHeightSegBySignature(sign);
-				// MAY BE DELETED?
-				if (this.deleted.contains(mainKey)) {
-					return null;
-				} else {
-					return mainKey;
-				}
-			}
-		}		
-	}
-	
-	public Transaction getTransaction(byte[] signature) {
-		
-		return this.get(this.getHeightSegBySignature(signature));
+		return this.map.get(new Tuple2(hight,seg)).getSignature();
 		
 	}
+	
+	public Transaction getTransaction(byte[] seg){
+		return this.get(DCSet.getInstance().getTransactionFinalMapSigns().getHeightSegBySignature(seg));
+		
+	}
+	
 
 }

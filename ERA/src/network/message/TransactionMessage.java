@@ -21,6 +21,11 @@ public class TransactionMessage extends Message{
 		return this.transaction;
 	}
 	
+	public boolean isRequest()
+	{
+		return false;
+	}
+
 	public static TransactionMessage parse(byte[] data) throws Exception
 	{
 		//PARSE TRANSACTION
@@ -43,7 +48,8 @@ public class TransactionMessage extends Message{
 		return data;
 	}	
 	
-	protected int getDataLength()
+	@Override
+	public int getDataLength()
 	{
 		return this.transaction.getDataLength(false);
 	}

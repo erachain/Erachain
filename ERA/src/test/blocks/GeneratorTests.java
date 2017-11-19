@@ -425,7 +425,7 @@ public class GeneratorTests {
 			if (!newBlock.isValid(dcSet))
 				assertEquals(false, newBlock.isValid(dcSet));
 
-			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeight(dcSet, false);
+			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
 
 			if (i == 2) {
 				// for debug breakpoint
@@ -448,7 +448,7 @@ public class GeneratorTests {
 			
 			height = newBlock.getHeight(dcSet);
 
-			Tuple2<Integer, Long> hWeight = cntrlr.getBlockChain().getHWeight(dcSet, false);
+			Tuple2<Integer, Long> hWeight = cntrlr.getBlockChain().getHWeightFull(dcSet);
 
 			assertEquals((long)hWeight_old.b + weight_old, (long)hWeight.b);
 			
@@ -525,7 +525,7 @@ public class GeneratorTests {
 				i_break++;
 			}
 
-			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeight(dcSet, false);
+			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
 			long weight = block.calcWinValueTargeted(dcSet);
 
 			//PRPHAN BLOCK
@@ -543,7 +543,7 @@ public class GeneratorTests {
 			Block parent = block.getParent(dcSet);
 			int parentHeight = parent.getHeight(dcSet);
 			
-			Tuple2<Integer, Long> hWeight = cntrlr.getBlockChain().getHWeight(dcSet, false);
+			Tuple2<Integer, Long> hWeight = cntrlr.getBlockChain().getHWeightFull(dcSet);
 
 			assertEquals((int)hWeight.a, parentHeight);
 

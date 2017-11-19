@@ -34,6 +34,11 @@ public class BlockWinMessage extends Message{
 		return this.height;
 	}
 	
+	public boolean isRequest()
+	{
+		return false;
+	}
+
 	public static BlockWinMessage parse(byte[] data) throws Exception
 	{
 		//PARSE HEIGHT
@@ -67,7 +72,8 @@ public class BlockWinMessage extends Message{
 		return data;
 	}	
 	
-	protected int getDataLength()
+	@Override
+	public int getDataLength()
 	{
 		return HEIGHT_LENGTH + this.block.getDataLength(false);
 	}

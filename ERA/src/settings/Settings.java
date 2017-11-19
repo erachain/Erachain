@@ -44,8 +44,8 @@ public class Settings {
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = 30000; // 10000 
-	private static final int DEFAULT_PING_INTERVAL = 150000;
+	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>3; // 10000 
+	private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
 	private static final String DEFAULT_FONT_NAME = "Arial";

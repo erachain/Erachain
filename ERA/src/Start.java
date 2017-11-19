@@ -39,8 +39,6 @@ public class Start {
 	{	
 		
 		
-		about_frame = AboutFrame.getInstance();
-		about_frame.setUserClose(false);
 		////
 		File log4j = new File("log4j.properties");
 		if(log4j.exists())
@@ -101,7 +99,8 @@ public class Start {
 		}
 		
 		if(Controller.useGui){
-			about_frame.setVisible(true);
+			about_frame = AboutFrame.getInstance();
+			about_frame.setUserClose(false);
 			}
 		if(!cli)
 		{			
@@ -127,9 +126,9 @@ public class Start {
 				
 				//STARTING NETWORK/BLOCKCHAIN/RPC
 				Controller.getInstance().start();
-				
-				
-			
+				//unlick wallet
+				Controller.getInstance().unlockWallet("1");
+				Status.getinstance();
 				
 				if (!Controller.useGui) {
 					LOGGER.info("-nogui used");

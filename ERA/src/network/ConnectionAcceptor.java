@@ -1,5 +1,6 @@
 package network;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
  import org.apache.log4j.Logger;
@@ -21,6 +22,7 @@ public class ConnectionAcceptor extends Thread{
 	private ServerSocket socket;
 	
 	private boolean isRun;
+
 	
 	static Logger LOGGER = Logger.getLogger(ConnectionAcceptor.class.getName());
 	
@@ -33,15 +35,10 @@ public class ConnectionAcceptor extends Thread{
 	{
 		this.isRun = true;
 		
+		
 		PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
-		while(isRun)
+		while(this.isRun && !this.isInterrupted())
 		{
-			try{ // NEED
-				Thread.sleep(100);	
-			} catch(Exception es)
-			{
-			}
-
 			try
 			{	
 				
@@ -74,6 +71,7 @@ public class ConnectionAcceptor extends Thread{
 					//ACCEPT CONNECTION
 					Socket connectionSocket = socket.accept();
 					
+					
 					//CHECK IF SOCKET IS NOT LOCALHOST || WE ARE ALREADY CONNECTED TO THAT SOCKET || BLACKLISTED
 					if(
 							/*connectionSocket.getInetAddress().isSiteLocalAddress() 
@@ -101,7 +99,7 @@ public class ConnectionAcceptor extends Thread{
 					{
 						
 						if (!this.isRun)
-							return;
+							break;
 
 						//CREATE PEER
 						////new Peer(callback, connectionSocket);
@@ -118,18 +116,36 @@ public class ConnectionAcceptor extends Thread{
 
 				try{ 
 					Thread.sleep(1000);	
-				} catch(Exception es)
+				} catch(InterruptedException  es){
+					try {
+						socket.close();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					break;
+				}
 				{
 				}
 
 				//LOGGER.info(e.getMessage(),e);
 				//LOGGER.info(Lang.getInstance().translate("Error accepting new connection") + " - " + e.getMessage());			
 			}
+			if(this.isInterrupted())break;
 		}
+		
 	}
 	
 	public void halt()
 	{
+		//this.interrupt();
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		this.isRun = false;
 	}
 }

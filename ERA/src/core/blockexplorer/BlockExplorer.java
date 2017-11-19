@@ -4385,10 +4385,10 @@ if ( asset_1 == null) {
 		//RETURN HEIGHT
 		return DCSet.getInstance().getBlockSignsMap().getHeight(lastBlockSignature);
 	}
-	public Tuple2<Integer, Long> getHWeight() {
+	public Tuple2<Integer, Long> getHWeightFull() {
 		
 		//RETURN HEIGHT
-		return Controller.getInstance().getMyHWeight(false);
+		return Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
 	}
 	
 	public Block getLastBlock() 

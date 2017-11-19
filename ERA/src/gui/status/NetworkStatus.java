@@ -49,11 +49,11 @@ public class NetworkStatus extends JLabel implements Observer
 				+ ": " + Controller.getInstance().getBlockChain().getTarget(DCSet.getInstance()) + ", ";
 
 				if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
-					mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getMyHWeight(false).a;
+					mess += Lang.getInstance().translate("Block height") + ": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
 				} else if( Controller.getInstance().getWalletSyncHeight() > 0 ) {
-					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight(false);
+					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0);
 				} else {
-					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(false).a;
+					mess += Lang.getInstance().translate("Block height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0).a;
 				}
 				setToolTipText(mess);
 		}});
@@ -76,7 +76,7 @@ public class NetworkStatus extends JLabel implements Observer
 		if(type == ObserverMessage.WALLET_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue();
-			int height = Controller.getInstance().getMyHWeight(false).a;
+			int height = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
 			if(currentHeight== 0 || currentHeight == height)
 			{
 				this.update(null, new ObserverMessage(
@@ -95,7 +95,7 @@ public class NetworkStatus extends JLabel implements Observer
 		if(type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue();
-			Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(true);
+			Tuple3<Integer, Long, Peer> heightW = Controller.getInstance().getMaxPeerHWeight(0);
 			if(heightW == null)
 				return;
 			

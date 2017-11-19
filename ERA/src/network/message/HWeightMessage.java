@@ -39,6 +39,11 @@ public class HWeightMessage extends Message{
 		return new Tuple2<Integer, Long>(this.height, this.weight);
 	}
 
+	public boolean isRequest()
+	{
+		return false;
+	}
+
 	public static Message parse(byte[] data) throws Exception {
 		
 		//CHECK IF DATA MATCHES LENGTH

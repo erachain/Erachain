@@ -35,6 +35,11 @@ public class BlockMessage extends Message{
 		return this.height;
 	}
 	
+	public boolean isRequest()
+	{
+		return false;
+	}
+
 	public static BlockMessage parse(byte[] data) throws Exception
 	{
 
@@ -81,7 +86,8 @@ public class BlockMessage extends Message{
 		return data;
 	}	
 	
-	protected int getDataLength()
+	@Override
+	public int getDataLength()
 	{
 		return HEIGHT_LENGTH + (this.block==null?0:this.block.getDataLength(false));
 	}

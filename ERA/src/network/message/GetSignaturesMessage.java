@@ -21,6 +21,11 @@ public class GetSignaturesMessage extends Message{
 		return this.parent;
 	}
 
+	public boolean isRequest()
+	{
+		return true;
+	}
+
 	public static Message parse(byte[] data) throws Exception 
 	{
 		//CHECK IF DATA MATCHES LENGTH

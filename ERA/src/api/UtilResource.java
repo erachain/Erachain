@@ -27,7 +27,7 @@ public class UtilResource
 	@Path("/hw_test")
 	public String hw_Test() 
 	{ 
-		return String.valueOf(Chain.hw_Test(false));
+		return String.valueOf(Chain.hw_Test());
 	}
 
 }

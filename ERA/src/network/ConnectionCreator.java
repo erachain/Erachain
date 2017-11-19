@@ -136,7 +136,7 @@ public class ConnectionCreator extends Thread {
 						PeersMessage peersMessage = (PeersMessage) peer.getResponse(getPeersMessage);
 						if(peersMessage != null)
 						{
-							peer.setPing(System.currentTimeMillis() - start);
+							peer.setPing((int)(System.currentTimeMillis() - start));
 
 							int foreignPeersCounter = 0;
 							//FOR ALL THE RECEIVED PEERS

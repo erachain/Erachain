@@ -59,7 +59,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		account = new Account("");
 		
 		Controller.getInstance().addWalletListener(this);
-		Controller.getInstance().addObserver(this);
+	//	Controller.getInstance().addObserver(this);
 		
 	}
 	
@@ -223,7 +223,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		
 		
 		//CHECK IF NEW LIST
-				if(message.getType() == ObserverMessage.LIST_TRANSACTION_TYPE)
+				if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
 				{
 					if(this.transactions == null)
 					{
@@ -258,11 +258,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		
 		
 		
-		if( message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK ) {
-			
-			this.fireTableRowsUpdated(0, this.getRowCount()-1);
-			
-		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
+	
 			
 			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
 					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
@@ -287,7 +283,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 				this.fireTableDataChanged();
 			}
 			*/
-		}
+		
 	
 		
 	

@@ -22,21 +22,21 @@ import org.mapdb.HTreeMap;
 
 import com.google.common.primitives.UnsignedBytes;
 //import com.sun.media.jfxmedia.logging.Logger;
+import org.apache.log4j.Logger;
 
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import database.DBMap;
 import database.serializer.BlockSerializer;
 import settings.Settings;
 import utils.Converter;
 import utils.ObserverMessage;
-import utils.ReverseComparator;
 
 public class BlockMap extends DCMap<byte[], Block> 
 {
 	public static final int HEIGHT_INDEX = 1;
 
-	
+	private static final Logger LOGGER = Logger.getLogger(BlockMap.class);
+
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
 	private Var<byte[]> lastBlockVar;
@@ -47,9 +47,10 @@ public class BlockMap extends DCMap<byte[], Block>
 	
 	private Var<Boolean> processingVar;
 	private Boolean processing;
-	NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
-	BTreeMap<byte[], byte[]> childIndex;
+//	NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
+//	BTreeMap<byte[], byte[]> childIndex;
 	//private List<Block> lastBlocksForTarget;
+	
 
 	private BTreeMap<Tuple2<String, String>, byte[]> generatorMap;
 	
@@ -92,42 +93,6 @@ public class BlockMap extends DCMap<byte[], Block>
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	protected void createIndexes(DB database)
 	{
-		//HEIGHT INDEX
-		Tuple2Comparator<Integer, byte[]> comparator = new Fun.Tuple2Comparator<Integer, byte[]>(Fun.COMPARATOR, UnsignedBytes.lexicographicalComparator());
-		heightIndex = database.createTreeSet("blocks_index_height")
-				.comparator(comparator)
-				.makeOrGet();
-		
-		NavigableSet<Tuple2<Integer, byte[]>> descendingHeightIndex = database.createTreeSet("blocks_index_height_descending")
-				.comparator(new ReverseComparator(comparator))
-				.makeOrGet();
-		
-		createIndex(HEIGHT_INDEX, heightIndex, descendingHeightIndex, new Fun.Function2<Integer, byte[], Block>() {
-		   	@Override
-		    public Integer run(byte[] key, Block value) {
-		   		return value.getHeight(getDCSet());
-		    }
-		});
-		
-		//HEIGHT INDEX
-				Tuple2Comparator<Integer, byte[]> comparator1 = new Fun.Tuple2Comparator<Integer, byte[]>(Fun.COMPARATOR, UnsignedBytes.lexicographicalComparator());
-				 NavigableSet<Object> heightIndex1 = database.createTreeSet("blocks_index_height1")
-						.comparator(comparator)
-						.makeOrGet();
-				
-				NavigableSet<Tuple2<Integer, byte[]>> descendingHeightIndex1 = database.createTreeSet("blocks_index_height_descending1")
-						.comparator(new ReverseComparator(comparator))
-						.makeOrGet();
-				
-				createIndex(2, heightIndex1, descendingHeightIndex1, new Fun.Function2<Integer, byte[], Block>() {
-				   	@Override
-				    public Integer run(byte[] key, Block value) {
-				   		return value.getHeight(getDCSet());
-				    }
-				});
-				
-				
-		
 		generatorMap = database.createTreeMap("generators_index").makeOrGet();
 		
 		Bind.secondaryKey((BTreeMap)this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, byte[], Block>() {
@@ -137,19 +102,7 @@ public class BlockMap extends DCMap<byte[], Block>
 			}
 		});
 		
-	//index parrent block signature - child block.signature
-		childIndex = database.createTreeMap("children")
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.comparator(UnsignedBytes.lexicographicalComparator())
-				.makeOrGet();
-		
-		Bind.secondaryKey((BTreeMap)this.map, childIndex, new Fun.Function2<byte[], byte[], Block>() {
-			@Override
-			public byte[] run(byte[] b, Block block) {
-				return block.getReference();
-				
-			}
-		});
+	
  /* secondary value map. Key - byte[], value  Tuple2<Integer, Integer>
 		HTreeMap<byte[], Tuple2<Integer,Integer>> blockSignsMap = database.createHashMap("block_signs_map_Value").makeOrGet();
  		Bind.secondaryValue((BTreeMap)this.map, blockSignsMap, new Fun.Function2<Tuple2<Integer,Integer>, byte[], Block>() {
@@ -190,26 +143,7 @@ public class BlockMap extends DCMap<byte[], Block>
 	
 	
 	
-	public Block getChildBlock(Block parent)
-	{
-		if(this.childIndex.containsKey(parent.getSignature()))
-		{
-			byte[] key = childIndex.get(parent.getSignature());
-			if (this.map.containsKey(key))	return this.map.get(key);
-		}
-		
-		return null;
-	}
 	
-	public byte[] getChildBlock(byte[] parent)
-	{
-		if(this.contains(parent))
-		{
-			return childIndex.get(parent);
-		}
-		
-		return null;
-	}
 
 	@Override
 	protected Map<byte[], Block> getMap(DB database) 
@@ -325,9 +259,8 @@ public class BlockMap extends DCMap<byte[], Block>
 
 		if (block.getVersion() == 0) {
 			// GENESIS block
-			dcSet.getBlockSignsMap().set(signature,
-					new Tuple2<Integer, Integer>(1, core.BlockChain.GENESIS_WIN_VALUE));
-	//		dcSet.getBlockHeightsMap().add(signature);
+			dcSet.getBlockSignsMap().set(signature, 1, core.BlockChain.GENESIS_WIN_VALUE);
+			dcSet.getBlockHeightsMap().add(signature);
 		} else {
 			Block parent = this.get(block.getReference());
 	//		byte[] ss = parent.getSignature();
@@ -335,10 +268,9 @@ public class BlockMap extends DCMap<byte[], Block>
 	//		System.out.println("/n ####################sign:" + new String(ss));
 	//		System.out.println("/n ####################refe:" + new String(s1));
 			int height = parent.getHeight(dcSet) + 1;
-			//dcSet.getBlockMap().getChildMap().set(parent, block);
-			dcSet.getBlockSignsMap().set(signature,
-					new Tuple2<Integer, Integer>(height, win_value));
-			//dcSet.getBlockHeightsMap().set((long)height, signature);
+			dcSet.getChildMap().set(parent, block);
+			dcSet.getBlockSignsMap().set(signature,	height, win_value);
+			dcSet.getBlockHeightsMap().set(height, signature);
 	//		long heightInMap = dcSet.getBlockHeightsMap().add(signature);
 			
 			//
@@ -375,12 +307,12 @@ public class BlockMap extends DCMap<byte[], Block>
 		
 		this.setLastBlockSignature(parentSign);
 		
-	//	dcSet.getChildMap().delete(parent.getSignature());
+		dcSet.getChildMap().delete(parent.getSignature());
 	
 		// ORPHAN FORGING DATA
 		int height = parent.getHeight(dcSet) + 1;
 		if (height > 1) {
-	//		dcSet.getBlockHeightsMap().delete(height);
+			dcSet.getBlockHeightsMap().delete(height);
 
 			PublicKeyAccount creator = block.getCreator();
 			// INITIAL forging DATA no need remove!
@@ -408,27 +340,14 @@ public class BlockMap extends DCMap<byte[], Block>
 	}
 	
 	public int getHeight(byte[] signature){
-		Iterator<Tuple2<Integer, byte[]>> it = heightIndex.iterator();
-		while(it.hasNext()){
-			 Tuple2<Integer, byte[]> ss = it.next();
-			if (ss.b.equals(signature)){
-				return ss.a;
-			}
-		}
-		return -1;
+		
+		return (this.map.get(signature)).getHeight(this.getDCSet());
+		
+		
 	}
-	public byte[] getSignByHeight(int  height){
-		Iterator<Tuple2<Integer, byte[]>> it = heightIndex.iterator();
-		while(it.hasNext()){
-			 Tuple2<Integer, byte[]> ss = it.next();
-			if (ss.a==height){
-				return ss.b;
-			}
-		}
-		return null;
-	}
+	
 	public Block get(int height){
-		return this.get(getSignByHeight(height));
+		return this.get(DCSet.getInstance().getBlockHeightsMap().get(height));
 		
 		
 	}
@@ -440,11 +359,13 @@ public class BlockMap extends DCMap<byte[], Block>
 		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_ADD_BLOCK_TYPE");
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
+		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_ADD_BLOCK_TYPE END");
 	}
 	public void notifyOrphanChain(Block block) {
 		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
+		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_REMOVE_BLOCK_TYPE END");
 	}
 	public void notifyListChain(List<Block> blocks) {
 		this.setChanged();

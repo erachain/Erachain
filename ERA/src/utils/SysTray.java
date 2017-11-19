@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import controller.Controller;
 import core.transaction.Transaction;
 import database.wallet.TransactionMap;
+import datachain.DCSet;
 import gui.ClosingDialog;
 import gui.ConsolePanel;
 import gui.Gui;
@@ -350,15 +351,15 @@ public class SysTray implements Observer{
 			{
 				this.update(null, new ObserverMessage(
 						ObserverMessage.NETWORK_STATUS, Controller.getInstance().getStatus()));
-				currentHeight = Controller.getInstance().getMyHWeight(false).a;
+				currentHeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
 				return;
 			}
 			networkStatus = Lang.getInstance().translate("Wallet Synchronizing");
 			
-			syncProcent = 100 * currentHeight/Controller.getInstance().getMyHWeight(false).a + "%";
+			syncProcent = 100 * currentHeight/Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "%";
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\n" + Lang.getInstance().translate("Height") +": " + currentHeight + "/" + Controller.getInstance().getMyHWeight(false).a + "/" + Controller.getInstance().getMaxPeerHWeight(false).a;
+			toolTipText += "\n" + Lang.getInstance().translate("Height") +": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0).a;
 			setToolTipText(toolTipText);
 			
 		} else if(message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
@@ -366,17 +367,17 @@ public class SysTray implements Observer{
 
 			if(Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING)
 			{
-				syncProcent = 100 * currentHeight/Controller.getInstance().getMaxPeerHWeight(false).a + "%";	
+				syncProcent = 100 * currentHeight/Controller.getInstance().getMaxPeerHWeight(0).a + "%";	
 			}
 			
 			toolTipText += networkStatus + " " + syncProcent;
-			toolTipText += "\n" + Lang.getInstance().translate("Height") +": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(false);
+			toolTipText += "\n" + Lang.getInstance().translate("Height") +": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0);
 			setToolTipText(toolTipText);
 			
 		} else {
 			if(Controller.getInstance().getStatus() == Controller.STATUS_OK || Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
 				toolTipText += networkStatus + " " + syncProcent;
-				toolTipText += "\n" + Lang.getInstance().translate("Height") +": " + Controller.getInstance().getMyHWeight(false).a;
+				toolTipText += "\n" + Lang.getInstance().translate("Height") +": " + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
 				setToolTipText(toolTipText);
 			}
 		}

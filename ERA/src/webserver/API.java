@@ -209,7 +209,7 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++steep;
-			byte[] childSign = dcSet.getBlockMap().getChildBlock(signatureBytes);
+			byte[] childSign = dcSet.getChildMap().getChildBlock(signatureBytes);
 			out.put("child", Base58.encode(childSign));
 		}
 		catch(Exception e)
@@ -244,7 +244,7 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++steep;
-			byte[] childSign = dcSet.getBlockMap().getChildBlock(signatureBytes);
+			byte[] childSign = dcSet.getChildMap().getChildBlock(signatureBytes);
 			out = dcSet.getBlockMap().get(childSign).toJson();
 		}
 		catch(Exception e)
@@ -282,7 +282,7 @@ public class API {
 			out.put("block", block.toJson());
 			
 			++steep;
-			byte[] childSign = dcSet.getBlockMap().getChildBlock(block.getSignature());
+			byte[] childSign = dcSet.getChildMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -320,7 +320,7 @@ public class API {
 			out.put("block", block.toJson());
 			
 			++steep;
-			byte[] childSign = dcSet.getBlockMap().getChildBlock(block.getSignature());
+			byte[] childSign = dcSet.getChildMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
@@ -361,7 +361,7 @@ public class API {
 			
 			BlockMap blockMap = dcSet.getBlockMap();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = blockMap.getSignByHeight(i);
+				byte[] signature = dcSet.getBlockHeightsMap().getSignByHeight(i);
 				if (signature == null) {
 					out.put("end", 1);
 					break;
@@ -406,7 +406,7 @@ public class API {
 			JSONArray array = new JSONArray();
 			BlockMap blockMap = dcSet.getBlockMap();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = blockMap.getSignByHeight(i);
+				byte[] signature = dcSet.getBlockHeightsMap().getSignByHeight(i);
 				if (signature == null) {
 					out.put("end", 1);
 					break;

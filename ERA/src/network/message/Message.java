@@ -9,7 +9,7 @@ import controller.Controller;
 import core.crypto.Crypto;
 import network.Peer;
 
-public class Message {
+public abstract class Message {
 
 	public static final byte[] MAINNET_MAGIC = {0x19, 0x66, 0x08, 0x21};
 	
@@ -22,7 +22,7 @@ public class Message {
 	
 	public static final int GET_PEERS_TYPE = 1;
 	public static final int PEERS_TYPE = 2;
-	//public static final int HEIGHT_TYPE = 3; not used
+	public static final int GET_HWEIGHT_TYPE = 3;
 	public static final int HWEIGHT_TYPE = 4;
 	public static final int GET_SIGNATURES_TYPE = 5;
 	public static final int SIGNATURES_TYPE = 6;
@@ -38,12 +38,15 @@ public class Message {
 	private Peer sender;
 	private int id;
 	
+	public abstract boolean isRequest();
+	
 	public Message(int type)
 	{
 		this.type = type;
+		
 		this.id = -1;
 	}
-	
+
 	public int getId()
 	{
 		return id;
@@ -70,6 +73,8 @@ public class Message {
 				return "GET_PEERS_TYPE";
 			case 2:
 				return "PEERS_TYPE";
+			case 3:
+				return "GET_HWEIGHT_TYPE";
 			case 4:
 				return "HWEIGHT_TYPE";
 			case 5:
@@ -85,13 +90,13 @@ public class Message {
 			case 10:
 				return "TRANSACTION_TYPE";
 			case 11:
-				return "PING_TYPE";
+				return "GET_PING_TYPE";
 			case 12:
 				return "VERSION_TYPE";
 			case 13:
 				return "FIND_MYSELF_TYPE";
 			default:
-				return "none";
+				return "!!!" + type;
 		}
 	}
 	public String viewType()
@@ -157,7 +162,7 @@ public class Message {
 		return checksum;
 	}
 	
-	protected int getDataLength()
+	public int getDataLength()
 	{
 		return 0;
 	}

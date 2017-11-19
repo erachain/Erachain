@@ -77,7 +77,6 @@ public class Wallet extends Observable implements Observer
 	public static final int STATUS_UNLOCKED = 1;
 	public static final int STATUS_LOCKED = 0;
 	
-	
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public DWSet database;
@@ -106,8 +105,10 @@ public class Wallet extends Observable implements Observer
 			this.database = new DWSet();
 			
 			//ADD OBSERVER
-		    Controller.getInstance().addObserver(this);
-		    DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+		 //   Controller.getInstance().addObserver(this);
+		    DCSet.getInstance().getTransactionMap().addObserver(this);
+		    DCSet.getInstance().getBlockMap().addObserver(this);
+		 //   DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 		}
 	}
 	
@@ -708,7 +709,7 @@ public class Wallet extends Observable implements Observer
 					
 					Controller.getInstance().walletSyncStatusUpdate(this.syncHeight);
 					
-					//LOGGER.info("Synchronize wallet: " + this.syncHeight);
+					LOGGER.debug("Synchronize wallet: " + this.syncHeight);
 					this.database.commit();
 				}
 				
@@ -750,7 +751,7 @@ public class Wallet extends Observable implements Observer
 		
 		//NOW IF NOT SYNCHRONIZED SET STATUS
 		//CHECK IF WE ARE UPTODATE
-		if(!Controller.getInstance().checkStatus())
+		if(!Controller.getInstance().checkStatus(0))
 		{
 			// NOTIFY
 			Controller.getInstance().notifyObservers(new ObserverMessage(
@@ -1249,7 +1250,8 @@ public class Wallet extends Observable implements Observer
 			
 			//LOGGER.error("Wallet orphanBlock for find lastBlockSignature." + block.getHeightByParent(DCSet.getInstance()));
 			
-			this.update(this, new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
+			///this.update(this, new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
+			this.orphanBlock(block);
 			
 			block = blockMap.get(reference);
 
@@ -1290,7 +1292,7 @@ public class Wallet extends Observable implements Observer
 			return;
 		}
 		
-		//long start = System.currentTimeMillis();
+		long start = System.currentTimeMillis();
 
 		//SET AS LAST BLOCK
 		this.database.setLastBlockSignature(block.getSignature());
@@ -1413,9 +1415,9 @@ public class Wallet extends Observable implements Observer
 			}
 		}
 
-		//long tickets = System.currentTimeMillis() - start;
-		//LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance()) + "] processing time: " +  tickets*0.001
-		//		+ " for records:" + block.getTransactionCount() + " millsec/record:" + tickets/(block.getTransactionCount()+1) );
+		long tickets = System.currentTimeMillis() - start;
+		LOGGER.info("WALLET [" + block.getHeightByParent(DCSet.getInstance()) + "] processing time: " +  tickets*0.001
+				+ " for records:" + block.getTransactionCount() + " millsec/record:" + tickets/(block.getTransactionCount()+1) );
 
 	}
 
@@ -2033,7 +2035,7 @@ public class Wallet extends Observable implements Observer
 
 		if(message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)//.WALLET_ADD_BLOCK_TYPE)
 		{
-			Block block = (Block) message.getValue();
+			Block block = (Block)message.getValue();
 				
 			//CHECK IF WE NEED TO RESYNC
 			// BY REFERENCE !!!!
@@ -2048,7 +2050,7 @@ public class Wallet extends Observable implements Observer
 		}
 		else if(message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)//.WALLET_REMOVE_BLOCK_TYPE)
 		{
-			Block block = (Block) message.getValue();
+			Block block = (Block)message.getValue();
 				
 			//CHECK IF WE NEED TO RESYNC
 			// BY SIGNATURE !!!!

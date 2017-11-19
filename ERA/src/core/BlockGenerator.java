@@ -1,6 +1,8 @@
 package core;
 
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -24,6 +26,10 @@ import core.block.BlockFactory;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
+import network.Peer;
+import network.message.Message;
+import network.message.MessageFactory;
+import network.message.SignaturesMessage;
 
 public class BlockGenerator extends Thread implements Observer
 {	
@@ -34,7 +40,8 @@ public class BlockGenerator extends Thread implements Observer
 	private static final int MAX_BLOCK_SIZE_BYTE = 
 			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>2;
 
-	static final int wait_interval_flush = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
+	static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
+	static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
 	private PrivateKeyAccount acc_winner;
 	private List<Block> lastBlocksForTarget;
 	private byte[] solvingReference;
@@ -43,7 +50,7 @@ public class BlockGenerator extends Thread implements Observer
 	
 	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
 	private boolean walletOnceUnlocked = false;
-	private static int status;
+	private static int status = 0;
 
 	
 	public enum ForgingStatus {
@@ -76,7 +83,7 @@ public class BlockGenerator extends Thread implements Observer
         return forgingStatus;
     }	
 
-    public int getStatus()
+    public static int getStatus()
     {
         return status;
     }	
@@ -85,24 +92,28 @@ public class BlockGenerator extends Thread implements Observer
     {
     	
 		switch (status) {
+		case -1:
+			return "-1 STOPed";
 		case 1:
-			return "1:FLUSH, WAIT";
+			return "1 FLUSH, WAIT";
 		case 2:
-			return "2:FLUSH, TRY";
+			return "2 FLUSH, TRY";
 		case 3:
-			return "3:UPDATE";
+			return "3 UPDATE";
+		case 31:
+			return "31 UPDATE SAME";
 		case 4:
-			return "4:FORGING";
+			return "4 PREPARE MAKING";
 		case 5:
-			return "5:FORGING BY ACCOUNTS";
+			return "5 GET WIN ACCOUNT";
 		case 6:
-			return "6:MAKING NEW BLOCK";
+			return "6 WAIT BEFORE MAKING";
 		case 7:
-			return "7:BROADCAST, WAIT";
+			return "7 MAKING NEW BLOCK";
 		case 8:
-			return "8:BROADCAST, TRY";
+			return "8 BROADCASTING";
 		default:
-			return "unknown";
+			return "0 WAIT";
 		}
     }	
 
@@ -195,297 +206,333 @@ public class BlockGenerator extends Thread implements Observer
 		BlockChain bchain = ctrl.getBlockChain();
 		DCSet dcSet = DCSet.getInstance();
 
+		long timeTmp;
+		long timePoint = 0;
+		long flushPoint = 0;
+		Block waitWin = null;
+		long timeUpdate = 0;
+
 		while(!ctrl.isOnStopping())
 		{
-			
-			status = 0;
-
 			try {
-				Thread.sleep(500);
-			}
-			catch (InterruptedException e) {
-			}
-			
-			if (ctrl.isOnStopping())
-				return;
-			
-			////////////////////////////  FLUSH NEW BLOCK /////////////////////////
 
-			// try solve and flush new block from Win Buffer		
-			Block waitWin = bchain.getWaitWinBuffer();
-			while (waitWin != null) {
-				
-				status = 1;
+				status = 0;
 				
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(100);
 				}
 				catch (InterruptedException e) {
 				}
-
-				if (ctrl.isOnStopping())
-					return;
 				
-				// REFRESH
-				waitWin = bchain.getWaitWinBuffer();
-				//long diffTimeWinBlock =  NTP.getTime() - wait_interval_flush - waitWin.getTimestamp(dcSet);
-				//if (diffTimeWinBlock < 0 )
-				//	continue;
-				if(waitWin.getTimestamp(dcSet) + BlockChain.WIN_BLOCK_BROADCAST_WAIT > NTP.getTime()) {
+				if (ctrl.isOnStopping()) {
+					status = -1;
+					return;
+				}
+				
+				timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+				if (timeTmp > NTP.getTime())
 					continue;
-				}
 				
-				// FLUSH WINER to DB MAP
-				LOGGER.info("FLUSH WINER to DB MAP");
+				if (timePoint != timeTmp) {
+					timePoint = timeTmp;
+					Timestamp timestampPoit = new Timestamp(timePoint);
+					LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
 
-				try {
+					flushPoint = FLUSH_TIMEPOINT + timePoint;
+					this.solvingReference = null;
+
+					// GET real HWeight
+					ctrl.pingAllPeers(false);						
 					
-					status = 2;
+				}
+				
+				// is WALLET
+				if(ctrl.doesWalletExists()) {
+	
+					//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
+					syncForgingStatus();
 					
-					ctrl.flushNewBlockGenerated();
+					//Timestamp timestamp = new Timestamp(NTP.getTime());
+					//LOGGER.info("NTP.getTime() " + timestamp);
 					
-					if (ctrl.isOnStopping())
-						return;
-						
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					if (ctrl.isOnStopping())
-						return;
-					LOGGER.error(e.getMessage(), e);
-				}
-				break;
-			}
-			
-			////////////////////////// UPDATE ////////////////////
-			//CHECK IF WE ARE NOT UP TO DATE
-			ctrl.checkStatus(ctrl.getStatus());
-			if(ctrl.needUpToDate())
-			{
-				status = 3;
+					waitWin = bchain.getWaitWinBuffer();
 
-				if (ctrl.isOnStopping())
-					return;
-				
-				bchain.clearWaitWinBuffer();
-				
-				ctrl.update();
-				
-				try {
-					Thread.sleep(10000);
-				}
-				catch (InterruptedException e) {
-				}
-				
-				if (ctrl.isOnStopping())
-					return;
-
-				continue;
-			}
-			
-			if (ctrl.isOnStopping()) {
-				return;
-			}
-
-			// NO WALLET - loop
-			if(!ctrl.doesWalletExists())
-				continue;
-
-			//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-			syncForgingStatus();
-			if (forgingStatus == ForgingStatus.FORGING // FORGING enabled
-					&& (this.solvingReference == null // AND GENERATING NOT MAKED
-						|| !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature()))
-					)
-			{
-				
-				/////////////////////////////// TRY FORGING ////////////////////////
-
-				if(dcSet.isStoped()) {
-					return;
-				}
-
-				//SET NEW BLOCK TO SOLVE
-				this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
-				Block solvingBlock = dcSet.getBlockMap().get(this.solvingReference);
-				
-				//set max block
-				if (BlockChain.BLOCK_COUNT >0 && solvingBlock.getHeight(dcSet) > BlockChain.BLOCK_COUNT ) return;
-
-				if(dcSet.isStoped()) {
-					return;
-				}
-
-				/*
-				 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
-				 * значть их ХЭШ - 
-				 * тоже самое и AT записями поидее
-				 * и эти хэши закатываем уже в заголвок блока и подписываем
-				 * после чего делать вычисление значения ПОБЕДЫ - она от подписи зависит
-				 * если победа случиласть то
-				 * далее сами трнзакции кладем в тело блока и закрываем его
-				 */
-				/*
-				 * нет не  так - вычисляеи победное значение и если оно выиграло то
-				 * к нему транзакции собираем
-				 * и время всегда одинаковое
-				 * 
-				 */
-
-				status = 4;
-				
-				//GENERATE NEW BLOCKS
-				this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
-				this.acc_winner = null;
-				
-				List<Transaction> unconfirmedTransactions = null;
-				byte[] unconfirmedTransactionsHash = null;
-				long max_winned_value = 0;
-				long winned_value;				
-				int height = bchain.getHeight(dcSet) + 1;
-				long target = bchain.getTarget(dcSet);
-
-				//PREVENT CONCURRENT MODIFY EXCEPTION
-				List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-				synchronized(knownAccounts)
-				{
-					
-					status = 5;
-					
-					for(PrivateKeyAccount account: knownAccounts)
+					if (waitWin == null && timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS < NTP.getTime()
+						&& forgingStatus == ForgingStatus.FORGING // FORGING enabled
+							&& (this.solvingReference == null // AND GENERATING NOT MAKED
+								|| !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
+							)
+						)
 					{
 						
-						winned_value = account.calcWinValue(dcSet, bchain, this.lastBlocksForTarget, height, target);
-						if(winned_value < 1l)
-							continue;
+						/////////////////////////////// TRY FORGING ////////////////////////
+		
+						if(ctrl.isOnStopping()) {
+							status = -1;
+							return;
+						}
+		
+						//SET NEW BLOCK TO SOLVE
+						this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
+						Block solvingBlock = dcSet.getBlockMap().get(this.solvingReference);
 						
-						if (winned_value > max_winned_value) {
-							//this.winners.put(account, winned_value);
-							acc_winner = account;
-							max_winned_value = winned_value;
+						//set max block
+						//if (BlockChain.BLOCK_COUNT >0)	if (solvingBlock.getHeight(dcSet) > BlockChain.BLOCK_COUNT ) return;
+		
+						if(ctrl.isOnStopping()) {
+							status = -1;
+							return;
+						}
+		
+						/*
+						 * нужно сразу взять транзакции которые бедум в блок класть - чтобы
+						 * значть их ХЭШ - 
+						 * тоже самое и AT записями поидее
+						 * и эти хэши закатываем уже в заголвок блока и подписываем
+						 * после чего делать вычисление значения ПОБЕДЫ - она от подписи зависит
+						 * если победа случиласть то
+						 * далее сами трнзакции кладем в тело блока и закрываем его
+						 */
+						/*
+						 * нет не  так - вычисляеи победное значение и если оно выиграло то
+						 * к нему транзакции собираем
+						 * и время всегда одинаковое
+						 * 
+						 */
+		
+						status = 4;
+						
+						//GENERATE NEW BLOCKS
+						this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
+						this.acc_winner = null;
+						
+						List<Transaction> unconfirmedTransactions = null;
+						byte[] unconfirmedTransactionsHash = null;
+						long max_winned_value = 0;
+						long winned_value;				
+						int height = bchain.getHeight(dcSet) + 1;
+						long target = bchain.getTarget(dcSet);
+		
+						//PREVENT CONCURRENT MODIFY EXCEPTION
+						List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
+						synchronized(knownAccounts)
+						{
 							
+							status = 5;
+							
+							for(PrivateKeyAccount account: knownAccounts)
+							{
+								
+								winned_value = account.calcWinValue(dcSet, bchain, this.lastBlocksForTarget, height, target);
+								if(winned_value < 1l)
+									continue;
+								
+								if (winned_value > max_winned_value) {
+									//this.winners.put(account, winned_value);
+									acc_winner = account;
+									max_winned_value = winned_value;
+									
+								}
+							}
+						}
+						
+						if(acc_winner != null) {
+							
+							if (ctrl.isOnStopping()) {
+								status = -1;
+								return;
+							}
+			
+							int wait_new_block_broadcast = (int)((WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (target - max_winned_value) / target);
+							
+							if (wait_new_block_broadcast > 0) {
+	
+								status = 6;
+								
+								LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast/1000);
+								// SLEEP and WATCH break
+								long wait_steep = wait_new_block_broadcast / 100;
+								boolean newWinner = false;
+								do {
+									try
+									{
+										Thread.sleep(100);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+									
+									if (ctrl.isOnStopping()) {
+										status = -1;
+										return;
+									}
+	
+									waitWin = bchain.getWaitWinBuffer();
+									if (waitWin != null && waitWin.calcWinValue(dcSet) > max_winned_value) {
+										// NEW WINNER received
+										newWinner = true;
+										this.solvingReference = null;
+										break;
+									}
+											
+								} while (wait_steep-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+	
+								if (newWinner)
+								{
+									LOGGER.info("NEW WINER RECEIVED - drop my block");
+									continue;
+								}
+							}
+	
+							// MAKING NEW BLOCK
+							status = 7;
+			
+							// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+							LOGGER.info("GENERATE my BLOCK");
+			
+							unconfirmedTransactions = getUnconfirmedTransactions(dcSet, timePoint);
+							// CALCULATE HASH for that transactions
+							byte[] winnerPubKey = acc_winner.getPublicKey();
+							byte[] atBytes = null;
+							unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
+			
+							//ADD TRANSACTIONS
+							//this.addUnconfirmedTransactions(dcSet, block);
+							Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
+									solvingBlock, unconfirmedTransactionsHash);
+							generatedBlock.setTransactions(unconfirmedTransactions);
+							
+							//PASS BLOCK TO CONTROLLER
+							///ctrl.newBlockGenerated(block);
+							LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+							if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
+			
+								// need to BROADCAST
+								status = 8;
+								ctrl.broadcastWinBlock(generatedBlock, null);
+								status = 0;
+
+							} else {
+								LOGGER.info("my BLOCK is weak ((...");
+							}
 						}
 					}
 				}
 				
-				if(acc_winner == null)
-					continue;
-				
-				if (ctrl.isOnStopping())
-					return;
+				////////////////////////////  FLUSH NEW BLOCK /////////////////////////
+	
+				// try solve and flush new block from Win Buffer		
+				waitWin = bchain.getWaitWinBuffer();
+				if (waitWin != null) {
 
-				status = 6;
+					this.solvingReference = null;
 
-				int wait_new_block_broadcast = (int)(solvingBlock.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + wait_interval_flush - NTP.getTime());
-				
-				if (wait_new_block_broadcast + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0) {
-					wait_new_block_broadcast = -1;
-				} else {
-					// WAIT
-					if (target + (target>>1) < max_winned_value) {
-						wait_new_block_broadcast -= wait_interval_flush>>1 + wait_interval_flush>>3;
-					} else if (target + (target>>2) < max_winned_value) {
-						wait_new_block_broadcast -= wait_interval_flush>>2;
-					} else if (target + (target>>3) < max_winned_value) {
-						wait_new_block_broadcast -= wait_interval_flush>>3;
-					} else if (target + (target>>4) < max_winned_value) {
-						wait_new_block_broadcast -= wait_interval_flush>>4;
-					} else if (target < max_winned_value) {
-						wait_new_block_broadcast += wait_interval_flush>>4;
-					} else {
-						wait_new_block_broadcast += (wait_interval_flush>>4)
-								+ (long)wait_interval_flush * target / max_winned_value;
-					}
-				}	
-				
-				if (wait_new_block_broadcast > 0) {
-					LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast/1000);
-					// SLEEP and WATCH break
-					long wait_steep = wait_new_block_broadcast / 500;
-					long maxTime = solvingBlock.getTimestamp(dcSet) + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
-					boolean newWinner = false;
-					do {
+					// FLUSH WINER to DB MAP
+					LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime())/1000);
+	
+					status = 1;
+	
+					while (flushPoint > NTP.getTime()) {
 						try
 						{
-							Thread.sleep(500);
+							Thread.sleep(100);
 						}
 						catch (InterruptedException e) 
 						{
 						}
-						
-						waitWin = bchain.getWaitWinBuffer();
-						if (waitWin != null && waitWin.calcWinValue(dcSet) > max_winned_value) {
-							// NEW WINNER received
-							newWinner = true;
-							break;
-						}
-
-						if (ctrl.isOnStopping())
+	
+						if (ctrl.isOnStopping()) {
+							status = -1;
 							return;
+						}
+					}
+					
+					// FLUSH WINER to DB MAP
+					LOGGER.info("TRY to FLUSH WINER to DB MAP");
+	
+					try {
 						
-					} while (wait_steep-- > 0 && NTP.getTime() < maxTime);
+						status = 2;
+						if (!ctrl.flushNewBlockGenerated()) {
+							// NEW BLOCK not FLUSHED
+							LOGGER.error("NEW BLOCK not FLUSHED");
+							continue;
+						}
+						status = 0;
 
-					if (newWinner)
-					{
-						LOGGER.info("NEW WINER RECEIVED - drop my block");
+						if (ctrl.isOnStopping()) {
+							status = -1;
+							return;
+						}
+							
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						if (ctrl.isOnStopping()) {
+							status = -1;
+							return;
+						}
+						// if FLUSH out of memory
+						bchain.clearWaitWinBuffer();
+						LOGGER.error(e.getMessage(), e);
+					}
+				}
+	
+				////////////////////////// UPDATE ////////////////////
+				//CHECK IF WE ARE NOT UP TO DATE
+				waitWin = bchain.getWaitWinBuffer();
+				if (waitWin == null) {
+					
+					timeUpdate = timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
+
+					if (timeUpdate > 0) {
+						//// still early FOR UPDATE
 						continue;
 					}
-				}
 
-				
-				// MAKING NEW BLOCK
-				status = 7;
-
-				// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-				long newTimestamp = BlockChain.GENERATING_MIN_BLOCK_TIME_MS + bchain.getTimestamp(dcSet);
-				LOGGER.info("GENERATE my BLOCK after timePOINT: " + (NTP.getTime() - newTimestamp)/1000);
-
-				unconfirmedTransactions = getUnconfirmedTransactions(dcSet, newTimestamp);
-				// CALCULATE HASH for that transactions
-				byte[] winnerPubKey = acc_winner.getPublicKey();
-				byte[] atBytes = null;
-				unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
-
-				//ADD TRANSACTIONS
-				//this.addUnconfirmedTransactions(dcSet, block);
-				Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
-						solvingBlock, unconfirmedTransactionsHash);
-				generatedBlock.setTransactions(unconfirmedTransactions);
-				
-				//PASS BLOCK TO CONTROLLER
-				///ctrl.newBlockGenerated(block);
-				LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-				if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
-
-					// need to BROADCAST
-
-					// REFRESH
-					waitWin = bchain.getWaitWinBuffer();
-					if (waitWin != null)
-					{
-						long wait_winned_value = waitWin.calcWinValue(dcSet);
-						if (wait_winned_value > max_winned_value) {
-							// block in buffer is more good
-							LOGGER.info("wait_winned_value > max_winned_value (new): " + wait_winned_value + ">" + max_winned_value);
-							continue;
+					/// CHECK PEERS SAME ME 
+					ctrl.checkStatusAndObserve(0);
+					if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0 && !ctrl.needUpToDate()) {
+						//////// PAT SITUATION ////////////
+						ctrl.checkStatusAndObserve(-1);
+						if (ctrl.needUpToDate()) {
+							status = 31;
+							ctrl.orphanInPipe(ctrl.getLastBlock());
 						}
-					}
+					}					
 					
-					status = 8;
-					
-					long timeBlock = generatedBlock.getTimestamp(dcSet) + BlockChain.WIN_BLOCK_BROADCAST_WAIT;
-					while(timeBlock > NTP.getTime()) {
-						try
-						{
-							Thread.sleep(500);
+					/// CHECK PEERS HIGHER 
+					ctrl.checkStatusAndObserve(0);
+					if (timeUpdate < 0 && ctrl.needUpToDate()) {
+						if (ctrl.isOnStopping()) {
+							status = -1;
+							return;
 						}
-						catch (InterruptedException e) 
-						{
-						}
-					}
+						
+						status = 3;
+						ctrl.update(0);
+						status = 0;
 
-					ctrl.broadcastWinBlock(generatedBlock, null);
-	
+						if (ctrl.isOnStopping()) {
+							status = -1;
+							return;
+						}	
+					}
 				}
+				
+				if (ctrl.isOnStopping()) {
+					status = -1;
+					return;
+				}
+					
+			} catch (Exception e) {
+				if (ctrl.isOnStopping()) {
+					status = -1;
+					return;
+				}
+				LOGGER.error(e.getMessage(), e);
+				this.solvingReference = null;
+				bchain.clearWaitWinBuffer();
+
 			}
 		}
 	}
@@ -541,6 +588,7 @@ public class BlockGenerator extends Thread implements Observer
 		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
 		long tickets2 = System.currentTimeMillis() - start - tickets;
 		LOGGER.error("sort time " + tickets2);
+		start = System.currentTimeMillis();
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
 		
@@ -631,14 +679,14 @@ public class BlockGenerator extends Thread implements Observer
 		}
 		while(count < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
 
-		long start2 = System.currentTimeMillis();
+
+		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"milsec for trans: " + transactionsList.size() );
+		start = System.currentTimeMillis();
 
 		// sort by TIMESTAMP
 		Collections.sort(transactionsList,  new TransactionTimestampComparator());
 
-		long start22 = System.currentTimeMillis() - start2;
-
-		LOGGER.debug("get Unconfirmed Transactions =" + start22 +"milsec for trans: " + transactionsList.size() );
+		LOGGER.debug("sort 2 Unconfirmed Transactions =" + (System.currentTimeMillis() - start) +"milsec for trans: " + transactionsList.size() );
 		
 		return transactionsList;
 	}	

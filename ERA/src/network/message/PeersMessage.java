@@ -27,6 +27,11 @@ public class PeersMessage extends Message {
 	{
 		return this.peers;
 	}
+	
+	public boolean isRequest()
+	{
+		return false;
+	}
 
 	public static PeersMessage parse(byte[] data) throws Exception
 	{

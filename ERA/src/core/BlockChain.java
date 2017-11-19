@@ -30,9 +30,9 @@ public class BlockChain
 
 	//public static final int START_LEVEL = 1;
 	public static final boolean DEVELOP_USE = false;
-	public static final boolean HARD_WORK = false;
+	public static final boolean HARD_WORK = true;
 	public static final boolean PERSON_SEND_PROTECT = true;
-	public static final int BLOCK_COUNT = 0; // max count Block (if =<0 to the moon)
+	//public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
 	public static final int TESTNET_PORT = DEVELOP_USE?9065:9045;
 	public static final int MAINNET_PORT = DEVELOP_USE?9066:9046;
@@ -42,10 +42,9 @@ public class BlockChain
 
 	//public static final String TIME_ZONE = "GMT+3";
 	//
-	public static boolean USE_AT_ATX = false;
-
-	public static final int MAX_ORPHAN = 10000; // max orphan blocks in chain
-	public static final int SYNCHRONIZE_PACKET = 100; // when synchronize - get blocks packet
+	
+	public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
+	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
@@ -58,11 +57,11 @@ public class BlockChain
 	public static final int MIN_GENERATING_BALANCE = 100;
 	public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
 	//public static final int GENERATING_RETARGET = 10;
-	
 	public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE?120:288; // 300 PER DAY
-	public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000; 
+	public static final int GENERATING_MIN_BLOCK_TIME_MS = BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
+	public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; // 
+
 	public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
-	public static final int WIN_BLOCK_BROADCAST_WAIT = 10000; // 
 	//public static final int GENERATING_MAX_BLOCK_TIME = 1000;
 	public static final int MAX_BLOCK_BYTES = 2<<21; //4 * 1048576;
 	public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES>>1;
@@ -91,7 +90,7 @@ public class BlockChain
 
 	//TESTNET 
 												//   1486444444444l
-												//	 1487844444444
+										   //	 1487844444444   1509434273     1509434273 
 	public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE?1501251005000l:1487844793333l;
 
 	//public static final int FEE_MIN_BYTES = 200;
@@ -102,7 +101,7 @@ public class BlockChain
 	public static final float FEE_POW_BASE = (float)1.5;
 	public static final int FEE_POW_MAX = 6;
 	public static final int ISSUE_MULT_FEE = 1<<10;
-	public static final int ISSUE_ASSET_MULT_FEE = 1<<8;
+	public static final int ISSUE_ASSET_MULT_FEE = 1<<8; 
 	//
 	public static final int FEE_INVITED_DEEP = 4; // levels for deep
 	public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
@@ -128,23 +127,25 @@ public class BlockChain
 	private long genesisTimestamp;
 
 	private Block waitWinBuffer;
-	private int checkPoint = 70000;
+	private int checkPoint = 1;
 	//private int target = 0;
+	//private byte[] lastBlockSignature;
+	//private Tuple2<Integer, Long> HWeight;
+
 	
 	//private DBSet dcSet;
 	
 	// dcSet_in = db() - for test
 	public BlockChain(DCSet dcSet_in) throws Exception
 	{	
+		//CREATE GENESIS BLOCK
+		genesisBlock = new GenesisBlock();
+		genesisTimestamp = genesisBlock.getTimestamp(null);
+		
 		DCSet dcSet = dcSet_in;
 		if (dcSet == null) {
 			dcSet = DCSet.getInstance();
 		}
-
-		//CREATE GENESIS BLOCK
-		genesisBlock = new GenesisBlock();
-		genesisTimestamp = genesisBlock.getTimestamp(dcSet);
-		
 
 		if(Settings.getInstance().isTestnet()) {
 			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
@@ -169,6 +170,10 @@ public class BlockChain
         	genesisBlock.process(dcSet);
 
         }
+		
+		//lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
+		//HWeight = dcSet.getBlockSignsMap().get(lastBlockSignature);
+		
 	}
 	
 	public GenesisBlock getGenesisBlock() {
@@ -225,7 +230,9 @@ public class BlockChain
 		return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
 	}
 
-	public synchronized Tuple2<Integer, Long> getHWeight(DCSet dcSet, boolean withWinBuffer) {
+	/*
+	//public synchronized Tuple2<Integer, Long> getHWeight(DCSet dcSet, boolean withWinBuffer) {
+	public Tuple2<Integer, Long> getHWeight(DCSet dcSet, boolean withWinBuffer) {
 		
 		if (dcSet.isStoped())
 			return null;
@@ -255,7 +262,18 @@ public class BlockChain
 		return  new Tuple2<Integer, Long>(height, weight);
 		
 	}
+	*/
 	
+	public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
+		Tuple2<Integer, Long> hWeight = dcSet.getBlockSignsMap().get(this.getLastBlockSignature(dcSet));
+		if (hWeight == null || hWeight.a == -1) return new Tuple2<Integer, Long>(-1, -1L);
+		
+		if (hWeight.b < hWeight.a * 2000) {
+			dcSet.getBlockSignsMap().recalcWeightFull(dcSet);
+		}
+		return new Tuple2<Integer, Long>(hWeight.a, dcSet.getBlockSignsMap().getFullWeight());
+	}
+
 	public long getFullWeight(DCSet dcSet) {
 		
 		return dcSet.getBlockSignsMap().getFullWeight();
@@ -264,7 +282,7 @@ public class BlockChain
 	public int getCheckPoint(DCSet dcSet) {
 		
 		int checkPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
-		checkPoint = DEVELOP_USE?1:1; // 32400
+		checkPoint = DEVELOP_USE?1:32400;
 		
 		if ( checkPoint > this.checkPoint)
 			this.checkPoint = checkPoint;
@@ -301,7 +319,8 @@ public class BlockChain
 			while(childBlock != null && counter < SYNCHRONIZE_PACKET)
 			{
 
-				counter += 1 + (childBlock.getTransactionCount()>>6);
+				// >>10 - for 20000 = 10 max blocks will be send
+				counter += 1 + (childBlock.getTransactionCount() >> 10);
 
 				headers.add(childBlock.getSignature());
 				
@@ -323,7 +342,7 @@ public class BlockChain
 	}
 	public Block getBlock(DCSet dcSet, int height) {
 
-		byte[] signature = dcSet.getBlockMap().getSignByHeight(height);
+		byte[] signature = dcSet.getBlockHeightsMap().get(height);
 		return dcSet.getBlockMap().get(signature);
 	}
 
@@ -332,14 +351,14 @@ public class BlockChain
 		//CHECK IF NOT GENESIS
 		if(block.getVersion() == 0 || block instanceof GenesisBlock)
 		{
-			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> as GenesisBlock");
+			LOGGER.debug("isNewBlockValid ERROR -> as GenesisBlock");
 			return -1;
 		}
 		
 		//CHECK IF SIGNATURE IS VALID
 		if(!block.isSignatureValid())
 		{
-			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> signature");
+			LOGGER.debug("isNewBlockValid ERROR -> signature");
 			return -2;
 		}
 		
@@ -351,42 +370,42 @@ public class BlockChain
 			//CHECK IF WE KNOW THIS BLOCK
 			if(dbMap.contains(block.getSignature()))
 			{
-				LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> already in DB #" + block.getHeight(dcSet));
+				LOGGER.debug("isNewBlockValid IGNORE -> already in DB #" + block.getHeight(dcSet));
 				return -3;
 			}
-
-			LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference NOT to last block");			
 
 			Block lastBlock = dbMap.get(lastSignature);
 			if(Arrays.equals(lastBlock.getReference(), block.getReference())) {
 				// CONCURENT for LAST BLOCK
 				if (block.calcWinValue(dcSet) > lastBlock.calcWinValue(dcSet)) {
-					LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> reference to PARENT last block");
+					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> TRY WIN");
 					return 4;
 				} else {
+					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> weak...");
 					return -4;
 				}
 			}
 			
 			Block winBlock = this.getWaitWinBuffer();
 			if (winBlock == null) {
-				LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> win BLOCK is NULL");
+				LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block AND win BLOCK is NULL");			
 				return -10;
 			}
 			
 			if (Arrays.equals(winBlock.getSignature(), newBlockReference)) {
 				// this new block for my winBlock + 1 Height
-				if (winBlock.getTimestamp(dcSet) - (GENERATING_MIN_BLOCK_TIME_MS>>8) > NTP.getTime()) {
+				if (this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS>>8) > NTP.getTime()) {
 					// BLOCK from FUTURE
-					LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> new BLOCK from FUTURE");
+					LOGGER.debug("isNewBlockValid ERROR -> reference to WIN block in BUFFER and IT from FUTURE");
 					return -5;
 				} else {
 					// LETS FLUSH winBlock and set newBlock as waitWIN
-					LOGGER.debug("core.BlockChain.isNewBlockValid ERROR -> LETS FLUSH winBlock and set newBlock as waitWIN");
+					LOGGER.debug("isNewBlockValid ERROR -> reference to WIN block in BUFFER try SET IT");
 					return 5;
 				}
 			}
 			
+			LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block -9");			
 			return -9;
 		}
 		

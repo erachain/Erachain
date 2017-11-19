@@ -169,10 +169,10 @@ public class TestChain {
 		while (i <= blockChain.getHeight(dcSet)) {
 			block = blockChain.getBlock(dcSet, i);
 			int win_value = block.calcWinValueTargeted(dcSet);
-			int www = dbHeight.getWeight(block);
+			long www = dbHeight.getWeight(block);
 			if (www != win_value) {
 				//assertEquals(www, win_value);
-				int diff = www - win_value;
+				long diff = www - win_value;
 				i = i + 1 - 1;
 				win_value = block.calcWinValueTargeted(dcSet);
 				lastH = block.getCreator().getForgingData(dcSet, i);

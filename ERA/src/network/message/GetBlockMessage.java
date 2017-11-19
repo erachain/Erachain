@@ -20,6 +20,11 @@ public class GetBlockMessage extends Message{
 		return this.signature;
 	}
 	
+	public boolean isRequest()
+	{
+		return true;
+	}
+
 	public static GetBlockMessage parse(byte[] data) throws Exception 
 	{
 		//CHECK IF DATA MATCHES LENGTH
