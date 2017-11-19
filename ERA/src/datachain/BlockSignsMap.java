@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -23,6 +24,8 @@ import core.block.Block;
 public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Long>> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+
+	private static final Logger LOGGER = Logger.getLogger(BlockSignsMap.class);
 		
 	// for saving in DB
 	private Var<Long> fullWeightVar;
@@ -144,6 +147,7 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Long>>
 		if (this.contains(key)) {
 			// sub old value from FULL
 			Tuple2<Integer, Long> value_old = this.get(key);
+			LOGGER.error("================= value_old :\n" + value_old + " ++ NEW: " + weight);		
 			fullWeight -= value_old.b;
 		}
 		

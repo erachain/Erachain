@@ -120,14 +120,6 @@ public abstract class Item_Map extends DCMap<Long, ItemCls>
 		
 		//LOGGER.debug("<<<<< delete 1, key: " + key);
 
-		//DECREMENT ATOMIC KEY IF EXISTS
-		if(this.atomicKey != null)
-		{
-			this.atomicKey.decrementAndGet();
-		}
-		
-		//LOGGER.debug("<<<<< delete 2");
-
 		// delete empty KEYS (run to GENESIS inserted keys)
 		do {
 			//DECREMENT ATOMIC KEY IF EXISTS

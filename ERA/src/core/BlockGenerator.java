@@ -241,8 +241,8 @@ public class BlockGenerator extends Thread implements Observer
 				
 				if (orphanto>0) {
 					status = 9;
-					ForgingStatus forgingStatus = ctrl.getForgingStatus();
 					ctrl.setForgingStatus(ForgingStatus.FORGING_WAIT);
+					ctrl.checkStatusAndObserve(0);
 					try
 					{
 						ctrl.clearWaitWinBufferProcessed();
@@ -254,9 +254,6 @@ public class BlockGenerator extends Thread implements Observer
 					{
 					}
 
-					ctrl.setForgingStatus(forgingStatus);
-					ctrl.checkStatusAndObserve(0);
-					continue;
 				}
 				
 				timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
@@ -462,7 +459,7 @@ public class BlockGenerator extends Thread implements Observer
 	
 					status = 1;
 	
-					while (flushPoint > NTP.getTime()) {
+					while (flushPoint > NTP.getTime() && bchain.getWaitWinBuffer() != null) {
 						try
 						{
 							Thread.sleep(100);

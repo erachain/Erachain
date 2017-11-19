@@ -267,10 +267,12 @@ public class BlockChain
 	public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
 		Tuple2<Integer, Long> hWeight = dcSet.getBlockSignsMap().get(this.getLastBlockSignature(dcSet));
 		if (hWeight == null || hWeight.a == -1) return new Tuple2<Integer, Long>(-1, -1L);
-		
+
+		/*
 		if (hWeight.b < hWeight.a * 2000) {
 			dcSet.getBlockSignsMap().recalcWeightFull(dcSet);
 		}
+		*/
 		return new Tuple2<Integer, Long>(hWeight.a, dcSet.getBlockSignsMap().getFullWeight());
 	}
 

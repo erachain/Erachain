@@ -249,7 +249,11 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 		{
 			//CHECK IF LIST UPDATED
 			this.blocks.remove(0);
-			this.fireTableRowsDeleted(0, 0);	
+			if (this.blocks.size() > 10) {
+				this.fireTableRowsDeleted(0, 0);
+			} else {
+				resetRows();
+			}
 
 		} else if(type == ObserverMessage.CHAIN_RESET_BLOCK_TYPE)
 		{
