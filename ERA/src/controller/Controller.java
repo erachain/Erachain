@@ -1233,7 +1233,7 @@ public class Controller extends Observable {
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockWinMessage.getBlock();
 
-				if (this.status != STATUS_OK) {
+				if (this.status == STATUS_SYNCHRONIZING) {
 					// SET for FUTURE without CHECK
 					blockChain.clearWaitWinBuffer();
 					blockChain.setWaitWinBuffer(dcSet, newBlock);
