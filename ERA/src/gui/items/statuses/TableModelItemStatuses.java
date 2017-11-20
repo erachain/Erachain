@@ -157,7 +157,7 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	
 	public void removeObservers() 
 	{
-		this.statuses.removeObserver();
+		if(this.statuses != null)this.statuses.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
 }

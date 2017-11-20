@@ -152,7 +152,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 	
 	public void removeObservers() 
 	{
-		this.polls.removeObserver();
+		if(this.polls!=null)this.polls.removeObserver();
 		DCSet.getInstance().getPollMap().deleteObserver(this);
 	}
 }

@@ -75,6 +75,7 @@ public class Search_Notes_Tab extends Split_Panel {
 		
 		setName(Lang.getInstance().translate("Search Templates"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+		searchToolBar_LeftPanel.setVisible(true);
 		// not show buttons
 			button1_ToolBar_LeftPanel.setVisible(false);
 			button2_ToolBar_LeftPanel.setVisible(false);

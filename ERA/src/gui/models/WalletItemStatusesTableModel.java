@@ -163,7 +163,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		}	
 	}
 	public void removeObservers(){
-		this.statuses.removeObserver();
+		if (this.statuses != null)	this.statuses.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
 }
