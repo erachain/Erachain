@@ -68,7 +68,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 	@Override
 	public int getRowCount() 
 	{
-		 return this.polls.size();
+		 return (this.polls == null)? 0 : this.polls.size();
 	}
 
 	@Override

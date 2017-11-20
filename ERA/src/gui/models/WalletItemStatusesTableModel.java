@@ -75,7 +75,9 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 	@Override
 	public int getRowCount() 
 	{
-		 return this.statuses.size();
+		
+	
+		return (this.statuses == null)? 0 : this.statuses.size();
 	}
 
 	@Override

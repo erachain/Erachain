@@ -74,8 +74,7 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	@Override
 	public int getRowCount() 
 	{
-		return this.notes.size();
-		
+		return (this.notes == null)? 0 : this.notes.size();
 	}
 
 	@Override

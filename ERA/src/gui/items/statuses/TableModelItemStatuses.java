@@ -72,7 +72,8 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	@Override
 	public int getRowCount() 
 	{
-		return this.statuses.size();
+		
+		return (this.statuses == null)? 0 : this.statuses.size();
 		
 	}
 

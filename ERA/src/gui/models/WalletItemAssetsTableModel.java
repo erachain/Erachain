@@ -77,7 +77,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 	@Override
 	public int getRowCount() 
 	{
-		 return this.assets.size();
+		 return (this.assets == null)? 0 : this.assets.size();
 	}
 
 	@Override

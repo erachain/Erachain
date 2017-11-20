@@ -75,7 +75,8 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 	@Override
 	public int getRowCount() 
 	{
-		 return this.unions.size();
+		
+		return (this.unions == null)? 0 : this.unions.size();
 	}
 
 	@Override
