@@ -3958,6 +3958,7 @@ if ( asset_1 == null) {
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+			transaction.calcFee();
 			List<Transaction>tt = new ArrayList<Transaction>();
 			tt.add(transaction);
 		//	output.put("transaction_Header",Transactions_JSON(tt));
