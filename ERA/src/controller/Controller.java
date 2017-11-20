@@ -1253,8 +1253,11 @@ public class Controller extends Observable {
 						+ " WIN_BLOCK_TYPE targetedWIN: " + newBlock.calcWinValueTargeted(dcSet));
 				
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
-				if (isNewWinBlockValid != 0) // TODO not solve 4 5
+				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
+					info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
+					banPeerOnError(message.getSender(), info);
 					return;
+				}
 
 				if (!newBlock.isValid(dcSet)) {
 					info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
