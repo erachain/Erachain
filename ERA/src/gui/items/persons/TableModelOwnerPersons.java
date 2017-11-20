@@ -189,7 +189,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	
 	public void removeObservers() 
 	{
-		this.persons_S_List.removeObserver();
+		if (persons_S_List != null)	this.persons_S_List.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
 	
