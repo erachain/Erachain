@@ -103,6 +103,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	@Override
 	public int getRowCount() 
 	{
+		if (this.persons == null) return 0;
 		return this.persons.size();
 		
 	}
