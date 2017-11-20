@@ -65,7 +65,8 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 	@Override
 	public int getRowCount() 
 	{
-		 return this.polls.size();
+	
+		 return (this.polls == null)? 0 : this.polls.size();
 	}
 
 	@Override

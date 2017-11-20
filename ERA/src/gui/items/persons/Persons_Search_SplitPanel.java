@@ -139,6 +139,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 						if (search_Table_Model.getRowCount() < 1) {
 							Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
 							jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+							jScrollPane_jPanel_RightPanel.setViewportView(null);
 							return;
 						}
 						jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
@@ -255,6 +256,7 @@ public class Persons_Search_SplitPanel extends Split_Panel{
 							if (search_Table_Model.getRowCount() < 1) {
 								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
 								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+								jScrollPane_jPanel_RightPanel.setViewportView(null);
 								return;
 							}
 							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);

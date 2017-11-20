@@ -1,12 +1,17 @@
 package gui.items.statuses;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.validation.constraints.Null;
 
 import controller.Controller;
+import core.item.ItemCls;
+import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
+import datachain.DCSet;
+import datachain.ItemStatusMap;
 import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -22,20 +27,25 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	public static final int COLUMN_UNIQUE = 3;
 	public static final int COLUMN_FAVORITE = 4;
 
-	private SortableList<Long, StatusCls> statuses;
+	//private SortableList<Long, StatusCls> statuses;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Unique", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
+	private ItemStatusMap db;
+	private ArrayList<ItemCls> list;
+	private Long key_filter;
+	private String filter_Name;
 	
 	public TableModelItemStatuses()
 	{
-		Controller.getInstance().addObserver(this);
+	//	Controller.getInstance().addObserver(this);
+		db= DCSet.getInstance().getItemStatusMap();
 	}
 	
 	@Override
 	public SortableList<Long, StatusCls> getSortableList() 
 	{
-		return this.statuses;
+		return null;
 	}
 	
 	
@@ -54,7 +64,7 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 		}
 	public StatusCls getStatus(int row)
 	{
-		return this.statuses.get(row).getB();
+		return (StatusCls) db.get((long) row);
 	}
 	
 	@Override
@@ -72,19 +82,20 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	@Override
 	public int getRowCount() 
 	{
-		return this.statuses.size();
+		
+		return (list == null)? 0 : list.size();
 		
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.statuses == null || row > this.statuses.size() - 1 )
+		if(list == null || row > list.size() - 1 )
 		{
 			return null;
 		}
 		
-		StatusCls status = this.statuses.get(row).getB();
+		StatusCls status = (StatusCls) list.get(row);
 		
 		switch(column)
 		{
@@ -116,47 +127,40 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
+		
 	}
 	
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
-	//	System.out.println("message:"+message.getType()+"  value:"+ message.getValue());
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_STATUS_TYPE)
-		{			
-			if(this.statuses == null)
-			{
-				this.statuses = (SortableList<Long, StatusCls>) message.getValue();
-				this.statuses.addFilterField("name");
-				this.statuses.registerObserver();
-			}	
-			
-			this.fireTableDataChanged();
-		}
-		int a = message.getType();
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE || message.getType() == ObserverMessage.REMOVE_STATUS_TYPE || message.getType() == ObserverMessage.LIST_STATUS_FAVORITES_TYPE )
-		{
-			
-			
-			this.statuses = (SortableList<Long, StatusCls>) message.getValue();
-			this.fireTableDataChanged();
-		}
-	}
+
 	
 	public void removeObservers() 
 	{
-		this.statuses.removeObserver();
-		Controller.getInstance().deleteObserver(this);
+		//if(this.statuses != null)this.statuses.removeObserver();
+		//Controller.getInstance().deleteObserver(this);
+	}
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		if (text.equals("") || text == null) return;
+		if (!text.matches("[0-9]*"))return;
+			key_filter = new Long(text);
+			list =new ArrayList<ItemCls>();
+			// Controller.getInstance().getNote(key_filter);
+			StatusCls note = (StatusCls) db.get(key_filter);
+			if ( note == null) return;
+			list.add(note);
+						
+			this.fireTableDataChanged();
+		
+		
+	}
+	public void clear(){
+		list =new ArrayList<ItemCls>();
+		this.fireTableDataChanged();
+		
+	}
+	public void set_Filter_By_Name(String str) {
+		filter_Name = str;
+		list = (ArrayList<ItemCls>) db.get_By_Name(filter_Name, false);
+		this.fireTableDataChanged();
+
 	}
 }

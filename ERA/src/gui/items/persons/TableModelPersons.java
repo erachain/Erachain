@@ -160,11 +160,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	@SuppressWarnings("unchecked")
 	public synchronized void syncUpdate(Observable o, Object arg) {
 		ObserverMessage message = (ObserverMessage) arg;
-		if (key_filter >0){
-			
-		return;	
-		}
-		
+		if (key_filter >0)	return;	
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
 			if (this.list == null && !filter_Name.equals("")) {
@@ -217,7 +213,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		if (!text.matches("[0-9]*"))return;
 			key_filter = new Long(text);
 			list =new ArrayList<ItemCls>();
-			PersonCls pers = Controller.getInstance().getPerson(key_filter);
+			PersonCls pers = (PersonCls) db.get(key_filter);
 			if ( pers == null) return;
 			list.add(pers);
 			this.fireTableDataChanged();

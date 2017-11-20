@@ -1,15 +1,21 @@
 package gui.items.notes;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.validation.constraints.Null;
 
 import controller.Controller;
+import core.item.ItemCls;
 import core.item.notes.NoteCls;
+import core.item.persons.PersonCls;
+import datachain.DCSet;
+import datachain.ItemNoteMap;
 import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
+import utils.Pair;
 import gui.models.TableModelCls;
 import lang.Lang;
 
@@ -20,21 +26,22 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_FAVORITE = 3;
-
-	private SortableList<Long, NoteCls> notes;
-	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
+	private Long key_filter;
+	private ArrayList<ItemCls> list;
+	private String filter_Name;
+	private ItemNoteMap db;
 	
 	public TableModelNotes()
 	{
-		Controller.getInstance().addObserver(this);
+		db= DCSet.getInstance().getItemNoteMap();
 	}
 	
 	@Override
 	public SortableList<Long, NoteCls> getSortableList() 
 	{
-		return this.notes;
+		return null;
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -56,7 +63,7 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	
 	public NoteCls getNote(int row)
 	{
-		return this.notes.get(row).getB();
+		return (NoteCls) list.get(row);
 	}
 	
 	@Override
@@ -74,19 +81,18 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	@Override
 	public int getRowCount() 
 	{
-		return this.notes.size();
-		
+		return (list == null)? 0 : list.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.notes == null || row > this.notes.size() - 1 )
+		if(this.list == null || row > this.list.size() - 1 )
 		{
 			return null;
 		}
 		
-		NoteCls note = this.notes.get(row).getB();
+		NoteCls note = (NoteCls) list.get(row);
 		
 		switch(column)
 		{
@@ -128,16 +134,11 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
+		if (true)	return;	
 		//CHECK IF NEW LIST
 		if(message.getType() == ObserverMessage.LIST_NOTE_TYPE)
 		{			
-			if(this.notes == null)
-			{
-				this.notes = (SortableList<Long, NoteCls>) message.getValue();
-				this.notes.addFilterField("name");
-				this.notes.registerObserver();
-			}	
+			
 			
 			this.fireTableDataChanged();
 		}
@@ -151,7 +152,33 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 	
 	public void removeObservers() 
 	{
-		this.notes.removeObserver();
-		Controller.getInstance().deleteObserver(this);
+		
+	}
+	
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		if (text.equals("") || text == null) return;
+		if (!text.matches("[0-9]*"))return;
+			key_filter = new Long(text);
+			list =new ArrayList<ItemCls>();
+			// Controller.getInstance().getNote(key_filter);
+			 NoteCls note = (NoteCls) db.get(key_filter);
+			if ( note == null) return;
+			list.add(note);
+						
+			this.fireTableDataChanged();
+		
+		
+	}
+	public void clear(){
+		list =new ArrayList<ItemCls>();
+		this.fireTableDataChanged();
+		
+	}
+	public void set_Filter_By_Name(String str) {
+		filter_Name = str;
+		list = (ArrayList<ItemCls>) db.get_By_Name(filter_Name, false);
+		this.fireTableDataChanged();
+
 	}
 }

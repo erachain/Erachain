@@ -63,11 +63,13 @@ import gui.models.Renderer_Right;
 import gui.models.WalletItemImprintsTableModel;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
+import utils.MenuPopupUtil;
 
 public class Search_Notes_Tab extends Split_Panel {
 	private TableModelNotes tableModelNotes;
 	final MTable notesTable;
 	protected int row;
+	private JTextField key_Item;
 	
 	
 	public Search_Notes_Tab(){
@@ -75,11 +77,70 @@ public class Search_Notes_Tab extends Split_Panel {
 		
 		setName(Lang.getInstance().translate("Search Templates"));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+		searchToolBar_LeftPanel.setVisible(true);
 		// not show buttons
 			button1_ToolBar_LeftPanel.setVisible(false);
 			button2_ToolBar_LeftPanel.setVisible(false);
 			jButton1_jToolBar_RightPanel.setVisible(false);
 			jButton2_jToolBar_RightPanel.setVisible(false);
+
+			this.searchToolBar_LeftPanel.setVisible(true);
+			this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key")+":"));
+	    	key_Item = new JTextField();
+	    	key_Item.setToolTipText("");
+	    	key_Item.setAlignmentX(1.0F);
+	    	key_Item.setMinimumSize(new java.awt.Dimension(100, 20));
+	    	key_Item.setName(""); // NOI18N
+	    	key_Item.setPreferredSize(new java.awt.Dimension(100, 20));
+	    	key_Item.setMaximumSize(new java.awt.Dimension(2000, 20));
+	       	
+	    	MenuPopupUtil.installContextMenu(key_Item);
+	    	
+	    	this.toolBar_LeftPanel.add(key_Item);
+	    	key_Item.addActionListener(new ActionListener(){
+
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					// TODO Auto-generated method stub
+					searchTextField_SearchToolBar_LeftPanel.setText("");
+					
+					
+					Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+					jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+					
+					
+					
+					
+				
+					
+					new Thread() {
+						@Override
+						public void run() {
+							tableModelNotes.Find_item_from_key(key_Item.getText());	
+							if (tableModelNotes.getRowCount() < 1) {
+								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
+								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+								jScrollPane_jPanel_RightPanel.setViewportView(null);
+								return;
+							}
+							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+							// ddd.dispose();
+							jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+						}
+					}.start();
+					
+					
+				}
+	    		
+	    	});
+			
+			
+			
+	// not show My filter
+			searth_My_JCheckBox_LeftPanel.setVisible(false);
+			searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
+
+			
 			
 
 	//CREATE TABLE
@@ -129,43 +190,78 @@ public class Search_Notes_Tab extends Split_Panel {
 		RowSorter sorter =   new TableRowSorter(tableModelNotes);
 		notesTable.setRowSorter(sorter);	
 	// UPDATE FILTER ON TEXT CHANGE
-		searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				onChange();
-			}
+		searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener(){
 
-			public void removeUpdate(DocumentEvent e) {
-				onChange();
-			}
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				// TODO Auto-generated method stub
+				// GET VALUE
+					String search = searchTextField_SearchToolBar_LeftPanel.getText();
+					if (search.equals("")){jScrollPane_jPanel_RightPanel.setViewportView(null);
+					tableModelNotes.clear();
+					 Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+					 jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+					return;
+				}
+					if (search.length()<3) {
+						Label_search_Info_Panel.setText(Lang.getInstance().translate("Enter more  2 characters"));
+						 jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+						
+						
+						
+						return;
+					}
+					key_Item.setText("");
+					
+					Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
+					jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+					
+					
+					
+					
+				//	search_Table_Model.set_Filter_By_Name(search);
+					
+					new Thread() {
+						@Override
+						public void run() {
+							tableModelNotes.set_Filter_By_Name(search);
+							if (tableModelNotes.getRowCount() < 1) {
+								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
+								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
+								jScrollPane_jPanel_RightPanel.setViewportView(null);
+								return;
+							}
+							jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+							// ddd.dispose();
+							jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+						}
+					}.start();
+			
+			
+					
+					
+					
+				
+					
+					
+					
+				//	jScrollPanel_LeftPanel.setViewportView(null);
+				//	jScrollPane_jPanel_RightPanel.setViewportView(null);
+					
+					
+					// if (search.length()<3) return;
+				
+					// show message
+					// jTable_jScrollPanel_LeftPanel.setVisible(false);//
+					
 
-			public void insertUpdate(DocumentEvent e) {
-				onChange();
+					
+			
+			
 			}
-
-			public void onChange() {
-				RowFilter filter;
-	// GET VALUE
-				String search = searchTextField_SearchToolBar_LeftPanel.getText();
-				tableModelNotes.fireTableDataChanged();
-				
-				 if (searth_My_JCheckBox_LeftPanel.isSelected()) {
-			            
-			            filter = RowFilter.regexFilter("true",tableModelNotes.COLUMN_FAVORITE);
-						 	            
-			        }else{
-			        	filter = RowFilter.regexFilter("false",tableModelNotes.COLUMN_FAVORITE);
-			        }
-				 ((DefaultRowSorter) sorter).setRowFilter(filter);
-				
-	// SET FILTER
-				
-				 filter = RowFilter.regexFilter(".*" + search + ".*", tableModelNotes.COLUMN_NAME);
-				 
-				((DefaultRowSorter) sorter).setRowFilter(filter);
-				tableModelNotes.fireTableDataChanged();
-								
-			}
-		});
+    		
+    	});
+		
 				
 	// set showvideo			
 		jTable_jScrollPanel_LeftPanel.setModel(this.tableModelNotes);

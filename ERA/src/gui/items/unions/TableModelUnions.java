@@ -74,7 +74,8 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 	@Override
 	public int getRowCount() 
 	{
-		return this.unions.size();
+		
+		return (this.unions == null)? 0 : this.unions.size();
 		
 	}
 
@@ -151,7 +152,7 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 	
 	public void removeObservers() 
 	{
-		this.unions.removeObserver();
+		if (this.unions != null) this.unions.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
 }

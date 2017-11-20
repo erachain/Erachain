@@ -68,7 +68,9 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 	@Override
 	public int getRowCount() 
 	{
-		 return this.orders.size();
+	//	 return this.orders.size();
+		 return (this.orders == null)? 0 : this.orders.size();
+		 
 	}
 
 	@Override
