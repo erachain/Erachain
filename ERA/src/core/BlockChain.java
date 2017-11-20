@@ -44,7 +44,7 @@ public class BlockChain
 	//
 	
 	public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
-	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet
+	public static final int SYNCHRONIZE_PACKET = 3000; // when synchronize - get blocks packet by transactions
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
@@ -316,13 +316,13 @@ public class BlockChain
 		{
 			Block childBlock = dcSet.getBlockMap().get(parent).getChild(dcSet);
 			
+			int i = 0;
 			int counter = 0;
 			//while(childBlock != null && counter < MAX_ORPHAN)
-			while(childBlock != null && counter < SYNCHRONIZE_PACKET)
+			while(childBlock != null && (i++ <3 || counter < SYNCHRONIZE_PACKET))
 			{
 
-				// >>10 - for 20000 = 10 max blocks will be send
-				counter += 1 + (childBlock.getTransactionCount() >> 10);
+				counter += 1 + (childBlock.getTransactionCount() >> 3);
 
 				headers.add(childBlock.getSignature());
 				

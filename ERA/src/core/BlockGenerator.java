@@ -221,6 +221,7 @@ public class BlockGenerator extends Thread implements Observer
 		long flushPoint = 0;
 		Block waitWin = null;
 		long timeUpdate = 0;
+		int shift_height;
 
 		while(!ctrl.isOnStopping())
 		{
@@ -515,34 +516,33 @@ public class BlockGenerator extends Thread implements Observer
 						//// still early FOR UPDATE
 						continue;
 					}
+					
+					shift_height = 0;
 
-					/// CHECK PEERS SAME ME 
-					ctrl.checkStatusAndObserve(0);
+					ctrl.checkStatusAndObserve(shift_height);
 					if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0 && !ctrl.needUpToDate()) {
 						//////// PAT SITUATION ////////////
-						ctrl.checkStatusAndObserve(-1);
-						if (ctrl.needUpToDate()) {
-							status = 31;
-							ctrl.orphanInPipe(ctrl.getLastBlock());
-						}
-					}					
+						/// CHECK PEERS SAME ME 
+						shift_height = -1;
+					}
 					
 					/// CHECK PEERS HIGHER 
-					ctrl.checkStatusAndObserve(0);
-					if (timeUpdate < 0 && ctrl.needUpToDate()) {
+					ctrl.checkStatusAndObserve(shift_height);
+					if (ctrl.needUpToDate()) {
+						
 						if (ctrl.isOnStopping()) {
 							status = -1;
 							return;
 						}
 						
 						status = 3;
-						ctrl.update(0);
+						ctrl.update(shift_height);
 						status = 0;
-
+	
 						if (ctrl.isOnStopping()) {
 							status = -1;
 							return;
-						}	
+						}
 					}
 				}
 				
