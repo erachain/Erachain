@@ -38,9 +38,9 @@ public class BlockGenerator extends Thread implements Observer
 	
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
-	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:1000;
+	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:20000>>4;
 	private static final int MAX_BLOCK_SIZE_BYTE = 
-			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>2;
+			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>3;
 
 	static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
 	static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;

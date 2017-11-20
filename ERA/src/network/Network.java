@@ -36,8 +36,8 @@ public class Network extends Observable implements ConnectionCallback {
 	
 	public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK?0:1;
 	private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
-	private static final int RESEND_UNCONFIRMED = BlockChain.HARD_WORK?10:10;
-	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<4;
+	private static final int RESEND_UNCONFIRMED = BlockChain.HARD_WORK?1000:100;
+	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<3;
 	
 	private ConnectionCreator creator;
 	private ConnectionAcceptor acceptor;
