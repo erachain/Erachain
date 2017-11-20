@@ -155,7 +155,7 @@ public class Account {
 	{
 		if (key < 0)
 			key = -key;
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.getBalance(db, key);
 		return balance.a.add(balance.b);
 	}
 
@@ -237,7 +237,15 @@ public class Account {
 		if (key < 0)
 			key = -key;
 			
-		return db.getAssetBalanceMap().get(getAddress(), key);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
+		if (BlockChain.DEVELOP_USE) {
+			if (key == 1)
+				return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance.a.add(BigDecimal.valueOf(1000)), balance.b, balance.c);
+			else if (key == 2)
+				return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(balance.a.add(BigDecimal.ONE), balance.b, balance.c);	
+		}
+		return balance;
+		
 	}
 	
 	public BigDecimal getBalance(DCSet db, long key, int actionType)
@@ -246,8 +254,16 @@ public class Account {
 			key = -key;
 			
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = db.getAssetBalanceMap().get(getAddress(), key);
-		if (actionType == 1)
+		if (actionType == 1) {
+			if (BlockChain.DEVELOP_USE) {
+				if (key == 1)
+					return balance.a.add(BigDecimal.valueOf(1000));
+				else if (key == 2)
+					return balance.a.add(BigDecimal.ONE);
+			}
+			
 			return balance.a;
+		}
 		else if (actionType == 2)
 			return balance.b;
 		else if (actionType == 3)
