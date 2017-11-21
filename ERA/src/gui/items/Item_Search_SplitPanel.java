@@ -500,7 +500,7 @@ public class Item_Search_SplitPanel extends Split_Panel{
 				if (item == null) return;
 					selected_Item = search_Table.getSelectedRow();
 					Component cc = (Component) ItemDetailsFactopy.getInstance().show(item);
-					jScrollPane_jPanel_RightPanel.setViewportView(cc);
+				//	jScrollPane_jPanel_RightPanel.setViewportView(cc);
 					
 			}
 		}

@@ -1,26 +1,17 @@
 package gui.items.notes;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
-
 import javax.validation.constraints.Null;
-
-import controller.Controller;
 import core.item.ItemCls;
 import core.item.notes.NoteCls;
-import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.ItemNoteMap;
 import datachain.SortableList;
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import utils.Pair;
 import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Observer
+public class TableModelNotes extends TableModelCls<Long, NoteCls>
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -117,43 +108,7 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls> implements Obs
 		return null;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) 
-	{	
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
-	}
 	
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
-		if (true)	return;	
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_NOTE_TYPE)
-		{			
-			
-			
-			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_NOTE_TYPE || message.getType() == ObserverMessage.REMOVE_NOTE_TYPE)
-		{
-			this.fireTableDataChanged();
-		}
-	}
-	
-	public void removeObservers() 
-	{
-		
-	}
 	
 	public void Find_item_from_key(String text) {
 		// TODO Auto-generated method stub

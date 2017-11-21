@@ -3,27 +3,21 @@ package gui.items.statement;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
 
-import controller.Controller;
 import core.block.Block;
-import core.item.ItemCls;
-import core.item.persons.PersonCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
-import utils.ObserverMessage;
 import utils.Pair;
 
-public class Statements_Table_Model_Search extends AbstractTableModel implements Observer {
+public class Statements_Table_Model_Search extends AbstractTableModel {
 
 	/**
 	 * 
@@ -42,10 +36,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 
 	public Statements_Table_Model_Search() {
 
-		//transactions = new ArrayList<Transaction>();
-		//addObservers();
-		//transactions = read_Statement("", (long) -1);
-		clear();
+	clear();
 	}
 
 	// set class
@@ -173,47 +164,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		//}
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
-		try {
-			this.syncUpdate(o, arg);
-		} catch (Exception e) {
-			// GUI ERROR
-		}
-	}
-
-	public synchronized void syncUpdate(Observable o, Object arg) {
-		ObserverMessage message = (ObserverMessage) arg;
-		// System.out.println( message.getType());
-
-		/*
-		// CHECK IF NEW LIST
-		if (message.getType() == ObserverMessage.LIST_STATEMENT_TYPE) {
-			if (this.transactions == null) {
-				transactions = read_Statement("",(long) -1, false);
-				this.fireTableDataChanged();
-			}
-			
-		}
-		*/
-
-		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-			Transaction trans = (Transaction) message.getValue();
-			if (trans.getType() != Transaction.SIGN_NOTE_TRANSACTION)
-				return;
-			for (Transaction tr : transactions) {
-				if (tr.viewSignature().equals(trans.viewSignature())) {
-					transactions.remove(tr);
-				}
-
-			}
-			transactions.add((R_SignNote) trans);
-
-			this.fireTableDataChanged();
-		}
-	}
-
+	
 	private List<R_SignNote> read_Statement(String str, Long key, boolean b) {
 		List<R_SignNote> tran;
 		ArrayList<Transaction> db_transactions;
@@ -256,17 +207,6 @@ public class Statements_Table_Model_Search extends AbstractTableModel implements
 		
 		return tran;
 
-	}
-
-	public void removeObservers() {
-
-		// Controller.getInstance().deleteObserver(this);
-		DCSet.getInstance().getTransactionFinalMap().deleteObserver(this);
-	}
-
-	public void addObservers() {
-		// Controller.getInstance().addObserver(this);
-//		DCSet.getInstance().getTransactionFinalMap().addObserver(this);
 	}
 	
 	public void Find_item_from_key(String text) {

@@ -1,29 +1,19 @@
 package gui.items.persons;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 import javax.validation.constraints.Null;
-
 import org.mapdb.Fun.Tuple2;
-
-import controller.Controller;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.ItemPersonMap;
 import datachain.SortableList;
-import utils.ObserverMessage;
 import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelPersons extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer {
+public class TableModelPersons extends TableModelCls<Tuple2<String, String>, PersonCls> {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_BORN = 2;
@@ -148,65 +138,7 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		return null;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) {
-		try {
-			this.syncUpdate(o, arg);
-		} catch (Exception e) {
-			// GUI ERROR
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg) {
-		ObserverMessage message = (ObserverMessage) arg;
-		if (key_filter >0)	return;	
-		// CHECK IF NEW LIST
-		if (message.getType() == ObserverMessage.LIST_PERSON_TYPE) {
-			if (this.list == null && !filter_Name.equals("")) {
-				list = db.get_By_Name(filter_Name, false);
-				this.fireTableDataChanged();
-				// this.persons = (SortableList<Tuple2<String, String>,
-				// PersonCls>) message.getValue();
-				// this.persons.addFilterField("name");
-				// this.persons.registerObserver();
-			}
-
-		}
-
-		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.ADD_PERSON_TYPE) {
-			PersonCls ppp = (PersonCls) message.getValue();
-			if (ppp.getName().contains(filter_Name))
-				list.add(ppp);
-			// list = db.getPerson_By_Name(filter_Name);
-
-			this.fireTableDataChanged();
-		}
-
-		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.REMOVE_PERSON_TYPE) {
-			PersonCls ppp = (PersonCls) message.getValue();
-			if (ppp.getName().contains(filter_Name))
-				list.remove(ppp);
-			// list = db.getPerson_By_Name(filter_Name);
-
-			this.fireTableDataChanged();
-		}
-	}
-
-	public void addObservers() {
-
-		// Controller.getInstance()..addObserver(this);
-		DCSet.getInstance().getItemPersonMap().addObserver(this);
-	}
-
-	public void removeObservers() {
-
-		// Controller.getInstance().deleteObserver(this);
-		DCSet.getInstance().getItemPersonMap().deleteObserver(this);
-	}
-
+	
 	public void Find_item_from_key(String text) {
 		// TODO Auto-generated method stub
 		if (text.equals("") || text == null) return;

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import javax.swing.DefaultRowSorter;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -307,7 +306,6 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 	@Override
 	public void delay_on_close() {
 		// delete observer left panel
-		search_Table_Model.removeObservers();
 		// get component from right panel
 		Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 		// if Person_Info 002 delay on close

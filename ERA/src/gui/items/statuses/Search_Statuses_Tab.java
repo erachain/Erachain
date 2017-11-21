@@ -14,8 +14,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
@@ -26,10 +24,8 @@ import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
 import gui.Split_Panel;
-import gui.items.notes.Info_Notes;
 import gui.library.MTable;
 import lang.Lang;
 import utils.MenuPopupUtil;
@@ -417,7 +413,6 @@ public  void onChange(Split_Panel search_Status_SplitPanel, RowSorter sorter) {
 @Override
 public void delay_on_close(){
 	// delete observer left panel
-	tableModelItemStatuses.removeObservers();
 	// get component from right panel
 	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
 	// if Person_Info 002 delay on close

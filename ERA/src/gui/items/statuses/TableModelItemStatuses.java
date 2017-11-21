@@ -19,7 +19,7 @@ import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> implements Observer
+public class TableModelItemStatuses extends TableModelCls<Long, StatusCls>
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -124,19 +124,7 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls> imple
 		return null;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) 
-	{	
-		
-	}
 	
-
-	
-	public void removeObservers() 
-	{
-		//if(this.statuses != null)this.statuses.removeObserver();
-		//Controller.getInstance().deleteObserver(this);
-	}
 	public void Find_item_from_key(String text) {
 		// TODO Auto-generated method stub
 		if (text.equals("") || text == null) return;

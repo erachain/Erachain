@@ -2,44 +2,20 @@ package gui.items.notes;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.swing.DefaultRowSorter;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowFilter;
 import javax.swing.RowSorter;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
@@ -48,25 +24,19 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
-import core.item.assets.AssetCls;
 import core.item.notes.NoteCls;
-import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import gui.CoreRowSorter;
 import gui.Split_Panel;
-import gui.items.unions.TableModelUnions;
 import gui.library.MTable;
-import gui.models.Renderer_Boolean;
-import gui.models.Renderer_Left;
-import gui.models.Renderer_Right;
-import gui.models.WalletItemImprintsTableModel;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
+@SuppressWarnings("serial")
 public class Search_Notes_Tab extends Split_Panel {
 	private TableModelNotes tableModelNotes;
+	@SuppressWarnings("rawtypes")
 	final MTable notesTable;
 	protected int row;
 	private JTextField key_Item;
@@ -401,16 +371,12 @@ public class Search_Notes_Tab extends Split_Panel {
 			if(e.getClickCount() == 2)
 			{
 				row = notesTable.convertRowIndexToModel(row);
-				NoteCls note = tableModelNotes.getNote(row);
-		//		new AssetPairSelect(asset.getKey(), "","");
-		//		new AssetFrame(asset);
 			}
 			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
 			{
 				
 				if (notesTable.getSelectedColumn() == tableModelNotes.COLUMN_FAVORITE){
 					row = notesTable.convertRowIndexToModel(row);
-					NoteCls note = tableModelNotes.getNote(row);
 					favorite_set( notesTable);	
 					
 					
@@ -442,10 +408,6 @@ public class Search_Notes_Tab extends Split_Panel {
 	
 	
 	
-}
-
-public void removeObservers() {
-	this.tableModelNotes.removeObservers();
 }
 
 public void favorite_set(JTable assetsTable){
