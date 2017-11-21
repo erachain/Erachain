@@ -60,6 +60,7 @@ public class Voting_Dialog extends JDialog
 	{
 //		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Vote"));
 		
+		if (poll == null) return;
 		this.poll = poll;
 		
 		//ICON

@@ -180,7 +180,7 @@ public class All_Votings_Panel extends JPanel{
 				String search = txtSearch.getText();
 
 			 	// SET FILTER
-				pollsTableModel.getSortableList().setFilter(search);
+			//	pollsTableModel.getSortableList().setFilter(search);
 				pollsTableModel.fireTableDataChanged();
 			}
 		});

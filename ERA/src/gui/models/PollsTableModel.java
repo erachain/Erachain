@@ -10,6 +10,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import core.voting.Poll;
 import datachain.DCSet;
+import datachain.PollMap;
 import datachain.SortableList;
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -25,11 +26,14 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Name", "Creator", "Total Votes"});
 	private SortableList<String, Poll> polls;
+	private PollMap db;
 	
 	public PollsTableModel()
 	{
 		this.asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-		Controller.getInstance().addObserver(this);
+		//Controller.getInstance().addObserver(this);
+		db = DCSet.getInstance().getPollMap();
+		polls = db.getList();
 	}
 	
 	public void setAsset(AssetCls asset) 
@@ -152,7 +156,7 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 	
 	public void removeObservers() 
 	{
-		if(this.polls!=null)this.polls.removeObserver();
-		DCSet.getInstance().getPollMap().deleteObserver(this);
+		//if(this.polls!=null)this.polls.removeObserver();
+		//DCSet.getInstance().getPollMap().deleteObserver(this);
 	}
 }
