@@ -140,7 +140,7 @@ public class Item_Search_SplitPanel extends Split_Panel{
 					public void run() {
 						search_Table_Model.Find_item_from_key(key_Item.getText());	
 						if (search_Table_Model.getRowCount() < 1) {
-							Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
+							Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
 							jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 							jScrollPane_jPanel_RightPanel.setViewportView(null);
 							return;
@@ -257,7 +257,7 @@ public class Item_Search_SplitPanel extends Split_Panel{
 						public void run() {
 							search_Table_Model.set_Filter_By_Name(search);
 							if (search_Table_Model.getRowCount() < 1) {
-								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Persons"));
+								Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found"));
 								jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 								jScrollPane_jPanel_RightPanel.setViewportView(null);
 								return;
