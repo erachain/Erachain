@@ -1620,15 +1620,15 @@ public class Controller extends Observable {
 		if (isStopping)
 			return true;
 		
-		// withWinBuffer
-		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift);
-		if (maxHW.c == null) {
+		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeightFull(dcSet);
+		if (thisHW == null) {
 			this.status = STATUS_OK;
 			return true;
 		}
 		
-		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeightFull(dcSet);
-		if (thisHW == null) {
+		// withWinBuffer
+		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift);
+		if (maxHW.c == null) {
 			this.status = STATUS_OK;
 			return true;
 		}
