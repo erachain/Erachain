@@ -29,6 +29,8 @@ import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
@@ -57,7 +59,9 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 	public JButton newAccount_Button;
 	MTable table;
 	private Accounts_Panel th;
-	//protected Integer row;
+	protected AssetCls asset;
+	//protected Account account;
+	protected PublicKeyAccount pub_Key;
 
 	@SuppressWarnings("unchecked")
 	public Accounts_Panel()
@@ -207,24 +211,60 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
+		
+		menu.addAncestorListener(new AncestorListener(){
 
+			@Override
+			public void ancestorAdded(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				int row = table.getSelectedRow();
+				if (row < 1 ) return;
+			
+			row = table.convertRowIndexToModel(row);
+			asset = (AssetCls) cbxFavorites.getSelectedItem();
+			pub_Key = tableModel.getPublicKeyAccount(row);
+			}
+
+			@Override
+			public void ancestorMoved(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void ancestorRemoved(AncestorEvent event) {
+				// TODO Auto-generated method stub
+				int row = table.getSelectedRow();
+				if (row < 1 ) return;
+			
+			row = table.convertRowIndexToModel(row);
+			asset = (AssetCls) cbxFavorites.getSelectedItem();
+			pub_Key = tableModel.getPublicKeyAccount(row);
+			
+			}
+			
+			
+			
+			
+		});
 		
 		JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
 		sendAsset.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+				//int row = table.getSelectedRow();
+				//if (row < 1 ) return;
 			
-			row = table.convertRowIndexToModel(row);
+			//row = table.convertRowIndexToModel(row);
 				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
+			//	AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+			//	Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Send_Dialog(asset, account, null, null); 
+				 new Account_Send_Dialog(asset, pub_Key, null, null); 
 						
 			}
 		});
@@ -235,17 +275,17 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+				//int row = table.getSelectedRow();
+				//if (row < 1 ) return;
 			
-			row = table.convertRowIndexToModel(row);
+			//row = table.convertRowIndexToModel(row);
 				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
+			//	AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+			//	Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Take_Hold_Dialog(asset, account); 
+				 new Account_Take_Hold_Dialog(asset, pub_Key); 
 						
 			}
 		});
@@ -258,17 +298,17 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+				//int row = table.getSelectedRow();
+				//if (row < 1 ) return;
 			
-			row = table.convertRowIndexToModel(row);
+			//row = table.convertRowIndexToModel(row);
 				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
+			//	AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+			//	Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Lend_Dialog(asset, account); 
+				 new Account_Lend_Dialog(asset, pub_Key); 
 						
 			}
 		});
@@ -280,17 +320,17 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+			//	int row = table.getSelectedRow();
+			//	if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
+			//	row = table.convertRowIndexToModel(row);
 				
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
+			//	AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+			//	Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Repay_Debt_Dialog(asset, account); 
+				 new Account_Repay_Debt_Dialog(asset, pub_Key); 
 						
 			}
 		});
@@ -301,16 +341,16 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+		//		int row = table.getSelectedRow();
+		//		if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
-				AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-				Account account = tableModel.getAccount(row);
+		//		row = table.convertRowIndexToModel(row);
+		//		AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+		//		Account account = tableModel.getAccount(row);
         		//Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
 				//Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 				
-				 new Account_Confiscate_Debt_Dialog(asset, account); 
+				 new Account_Confiscate_Debt_Dialog(asset, pub_Key); 
 						
 			}
 		});
@@ -329,14 +369,14 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+		//		int row = table.getSelectedRow();
+		//		if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
-				Account account = tableModel.getAccount(row);
+		//		row = table.convertRowIndexToModel(row);
+		//		Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(account.getAddress());
+				StringSelection value = new StringSelection(pub_Key.getAddress());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -347,15 +387,15 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+		//		int row = table.getSelectedRow();
+		//		if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
-				Account account = tableModel.getAccount(row);
+		//		row = table.convertRowIndexToModel(row);
+		//		Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 				long key = cbxFavorites.getItemAt(cbxFavorites.getSelectedIndex()).getKey();
-				StringSelection value = new StringSelection(account.getBalanceUSE(key).toPlainString());
+				StringSelection value = new StringSelection(pub_Key.getBalanceUSE(key).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -367,14 +407,14 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+			//	int row = table.getSelectedRow();
+			//	if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
-				Account account = tableModel.getAccount(row);
+			//	row = table.convertRowIndexToModel(row);
+			//	Account account = tableModel.getAccount(row);
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(account.getBalanceUSE(Transaction.FEE_KEY).toPlainString());
+				StringSelection value = new StringSelection(pub_Key.getBalanceUSE(Transaction.FEE_KEY).toPlainString());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -405,16 +445,16 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+				//int row = table.getSelectedRow();
+				//if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
-				PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
+				//row = table.convertRowIndexToModel(row);
+				//PublicKeyAccount publicKeyAccount = tableModel.getPublicKeyAccount(row);
 				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
 				//		account.getAddress());
 				
 				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection(publicKeyAccount.getBase58());
+				StringSelection value = new StringSelection(pub_Key.getBase58());
 			    clipboard.setContents(value, null);
 			}
 		});
@@ -425,11 +465,11 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		{
 			public void actionPerformed(ActionEvent e) 
 			{
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
+				//int row = table.getSelectedRow();
+				//if (row < 1 ) return;
 			
-				row = table.convertRowIndexToModel(row);
-				String bankKeyAccount = "+" + Base32.encode(tableModel.getPublicKeyAccount(row).getPublicKey());
+				//row = table.convertRowIndexToModel(row);
+				String bankKeyAccount = "+" + Base32.encode(pub_Key.getPublicKey());
 				//PublicKeyAccount publicKeyAccount = Controller.getInstance().getPublicKeyAccountByAddress(
 				//		account.getAddress());
 				
