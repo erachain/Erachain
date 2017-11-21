@@ -160,7 +160,9 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 		else if(type == ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
 		{
 			//CHECK IF LIST UPDATED
-			this.transactions.add((Transaction)message.getValue());
+		//	this.transactions.add((Transaction)message.getValue());
+			Pair<Integer, Transaction> ss = (Pair<Integer, Transaction>) message.getValue();
+			this.transactions.add(ss.getB());
 			this.fireTableRowsInserted(0, 0);			
 			if (this.transactions.size() > 100) {
 				this.transactions.remove(100);
