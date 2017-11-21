@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
+import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.MainFrame;
@@ -49,6 +50,8 @@ public class Records_My_SplitPanel extends Split_Panel {
 	private JMenuItem item_Delete;
 
 	private JMenuItem item_Rebroadcast;
+
+	protected Transaction trans;
 
 	
 	public static Records_My_SplitPanel getInstance(){
@@ -96,6 +99,38 @@ public class Records_My_SplitPanel extends Split_Panel {
 		my_Records_Panel.records_Table.getSelectionModel().addListSelectionListener(new search_listener());
 	
 		 menu = new JPopupMenu();
+		 menu.addAncestorListener(new AncestorListener(){
+
+				@Override
+				public void ancestorAdded(AncestorEvent event) {
+					// TODO Auto-generated method stub
+					int row = my_Records_Panel.records_Table.getSelectedRow();
+					row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+					if (row < 0) return;
+					trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+				}
+
+				@Override
+				public void ancestorMoved(AncestorEvent event) {
+					// TODO Auto-generated method stub
+					// TODO Auto-generated method stub
+					
+				}
+
+				@Override
+				public void ancestorRemoved(AncestorEvent event) {
+					// TODO Auto-generated method stub
+					int row = my_Records_Panel.records_Table.getSelectedRow();
+					row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+					if (row < 0) return;
+					trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+				
+				}
+				
+				
+				
+				
+			});
     	
     	 item_Rebroadcast= new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
     
@@ -104,9 +139,7 @@ public class Records_My_SplitPanel extends Split_Panel {
     	public void actionPerformed(ActionEvent e) {
   			// code Rebroadcast
 			
-			int row = my_Records_Panel.records_Table.getSelectedRow();
-			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
-			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+  			if (trans == null) return;
 			// DBSet db = DBSet.getInstance();
   			Controller.getInstance().broadcastTransaction(trans);
   						
@@ -120,10 +153,11 @@ public class Records_My_SplitPanel extends Split_Panel {
     	public void actionPerformed(ActionEvent e) {
    
   			// code delete
-			int row = my_Records_Panel.records_Table.getSelectedRow();
-			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
-			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
-			DCSet.getInstance().getTransactionMap().delete(trans);
+			//int row = my_Records_Panel.records_Table.getSelectedRow();
+			//row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+			//Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+			if (trans == null) return;
+				DCSet.getInstance().getTransactionMap().delete(trans);
   			
 			}});
     	
@@ -134,9 +168,10 @@ public class Records_My_SplitPanel extends Split_Panel {
 		@Override
 		public void ancestorAdded(AncestorEvent event) {
 			// TODO Auto-generated method stub
-			int row = my_Records_Panel.records_Table.getSelectedRow();
-			row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
-			Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+		//	int row = my_Records_Panel.records_Table.getSelectedRow();
+		//	row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+		//	Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+			if (trans == null) return;
 			item_Delete.setEnabled(true);
 			item_Rebroadcast.setEnabled(true);
 			if (trans.isConfirmed(DCSet.getInstance())) {
