@@ -1,134 +1,90 @@
 package gui.items;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import controller.Controller;
+import java.util.ArrayList;
+import javax.validation.constraints.Null;
 import core.item.ItemCls;
+import datachain.Item_Map;
 import datachain.SortableList;
-//import utils.NumberAsString;
-import utils.ObserverMessage;
 import gui.models.TableModelCls;
-import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelItems extends TableModelCls<Long, ItemCls> implements Observer
+public class TableModelItems extends TableModelCls<Long, ItemCls>
 {
-	public static final int COLUMN_KEY = 0;
-	public static final int COLUMN_NAME = 1;
-	public static final int COLUMN_ADDRESS = 2;
+	//public static final int COLUMN_KEY = 0;
+	//public static final int COLUMN_NAME = 1;
+	//public static final int COLUMN_ADDRESS = 2;
 	//public static final int COLUMN_AMOUNT = 3;
 	//public static final int COLUMN_DIVISIBLE = 4;
 
-	private SortableList<Long, ItemCls> items;
+	protected ArrayList<ItemCls> list;
+	protected Item_Map db;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Quantity", "Divisible"});
 	
 	public TableModelItems()
 	{
-		Controller.getInstance().addObserver(this);
+	
 	}
 	
-	@Override
-	public SortableList<Long, ItemCls> getSortableList() 
-	{
-		return this.items;
+	public Class<? extends Object> getColumnClass(int c) {     // set column type
+		Object o = getValueAt(0, c);
+		return o==null?Null.class:o.getClass();
+     }
+	
+	public void Find_item_from_key(String text) {
+		// TODO Auto-generated method stub
+		if (text.equals("") || text == null) return;
+		if (!text.matches("[0-9]*"))return;
+			Long key_filter = new Long(text);
+			list = null;
+			list =new ArrayList<ItemCls>();
+			ItemCls itemCls = (ItemCls) db.get(key_filter);
+			if ( itemCls == null) return;
+			list.add(itemCls);
+			this.fireTableDataChanged();
+	}
+	
+	public void clear(){
+		list = null;
+		list =new ArrayList<ItemCls>();
+		this.fireTableDataChanged();
+		
+	}
+	
+	public void set_Filter_By_Name(String str) {
+		list = null;
+		list =  (ArrayList<ItemCls>) db.get_By_Name(str, false);
+		this.fireTableDataChanged();
 	}
 	
 	public ItemCls getItem(int row)
 	{
-		return this.items.get(row).getB();
+		return this.list.get(row);
 	}
 	
-	@Override
-	public int getColumnCount() 
-	{
-		return this.columnNames.length;
-	}
-	
-	@Override
-	public String getColumnName(int index) 
-	{
-		return this.columnNames[index];
-	}
-
 	@Override
 	public int getRowCount() 
 	{
-		return this.items.size();
-		
+		return (this.list == null)? 0 : this.list.size();
 	}
 
+	
 	@Override
-	public Object getValueAt(int row, int column) 
-	{
-		if(this.items == null || row > this.items.size() - 1 )
-		{
-			return null;
-		}
-		
-		ItemCls item = this.items.get(row).getB();
-		
-		switch(column)
-		{
-		case COLUMN_KEY:
-			
-			return item.getKey();
-		
-		case COLUMN_NAME:
-			
-			return item.getName();
-		
-		case COLUMN_ADDRESS:
-			
-			return item.getOwner().getPersonAsString();
-			
-		}
-		
+	public SortableList<Long, ItemCls> getSortableList() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void update(Observable o, Object arg) 
-	{	
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
+	public int getColumnCount() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
+
+	@Override
+	public Object getValueAt(int rowIndex, int columnIndex) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
-		
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_NOTE_TYPE)
-		{			
-			if(this.items == null)
-			{
-				this.items = (SortableList<Long, ItemCls>) message.getValue();
-				this.items.addFilterField("name");
-				this.items.registerObserver();
-			}	
-			
-			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_NOTE_TYPE || message.getType() == ObserverMessage.REMOVE_NOTE_TYPE)
-		{
-			this.fireTableDataChanged();
-		}
-	}
-	
-	public void removeObservers() 
-	{
-		this.items.removeObserver();
-		Controller.getInstance().deleteObserver(this);
-	}
 }

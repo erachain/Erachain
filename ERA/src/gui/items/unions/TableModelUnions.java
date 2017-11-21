@@ -1,62 +1,24 @@
 package gui.items.unions;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.validation.constraints.Null;
-
-import controller.Controller;
 import core.item.unions.UnionCls;
 import datachain.DCSet;
-import datachain.SortableList;
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import gui.models.TableModelCls;
+import gui.items.TableModelItems;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelUnions extends TableModelCls<Long, UnionCls> implements Observer
+public class TableModelUnions extends TableModelItems 
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_FAVORITE = 3;
 
-	private SortableList<Long, UnionCls> unions;
-	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Creator", "Favorite"});
-	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	
 	public TableModelUnions()
 	{
-		Controller.getInstance().addObserver(this);
-	}
-	
-	@Override
-	public SortableList<Long, UnionCls> getSortableList() 
-	{
-		return this.unions;
-	}
-	
-	
-	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object o = getValueAt(0, c);
-		return o==null?Null.class:o.getClass();
-     }
-	// читаем колонки которые изменяем высоту	   
-		public Boolean[] get_Column_AutoHeight(){
-			
-			return this.column_AutuHeight;
-		}
-	// устанавливаем колонки которым изменить высоту	
-		public void set_get_Column_AutoHeight( Boolean[] arg0){
-			this.column_AutuHeight = arg0;	
-		}
-		
-	
-	public UnionCls getUnion(int row)
-	{
-		return this.unions.get(row).getB();
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+		db = DCSet.getInstance().getItemUnionMap();
 	}
 	
 	@Override
@@ -70,30 +32,23 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 	{
 		return this.columnNames[index];
 	}
-
-	@Override
-	public int getRowCount() 
-	{
-		
-		return (this.unions == null)? 0 : this.unions.size();
-		
-	}
-
+			
+	
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.unions == null || row > this.unions.size() - 1 )
+		if(this.list == null || row > this.list.size() - 1 )
 		{
 			return null;
 		}
 		
-		UnionCls union = this.unions.get(row).getB();
+		UnionCls union = (UnionCls) this.list.get(row);
 		
 		switch(column)
 		{
 		case COLUMN_KEY:
 			
-			return union.getKey(DCSet.getInstance());
+			return union.getKey();
 		
 		case COLUMN_NAME:
 			
@@ -111,48 +66,5 @@ public class TableModelUnions extends TableModelCls<Long, UnionCls> implements O
 		
 		return null;
 	}
-
-	@Override
-	public void update(Observable o, Object arg) 
-	{	
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
-	}
 	
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
-		
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_UNION_TYPE)
-		{			
-			if(this.unions == null)
-			{
-				this.unions = (SortableList<Long, UnionCls>) message.getValue();
-				this.unions.addFilterField("name");
-				this.unions.registerObserver();
-			}	
-			
-			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_UNION_TYPE || message.getType() == ObserverMessage.REMOVE_UNION_TYPE)
-		{
-			this.fireTableDataChanged();
-		}
-	}
-	
-	public void removeObservers() 
-	{
-		if (this.unions != null) this.unions.removeObserver();
-		Controller.getInstance().deleteObserver(this);
-	}
 }

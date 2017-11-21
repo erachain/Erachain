@@ -23,91 +23,20 @@ import javax.swing.table.TableRowSorter;
 
 import core.item.unions.UnionCls;
 import gui.Split_Panel;
+import gui.items.Item_Search_SplitPanel;
 import gui.library.MTable;
 import lang.Lang;
 
-public class Search_Union_Tab extends Split_Panel{
-	private TableModelUnions tableModelUnions;
-	private Search_Union_Tab sUT;
+public class Search_Union_Tab extends Item_Search_SplitPanel{
+	private static TableModelUnions tableModelUnions = new TableModelUnions();
+	private Search_Union_Tab th;
 
 	public Search_Union_Tab(){
-		super("Search_Union_Tab");
-		sUT = this;
+		super(tableModelUnions, "Search_Union_Tab", "Search_Union_Tab");
+		th = this;
+
 		
-		setName(Lang.getInstance().translate("Search_Union_Tab"));
-		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
-// not show buttons
-		button1_ToolBar_LeftPanel.setVisible(false);
-		button2_ToolBar_LeftPanel.setVisible(false);
-		jButton1_jToolBar_RightPanel.setVisible(false);
-		jButton2_jToolBar_RightPanel.setVisible(false);
-			
-			
-//CREATE TABLE
-		this.tableModelUnions = new TableModelUnions();
-		final MTable unionsTable = new MTable(this.tableModelUnions);
-		TableColumnModel columnModel = unionsTable.getColumnModel(); // read column model
-		columnModel.getColumn(0).setMaxWidth((100));
-//CHECKBOX FOR FAVORITE
-		TableColumn favoriteColumn = unionsTable.getColumnModel().getColumn(TableModelUnions.COLUMN_FAVORITE);
 	
-		favoriteColumn.setMinWidth(50);
-		favoriteColumn.setMaxWidth(50);
-		favoriteColumn.setPreferredWidth(50);
-//Sorter
-		RowSorter<TableModelUnions> sorter =   new TableRowSorter<TableModelUnions>(this.tableModelUnions);
-		unionsTable.setRowSorter(sorter);	
-// UPDATE FILTER ON TEXT CHANGE
-		searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				onChange();
-			}
-			public void removeUpdate(DocumentEvent e) {
-				onChange();
-			}
-			public void insertUpdate(DocumentEvent e) {
-				onChange();
-			}
-			@SuppressWarnings("unchecked")
-			public void onChange() {
-// GET VALUE
-				String search = searchTextField_SearchToolBar_LeftPanel.getText();
-// SET FILTER
-				tableModelUnions.fireTableDataChanged();
-				@SuppressWarnings("rawtypes")
-				RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
-				((DefaultRowSorter<TableModelUnions, ?>) sorter).setRowFilter(filter);
-				tableModelUnions.fireTableDataChanged();
-			}
-		});
-// set show			
-		jTable_jScrollPanel_LeftPanel.setModel(this.tableModelUnions);
-		jTable_jScrollPanel_LeftPanel = unionsTable;
-		jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
-				
-		Union_Info info = new Union_Info();
-	
-// обработка изменения положения курсора в таблице
-		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new ListSelectionListener()  {
-		@SuppressWarnings({ "unused" })
-		@Override
-			public void valueChanged(ListSelectionEvent arg0) {
-				String dateAlive;
-				String date_birthday;
-				String message;
-// устанавливаем формат даты
-				SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-//создаем объект персоны
-				UnionCls union;
-				if (unionsTable.getSelectedRow() >= 0 ){
-					union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
-					info.show_Union_001(union);
-					jSplitPanel.setDividerLocation(jSplitPanel.getDividerLocation());	
-					searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-				}
-			}
-		});				
-		jScrollPane_jPanel_RightPanel.setViewportView(info);
 						
 // MENU			
 		JPopupMenu all_Unions_Table_menu = new JPopupMenu();
@@ -115,8 +44,8 @@ public class Search_Union_Tab extends Split_Panel{
 		confirm_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 // открываем диалоговое окно ввода данных для подтверждения персоны 
-				UnionCls union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
-				new UnionConfirmDialog(sUT, union);
+				UnionCls union = (UnionCls) tableModelUnions.getItem(th.search_Table.convertRowIndexToModel(th.search_Table.getSelectedRow()));
+				new UnionConfirmDialog(th, union);
 			}
 		});
 		all_Unions_Table_menu.add(confirm_Menu);
@@ -124,41 +53,26 @@ public class Search_Union_Tab extends Split_Panel{
 		JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set Status"));
 		setStatus_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				UnionCls union = tableModelUnions.getUnion(unionsTable.convertRowIndexToModel(unionsTable.getSelectedRow()));
-				new UnionSetStatusDialog(sUT, union);		
+				UnionCls union = (UnionCls) tableModelUnions.getItem(th.search_Table.convertRowIndexToModel(th.search_Table.getSelectedRow()));
+				new UnionSetStatusDialog(th, union);		
 			}
 		});
 		all_Unions_Table_menu.add(setStatus_Menu);
-		unionsTable.setComponentPopupMenu(all_Unions_Table_menu);
+		th.search_Table.setComponentPopupMenu(all_Unions_Table_menu);
 							
-		unionsTable.addMouseListener(new MouseAdapter() {
+		th.search_Table.addMouseListener(new MouseAdapter() {
 		@Override
 			public void mousePressed(MouseEvent e) {
 				Point p = e.getPoint();
-				int row = unionsTable.rowAtPoint(p);
-				unionsTable.setRowSelectionInterval(row, row);
+				int row = th.search_Table.rowAtPoint(p);
+				th.search_Table.setRowSelectionInterval(row, row);
 				if(e.getClickCount() == 2)
 				{
-					row = unionsTable.convertRowIndexToModel(row);
+					row = th.search_Table.convertRowIndexToModel(row);
 				}
 			}
 	});
 						 
-		
-		
-		
-		
-		
 	}
 
-	@Override
-	public void delay_on_close(){
-		// delete observer left panel
-		tableModelUnions.removeObservers();
-		// get component from right panel
-	//	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
-		// if Person_Info 002 delay on close
-		//  if (c1 instanceof Statement_Info) ( (Statement_Info)c1).delay_on_Close();
-		
 	}
-}
