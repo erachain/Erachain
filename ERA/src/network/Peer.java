@@ -507,7 +507,10 @@ public class Peer extends Thread{
 					catch (java.net.SocketTimeoutException timeOut) {
 						///LOGGER.error("readFully - " + timeOut.getMessage(), timeOut);
 						continue;
-					}			 
+					}
+					catch (java.net.SocketException err) {
+						callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
+					}
 					catch (java.io.IOException err) {
 						//LOGGER.error("readFully - " + err.getMessage(), err);
 						callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
