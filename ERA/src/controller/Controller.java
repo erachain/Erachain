@@ -1227,7 +1227,11 @@ public class Controller extends Observable {
 				break;
 
 			case Message.WIN_BLOCK_TYPE:
-				
+
+				if (this.status != STATUS_OK) {
+					break;
+				}
+
 				BlockWinMessage blockWinMessage = (BlockWinMessage) message;
 
 				// ASK BLOCK FROM BLOCKCHAIN

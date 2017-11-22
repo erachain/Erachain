@@ -269,16 +269,6 @@ public class BlockGenerator extends Thread implements Observer
 					flushPoint = FLUSH_TIMEPOINT + timePoint;
 					this.solvingReference = null;
 					
-					waitWin = bchain.getWaitWinBuffer();
-					if (waitWin != null) {
-						// IF we HOLD winBlock when SYNCHONIZE
-						// CHECK it
-						if (bchain.isNewBlockValid(dcSet, waitWin) != 0
-								|| !waitWin.isValid(dcSet)) {
-							bchain.clearWaitWinBuffer();
-						}
-					}
-
 					// GET real HWeight
 					ctrl.pingAllPeers(false);						
 					
@@ -516,10 +506,10 @@ public class BlockGenerator extends Thread implements Observer
 				}
 	
 				////////////////////////// UPDATE ////////////////////
+				
 				//CHECK IF WE ARE NOT UP TO DATE
-				waitWin = bchain.getWaitWinBuffer();
-				if (ctrl.needUpToDate() // IF winBlock was set while me was on update
-						|| waitWin == null) {
+				if (ctrl.needUpToDate()) {
+					// IF winBlock was set while me was on update
 					
 					timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
 
