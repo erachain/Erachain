@@ -1233,13 +1233,6 @@ public class Controller extends Observable {
 				// ASK BLOCK FROM BLOCKCHAIN
 				newBlock = blockWinMessage.getBlock();
 
-				if (this.status == STATUS_SYNCHRONIZING) {
-					// SET for FUTURE without CHECK
-					blockChain.clearWaitWinBuffer();
-					blockChain.setWaitWinBuffer(dcSet, newBlock);
-					break;
-				}
-
 				// if already it block in process
 				byte[] key = newBlock.getSignature();
 				
@@ -1248,10 +1241,18 @@ public class Controller extends Observable {
 							|| Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), key))
 						return;
 				}
-				
+
 				LOGGER.debug(blockWinMessage.getSender().getAddress()
 						+ " WIN_BLOCK_TYPE targetedWIN: " + newBlock.calcWinValueTargeted(dcSet));
-				
+
+				if (this.status == STATUS_SYNCHRONIZING) {
+					// SET for FUTURE without CHECK
+					blockChain.clearWaitWinBuffer();
+					blockChain.setWaitWinBuffer(dcSet, newBlock);
+					break;
+				}
+
+
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
 				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
 					info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";

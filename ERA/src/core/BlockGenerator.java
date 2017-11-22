@@ -268,6 +268,16 @@ public class BlockGenerator extends Thread implements Observer
 
 					flushPoint = FLUSH_TIMEPOINT + timePoint;
 					this.solvingReference = null;
+					
+					waitWin = bchain.getWaitWinBuffer();
+					if (waitWin != null) {
+						// IF we HOLD winBlock when SYNCHONIZE
+						// CHECK it
+						if (bchain.isNewBlockValid(dcSet, waitWin) != 0
+								|| !waitWin.isValid(dcSet)) {
+							bchain.clearWaitWinBuffer();
+						}
+					}
 
 					// GET real HWeight
 					ctrl.pingAllPeers(false);						
