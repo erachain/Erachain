@@ -510,7 +510,7 @@ public class BlockGenerator extends Thread implements Observer
 				waitWin = bchain.getWaitWinBuffer();
 				if (waitWin == null) {
 					
-					timeUpdate = timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
+					timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
 
 					if (timeUpdate > 0) {
 						//// still early FOR UPDATE
@@ -520,7 +520,7 @@ public class BlockGenerator extends Thread implements Observer
 					shift_height = 0;
 
 					ctrl.checkStatusAndObserve(shift_height);
-					if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0 && !ctrl.needUpToDate()) {
+					if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0l && !ctrl.needUpToDate()) {
 						//////// PAT SITUATION ////////////
 						/// CHECK PEERS SAME ME 
 						shift_height = -1;

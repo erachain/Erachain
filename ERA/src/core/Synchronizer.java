@@ -672,6 +672,7 @@ public class Synchronizer
 			throw new Exception("on stoping");
 		}
 
+		int blockSize = 10 + block.getTransactionCount()>>(hardFlush?7:3);
 		dcSet.getBlockMap().setProcessing(true);
 
 		if(doOrphan)
@@ -680,7 +681,8 @@ public class Synchronizer
 			try {
 				block.orphan(dcSet);
 				dcSet.getBlockMap().setProcessing(false);
-				dcSet.flush(hardFlush?1:block.getDataLength(true)>>7, hardFlush);
+				// FARDFLUSH not use in each case - only after accumulate size
+				dcSet.flush(blockSize, false);
 				
 				if(Controller.getInstance().isOnStopping())
 					throw new Exception("on stoping");
@@ -707,7 +709,8 @@ public class Synchronizer
 			try {
 				block.process(dcSet);
 				dcSet.getBlockMap().setProcessing(false);
-				dcSet.flush(hardFlush?1:block.getDataLength(true)>>7, hardFlush);
+				// FARDFLUSH not use in each case - only after accumulate size
+				dcSet.flush(blockSize, false);
 
 				if(Controller.getInstance().isOnStopping())
 					throw new Exception("on stoping");
