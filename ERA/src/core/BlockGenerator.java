@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.apache.log4j.Logger;
-
-import api.ApiErrorFactory;
 import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
@@ -21,6 +19,7 @@ import at.AT_Constants;
 import at.AT_Controller;
 
 import controller.Controller;
+import core.BlockGenerator.ForgingStatus;
 import core.account.PrivateKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
@@ -38,9 +37,9 @@ public class BlockGenerator extends Thread implements Observer
 	
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
-	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:20000>>4;
+	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:1000;
 	private static final int MAX_BLOCK_SIZE_BYTE = 
-			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>3;
+			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>2;
 
 	static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
 	static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
@@ -120,8 +119,6 @@ public class BlockGenerator extends Thread implements Observer
 			return "7 MAKING NEW BLOCK";
 		case 8:
 			return "8 BROADCASTING";
-		case 9:
-			return "9 ORPHAN TO";
 		default:
 			return "0 WAIT";
 		}
@@ -221,7 +218,7 @@ public class BlockGenerator extends Thread implements Observer
 		long flushPoint = 0;
 		Block waitWin = null;
 		long timeUpdate = 0;
-		int shift_height;
+		int shift_height = 0;
 
 		while(!ctrl.isOnStopping())
 		{
@@ -268,7 +265,7 @@ public class BlockGenerator extends Thread implements Observer
 
 					flushPoint = FLUSH_TIMEPOINT + timePoint;
 					this.solvingReference = null;
-					
+
 					// GET real HWeight
 					ctrl.pingAllPeers(false);						
 					
@@ -277,16 +274,19 @@ public class BlockGenerator extends Thread implements Observer
 				// is WALLET
 				if(ctrl.doesWalletExists()) {
 	
+					if (timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS > NTP.getTime()) {
+						continue;
+					}
+					
 					//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
 					syncForgingStatus();
 					
 					//Timestamp timestamp = new Timestamp(NTP.getTime());
 					//LOGGER.info("NTP.getTime() " + timestamp);
 					
-					waitWin = bchain.getWaitWinBuffer();
+					//waitWin = bchain.getWaitWinBuffer();
 
-					if (waitWin == null && timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS < NTP.getTime()
-						&& forgingStatus == ForgingStatus.FORGING // FORGING enabled
+					if (forgingStatus == ForgingStatus.FORGING // FORGING enabled
 							&& (this.solvingReference == null // AND GENERATING NOT MAKED
 								|| !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
 							)
@@ -303,10 +303,7 @@ public class BlockGenerator extends Thread implements Observer
 						//SET NEW BLOCK TO SOLVE
 						this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
 						Block solvingBlock = dcSet.getBlockMap().get(this.solvingReference);
-						
-						//set max block
-						//if (BlockChain.BLOCK_COUNT >0)	if (solvingBlock.getHeight(dcSet) > BlockChain.BLOCK_COUNT ) return;
-		
+								
 						if(ctrl.isOnStopping()) {
 							status = -1;
 							return;
@@ -460,7 +457,7 @@ public class BlockGenerator extends Thread implements Observer
 	
 					status = 1;
 	
-					while (flushPoint > NTP.getTime() && bchain.getWaitWinBuffer() != null) {
+					while (flushPoint > NTP.getTime()) {
 						try
 						{
 							Thread.sleep(100);
@@ -506,50 +503,39 @@ public class BlockGenerator extends Thread implements Observer
 				}
 	
 				////////////////////////// UPDATE ////////////////////
-				
+
+				timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
+				if (timeUpdate > 0)
+					continue;
+
 				//CHECK IF WE ARE NOT UP TO DATE
-				if (ctrl.needUpToDate()) {
-					// IF winBlock was set while me was on update
-					
-					timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
 
-					if (timeUpdate > 0) {
-						//// still early FOR UPDATE
-						continue;
-					}
-					
-					shift_height = 0;
+				shift_height = 0;
 
-					ctrl.checkStatusAndObserve(shift_height);
-					if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0l && !ctrl.needUpToDate()) {
-						//////// PAT SITUATION ////////////
-						/// CHECK PEERS SAME ME 
-						shift_height = -1;
-					}
-					
-					/// CHECK PEERS HIGHER 
-					ctrl.checkStatusAndObserve(shift_height);
-					if (ctrl.needUpToDate()) {
-						
-						if (ctrl.isOnStopping()) {
-							status = -1;
-							return;
-						}
-						
-						status = 3;
-						ctrl.update(shift_height);
-						status = 0;
-	
-						if (ctrl.isOnStopping()) {
-							status = -1;
-							return;
-						}
-					}
+				ctrl.checkStatusAndObserve(shift_height);
+				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0l && !ctrl.needUpToDate()) {
+					//////// PAT SITUATION ////////////
+					/// CHECK PEERS SAME ME 
+					shift_height = -1;
 				}
 				
-				if (ctrl.isOnStopping()) {
-					status = -1;
-					return;
+				/// CHECK PEERS HIGHER 
+				ctrl.checkStatusAndObserve(shift_height);
+				if (ctrl.needUpToDate()) {
+					
+					if (ctrl.isOnStopping()) {
+						status = -1;
+						return;
+					}
+					
+					status = 3;
+					ctrl.update(shift_height);
+					status = 0;
+
+					if (ctrl.isOnStopping()) {
+						status = -1;
+						return;
+					}
 				}
 					
 			} catch (Exception e) {
