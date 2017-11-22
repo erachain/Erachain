@@ -508,7 +508,8 @@ public class BlockGenerator extends Thread implements Observer
 				////////////////////////// UPDATE ////////////////////
 				//CHECK IF WE ARE NOT UP TO DATE
 				waitWin = bchain.getWaitWinBuffer();
-				if (waitWin == null) {
+				if (ctrl.needUpToDate() // IF winBlock was set while me was on update
+						|| waitWin == null) {
 					
 					timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
 
