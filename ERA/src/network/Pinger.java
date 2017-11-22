@@ -175,11 +175,12 @@ public class Pinger extends Thread
 					
 					if (tryPing(2000)) {
 						Tuple2<Integer, Long> peerHWeight = cnt.getHWeightOfPeer(this.peer);
-						int peerHeight = peerHWeight==null?-1:(int)peerHWeight.a;
+						int peerHeight = peerHWeight==null?-1:peerHWeight.a;
 						int myHeight = chain.getHeight(DCSet.getInstance());
 						if (peerHWeight != null 
-								&& peerHeight <= myHeight
-								&& peerHeight > myHeight - 2) {
+								&& peerHeight == myHeight
+								//&& peerHeight > myHeight - 2
+								) {
 							LOGGER.debug("try ASYNC send " + messageQueuePing.viewType() + " " + this.peer.getAddress()	+ " after PING: " + this.ping);
 							boolean resultSend = this.peer.sendMessage(this.messageQueuePing);
 						}
