@@ -330,6 +330,13 @@ public class BlockMap extends DCMap<byte[], Block>
 		this.delete(block);
 	}
 
+	// WIPE for clear memory
+	public void wipe(byte[] signature)
+	{
+		if (this.parent != null)
+			super.delete(signature);
+	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Collection<byte[]> getGeneratorBlocks(String address)
 	{

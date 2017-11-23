@@ -101,6 +101,7 @@ public class Synchronizer
 
 				//runedBlock = lastBlock; // FOR quick STOPPING
 				lastBlock.orphan(fork);
+				fork.getBlockMap().wipe(lastBlock.getSignature());
 				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 				lastBlock = fork.getBlockMap().get(lastBlock.getReference());
 			}
@@ -152,7 +153,6 @@ public class Synchronizer
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
 		Map<String, byte[]> states = new TreeMap<String, byte[]>();
-		int height_AT = 0;
 
 		if(lastCommonBlock != null)
 		{
