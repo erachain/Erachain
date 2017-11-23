@@ -30,7 +30,7 @@ public abstract class Message {
 	public static final int WIN_BLOCK_TYPE = 8;
 	public static final int BLOCK_TYPE = 9;
 	public static final int TRANSACTION_TYPE = 10;
-	public static final int PING_TYPE = 11;
+	public static final int GET_PING_TYPE = 11;
 	public static final int VERSION_TYPE = 12;
 	public static final int FIND_MYSELF_TYPE = 13;
 

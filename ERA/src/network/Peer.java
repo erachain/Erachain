@@ -509,11 +509,14 @@ public class Peer extends Thread{
 						continue;
 					}
 					catch (java.net.SocketException err) {
-						callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
+						//callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
+						callback.tryDisconnect(this, 0, "");
+						continue;
 					}
 					catch (java.io.IOException err) {
 						//LOGGER.error("readFully - " + err.getMessage(), err);
-						callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
+						//callback.tryDisconnect(this, 1, " readFully - " + err.getMessage());
+						callback.tryDisconnect(this, 0, "");
 						continue;
 					}
 				} else {
@@ -588,7 +591,7 @@ public class Peer extends Thread{
 				}
 
 				//CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-				if(message.getType() != Message.PING_TYPE
+				if(message.getType() != Message.GET_PING_TYPE
 						&& !message.isRequest()
 						&& message.hasId()
 						&& this.messages.containsKey(message.getId()) ) {
@@ -674,7 +677,8 @@ public class Peer extends Thread{
 		{
 			//ERROR
 			//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-			callback.tryDisconnect(this, 0, "SEND - " + e.getMessage());
+			//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+			callback.tryDisconnect(this, 0, "");
 
 			//RETURN
 			//--sendUsed;
@@ -683,7 +687,9 @@ public class Peer extends Thread{
 		catch (Exception e) 
 		{
 			//ERROR
-			LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
+			//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
+			//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+			callback.tryDisconnect(this, 0, "");
 
 			//RETURN
 			//--sendUsed;
@@ -756,7 +762,8 @@ public class Peer extends Thread{
 	public void onPingFail(String mess)
 	{
 		// , 
-		this.callback.tryDisconnect(this, 5, "onPingFail : " + this.address.getHostAddress() + " - " + mess);
+		//this.callback.tryDisconnect(this, 5, "onPingFail : " + this.address.getHostAddress() + " - " + mess);
+		this.callback.tryDisconnect(this, 0, "");
 	}
 	
 

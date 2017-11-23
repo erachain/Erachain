@@ -221,6 +221,17 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin = null;
 		long timeUpdate = 0;
 		int shift_height = 0;
+		List<Transaction> unconfirmedTransactions;
+		byte[] unconfirmedTransactionsHash;
+		long max_winned_value;
+		long winned_value;				
+		int height = bchain.getHeight(dcSet) + 1;
+		long target = bchain.getTarget(dcSet);
+
+		int wait_new_block_broadcast;
+		long wait_steep;
+		boolean newWinner;
+
 
 		while(!ctrl.isOnStopping())
 		{
@@ -335,12 +346,11 @@ public class BlockGenerator extends Thread implements Observer
 						this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
 						this.acc_winner = null;
 						
-						List<Transaction> unconfirmedTransactions = null;
-						byte[] unconfirmedTransactionsHash = null;
-						long max_winned_value = 0;
-						long winned_value;				
-						int height = bchain.getHeight(dcSet) + 1;
-						long target = bchain.getTarget(dcSet);
+						unconfirmedTransactions = null;
+						unconfirmedTransactionsHash = null;
+						max_winned_value = 0;
+						height = bchain.getHeight(dcSet) + 1;
+						target = bchain.getTarget(dcSet);
 		
 						//PREVENT CONCURRENT MODIFY EXCEPTION
 						List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
@@ -372,16 +382,16 @@ public class BlockGenerator extends Thread implements Observer
 								return;
 							}
 			
-							int wait_new_block_broadcast = (int)((WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (target - max_winned_value) / target);
+							wait_new_block_broadcast = (int)((WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (target - max_winned_value) / target);
 							
+							newWinner = false;
 							if (wait_new_block_broadcast > 0) {
 	
 								status = 6;
 								
 								LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast/1000);
 								// SLEEP and WATCH break
-								long wait_steep = wait_new_block_broadcast / 100;
-								boolean newWinner = false;
+								wait_steep = wait_new_block_broadcast / 100;
 								do {
 									try
 									{
@@ -400,47 +410,46 @@ public class BlockGenerator extends Thread implements Observer
 									if (waitWin != null && waitWin.calcWinValue(dcSet) > max_winned_value) {
 										// NEW WINNER received
 										newWinner = true;
-										//this.solvingReference = null;
 										break;
 									}
 											
 								} while (wait_steep-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
-	
-								if (newWinner)
-								{
-									LOGGER.info("NEW WINER RECEIVED - drop my block");
-								} else {
-									// MAKING NEW BLOCK
-									status = 7;
-					
-									// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-									LOGGER.info("GENERATE my BLOCK");
-					
-									unconfirmedTransactions = getUnconfirmedTransactions(dcSet, timePoint);
-									// CALCULATE HASH for that transactions
-									byte[] winnerPubKey = acc_winner.getPublicKey();
-									byte[] atBytes = null;
-									unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
-					
-									//ADD TRANSACTIONS
-									//this.addUnconfirmedTransactions(dcSet, block);
-									Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
-											solvingBlock, unconfirmedTransactionsHash);
-									generatedBlock.setTransactions(unconfirmedTransactions);
-									
-									//PASS BLOCK TO CONTROLLER
-									///ctrl.newBlockGenerated(block);
-									LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-									if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
-					
-										// need to BROADCAST
-										status = 8;
-										ctrl.broadcastWinBlock(generatedBlock, null);
-										status = 0;
+							}
 
-									} else {
-										LOGGER.info("my BLOCK is weak ((...");
-									}
+							if (newWinner)
+							{
+								LOGGER.info("NEW WINER RECEIVED - drop my block");
+							} else {
+								// MAKING NEW BLOCK
+								status = 7;
+				
+								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+								LOGGER.info("GENERATE my BLOCK");
+				
+								unconfirmedTransactions = getUnconfirmedTransactions(dcSet, timePoint);
+								// CALCULATE HASH for that transactions
+								byte[] winnerPubKey = acc_winner.getPublicKey();
+								byte[] atBytes = null;
+								unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
+				
+								//ADD TRANSACTIONS
+								//this.addUnconfirmedTransactions(dcSet, block);
+								Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
+										solvingBlock, unconfirmedTransactionsHash);
+								generatedBlock.setTransactions(unconfirmedTransactions);
+								
+								//PASS BLOCK TO CONTROLLER
+								///ctrl.newBlockGenerated(block);
+								LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+								if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
+				
+									// need to BROADCAST
+									status = 8;
+									ctrl.broadcastWinBlock(generatedBlock, null);
+									status = 0;
+
+								} else {
+									LOGGER.info("my BLOCK is weak ((...");
 								}
 							}
 						}
@@ -509,9 +518,9 @@ public class BlockGenerator extends Thread implements Observer
 				if (timeUpdate > 0)
 					continue;
 
-				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0l) {
+				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
-					shift_height = -1;
+					//shift_height = -1;
 				} else { 
 					shift_height = 0;
 				}
@@ -527,6 +536,7 @@ public class BlockGenerator extends Thread implements Observer
 					}
 					
 					status = 3;
+					this.solvingReference = null;
 					ctrl.update(shift_height);
 					status = 0;
 

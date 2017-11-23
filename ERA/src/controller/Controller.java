@@ -1638,7 +1638,7 @@ public class Controller extends Observable {
 			return true;
 		}
 		
-		if (maxHW.a > thisHW.a ) {
+		if (maxHW.a > thisHW.a + shift ) {
 			this.status = STATUS_SYNCHRONIZING;
 			return false;
 		//} else if (maxHW.a < thisHW.a) {

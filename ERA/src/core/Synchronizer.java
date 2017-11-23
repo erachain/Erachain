@@ -124,7 +124,7 @@ public class Synchronizer
 				//runedBlock = block;
 				block.process(fork);
 				// RELEASE MEMORY in FORK DB
-				fork.getBlockMap().wipe(block);
+				if(false) fork.getBlockMap().wipe(block);
 			}
 			else
 			{

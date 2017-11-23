@@ -168,7 +168,7 @@ public class MessageFactory {
 		switch(type)
 		{
 		//TODO: delete PING and GET HWeight
-		case Message.PING_TYPE:
+		case Message.GET_PING_TYPE:
 			
 			message = new PingMessage();
 			break;

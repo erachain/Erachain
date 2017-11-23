@@ -4,7 +4,7 @@ public class PingMessage extends Message{
 
 	public PingMessage()
 	{
-		super(PING_TYPE);	
+		super(GET_PING_TYPE);	
 	}
 		
 	public boolean isRequest()

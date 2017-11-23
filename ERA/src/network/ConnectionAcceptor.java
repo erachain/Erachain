@@ -103,9 +103,9 @@ public class ConnectionAcceptor extends Thread{
 
 						//CREATE PEER
 						////new Peer(callback, connectionSocket);
-						LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
-								+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
-								+ " my:" + Network.getMyselfAddress());
+						//LOGGER.info("START ACCEPT CONNECT FROM " + connectionSocket.getInetAddress().getHostAddress()
+						//		+ " isMy:" + Network.isMyself(connectionSocket.getInetAddress())
+						//		+ " my:" + Network.getMyselfAddress());
 
 						callback.startPeer(connectionSocket);
 					}
