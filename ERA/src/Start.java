@@ -127,9 +127,9 @@ public class Start {
 				//STARTING NETWORK/BLOCKCHAIN/RPC
 				Controller.getInstance().start();
 				//unlick wallet
-				if (Controller.getInstance().doesWalletDatabaseExists()) {
-					Controller.getInstance().unlockWallet("1");
-				}
+				//if (Controller.getInstance().doesWalletDatabaseExists()) {
+				//	Controller.getInstance().unlockWallet("1");
+				//}
 				Status.getinstance();
 				
 				if (!Controller.useGui) {
