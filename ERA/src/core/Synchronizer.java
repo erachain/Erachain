@@ -675,7 +675,7 @@ public class Synchronizer
 			throw new Exception("on stoping");
 		}
 
-		int blockSize = 10 + block.getTransactionCount()>>(hardFlush?7:3);
+		int blockSize = 1 + (10 + block.getTransactionCount())>>(hardFlush?0:5);
 		dcSet.getBlockMap().setProcessing(true);
 
 		if(doOrphan)
