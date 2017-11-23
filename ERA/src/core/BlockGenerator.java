@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple3;
+
 import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
@@ -215,6 +217,7 @@ public class BlockGenerator extends Thread implements Observer
 		BlockChain bchain = ctrl.getBlockChain();
 		DCSet dcSet = DCSet.getInstance();
 
+		Peer peer;
 		long timeTmp;
 		long timePoint = 0;
 		long flushPoint = 0;
@@ -521,6 +524,23 @@ public class BlockGenerator extends Thread implements Observer
 				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
+					Tuple3<Integer, Long, Peer> maxHW = ctrl.getMaxPeerHWeight(-1);
+					peer = maxHW.c;
+					if (peer != null) {
+						SignaturesMessage response;
+						try {
+							response = (SignaturesMessage) peer.getResponse(MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
+									10000);
+						} catch (java.lang.ClassCastException e) {
+							peer.ban(1, "Cannot retrieve headers");
+							throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			
+						}
+
+						if (response == null) {
+							ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+						}
+
+					}
 				} else { 
 					shift_height = 0;
 				}
@@ -536,8 +556,12 @@ public class BlockGenerator extends Thread implements Observer
 					}
 					
 					status = 3;
+					
 					this.solvingReference = null;
+					bchain.clearWaitWinBuffer();
+					
 					ctrl.update(shift_height);
+					
 					status = 0;
 
 					if (ctrl.isOnStopping()) {
@@ -552,8 +576,6 @@ public class BlockGenerator extends Thread implements Observer
 					return;
 				}
 				LOGGER.error(e.getMessage(), e);
-				this.solvingReference = null;
-				bchain.clearWaitWinBuffer();
 
 			}
 		}
