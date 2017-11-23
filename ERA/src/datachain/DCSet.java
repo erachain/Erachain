@@ -26,7 +26,7 @@ import utils.ObserverMessage;
 public class DCSet implements Observer, IDB {
 
 	private static final Logger LOGGER = Logger.getLogger(DCSet.class);
-	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?10000<<4:10000;
+	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?3000<<4:3000;
 	private static final int CASH_SIZE = BlockChain.HARD_WORK?1028<<2:2048;
 	
 	private static DCSet instance;
