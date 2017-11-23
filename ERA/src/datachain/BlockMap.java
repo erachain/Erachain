@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.transaction.Transaction;
 import database.serializer.BlockSerializer;
 import settings.Settings;
 import utils.Converter;
@@ -330,11 +331,15 @@ public class BlockMap extends DCMap<byte[], Block>
 		this.delete(block);
 	}
 
-	// WIPE for clear memory
-	public void wipe(byte[] signature)
+	// WIPE for clear memory in FORK DB
+	public void wipe(Block block)
 	{
-		if (this.parent != null)
-			super.delete(signature);
+		if (this.parent != null) {
+			DCSet thisSET = getDCSet();
+			int height = block.getHeightByParent(thisSET);
+			thisSET.getTransactionFinalMap().delete(height);
+			super.delete(block.getSignature());
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

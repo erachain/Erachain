@@ -101,7 +101,6 @@ public class Synchronizer
 
 				//runedBlock = lastBlock; // FOR quick STOPPING
 				lastBlock.orphan(fork);
-				fork.getBlockMap().wipe(lastBlock.getSignature());
 				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 				lastBlock = fork.getBlockMap().get(lastBlock.getReference());
 			}
@@ -124,6 +123,8 @@ public class Synchronizer
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				//runedBlock = block;
 				block.process(fork);
+				// RELEASE MEMORY in FORK DB
+				fork.getBlockMap().wipe(block);
 			}
 			else
 			{
