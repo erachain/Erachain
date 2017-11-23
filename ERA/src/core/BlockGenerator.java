@@ -109,6 +109,8 @@ public class BlockGenerator extends Thread implements Observer
 			return "3 UPDATE";
 		case 31:
 			return "31 UPDATE SAME";
+		case 41:
+			return "41 WAIT MAKING";
 		case 4:
 			return "4 PREPARE MAKING";
 		case 5:
@@ -223,8 +225,6 @@ public class BlockGenerator extends Thread implements Observer
 		while(!ctrl.isOnStopping())
 		{
 			try {
-
-				status = 0;
 				
 				try {
 					Thread.sleep(100);
@@ -265,6 +265,7 @@ public class BlockGenerator extends Thread implements Observer
 
 					flushPoint = FLUSH_TIMEPOINT + timePoint;
 					this.solvingReference = null;
+					status = 0;
 
 					// GET real HWeight
 					ctrl.pingAllPeers(false);						
@@ -274,9 +275,12 @@ public class BlockGenerator extends Thread implements Observer
 				// is WALLET
 				if(ctrl.doesWalletExists()) {
 	
+
 					if (timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS > NTP.getTime()) {
 						continue;
 					}
+
+					status = 41;
 					
 					//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
 					syncForgingStatus();
@@ -473,7 +477,7 @@ public class BlockGenerator extends Thread implements Observer
 					}
 					
 					// FLUSH WINER to DB MAP
-					LOGGER.info("TRY to FLUSH WINER to DB MAP");
+					LOGGER.debug("TRY to FLUSH WINER to DB MAP");
 	
 					try {
 						
@@ -481,9 +485,7 @@ public class BlockGenerator extends Thread implements Observer
 						if (!ctrl.flushNewBlockGenerated()) {
 							// NEW BLOCK not FLUSHED
 							LOGGER.error("NEW BLOCK not FLUSHED");
-							continue;
 						}
-						status = 0;
 
 						if (ctrl.isOnStopping()) {
 							status = -1;
@@ -508,19 +510,16 @@ public class BlockGenerator extends Thread implements Observer
 				if (timeUpdate > 0)
 					continue;
 
-				//CHECK IF WE ARE NOT UP TO DATE
-
-				shift_height = 0;
-
-				ctrl.checkStatusAndObserve(shift_height);
-				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < 0l && !ctrl.needUpToDate()) {
-					//////// PAT SITUATION ////////////
-					/// CHECK PEERS SAME ME 
+				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0l) {
+					// MAY BE PAT SITUATION
 					shift_height = -1;
+				} else { 
+					shift_height = 0;
 				}
-				
+
 				/// CHECK PEERS HIGHER 
 				ctrl.checkStatusAndObserve(shift_height);
+				//CHECK IF WE ARE NOT UP TO DATE
 				if (ctrl.needUpToDate()) {
 					
 					if (ctrl.isOnStopping()) {

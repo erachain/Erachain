@@ -595,6 +595,8 @@ public class Synchronizer
 
 	private List<Block> getBlocks(DCSet dcSet, List<byte[]> signatures, Peer peer) throws Exception {
 		
+		LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer.getAddress());
+
 		List<Block> blocks = new ArrayList<Block>();
 		Controller cnt = Controller.getInstance();
 		
