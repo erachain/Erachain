@@ -121,7 +121,16 @@ public class BlockBuffer extends Thread
 		}
 		
 		//GET BLOCK
-		return this.blocks.get(signature).poll(Settings.getInstance().getConnectionTimeout(), TimeUnit.MILLISECONDS);
+		if (this.error) {
+			throw new Exception("Block buffer error");
+		}
+		
+		Block block = this.blocks.get(signature).poll(Settings.getInstance().getConnectionTimeout(), TimeUnit.MILLISECONDS);
+		if (block == null) {
+			throw new Exception("Block buffer error");			
+		}
+		
+		return block;
 	}
 	
 	public void stopThread()
