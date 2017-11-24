@@ -174,12 +174,13 @@ public class APIUtils {
 		try {
 			disallowRemote(request);
 
-			if(password != null && password.length() > 0)
+			if(password != null && password.length() > 0) {
 				if (false && Controller.getInstance().isWalletUnlocked())
 						return;
 
 				if (Controller.getInstance().unlockWallet(password))
 					return;
+			}
 
 			if (!gui.Gui.isGuiStarted()) {
 				throw ApiErrorFactory.getInstance().createError(
