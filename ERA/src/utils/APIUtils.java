@@ -175,7 +175,7 @@ public class APIUtils {
 			disallowRemote(request);
 
 			if(password != null && password.length() > 0)
-				if (Controller.getInstance().isWalletUnlocked())
+				if (false && Controller.getInstance().isWalletUnlocked())
 						return;
 
 				if (Controller.getInstance().unlockWallet(password))
@@ -201,7 +201,7 @@ public class APIUtils {
 			
 			if(!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled()))
 			{	
-				if(!Controller.getInstance().isWalletUnlocked()) {
+				if(true || !Controller.getInstance().isWalletUnlocked()) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance()); 
 					if(!password.equals("") && !Controller.getInstance().unlockWallet(password))
 					{
