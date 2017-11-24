@@ -754,7 +754,7 @@ public class Wallet extends Observable implements Observer
 		
 		//NOW IF NOT SYNCHRONIZED SET STATUS
 		//CHECK IF WE ARE UPTODATE
-		if(!Controller.getInstance().checkStatus(0))
+		if(false && !Controller.getInstance().checkStatus(0))
 		{
 			// NOTIFY
 			Controller.getInstance().notifyObservers(new ObserverMessage(
