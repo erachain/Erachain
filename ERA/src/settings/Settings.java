@@ -58,7 +58,7 @@ public class Settings {
 	
 	//RPC
 	private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1";
-	private static final boolean DEFAULT_RPC_ENABLED = true;
+	private static final boolean DEFAULT_RPC_ENABLED = false;
 	
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
