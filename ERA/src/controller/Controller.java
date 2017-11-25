@@ -1246,8 +1246,12 @@ public class Controller extends Observable {
 						return;
 				}
 
-				LOGGER.debug(blockWinMessage.getSender().getAddress()
-						+ " WIN_BLOCK_TYPE targetedWIN: " + newBlock.calcWinValueTargeted(dcSet));
+				info = "mess from " + blockWinMessage.getSender().getAddress();
+				LOGGER.debug(info);
+				if (Controller.useGui) about_frame.set_console_Text(info);
+				info = " received new WIN Block " + newBlock.toString(dcSet);
+				LOGGER.debug(info);
+				if (Controller.useGui) about_frame.set_console_Text(info);
 
 				if (this.status == STATUS_SYNCHRONIZING) {
 					// SET for FUTURE without CHECK
@@ -1272,13 +1276,6 @@ public class Controller extends Observable {
 					if (Controller.useGui) about_frame.set_console_Text(info);
 					return;
 				}
-
-				info = "mess from " + blockWinMessage.getSender().getAddress();
-				LOGGER.debug(info);
-				if (Controller.useGui) about_frame.set_console_Text(info);
-				info = " received new WIN Block " + newBlock.toString(dcSet);
-				LOGGER.debug(info);
-				if (Controller.useGui) about_frame.set_console_Text(info);
 
 				// CHECK IF VALID
 				if(isNewWinBlockValid == 0)	{

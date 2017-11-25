@@ -1471,9 +1471,10 @@ public class Block {
 	}
 
 	public String toString(DCSet dcSet) {
-		return "H:" + this.getHeightByParent(dcSet)
+		return " WT: " + this.calcWinValueTargeted(dcSet)
+			+ " recs: " + this.transactionCount
+			+ " H: " + this.getHeightByParent(dcSet)
 			+ " W: " + this.calcWinValue(dcSet)
-			+ " WT: " + this.calcWinValueTargeted(dcSet)
 			+ " C: " + this.getCreator().getPersonAsString().substring(0, 7);
 	}
 	

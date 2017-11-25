@@ -636,7 +636,7 @@ public class GeneratorTests {
 						
 		}
 		
-		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet) );
+		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet), null, 0l);
 		// CALCULATE HASH for that transactions
 		byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
 
@@ -708,7 +708,7 @@ public class GeneratorTests {
 		}
 		
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet) );
+		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet), null, 0l);
 
 		//CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
 		assertEquals(true, max_count > transactions.size());
@@ -776,7 +776,7 @@ public class GeneratorTests {
 		blockGenerator.addUnconfirmedTransaction(dcSet, payment);
 		
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
-		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet) );
+		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet), null, 0l);
 		
 		// CALCULATE HASH for that transactions
 		byte[] transactionsHash = Block.makeTransactionsHash(userAccount1.getPrivateKey(), transactions, null);
