@@ -10,10 +10,10 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import controller.Controller;
@@ -207,10 +207,24 @@ public class Item_Search_SplitPanel extends Split_Panel {
 			}
 		});
 
-		menu_Table.addAncestorListener(new AncestorListener(){
+		menu_Table.addPopupMenuListener(new PopupMenuListener(){
 
 			@Override
-			public void ancestorAdded(AncestorEvent arg0) {
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+			
 				// TODO Auto-generated method stub
 				item_Menu = search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
@@ -222,20 +236,12 @@ public class Item_Search_SplitPanel extends Split_Panel {
 					favorite_menu_items.setText(Lang.getInstance().translate("Remove Favorite"));
 				} else {
 					favorite_menu_items.setText(Lang.getInstance().translate("Add Favorite"));
-				}
-			}
-
-			@Override
-			public void ancestorMoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
+				}	
 				
 			}
-
-			@Override
-			public void ancestorRemoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+			
+			
+			
 		});
 		
 		menu_Table.add(favorite_menu_items);
