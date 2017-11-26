@@ -1292,9 +1292,11 @@ public class Controller extends Observable {
 						this.network.asyncBroadcastPing(message, excludes);
 						return;
 					} else {
-						// SEND my WIN BLOCK as RESPONCE
-						Message messageBestWin = MessageFactory.getInstance().createWinBlockMessage(blockChain.getWaitWinBuffer());
-						message.getSender().sendMessage(messageBestWin);
+						// SEND IF my WIN BLOCK as RESPONCE
+						if (blockChain.compareNewWin(dcSet, newBlock) < 0) {
+							Message messageBestWin = MessageFactory.getInstance().createWinBlockMessage(blockChain.getWaitWinBuffer());
+							message.getSender().sendMessage(messageBestWin);
+						}
 						return;
 					}
 				} else if (isNewWinBlockValid == 4) {

@@ -171,6 +171,22 @@ public class Block {
 		return db.getChildMap().getChildBlock(this);
 	}
 
+	public int compareWin(Block block, DCSet db)
+	{
+		long myWin = this.calcWinValue(db);
+		long itWin = block.calcWinValue(db);
+		
+		if(myWin < itWin) return -1;
+		if (myWin > itWin) return 1;
+
+		int myHash = Arrays.hashCode(this.signature);
+		int itHash = Arrays.hashCode(block.signature);
+		if (myHash < itHash) return -1;
+		if (myHash > itHash) return 1;
+		return 0;
+			
+	}
+
 	public int getHeightByParent(DCSet db)
 	{
 		

@@ -202,6 +202,10 @@ public class BlockChain
 		return block;
 	}
 
+	public int compareNewWin(DCSet dcSet, Block block) {
+		return this.waitWinBuffer == null?-1: this.waitWinBuffer.compareWin(block, dcSet);
+	}
+
 	// SOLVE WON BLOCK
 	// 0 - unchanged;
 	// 1 - changed, need broadcasting;
@@ -210,7 +214,7 @@ public class BlockChain
 		LOGGER.info("try set new winBlock: " + block.toString(dcSet));
 		
 		if (this.waitWinBuffer == null
-				|| block.calcWinValue(dcSet) > this.waitWinBuffer.calcWinValue(dcSet)) {
+				|| block.compareWin(waitWinBuffer, dcSet) > 0) {
 
 			this.waitWinBuffer = block;
 
