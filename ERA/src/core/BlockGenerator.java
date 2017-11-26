@@ -429,31 +429,39 @@ public class BlockGenerator extends Thread implements Observer
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
 				
-								unconfirmedTransactions = getUnconfirmedTransactions(dcSet, timePoint);
-								// CALCULATE HASH for that transactions
-								byte[] winnerPubKey = acc_winner.getPublicKey();
-								byte[] atBytes = null;
-								unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
-				
-								//ADD TRANSACTIONS
-								//this.addUnconfirmedTransactions(dcSet, block);
-								Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
-										solvingBlock, unconfirmedTransactionsHash);
-								generatedBlock.setTransactions(unconfirmedTransactions);
+								unconfirmedTransactions = getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value);
 								
-								//PASS BLOCK TO CONTROLLER
-								///ctrl.newBlockGenerated(block);
-								LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-								if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
-				
-									// need to BROADCAST
-									status = 8;
-									ctrl.broadcastWinBlock(generatedBlock, null);
-									status = 0;
-
-								} else {
+								if (unconfirmedTransactions == null) {
+									if (ctrl.isOnStopping()) {
+										return;
+									}
 									LOGGER.info("my BLOCK is weak ((...");
-								}
+								} else {
+
+									// CALCULATE HASH for that transactions
+									byte[] winnerPubKey = acc_winner.getPublicKey();
+									byte[] atBytes = null;
+									unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
+					
+									//ADD TRANSACTIONS
+									//this.addUnconfirmedTransactions(dcSet, block);
+									Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
+											solvingBlock, unconfirmedTransactionsHash);
+									generatedBlock.setTransactions(unconfirmedTransactions);
+									
+									//PASS BLOCK TO CONTROLLER
+									///ctrl.newBlockGenerated(block);
+									LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+									if (bchain.setWaitWinBuffer(dcSet, generatedBlock)) {
+					
+										// need to BROADCAST
+										status = 8;
+										ctrl.broadcastWinBlock(generatedBlock, null);
+										status = 0;
+									} else {
+										LOGGER.info("my BLOCK is weak ((...");
+									}
+								}	
 							}
 						}
 					}
@@ -607,17 +615,16 @@ public class BlockGenerator extends Thread implements Observer
 
 	}
 	
-	public static List<Transaction> getUnconfirmedTransactions(DCSet db, long timestamp)
+	public static List<Transaction> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value)
 	{
 		
 		long timrans1 = System.currentTimeMillis();
 					
 		//CREATE FORK OF GIVEN DATABASE
-		DCSet newBlockDb = db.fork();
+		DCSet newBlockDb = dcSet.fork();
 		Controller ctrl = Controller.getInstance();
 					
-		//ORDER TRANSACTIONS BY FEE PER BYTE
-		DCSet dcSet = DCSet.getInstance();
+		Block waitWin;
 		
 		long start = System.currentTimeMillis();
 		LOGGER.error("get orderedTransactions");
@@ -651,6 +658,13 @@ public class BlockGenerator extends Thread implements Observer
 								
 				if (ctrl.isOnStopping()) {
 					return null;
+				}
+
+				if (bchain != null ) {
+					waitWin = bchain.getWaitWinBuffer();
+					if (waitWin != null && waitWin.calcWinValue(dcSet) > max_winned_value) {
+						return null;
+					}
 				}
 
 				try{
