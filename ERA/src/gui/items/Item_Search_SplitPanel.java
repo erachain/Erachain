@@ -18,7 +18,9 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import controller.Controller;
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import gui.Split_Panel;
+import gui.items.assets.ExchangeFrame;
 import gui.library.MTable;
 import lang.Lang;
 import utils.MenuPopupUtil;
@@ -187,10 +189,18 @@ public class Item_Search_SplitPanel extends Split_Panel {
 				Point p = e.getPoint();
 				int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
 				jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+				ItemCls item = search_Table_Model.getItem(row);
+				
+				if(e.getClickCount() == 2 )
+				{
+					table_mouse_2_Click(item);
+				}
+				
 				if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
+					
 					if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == search_Table_Model.COLUMN_FAVORITE) {
-						row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-						favorite_set();
+					favorite_set(item);
 					}
 				}
 			}
@@ -201,8 +211,9 @@ public class Item_Search_SplitPanel extends Split_Panel {
 		favorite_menu_items = new JMenuItem();
 		favorite_menu_items.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				favorite_set();
+				int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+				favorite_set(search_Table_Model.getItem(row));
 
 			}
 		});
@@ -260,10 +271,8 @@ public class Item_Search_SplitPanel extends Split_Panel {
 		item_Table_Selected = null;
 	}
 
-	public void favorite_set() {
-		int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
-		row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-		ItemCls itemCls = search_Table_Model.getItem(row);
+	public void favorite_set(ItemCls itemCls) {
+		
 		// CHECK IF FAVORITES
 		if (Controller.getInstance().isItemFavorite(itemCls)) {
 
@@ -276,9 +285,12 @@ public class Item_Search_SplitPanel extends Split_Panel {
 
 	}
 
-	public Component get_show(ItemCls item) {
+	protected Component get_show(ItemCls item) {
 		return null;
 
 	}
+	protected void  table_mouse_2_Click(ItemCls item){
+		
+	};
 
 }

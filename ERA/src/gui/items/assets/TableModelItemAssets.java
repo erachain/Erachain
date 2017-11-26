@@ -2,25 +2,18 @@ package gui.items.assets;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
 import javax.validation.constraints.Null;
 
 import controller.Controller;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.ItemAssetMap;
-import datachain.SortableList;
-import gui.models.TableModelCls;
-import utils.NumberAsString;
-import utils.ObserverMessage;
+import gui.items.TableModelItems;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implements Observer
+public class TableModelItemAssets extends TableModelItems
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -43,6 +36,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 	public TableModelItemAssets()
 	{
 		//Controller.getInstance().addObserver(this);
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		db = DCSet.getInstance().getItemAssetMap();
 	}
 	public void set_Filter_By_Name(String str) {
@@ -68,11 +62,7 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		}
 		
 	
-	@Override
-	public SortableList<Long, AssetCls> getSortableList() 
-	{
-		return null;
-	}
+	
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
@@ -84,6 +74,11 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		return (AssetCls) this.list.get(row);
 	}
 	
+	@Override
+	public ItemCls getItem(int row)
+	{
+		return this.list.get(row);
+	}
 	@Override
 	public int getColumnCount() 
 	{
@@ -156,88 +151,10 @@ public class TableModelItemAssets extends TableModelCls<Long, AssetCls> implemen
 		return null;
 	}
 
-	@Override
-	public void update(Observable o, Object arg) 
-	{	
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
-	}
 	
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
-		/*
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ASSET_TYPE)
-		{			
-			if(this.assets == null)
-			{
-				this.assets = (SortableList<Long, AssetCls>) message.getValue();
-				this.assets.addFilterField("name");
-				this.assets.registerObserver();
-			}	
-			
-			this.fireTableDataChanged();
-		}
-		
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ASSET_TYPE || message.getType() == ObserverMessage.REMOVE_ASSET_TYPE)
-		{
-			this.fireTableDataChanged();
-		}
-		*/
-		if (key_filter >0){
-			
-			return;	
-			}
-			
-			// CHECK IF NEW LIST
-			if (message.getType() == ObserverMessage.LIST_ASSET_TYPE) {
-				if (this.list == null && !filter_Name.equals("")) {
-					list = db.get_By_Name(filter_Name, false);
-					this.fireTableDataChanged();
-					// this.persons = (SortableList<Tuple2<String, String>,
-					// PersonCls>) message.getValue();
-					// this.persons.addFilterField("name");
-					// this.persons.registerObserver();
-				}
-
-			}
-
-			// CHECK IF LIST UPDATED
-			if (message.getType() == ObserverMessage.ADD_ASSET_TYPE) {
-				AssetCls ppp = (AssetCls) message.getValue();
-				if (ppp.getName().contains(filter_Name))
-					list.add(ppp);
-				// list = db.getPerson_By_Name(filter_Name);
-
-				this.fireTableDataChanged();
-			}
-
-			// CHECK IF LIST UPDATED
-			if (message.getType() == ObserverMessage.REMOVE_ASSET_TYPE) {
-				 AssetCls ppp = (AssetCls) message.getValue();
-				if (ppp.getName().contains(filter_Name))
-					list.remove(ppp);
-				// list = db.getPerson_By_Name(filter_Name);
-
-				this.fireTableDataChanged();
-			}
-		
-	}
 	
-	public void removeObservers() 
-	{
-	//	this.assets.removeObserver();
-		Controller.getInstance().deleteObserver(this);
-	}
+	
+	
 	
 	public void Find_item_from_key(String text) {
 		// TODO Auto-generated method stub

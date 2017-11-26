@@ -18,7 +18,7 @@ public class Search_Statuses_Tab extends Item_Search_SplitPanel{
 
 //show details
 	@Override
-	public Component get_show(ItemCls item) {
+	protected Component get_show(ItemCls item) {
 		Status_Info info_Note = new Status_Info();
 		info_Note.show_001((StatusCls) item);
 		return info_Note;

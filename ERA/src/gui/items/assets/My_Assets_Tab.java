@@ -35,7 +35,6 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
-import gui.items.assets.Search_Assets_Tab.search_listener;
 import gui.items.persons.Person_Info_002;
 import gui.library.MTable;
 import gui.models.Renderer_Boolean;
