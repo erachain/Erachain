@@ -7,11 +7,12 @@ import core.item.notes.NoteCls;
 import datachain.DCSet;
 import datachain.ItemNoteMap;
 import datachain.SortableList;
+import gui.items.TableModelItems;
 import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelNotes extends TableModelCls<Long, NoteCls>
+public class TableModelNotes extends TableModelItems
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -26,13 +27,8 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls>
 	
 	public TableModelNotes()
 	{
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		db= DCSet.getInstance().getItemNoteMap();
-	}
-	
-	@Override
-	public SortableList<Long, NoteCls> getSortableList() 
-	{
-		return null;
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -49,7 +45,11 @@ public class TableModelNotes extends TableModelCls<Long, NoteCls>
 		public void set_get_Column_AutoHeight( Boolean[] arg0){
 			this.column_AutuHeight = arg0;	
 		}
-		
+		@Override
+		public ItemCls getItem(int row)
+		{
+			return this.list.get(row);
+		}	
 	
 	
 	public NoteCls getNote(int row)
