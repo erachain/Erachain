@@ -1,25 +1,16 @@
 package gui.items.statuses;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
-
 import javax.validation.constraints.Null;
-
-import controller.Controller;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
 import datachain.DCSet;
 import datachain.ItemStatusMap;
-import datachain.SortableList;
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import gui.models.TableModelCls;
+import gui.items.TableModelItems;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelItemStatuses extends TableModelCls<Long, StatusCls>
+public class TableModelItemStatuses extends TableModelItems
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -39,15 +30,11 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls>
 	public TableModelItemStatuses()
 	{
 	//	Controller.getInstance().addObserver(this);
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		db= DCSet.getInstance().getItemStatusMap();
 	}
 	
-	@Override
-	public SortableList<Long, StatusCls> getSortableList() 
-	{
-		return null;
-	}
-	
+		
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
@@ -66,6 +53,13 @@ public class TableModelItemStatuses extends TableModelCls<Long, StatusCls>
 	{
 		return (StatusCls) db.get((long) row);
 	}
+	
+	@Override
+	public ItemCls getItem(int row)
+	{
+		return this.list.get(row);
+	}
+	
 	
 	@Override
 	public int getColumnCount() 
