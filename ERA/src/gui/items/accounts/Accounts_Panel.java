@@ -31,6 +31,8 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
@@ -212,28 +214,22 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		//MENU
 		JPopupMenu menu = new JPopupMenu();	
 		
-		menu.addAncestorListener(new AncestorListener(){
+		menu.addPopupMenuListener(new PopupMenuListener(){
 
 			@Override
-			public void ancestorAdded(AncestorEvent event) {
-				// TODO Auto-generated method stub
-				int row = table.getSelectedRow();
-				if (row < 1 ) return;
-			
-			row = table.convertRowIndexToModel(row);
-			asset = (AssetCls) cbxFavorites.getSelectedItem();
-			pub_Key = tableModel.getPublicKeyAccount(row);
-			}
-
-			@Override
-			public void ancestorMoved(AncestorEvent event) {
-				// TODO Auto-generated method stub
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
 
 			@Override
-			public void ancestorRemoved(AncestorEvent event) {
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
 				// TODO Auto-generated method stub
 				int row = table.getSelectedRow();
 				if (row < 1 ) return;
@@ -243,12 +239,10 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			pub_Key = tableModel.getPublicKeyAccount(row);
 			
 			}
-			
-			
-			
-			
-		});
+			});
 		
+		
+				
 		JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
 		sendAsset.addActionListener(new ActionListener()
 		{
