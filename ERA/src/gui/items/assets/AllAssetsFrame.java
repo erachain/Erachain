@@ -184,7 +184,5 @@ public class AllAssetsFrame extends JFrame{
 		this.setVisible(true);
 	}
 
-	public void removeObservers() {
-		this.tableModelItemAssets.removeObservers();
-	}
+	
 }
