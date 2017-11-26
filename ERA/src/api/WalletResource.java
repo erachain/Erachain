@@ -118,6 +118,8 @@ public class WalletResource {
 			//READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String password = (String) jsonObject.get("password");
+			
+			password = null;
 			APIUtils.askAPICallAllowed(password, "POST wallet " + x, request);
 
 			boolean recover = (boolean) jsonObject.get("recover");
@@ -175,8 +177,8 @@ public class WalletResource {
 	@Consumes(MediaType.WILDCARD)	
 	public String unlock(String x)
 	{
-		String password_1 = null;
-		APIUtils.askAPICallAllowed(password_1, "POST wallet/unlock " + x, request);
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "POST wallet/unlock " + x, request);
 
 		//JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 		//String password = (String) jsonObject.get("password");

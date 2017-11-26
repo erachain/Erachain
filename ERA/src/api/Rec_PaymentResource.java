@@ -31,7 +31,6 @@ public class Rec_PaymentResource
 	@Consumes(MediaType.WILDCARD)
 	public String createPayment(String x)
 	{
-		//APIUtils.askAPICallAllowed("POST payment\n " + x, request);
 
 		try
 		{
@@ -43,7 +42,10 @@ public class Rec_PaymentResource
 			String sender = (String) jsonObject.get("sender");
 			String recipient = (String) jsonObject.get("recipient");
 			String password = (String) jsonObject.get("password");
-			
+
+			password = null;
+			APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request);
+		
 			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, x, request );
 		}
 		catch(NullPointerException| ClassCastException e)
@@ -52,7 +54,7 @@ public class Rec_PaymentResource
 			LOGGER.info(e);
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
-	}
 
+	}
 
 }

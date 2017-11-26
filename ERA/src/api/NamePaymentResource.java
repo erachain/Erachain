@@ -48,6 +48,7 @@ public class NamePaymentResource {
 			if(nameToAdress.getB() == NameResult.OK)
 			{
 				String recipient = nameToAdress.getA().getAddress();
+				password = null;
 				return APIUtils.processPayment(password, sender, feePow, recipient, assetKey,  amount, x, request);
 			}else
 			{
