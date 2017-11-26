@@ -156,4 +156,10 @@ public class WalletPollsTableModel extends TableModelCls<Tuple2<String, String>,
 	public void addObservers(){
 		Controller.getInstance().addWalletListener(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return polls.get(k).getB();
+	}
 }

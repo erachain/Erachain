@@ -186,4 +186,10 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 	
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.assets.get(k).getB();
+	}
 }

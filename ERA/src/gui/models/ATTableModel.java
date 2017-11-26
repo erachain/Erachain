@@ -159,4 +159,10 @@ public class ATTableModel extends TableModelCls<Long, AT> implements Observer
 		this.ats.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.ats.get(k).getB();
+	}
 }

@@ -12,5 +12,5 @@ public abstract class TableModelCls<T, U> extends AbstractTableModel  {
 	
 	public abstract SortableList<T, U> getSortableList();
 
-	
+	public abstract Object getItem(int k);
 }

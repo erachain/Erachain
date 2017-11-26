@@ -174,4 +174,10 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 		this.orders.removeObserver();
 		Controller.getInstance().deleteWalletObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.orders.get(k).getB();
+	}
 }

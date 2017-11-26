@@ -159,4 +159,10 @@ public class PollsTableModel extends TableModelCls<String, Poll> implements Obse
 		//if(this.polls!=null)this.polls.removeObserver();
 		//DCSet.getInstance().getPollMap().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.polls.get(k).getB();
+	}
 }

@@ -149,4 +149,10 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 		this.imprints.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.imprints.get(k).getB();
+	}
 }

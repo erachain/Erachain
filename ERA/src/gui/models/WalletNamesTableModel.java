@@ -131,4 +131,17 @@ public class WalletNamesTableModel extends TableModelCls<Tuple2<String, String>,
 			this.fireTableDataChanged();
 		}	
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		Pair<Tuple2<String, String>, Name> namepair = this.names.get(k);
+		if(!namepair.getA().a.equalsIgnoreCase(namepair.getB().getOwner().getAddress()))
+		{
+			//inconsistency, owner was not updated correctly
+			Name name = new Name(new Account(namepair.getA().a), namepair.getB().getName(), namepair.getB().getValue());
+			return name;
+		}
+		return this.names.get(k).getB();
+	}
 }

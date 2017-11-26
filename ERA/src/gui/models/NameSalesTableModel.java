@@ -138,4 +138,11 @@ public class NameSalesTableModel extends TableModelCls<String, BigDecimal> imple
 		this.nameSales.removeObserver();
 		DCSet.getInstance().getNameExchangeMap().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		Pair<String, BigDecimal> pair = this.nameSales.get(k);
+		return new NameSale(pair.getA(), pair.getB());
+	}
 }

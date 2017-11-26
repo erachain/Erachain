@@ -199,4 +199,10 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 		
 		Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return  this.persons.get(k);
+	}
 }

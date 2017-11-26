@@ -291,4 +291,14 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		Transaction data = transactions.get(k);
+		if (data == null ) {
+			return null;
+		}
+		return data;
+	}
 }

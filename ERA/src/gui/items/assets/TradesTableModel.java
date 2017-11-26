@@ -232,4 +232,14 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		this.trades.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		Pair<Tuple2<BigInteger, BigInteger>, Trade> rec = this.trades.get(k);
+		if (rec == null)
+			return null;
+		
+		return this.trades.get(k).getB();
+	}
 }

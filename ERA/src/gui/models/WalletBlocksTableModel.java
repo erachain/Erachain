@@ -191,4 +191,10 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 		Controller.getInstance().wallet.database.getBlockMap().deleteObserver(this.blocks);
 		
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.blocks.get(k);
+	}
 }

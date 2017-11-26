@@ -184,4 +184,10 @@ public class ATTxsTableModel extends TableModelCls<Tuple2<Integer, Integer>, AT_
 		this.ats.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.ats.get(k).getB().getAmount();
+	}
 }

@@ -157,4 +157,10 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 		this.trades.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.trades.get(k).getB();
+	}
 }

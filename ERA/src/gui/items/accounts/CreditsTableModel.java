@@ -312,4 +312,10 @@ public class CreditsTableModel  extends TableModelCls<Tuple2<String, String>, Tr
 		
 		return totalBalance;
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return transactions_Asset.get(k);
+	}
 }

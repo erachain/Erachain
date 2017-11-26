@@ -181,4 +181,10 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 		this.orders.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return this.orders.get(k).getB();
+	}
 }

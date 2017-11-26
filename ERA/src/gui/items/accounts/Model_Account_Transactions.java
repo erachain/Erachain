@@ -307,4 +307,10 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		
 		return totalBalance;
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		return transactions_Asset.get(k);
+	}
 }

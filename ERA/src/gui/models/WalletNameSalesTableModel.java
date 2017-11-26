@@ -138,4 +138,11 @@ public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, Stri
 	{
 		Controller.getInstance().deleteWalletObserver(this);
 	}
+
+	@Override
+	public Object getItem(int k) {
+		// TODO Auto-generated method stub
+		Pair<Tuple2<String, String>, BigDecimal> data = this.nameSales.get(k);
+		return new NameSale(data.getA().b, data.getB());
+	}
 }
