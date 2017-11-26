@@ -1744,9 +1744,10 @@ if ( asset_1 == null) {
 			 Object creat = statusModel.getValueAt(i, statusModel.COLUMN_MAKER);
 			
 			if (!creat.equals("")){
+				PersonCls pers = statusModel.getCreatorPerson(i);
 				statusJSON.put("status_creator", creat.toString());
-				statusJSON.put("status_creator_key", "");
-				statusJSON.put("status_creator_name","");
+				statusJSON.put("status_creator_key", pers.getKey());
+				statusJSON.put("status_creator_name",pers.getName());
 				
 			//	PersonCls pp = (PersonCls) statusModel.getValueAt(i, statusModel.COLUMN_MAKER);
 			//	statusJSON.put("status_creator_name", pp.getName());

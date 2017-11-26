@@ -28,6 +28,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.imprints.ImprintCls;
+import core.item.persons.PersonCls;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
 import core.transaction.Transaction;
@@ -200,6 +201,17 @@ public  class WEB_PersonStatusesModel extends  AbstractTableModel implements Obs
 		}
 		
 		return null;
+	}
+	
+	public PersonCls getCreatorPerson(int row){
+		Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>> value = statusesRows.get(row);
+		int block = value.b.d;
+		int recNo = value.b.e;
+		Transaction record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
+		return record==null?null:record.getCreator().getPerson().b;
+		
+		
+		
 	}
 
 	@Override
