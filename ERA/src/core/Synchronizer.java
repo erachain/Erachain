@@ -193,7 +193,10 @@ public class Synchronizer
 				throw new Exception("on stoping");
 
 			//SYNCHRONIZED PROCESSING
+			LOGGER.debug("*** begin PIPE");
 			this.pipeProcessOrOrphan(dcSet, block, false, false);
+
+			LOGGER.debug("*** begin REMOVE orphanedTransactions");
 			for (Transaction transaction: block.getTransactions()) {
 				if (cnt.isOnStopping())
 					throw new Exception("on stoping");
