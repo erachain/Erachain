@@ -176,7 +176,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 							jScrollPanel_LeftPanel.setViewportView(search_Info_Panel);
 							return;
 						}
-						jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
+					//	jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(0, 0);
 						// ddd.dispose();
 						jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 					}
@@ -245,7 +245,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 			public void mousePressed(MouseEvent e) {
 				Point p = e.getPoint();
 				int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
-				jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+			//	jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 
 				if (e.getClickCount() == 1 & e.getButton() == MouseEvent.BUTTON1) {
 
