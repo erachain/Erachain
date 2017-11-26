@@ -1363,6 +1363,7 @@ public class Block {
 		{
 			cnt.blockchainSyncStatusUpdate(heightBlock);
 		}
+		
 		long tickets = System.currentTimeMillis() - start;
 		LOGGER.debug("[" + this.heightBlock + "] processing time: " +  tickets*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );

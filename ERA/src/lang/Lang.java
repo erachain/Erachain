@@ -42,7 +42,7 @@ public class Lang {
 	}
 	
 	public void loadLang() {
-		LOGGER.error("try lang file: " + Settings.getInstance().getLang());	
+		LOGGER.debug("try lang file: " + Settings.getInstance().getLang());	
 		langObj = openLangFile(Settings.getInstance().getLang());
 		noTranslateMap = new LinkedHashMap<String, String>();
 	}
@@ -148,7 +148,7 @@ public class Lang {
         	if(!fileList.get(i).equals("en.json") && !fileList.get(i).equals("available.json"))
         	{
         		try {
-					LOGGER.error("try lang file: " + fileList.get(i));	
+					LOGGER.debug("try lang file: " + fileList.get(i));	
         			JSONObject langFile = openLangFile(fileList.get(i));
         			if (langFile.size() == 0)
         				continue;
@@ -183,7 +183,7 @@ public class Lang {
         	if(!fileList.get(i).equals("en.json") && !fileList.get(i).equals("available.json"))
         	{
         		try {
-					LOGGER.error("try lang file: " + fileList.get(i));	
+					LOGGER.debug("try lang file: " + fileList.get(i));	
 					JSONObject langFile = openLangFile(fileList.get(i));
         			if (langFile.size() == 0)
         				continue;

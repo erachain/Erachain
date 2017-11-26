@@ -1163,7 +1163,7 @@ public class Controller extends Observable {
 							hWeightMessage.getHWeight());
 				}
 				
-				this.checkStatusAndObserve(0);
+				//this.checkStatusAndObserve(0);
 				
 				break;
 
@@ -1890,7 +1890,7 @@ public class Controller extends Observable {
 			hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b - 10000l);							
 		}
 		this.peerHWeight.put(peer, hWeightMy);
-		blockchainSyncStatusUpdate(this.getMyHeight());
+		////blockchainSyncStatusUpdate(this.getMyHeight());
 	}
 
 	// WALLET
