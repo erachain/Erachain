@@ -305,23 +305,7 @@ import utils.TableMenuPopupUtil;
 		    	    				{
 		    	    					favorite.setText(Lang.getInstance().translate("Add Favorite"));
 		    	    				}
-		    	    				/*	
-		    	    				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
-		    	    				this.favoritesButton.addActionListener(new ActionListener()
-		    	    				{
-		    	    					public void actionPerformed(ActionEvent e)
-		    	    					{
-		    	    						onFavoriteClick();
-		    	    					}
-		    	    				});	
-		    	    				this.add(this.favoritesButton, labelGBC);
-		    	    				*/
-		    	    			
-		    	    		
-		    	    		
-		    	    		
-		    	    		
-		    	    		}
+		    	    				}
 		    	    		
 		    	    	}
 		    	    	
@@ -404,7 +388,10 @@ import utils.TableMenuPopupUtil;
 					public void valueChanged(ListSelectionEvent arg0) {
 						PersonCls person = null;
 						if (search_Table.getSelectedRow() >= 0 ) person = search_Table_Model.getItem(search_Table.convertRowIndexToModel(search_Table.getSelectedRow()));
-						if (person == null) return;
+						if (person == null){
+							jScrollPane_jPanel_RightPanel.setViewportView(null);
+							return;
+						}
 							Person_Info_002 info_panel = new Person_Info_002(person, true);
 							info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
 							jScrollPane_jPanel_RightPanel.setViewportView(info_panel);

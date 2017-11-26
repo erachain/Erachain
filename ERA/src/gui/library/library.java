@@ -260,7 +260,7 @@ public class library {
 		
 		// .setUIFont(new javax.swing.plaf.FontUIResource("Tahoma",Font.PLAIN,12));
 		 
-		 ArrayList<Tuple2<String,Object>> ss = new ArrayList<Tuple2<String, Object>>();
+		// ArrayList<Tuple2<String,Object>> ss = new ArrayList<Tuple2<String, Object>>();
 	      
 		
 	      
@@ -298,12 +298,12 @@ public class library {
 		    	String key = keys.nextElement().toString();
 		    	if (key.contains("OptionPane")){
 		        Object value = UIManager.get(key);
-		        ss.add(new Tuple2<String, Object>(key,value));
+		//        ss.add(new Tuple2<String, Object>(key,value));
 		//        if(value instanceof javax.swing.plaf.FontUIResource) UIManager.put(key, f);
 		    	}
 		    }
 	      
-	    font = font;
+	//    font = font;
 	       
 	        
 		

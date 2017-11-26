@@ -34,7 +34,6 @@ package gui2;
 
  
 import javax.swing.*;
-import javax.swing.*;
 import javax.swing.plaf.basic.BasicButtonUI;
 
 import org.json.simple.JSONObject;
@@ -55,7 +54,11 @@ import java.util.HashMap;
  * a JButton to close the tab it belongs to 
  */
 public class ButtonTabComponent extends JPanel {
-    private final JTabbedPane pane;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private final JTabbedPane pane;
  
     public ButtonTabComponent(final JTabbedPane pane) {
         //unset default FlowLayout' gaps
@@ -73,7 +76,7 @@ public class ButtonTabComponent extends JPanel {
                 if (i != -1) {
                     return pane.getTitleAt(i);
                 }
-                return null;
+               return null;
             }
         };
          
@@ -89,7 +92,8 @@ public class ButtonTabComponent extends JPanel {
  
     private class TabButton extends JButton implements ActionListener {
         public TabButton() {
-            int size = 17;
+            int size = UIManager.getFont("TextField.font").getSize() +4;
+            if (size <10) size = 10;
             setPreferredSize(new Dimension(size, size));
             setToolTipText("close this tab");
             //Make the button looks the same for all Laf's
@@ -111,7 +115,7 @@ public class ButtonTabComponent extends JPanel {
         public void actionPerformed(ActionEvent e) {
         	
             int i = pane.indexOfTabComponent(ButtonTabComponent.this);
-            
+            JFrame frame1 = new JFrame();
             if (i != -1) {
             	Component p_Comp = pane.getComponentAt(i);
             	
@@ -146,13 +150,22 @@ public class ButtonTabComponent extends JPanel {
 					try {
 						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
 					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(new JFrame(), "Error writing to the file: "
+						
+						JOptionPane.showMessageDialog(frame1, "Error writing to the file: "
 								+ Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
 								JOptionPane.ERROR_MESSAGE);
 					}
 					sP.delay_on_close();
+					sP = null;
+					
 				}
                 pane.remove(i);
+                p_Comp = null;
+                outTabbedDiv= null;
+				settingsJSON = null;
+				settingsJSONbuf = null;
+				frame1 = null;
+                
             }
         }
  
@@ -169,7 +182,7 @@ public class ButtonTabComponent extends JPanel {
                 g2.translate(1, 1);
             }
             g2.setStroke(new BasicStroke(2));
-            g2.setColor(Color.BLACK);
+            g2.setColor(Color.PINK);
             if (getModel().isRollover()) {
                 g2.setColor(Color.MAGENTA);
             }
@@ -177,6 +190,7 @@ public class ButtonTabComponent extends JPanel {
             g2.drawLine(delta, delta, getWidth() - delta - 1, getHeight() - delta - 1);
             g2.drawLine(getWidth() - delta - 1, delta, delta, getHeight() - delta - 1);
             g2.dispose();
+            g2 = null;
         }
     }
  

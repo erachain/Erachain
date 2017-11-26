@@ -31,9 +31,10 @@ public class M_TabbedPanel extends JTabbedPane {
 	
 	private void init(Component comp){
 		// set for tab view close buton
-		this.setTabComponentAt(this.indexOfComponent(comp), new ButtonTabComponent(this));		
+		ButtonTabComponent button_Comp = new ButtonTabComponent(this);
+		this.setTabComponentAt(this.indexOfComponent(comp), button_Comp);		
 		// write info to tabbed setting object
-		
+		button_Comp = null;
 		
 	}
 	
