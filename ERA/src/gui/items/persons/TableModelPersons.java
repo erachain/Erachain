@@ -3,25 +3,20 @@ package gui.items.persons;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.Null;
-import org.mapdb.Fun.Tuple2;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.ItemPersonMap;
-import datachain.SortableList;
-import gui.models.TableModelCls;
+import gui.items.TableModelItems;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class TableModelPersons extends TableModelCls<Tuple2<String, String>, PersonCls> {
+public class TableModelPersons extends TableModelItems {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_BORN = 2;
 	public static final int COLUMN_PUBLISHER = 3;
 	public static final int COLUMN_FAVORITE = 4;
-
-	// private SortableList<Long, PersonCls> persons;
-	private SortableList<Tuple2<String, String>, PersonCls> persons;
 
 	private String[] columnNames = Lang.getInstance()
 			.translate(new String[] { "Key", "Name", "Birthday", "Publisher", "Favorite" });// ,
@@ -33,18 +28,10 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 	private long key_filter =0;
 
 	public TableModelPersons() {
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		db = DCSet.getInstance().getItemPersonMap();
-		// addObservers() ;
-		// PersonCls ss =
-		// DBSet.getInstance().getItemPersonMap().get_Indexes("v");
-		// String sss = ss!=null?ss.getName():"--";
 	}
 
-	// @Override
-	// public SortableList<Long, PersonCls> getSortableList()
-	// {
-	// return this.persons;
-	// }
 	public void set_Filter_By_Name(String str) {
 		filter_Name = str;
 		list = db.get_By_Name(filter_Name, false);
@@ -55,11 +42,6 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 		list =new ArrayList<ItemCls>();
 		this.fireTableDataChanged();
 		
-	}
-
-	@Override
-	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
-		return this.persons;
 	}
 
 	public Class<? extends Object> getColumnClass(int c) { // set column type
@@ -80,6 +62,12 @@ public class TableModelPersons extends TableModelCls<Tuple2<String, String>, Per
 
 	public PersonCls getPerson(int row) {
 		return (PersonCls) this.list.get(row);
+	}
+	
+	@Override
+	public ItemCls getItem(int row)
+	{
+		return this.list.get(row);
 	}
 
 	@Override
