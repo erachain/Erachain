@@ -312,13 +312,14 @@ public class Synchronizer
 				
 				if (blockFromPeer == null) {
 					
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
+
 					if (true) break;
 					
 					//INVALID BLOCK THROW EXCEPTION
 					String mess = "Dishonest peer on block null";
 					peer.ban(BAN_BLOCK_TIMES>>4, mess);
-					//STOP BLOCKBUFFER
-					blockBuffer.stopThread();
 					throw new Exception(mess);
 				}
 
