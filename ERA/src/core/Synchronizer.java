@@ -620,6 +620,7 @@ public class Synchronizer
 			block.setCalcGeneratingBalance(dcSet);
 
 			blocks.add(block);	
+			LOGGER.debug("block added with RECS:" + block.getTransactionCount());
 		}
 		
 		return blocks;
