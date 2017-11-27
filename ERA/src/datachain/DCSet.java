@@ -26,7 +26,7 @@ import utils.ObserverMessage;
 public class DCSet implements Observer, IDB {
 
 	private static final Logger LOGGER = Logger.getLogger(DCSet.class);
-	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?3000<<4:3000;
+	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?3000<<0:3000;
 	private static final int CASH_SIZE = BlockChain.HARD_WORK?1028<<2:2048;
 	
 	private static DCSet instance;
@@ -192,7 +192,9 @@ public class DCSet implements Observer, IDB {
 	
 	public static DCSet createEmptyDatabaseSet()
 	{
-		DB database = DBMaker.newMemoryDB()
+		DB database = DBMaker
+				.newMemoryDB()
+				//.newMemoryDirectDB()
 				.make();
 		
 		return new DCSet(database, false, false);
@@ -822,7 +824,11 @@ public class DCSet implements Observer, IDB {
 		if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
 			long start = System.currentTimeMillis();
 			LOGGER.debug("%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%% actions:" + actions);
-			this.database.commit();
+			if (parent == null) {
+				this.database.commit();
+			} else {
+				this.parent.database.commit();				
+			}
 
 			LOGGER.debug("%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%  commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
 			this.actions = 0l;
