@@ -644,12 +644,6 @@ public class BlockGenerator extends Thread implements Observer
 		start = System.currentTimeMillis();
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
-
-		
-		List<Transaction> orderedFilteredTransactions = new ArrayList<Transaction>();
-		for(Transaction transaction: orderedTransactions)
-		{
-		}
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
 
