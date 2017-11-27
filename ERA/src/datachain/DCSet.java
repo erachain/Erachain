@@ -100,7 +100,7 @@ public class DCSet implements Observer, IDB {
 
 	
 	private DB database;
-	private Long actions = (long)(Math.random() * (ACTIONS_BEFORE_COMMIT>>1));
+	private long actions = (long)(Math.random() * (ACTIONS_BEFORE_COMMIT>>1));
 	private boolean withObserver;// observe
 	private boolean dynamicGUI;// observe
 	
