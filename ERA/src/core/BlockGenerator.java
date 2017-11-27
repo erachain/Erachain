@@ -622,8 +622,7 @@ public class BlockGenerator extends Thread implements Observer
 	{
 		
 		//CREATE FORK OF GIVEN DATABASE
-		DCSet newBlockDb = dcSet.fork();
-					
+		DCSet newBlockDb = dcSet.fork();		
 		Block waitWin;
 		
 		long start = System.currentTimeMillis();
