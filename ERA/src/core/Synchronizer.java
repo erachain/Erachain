@@ -291,6 +291,7 @@ public class Synchronizer
 					+ " peer: " + peer.getAddress().getHostName()
 					+ " for blocks: " + signatures.b.size());
 			BlockBuffer blockBuffer = new BlockBuffer(signatures.b, peer);
+			Block blockFromPeer;
 
 			//GET AND PROCESS BLOCK BY BLOCK
 			for(byte[] signature: signatures.b)
@@ -307,7 +308,19 @@ public class Synchronizer
 						);
 
 				long time1 = System.currentTimeMillis();
-				Block blockFromPeer = blockBuffer.getBlock(signature);
+				blockFromPeer = blockBuffer.getBlock(signature);
+				
+				if (blockFromPeer == null) {
+					
+					if (true) break;
+					
+					//INVALID BLOCK THROW EXCEPTION
+					String mess = "Dishonest peer on block null";
+					peer.ban(BAN_BLOCK_TIMES>>4, mess);
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
+					throw new Exception(mess);
+				}
 
 				LOGGER.debug("synchronize BLOCK getted "
 						+ " time ms: " + (System.currentTimeMillis() - time1)
@@ -321,15 +334,6 @@ public class Synchronizer
 					throw new Exception("on stoping");
 				}
 				
-				if (blockFromPeer == null) { // icreator
-					
-					//INVALID BLOCK THROW EXCEPTION
-					String mess = "Dishonest peer on block null";
-					peer.ban(BAN_BLOCK_TIMES>>4, mess);
-					//STOP BLOCKBUFFER
-					blockBuffer.stopThread();
-					throw new Exception(mess);
-				}
 				blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
 
 				if (cnt.isOnStopping()) {

@@ -125,7 +125,7 @@ public class BlockBuffer extends Thread
 			throw new Exception("Block buffer error");
 		}
 		
-		Block block = this.blocks.get(signature).poll(Settings.getInstance().getConnectionTimeout(), TimeUnit.MILLISECONDS);
+		Block block = this.blocks.get(signature).poll(60000, TimeUnit.MILLISECONDS);
 		if (block == null) {
 			throw new Exception("Block buffer error");			
 		}
