@@ -448,7 +448,7 @@ public class BlockGenerator extends Thread implements Observer
 									Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
 											solvingBlock, unconfirmedTransactionsHash);
 									generatedBlock.setTransactions(unconfirmedTransactions);
-									
+									unconfirmedTransactions = null;
 									//PASS BLOCK TO CONTROLLER
 									///ctrl.newBlockGenerated(block);
 									LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
@@ -457,6 +457,7 @@ public class BlockGenerator extends Thread implements Observer
 										// need to BROADCAST
 										status = 8;
 										ctrl.broadcastWinBlock(generatedBlock, null);
+										generatedBlock = null;
 										status = 0;
 									} else {
 										LOGGER.info("my BLOCK is weak ((...");
