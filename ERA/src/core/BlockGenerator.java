@@ -51,6 +51,7 @@ public class BlockGenerator extends Thread implements Observer
 	
 	private List<PrivateKeyAccount> cachedAccounts;
 	
+	private static Controller ctrl = Controller.getInstance();
 	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
 	private boolean walletOnceUnlocked = false;
 	private static int status = 0;
@@ -130,6 +131,7 @@ public class BlockGenerator extends Thread implements Observer
 
 	public BlockGenerator(boolean withObserve)
 	{
+		
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled())
 		{
 			this.cachedAccounts = new ArrayList<PrivateKeyAccount>();
@@ -145,7 +147,7 @@ public class BlockGenerator extends Thread implements Observer
 			public void run() {
 				
 				//WE HAVE TO WAIT FOR THE WALLET TO ADD THAT LISTENER.
-				while(!Controller.getInstance().doesWalletExists() || !Controller.getInstance().doesWalletDatabaseExists())
+				while(!ctrl.doesWalletExists() || !ctrl.doesWalletDatabaseExists())
 				{
 					try {
 						Thread.sleep(500);
@@ -154,11 +156,11 @@ public class BlockGenerator extends Thread implements Observer
 					}
 				}
 				
-				Controller.getInstance().addWalletListener(BlockGenerator.this);
+				ctrl.addWalletListener(BlockGenerator.this);
 				syncForgingStatus();
 			}
 		}.start();
-		Controller.getInstance().addObserver(this);
+		ctrl.addObserver(this);
 	}
 	
 	public void addUnconfirmedTransaction(Transaction transaction)
@@ -181,7 +183,7 @@ public class BlockGenerator extends Thread implements Observer
 		//CHECK IF CACHING ENABLED
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled())
 		{
-			List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
+			List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
 			
 			//IF ACCOUNTS EXISTS
 			if(privateKeyAccounts.size() > 0)
@@ -196,7 +198,7 @@ public class BlockGenerator extends Thread implements Observer
 		else
 		{
 			//RETURN ACCOUNTS
-			return Controller.getInstance().getPrivateKeyAccounts();
+			return ctrl.getPrivateKeyAccounts();
 		}
 	}
 	
@@ -205,7 +207,7 @@ public class BlockGenerator extends Thread implements Observer
 		if(forgingStatus != status)
 		{
 			forgingStatus = status;
-			Controller.getInstance().forgingStatusChanged(forgingStatus);
+			ctrl.forgingStatusChanged(forgingStatus);
 		}
 	}
 	
@@ -213,7 +215,7 @@ public class BlockGenerator extends Thread implements Observer
 	public void run()
 	{
 
-		Controller ctrl = Controller.getInstance();
+	
 		BlockChain bchain = ctrl.getBlockChain();
 		DCSet dcSet = DCSet.getInstance();
 
@@ -619,11 +621,9 @@ public class BlockGenerator extends Thread implements Observer
 	public static List<Transaction> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value)
 	{
 		
-		long timrans1 = System.currentTimeMillis();
-					
 		//CREATE FORK OF GIVEN DATABASE
 		DCSet newBlockDb = dcSet.fork();
-		Controller ctrl = Controller.getInstance();
+	
 					
 		Block waitWin;
 		
@@ -738,7 +738,9 @@ public class BlockGenerator extends Thread implements Observer
 		}
 		while(count < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
 
-
+		orderedTransactions = null;
+		waitWin = null;
+		newBlockDb = null;
 		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"milsec for trans: " + transactionsList.size() );
 		start = System.currentTimeMillis();
 
@@ -779,7 +781,7 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 		}
 		
-		Controller ctrl = Controller.getInstance();
+	
 		int status = ctrl.getStatus();
 		//CONNECTIONS OKE? -> FORGING
 		// CONNECTION not NEED now !!
@@ -792,7 +794,7 @@ public class BlockGenerator extends Thread implements Observer
 		}
 
 		// NOT NEED to wait - TARGET_WIN will be small
-		if (Controller.getInstance().isReadyForging())
+		if (ctrl.isReadyForging())
 			setForgingStatus(ForgingStatus.FORGING);
 		else
 			setForgingStatus(ForgingStatus.FORGING_WAIT);

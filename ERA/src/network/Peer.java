@@ -455,7 +455,7 @@ public class Peer extends Thread{
 	
 	public void run()
 	{
-		
+		byte[] messageMagic = null;
 		DataInputStream in = null;
 
 		while(true)
@@ -495,7 +495,7 @@ public class Peer extends Thread{
 			}
 
 			//READ FIRST 4 BYTES
-			byte[] messageMagic = new byte[Message.MAGIC_LENGTH];
+			messageMagic = new byte[Message.MAGIC_LENGTH];
 			try 
 			{
 
@@ -623,6 +623,7 @@ public class Peer extends Thread{
 				callback.tryDisconnect(this, 3600, "parse - received message with wrong magic");
 				continue;
 			}
+			messageMagic = null;
 		}
 	}
 	
