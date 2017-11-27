@@ -209,7 +209,7 @@ public class BlockChain
 	// SOLVE WON BLOCK
 	// 0 - unchanged;
 	// 1 - changed, need broadcasting;
-	public boolean setWaitWinBuffer(DCSet dcSet, Block block) {
+	public synchronized boolean setWaitWinBuffer(DCSet dcSet, Block block) {
 				
 		LOGGER.info("try set new winBlock: " + block.toString(dcSet));
 		

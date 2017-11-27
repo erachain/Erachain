@@ -628,10 +628,11 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin;
 		
 		long start = System.currentTimeMillis();
-		LOGGER.error("get orderedTransactions");
-		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValues());
+		LOGGER.debug("get orderedTransactions");
+		///////List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValues());
+		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.error(" time " + tickets);
+		LOGGER.debug(" time: " + tickets + "ms for SIZE: " + orderedTransactions.size());
 
 		// TODO make SORT by FEE to!
 		// toBYTE / FEE + TIMESTAMP !!
@@ -639,10 +640,16 @@ public class BlockGenerator extends Thread implements Observer
 		// sort by TIMESTAMP
 		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
 		long tickets2 = System.currentTimeMillis() - start - tickets;
-		LOGGER.error("sort time " + tickets2);
+		LOGGER.debug("sort time " + tickets2);
 		start = System.currentTimeMillis();
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
+
+		
+		List<Transaction> orderedFilteredTransactions = new ArrayList<Transaction>();
+		for(Transaction transaction: orderedTransactions)
+		{
+		}
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
 

@@ -41,6 +41,8 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	private static final int MAX_MAP_SIZE = core.BlockChain.HARD_WORK?100000:5000;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+	
+	private NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
 
 	// PEERS for transaction signature
 	private Map<byte[], List<byte[]>> peersBroadcasted = new HashMap<byte[], List<byte[]>>();
@@ -118,11 +120,16 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		return this.observableData;
 	}
 	
+	public List<Transaction> getSubSet(long timestamp) {
+		List<Transaction> values = this.heightIndex.subSet(fromElement, toElement);
+		return values;
+	}
+	
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
 		ObserverMessage message = (ObserverMessage) arg;
-				
+		
 		//ON NEW BLOCK
 		if(message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)
 		{			
@@ -141,20 +148,18 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 				item = this.get(key);
 				
 				//CHECK IF DEADLINE PASSED
-				if(++i> MAX_MAP_SIZE
+				if(i> MAX_MAP_SIZE
 						|| item.getDeadline() < NTP.getTime())
 				{
 					iterator.remove();
-					
-					/* it make in SUPER.class
-					//NOTIFY
-					this.setChanged();
-					this.notifyObservers(new ObserverMessage(ObserverMessage.REMOVE_TRANSACTION_TYPE, item));
-					*/
+					continue;
 				}
+				
+				i++;
+				
 			}
 			long tickets = System.currentTimeMillis() - start;
-			LOGGER.error("update CLEAR DEADLINE time " + tickets);
+			LOGGER.debug("update CLEAR DEADLINE time " + tickets);
 
 		}
 	}
