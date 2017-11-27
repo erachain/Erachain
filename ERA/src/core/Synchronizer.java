@@ -607,6 +607,7 @@ public class Synchronizer
 		List<Block> blocks = new ArrayList<Block>();
 		Controller cnt = Controller.getInstance();
 		
+		boolean checkPeer = true;
 		for(byte[] signature: signatures)
 		{
 			if (cnt.isOnStopping()) {
@@ -614,7 +615,10 @@ public class Synchronizer
 			}
 
 			//ADD TO LIST
-			Block block = getBlock(signature, peer, false);
+			Block block = getBlock(signature, peer, checkPeer);
+			if (block == null)
+				break;
+			
 			// NOW generating balance not was send by NET
 			// need to SET it!
 			block.setCalcGeneratingBalance(dcSet);
@@ -634,7 +638,7 @@ public class Synchronizer
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 		
 		//SEND MESSAGE TO PEER
-		BlockMessage response = (BlockMessage) peer.getResponse(message, 30000);
+		BlockMessage response = (BlockMessage) peer.getResponse(message, 60000);
 		
 		//CHECK IF WE GOT RESPONSE
 		if(response == null)
