@@ -2,6 +2,7 @@ package datachain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -120,8 +121,11 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		return this.observableData;
 	}
 	
-	public List<Transaction> getSubSet(long timestamp) {
-		List<Transaction> values = this.heightIndex.subSet(fromElement, toElement);
+	// TODO - get records.getTimestamp() < timestamp
+	public Collection<Transaction> getSubSet(long timestamp) {
+		//List<Transaction> values = this.heightIndex.subSet(fromElement, toElement);
+		Collection<Transaction> values = this.getValues();
+		
 		return values;
 	}
 	
