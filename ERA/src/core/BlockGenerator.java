@@ -623,7 +623,6 @@ public class BlockGenerator extends Thread implements Observer
 		
 		//CREATE FORK OF GIVEN DATABASE
 		DCSet newBlockDb = dcSet.fork();
-	
 					
 		Block waitWin;
 		
