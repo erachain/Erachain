@@ -63,8 +63,6 @@ public class Synchronizer
 		//int originalHeight = 0;
 		
 		//ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
-		Map<String, byte[]> states = new TreeMap<String, byte[]>();
-		int height_AT = 0;
 		if(lastCommonBlock != null)
 		{
 	
@@ -101,6 +99,9 @@ public class Synchronizer
 
 				//runedBlock = lastBlock; // FOR quick STOPPING
 				lastBlock.orphan(fork);
+				fork.flush(lastBlock.getTransactionCount()>>1, false);
+
+				
 				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 				lastBlock = fork.getBlockMap().get(lastBlock.getReference());
 			}
@@ -123,6 +124,8 @@ public class Synchronizer
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				//runedBlock = block;
 				block.process(fork);
+				fork.flush(block.getTransactionCount()>>1, false);
+
 				// RELEASE MEMORY in FORK DB
 				if(false) fork.getBlockMap().wipe(block);
 			}
@@ -678,7 +681,7 @@ public class Synchronizer
 			throw new Exception("on stoping");
 		}
 
-		int blockSize = 1 + (10 + block.getTransactionCount())>>(hardFlush?0:5);
+		int blockSize = 1 + (10 + block.getTransactionCount())>>(hardFlush?0:4);
 		dcSet.getBlockMap().setProcessing(true);
 
 		if(doOrphan)

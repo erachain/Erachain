@@ -125,6 +125,7 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	public Collection<Transaction> getSubSet(long timestamp) {
 		//List<Transaction> values = this.heightIndex.subSet(fromElement, toElement);
 		Collection<Transaction> values = this.getValues();
+		this.heightIndex.iterator();
 		
 		return values;
 	}
