@@ -293,6 +293,7 @@ public class Synchronizer
 			BlockBuffer blockBuffer = new BlockBuffer(signatures.b, peer);
 			Block blockFromPeer;
 
+			String errorMess = null;
 			//GET AND PROCESS BLOCK BY BLOCK
 			for(byte[] signature: signatures.b)
 			{
@@ -347,39 +348,51 @@ public class Synchronizer
 				LOGGER.debug("synchronize - simple ADD NEW BLOCK process..."
 						+ " height:" + blockFromPeer.getHeightByParent(dcSet));
 				
-				if(blockFromPeer.isSignatureValid()) {
-					if (blockFromPeer.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) <= NTP.getTime()) {
-						if (blockFromPeer.isValid(dcSet)) {
-							try {
-								
-								this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);							
-								LOGGER.debug("synchronize BLOCK END process");
-								continue;
-								
-							} catch (Exception e) {	
-								if (cnt.isOnStopping()) {
-									//STOP BLOCKBUFFER
-									blockBuffer.stopThread();
-									throw new Exception("on stoping");
-								} else {
-									LOGGER.error(e.getMessage(),e);
-								}
-							}
-						}
-					}
+				if(!blockFromPeer.isSignatureValid()) {
+					errorMess = "[" + blockFromPeer.getHeight(dcSet) + "] invalid Sign!";
+					break;
+				}
+				
+				if (blockFromPeer.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
+					errorMess = "[" + blockFromPeer.getHeight(dcSet) + "] invalid Timestamp from FUTURE";
+					break;
+				}
+				
+				if (!blockFromPeer.isValid(dcSet)) {
+					errorMess = "[" + blockFromPeer.getHeight(dcSet) + "] invalid Transactions";
+					break;
 				}
 
-				//INVALID BLOCK THROW EXCEPTION
-				String mess = "Dishonest peer on block " + blockFromPeer.getHeight(dcSet);
-				peer.ban(BAN_BLOCK_TIMES>>2, mess);
-				//STOP BLOCKBUFFER
-				blockBuffer.stopThread();
-				throw new Exception(mess);
+				try {
+						
+					LOGGER.debug("[" + blockFromPeer.getHeight(dcSet) + "] try pipeProcessOrOrphan");
+					this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);							
+					LOGGER.debug("synchronize BLOCK END process");
+					continue;
+					
+				} catch (Exception e) {	
+					
+					//STOP BLOCKBUFFER
+					blockBuffer.stopThread();
 
+					if (cnt.isOnStopping()) {
+						throw new Exception("on stoping");
+					} else {
+						throw new Exception(e);
+					}
+				}
 			}
 
 			//STOP BLOCKBUFFER
 			blockBuffer.stopThread();
+
+			if (errorMess != null) {
+				//INVALID BLOCK THROW EXCEPTION
+				String mess = "Dishonest peer on block " + errorMess;
+				peer.ban(BAN_BLOCK_TIMES>>2, mess);
+				throw new Exception(mess);
+			}
+
 		}
 		else
 		{
