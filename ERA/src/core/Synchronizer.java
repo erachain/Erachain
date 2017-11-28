@@ -346,26 +346,27 @@ public class Synchronizer
 				
 				//PROCESS BLOCK
 				LOGGER.debug("synchronize - simple ADD NEW BLOCK process..."
-						+ " height:" + blockFromPeer.getHeightByParent(dcSet));
+						//+ " height:" + blockFromPeer.getHeightByParent(dcSet)
+						);
 				
 				if(!blockFromPeer.isSignatureValid()) {
-					errorMess = "[" + blockFromPeer.getHeight(dcSet) + "] invalid Sign!";
+					errorMess = "invalid Sign!";
 					break;
 				}
 				
 				if (blockFromPeer.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
-					errorMess = "[" + blockFromPeer.getHeight(dcSet) + "] invalid Timestamp from FUTURE";
+					errorMess = "invalid Timestamp from FUTURE";
 					break;
 				}
 				
 				if (!blockFromPeer.isValid(dcSet)) {
-					errorMess = "[" + blockFromPeer.getHeight(dcSet) + "] invalid Transactions";
+					errorMess = "invalid Transactions";
 					break;
 				}
 
 				try {
 						
-					LOGGER.debug("[" + blockFromPeer.getHeight(dcSet) + "] try pipeProcessOrOrphan");
+					LOGGER.debug("try pipeProcessOrOrphan");
 					this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);							
 					LOGGER.debug("synchronize BLOCK END process");
 					continue;
