@@ -1,4 +1,4 @@
-package gui.items.statuses;
+package gui.items.notes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -8,15 +8,15 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
+import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
-import core.item.statuses.StatusCls;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
+public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -24,23 +24,17 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
 	
-	private List<StatusCls> statuses;
+	private List<NoteCls> templates;
 	
 	
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
-	public Statuses_Favorite_TableModel()
+	public Templates_Favorite_TableModel()
 	{
 		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		addObservers();
-		
-		
-		//addObservers();
-		//fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
-		
-		
 	}
 	
 	@Override
@@ -62,9 +56,9 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 		return o==null?Null.class:o.getClass();
     }
 	
-	public StatusCls getItem(int row)
+	public NoteCls getItem(int row)
 	{
-		return this.statuses.get(row);
+		return this.templates.get(row);
 		
 	}
 	
@@ -83,19 +77,19 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 	@Override
 	public int getRowCount() 
 	{
-		if (statuses == null) return 0;
-		return this.statuses.size();
+		if (templates == null) return 0;
+		return this.templates.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.statuses == null || row > this.statuses.size() - 1 )
+		if(this.templates == null || row > this.templates.size() - 1 )
 		{
 			return null;
 		}
 		
-		StatusCls status = this.statuses.get(row);
+		NoteCls status = this.templates.get(row);
 		if (status == null)
 			return null;
 		
@@ -147,54 +141,35 @@ public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_STATUS_FAVORITES_TYPE && statuses==null)
+		if(message.getType() == ObserverMessage.LIST_NOTE_FAVORITES_TYPE && templates==null)
 		{
-			statuses = new ArrayList<StatusCls>();
+			templates = new ArrayList<NoteCls>();
 			fill((Set<Long>) message.getValue());
 			fireTableDataChanged();
 			}
-		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE_FAVORITES_TYPE){
-			statuses.add(Controller.getInstance().getStatus((long) message.getValue()));
+		if(message.getType() == ObserverMessage.ADD_NOTE_TYPE_FAVORITES_TYPE){
+			templates.add(Controller.getInstance().getNote((long) message.getValue()));
 			fireTableDataChanged();
 			}
-		if(message.getType() == ObserverMessage.DELETE_STATUS_FAVORITES_TYPE){
-			statuses.remove(Controller.getInstance().getStatus((long) message.getValue()));
+		if(message.getType() == ObserverMessage.DELETE_NOTE_FAVORITES_TYPE){
+			templates.remove(Controller.getInstance().getNote((long) message.getValue()));
 			fireTableDataChanged();
 			}
-	
-	
 	}
-			
-		
 		
 	public void fill(Set<Long> set){
-		
-	//	persons.clear();
-			
 		for(Long s:set){
-			
-				statuses.add ( Controller.getInstance().getStatus(s));
-			
-			
+				templates.add ( Controller.getInstance().getNote(s));
 		}
-		
-		
 	}
-			
-			
-			
-		
-	
 	
 	public void removeObservers() 
 	{
-		
-		Controller.getInstance().wallet.database.getStatusFavoritesSet().deleteObserver(this);
-		
+		Controller.getInstance().wallet.database.getNoteFavoritesSet().deleteObserver(this);
 	}
 	public void addObservers(){
 		
-		Controller.getInstance().wallet.database.getStatusFavoritesSet().addObserver(this);
+		Controller.getInstance().wallet.database.getNoteFavoritesSet().addObserver(this);
 	}
 
 	

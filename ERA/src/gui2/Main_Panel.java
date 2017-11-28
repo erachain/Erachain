@@ -46,6 +46,7 @@ import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
 import gui.items.notes.IssueNotePanel;
 import gui.items.notes.Search_Notes_Tab;
+import gui.items.notes.Templates_Favorite_SplitPanel;
 import gui.items.other.Other_Split_Panel;
 import gui.items.other.other_Panel;
 import gui.items.persons.InsertPersonPanel;
@@ -424,6 +425,10 @@ public class Main_Panel extends javax.swing.JPanel {
 		}
 		if ( str.equals( Lang.getInstance().translate("Search Templates"))   || str.equals("Search_Notes_Tab")){
 			ccase1( Lang.getInstance().translate("Search Templates"), new Search_Notes_Tab());
+			return;
+		}
+		if ( str.equals( Lang.getInstance().translate("Favorite Templates"))   || str.equals("Templates_Favorite_SplitPanel")){
+			ccase1( Lang.getInstance().translate("Favorite Templates"), new Templates_Favorite_SplitPanel());
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Issue Template"))  || str.equals("IssueNotePanel")){

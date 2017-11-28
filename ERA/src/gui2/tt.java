@@ -111,11 +111,13 @@ public tt() {
    
   
  //  templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Templates")));
+   templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Templates")));
    templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Templates")));
    templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Template")));
+  
    
    
-   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Statuses")));
+   statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Statuses")));
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Statuses")));
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Create Status")));
    

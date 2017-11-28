@@ -236,6 +236,8 @@ public class ObserverMessage {
 	public static final int WALLET_REMOVE_NOTE_TYPE = 1083;
 	public static final int WALLET_LIST_NOTE_TYPE = 1084;
 	public static final int LIST_NOTE_FAVORITES_TYPE = 1086;
+	public static final int ADD_NOTE_TYPE_FAVORITES_TYPE = 1087;
+	public static final int DELETE_NOTE_FAVORITES_TYPE = 1088;
 
 	public static final int WALLET_RESET_PERSON_TYPE = 1091;
 	public static final int WALLET_ADD_PERSON_TYPE = 1092;
@@ -259,6 +261,7 @@ public class ObserverMessage {
 	public static final int WALLET_REMOVE_UNION_TYPE = 2013;
 	public static final int WALLET_LIST_UNION_TYPE = 2014;
 	public static final int LIST_UNION_FAVORITES_TYPE = 2016;
+	
 	
 	
 

@@ -180,7 +180,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 	
 	public void removeObservers() 
 	{
-		Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+		Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
 	}
 	
 	public void addObservers(){

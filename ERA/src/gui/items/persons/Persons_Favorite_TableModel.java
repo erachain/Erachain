@@ -188,7 +188,7 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public void removeObservers() 
 	{
 		
-		Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
+		Controller.getInstance().wallet.database.getPersonFavoritesSet().deleteObserver(this);
 		
 	}
 	public void addObservers(){
