@@ -251,12 +251,16 @@ public class ObserverMessage {
 	public static final int WALLET_REMOVE_STATUS_TYPE = 2003;
 	public static final int WALLET_LIST_STATUS_TYPE = 2004;
 	public static final int LIST_STATUS_FAVORITES_TYPE = 2006;
-
+	public static final int ADD_STATUS_TYPE_FAVORITES_TYPE = 2007;
+	public static final int DELETE_STATUS_FAVORITES_TYPE = 2008;
+	
 	public static final int WALLET_RESET_UNION_TYPE = 2011;
 	public static final int WALLET_ADD_UNION_TYPE = 2012;
 	public static final int WALLET_REMOVE_UNION_TYPE = 2013;
 	public static final int WALLET_LIST_UNION_TYPE = 2014;
 	public static final int LIST_UNION_FAVORITES_TYPE = 2016;
+	
+	
 
 	private int type;
 	private Object value;

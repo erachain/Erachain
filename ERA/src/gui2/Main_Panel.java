@@ -63,6 +63,7 @@ import gui.items.statement.Statements_Search_SplitPanel;
 import gui.items.statuses.IssueStatusPanel;
 import gui.items.statuses.My_Statuses_Tab;
 import gui.items.statuses.Search_Statuses_Tab;
+import gui.items.statuses.Statuses_Favorite_SplitPanel;
 import gui.items.unions.IssueUnionPanel;
 import gui.items.unions.My_Unions_Tab;
 import gui.items.unions.Search_Union_Tab;
@@ -433,8 +434,8 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Create Status"), new IssueStatusPanel());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("My Statuses"))  || str.equals("My_Statuses_Tab")){
-			ccase1( Lang.getInstance().translate("My Statuses"), new My_Statuses_Tab());
+		if ( str.equals( Lang.getInstance().translate("Favorite Statuses"))  || str.equals("Statuses_Favorite_SplitPanel")){
+			ccase1( Lang.getInstance().translate("Favorite Statuses"), new Statuses_Favorite_SplitPanel());
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Search Statuses")) || str.equals("Search_Statuses_Tab")){

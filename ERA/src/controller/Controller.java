@@ -8,7 +8,6 @@ import java.io.IOError;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -21,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -31,26 +29,15 @@ import java.util.Observer;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-//import java.util.TreeMap;
-//import java.util.TreeSet;
-
-// import org.apache.log4j.Logger;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.ws.rs.HEAD;
-
 import org.apache.commons.io.FileUtils;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-
 import com.google.common.primitives.Longs;
-
 import api.ApiClient;
 import api.ApiService;
 import at.AT;
@@ -91,7 +78,6 @@ import datachain.LocalDataMap;
 import datachain.SortableList;
 import gui.AboutFrame;
 import gui.Gui;
-import gui.library.My_JFileChooser;
 import lang.Lang;
 import network.Network;
 import network.Peer;
@@ -100,7 +86,6 @@ import network.message.BlockWinMessage;
 import network.message.GetBlockMessage;
 import network.message.GetSignaturesMessage;
 import network.message.HWeightMessage;
-//import network.message.HeightMessage;
 import network.message.Message;
 import network.message.MessageFactory;
 import network.message.TransactionMessage;
@@ -110,7 +95,6 @@ import settings.Settings;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
 import utils.Pair;
-import utils.SaveStrToFile;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import utils.SysTray;
 import utils.UpdateUtil;
@@ -2441,6 +2425,9 @@ public class Controller extends Observable {
 	}
 	public PersonCls getPerson(long key) {
 		return (PersonCls) this.dcSet.getItemPersonMap().get(key);
+	}
+	public StatusCls getStatus(long key) {
+		return (StatusCls) this.dcSet.getItemStatusMap().get(key);
 	}
 	public NoteCls getNote(long key) {
 		return (NoteCls) this.dcSet.getItemNoteMap().get(key);

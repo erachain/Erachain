@@ -1,4 +1,4 @@
-package gui.items.persons;
+package gui.items.statuses;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -9,13 +9,14 @@ import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
+public class Statuses_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -23,14 +24,14 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
 	
-	private List <PersonCls> persons;
+	private List<StatusCls> statuses;
 	
 	
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
-	public Persons_Favorite_TableModel()
+	public Statuses_Favorite_TableModel()
 	{
 		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		addObservers();
@@ -61,9 +62,9 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 		return o==null?Null.class:o.getClass();
     }
 	
-	public PersonCls getItem(int row)
+	public StatusCls getItem(int row)
 	{
-		return this.persons.get(row);
+		return this.statuses.get(row);
 		
 	}
 	
@@ -82,20 +83,20 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	@Override
 	public int getRowCount() 
 	{
-		if (persons == null) return 0;
-		return this.persons.size();
+		if (statuses == null) return 0;
+		return this.statuses.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.persons == null || row > this.persons.size() - 1 )
+		if(this.statuses == null || row > this.statuses.size() - 1 )
 		{
 			return null;
 		}
 		
-		PersonCls person = this.persons.get(row);
-		if (person == null)
+		StatusCls status = this.statuses.get(row);
+		if (status == null)
 			return null;
 		
 		
@@ -104,23 +105,23 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 		{
 		case COLUMN_KEY:
 			
-			return person.getKey(DCSet.getInstance());
+			return status.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			
-			return person.getName();
+			return status.getName();
 		
 		case COLUMN_ADDRESS:
 			
-			return person.getOwner().getPersonAsString();
+			return status.getOwner().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			
-			return person.isConfirmed();
+			return status.isConfirmed();
 			
 		case COLUMN_FAVORITE:
 			
-			return person.isFavorite();
+			return status.isFavorite();
 			
 		}
 		
@@ -146,18 +147,18 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_PERSON_FAVORITES_TYPE && persons==null)
+		if(message.getType() == ObserverMessage.LIST_STATUS_FAVORITES_TYPE && statuses==null)
 		{
-			persons = new ArrayList<PersonCls>();
+			statuses = new ArrayList<StatusCls>();
 			fill((Set<Long>) message.getValue());
 			fireTableDataChanged();
 			}
-		if(message.getType() == ObserverMessage.ADD_PERSON_FAVORITES_TYPE){
-			persons.add( Controller.getInstance().getPerson((long) message.getValue()));
+		if(message.getType() == ObserverMessage.ADD_STATUS_TYPE_FAVORITES_TYPE){
+			statuses.add(Controller.getInstance().getStatus((long) message.getValue()));
 			fireTableDataChanged();
 			}
-		if(message.getType() == ObserverMessage.DELETE_PERSON_FAVORITES_TYPE){
-			persons.remove( Controller.getInstance().getPerson((long) message.getValue()));
+		if(message.getType() == ObserverMessage.DELETE_STATUS_FAVORITES_TYPE){
+			statuses.remove(Controller.getInstance().getStatus((long) message.getValue()));
 			fireTableDataChanged();
 			}
 	
@@ -172,7 +173,7 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 			
 		for(Long s:set){
 			
-				persons.add ( Controller.getInstance().getPerson(s));
+				statuses.add ( Controller.getInstance().getStatus(s));
 			
 			
 		}
@@ -188,12 +189,12 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	public void removeObservers() 
 	{
 		
-		Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
+		Controller.getInstance().wallet.database.getStatusFavoritesSet().addObserver(this);
 		
 	}
 	public void addObservers(){
 		
-		Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
+		Controller.getInstance().wallet.database.getStatusFavoritesSet().addObserver(this);
 	}
 
 	
