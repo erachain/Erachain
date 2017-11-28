@@ -48,13 +48,8 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
 	}
 	
 	@Override
-	public void delay_on_close() {
+	protected void splitClose(){ 
 		search_Table_Model.removeObservers();
-		jTable_jScrollPanel_LeftPanel = null;
-		table_Model = null;
-		favorite_menu_items = null;
-		menu_Table= null;
-		item_Menu =null;
-		item_Table_Selected = null;
+		
 	}
 }
