@@ -99,7 +99,7 @@ public class Synchronizer
 
 				//runedBlock = lastBlock; // FOR quick STOPPING
 				lastBlock.orphan(fork);
-				fork.flush(lastBlock.getTransactionCount()>>1, false);
+				fork.flush(500 + lastBlock.getDataLength(false), false);
 
 				
 				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
@@ -124,7 +124,7 @@ public class Synchronizer
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				//runedBlock = block;
 				block.process(fork);
-				fork.flush(block.getTransactionCount()>>1, false);
+				fork.flush(500 + block.getDataLength(false), false);
 
 				// RELEASE MEMORY in FORK DB
 				if(false) fork.getBlockMap().wipe(block);
@@ -705,7 +705,7 @@ public class Synchronizer
 			throw new Exception("on stoping");
 		}
 
-		int blockSize = 1 + (10 + block.getTransactionCount())>>(hardFlush?0:4);
+		int blockSize = 500 + (block.getDataLength(false))>>(hardFlush?0:2);
 		dcSet.getBlockMap().setProcessing(true);
 
 		if(doOrphan)
