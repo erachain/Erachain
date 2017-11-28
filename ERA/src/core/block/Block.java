@@ -1270,7 +1270,9 @@ public class Block {
 		}
 
 		//ADD TO DB
+		long timerStart = System.currentTimeMillis();
 		dcSet.getBlockMap().set(this);
+		LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
 		
 		this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
@@ -1282,40 +1284,67 @@ public class Block {
 		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
 		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
 		TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
+		
+		long timerProcess = 0;
+		long timerRefsMap_set = 0;
+		long timerUnconfirmedMap_delete = 0;
+		long timerFinalMap_set = 0;
+		long timerTransFinalMapSinds_set = 0;
+		
 		for(Transaction transaction: this.transactions)
 		{
 			
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
 			
+			//LOGGER.debug("[" + seq + "] record is process" );
+
 			//PROCESS
 			if (!transaction.isWiped()) {
 				transaction.setDB(dcSet, false);
+				timerStart = System.currentTimeMillis();
 				transaction.process(dcSet, this, false);
+				timerProcess += System.currentTimeMillis() - timerStart;
 			} else {
 				//UPDATE REFERENCE OF SENDER
 				if (transaction.isReferenced() )
 					// IT IS REFERENCED RECORD?
 					transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
 			}
-			
+
 			//SET PARENT
+			///LOGGER.debug("[" + seq + "] try refsMap.set" );
+			timerStart = System.currentTimeMillis();
 			refsMap.set(transaction, this);
+			timerRefsMap_set += System.currentTimeMillis() - timerStart;
 
 			//REMOVE FROM UNCONFIRMED DATABASE
+			///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
+			timerStart = System.currentTimeMillis();
 			unconfirmedMap.delete(transaction);
+			timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
 
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
 			
+			///LOGGER.debug("[" + seq + "] try finalMap.set" );
+			timerStart = System.currentTimeMillis();
 			finalMap.set( key, transaction);
+			timerFinalMap_set += System.currentTimeMillis() - timerStart;
+			//LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
+			timerStart = System.currentTimeMillis();
 			transFinalMapSinds.set(transaction.getSignature(), key);
+			timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 			
 			seq++;
 
 		}
+
+		LOGGER.debug("timerProcess: " + timerProcess + "  timerRefsMap_set: " + timerRefsMap_set
+				+ "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
+				+ "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
 		//PROCESS FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
