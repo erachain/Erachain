@@ -271,7 +271,7 @@ public class CreatePollFrame extends JFrame
 			    }
 				 text += "<br>    ";
 				
-			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issue_voiting.viewSize(true)+" Bytes, ";
+			    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issue_voiting.viewSize(false)+" Bytes, ";
 			    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issue_voiting.getFee().toString()+" COMPU</b><br></body></HTML>";
 			    
 			

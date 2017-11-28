@@ -320,7 +320,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 				value_1, value_2, data_1, data_2, refParent, description
 				);
 
-		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(false)+" Bytes, ";
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		

@@ -575,7 +575,7 @@ public class OrderPanel extends JPanel
 
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave.setScale(8, RoundingMode.HALF_DOWN), amountWant.setScale(8, RoundingMode.HALF_DOWN), feePow);
-		 String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		 String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(false)+" Bytes, ";
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		

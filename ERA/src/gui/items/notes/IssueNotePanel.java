@@ -259,7 +259,7 @@ public class IssueNotePanel extends JPanel
 	    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueNote.getCreator() +"<br>";
 	    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueNote.getItem().getName() +"<br>";
 	    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueNote.getItem().getDescription())+"<br>";
-	    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueNote.viewSize(true)+" Bytes, ";
+	    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueNote.viewSize(false)+" Bytes, ";
 	    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueNote.getFee().toString()+" COMPU</b><br></body></HTML>";
 		    
 	    //System.out.print("\n"+ text +"\n");

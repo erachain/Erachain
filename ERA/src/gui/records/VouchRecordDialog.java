@@ -177,7 +177,7 @@ public class VouchRecordDialog extends JDialog  {
 				record.getBlockHeight(DCSet.getInstance()), record.getSeqNo(DCSet.getInstance()));
 		//Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 
-		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(false)+" Bytes, ";
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		

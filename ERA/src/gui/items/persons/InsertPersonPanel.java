@@ -401,7 +401,7 @@ private void init(){
 			
 			//CHECK VALIDATE MESSAGE
 			if (result.getB() == Transaction.VALIDATE_OK) {
-				 String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ result.getA().viewSize(true)+" Bytes, ";
+				 String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ result.getA().viewSize(false)+" Bytes, ";
 				    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ result.getA().getFee().toString()+" COMPU</b><br></body></HTML>";
 				    
 			//	  System.out.print("\n"+ text +"\n");

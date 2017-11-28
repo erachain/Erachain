@@ -362,7 +362,7 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 				head, messageBytes, isTextByte, encrypted);
 		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 	
-		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
+		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(false)+" Bytes, ";
 		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 		
 		
