@@ -41,12 +41,13 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
 		this.search_Table_Model = search_Table_Model1;
 		setName(Lang.getInstance().translate(search_Label_Text));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
-		// not show buttons
-		jToolBar_RightPanel.setVisible(false);
-		toolBar_LeftPanel.setVisible(true);
-		button1_ToolBar_LeftPanel.setVisible(false);
-		button2_ToolBar_LeftPanel.setVisible(false);
-
+		
+		// CHECKBOX FOR FAVORITE
+		TableColumn favorite_Column = jTable_jScrollPanel_LeftPanel.getColumnModel()
+				.getColumn(search_Table_Model.COLUMN_FAVORITE);
+		favorite_Column.setMaxWidth(1000);
+		favorite_Column.setPreferredWidth(50);
+		// search Panel
 		this.searchToolBar_LeftPanel.setVisible(true);
 		this.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
 		key_Item = new JTextField();

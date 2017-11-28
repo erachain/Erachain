@@ -46,7 +46,7 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	@SuppressWarnings("unchecked")
 	public Persons_Favorite_TableModel()
 	{
-		
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		addObservers();
 		
 		
@@ -164,15 +164,15 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 		{
 			persons = new ArrayList<PersonCls>();
 			fill((Set<Long>) message.getValue());
-			this.fireTableDataChanged();
+			fireTableDataChanged();
 			}
 		if(message.getType() == ObserverMessage.ADD_PERSON_FAVORITES_TYPE){
 			persons.add(  Controller.getInstance().getPerson((long) message.getValue()));
-			this.fireTableDataChanged();
+			fireTableDataChanged();
 			}
 		if(message.getType() == ObserverMessage.DELETE_PERSON_FAVORITES_TYPE){
 			persons.remove( Controller.getInstance().getPerson((long) message.getValue()));
-			this.fireTableDataChanged();
+			fireTableDataChanged();
 			}
 	
 	
@@ -201,9 +201,9 @@ public class Persons_Favorite_TableModel extends TableModelCls<Tuple2<String, St
 	
 	public void removeObservers() 
 	{
-		//this.persons.removeObserver();
+		
 		Controller.getInstance().wallet.database.getPersonFavoritesSet().addObserver(this);
-		//Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
+		
 	}
 	public void addObservers(){
 		

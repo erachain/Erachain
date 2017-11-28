@@ -12,7 +12,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import controller.Controller;
 import core.item.ItemCls;
@@ -25,18 +24,23 @@ import utils.TableMenuPopupUtil;
 public class Item_SplitPanel extends Split_Panel {
 
 	private static final long serialVersionUID = 2717571093561259483L;
-	protected TableModelCls search_Table_Model;
+	protected TableModelCls table_Model;
 	protected JMenuItem favorite_menu_items;
 	protected JPopupMenu menu_Table;
 	protected ItemCls item_Menu;
 	protected ItemCls item_Table_Selected = null;
+	protected TableColumnModel tableColumnMode;
 
 	@SuppressWarnings("rawtypes")
-	public Item_SplitPanel(TableModelCls search_Table_Model1, String gui_Name) {
+	public Item_SplitPanel(TableModelCls table_Model1, String gui_Name) {
 
 		super(gui_Name);
-		this.search_Table_Model = search_Table_Model1;
-		
+		this.table_Model = table_Model1;
+		// not show buttons
+				jToolBar_RightPanel.setVisible(false);
+				toolBar_LeftPanel.setVisible(true);
+				button1_ToolBar_LeftPanel.setVisible(false);
+				button2_ToolBar_LeftPanel.setVisible(false);
 		
 
 		// not show My filter
@@ -44,19 +48,15 @@ public class Item_SplitPanel extends Split_Panel {
 		searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
 
 		// CREATE TABLE
-		jTable_jScrollPanel_LeftPanel = new MTable(this.search_Table_Model);
+		jTable_jScrollPanel_LeftPanel = new MTable(this.table_Model);
 		TableColumnModel columnModel = jTable_jScrollPanel_LeftPanel.getColumnModel(); 
 		columnModel.getColumn(0).setMaxWidth((100));
-		// CHECKBOX FOR FAVORITE
-		TableColumn favorite_Column = jTable_jScrollPanel_LeftPanel.getColumnModel()
-				.getColumn(search_Table_Model.COLUMN_FAVORITE);
-		favorite_Column.setMaxWidth(1000);
-		favorite_Column.setPreferredWidth(50);
+		
 		// hand cursor for Favorite column
 		jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
 			public void mouseMoved(MouseEvent e) {
 
-				if (jTable_jScrollPanel_LeftPanel.columnAtPoint(e.getPoint()) == search_Table_Model.COLUMN_FAVORITE) {
+				if (jTable_jScrollPanel_LeftPanel.columnAtPoint(e.getPoint()) == table_Model.COLUMN_FAVORITE) {
 
 					jTable_jScrollPanel_LeftPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
 				} else {
@@ -76,10 +76,9 @@ public class Item_SplitPanel extends Split_Panel {
 				
 				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) {
 					jScrollPane_jPanel_RightPanel.setViewportView(null);
-					jTable_jScrollPanel_LeftPanel.repaint();
 					return;
 				}
-				item_Table_Selected = (ItemCls) search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel
+				item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
 						.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 				if (item_Table_Selected == null)
 					return;
@@ -104,7 +103,7 @@ public class Item_SplitPanel extends Split_Panel {
 				int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
 				jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
 				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-				ItemCls item = (ItemCls) search_Table_Model.getItem(row);
+				ItemCls item = (ItemCls) table_Model.getItem(row);
 				
 				if(e.getClickCount() == 2 )
 				{
@@ -113,7 +112,7 @@ public class Item_SplitPanel extends Split_Panel {
 				
 				if (e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
 					
-					if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == search_Table_Model.COLUMN_FAVORITE) {
+					if (jTable_jScrollPanel_LeftPanel.getSelectedColumn() == table_Model.COLUMN_FAVORITE) {
 					favorite_set(item);
 					}
 				}
@@ -127,7 +126,7 @@ public class Item_SplitPanel extends Split_Panel {
 			public void actionPerformed(ActionEvent e) {
 				int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
 				row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
-				favorite_set((ItemCls)search_Table_Model.getItem(row));
+				favorite_set((ItemCls)table_Model.getItem(row));
 
 			}
 		});
@@ -151,7 +150,7 @@ public class Item_SplitPanel extends Split_Panel {
 				// TODO Auto-generated method stub
 			
 				// TODO Auto-generated method stub
-				item_Menu = (ItemCls) search_Table_Model.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+				item_Menu = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
 				// IF ASSET CONFIRMED AND NOT ERM
 
@@ -171,13 +170,14 @@ public class Item_SplitPanel extends Split_Panel {
 		
 		menu_Table.add(favorite_menu_items);
 		TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu_Table);
+		jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 
 	}
 
 	@Override
 	public void delay_on_close() {
 		jTable_jScrollPanel_LeftPanel = null;
-		search_Table_Model = null;
+		table_Model = null;
 		favorite_menu_items = null;
 		menu_Table= null;
 		item_Menu =null;
