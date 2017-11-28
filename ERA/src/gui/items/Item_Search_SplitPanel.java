@@ -37,7 +37,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
 	@SuppressWarnings("rawtypes")
 	public Item_Search_SplitPanel(TableModelItems search_Table_Model1, String gui_Name, String search_Label_Text) {
 
-		super(search_Table_Model1, gui_Name, search_Label_Text);
+		super(search_Table_Model1, gui_Name);
 		this.search_Table_Model = search_Table_Model1;
 		setName(Lang.getInstance().translate(search_Label_Text));
 		searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");

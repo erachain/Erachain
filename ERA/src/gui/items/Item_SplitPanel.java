@@ -6,10 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.*;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
@@ -22,21 +20,19 @@ import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.TableModelCls;
 import lang.Lang;
-import utils.MenuPopupUtil;
 import utils.TableMenuPopupUtil;
 
 public class Item_SplitPanel extends Split_Panel {
 
 	private static final long serialVersionUID = 2717571093561259483L;
 	protected TableModelCls search_Table_Model;
-	private JTextField key_Item;
 	protected JMenuItem favorite_menu_items;
 	protected JPopupMenu menu_Table;
 	protected ItemCls item_Menu;
 	protected ItemCls item_Table_Selected = null;
 
 	@SuppressWarnings("rawtypes")
-	public Item_SplitPanel(TableModelCls search_Table_Model1, String gui_Name, String search_Label_Text) {
+	public Item_SplitPanel(TableModelCls search_Table_Model1, String gui_Name) {
 
 		super(gui_Name);
 		this.search_Table_Model = search_Table_Model1;
@@ -182,7 +178,6 @@ public class Item_SplitPanel extends Split_Panel {
 	public void delay_on_close() {
 		jTable_jScrollPanel_LeftPanel = null;
 		search_Table_Model = null;
-		key_Item = null;
 		favorite_menu_items = null;
 		menu_Table= null;
 		item_Menu =null;
