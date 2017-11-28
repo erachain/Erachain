@@ -37,6 +37,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 	
 	public TableModelItemAssetsFavorute()
 	{
+		super.COLUMN_FAVORITE=COLUMN_FAVORITE;
 		addObservers();
 	}
 	
@@ -173,28 +174,17 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 	}
 	
 	public void fill(Set<Long> set){
-		
-		//	persons.clear();
-				
 			for(Long s:set){
-				
 				if (s == 0) continue;
 					persons.add ( Controller.getInstance().getAsset(s));
-				
-				
 			}
-			
-			
 		}
-				
-	
 	
 	public void removeObservers() 
 	{
-		//this.persons.removeObserver();
 		Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
-		//Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
 	}
+	
 	public void addObservers(){
 		
 		Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
