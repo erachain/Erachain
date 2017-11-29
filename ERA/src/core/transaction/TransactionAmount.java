@@ -555,9 +555,7 @@ public abstract class TransactionAmount extends Transaction {
 					}
 				}
 			}
-
-			
-			return VALIDATE_OK;
+			return CREATOR_NOT_PERSONALIZED;
 		}
 		
 		return VALIDATE_OK;
