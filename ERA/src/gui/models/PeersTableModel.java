@@ -86,6 +86,7 @@ public class PeersTableModel extends AbstractTableModel implements Observer{
 		
 	
 		 public Peer get_Peers(int row){
+			 if (row<0) return null;
 			return peers.get(row);
 		 }
 	@Override

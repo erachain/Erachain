@@ -19,7 +19,11 @@ import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
+import controller.Controller;
+import core.item.ItemCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.library.MTable;
@@ -43,6 +47,7 @@ public class Other_Split_Panel extends Split_Panel{
 	private WalletBlocksTableModel blocksModel;
 	private MTable jTable_My_Block;
 	private JPopupMenu peers_Menu;
+	private Peer item_Peer_Menu;
 
 	public Other_Split_Panel() {
 		super("Other_Split_Panel");
@@ -54,16 +59,44 @@ public class Other_Split_Panel extends Split_Panel{
   
 
          peers_Menu = new JPopupMenu();
+         
+         peers_Menu.addPopupMenuListener(new PopupMenuListener(){
+
+ 			@Override
+ 			public void popupMenuCanceled(PopupMenuEvent arg0) {
+ 				// TODO Auto-generated method stub
+ 				
+ 			}
+
+ 			@Override
+ 			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+ 				// TODO Auto-generated method stub
+ 				
+ 			}
+
+ 			@Override
+ 			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+ 				// TODO Auto-generated method stub
+ 			
+ 				// TODO Auto-generated method stub
+ 				item_Peer_Menu = peersTableModel.get_Peers(jTable_Peers.convertRowIndexToModel(jTable_Peers.getSelectedRow()));
+
+ 				 				
+ 			}
+ 			
+ 			
+ 			
+ 		});
+         
+         
          JMenuItem Baned_2_Min_Item = new JMenuItem(Lang.getInstance().translate("Ban in 10 min."));
          Baned_2_Min_Item.addActionListener(new ActionListener(){
 
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				int row = jTable_Peers.getSelectedRow();
-				row = jTable_Peers.convertRowIndexToModel(row);
-				Peer peer = peersTableModel.get_Peers(row);
-				peer.ban(10, "banned by user");
+ 			
+				item_Peer_Menu.ban(10, "banned by user");
 				
  			}
        	
@@ -75,10 +108,7 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				int row = jTable_Peers.getSelectedRow();
-				row = jTable_Peers.convertRowIndexToModel(row);
-				Peer peer = peersTableModel.get_Peers(row);	
-				peer.ban(60, "banned by user");
+ 				item_Peer_Menu.ban(60, "banned by user");
  			}
        	
          });
@@ -89,10 +119,7 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				int row = jTable_Peers.getSelectedRow();
-				row = jTable_Peers.convertRowIndexToModel(row);
-				Peer peer = peersTableModel.get_Peers(row);	
-				peer.ban(180, "banned by user");
+				item_Peer_Menu.ban(180, "banned by user");
  			}
        	
          });
@@ -103,10 +130,7 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				int row = jTable_Peers.getSelectedRow();
-				row = jTable_Peers.convertRowIndexToModel(row);
-				Peer peer = peersTableModel.get_Peers(row);
-				peer.ban(1440, "banned by user");
+				item_Peer_Menu.ban(1440, "banned by user");
  			}
        	
          });
@@ -118,10 +142,7 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				int row = jTable_Peers.getSelectedRow();
-				row = jTable_Peers.convertRowIndexToModel(row);
-				Peer peer = peersTableModel.get_Peers(row);
-				peer.ban(999999, "banned by user");
+				item_Peer_Menu.ban(999999, "banned by user");
  			}
        	
          });
@@ -134,13 +155,11 @@ public class Other_Split_Panel extends Split_Panel{
  			@Override
  			public void actionPerformed(ActionEvent arg0) {
  				// TODO Auto-generated method stub
- 				int row = jTable_Peers.getSelectedRow();
-				row = jTable_Peers.convertRowIndexToModel(row);
-				Peer peer = peersTableModel.get_Peers(row);
+ 				
  			}
        	
          });
-         peers_Menu.add(allow_Item);
+       //  peers_Menu.add(allow_Item);
          
          TableMenuPopupUtil.installContextMenu( this.jTable_Peers, peers_Menu);
          
