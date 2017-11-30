@@ -157,7 +157,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 					.getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
 		}
 
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
 			if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
 				all_transactions.add(transaction);
 			}

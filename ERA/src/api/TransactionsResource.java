@@ -178,7 +178,7 @@ public class TransactionsResource {
 	@Path("/network")
 	public String getNetworkTransactions()
 	{
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
 		JSONArray array = new JSONArray();
 		
 		for(Transaction transaction: transactions)
@@ -195,7 +195,7 @@ public class TransactionsResource {
 	@Path("/unconfirmedof/{address}")
 	public String getNetworkTransactions(@PathParam("address") String address)
 	{
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
 		JSONArray array = new JSONArray();
 		
 		for(Transaction transaction: transactions)

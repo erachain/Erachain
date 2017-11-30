@@ -76,6 +76,7 @@ import datachain.DCSet;
 import datachain.Item_Map;
 import datachain.LocalDataMap;
 import datachain.SortableList;
+import datachain.TransactionMap;
 import gui.AboutFrame;
 import gui.Gui;
 import lang.Lang;
@@ -2386,8 +2387,9 @@ public class Controller extends Observable {
 	}
 
 	
-	public List<Transaction> getUnconfirmedTransactions() {
-		return this.blockGenerator.getUnconfirmedTransactions();
+	public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
+		return DCSet.getInstance().getTransactionMap().getTransactions(from, count, descending);
+
 	}
 
 	// BALANCES

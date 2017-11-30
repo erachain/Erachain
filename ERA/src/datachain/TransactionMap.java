@@ -202,8 +202,21 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 			this.peersBroadcasted.put(signature, peers);
 	}
 
-	public List< Transaction> getTransactions() {
-		return new ArrayList< Transaction>(this.getValues());
+	public List<Transaction> getTransactions(int from, int count, boolean descending)
+	{
+		
+		ArrayList<Transaction> values = new ArrayList<Transaction>();
+		TransactionMap map = DCSet.getInstance().getTransactionMap();
+		Iterator<byte[]> iterator = map.getIterator(from, descending);
+		
+		for ( int i = 0; i < count; i++) {
+			if (!iterator.hasNext())
+				break;
+			
+			values.add(map.get(iterator.next()));
+		}
+		
+		return values;
 	}
 
 	// HOW many PEERS broadcasted by this TRANSACTION

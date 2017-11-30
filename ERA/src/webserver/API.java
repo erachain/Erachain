@@ -110,7 +110,7 @@ public class API {
 		help.put("*** ADDRESS ***", "");
 		help.put("GET Address Validate", "addressvalidate/{address}");
 		help.put("GET Address Last Reference", "addresslastreference/{address}");
-		help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}");
+		help.put("GET Address Unconfirmed Last Reference", "addressunconfirmedlastreference/{address}/{from}/{count}");
 		help.put("GET Address Generating Balance", "addressgeneratingbalance/{address}");
 		help.put("GET Address Asset Balance", "addressassetbalance/{address}/{assetid}");
 		help.put("GET Address Assets", "addressassets/{address}");
@@ -706,8 +706,9 @@ public class API {
 	}
 	
 	@GET
-	@Path("addressunconfirmedlastreference/{address}/")
-	public Response getUnconfirmedLastReferenceUnconfirmed(@PathParam("address") String address) {
+	@Path("addressunconfirmedlastreference/{address}/{from}/{count}")
+	public Response getUnconfirmedLastReferenceUnconfirmed(@PathParam("address") String address,
+			@PathParam("from") int from, @PathParam("count") int count) {
 		
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
@@ -723,7 +724,7 @@ public class API {
 		
 		Controller cntrl = Controller.getInstance();
 
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(from, count, true);
 		
 		DCSet db = DCSet.getInstance();
 		Long lastTimestamp = account.getLastReference();
@@ -756,7 +757,7 @@ public class API {
 			return getAddressLastReference(address);
 		}
 		
-		for (Transaction item : cntrl.getUnconfirmedTransactions())
+		for (Transaction item : cntrl.getUnconfirmedTransactions(from, count, true))
 		{
 			if (item.getCreator().equals(account))
 			{

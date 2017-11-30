@@ -98,7 +98,7 @@ public class Account_Transactions_Table extends JTable implements Observer{
 		
 		transactions = new ArrayList<Transaction>();
 
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions()) {
+		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
 			if(transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
 			{
 				transactions.add(transaction);

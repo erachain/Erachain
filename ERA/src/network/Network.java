@@ -94,9 +94,6 @@ public class Network extends Observable implements ConnectionCallback {
 		//ADD TO DATABASE
 		PeerManager.getInstance().addPeer(peer, 0);
 		
-		//PASS TO CONTROLLER
-		Controller.getInstance().onConnect(peer);
-		
 		if(Controller.getInstance().isOnStopping())
 			return;
 
@@ -106,6 +103,10 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+
+		//PASS TO CONTROLLER
+		Controller.getInstance().onConnect(peer);
+		
 	}
 
 	@Override

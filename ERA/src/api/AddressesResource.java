@@ -112,7 +112,7 @@ public class AddressesResource {
 		
 		Controller cntrl = Controller.getInstance();
 
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 10, true);
 		
 		DCSet db = DCSet.getInstance();
 		Long lastTimestamp = account.getLastReference(db);
@@ -144,7 +144,7 @@ public class AddressesResource {
 			return getLastReference(address);
 		}
 		
-		for (Transaction tx : cntrl.getUnconfirmedTransactions())
+		for (Transaction tx : cntrl.getUnconfirmedTransactions(0, 10, true))
 		{
 			if (tx.getCreator().equals(account))
 			{

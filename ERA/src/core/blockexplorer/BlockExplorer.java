@@ -1619,7 +1619,7 @@ if ( asset_1 == null) {
 
 		output.put("maxHeight", block.getHeight(DCSet.getInstance()));
 
-		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
+		output.put("unconfirmedTxs", DCSet.getInstance().getTransactionMap().size());
 		
 		// TODO translate_web(
 		
@@ -1870,7 +1870,7 @@ if ( asset_1 == null) {
 
 		
 
-		output.put("unconfirmedTxs", Controller.getInstance().getUnconfirmedTransactions().size());
+		output.put("unconfirmedTxs", DCSet.getInstance().getTransactionMap().size());
 		
 		// TODO translate_web(
 		
@@ -4193,7 +4193,7 @@ if ( asset_1 == null) {
 
 		AssetNames assetNames = new AssetNames();
 
-		all.addAll(Controller.getInstance().getUnconfirmedTransactions());
+		all.addAll(Controller.getInstance().getUnconfirmedTransactions(0, 100, true));
 
 		output.put("type", "unconfirmed");
 

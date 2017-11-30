@@ -208,7 +208,7 @@ public class Peer extends Thread{
 
 			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
 			if(!Controller.getInstance().isOnStopping()){
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
 			if (transactions != null && !transactions.isEmpty())
 				this.callback.broadcastUnconfirmedToPeer(transactions, this);
 			}
@@ -290,7 +290,7 @@ public class Peer extends Thread{
 			
 			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
 			if(!Controller.getInstance().isOnStopping()){
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
 			if (transactions != null && !transactions.isEmpty())
 				this.callback.broadcastUnconfirmedToPeer(transactions, this);
 			}
@@ -351,7 +351,7 @@ public class Peer extends Thread{
 			
 			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
 			if(!Controller.getInstance().isOnStopping()){
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
+			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
 			if (transactions != null && !transactions.isEmpty())
 				this.callback.broadcastUnconfirmedToPeer(transactions, this);
 			}

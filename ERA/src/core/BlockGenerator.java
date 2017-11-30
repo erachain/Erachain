@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -28,6 +29,7 @@ import core.block.GenesisBlock;
 import core.block.BlockFactory;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import datachain.TransactionMap;
 import lang.Lang;
 import network.Peer;
 import network.message.Message;
@@ -172,12 +174,7 @@ public class BlockGenerator extends Thread implements Observer
 		//ADD TO TRANSACTION DATABASE 
 		db.getTransactionMap().add(transaction);
 	}
-	
-	public List<Transaction> getUnconfirmedTransactions()
-	{
-		return new ArrayList<Transaction>(DCSet.getInstance().getTransactionMap().getValues());
-	}
-	
+		
 	private List<PrivateKeyAccount> getKnownAccounts()
 	{
 		//CHECK IF CACHING ENABLED
