@@ -35,6 +35,7 @@ import com.google.common.primitives.Bytes;
 
 public class Synchronizer
 {
+	public static final int GET_BLOCK_TIMEOUT = 60000;
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
 	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)195, (byte)26, (byte)245}; // 185.195.26.245
 	

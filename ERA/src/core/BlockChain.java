@@ -323,10 +323,10 @@ public class BlockChain
 			int i = 0;
 			int counter = 0;
 			//while(childBlock != null && counter < MAX_ORPHAN)
-			while(childBlock != null && (i++ <3 || counter < SYNCHRONIZE_PACKET))
+			while(childBlock != null && (i++ <4 || counter < SYNCHRONIZE_PACKET))
 			{
 
-				counter += 1 + (childBlock.getTransactionCount() >> 3);
+				counter += 10 + (childBlock.getTransactionCount() >> 3);
 
 				headers.add(childBlock.getSignature());
 				

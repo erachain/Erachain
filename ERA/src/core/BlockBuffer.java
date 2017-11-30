@@ -7,6 +7,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+
 import core.block.Block;
 import settings.Settings;
 import network.Peer;
@@ -25,7 +27,9 @@ public class BlockBuffer extends Thread
 	private Map<byte[], BlockingQueue<Block>> blocks;
 	
 	private boolean run = true;
-	
+
+	private static final Logger LOGGER = Logger.getLogger(BlockBuffer.class);
+
 	public BlockBuffer(List<byte[]> signatures, Peer peer)
 	{
 		this.signatures = signatures;
@@ -78,7 +82,7 @@ public class BlockBuffer extends Thread
 				Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 				
 				//SEND MESSAGE TO PEER
-				BlockMessage response = (BlockMessage) peer.getResponse(message);
+				BlockMessage response = (BlockMessage) peer.getResponse(message, Synchronizer.GET_BLOCK_TIMEOUT);
 				
 				//CHECK IF WE GOT RESPONSE
 				if(response == null)
@@ -97,7 +101,9 @@ public class BlockBuffer extends Thread
 				}
 				
 				//ADD TO LIST
-				blockingQueue.add(response.getBlock());
+				blockingQueue.add(block);
+				LOGGER.debug("block BUFFER added with RECS:" + block.getTransactionCount());
+
 			}
 		}.start();
 	}
@@ -125,7 +131,7 @@ public class BlockBuffer extends Thread
 			throw new Exception("Block buffer error");
 		}
 		
-		Block block = this.blocks.get(signature).poll(60000, TimeUnit.MILLISECONDS);
+		Block block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
 		if (block == null) {
 			throw new Exception("Block buffer error");			
 		}
@@ -138,6 +144,9 @@ public class BlockBuffer extends Thread
 		try
 		{
 			this.run = false;
+			
+			this.signatures = null;
+			this.blocks = null;
 			
 			this.join();
 		}
