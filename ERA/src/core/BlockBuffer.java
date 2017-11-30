@@ -139,6 +139,15 @@ public class BlockBuffer extends Thread
 		return block;
 	}
 	
+	public void clearBlock(byte[] signature) {
+		
+		if(this.blocks.containsKey(signature))
+		{
+			this.blocks.remove(signature);
+		}
+
+	}
+	
 	public void stopThread()
 	{
 		try

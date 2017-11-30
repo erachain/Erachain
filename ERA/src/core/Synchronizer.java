@@ -35,7 +35,9 @@ import com.google.common.primitives.Bytes;
 
 public class Synchronizer
 {
+
 	public static final int GET_BLOCK_TIMEOUT = 60000;
+	private static final int BYTES_MAX_GET = 1024<<12;
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
 	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)195, (byte)26, (byte)245}; // 185.195.26.245
 	
@@ -100,8 +102,6 @@ public class Synchronizer
 
 				//runedBlock = lastBlock; // FOR quick STOPPING
 				lastBlock.orphan(fork);
-				fork.flush(500 + lastBlock.getDataLength(false), false);
-
 				
 				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
 				lastBlock = fork.getBlockMap().get(lastBlock.getReference());
@@ -125,7 +125,6 @@ public class Synchronizer
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				//runedBlock = block;
 				block.process(fork);
-				fork.flush(500 + block.getDataLength(false), false);
 
 				// RELEASE MEMORY in FORK DB
 				if(false) fork.getBlockMap().wipe(block);
@@ -368,8 +367,10 @@ public class Synchronizer
 				try {
 						
 					LOGGER.debug("try pipeProcessOrOrphan");
-					this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);							
+					this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
 					LOGGER.debug("synchronize BLOCK END process");
+					blockBuffer.clearBlock(blockFromPeer.getSignature());
+					LOGGER.debug("synchronize clear from BLOCK BUFFER");
 					continue;
 					
 				} catch (Exception e) {	
@@ -627,6 +628,7 @@ public class Synchronizer
 		List<Block> blocks = new ArrayList<Block>();
 		Controller cnt = Controller.getInstance();
 		
+		int bytesGet = 0;
 		boolean checkPeer = true;
 		for(byte[] signature: signatures)
 		{
@@ -643,8 +645,12 @@ public class Synchronizer
 			// need to SET it!
 			block.setCalcGeneratingBalance(dcSet);
 
-			blocks.add(block);	
-			LOGGER.debug("block added with RECS:" + block.getTransactionCount());
+			blocks.add(block);
+			bytesGet += block.getDataLength(true);
+			LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet/1000);
+			if (bytesGet > BYTES_MAX_GET) {
+				break;
+			}
 		}
 		
 		return blocks;
@@ -658,7 +664,7 @@ public class Synchronizer
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 		
 		//SEND MESSAGE TO PEER
-		BlockMessage response = (BlockMessage) peer.getResponse(message, 60000);
+		BlockMessage response = (BlockMessage) peer.getResponse(message, GET_BLOCK_TIMEOUT);
 		
 		//CHECK IF WE GOT RESPONSE
 		if(response == null)
