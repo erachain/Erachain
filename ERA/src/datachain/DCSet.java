@@ -818,17 +818,18 @@ public class DCSet implements Observer, IDB {
 	
 	public void flush(int size, boolean hardFlush)
 	{
+
+		if (parent != null)
+			return;
+
 		this.addUses();
 
 		this.actions += size;
 		if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
 			long start = System.currentTimeMillis();
 			LOGGER.debug("%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%% actions:" + actions);
-			if (parent == null) {
-				this.database.commit();
-			} else {
-				this.parent.database.commit();				
-			}
+
+			this.database.commit();
 
 			LOGGER.debug("%%%%%%%%%%%%%%%   size:"+ DCSet.getInstance().getEngineeSize() +"   %%%%%%  commit time: " + new Double ((System.currentTimeMillis() -start))*0.001 );
 			this.actions = 0l;
