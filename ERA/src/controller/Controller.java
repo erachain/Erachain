@@ -1515,8 +1515,7 @@ public class Controller extends Observable {
 				
 				// TODO - for OLD versions
 				//CREATE PING
-				response = MessageFactory.getInstance().createPingMessage();
-				//response = MessageFactory.getInstance().createHWeightMessage(HWeight);
+				response = MessageFactory.getInstance().createHWeightMessage(HWeight);
 				// CREATE RESPONSE WITH SAME ID
 				response.setId(message.getId());
 				
