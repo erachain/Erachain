@@ -122,6 +122,19 @@ public class Block {
 	
 	//GETTERS/SETTERS
 
+	public Block(int version, byte[] reference, PublicKeyAccount generator, List<Transaction> trans,
+			byte[] atBytes) {
+	// TODO Auto-generated constructor stub
+	this.version = version;
+	this.reference = reference;
+	this.creator = generator;
+	this.transactions = trans;
+	this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), trans, this.atBytes);
+	this.transactionCount = 0;
+	this.atBytes = atBytes;
+
+	}
+
 	public int getVersion()
 	{
 		return version;
@@ -552,7 +565,9 @@ public class Block {
 			for(Transaction transaction: transactions)
 			{
 				data = Bytes.concat(data, transaction.getSignature());
+				transaction=null;
 			}
+			transactions = null;
 		}
 		
 		if (atBytes != null)

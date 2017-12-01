@@ -55,7 +55,7 @@ public class Peer extends Thread{
 		this.address = address;
 		this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>());
 		//LOGGER.debug("@@@ new Peer(InetAddress address) : " + address.getHostAddress());
-
+		this.setName("Thread Peer - "+ this.getId());
 	}
 	
 	/*
@@ -178,6 +178,7 @@ public class Peer extends Thread{
 			this.pingCounter = 0;
 			this.connectionTime = NTP.getTime();
 			this.errors = 0;
+			this.setName("Thread Peer - "+ this.getId());
 			
 			//ENABLE KEEPALIVE
 			this.socket.setKeepAlive(KEEP_ALIVE);
@@ -455,7 +456,7 @@ public class Peer extends Thread{
 	
 	public void run()
 	{
-		byte[] messageMagic = null;
+		byte[] messageMagic = null;	
 		DataInputStream in = null;
 
 		while(true)

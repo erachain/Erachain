@@ -22,6 +22,7 @@ public class ConnectionCreator extends Thread {
 	public ConnectionCreator(ConnectionCallback callback)
 	{
 		this.callback = callback;
+		this.setName("Thread ConnectionCreator - "+ this.getId());
 	}
 	
 	public void run()

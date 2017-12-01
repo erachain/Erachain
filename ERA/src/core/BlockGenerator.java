@@ -52,8 +52,9 @@ public class BlockGenerator extends Thread implements Observer
 	private byte[] solvingReference;
 	
 	private List<PrivateKeyAccount> cachedAccounts;
-	
 	private static Controller ctrl = Controller.getInstance();
+
+	
 	private ForgingStatus forgingStatus = ForgingStatus.FORGING_DISABLED;
 	private boolean walletOnceUnlocked = false;
 	private static int status = 0;
@@ -133,13 +134,13 @@ public class BlockGenerator extends Thread implements Observer
 
 	public BlockGenerator(boolean withObserve)
 	{
-		
 		if(Settings.getInstance().isGeneratorKeyCachingEnabled())
 		{
 			this.cachedAccounts = new ArrayList<PrivateKeyAccount>();
 		}
 		
 		if (withObserve) addObserver();
+		this.setName("Thread BlockGenerator - "+ this.getId());
 	}
 
 	public void addObserver() {
@@ -212,7 +213,6 @@ public class BlockGenerator extends Thread implements Observer
 	public void run()
 	{
 
-	
 		BlockChain bchain = ctrl.getBlockChain();
 		DCSet dcSet = DCSet.getInstance();
 
@@ -223,7 +223,6 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin = null;
 		long timeUpdate = 0;
 		int shift_height = 0;
-		List<Transaction> unconfirmedTransactions;
 		byte[] unconfirmedTransactionsHash;
 		long max_winned_value;
 		long winned_value;				
@@ -348,7 +347,7 @@ public class BlockGenerator extends Thread implements Observer
 						this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
 						this.acc_winner = null;
 						
-						unconfirmedTransactions = null;
+						
 						unconfirmedTransactionsHash = null;
 						max_winned_value = 0;
 						height = bchain.getHeight(dcSet) + 1;
@@ -427,27 +426,18 @@ public class BlockGenerator extends Thread implements Observer
 				
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
-				
-								unconfirmedTransactions = getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value);
-								
-								if (unconfirmedTransactions == null) {
-									if (ctrl.isOnStopping()) {
-										return;
-									}
-									LOGGER.info("my BLOCK is weak ((...");
-								} else {
-
-									// CALCULATE HASH for that transactions
-									byte[] winnerPubKey = acc_winner.getPublicKey();
-									byte[] atBytes = null;
-									unconfirmedTransactionsHash = Block.makeTransactionsHash(winnerPubKey, unconfirmedTransactions, atBytes);
-					
-									//ADD TRANSACTIONS
-									//this.addUnconfirmedTransactions(dcSet, block);
+														
 									Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
-											solvingBlock, unconfirmedTransactionsHash);
-									generatedBlock.setTransactions(unconfirmedTransactions);
-									unconfirmedTransactions = null;
+											solvingBlock, getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
+									solvingBlock = null;
+									
+									if (generatedBlock == null) {
+										if (ctrl.isOnStopping()) {
+											return;
+										}
+										LOGGER.info("my BLOCK is weak ((...");
+									} else {
+									
 									//PASS BLOCK TO CONTROLLER
 									///ctrl.newBlockGenerated(block);
 									LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
@@ -459,6 +449,7 @@ public class BlockGenerator extends Thread implements Observer
 										generatedBlock = null;
 										status = 0;
 									} else {
+										generatedBlock = null;
 										LOGGER.info("my BLOCK is weak ((...");
 									}
 								}	
@@ -532,8 +523,7 @@ public class BlockGenerator extends Thread implements Observer
 				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
-					Tuple3<Integer, Long, Peer> maxHW = ctrl.getMaxPeerHWeight(-1);
-					peer = maxHW.c;
+					peer = ctrl.getMaxPeerHWeight(-1).c;
 					if (peer != null) {
 						SignaturesMessage response;
 						try {
@@ -593,6 +583,7 @@ public class BlockGenerator extends Thread implements Observer
 			Block parentBlock, byte[] transactionsHash)
 	{
 		
+		
 		int version = parentBlock.getNextBlockVersion(dcSet);
 		byte[] atBytes;
 		if ( version > 1 )
@@ -611,19 +602,56 @@ public class BlockGenerator extends Thread implements Observer
 		newBlock.setCalcGeneratingBalance(dcSet);
 		newBlock.sign(account);
 		
+		
 		return newBlock;
 
 	}
 	
+	public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
+			Block parentBlock, List<Transaction>trans)
+	{
+		
+		if (trans == null) {
+			return null;
+		}
+		
+		int version = parentBlock.getNextBlockVersion(dcSet);
+		byte[] atBytes;
+		if ( version > 1 )
+		{
+			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
+					parentBlock.getHeight(dcSet)) , parentBlock.getHeight(dcSet) + 1 );
+			atBytes = atBlock.getBytesForBlock();
+		} else {
+			atBytes = new byte[0];
+		}
+
+		//CREATE NEW BLOCK
+		
+		Block newBlock = new Block(version, parentBlock.getSignature(), account, trans, atBytes);
+			//	//BlockFactory.getInstance().create(version, parentBlock.getSignature(), account, trans, atBytes);
+		// SET GENERATING BALANCE here
+		newBlock.setCalcGeneratingBalance(dcSet);
+		newBlock.sign(account);
+		
+		trans=null;
+		
+		return newBlock;
+
+	}
+	
+	
+	
 	public static List<Transaction> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value)
 	{
 		
+		long timrans1 = System.currentTimeMillis();
+					
 		//CREATE FORK OF GIVEN DATABASE
-		DCSet newBlockDb = dcSet.fork();		
+		DCSet newBlockDb = dcSet.fork();
 		Block waitWin;
 		
 		long start = System.currentTimeMillis();
-		LOGGER.debug("get orderedTransactions");
 		///////List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValues());
 		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
 		long tickets = System.currentTimeMillis() - start;
@@ -635,7 +663,7 @@ public class BlockGenerator extends Thread implements Observer
 		// sort by TIMESTAMP
 		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
 		long tickets2 = System.currentTimeMillis() - start - tickets;
-		LOGGER.debug("sort time " + tickets2);
+		LOGGER.error("sort time " + tickets2);
 		start = System.currentTimeMillis();
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
@@ -733,10 +761,10 @@ public class BlockGenerator extends Thread implements Observer
 			}
 		}
 		while(count < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
-
 		orderedTransactions = null;
 		waitWin = null;
 		newBlockDb = null;
+
 		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"milsec for trans: " + transactionsList.size() );
 		start = System.currentTimeMillis();
 
@@ -777,7 +805,6 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 		}
 		
-	
 		int status = ctrl.getStatus();
 		//CONNECTIONS OKE? -> FORGING
 		// CONNECTION not NEED now !!

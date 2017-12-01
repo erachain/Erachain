@@ -11,6 +11,7 @@ import java.util.NavigableSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 
 import ntp.NTP;
 
@@ -46,7 +47,7 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	private NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
 
 	// PEERS for transaction signature
-	private Map<byte[], List<byte[]>> peersBroadcasted = new HashMap<byte[], List<byte[]>>();
+	private Map<byte[], List<byte[]>> peersBroadcasted = new WeakHashMap<byte[], List<byte[]>>();
 
 	public TransactionMap(DCSet databaseSet, DB database)
 	{
@@ -123,11 +124,8 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	
 	// TODO - get records.getTimestamp() < timestamp
 	public Collection<Transaction> getSubSet(long timestamp) {
-		//List<Transaction> values = this.heightIndex.subSet(fromElement, toElement);
-		Collection<Transaction> values = this.getValues();
-		///this.heightIndex.iterator();
 		
-		return values;
+		return this.getValues();
 	}
 	
 	@Override
@@ -163,6 +161,7 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 				i++;
 				
 			}
+			iterator= null;
 			long tickets = System.currentTimeMillis() - start;
 			LOGGER.debug("update CLEAR DEADLINE time " + tickets);
 
@@ -200,6 +199,8 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 
 		if (peers.add(peer))
 			this.peersBroadcasted.put(signature, peers);
+		peers = null;
+		signature = null;
 	}
 
 	public List<Transaction> getTransactions(int from, int count, boolean descending)
@@ -215,7 +216,8 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 			
 			values.add(map.get(iterator.next()));
 		}
-		
+		iterator = null;
+		map= null;
 		return values;
 	}
 

@@ -28,7 +28,7 @@ public class Pinger extends Thread
 		this.peer = peer;
 		//this.run = true;
 		this.ping = Integer.MAX_VALUE;
-		
+		this.setName("Thread Pinger - "+ this.getId());
 		this.start();
 	}
 	
@@ -175,7 +175,7 @@ public class Pinger extends Thread
 					
 					if (tryPing(2000)) {
 						Tuple2<Integer, Long> peerHWeight = cnt.getHWeightOfPeer(this.peer);
-						int peerHeight = peerHWeight==null?-1:peerHWeight.a;
+						int peerHeight = peerHWeight==null?-1:(int)peerHWeight.a;
 						int myHeight = chain.getHeight(DCSet.getInstance());
 						if (peerHWeight != null 
 								&& peerHeight == myHeight

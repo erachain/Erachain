@@ -36,8 +36,8 @@ public class Network extends Observable implements ConnectionCallback {
 	
 	public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK?0:1;
 	private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
-	private static final int RESEND_UNCONFIRMED = BlockChain.HARD_WORK?1000:100;
-	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<3;
+	private static final int RESEND_UNCONFIRMED = BlockChain.HARD_WORK?10:10;
+	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<4;
 	
 	private ConnectionCreator creator;
 	private ConnectionAcceptor acceptor;
@@ -93,7 +93,7 @@ public class Network extends Observable implements ConnectionCallback {
 					
 		//ADD TO DATABASE
 		PeerManager.getInstance().addPeer(peer, 0);
-		
+				
 		if(Controller.getInstance().isOnStopping())
 			return;
 
@@ -103,10 +103,10 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
-
+		
 		//PASS TO CONTROLLER
 		Controller.getInstance().onConnect(peer);
-		
+
 	}
 
 	@Override

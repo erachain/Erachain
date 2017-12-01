@@ -197,6 +197,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			if (this.contains(key))
 				this.delete(key);
 		}
+		keys= null;
 	}
 	
 	public void delete(Integer height, Integer seq)
@@ -212,17 +213,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	
 	public Transaction getTransaction(Integer height, Integer seq)
 	{
-		Transaction tx = this.get(new Tuple2<Integer,Integer>(height, seq));
-		/*
-		if ( this.parent != null )
-		{
-			if ( tx == null )
-			{
-				return this.parent.get(new Tuple2<Integer,Integer>(height, seq));
-			}
-		}
-		*/
-		return tx;
+		return this.get(new Tuple2<Integer,Integer>(height, seq));
 	}
 	
 	public List<Transaction> getTransactionsByRecipient(String address)
@@ -235,6 +226,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	{
 		Iterable keys = Fun.filter(this.recipientKey, address);
 		Iterator iter = keys.iterator();
+		keys= null;
 		List<Transaction> txs = new ArrayList<>();
 		int counter=0;
 		while ( iter.hasNext() && (limit ==0 || counter<limit) )
@@ -242,6 +234,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			txs.add(this.map.get(iter.next()));
 			counter++;
 		}
+		iter = null;
 		return txs;
 	}
 	
@@ -255,6 +248,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	{
 		Iterable keys = Fun.filter(this.block_Key, block);
 		Iterator iter = keys.iterator();
+		keys = null;
 		List<Transaction> txs = new ArrayList<>();
 		int counter=0;
 		while ( iter.hasNext() && (limit ==0 || counter<limit) )
@@ -262,6 +256,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			txs.add(this.map.get(iter.next()));
 			counter++;
 		}
+		iter = null;
 		return txs;
 	}
 	
@@ -277,7 +272,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	{
 		Iterable keys = Fun.filter(this.senderKey, address);
 		Iterator iter = keys.iterator();
-
+		keys =  null;
 		List<Transaction> txs = new ArrayList<>();
 		int counter=0;
 		while ( iter.hasNext() && (limit ==0 || counter<limit) )
@@ -285,7 +280,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			txs.add(this.map.get(iter.next()));
 			counter++;
 		}
-		
+		iter = null;
 		return txs;
 	}
 
@@ -294,7 +289,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	{
 		Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
 		Iterator iter = keys.iterator();
-
+		keys = null;
 		List<Transaction> txs = new ArrayList<>();
 		int counter=0;
 		while ( iter.hasNext() && (limit ==0 || counter<limit) )
@@ -302,7 +297,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			txs.add(this.map.get(iter.next()));
 			counter++;
 		}
-		
+		iter = null;
 		return txs;
 	}
 
@@ -318,14 +313,16 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
 		Iterator iter = treeKeys.iterator();
-
+		treeKeys = null;
+		recipientKeys = null;
+		senderKeys= null;
 		Set<BlExpUnit> txs = new TreeSet<>();
 		while ( iter.hasNext() )
 		{
 			Tuple2<Integer, Integer> request = (Tuple2<Integer, Integer>) iter.next();
 			txs.add(new BlExpUnit(request.a, request.b, this.map.get(request)));
 		}
-		
+		iter = null;
 		return txs;
 	}
 	
@@ -341,13 +338,15 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
 		Iterator iter = treeKeys.iterator();
-
+		treeKeys = null;
+		recipientKeys= null;
+		senderKeys = null;
 		List<Transaction> txs = new ArrayList<>();
 		while ( iter.hasNext() )
 		{
 			txs.add(this.map.get(iter.next()));
 		}
-		
+		treeKeys = null;
 		return txs;
 	}
 	
@@ -371,6 +370,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		Iterable keys = Fun.filter(this.recipientKey, address);
 		Iterator iter = keys.iterator();
 		int prevKey = startHeight;
+		keys=null;
 		while ( iter.hasNext() )
 		{
 			Tuple2<Integer, Integer> key = (Tuple2<Integer, Integer>) iter.next();
@@ -382,10 +382,11 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 					}
 					prevKey = key.a;
 					if ( key.b > numOfTx)
+						iter = null;
 						return key;
 			}
 		}
-		
+		iter = null;
 		return null;
 	}
 
@@ -404,14 +405,14 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 				type, service, desc, offset, limit);
 		
 		Iterator iter = keys.iterator();
-
+		keys =  null;
 		List<Transaction> txs = new ArrayList<>();
 		
 		while ( iter.hasNext() )
 		{
 			txs.add(this.map.get(iter.next()));
 		}
-		
+		iter= null;
 		return txs;
 	}
 	

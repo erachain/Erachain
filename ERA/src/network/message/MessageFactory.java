@@ -30,12 +30,6 @@ public class MessageFactory {
 		return instance;
 	}
 	
-	public Message createPingMessage()
-	{
-		//CREATE A MESSAGE WITH ping ACTION
-		return new PingMessage();
-	}
-
 	public Message createGetHWeightMessage()
 	{
 		//CREATE A MESSAGE WITH ping ACTION
@@ -170,7 +164,7 @@ public class MessageFactory {
 		//TODO: delete PING and GET HWeight
 		case Message.GET_PING_TYPE:
 			
-			message = new PingMessage();
+			message = new GetHWeightMessage();
 			break;
 		
 		//GET PEERS

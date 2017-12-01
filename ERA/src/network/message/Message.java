@@ -90,7 +90,7 @@ public abstract class Message {
 			case 10:
 				return "TRANSACTION_TYPE";
 			case 11:
-				return "GET_PING_TYPE";
+				return "PING_TYPE";
 			case 12:
 				return "VERSION_TYPE";
 			case 13:

@@ -29,14 +29,14 @@ public class BlockBuffer extends Thread
 	private boolean run = true;
 
 	private static final Logger LOGGER = Logger.getLogger(BlockBuffer.class);
-
+	
 	public BlockBuffer(List<byte[]> signatures, Peer peer)
 	{
 		this.signatures = signatures;
 		this.peer = peer;
 		this.counter = 0;
 		this.error = false;
-		
+		this.setName("Thread BlockBuffer - "+ this.getId());
 		this.blocks = new HashMap<byte[], BlockingQueue<Block>>();
 		this.start();
 	}
@@ -147,17 +147,15 @@ public class BlockBuffer extends Thread
 		}
 
 	}
-	
+
 	public void stopThread()
 	{
 		try
 		{
 			this.run = false;
-			
-			this.signatures = null;
-			this.blocks = null;
-			
+
 			this.join();
+			
 		}
 		catch (InterruptedException e) 
 		{
