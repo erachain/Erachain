@@ -49,6 +49,7 @@ import core.naming.Name;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
 import datachain.DCSet;
+import datachain.ItemAssetBalanceMap;
 import datachain.Item_Map;
 import datachain.NameMap;
 import datachain.ReferenceMap;
@@ -868,6 +869,21 @@ public class Account {
 		
 		Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
 
+		ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+		Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
+		Tuple3<BigDecimal, BigDecimal, BigDecimal> ballance;
+		Tuple2<String, Long> iteratorKey;
+		int i = 0;
+		while (iterator.hasNext() && i++ < 1000) {
+			iteratorKey = iterator.next();
+			if(iteratorKey.b == key)
+			{
+				ballance =  map.get(iteratorKey);
+				values.put(iteratorKey.a, ballance.a);
+			}
+		}
+
+		/*
 		Collection<Tuple2<String, Long>> addrs = DCSet.getInstance().getAssetBalanceMap().getKeys();
 		
 		for (Tuple2<String, Long> addr : addrs) {
@@ -877,6 +893,7 @@ public class Account {
 				values.put(addr.a, ball.a);
 			}
 		}
+		*/
 
 		// add ORDER values
 		Collection<Order> orders = DCSet.getInstance().getOrderMap().getValues();

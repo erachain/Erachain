@@ -175,7 +175,29 @@ public abstract class DCMap<T, U> extends Observable {
 		this.outUses();
 		return u;
 	}
-	
+
+	public Collection<U> getValues(int from, int count, boolean descending)
+	{
+		this.addUses();
+		Iterator<T> u;
+		
+		if(descending)
+		{
+			u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+		} else { 		
+			u = ((NavigableMap<T, U>) this.map).keySet().iterator();
+		}
+
+		Collection<U> v = new ArrayList<U>();
+		int i=0;
+		while (u.hasNext() && i++ < count) {
+			v.add(this.map.get(u.next()));
+		}
+		
+		this.outUses();
+		return v;
+	}
+
 	public Collection<U> getValues()
 	{
 		this.addUses();

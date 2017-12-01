@@ -762,6 +762,9 @@ public class Synchronizer
 				
 			} catch (Exception e) {
 
+				if(Controller.getInstance().isOnStopping())
+					return;
+
 				dcSet.rollback();
 				
 				if (cnt.isOnStopping()) {

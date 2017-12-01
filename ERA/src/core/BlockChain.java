@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -616,44 +617,51 @@ public class BlockChain
 		long timestamp = GENERATING_MIN_BLOCK_TIME_MS + this.getTimestamp(dcSetOriginal);
 
 		TransactionMap unconfirmedMap = dcSetOriginal.getTransactionMap();
-		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSetOriginal.getTransactionMap().getValues());
-		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
+		Iterator<byte[]> iterator = unconfirmedMap.getIterator(0, false);
 
 		//CREATE FORK OF GIVEN DATABASE
-		DCSet dcFork = dcSetOriginal.fork();
+		///DCSet dcFork = dcSetOriginal.fork();
+		Transaction transaction;
+		byte[] key;
 
-		for(Transaction transaction: orderedTransactions)
+		while(iterator.hasNext())
 		{
 							
 			if (ctrl.isOnStopping()) {
 				return;
 			}
 
+			key = iterator.next();
+			transaction = unconfirmedMap.get(key);
+			
 			//CHECK TRANSACTION DEADLINE
 			if(transaction.getDeadline() < timestamp) {
-				unconfirmedMap.delete(transaction);
+				unconfirmedMap.delete(key);
 				continue;
 			}
 			
 			//CHECK IF VALID
 			if(!transaction.isSignatureValid()) {
 				// INVALID TRANSACTION
-				unconfirmedMap.delete(transaction);
+				unconfirmedMap.delete(key);
                 continue;
 			}
 				
-			transaction.setDB(dcFork, false);
-			
-			if (transaction.isValid(dcFork, null) != Transaction.VALIDATE_OK) {
-				// INVALID TRANSACTION
-				unconfirmedMap.delete(transaction);
-				continue;
+			/*
+				transaction.setDB(dcFork, false);
+				
+				if (transaction.isValid(dcFork, null) != Transaction.VALIDATE_OK) {
+					// INVALID TRANSACTION
+					unconfirmedMap.delete(transaction);
+					continue;
+				}
 			}
+			*/
 		}
 		
 		LOGGER.debug("timerUnconfirmed ----------------  work: "
 				+ (System.currentTimeMillis() - startTime)
-				+ " for SIZE: " + orderedTransactions.size());
+				+ " new SIZE: " + unconfirmedMap.size());
 
 	}
 }
