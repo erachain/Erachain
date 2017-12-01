@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.mapdb.Fun.Tuple2;
@@ -106,12 +107,18 @@ public class TransactionCreator
 		this.lastBlock = Controller.getInstance().getLastBlock();
 			
 		//SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
-		List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValues();
+		///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValues(100, true);
+		TransactionMap transactionMap = this.fork.getTransactionMap();
+		Iterator<byte[]> iterator = transactionMap.getIterator(0, false);
+		Transaction transaction;
+		List<Account> accountMap = Controller.getInstance().getAccounts();
+		
 		List<Transaction> accountTransactions = new ArrayList<Transaction>();
 			
-		for(Transaction transaction: transactions)
+		while(iterator.hasNext())
 		{
-			if(Controller.getInstance().getAccounts().contains(transaction.getCreator()))
+			transaction = transactionMap.get(iterator.next());
+			if(accountMap.contains(transaction.getCreator()))
 			{
 				accountTransactions.add(transaction);
 			}
@@ -121,23 +128,22 @@ public class TransactionCreator
 		Collections.sort(accountTransactions, new TransactionTimestampComparator());
 		
 		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
-		for(Transaction transaction: accountTransactions)
+		for(Transaction transactionAccount: accountTransactions)
 		{
-			if(!transaction.isSignatureValid()) {
+			if(!transactionAccount.isSignatureValid()) {
 				//THE TRANSACTION BECAME INVALID LET 
-				this.fork.getTransactionMap().delete(transaction);			
+				this.fork.getTransactionMap().delete(transactionAccount);			
 			} else {
-				transaction.setDB(this.fork, false);
-				if(transaction.isValid(this.fork, null) == Transaction.VALIDATE_OK)
+				transactionAccount.setDB(this.fork, false);
+				if(transactionAccount.isValid(this.fork, null) == Transaction.VALIDATE_OK)
 				{
-					transaction.process(this.fork, null, false);
+					transactionAccount.process(this.fork, null, false);
 				} else {
 					//THE TRANSACTION BECAME INVALID LET 
-					this.fork.getTransactionMap().delete(transaction);
+					this.fork.getTransactionMap().delete(transactionAccount);
 				}
 			}
-		}
-		
+		}	
 	}
 		
 	public long getReference(PublicKeyAccount creator)
