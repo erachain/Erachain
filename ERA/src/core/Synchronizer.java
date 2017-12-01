@@ -153,7 +153,11 @@ public class Synchronizer
 		Controller cnt = Controller.getInstance();
 
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-		checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);	
+		if (core.BlockGenerator.TEST_001) {
+			///checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks, peer);
+		} else {
+			checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);
+		}
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
 		Map<String, byte[]> states = new TreeMap<String, byte[]>();
@@ -182,6 +186,7 @@ public class Synchronizer
 				//runedBlock = lastBlock; // FOR quick STOPPING
 				LOGGER.debug("*** synchronize - orphan block...");
 				this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
+				///kjhjk
 				lastBlock = dcSet.getBlockMap().getLastBlock();
 			}
 
@@ -287,7 +292,7 @@ public class Synchronizer
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
 			
 			//CREATE BLOCK BUFFER
-			LOGGER.debug("synchronize try get BLOCKS in BUFFER"
+			LOGGER.debug("START BUFFER"
 					+ " peer: " + peer.getAddress().getHostName()
 					+ " for blocks: " + signatures.b.size());
 			BlockBuffer blockBuffer = new BlockBuffer(signatures.b, peer);
@@ -304,9 +309,7 @@ public class Synchronizer
 				}
 				
 				//GET BLOCK
-				LOGGER.debug("synchronize try get BLOCK"
-						+ " for: " + signature.toString()
-						);
+				LOGGER.debug("try get BLOCK from BUFFER");
 
 				long time1 = System.currentTimeMillis();
 				blockFromPeer = blockBuffer.getBlock(signature);
@@ -324,7 +327,7 @@ public class Synchronizer
 					throw new Exception(mess);
 				}
 
-				LOGGER.debug("synchronize BLOCK getted "
+				LOGGER.debug("BLOCK getted "
 						+ " time ms: " + (System.currentTimeMillis() - time1)
 						+ " size kB: " + (blockFromPeer.getDataLength(false)/1000 )
 						+ " from " + peer.getAddress().getHostAddress()
@@ -343,12 +346,7 @@ public class Synchronizer
 					blockBuffer.stopThread();
 					throw new Exception("on stoping");
 				}
-				
-				//PROCESS BLOCK
-				LOGGER.debug("synchronize - simple ADD NEW BLOCK process..."
-						//+ " height:" + blockFromPeer.getHeightByParent(dcSet)
-						);
-				
+								
 				if(!blockFromPeer.isSignatureValid()) {
 					errorMess = "invalid Sign!";
 					break;
@@ -365,7 +363,8 @@ public class Synchronizer
 				}
 
 				try {
-						
+					//PROCESS BLOCK
+		
 					LOGGER.debug("try pipeProcessOrOrphan");
 					this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
 					LOGGER.debug("synchronize BLOCK END process");
@@ -764,7 +763,7 @@ public class Synchronizer
 
 				if(Controller.getInstance().isOnStopping())
 					return;
-
+				
 				dcSet.rollback();
 				
 				if (cnt.isOnStopping()) {

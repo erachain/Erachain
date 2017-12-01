@@ -88,6 +88,7 @@ public class BlockBuffer extends Thread
 				if(response == null)
 				{
 					//ERROR
+					LOGGER.debug("ERROR block BUFFER response == null");
 					error = true;
 					return;
 				}
@@ -96,6 +97,7 @@ public class BlockBuffer extends Thread
 				//CHECK BLOCK SIGNATURE
 				if(block == null || !block.isSignatureValid())
 				{
+					LOGGER.debug("ERROR block BUFFER block == null or not Signed");
 					error = true;
 					return;
 				}
@@ -110,32 +112,37 @@ public class BlockBuffer extends Thread
 	
 	public Block getBlock(byte[] signature) throws Exception
 	{
-		//CHECK ERROR
-		if(this.error)
-		{
-			throw new Exception("Block buffer error");
+
+		Block block;
+		if(this.blocks.containsKey(signature)) {
+				
+		} else {
+			
+			//CHECK ERROR
+			if(this.error)
+			{
+				throw new Exception("Block buffer error 1");
+			}
+		
+			//CHECK IF ALREADY LOADED BLOCK
+			//LOAD BLOCK
+			this.loadBlock(signature);
+		
+			//GET BLOCK
+			if (this.error) {
+				throw new Exception("Block buffer error 2");
+			}
+		
 		}
 		
 		//UPDATE COUNTER
 		this.counter = this.signatures.indexOf(signature);
-		
-		//CHECK IF ALREADY LOADED BLOCK
-		if(!this.blocks.containsKey(signature))
-		{
-			//LOAD BLOCK
-			this.loadBlock(signature);
-		}
-		
-		//GET BLOCK
-		if (this.error) {
-			throw new Exception("Block buffer error");
-		}
-		
-		Block block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
+
+		block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
 		if (block == null) {
-			throw new Exception("Block buffer error");			
+			throw new Exception("Block buffer error 3");			
 		}
-		
+
 		return block;
 	}
 	
