@@ -39,6 +39,7 @@ import network.message.SignaturesMessage;
 public class BlockGenerator extends Thread implements Observer
 {	
 	
+	public static final boolean TEST_001 = true;
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
 	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:1000;
@@ -302,7 +303,9 @@ public class BlockGenerator extends Thread implements Observer
 					
 					//waitWin = bchain.getWaitWinBuffer();
 
+					ctrl.checkStatusAndObserve(1);
 					if (forgingStatus == ForgingStatus.FORGING // FORGING enabled
+							&& !ctrl.needUpToDate()
 							&& (this.solvingReference == null // AND GENERATING NOT MAKED
 								|| !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
 							)
@@ -459,58 +462,61 @@ public class BlockGenerator extends Thread implements Observer
 				}
 				
 				////////////////////////////  FLUSH NEW BLOCK /////////////////////////
+				ctrl.checkStatusAndObserve(1);
+				if (!ctrl.needUpToDate()) {
 	
-				// try solve and flush new block from Win Buffer		
-				waitWin = bchain.getWaitWinBuffer();
-				if (waitWin != null) {
-
-					this.solvingReference = null;
-
-					// FLUSH WINER to DB MAP
-					LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime())/1000);
+					// try solve and flush new block from Win Buffer		
+					waitWin = bchain.getWaitWinBuffer();
+					if (waitWin != null) {
 	
-					status = 1;
+						this.solvingReference = null;
 	
-					while (flushPoint > NTP.getTime()) {
-						try
-						{
-							Thread.sleep(100);
+						// FLUSH WINER to DB MAP
+						LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime())/1000);
+		
+						status = 1;
+		
+						while (flushPoint > NTP.getTime()) {
+							try
+							{
+								Thread.sleep(100);
+							}
+							catch (InterruptedException e) 
+							{
+							}
+		
+							if (ctrl.isOnStopping()) {
+								status = -1;
+								return;
+							}
 						}
-						catch (InterruptedException e) 
-						{
-						}
-	
-						if (ctrl.isOnStopping()) {
-							status = -1;
-							return;
-						}
-					}
-					
-					// FLUSH WINER to DB MAP
-					LOGGER.debug("TRY to FLUSH WINER to DB MAP");
-	
-					try {
 						
-						status = 2;
-						if (!ctrl.flushNewBlockGenerated()) {
-							// NEW BLOCK not FLUSHED
-							LOGGER.error("NEW BLOCK not FLUSHED");
-						}
-
-						if (ctrl.isOnStopping()) {
-							status = -1;
-							return;
-						}
+						// FLUSH WINER to DB MAP
+						LOGGER.debug("TRY to FLUSH WINER to DB MAP");
+		
+						try {
 							
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						if (ctrl.isOnStopping()) {
-							status = -1;
-							return;
+							status = 2;
+							if (!ctrl.flushNewBlockGenerated()) {
+								// NEW BLOCK not FLUSHED
+								LOGGER.error("NEW BLOCK not FLUSHED");
+							}
+	
+							if (ctrl.isOnStopping()) {
+								status = -1;
+								return;
+							}
+								
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							if (ctrl.isOnStopping()) {
+								status = -1;
+								return;
+							}
+							// if FLUSH out of memory
+							bchain.clearWaitWinBuffer();
+							LOGGER.error(e.getMessage(), e);
 						}
-						// if FLUSH out of memory
-						bchain.clearWaitWinBuffer();
-						LOGGER.error(e.getMessage(), e);
 					}
 				}
 	
