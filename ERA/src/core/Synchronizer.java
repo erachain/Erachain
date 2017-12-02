@@ -600,17 +600,9 @@ public class Synchronizer
 				+ " founded headers: " + headers.size()
 				);
 
-		// CLEAR head of common headers
-		while ( !headers.isEmpty() && dcSet.getBlockMap().contains(headers.get(0))) {
+		// CLEAR head of common headers exclude LAST!
+		while ( headers.size() > 1 && dcSet.getBlockMap().contains(headers.get(0))) {
 			lastBlockSignatureCommon = headers.remove(0);
-		}
-
-		if (headers.isEmpty()) {
-			
-			String mess = "Dishonest peer by headers.size==0 " + peer.getAddress().getHostAddress();
-			
-			peer.ban(BAN_BLOCK_TIMES>>1, mess);
-			throw new Exception(mess);
 		}
 
 		LOGGER.info("findHeaders headers CLEAR"
