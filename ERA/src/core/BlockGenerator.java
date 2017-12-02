@@ -531,18 +531,26 @@ public class BlockGenerator extends Thread implements Observer
 					//shift_height = -1;
 					peer = ctrl.getMaxPeerHWeight(-1).c;
 					if (peer != null) {
-						SignaturesMessage response;
-						try {
-							response = (SignaturesMessage) peer.getResponse(MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
-									10000);
-						} catch (java.lang.ClassCastException e) {
-							peer.ban(1, "Cannot retrieve headers");
-							throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			
-						}
-
-						if (response == null) {
-							ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-						}
+						
+						 if (bchain.getLastBlockSignature(dcSet) != null) {
+						
+							SignaturesMessage response;
+							try {
+								response = (SignaturesMessage) peer.getResponse(
+										MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
+										30000);
+							} catch (java.lang.ClassCastException e) {
+								peer.ban(1, "Cannot retrieve headers");
+								throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			
+							}
+	
+							if (response == null) {
+								ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+							}
+						 } else {
+							 if (ctrl.getActivePeersCounter() < BlockChain.REPEAT_WIN>>1)
+								 continue;
+						 }
 
 					}
 				} else { 
