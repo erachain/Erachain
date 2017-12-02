@@ -532,7 +532,7 @@ public class BlockGenerator extends Thread implements Observer
 					peer = ctrl.getMaxPeerHWeight(-1).c;
 					if (peer != null) {
 						
-						 if (bchain.getLastBlockSignature(dcSet) != null) {
+						 if (bchain.getHeight(dcSet) > 1) {
 						
 							SignaturesMessage response;
 							try {
