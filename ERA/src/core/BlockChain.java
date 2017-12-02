@@ -19,6 +19,7 @@ import core.crypto.Base58;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
 import datachain.BlockMap;
+import datachain.ChildMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import ntp.NTP;
@@ -310,34 +311,26 @@ public class BlockChain
 		}
 	}
 
-	public List<byte[]> getSignatures(DCSet dcSet, byte[] parent) {
+	public List<byte[]> getSignatures(DCSet dcSet, byte[] parentSignature) {
 		
 		//LOGGER.debug("getSignatures for ->" + Base58.encode(parent));
 		
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
 		//CHECK IF BLOCK EXISTS
-		if(dcSet.getBlockMap().contains(parent))
+		if(dcSet.getBlockMap().contains(parentSignature))
 		{
-			Block childBlock = dcSet.getBlockMap().get(parent).getChild(dcSet);
 			
-			int i = 0;
+			ChildMap childsMap = dcSet.getChildMap();			
 			int counter = 0;
-			//while(childBlock != null && counter < MAX_ORPHAN)
-			while(childBlock != null && (i++ <4 || counter < SYNCHRONIZE_PACKET))
-			{
-
-				counter += 10 + (childBlock.getTransactionCount() >> 3);
-
-				headers.add(childBlock.getSignature());
-				
-				childBlock = childBlock.getChild(dcSet);
-				
+			while(parentSignature != null && counter++ < SYNCHRONIZE_PACKET)
+			{				
+				headers.add(parentSignature);
+				parentSignature = childsMap.getChildBlock(parentSignature);
 			}
 			//LOGGER.debug("get size " + counter);
 		} else {
 			//LOGGER.debug("*** getSignatures NOT FOUND !");
-			
 		}
 		
 		return headers;		
