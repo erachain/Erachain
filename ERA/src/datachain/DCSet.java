@@ -168,9 +168,9 @@ public class DCSet implements Observer, IDB {
 		return u;
 	}
 
-	public void updateUncTxCounter(long offset)
+	public void updateUncTxCounter(int offset)
 	{
-		if (parent == null && offset != 0l) {
+		if (parent == null && offset != 0) {
 			this.uses++;
 			this.database.getAtomicLong(UNC_TX_COUNTER).set(this.database.getAtomicLong(UNC_TX_COUNTER).get() + offset);
 			this.uses--;

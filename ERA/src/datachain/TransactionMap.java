@@ -122,10 +122,23 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		return this.observableData;
 	}
 	
-	// TODO - get records.getTimestamp() < timestamp
-	public Collection<Transaction> getSubSet(long timestamp) {
+	public List<Transaction> getSubSet(long timestamp) {
 		
-		return this.getValues();
+		//return this.getValues(100, true);
+		
+		List<Transaction> values = new ArrayList<Transaction>();
+		Iterator<byte[]> iterator = this.getIterator(0, false);
+		Transaction transaction;
+		while (iterator.hasNext()) {
+			transaction = this.map.get(iterator.next());
+			if (transaction.getDeadline() < NTP.getTime()
+					|| transaction.getTimestamp() > timestamp)
+				continue;
+			
+			values.add(transaction);
+		}
+		
+		return values;
 	}
 	
 	@Override
@@ -172,6 +185,9 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		
 		if (this.size() > MAX_MAP_SIZE)
 			return false;
+		
+		if (!this.contains(signature))
+			this.getDCSet().updateUncTxCounter(1);
 		
 		return super.set(signature, transaction);
 		
@@ -267,6 +283,10 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		if (this.peersBroadcasted.containsKey(signature)) {
 			this.peersBroadcasted.remove(signature);
 		}
+
+		if (this.contains(signature))
+			this.getDCSet().updateUncTxCounter(-1);
+
 		super.delete(signature);
 	}
 
