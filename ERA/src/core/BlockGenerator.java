@@ -548,7 +548,7 @@ public class BlockGenerator extends Thread implements Observer
 								ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
 							}
 						 } else {
-							 if (ctrl.getActivePeersCounter() < BlockChain.REPEAT_WIN>>1)
+							 if (ctrl.getActivePeersCounter() < 1) //BlockChain.REPEAT_WIN>>1)
 								 continue;
 						 }
 

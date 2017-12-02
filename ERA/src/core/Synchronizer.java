@@ -257,17 +257,20 @@ public class Synchronizer
 					//+ ", ping: " + peer.getPing()
 					);			
 		}
-		Tuple2<byte[], List<byte[]>> signatures = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+		Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+		List<byte[]> signatures = headers.b;
 
 		//FIND FIRST COMMON BLOCK in HEADERS CHAIN
-		Block common = dcSet.getBlockMap().get(signatures.a);
-		if (common == null) { // icreator
+		Block common = dcSet.getBlockMap().get(headers.a);
+		if (common == null) {
 			
 			//INVALID BLOCK THROW EXCEPTION
 			String mess = "Dishonest peer on COMMON block not found!!";
 			peer.ban(BAN_BLOCK_TIMES>>4, mess);
 			//STOP BLOCKBUFFER
 			throw new Exception(mess);
+		} else {
+			
 		}
 
 		int commonBlockHeight = common.getHeight(dcSet);
@@ -281,7 +284,7 @@ public class Synchronizer
 		if(Arrays.equals(common.getSignature(), lastBlockSignature))
 		{
 			
-			if (signatures.b.size() == 0) {
+			if (signatures.size() == 0) {
 				// TODO it is because incorrect calculate WIN_TARGET value
 				//dcSet.getBlockSignsMap().setFullWeight(Controller.getInstance().getPeerHWeights().get(peer).b);
 				Tuple2<Integer, Long> myHW = Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
@@ -289,18 +292,20 @@ public class Synchronizer
 				LOGGER.info("  set new Weight " + myHW + " for PEER " + peer.getAddress().getHostAddress());
 				return;
 			}
+			
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
+			signatures.remove(0);
 			
 			//CREATE BLOCK BUFFER
 			LOGGER.debug("START BUFFER"
 					+ " peer: " + peer.getAddress().getHostName()
-					+ " for blocks: " + signatures.b.size());
-			BlockBuffer blockBuffer = new BlockBuffer(signatures.b, peer);
+					+ " for blocks: " + signatures.size());
+			BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
 			Block blockFromPeer;
 
 			String errorMess = null;
 			//GET AND PROCESS BLOCK BY BLOCK
-			for(byte[] signature: signatures.b)
+			for(byte[] signature: signatures)
 			{
 				if (cnt.isOnStopping()) {
 					//STOP BLOCKBUFFER
@@ -400,7 +405,7 @@ public class Synchronizer
 		{
 			
 			//GET THE BLOCKS FROM SIGNATURES
-			List<Block> blocks = this.getBlocks(dcSet, signatures.b, peer);
+			List<Block> blocks = this.getBlocks(dcSet, signatures, peer);
 
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
