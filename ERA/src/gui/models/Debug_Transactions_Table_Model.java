@@ -161,7 +161,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 		{
 			//CHECK IF LIST UPDATED
 		//	this.transactions.add((Transaction)message.getValue());
-			Pair<Integer, Transaction> ss = (Pair<Integer, Transaction>) message.getValue();
+			Pair<byte[], Transaction> ss = (Pair<byte[], Transaction>) message.getValue();
 			this.transactions.add(ss.getB());
 			this.fireTableRowsInserted(0, 0);			
 			if (this.transactions.size() > 100) {
