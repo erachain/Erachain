@@ -1619,8 +1619,16 @@ if ( asset_1 == null) {
 
 		output.put("maxHeight", block.getHeight(DCSet.getInstance()));
 
+		//long startTime = System.currentTimeMillis();
 		output.put("unconfirmedTxs", DCSet.getInstance().getTransactionMap().size());
-		output.put("totaltransactions", DCSet.getInstance().getTransactionFinalMap().size());
+		//LOGGER.debug("unconfCount time: " +  (System.currentTimeMillis() - startTime)*0.001);
+		//startTime = System.currentTimeMillis();
+		//output.put("totaltransactions", DCSet.getInstance().getTransactionRef_BlockRef_Map().size());
+		output.put("totaltransactions", DCSet.getInstance().getTxCounter());
+		//LOGGER.debug("refsCount time: " +  (System.currentTimeMillis() - startTime)*0.001);
+		//startTime = System.currentTimeMillis();
+		//output.put("totaltransactions", DCSet.getInstance().getTransactionFinalMap().size());
+		//LOGGER.debug("finalCount time: " +  (System.currentTimeMillis() - startTime)*0.001);
 		
 		// TODO translate_web(
 		

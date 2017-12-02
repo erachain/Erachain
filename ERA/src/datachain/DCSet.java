@@ -29,6 +29,9 @@ public class DCSet implements Observer, IDB {
 	private static final int ACTIONS_BEFORE_COMMIT = BlockChain.HARD_WORK?1024<<9:1024<<6;
 	private static final int CASH_SIZE = BlockChain.HARD_WORK?1028<<2:2048;
 	
+	private static final String TX_COUNTER = "tx_counter";
+	private static final String UNC_TX_COUNTER = "unc_tx_counter";
+
 	private static DCSet instance;
 	private DCSet parent;
 	private int uses;
@@ -150,6 +153,35 @@ public class DCSet implements Observer, IDB {
 		}
 	}
 
+	public void updateTxCounter(long offset)
+	{
+		if (parent == null && offset != 0l) {
+			this.uses++;
+			this.database.getAtomicLong(TX_COUNTER).set(this.database.getAtomicLong(TX_COUNTER).get() + offset);
+			this.uses--;
+		}
+	}
+	
+	public long getTxCounter()
+	{
+		long u = this.database.getAtomicLong(TX_COUNTER).longValue();
+		return u;
+	}
+
+	public void updateUncTxCounter(long offset)
+	{
+		if (parent == null && offset != 0l) {
+			this.uses++;
+			this.database.getAtomicLong(UNC_TX_COUNTER).set(this.database.getAtomicLong(UNC_TX_COUNTER).get() + offset);
+			this.uses--;
+		}
+	}
+	
+	public long getUncTxCounter()
+	{
+		long u = this.database.getAtomicLong(UNC_TX_COUNTER).longValue();
+		return u;
+	}
 	
 	public static void reCreateDatabase(boolean withObserver, boolean dynamicGUI) {
 
@@ -163,7 +195,7 @@ public class DCSet implements Observer, IDB {
 				.closeOnJvmShutdown()
 				//.cacheSize(CASH_SIZE)
 				//.cacheDisable()
-				//.checksumEnable()
+				.checksumEnable()
 				.mmapFileEnableIfSupported() // -- error on asyncWriteEnable
 				//.snapshotEnable()
 				/// ICREATOR
@@ -187,6 +219,12 @@ public class DCSet implements Observer, IDB {
 		
 		//CREATE INSTANCE
 		instance = new DCSet(database, withObserver, dynamicGUI);
+
+		// INIT COUNTERS
+		if (instance.database.getAtomicLong(TX_COUNTER) == null) {
+			instance.database.getAtomicLong(TX_COUNTER).set(0);
+			instance.database.getAtomicLong(UNC_TX_COUNTER).set(0);
+		}
 		
 	}	
 	
@@ -199,7 +237,31 @@ public class DCSet implements Observer, IDB {
 		
 		return new DCSet(database, false, false);
 	}
+
+	public static DB сreateForkbase() {
+
+		//OPEN DB
+		File dbFile = new File(Settings.getInstance().getLocalDir(), "fork.dat");
+		dbFile.getParentFile().mkdirs();
+		
+		/// https://jankotek.gitbooks.io/mapdb/performance/
+		//CREATE DATABASE
+		return DBMaker.newFileDB(dbFile)
+				.closeOnJvmShutdown()
+				.transactionDisable()
+				.cacheSize(1024)
+				//.cacheDisable()
+				.mmapFileEnableIfSupported() // -- error on asyncWriteEnable
+				//.snapshotEnable()
+				/// ICREATOR
+				.commitFileSyncDisable()
+				.asyncWriteEnable()
+				.asyncWriteFlushDelay(10)
+				//.cacheHardRefEnable()
+				.make();		
+	}	
 	
+
 	public DCSet(DB database, boolean withObserver, boolean dynamicGUI)
 	{
 		uses = 1;
@@ -281,12 +343,13 @@ public class DCSet implements Observer, IDB {
 		
 	}
 	
-	protected DCSet(DCSet parent)
+	protected DCSet(DCSet parent, DB idDatabase)
 	{
 		
 		this.addUses();
 		
-		//DB database = DBMaker.newMemoryDB().make();
+		if (idDatabase != null)
+			this.database = idDatabase;
 
 		this.parent = parent;
 		///this.database = parent.database.snapshot();
@@ -763,13 +826,21 @@ public class DCSet implements Observer, IDB {
 	public DCSet fork()
 	{
 		this.addUses();
-		///this.database.commit();
-		DCSet fork = new DCSet(this);
+		DCSet fork = new DCSet(this, null);
 		this.outUses();
 		
 		return fork;
 	}
-	
+
+	public DCSet forkinFile()
+	{
+		this.addUses();
+		DCSet fork = new DCSet(this, сreateForkbase());
+		this.outUses();
+		
+		return fork;
+	}
+
 	public void close()
 	{
 		if(this.database != null)

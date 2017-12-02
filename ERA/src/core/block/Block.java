@@ -87,7 +87,7 @@ public class Block {
 
 	private List<Transaction> transactions;	
 	private int transactionCount;
-	private byte[] rawTransactions;
+	private byte[] rawTransactions = null;
 
 	protected byte[] transactionsHash;
 
@@ -282,7 +282,7 @@ public class Block {
 				}
 				//incomed_amount += amount;
 			}
-
+			
 			// for creator
 			txs = dcSet.getTransactionFinalMap().findTransactions(null, creator.getAddress(), null,
 					previousForgingHeight, height,
@@ -320,8 +320,10 @@ public class Block {
 				} else {
 					continue;
 				}
+				
 				//incomed_amount += amount;
 			}
+			txs = null;
 		}
 		
 		// OWN + RENT balance - in USE
@@ -412,6 +414,8 @@ public class Block {
 
 	public void setTransactionData(int transactionCount, byte[] rawTransactions)
 	{
+		
+		this.rawTransactions = null;
 		this.transactionCount = transactionCount;
 		this.rawTransactions = rawTransactions;
 	}
@@ -568,10 +572,11 @@ public class Block {
 				transaction=null;
 			}
 			transactions = null;
+			
 		}
 		
 		if (atBytes != null)
-			data = Bytes.concat(data, atBytes);
+			data = Bytes.concat(data, atBytes); 
 
 		
 		return Crypto.getInstance().digest(data);
@@ -673,9 +678,10 @@ public class Block {
 		position += TRANSACTIONS_COUNT_LENGTH;
 
 		//SET TRANSACTIONDATA
-		byte[] rawTransactions = Arrays.copyOfRange(data, position, data.length);
-		block.setTransactionData(transactionCount, rawTransactions);
+		
+		block.setTransactionData(transactionCount, Arrays.copyOfRange(data, position, data.length));
 
+	
 		//SET TRANSACTIONS SIGNATURE
 		// transaction only in raw here - block.makeTransactionsHash();
 
@@ -1116,7 +1122,7 @@ public class Block {
 		*/
 		
 		//CHECK IF PARENT EXISTS
-		if(this.reference == null || this.getParent(db) == null)
+		if(height < 2 || this.reference == null || this.getParent(db) == null)
 		{
 			LOGGER.debug("*** Block[" + height + "].reference invalid");
 			return false;
@@ -1407,7 +1413,6 @@ public class Block {
 		{
 			cnt.blockchainSyncStatusUpdate(heightBlock);
 		}
-		
 		long tickets = System.currentTimeMillis() - start;
 		LOGGER.debug("[" + this.heightBlock + "] processing time: " +  tickets*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
@@ -1536,7 +1541,7 @@ public class Block {
 			+ " recs: " + this.transactionCount
 			+ " H: " + this.getHeightByParent(dcSet)
 			+ " W: " + this.calcWinValue(dcSet)
-			+ " C: " + this.getCreator().getPersonAsString().substring(0, 7);
+			+ " C: " + this.getCreator().getPersonAsString();
 	}
 	
 	public void stop() {		
