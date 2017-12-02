@@ -1620,10 +1620,12 @@ if ( asset_1 == null) {
 		output.put("maxHeight", block.getHeight(DCSet.getInstance()));
 
 		output.put("unconfirmedTxs", DCSet.getInstance().getTransactionMap().size());
+		output.put("totaltransactions", DCSet.getInstance().getTransactionFinalMap().size());
 		
 		// TODO translate_web(
 		
 		output.put("Label_Unconfirmed_transactions",Lang.getInstance().translate_from_langObj("Unconfirmed transactions", langObj));
+		output.put("Label_total_transactions",Lang.getInstance().translate_from_langObj("Total Transactions", langObj));
 		output.put("Label_Height", Lang.getInstance().translate_from_langObj("Height", langObj)); 
 		output.put("Label_Time", Lang.getInstance().translate_from_langObj("Time", langObj));
 		output.put("Label_Generator", Lang.getInstance().translate_from_langObj("Creator", langObj));
@@ -1649,6 +1651,7 @@ if ( asset_1 == null) {
 			blockJSON.put("timestamp", block.getTimestamp(DCSet.getInstance()));
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DCSet.getInstance())));
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
+			
 
 			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
 			for (Transaction transaction : block.getTransactions()) {
