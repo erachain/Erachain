@@ -129,13 +129,21 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		List<Transaction> values = new ArrayList<Transaction>();
 		Iterator<byte[]> iterator = this.getIterator(0, false);
 		Transaction transaction;
+		int count = 0;
 		while (iterator.hasNext()) {
-			transaction = this.map.get(iterator.next());
-			if (transaction.getDeadline() < NTP.getTime()
-					|| transaction.getTimestamp() > timestamp)
+			byte[] key = iterator.next();
+			transaction = this.map.get(key);
+			if (transaction.getDeadline() < timestamp)
+				this.map.remove(key);
+			
+			if (transaction.getTimestamp() > timestamp)
 				continue;
 			
+			if(count++ > 22222)
+				break;
+			
 			values.add(transaction);
+			
 		}
 		
 		return values;

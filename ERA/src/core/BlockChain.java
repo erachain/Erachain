@@ -605,6 +605,9 @@ public class BlockChain
 	// CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
 	public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal) {
 		
+		if (true)
+			return;
+		
 		long startTime = System.currentTimeMillis();
 
 		long timestamp = GENERATING_MIN_BLOCK_TIME_MS + this.getTimestamp(dcSetOriginal);
