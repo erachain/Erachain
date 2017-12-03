@@ -311,6 +311,8 @@ public class Synchronizer
 			Block blockFromPeer;
 
 			String errorMess = null;
+			int banTime = BAN_BLOCK_TIMES>>2;
+			
 			//GET AND PROCESS BLOCK BY BLOCK
 			for(byte[] signature: signatures)
 			{
@@ -327,16 +329,11 @@ public class Synchronizer
 				blockFromPeer = blockBuffer.getBlock(signature);
 				
 				if (blockFromPeer == null) {
-					
-					//STOP BLOCKBUFFER
-					blockBuffer.stopThread();
-
-					if (true) break;
-					
+										
 					//INVALID BLOCK THROW EXCEPTION
-					String mess = "Dishonest peer on block null";
-					peer.ban(BAN_BLOCK_TIMES>>4, mess);
-					throw new Exception(mess);
+					errorMess = "Dishonest peer on block null";
+					banTime = BAN_BLOCK_TIMES>>4;
+					break;
 				}
 
 				LOGGER.debug("BLOCK getted "
@@ -362,6 +359,7 @@ public class Synchronizer
 								
 				if(!blockFromPeer.isSignatureValid()) {
 					errorMess = "invalid Sign!";
+					banTime = BAN_BLOCK_TIMES<<1;
 					break;
 				}
 				LOGGER.debug("BLOCK is Signature Valid");
@@ -373,6 +371,7 @@ public class Synchronizer
 				
 				if (!blockFromPeer.isValid(dcSet)) {
 					errorMess = "invalid Transactions";
+					banTime = BAN_BLOCK_TIMES<<1;
 					break;
 				}
 				LOGGER.debug("BLOCK is Valid");
@@ -406,7 +405,7 @@ public class Synchronizer
 			if (errorMess != null) {
 				//INVALID BLOCK THROW EXCEPTION
 				String mess = "Dishonest peer on block " + errorMess;
-				peer.ban(BAN_BLOCK_TIMES>>2, mess);
+				peer.ban(banTime, mess);
 				throw new Exception(mess);
 			}
 
