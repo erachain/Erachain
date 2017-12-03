@@ -1604,12 +1604,13 @@ if ( asset_1 == null) {
 
 	public Map jsonQueryBlocks(int start)
 	{
-		Block block;
+		Block block = null;
 		if(start > 0)
 		{
 			block = Controller.getInstance().getBlockByHeight(start);
 		}
-		else
+		
+		if (block == null)
 		{
 			block = getLastBlock();	
 			start = block.getHeight(DCSet.getInstance()); 
