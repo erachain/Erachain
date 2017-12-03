@@ -231,7 +231,7 @@ public class BlockMap extends DCMap<byte[], Block>
 	{
 		if(this.processingVar != null)
 		{
-			if (DCSet.getInstance().isStoped()) {
+			if (DCSet.isStoped()) {
 				return;
 			}
 			this.processingVar.set(processing);
@@ -368,16 +368,16 @@ public class BlockMap extends DCMap<byte[], Block>
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_RESET_BLOCK_TYPE, null));
 	}
 	public void notifyProcessChain(Block block) {
-		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_ADD_BLOCK_TYPE");
+		LOGGER.debug("++++++ NOTEFY CHAIN_ADD_BLOCK_TYPE");
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
-		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_ADD_BLOCK_TYPE END");
+		LOGGER.debug("++++++ NOTEFY CHAIN_ADD_BLOCK_TYPE END");
 	}
 	public void notifyOrphanChain(Block block) {
-		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
+		LOGGER.debug("===== NOTEFY CHAIN_REMOVE_BLOCK_TYPE");
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
-		LOGGER.debug("&&&&&&&&&&&&& NOTEFY CHAIN_REMOVE_BLOCK_TYPE END");
+		LOGGER.debug("===== NOTEFY CHAIN_REMOVE_BLOCK_TYPE END");
 	}
 	public void notifyListChain(List<Block> blocks) {
 		this.setChanged();

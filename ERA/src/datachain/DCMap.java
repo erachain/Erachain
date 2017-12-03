@@ -127,7 +127,7 @@ public abstract class DCMap<T, U> extends Observable {
 	public U get(T key)
 	{
 
-		if (DCSet.getInstance().isStoped()) {
+		if (DCSet.isStoped()) {
 			return null;
 		}
 		
@@ -176,7 +176,7 @@ public abstract class DCMap<T, U> extends Observable {
 		return u;
 	}
 
-	public Collection<U> getValues(int from, int count, boolean descending)
+	public Collection<U> getValues(int count, boolean descending)
 	{
 		this.addUses();
 		Iterator<T> u;
@@ -198,7 +198,7 @@ public abstract class DCMap<T, U> extends Observable {
 		return v;
 	}
 
-	public Collection<U> getValues()
+	public Collection<U> getValues1()
 	{
 		this.addUses();
 		Collection<U> u = this.map.values();
@@ -208,7 +208,7 @@ public abstract class DCMap<T, U> extends Observable {
 	
 	public boolean set(T key, U value)
 	{
-		if (DCSet.getInstance().isStoped()) {
+		if (DCSet.isStoped()) {
 			return false;
 		}
 		
@@ -236,7 +236,7 @@ public abstract class DCMap<T, U> extends Observable {
 
 				if (this.parent == null) {
 					//NOTIFY ADD
-					if(this.getObservableData().containsKey(DBMap.NOTIFY_ADD) && !DCSet.getInstance().isStoped())
+					if(this.getObservableData().containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped())
 					{
 						this.setChanged();
 						if ( this.getObservableData().get(DBMap.NOTIFY_ADD).equals( ObserverMessage.ADD_AT_TX_TYPE)
@@ -275,7 +275,7 @@ public abstract class DCMap<T, U> extends Observable {
 	public void delete(T key) 
 	{
 		
-		if (DCSet.getInstance().isStoped()) {
+		if (DCSet.isStoped()) {
 			return;
 		}
 
@@ -342,7 +342,7 @@ public abstract class DCMap<T, U> extends Observable {
 	public boolean contains(T key)
 	{
 		
-		if (DCSet.getInstance().isStoped()) {
+		if (DCSet.isStoped()) {
 			return false;
 		}
 		

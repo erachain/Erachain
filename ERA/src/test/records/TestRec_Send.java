@@ -107,7 +107,9 @@ public class TestRec_Send {
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
+		assertEquals((long)maker.getLastReference(db), gb.getTimestamp(db));
 		r_SendV3.process(db, gb, false);
+		assertEquals((long)maker.getLastReference(db), timestamp);
 		
 		//assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
@@ -137,6 +139,7 @@ public class TestRec_Send {
 
 		//// MESSAGE ONLY
 		r_SendV3.orphan(db, false);
+		assertEquals((long)maker.getLastReference(db), gb.getTimestamp(db));
 		
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
@@ -153,6 +156,7 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
 		r_SendV3.process(db, gb, false);
+		assertEquals((long)maker.getLastReference(db), timestamp);
 		
 		//assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
@@ -183,6 +187,7 @@ public class TestRec_Send {
 
 		//// AMOUNT ONLY
 		r_SendV3.orphan(db, false);
+		assertEquals((long)maker.getLastReference(db), gb.getTimestamp(db));
 		
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
@@ -290,8 +295,8 @@ public class TestRec_Send {
 		r_SendV3.process(db, gb, false);
 		
 		//assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(110).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(0).setScale(8), recipient.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERM_KEY, db));
 		
 		rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
 		dd = r_SendV3.getDataLength(false);

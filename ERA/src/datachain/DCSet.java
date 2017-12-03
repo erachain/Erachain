@@ -32,6 +32,7 @@ public class DCSet implements Observer, IDB {
 	private static final String TX_COUNTER = "tx_counter";
 	private static final String UNC_TX_COUNTER = "unc_tx_counter";
 
+	private static boolean isStoped = false;
 	private static DCSet instance;
 	private DCSet parent;
 	private int uses;
@@ -234,6 +235,10 @@ public class DCSet implements Observer, IDB {
 				.newMemoryDB()
 				//.newMemoryDirectDB()
 				.make();
+		
+		database.createAtomicVar("fullWeight", 0l, null);
+		database.createAtomicVar("lastBlock", new byte[0], null);
+		database.createAtomicVar("processingBlock", false, null);
 		
 		return new DCSet(database, false, false);
 	}
@@ -863,9 +868,9 @@ public class DCSet implements Observer, IDB {
 		}
 	}
 	
-	public boolean isStoped()
+	public static boolean isStoped()
 	{
-		return this.database.isClosed();
+		return isStoped;
 	}
 	
 	public void commit()

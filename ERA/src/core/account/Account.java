@@ -865,11 +865,11 @@ public class Account {
 	}
 	
 	// top balance + orders values
-	public static String getRich(long key) {
+	public static String getRich(DCSet dcSet, long key) {
 		
 		Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
 
-		ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+		ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
 		Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> ballance;
 		Tuple2<String, Long> iteratorKey;
@@ -884,7 +884,7 @@ public class Account {
 		}
 
 		/*
-		Collection<Tuple2<String, Long>> addrs = DCSet.getInstance().getAssetBalanceMap().getKeys();
+		Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
 		
 		for (Tuple2<String, Long> addr : addrs) {
 			if(addr.b == key)
@@ -896,7 +896,7 @@ public class Account {
 		*/
 
 		// add ORDER values
-		Collection<Order> orders = DCSet.getInstance().getOrderMap().getValues();
+		Collection<Order> orders = dcSet.getOrderMap().getValues(100, true);
 
 		for (Order order : orders) {
 			if(order.getHave() == key)
