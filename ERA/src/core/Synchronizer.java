@@ -45,7 +45,6 @@ public class Synchronizer
 	//private Block runedBlock;
 	private Peer fromPeer;
 	
-	
 	public Synchronizer()
 	{
 		//this.run = true;
@@ -295,7 +294,10 @@ public class Synchronizer
 			}
 			
 			// CONNON BLOCK is my LAST BLOCK in CHAIN
-			signatures.remove(0);
+			//TODO SSS
+			if (dcSet.getBlockMap().contains(signatures.get(0))) {
+				signatures.remove(0);
+			}
 			
 			//CREATE BLOCK BUFFER
 			LOGGER.debug("START BUFFER"
@@ -346,6 +348,7 @@ public class Synchronizer
 				}
 				
 				blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
+				LOGGER.debug("BLOCK Calc Generating Balance");
 
 				if (cnt.isOnStopping()) {
 					//STOP BLOCKBUFFER
@@ -357,6 +360,7 @@ public class Synchronizer
 					errorMess = "invalid Sign!";
 					break;
 				}
+				LOGGER.debug("BLOCK is Signature Valid");
 				
 				if (blockFromPeer.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
 					errorMess = "invalid Timestamp from FUTURE";
@@ -367,6 +371,7 @@ public class Synchronizer
 					errorMess = "invalid Transactions";
 					break;
 				}
+				LOGGER.debug("BLOCK is Valid");
 
 				try {
 					//PROCESS BLOCK
@@ -692,7 +697,7 @@ public class Synchronizer
 			throw new Exception(mess);
 		}
 		
-		block.makeTransactionsHash();
+		///////block.makeTransactionsHash();
 		//ADD TO LIST
 		return block;
 	}
