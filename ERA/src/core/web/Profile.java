@@ -80,7 +80,7 @@ public class Profile {
 		}
 
 		List<Name> results = new ArrayList<>();
-		Collection<Name> values = DCSet.getInstance().getNameMap().getValues();
+		Collection<Name> values = DCSet.getInstance().getNameMap().getValues(100, true);
 
 		for (Name name : values) {
 			Profile profileOpt = Profile.getProfileOpt(name);

@@ -2242,11 +2242,11 @@ public class Controller extends Observable {
 	}
 
 	public Collection<Poll> getAllPolls() {
-		return this.dcSet.getPollMap().getValues();
+		return this.dcSet.getPollMap().getValues(100, true);
 	}
 
 	public Collection<ItemCls> getAllItems(int type) {
-		return getItemMap(type).getValues();
+		return getItemMap(type).getValues(100, false);
 	}
 
 	/*
@@ -2525,7 +2525,7 @@ public class Controller extends Observable {
 		if (false ) {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.WALLET_LIST_TRANSACTION_TYPE, this.dcSet.getTransactionMap().getValues()));
+				ObserverMessage.WALLET_LIST_TRANSACTION_TYPE, this.dcSet.getTransactionMap().getValues(10, true)));
 
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(

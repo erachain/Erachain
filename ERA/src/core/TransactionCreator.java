@@ -143,7 +143,7 @@ public class TransactionCreator
 					this.fork.getTransactionMap().delete(transactionAccount);
 				}
 			}
-		}	
+		}
 	}
 		
 	public long getReference(PublicKeyAccount creator)
@@ -369,7 +369,7 @@ public class TransactionCreator
 
 			// IF has not DUPLICATE in UNCONFIRMED RECORDS
 			TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-			for (Transaction record: unconfirmedMap.getValues()) {
+			for (Transaction record: unconfirmedMap.getValues(100, true)) {
 				if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
 					if (record instanceof IssuePersonRecord) {
 						IssuePersonRecord issuePerson = (IssuePersonRecord) record;
@@ -424,7 +424,7 @@ public class TransactionCreator
 							
 		// IF has not DUPLICATE in UNCONFIRMED RECORDS
 		TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-		for (Transaction record: unconfirmedMap.getValues()) {
+		for (Transaction record: unconfirmedMap.getValues(100, true)) {
 			if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
 				if (record instanceof IssuePersonRecord) {
 					IssuePersonRecord issuePerson = (IssuePersonRecord) record;
