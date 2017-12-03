@@ -23,6 +23,7 @@ import at.AT_Controller;
 
 import controller.Controller;
 import core.BlockGenerator.ForgingStatus;
+import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
@@ -42,8 +43,8 @@ public class BlockGenerator extends Thread implements Observer
 	public static final boolean TEST_001 = true;
 	static Logger LOGGER = Logger.getLogger(BlockGenerator.class.getName());
 	
-	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?20000:1000;
-	private static final int MAX_BLOCK_SIZE_BYTE = 
+	private static final int MAX_BLOCK_SIZE = BlockChain.HARD_WORK?22221:1000;
+	public static final int MAX_BLOCK_SIZE_BYTE = 
 			BlockChain.HARD_WORK?BlockChain.MAX_BLOCK_BYTES:BlockChain.MAX_BLOCK_BYTES>>2;
 
 	static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
@@ -227,8 +228,11 @@ public class BlockGenerator extends Thread implements Observer
 		byte[] unconfirmedTransactionsHash;
 		long max_winned_value;
 		long winned_value;				
+		long winned_value_account;
+		long max_winned_value_account;
 		int height = bchain.getHeight(dcSet) + 1;
 		long target = bchain.getTarget(dcSet);
+		Block generatedBlock;
 
 		int wait_new_block_broadcast;
 		long wait_steep;
@@ -274,6 +278,8 @@ public class BlockGenerator extends Thread implements Observer
 				if (timePoint != timeTmp) {
 					timePoint = timeTmp;
 					Timestamp timestampPoit = new Timestamp(timePoint);
+					dcSet.getTransactionMap().clear(timePoint - BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+					
 					LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
 
 					flushPoint = FLUSH_TIMEPOINT + timePoint;
@@ -353,6 +359,7 @@ public class BlockGenerator extends Thread implements Observer
 						
 						unconfirmedTransactionsHash = null;
 						max_winned_value = 0;
+						max_winned_value_account = 0;
 						height = bchain.getHeight(dcSet) + 1;
 						target = bchain.getTarget(dcSet);
 		
@@ -365,7 +372,8 @@ public class BlockGenerator extends Thread implements Observer
 							
 							for(PrivateKeyAccount account: knownAccounts)
 							{
-								
+							
+								winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
 								winned_value = account.calcWinValue(dcSet, bchain, this.lastBlocksForTarget, height, target);
 								if(winned_value < 1l)
 									continue;
@@ -374,6 +382,7 @@ public class BlockGenerator extends Thread implements Observer
 									//this.winners.put(account, winned_value);
 									acc_winner = account;
 									max_winned_value = winned_value;
+									max_winned_value_account = winned_value_account;
 									
 								}
 							}
@@ -430,7 +439,7 @@ public class BlockGenerator extends Thread implements Observer
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
 														
-									Block generatedBlock = generateNextBlock(dcSet, acc_winner, 
+									generatedBlock = generateNextBlock(dcSet, acc_winner, 
 											solvingBlock, getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
 									solvingBlock = null;
 									
@@ -616,7 +625,6 @@ public class BlockGenerator extends Thread implements Observer
 		newBlock.setCalcGeneratingBalance(dcSet);
 		newBlock.sign(account);
 		
-		
 		return newBlock;
 
 	}
@@ -634,7 +642,7 @@ public class BlockGenerator extends Thread implements Observer
 		if ( version > 1 )
 		{
 			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
-					parentBlock.getHeight(dcSet)) , parentBlock.getHeight(dcSet) + 1 );
+					parentBlock.getHeight(dcSet)), parentBlock.getHeight(dcSet) + 1 );
 			atBytes = atBlock.getBytesForBlock();
 		} else {
 			atBytes = new byte[0];
@@ -779,7 +787,7 @@ public class BlockGenerator extends Thread implements Observer
 		waitWin = null;
 		newBlockDb = null;
 
-		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"milsec for trans: " + transactionsList.size() );
+		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"ms for trans: " + transactionsList.size() );
 		start = System.currentTimeMillis();
 
 		// sort by TIMESTAMP

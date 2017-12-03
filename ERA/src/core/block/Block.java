@@ -82,6 +82,7 @@ public class Block {
 	Block parentBlock;
 	//protected long timestamp;
 	protected int generatingBalance; // only for DB MAP
+	protected long winValue; // only for DB MAP
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
 
@@ -697,7 +698,7 @@ public class Block {
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.getTimestamp(DCSet.getInstance()));
 		block.put("generatingBalance", this.generatingBalance);
-		//block.put("winValue", this.calcWinValue(DBSet.getInstance()));
+		block.put("winValue", this.calcWinValue(DCSet.getInstance()));
 		block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
 		block.put("fee", this.getTotalFee().toPlainString());
@@ -967,16 +968,22 @@ public class Block {
 	
 	public long calcWinValue(DCSet dcSet)
 	{
+		
+		if (this.winValue != 0)
+			return this.winValue;
+		
 		if (this.version == 0) {
 			// GENESIS
-			return BlockChain.GENESIS_WIN_VALUE;
+			this.winValue = BlockChain.GENESIS_WIN_VALUE; 
+			return this.winValue;
 		}
 
 		int height = this.getHeightByParent(dcSet);
 		
 		if (this.creator == null) {
 			LOGGER.error("block.creator == null in BLOCK:" + height);
-			return BlockChain.BASE_TARGET;
+			this.winValue = BlockChain.BASE_TARGET; 
+			return this.winValue;
 		}
 		
 		if (this.generatingBalance <= 0) {
@@ -984,9 +991,13 @@ public class Block {
 		}
 		
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, this.creator, height);
-		if (previousForgingHeight == -1)
-			return 0l;
-		return calcWinValue(previousForgingHeight, height, this.generatingBalance);
+		if (previousForgingHeight == -1) {
+			this.winValue = 1l;
+			return this.winValue;
+		}
+		
+		this.winValue = calcWinValue(previousForgingHeight, height, this.generatingBalance);
+		return this.winValue;
 	}
 
 

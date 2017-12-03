@@ -124,22 +124,23 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	
 	public List<Transaction> getSubSet(long timestamp) {
 		
-		//return this.getValues(100, true);
-		
 		List<Transaction> values = new ArrayList<Transaction>();
 		Iterator<byte[]> iterator = this.getIterator(0, false);
 		Transaction transaction;
 		int count = 0;
+		int bytesTotal = 0;
 		while (iterator.hasNext()) {
 			byte[] key = iterator.next();
 			transaction = this.map.get(key);
-			if (transaction.getDeadline() < timestamp)
-				this.map.remove(key);
-			
-			if (transaction.getTimestamp() > timestamp)
+			if (transaction.getDeadline() < timestamp || transaction.getTimestamp() > timestamp)
 				continue;
 			
-			if(count++ > 22222)
+			bytesTotal += transaction.getDataLength(false);
+			if (bytesTotal > core.BlockGenerator.MAX_BLOCK_SIZE_BYTE + (core.BlockGenerator.MAX_BLOCK_SIZE_BYTE>>3)) {
+				break;
+			}
+			
+			if(count++ > 25222)
 				break;
 			
 			values.add(transaction);
@@ -148,7 +149,22 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		
 		return values;
 	}
-	
+
+	public void clear(long timestamp) {
+		
+		Iterator<byte[]> iterator = this.getIterator(0, false);
+		Transaction transaction;
+		while (iterator.hasNext()) {
+			byte[] key = iterator.next();
+			transaction = this.map.get(key);
+			if (transaction.getDeadline() < timestamp) {
+				this.delete(key);
+			}
+						
+		}
+		
+	}
+
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
