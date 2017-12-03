@@ -155,6 +155,7 @@ public class Synchronizer
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
 		if (core.BlockGenerator.TEST_001) {
 			///checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks, peer);
+			checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);
 		} else {
 			checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);
 		}
