@@ -38,6 +38,7 @@ public class Synchronizer
 
 	public static final int GET_BLOCK_TIMEOUT = 60000;
 	private static final int BYTES_MAX_GET = 1024<<12;
+	private static int MAX_ORPHAN_TRANSACTIONS = 100000;
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
 	private static final byte[] PEER_TEST = new byte[]{(byte)185, (byte)195, (byte)26, (byte)245}; // 185.195.26.245
 	
@@ -81,12 +82,14 @@ public class Synchronizer
 					+ "\n for lastCommonBlock = " + lastCommonBlock.getHeight(fork));
 
 			byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+			int countTransactionToOrphan = 0;
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature))
 			{
 				LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
 				if (cnt.getBlockChain().getCheckPoint(fork) > lastBlock.getHeightByParent(fork)
-						|| lastBlock.getVersion() == 0) {
+						|| lastBlock.getVersion() == 0
+						|| countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
 					//cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
 					//		+ lastCommonBlock.getHeight(fork) + "]"); // icreator
 
@@ -100,6 +103,7 @@ public class Synchronizer
 					throw new Exception("on stoping");
 
 				//runedBlock = lastBlock; // FOR quick STOPPING
+				countTransactionToOrphan += lastBlock.getTransactionCount();
 				lastBlock.orphan(fork);
 				
 				LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");

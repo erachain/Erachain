@@ -95,9 +95,9 @@ public class BlockBuffer extends Thread
 				
 				Block block = response.getBlock();
 				//CHECK BLOCK SIGNATURE
-				if(block == null || !block.isSignatureValid())
+				if(block == null)
 				{
-					LOGGER.debug("ERROR block BUFFER block == null or not Signed");
+					LOGGER.debug("ERROR block BUFFER block");
 					error = true;
 					return;
 				}
@@ -115,6 +115,9 @@ public class BlockBuffer extends Thread
 
 		Block block;
 		if(this.blocks.containsKey(signature)) {
+			if (this.error) {
+				throw new Exception("Block buffer error 0");
+			}
 				
 		} else {
 			
