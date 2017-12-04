@@ -70,7 +70,7 @@ public class BlockMap extends DCMap<byte[], Block>
 		}
 
 		//LAST BLOCK
-		if (this.lastBlockVar == null) {
+		if (database.getCatalog().get(("lastBlock" + ".type")) == null) {
 			database.createAtomicVar("lastBlock", new byte[0], null);
 		}
 		this.lastBlockVar = database.getAtomicVar("lastBlock");
