@@ -14,6 +14,7 @@ import ntp.NTP;
 import utils.NumberAsString;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
@@ -228,9 +229,12 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 		
 		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
-		{
-			return INVALID_ADDRESS;
+		if (!"1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3".equals(this.recipient.getAddress())) {
+			Tuple2<Account, String> result = Account.tryMakeAccount(this.recipient.getAddress());
+			if(result.a == null)
+			{
+				return INVALID_ADDRESS;
+			}
 		}
 						
 		//CHECK IF AMOUNT IS DIVISIBLE
