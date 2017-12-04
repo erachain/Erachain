@@ -231,12 +231,12 @@ public class BlockTests
 		assertEquals((long)recipient2.getLastReference(db), 0);
 		
 		//CHECK BALANCE RECIPIENT 1
-		assertEquals(1, recipient1.getBalanceUSE(ERM_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
-		assertEquals(0, recipient1.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0.0001).setScale(8)));
+		assertEquals(0, recipient1.getBalanceUSE(ERM_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
+		assertEquals(0, recipient1.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0.0).setScale(8)));
 				
 		//CHECK BALANCE RECIPIENT2
-		assertEquals(1, recipient2.getBalanceUSE(ERM_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
-		assertEquals(0, recipient2.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0.0001).setScale(8)));
+		assertEquals(0, recipient2.getBalanceUSE(ERM_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
+		assertEquals(0, recipient2.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0.0).setScale(8)));
 
 		int height = genesisBlock.getHeight(db) + 1;
 		Integer forgingData = recipient1.getForgingData(db, height);
@@ -253,8 +253,8 @@ public class BlockTests
 			e.printStackTrace();
 		}
 				
-		assertEquals(true, recipient1.getLastReference(db) == null);
-		assertEquals(true, recipient2.getLastReference(db) == null);
+		assertEquals(true, recipient1.getLastReference(db) == 0l);
+		assertEquals(true, recipient2.getLastReference(db) == 0l);
 		
 		//CHECK BALANCE RECIPIENT 1
 		assertEquals(recipient1.getBalanceUSE(ERM_KEY, db), BigDecimal.valueOf(0).setScale(8));		
@@ -308,6 +308,8 @@ public class BlockTests
 		
 		//INVALID GENERATOR SIGNATURE
 		newBlock = BlockFactory.getInstance().create(newBlock.getVersion(), newBlock.getReference(), generator, new byte[Crypto.HASH_LENGTH], new byte[0]);
+		newBlock.sign(generator);
+		newBlock.setTransactions(transactions);
 		
 		///CHECK IF SIGNATURE INVALID
 		assertEquals(false, newBlock.isSignatureValid());
@@ -493,39 +495,40 @@ public class BlockTests
 		//CONVERT TO BYTES
 		byte[] rawBlock = block.toBytes(true, forDB);
 				
+		Block parsedBlock = null;
 		try 
 		{	
 			//PARSE FROM BYTES
-			Block parsedBlock = BlockFactory.getInstance().parse(rawBlock, forDB);
-					
-			//CHECK INSTANCE
-			assertEquals(false, parsedBlock instanceof GenesisBlock);
-					
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(block.getSignature(), parsedBlock.getSignature()));
-					
-			//CHECK GENERATOR
-			assertEquals(block.getCreator().getAddress(), parsedBlock.getCreator().getAddress());	
-					
-			//CHECK BASE TARGET
-			assertEquals(block.getGeneratingBalance(db), parsedBlock.getGeneratingBalance(db));	
-			
-			//CHECK FEE
-			assertEquals(block.getTotalFee(), parsedBlock.getTotalFee());	
-					
-			//CHECK REFERENCE
-			assertEquals(true, Arrays.equals(block.getReference(), parsedBlock.getReference()));	
-					
-			//CHECK TIMESTAMP
-			assertEquals(block.getTimestamp(db), parsedBlock.getTimestamp(db));		
-			
-			//CHECK TRANSACTIONS COUNT
-			assertEquals(block.getTransactionCount(), parsedBlock.getTransactionCount());		
+			parsedBlock = BlockFactory.getInstance().parse(rawBlock, forDB);
 		}
 		catch (Exception e) 
 		{
 			fail("Exception while parsing transaction.");
 		}
+
+		//CHECK INSTANCE
+		assertEquals(false, parsedBlock instanceof GenesisBlock);
+				
+		//CHECK SIGNATURE
+		assertEquals(true, Arrays.equals(block.getSignature(), parsedBlock.getSignature()));
+				
+		//CHECK GENERATOR
+		assertEquals(block.getCreator().getAddress(), parsedBlock.getCreator().getAddress());	
+				
+		//CHECK BASE TARGET
+		assertEquals(block.getGeneratingBalance(db), parsedBlock.getGeneratingBalance(db));	
+		
+		//CHECK FEE
+		assertEquals(block.getTotalFee(db), parsedBlock.getTotalFee(db));	
+				
+		//CHECK REFERENCE
+		assertEquals(true, Arrays.equals(block.getReference(), parsedBlock.getReference()));	
+				
+		//CHECK TIMESTAMP
+		assertEquals(block.getTimestamp(db), parsedBlock.getTimestamp(db));		
+		
+		//CHECK TRANSACTIONS COUNT
+		assertEquals(block.getTransactionCount(), parsedBlock.getTransactionCount());		
 				
 		//PARSE TRANSACTION FROM WRONG BYTES
 		rawBlock = new byte[50];

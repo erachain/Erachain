@@ -49,11 +49,10 @@ public class BlockFactory {
 	{		
 		return new Block(version, reference, generator, unconfirmedTransactionsHash, atBytes);
 	}
-
+	
 	// not signed and not getGeneratingBalance
 	public Block create(int version, byte[] reference, PublicKeyAccount generator, List<Transaction> trans, byte[] atBytes) 
 	{		
 		return new Block(version, reference, generator, trans, atBytes);
 	}
-
 }
