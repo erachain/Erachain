@@ -226,7 +226,7 @@ public class DCSet implements Observer, IDB {
 			instance.database.getAtomicLong(TX_COUNTER).set(0);
 			instance.database.getAtomicLong(UNC_TX_COUNTER).set(0);
 		}
-		
+
 	}	
 	
 	public static DCSet createEmptyDatabaseSet()
@@ -235,11 +235,7 @@ public class DCSet implements Observer, IDB {
 				.newMemoryDB()
 				//.newMemoryDirectDB()
 				.make();
-		
-		database.createAtomicVar("fullWeight", 0l, null);
-		database.createAtomicVar("lastBlock", new byte[0], null);
-		database.createAtomicVar("processingBlock", false, null);
-		
+				
 		return new DCSet(database, false, false);
 	}
 
@@ -276,7 +272,13 @@ public class DCSet implements Observer, IDB {
 		try {
 			this.database = database;
 			this.actions = 0l;
-			
+
+			this.blockMap = new BlockMap(this, database);
+			this.childMap = new ChildMap(this, database);
+			this.blockSignsMap = new BlockSignsMap(this, database);
+			this.blockHeightsMap = new BlockHeightsMap(this, database);
+			this.referenceMap = new ReferenceMap(this, database);
+
 			this.addressForging = new AddressForging(this, database);
 			this.credit_AddressesMap = new Credit_AddressesMap(this, database);
 			this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
@@ -298,12 +300,8 @@ public class DCSet implements Observer, IDB {
 			this.hashesMap = new HashesMap(this, database);
 			this.hashesSignsMap = new HashesSignsMap(this, database);
 			
+
 			this.addressTime_SignatureMap = new AddressTime_SignatureMap(this, database);
-			this.blockMap = new BlockMap(this, database);
-			this.childMap = new ChildMap(this, database);
-			this.blockSignsMap = new BlockSignsMap(this, database);
-			this.blockHeightsMap = new BlockHeightsMap(this, database);
-			this.referenceMap = new ReferenceMap(this, database);
 			this.nameMap = new NameMap(this, database);
 			this.nameStorageMap = new NameStorageMap(this, database);
 			this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -320,7 +318,6 @@ public class DCSet implements Observer, IDB {
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
 			this.pollMap = new PollMap(this, database);
 			this.voteOnPollMap = new VoteOnPollMap(this, database);
-			this.itemAssetMap = new ItemAssetMap(this, database);
 			this.issueAssetMap = new IssueAssetMap(this, database);
 			this.orderMap = new OrderMap(this, database);
 			this.completedOrderMap = new CompletedOrderMap(this, database);
@@ -332,6 +329,7 @@ public class DCSet implements Observer, IDB {
 			this.issueStatementMap = new IssueStatementMap(this, database);
 			this.itemPersonMap = new ItemPersonMap(this, database);
 			this.issuePersonMap = new IssuePersonMap(this, database);
+			this.itemAssetMap = new ItemAssetMap(this, database);
 			this.itemStatusMap = new ItemStatusMap(this, database);
 			this.issueStatusMap = new IssueStatusMap(this, database);
 			this.itemUnionMap = new ItemUnionMap(this, database);

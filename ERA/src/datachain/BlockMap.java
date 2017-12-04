@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import org.mapdb.Atomic;
 import org.mapdb.Atomic.Var;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -46,7 +47,7 @@ public class BlockMap extends DCMap<byte[], Block>
 	private Var<Long> feePoolVar;
 	private long feePool; // POOL for OVER_FREE FEE
 	
-	private Var<Boolean> processingVar;
+	private Atomic.Boolean processingVar;
 	private Boolean processing;
 //	NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
 //	BTreeMap<byte[], byte[]> childIndex;
@@ -69,6 +70,9 @@ public class BlockMap extends DCMap<byte[], Block>
 		}
 
 		//LAST BLOCK
+		if (this.lastBlockVar == null) {
+			database.createAtomicVar("lastBlock", new byte[0], null);
+		}
 		this.lastBlockVar = database.getAtomicVar("lastBlock");
 		this.lastBlockSignature = this.lastBlockVar.get();
 
@@ -77,7 +81,7 @@ public class BlockMap extends DCMap<byte[], Block>
 		//this.feePool = this.feePoolVar.get();
 
 		//PROCESSING
-		this.processingVar = database.getAtomicVar("processingBlock");
+		this.processingVar = database.getAtomicBoolean("processingBlock");
 		this.processing = this.processingVar.get();
 	}
 
@@ -138,14 +142,6 @@ public class BlockMap extends DCMap<byte[], Block>
 		
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-
 	@Override
 	protected Map<byte[], Block> getMap(DB database) 
 	{

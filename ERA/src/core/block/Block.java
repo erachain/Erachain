@@ -944,8 +944,12 @@ public class Block {
 	public static long calcWinValue(int previousForgingHeight, int height, int generatingBalance)
 	{
 		
-		long win_value = (long)generatingBalance * (height - previousForgingHeight);
-
+		long win_value;
+		int diff = height - previousForgingHeight;
+		if (diff > 1)
+			win_value = (long)generatingBalance * diff;
+		else 
+			win_value = (long)generatingBalance;
 		
 		if (height < BlockChain.REPEAT_WIN)
 			win_value >>= 4;

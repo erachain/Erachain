@@ -659,13 +659,17 @@ public abstract class Transaction {
 	}
 
 	// get current or last
-	public int getBlockHeightByParentOrLast(DCSet db)
+	public int getBlockHeightByParentOrLast(DCSet dc)
 	{
 
 		if (block != null)
-			return block.getHeightByParent(db);
+			return block.getHeightByParent(dc);
 		
-		return Controller.getInstance().getMyHeight() + 1;
+		Tuple2<Integer, Long> hWeight = dc.getBlockSignsMap().get(dc.getBlockMap().getLastBlockSignature());
+		if (hWeight == null || hWeight.a == -1)
+			return -1;
+
+		return hWeight.a + 1;
 	}
 
 	public int getSeqNo(DCSet db)
