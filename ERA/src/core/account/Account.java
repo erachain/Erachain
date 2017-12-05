@@ -1,6 +1,7 @@
 package core.account;
 //04/01 +- 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -52,6 +53,7 @@ import datachain.DCSet;
 import datachain.ItemAssetBalanceMap;
 import datachain.Item_Map;
 import datachain.NameMap;
+import datachain.OrderMap;
 import datachain.ReferenceMap;
 import ntp.NTP;
 import settings.Settings;
@@ -864,17 +866,12 @@ public class Account {
 		
 	}
 	
-	// top balance + orders values
-	public static String getRich(DCSet dcSet, long key) {
-		
-		Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
-
+	public static Map<String, BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
 		ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
 		Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> ballance;
 		Tuple2<String, Long> iteratorKey;
-		int i = 0;
-		while (iterator.hasNext() && i++ < 1000) {
+		while (iterator.hasNext()) {
 			iteratorKey = iterator.next();
 			if(iteratorKey.b == key)
 			{
@@ -882,30 +879,49 @@ public class Account {
 				values.put(iteratorKey.a, ballance.a);
 			}
 		}
-
-		/*
-		Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
 		
-		for (Tuple2<String, Long> addr : addrs) {
-			if(addr.b == key)
-			{
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DCSet.getInstance().getAssetBalanceMap().get(addr);
-				values.put(addr.a, ball.a);
-			}
+		DCSet dcParent = dcSet.getParent();
+		if (dcParent != null) {
+			values = getKeyBalancesWithForks(dcParent, key, values);
 		}
-		*/
 
-		// add ORDER values
-		Collection<Order> orders = dcSet.getOrderMap().getValuesAll();
+		return values;
 
-		for (Order order : orders) {
+	}
+
+	public static Map<String, BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
+
+		OrderMap map = dcSet.getOrderMap();
+		Iterator<BigInteger> iterator = map.getIterator(0, true);
+		Order order;
+		while (iterator.hasNext()) {
+			order =  map.get(iterator.next());
 			if(order.getHave() == key)
 			{
 				String address = order.getCreator().address;
 				values.put(address, values.get(address).add(order.getAmountHave()));
 			}
 		}
+		
+		DCSet dcParent = dcSet.getParent();
+		if (dcParent != null) {
+			values = getKeyOrdersWithForks(dcParent, key, values);
+		}
 
+		return values;
+
+	}
+
+	// top balance + orders values
+	public static String getRichWithForks(DCSet dcSet, long key) {
+		
+		Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
+
+		values = getKeyBalancesWithForks(dcSet, key, values);
+
+		// add ORDER values
+		values = getKeyOrdersWithForks(dcSet, key, values);
+		
 		// search richest address
 		String rich = null;
 		BigDecimal maxValue = BigDecimal.ZERO;

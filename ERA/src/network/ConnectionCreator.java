@@ -215,9 +215,9 @@ public class ConnectionCreator extends Thread {
 				
 				//SLEEP
 				int counter = callback.getActivePeersCounter(false); 
-				if ( counter < 3)
+				if ( counter < 6)
 					continue;
-				else if (counter < 3)
+				else if (counter < 10)
 					Thread.sleep(10000);
 				else
 					Thread.sleep(20000);

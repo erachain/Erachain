@@ -1390,7 +1390,7 @@ public class Block {
 		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
 			// find rich account
-			String rich = Account.getRich(dcSet, Transaction.FEE_KEY);
+			String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 			if (!rich.equals(this.creator.getAddress())) {
 			
 				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
@@ -1463,7 +1463,7 @@ public class Block {
 		if (blockFee.compareTo(blockTotalFee) < 0) {
 			
 			// find rich account
-			String rich = Account.getRich(dcSet, Transaction.FEE_KEY);
+			String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
 			if (!rich.equals(this.creator.getAddress())) {
 				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);

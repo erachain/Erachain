@@ -1317,7 +1317,7 @@ public class Wallet extends Observable implements Observer
 			if (blockFee.compareTo(blockTotalFee) < 0) {
 				
 				// find rich account
-				String rich = Account.getRich(DCSet.getInstance(), Transaction.FEE_KEY);
+				String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
 				if (!rich.equals(blockGeneratorStr)) {
 
 					blockFee = blockTotalFee;
@@ -1536,7 +1536,7 @@ public class Wallet extends Observable implements Observer
 			if (blockFee.compareTo(blockTotalFee) < 0) {
 				
 				// find rich account
-				String rich = Account.getRich(DCSet.getInstance(), Transaction.FEE_KEY);
+				String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
 				if (!rich.equals(blockGeneratorStr)) {
 
 					blockFee = blockTotalFee;
