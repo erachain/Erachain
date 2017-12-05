@@ -1,86 +1,44 @@
 package gui.items.statement;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.concurrent.BlockingQueue;
-
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
-import org.json.simple.JSONArray;
+import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
-import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
-import core.block.Block;
-import core.block.GenesisBlock;
-import core.item.assets.AssetCls;
-import core.transaction.R_SertifyPubKeys;
-import core.transaction.R_SignNote;
-//import core.transaction.R_SignStatement_old;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
-import datachain.DCMap;
 import datachain.DCSet;
-import datachain.SortableList;
-import datachain.TransactionFinalMap;
-import datachain.TransactionMap;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
-import utils.Pair;
 
 public class Statements_Vouch_Table_Model extends AbstractTableModel implements Observer {
 
 	/**
 	 * 
 	 */
+	static Logger LOGGER = Logger.getLogger(Statements_Vouch_Table_Model.class.getName());
 	private static final long serialVersionUID = 1L;
-
 	public static final int COLUMN_TIMESTAMP = 0;
-	// public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_CREATOR = 1;
-	// public static final int COLUMN_BODY = 2;
-	// public static final int COLUMN_AMOUNT = 2;
-	 public static final int COLUMN_HEIGHT = 2;
-	 public static final int COLUMN_CREATOR_NAME =30;
+	public static final int COLUMN_HEIGHT = 2;
+	public static final int COLUMN_CREATOR_NAME =30;
 	List<R_Vouch> transactions;
-
-	// private SortableList<byte[], Transaction> transactions;
-
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Height" });// ,
-																											// AssetCls.FEE_NAME});
-	private Boolean[] column_AutuHeight = new Boolean[] { true, true };
-	// private Map<byte[], BlockingQueue<Block>> blocks;
-	// private Transaction transaction;
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Timestamp", "Creator", "Height" });
 	private int blockNo;
 	private int recNo;
 
-	TransactionFinalMap table;
-
-	private ObserverMessage message;
-
-	private String sss;
-
 	public Statements_Vouch_Table_Model(Transaction transaction) {
-		table = DCSet.getInstance().getTransactionFinalMap();
 		blockNo = transaction.getBlockHeight(DCSet.getInstance());
 		recNo = transaction.getSeqNo(DCSet.getInstance());
 		transactions = new ArrayList<R_Vouch>();
-		// transactions = read_Sign_Accoutns();
 		addObservers();
 		
 
@@ -89,17 +47,6 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	public Class<? extends Object> getColumnClass(int c) { // set column type
 		Object o = getValueAt(0, c);
 		return o==null?Null.class:o.getClass();
-	}
-
-	// читаем колонки которые изменяем высоту
-	public Boolean[] get_Column_AutoHeight() {
-
-		return this.column_AutuHeight;
-	}
-
-	// устанавливаем колонки которым изменить высоту
-	public void set_get_Column_AutoHeight(Boolean[] arg0) {
-		this.column_AutuHeight = arg0;
 	}
 
 	@Override
@@ -118,7 +65,6 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 		return transaction.getCreator();
 		
 	}
-	
 
 	@Override
 	public int getRowCount() {
@@ -165,41 +111,11 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			if (transaction == null)
 				return null;
 
-			// R_Vouch i;
 			switch (column) {
 			case COLUMN_TIMESTAMP:
 
-				// return
-				// DateTimeFormat.timestamptoString(transaction.getTimestamp())
-				// + " " + transaction.getTimestamp();
-				return DateTimeFormat.timestamptoString(transaction.getTimestamp());//.viewTimestamp(); // + " " +
-													// transaction.getTimestamp()
-													// / 1000;
-
-			/*
-			 * case COLUMN_TYPE:
-			 * 
-			 * //return Lang.transactionTypes[transaction.getType()]; return
-			 * Lang.getInstance().translate(transaction.viewTypeName());
-			 */
-
-			// case COLUMN_BODY:
-
-			// i = (R_Vouch)transaction;
-
-			// return new String( i.getData(), Charset.forName("UTF-8") )
-			// ;//transaction.viewReference();//.viewProperies();
-
-			// case COLUMN_AMOUNT:
-
-			// return
-			// NumberAsString.getInstance().numberAsString(transaction.getAmount(transaction.getCreator()));
-
-			// case COLUMN_FEE:
-
-			// return
-			// NumberAsString.getInstance().numberAsString(transaction.getFee());
-
+				return DateTimeFormat.timestamptoString(transaction.getTimestamp());
+							
 			case COLUMN_CREATOR:
 
 				return transaction.getCreator().getPersonAsString();
@@ -215,186 +131,56 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 			return null;
 
 		} catch (Exception e) {
-			// LOGGER.error(e.getMessage(),e);
+			 LOGGER.error(e.getMessage(),e);
 			return null;
 		}
 	}
 
 	@Override
 	public void update(Observable o, Object arg) {
-		// try
-		// {
+		 try
+		 {
 		this.syncUpdate(o, arg);
-		// }
-		// catch(Exception e)
-		// {
+		 }
+		 catch(Exception e)
+		 {
 		// GUI ERROR
-		// }
+			 LOGGER.error(e.getMessage(),e);
+		 }
 	}
 
 	public synchronized void syncUpdate(Observable o, Object arg) {
-		message = (ObserverMessage) arg;
-
-		/*
-		if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
-			// CHECK IF NEW LIST
-			if (this.transactions == null || this.transactions.size() == 0) {
-				transactions = read_Sign_Accoutns();
-				this.fireTableDataChanged();
-			//	Tuple2<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>(key,value)));
-				
-			}
-		} 
+		ObserverMessage message = (ObserverMessage) arg;
 		
-		if (message.getType() == ObserverMessage.ADD_VOUCH_TYPE) {
-			// CHECK IF NEW LIST
-			
-				//transactions = read_Sign_Accoutns();
-			Tuple2<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a = (Tuple2<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message.getValue();
-				transactions.addAll(add_Trans(a));
-				this.fireTableDataChanged();
-			
-		} 
-		*/
-		
-		if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.LIST_VOUCH_TYPE || message.getType() == ObserverMessage.ADD_VOUCH_TYPE || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE )
 		{
-			//CHECK IF NEW LIST
-			
-			SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
-			Iterator<Pair<byte[], Transaction>> s = ss.iterator();
-			
-			boolean fire = false;
-			while (s.hasNext()){
-				Pair<byte[], Transaction> a = s.next();
-				Transaction t = a.getB();
-				if (t == null)
-					continue;
+			// read indexes to DB
+			Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> vouches = DCSet.getInstance().getVouchRecordMap().get(new Tuple2<Integer, Integer>(this.blockNo, this.recNo));
+			if (vouches == null) {
+				fireTableDataChanged();
+				return;
 				
-				if (t.getType()== Transaction.VOUCH_TRANSACTION ){
-					R_Vouch tt = (R_Vouch)t;
-					if (tt.getVouchHeight() == blockNo && tt.getVouchSeq() == recNo) {
-						if (!this.transactions.contains(tt)){
-							this.transactions.add(tt);
-							fire = true;
-						}
-					}
-				}
 			}
 			
-			if (fire)
-				this.fireTableDataChanged();
-		}
-		/*
-		
-		if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE
-		// || message.getType() == ObserverMessage.REMOVE_VOUCH_TYPE
-		// || message.getType() == ObserverMessage.LIST_STATEMENT_TYPE
-		// || message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
-				) {
-			Transaction t = (Transaction) message.getValue();
-			if (t.getType()== Transaction.VOUCH_TRANSACTION ){
-			R_Vouch ss = (R_Vouch) t;
-				R_Vouch ss1 = (R_Vouch) ss;
-				if (ss1.getVouchHeight() == blockNo	&& ss1.getVouchSeq() == recNo) {	
-					if (!this.transactions.contains(ss)){
-						this.transactions.add(ss);
-						this.fireTableDataChanged();
-					}
-				}
+			List<Tuple2<Integer, Integer>> ttxs=DCSet.getInstance().getVouchRecordMap().get(new Tuple2<Integer, Integer>(this.blockNo, this.recNo)).b;
+			transactions.clear();
+			for (Tuple2<Integer, Integer> ttx:ttxs){
+			// write R-Vouch transaction 
+				 transactions.add((R_Vouch) DCSet.getInstance().getTransactionFinalMap().getTransaction(ttx.a, ttx.b)); 
+						 
 			}
+			fireTableDataChanged();
 		}
-			*/
-			
 	}
 
-	private List<R_Vouch> read_Sign_Accoutns() {
-		List<R_Vouch> trans = new ArrayList<R_Vouch>();
-		// ArrayList<Transaction> db_transactions;
-		// db_transactions = new ArrayList<Transaction>();
-		// tran = new ArrayList<Transaction>();
-		// база данных
-		// DBSet dcSet = DBSet.getInstance();
-
-		/*
-		 * Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> signs =
-		 * DBSet.getInstance().getVouchRecordMap().get(blockNo, recNo);
-		 * 
-		 * 
-		 * if (signs == null) return null; for(Tuple2<Integer, Integer> seq:
-		 * signs.b) {
-		 * 
-		 * Transaction kk = table.getTransaction(seq.a, seq.b); if
-		 * (!tran.contains(kk)) tran.add(kk); }
-		 */
-
-		@SuppressWarnings("unchecked")
-		SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal,  List<Tuple2<Integer, Integer>>>> rec = (SortableList<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) message
-				.getValue();
-
-		Iterator<Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>> ss = rec
-				.iterator();
-		while (ss.hasNext()) {
-			Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a = (Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>>) ss
-					.next();
-			// block
-			trans.addAll(add_Trans(a));
-
-		}
-		return trans;
-	}
-	
 	public void addObservers(){
-		
-	//	DCSet.getInstance().getTransactionFinalMap().addObserver(this);
-	//	DCSet.getInstance().getTransactionMap().addObserver(this);
 		DCSet.getInstance().getVouchRecordMap().addObserver(this);
-			
-		}
-		
+	}
 		
 	public void removeObservers() 
 	{
-		
-		DCSet.getInstance().getTransactionFinalMap().deleteObserver(this);
-		DCSet.getInstance().getTransactionMap().deleteObserver(this);
-		DCSet.getInstance().getVouchRecordMap().deleteObserver(this);
-	
+	DCSet.getInstance().getVouchRecordMap().deleteObserver(this);
 	}
 	
-	private List<R_Vouch>  add_Trans(Pair<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a){
-		List<R_Vouch> trans = new ArrayList<R_Vouch>();
-		if (a.getA().a == blockNo && a.getA().b == recNo) {
-			List<Tuple2<Integer, Integer>> ff = a.getB().b;
-
-			for (Tuple2<Integer, Integer> ll : ff) {
-				Integer bl = ll.a;
-				Integer seg = ll.b;
-
-				R_Vouch kk = (R_Vouch) table.getTransaction(bl, seg);
-				if (!trans.contains(kk))
-					trans.add(kk);
-			}
-		}
-		
-		return trans;
-	}
-
-	private List<R_Vouch>  add_Trans(Tuple2<Tuple2<Integer, Integer>, Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>> a){
-		List<R_Vouch> trans = new ArrayList<R_Vouch>();
-		if (a.a.a == blockNo && a.a.b == recNo) {
-			List<Tuple2<Integer, Integer>> ff = a.b.b;
-
-			for (Tuple2<Integer, Integer> ll : ff) {
-				Integer bl = ll.a;
-				Integer seg = ll.b;
-
-				R_Vouch kk = (R_Vouch) table.getTransaction(bl, seg);
-				if (!trans.contains(kk))
-					trans.add(kk);
-			}
-		}
-		
-		return trans;
-	}
+	
 }
