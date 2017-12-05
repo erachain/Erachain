@@ -2242,23 +2242,23 @@ public class Controller extends Observable {
 	}
 
 	public Collection<Poll> getAllPolls() {
-		return this.dcSet.getPollMap().getValues(100, true);
+		return this.dcSet.getPollMap().getValuesAll();
 	}
 
 	public Collection<ItemCls> getAllItems(int type) {
-		return getItemMap(type).getValues(100, false);
+		return getItemMap(type).getValuesAll();
 	}
 
 	/*
 	public Collection<ItemCls> getAllAssets() {
-		return this.dcSet.getAssetMap().getValues();
+		return this.dcSet.getAssetMap().getValuesAll();
 	}
 
 	public Collection<ItemCls> getAllNotes() {
-		return this.dcSet.getNoteMap().getValues();
+		return this.dcSet.getNoteMap().getValuesAll();
 	}
 	public Collection<ItemCls> getAllPersons() {
-		return this.dcSet.getPersonMap().getValues();
+		return this.dcSet.getPersonMap().getValuesAll();
 	}
 	*/
 
@@ -2530,7 +2530,7 @@ public class Controller extends Observable {
 		if (false ) {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.WALLET_LIST_TRANSACTION_TYPE, this.dcSet.getTransactionMap().getValues(10, true)));
+				ObserverMessage.WALLET_LIST_TRANSACTION_TYPE, this.dcSet.getTransactionMap().getValuesAll()));
 
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(

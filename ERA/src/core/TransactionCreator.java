@@ -107,7 +107,7 @@ public class TransactionCreator
 		this.lastBlock = Controller.getInstance().getLastBlock();
 			
 		//SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
-		///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValues(100, true);
+		///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
 		TransactionMap transactionMap = this.fork.getTransactionMap();
 		Iterator<byte[]> iterator = transactionMap.getIterator(0, false);
 		Transaction transaction;
@@ -369,7 +369,7 @@ public class TransactionCreator
 
 			// IF has not DUPLICATE in UNCONFIRMED RECORDS
 			TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-			for (Transaction record: unconfirmedMap.getValues(100, true)) {
+			for (Transaction record: unconfirmedMap.getValuesAll()) {
 				if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
 					if (record instanceof IssuePersonRecord) {
 						IssuePersonRecord issuePerson = (IssuePersonRecord) record;
@@ -424,7 +424,7 @@ public class TransactionCreator
 							
 		// IF has not DUPLICATE in UNCONFIRMED RECORDS
 		TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-		for (Transaction record: unconfirmedMap.getValues(100, true)) {
+		for (Transaction record: unconfirmedMap.getValuesAll()) {
 			if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
 				if (record instanceof IssuePersonRecord) {
 					IssuePersonRecord issuePerson = (IssuePersonRecord) record;

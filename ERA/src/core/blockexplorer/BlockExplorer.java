@@ -984,7 +984,7 @@ if ( asset_1 == null) {
 	 asset_g = Long.valueOf(asset_1);
 }
 
-		List<Poll> pools = new ArrayList< Poll > (DCSet.getInstance().getPollMap().getValues(100, true));
+		List<Poll> pools = new ArrayList< Poll > (DCSet.getInstance().getPollMap().getValuesAll());
 
 		if(pools.size() == 0)
 		{
@@ -1590,7 +1590,7 @@ if ( asset_1 == null) {
 		Map output=new LinkedHashMap();
 		Map namesJSON=new LinkedHashMap();
 
-		Collection<Name> names = DCSet.getInstance().getNameMap().getValues(100, true);
+		Collection<Name> names = DCSet.getInstance().getNameMap().getValuesAll();
 
 		for (Name name : names) {
 			namesJSON.put(name.toString(), name.getOwner().getAddress());
@@ -2066,7 +2066,7 @@ if ( asset_1 == null) {
 		LOGGER.info(listJSON);
 		*/
 
-		Collection<Order> orders = DCSet.getInstance().getOrderMap().getValues(100, true);
+		Collection<Order> orders = DCSet.getInstance().getOrderMap().getValuesAll();
 
 		for (Order order : orders) {
 			if(order.getHave() == key)

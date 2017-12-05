@@ -136,7 +136,7 @@ public class DatabaseTests {
 		
 
 		//assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
-		//assertEquals(dcSet.getItemPersonMap().getValues().toString(), "");
+		//assertEquals(dcSet.getItemPersonMap().getValuesAll().toString(), "");
 		//CREATE FORK
 		DCSet fork = dcSet.fork();
 
@@ -199,7 +199,7 @@ public class DatabaseTests {
 		}
 		
 		ItemAssetMap dbMap = dcSet.getItemAssetMap();
-		Collection<ItemCls> assets = dbMap.getValues(1000, true);
+		Collection<ItemCls> assets = dbMap.getValuesAll();
 		for (ItemCls asset:assets) {
 			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
 			AssetCls aa = (AssetCls) asset;
@@ -213,7 +213,7 @@ public class DatabaseTests {
 		dbMap.add(dbMap.get(1l));
 		LOGGER.info("keys " + dbMap.getKeys());
 
-		//Collection<Asset> issues = DBSet.getInstance().getIssueAssetMap.getValues();
+		//Collection<Asset> issues = DBSet.getInstance().getIssueAssetMap.getValuesAll();
 		
 		//long key = db.);
 
@@ -234,7 +234,7 @@ public class DatabaseTests {
 		long key = asset.getKey(dcSet);
 		
 		ItemAssetMap assetDB = dcSet.getItemAssetMap();
-		Collection<ItemCls> assets = assetDB.getValues(1000, true);
+		Collection<ItemCls> assets = assetDB.getValuesAll();
 		for (ItemCls asset_2:assets) {
 			AssetCls aa = (AssetCls) asset_2;
 			LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());

@@ -198,7 +198,7 @@ public abstract class DCMap<T, U> extends Observable {
 		return v;
 	}
 
-	public Collection<U> getValues1()
+	public Collection<U> getValuesAll()
 	{
 		this.addUses();
 		Collection<U> u = this.map.values();
