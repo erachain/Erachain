@@ -68,7 +68,8 @@ public class DWSet implements IDB
 	    this.database = DBMaker.newFileDB(WALLET_FILE)
 	    		.closeOnJvmShutdown()
 	    		//.cacheSize(2048)
-	    		//.checksumEnable()
+	    		.cacheDisable()
+	    		.checksumEnable()
 				.mmapFileEnableIfSupported()
 				/// ICREATOR
 				.commitFileSyncDisable()
