@@ -12,6 +12,7 @@ import ntp.NTP;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import controller.Controller;
 import core.BlockGenerator;
 import core.Synchronizer;
 import core.account.Account;
@@ -67,7 +68,7 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
+			Block newBlock = BlockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -106,7 +107,7 @@ public class SynchronizerTests {
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(fork, generator, lastBlock, transactionsHash);
+			Block newBlock = BlockGenerator.generateNextBlock(fork, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -168,17 +169,27 @@ public class SynchronizerTests {
 	{	
 		
 		//GENERATE 5 BLOCKS FROM ACCOUNT 1
-		DCSet databaseSet = DCSet.createEmptyDatabaseSet();
+		DCSet databaseSet1 = DCSet.createEmptyDatabaseSet();
 		DCSet databaseSet2 = DCSet.createEmptyDatabaseSet();
+		
+		GenesisBlock gb1;
+		GenesisBlock gb2;
 		
 		//PROCESS GENESISBLOCK
 		GenesisBlock genesisBlock = new GenesisBlock();
 		try {
-			genesisBlock.process(databaseSet);
-			genesisBlock.process(databaseSet2);
+			Controller.getInstance().initBlockChain(databaseSet1);
+			gb1 = Controller.getInstance().getBlockChain().getGenesisBlock();
+
+			//Controller.getInstance().initBlockChain(databaseSet2);
+			gb2 = Controller.getInstance().getBlockChain().getGenesisBlock();
+
+			genesisBlock.process(databaseSet1);
+			//genesisBlock.process(databaseSet2);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return;
 		}
 		
 		//CREATE KNOWN ACCOUNT
@@ -190,8 +201,8 @@ public class SynchronizerTests {
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
-		generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		generator.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
+		generator.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		generator.changeBalance(databaseSet1, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 		generator.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		generator.changeBalance(databaseSet2, false, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 
@@ -206,17 +217,17 @@ public class SynchronizerTests {
 		//GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
-		generator2.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
+		generator2.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		generator2.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
 		
 		
 		//GENERATE 5 NEXT BLOCKS
-		Block lastBlock = genesisBlock;
+		Block lastBlock = gb1;
 		BlockGenerator blockGenerator = new BlockGenerator(false);
 		for(int i=0; i<5; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet, generator, lastBlock, transactionsHash);
+			Block newBlock = blockGenerator.generateNextBlock(databaseSet1, generator, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -224,10 +235,11 @@ public class SynchronizerTests {
 			
 			//PROCESS NEW BLOCK
 			try {
-				newBlock.process(databaseSet);
+				newBlock.process(databaseSet1);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				fail(e.getMessage());
 			}
 			
 			//LAST BLOCK IS NEW BLOCK
@@ -235,12 +247,12 @@ public class SynchronizerTests {
 		}
 
 		//GENERATE NEXT 10 BLOCKS
-		lastBlock = genesisBlock;
+		lastBlock = gb2;
 		List<Block> newBlocks = new ArrayList<Block>();
 		for(int i=0; i<10; i++)
 		{	
 			//GENERATE NEXT BLOCK
-			Block newBlock = blockGenerator.generateNextBlock(databaseSet2, generator2, lastBlock, transactionsHash);
+			Block newBlock = BlockGenerator.generateNextBlock(databaseSet2, generator2, lastBlock, transactionsHash);
 			
 			//ADD TRANSACTION SIGNATURE
 			//byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getSignature());
@@ -248,10 +260,11 @@ public class SynchronizerTests {
 			
 			//PROCESS NEW BLOCK
 			try {
-				newBlock.process(databaseSet2);
+				//newBlock.process(databaseSet2);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				fail(e.getMessage());
 			}
 			
 			//ADD TO LIST
@@ -266,27 +279,28 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize_blocks(databaseSet, genesisBlock, newBlocks, null);
+			synchronizer.synchronize_blocks(databaseSet1, gb1, newBlocks, null);
 		}
 		catch(Exception e)
 		{
 			LOGGER.error(e.getMessage(),e);
-			fail("Exception during synchronize");
+			e.printStackTrace();
+			fail("Exception during synchronize:" + e.getMessage());
 		}	
 			
 		//CHECK BLOCKS
-		lastBlock = databaseSet.getBlockMap().getLastBlock();
+		lastBlock = databaseSet1.getBlockMap().getLastBlock();
 		for(int i=9; i>=0; i--)
 		{
 			//CHECK LAST BLOCK
 			assertEquals(true, Arrays.equals(newBlocks.get(i).getSignature(), lastBlock.getSignature()));
-			lastBlock = lastBlock.getParent(databaseSet);
+			lastBlock = lastBlock.getParent(databaseSet1);
 		}
 		
 		//CHECK LAST BLOCK
-		assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
+		assertEquals(true, Arrays.equals(lastBlock.getSignature(), gb1.getSignature()));
 		
 		//CHECK HEIGHT
-		assertEquals(11, databaseSet.getBlockMap().getLastBlock().getHeight(databaseSet));
+		assertEquals(11, databaseSet1.getBlockMap().getLastBlock().getHeight(databaseSet1));
 	}	
 }

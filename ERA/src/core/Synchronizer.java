@@ -84,7 +84,7 @@ public class Synchronizer
 			byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
 			int countTransactionToOrphan = 0;
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
-			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature))
+			while(!Arrays.equals(lastBlock.getReference(), lastCommonBlockSignature))
 			{
 				LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
 				if (cnt.getBlockChain().getCheckPoint(fork) > lastBlock.getHeightByParent(fork)
@@ -173,7 +173,7 @@ public class Synchronizer
 			Block lastBlock = dcSet.getBlockMap().getLastBlock();
 			
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
-			while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlock.getSignature()))
+			while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getSignature()))
 			{
 				if (cnt.isOnStopping())
 					throw new Exception("on stoping");
