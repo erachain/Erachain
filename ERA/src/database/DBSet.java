@@ -35,8 +35,8 @@ public class DBSet implements IDB
 				
 	    this.database = DBMaker.newFileDB(DATA_FILE)
 	    		.closeOnJvmShutdown()
-	    		//.cacheSize(2048)
-	    		//.checksumEnable()
+	    		.cacheDisable()
+	    		.checksumEnable()
 	    		.mmapFileEnableIfSupported()
 				/// ICREATOR
 				.commitFileSyncDisable()
