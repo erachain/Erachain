@@ -1,31 +1,21 @@
 package gui.items.persons;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Stack;
 import java.util.TreeMap;
-
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-
-import controller.Controller;
 import core.item.persons.PersonCls;
-import core.transaction.Transaction;
 import datachain.DCSet;
+import datachain.ItemPersonMap;
 import datachain.SortableList;
 import utils.ObserverMessage;
 import utils.Pair;
-import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -46,22 +36,16 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	
 	
 	private TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses;
+	private ItemPersonMap persomMap;
 	
 	public TableModelOwnerPersons(Long key)
 	{
-		addresses = DCSet.getInstance().getPersonAddressMap().getItems(key);
-		Controller.getInstance().addObserver(this);
-		
-		//PersonCls ss = DBSet.getInstance().getItemPersonMap().get_Indexes("v");
-		//String sss = ss!=null?ss.getName():"--";	
+		persomMap = DCSet.getInstance().getItemPersonMap();
+		addresses = DCSet.getInstance().getPersonAddressMap().getItems(key);	
+		persomMap.addObserver(this);
 	}
 	
-//	@Override
-	//public SortableList<Long, PersonCls> getSortableList() 
-//	{
-//		return this.persons;
-//	}
-	
+
 	
 	public  List<Pair<U, PersonCls>> getSortableList() {
 		return this.persons;
@@ -190,7 +174,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 	public void removeObservers() 
 	{
 		if (persons_S_List != null)	this.persons_S_List.removeObserver();
-		Controller.getInstance().deleteObserver(this);
+		persomMap.deleteObserver(this);
 	}
 	
 	@SuppressWarnings("unchecked")
