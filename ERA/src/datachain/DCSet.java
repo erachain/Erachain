@@ -195,7 +195,7 @@ public class DCSet implements Observer, IDB {
 		DB database = DBMaker.newFileDB(dbFile)
 				.closeOnJvmShutdown()
 				//.cacheSize(CASH_SIZE)
-				.cacheDisable()
+				//.cacheDisable()
 				.checksumEnable()
 				.mmapFileEnableIfSupported() // -- error on asyncWriteEnable
 				//.snapshotEnable()
