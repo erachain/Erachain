@@ -369,6 +369,7 @@ public class Block {
 			;
 		else if (height < inDay30<<2)
 			minFee = minFee.divide(new BigDecimal(2)).setScale(8);
+		/*
 		else if (height < inDay30<<3)
 			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
 		else if (height < inDay30<<4)
@@ -377,6 +378,9 @@ public class Block {
 			minFee = minFee.divide(new BigDecimal(16)).setScale(8);
 		else
 			minFee = minFee.divide(new BigDecimal(64)).setScale(8);
+		*/
+		else
+			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
 			
 		if ( fee.compareTo(minFee) < 0) 
 			fee = minFee;
@@ -1388,18 +1392,25 @@ public class Block {
 
 		
 		if (blockFee.compareTo(blockTotalFee) < 0) {
+
+			// ADD from EMISSION (with minus)
+			GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY, 
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee):blockFee.subtract(blockTotalFee).divide(new BigDecimal(2)));
+
+			blockFee = blockTotalFee;
 			
-			// find rich account
-			String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
-			if (!rich.equals(this.creator.getAddress())) {
-			
-				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-				blockFee = blockTotalFee;
-				Account richAccount = new Account(rich);
-			
-				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).subtract(bonus_fee), dcSet);
-				richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
-				
+			if (BlockChain.ROBINHOOD_USE) {
+				// find rich account
+				String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+	
+				if (!rich.equals(this.creator.getAddress())) {
+					BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+					blockFee = blockTotalFee;
+	
+					Account richAccount = new Account(rich);
+					//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
+					richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+				}
 			}
 		}
 
@@ -1461,17 +1472,25 @@ public class Block {
 		BigDecimal blockTotalFee = getTotalFee(dcSet); 
 
 		if (blockFee.compareTo(blockTotalFee) < 0) {
-			
-			// find rich account
-			String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
-			if (!rich.equals(this.creator.getAddress())) {
-				BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-				blockFee = blockTotalFee;
+			// SUBSTRACT from EMISSION (with minus)
+			GenesisBlock.CREATOR.changeBalance(dcSet, false, Transaction.FEE_KEY, 
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee):blockFee.subtract(blockTotalFee).divide(new BigDecimal(2)));
 
-				Account richAccount = new Account(rich);
-				//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-				richAccount.changeBalance(dcSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+			blockFee = blockTotalFee;
+
+			if (BlockChain.ROBINHOOD_USE) {
+				// find rich account
+				String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+	
+				if (!rich.equals(this.creator.getAddress())) {
+					BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+					blockFee = blockTotalFee;
+	
+					Account richAccount = new Account(rich);
+					//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
+					richAccount.changeBalance(dcSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+				}
 			}
 		}
 

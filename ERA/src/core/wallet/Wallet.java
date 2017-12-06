@@ -1316,18 +1316,21 @@ public class Wallet extends Observable implements Observer
 
 			if (blockFee.compareTo(blockTotalFee) < 0) {
 				
-				// find rich account
-				String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
-				if (!rich.equals(blockGeneratorStr)) {
+				blockFee = blockTotalFee;
 
-					blockFee = blockTotalFee;
-					
-					if(this.accountExists(rich)) {
-
-						BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-						Account richAccount = new Account(rich);	
-						this.database.getAccountMap().changeBalance(
-								richAccount.getAddress(), true, FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+				if (BlockChain.ROBINHOOD_USE) {
+				
+					// find rich account
+					String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
+					if (!rich.equals(blockGeneratorStr)) {
+	
+						if(this.accountExists(rich)) {
+	
+							BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+							Account richAccount = new Account(rich);	
+							this.database.getAccountMap().changeBalance(
+									richAccount.getAddress(), true, FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+						}
 					}
 				}
 			}
@@ -1535,18 +1538,20 @@ public class Wallet extends Observable implements Observer
 
 			if (blockFee.compareTo(blockTotalFee) < 0) {
 				
-				// find rich account
-				String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
-				if (!rich.equals(blockGeneratorStr)) {
+				blockFee = blockTotalFee;
 
-					blockFee = blockTotalFee;
-					
-					if(this.accountExists(rich)) {
-
-						BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-						Account richAccount = new Account(rich);
-						this.database.getAccountMap().changeBalance(
-								richAccount.getAddress(), false, FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+				if (BlockChain.ROBINHOOD_USE) {
+					// find rich account
+					String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
+					if (!rich.equals(blockGeneratorStr)) {
+							
+						if(this.accountExists(rich)) {
+	
+							BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+							Account richAccount = new Account(rich);
+							this.database.getAccountMap().changeBalance(
+									richAccount.getAddress(), false, FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+						}
 					}
 				}
 			}
