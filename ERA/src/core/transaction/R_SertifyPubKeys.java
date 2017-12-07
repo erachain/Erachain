@@ -438,13 +438,13 @@ public class R_SertifyPubKeys extends Transaction {
 	}
 
 	//
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(DCSet dcSet, Long releaserReference) {
 		
 		boolean creator_admin = false;
 		
-		int result = super.isValid(db, releaserReference);
-		if ( result == Transaction.CREATOR_NOT_PERSONALIZED) {
-			long personsCount = db.getItemPersonMap().getSize();
+		int result = super.isValid(dcSet, releaserReference);
+		if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
+			long personsCount = dcSet.getItemPersonMap().getSize();
 			if (personsCount < 20) {
 				// FIRST Persons only by ME
 				// FIRST Persons only by ADMINS
@@ -459,24 +459,26 @@ public class R_SertifyPubKeys extends Transaction {
 				return result;
 		}
 
+		int height = this.getBlockHeightByParentOrLast(dcSet);
+
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
 			//CHECK IF PERSON PUBLIC KEY IS VALID
 			if(!publicAccount.isValid())
 			{
 				return INVALID_PUBLIC_KEY;
-			} else if (publicAccount.getPerson(db) != null) {
-				LOGGER.error("ACCOUNT_ALREADY_PERSONALIZED " + publicAccount.getPerson(db));
+			} else if (publicAccount.getPerson(dcSet, height) != null) {
+				LOGGER.error("ACCOUNT_ALREADY_PERSONALIZED " + publicAccount.getPerson(dcSet, height));
 				return ACCOUNT_ALREADY_PERSONALIZED;
 			}
 		}
 
-		if ( !db.getItemPersonMap().contains(this.key) )
+		if ( !dcSet.getItemPersonMap().contains(this.key) )
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 		}
 
-		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, dcSet);
 		if ( balERA.compareTo(
 						//BlockChain.MINOR_ERA_BALANCE_BD
 						BlockChain.MIN_GENERATING_BALANCE_BD

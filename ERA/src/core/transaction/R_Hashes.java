@@ -380,44 +380,46 @@ public class R_Hashes extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(DCSet dcSet, Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, block, asPack);
+		super.process(dcSet, block, asPack);
+		
+		int height = this.getBlockHeightByParentOrLast(dcSet);
 		
 		int transactionIndex = -1;
 		int blockIndex = -1;
 		if (block == null) {
-			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+			blockIndex = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
 		} else {
-			blockIndex = block.getHeight(db);
+			blockIndex = block.getHeight(dcSet);
 			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
-				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+				blockIndex = dcSet.getBlockMap().getLastBlock().getHeight(dcSet) + 1;
 			}			
 			transactionIndex = block.getTransactionSeq(signature);
 		}
 
 		long personKey;
-		Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(db);
+		Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(dcSet, height);
 		if (asPerson != null && asPerson.a >= 0) {
-			personKey = asPerson.b.getKey(db);
+			personKey = asPerson.b.getKey(dcSet);
 		} else {
 			personKey = 0l;
 		}
 		
-		HashesSignsMap map = db.getHashesSignsMap();
+		HashesSignsMap map = dcSet.getHashesSignsMap();
 		for (byte[] hash: hashes) {
 			map.addItem(hash, new Tuple3<Long, Integer, Integer>(personKey, blockIndex, transactionIndex));
 		}
 	}
 
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(DCSet dcSet, boolean asPack) {
 
 		//UPDATE SENDER
-		super.orphan(db, asPack);
+		super.orphan(dcSet, asPack);
 						
-		HashesSignsMap map = db.getHashesSignsMap();
+		HashesSignsMap map = dcSet.getHashesSignsMap();
 		for (byte[] hash: hashes) {
 			map.removeItem(hash);
 		}

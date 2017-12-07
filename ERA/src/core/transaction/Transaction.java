@@ -986,11 +986,11 @@ public abstract class Transaction {
 		return isValid(DCSet.getInstance(), releaserReference);
 	}
 	
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(DCSet dcSet, Long releaserReference)
 	{
 	
 		//CHECK IF REFERENCE IS OK
-		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+		Long reference = releaserReference==null ? this.creator.getLastReference(dcSet) : releaserReference;
 		if (reference != null && this.isReferenced()) {
 			if (false && reference.compareTo(this.reference) >= 0)
 				return INVALID_REFERENCE;
@@ -1003,8 +1003,10 @@ public abstract class Transaction {
 		{
 			return INVALID_ADDRESS;
 		}
-				
-		if (this.hasPublicText() && !this.creator.isPerson(db)) {
+		
+		int height = this.getBlockHeightByParentOrLast(dcSet);
+		
+		if (this.hasPublicText() && !this.creator.isPerson(dcSet, height)) {
 			if (BlockChain.DEVELOP_USE) {
 				boolean good = false;
 				for ( String admin: BlockChain.GENESIS_ADMINS) {
@@ -1022,7 +1024,7 @@ public abstract class Transaction {
 
 		// CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-		if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
+		if(this.creator.getBalance(dcSet, FEE_KEY).a.compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
 		}

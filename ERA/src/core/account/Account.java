@@ -741,13 +741,15 @@ public class Account {
 		return getPersonDuration(db, this.address);
 	}
 	
-	public boolean isPerson(DCSet db) {
+	
+	public boolean isPerson(DCSet dcSet, int forHeight) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
-		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
+		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
 		if (addressDuration == null) return false;
-		// TEST TIME and EXPIRE TIME
-		long current_time = NTP.getTime();
+
+		// TEST TIME and EXPIRE TIME		
+		long current_time = Controller.getInstance().getBlockChain().getTimestamp(forHeight);
 		
 		// TEST TIME and EXPIRE TIME for PERSONALIZE address
 		int days = addressDuration.b;
@@ -768,17 +770,23 @@ public class Account {
 		return true;
 		
 	}
-	public Tuple2<Integer, PersonCls> getPerson(DCSet db) {
+	public boolean isPerson() {
+		return isPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
+	}
+
+	
+	public Tuple2<Integer, PersonCls> getPerson(DCSet dcSet, int forHeight) {
 		
 		// IF DURATION ADDRESS to PERSON IS ENDED
-		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(db);
+		Tuple4<Long, Integer, Integer, Integer> addressDuration = this.getPersonDuration(dcSet);
 		if (addressDuration == null) return null;
-		// TEST TIME and EXPIRE TIME
-		long current_time = NTP.getTime();
+
+		// TEST TIME and EXPIRE TIME		
+		long current_time = Controller.getInstance().getBlockChain().getTimestamp(forHeight);
 		
 		// get person
 		Long personKey = addressDuration.a;
-		PersonCls person = (PersonCls)Controller.getInstance().getItem(db, ItemCls.PERSON_TYPE, personKey);
+		PersonCls person = (PersonCls)Controller.getInstance().getItem(dcSet, ItemCls.PERSON_TYPE, personKey);
 		
 		// TEST ADDRESS is ACTIVE?
 		int days = addressDuration.b;
@@ -806,7 +814,7 @@ public class Account {
 		
 	}
 	public Tuple2<Integer, PersonCls> getPerson() {
-		return getPerson(DCSet.getInstance());
+		return getPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
 	}
 	
 	// previous forging block

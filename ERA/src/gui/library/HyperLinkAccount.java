@@ -31,7 +31,7 @@ public  HyperLinkAccount(Account account){
 }
 
 public void set_account(Account account){
-	if(account.isPerson(DCSet.getInstance())){
+	if(account.isPerson()){
 		this.text = account.getPersonAsString();
 	}
 	else if (GenesisBlock.CREATOR.equals(account)) this.text =("GENESIS");

@@ -336,7 +336,7 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override // - fee + balance - calculate here
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(DCSet dcSet, Long releaserReference) {
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
@@ -345,7 +345,7 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		Long reference = releaserReference==null ? this.creator.getLastReference(db) : releaserReference;
+		Long reference = releaserReference==null ? this.creator.getLastReference(dcSet) : releaserReference;
 		if (false && reference.compareTo(this.reference) >= 0) {
 			// TODO delete REFERENCE from TRANSACTION - in DB insert
 			// TODO: delete wrong check in new CHAIN
@@ -365,7 +365,9 @@ public abstract class TransactionAmount extends Transaction {
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
-		boolean isPerson = this.creator.isPerson(db);
+		int height = this.getBlockHeightByParentOrLast(dcSet);
+
+		boolean isPerson = this.creator.isPerson(dcSet, height);
 
 		//CHECK IF AMOUNT AND ASSET
 		if (this.amount != null) {
@@ -373,7 +375,7 @@ public abstract class TransactionAmount extends Transaction {
 			if (absKey < 0)
 				absKey = -absKey;
 
-			AssetCls asset = (AssetCls)db.getItemAssetMap().get(absKey);
+			AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
 			if (asset == null) {
 				return ITEM_ASSET_NOT_EXIST;
 			}
@@ -404,7 +406,7 @@ public abstract class TransactionAmount extends Transaction {
 					if (!asset.isMovable()) {
 						return NOT_MOVABLE_ASSET;						
 					}					
-					BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType);
 					if (amount.compareTo(balance1) > 0) {
 						return NO_HOLD_BALANCE;
 					}
@@ -421,7 +423,7 @@ public abstract class TransactionAmount extends Transaction {
 						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
 								this.creator.getAddress(), absKey,
 								this.recipient.getAddress()); 
-						BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
+						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
 						if (creditAmount.compareTo(amount) < 0) {
 							// NOT ENOUGHT DEBT from recipient to creator
 							return NO_DEBT_BALANCE;
@@ -441,10 +443,10 @@ public abstract class TransactionAmount extends Transaction {
 								this.recipient.getAddress(), absKey,
 								this.creator.getAddress());
 						// TRY RETURN
-						BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
+						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
 						if (creditAmount.compareTo(amount) < 0) {
 							BigDecimal leftAmount = amount.subtract(creditAmount);
-							BigDecimal balanceOwn = this.creator.getBalance(db, absKey, 1); // OWN balance
+							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1); // OWN balance
 							// NOT ENOUGHT DEBT from recipient to creator
 							// TRY CREDITN OWN
 							if (balanceOwn.compareTo(leftAmount) < 0) {
@@ -460,7 +462,6 @@ public abstract class TransactionAmount extends Transaction {
 					
 					if (absKey == RIGHTS_KEY) {
 						
-						int height = this.getBlockHeightByParentOrLast(db);
 						if (height > Transaction.FREEZE_FROM) {
 							// LOCK PAYMENTS
 							boolean ok = true;
@@ -490,16 +491,16 @@ public abstract class TransactionAmount extends Transaction {
 						// not make RETURN - check validate next
 						//
 					} else if (absKey == FEE_KEY) {
-						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.amount.add(this.fee) ) < 0) {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).compareTo( this.amount.add(this.fee) ) < 0) {
 							return NO_BALANCE;
 						}
 						
 					} else {
-						if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.fee ) < 0) {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-						BigDecimal balanceOWN = this.creator.getBalance(db, absKey, actionType);
-						BigDecimal balanceUSE = this.creator.getBalanceUSE(absKey, db);
+						BigDecimal balanceOWN = this.creator.getBalance(dcSet, absKey, actionType);
+						BigDecimal balanceUSE = this.creator.getBalanceUSE(absKey, dcSet);
 						
 						if (amount.compareTo(balanceOWN) > 0 || amount.compareTo(balanceUSE) > 0) {
 							// TODO: delete wrong check in new CHAIN
@@ -520,10 +521,10 @@ public abstract class TransactionAmount extends Transaction {
 				} else {
 					// PRODUCE - SPEND
 					// TRY FEE
-					if(this.creator.getBalance(db, FEE_KEY, 1).compareTo( this.fee ) < 0) {
+					if(this.creator.getBalance(dcSet, FEE_KEY, 1).compareTo( this.fee ) < 0) {
 						return NOT_ENOUGH_FEE;
 					}
-					BigDecimal balance1 = this.creator.getBalance(db, absKey, actionType);
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType);
 					if (amount.compareTo(balance1) > 0) {
 						return NO_BALANCE;
 					}
@@ -531,7 +532,7 @@ public abstract class TransactionAmount extends Transaction {
 				
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
-				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(db)) {
+				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(dcSet, height)) {
 					return RECEIVER_NOT_PERSONALIZED;
 				}
 			}
@@ -539,7 +540,7 @@ public abstract class TransactionAmount extends Transaction {
 		} else {
 			// TODO first records is BAD already ((
 			//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) < 0)
+			if(this.creator.getBalance(dcSet, FEE_KEY).a.compareTo(this.fee) < 0)
 			{
 				return NOT_ENOUGH_FEE;
 			}				

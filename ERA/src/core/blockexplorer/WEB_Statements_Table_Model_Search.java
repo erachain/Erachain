@@ -208,8 +208,8 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		String str ="";
 		R_SignNote record = (R_SignNote)this.transactions.get(row);
 		PublicKeyAccount creator = record.getCreator();
-		if (creator.isPerson(DCSet.getInstance())){
-		return creator.getPerson(DCSet.getInstance()).b.getKey()+"";
+		if (creator.isPerson()){
+		return creator.getPerson().b.getKey()+"";
 		
 		
 		}
