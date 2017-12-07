@@ -669,10 +669,6 @@ public class R_SetStatusToItem extends Transaction {
 			if (tx == null )
 				return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
-				
-		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERA.compareTo(BlockChain.MINOR_ERA_BALANCE_BD)<0 )
-			return Transaction.NOT_ENOUGH_RIGHTS;
 		
 		return Transaction.VALIDATE_OK;
 	}
