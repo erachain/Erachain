@@ -35,7 +35,7 @@ public class MTextPane extends JScrollPane {
 
 	}
 	public void set_text(String str){
-		str = core.exdata.ExData.viewDescriptionHTML(str);
+		str = library.viewDescriptionHTML(str);
 		int font_saze = UIManager.getFont("Label.font").getSize();
 		str = "<head><style>" 
 				+ " body{ font-family:"

@@ -1,39 +1,21 @@
 package gui.library;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.TrayIcon.MessageType;
-import java.beans.PropertyVetoException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Properties;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.LookAndFeel;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import org.mapdb.Fun.Tuple2;
-
 import com.github.rjeschke.txtmark.Processor;
-
 import controller.Controller;
 import core.account.Account;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import de.muntjak.tinylookandfeel.Theme;
-import de.muntjak.tinylookandfeel.ThemeDescription;
+
 
 /*
 import org.jvnet.substance.SubstanceLookAndFeel;
@@ -71,7 +53,6 @@ public class library {
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public static void Set_GUI_Look_And_Feel(String text) {
 		String name_font = "Courier";
 		int size_font;
@@ -289,7 +270,8 @@ public class library {
 	        Theme.internalPaletteTitleFont.setFont(font);
 	        Theme.toolTipFont.setFont(font);
 	 
-	        java.util.Enumeration keys = UIManager.getDefaults().keys();
+	        @SuppressWarnings("rawtypes")
+			java.util.Enumeration keys = UIManager.getDefaults().keys();
 			 
 		    while(keys.hasMoreElements())
 		    {
@@ -297,9 +279,6 @@ public class library {
 		    	
 		    	String key = keys.nextElement().toString();
 		    	if (key.contains("OptionPane")){
-		        Object value = UIManager.get(key);
-		//        ss.add(new Tuple2<String, Object>(key,value));
-		//        if(value instanceof javax.swing.plaf.FontUIResource) UIManager.put(key, f);
 		    	}
 		    }
 	      
@@ -333,13 +312,12 @@ public class library {
 
 	public static String to_HTML(String str){
 		
-		return core.exdata.ExData.viewDescriptionHTML(str);
+		return viewDescriptionHTML(str);
 		
 		}
 	
 	public static String isNum_And_Length(String str, int length){
 		try {
-			Long a = Long.valueOf(str);
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			return "Not Namber";
@@ -361,5 +339,29 @@ public class library {
 			return new BigDecimal(-1);
 		
 		
+	}
+public static String viewDescriptionHTML(String descr) {
+		
+		if (descr.startsWith("#"))
+			// MARK DOWN
+			return Processor.process(descr);
+
+		if (descr.startsWith("]"))
+			// FORUM CKeditor
+			// TODO CK_editor INSERT
+			return Processor.process(descr);
+
+		if (descr.startsWith("}"))
+			// it is DOCX
+			// TODO DOCX insert
+			return descr;
+
+		if (descr.startsWith(">"))
+			// it is HTML
+			return descr;
+
+		// PLAIN TEXT
+		return descr.replaceAll(" ", "&ensp;").replaceAll("\t", "&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;").replaceAll("\n","<br>");
+
 	}
 }

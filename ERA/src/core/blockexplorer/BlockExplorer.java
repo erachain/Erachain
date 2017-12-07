@@ -1,7 +1,5 @@
 package core.blockexplorer;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 // 30/03 ++ asset - Trans_Amount
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -45,7 +43,6 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.exdata.ExData;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
@@ -61,13 +58,10 @@ import core.transaction.CancelSellNameTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
-import core.transaction.GenesisIssue_ItemRecord;
-import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Issue_ItemRecord;
 import core.transaction.MultiPaymentTransaction;
 import core.transaction.R_Send;
-import core.transaction.R_SertifyPubKeys;
 import core.transaction.R_SignNote;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.SellNameTransaction;
@@ -79,7 +73,6 @@ import core.voting.Poll;
 import core.voting.PollOption;
 import datachain.DCSet;
 import datachain.SortableList;
-import gui.items.persons.TableModelPersons;
 import gui.library.library;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
@@ -120,6 +113,7 @@ public class BlockExplorer
 	}
 
 
+	@SuppressWarnings("static-access")
 	public Map jsonQueryMain(UriInfo info) throws UnsupportedEncodingException
 	{		
 		Stopwatch stopwatchAll = new Stopwatch();
@@ -3721,7 +3715,7 @@ if ( asset_1 == null) {
 					if (jSON.containsKey("MS")) {
 						String mess = (String)jSON.get("MS");
 						str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj)
-								+ ": </b><br>" + ExData.viewDescriptionHTML(mess) + "<br><br>";
+								+ ": </b><br>" + library.viewDescriptionHTML(mess) + "<br><br>";
 
 					}
 	// Hashes

@@ -1,6 +1,7 @@
 package gui.transaction;
 
 import gui.PasswordPane;
+import gui.library.library;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -77,7 +78,7 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 			detailGBC.gridwidth = 2;
 			messageText = new JTextPane();
 			messageText.setContentType("text/html");
-			String ss = (( r_Statement.isText() ) ? core.exdata.ExData.viewDescriptionHTML(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
+			String ss = (( r_Statement.isText() ) ? library.viewDescriptionHTML(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : Processor.process(Converter.toHex(r_Statement.getData())));
 			messageText.setEditable(false);
 			//messageText.setSize(200, 300);
 			//messageText.setPreferredSize(new Dimension(800,200));
