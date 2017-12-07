@@ -10,8 +10,6 @@ import java.util.List;
 //import java.util.Map;
 // import org.apache.log4j.Logger;
 
-//import ntp.NTP;
-
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;

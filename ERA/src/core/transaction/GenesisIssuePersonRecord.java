@@ -17,8 +17,6 @@ import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
 
-//import ntp.NTP;
-
 //import org.json.simple.JSONObject;
 
 //import com.google.common.primitives.Bytes;

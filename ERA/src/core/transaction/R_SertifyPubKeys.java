@@ -40,7 +40,7 @@ import core.item.notes.NoteCls;
 import core.item.notes.NoteFactory;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
-import ntp.NTP;
+
 import utils.Converter;
 import utils.DateTimeFormat;
 

@@ -12,8 +12,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-//import ntp.NTP;
-
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;

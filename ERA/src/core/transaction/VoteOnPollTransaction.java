@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import ntp.NTP;
-
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;

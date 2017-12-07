@@ -34,7 +34,6 @@ import core.item.statuses.StatusCls;
 import datachain.DCMap;
 import datachain.DCSet;
 import core.item.ItemCls;
-import ntp.NTP;
 
 // this.end_date == null -> MAX
 public class R_SetUnionStatusToItem extends Transaction {

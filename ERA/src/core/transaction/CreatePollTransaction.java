@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import ntp.NTP;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -196,13 +194,6 @@ public class CreatePollTransaction extends Transaction
 	@Override
 	public int isValid(DCSet db, Long releaserReference) 
 	{
-		/*
-		//CHECK IF RELEASED
-		if(NTP.getTime() < Transaction.getVOTING_RELEASE())
-		{
-			return NOT_YET_RELEASED;
-		}
-		*/
 		
 		//CHECK POLL NAME LENGTH
 		int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;

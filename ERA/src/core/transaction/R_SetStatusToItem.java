@@ -36,7 +36,6 @@ import core.item.statuses.StatusCls;
 import datachain.DCMap;
 import datachain.DCSet;
 import core.item.ItemCls;
-import ntp.NTP;
 import utils.DateTimeFormat;
 
 public class R_SetStatusToItem extends Transaction {
