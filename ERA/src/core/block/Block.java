@@ -1394,8 +1394,8 @@ public class Block {
 		if (blockFee.compareTo(blockTotalFee) < 0) {
 
 			// ADD from EMISSION (with minus)
-			GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY, 
-					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockFee.subtract(blockTotalFee));
+			GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY,
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee));
 
 			blockFee = blockTotalFee;
 			
@@ -1474,8 +1474,8 @@ public class Block {
 		if (blockFee.compareTo(blockTotalFee) < 0) {
 
 			// SUBSTRACT from EMISSION (with minus)
-			GenesisBlock.CREATOR.changeBalance(dcSet, false, Transaction.FEE_KEY, 
-					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockFee.subtract(blockTotalFee));
+			GenesisBlock.CREATOR.changeBalance(dcSet, false, Transaction.FEE_KEY,
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee));
 
 			blockFee = blockTotalFee;
 

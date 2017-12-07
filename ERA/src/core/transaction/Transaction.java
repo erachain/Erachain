@@ -1005,14 +1005,19 @@ public abstract class Transaction {
 		}
 				
 		if (this.hasPublicText() && !this.creator.isPerson(db)) {
-			if (BlockChain.DEVELOP_USE) {	
+			if (BlockChain.DEVELOP_USE) {
+				boolean good = false;
 				for ( String admin: BlockChain.GENESIS_ADMINS) {
 					if (this.creator.equals(admin)) {
-						return VALIDATE_OK;
+						good = true;
+						break;
 					}
 				}
+				if (!good)
+					return CREATOR_NOT_PERSONALIZED;
+			} else {
+				return CREATOR_NOT_PERSONALIZED;
 			}
-			return CREATOR_NOT_PERSONALIZED;
 		}
 
 		// CHECK IT AFTER isPERSON ! because in ignored in IssuePerson

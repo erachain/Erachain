@@ -549,15 +549,21 @@ public abstract class TransactionAmount extends Transaction {
 		// PUBLICK TEXT only from PERSONS
 		if (this.hasPublicText() && !isPerson) {
 			if (BlockChain.DEVELOP_USE) {	
+				boolean good = false;
 				for ( String admin: BlockChain.GENESIS_ADMINS) {
 					if (this.creator.equals(admin)) {
-						return VALIDATE_OK;
+						good = true;
+						break;
 					}
 				}
+				if (!good) {
+					return CREATOR_NOT_PERSONALIZED;					
+				}
 			} else if (Base58.encode(this.getSignature()).equals("1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
-				return VALIDATE_OK;				
+				;				
+			} else {
+				return CREATOR_NOT_PERSONALIZED;
 			}
-			return CREATOR_NOT_PERSONALIZED;
 		}
 		
 		return VALIDATE_OK;
