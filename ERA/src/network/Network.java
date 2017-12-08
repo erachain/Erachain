@@ -36,7 +36,6 @@ public class Network extends Observable implements ConnectionCallback {
 	
 	public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK?0:1;
 	private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
-	private static final int RESEND_UNCONFIRMED = BlockChain.HARD_WORK?10:10;
 	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<4;
 	
 	private ConnectionCreator creator;
@@ -569,7 +568,7 @@ public class Network extends Observable implements ConnectionCallback {
 						LOGGER.debug("SENDED time " + tickets);
 					}
 				}
-			}	
+			}
 		}
 		catch(Exception e)
 		{
@@ -578,50 +577,6 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 		
 		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
-	}
-
-	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) 
-	{		
-
-		byte[] peerByte = peer.getAddress().getAddress();
-		DCSet dcSet = DCSet.getInstance();
-		datachain.TransactionMap dcMap = dcSet.getTransactionMap();
-		
-		int i = 0;
-		for (Transaction transaction: transactions) {
-
-			if (!this.run || !peer.isUsed()) {
-				return;
-			}
-
-			if(transaction.getDeadline() < NTP.getTime())
-			{
-				dcMap.delete(transaction.getSignature());
-				continue;
-			}
-
-			i++;
-			if (i > RESEND_UNCONFIRMED)
-				return;
-			
-			Message message = MessageFactory.getInstance()
-					.createTransactionMessage(transaction);
-
-			if (dcMap.isBroadcastedToPeer(transaction, peerByte))
-				continue;
-			
-			try
-			{
-				if (peer.sendMessage(message)) {
-					dcMap.addBroadcastedPeer(transaction, peerByte);
-				}
-			} catch(Exception e)
-			{
-				LOGGER.error(e.getMessage(),e);
-			}
-		}
-		
-		//LOGGER.info("Broadcasting end");
 	}
 
 	@Override

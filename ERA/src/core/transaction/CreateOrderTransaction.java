@@ -248,16 +248,19 @@ public class CreateOrderTransaction extends Transaction
 			int height = this.getBlockHeightByParentOrLast(db);
 			if (height > Transaction.FREEZE_FROM ) {
 				// LOCK ERA sell
-				boolean ok = true;
-				for ( String address: TRUE_ADDRESSES) {
+				boolean wrong = true;
+				for ( String address: Transaction.TRUE_ADDRESSES) {
 					if (this.creator.equals(address)) {
-						ok = false;
+						wrong = false;
 						break;
 					}
 				}
 				
-				if (ok)
-					return INVALID_ADDRESS;
+				if (wrong) {
+					int balance = this.creator.getBalance(dcSet, RIGHTS_KEY, 1).intValue();
+					if (balance > 3000)
+						return INVALID_ADDRESS;
+				}
 
 			}
 		}

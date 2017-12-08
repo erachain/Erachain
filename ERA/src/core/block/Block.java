@@ -123,15 +123,15 @@ public class Block {
 	
 	//GETTERS/SETTERS
 
-	public Block(int version, byte[] reference, PublicKeyAccount generator, List<Transaction> trans,
+	public Block(int version, byte[] reference, PublicKeyAccount generator, List<Transaction> transactions,
 			byte[] atBytes) {
 	// TODO Auto-generated constructor stub
 	this.version = version;
 	this.reference = reference;
 	this.creator = generator;
-	this.transactions = trans;
-	this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), trans, this.atBytes);
-	this.transactionCount = 0;
+	this.transactions = transactions;
+	this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, this.atBytes);
+	this.transactionCount = transactions == null?0: transactions.size();
 	this.atBytes = atBytes;
 
 	}
@@ -369,18 +369,13 @@ public class Block {
 			;
 		else if (height < inDay30<<2)
 			minFee = minFee.divide(new BigDecimal(2)).setScale(8);
-		/*
-		else if (height < inDay30<<3)
+		else if (height < inDay30<<3) // < 72000
 			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
-		else if (height < inDay30<<4)
+		else if (height < inDay30<<3) //87000)
 			minFee = minFee.divide(new BigDecimal(8)).setScale(8);
-		else if (height < inDay30<<5)
-			minFee = minFee.divide(new BigDecimal(16)).setScale(8);
 		else
-			minFee = minFee.divide(new BigDecimal(64)).setScale(8);
-		*/
-		else
-			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
+			//minFee = minFee.divide(new BigDecimal(2)).setScale(8); 
+			minFee = minFee.divide(new BigDecimal(8)).setScale(8); 
 			
 		if ( fee.compareTo(minFee) < 0) 
 			fee = minFee;

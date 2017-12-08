@@ -21,6 +21,5 @@ public interface ConnectionCallback {
 	Peer getKnownPeer(Peer peer);
 	void onMessage(Message message);
 	Peer startPeer(Socket socket);
-	void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer);
 	
 }

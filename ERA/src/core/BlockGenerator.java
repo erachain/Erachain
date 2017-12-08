@@ -630,10 +630,10 @@ public class BlockGenerator extends Thread implements Observer
 	}
 	
 	public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
-			Block parentBlock, List<Transaction>trans)
+			Block parentBlock, List<Transaction> transactions)
 	{
 		
-		if (trans == null) {
+		if (transactions == null) {
 			return null;
 		}
 		
@@ -650,13 +650,13 @@ public class BlockGenerator extends Thread implements Observer
 
 		//CREATE NEW BLOCK
 		
-		Block newBlock = new Block(version, parentBlock.getSignature(), account, trans, atBytes);
+		Block newBlock = new Block(version, parentBlock.getSignature(), account, transactions, atBytes);
 			//	//BlockFactory.getInstance().create(version, parentBlock.getSignature(), account, trans, atBytes);
 		// SET GENERATING BALANCE here
 		newBlock.setCalcGeneratingBalance(dcSet);
 		newBlock.sign(account);
 		
-		trans=null;
+		transactions=null;
 		
 		return newBlock;
 

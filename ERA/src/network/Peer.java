@@ -200,19 +200,11 @@ public class Peer extends Thread{
 				this.pinger = new Pinger(this);
 			else
 				this.pinger.setPing(Integer.MAX_VALUE);
-
 			
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, true);
 
 			this.runed = true;
-
-			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			if(!Controller.getInstance().isOnStopping()){
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
-			if (transactions != null && !transactions.isEmpty())
-				this.callback.broadcastUnconfirmedToPeer(transactions, this);
-			}
 
 			//LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 			
@@ -288,14 +280,7 @@ public class Peer extends Thread{
 			}
 
 			this.runed = true;
-			
-			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			if(!Controller.getInstance().isOnStopping()){
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
-			if (transactions != null && !transactions.isEmpty())
-				this.callback.broadcastUnconfirmedToPeer(transactions, this);
-			}
-			
+						
 			//LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
 
 		}
@@ -349,14 +334,7 @@ public class Peer extends Thread{
 			this.pinger.setPing(Integer.MAX_VALUE);
 
 			this.runed = true;
-			
-			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			if(!Controller.getInstance().isOnStopping()){
-			List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
-			if (transactions != null && !transactions.isEmpty())
-				this.callback.broadcastUnconfirmedToPeer(transactions, this);
-			}
-			
+						
 			//LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
 
 		}

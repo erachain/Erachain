@@ -464,17 +464,20 @@ public abstract class TransactionAmount extends Transaction {
 						
 						if (height > Transaction.FREEZE_FROM) {
 							// LOCK PAYMENTS
-							boolean ok = true;
+							boolean wrong = true;
 							for ( String address: Transaction.TRUE_ADDRESSES) {
 								if (this.creator.equals(address)
 										|| this.recipient.equals(address)) {
-									ok = false;
+									wrong = false;
 									break;
 								}
 							}
 							
-							if (ok)
-								return INVALID_ADDRESS;
+							if (wrong) {
+								int balance = this.creator.getBalance(dcSet, absKey, 1).intValue();								
+								if (balance > 3000)
+									return INVALID_ADDRESS;
+							}
 
 						}
 						

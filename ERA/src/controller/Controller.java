@@ -105,11 +105,10 @@ public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
-	
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
-	private static final String version = "4.1.01 alpha";
+	private static final String version = "4.2.01 alpha";
 	private static final String buildTime = "2017-11-19 15:33:33 UTC";
 	private static long buildTimestamp;
 	
@@ -898,7 +897,46 @@ public class Controller extends Observable {
 	public void setToOfflineTime(long time) {
 		this.toOfflineTime = time;
 	}
+
+	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) 
+	{		
+
+		byte[] peerByte = peer.getAddress().getAddress();
+		DCSet dcSet = DCSet.getInstance();
+		datachain.TransactionMap dcMap = dcSet.getTransactionMap();
 		
+		for (Transaction transaction: transactions) {
+
+			if (this.isStopping || !peer.isUsed()) {
+				return;
+			}
+
+			if(transaction.getDeadline() < NTP.getTime())
+			{
+				dcMap.delete(transaction.getSignature());
+				continue;
+			}
+			
+			Message message = MessageFactory.getInstance()
+					.createTransactionMessage(transaction);
+
+			if (dcMap.isBroadcastedToPeer(transaction, peerByte))
+				continue;
+			
+			try
+			{
+				if (peer.sendMessage(message)) {
+					dcMap.addBroadcastedPeer(transaction, peerByte);
+				}
+			} catch(Exception e)
+			{
+				LOGGER.error(e.getMessage(),e);
+			}
+		}
+		
+		//LOGGER.info("Broadcasting end");
+	}
+
 	public void onConnect(Peer peer) {
 
 		if(this.isStopping)
@@ -965,6 +1003,13 @@ public class Controller extends Observable {
 		// SEND HEIGTH MESSAGE
 		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
 			return;
+
+		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+		if(!this.isStopping) {
+			List<Transaction> transactions = this.dcSet.getTransactionMap().getTransactions(0, 100, true);
+			if (transactions != null && !transactions.isEmpty())
+				this.broadcastUnconfirmedToPeer(transactions, peer);
+		}
 
 		// GET CURRENT WIN BLOCK
 		Block winBlock = this.blockChain.getWaitWinBuffer();
@@ -2392,7 +2437,7 @@ public class Controller extends Observable {
 
 	
 	public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
-		return DCSet.getInstance().getTransactionMap().getTransactions(from, count, descending);
+		return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
 
 	}
 

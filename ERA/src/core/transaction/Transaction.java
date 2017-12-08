@@ -49,7 +49,7 @@ public abstract class Transaction {
 	protected static final int TODO_h1 = 69000;
 
 	
-	protected static final int FREEZE_FROM = BlockChain.DEVELOP_USE?9999999:41800;
+	protected static final int FREEZE_FROM = BlockChain.DEVELOP_USE?12980:41800;
 	protected static final String[] TRUE_ADDRESSES = new String[]{
 			"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv",
