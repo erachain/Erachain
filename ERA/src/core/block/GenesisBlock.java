@@ -62,9 +62,7 @@ public class GenesisBlock extends Block{
 	
 	//AssetVenture asset0;
 	//AssetVenture asset1;
-	List<Transaction> transactions = new ArrayList<Transaction>();
 	public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
-
 
 	public GenesisBlock()
 	{
@@ -484,7 +482,9 @@ public class GenesisBlock extends Block{
 		}
 		
 		//GENERATE AND VALIDATE TRANSACTIONS
-		this.setTransactions(transactions);
+		this.transactionCount = transactions.size();
+		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
+
 		// SIGN simple as HASH
 		this.signature = generateHeadHash();
 	}
@@ -492,6 +492,7 @@ public class GenesisBlock extends Block{
 	private void initItems()
 	{
 		
+		transactions = new ArrayList<Transaction>();
 		///// ASSETS
 		//CREATE ERA ASSET
 		//asset0 = makeAsset(AssetCls.ERA_KEY);

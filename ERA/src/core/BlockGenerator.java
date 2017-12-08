@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import ntp.NTP;
@@ -439,16 +440,17 @@ public class BlockGenerator extends Thread implements Observer
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
 														
-									generatedBlock = generateNextBlock(dcSet, acc_winner, 
-											solvingBlock, getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
-									solvingBlock = null;
+								generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
+										getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
+					
+								solvingBlock = null;
 									
-									if (generatedBlock == null) {
-										if (ctrl.isOnStopping()) {
-											return;
-										}
-										LOGGER.info("my BLOCK is weak ((...");
-									} else {
+								if (generatedBlock == null) {
+									if (ctrl.isOnStopping()) {
+										return;
+									}
+									LOGGER.info("my BLOCK is weak ((...");
+								} else {
 									
 									//PASS BLOCK TO CONTROLLER
 									///ctrl.newBlockGenerated(block);
@@ -630,41 +632,30 @@ public class BlockGenerator extends Thread implements Observer
 	}
 	
 	public static Block generateNextBlock(DCSet dcSet, PrivateKeyAccount account,
-			Block parentBlock, List<Transaction> transactions)
+			Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem)
 	{
 		
-		if (transactions == null) {
+		if (transactionsItem == null) {
 			return null;
 		}
 		
 		int version = parentBlock.getNextBlockVersion(dcSet);
 		byte[] atBytes;
-		if ( version > 1 )
-		{
-			AT_Block atBlock = AT_Controller.getCurrentBlockATs( AT_Constants.getInstance().MAX_PAYLOAD_FOR_BLOCK(
-					parentBlock.getHeight(dcSet)), parentBlock.getHeight(dcSet) + 1 );
-			atBytes = atBlock.getBytesForBlock();
-		} else {
-			atBytes = new byte[0];
-		}
+		atBytes = new byte[0];
 
 		//CREATE NEW BLOCK
 		
-		Block newBlock = new Block(version, parentBlock.getSignature(), account, transactions, atBytes);
+		Block newBlock = new Block(version, parentBlock.getSignature(), account, transactionsItem, atBytes);
 			//	//BlockFactory.getInstance().create(version, parentBlock.getSignature(), account, trans, atBytes);
 		// SET GENERATING BALANCE here
 		newBlock.setCalcGeneratingBalance(dcSet);
 		newBlock.sign(account);
 		
-		transactions=null;
-		
 		return newBlock;
 
 	}
 	
-	
-	
-	public static List<Transaction> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value)
+	public static Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(DCSet dcSet, long timestamp, BlockChain bchain, long max_winned_value)
 	{
 		
 		long timrans1 = System.currentTimeMillis();
@@ -674,10 +665,11 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin;
 		
 		long start = System.currentTimeMillis();
-		///////List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
 		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
 		long tickets = System.currentTimeMillis() - start;
-		LOGGER.debug(" time: " + tickets + "ms for SIZE: " + orderedTransactions.size());
+		int txCount = orderedTransactions.size();
+		long ticketsCount = System.currentTimeMillis() - tickets;
+		LOGGER.debug("=== time: " + tickets + "ms for SIZE: " + txCount + " .size() ms: " + ticketsCount);
 
 		// TODO make SORT by FEE to!
 		// toBYTE / FEE + TIMESTAMP !!
@@ -685,7 +677,7 @@ public class BlockGenerator extends Thread implements Observer
 		// sort by TIMESTAMP
 		Collections.sort(orderedTransactions, new TransactionTimestampComparator());
 		long tickets2 = System.currentTimeMillis() - start - tickets;
-		LOGGER.error("sort time " + tickets2);
+		LOGGER.error("=== sort time " + tickets2);
 		start = System.currentTimeMillis();
 		
 		//Collections.sort(orderedTransactions, Collections.reverseOrder());
@@ -694,7 +686,7 @@ public class BlockGenerator extends Thread implements Observer
 
 		boolean transactionProcessed;
 		long totalBytes = 0;
-		int count = 0;
+		int counter = 0;
 
 		do
 		{
@@ -748,8 +740,10 @@ public class BlockGenerator extends Thread implements Observer
 					totalBytes += transaction.getDataLength(false);
 
 					if(totalBytes > MAX_BLOCK_SIZE_BYTE
-							|| ++count> MAX_BLOCK_SIZE)
+							|| ++counter> MAX_BLOCK_SIZE) {
+						counter--;
 						break;
+					}
 					
 					////ADD INTO LIST
 					transactionsList.add(transaction);
@@ -782,20 +776,20 @@ public class BlockGenerator extends Thread implements Observer
 				
 			}
 		}
-		while(count < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
+		while(counter < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
 		orderedTransactions = null;
 		waitWin = null;
 		newBlockDb = null;
 
-		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"ms for trans: " + transactionsList.size() );
+		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"ms for trans: " + counter );
 		start = System.currentTimeMillis();
 
 		// sort by TIMESTAMP
 		Collections.sort(transactionsList,  new TransactionTimestampComparator());
 
-		LOGGER.debug("sort 2 Unconfirmed Transactions =" + (System.currentTimeMillis() - start) +"milsec for trans: " + transactionsList.size() );
+		LOGGER.debug("sort 2 Unconfirmed Transactions =" + (System.currentTimeMillis() - start) +"milsec for trans: " + counter );
 		
-		return transactionsList;
+		return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
 	}	
 	
 	@Override

@@ -418,6 +418,7 @@ public class BlockChain
 	{	
 		//CREATE LIST
 		List<Transaction> transactions = new ArrayList<Transaction>();
+		int counter = 0;
 		
 		//IF NO BLOCK START FROM GENESIS
 		if(block == null)
@@ -457,6 +458,7 @@ public class BlockChain
 				
 				//ADD TO LIST
 				transactions.add(transaction);
+				counter++;
 			}
 			
 			//SET BLOCK TO CHILD
@@ -464,7 +466,7 @@ public class BlockChain
 			scannedBlocks++;
 		}
 		//WHILE BLOCKS EXIST && NOT REACHED TRANSACTIONLIMIT && NOT REACHED BLOCK LIMIT
-		while(block != null && (transactions.size() < transactionLimit || transactionLimit == -1) && (scannedBlocks < blockLimit || blockLimit == -1)); 
+		while(block != null && (counter < transactionLimit || transactionLimit == -1) && (scannedBlocks < blockLimit || blockLimit == -1)); 
 		
 		//CHECK IF WE REACHED THE END
 		if(block == null)
@@ -659,7 +661,7 @@ public class BlockChain
 		
 		LOGGER.debug("timerUnconfirmed ----------------  work: "
 				+ (System.currentTimeMillis() - startTime)
-				+ " new SIZE: " + unconfirmedMap.size());
+				+ " new SIZE: " + dcSetOriginal.getUncTxCounter());
 
 	}
 }

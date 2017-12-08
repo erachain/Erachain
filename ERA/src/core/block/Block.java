@@ -56,8 +56,6 @@ import com.google.common.primitives.Ints;
 
 public class Block {
 
-	private boolean run = true;
-	
 	public static final int VERSION_LENGTH = 4;
 	//public static final int TIMESTAMP_LENGTH = 8;
 	public static final int GENERATING_BALANCE_LENGTH = 4;
@@ -86,9 +84,9 @@ public class Block {
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
 
-	private List<Transaction> transactions;	
-	private int transactionCount;
-	private byte[] rawTransactions = null;
+	protected List<Transaction> transactions;	
+	protected int transactionCount;
+	protected byte[] rawTransactions = null;
 
 	protected byte[] transactionsHash;
 
@@ -123,15 +121,15 @@ public class Block {
 	
 	//GETTERS/SETTERS
 
-	public Block(int version, byte[] reference, PublicKeyAccount generator, List<Transaction> transactions,
+	public Block(int version, byte[] reference, PublicKeyAccount generator, Tuple2<List<Transaction>, Integer> transactionsItem,
 			byte[] atBytes) {
 	// TODO Auto-generated constructor stub
 	this.version = version;
 	this.reference = reference;
 	this.creator = generator;
-	this.transactions = transactions;
+	this.transactions = transactionsItem.a;
 	this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, this.atBytes);
-	this.transactionCount = transactions == null?0: transactions.size();
+	this.transactionCount = transactionsItem.b;
 	this.atBytes = atBytes;
 
 	}
@@ -415,7 +413,6 @@ public class Block {
 	public void setTransactionData(int transactionCount, byte[] rawTransactions)
 	{
 		
-		this.rawTransactions = null;
 		this.transactionCount = transactionCount;
 		this.rawTransactions = rawTransactions;
 	}
@@ -463,25 +460,20 @@ public class Block {
 		return this.transactions;
 	}
 
-	/*
-	public void addTransaction(Transaction transaction)
+	public void setTransactions(List<Transaction> transactions, int count)
 	{
-		this.getTransactions().add(transaction);
-
-		this.transactionCount++;
+		this.transactions = transactions;
+		this.transactionCount = count;
+		//this.atBytes = null;
+		if (this.transactionsHash == null)
+			this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
 	}
-	*/
+
 	public void setTransactions(List<Transaction> transactions)
 	{
-		if (transactions == null)
-			transactions = new ArrayList<Transaction>();
-		
-		this.transactions = transactions;
-		this.transactionCount = transactions.size();
-		this.atBytes = null;
-		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
+		this.setTransactions(transactions, transactions.size());
 	}
-	
+
 	public void setATBytes(byte[] atBytes)
 	{
 		this.atBytes = atBytes;
@@ -560,7 +552,7 @@ public class Block {
 
 		byte[] data = new byte[0];
 
-		if (transactions == null || transactions.size() == 0) {
+		if (transactions == null || transactions.isEmpty()) {
 			data = Bytes.concat(data, creator);
 			
 		} else {
@@ -1196,7 +1188,7 @@ public class Block {
 		//CHECK TRANSACTIONS
 		this.getTransactions(); // load from RAW transactions
 		
-		if (this.transactions == null || this.transactions.size() == 0) {
+		if (this.transactions == null || this.transactionCount == 0) {
 			// empty transactions
 		} else {
 			DCSet fork = db.fork();
@@ -1519,8 +1511,9 @@ public class Block {
 		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
 		TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
+		this.getTransactions();
 		//ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
-		for(int i=this.getTransactions().size() -1; i>=0; i--)
+		for(int i = this.transactionCount - 1; i >= 0; i--)
 		{
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
@@ -1573,8 +1566,4 @@ public class Block {
 			+ " C: " + this.getCreator().getPersonAsString();
 	}
 	
-	public void stop() {		
-		this.run = false;
-	}
-
 }
