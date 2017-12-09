@@ -39,6 +39,7 @@ public class CreateOrderTransaction extends Transaction
 
 	public static final byte[][] VALID_REC = new byte[][]{
 		Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
+		Base58.decode("4fWbpHBsEzyG9paXH5oJswn3YMhvxw6fRssk6qZmB7jxQ72sRXJunEQhi9bnTwg2cUjwGCZy54u4ZseLRM7xh2x6"),
 	};
 
 	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) 
