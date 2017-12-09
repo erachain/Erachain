@@ -32,6 +32,9 @@ public class CancelOrderTransaction extends Transaction
 	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
 	
 	private BigInteger order;
+	public static final byte[][] VALID_REC = new byte[][]{
+	};
+
 	
 	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
@@ -160,6 +163,13 @@ public class CancelOrderTransaction extends Transaction
 	//@Override
 	public int isValid(DCSet db, Long releaserReference) 
 	{
+		
+		for ( byte[] valid_item: VALID_REC) {
+			if (Arrays.equals(this.signature, valid_item)) {
+				return VALIDATE_OK;
+			}
+		}
+
 		//CHECK IF ORDER EXISTS
 		Order order = null;
 		if(db.getOrderMap().contains(this.order))

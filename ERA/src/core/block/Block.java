@@ -371,9 +371,9 @@ public class Block {
 		else if (height < inDay30<<2)
 			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(8);
 		else if (height < inDay30<<3) // < 72000
-			minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(8);
-		else if (height < 87000) //87000)
-			minFee = minFee.divide(new BigDecimal(6), 8, BigDecimal.ROUND_DOWN).setScale(8);
+			minFee = minFee.divide(new BigDecimal(3), 8, BigDecimal.ROUND_DOWN).setScale(8);
+		//else if (height < 87000) //87000)
+		//	minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(8);
 		else
 			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(8); 
 			

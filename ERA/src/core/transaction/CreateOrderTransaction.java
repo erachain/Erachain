@@ -20,6 +20,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.DCSet;
@@ -35,7 +36,11 @@ public class CreateOrderTransaction extends Transaction
 	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2*AMOUNT_LENGTH;
 
 	private Order order;
-	
+
+	public static final byte[][] VALID_REC = new byte[][]{
+		Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
+	};
+
 	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) 
 	{
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
@@ -239,6 +244,12 @@ public class CreateOrderTransaction extends Transaction
 	public int isValid(DCSet db, Long releaserReference) 
 	{
 		
+		for ( byte[] valid_item: VALID_REC) {
+			if (Arrays.equals(this.signature, valid_item)) {
+				return VALIDATE_OK;
+			}
+		}
+
 		//CHECK IF ASSETS NOT THE SAME
 		long have = this.order.getHave();
 		long want = this.order.getWant();
