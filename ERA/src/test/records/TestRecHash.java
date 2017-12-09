@@ -85,14 +85,14 @@ public class TestRecHash {
 		
 		init();
 		
-		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastReference(db));
+		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 		hashesRecord.sign(maker, asPack);
 		
 		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
 		assertEquals(true, hashesRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastReference(db), new byte[64]);
+		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE NOTE IS INVALID
 		assertEquals(false, hashesRecord.isSignatureValid());
@@ -107,7 +107,7 @@ public class TestRecHash {
 		init();
 		
 		
-		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastReference(db));
+		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 		hashesRecord.sign(maker, asPack);
 		
 		//CONVERT TO BYTES
@@ -168,7 +168,7 @@ public class TestRecHash {
 		byte[] hash0 = maker.getPublicKey();
 		hashes[0] = hash0;
 		
-		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastReference(db));
+		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 		
 		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(db, releaserReference));
 		
@@ -176,7 +176,7 @@ public class TestRecHash {
 		hashesRecord.process(db, gb, false);
 							
 		//CHECK REFERENCE SENDER
-		assertEquals(hashesRecord.getTimestamp(), maker.getLastReference(db));
+		assertEquals(hashesRecord.getTimestamp(), maker.getLastTimestamp(db));
 		
 		HashesSignsMap map = db.getHashesSignsMap();
 		Stack<Tuple3<Long, Integer, Integer>> result = map.get(hash0);

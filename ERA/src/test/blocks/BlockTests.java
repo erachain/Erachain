@@ -75,7 +75,7 @@ public class BlockTests
 	}
 		
 	private void initTrans(List<Transaction> transactions, long timestamp) {
-		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(db));
+		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastTimestamp(db));
 		payment.sign(generator, false);
 		transactions.add(payment);
 
@@ -227,8 +227,8 @@ public class BlockTests
 		Account recipient2 = new Account("7FUUEjDSo9J4CYon4tsokMCPmfP4YggPnd");
 				
 		//CHECK LAST REFERENCE GENERATOR
-		assertEquals((long)recipient1.getLastReference(db), 0);
-		assertEquals((long)recipient2.getLastReference(db), 0);
+		assertEquals((long)recipient1.getLastTimestamp(db), 0);
+		assertEquals((long)recipient2.getLastTimestamp(db), 0);
 		
 		//CHECK BALANCE RECIPIENT 1
 		assertEquals(0, recipient1.getBalanceUSE(ERM_KEY, db).compareTo(BigDecimal.valueOf(0).setScale(8)));
@@ -253,8 +253,8 @@ public class BlockTests
 			e.printStackTrace();
 		}
 				
-		assertEquals(true, recipient1.getLastReference(db) == 0l);
-		assertEquals(true, recipient2.getLastReference(db) == 0l);
+		assertEquals(true, recipient1.getLastTimestamp(db) == 0l);
+		assertEquals(true, recipient2.getLastTimestamp(db) == 0l);
 		
 		//CHECK BALANCE RECIPIENT 1
 		assertEquals(recipient1.getBalanceUSE(ERM_KEY, db), BigDecimal.valueOf(0).setScale(8));		
@@ -296,7 +296,7 @@ public class BlockTests
 		assertEquals(true, newBlock.isSignatureValid());
 
 		//INVALID TRANSACTION HASH
-		Transaction payment = new R_Send(generator, FEE_POWER, generator, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastReference(db));
+		Transaction payment = new R_Send(generator, FEE_POWER, generator, FEE_KEY, BigDecimal.valueOf(1).setScale(8), timestamp, generator.getLastTimestamp(db));
 		payment.sign(generator, false);
 		transactions.add(payment);
 		
@@ -320,7 +320,7 @@ public class BlockTests
 		//ADD TRANSACTION
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp(db);
-		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(db));
+		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastTimestamp(db));
 		payment.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db, null));
 		transactions = new ArrayList<Transaction>();
@@ -340,7 +340,7 @@ public class BlockTests
 		newBlock = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);	
 		
 		//ADD TRANSACTION
-		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(200).setScale(8), NTP.getTime(), generator.getLastReference(db), payment.getSignature());
+		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(200).setScale(8), NTP.getTime(), generator.getLastTimestamp(db), payment.getSignature());
 		transactions = new ArrayList<Transaction>();
 		transactions.add(payment);
 				
@@ -410,7 +410,7 @@ public class BlockTests
 		invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = newBlock.getTimestamp(db);
-		Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(8), timestamp, generator.getLastReference(db));
+		Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(8), timestamp, generator.getLastTimestamp(db));
 		payment.sign(generator, false);
 		
 		transactions = new ArrayList<Transaction>();
@@ -471,7 +471,7 @@ public class BlockTests
 		//GENERATE PAYMENT 1
 		Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		long timestamp = block.getTimestamp(db);
-		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(db));
+		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastTimestamp(db));
 		payment1.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
 		
@@ -482,7 +482,7 @@ public class BlockTests
 				
 		//GENERATE PAYMENT 2
 		Account recipient2 = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
-		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastReference(fork));
+		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, generator.getLastTimestamp(fork));
 		payment2.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(fork, null));
 		
@@ -576,7 +576,7 @@ public class BlockTests
 		Account recipient1 = new Account("7JU8UTuREAJG2yht5ASn7o1Ur34P1nvTk5");
 		// TIMESTAMP for records make lower
 		long timestamp = block.getTimestamp(db) - 1000;
-		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient1, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp++, generator.getLastReference(fork));
+		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient1, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp++, generator.getLastTimestamp(fork));
 		payment1.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
 
@@ -587,7 +587,7 @@ public class BlockTests
 		//GENERATE PAYMENT 2
 		Account recipient2 = new Account("7G1G45RX4td59daBv6PoN84nAJA49NZ47i");
 		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, ERM_KEY,
-				BigDecimal.valueOf(10).setScale(8), timestamp++, generator.getLastReference(fork));
+				BigDecimal.valueOf(10).setScale(8), timestamp++, generator.getLastTimestamp(fork));
 		payment2.sign(generator, false);
 		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(fork, null));
 
@@ -619,7 +619,7 @@ public class BlockTests
 		assertEquals(generator.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(1900.0000).setScale(8));
 		
 		//CHECK LAST REFERENCE GENERATOR
-		assertEquals((long)generator.getLastReference(db), (long)payment2.getTimestamp());
+		assertEquals((long)generator.getLastTimestamp(db), (long)payment2.getTimestamp());
 		
 		//CHECK BALANCE RECIPIENT 1
 		assertEquals(recipient1.getBalanceUSE(ERM_KEY, db), BigDecimal.valueOf(0).setScale(8));
@@ -627,14 +627,14 @@ public class BlockTests
 		
 		//CHECK LAST REFERENCE RECIPIENT 1
 		//assertEquals((long)recipient1.getLastReference(db), (long)payment1.getTimestamp());
-		assertEquals((long)recipient1.getLastReference(db), 0l);
+		assertEquals((long)recipient1.getLastTimestamp(db), 0l);
 		
 		//CHECK BALANCE RECIPIENT2
 		assertEquals(recipient2.getBalanceUSE(ERM_KEY, db), BigDecimal.valueOf(10).setScale(8));
 		assertEquals(recipient2.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(0).setScale(8));
 				
 		//CHECK LAST REFERENCE RECIPIENT 2
-		assertNotEquals(recipient2.getLastReference(db), payment2.getTimestamp());
+		assertNotEquals(recipient2.getLastTimestamp(db), payment2.getTimestamp());
 		
 		//CHECK TOTAL FEE
 		assertEquals(block.getTotalFee(), BigDecimal.valueOf(0.00065536).setScale(8));
@@ -660,19 +660,19 @@ public class BlockTests
 		assertEquals(generator.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(2000).setScale(8));
 		
 		//CHECK LAST REFERENCE GENERATOR
-		assertEquals((long)generator.getLastReference(db), gb.getTimestamp(db));
+		assertEquals((long)generator.getLastTimestamp(db), gb.getTimestamp(db));
 		
 		//CHECK BALANCE RECIPIENT 1
 		assertEquals(recipient1.getBalanceUSE(FEE_KEY, db), BigDecimal.valueOf(0).setScale(8));
 		
 		//CHECK LAST REFERENCE RECIPIENT 1
-		assertNotEquals(recipient1.getLastReference(db), payment1.getTimestamp());
+		assertNotEquals(recipient1.getLastTimestamp(db), payment1.getTimestamp());
 		
 		//CHECK BALANCE RECIPIENT 2
 		assertEquals(true, recipient2.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0)) == 0);
 				
 		//CHECK LAST REFERENCE RECIPIENT 2
-		assertEquals((long)recipient2.getLastReference(db), (long)0);
+		assertEquals((long)recipient2.getLastTimestamp(db), (long)0);
 		
 		//CHECK LAST BLOCK
 		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().getLastBlock().getSignature()));

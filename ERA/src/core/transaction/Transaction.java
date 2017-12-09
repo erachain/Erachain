@@ -988,7 +988,7 @@ public abstract class Transaction {
 	{
 	
 		//CHECK IF REFERENCE IS OK
-		Long reference = releaserReference==null ? this.creator.getLastReference(dcSet) : releaserReference;
+		Long reference = releaserReference==null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
 		if (reference != null && this.isReferenced()) {
 			if (false && reference.compareTo(this.reference) >= 0)
 				return INVALID_REFERENCE;

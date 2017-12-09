@@ -163,7 +163,7 @@ public class TestNoteAsPack {
 		issueNoteRecord.sign(maker, asPack);
 		
 		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
-		Long makerReference = maker.getLastReference(db);
+		Long makerReference = maker.getLastTimestamp(db);
 		issueNoteRecord.process(db, gb, asPack);
 		
 		LOGGER.info("note KEY: " + note.getKey(db));
@@ -186,7 +186,7 @@ public class TestNoteAsPack {
 		assertEquals(true, Arrays.equals(db.getItemNoteMap().get(key).toBytes(includeReference, false), note.toBytes(includeReference, false)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals((long)makerReference, (long)maker.getLastReference(db));
+		assertEquals((long)makerReference, (long)maker.getLastTimestamp(db));
 	}
 	
 	
@@ -197,14 +197,14 @@ public class TestNoteAsPack {
 		init();				
 				
 		Note note = new Note(maker, "test", icon, image, "strontje");
-		Long makerReference = maker.getLastReference(db);
+		Long makerReference = maker.getLastTimestamp(db);
 				
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note);
 		issueNoteRecord.sign(maker, asPack);
 		issueNoteRecord.process(db, gb, asPack);
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals((long)makerReference, (long)maker.getLastReference(db));
+		assertEquals((long)makerReference, (long)maker.getLastTimestamp(db));
 		
 		issueNoteRecord.orphan(db, asPack);
 				
@@ -212,7 +212,7 @@ public class TestNoteAsPack {
 		assertEquals(false, db.getItemNoteMap().contains(key));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals((long)makerReference, (long)maker.getLastReference(db));
+		assertEquals((long)makerReference, (long)maker.getLastTimestamp(db));
 	}
 	
 	

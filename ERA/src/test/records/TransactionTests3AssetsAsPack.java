@@ -74,7 +74,7 @@ public class TransactionTests3AssetsAsPack {
 		asset = new AssetVenture(maker, "a", icon, image, "a", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
 
-		releaserReference = maker.getLastReference(db);
+		releaserReference = maker.getLastTimestamp(db);
 
 	}
 	
@@ -434,7 +434,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		Long maker_LastReference = releaserReference;
-		Long recipient_LastReference = recipient.getLastReference(db);
+		Long recipient_LastReference = recipient.getLastTimestamp(db);
 			
 		//CREATE ASSET TRANSFER
 		long key = 221;
@@ -455,7 +455,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(maker_LastReference, releaserReference);
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(recipient_LastReference, recipient.getLastReference(db));
+		assertEquals(recipient_LastReference, recipient.getLastTimestamp(db));
 	}
 	
 	@Test
@@ -467,7 +467,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		Long maker_LastReference = releaserReference;
-		Long recipient_LastReference = recipient.getLastReference(db);
+		Long recipient_LastReference = recipient.getLastTimestamp(db);
 			
 		//CREATE ASSET TRANSFER
 		long key = 1l;
@@ -489,7 +489,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(maker_LastReference, releaserReference);
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(recipient_LastReference, recipient.getLastReference(db));
+		assertEquals(recipient_LastReference, recipient.getLastTimestamp(db));
 	}
 
 	
@@ -748,7 +748,7 @@ public class TransactionTests3AssetsAsPack {
 				"headdd", data,
 				new byte[] { 1 },
 				new byte[] { 0 },
-				maker.getLastReference()
+				maker.getLastTimestamp()
 				);
 		r_Send.sign(creator, asPack);
 		

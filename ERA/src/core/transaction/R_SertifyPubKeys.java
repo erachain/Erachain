@@ -582,15 +582,6 @@ public class R_SertifyPubKeys extends Transaction {
 			db.getAddressPersonMap().addItem(address, itemA);
 			db.getPersonAddressMap().addItem(this.key, address, itemP);			
 		}
-				
-		if (!asPack) {
-
-			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
-			if(false && pkAccount.getLastReference(db) == null)
-			{
-				pkAccount.setLastTimestamp(this.timestamp, db);
-			}
-		}
 
 	}
 
@@ -646,14 +637,6 @@ public class R_SertifyPubKeys extends Transaction {
 
 		}
 
-		if (!asPack) {
-			
-			//UPDATE REFERENCE OF RECIPIENT
-			if(false && pkAccount.getLastReference(db).equals(this.timestamp))
-			{
-				pkAccount.removeLastTimestamp(db);
-			}	
-		}
 	}
 
 	@Override

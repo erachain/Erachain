@@ -92,7 +92,7 @@ public class TransactionV3Tests {
 				"headdd", data,
 				isText,
 				encrypted,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		messageTransactionV3.sign(maker, false);
 		
@@ -171,7 +171,7 @@ public class TransactionV3Tests {
 				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp + 100, maker.getLastReference(db)
+				timestamp + 100, maker.getLastTimestamp(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
 		
@@ -246,7 +246,7 @@ public class TransactionV3Tests {
 				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
 		

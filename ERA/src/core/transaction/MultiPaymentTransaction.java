@@ -289,7 +289,7 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.process(this.creator, db);
 			
 			//UPDATE REFERENCE OF RECIPIENT
-			if(false && payment.getRecipient().getLastReference(db) == null)
+			if(false && payment.getRecipient().getLastTimestamp(db) == null)
 			{
 				payment.getRecipient().setLastTimestamp(this.timestamp, db);
 			}		
@@ -308,7 +308,7 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.orphan(this.creator, db);
 								
 			//UPDATE REFERENCE OF RECIPIENT
-			if(false && payment.getRecipient().getLastReference(db).equals(this.timestamp))
+			if(false && payment.getRecipient().getLastTimestamp(db).equals(this.timestamp))
 			{
 				payment.getRecipient().setLastTimestamp(this.reference, db);
 			}

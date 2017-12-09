@@ -95,7 +95,7 @@ public class TestRecSetStatusToItem {
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
 		//CREATE ISSUE PERSON TRANSACTION
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(db));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issuePersonTransaction.process(db, gb, false);
 		person = (PersonCls)issuePersonTransaction.getItem();
 		personkey = person.getKey(db);
@@ -109,7 +109,7 @@ public class TestRecSetStatusToItem {
 				"teasdskkj kjh kj EST".getBytes(Charset.forName("UTF-8")),
 				0l,
 				"DESCRIPTION".getBytes(Charset.forName("UTF-8")),
-				timestamp, maker.getLastReference(db));
+				timestamp, maker.getLastTimestamp(db));
 		timestamp += 100;
 
 	}
@@ -133,7 +133,7 @@ public class TestRecSetStatusToItem {
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
 				person.getItemTypeInt(), person.getKey(db), to_date, null,
 				323234, 2342342, null, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l, null,
-				timestamp, maker.getLastReference(db), new byte[64]);
+				timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
 		assertEquals(false, setStatusTransaction.isSignatureValid());
@@ -242,7 +242,7 @@ public class TestRecSetStatusToItem {
 				"test TEST".getBytes(Charset.forName("UTF-8")),
 				0l,
 				"tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
-				timestamp+10, maker.getLastReference(db));
+				timestamp+10, maker.getLastTimestamp(db));
 		setStatusTransaction_2.sign(maker, false);
 		setStatusTransaction_2.process(db, gb, false);
 
@@ -259,7 +259,7 @@ public class TestRecSetStatusToItem {
 		assertEquals((long)endDate, (long)Long.MIN_VALUE);
 
 		//CHECK REFERENCE SENDER
-		assertEquals(setStatusTransaction.getTimestamp(), maker.getLastReference(db));
+		assertEquals(setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
 		////// ORPHAN ///////
 		setStatusTransaction.orphan(db, false);

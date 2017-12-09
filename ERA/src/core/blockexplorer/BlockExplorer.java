@@ -767,7 +767,7 @@ public class BlockExplorer
 				DCSet db = DCSet.getInstance();
 				String address = account.getAddress();
 				// get reference to parent record for this account
-				Long timestampRef = db.getReferenceMap().get(address);
+				Long timestampRef = account.getLastTimestamp();
 				// get signature for account + time
 				byte[] signatureBytes = db.getAddressTime_SignatureMap().get(address, timestampRef);
 
@@ -793,7 +793,7 @@ public class BlockExplorer
 					}
 					// get reference to parent record for this account
 					//timestampRef = transaction.getReference();
-					timestampRef = account.getLastReference();
+					timestampRef = account.getLastTimestamp();
 					// get signature for account + time
 					signatureBytes = db.getAddressTime_SignatureMap().get(address, timestampRef);
 

@@ -101,15 +101,15 @@ public class TestRec_Send {
 				head, data,
 				isText,
 				encrypted,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		assertEquals((long)maker.getLastReference(db), gb.getTimestamp(db));
+		assertEquals((long)maker.getLastTimestamp(db), gb.getTimestamp(db));
 		r_SendV3.process(db, gb, false);
-		assertEquals((long)maker.getLastReference(db), timestamp);
+		assertEquals((long)maker.getLastTimestamp(db), timestamp);
 		
 		//assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
@@ -139,7 +139,7 @@ public class TestRec_Send {
 
 		//// MESSAGE ONLY
 		r_SendV3.orphan(db, false);
-		assertEquals((long)maker.getLastReference(db), gb.getTimestamp(db));
+		assertEquals((long)maker.getLastTimestamp(db), gb.getTimestamp(db));
 		
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
@@ -149,14 +149,14 @@ public class TestRec_Send {
 				head, data,
 				isText,
 				encrypted,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
 		
 		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
 		r_SendV3.process(db, gb, false);
-		assertEquals((long)maker.getLastReference(db), timestamp);
+		assertEquals((long)maker.getLastTimestamp(db), timestamp);
 		
 		//assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
@@ -187,7 +187,7 @@ public class TestRec_Send {
 
 		//// AMOUNT ONLY
 		r_SendV3.orphan(db, false);
-		assertEquals((long)maker.getLastReference(db), gb.getTimestamp(db));
+		assertEquals((long)maker.getLastTimestamp(db), gb.getTimestamp(db));
 		
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
@@ -197,7 +197,7 @@ public class TestRec_Send {
 				"", null,
 				null,
 				null,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
 		
@@ -241,7 +241,7 @@ public class TestRec_Send {
 				null, null,
 				null,
 				null,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
 		
@@ -286,7 +286,7 @@ public class TestRec_Send {
 				head, data,
 				isText,
 				encrypted,
-				++timestamp, maker.getLastReference(db)
+				++timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
 		
@@ -364,7 +364,7 @@ public class TestRec_Send {
 				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				++timestamp, maker.getLastReference(db)
+				++timestamp, maker.getLastTimestamp(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
 		
@@ -439,7 +439,7 @@ public class TestRec_Send {
 				maker, payments, 111,
 				data, 
 				FEE_POWER,
-				timestamp, maker.getLastReference(db)
+				timestamp, maker.getLastTimestamp(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
 		

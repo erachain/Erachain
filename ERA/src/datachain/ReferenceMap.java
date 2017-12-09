@@ -86,23 +86,10 @@ public class ReferenceMap extends DCMap<byte[], Long>
 		this.delete(key);
 	}
 
-	public Long get(String address)
+	public Long getLast(String address)
 	{
 		byte[] key = Base58.decode(address);
 		return this.get(key);
 	}
 	
-	public void set(String address, Long reference)
-	{
-		byte[] key = Base58.decode(address);
-		this.set(key, reference);
-	}
-	
-	public void delete(String address)
-	{
-		byte[] key = Base58.decode(address);
-		this.delete(key);
-	}
-
-			
 }

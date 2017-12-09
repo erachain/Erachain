@@ -345,7 +345,7 @@ public abstract class TransactionAmount extends Transaction {
 		}
 		
 		//CHECK IF REFERENCE IS OK
-		Long reference = releaserReference==null ? this.creator.getLastReference(dcSet) : releaserReference;
+		Long reference = releaserReference==null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
 		if (false && reference.compareTo(this.reference) >= 0) {
 			// TODO delete REFERENCE from TRANSACTION - in DB insert
 			// TODO: delete wrong check in new CHAIN

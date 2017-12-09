@@ -416,7 +416,7 @@ public class DeployATTransaction extends Transaction
 		atAccount.changeBalance(db, false, Transaction.FEE_KEY, this.amount );
 		
 		//UPDATE REFERENCE OF RECIPIENT
-		if( true || atAccount.getLastReference(db) == null)
+		if( true || atAccount.getLastTimestamp(db) == null)
 		{
 			atAccount.setLastTimestamp(this.timestamp, db);
 		}

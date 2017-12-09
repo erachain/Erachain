@@ -521,14 +521,14 @@ public class Account {
 
 	//REFERENCE
 	
-	public Long getLastReference()
+	public Long getLastTimestamp()
 	{
-		return this.getLastReference(DCSet.getInstance());
+		return this.getLastTimestamp(DCSet.getInstance());
 	}
 	
-	public Long getLastReference(DCSet db)
+	public Long getLastTimestamp(DCSet db)
 	{
-		return db.getReferenceMap().get(this.getAddress());
+		return db.getReferenceMap().getLast(this.getAddress());
 	}
 
 	/*

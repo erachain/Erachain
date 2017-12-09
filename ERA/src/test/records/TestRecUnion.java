@@ -124,7 +124,7 @@ public class TestRecUnion {
 				parent + 1, icon, image, "Россия");
 
 		//CREATE ISSUE UNION TRANSACTION
-		issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastReference(db));
+		issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
 
 		sertifiedPrivateKeys.add(userAccount1);
 		sertifiedPrivateKeys.add(userAccount2);
@@ -165,7 +165,7 @@ public class TestRecUnion {
 		assertEquals(true, issueUnionTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastReference(db), new byte[64]);		
+		issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db), new byte[64]);		
 		//CHECK IF ISSUE UNION IS INVALID
 		assertEquals(false, issueUnionTransaction.isSignatureValid());
 
@@ -184,7 +184,7 @@ public class TestRecUnion {
 		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CREATE INVALID ISSUE UNION - INVALID UNIONALIZE
-		issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastReference(db), new byte[64]);		
+		issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(db, releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
@@ -334,7 +334,7 @@ public class TestRecUnion {
 		assertEquals(true, Arrays.equals(db.getItemUnionMap().get(key).toBytes(true, false), union.toBytes(true, false)));
 						
 		//CHECK REFERENCE SENDER
-		assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastReference(db));
+		assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
 		//////// ORPHAN /////////
 		issueUnionTransaction.orphan(db, false);

@@ -1774,7 +1774,7 @@ public class Controller extends Observable {
 		Peer peer = null;
 		//Block lastBlock = getLastBlock();
 		//int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
-		int checkPointHeight = this.getBlockChain().getCheckPoint(dcSet);
+		int checkPointHeight = BlockChain.getCheckPoint(dcSet);
 		
 		boolean isUpToDate;
 		// WHILE NOT UPTODATE

@@ -222,7 +222,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payment.process(this.getCreator(), db);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (false && payment.getRecipient().getLastReference(db) == null) {
+			if (false && payment.getRecipient().getLastTimestamp(db) == null) {
 				payment.getRecipient().setLastTimestamp(this.timestamp, db);
 			}
 		}
@@ -247,7 +247,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payment.orphan(this.getCreator(), db);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (false && payment.getRecipient().getLastReference(db).equals(this.timestamp)) {
+			if (false && payment.getRecipient().getLastTimestamp(db).equals(this.timestamp)) {
 				payment.getRecipient().removeLastTimestamp(db);
 			}
 		}

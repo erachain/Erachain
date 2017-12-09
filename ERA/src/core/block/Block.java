@@ -369,14 +369,13 @@ public class Block {
 		if (height < inDay30<<1)
 			;
 		else if (height < inDay30<<2)
-			minFee = minFee.divide(new BigDecimal(2)).setScale(8);
+			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(8);
 		else if (height < inDay30<<3) // < 72000
-			minFee = minFee.divide(new BigDecimal(4)).setScale(8);
-		else if (height < inDay30<<3) //87000)
-			minFee = minFee.divide(new BigDecimal(8)).setScale(8);
+			minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(8);
+		else if (height < 87000) //87000)
+			minFee = minFee.divide(new BigDecimal(6), 8, BigDecimal.ROUND_DOWN).setScale(8);
 		else
-			//minFee = minFee.divide(new BigDecimal(2)).setScale(8); 
-			minFee = minFee.divide(new BigDecimal(8)).setScale(8); 
+			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(8); 
 			
 		if ( fee.compareTo(minFee) < 0) 
 			fee = minFee;
@@ -1519,8 +1518,9 @@ public class Block {
 			Transaction transaction = transactions.get(i);
 			//LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
+			transaction.setDC(dcSet, false);
+
 			if (!transaction.isWiped()) {
-				transaction.setDC(dcSet, false);
 				transaction.orphan(dcSet, false);
 			} else {
 				// IT IS REFERENCED RECORD?

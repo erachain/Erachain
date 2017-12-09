@@ -261,6 +261,7 @@ public class Synchronizer
 					//+ ", ping: " + peer.getPing()
 					);			
 		}
+		
 		Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
 		List<byte[]> signatures = headers.b;
 

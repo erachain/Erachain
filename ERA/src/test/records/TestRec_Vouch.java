@@ -85,14 +85,14 @@ public class TestRec_Vouch {
 		init();
 						
 		//CREATE VOUCH RECORD
-		Transaction vouchRecord = new R_Vouch(maker, FEE_POWER,  height, seq, timestamp, maker.getLastReference(db));
+		Transaction vouchRecord = new R_Vouch(maker, FEE_POWER,  height, seq, timestamp, maker.getLastTimestamp(db));
 		vouchRecord.sign(maker, false);
 		
 		//CHECK IF TRANSACTION IS VALID
 		assertEquals(true, vouchRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		vouchRecord = new R_Vouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastReference(db), new byte[64]);
+		vouchRecord = new R_Vouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF VOUCH IS INVALID
 		assertEquals(false, vouchRecord.isSignatureValid());
@@ -105,20 +105,20 @@ public class TestRec_Vouch {
 		init();
 						
 		//CREATE VOUCH RECORD
-		Transaction vouchRecord = new R_Vouch(maker, FEE_POWER,  height, seq, timestamp, maker.getLastReference(db));		
+		Transaction vouchRecord = new R_Vouch(maker, FEE_POWER,  height, seq, timestamp, maker.getLastTimestamp(db));		
 		assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(db, releaserReference));
 		
-		vouchRecord = new R_Vouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastReference(db), new byte[64]);		
+		vouchRecord = new R_Vouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(db, releaserReference));
 
 		// SET <2 in isValid()
-		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastReference(db), new byte[64]);		
+		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(db, releaserReference));
 
-		vouchRecord = new R_Vouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastReference(db), new byte[64]);		
+		vouchRecord = new R_Vouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(db, releaserReference));
 
-		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastReference(db), new byte[64]);		
+		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(db, releaserReference));
 }
 
@@ -130,7 +130,7 @@ public class TestRec_Vouch {
 		init();
 						
 		//CREATE ISSUE ASSET TRANSACTION
-		R_Vouch vouchRecord = new R_Vouch(maker,  FEE_POWER, height, seq, timestamp, maker.getLastReference(db));
+		R_Vouch vouchRecord = new R_Vouch(maker,  FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
 		vouchRecord.sign(maker, false);
 		
 		//CONVERT TO BYTES
@@ -197,7 +197,7 @@ public class TestRec_Vouch {
 		
 		init();				
 		
-		R_Vouch vouchRecord = new R_Vouch(maker,  FEE_POWER, height, seq, timestamp, maker.getLastReference(db));
+		R_Vouch vouchRecord = new R_Vouch(maker,  FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
 		//vouchRecord.sign(maker, false);
 		
 		//assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(db, releaserReference));

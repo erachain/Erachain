@@ -266,6 +266,7 @@ public class BlockGenerator extends Thread implements Observer
 					}
 					catch(Exception e)
 					{
+						LOGGER.error(e.getMessage(), e);
 					}
 					this.orphanto = 0;
 					ctrl.checkStatusAndObserve(0);

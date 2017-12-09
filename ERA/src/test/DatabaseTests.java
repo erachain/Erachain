@@ -113,7 +113,7 @@ public class DatabaseTests {
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
 		//CREATE ISSUE PERSON TRANSACTION
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastReference(dcSet));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
 
 	}
 
@@ -126,11 +126,11 @@ public class DatabaseTests {
 		issuePersonTransaction.sign(maker, asPack);
 		issuePersonTransaction.process(dcSet, gb, asPack);
 
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dcSet));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
 		issuePersonTransaction.sign(maker, asPack);
 		issuePersonTransaction.process(dcSet, gb, asPack);
 
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(dcSet));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
 		issuePersonTransaction.sign(maker, asPack);
 		issuePersonTransaction.process(dcSet, gb, asPack);
 		
@@ -140,11 +140,11 @@ public class DatabaseTests {
 		//CREATE FORK
 		DCSet fork = dcSet.fork();
 
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(fork));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
 		issuePersonTransaction.sign(maker, asPack);
 		issuePersonTransaction.process(fork, gb, asPack);
 
-		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastReference(fork));
+		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
 		issuePersonTransaction.sign(maker, asPack);
 		issuePersonTransaction.process(fork, gb, asPack);
 
@@ -226,7 +226,7 @@ public class DatabaseTests {
 		init();
 						
 		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, 50000l, (byte) 2, false);
-		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastReference(dcSet));
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
 		issueAssetTransaction.sign(maker, false);
 		issueAssetTransaction.process(dcSet, gb, false);
 		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());

@@ -688,7 +688,7 @@ public class API {
 		// GET ACCOUNT
 		Account account = new Account(address);
 
-		Long lastTimestamp = account.getLastReference();
+		Long lastTimestamp = account.getLastTimestamp();
 		
 		String out;
 		if(lastTimestamp == null) {
@@ -727,7 +727,7 @@ public class API {
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(from, count, true);
 		
 		DCSet db = DCSet.getInstance();
-		Long lastTimestamp = account.getLastReference();
+		Long lastTimestamp = account.getLastTimestamp();
 		byte[] signature;
 		if(!(lastTimestamp == null)) 
 		{

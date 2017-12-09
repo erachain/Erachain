@@ -93,14 +93,14 @@ public class TestRecStatus {
 		Status status = new Status(maker, "test", icon, image, "strontje", true);
 				
 		//CREATE ISSUE STATUS TRANSACTION
-		Transaction issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
+		Transaction issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueStatusTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE STATUS TRANSACTION IS VALID
 		assertEquals(true, issueStatusTransaction.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
+		issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
 		assertEquals(false, issueStatusTransaction.isSignatureValid());
@@ -119,7 +119,7 @@ public class TestRecStatus {
 		assertEquals(raw.length, status.getDataLength(false));
 				
 		//CREATE ISSUE STATUS TRANSACTION
-		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueStatusRecord.sign(maker, false);
 		issueStatusRecord.process(db, gb, false);
 		
@@ -179,7 +179,7 @@ public class TestRecStatus {
 		Status status = new Status(maker, "test", icon, image, "strontje", true);
 				
 		//CREATE ISSUE STATUS TRANSACTION
-		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
 		
@@ -193,7 +193,7 @@ public class TestRecStatus {
 		assertEquals(true, db.getItemStatusMap().contains(key));
 		
 		StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje", true);				
-		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
+		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
 		issueStatusTransaction_2.sign(maker, false);
 		issueStatusTransaction_2.process(db, gb, false);
 		LOGGER.info("status_2 KEY: " + status_2.getKey(db));
@@ -204,7 +204,7 @@ public class TestRecStatus {
 		assertEquals(true, Arrays.equals(db.getItemStatusMap().get(key).toBytes(true, false), status.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(issueStatusRecord.getTimestamp(), maker.getLastReference(db));
+		assertEquals(issueStatusRecord.getTimestamp(), maker.getLastTimestamp(db));
 
 		////// ORPHAN ///////
 		

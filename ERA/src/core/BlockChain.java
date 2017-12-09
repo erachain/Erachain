@@ -132,7 +132,8 @@ public class BlockChain
 
 	private Block waitWinBuffer;
 	//private int checkPoint = DEVELOP_USE?1:32400;
-	public static final byte[] CHECKPOINT = Base58.decode("4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W");
+	public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(36654,
+			Base58.decode("4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W"));
 
 	//private int target = 0;
 	//private byte[] lastBlockSignature;
@@ -293,15 +294,15 @@ public class BlockChain
 
 	public static int getCheckPoint(DCSet dcSet) {
 		
-		int checkPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
-		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(CHECKPOINT);
+		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
 		if (item == null)
-			return checkPoint;
+			return 1;
 		
 		int heightCheckPoint = item.a;
+		int dynamicCheckPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
 				
-		if (checkPoint > heightCheckPoint)
-			return checkPoint;
+		if (dynamicCheckPoint > heightCheckPoint)
+			return dynamicCheckPoint;
 		return heightCheckPoint;
 	}
 	

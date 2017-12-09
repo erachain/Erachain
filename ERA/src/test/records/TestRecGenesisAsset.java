@@ -254,7 +254,7 @@ public class TestRecGenesisAsset {
 				
 		//CHECK REFERENCE SENDER
 		// it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
-		assertEquals(null, maker.getLastReference(db));
+		assertEquals(null, maker.getLastTimestamp(db));
 
 	}
 
@@ -420,7 +420,7 @@ public class TestRecGenesisAsset {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(assetTransfer.getTimestamp(), recipient.getLastReference(db));
+		assertEquals(assetTransfer.getTimestamp(), recipient.getLastTimestamp(db));
 	}
 	
 	@Test
@@ -453,7 +453,7 @@ public class TestRecGenesisAsset {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertNotEquals(assetTransfer.getSignature(), recipient.getLastReference(db));
+		assertNotEquals(assetTransfer.getSignature(), recipient.getLastTimestamp(db));
 	}
 	
 	@Test
@@ -531,7 +531,7 @@ public class TestRecGenesisAsset {
 		*/
 		
 		//CHECK REFERENCE RECIPIENT
-		assertEquals(assetTransfer.getTimestamp(), recipient.getLastReference(db));
+		assertEquals(assetTransfer.getTimestamp(), recipient.getLastTimestamp(db));
 
 		///////////////////////////
 		////////////////////////////
@@ -547,7 +547,7 @@ public class TestRecGenesisAsset {
 		assertEquals(BigDecimal.ZERO.setScale(8), owner.getBalance(db, key));
 
 		//CHECK REFERENCE RECIPIENT
-		assertNotEquals(assetTransfer.getSignature(), recipient.getLastReference(db));
+		assertNotEquals(assetTransfer.getSignature(), recipient.getLastTimestamp(db));
 	}
 	
 

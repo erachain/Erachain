@@ -543,7 +543,7 @@ public abstract class AT_Controller {
 				if ( tx.getRecipientId() != null && !Arrays.equals(tx.getRecipientId(), new byte[ AT_Constants.AT_ID_SIZE ]))
 				{
 					Account recipient = new Account( Base58.encode( tx.getRecipientId() ) );
-					if (false && recipient.getLastReference(dcSet) == null)
+					if (false && recipient.getLastTimestamp(dcSet) == null)
 					{
 						recipient.setLastTimestamp(-1L, dcSet);
 					}

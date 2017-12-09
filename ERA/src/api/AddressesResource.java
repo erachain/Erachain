@@ -83,7 +83,7 @@ public class AddressesResource {
 		// GET ACCOUNT
 		Account account = new Account(address);
 
-		Long lastTimestamp = account.getLastReference();
+		Long lastTimestamp = account.getLastTimestamp();
 		
 		// RETURN
 		
@@ -115,7 +115,7 @@ public class AddressesResource {
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 10, true);
 		
 		DCSet db = DCSet.getInstance();
-		Long lastTimestamp = account.getLastReference(db);
+		Long lastTimestamp = account.getLastTimestamp(db);
 		byte[] signature;
 		if(!(lastTimestamp == null)) 
 		{

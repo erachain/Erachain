@@ -96,7 +96,7 @@ public class TestRecNote {
 		note = new Note(maker, "test132", icon, image, "12345678910strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueNoteRecord.sign(maker, false);
 		if (process) {
 			issueNoteRecord.process(db, gb, false);
@@ -125,7 +125,7 @@ public class TestRecNote {
 		assertEquals(true, issueNoteRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db), new byte[64]);
+		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE NOTE IS INVALID
 		assertEquals(false, issueNoteRecord.isSignatureValid());
@@ -144,7 +144,7 @@ public class TestRecNote {
 		assertEquals(raw.length, note.getDataLength(false));
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueNoteRecord.sign(maker, false);
 		issueNoteRecord.process(db, gb, false);
 		
@@ -204,7 +204,7 @@ public class TestRecNote {
 		Note note = new Note(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		
 		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
 		
@@ -219,7 +219,7 @@ public class TestRecNote {
 		assertEquals(true, noteMap.contains(key));
 		
 		NoteCls note_2 = new Note(maker, "test132_2", icon, image, "2_12345678910strontje");				
-		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastReference(db));
+		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
 		issueNoteTransaction_2.sign(maker, false);
 		issueNoteTransaction_2.process(db, gb, false);
 		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
@@ -230,7 +230,7 @@ public class TestRecNote {
 		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true, false), note.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastReference(db));
+		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
 	}
 	
 	
@@ -243,11 +243,11 @@ public class TestRecNote {
 		Note note = new Note(maker, "test", icon, image, "strontje");
 				
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastReference(db));
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueNoteRecord.sign(maker, false);
 		issueNoteRecord.process(db, gb, false);
 		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastReference(db));
+		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
 		
 		issueNoteRecord.orphan(db, false);
 				
@@ -270,14 +270,14 @@ public class TestRecNote {
 		
 		initNote(true);
 		
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db));
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
 		signNoteRecord.sign(maker, asPack);
 		
 		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
 		assertEquals(true, signNoteRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db), new byte[64]);
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE NOTE IS INVALID
 		assertEquals(false, signNoteRecord.isSignatureValid());
@@ -293,7 +293,7 @@ public class TestRecNote {
 		
 		initNote(true);
 		
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db));
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
 		signNoteRecord.sign(maker, asPack);
 		
 		//CONVERT TO BYTES
@@ -343,7 +343,7 @@ public class TestRecNote {
 		
 		// NOT DATA
 		data = null;
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastReference(db));
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastTimestamp(db));
 		signNoteRecord.sign(maker, asPack);
 		
 		//CONVERT TO BYTES
@@ -393,7 +393,7 @@ public class TestRecNote {
 		// NOT KEY
 		//data = null;
 		noteKey = 0;
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastReference(db));
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastTimestamp(db));
 		signNoteRecord.sign(maker, asPack);
 		
 		//CONVERT TO BYTES
@@ -443,7 +443,7 @@ public class TestRecNote {
 		// NOT KEY
 		data = null;
 		noteKey = 0;
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastReference(db));
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+20, maker.getLastTimestamp(db));
 		signNoteRecord.sign(maker, asPack);
 		
 		//CONVERT TO BYTES
@@ -501,7 +501,7 @@ public class TestRecNote {
 		
 		initNote(true);
 		
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastReference(db));
+		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
 		
 		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(db, releaserReference));
 		
@@ -509,7 +509,7 @@ public class TestRecNote {
 		signNoteRecord.process(db, gb, false);
 							
 		//CHECK REFERENCE SENDER
-		assertEquals(signNoteRecord.getTimestamp(), maker.getLastReference(db));	
+		assertEquals(signNoteRecord.getTimestamp(), maker.getLastTimestamp(db));	
 			
 		///// ORPHAN
 		signNoteRecord.orphan(db, false);

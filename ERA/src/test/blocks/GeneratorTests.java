@@ -625,7 +625,7 @@ public class GeneratorTests {
 		{
 				
 			//CREATE VALID PAYMENT
-			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01).setScale(8), timestamp++, generator.getLastReference(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01).setScale(8), timestamp++, generator.getLastTimestamp(snapshot));
 			payment.sign(generator, false);
 		
 			//PROCESS IN DB
@@ -697,7 +697,7 @@ public class GeneratorTests {
 			//CREATE VALID PAYMENT
 			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001).setScale(8),
 					 "sss", new byte[3000], new byte[]{1}, new byte[]{0},
-					 timestamp++, generator.getLastReference(snapshot));
+					 timestamp++, generator.getLastTimestamp(snapshot));
 			payment.sign(generator, false);
 			assertEquals(payment.isValid(snapshot, null), Transaction.VALIDATE_OK);
 		
@@ -769,7 +769,7 @@ public class GeneratorTests {
 
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		Transaction payment = new R_Send(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000).setScale(8),
-				 timestamp++, userAccount1.getLastReference(dcSet));
+				 timestamp++, userAccount1.getLastTimestamp(dcSet));
 		payment.sign(userAccount1, false);
 		assertEquals(payment.isValid(dcSet, null), Transaction.VALIDATE_OK);
 			
