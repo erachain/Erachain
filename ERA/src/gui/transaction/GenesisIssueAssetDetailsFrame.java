@@ -18,6 +18,7 @@ import javax.swing.border.EmptyBorder;
 
 import core.crypto.Base58;
 import core.transaction.GenesisIssueAssetTransaction;
+import datachain.DCSet;
 import core.item.assets.AssetCls;
 import lang.Lang;
 import utils.DateTimeFormat;
@@ -65,7 +66,7 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame
 				
 		//QUANTITY
 		++detailGBC.gridy;
-		JTextField quantity = new JTextField(asset.getQuantity().toString());
+		JTextField quantity = new JTextField(asset.getQuantity(DCSet.getInstance()).toString());
 		quantity.setEditable(false);
 		MenuPopupUtil.installContextMenu(quantity);
 		this.add(quantity, detailGBC);	

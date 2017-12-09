@@ -10,6 +10,7 @@ import javax.validation.constraints.Null;
 
 import controller.Controller;
 import core.item.assets.AssetCls;
+import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import utils.ObserverMessage;
@@ -116,7 +117,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
 		case COLUMN_AMOUNT:
 			
-			return asset.getTotalQuantity();
+			return asset.getTotalQuantity(DCSet.getInstance());
 			
 		case COLUMN_DIVISIBLE:
 			

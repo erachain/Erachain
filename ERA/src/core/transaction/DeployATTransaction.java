@@ -505,7 +505,7 @@ public class DeployATTransaction extends Transaction
 	public HashSet<Account> getRecipientAccounts()
 	{
 		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.getATaccount(DCSet.getInstance()));
+		accounts.add(this.getATaccount(dcSet));
 		return accounts;
 	}
 	
@@ -519,7 +519,7 @@ public class DeployATTransaction extends Transaction
 			return true;
 		}
 
-		if(address.equals(this.getATaccount(DCSet.getInstance()).getAddress()))
+		if(address.equals(this.getATaccount(dcSet).getAddress()))
 		{
 			return true;
 		}
@@ -545,7 +545,7 @@ public class DeployATTransaction extends Transaction
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 		
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.amount);
-		assetAmount = addAssetAmount(assetAmount, this.getATaccount(DCSet.getInstance()).getAddress(), FEE_KEY, this.amount);
+		assetAmount = addAssetAmount(assetAmount, this.getATaccount(dcSet).getAddress(), FEE_KEY, this.amount);
 		
 		return assetAmount;
 	}

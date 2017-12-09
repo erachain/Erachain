@@ -531,7 +531,7 @@ public class R_SertifyPubKeys extends Transaction {
 			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 
 			// GET FEE from that record
-			transPersonIssue.setDB(db, false); // NEED to RECAL?? if from DB
+			transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
 			
 			// ISSUE NEW COMPU in chain
 			BigDecimal issued_FEE_BD = transPersonIssue.getFee();
@@ -624,7 +624,7 @@ public class R_SertifyPubKeys extends Transaction {
 			// FIND issue record
 			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 			// GET FEE from that record
-			transPersonIssue.setDB(db, false); // NEED to RECAL?? if from DB
+			transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
 			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			//if (true || BlockChain.START_LEVEL == 1)
 			//	issueFEE = issueFEE>>2;

@@ -278,13 +278,13 @@ public class CancelOrderTransaction extends Transaction
 
 		Order order;
 
-		if(DCSet.getInstance().getCompletedOrderMap().contains(this.order))
+		if(this.dcSet.getCompletedOrderMap().contains(this.order))
 		{
-			order =  DCSet.getInstance().getCompletedOrderMap().get(this.order);
+			order =  this.dcSet.getCompletedOrderMap().get(this.order);
 		}
 		else
 		{
-			order =  DCSet.getInstance().getOrderMap().get(this.order);
+			order =  this.dcSet.getOrderMap().get(this.order);
 		}	
 		
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHaveLeft());

@@ -385,7 +385,7 @@ public abstract class Transaction {
 	}
 
 	//GETTERS/SETTERS
-	public void setDB(DCSet db, boolean asPack)
+	public void setDC(DCSet db, boolean asPack)
 	{
 		this.dcSet = db;
 		if (!asPack)
@@ -584,7 +584,7 @@ public abstract class Transaction {
 	public int getForgedFee(DCSet db)
 	{
 		if (this.dcSet == null)
-			this.setDB(db, false);
+			this.setDC(db, false);
 		
 		int fee = this.fee.unscaledValue().intValue();
 		int fee_invited = fee>>BlockChain.FEE_INVITED_SHIFT;
@@ -595,7 +595,7 @@ public abstract class Transaction {
 	public int getInvitedFee(DCSet db)
 	{
 		if (this.dcSet == null)
-			this.setDB(db, false);
+			this.setDC(db, false);
 
 		int fee = this.fee.unscaledValue().intValue();
 		return fee>>BlockChain.FEE_INVITED_SHIFT;		
@@ -800,11 +800,13 @@ public abstract class Transaction {
 	protected JSONObject getJsonBase()
 	{
 		
+		DCSet localDCSet = DCSet.getInstance();
+		
 		JSONObject transaction = new JSONObject();
 		
 		transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
 		transaction.put("record_type", this.viewTypeName());
-		transaction.put("confirmations", this.getConfirmations(DCSet.getInstance()));
+		transaction.put("confirmations", this.getConfirmations(localDCSet));
 		transaction.put("type_name", this.viewTypeName());
 		transaction.put("sub_type_name", this.viewSubTypeName());
 		
@@ -816,11 +818,11 @@ public abstract class Transaction {
 			transaction.put("signature", "genesis");
 			height = 1;
 		} else {
-			height = this.getBlockHeight(DCSet.getInstance());
+			height = this.getBlockHeight(localDCSet);
 			//transaction.put("reference", this.reference==null?"null":"" + this.reference);
 			transaction.put("signature", this.signature==null?"null":Base58.encode(this.signature));
 			if (this.fee.signum() == 0) {
-				this.setDB(DCSet.getInstance(), false);
+				this.setDC(localDCSet, false);
 			}
 			transaction.put("fee", this.fee.toPlainString());
 			transaction.put("timestamp", this.timestamp<1000?"null":this.timestamp);
@@ -832,7 +834,7 @@ public abstract class Transaction {
 		
 		transaction.put("height", height);
 		if (height > 0)
-			transaction.put("sequence", this.getSeqNo(DCSet.getInstance()));
+			transaction.put("sequence", this.getSeqNo(localDCSet));
 		transaction.put("size", this.viewSize(false));
 		return transaction;
 	}
@@ -842,22 +844,23 @@ public abstract class Transaction {
 	@SuppressWarnings("unchecked")
 	public JSONObject rawToJson() {
 		
+		DCSet localDCSet = DCSet.getInstance();
 		JSONObject transaction = new JSONObject();
 		
-		transaction.put("confirmations", this.getConfirmations(DCSet.getInstance()));
+		transaction.put("confirmations", this.getConfirmations(localDCSet));
 		
 		int height;
 		if (this.creator == null )
 		{
 			height = 1;
 		} else {
-			height = this.getBlockHeight(DCSet.getInstance());
+			height = this.getBlockHeight(localDCSet);
 			transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
 		}
 
 		transaction.put("height", height);
 		if (height > 0)
-			transaction.put("sequence", this.getSeqNo(DCSet.getInstance()));
+			transaction.put("sequence", this.getSeqNo(localDCSet));
 		
 		boolean isSigned = this.signature!=null;
 		transaction.put("signature", isSigned?Base58.encode(this.signature):"null");
@@ -865,7 +868,7 @@ public abstract class Transaction {
 		transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
 		
 		transaction.put("block", block);
-		transaction.put("nom_in_block", viewHeightSeq(DCSet.getInstance()));
+		transaction.put("nom_in_block", viewHeightSeq(localDCSet));
 		
 		return transaction;
 	}
@@ -980,12 +983,7 @@ public abstract class Transaction {
 
 		return Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data);
 	}
-	
-	public int isValid(Long releaserReference)
-	{
-		return isValid(DCSet.getInstance(), releaserReference);
-	}
-	
+		
 	public int isValid(DCSet dcSet, Long releaserReference)
 	{
 	
@@ -1215,7 +1213,7 @@ public abstract class Transaction {
 		}
 		
 		// IF UNCONFIRMED
-		return Controller.getInstance().getLastBlock().getNextBlockVersion(DCSet.getInstance());	
+		return Controller.getInstance().getLastBlock().getNextBlockVersion(db);	
 	}
 
 	public static Map<String, Map<Long, BigDecimal>> subAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount, String address, Long assetKey, BigDecimal amount) 

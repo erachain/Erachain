@@ -96,12 +96,14 @@ public class BlockExplorer
 	private static final long FEE_KEY = Transaction.FEE_KEY;
 	public static final String  LANG_DEFAULT = "en";
 	private  String lang_file;
+	private DCSet dcSet;
 	
 	public static BlockExplorer getInstance()
 	{
 		if(blockExplorer == null)
 		{
 			blockExplorer = new BlockExplorer();
+			blockExplorer.dcSet = DCSet.getInstance();
 		}
 
 		return blockExplorer;
@@ -846,7 +848,7 @@ public class BlockExplorer
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", Processor.process(asset.getDescription()));
 			assetJSON.put("owner", asset.getOwner().getAddress());
-			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
+			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(DCSet.getInstance())));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
 			assetJSON.put("isDivisible", a);
@@ -901,7 +903,7 @@ public class BlockExplorer
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", Processor.process(asset.getDescription()));
 			assetJSON.put("owner", asset.getOwner().getAddress());
-			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity()));
+			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(dcSet)));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
 			assetJSON.put("isDivisible", a);
@@ -1296,7 +1298,7 @@ if ( asset_1 == null) {
 		assetJSON.put("name", asset.getName());
 		assetJSON.put("description", asset.getDescription());
 		assetJSON.put("owner", asset.getOwner().getAddress());
-		assetJSON.put("quantity", asset.getQuantity());
+		assetJSON.put("quantity", asset.getQuantity(dcSet));
 		String divis = Lang.getInstance().translate_from_langObj("False", langObj);
 		if (asset.isDivisible()) divis = Lang.getInstance().translate_from_langObj("True", langObj);
 		assetJSON.put("isDivisible",divis );
@@ -2126,7 +2128,7 @@ if ( asset_1 == null) {
 		
 		output.put("all", all.toPlainString());
 		output.put("allinOrders", alloreders.toPlainString());
-		output.put("allTotal",asset.getTotalQuantity());//(all.add(alloreders)).toPlainString());
+		output.put("allTotal",asset.getTotalQuantity(dcSet));//(all.add(alloreders)).toPlainString());
 		output.put("assetKey", key);
 		output.put("assetName",asset.getName());
 		output.put("limit", limit);

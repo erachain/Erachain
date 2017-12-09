@@ -424,7 +424,7 @@ public class TestRecPerson {
 				sertifiedPublicKeys,
 				356, timestamp, userAccount1.getLastReference(db));
 		//CREATE INVALID ISSUE PERSON - NOT FEE
-		personalizeRecord_0.setDB(db, false);
+		personalizeRecord_0.setDC(db, false);
 		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));

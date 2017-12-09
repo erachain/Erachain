@@ -160,7 +160,7 @@ public class TransactionTests3AssetsAsPack {
 			assertEquals(issueAssetTransaction.getItem().getDescription(), parsedIssueAssetTransaction.getItem().getDescription());
 				
 			//CHECK QUANTITY
-			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(db), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity(db));
 			
 			//DIVISIBLE
 			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
@@ -226,7 +226,7 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity())) == 0);
+		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity(db))) == 0);
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(issueAssetTransaction.getSignature(), releaserReference);
@@ -314,7 +314,7 @@ public class TransactionTests3AssetsAsPack {
 		issueAssetTransaction.process(db, gb, asPack);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(new BigDecimal(asset.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
@@ -668,7 +668,7 @@ public class TransactionTests3AssetsAsPack {
 		cancelOrderTransaction.process(db, gb, asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(asset.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.valueOf(asset.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(cancelOrderTransaction.getSignature(), releaserReference);

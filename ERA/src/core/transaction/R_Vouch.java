@@ -333,7 +333,7 @@ public class R_Vouch extends Transaction {
 	public HashSet<Account> getRecipientAccounts() {
 		HashSet<Account> accounts = new HashSet<Account>();
 
-		Transaction record = DCSet.getInstance().getTransactionFinalMap().getTransaction(height, seq);
+		Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 		if (record == null) {
 			LOGGER.debug("core.transaction.R_Vouch.getRecipientAccounts() not found record: " + height + "-" + seq);
 			return accounts;

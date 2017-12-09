@@ -2345,7 +2345,7 @@ public class TransactionTests {
 			assertEquals(issueAssetTransaction.getItem().getDescription(), parsedIssueAssetTransaction.getItem().getDescription());
 				
 			//CHECK QUANTITY
-			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(db), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity(db));
 			
 			//DIVISIBLE
 			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
@@ -2414,7 +2414,7 @@ public class TransactionTests {
 		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity())) == 0);
+		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity(db))) == 0);
 				
 		//CHECK REFERENCE SENDER
 		assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastReference(db));

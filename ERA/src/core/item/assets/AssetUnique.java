@@ -18,6 +18,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.DCSet;
 
 public class AssetUnique extends AssetCls {
 	
@@ -39,10 +40,10 @@ public class AssetUnique extends AssetCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "unique"; }
 
-	public Long getQuantity() {
+	public Long getQuantity(DCSet dc) {
 		return 1L;
 	}
-	public Long getTotalQuantity() {
+	public Long getTotalQuantity(DCSet dc) {
 		return 1L;
 	}
 

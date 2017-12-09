@@ -327,7 +327,7 @@ public class R_SetStatusToItem extends Transaction {
 	
 	@Override
 	public String viewItemName() {
-		ItemCls status = DCSet.getInstance().getItemStatusMap().get(this.key);
+		ItemCls status = dcSet.getItemStatusMap().get(this.key);
 		return status==null?"null" : status.toString();
 	}
 	
@@ -338,7 +338,7 @@ public class R_SetStatusToItem extends Transaction {
 	
 	@Override
 	public String viewRecipient() {
-		ItemCls item = ItemCls.getItem(DCSet.getInstance(), this.itemType, this.itemKey);
+		ItemCls item = ItemCls.getItem(dcSet, this.itemType, this.itemKey);
 		return item==null?"null" : item.toString();
 	}
 	

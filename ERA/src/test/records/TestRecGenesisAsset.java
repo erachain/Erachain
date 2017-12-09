@@ -116,7 +116,7 @@ public class TestRecGenesisAsset {
 			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
 
 			//CHECK QUANTITY
-			assertEquals(asset.getQuantity(), asset1.getQuantity());
+			assertEquals(asset.getQuantity(db), asset1.getQuantity(db));
 			
 			//DIVISIBLE
 			assertEquals(asset.isDivisible(), asset1.isDivisible());
@@ -178,7 +178,7 @@ public class TestRecGenesisAsset {
 			//CHECK QUANTITY
 			AssetCls asset = (AssetCls)genesisIssueAssetTransaction.getItem();
 			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
-			assertEquals(asset.getQuantity(), asset1.getQuantity());
+			assertEquals(asset.getQuantity(db), asset1.getQuantity(db));
 			
 			//DIVISIBLE
 			assertEquals(asset.isDivisible(), asset1.isDivisible());
@@ -391,7 +391,7 @@ public class TestRecGenesisAsset {
 
 		initIssue(true);
 		
-		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity(db)).setScale(8);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 		//assertEquals(total, amoSend);
 		
@@ -429,7 +429,7 @@ public class TestRecGenesisAsset {
 		
 		initIssue(true);
 		
-		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity(db)).setScale(8);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 			
 		//CREATE SIGNATURE
@@ -462,7 +462,7 @@ public class TestRecGenesisAsset {
 
 		initIssue(true);
 		
-		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(8);
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity(db)).setScale(8);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(8);
 		//assertEquals(total, amoSend);
 		

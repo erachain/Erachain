@@ -112,7 +112,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 				
 			case COLUMN_AMOUNT:
 				
-				return asset.getTotalQuantity();
+				return asset.getTotalQuantity(DCSet.getInstance());
 				
 			case COLUMN_DIVISIBLE:
 				

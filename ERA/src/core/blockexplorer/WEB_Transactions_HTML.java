@@ -215,7 +215,7 @@ public class WEB_Transactions_HTML {
 		AssetCls asset = (AssetCls)assetIssue.getItem();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +asset.getName();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" +asset.getDescription();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" +asset.getQuantity().toString();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" +asset.getQuantity(DCSet.getInstance()).toString();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isDivisible()+"", langObj) ;
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isMovable()+"", langObj) ;
 		return out;
@@ -510,7 +510,7 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ library.viewDescriptionHTML(tr.getItem().getDescription()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
-				+ ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
+				+ ((AssetCls) tr.getItem()).getQuantity(DCSet.getInstance()).toString() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ":</b> "
 				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isDivisible() + "", langObj)
 				+ "<br>";

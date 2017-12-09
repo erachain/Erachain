@@ -169,7 +169,7 @@ public class TestRecAsset {
 			assertEquals(issueAssetTransaction.getItem().getDescription(), parsedIssueAssetTransaction.getItem().getDescription());
 				
 			//CHECK QUANTITY
-			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(db), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity(db));
 			
 			//DIVISIBLE
 			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
@@ -235,7 +235,7 @@ public class TestRecAsset {
 		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity())) == 0);
+		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity(db))) == 0);
 				
 		//CHECK REFERENCE SENDER
 		assertEquals((long)issueAssetTransaction.getTimestamp(), (long)maker.getLastReference(db));
@@ -323,7 +323,7 @@ public class TestRecAsset {
 		issueAssetTransaction.process(db, gb, false);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(new BigDecimal(asset.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -495,7 +495,7 @@ public class TestRecAsset {
 		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
 		Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastReference(db));
 		assetTransfer.sign(maker, false);
-		assetTransfer.setDB(db, false);
+		assetTransfer.setDC(db, false);
 		assetTransfer.process(db, gb, false);
 		assetTransfer.orphan(db, false);
 		
@@ -569,7 +569,7 @@ public class TestRecAsset {
 		issueMessageTransaction.process(db, gb, false);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(asset.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(new BigDecimal(asset.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -800,7 +800,7 @@ public class TestRecAsset {
 				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastReference(db));
 		messageTransaction.sign(maker, false);
-		messageTransaction.setDB(db, false);
+		messageTransaction.setDC(db, false);
 		messageTransaction.process(db, gb, false);
 		messageTransaction.orphan(db, false);
 		
@@ -835,7 +835,7 @@ public class TestRecAsset {
 		long key = assetMovable.getKey(db);
 		
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(assetMovable.getQuantity()).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(new BigDecimal(assetMovable.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");

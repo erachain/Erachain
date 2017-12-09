@@ -262,6 +262,7 @@ public class Block {
 				if ( transaction.getAbsKey() != Transaction.RIGHTS_KEY )
 					continue;
 				
+				transaction.setDC(dcSet, false);
 				if (transaction instanceof TransactionAmount) {
 					TransactionAmount recordAmount = (TransactionAmount) transaction;
 					if (recordAmount.isBackward())
@@ -289,7 +290,9 @@ public class Block {
 			
 			//amount = 0l;
 			for(Transaction transaction: txs)
-			{				
+			{
+				transaction.setDC(dcSet, false);
+
 				if (false && transaction instanceof R_SertifyPubKeys) {
 				//	amount = BlockChain.GIFTED_ERA_AMOUNT.intValue();
 				//	incomed_amount += amount;
@@ -1220,7 +1223,7 @@ public class Block {
 						return false;
 					}
 		
-					transaction.setDB(fork, false);
+					transaction.setDC(fork, false);
 
 					//CHECK IF VALID
 					if ( transaction instanceof DeployATTransaction)
@@ -1328,7 +1331,7 @@ public class Block {
 
 			//PROCESS
 			if (!transaction.isWiped()) {
-				transaction.setDB(dcSet, false);
+				transaction.setDC(dcSet, false);
 				timerStart = System.currentTimeMillis();
 				transaction.process(dcSet, this, false);
 				timerProcess += System.currentTimeMillis() - timerStart;
@@ -1517,7 +1520,7 @@ public class Block {
 			//LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
 			if (!transaction.isWiped()) {
-				transaction.setDB(dcSet, false);
+				transaction.setDC(dcSet, false);
 				transaction.orphan(dcSet, false);
 			} else {
 				// IT IS REFERENCED RECORD?

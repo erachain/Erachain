@@ -204,15 +204,10 @@ public abstract class ArbitraryTransaction extends Transaction {
 		try {
 			// NAME STORAGE UPDATE
 			if (this.getService() == 10) {
-				StorageUtils.processUpdate(getData(), signature, this.getCreator(),
-						DCSet.getInstance());
 				StorageUtils.processUpdate(getData(), signature, this.getCreator(), db);
-				// BLOGPOST?
 			} else if (this.getService() == 777) {
-				addToBlogMapOnDemand(DCSet.getInstance());
 				addToBlogMapOnDemand(db);
 			} else if (this.getService() == BlogUtils.COMMENT_SERVICE_ID) {
-				addToCommentMapOnDemand(DCSet.getInstance());
 				addToCommentMapOnDemand(db);
 			}
 		} catch (Throwable e) {

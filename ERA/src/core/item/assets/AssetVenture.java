@@ -20,6 +20,7 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import datachain.DCSet;
 
 public class AssetVenture extends AssetCls {
 	
@@ -53,15 +54,15 @@ public class AssetVenture extends AssetCls {
 	
 	public String getItemSubType() { return "venture"; }
 
-	public Long getQuantity() {		
+	public Long getQuantity(DCSet dc) {		
 		return this.quantity;
 	}
 
-	public Long getTotalQuantity() {
+	public Long getTotalQuantity(DCSet dcSet) {
 		
 		if (this.quantity == 0) {
 			// IF UNLIMIT QIUNTITY
-			Tuple3<BigDecimal, BigDecimal, BigDecimal> bals = this.getOwner().getBalance(this.getKey());
+			Tuple3<BigDecimal, BigDecimal, BigDecimal> bals = this.getOwner().getBalance(this.getKey(dcSet));
 			long bal = -bals.a.longValue();
 			if (bal == 0) {
 				bal = 1l;
@@ -219,7 +220,7 @@ public class AssetVenture extends AssetCls {
 		JSONObject assetJSON = super.toJson();
 
 		// ADD DATA
-		assetJSON.put("quantity", this.getQuantity());
+		assetJSON.put("quantity", this.getQuantity(DCSet.getInstance()));
 		assetJSON.put("scale", this.getScale());
 		assetJSON.put("isDivisible", this.isDivisible());
 		

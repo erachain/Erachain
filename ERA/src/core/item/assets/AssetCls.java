@@ -123,8 +123,8 @@ public abstract class AssetCls extends ItemCls {
 		this.typeBytes[1] = (byte)(this.typeBytes[1] & (movable?1:0));
 	}
 	
-	public abstract Long getQuantity();
-	public abstract Long getTotalQuantity();
+	public abstract Long getQuantity(DCSet dc);
+	public abstract Long getTotalQuantity(DCSet dc);
 
 	public boolean isDivisible() {
 		return true;

@@ -276,7 +276,13 @@ public class Order implements Comparable<Order>
 		return DCSet.getInstance().getOrderMap().contains(this.id)
 				|| DCSet.getInstance().getCompletedOrderMap().contains(this.id);
 	}
-	
+
+	public boolean isConfirmed(DCSet dc)
+	{
+		return dc.getOrderMap().contains(this.id)
+				|| dc.getCompletedOrderMap().contains(this.id);
+	}
+
 	//PARSE/CONVERT
 	
 	// forDB - use fulFill

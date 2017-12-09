@@ -26,6 +26,7 @@ import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
@@ -372,7 +373,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
 			    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator() +"<br>";
 			    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.getItem().getName() +"<br>";
-			    text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
+			    text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity(DCSet.getInstance()).toString()+"<br>";
 			    text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
 			    text += Lang.getInstance().translate("Divisible") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isDivisible()+"")+ "<br>";
 			    text += Lang.getInstance().translate("Scale") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";

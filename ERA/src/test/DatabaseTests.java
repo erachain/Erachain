@@ -204,7 +204,7 @@ public class DatabaseTests {
 			//Asset asset = DBSet.getInstance().getAssetMap().get(key);
 			AssetCls aa = (AssetCls) asset;
 			LOGGER.info("ASSET - " + asset.getKey(dcSet) + " : " + asset.getName()
-				+ " : " + aa.getQuantity()	
+				+ " : " + aa.getQuantity(dcSet)	
 				+ " - " + aa.getReference().length	
 				+ ": " + aa.getReference());	
 			//db.add(asset);
@@ -237,7 +237,7 @@ public class DatabaseTests {
 		Collection<ItemCls> assets = assetDB.getValuesAll();
 		for (ItemCls asset_2:assets) {
 			AssetCls aa = (AssetCls) asset_2;
-			LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());
+			LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity(dcSet));
 		}
 		
 	}

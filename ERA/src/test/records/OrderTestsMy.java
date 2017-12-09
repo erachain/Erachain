@@ -1721,12 +1721,12 @@ public class OrderTestsMy
 		init();
 		
 		//CREATE ORDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(8), accountA.getBalanceUSE( keyA, db));
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db)).setScale(8), accountA.getBalanceUSE( keyA, db));
 		orderCreation.sign(accountA, false);
 		orderCreation.process(db, null, false);
 		BigInteger orderID = orderCreation.getOrder().getId();
 
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db))
 				.subtract(orderCreation.getOrder().getAmountHave()).setScale(8),
 				accountA.getBalanceUSE( keyA, db));
 
@@ -1738,7 +1738,7 @@ public class OrderTestsMy
 		cancelOrderTransaction.process(db, null, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(8),
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db)).setScale(8),
 				accountA.getBalanceUSE(keyA, db));
 						
 		//CHECK REFERENCE SENDER
@@ -1749,11 +1749,11 @@ public class OrderTestsMy
 
 		////////// OPHRAN ////////////////
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(8), accountA.getBalanceUSE( keyA, db));
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db)).setScale(8), accountA.getBalanceUSE( keyA, db));
 		cancelOrderTransaction.orphan(db, false);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db))
 				.subtract(orderCreation.getOrder().getAmountHave()).setScale(8),
 				accountA.getBalanceUSE( keyA, db));
 						

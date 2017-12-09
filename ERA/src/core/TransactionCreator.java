@@ -134,7 +134,7 @@ public class TransactionCreator
 				//THE TRANSACTION BECAME INVALID LET 
 				this.fork.getTransactionMap().delete(transactionAccount);			
 			} else {
-				transactionAccount.setDB(this.fork, false);
+				transactionAccount.setDC(this.fork, false);
 				if(transactionAccount.isValid(this.fork, null) == Transaction.VALIDATE_OK)
 				{
 					transactionAccount.process(this.fork, null, false);
@@ -163,7 +163,7 @@ public class TransactionCreator
 		//CREATE NAME REGISTRATION
 		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, (byte)feePow, time, creator.getLastReference(this.fork));
 		nameRegistration.sign(creator, false);
-		nameRegistration.setDB(this.fork, false);
+		nameRegistration.setDC(this.fork, false);
 		
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(nameRegistration, this.afterCreate(nameRegistration, false));
@@ -180,7 +180,7 @@ public class TransactionCreator
 		//CREATE NAME UPDATE
 		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, (byte)feePow, time, creator.getLastReference(this.fork));
 		nameUpdate.sign(creator, false);
-		nameUpdate.setDB(this.fork, false);
+		nameUpdate.setDC(this.fork, false);
 		
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(nameUpdate, this.afterCreate(nameUpdate, false));
@@ -196,7 +196,7 @@ public class TransactionCreator
 		//CREATE NAME SALE
 		SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, (byte)feePow, time, creator.getLastReference(this.fork));
 		nameSaleTransaction.sign(creator, false);
-		nameSaleTransaction.setDB(this.fork, false);
+		nameSaleTransaction.setDC(this.fork, false);
 				
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(nameSaleTransaction, this.afterCreate(nameSaleTransaction, false));
@@ -212,7 +212,7 @@ public class TransactionCreator
 		//CREATE CANCEL NAME SALE
 		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), (byte)feePow, time, creator.getLastReference(this.fork));
 		cancelNameSaleTransaction.sign(creator, false);
-		cancelNameSaleTransaction.setDB(this.fork, false);
+		cancelNameSaleTransaction.setDC(this.fork, false);
 				
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(cancelNameSaleTransaction, this.afterCreate(cancelNameSaleTransaction, false));
@@ -229,7 +229,7 @@ public class TransactionCreator
 		//CREATE NAME PURCHASE
 		BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), (byte)feePow, time, creator.getLastReference(this.fork));
 		namePurchase.sign(creator, false);
-		namePurchase.setDB(this.fork, false);
+		namePurchase.setDC(this.fork, false);
 				
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, false));
@@ -246,7 +246,7 @@ public class TransactionCreator
 		//CREATE POLL CREATION
 		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, (byte)feePow, time, creator.getLastReference(this.fork));
 		pollCreation.sign(creator, false);
-		pollCreation.setDB(this.fork, false);
+		pollCreation.setDC(this.fork, false);
 
 		return pollCreation;
 		
@@ -265,7 +265,7 @@ public class TransactionCreator
 		//CREATE POLL VOTE
 		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, (byte)feePow, time, creator.getLastReference(this.fork));
 		pollVote.sign(creator, false);
-		pollVote.setDB(this.fork, false);
+		pollVote.setDC(this.fork, false);
 						
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(pollVote, this.afterCreate(pollVote, false));
@@ -283,7 +283,7 @@ public class TransactionCreator
 		Transaction arbitraryTransaction;
 		arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte)feePow, time, creator.getLastReference(this.fork));
 		arbitraryTransaction.sign(creator, false);
-		arbitraryTransaction.setDB(this.fork, false);
+		arbitraryTransaction.setDC(this.fork, false);
 		
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(arbitraryTransaction, this.afterCreate(arbitraryTransaction, false));
@@ -306,7 +306,7 @@ public class TransactionCreator
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastReference(this.fork));										
 		issueAssetTransaction.sign(creator, false);
-		issueAssetTransaction.setDB(this.fork, false);
+		issueAssetTransaction.setDC(this.fork, false);
 
 		return issueAssetTransaction;
 	}
@@ -326,7 +326,7 @@ public class TransactionCreator
 		//CREATE ISSUE IMPRINT TRANSACTION
 		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time);
 		issueImprintRecord.sign(creator, false);
-		issueImprintRecord.setDB(this.fork, false);
+		issueImprintRecord.setDC(this.fork, false);
 										
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
@@ -347,7 +347,7 @@ public class TransactionCreator
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(creator, note, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueNoteRecord.sign(creator, false);
-		issueNoteRecord.setDB(this.fork, false);
+		issueNoteRecord.setDC(this.fork, false);
 										
 		//VALIDATE AND PROCESS
 		return issueNoteRecord;
@@ -398,7 +398,7 @@ public class TransactionCreator
 		//CREATE ISSUE NOTE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, lastReference);
 		issuePersonRecord.sign(creator, false);
-		issuePersonRecord.setDB(this.fork, false);
+		issuePersonRecord.setDC(this.fork, false);
 
 		//VALIDATE AND PROCESS
 		if (forIssue) {
@@ -444,7 +444,7 @@ public class TransactionCreator
 		//CREATE ISSUE NOTE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte)feePow, time, lastReference);
 		issuePersonRecord.sign(creator, false);
-		issuePersonRecord.setDB(this.fork, false);
+		issuePersonRecord.setDC(this.fork, false);
 
 		//VALIDATE AND PROCESS
 		boolean asPack = false;
@@ -467,7 +467,7 @@ public class TransactionCreator
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueStatusRecord.sign(creator, false);
-		issueStatusRecord.setDB(this.fork, false);
+		issueStatusRecord.setDC(this.fork, false);
 
 		return issueStatusRecord;
 	}
@@ -487,7 +487,7 @@ public class TransactionCreator
 		//CREATE ISSUE NOTE TRANSACTION
 		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, creator.getLastReference(this.fork));
 		issueUnionRecord.sign(creator, false);
-		issueUnionRecord.setDB(this.fork, false);
+		issueUnionRecord.setDC(this.fork, false);
 					
 		return issueUnionRecord;
 		
@@ -512,7 +512,7 @@ public class TransactionCreator
 				
 		//VALIDATE AND PROCESS
 		createOrderTransaction.sign(creator, false);
-		createOrderTransaction.setDB(this.fork, false);
+		createOrderTransaction.setDC(this.fork, false);
 
 		return createOrderTransaction;
 	}
@@ -528,7 +528,7 @@ public class TransactionCreator
 		//CREATE PRDER TRANSACTION
 		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), (byte)feePow, time, creator.getLastReference(this.fork));
 		cancelOrderTransaction.sign(creator, false);
-		cancelOrderTransaction.setDB(this.fork, false);
+		cancelOrderTransaction.setDC(this.fork, false);
 								
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(cancelOrderTransaction, this.afterCreate(cancelOrderTransaction, false));
@@ -545,7 +545,7 @@ public class TransactionCreator
 		//CREATE MULTI PAYMENTS
 		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, (byte)feePow, time, creator.getLastReference(this.fork));
 		multiPayment.sign(creator, false);
-		multiPayment.setDB(this.fork, false);
+		multiPayment.setDC(this.fork, false);
 
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(multiPayment, this.afterCreate(multiPayment, false));
@@ -562,7 +562,7 @@ public class TransactionCreator
 		//DEPLOY AT
 		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, (byte)feePow, time, creator.getLastReference(this.fork));
 		deployAT.sign(creator, false);
-		deployAT.setDB(this.fork, false);
+		deployAT.setDC(this.fork, false);
 
 		return new Pair<Transaction, Integer>(deployAT, this.afterCreate(deployAT, false));
 		
@@ -583,7 +583,7 @@ public class TransactionCreator
 		//CREATE MESSAGE TRANSACTION
 		messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
-		messageTx.setDB(this.fork, false);
+		messageTx.setDC(this.fork, false);
 			
 		return messageTx;// new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
@@ -602,7 +602,7 @@ public class TransactionCreator
 		//CREATE MESSAGE TRANSACTION
 		messageTx = new R_Send(version, property1, property2, creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
-		messageTx.setDB(this.fork, false);
+		messageTx.setDC(this.fork, false);
 			
 		return messageTx;
 	}
@@ -621,7 +621,7 @@ public class TransactionCreator
 		recordNoteTx = new R_SignNote(version, property1, property1,
 				creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastReference(this.fork));
 		recordNoteTx.sign(creator, asPack);
-		recordNoteTx.setDB(this.fork, asPack);
+		recordNoteTx.setDC(this.fork, asPack);
 		
 		return 	recordNoteTx;
 	
@@ -644,7 +644,7 @@ public class TransactionCreator
 				userAccounts,
 				add_day,  timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
-		record.setDB(this.fork, asPack);
+		record.setDC(this.fork, asPack);
 			
 		return record;
 	}
@@ -665,7 +665,7 @@ public class TransactionCreator
 				height, seq,
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
-		record.setDB(this.fork, asPack);
+		record.setDC(this.fork, asPack);
 			
 		return record;
 	}
@@ -690,7 +690,7 @@ public class TransactionCreator
 		//CREATE MESSAGE TRANSACTION
 		messageTx = new R_Hashes(creator, (byte)feePow, url, data, hashes, timestamp, creator.getLastReference(this.fork));
 		messageTx.sign(creator, false);
-		messageTx.setDB(this.fork, false);
+		messageTx.setDC(this.fork, false);
 			
 		return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
 	}
@@ -754,7 +754,7 @@ public class TransactionCreator
 				beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
 				timestamp, creator.getLastReference(this.fork));
 		record.sign(creator, asPack);
-		record.setDB(this.fork, asPack);
+		record.setDC(this.fork, asPack);
 			
 		return  record;
 	}
@@ -831,7 +831,7 @@ public class TransactionCreator
 	public Integer afterCreate(Transaction transaction, boolean asPack)
 	{
 		//CHECK IF PAYMENT VALID
-		transaction.setDB(this.fork, asPack);
+		transaction.setDC(this.fork, asPack);
 		int valid = transaction.isValid(this.fork, null);
 		
 		if(valid == Transaction.VALIDATE_OK)

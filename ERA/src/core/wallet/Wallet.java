@@ -1874,7 +1874,7 @@ public class Wallet extends Observable implements Observer
 				// FIND issue record
 				Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 				// GET FEE from that record
-				transPersonIssue.setDB(db, false); // RECALC FEE if from DB
+				transPersonIssue.setDC(db, false); // RECALC FEE if from DB
 				BigDecimal issueFEE_BD = transPersonIssue.getFee();
 				//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 				//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);
@@ -1929,7 +1929,7 @@ public class Wallet extends Observable implements Observer
 			// FIND issue record
 			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 			// GET FEE from that record
-			transPersonIssue.setDB(db, false); // RECALC FEE if from DB
+			transPersonIssue.setDC(db, false); // RECALC FEE if from DB
 			BigDecimal issueFEE_BD = transPersonIssue.getFee();
 			//long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
 			//BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE, BlockChain.FEE_SCALE);

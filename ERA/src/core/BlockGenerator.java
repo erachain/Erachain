@@ -726,7 +726,7 @@ public class BlockGenerator extends Thread implements Observer
 						break;
 					}
 						
-					transaction.setDB(newBlockDb, false);
+					transaction.setDC(newBlockDb, false);
 					
 					if (transaction.isValid(newBlockDb, null) != Transaction.VALIDATE_OK) {
 						// INVALID TRANSACTION

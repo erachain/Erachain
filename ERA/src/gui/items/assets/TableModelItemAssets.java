@@ -131,7 +131,7 @@ public class TableModelItemAssets extends TableModelItems
 
 		case COLUMN_AMOUNT:
 			
-			return asset.getTotalQuantity();
+			return asset.getTotalQuantity(DCSet.getInstance());
 			
 		case COLUMN_DIVISIBLE:
 			
