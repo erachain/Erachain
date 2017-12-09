@@ -1196,12 +1196,14 @@ public class Wallet extends Observable implements Observer
 		
 		///FOR ALL ACCOUNTS
 		List<Account> accounts = this.getAccounts();
+		DCSet dcSet = DCSet.getInstance();
 		
 		synchronized(accounts)
 		{		
 			for(Account account: accounts)
 			{
 				//CHECK IF INVOLVED
+				transaction.setDC(dcSet, false);
 				if(transaction.isInvolved(account))
 				{
 					//DELETE FROM ACCOUNT TRANSACTIONS

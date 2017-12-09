@@ -298,10 +298,15 @@ public class Synchronizer
 				return;
 			}
 			
-			// CONNON BLOCK is my LAST BLOCK in CHAIN
+			// COMMON BLOCK is my LAST BLOCK in CHAIN
 			//TODO SSS
 			if (dcSet.getBlockMap().contains(signatures.get(0))) {
 				signatures.remove(0);
+				if (signatures.size() == 0) {
+					LOGGER.info("  signatures.remove(0) -> size = 0 for PEER " + peer.getAddress().getHostAddress());
+					return;
+				}
+					
 			}
 			
 			//CREATE BLOCK BUFFER
