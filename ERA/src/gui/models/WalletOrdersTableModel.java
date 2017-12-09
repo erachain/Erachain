@@ -149,7 +149,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ORDER_TYPE)
+		if(message.getType() == ObserverMessage.LIST_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE)
 		{
 			if(this.orders == null)
 			{

@@ -155,7 +155,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ASSET_TYPE)
+		if(message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE)
 		{
 			if(this.assets == null)
 			{
@@ -168,7 +168,8 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ASSET_TYPE || message.getType() == ObserverMessage.REMOVE_ASSET_TYPE)
+		if(message.getType() == ObserverMessage.ADD_ASSET_TYPE || message.getType() == ObserverMessage.REMOVE_ASSET_TYPE 
+				|| message.getType() == ObserverMessage.WALLET_ADD_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ASSET_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	
