@@ -124,6 +124,6 @@ public class BlockHeightsMap extends DCMap<Integer, byte[]>
 	
 	public byte[] getSignByHeight(int  height){
 		
-		return this.map.get(height);
+		return this.get(height);
 	}
 }

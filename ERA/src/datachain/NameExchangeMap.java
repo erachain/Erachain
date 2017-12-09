@@ -99,6 +99,21 @@ public class NameExchangeMap extends DCMap<String, BigDecimal>
 			nameSales.add(new NameSale(entry.getKey(), entry.getValue()));
 		}
 		
+		/*
+		if(this.parent != null) {
+			nameSales.addAll(this.parent.getNameSales());
+			
+			if (this.deleted != null) {
+				//DELETE DELETED
+				for(Tuple2 deleted: this.deleted)
+				{
+					nameSales.remove(deleted);
+				}
+
+			}
+		}
+		*/
+		
 		return nameSales;
 	}
 

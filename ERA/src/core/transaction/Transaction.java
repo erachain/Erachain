@@ -716,7 +716,7 @@ public abstract class Transaction {
 		if(dbRef.length > 20)
 		{
 			// soft or hard confirmations
-			key = db.getTransactionFinalMapSigns().getHeightSegBySignature(dbRef);
+			key = db.getTransactionFinalMapSigns().get(dbRef);
 			if (key == null) {
 				return db.getTransactionMap().get(dbRef);
 			}

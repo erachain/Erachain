@@ -1226,12 +1226,12 @@ public class Block {
 					transaction.setDC(fork, false);
 
 					//CHECK IF VALID
-					if ( transaction instanceof DeployATTransaction)
+					if ( false && transaction instanceof DeployATTransaction)
 					{
 						Integer min = 0;
-						if ( db.getBlockMap().getParentList() != null )
+						if ( false ) //db.getBlockMap().getParentList() != null )
 						{
-							min = AT_API_Platform_Impl.getForkHeight(db);
+							min = height; //AT_API_Platform_Impl.getForkHeight(db);
 						}
 		
 						DeployATTransaction atTx = (DeployATTransaction)transaction;

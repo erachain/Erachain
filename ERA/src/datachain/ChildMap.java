@@ -75,10 +75,11 @@ public class ChildMap extends DCMap<byte[], byte[]>
 	}
 	public Block getChildBlock(Block parent)
 	{
-		if(this.map.containsKey(parent.getSignature()))
+		if(this.contains(parent.getSignature()))
 		{
-			byte[] key = map.get(parent.getSignature());
-			if (this.getDCSet().getBlockMap().contains(key))	return this.getDCSet().getBlockMap().get(key);
+			byte[] key = this.get(parent.getSignature());
+			if (this.getDCSet().getBlockMap().contains(key))
+				return this.getDCSet().getBlockMap().get(key);
 		}
 		
 		return null;

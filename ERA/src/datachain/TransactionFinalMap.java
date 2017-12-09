@@ -285,6 +285,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO ERROR - not use PARENT MAP and DELETED in FORK
 	public List<Transaction> getTransactionsByTypeAndAddress(String address, Integer type, int limit)
 	{
 		Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
@@ -302,6 +303,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO ERROR - not use PARENT MAP and DELETED in FORK
 	public Set<BlExpUnit> getBlExpTransactionsByAddress(String address)
 	{
 		Iterable senderKeys = Fun.filter(this.senderKey, address);
@@ -327,6 +329,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO ERROR - not use PARENT MAP and DELETED in FORK
 	public List<Transaction> getTransactionsByAddress(String address)
 	{
 		Iterable senderKeys = Fun.filter(this.senderKey, address);
@@ -351,6 +354,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO ERROR - not use PARENT MAP and DELETED in FORK
 	public int getTransactionsByAddressCount(String address)
 	{
 		Iterable senderKeys = Fun.filter(this.senderKey, address);
@@ -365,6 +369,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}	
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
+	// TODO ERROR - not use PARENT MAP and DELETED in FORK
 	public Tuple2<Integer, Integer> getTransactionsAfterTimestamp(int startHeight, int numOfTx,
 			String address) {
 		Iterable keys = Fun.filter(this.recipientKey, address);
@@ -390,7 +395,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		return null;
 	}
 
-	public DCMap<Tuple2<Integer, Integer>, Transaction> getParent() {
+	public DCMap<Tuple2<Integer, Integer>, Transaction> getParentMap() {
 		return this.parent;
 	}
 	
@@ -509,15 +514,13 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public byte[] getSignature(int hight, int seg){
 		
-		
-		return this.map.get(new Tuple2(hight,seg)).getSignature();
+		return this.get(new Tuple2(hight,seg)).getSignature();
 		
 	}
 	
 	public Transaction getTransaction(byte[] seg){
-		return this.get(getDCSet().getTransactionFinalMapSigns().getHeightSegBySignature(seg));
+		return this.get(getDCSet().getTransactionFinalMapSigns().get(seg));
 		
 	}
-	
 
 }

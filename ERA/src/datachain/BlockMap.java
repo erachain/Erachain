@@ -346,19 +346,11 @@ public class BlockMap extends DCMap<byte[], Block>
 		
 		return blocks;
 	}
-	
-	public int getHeight(byte[] signature){
 		
-		return (this.map.get(signature)).getHeight(this.getDCSet());
-		
-		
+	public Block get(int height) {
+		return this.get(getDCSet().getBlockHeightsMap().get(height));	
 	}
 	
-	public Block get(int height){
-		return this.get(getDCSet().getBlockHeightsMap().get(height));
-		
-		
-	}
 	public void notifyResetChain() {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_RESET_BLOCK_TYPE, null));

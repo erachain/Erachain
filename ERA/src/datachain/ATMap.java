@@ -271,7 +271,8 @@ public class ATMap extends DCMap<String, AT>
 
 	public void delete(AT at)
 	{
-		this.map.remove( Base58.encode(at.getId()));
+		// USE parents
+		this.delete( Base58.encode(at.getId()));
 
 	}
 
@@ -279,7 +280,7 @@ public class ATMap extends DCMap<String, AT>
 	//GET AT BY ID
 	public AT getAT( String id )
 	{
-		AT at = this.map.get(id);
+		AT at = super.get(id);
 		if (at!=null)
 		{
 			byte[] state = stateAT.get(id);

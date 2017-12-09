@@ -95,6 +95,7 @@ public class ATStateMap extends DCMap< Tuple2<Integer, String> ,  byte[] > {
 		Collection<Tuple2> keys = ((BTreeMap<Tuple2, String>) map).subMap(
 				Fun.t2(height, null),
 				Fun.t2(Fun.HI(), Fun.HI())).keySet();
+		// TODO: ERROR - NEED PARENT DB seek if FORKED
 		
 		Map<String, byte[]> states = new TreeMap<String, byte[]>();
 		
@@ -104,8 +105,19 @@ public class ATStateMap extends DCMap< Tuple2<Integer, String> ,  byte[] > {
 			Iterator<Tuple2< Integer, String>> iter = Fun.filter(allATStates, new Tuple2<String, Integer>((String)key.b, 0), true, new Tuple2<String,Integer>((String)key.b, height-1),true).iterator();
 			if ( iter.hasNext() )
 			{
-				states.put((String) key.b, this.map.get(iter.next()));
+				states.put((String) key.b, this.get(iter.next()));
 			}
+		}
+		
+		if (this.parent != null) {
+			states.putAll(this.parent.getDCSet().getATStateMap().getStates(blockHeight));
+
+			//DELETE DELETED
+			for(Tuple2 deleted: this.deleted)
+			{
+				states.remove(deleted);
+			}
+
 		}
 		
 		return states;
@@ -125,6 +137,11 @@ public class ATStateMap extends DCMap< Tuple2<Integer, String> ,  byte[] > {
 		//DELETE
 		for(Tuple2 key: keys) {
 			this.delete(key);
+		}
+		
+		// in .deleted
+		if (false && this.parent != null) {
+			this.parent.getDCSet().getATStateMap().deleteStatesAfter(blockHeight);
 		}
 	}
 

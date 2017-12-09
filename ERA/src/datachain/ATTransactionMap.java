@@ -147,6 +147,10 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 		for(Tuple2 key: keys) {
 			this.delete(key);
 		}
+		
+		if (this.parent != null)
+			this.parent.getDCSet().getATTransactionMap().delete(height);
+
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -163,6 +167,10 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 		for(Tuple2 key: keys) {
 			this.delete(key);
 		}
+
+		if (this.parent != null)
+			this.parent.getDCSet().getATTransactionMap().deleteAllAfterHeight(height);
+
 	}
 	
 	
@@ -182,6 +190,10 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 		{
 			txs.put(  key ,  this.map.get(key) );
 		}
+
+		if (this.parent != null)
+			txs.putAll(this.parent.getDCSet().getATTransactionMap().getATTransactions(height));
+
 		return txs;
 		
 	}
@@ -197,7 +209,10 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 		{
 			ats.add(this.map.get(iter.next()));
 		}
-		
+
+		if (this.parent != null)
+			ats.addAll(this.parent.getDCSet().getATTransactionMap().getATTransactionsBySender(sender));
+
 		return ats;
 	}
 	
@@ -213,7 +228,10 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 			AT_Transaction aTtx = this.map.get(iter.next());
 			ats.add( new BlExpUnit( aTtx.getBlockHeight(), aTtx.getSeq(), aTtx ) );
 		}
-		
+
+		if (this.parent != null)
+			ats.addAll(this.parent.getDCSet().getATTransactionMap().getBlExpATTransactionsBySender(sender));
+
 		return ats;
 	}
 	
@@ -229,6 +247,9 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 			ats.add(this.map.get(iter.next()));
 		}
 		
+		if (this.parent != null)
+			ats.addAll(this.parent.getDCSet().getATTransactionMap().getATTransactionsByRecipient(recipient));
+
 		return ats;
 	}
 	
@@ -245,12 +266,17 @@ public class ATTransactionMap extends DCMap< Tuple2<Integer, Integer> ,  AT_Tran
 			ats.add( new BlExpUnit( aTtx.getBlockHeight(), aTtx.getSeq(), aTtx ) );
 		}
 		
+		if (this.parent != null)
+			ats.addAll(this.parent.getDCSet().getATTransactionMap().getBlExpATTransactionsByRecipient(recipient));
+
 		return ats;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Tuple2<Integer,Integer > getNextATTransaction(Integer height, Integer seq, String recipient)
 	{
+		
+		// TODO - ERROR - FORK not used!
 		Iterable keys = Fun.filter(this.recipientKey,recipient);
 		Iterator iter = keys.iterator();
 		int prevKey = height;

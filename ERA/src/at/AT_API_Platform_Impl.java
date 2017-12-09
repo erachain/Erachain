@@ -489,7 +489,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			startHeight = state.getCreationBlockHeight();
 		}
 
-		int forkHeight = getForkHeight(dcSet);
+		int forkHeight = startHeight; //getForkHeight(dcSet);
 
 		Tuple2<Integer, Integer > atTxT = dcSet.getATTransactionMap().getNextATTransaction( startHeight , numOfTx, account.getAddress());
 
@@ -502,7 +502,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			Tuple2<Integer, Integer > atTxTp = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).getNextATTransaction( startHeight , numOfTx, account.getAddress());
 			int atTxsp = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).getATTransactions( startHeight ).size();
 
-			Tuple2<Integer, Integer> txp = ((TransactionFinalMap)dcSet.getTransactionFinalMap().getParent()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs)?numOfTx-atTxsp:0, account.getAddress());
+			Tuple2<Integer, Integer> txp = ((TransactionFinalMap)dcSet.getTransactionFinalMap().getParentMap()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs)?numOfTx-atTxsp:0, account.getAddress());
 			if ( atTxTp != null && ( txp == null || atTxTp.a <= txp.a ) && atTxTp.a < forkHeight )
 			{
 				AT_Transaction atTx = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).get(atTxTp);
@@ -515,7 +515,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			else if ( txp != null && txp.a < forkHeight )
 			{
 				atTxs = ((ATTransactionMap)dcSet.getATTransactionMap().getParent()).getATTransactions( txp.a ).size();
-				Transaction transaction = ((TransactionFinalMap)dcSet.getTransactionFinalMap().getParent()).get(txp);
+				Transaction transaction = ((TransactionFinalMap)dcSet.getTransactionFinalMap().getParentMap()).get(txp);
 
 				long txAmount = getAmount((Transaction)transaction, new Account(Base58.encode(state.getId())), state.getHeight());
 				
@@ -570,6 +570,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 	}
 
 
+	/*
 	public static int getForkHeight(DCSet db)
 	{
 		//CHECK IF FORK
@@ -588,6 +589,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 		}
 		return 0;
 	}
+	*/
 
 
 	protected static Object findTransaction(byte[] id, DCSet db){
@@ -599,7 +601,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 			return null;
 		}
 
-		int forkHeight = getForkHeight(db);
+		int forkHeight = height; //getForkHeight(db);
 
 		//IF NOT FORK
 		if ( forkHeight == 0 || forkHeight <= height )

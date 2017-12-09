@@ -115,6 +115,9 @@ public class Credit_AddressesMap extends DCMap<Tuple3<String, Long, String>, Big
 			result.add(new Tuple2<Tuple3<String, Long, String>, BigDecimal>(keyMap, this.get(keyMap)));
 		}
 		
+		if (this.parent != null)
+			result.addAll(this.parent.getDCSet().getCredit_AddressesMap().getList(creditorAddress, key));
+
 		return result;
 	}
 

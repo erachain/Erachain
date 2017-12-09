@@ -57,7 +57,6 @@ public abstract class DCMap<T, U> extends Observable {
 	    
 	    //OPEN MAP
 	    this.map = this.getMemoryMap();
-	    this.deleted = new ArrayList<T>();
 	}
 
 	
@@ -119,7 +118,15 @@ public abstract class DCMap<T, U> extends Observable {
 	
 	public int size() {
 		this.addUses();
+		
 		int u = this.map.size();
+		
+		if (this.parent != null) {
+			u += this.parent.size();
+			if (this.deleted != null)
+				u -= this.deleted.size();
+		}
+		
 		this.outUses();
 		return u;
 	}
@@ -172,11 +179,15 @@ public abstract class DCMap<T, U> extends Observable {
 		
 		this.addUses();
 		Set<T> u = this.map.keySet();
+		
+		if(this.parent != null)
+			u.addAll(this.parent.getKeys());
+		
 		this.outUses();
 		return u;
 	}
 
-	public Collection<U> getValues(int count, boolean descending)
+	public Collection<U> getValues(int count, boolean descending, int i)
 	{
 		this.addUses();
 		Iterator<T> u;
@@ -189,19 +200,32 @@ public abstract class DCMap<T, U> extends Observable {
 		}
 
 		Collection<U> v = new ArrayList<U>();
-		int i=0;
 		while (u.hasNext() && i++ < count) {
 			v.add(this.map.get(u.next()));
 		}
 		
+		if(this.parent != null)
+			v.addAll(this.parent.getValues(count, descending, i));
+		
 		this.outUses();
 		return v;
+	}
+
+	public Collection<U> getValues(int count, boolean descending)
+	{
+		
+		return getValues(count, descending, 0);
+
 	}
 
 	public Collection<U> getValuesAll()
 	{
 		this.addUses();
 		Collection<U> u = this.map.values();
+
+		if(this.parent != null)
+			u.addAll(this.parent.getValuesAll());
+
 		this.outUses();
 		return u;
 	}
@@ -243,7 +267,7 @@ public abstract class DCMap<T, U> extends Observable {
 								|| this.getObservableData().get(DBMap.NOTIFY_ADD).equals( ObserverMessage.ADD_UNC_TRANSACTION_TYPE ))
 						{
 							this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD),
-									new Pair<T,U>(key,value)));
+									new Pair<T,U>(key, value)));
 						}
 						else
 						{
@@ -254,7 +278,7 @@ public abstract class DCMap<T, U> extends Observable {
 					if(this.getObservableData().containsKey(DBMap.NOTIFY_COUNT))
 					{
 						this.setChanged();
-						this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.map.size()));
+						this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.size()));
 					}
 				}
 			}
@@ -297,7 +321,7 @@ public abstract class DCMap<T, U> extends Observable {
 						if (this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals( ObserverMessage.REMOVE_AT_TX ))
 						{
 							this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_REMOVE),
-									new Pair<T,U>(key,value)));
+									new Pair<T,U>(key, value)));
 						}
 						else
 						{
@@ -308,25 +332,26 @@ public abstract class DCMap<T, U> extends Observable {
 					if(this.getObservableData().containsKey(DBMap.NOTIFY_COUNT))
 					{
 						this.setChanged();
-						this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.map.size()));
+						this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.size()));
 					}
 				}
 			}
-			
-			if(this.deleted != null)
-			{
-				this.deleted.add(key);
-			}
-			
-			//COMMIT
+						
 			if(this.parent == null)
 			{
 				// IT IS NOT FORK
 				if(!(this.databaseSet instanceof DWSet
 						&& Controller.getInstance().isProcessingWalletSynchronize()))
 				{
+					//COMMIT
 					/////this.databaseSet.commit();
 				}
+			} else {
+				if(this.deleted == null)
+				{
+				    this.deleted = new ArrayList<T>();
+				}
+				this.deleted.add(key);
 			}
 		}
 		//catch(Exception e)
@@ -441,7 +466,7 @@ public abstract class DCMap<T, U> extends Observable {
 		return u;
 	}
 	
-	public SortableList<T, U> getParentList()
+	public SortableList<T, U> getParentList2()
 	{
 		this.addUses();
 

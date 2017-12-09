@@ -96,13 +96,12 @@ public class TransactionFinalMapSigns extends DCMap<byte[], Tuple2<Integer, Inte
 		return this.observableData;
 	}
 	
+	/*
 	public Tuple2<Integer,Integer> getHeightSegBySignature(byte[] sign){
 		
-		return this.map.get(sign);
-		
-		
+		return this.get(sign);
 		
 	}
-	
+	*/
 
 }
