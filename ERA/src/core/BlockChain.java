@@ -295,8 +295,8 @@ public class BlockChain
 	public static int getCheckPoint(DCSet dcSet) {
 		
 		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
-		if (item == null)
-			return 1;
+		if (item == null || item.a == -1)
+			return 2;
 		
 		int heightCheckPoint = item.a;
 		int dynamicCheckPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
