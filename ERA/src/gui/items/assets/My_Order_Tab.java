@@ -9,12 +9,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -32,20 +36,27 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
+import core.transaction.Transaction;
+import datachain.DCSet;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.items.assets.My_Balance_Tab.search_listener;
+import gui.items.records.All_Records_Panel;
 import gui.library.MTable;
+import gui.library.Voush_Library_Panel;
 import gui.models.Renderer_Boolean;
 import gui.models.Renderer_Right;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemImprintsTableModel;
 import gui.models.WalletOrdersTableModel;
 import gui.transaction.CreateOrderDetailsFrame;
+import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 
 public class My_Order_Tab extends Split_Panel {
@@ -58,6 +69,7 @@ public class My_Order_Tab extends Split_Panel {
 	private static final long serialVersionUID = 1L;
 	final MTable table;
 	private My_Order_Tab th;
+	
 
 	public My_Order_Tab()
 	{
@@ -74,7 +86,7 @@ public class My_Order_Tab extends Split_Panel {
 	//TABLE
 		ordersModel = new WalletOrdersTableModel();
 	 table = new MTable(ordersModel);
-	
+	 
 	
 	
 	//assetsModel.getAsset(row)
@@ -391,23 +403,10 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
 class search_listener implements ListSelectionListener  {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			
-			
 			 Order order = null;
 			if (table.getSelectedRow() >= 0 ) order = ordersModel.getOrder(table.convertRowIndexToModel(table.getSelectedRow()));
 			if (order == null) return;
-			//AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
-				//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-				int div = th.jSplitPanel.getDividerLocation();
-				int or = th.jSplitPanel.getOrientation();
-		
-		//		 CreateOrderDetailsFrame info_panel = new CreateOrderDetailsFrame(order);
-					//info_panel.setPreferredSize(new Dimension(jScrollPane_jPanel_RightPanel.getSize().width-50,jScrollPane_jPanel_RightPanel.getSize().height-50));
-			//		jScrollPane_jPanel_RightPanel.setViewportView(info_panel);
-					//jSplitPanel.setRightComponent(info_panel);
-					jSplitPanel.setDividerLocation(div);
-					jSplitPanel.setOrientation(or);
-			
+			jScrollPane_jPanel_RightPanel.setViewportView(new Order_Info_Panel(order));
 		}
 	}
 
