@@ -81,7 +81,8 @@ public class Synchronizer
 					+ " in ForkDB: " + lastBlock.getHeight(fork)
 					+ "\n for lastCommonBlock = " + lastCommonBlock.getHeight(fork));
 
-			byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+			///byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+			byte[] lastCommonBlockSignature = lastCommonBlock.getReference();/// !!!
 			int countTransactionToOrphan = 0;
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 			while(!Arrays.equals(lastBlock.getReference(), lastCommonBlockSignature))
@@ -173,7 +174,8 @@ public class Synchronizer
 			Block lastBlock = dcSet.getBlockMap().getLastBlock();
 			
 			//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
-			while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getSignature()))
+			////while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getSignature()))
+			while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getReference())) /// !!!
 			{
 				if (cnt.isOnStopping())
 					throw new Exception("on stoping");
