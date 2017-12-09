@@ -355,7 +355,7 @@ public class BlockMap extends DCMap<byte[], Block>
 	}
 	
 	public Block get(int height){
-		return this.get(DCSet.getInstance().getBlockHeightsMap().get(height));
+		return this.get(getDCSet().getBlockHeightsMap().get(height));
 		
 		
 	}

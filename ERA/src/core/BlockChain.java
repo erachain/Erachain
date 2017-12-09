@@ -31,7 +31,7 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = true;
+	public static final boolean DEVELOP_USE = false;
 	public static final boolean HARD_WORK = false;
 	public static final boolean PERSON_SEND_PROTECT = true;
 	//public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -131,7 +131,9 @@ public class BlockChain
 	private long genesisTimestamp;
 
 	private Block waitWinBuffer;
-	private int checkPoint = 1;
+	//private int checkPoint = DEVELOP_USE?1:32400;
+	public static final byte[] CHECKPOINT = Base58.decode("4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W");
+
 	//private int target = 0;
 	//private byte[] lastBlockSignature;
 	//private Tuple2<Integer, Long> HWeight;
@@ -231,7 +233,7 @@ public class BlockChain
 	}
 	
 	// 
-	public int getHeight(DCSet dcSet) {
+	public static int getHeight(DCSet dcSet) {
 		
 		//GET LAST BLOCK
 		byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
@@ -289,21 +291,27 @@ public class BlockChain
 		return dcSet.getBlockSignsMap().getFullWeight();
 	}
 
-	public int getCheckPoint(DCSet dcSet) {
+	public static int getCheckPoint(DCSet dcSet) {
 		
 		int checkPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
-		checkPoint = DEVELOP_USE?1:32400;
+		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(CHECKPOINT);
+		if (item == null)
+			return checkPoint;
 		
-		if ( checkPoint > this.checkPoint)
-			this.checkPoint = checkPoint;
-		
-		return this.checkPoint;
+		int heightCheckPoint = item.a;
+				
+		if (checkPoint > heightCheckPoint)
+			return checkPoint;
+		return heightCheckPoint;
 	}
+	
+	/*
 	public void setCheckPoint(int checkPoint) {
 		
 		if (checkPoint > 1)
 			this.checkPoint = checkPoint;
 	}
+	*/
 	
 	public static int getNetworkPort() {
 		if(Settings.getInstance().isTestnet()) {

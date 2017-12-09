@@ -1417,11 +1417,6 @@ public class Block {
 		}
 		*/
 
-		BlockChain blockChain = cnt.getBlockChain();
-		if (blockChain != null) {
-			cnt.getBlockChain().setCheckPoint(this.heightBlock - BlockChain.MAX_ORPHAN);
-		}
-
 		if(heightBlock % BlockChain.MAX_ORPHAN == 0) 
 		{
 			cnt.blockchainSyncStatusUpdate(heightBlock);

@@ -247,7 +247,7 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	{
 		
 		ArrayList<Transaction> values = new ArrayList<Transaction>();
-		TransactionMap map = DCSet.getInstance().getTransactionMap();
+		TransactionMap map = getDCSet().getTransactionMap();
 		Iterator<byte[]> iterator = map.getIterator(from, descending);
 		
 		for ( int i = 0; i < count; i++) {

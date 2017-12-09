@@ -346,9 +346,12 @@ public class BlocksResource
 
 	@GET
 	@Path("/orphanto/{height}")
-	public static String orphanTo(@PathParam("height") int heightTo) 
+	public String orphanTo(@PathParam("height") int heightTo) 
 	{
 		
+		String password = "";
+		APIUtils.askAPICallAllowed(password, "GET blocks/orphanto/", request);
+
 		Controller.getInstance().setOrphanTo(heightTo);
 
 		return "OK";

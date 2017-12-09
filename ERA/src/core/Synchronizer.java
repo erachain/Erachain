@@ -516,9 +516,16 @@ public class Synchronizer
 			// end of my CHAIN is common
 			return new Tuple2<byte[], List<byte[]>>(lastBlockSignature, headers);
 		} else {
-			//String mess = "Dishonest peer: headers.size == 1";
-			//peer.ban(BAN_BLOCK_TIMES>>2, mess);
-			//throw new Exception(mess);			
+			int myCheckPoint = BlockChain.getCheckPoint(dcSet);
+			byte[] signCheck = dcSet.getBlockHeightsMap().get(myCheckPoint);
+
+			List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
+			if (headersCheck.size() == 0) {
+				String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> not found";
+				peer.ban(BAN_BLOCK_TIMES, mess);
+				throw new Exception(mess);
+			}
+				
 		}
 
 		

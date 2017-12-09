@@ -114,30 +114,17 @@ public abstract class Item_Map extends DCMap<Long, ItemCls>
 	}
 	
 	
-	public void delete(long key)
+	public void remove()
 	{
 		super.delete(key);
 		
-		//LOGGER.debug("<<<<< delete 1, key: " + key);
-
-		// delete empty KEYS (run to GENESIS inserted keys)
-		do {
-			//DECREMENT ATOMIC KEY IF EXISTS
-			if(this.atomicKey != null)
-			{
-				this.atomicKey.decrementAndGet();
-			}
+		if(this.atomicKey != null)
+		{
+			this.atomicKey.decrementAndGet();
+		}
 			
-			//DECREMENT KEY
-			this.key = --key;
-			
-			//LOGGER.debug("<<<<< delete 3 current key = " + key);
-			
-			// FOR IF core.transaction.Issue_ItemRecord.getStartKey() = 1000
-			break;
-
-		// TODO 1000 - for not ASSET may be other
-		} while (  key > 1000l && !super.map.containsKey(key) );
+		//DECREMENT KEY
+		--this.key;
 		 
 	}
 	

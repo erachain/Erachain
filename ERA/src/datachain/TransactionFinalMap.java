@@ -515,7 +515,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 	
 	public Transaction getTransaction(byte[] seg){
-		return this.get(DCSet.getInstance().getTransactionFinalMapSigns().getHeightSegBySignature(seg));
+		return this.get(getDCSet().getTransactionFinalMapSigns().getHeightSegBySignature(seg));
 		
 	}
 	

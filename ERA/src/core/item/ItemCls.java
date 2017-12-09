@@ -456,7 +456,7 @@ public abstract class ItemCls {
 
 		long thisKey = this.getKey(db);
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
-		this.getDBMap(db).delete(thisKey);	
+		this.getDBMap(db).remove();	
 				
 		//DELETE ORPHAN DATA
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");

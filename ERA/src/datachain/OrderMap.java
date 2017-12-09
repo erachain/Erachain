@@ -51,9 +51,9 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		}
 	}
 
-	public OrderMap(OrderMap parent) 
+	public OrderMap(OrderMap parent, DCSet dcSet) 
 	{
-		super(parent, null);
+		super(parent, dcSet);
 
 	}
 
@@ -217,7 +217,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		{
 			//Filters orders with unacceptably small amount. These orders have not worked
 			if(filter){
-				if(isExecutable(DCSet.getInstance(), orderKey.getKey()))
+				if(isExecutable(getDCSet(), orderKey.getKey()))
 					orders.add(this.get(orderKey.getKey()));
 			}
 			else
@@ -326,7 +326,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		if(filter){
 			List<BigInteger> keys2 = new ArrayList<BigInteger>();
 			
-			DCSet db = DCSet.getInstance();
+			DCSet db = getDCSet();
 			Iterator<BigInteger> iter = keys.iterator();
 			while (iter.hasNext()) {
 				BigInteger key = iter.next();

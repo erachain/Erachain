@@ -404,7 +404,7 @@ public class DCSet implements Observer, IDB {
 		this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
 		this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap);
 		this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap());
-		this.orderMap = new OrderMap(parent.orderMap);
+		this.orderMap = new OrderMap(parent.orderMap, this);
 		this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap);
 		this.tradeMap = new TradeMap(parent.tradeMap, this);
 		this.imprintMap = new ItemImprintMap(parent.imprintMap);
