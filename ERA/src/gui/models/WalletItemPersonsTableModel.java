@@ -142,7 +142,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_PERSON_TYPE)
+		if(message.getType() == ObserverMessage.LIST_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_LIST_PERSON_TYPE)
 		{
 			if(this.persons == null)
 			{
@@ -158,7 +158,8 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		
 		int a = message.getType();
 		
-		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE)
+		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_PERSON_TYPE)
 		{
 	//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
 			this.fireTableDataChanged();
