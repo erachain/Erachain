@@ -136,7 +136,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private Collection<BigInteger> getKeys(long have, long want) {
+	protected Collection<BigInteger> getSubKeysWithParent(long have, long want) {
 		
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
@@ -146,21 +146,46 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		//IF THIS IS A FORK
 		if(this.parent != null)
 		{
-			//GET ALL KEYS FOR FORK
-			Collection<BigInteger> forkKeys = ((OrderMap) this.parent).getKeys(have, want);
-			
-			//COMBINE LISTS
-			Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
-			combinedKeys.addAll(forkKeys);
-			
-			//DELETE DELETED
-			for(BigInteger deleted: this.deleted)
-			{
-				combinedKeys.remove(deleted);
+			if (false) { ///////////// OLD VERSION /////////
+				//GET ALL KEYS FOR FORK
+				Collection<BigInteger> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+				
+				//COMBINE LISTS
+				Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
+				combinedKeys.addAll(parentKeys);
+				
+				if (this.deleted != null) {
+					//DELETE DELETED
+					for(BigInteger deleted: this.deleted)
+					{
+						combinedKeys.remove(deleted);
+					}
+				}
+				
+				//CONVERT SET BACK TO COLLECTION
+				keys = combinedKeys;
+			} else {
+				
+				//GET ALL KEYS FOR FORK
+				Collection<BigInteger> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+				
+				// REMOVE those who DELETED here
+				if (this.deleted != null) {
+					//DELETE DELETED
+					for(BigInteger deleted: this.deleted)
+					{
+						parentKeys.remove(deleted);
+					}
+				}
+				
+				//COMBINE LISTS
+				Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
+				combinedKeys.addAll(parentKeys);
+
+				//CONVERT SET BACK TO COLLECTION
+				keys = combinedKeys;
+				
 			}
-			
-			//CONVERT SET BACK TO COLLECTION
-			keys = combinedKeys;
 		}
 		
 		return keys;
@@ -280,7 +305,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 	public List<Order> getOrders(long have, long want, boolean orderReverse) 
 	{
 		//FILTER ALL KEYS
-		Collection<BigInteger> keys = this.getKeys(have, want);
+		Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
 
 		//GET ALL ORDERS FOR KEYS
 		List<Order> orders = new ArrayList<Order>();
@@ -298,7 +323,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		}
 		
 		//IF THIS IS A FORK
-		if(this.parent != null)
+		if(false && this.parent != null)
 		{
 			//RESORT ORDERS
 			Collections.sort(orders);
