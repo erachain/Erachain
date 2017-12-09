@@ -220,10 +220,12 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>, Trade>
 			Set<Tuple2> combinedKeys = new TreeSet<Tuple2>(keys);
 			combinedKeys.addAll(forkKeys);
 			
-			//DELETE DELETED
-			for(Tuple2 deleted: this.deleted)
-			{
-				combinedKeys.remove(deleted);
+			if (this.deleted != null) {
+				//DELETE DELETED
+				for(Tuple2 deleted: this.deleted)
+				{
+					combinedKeys.remove(deleted);
+				}
 			}
 			
 			//CONVERT SET BACK TO COLLECTION

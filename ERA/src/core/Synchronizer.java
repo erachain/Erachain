@@ -303,6 +303,7 @@ public class Synchronizer
 			if (dcSet.getBlockMap().contains(signatures.get(0))) {
 				signatures.remove(0);
 				if (signatures.size() == 0) {
+					peer.setNeedPing();
 					LOGGER.info("  signatures.remove(0) -> size = 0 for PEER " + peer.getAddress().getHostAddress());
 					return;
 				}

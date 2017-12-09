@@ -2,10 +2,13 @@ package datachain;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.mapdb.DB;
@@ -99,20 +102,22 @@ public class NameExchangeMap extends DCMap<String, BigDecimal>
 			nameSales.add(new NameSale(entry.getKey(), entry.getValue()));
 		}
 		
-		/*
 		if(this.parent != null) {
-			nameSales.addAll(this.parent.getNameSales());
+
+			//GET ALL KEYS FOR FORK
+			List<NameSale> forkItems = this.parent.getDCSet().getNameExchangeMap().getNameSales();
+			
+			nameSales.addAll(forkItems);
 			
 			if (this.deleted != null) {
 				//DELETE DELETED
-				for(Tuple2 deleted: this.deleted)
+				for(String deleted: this.deleted)
 				{
 					nameSales.remove(deleted);
 				}
 
 			}
 		}
-		*/
 		
 		return nameSales;
 	}
