@@ -1348,6 +1348,7 @@ public class Wallet extends Observable implements Observer
 			if (!this.isWalletDatabaseExisting())
 				return;
 			
+			transaction.setDC(DCSet.getInstance(), false);
 			this.processTransaction(transaction);
 			
 			//SKIP PAYMENT TRANSACTIONS
@@ -1446,6 +1447,7 @@ public class Wallet extends Observable implements Observer
 		{
 
 			Transaction transaction = transactions.get(i);
+			transaction.setDC(DCSet.getInstance(), false);
 			this.orphanTransaction(transaction);
 			
 			//CHECK IF PAYMENT
@@ -2079,6 +2081,7 @@ public class Wallet extends Observable implements Observer
 		{	
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
+			transaction.setDC(DCSet.getInstance(), false);
 				
 			this.processTransaction(transaction);
 			
@@ -2123,6 +2126,7 @@ public class Wallet extends Observable implements Observer
 		{	
 			Transaction transaction = (Transaction)message.getValue();
 				
+			transaction.setDC(DCSet.getInstance(), false);
 			this.orphanTransaction(transaction);
 				
 			//CHECK IF PAYMENT
