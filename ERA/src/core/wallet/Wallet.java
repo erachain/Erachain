@@ -1340,7 +1340,8 @@ public class Wallet extends Observable implements Observer
 			this.database.getAccountMap().changeBalance(
 					blockGenerator.getAddress(), false, FEE_KEY, blockFee);
 		}
-		
+
+		DCSet dcSet = DCSet.getInstance();
 		//CHECK TRANSACTIONS
 		for(Transaction transaction: block.getTransactions())
 		{
@@ -1348,7 +1349,7 @@ public class Wallet extends Observable implements Observer
 			if (!this.isWalletDatabaseExisting())
 				return;
 			
-			transaction.setDC(DCSet.getInstance(), false);
+			transaction.setDC(dcSet, false);
 			this.processTransaction(transaction);
 			
 			//SKIP PAYMENT TRANSACTIONS
@@ -1442,12 +1443,13 @@ public class Wallet extends Observable implements Observer
 		
 		List<Transaction> transactions = block.getTransactions();
 		
+		DCSet dcSet = DCSet.getInstance();
 		//ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		for(int i=transactions.size() -1; i>=0; i--)
 		{
 
 			Transaction transaction = transactions.get(i);
-			transaction.setDC(DCSet.getInstance(), false);
+			transaction.setDC(dcSet, false);
 			this.orphanTransaction(transaction);
 			
 			//CHECK IF PAYMENT
@@ -2081,8 +2083,8 @@ public class Wallet extends Observable implements Observer
 		{	
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
+			
 			transaction.setDC(DCSet.getInstance(), false);
-				
 			this.processTransaction(transaction);
 			
 			//CHECK IF PAYMENT
