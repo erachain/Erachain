@@ -882,6 +882,12 @@ public class Block {
 			previousForgingHeight = creator.getLastForgingData(dcSet);			
 		}
 		
+		if (!BlockChain.DEVELOP_USE) {
+			if (height > 87090 && height - previousForgingHeight < 10 ) {
+				return -1;
+			}
+		}
+		
 		if (previousForgingHeight > height) {
 			return height;
 		}

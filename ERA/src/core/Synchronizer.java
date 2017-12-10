@@ -602,13 +602,13 @@ public class Synchronizer
 				lastBlockSignatureCommon = dcSet.getBlockHeightsMap().getSignByHeight(maxChainHeight);				
 			}
 
-			LOGGER.info("findHeaders try found COMMON header"
+			LOGGER.debug("findHeaders try found COMMON header"
 					+ " steep: " + steep
 					+ " maxChainHeight: " + maxChainHeight);
 
 			headers = this.getBlockSignatures(lastBlockSignatureCommon, peer);
 
-			LOGGER.info("findHeaders try found COMMON header"
+			LOGGER.debug("findHeaders try found COMMON header"
 					+ " founded headers: " + headers.size()
 					);
 
