@@ -269,7 +269,7 @@ public class CreateOrderTransaction extends Transaction
 				}
 				
 				if (wrong) {
-					int balance = this.creator.getBalance(dcSet, RIGHTS_KEY, 1).intValue();
+					int balance = this.creator.getBalance(dcSet, RIGHTS_KEY, 1).b.intValue();
 					if (balance > 3000)
 						return INVALID_ADDRESS;
 				}
@@ -299,7 +299,7 @@ public class CreateOrderTransaction extends Transaction
 
 		//CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if (FEE_KEY == have) {
-			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(
+			if(this.creator.getBalance(db, FEE_KEY).a.b.compareTo(
 					this.order.getAmountHave().add(this.fee)) == -1)
 			{
 				return NO_BALANCE;
@@ -307,7 +307,7 @@ public class CreateOrderTransaction extends Transaction
 		} else {
 
 			//CHECK IF SENDER HAS ENOUGH FEE BALANCE
-			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(this.fee) == -1)
+			if(this.creator.getBalance(db, FEE_KEY).a.b.compareTo(this.fee) == -1)
 			{
 				return NOT_ENOUGH_FEE;
 			}
@@ -316,7 +316,7 @@ public class CreateOrderTransaction extends Transaction
 			boolean unLimited = haveAsset.getQuantity(db).equals(0l)
 					&& haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
 
-			if( !unLimited && this.creator.getBalance(db, have).a.compareTo(
+			if( !unLimited && this.creator.getBalance(db, have).a.b.compareTo(
 					this.order.getAmountHave()) == -1)
 			{
 				return NO_BALANCE;

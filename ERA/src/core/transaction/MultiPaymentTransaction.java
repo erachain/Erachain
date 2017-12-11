@@ -230,7 +230,7 @@ public class MultiPaymentTransaction extends Transaction {
 		this.creator.changeBalance(fork, true, FEE_KEY, this.fee);
 		
 		//CHECK IF CREATOR HAS ENOUGH FEE BALANCE
-		if(this.creator.getBalance(fork, FEE_KEY).a.compareTo(BigDecimal.ZERO) == -1)
+		if(this.creator.getBalance(fork, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) == -1)
 		{
 			return NO_BALANCE;
 		}	
@@ -251,7 +251,7 @@ public class MultiPaymentTransaction extends Transaction {
 			}
 			
 			//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-			if(this.creator.getBalance(fork, payment.getAsset()).a.compareTo(payment.getAmount()) == -1)
+			if(this.creator.getBalance(fork, payment.getAsset()).a.b.compareTo(payment.getAmount()) == -1)
 			{
 				return NO_BALANCE;
 			}

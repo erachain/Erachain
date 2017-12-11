@@ -8,7 +8,9 @@ import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -106,7 +108,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		account = this.publicKeyAccounts.get(row);
 		
 		
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance;
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
 		String str;
 		
@@ -117,7 +119,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
+			str = NumberAsString.getInstance().numberAsString(balance.a) + "/" + balance.b.b.toPlainString() + "/" + balance.c.b.toPlainString();
 			return str;
 	/*
 		case COLUMN_WAINTING_BALANCE:

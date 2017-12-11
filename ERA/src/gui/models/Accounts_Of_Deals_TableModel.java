@@ -8,7 +8,9 @@ import java.util.Observer;
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -60,7 +62,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 	
 	BigDecimal ss = new BigDecimal(0);	
 	for (PublicKeyAccount acc:this.publicKeyAccounts){
-	ss = ss.add(acc.getBalance(this.asset.getKey(DCSet.getInstance())).a);	
+	ss = ss.add(acc.getBalance(this.asset.getKey(DCSet.getInstance())).a.b);	
 	
 	}
 		
@@ -75,7 +77,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		BigDecimal ss = new BigDecimal(0);	
 		BigDecimal sW = new BigDecimal(0);
 		for (PublicKeyAccount account:this.publicKeyAccounts){
-		ss = ss.add(account.getBalance(this.asset.getKey(DCSet.getInstance())).a);	
+		ss = ss.add(account.getBalance(this.asset.getKey(DCSet.getInstance())).a.b);	
 		
 		
 		sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance())).a);
@@ -161,8 +163,8 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		
 		account = this.publicKeyAccounts.get(row);
 		
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance;
+		Tuple3<BigDecimal, BigDecimal, BigDecimal>  unconfBalance;
 		String str;
 		
 		switch(column)
@@ -178,7 +180,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
 			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a));
+			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a.b));
 				//	+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 				//	+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
 			return str;

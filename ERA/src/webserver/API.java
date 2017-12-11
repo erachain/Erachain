@@ -41,6 +41,7 @@ import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import api.ApiErrorFactory;
 import controller.Controller;
@@ -841,11 +842,13 @@ public class API {
 
 		}
 		
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
 		JSONArray array = new JSONArray();
 		array.add(balance.a);
 		array.add(balance.b);
 		array.add(balance.c);
+		array.add(balance.d);
+		array.add(balance.e);
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -865,16 +868,18 @@ public class API {
 
 		}
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		JSONObject out = new JSONObject();
 		
-		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
+		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) 	
 		{
 			JSONArray array = new JSONArray();
 			array.add(assetsBalance.getB().a);
 			array.add(assetsBalance.getB().b);
 			array.add(assetsBalance.getB().c);
+			array.add(assetsBalance.getB().d);
+			array.add(assetsBalance.getB().e);
 			out.put(assetsBalance.getA().b, array);
 		}
 		

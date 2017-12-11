@@ -12,6 +12,7 @@ import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -37,11 +38,11 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"key Asset","Asset", "Balance A", "Balance B", "Balance C"});
 	// balances;
-	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
-	Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance;
+	private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+	Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
 	Object tab_Balances;
-	private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance ;
-	private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance1 ;
+	private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance ;
+	private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1 ;
 	Tuple2<Long,String> asset;
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -75,12 +76,14 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 			BigDecimal sumA = new BigDecimal(0);
 			BigDecimal sumB = new BigDecimal(0);
 			BigDecimal sumC = new BigDecimal(0);
-			for ( Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>> k:this.table_balance1){
+			for ( Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k:this.table_balance1){
 				if (k.getB().getA()==i){
 				
-				sumA=sumA.add(k.getB().getB().a);
-				sumB=sumB.add(k.getB().getB().b);
-				sumC=sumC.add(k.getB().getB().c);
+				sumA=sumA.add(k.getB().getB().a.b);
+				sumB=sumB.add(k.getB().getB().b.b);
+				sumC=sumC.add(k.getB().getB().c.b);
+				sumB=sumB.add(k.getB().getB().d.b);
+				sumB=sumB.add(k.getB().getB().e.b);
 			}
 			
 				
@@ -90,7 +93,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 			}
 	
 		
-		((SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>) this.balances).registerObserver();
+		((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances).registerObserver();
 	}
 	
 	

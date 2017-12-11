@@ -226,7 +226,7 @@ public class BuyNameTransaction extends Transaction
 		}
 		
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(db, Transaction.FEE_KEY).a.compareTo(this.nameSale.getAmount()) == -1)
+		if(this.creator.getBalance(db, Transaction.FEE_KEY).a.b.compareTo(this.nameSale.getAmount()) == -1)
 		{
 			return NO_BALANCE;
 		}

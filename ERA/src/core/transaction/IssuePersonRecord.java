@@ -157,7 +157,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 				return res;
 		} else if (res == Transaction.NOT_ENOUGH_FEE) {
 			// IF balance of FEE < 0 - ERROR 
-			if(this.creator.getBalance(db, FEE_KEY).a.compareTo(BigDecimal.ZERO) < 0)
+			if(this.creator.getBalance(db, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0)
 				return res;
 		} else if (res != Transaction.VALIDATE_OK) {
 			return res;

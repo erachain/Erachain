@@ -13,6 +13,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import core.account.Account;
 import core.item.assets.AssetCls;
@@ -24,7 +25,13 @@ import utils.ObserverMessage;
 // balances for all account in blockchain
 // TODO SOFT HARD TRUE
 // -> in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND) 
-public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> 
+public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
+	Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
+	Tuple2<BigDecimal, BigDecimal>, // in DEBT
+	Tuple2<BigDecimal, BigDecimal>, // in STOCK
+	Tuple2<BigDecimal, BigDecimal>, // it DO
+	Tuple2<BigDecimal, BigDecimal>  // on HOLD
+	>>
 {
 	//public static final long FEE_KEY = AssetCls.DILE_KEY;
 	
@@ -56,10 +63,14 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 
 	@SuppressWarnings({ "unchecked"})
 	@Override
-	protected Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getMap(DB database) 
+	protected Map<Tuple2<String, Long>, Tuple5<
+		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>> getMap(DB database) 
 	{
 		//OPEN MAP
-		BTreeMap<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> map =  database.createTreeMap("balances")
+		BTreeMap<Tuple2<String, Long>, Tuple5<
+		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>> map =  database.createTreeMap("balances")
 				.keySerializer(BTreeKeySerializer.TUPLE2)
 				.counterEnable()
 				.makeOrGet();
@@ -78,12 +89,35 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 				return new Tuple3<Long, BigDecimal, String>(key.b, value.negate(), key.a);
 			}	
 		});*/
-		Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Tuple3<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>, String>,
-				Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>() {
+		Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Tuple3<Long,
+				Tuple5<
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>,
+				String>,
+				Tuple2<String, Long>,
+				Tuple5<
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>>
+		() {
 			@Override
-			public Tuple3<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>, String> run(Tuple2<String, Long> key, Tuple3<BigDecimal, BigDecimal, BigDecimal> value) {
-				return new Tuple3<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>, String>(
-						key.b, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(value.a.negate(), value.b.negate(), value.c.negate()), key.a);
+			public Tuple3<Long, Tuple5<
+			Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+			Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>, String>
+				run(Tuple2<String, Long> key, Tuple5<
+						Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+						Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> value) {
+				return new Tuple3<Long, Tuple5<
+						Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+						Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>, String>(
+						key.b, new Tuple5<
+						Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+						Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>
+							(new Tuple2<BigDecimal, BigDecimal>(value.a.a.negate(), value.a.b.negate()),
+								new Tuple2<BigDecimal, BigDecimal>(value.b.a.negate(), value.b.b.negate()),
+								new Tuple2<BigDecimal, BigDecimal>(value.c.a.negate(), value.c.b.negate()),
+								new Tuple2<BigDecimal, BigDecimal>(value.d.a.negate(), value.d.b.negate()),
+								new Tuple2<BigDecimal, BigDecimal>(value.e.a.negate(), value.e.b.negate())),
+									key.a);
 			}	
 		});
 		
@@ -92,15 +126,28 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 	}
 
 	@Override
-	protected Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getMemoryMap() 
+	protected Map<Tuple2<String, Long>, Tuple5<
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>> getMemoryMap() 
 	{
-		return new TreeMap<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>(Fun.TUPLE2_COMPARATOR);
+		return new TreeMap<Tuple2<String, Long>, Tuple5<
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>>(Fun.TUPLE2_COMPARATOR);
 	}
 
 	@Override
-	protected Tuple3<BigDecimal, BigDecimal, BigDecimal> getDefaultValue() 
+	protected Tuple5<
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> getDefaultValue() 
 	{
-		return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8));
+		return new Tuple5<
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>
+			(new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8)));
 	}
 	
 	@Override
@@ -116,7 +163,9 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 	}
 	*/
 	
-	public void set(String address, long key, Tuple3<BigDecimal, BigDecimal, BigDecimal> value)
+	public void set(String address, long key, Tuple5<
+			Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+			Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> value)
 	{
 		if (key < 0)
 			key = -key;
@@ -131,13 +180,17 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 	}
 	*/
 	
-	public Tuple3<BigDecimal, BigDecimal, BigDecimal> get(String address, long key)
+	public Tuple5<
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> get(String address, long key)
 	{
 		if (key < 0)
 			key = -key;
 		
 		
-		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.get(new Tuple2<String, Long>(address, key));
+		Tuple5<
+		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> value = this.get(new Tuple2<String, Long>(address, key));
 
 		/*
 		// TODO for TEST
@@ -155,7 +208,9 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getBalancesSortableList(long key)
+	public SortableList<Tuple2<String, Long>, Tuple5<
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key)
 	{
 		if (key < 0)
 			key = -key;
@@ -166,11 +221,15 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 				Fun.t3(key, Fun.HI(), Fun.HI())).values();
 		
 		//RETURN
-		return new SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>(this, keys);
+		return new SortableList<Tuple2<String, Long>, Tuple5<
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>>(this, keys);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> getBalancesSortableList(Account account) 
+	public SortableList<Tuple2<String, Long>, Tuple5<
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
+	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account) 
 	{
 		BTreeMap map = (BTreeMap) this.map;
 		
@@ -182,6 +241,7 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple3<BigD
 		// TODO - ERROR PARENT not userd!
 		
 		//RETURN
-		return new SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>(this, keys);
+		return new SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
 	}
+
 }

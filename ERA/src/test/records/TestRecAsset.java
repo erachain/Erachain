@@ -12,7 +12,9 @@ import java.util.List;
 import ntp.NTP;
 
 import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.BlockChain;
@@ -66,7 +68,7 @@ public class TestRecAsset {
 	long key = 0;
 
 	R_Send rsend;
-	Tuple3<BigDecimal, BigDecimal, BigDecimal> balance3;
+	Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance5;
 	
 	// INIT ASSETS
 	private void init() {
@@ -235,7 +237,7 @@ public class TestRecAsset {
 		assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.compareTo(new BigDecimal(asset.getQuantity(db))) == 0);
+		assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.compareTo(new BigDecimal(asset.getQuantity(db))) == 0);
 				
 		//CHECK REFERENCE SENDER
 		assertEquals((long)issueAssetTransaction.getTimestamp(), (long)maker.getLastTimestamp(db));
@@ -267,7 +269,7 @@ public class TestRecAsset {
 		assertEquals(false, db.getItemAssetMap().contains(key));
 		
 		//CHECK ASSET BALANCE SENDER
-		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.longValue());
+		assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.longValue());
 				
 		//CHECK REFERENCE SENDER
 		//assertEquals(issueAssetTransaction.getReference(), maker.getLastReference(db));
@@ -964,10 +966,13 @@ public class TestRecAsset {
 		long timestamp = NTP.getTime();
 
 		// SET BALANCES
-		db.getAssetBalanceMap().set(maker.getAddress(), key, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-				BigDecimal.valueOf(20).setScale(8),
-				BigDecimal.valueOf(10).setScale(8),
-				BigDecimal.valueOf(0).setScale(8))
+		db.getAssetBalanceMap().set(maker.getAddress(), key, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(20).setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(10).setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(0).setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(0).setScale(8)),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(0).setScale(8))
+					)
 				);
 		
 		//CREATE ASSET TRANSFER
@@ -985,11 +990,11 @@ public class TestRecAsset {
 		rsend.sign(maker, false);
 		rsend.process(db, gb, false);
 		
-		balance3 = maker.getBalance(db, key);
+		balance5 = maker.getBalance(db, key);
 		
 		//CHECK BALANCE SENDER
 		
-		assertEquals(BigDecimal.valueOf(100).setScale(8), balance3.c);
+		assertEquals(BigDecimal.valueOf(100).setScale(8), balance5.c);
 		//CHECK BALANCE SENDER
 		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
 				

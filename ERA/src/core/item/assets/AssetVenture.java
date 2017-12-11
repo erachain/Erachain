@@ -7,7 +7,9 @@ import java.util.Arrays;
  import org.apache.log4j.Logger;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 //import com.google.common.primitives.Bytes;
@@ -62,8 +64,8 @@ public class AssetVenture extends AssetCls {
 		
 		if (this.quantity == 0) {
 			// IF UNLIMIT QIUNTITY
-			Tuple3<BigDecimal, BigDecimal, BigDecimal> bals = this.getOwner().getBalance(this.getKey(dcSet));
-			long bal = -bals.a.longValue();
+			Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+			long bal = -bals.a.b.longValue();
 			if (bal == 0) {
 				bal = 1l;
 			}

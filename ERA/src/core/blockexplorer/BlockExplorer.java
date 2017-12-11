@@ -33,6 +33,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
 import com.github.rjeschke.txtmark.Processor;
 import at.AT;
@@ -2045,13 +2046,12 @@ if ( asset_1 == null) {
 		for (Tuple2<String, Long> addr : addrs) {
 			if(addr.b == key)
 			{
-				Tuple3<BigDecimal, BigDecimal, BigDecimal> ball =  DCSet.getInstance().getAssetBalanceMap().get(addr.a, key);
-			//	all = all.add(ball.a);
+				Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = DCSet.getInstance().getAssetBalanceMap().get(addr);
+				//all = all.add(ball.a);
 				Account account = new Account(addr.a);
-				 BigDecimal ballans = account.getBalanceUSE(key);
-				 
-				
-				top100s.add(Fun.t3(addr.a, ballans, ball.a));
+				BigDecimal ballans = account.getBalanceUSE(key);
+
+				top100s.add(Fun.t3(addr.a, ballans, ball.a.b));
 			}
 		}
 
@@ -2752,9 +2752,9 @@ if ( asset_1 == null) {
 			return output; 
 		}
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
-		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
+		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) 	
 		{
 			Map assetBalance = new LinkedHashMap();
 
@@ -2767,13 +2767,13 @@ if ( asset_1 == null) {
 		return output; 
 	}
 	
-	public Map<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetBalance(String address)
+	public Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetBalance(String address)
 	{
-		Map<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> output = new LinkedHashMap();
+		Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> output = new LinkedHashMap();
 
-		SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+		SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
-		for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalance : assetsBalances) 	
+		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances)
 		{
 			output.put(assetsBalance.getA().b, assetsBalance.getB());
 		}
@@ -3169,24 +3169,26 @@ if ( asset_1 == null) {
 			
 		Map nativeBalance = new LinkedHashMap();
 		
-		Map<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetAmountTotal = new LinkedHashMap<>();
+		Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmountTotal = new LinkedHashMap<>();
 
 		for (String address : addresses) {
 
-			Map<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetAmountOfAddr = assetBalance(address);
+			Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmountOfAddr = assetBalance(address);
 
 			Map<Long, String> assetAmountOfAddrPrint = new LinkedHashMap<>();
 			
-			for (Map.Entry<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetAmounts : assetAmountOfAddr.entrySet()) 
+			for (Map.Entry<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmounts : assetAmountOfAddr.entrySet()) 
 			{
 				if (assetAmountTotal.containsKey(assetAmounts.getKey())) 
 				{
-					Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = assetAmountTotal.get(assetAmounts.getKey());
-					Tuple3<BigDecimal, BigDecimal, BigDecimal> value = assetAmounts.getValue();
-					balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-							balance.a.add(value.a),
-							balance.b.add(value.b),
-							balance.c.add(value.c)
+					Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = assetAmountTotal.get(assetAmounts.getKey());
+					Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value = assetAmounts.getValue();
+					balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+							new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(value.a.b)),
+							new Tuple2<BigDecimal, BigDecimal>(balance.b.a, balance.b.b.add(value.b.b)),
+							new Tuple2<BigDecimal, BigDecimal>(balance.c.a, balance.c.b.add(value.c.b)),
+							new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.add(value.d.b)),
+							new Tuple2<BigDecimal, BigDecimal>(balance.e.a, balance.e.b.add(value.e.b))	
 							);
 					
 					assetAmountTotal.put(assetAmounts.getKey(), balance);
@@ -3203,7 +3205,7 @@ if ( asset_1 == null) {
 		}
 		
 		Map<Long, String> assetAmountTotalPrint = new LinkedHashMap<>();
-		for (Map.Entry<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetAmounts : assetAmountTotal.entrySet()) 
+		for (Map.Entry<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetAmounts : assetAmountTotal.entrySet()) 
 		{
 			assetAmountTotalPrint.put(assetAmounts.getKey(), assetAmounts.getValue().toString());
 		}

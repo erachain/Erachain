@@ -9,6 +9,7 @@ import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -28,7 +29,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance", "in OWN"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
-	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
+	private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 	
 	public BalancesTableModel(long key)
 	{
@@ -82,7 +83,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 			return null;
 		}
 		
-		Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> aRow = this.balances.get(row);
+		Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
 		Account account = new Account(aRow.getA().a);
 		
 		switch(column)
@@ -97,7 +98,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer
 
 		case COLUMN_OWN:
 			
-			Tuple3<BigDecimal, BigDecimal, BigDecimal> val = account.getBalance(this.key);
+			Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> val = account.getBalance(this.key);
 			return  val.a; // NumberAsString.getInstance().numberAsString(val.a);
 		}
 		

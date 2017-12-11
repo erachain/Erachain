@@ -9,6 +9,7 @@ import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -27,7 +28,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false};
-	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
+	private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 	
 	public Balances_To_Account_TableModel(long key)
 	{
@@ -81,7 +82,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
 			return null;
 		}
 		
-		Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> aRow = this.balances.get(row);
+		Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
 		Account account = new Account(aRow.getA().a);
 		
 		switch(column)

@@ -10,7 +10,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -151,7 +153,13 @@ public class DatabaseTests {
 		//assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 		
 		//SET BALANCE
-		dcSet.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE));
+		dcSet.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+				(new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
+						new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
+						new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
+						new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
+						new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE)
+						));
 		
 		//CHECK VALUE IN DB
 		assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
@@ -160,7 +168,14 @@ public class DatabaseTests {
 		assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test", 1L));
 		
 		//SET BALANCE IN FORK
-		fork.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN, BigDecimal.TEN));
+		fork.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+			(
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN)
+					));
 		
 		//CHECK VALUE IN DB
 		assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
@@ -172,7 +187,14 @@ public class DatabaseTests {
 		DCSet fork2 = fork.fork();
 		
 		//SET BALANCE IN FORK2
-		fork2.getAssetBalanceMap().set("test", 1L, new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO));
+		fork2.getAssetBalanceMap().set("test", 1L,  new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+			(
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO)
+					));
 		
 		//CHECK VALUE IN DB
 		assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));

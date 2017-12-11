@@ -11,6 +11,7 @@ import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import utils.NumberAsString;
 import utils.ObserverMessage;
@@ -35,8 +36,8 @@ public class Balance_from_Assets extends AbstractTableModel implements Observer
 	private long key;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Asset","key Asset", "Balance"});
 	// balances;
-	private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
-	Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance;
+	private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+	Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
 	Object tab_Balances;
 	private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance ;
 	Tuple2<Long,String> asset;
@@ -54,7 +55,7 @@ public class Balance_from_Assets extends AbstractTableModel implements Observer
 		
 		for (int ia = 0; accounts.size()>ia; ia++){
 			account = accounts.get(ia);
-			this.balances = Controller.getInstance().getBalances(account); //.getBalances(key);
+			balances = Controller.getInstance().getBalances(account); //.getBalances(key);
 			for (int ib=0; this.balances.size()>ib; ib++){
 				balance = this.balances.get(ib);
 				table_balance.add(new Pair(account,new Pair(balance.getA().b, balance.getB())));
@@ -64,7 +65,7 @@ public class Balance_from_Assets extends AbstractTableModel implements Observer
 		
 		
 		
-		((SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>) this.balances).registerObserver();
+		((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances).registerObserver();
 	}
 	
 	

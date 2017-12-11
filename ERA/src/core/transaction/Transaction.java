@@ -1022,7 +1022,7 @@ public abstract class Transaction {
 
 		// CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
 		//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-		if(this.creator.getBalance(dcSet, FEE_KEY).a.compareTo(this.fee) < 0)
+		if(this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0)
 		{
 			return NOT_ENOUGH_FEE;
 		}

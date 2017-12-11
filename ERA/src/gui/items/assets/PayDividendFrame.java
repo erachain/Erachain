@@ -22,6 +22,7 @@ import javax.swing.border.EmptyBorder;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.account.Account;
@@ -36,7 +37,7 @@ public class PayDividendFrame extends JFrame
 	private AssetCls asset;
 	private JTextField txtAsset;
 	private JTextField txtAccount;
-	private JComboBox<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>> cbxAssetToPay;
+	private JComboBox<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> cbxAssetToPay;
 	private JTextField txtAmount;
 	private JTextField txtHolders;
 	private JButton generateButton;
@@ -126,7 +127,7 @@ public class PayDividendFrame extends JFrame
       		
       	//CBX ASSET TO PAY
       	txtGBC.gridy = 2;
-      	this.cbxAssetToPay = new JComboBox<Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>
+      	this.cbxAssetToPay = new JComboBox<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>
       		(new BalancesComboBoxModel(asset.getOwner()));
       	this.cbxAssetToPay.setRenderer(new BalanceRenderer());
         this.add(this.cbxAssetToPay, txtGBC);
@@ -192,7 +193,7 @@ public class PayDividendFrame extends JFrame
 			AssetCls assetToPay = Controller.getInstance().getAsset(assetKey);
 			
 			//BALANCES
-			SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances = Controller.getInstance().getBalances(this.asset.getKey());
+			SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(this.asset.getKey());
 			
 			//GET ACCOUNTS AND THEIR TOTAL BALANCE
 			List<Account> accounts = new ArrayList<Account>();
@@ -202,7 +203,7 @@ public class PayDividendFrame extends JFrame
 				Account account = new Account(balances.get(i).getA().a);
 				accounts.add(account);
 				
-				total = total.add(balances.get(i).getB().a);
+				total = total.add(balances.get(i).getB().a.b);
 			}
 			
 			//CREATE PAYMENTS

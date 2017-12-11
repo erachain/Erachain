@@ -406,7 +406,7 @@ public abstract class TransactionAmount extends Transaction {
 					if (!asset.isMovable()) {
 						return NOT_MOVABLE_ASSET;						
 					}					
-					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType);
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
 					if (amount.compareTo(balance1) > 0) {
 						return NO_HOLD_BALANCE;
 					}
@@ -446,7 +446,7 @@ public abstract class TransactionAmount extends Transaction {
 						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
 						if (creditAmount.compareTo(amount) < 0) {
 							BigDecimal leftAmount = amount.subtract(creditAmount);
-							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1); // OWN balance
+							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN balance
 							// NOT ENOUGHT DEBT from recipient to creator
 							// TRY CREDITN OWN
 							if (balanceOwn.compareTo(leftAmount) < 0) {
@@ -474,7 +474,7 @@ public abstract class TransactionAmount extends Transaction {
 							}
 							
 							if (wrong) {
-								int balance = this.creator.getBalance(dcSet, absKey, 1).intValue();								
+								int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();								
 								if (balance > 3000)
 									return INVALID_ADDRESS;
 							}
@@ -494,15 +494,15 @@ public abstract class TransactionAmount extends Transaction {
 						// not make RETURN - check validate next
 						//
 					} else if (absKey == FEE_KEY) {
-						if(this.creator.getBalance(dcSet, FEE_KEY, 1).compareTo( this.amount.add(this.fee) ) < 0) {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
 							return NO_BALANCE;
 						}
 						
 					} else {
-						if(this.creator.getBalance(dcSet, FEE_KEY, 1).compareTo( this.fee ) < 0) {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-						BigDecimal balanceOWN = this.creator.getBalance(dcSet, absKey, actionType);
+						BigDecimal balanceOWN = this.creator.getBalance(dcSet, absKey, actionType).b;
 						BigDecimal balanceUSE = this.creator.getBalanceUSE(absKey, dcSet);
 						
 						if (amount.compareTo(balanceOWN) > 0 || amount.compareTo(balanceUSE) > 0) {
@@ -524,10 +524,10 @@ public abstract class TransactionAmount extends Transaction {
 				} else {
 					// PRODUCE - SPEND
 					// TRY FEE
-					if(this.creator.getBalance(dcSet, FEE_KEY, 1).compareTo( this.fee ) < 0) {
+					if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
 						return NOT_ENOUGH_FEE;
 					}
-					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType);
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
 					if (amount.compareTo(balance1) > 0) {
 						return NO_BALANCE;
 					}
@@ -543,7 +543,7 @@ public abstract class TransactionAmount extends Transaction {
 		} else {
 			// TODO first records is BAD already ((
 			//CHECK IF CREATOR HAS ENOUGH FEE MONEY
-			if(this.creator.getBalance(dcSet, FEE_KEY).a.compareTo(this.fee) < 0)
+			if(this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0)
 			{
 				return NOT_ENOUGH_FEE;
 			}				

@@ -572,7 +572,7 @@ public abstract class AT_Controller {
 	{
 		Account account = new Account( Base58.encode( id ) );
 
-		BigDecimal balance = account.getBalance( dcSet, Transaction.FEE_KEY ).a;
+		BigDecimal balance = account.getBalance( dcSet, Transaction.FEE_KEY ).a.b;
 
 		byte[] balanceBytes = balance.unscaledValue().toByteArray();
 		byte[] fill = new byte[8 - balanceBytes.length];

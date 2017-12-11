@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.account.Account;
@@ -55,14 +56,17 @@ public class ItemsFavorites_not implements Observer{
 	public void reload()
 	{
 		List<Long> favoritesUpadate = new ArrayList<Long>();
+		SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList;
 		
 		for (Account account : Controller.getInstance().getAccounts()) {
-			SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balancesList = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
 			
-			for (Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balance : balancesList) {
-				if(balance.getB().a.compareTo(BigDecimal.ZERO) != 0
-						|| balance.getB().b.compareTo(BigDecimal.ZERO) != 0
-						|| balance.getB().c.compareTo(BigDecimal.ZERO) != 0
+			balancesList = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
+			for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : balancesList) {
+				if(balance.getB().a.b.compareTo(BigDecimal.ZERO) != 0
+						|| balance.getB().b.b.compareTo(BigDecimal.ZERO) != 0
+						|| balance.getB().c.b.compareTo(BigDecimal.ZERO) != 0
+						|| balance.getB().d.b.compareTo(BigDecimal.ZERO) != 0
+						|| balance.getB().e.b.compareTo(BigDecimal.ZERO) != 0
 						) {
 					if(!favoritesUpadate.contains(balance.getA().b)){
 						favoritesUpadate.add(balance.getA().b);
