@@ -108,7 +108,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
-	private static final String version = "4.2.02 alpha";
+	private static final String version = "4.2.03 alpha";
 	private static final String buildTime = "2017-11-19 15:33:33 UTC";
 	private static long buildTimestamp;
 	
@@ -308,6 +308,9 @@ public class Controller extends Observable {
 		if(peerHWeight!=null){
 			peerHWeight.put(peer, hWeight);
 		}
+	}
+	public void resetWeightOfPeer(Peer peer) {
+		peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
 	}
 	
 	public Map<Peer, Pair<String, Long>> getPeersVersions() {
@@ -1638,7 +1641,7 @@ public class Controller extends Observable {
 	// SYNCHRONIZE
 	
 	public void orphanInPipe(Block block) throws Exception {
-		this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false);
+		this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, true);
 	}
 
 	public boolean checkStatus(int shift) {

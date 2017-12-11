@@ -304,6 +304,10 @@ public class BlockMap extends DCMap<byte[], Block>
 		
 		this.setLastBlockSignature(parentSign);
 		
+		if (dcSet.getChildMap().contains(parent.getSignature())) {
+			dcSet.getChildMap().delete(block.getSignature());
+		}
+		
 		dcSet.getChildMap().delete(parent.getSignature());
 	
 		// ORPHAN FORGING DATA

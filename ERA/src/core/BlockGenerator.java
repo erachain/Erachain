@@ -231,7 +231,7 @@ public class BlockGenerator extends Thread implements Observer
 		long winned_value;				
 		long winned_value_account;
 		long max_winned_value_account;
-		int height = bchain.getHeight(dcSet) + 1;
+		int height = BlockChain.getHeight(dcSet) + 1;
 		long target = bchain.getTarget(dcSet);
 		Block generatedBlock;
 
@@ -261,6 +261,7 @@ public class BlockGenerator extends Thread implements Observer
 					try
 					{
 						while (bchain.getHeight(dcSet) > this.orphanto) {
+							Block block = bchain.getLastBlock(dcSet);
 							ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
 						}
 					}
