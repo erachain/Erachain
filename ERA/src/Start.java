@@ -55,6 +55,7 @@ public class Start {
 		
 		boolean cli = false;
 		
+		String pass = null;
 		
 		for(String arg: args)
 		{
@@ -68,6 +69,11 @@ public class Start {
 					
 				Controller.useGui = false;
 				
+				}
+				
+				if(arg.startsWith("-pass=") && arg.length() > 6) 
+				{
+					pass = arg.substring(6);
 				}
 					
 				if(arg.startsWith("-peers=") && arg.length() > 7) 
@@ -127,9 +133,11 @@ public class Start {
 				//STARTING NETWORK/BLOCKCHAIN/RPC
 				Controller.getInstance().start();
 				//unlick wallet
-				//if (Controller.getInstance().doesWalletDatabaseExists()) {
-				//	Controller.getInstance().unlockWallet("1");
-				//}
+				
+				if(pass != null && Controller.getInstance().doesWalletDatabaseExists()) {
+					Controller.getInstance().unlockWallet(pass);
+				}
+
 				Status.getinstance();
 				
 				if (!Controller.useGui) {
