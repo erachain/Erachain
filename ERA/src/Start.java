@@ -135,7 +135,8 @@ public class Start {
 				//unlick wallet
 				
 				if(pass != null && Controller.getInstance().doesWalletDatabaseExists()) {
-					Controller.getInstance().unlockWallet(pass);
+					if (Controller.getInstance().unlockWallet(pass))
+						Controller.getInstance().lockWallet();
 				}
 
 				Status.getinstance();
