@@ -133,7 +133,7 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize_blocks(databaseSet, null, newBlocks, null);
+			synchronizer.synchronize_blocks(databaseSet, null, 1, newBlocks, null);
 			
 			//CHECK LAST 5 BLOCKS
 			lastBlock = databaseSet.getBlockMap().getLastBlock();
@@ -279,7 +279,7 @@ public class SynchronizerTests {
 		
 		try
 		{
-			synchronizer.synchronize_blocks(databaseSet1, gb1, newBlocks, null);
+			synchronizer.synchronize_blocks(databaseSet1, gb1, 1, newBlocks, null);
 		}
 		catch(Exception e)
 		{

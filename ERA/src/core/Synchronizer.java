@@ -57,7 +57,7 @@ public class Synchronizer
 		return fromPeer;
 	}
 	
-	private void checkNewBlocks(DCSet fork, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
+	private void checkNewBlocks(DCSet fork, Block lastCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		
 		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
@@ -79,23 +79,30 @@ public class Synchronizer
 				+ " in ForkDB: " + lastBlock.getHeight(fork)
 				+ "\n for lastCommonBlock = " + lastCommonBlock.getHeight(fork));
 
-		///byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
-		byte[] lastCommonBlockSignature = lastCommonBlock.getReference();/// !!!
+		byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+		///byte[] lastCommonBlockSignature = lastCommonBlock.getReference();/// !!!
 		int countTransactionToOrphan = 0;
 		//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
 		while(!Arrays.equals(lastBlock.getReference(), lastCommonBlockSignature))
 		{
 			LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
-			if (cnt.getBlockChain().getCheckPoint(fork) > lastBlock.getHeightByParent(fork)
-					|| lastBlock.getVersion() == 0
-					|| countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
-				//cnt.closePeerOnError(peer, "Dishonest peer by not valid lastCommonBlock["
-				//		+ lastCommonBlock.getHeight(fork) + "]"); // icreator
-
+			if (checkPointHeight > lastBlock.getHeightByParent(fork)) {
 				String mess = "Dishonest peer by not valid lastCommonBlock["
-						+ lastCommonBlock.getHeight(fork) + "]";
-				peer.ban(BAN_BLOCK_TIMES>>2, mess);
+						+ lastCommonBlock.getHeight(fork) + "] < [" + checkPointHeight + "] checkPointHeight";
+				peer.ban(BAN_BLOCK_TIMES, mess);
 				throw new Exception(mess);
+				
+			} else if (lastBlock.getVersion() == 0) {
+				String mess = "Dishonest peer by not valid lastCommonBlock["
+						+ lastCommonBlock.getHeight(fork) + "] Version == 0";
+				peer.ban(BAN_BLOCK_TIMES, mess);
+				throw new Exception(mess);
+				
+			} else if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
+				String mess = "Dishonest peer by on lastCommonBlock["
+						+ lastCommonBlock.getHeight(fork) + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
+				peer.ban(BAN_BLOCK_TIMES>>2, mess);
+				throw new Exception(mess);				
 			}
 			//LOGGER.debug("*** core.Synchronizer.checkNewBlocks - try orphan: " + lastBlock.getHeight(fork));
 			if (cnt.isOnStopping())
@@ -143,7 +150,7 @@ public class Synchronizer
 	}
 
 	// process new BLOCKS to DB and orphan DB
-	public List<Transaction> synchronize_blocks(DCSet dcSet, Block lastCommonBlock, List<Block> newBlocks, Peer peer) throws Exception
+	public List<Transaction> synchronize_blocks(DCSet dcSet, Block lastCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		TreeMap<String, Transaction> orphanedTransactions = new TreeMap<String, Transaction>();
 		Controller cnt = Controller.getInstance();
@@ -151,20 +158,20 @@ public class Synchronizer
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
 		if (core.BlockGenerator.TEST_001) {
 			///checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks, peer);
-			checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);
+			checkNewBlocks(dcSet.fork(), lastCommonBlock, checkPointHeight, newBlocks, peer);
 		} else {
-			checkNewBlocks(dcSet.fork(), lastCommonBlock, newBlocks, peer);
+			checkNewBlocks(dcSet.fork(), lastCommonBlock, checkPointHeight, newBlocks, peer);
 		}
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
-		Map<String, byte[]> states = new TreeMap<String, byte[]>();
+		////Map<String, byte[]> states = new TreeMap<String, byte[]>();
 
 		//GET LAST BLOCK
 		Block lastBlock = dcSet.getBlockMap().getLastBlock();
 		
 		//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
-		////while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getSignature()))
-		while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getReference())) /// !!!
+		while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getSignature()))
+		///while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getReference())) /// !!!
 		{
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
@@ -381,7 +388,7 @@ public class Synchronizer
 			//SYNCHRONIZE BLOCKS
 			LOGGER.error("synchronize with OPRHAN from common block [" + commonBlock.getHeightByParent(dcSet)
 				+ "] for blocks: " + blocks.size());			
-			List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, commonBlock, blocks, peer);
+			List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, commonBlock, checkPointHeight, blocks, peer);
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
 			}
