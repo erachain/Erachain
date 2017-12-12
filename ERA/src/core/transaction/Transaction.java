@@ -1040,7 +1040,7 @@ public abstract class Transaction {
 		if (personDuration == null) {
 			// USE all GIFT for current ACCOUNT
 			//creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);
-			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
+			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
 			return;
 		}
 		
@@ -1052,7 +1052,7 @@ public abstract class Transaction {
 		Account invitedAccount = person.getOwner();
 		if (creator.equals(invitedAccount)) {
 			// IT IS ME - all fee!
-			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE));
+			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
 			return;			
 		}
 
@@ -1064,7 +1064,7 @@ public abstract class Transaction {
 		
 		int fee_gift_get =  fee_gift - fee_gift_next;
 		//invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
-		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE));
+		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE), asOrphan);
 		
 		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
 			process_gifts(db, ++level, fee_gift_next, invitedAccount, asOrphan);
@@ -1082,7 +1082,7 @@ public abstract class Transaction {
 	
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
 				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).subtract(this.fee), db);
-				this.creator.changeBalance(db, true, FEE_KEY, this.fee);
+				this.creator.changeBalance(db, true, FEE_KEY, this.fee, false);
 
 			}
 						
@@ -1109,7 +1109,7 @@ public abstract class Transaction {
 		if (!asPack) {
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
 				//this.creator.setBalance(FEE_KEY, this.creator.getBalance(db, FEE_KEY).add(this.fee), db);
-				this.creator.changeBalance(db, false, FEE_KEY, this.fee);
+				this.creator.changeBalance(db, false, FEE_KEY, this.fee, true);
 
 			}
 			

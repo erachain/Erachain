@@ -538,15 +538,15 @@ public class R_SertifyPubKeys extends Transaction {
 
 			// BACK FEE FOR ISSUER without gift for this.CREATOR
 			transPersonIssue.getCreator().changeBalance(db, false, FEE_KEY, issued_FEE_BD
-					.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD));
+					.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
 		
 			// GIVE GIFTs
-			this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD);
-			pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD);
+			this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
+			pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
 
 			// ADD to EMISSION (with minus)
 			GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD
-					.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD));
+					.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), false);
 
 		}
 		
@@ -625,15 +625,15 @@ public class R_SertifyPubKeys extends Transaction {
 
 			// BACK FEE FOR ISSUER without gift for this.CREATOR
 			transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY, issued_FEE_BD
-					.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD));
+					.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), true);
 		
 			// GIVE GIFTs
-			this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD);
-			pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD);
+			this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, true);
+			pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, true);
 
 			// ADD to EMISSION (with minus)
 			GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD
-					.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD));
+					.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
 
 		}
 

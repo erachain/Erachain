@@ -266,7 +266,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		long key = this.key;
 
 		//UPDATE RECIPIENT OWN or RENT
-		this.recipient.changeBalance(db, false, key, this.amount);
+		this.recipient.changeBalance(db, false, key, this.amount, false);
 		
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastTimestamp(this.timestamp, db);
@@ -280,7 +280,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		if (key < 0) {
 			// THIS is CREDIT
 			//this.owner.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
-			this.owner.changeBalance(db, true, key, this.amount);
+			this.owner.changeBalance(db, true, key, this.amount, false);
 			db.getCredit_AddressesMap().add(
 					new Tuple3<String, Long, String>(
 							this.owner.getAddress(), -key,
@@ -289,13 +289,16 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 					this.amount);
 		} else {
 			// CREATOR update
-			GenesisBlock.CREATOR.changeBalance(db, true, key, this.amount);			
+			GenesisBlock.CREATOR.changeBalance(db, true, key, this.amount, false);			
 		}
 	}
 
 	@Override
 	public void orphan(DCSet db, boolean asPack) 
 	{
+		// RISE ERROR
+		DCSet err = null;
+		err.commit();
 		
 		/* IT CANNOT BE orphanED !!!
 		 * 

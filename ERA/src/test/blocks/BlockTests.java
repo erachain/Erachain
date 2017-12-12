@@ -70,8 +70,8 @@ public class BlockTests
 		gbTransactions = gb.getTransactions();
 
 		generator.setLastTimestamp(gb.getTimestamp(db), db);
-		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8)); // need for payments
+		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8), false);
+		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), false); // need for payments
 	}
 		
 	private void initTrans(List<Transaction> transactions, long timestamp) {
@@ -458,8 +458,8 @@ public class BlockTests
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastTimestamp(gb.getTimestamp(db), db);
-		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8));
+		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8), false);
+		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), false);
 
 								
 		//GENERATE NEXT BLOCK
@@ -563,8 +563,8 @@ public class BlockTests
 		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(8), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastTimestamp(gb.getTimestamp(db), db);
-		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100000).setScale(8));
-		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8));
+		generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100000).setScale(8), false);
+		generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), false);
 								
 		//GENERATE NEXT BLOCK
 		Block block = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);

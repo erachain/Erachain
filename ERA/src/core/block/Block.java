@@ -1390,7 +1390,7 @@ public class Block {
 
 			// ADD from EMISSION (with minus)
 			GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY,
-					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee));
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee), false);
 
 			blockFee = blockTotalFee;
 			
@@ -1404,7 +1404,7 @@ public class Block {
 	
 					Account richAccount = new Account(rich);
 					//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-					richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+					richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), false);
 				}
 			}
 		}
@@ -1414,7 +1414,7 @@ public class Block {
 		if (cnt.isOnStopping())
 			throw new Exception("on stoping");
 		
-		this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee);
+		this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee, false);
 
 		/*
 		if (!dcSet.isFork()) {
@@ -1465,7 +1465,7 @@ public class Block {
 
 			// SUBSTRACT from EMISSION (with minus)
 			GenesisBlock.CREATOR.changeBalance(dcSet, false, Transaction.FEE_KEY,
-					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee));
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee), true);
 
 			blockFee = blockTotalFee;
 
@@ -1479,7 +1479,7 @@ public class Block {
 	
 					Account richAccount = new Account(rich);
 					//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-					richAccount.changeBalance(dcSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)));
+					richAccount.changeBalance(dcSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), true);
 				}
 			}
 		}
@@ -1487,7 +1487,7 @@ public class Block {
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
 
 		//UPDATE GENERATOR BALANCE WITH FEE
-		this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee);
+		this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee, true);
 		
 		//DELETE BLOCK FROM DB
 		dcSet.getBlockMap().delete(this);

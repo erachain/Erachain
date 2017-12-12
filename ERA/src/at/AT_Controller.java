@@ -554,7 +554,7 @@ public abstract class AT_Controller {
 					totalFees += tx.getAmount();
 				}
 				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dcSet );
-				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , 8 ) );
+				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , 8 ), false );
 				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dcSet, Transaction.FEE_KEY));
 			}
 

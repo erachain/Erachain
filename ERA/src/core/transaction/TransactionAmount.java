@@ -591,9 +591,9 @@ public abstract class TransactionAmount extends Transaction {
 				|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
 		//UPDATE SENDER
-		this.creator.changeBalance(db, !confiscate_credit, key, this.amount);
+		this.creator.changeBalance(db, !confiscate_credit, key, this.amount, false);
 		//UPDATE RECIPIENT
-		this.recipient.changeBalance(db, confiscate_credit, key, this.amount);
+		this.recipient.changeBalance(db, confiscate_credit, key, this.amount, false);
 
 		int actionType = Account.actionType(key, amount);
 		if (actionType == 2) {
@@ -675,9 +675,9 @@ public abstract class TransactionAmount extends Transaction {
 				|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 		
 		//UPDATE SENDER
-		this.creator.changeBalance(db, confiscate_credit, key, this.amount);
+		this.creator.changeBalance(db, confiscate_credit, key, this.amount, true);
 		//UPDATE RECIPIENT
-		this.recipient.changeBalance(db, !confiscate_credit, key, this.amount);
+		this.recipient.changeBalance(db, !confiscate_credit, key, this.amount, true);
 
 		int actionType = Account.actionType(key, amount);
 		if (actionType == 2) {

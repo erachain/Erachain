@@ -64,7 +64,7 @@ public class TestNoteAsPack {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 
 	}
 	

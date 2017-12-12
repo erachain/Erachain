@@ -107,8 +107,8 @@ public class DatabaseTests {
 		genesis_certify.process(dcSet, gb, false);
 		
 		maker.setLastTimestamp(last_ref, dcSet);
-		maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(8), false);
+		maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
