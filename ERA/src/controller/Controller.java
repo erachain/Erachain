@@ -839,7 +839,7 @@ public class Controller extends Observable {
 
 			LOGGER.info("Closed.");
 			// FORCE CLOSE
-			System.out.println("EXIT parametr:" + par);
+			LOGGER.info("EXIT parameter:" + par);
 			System.exit(par);
 		//	bat
 		//	if %errorlevel% neq 0 exit /b %errorlevel%

@@ -1,8 +1,11 @@
 package utils;
 
+import org.apache.log4j.Logger;
+
 import controller.Controller;
 
 public class MemoryViewer extends Thread {
+	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 	
 	public MemoryViewer(){
 		
