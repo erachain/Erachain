@@ -136,8 +136,8 @@ public class TestRecPerson {
 		genesis_certify.process(db, gb, false);
 		
 		certifier.setLastTimestamp(last_ref, db);
-		certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8));
-		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8), false);
+		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 		
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
@@ -216,7 +216,7 @@ public class TestRecPerson {
 		issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
 
 	}
@@ -427,11 +427,11 @@ public class TestRecPerson {
 		personalizeRecord_0.setDC(db, false);
 		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD RIGHTS
-		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8));
+		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8), false);
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();

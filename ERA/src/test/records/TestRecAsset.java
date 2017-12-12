@@ -82,7 +82,7 @@ public class TestRecAsset {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 		
 		maker_1.setLastTimestamp(gb.getTimestamp(db), db);
 		
@@ -462,7 +462,7 @@ public class TestRecAsset {
 		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8));
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8), false);
 		Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastTimestamp(db));
 		assetTransfer.sign(maker, false);
 		assetTransfer.isValid(db, releaserReference);
@@ -494,7 +494,7 @@ public class TestRecAsset {
 			
 		//CREATE ASSET TRANSFER
 		long key = 1l;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8), false);
 		Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastTimestamp(db));
 		assetTransfer.sign(maker, false);
 		assetTransfer.setDC(db, false);
@@ -764,7 +764,7 @@ public class TestRecAsset {
 		long timestamp = NTP.getTime();
 			
 		//CREATE ASSET TRANSFER
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8));
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8), false);
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
 				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastTimestamp(db));
@@ -797,7 +797,7 @@ public class TestRecAsset {
 			
 		//CREATE ASSET TRANSFER
 		long key = 2l;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8), false);
 		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
 				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastTimestamp(db));

@@ -276,7 +276,7 @@ public class TestRec_Send {
 
 		// NEGATE for test HOLD ///////////////////
 		amount = amount.negate();
-		recipient.changeBalance(db, false, -ERM_KEY, amount.negate());
+		recipient.changeBalance(db, false, -ERM_KEY, amount.negate(), false);
 		/// MESSAGE + AMOUNT
 		r_SendV3 = new R_Send(
 				maker, FEE_POWER, 
@@ -353,7 +353,7 @@ public class TestRec_Send {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8));
+		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8), false);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
@@ -431,7 +431,7 @@ public class TestRec_Send {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8));
+		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8), false);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 				

@@ -69,7 +69,7 @@ public class TransactionTests3AssetsAsPack {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8));
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
 		
 		asset = new AssetVenture(maker, "a", icon, image, "a", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
@@ -438,7 +438,7 @@ public class TransactionTests3AssetsAsPack {
 			
 		//CREATE ASSET TRANSFER
 		long key = 221;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8));
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8), false);
 		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
 		assetTransfer.sign(maker, asPack);
 		assetTransfer.process(db, gb, asPack);
@@ -471,7 +471,7 @@ public class TransactionTests3AssetsAsPack {
 			
 		//CREATE ASSET TRANSFER
 		long key = 1l;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8), false);
 		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
 		assetTransfer.sign(maker, asPack);
 		assetTransfer.process(db, gb, asPack);
@@ -562,7 +562,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE INVALID CANCEL ORDER NO BALANCE
 		DCSet fork = db.fork();
 		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1,2});		
-		maker.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO);		
+		maker.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false);		
 		
 		//CHECK IF CANCEL ORDER IS INVALID
 		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));
@@ -738,7 +738,7 @@ public class TransactionTests3AssetsAsPack {
 
 		long key = 2l;
 		
-		creator.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8));
+		creator.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8), false);
 				
 		R_Send r_Send = new R_Send(
 				creator, 

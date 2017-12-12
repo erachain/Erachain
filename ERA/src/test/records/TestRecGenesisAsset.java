@@ -296,7 +296,7 @@ public class TestRecGenesisAsset {
 		assetTransfer.process(db, gb, false);
 
 		//CREATE VALID ASSET TRANSFER
-		maker.changeBalance(db, false, 1, BigDecimal.valueOf(100).setScale(8));
+		maker.changeBalance(db, false, 1, BigDecimal.valueOf(100).setScale(8), false);
 		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(8));
 
 		//CHECK IF ASSET TRANSFER IS VALID
