@@ -121,8 +121,8 @@ public class Pinger extends Thread
 		BlockChain chain = cnt.getBlockChain();
 
 		int sleepTimeFull = Settings.getInstance().getPingInterval();
-		int sleepTimeSteep = 100;
-		int sleepSteeps = sleepTimeFull / sleepTimeSteep;
+		int sleepTimeSteep = 10;
+		int sleepSteeps = sleepTimeFull / sleepTimeSteep + 10;
 		int sleepStepTimeCounter;
 		long pingOld = 100;
 		while(true)
@@ -163,7 +163,6 @@ public class Pinger extends Thread
 					//LOGGER.debug("try ASYNC send " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
 
 					messageQueue = null;
-					continue;
 				}
 
 				pingOld = this.ping;

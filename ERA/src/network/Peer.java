@@ -456,7 +456,13 @@ public class Peer extends Thread{
 				continue;
 
 			}
-			
+
+			try {
+				Thread.sleep(1);
+			}
+			catch (Exception e) {		
+			}
+
 			// CHECK stream
 			if (in == null) {
 				try 

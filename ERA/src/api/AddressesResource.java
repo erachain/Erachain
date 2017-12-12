@@ -342,6 +342,7 @@ public class AddressesResource {
 		return getGeneratingBalance(address, 1);
 	}
 
+	///  get addresses/assetbalance/1/7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
 	@GET
 	@Path("assetbalance/{assetid}/{address}")
 	public String getAssetBalance(@PathParam("assetid") String assetid,
@@ -373,6 +374,47 @@ public class AddressesResource {
 					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
+
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+		JSONArray result = new JSONArray();
+		result.add(JSONUtil.putNewArray(balance.a.a));
+
+		return result.toJSONString();
+	}
+
+	@GET
+	@Path("assetbalanceincomed/{assetid}/{address}")
+	public String getAssetBalanceIncomed(@PathParam("assetid") String assetid,
+			@PathParam("address") String address) {
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		Long assetAsLong = null;
+
+		// HAS ASSET NUMBERFORMAT
+		try {
+			assetAsLong = Long.valueOf(assetid);
+
+		} catch (NumberFormatException e) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+
+		// DOES ASSETID EXIST
+		if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+
+		}
+		
+		//balance = 
 
 		return DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
 				.toString();
