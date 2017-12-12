@@ -53,9 +53,10 @@ public class ClosingDialog extends JFrame{
 		    @Override
 		    public void run() {
 		    	Controller.getInstance().deleteObservers();
-		    	Controller.getInstance().stopAll();
 		    	waitDialog.dispose();
-		    	System.exit(0);
+		    	Controller.getInstance().stopAll(0);
+		    	
+		 //   	System.exit(0);
 		    }
 		});
     	

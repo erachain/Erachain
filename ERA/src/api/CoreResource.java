@@ -34,8 +34,8 @@ public class CoreResource
 		}
 		
 		//STOP
-		Controller.getInstance().stopAll();		
-		System.exit(0);
+		Controller.getInstance().stopAll(0);		
+	//	System.exit(0);
 		
 		//RETURN
 		return String.valueOf(true);

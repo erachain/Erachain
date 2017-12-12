@@ -188,8 +188,8 @@ public class RecoverWalletFrame extends JFrame
         {
             public void windowClosing(WindowEvent e)
             {
-            	Controller.getInstance().stopAll();
-            	System.exit(0);
+            	Controller.getInstance().stopAll(0);
+            //	System.exit(0);
             }
         });
         

@@ -103,8 +103,8 @@ public class Gui extends JFrame{
 	
 	public void onCancelCreateWallet() 
 	{
-		Controller.getInstance().stopAll();
-		System.exit(0);
+		Controller.getInstance().stopAll(0);
+//		System.exit(0);
 	}
 	
 	public static <T extends TableModel> MTable createSortableTable(T tableModel, int defaultSort)

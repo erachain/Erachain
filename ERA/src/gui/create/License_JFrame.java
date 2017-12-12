@@ -162,8 +162,8 @@ public class License_JFrame extends JDialog {
 					parent.setVisible(true);
 					dispose();		
 				} else {
-	            	Controller.getInstance().stopAll();
-	            	System.exit(0);
+	            	Controller.getInstance().stopAll(0);
+	      //      	System.exit(0);
 				}
 			}
         });
@@ -203,8 +203,8 @@ public class License_JFrame extends JDialog {
             	if (!needAccept)
             		return;
             	 
-            	Controller.getInstance().stopAll();
-            	System.exit(0);
+            	Controller.getInstance().stopAll(0);
+           // 	System.exit(0);
             	 
             }
         });

@@ -96,6 +96,7 @@ import network.message.VersionMessage;
 import ntp.NTP;
 import settings.Settings;
 import utils.DateTimeFormat;
+import utils.MemoryViewer;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -390,6 +391,11 @@ public class Controller extends Observable {
 	
 	public void start() throws Exception {
 		
+		// start memory viewer
+		MemoryViewer a = new MemoryViewer();
+		a.start();
+		
+		
 		this.toOfflineTime = NTP.getTime();
 		if (Controller.useGui) about_frame = AboutFrame.getInstance();
 		this.foundMyselfID = new byte[128];
@@ -546,7 +552,7 @@ public class Controller extends Observable {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				stopAll();
+				stopAll(0);
 			}
 		});
 		
@@ -579,6 +585,8 @@ public class Controller extends Observable {
 					BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>4, BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
 		}
 		
+		 
+	
 
 		if( Settings.getInstance().isTestnet()) 
 			this.status = STATUS_OK;
@@ -801,7 +809,7 @@ public class Controller extends Observable {
 		return this.isStopping;
 	}
 
-	public void stopAll() {
+	public void stopAll(Integer par) {
 		// PREVENT MULTIPLE CALLS
 		if (this.isStopping)  return;
 		this.isStopping = true; 
@@ -831,7 +839,10 @@ public class Controller extends Observable {
 
 			LOGGER.info("Closed.");
 			// FORCE CLOSE
-			System.exit(0);
+			System.out.println("EXIT parametr:" + par);
+			System.exit(par);
+		//	bat
+		//	if %errorlevel% neq 0 exit /b %errorlevel%
 		
 	}
 
