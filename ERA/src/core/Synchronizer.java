@@ -721,6 +721,9 @@ public class Synchronizer
 				dcSet.updateTxCounter(block.getTransactionCount());
 				// FARDFLUSH not use in each case - only after accumulate size
 				dcSet.flush(blockSize, false);
+				if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
+					cnt.NotifyIncoming(block.getTransactions());
+				}
 
 				if(Controller.getInstance().isOnStopping())
 					throw new Exception("on stoping");

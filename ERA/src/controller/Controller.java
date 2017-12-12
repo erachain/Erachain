@@ -1772,6 +1772,37 @@ public class Controller extends Observable {
 		return true;
 	}
 	
+	public void NotifyIncoming(List<Transaction> transactions) {
+		
+		List<Account> accounts = this.wallet.getAccounts();	
+		List<Integer> seqs = new ArrayList<Integer>();
+
+		int seq = 0;
+		for (Transaction transaction: transactions) {
+			//FOR ALL ACCOUNTS
+			synchronized(accounts)
+			{		
+				for(Account account: accounts)
+				{
+					//CHECK IF INVOLVED
+					if(!account.equals(transaction.getCreator()) && transaction.isInvolved(account))
+					{
+						seqs.add(++seq);
+						break;
+					}
+				}
+			}
+		}
+		
+		if (seqs.isEmpty())
+			return;
+		
+		// SEE - http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+		String url = Settings.getInstance().getNotifyIncomingURL();
+		http(url)
+		
+	}
+	
 	public boolean isNSUpToDate() {
 		return !Settings.getInstance().updateNameStorage();
 	}

@@ -100,7 +100,10 @@ public class Settings {
 	private static final boolean DEFAULT_FORGING_ENABLED = true;
 	
 	public static String DEFAULT_LANGUAGE = "en.json";
-	
+
+	private static final String NOTEFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
+	private static final int NOTEFY_INCOMING_CONFIRMATIONS = 0;
+
 	private static Settings instance;
 	
 	private JSONObject settingsJSON;
@@ -222,7 +225,26 @@ public class Settings {
 	{
 		return this.userPath;
 	}
-	
+
+	public String getNotifyIncomingURL()
+	{
+		if(this.settingsJSON.containsKey("notify_incoming_url"))
+		{
+			return (String) this.settingsJSON.get("notify_incoming_url");
+		}
+		return NOTEFY_INCOMING_URL;
+	}
+
+	public int getNotifyIncomingConfirmations()
+	{
+		if(this.settingsJSON.containsKey("notify_incoming_confirmations"))
+		{
+			return (int) this.settingsJSON.get("notify_incoming_confirmations");
+		}
+		
+		return NOTEFY_INCOMING_CONFIRMATIONS;
+	}
+
 	public JSONArray getPeersJson()
 	{
 		if(this.peersJSON != null && this.peersJSON.containsKey("knownpeers")) {
@@ -823,8 +845,7 @@ public class Settings {
 			return ((String) this.settingsJSON.get("font_size").toString());
 		}
 		
-		return DEFAULT_FONT_SIZE.toString();
-		
+		return DEFAULT_FONT_SIZE.toString();		
 		
 	}
 	
@@ -836,8 +857,8 @@ public class Settings {
 		
 		return getUserPath();
 		
-		
 	}
+	
 	public int get_File_Chooser_Wight(){
 		if(this.settingsJSON.containsKey("FileChooser_Wight"))
 		{
@@ -846,8 +867,8 @@ public class Settings {
 		
 		return 0;
 		
-		
 	}
+	
 	public int get_File_Chooser_Height(){
 		if(this.settingsJSON.containsKey("FileChooser_Height"))
 		{
@@ -856,10 +877,7 @@ public class Settings {
 		
 		return 0;
 		
-		
 	}
-	
-	
 	
 	public String get_Font_Name(){
 		if(this.settingsJSON.containsKey("font_name"))
