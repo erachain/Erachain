@@ -340,6 +340,16 @@ public class ApiClient {
 				"Errors: 102 - Invalid address. 601 - Invalid asset id."
 			},
 			{
+				"GET addresses/assetbalanceown/<key>/<address>", 
+				"Returns the confirmed balance in OWN of the given address for the given asset key.",
+				"Errors: 102 - Invalid address. 601 - Invalid asset id."
+			},
+			{
+				"GET addresses/assetbalanceincomedown/<key>/<address>", 
+				"Returns the confirmed incomed balance in OWN of the given address for the given asset key.",
+				"Errors: 102 - Invalid address. 601 - Invalid asset id."
+			},
+			{
 				"POST addresses/sign/<address> <message>", 
 				"Signs the given message using the given address.",
 				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."

@@ -376,15 +376,40 @@ public class AddressesResource {
 		}
 
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+		JSONArray item1 = new JSONArray();
+		JSONArray item2 = new JSONArray();
+		JSONArray item3 = new JSONArray();
+		JSONArray item4 = new JSONArray();
+		JSONArray item5 = new JSONArray();
+		
+		item1.add(balance.a.a);
+		item1.add(balance.a.b);
+
+		item2.add(balance.b.a);
+		item2.add(balance.b.b);
+
+		item3.add(balance.c.a);
+		item3.add(balance.c.b);
+
+		item4.add(balance.d.a);
+		item4.add(balance.d.b);
+
+		item5.add(balance.e.a);
+		item5.add(balance.e.b);
+
 		JSONArray result = new JSONArray();
-		result.add(JSONUtil.putNewArray(balance.a.a));
+		result.add(item1);
+		result.add(item2);
+		result.add(item3);
+		result.add(item4);
+		result.add(item5);
 
 		return result.toJSONString();
 	}
 
 	@GET
-	@Path("assetbalanceincomed/{assetid}/{address}")
-	public String getAssetBalanceIncomed(@PathParam("assetid") String assetid,
+	@Path("assetbalanceown/{assetid}/{address}")
+	public String getAssetBalanceOwn(@PathParam("assetid") String assetid,
 			@PathParam("address") String address) {
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
@@ -414,12 +439,48 @@ public class AddressesResource {
 
 		}
 		
-		//balance = 
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
 
-		return DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong)
-				.toString();
+		return balance.a.b.toPlainString();
 	}
-	
+
+	@GET
+	@Path("assetbalanceincomedown/{assetid}/{address}")
+	public String getAssetBalanceIncomedOwn(@PathParam("assetid") String assetid,
+			@PathParam("address") String address) {
+		// CHECK IF VALID ADDRESS
+		if (!Crypto.getInstance().isValidAddress(address)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
+					Transaction.INVALID_ADDRESS);
+
+		}
+
+		Long assetAsLong = null;
+
+		// HAS ASSET NUMBERFORMAT
+		try {
+			assetAsLong = Long.valueOf(assetid);
+
+		} catch (NumberFormatException e) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+
+		// DOES ASSETID EXIST
+		if (!DCSet.getInstance().getItemAssetMap().contains(assetAsLong)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+
+		}
+		
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+
+		return balance.a.a.toPlainString();
+	}
+
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("assets/{address}")
