@@ -392,8 +392,8 @@ public class Controller extends Observable {
 	public void start() throws Exception {
 		
 		// start memory viewer
-		MemoryViewer a = new MemoryViewer();
-		a.start();
+		MemoryViewer mamoryViewer = new MemoryViewer();
+		mamoryViewer.start();
 		
 		
 		this.toOfflineTime = NTP.getTime();
@@ -444,13 +444,23 @@ public class Controller extends Observable {
 		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Database OK"));
 
 		// OPENING DATABASES
+		int error = 0;
 		try {
 			if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open datachain"));
 			this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
 		} catch (Throwable e) {
+			//Error open DB
+			error =1;
 			LOGGER.error(e.getMessage(),e);
 			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
 			reCreateDB();
+		}
+		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled() && Settings.getInstance().getbacUpAskToStart()){
+			// delete files in BackUp dir
+			
+			// Copy DB files to BackUp dir
+			
+			
 		}
 
 		////  startFromScratchOnDemand();
@@ -852,27 +862,47 @@ public class Controller extends Observable {
 	//		this.dcSet.close();
 
 			File dataDir = new File(Settings.getInstance().getDataDir());
+			File dataLoc = new File(Settings.getInstance().getLocalDir());
 
-			File dataBak = getDataBakDir(dataDir);
-
+			File dataBakDC = new File(Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_DATA_DIR +"\\");
+			File dataBakLoc = new File(Settings.getInstance().getBackUpDir() + "\\"+  Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
+			// copy Data dir to Back 
 			if (dataDir.exists()) {
-				if (dataBak.exists()) {
+				if (dataBakDC.exists()) {
 					try {
 						Files.walkFileTree(
-								dataBak.toPath(),
+								dataBakDC.toPath(),
 								new SimpleFileVisitorForRecursiveFolderDeletion());
 					} catch (IOException e) {
 						LOGGER.error(e.getMessage(),e);
 					}
 				}
 				try {
-					FileUtils.copyDirectory(dataDir, dataBak);
+					FileUtils.copyDirectory(dataDir, dataBakDC);
 				} catch (IOException e) {
 					LOGGER.error(e.getMessage(),e);
 				}
 
 			}
+			// copy Loc dir to Back 
+						if (dataLoc.exists()) {
+							if (dataBakLoc.exists()) {
+								try {
+									Files.walkFileTree(
+											dataBakLoc.toPath(),
+											new SimpleFileVisitorForRecursiveFolderDeletion());
+								} catch (IOException e) {
+									LOGGER.error(e.getMessage(),e);
+								}
+							}
+							try {
+								FileUtils.copyDirectory(dataLoc, dataBakLoc);
+							} catch (IOException e) {
+								LOGGER.error(e.getMessage(),e);
+							}
 
+						}
+			
 		}
 
 	}

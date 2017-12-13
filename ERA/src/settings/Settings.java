@@ -74,10 +74,10 @@ public class Settings {
 	private static final boolean DEFAULT_GUI_DYNAMIC = true;
 	
 	//DATA
-	private static final String DEFAULT_DATA_DIR = "datachain";
-	private static final String DEFAULT_LOCAL_DIR = "datalocal";
-	private static final String DEFAULT_WALLET_DIR = "wallet";
-	private static final String DEFAULT_BACKUP_DIR = "backup";
+	public static final String DEFAULT_DATA_DIR = "datachain";
+	public static final String DEFAULT_LOCAL_DIR = "datalocal";
+	public static final String DEFAULT_WALLET_DIR = "wallet";
+	public static final String DEFAULT_BACKUP_DIR = "backup";
 	
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
