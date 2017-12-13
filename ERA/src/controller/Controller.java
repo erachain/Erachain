@@ -31,6 +31,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -455,11 +456,23 @@ public class Controller extends Observable {
 			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
 			reCreateDB();
 		}
-		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled() && Settings.getInstance().getbacUpAskToStart()){
+		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()){
 			
+			if (Settings.getInstance().getbacUpAskToStart()){
 			// ask dialog
 			// delete & copy files in BackUp dir
+			int n = JOptionPane.showConfirmDialog(
+				null, Lang.getInstance().translate("BackUp Database?"),
+				Lang.getInstance().translate("Confirmation"),
+		        JOptionPane.OK_CANCEL_OPTION);
+			if (n == JOptionPane.OK_OPTION) {
+				about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+				createDataCheckpoint();
+			}
+			}else{
+			about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
 			createDataCheckpoint();
+			}
 			
 		}
 		
