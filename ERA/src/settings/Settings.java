@@ -569,7 +569,7 @@ public class Settings {
 			return ((Boolean) this.settingsJSON.get("backupenabled")).booleanValue();
 		}
 		
-		return DEFAULT_RPC_ENABLED;
+		return false;
 	}
 	
 	public boolean getbacUpAskToStart() 
@@ -579,7 +579,7 @@ public class Settings {
 			return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();
 		}
 		
-		return DEFAULT_RPC_ENABLED;
+		return false;
 	}
 	
 	public int getWebPort()
