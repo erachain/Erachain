@@ -34,6 +34,7 @@ public class Start {
 	static Logger LOGGER = Logger.getLogger(Start.class.getName());
 	private static AboutFrame about_frame;
 	private static String info;
+	public static  boolean backUP = false;
 
 	public static void main(String args[]) throws IOException
 	{	
@@ -63,6 +64,15 @@ public class Start {
 			{
 				cli = true;
 			} 
+			// backUP data
+			if (arg.equals("-backup") ){
+				backUP = true;
+				
+				
+			}
+			
+			
+			
 			else 
 			{
 				if(arg.equals("-nogui")){

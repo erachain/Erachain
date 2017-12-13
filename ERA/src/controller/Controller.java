@@ -456,12 +456,13 @@ public class Controller extends Observable {
 			reCreateDB();
 		}
 		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled() && Settings.getInstance().getbacUpAskToStart()){
-			// delete files in BackUp dir
 			
-			// Copy DB files to BackUp dir
-			
+			// ask dialog
+			// delete & copy files in BackUp dir
+			createDataCheckpoint();
 			
 		}
+		
 
 		////  startFromScratchOnDemand();
 
