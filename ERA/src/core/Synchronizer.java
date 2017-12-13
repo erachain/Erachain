@@ -614,7 +614,7 @@ public class Synchronizer
 			block.setCalcGeneratingBalance(dcSet);
 
 			blocks.add(block);
-			bytesGet += block.getDataLength(true);
+			bytesGet += 500 + block.getDataLength(true);
 			LOGGER.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet/1000);
 			if (bytesGet > BYTES_MAX_GET) {
 				break;

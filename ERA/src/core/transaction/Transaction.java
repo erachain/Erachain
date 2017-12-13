@@ -993,10 +993,7 @@ public abstract class Transaction {
 	
 		//CHECK IF REFERENCE IS OK
 		Long reference = releaserReference==null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
-		if (reference != null && this.isReferenced()) {
-			if (false && reference.compareTo(this.reference) >= 0)
-				return INVALID_REFERENCE;
-			else if (reference.compareTo(this.timestamp) >= 0)
+		if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0) {
 				return INVALID_TIMESTAMP;
 		}		
 

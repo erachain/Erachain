@@ -346,22 +346,6 @@ public abstract class TransactionAmount extends Transaction {
 		
 		//CHECK IF REFERENCE IS OK
 		Long reference = releaserReference==null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
-		if (false && reference.compareTo(this.reference) >= 0) {
-			// TODO delete REFERENCE from TRANSACTION - in DB insert
-			// TODO: delete wrong check in new CHAIN
-			// SOME PAYMENTs is WRONG
-			boolean ok = true;
-			for (Long valid_item: VALID_REF) {
-				if (this.reference.equals(valid_item)) {
-					ok = false;
-					break;
-				}
-			}
-			
-			if (ok)
-				return INVALID_REFERENCE;
-		}
-		
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
 
@@ -623,15 +607,6 @@ public abstract class TransactionAmount extends Transaction {
 			}
 		}
 		
-		if (!asPack) {
-
-			//UPDATE REFERENCE OF RECIPIENT - for first accept FEE need
-			if(false && absKey == FEE_KEY)
-			{
-				this.recipient.setLastTimestamp(this.timestamp, db);
-			}
-		}
-
 		if (absKey == Transaction.RIGHTS_KEY
 				&& this.recipient.getLastForgingData(db) == -1
 				&& this.amount.compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) >= 0) {
@@ -706,15 +681,6 @@ public abstract class TransactionAmount extends Transaction {
 					db.getCredit_AddressesMap().add(leftCreditKey, amount);					
 				}
 
-			}
-		}
-
-		if (!asPack) {
-			
-			//UPDATE REFERENCE OF RECIPIENT
-			if(false && absKey == FEE_KEY)
-			{
-				this.recipient.removeLastTimestamp(db);
 			}
 		}
 	

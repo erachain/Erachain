@@ -584,9 +584,9 @@ public class Account {
 		return this.getLastTimestamp(DCSet.getInstance());
 	}
 	
-	public Long getLastTimestamp(DCSet db)
+	public Long getLastTimestamp(DCSet dcSet)
 	{
-		return db.getReferenceMap().getLast(this.getAddress());
+		return dcSet.getReferenceMap().getLast(this.getAddress());
 	}
 
 	/*
@@ -596,10 +596,10 @@ public class Account {
 	}
 	*/
 	
-	public void setLastTimestamp(Long timestamp, DCSet db)
+	public void setLastTimestamp(Long timestamp, DCSet dcSet)
 	{
 		byte[] key = Base58.decode(this.getAddress());
-		ReferenceMap map = db.getReferenceMap();
+		ReferenceMap map = dcSet.getReferenceMap();
 
 		// GET CURRENT REFERENCE
 		Long reference = map.get(key);
@@ -614,10 +614,10 @@ public class Account {
 		map.set(key, timestamp);
 	}
 		
-	public void removeLastTimestamp(DCSet db) 
+	public void removeLastTimestamp(DCSet dcSet) 
 	{
 		byte[] key = Base58.decode(this.getAddress());
-		ReferenceMap map = db.getReferenceMap();
+		ReferenceMap map = dcSet.getReferenceMap();
 				
 		// GET LAST TIMESTAMP
 		Long timestamp = map.get(key);

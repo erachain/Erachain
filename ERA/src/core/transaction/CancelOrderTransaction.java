@@ -26,6 +26,7 @@ import datachain.ItemAssetBalanceMap;
 
 public class CancelOrderTransaction extends Transaction
 {
+	// TODO - reference to ORDER - by recNor INT+INT - not 64xBYTE[] !!!
 	private static final byte TYPE_ID = (byte)CANCEL_ORDER_TRANSACTION;
 	private static final String NAME_ID = "Cancel Order";
 	private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
