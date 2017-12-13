@@ -13,8 +13,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
@@ -332,6 +335,55 @@ public class API {
 				out.put("message", "height error, use integer value");
 			else if (steep == 2)
 				out.put("message", "block not found");
+			else
+				out.put("message", e.getMessage());
+		}
+
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(out))
+				.build();
+	}
+
+	@GET
+	 // 		this.getIterator(23, true)
+	@Path("blockbyheight2/{height}")
+	public Response blockByHeight2(@PathParam("height") String heightStr)
+	{
+		
+		Map out = new LinkedHashMap();
+		int steep = 1;
+
+		try {
+			int height = Integer.parseInt(heightStr);
+			
+			++steep;
+			Block block;
+			LinkedList eee = null;
+			//LinkedList eee = ((LinkedList) dcSet.getBlockMap().map);//.keySet());
+			//LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.keySet());
+			//LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.values());
+			//LinkedList eee = ((LinkedList) dcSet.getBlockMap().map.entrySet());
+			ListIterator listIterator = eee.listIterator(height);
+			block = (Block)listIterator.next();
+
+			//block = dcSet.getBlockMap().get(iterator.next());
+			out.put("block", block.toJson());
+
+			++steep;
+			byte[] childSign = dcSet.getChildMap().getChildBlock(block.getSignature());
+			if (childSign != null)
+				out.put("next", Base58.encode(childSign));
+			
+		} catch (Exception e) {
+			
+			out.put("error", steep);
+			if (steep == 1)
+				out.put("message", "height error, use integer value " + e.getMessage());
+			else if (steep == 2)
+				out.put("message", "block not found " + e.getMessage());
 			else
 				out.put("message", e.getMessage());
 		}

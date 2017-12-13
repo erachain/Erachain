@@ -1,5 +1,6 @@
 *.class
 /data*
+/backup*
 /wallet*
 ERA/settings.json
 ERA/*.jar
