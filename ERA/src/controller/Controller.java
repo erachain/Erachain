@@ -1881,7 +1881,7 @@ public class Controller extends Observable {
 		
 		// SEE - http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
 		String url = Settings.getInstance().getNotifyIncomingURL();
-		http(url)
+		//http(url)
 		
 	}
 	

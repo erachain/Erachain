@@ -27,6 +27,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import settings.Settings;
 import utils.APIUtils;
 import utils.Pair;
 
@@ -564,4 +565,57 @@ public class TransactionsResource {
 		
 		return array.toJSONString();
 	}
+	
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("incoming/{height}")
+	public String incoming(@PathParam("height") int height) {
+		
+		// CHECK IF WALLET EXISTS
+		if (!Controller.getInstance().doesWalletExists()) {
+			throw ApiErrorFactory.getInstance().createError(
+					ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+		}
+
+		Block block;
+		try
+		{
+			block = Controller.getInstance().getBlockByHeight(height);
+			if(block == null)
+			{
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+			}
+		}
+		catch(Exception e)
+		{
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+		}
+
+		// GET ACCOUNTS
+		List<Account> accounts = Controller.getInstance().getAccounts();
+
+		JSONArray array = new JSONArray();
+		DCSet dcSet = DCSet.getInstance();
+
+		for (Transaction transaction: block.getTransactions()) {
+			//FOR ALL ACCOUNTS
+			synchronized(accounts)
+			{		
+				for(Account account: accounts)
+				{
+					//CHECK IF INVOLVED
+					if(!account.equals(transaction.getCreator()) && transaction.isInvolved(account))
+					{
+						transaction.setDC(dcSet, false);
+						array.add(transaction.toJson());
+						break;
+					}
+				}
+			}
+		}
+				
+		return array.toJSONString();
+		
+	}
+
 }
