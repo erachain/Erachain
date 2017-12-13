@@ -438,15 +438,16 @@ public class Controller extends Observable {
 		
 			
 
-		
+		int error = 0;
 		//OPEN DATABASE
+		try {
 		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open database"));
 		this.dbSet = new DBSet();
 		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Database OK"));
 
 		// OPENING DATABASES
-		int error = 0;
-		try {
+		
+		
 			if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open datachain"));
 			this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
 		} catch (Throwable e) {
@@ -674,73 +675,56 @@ public class Controller extends Observable {
 		File dataLocal = new File(Settings.getInstance().getLocalDir());
 
 		File  dataChainBackUp  = new File(Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_DATA_DIR +"\\");
-		File   dataChainLocal = new File(Settings.getInstance().getBackUpDir() + "\\"+  Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
+		File   dataLocalBackUp = new File(Settings.getInstance().getBackUpDir() + "\\"+  Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
+		
+		// del datachain
+		if (dataChain.exists()) {
+			try {
+				Files.walkFileTree(
+						dataChain.toPath(),
+						new SimpleFileVisitorForRecursiveFolderDeletion());
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage(),e);
+			}
+		}
+		// del DataLocal
+				if (dataLocal.exists()) {
+					try {
+						Files.walkFileTree(
+								dataLocal.toPath(),
+								new SimpleFileVisitorForRecursiveFolderDeletion());
+					} catch (IOException e) {
+						LOGGER.error(e.getMessage(),e);
+					}
+				}
+		
 		// copy Back dir to DataChain 
 		if (dataChainBackUp.exists()) {
-			if (dataChain.exists()) {
-				try {
-					Files.walkFileTree(
-							dataChain.toPath(),
-							new SimpleFileVisitorForRecursiveFolderDeletion());
-				} catch (IOException e) {
-					LOGGER.error(e.getMessage(),e);
-				}
-			}
+			
 			try {
 				FileUtils.copyDirectory(dataChainBackUp, dataChain);
-				LOGGER.info("Copy DataChain to BakUp");
+				LOGGER.info("Copy BackUp/DataChain to DataChain is Ok");
 			} catch (IOException e) {
 				error = 1;
 				LOGGER.error(e.getMessage(),e);
 			}
 
 		}
+		
+		
 		// copy Loc dir to Back 
-					if (dataChainLocal.exists()) {
-						if (dataLocal.exists()) {
-							try {
-								Files.walkFileTree(
-										dataLocal.toPath(),
-										new SimpleFileVisitorForRecursiveFolderDeletion());
-							} catch (IOException e) {
-								LOGGER.error(e.getMessage(),e);
-							}
-						}
+					if (dataLocalBackUp.exists()) {
+						
 						try {
-							FileUtils.copyDirectory(dataChainLocal, dataLocal);
-							LOGGER.info("Copy DataLocal to BakUp");
+							FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
+							LOGGER.info("Copy BackUp/DataLocal to DataLocal is Ok");
 						} catch (IOException e) {
 							error = 1;
 							LOGGER.error(e.getMessage(),e);
 						}
 
 					}
-		// if error =1 dotn copy Datachain or Datalocal
-	// delete folder datachain && datalocal 
-		if (error ==1){
-			if (dataChain.exists()) {
-				try {
-					Files.walkFileTree(
-							dataChain.toPath(),
-							new SimpleFileVisitorForRecursiveFolderDeletion());
-				} catch (IOException e) {
-					LOGGER.error(e.getMessage(),e);
-				}
-			}
-			if (dataLocal.exists()) {
-				try {
-					Files.walkFileTree(
-							dataLocal.toPath(),
-							new SimpleFileVisitorForRecursiveFolderDeletion());
-				} catch (IOException e) {
-					LOGGER.error(e.getMessage(),e);
-				}
-			}
-			
-		}
-		else{
-			LOGGER.info("BacUp is OK!");
-		}
+		
 		
 		DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
 	
