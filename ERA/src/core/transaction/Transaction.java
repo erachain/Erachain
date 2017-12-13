@@ -385,9 +385,9 @@ public abstract class Transaction {
 	}
 
 	//GETTERS/SETTERS
-	public void setDC(DCSet db, boolean asPack)
+	public void setDC(DCSet dcSet, boolean asPack)
 	{
-		this.dcSet = db;
+		this.dcSet = dcSet;
 		if (!asPack)
 			this.calcFee();
 	}
@@ -830,6 +830,10 @@ public abstract class Transaction {
 			transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
 			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
 			transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
+			if (this.block != null) {
+				transaction.put("height", this.block.getHeightByParent(localDCSet));				
+				transaction.put("height", this.getSeqNo(localDCSet));				
+			}
 		}
 		
 		transaction.put("height", height);
