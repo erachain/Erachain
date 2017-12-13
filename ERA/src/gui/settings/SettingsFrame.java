@@ -163,20 +163,17 @@ public class SettingsFrame extends JDialog{
 		boolean limitConnections = false;
 		boolean changeLang = false;
 		
+	// save backup settings
+		settingsJSONbuf.put("backupenabled", settingsTabPane.backUp_Setting_Panel.jCheckBox_Enable_BackUp.isSelected());
+		settingsJSONbuf.put("backupasktostart", settingsTabPane.backUp_Setting_Panel.jCheckBox_Ask_To_Start.isSelected());
+
+		if(!Settings.getInstance().getBackUpDir().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dip.getText()))
+		{
+			settingsJSONbuf.put("backuppath", settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dip.getText());
+			changeWallet = true;
+		}
 		
-		
-		
-		
-		
-		
-			
-		
-		
-		
-		
-		
-		
-		// font
+	// font
 	//	if(Settings.getInstance().getMinConnections() != MinConnections)
 	//	{
 		if (settingsTabPane.uI_Settings_Panel.size_Font.getSelectedItem().toString() != "") {

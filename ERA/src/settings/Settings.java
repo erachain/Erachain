@@ -77,7 +77,7 @@ public class Settings {
 	private static final String DEFAULT_DATA_DIR = "datachain";
 	private static final String DEFAULT_LOCAL_DIR = "datalocal";
 	private static final String DEFAULT_WALLET_DIR = "wallet";
-		
+	private static final String DEFAULT_BACKUP_DIR = "backup";
 	
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
@@ -117,6 +117,8 @@ public class Settings {
 	long timeLoadInternetPeers;
 	
 	private String[] defaultPeers = { };
+
+	private String getBackUpPath;
 
 	
 	public static Settings getInstance()
@@ -205,6 +207,11 @@ public class Settings {
 	public String getWalletDir()
 	{
 		return this.getUserPath() + DEFAULT_WALLET_DIR;
+	}
+	
+	public String getBackUpDir()
+	{
+		return this.getBackUpPath + DEFAULT_BACKUP_DIR;
 	}
 	
 	public String getDataDir()
@@ -550,6 +557,26 @@ public class Settings {
 		if(this.settingsJSON.containsKey("rpcenabled"))
 		{
 			return ((Boolean) this.settingsJSON.get("rpcenabled")).booleanValue();
+		}
+		
+		return DEFAULT_RPC_ENABLED;
+	}
+	
+	public boolean getbacUpEnabled() 
+	{
+		if(this.settingsJSON.containsKey("backupenabled"))
+		{
+			return ((Boolean) this.settingsJSON.get("backupenabled")).booleanValue();
+		}
+		
+		return DEFAULT_RPC_ENABLED;
+	}
+	
+	public boolean getbacUpAskToStart() 
+	{
+		if(this.settingsJSON.containsKey("backupasktostart"))
+		{
+			return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();
 		}
 		
 		return DEFAULT_RPC_ENABLED;
@@ -958,13 +985,37 @@ public class Settings {
 			
 			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/")))
 			{
-				this.userPath += "/"; 
+				this.userPath += "\\"; 
 			}
 		}
 		else
 		{
 			alreadyPassed ++;
 		}	
+		
+// read BackUb Path		
+		if(this.settingsJSON.containsKey("backuppath"))
+		{
+			this.getBackUpPath = (String) this.settingsJSON.get("backuppath");
+			
+		
+			try {
+				if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/")))
+				{
+					this.getBackUpPath += "\\"; 
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				this.getBackUpPath = ""; 
+			}
+			
+		}
+		else{
+			this.getBackUpPath = ""; 
+			
+		}
+		
+		
 	
 		//CREATE FILE IF IT DOESNT EXIST
 		if(!file.exists())

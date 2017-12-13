@@ -32,6 +32,7 @@ import org.json.simple.JSONValue;
 import com.google.common.base.Charsets;
 
 import controller.Controller;
+import gui.library.My_JFileChooser;
 import lang.Lang;
 import settings.Settings;
 import utils.DateTimeFormat;
@@ -245,11 +246,11 @@ public class SettingsBasicPanel extends JPanel
         gbc_btnBrowseDataFolder.gridy = 8;
         btnBrowseDataFolder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileopen = new JFileChooser();  
-                fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                My_JFileChooser fileopen = new My_JFileChooser();  
+                fileopen.setFileSelectionMode(My_JFileChooser.DIRECTORIES_ONLY);
                 fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
                 int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));                
-                if (ret == JFileChooser.APPROVE_OPTION) {
+                if (ret == My_JFileChooser.APPROVE_OPTION) {
                 	textDataFolder.setText(fileopen.getSelectedFile().toString());
                 }
             }
