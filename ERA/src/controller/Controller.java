@@ -436,6 +436,9 @@ public class Controller extends Observable {
 	//	Setting_Json = new JSONObject();
 	//	Setting_Json = Settings.getInstance().read_setting_JSON();
 		
+		
+		
+		
 			
 
 		int error = 0;
@@ -453,8 +456,10 @@ public class Controller extends Observable {
 		} catch (Throwable e) {
 			//Error open DB
 			error =1;
-			LOGGER.error(e.getMessage(),e);
+			//LOGGER.error(e.getMessage(),e);
 			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
+			
+			if (this.dbSet != null) this.dbSet.close();
 			reCreateDB();
 			this.dbSet = new DBSet();
 		}
@@ -488,6 +493,8 @@ public class Controller extends Observable {
 			} catch (Throwable e) {
 				LOGGER.error(e.getMessage(),e);
 			}
+			
+			if (this.dbSet != null) this.dbSet.close();
 			reCreateDB();
 			this.dbSet = new DBSet();
 		}
