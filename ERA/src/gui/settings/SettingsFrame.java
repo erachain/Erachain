@@ -167,9 +167,9 @@ public class SettingsFrame extends JDialog{
 		settingsJSONbuf.put("backupenabled", settingsTabPane.backUp_Setting_Panel.jCheckBox_Enable_BackUp.isSelected());
 		settingsJSONbuf.put("backupasktostart", settingsTabPane.backUp_Setting_Panel.jCheckBox_Ask_To_Start.isSelected());
 
-		if(!Settings.getInstance().getBackUpDir().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dip.getText()))
+		if(!Settings.getInstance().getBackUpDir().equals(settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText()))
 		{
-			settingsJSONbuf.put("backuppath", settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dip.getText());
+			settingsJSONbuf.put("backuppath", settingsTabPane.backUp_Setting_Panel.jTextField_BuckUp_Dir.getText());
 			changeWallet = true;
 		}
 		
