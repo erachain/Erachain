@@ -456,6 +456,7 @@ public class Controller extends Observable {
 			LOGGER.error(e.getMessage(),e);
 			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
 			reCreateDB();
+			this.dbSet = new DBSet();
 		}
 		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()){
 			
@@ -488,6 +489,7 @@ public class Controller extends Observable {
 				LOGGER.error(e.getMessage(),e);
 			}
 			reCreateDB();
+			this.dbSet = new DBSet();
 		}
 
 		
@@ -727,51 +729,7 @@ public class Controller extends Observable {
 		
 		
 		DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
-	
-		/*
 		this.dcSet = DCSet.getInstance();
-		
-		return this.dcSet;
-		
-		
-		
-		
-		File dataDir = new File(Settings.getInstance().getDataDir());
-		if (dataDir.exists()) {
-			// delete data folder
-			java.nio.file.Files.walkFileTree(dataDir.toPath(),
-					new SimpleFileVisitorForRecursiveFolderDeletion());
-			File dataBak = getDataBakDir(dataDir);
-			if (useDataBak && dataBak.exists()
-					&& Settings.getInstance().isCheckpointingEnabled()) {
-				FileUtils.copyDirectory(dataBak, dataDir);
-				
-				try {
-					DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
-				} catch (IOError e) {
-					LOGGER.error(e.getMessage(),e);
-					//backupdb is buggy too starting from scratch
-					if(dataDir.exists())
-					{
-						java.nio.file.Files.walkFileTree(dataDir.toPath(),
-								new SimpleFileVisitorForRecursiveFolderDeletion());
-					}
-					if(dataBak.exists())
-					{
-						java.nio.file.Files.walkFileTree(dataBak.toPath(),
-								new SimpleFileVisitorForRecursiveFolderDeletion());
-					} 
-					DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
-				}
-
-			} else {
-				DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
-			}
-
-		} */
-
-		this.dcSet = DCSet.getInstance();
-		
 		return this.dcSet;
 	}
 
