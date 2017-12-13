@@ -10,6 +10,7 @@ import controller.Controller;
 import gui.library.My_JFileChooser;
 import lang.Lang;
 import settings.Settings;
+import utils.MenuPopupUtil;
 
 public class BackUP_Setting_Panel extends JPanel{
 
@@ -29,16 +30,18 @@ public class BackUP_Setting_Panel extends JPanel{
 	    	 
 	    	 jCheckBox_Enable_BackUp.setSelected(Settings.getInstance().getbacUpEnabled());
 	    	 jCheckBox_Ask_To_Start.setSelected(Settings.getInstance().getbacUpAskToStart());
-	    	 jTextField_BuckUp_Dip.setText(Settings.getInstance().getBackUpDir());
+	    	 jTextField_BuckUp_Dir.setText(Settings.getInstance().getBackUpDir());
 	    	
+	    	 MenuPopupUtil.installContextMenu(jTextField_BuckUp_Dir);
+	    	 
 	    	 jButton_Paht_DIR.addActionListener(new ActionListener() {
 	             public void actionPerformed(ActionEvent e) {
 	                 My_JFileChooser fileopen = new My_JFileChooser();  
 	                 fileopen.setFileSelectionMode(My_JFileChooser.DIRECTORIES_ONLY);
-	                 fileopen.setCurrentDirectory(new File(jTextField_BuckUp_Dip.getText()));
+	                 fileopen.setCurrentDirectory(new File(jTextField_BuckUp_Dir.getText()));
 	                 int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set BackUp dir"));                
 	                 if (ret == My_JFileChooser.APPROVE_OPTION) {
-	                	 jTextField_BuckUp_Dip.setText(fileopen.getSelectedFile().toString());
+	                	 jTextField_BuckUp_Dir.setText(fileopen.getSelectedFile().toString());
 	                 }
 	             }
 	         });
@@ -59,7 +62,7 @@ public class BackUP_Setting_Panel extends JPanel{
 	        jLabel_Title = new javax.swing.JLabel();
 	        jCheckBox_Enable_BackUp = new javax.swing.JCheckBox();
 	        jLabel_Paht_DIR = new javax.swing.JLabel();
-	        jTextField_BuckUp_Dip = new javax.swing.JTextField();
+	        jTextField_BuckUp_Dir = new javax.swing.JTextField();
 	        jButton_Paht_DIR = new javax.swing.JButton();
 	        jCheckBox_Ask_To_Start = new javax.swing.JCheckBox();
 	        jLabel3 = new javax.swing.JLabel();
@@ -97,14 +100,14 @@ public class BackUP_Setting_Panel extends JPanel{
 	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 	        add(jLabel_Paht_DIR, gridBagConstraints);
 
-	        jTextField_BuckUp_Dip.setText("jTextField1");
+	        jTextField_BuckUp_Dir.setText("jTextField1");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
 	        gridBagConstraints.gridy = 4;
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
 	        gridBagConstraints.weightx = 0.2;
-	        add(jTextField_BuckUp_Dip, gridBagConstraints);
+	        add(jTextField_BuckUp_Dir, gridBagConstraints);
 
 	        jButton_Paht_DIR.setText("jButton1");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
@@ -123,7 +126,7 @@ public class BackUP_Setting_Panel extends JPanel{
 	        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 	        add(jCheckBox_Ask_To_Start, gridBagConstraints);
 
-	        jLabel3.setText("jLabel3");
+	        jLabel3.setText("");
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 8;
@@ -143,6 +146,6 @@ public class BackUP_Setting_Panel extends JPanel{
 	    private javax.swing.JLabel jLabel3;
 	    private javax.swing.JLabel jLabel_Paht_DIR;
 	    private javax.swing.JLabel jLabel_Title;
-	    public javax.swing.JTextField jTextField_BuckUp_Dip;
+	    public javax.swing.JTextField jTextField_BuckUp_Dir;
 	    // End of variables declaration                   
 	}

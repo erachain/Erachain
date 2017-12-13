@@ -60,6 +60,8 @@ public class Settings {
 	private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_RPC_ENABLED = false;
 	
+	private static final boolean DEFAULT_BACUP_ENABLED = true;
+	private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
 	public static final int DEFAULT_ACCOUNTS = 1;
@@ -569,7 +571,7 @@ public class Settings {
 			return ((Boolean) this.settingsJSON.get("backupenabled")).booleanValue();
 		}
 		
-		return false;
+		return DEFAULT_BACUP_ENABLED;
 	}
 	
 	public boolean getbacUpAskToStart() 
@@ -579,7 +581,7 @@ public class Settings {
 			return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();
 		}
 		
-		return false;
+		return DEFAULT_BACKUP_ASK_ENABLED;
 	}
 	
 	public int getWebPort()
