@@ -202,7 +202,7 @@ public class Block {
 	public int getHeightByParent(DCSet db)
 	{
 		
-		if (this instanceof GenesisBlock
+		if (this.version == 0 // ||this instanceof GenesisBlock
 				|| Arrays.equals(this.signature,
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
