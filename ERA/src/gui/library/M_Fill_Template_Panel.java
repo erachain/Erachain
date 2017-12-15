@@ -57,7 +57,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
     //		M_Template_Param_TextPane_Dialog d = new M_Template_Param_TextPane_Dialog(jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"), getMousePosition()); 
 	//			str =d.tp.getText();
     		    	}
-    	else{	 str = JOptionPane.showInputDialog(MainFrame.getInstance(), Lang.getInstance().translate("Insert") + " "+arg0.getDescription().replace("!$@!", ""), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription()+"}}"));
+    	else{	 str = JOptionPane.showInputDialog(MainFrame.getInstance(), Lang.getInstance().translate("Insert") + " "+arg0.getDescription().replace("!$@!", ""), jTextPane_Message_Public.pars.get("{{"+ arg0.getDescription().replace("!$@!", "")+"}}"));
     	
     	}
 				 if (str==null || str.equals("")) return;
