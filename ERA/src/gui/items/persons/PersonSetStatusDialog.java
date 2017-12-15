@@ -1,6 +1,5 @@
 package gui.items.persons;
 
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
@@ -11,66 +10,40 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.toedter.calendar.JDateChooser;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
-import core.transaction.R_Send;
 import core.transaction.R_SetStatusToItem;
 import core.transaction.R_Vouch;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.models.AccountsComboBoxModel;
 import gui.records.Record_Info;
-import gui.records.VouchRecordDialog;
 import gui.MainFrame;
 import gui.items.statuses.ComboBoxModelItemsStatuses;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
 import gui.transaction.OnDealClick;
-import gui.transaction.Send_RecordDetailsFrame;
 import gui.transaction.SetStatusToItemDetailsFrame;
 import jersey.repackaged.com.google.common.primitives.Ints;
 import lang.Lang;
-import utils.Pair;
 
-//public class PersonConfirm extends JDialog { // InternalFrame  {
 public class PersonSetStatusDialog extends JDialog {
-
-	/**
-	 * 
-	 */
-	//private static final long serialVersionUID = 1L;
 	private static final long serialVersionUID = 2717571093561259483L;
-
 	private static Transaction parentRecord;
 	private static Record_Info infoPanel;
-	
-	
-	 // Variables declaration - do not modify                     
     private javax.swing.JTextField jAData1Txt;
     private javax.swing.JTextField jAData2Txt;
-//    private javax.swing.JButton jButton_Cansel;
-//    private javax.swing.JButton jButton_SetStatus;
-//    private javax.swing.JComboBox<String> jComboBox_Status;
- //   private javax.swing.JComboBox<String> jComboBox_YourAddress;
-//    private javax.swing.JTextField jFeeTxt;
-//    private javax.swing.JFormattedTextField jFormattedTextField_fromDate;
- //   private javax.swing.JFormattedTextField jFormattedTextField_toDate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel_Fee;
     private javax.swing.JLabel jLabel_Addition1;
@@ -84,21 +57,12 @@ public class PersonSetStatusDialog extends JDialog {
     private javax.swing.JLabel jLabel_Status;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JLabel jLabel__Description;
- //   private javax.swing.JTextField jPar1Txt;
-//    private javax.swing.JTextField jPar2Txt;
- //   private javax.swing.JTextField jParentRecTxt;
     private javax.swing.JScrollPane jLabel_PersonInfo;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea_Description;
     private PersonCls person;
   
-	
-	
-	
-	
-	
-
-	public PersonSetStatusDialog( PersonCls person) {
+		public PersonSetStatusDialog( PersonCls person) {
 		super();
 		//ICON
 				List<Image> icons = new ArrayList<Image>();
@@ -111,10 +75,6 @@ public class PersonSetStatusDialog extends JDialog {
 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		initComponents();
 		this.setTitle(Lang.getInstance().translate("Set Status"));
-		//this.setResizable(true);
-	   // setPreferredSize(new Dimension(400, 600));
-	    
-		
 		    jLabel_Address.setText(Lang.getInstance().translate("Your Account")+":");
 		    jLabel_Data_From.setText(Lang.getInstance().translate("From Date")+":");
 		    jLabel_Data_To.setText(" "+Lang.getInstance().translate("To Date")+":");
@@ -127,16 +87,9 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jLabel_Title.setText(Lang.getInstance().translate("Information about the person")+":");
 		    jLabel__Description.setText("%D (" + Lang.getInstance().translate("text")+") :");;
 		    jLabel_Fee.setText(Lang.getInstance().translate("Fee Power")+ " (0..6):");
-		    
-		   
-		
 		    jComboBox_Status.setModel(new ComboBoxModelItemsStatuses());
 		    jComboBox_YourAddress.setModel(new AccountsComboBoxModel());
-		    
 		    jLabel_PersonInfo.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-		    
-		
-		    
 	        Person_Info info = new Person_Info(); 
 	        info.show_001(person);
 	        info.setFocusable(false);
@@ -149,23 +102,11 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jAData2Txt.setText("");
 		    jFeeTxt.setText("0");
 		    jParentRecTxt.setText("0");
-		    
-		    
-		
-		
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
- //       setMinimumSize(new java.awt.Dimension(650, 23));
         setModal(true);
-  //      setPreferredSize(new java.awt.Dimension(800, 650));
-	    
-        
-        
-        
-        
-	    
-		//PACK
-		this.pack();
-        this.setResizable(false);
+ 		//PACK
+	//	this.pack();
+     //   this.setResizable(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 	   
@@ -714,40 +655,20 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         gridBagConstraints.weightx = 0.1;
         getContentPane().add(jLabel1, gridBagConstraints);
 
-        pack();
+
     }// </editor-fold>                        
 
-	
-	
-	
-	
-	
-	
-	    
-	
-	    private void jButton_CanselActionPerformed(java.awt.event.ActionEvent evt) {                                               
-	        // TODO add your handling code here:
-	    }                                              
-
-	    /**
-	     * @param args the command line arguments
-	     */
-	  
-
-	    // Variables declaration - do not modify                     
+	 
 	    private MButton jButton_Cansel;
 	    private MButton jButton_SetStatus;
 	    private JComboBox<StatusCls> jComboBox_Status;
 	    private JComboBox<Account> jComboBox_YourAddress;
 	    private javax.swing.JTextField jPar1Txt;
 	    private javax.swing.JTextField jPar2Txt;
-//	    private javax.swing.JTextField jADataTxt;
 	    private javax.swing.JTextField jParentRecTxt;
 	    private javax.swing.JTextField jFeeTxt;
 	    private JDateChooser jFormattedTextField_fromDate;
 	    private JDateChooser jFormattedTextField_toDate;
-	//    private javax.swing.JScrollPane jLabel_PersonInfo;
 	    private javax.swing.JScrollPane jLabel_RecordInfo;
-	    // End of variables declaration                   
 	
 }

@@ -205,10 +205,20 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 					return null;
 				
 				itemName = item.toString();
-			} else if (transaction.viewItemName() != null) {
-				itemName = transaction.viewItemName();
-			}
+			} else{
+				
+				try {
+					if (transaction.viewItemName() != null) {
+					itemName = transaction.viewItemName();
+					}
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+					itemName="";
+				}
 			
+			
+			}
 			switch(column)
 			{
 			case COLUMN_CONFIRMATIONS:
@@ -240,7 +250,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
 			case COLUMN_RECIPIENT:
 				
-				return transaction.viewRecipient();
+				try {
+					return transaction.viewRecipient();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+					return "";
+				}
 
 			case COLUMN_FEE:
 				
