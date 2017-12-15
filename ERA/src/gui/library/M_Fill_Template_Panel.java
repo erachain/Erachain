@@ -1,5 +1,6 @@
 package gui.library;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -213,6 +214,9 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		jScrollPane_Message_Public_TextPane.setViewportView(jTextPane_Message_Public);
 
 		sp_pan.setLeftComponent(jScrollPane_Message_Public_TextPane);
+		
+		jTable_Params_Message_Public.setMinimumSize(new Dimension(250,100));
+		
 		jScrollPane_Params_Template_Public_TextPane.setViewportView(jTable_Params_Message_Public);
 
 		sp_pan.setRightComponent(jScrollPane_Params_Template_Public_TextPane);
