@@ -159,6 +159,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 			Transaction transaction = data.getB();
 			if (transaction == null)
 				return null;
+			
+			transaction.setDC(DCSet.getInstance(), false);
+			
 			//creator = transaction.getCreator();
 			String itemName = "";
 			if (transaction instanceof TransactionAmount && transaction.getAbsKey() >0)
