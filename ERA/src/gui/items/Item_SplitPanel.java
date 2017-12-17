@@ -74,7 +74,7 @@ public class Item_SplitPanel extends Split_Panel {
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
 				
-				if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) {
+				if (jTable_jScrollPanel_LeftPanel == null || jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) {
 					jScrollPane_jPanel_RightPanel.setViewportView(null);
 					return;
 				}
