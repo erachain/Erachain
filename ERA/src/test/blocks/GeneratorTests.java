@@ -134,8 +134,8 @@ public class GeneratorTests {
 			assertEquals(true, newBlock.isSignatureValid());
 			
 			//CHECK IF BLOCK IS VALID
-			if (!newBlock.isValid(dcSet))
-				assertEquals(true, newBlock.isValid(dcSet));
+			if (!newBlock.isValid(dcSet, false))
+				assertEquals(true, newBlock.isValid(dcSet, false));
 			
 			height = Controller.getInstance().getMyHeight();
 			assertEquals(height, i + 1);
@@ -422,8 +422,8 @@ public class GeneratorTests {
 			
 			long weight_old = newBlock.calcWinValueTargeted(dcSet);
 			//CHECK IF BLOCK IS VALID
-			if (!newBlock.isValid(dcSet))
-				assertEquals(false, newBlock.isValid(dcSet));
+			if (!newBlock.isValid(dcSet, false))
+				assertEquals(false, newBlock.isValid(dcSet, false));
 
 			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
 
@@ -646,7 +646,7 @@ public class GeneratorTests {
 		newBlock.setTransactions(transactions);
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(dcSet));
+		assertEquals(true, newBlock.isValid(dcSet, false));
 
 		newBlock.sign(generator);
 		//CHECK IF BLOCK IS VALID
@@ -725,7 +725,7 @@ public class GeneratorTests {
 		assertEquals(transactions.size(), newBlock.getTransactionCount());
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(dcSet));
+		assertEquals(true, newBlock.isValid(dcSet, false));
 	}
 
 	@Test

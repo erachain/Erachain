@@ -743,7 +743,7 @@ public class GenesisBlock extends Block{
 	*/
 	
 	@Override
-	public boolean isValid(DCSet db)
+	public boolean isValid(DCSet db, boolean andProcess)
 	{
 		//CHECK IF NO OTHER BLOCK IN DB
 		if(db.getBlockMap().getLastBlock() != null)

@@ -127,11 +127,11 @@ public class Synchronizer
 			int heigh = block.getHeightByParent(fork);
 
 			//CHECK IF VALID
-			if(block.isSignatureValid() && block.isValid(fork))
+			if(block.isSignatureValid() && block.isValid(fork, true))
 			{
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				//runedBlock = block;
-				block.process(fork);
+				/// already in Validate block.process(fork);
 
 			} else {
 
@@ -332,7 +332,7 @@ public class Synchronizer
 					break;
 				}
 				
-				if (!blockFromPeer.isValid(dcSet)) {
+				if (!blockFromPeer.isValid(dcSet, false)) {
 					errorMess = "invalid Transactions";
 					banTime = BAN_BLOCK_TIMES<<1;
 					break;

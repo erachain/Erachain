@@ -1405,7 +1405,7 @@ public class Controller extends Observable {
 					return;
 				}
 
-				if (!newBlock.isValid(dcSet)) {
+				if (!newBlock.isValid(dcSet, false)) {
 					info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
 					banPeerOnError(message.getSender(), info);
 					if (Controller.useGui) about_frame.set_console_Text(info);
@@ -1565,7 +1565,7 @@ public class Controller extends Observable {
 				}	
 				
 				// CHECK IF VALID
-				if(newBlock.isSignatureValid() && newBlock.isValid(dcSet))
+				if(newBlock.isSignatureValid() && newBlock.isValid(dcSet, false))
 				{
 					try {
 						this.synchronizer.pipeProcessOrOrphan(dcSet, newBlock, false, false);
@@ -2542,7 +2542,7 @@ public class Controller extends Observable {
 		if (isMyAccountByAddress(newBlock.getCreator().getAddress())) {
 			isValid = true; // GENERATE by ME
 		} else {
-			isValid= newBlock.isSignatureValid() && newBlock.isValid(this.dcSet);
+			isValid= newBlock.isSignatureValid() && newBlock.isValid(this.dcSet, false);
 			LOGGER.debug("+++ flushNewBlockGenerated Validated records: " + newBlock.getTransactionCount());
 		}
  

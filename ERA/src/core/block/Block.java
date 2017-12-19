@@ -1120,10 +1120,11 @@ public class Block {
 	return 0;
 
 	}
-	public boolean isValid(DCSet db)
+	
+	public boolean isValid(DCSet dcSet, boolean andProcess)
 	{
 		
-		int height = this.getHeightByParent(db);
+		int height = this.getHeightByParent(dcSet);
 		Controller cnt = Controller.getInstance();
 
 		/*
@@ -1136,21 +1137,21 @@ public class Block {
 		*/
 		
 		//CHECK IF PARENT EXISTS
-		if(height < 2 || this.reference == null || this.getParent(db) == null)
+		if(height < 2 || this.reference == null || this.getParent(dcSet) == null)
 		{
 			LOGGER.debug("*** Block[" + height + "].reference invalid");
 			return false;
 		}
 
 		// TODO - show it to USER
-		if(this.getTimestamp(db) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
+		if(this.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
 			LOGGER.debug("*** Block[" + height + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-					+ NTP.getTime() + " + sec: " + (this.getTimestamp(db) - NTP.getTime())/1000);
+					+ NTP.getTime() + " + sec: " + (this.getTimestamp(dcSet) - NTP.getTime())/1000);
 			return false;			
 		}
 		
 		//CHECK IF VERSION IS CORRECT
-		if(this.version != this.getParent(db).getNextBlockVersion(db))
+		if(this.version != this.getParent(dcSet).getNextBlockVersion(dcSet))
 		{
 			LOGGER.debug("*** Block[" + height + "].version invalid");
 			return false;
@@ -1164,16 +1165,16 @@ public class Block {
 		
 		// TEST STRONG of win Value
 		int base = BlockChain.getMinTarget(height);
-		int targetedWinValue = this.calcWinValueTargeted(db); 
+		int targetedWinValue = this.calcWinValueTargeted(dcSet); 
 		if (!cnt.isTestNet() && base > targetedWinValue) {
-			targetedWinValue = this.calcWinValueTargeted(db);
+			targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
 			return false;
 		}
 		
 		// STOP IF SO RAPIDLY			
 		if (!cnt.isTestNet() && isSoRapidly(height, this.getCreator(),
-				cnt.getBlockChain().getLastBlocksForTarget(db)) > 0) {
+				cnt.getBlockChain().getLastBlocksForTarget(dcSet)) > 0) {
 			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}
@@ -1183,7 +1184,7 @@ public class Block {
 			try
 			{
 
-				AT_Block atBlock = AT_Controller.validateATs( this.getBlockATs() , db.getBlockMap().getLastBlock().getHeight(db)+1 , db);
+				AT_Block atBlock = AT_Controller.validateATs( this.getBlockATs() , dcSet.getBlockMap().getLastBlock().getHeight(dcSet)+1 , dcSet);
 				//this.atFees = atBlock.getTotalFees();
 			}
 			catch(NoSuchAlgorithmException | AT_Exception e)
@@ -1193,18 +1194,49 @@ public class Block {
 			}
 		}
 
+		long timerStart = System.currentTimeMillis();
+
+		if (andProcess) {
+			//ADD TO DB
+			dcSet.getBlockMap().set(this);
+			LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
+			
+			this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
+
+		}
 		//CHECK TRANSACTIONS
-		this.getTransactions(); // load from RAW transactions
 		
 		if (this.transactions == null || this.transactionCount == 0) {
 			// empty transactions
 		} else {
-			DCSet fork = db.fork();
+			int seq = 1;
+			this.getTransactions();
+			
+			long timerProcess = 0;
+			long timerRefsMap_set = 0;
+			long timerUnconfirmedMap_delete = 0;
+			long timerFinalMap_set = 0;
+			long timerTransFinalMapSinds_set = 0;
+
 			byte[] transactionsSignatures = new byte[0];
 			
-			long timestampEnd = this.getTimestamp(db);
+			long timestampEnd = this.getTimestamp(dcSet);
 			// because time filter used by parent block timestamp on core.BlockGenerator.run()
-			long timestampBeg = this.getParent(fork).getTimestamp(fork);
+			long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
+
+			DCSet validatingDC;
+			
+			if (andProcess) {
+				validatingDC = dcSet;
+			} else {
+				validatingDC = dcSet.fork();
+			}
+			
+			//DBSet dbSet = Controller.getInstance().getDBSet();
+			TransactionRef_BlockRef_Map refsMap = validatingDC.getTransactionRef_BlockRef_Map();
+			TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
+			TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
+			TransactionFinalMapSigns transFinalMapSinds = validatingDC.getTransactionFinalMapSigns();
 
 			for(Transaction transaction: this.transactions)
 			{
@@ -1212,9 +1244,8 @@ public class Block {
 					return false;
 
 				if (!transaction.isWiped()) {
-					// NOT WIPERD
-	
-					//CHECK IF NOT GENESISTRANSACTION
+
+					//CHECK IF NOT GENESIS TRANSACTION
 					if(transaction.getCreator() == null)
 						 // ALL GENESIS transaction
 						return false;
@@ -1228,29 +1259,15 @@ public class Block {
 						return false;
 					}
 		
-					transaction.setDC(fork, false);
+					transaction.setDC(validatingDC, false);
 
 					//CHECK IF VALID
-					if ( false && transaction instanceof DeployATTransaction)
-					{
-						Integer min = 0;
-						if ( false ) //db.getBlockMap().getParentList() != null )
-						{
-							min = height; //AT_API_Platform_Impl.getForkHeight(db);
-						}
-		
-						DeployATTransaction atTx = (DeployATTransaction)transaction;
-						if ( atTx.isValid(fork, min) != Transaction.VALIDATE_OK )
-						{
-							LOGGER.debug("*** Block[" + height + "].atTx invalid");
-							return false;
-						}
-					} else if(transaction.isValid(fork, null) != Transaction.VALIDATE_OK)
+					if(transaction.isValid(validatingDC, null) != Transaction.VALIDATE_OK)
 					{
 						LOGGER.debug("*** Block[" + height
 							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 							+ transaction.viewFullTypeName() + "]"
-							+ "invalid code: " + transaction.isValid(fork, null));
+							+ "invalid code: " + transaction.isValid(validatingDC, null));
 						return false;
 					}
 		
@@ -1262,16 +1279,57 @@ public class Block {
 						LOGGER.debug("*** Block[" + height + "].TX.timestamp invalid");
 						return false;
 					}
-		
+
+					timerStart = System.currentTimeMillis();
 					try{
-						//PROCESS TRANSACTION IN MEMORYDB TO MAKE SURE OTHER TRANSACTIONS VALIDATE PROPERLY
-						transaction.process(fork, this, false);
-						
+						transaction.process(validatingDC, this, false);
 					} catch (Exception e) {
+						if (cnt.isOnStopping())
+							return false;
+						
 	                    LOGGER.error("*** Block[" + height + "].TX.process ERROR", e);
 	                    return false;                    
 					}
+					timerProcess += System.currentTimeMillis() - timerStart;
+					
+				} else {
+					//UPDATE REFERENCE OF SENDER
+					if (transaction.isReferenced() )
+						// IT IS REFERENCED RECORD?
+						transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), validatingDC);
 				}
+
+				if (andProcess) {
+					//SET PARENT
+					///LOGGER.debug("[" + seq + "] try refsMap.set" );
+					timerStart = System.currentTimeMillis();
+					refsMap.set(transaction, this);
+					timerRefsMap_set += System.currentTimeMillis() - timerStart;
+	
+					//REMOVE FROM UNCONFIRMED DATABASE
+					///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
+					timerStart = System.currentTimeMillis();
+					unconfirmedMap.delete(transaction);
+					timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
+	
+					Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
+
+					if (cnt.isOnStopping())
+						return false;
+					
+					///LOGGER.debug("[" + seq + "] try finalMap.set" );
+					timerStart = System.currentTimeMillis();
+					finalMap.set(key, transaction);
+					timerFinalMap_set += System.currentTimeMillis() - timerStart;
+					//LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
+					timerStart = System.currentTimeMillis();
+					transFinalMapSinds.set(transaction.getSignature(), key);
+					timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
+					
+					seq++;
+				
+				}
+
 				transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
 			}
 			
@@ -1283,11 +1341,76 @@ public class Block {
 		}
 
 		//BLOCK IS VALID
+		if (andProcess) {
+			try {
+				this.process_after(cnt, dcSet);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);				
+				return false;
+			}
+		}
+
 		return true;
 	}
 
 	//PROCESS/ORPHAN
+	
+	// TODO - make it trownable
+	public void process_after(Controller cnt, DCSet dcSet) throws Exception
+	{
+		
+		//PROCESS FEE
+		BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
+		BigDecimal blockTotalFee = getTotalFee(dcSet);
 
+		
+		if (blockFee.compareTo(blockTotalFee) < 0) {
+
+			// ADD from EMISSION (with minus)
+			GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY,
+					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee), false);
+
+			blockFee = blockTotalFee;
+			
+			if (BlockChain.ROBINHOOD_USE) {
+				// find rich account
+				String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+	
+				if (!rich.equals(this.creator.getAddress())) {
+					BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
+					blockFee = blockTotalFee;
+	
+					Account richAccount = new Account(rich);
+					//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
+					richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), false);
+				}
+			}
+		}
+
+		//UPDATE GENERATOR BALANCE WITH FEE
+		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dcSet, Transaction.FEE_KEY).add(blockFee), dcSet);
+		if (cnt.isOnStopping())
+			throw new Exception("on stoping");
+		
+		this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee, false);
+
+		/*
+		if (!dcSet.isFork()) {
+			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
+			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dcSet) + 1)
+					+ "] SET new last Height: " + lastHeight
+					+ " getHeightMap().getHeight: " + this.height_process);
+		}
+		*/
+
+		if(heightBlock % BlockChain.MAX_ORPHAN == 0) 
+		{
+			cnt.blockchainSyncStatusUpdate(heightBlock);
+		}
+
+	}
+
+	
 	// TODO - make it trownable
 	public void process(DCSet dcSet) throws Exception
 	{			
@@ -1381,54 +1504,8 @@ public class Block {
 				+ "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
 				+ "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
-		//PROCESS FEE
-		BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
-		BigDecimal blockTotalFee = getTotalFee(dcSet);
-
+		this.process_after(cnt, dcSet);
 		
-		if (blockFee.compareTo(blockTotalFee) < 0) {
-
-			// ADD from EMISSION (with minus)
-			GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY,
-					BlockChain.ROBINHOOD_USE?blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)):blockTotalFee.subtract(blockFee), false);
-
-			blockFee = blockTotalFee;
-			
-			if (BlockChain.ROBINHOOD_USE) {
-				// find rich account
-				String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
-	
-				if (!rich.equals(this.creator.getAddress())) {
-					BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-					blockFee = blockTotalFee;
-	
-					Account richAccount = new Account(rich);
-					//richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-					richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), false);
-				}
-			}
-		}
-
-		//UPDATE GENERATOR BALANCE WITH FEE
-		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dcSet, Transaction.FEE_KEY).add(blockFee), dcSet);
-		if (cnt.isOnStopping())
-			throw new Exception("on stoping");
-		
-		this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee, false);
-
-		/*
-		if (!dcSet.isFork()) {
-			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
-			LOGGER.error("*** core.block.Block.process(DBSet)[" + (this.getParentHeight(dcSet) + 1)
-					+ "] SET new last Height: " + lastHeight
-					+ " getHeightMap().getHeight: " + this.height_process);
-		}
-		*/
-
-		if(heightBlock % BlockChain.MAX_ORPHAN == 0) 
-		{
-			cnt.blockchainSyncStatusUpdate(heightBlock);
-		}
 		long tickets = System.currentTimeMillis() - start;
 		LOGGER.debug("[" + this.heightBlock + "] processing time: " +  tickets*0.001
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
