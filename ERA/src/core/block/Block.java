@@ -313,7 +313,7 @@ public class Block {
 						} else if (amount < 1000) {
 							amount >>=2;
 						} else {
-							amount >>=1;			
+							amount >>=1;
 						}
 						incomed_amount += amount;						
 					} else {
@@ -1090,30 +1090,40 @@ public class Block {
 		*/
 	}
 
-	public static int isSoRapidly(int height, Account accountCreator, List<Block> lastBlocksForTarget) {
-		
-		int repeat_win = 0;
-		if (height < BlockChain.REPEAT_WIN<<1) {
-			repeat_win = BlockChain.REPEAT_WIN;
-		}
-		else if (height > 32400) {
-		} else {
-			return 0;
-		}
+	public static int isSoRapidly(DCSet dcSet, int height, Account accountCreator, List<Block> lastBlocksForTarget) {
 		
 		// NEED CHECK ONLY ON START
 		// test repeated win account
 		if (lastBlocksForTarget == null || lastBlocksForTarget.isEmpty()) {
 			return 0;
 		}
+		
+		int usedBalance = accountCreator.getBalanceUSE(1, dcSet).intValue();
+		if (usedBalance < BlockChain.MIN_GENERATING_BALANCE) {
+			return 1;			
+		}
+		
+		int repeatsMin = BlockChain.GENESIS_ERA_TOTAL/usedBalance;
+		if (height < BlockChain.REPEAT_WIN<<1)
+			repeatsMin = BlockChain.REPEAT_WIN;
+		if (height < 89000)
+			repeatsMin = 0;
+		if (height < 100000 && repeatsMin > 9)
+			repeatsMin = 9;
+		else if (height < 110000 && repeatsMin > 40)
+			repeatsMin = 40;
+		else if (repeatsMin > 100)
+			repeatsMin = 100;
+
+		
 		// NEED CHECK ONLY ON START
 		int i = 0;
 		for (Block testBlock: lastBlocksForTarget) {
-			i++;
+			if ( ++i > repeatsMin)
+				return 0;
+				
 			if (testBlock.getCreator().equals(accountCreator)) {
 				return i;
-			} else if ( i > repeat_win) {
-				return 0;
 			}
 		}
 	
@@ -1162,20 +1172,19 @@ public class Block {
 			return false;
 		}
 		
+		// STOP IF SO RAPIDLY			
+		if (!cnt.isTestNet() && isSoRapidly(dcSet, height, this.getCreator(),
+				cnt.getBlockChain().getLastBlocksForTarget(dcSet)) > 0) {
+			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
+			return false;
+		}
 		
 		// TEST STRONG of win Value
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = this.calcWinValueTargeted(dcSet); 
-		if (!cnt.isTestNet() && base > targetedWinValue) {
+		if (!cnt.isTestNet() && base > targetedWinValue + (targetedWinValue>>2)) {
 			targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
-			return false;
-		}
-		
-		// STOP IF SO RAPIDLY			
-		if (!cnt.isTestNet() && isSoRapidly(height, this.getCreator(),
-				cnt.getBlockChain().getLastBlocksForTarget(dcSet)) > 0) {
-			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}
 

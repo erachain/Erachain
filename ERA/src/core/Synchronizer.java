@@ -51,7 +51,7 @@ public class Synchronizer
 		//this.run = true;
 	}
 	
-	public static int BAN_BLOCK_TIMES = BlockChain.GENERATING_MIN_BLOCK_TIME / 60 * 8;
+	public static int BAN_BLOCK_TIMES = 8 * BlockChain.GENERATING_MIN_BLOCK_TIME / 60;
 	
 	public Peer getPeer() {
 		return fromPeer;
@@ -334,7 +334,7 @@ public class Synchronizer
 				
 				if (!blockFromPeer.isValid(dcSet, false)) {
 					errorMess = "invalid Transactions";
-					banTime = BAN_BLOCK_TIMES<<1;
+					banTime = BAN_BLOCK_TIMES;
 					break;
 				}
 				LOGGER.debug("BLOCK is Valid");
@@ -500,7 +500,7 @@ public class Synchronizer
 		if (maxChainHeight < checkPointHeight) {
 			String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight
 					+ "\n -> not found";
-			peer.ban(BAN_BLOCK_TIMES<<1, mess);
+			peer.ban(BAN_BLOCK_TIMES, mess);
 			throw new Exception(mess);
 		}
 

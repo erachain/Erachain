@@ -909,7 +909,7 @@ public class Account {
 		
 		// test repeated win account
 		if (!Controller.getInstance().isTestNet()) {
-			int repeated = Block.isSoRapidly(height, this, lastBlocksForTarget);
+			int repeated = Block.isSoRapidly(dcSet, height, this, lastBlocksForTarget);
 			if (repeated > 0) {
 				return -repeated;
 			}
