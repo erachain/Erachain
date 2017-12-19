@@ -79,11 +79,11 @@ public class Synchronizer
 				+ " in ForkDB: " + lastBlock.getHeight(fork)
 				+ "\n for lastCommonBlock = " + lastCommonBlock.getHeight(fork));
 
-		byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
-		///byte[] lastCommonBlockSignature = lastCommonBlock.getReference();/// !!!
 		int countTransactionToOrphan = 0;
-		//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
-		while(!Arrays.equals(lastBlock.getReference(), lastCommonBlockSignature))
+		// ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in FORK DB
+		// ============  by EQUAL SIGNATURE !!!!!
+		byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+		while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature))
 		{
 			LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
 			if (checkPointHeight > lastBlock.getHeightByParent(fork)) {
@@ -168,9 +168,11 @@ public class Synchronizer
 
 		//GET LAST BLOCK
 		Block lastBlock = dcSet.getBlockMap().getLastBlock();
-		
-		//ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK
-		while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getSignature()))
+
+		// ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
+		// ============  by EQUAL SIGNATURE !!!!!
+		byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+		while(!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature))
 		///while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getReference())) /// !!!
 		{
 			if (cnt.isOnStopping())
