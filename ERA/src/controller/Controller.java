@@ -644,7 +644,7 @@ public class Controller extends Observable {
 
 			try {
 				FileUtils.copyDirectory(dataChainBackUp, dataChain);
-				LOGGER.info("Copy BackUp/DataChain to DataChain is Ok");
+				LOGGER.info("Restore BackUp/DataChain to DataChain is Ok");
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage(), e);
 			}
@@ -677,7 +677,7 @@ public class Controller extends Observable {
 
 			try {
 				FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
-				LOGGER.info("Copy BackUp/DataLocal to DataLocal is Ok");
+				LOGGER.info("Restore BackUp/DataLocal to DataLocal is Ok");
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage(), e);
 			}
