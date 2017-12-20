@@ -630,7 +630,7 @@ public class Controller extends Observable {
 	public DCSet reCreateDC() throws IOException, Exception {
 		File dataChain = new File(Settings.getInstance().getDataDir());
 		File dataChainBackUp = new File(
-				Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_DATA_DIR + "\\");
+				Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
 				// del datachain
 		if (dataChain.exists()) {
 			try {
@@ -662,7 +662,7 @@ public class Controller extends Observable {
 
 		File dataLocal = new File(Settings.getInstance().getLocalDir());
 		File dataLocalBackUp = new File(
-				Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
+				Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
 
 		// del DataLocal
 		if (dataLocal.exists()) {
@@ -862,9 +862,9 @@ public class Controller extends Observable {
 			File dataLoc = new File(Settings.getInstance().getLocalDir());
 
 			File dataBakDC = new File(
-					Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_DATA_DIR + "\\");
+					Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
 			File dataBakLoc = new File(
-					Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
+					Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
 			// copy Data dir to Back
 			if (dataDir.exists()) {
 				if (dataBakDC.exists()) {

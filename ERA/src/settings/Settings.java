@@ -968,7 +968,7 @@ public class Settings {
 			//correcting single backslash bug
 			if(line.contains("userpath"))
 			{
-				line = line.replace("\\", "/");
+				line = line.replace("\\", File.separator);
 			}
 			
 			jsonString += line;
@@ -985,9 +985,9 @@ public class Settings {
 		{
 			this.userPath = (String) this.settingsJSON.get("userpath");
 			
-			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/")))
+			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator)))
 			{
-				this.userPath += "\\"; 
+				this.userPath += File.separator; 
 			}
 		}
 		else
@@ -1002,9 +1002,9 @@ public class Settings {
 			
 		
 			try {
-				if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/")))
+				if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/")|| this.getBackUpPath.endsWith(File.separator)))
 				{
-					this.getBackUpPath += "\\"; 
+					this.getBackUpPath += File.separator; 
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
