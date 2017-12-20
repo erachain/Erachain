@@ -4,6 +4,7 @@ import java.io.File;
 
 import database.IDB;
 import database.wallet.DWSet;
+import datachain.DCSet;
 import datachain.TransactionMap;
 
 import org.mapdb.DB;
@@ -18,35 +19,55 @@ public class DBSet implements IDB
 	
 	private static final String VERSION = "version";
 	
-	private DB database;	
-	private int uses;
+	private static DB database;	
+	private static int uses;
 
 	private PeerMap peerMap;
+
+	private static DBSet instance;
 	
 	public static boolean exists()
 	{
 		return DATA_FILE.exists();
 	}
 	
-	public DBSet()
-	{
+	public static DBSet getinstanse(){
+		if(instance == null)
+		{
+			reCreateDatabase();
+		}
+		
+		return instance;
+		
+	}
+	
+	public static void reCreateDatabase() {
+
+		//OPEN DB
 		//OPEN WALLET
-		DATA_FILE.getParentFile().mkdirs();
-				
-	    this.database = DBMaker.newFileDB(DATA_FILE)
-	    		.closeOnJvmShutdown()
-	    		//.cacheDisable()
-	    		.checksumEnable()
-	    		.mmapFileEnableIfSupported()
-				/// ICREATOR
-				.commitFileSyncDisable()
-				.transactionDisable()
-	            .make();
-	    
-	    uses = 0;
-	    
-		this.peerMap = new PeerMap(this, this.database);
-	    
+				DATA_FILE.getParentFile().mkdirs();
+						
+			   database = DBMaker.newFileDB(DATA_FILE)
+			    		.closeOnJvmShutdown()
+			    		//.cacheDisable()
+			    		.checksumEnable()
+			    		.mmapFileEnableIfSupported()
+						/// ICREATOR
+						.commitFileSyncDisable()
+						.transactionDisable()
+			            .make();
+			    
+			    uses = 0;
+		
+		//CREATE INSTANCE
+		instance = new DBSet();
+
+		
+	}	
+	
+	private DBSet()
+	{
+			this.peerMap = new PeerMap(this, this.database);
 	}	
 
 	public PeerMap getPeerMap()

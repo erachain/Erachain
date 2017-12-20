@@ -445,7 +445,7 @@ public class Controller extends Observable {
 		//OPEN DATABASE
 		try {
 		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open database"));
-		this.dbSet = new DBSet();
+		this.dbSet = DBSet.getinstanse();
 		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Database OK"));
 
 		// OPENING DATABASES
@@ -459,9 +459,9 @@ public class Controller extends Observable {
 			//LOGGER.error(e.getMessage(),e);
 			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
 			
-			if (this.dbSet != null) this.dbSet.close();
+			//if (this.dbSet != null) this.dbSet.close();
 			reCreateDB();
-			this.dbSet = new DBSet();
+			//this.dbSet = DBSet.getinstanse();
 		}
 		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()){
 			
@@ -496,7 +496,7 @@ public class Controller extends Observable {
 			
 			if (this.dbSet != null) this.dbSet.close();
 			reCreateDB();
-			this.dbSet = new DBSet();
+			
 		}
 
 		
@@ -737,6 +737,8 @@ public class Controller extends Observable {
 		
 		DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
 		this.dcSet = DCSet.getInstance();
+		DBSet.reCreateDatabase();
+		this.dbSet = DBSet.getinstanse();
 		return this.dcSet;
 	}
 
