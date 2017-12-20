@@ -64,7 +64,6 @@ import core.transaction.TransactionFactory;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
-import database.DBSet;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import ntp.NTP;

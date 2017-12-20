@@ -8,21 +8,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
 import core.BlockChain;
 import core.block.Block;
-import core.transaction.Transaction;
-import database.DBSet;
-import database.wallet.DWSet;
-import datachain.BlockMap;
 import datachain.DCSet;
-import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -36,9 +28,6 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 	public static final int COLUMN_FEE = 5;
 	
 	private List<Block> blocks;
-	private long winValue = 0l;
-	private boolean is_Select_Last_100_Block;
-	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
 			"GB pH VW tVW", //"Generating Balance",
 			"Transactions", "Fee"});
@@ -218,7 +207,6 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;

@@ -44,7 +44,6 @@ import core.transaction.GenesisIssueNoteRecord;
 import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
-import database.DBSet;
 import datachain.DCSet;
 import settings.Settings;
 import utils.Pair;
