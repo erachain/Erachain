@@ -167,7 +167,7 @@ public class BlockChain
 		
 	        	try {
 	        		dcSet.close();
-	        		dcSet = Controller.getInstance().reCreateDB();
+	        		dcSet = Controller.getInstance().reCreateDC();
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage(),e);
 				}
