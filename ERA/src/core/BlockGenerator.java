@@ -667,7 +667,8 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin;
 		
 		long start = System.currentTimeMillis();
-		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
+		// List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
+		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
 		long tickets = System.currentTimeMillis() - start;
 		int txCount = orderedTransactions.size();
 		long ticketsCount = System.currentTimeMillis() - tickets;
@@ -686,13 +687,13 @@ public class BlockGenerator extends Thread implements Observer
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
 
-		boolean transactionProcessed;
+	//	boolean transactionProcessed;
 		long totalBytes = 0;
 		int counter = 0;
 
-		do
-		{
-			transactionProcessed = false;
+		//do
+		//{
+		//	transactionProcessed = false;
 						
 			for(Transaction transaction: orderedTransactions)
 			{
@@ -711,21 +712,12 @@ public class BlockGenerator extends Thread implements Observer
 				try{
 
 					//CHECK TRANSACTION TIMESTAMP AND DEADLINE
-					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp) {
-						// OFF TIME
-						// REMOVE FROM LIST
-						transactionProcessed = true;
-						orderedTransactions.remove(transaction);
-						break;
-					}
-					
-					//CHECK IF VALID
-					if(!transaction.isSignatureValid()) {
+					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp || !transaction.isSignatureValid()) {
 						// INVALID TRANSACTION
 						// REMOVE FROM LIST
-						transactionProcessed = true;
-						orderedTransactions.remove(transaction);
-						break;
+						//transactionProcessed = true;
+						//orderedTransactions.remove(transaction);
+						continue;
 					}
 						
 					transaction.setDC(newBlockDb, false);
@@ -733,9 +725,9 @@ public class BlockGenerator extends Thread implements Observer
 					if (transaction.isValid(newBlockDb, null) != Transaction.VALIDATE_OK) {
 						// INVALID TRANSACTION
 						// REMOVE FROM LIST
-						transactionProcessed = true;
-						orderedTransactions.remove(transaction);
-						break;
+						//transactionProcessed = true;
+						//orderedTransactions.remove(transaction);
+						continue;
 					}
 														
 					//CHECK IF ENOUGH ROOM
@@ -751,16 +743,16 @@ public class BlockGenerator extends Thread implements Observer
 					transactionsList.add(transaction);
 								
 					//REMOVE FROM LIST
-					orderedTransactions.remove(transaction);
+					//orderedTransactions.remove(transaction);
 								
 					//PROCESS IN NEWBLOCKDB
 					transaction.process(newBlockDb, null, false);
 								
 					//TRANSACTION PROCESSES
-					transactionProcessed = true;
+					//transactionProcessed = true;
 										
 					// GO TO NEXT TRANSACTION
-					break;
+					continue;
 						
 				} catch (Exception e) {
 					
@@ -768,7 +760,7 @@ public class BlockGenerator extends Thread implements Observer
 						return null;
 					}
 
-                    transactionProcessed = true;
+               //     transactionProcessed = true;
 
                     LOGGER.error(e.getMessage(), e);
                     //REMOVE FROM LIST
@@ -777,8 +769,8 @@ public class BlockGenerator extends Thread implements Observer
 				}
 				
 			}
-		}
-		while(counter < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
+		//}
+		//while(counter < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
 		orderedTransactions = null;
 		waitWin = null;
 		newBlockDb = null;
