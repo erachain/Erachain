@@ -145,7 +145,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 		
 		//sellOrderPanel.setBackground(Color.BLUE);
 		
-		orderGBC.fill = GridBagConstraints.NORTH;  
+		orderGBC.fill = GridBagConstraints.BOTH;
 		if (action == "To sell"){
 			orderGBC.gridx = 0;
 			orderGBC.fill = GridBagConstraints.BOTH;

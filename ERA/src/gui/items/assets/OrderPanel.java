@@ -185,7 +185,8 @@ public class OrderPanel extends JPanel
 			 }
 			this.cbxAccount.setEnabled(false);
 		}
-		
+		cbxAccount.setPreferredSize(new Dimension(100, cbxAccount.getFontMetrics(cbxAccount.getFont()).getHeight() + 8));
+
 		
 		this.add(this.cbxAccount, detailGBC);
 		detailGBC.gridwidth = 1;
@@ -214,7 +215,7 @@ public class OrderPanel extends JPanel
 				
 		//LABEL PRICE
 		labelGBC.gridy++;
-		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price per unit") + " " + (buying?want.getName():have.getName()) + "(2):");
+		JLabel priceLabel = new JLabel("<html><div style=\"width: 100px;\">" + Lang.getInstance().translate("Price per unit") + " " + (buying?want.getName():have.getName()) + "(2):</div></html>");
 		this.add(priceLabel, labelGBC);
 		//PRICE
 		detailGBC.gridy++;
