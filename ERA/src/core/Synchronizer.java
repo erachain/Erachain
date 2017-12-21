@@ -57,7 +57,7 @@ public class Synchronizer
 		return fromPeer;
 	}
 	
-	private void checkNewBlocks(DCSet fork, Block lastUnCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
+	private void checkNewBlocks(DCSet fork, Block firstUnCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		
 		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
@@ -77,30 +77,30 @@ public class Synchronizer
 				+ "\n search common block in FORK"
 				+ " in mainDB: " + lastBlock.getHeight(fork.getParent())
 				+ " in ForkDB: " + lastBlock.getHeight(fork)
-				+ "\n for last UnCommonBlock = " + lastUnCommonBlock.getHeight(fork));
+				+ "\n for last UnCommonBlock = " + firstUnCommonBlock.getHeight(fork));
 
 		int countTransactionToOrphan = 0;
 		// ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in FORK DB
 		// ============  by EQUAL SIGNATURE !!!!!
-		byte[] lastUnCommonBlockSignature = lastUnCommonBlock.getSignature();
+		byte[] lastUnCommonBlockSignature = firstUnCommonBlock.getSignature();
 		while(!Arrays.equals(lastBlock.getSignature(), lastUnCommonBlockSignature))
 		{
 			LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK [" + lastBlock.getHeightByParent(fork) + "]");
 			if (checkPointHeight > lastBlock.getHeightByParent(fork)) {
 				String mess = "Dishonest peer by not valid lastCommonBlock["
-						+ lastUnCommonBlock.getHeight(fork) + "] < [" + checkPointHeight + "] checkPointHeight";
+						+ firstUnCommonBlock.getHeight(fork) + "] < [" + checkPointHeight + "] checkPointHeight";
 				peer.ban(BAN_BLOCK_TIMES, mess);
 				throw new Exception(mess);
 				
 			} else if (lastBlock.getVersion() == 0) {
 				String mess = "Dishonest peer by not valid lastCommonBlock["
-						+ lastUnCommonBlock.getHeight(fork) + "] Version == 0";
+						+ firstUnCommonBlock.getHeight(fork) + "] Version == 0";
 				peer.ban(BAN_BLOCK_TIMES, mess);
 				throw new Exception(mess);
 				
 			} else if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
 				String mess = "Dishonest peer by on lastCommonBlock["
-						+ lastUnCommonBlock.getHeight(fork) + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
+						+ firstUnCommonBlock.getHeight(fork) + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
 				peer.ban(BAN_BLOCK_TIMES>>2, mess);
 				throw new Exception(mess);				
 			}
@@ -150,7 +150,7 @@ public class Synchronizer
 	}
 
 	// process new BLOCKS to DB and orphan DB
-	public List<Transaction> synchronize_blocks(DCSet dcSet, Block lastUnCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
+	public List<Transaction> synchronize_blocks(DCSet dcSet, Block firstUnCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		TreeMap<String, Transaction> orphanedTransactions = new TreeMap<String, Transaction>();
 		Controller cnt = Controller.getInstance();
@@ -158,9 +158,9 @@ public class Synchronizer
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
 		if (core.BlockGenerator.TEST_001) {
 			///checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks, peer);
-			checkNewBlocks(dcSet.fork(), lastUnCommonBlock, checkPointHeight, newBlocks, peer);
+			checkNewBlocks(dcSet.fork(), firstUnCommonBlock, checkPointHeight, newBlocks, peer);
 		} else {
-			checkNewBlocks(dcSet.fork(), lastUnCommonBlock, checkPointHeight, newBlocks, peer);
+			checkNewBlocks(dcSet.fork(), firstUnCommonBlock, checkPointHeight, newBlocks, peer);
 		}
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -171,7 +171,7 @@ public class Synchronizer
 
 		// ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
 		// ============  by EQUAL SIGNATURE !!!!!
-		byte[] lastUnCommonBlockSignature = lastUnCommonBlock.getSignature();
+		byte[] lastUnCommonBlockSignature = firstUnCommonBlock.getSignature();
 		while(!Arrays.equals(lastBlock.getSignature(), lastUnCommonBlockSignature))
 		///while(!Arrays.equals(lastBlock.getReference(), lastCommonBlock.getReference())) /// !!!
 		{
@@ -262,10 +262,10 @@ public class Synchronizer
 
 		// IF 
 		Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
-		byte[] commonBlockSignature = headers.a;
+		byte[] firstUnCommonBlockSignature = headers.a;
 		List<byte[]> signatures = headers.b;
 		
-		if (commonBlockSignature == null) {
+		if (firstUnCommonBlockSignature == null) {
 			// simple ACCEPT tail CHAIN
 									
 			//CREATE BLOCK BUFFER
@@ -385,12 +385,12 @@ public class Synchronizer
 				throw new Exception("on stoping");
 			}
 
-			Block commonBlock = dcSet.getBlockMap().get(commonBlockSignature);
+			Block firstUnCommonBlock = dcSet.getBlockMap().get(firstUnCommonBlockSignature);
 			
 			//SYNCHRONIZE BLOCKS
-			LOGGER.error("synchronize with OPRHAN from common block [" + commonBlock.getHeightByParent(dcSet)
+			LOGGER.error("synchronize with OPRHAN from common block [" + firstUnCommonBlock.getHeightByParent(dcSet)
 				+ "] for blocks: " + blocks.size());			
-			List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, commonBlock, checkPointHeight, blocks, peer);
+			List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, firstUnCommonBlock, checkPointHeight, blocks, peer);
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
 			}
@@ -536,7 +536,7 @@ public class Synchronizer
 		//GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN CHECKED
 		//int steep = BlockChain.SYNCHRONIZE_PACKET>>2;
 		int steep = 2;
-		byte[] lastBlockSignatureCommon;
+		byte[] firstUnCommonBlockSignature;
 		do {
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
@@ -546,16 +546,16 @@ public class Synchronizer
 			
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
-				lastBlockSignatureCommon = checkPointHeightCommonBlock.getSignature();
+				firstUnCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
 			} else {
-				lastBlockSignatureCommon = dcSet.getBlockHeightsMap().getSignByHeight(maxChainHeight);				
+				firstUnCommonBlockSignature = dcSet.getBlockHeightsMap().getSignByHeight(maxChainHeight);				
 			}
 
 			LOGGER.debug("findHeaders try found COMMON header"
 					+ " steep: " + steep
 					+ " maxChainHeight: " + maxChainHeight);
 
-			headers = this.getBlockSignatures(lastBlockSignatureCommon, peer);
+			headers = this.getBlockSignatures(firstUnCommonBlockSignature, peer);
 
 			LOGGER.debug("findHeaders try found COMMON header"
 					+ " founded headers: " + headers.size()
@@ -581,14 +581,14 @@ public class Synchronizer
 
 		// CLEAR head of common headers exclude LAST!
 		while ( headers.size() > 1 && dcSet.getBlockMap().contains(headers.get(0))) {
-			lastBlockSignatureCommon = headers.remove(0);
+			firstUnCommonBlockSignature = headers.remove(0);
 		}
 
 		LOGGER.info("findHeaders headers CLEAR"
 				+ "now headers: " + headers.size()
 				);
 		
-		return new Tuple2<byte[], List<byte[]>>(lastBlockSignatureCommon, headers);
+		return new Tuple2<byte[], List<byte[]>>(firstUnCommonBlockSignature, headers);
 	}
 
 	private List<Block> getBlocks(DCSet dcSet, List<byte[]> signatures, Peer peer) throws Exception {
