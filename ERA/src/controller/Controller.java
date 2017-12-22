@@ -718,7 +718,8 @@ public class Controller extends Observable {
 	}
 
 	public void rpcServiceRestart() {
-		this.rpcService.stop();
+		if (this.rpcService != null)
+			this.rpcService.stop();
 
 		// START API SERVICE
 		if (Settings.getInstance().isRpcEnabled()) {

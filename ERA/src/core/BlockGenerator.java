@@ -219,7 +219,7 @@ public class BlockGenerator extends Thread implements Observer
 		BlockChain bchain = ctrl.getBlockChain();
 		DCSet dcSet = DCSet.getInstance();
 
-		Peer peer;
+		Peer peer = null;
 		long timeTmp;
 		long timePoint = 0;
 		long flushPoint = 0;
@@ -542,7 +542,11 @@ public class BlockGenerator extends Thread implements Observer
 				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
-					peer = ctrl.getMaxPeerHWeight(-1).c;
+					Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(-1);
+					if (maxPeer != null) {
+						peer = maxPeer.c;
+					}
+					
 					if (peer != null) {
 						
 						 if (bchain.getHeight(dcSet) > 1) {
