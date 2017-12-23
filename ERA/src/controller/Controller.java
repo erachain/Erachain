@@ -1312,6 +1312,9 @@ public class Controller extends Observable {
 						//// info = "newBlock (" + newBlock.toString(dcSet) + ") is
 						//// Invalid";
 						//// banPeerOnError(message.getSender(), info);
+						return;
+					} else if (isNewWinBlockValid == 3 || isNewWinBlockValid == 41) {
+						return;
 					}
 					return;
 				}
