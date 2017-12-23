@@ -124,8 +124,8 @@ public class Synchronizer
 		// Height & Weight
 		int myHeight = myHW.a + 1;
 		long myWeight = myHW.b;
-		int newHeight = lastBlock.getHeight(fork) + 1 + newBlocks.size();
-		boolean checkFullWeight = newHeight < myHeight + 3;
+		int newHeight = lastBlock.getHeight(fork) + newBlocks.size();
+		boolean checkFullWeight = newHeight < myHeight + 2;
 
 		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
