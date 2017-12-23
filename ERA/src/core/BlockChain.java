@@ -382,7 +382,7 @@ public class BlockChain
 			if(dbMap.contains(block.getSignature()))
 			{
 				LOGGER.debug("isNewBlockValid IGNORE -> already in DB #" + block.getHeight(dcSet));
-				return -3;
+				return 3;
 			}
 
 			Block lastBlock = dbMap.get(lastSignature);
@@ -393,7 +393,7 @@ public class BlockChain
 					return 4;
 				} else {
 					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> weak...");
-					return -4;
+					return 41;
 				}
 			}
 			
