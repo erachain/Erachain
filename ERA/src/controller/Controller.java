@@ -1307,11 +1307,14 @@ public class Controller extends Observable {
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
 				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
 					/// NOT BAN - WATCH it
-					if (isNewWinBlockValid < 0) {
-						this.network.tryDisconnect(message.getSender(), 0, "");
-						//// info = "newBlock (" + newBlock.toString(dcSet) + ") is
-						//// Invalid";
-						//// banPeerOnError(message.getSender(), info);
+					if (isNewWinBlockValid < -10) {
+						info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
+						banPeerOnError(message.getSender(), info);
+						return;
+					} else if (isNewWinBlockValid < 0) {
+						if (this.network.getActivePeersCounter(false) > Settings.getInstance().getMaxConnections() - 3) {
+							this.network.tryDisconnect(message.getSender(), 0, "");
+						}
 						return;
 					} else if (isNewWinBlockValid == 3 || isNewWinBlockValid == 41) {
 						return;

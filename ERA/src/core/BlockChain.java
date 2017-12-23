@@ -363,14 +363,14 @@ public class BlockChain
 		if(block.getVersion() == 0 || block instanceof GenesisBlock)
 		{
 			LOGGER.debug("isNewBlockValid ERROR -> as GenesisBlock");
-			return -1;
+			return -100;
 		}
 		
 		//CHECK IF SIGNATURE IS VALID
 		if(!block.isSignatureValid())
 		{
 			LOGGER.debug("isNewBlockValid ERROR -> signature");
-			return -2;
+			return -200;
 		}
 		
 		BlockMap dbMap = dcSet.getBlockMap();
@@ -393,14 +393,14 @@ public class BlockChain
 					return 4;
 				} else {
 					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> weak...");
-					return 41;
+					return -4;
 				}
 			}
 			
 			Block winBlock = this.getWaitWinBuffer();
 			if (winBlock == null) {
 				LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block AND win BLOCK is NULL");			
-				return -10;
+				return -6;
 			}
 			
 			if (Arrays.equals(winBlock.getSignature(), newBlockReference)) {
@@ -417,7 +417,7 @@ public class BlockChain
 			}
 			
 			LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block -9");			
-			return -9;
+			return -7;
 		}
 		
 		return 0;
