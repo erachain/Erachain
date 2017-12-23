@@ -57,13 +57,16 @@ public class Synchronizer
 		return fromPeer;
 	}
 	
-	private void checkNewBlocks(DCSet fork, Block firstUnCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
+	private void checkNewBlocks(Tuple2<Integer, Long> myHW, DCSet fork, Block firstUnCommonBlock, int checkPointHeight, List<Block> newBlocks, Peer peer) throws Exception
 	{
 		
 		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
 	
 		Controller cnt = Controller.getInstance();
-		//int originalHeight = 0;
+
+		// Height & Weight
+		int myHeight = myHW.a;
+		long myWeight = myHW.b;
 		
 		//ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
 	
@@ -132,6 +135,14 @@ public class Synchronizer
 				//PROCESS TO VALIDATE NEXT BLOCKS
 				//runedBlock = block;
 				/// already in Validate block.process(fork);
+				if (myHeight == heigh) {
+					if (myWeight >= fork.getBlockSignsMap().getFullWeight()) {
+						//INVALID BLOCK THROW EXCEPTION
+						String mess = "Dishonest peer by weak FullWeight, heigh: " + heigh;
+						peer.ban(BAN_BLOCK_TIMES, mess);
+						throw new Exception(mess);						
+					}
+				}
 
 			} else {
 
@@ -155,12 +166,14 @@ public class Synchronizer
 		TreeMap<String, Transaction> orphanedTransactions = new TreeMap<String, Transaction>();
 		Controller cnt = Controller.getInstance();
 
+		Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+
 		//VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
 		if (core.BlockGenerator.TEST_001) {
 			///checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks, peer);
-			checkNewBlocks(dcSet.fork(), firstUnCommonBlock, checkPointHeight, newBlocks, peer);
+			checkNewBlocks(myHW, dcSet.fork(), firstUnCommonBlock, checkPointHeight, newBlocks, peer);
 		} else {
-			checkNewBlocks(dcSet.fork(), firstUnCommonBlock, checkPointHeight, newBlocks, peer);
+			checkNewBlocks(myHW, dcSet.fork(), firstUnCommonBlock, checkPointHeight, newBlocks, peer);
 		}
 		
 		//NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
