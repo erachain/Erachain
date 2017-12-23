@@ -207,8 +207,18 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 
 	public boolean set(byte[] signature, Transaction transaction) {
 		
-		if (this.size() > MAX_MAP_SIZE)
-			return false;
+		if (this.size() > MAX_MAP_SIZE) {
+			Iterator<byte[]> iterator = this.getIterator(0, false);
+			Transaction item;
+			long dTime = NTP.getTime();
+			
+			do {
+				byte[] key = iterator.next();
+				item = this.get(key);
+				this.delete(key);
+				
+			} while (item.getDeadline() < dTime && iterator.hasNext());
+		}
 		
 		if (!this.contains(signature))
 			this.getDCSet().updateUncTxCounter(1);

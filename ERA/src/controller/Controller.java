@@ -985,6 +985,8 @@ public class Controller extends Observable {
 			}
 
 		}
+		
+		LOGGER.info(" sended UNCONFIRMED  counter: " + counter + " - " + peer.getAddress().getHostName());
 
 	}
 
