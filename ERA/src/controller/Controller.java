@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -941,7 +942,53 @@ public class Controller extends Observable {
 		this.toOfflineTime = time;
 	}
 
-	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) {
+	public void broadcastUnconfirmedToPeer(Peer peer) {
+		
+		byte[] peerByte = peer.getAddress().getAddress();
+
+		TransactionMap map = this.dcSet.getTransactionMap();
+		Iterator<byte[]> iterator = map.getIterator(0, false);
+		Transaction transaction;
+		Message message;
+		int counter = 0;
+		
+		while (iterator.hasNext()) {
+			
+			if (this.isStopping) {
+				return;
+			}
+
+			transaction = map.get(iterator.next());
+			
+			if (transaction.getDeadline() < NTP.getTime()) {
+				map.delete(transaction);
+				continue;
+			}
+
+			//LOGGER.error(" time " + transaction.viewTimestamp());
+
+			message = MessageFactory.getInstance().createTransactionMessage(transaction);
+
+			if (map.isBroadcastedToPeer(transaction, peerByte))
+				continue;
+
+			try {
+				if (peer.sendMessage(message)) {
+					counter++;
+					map.addBroadcastedPeer(transaction, peerByte);
+				}
+			} catch (Exception e) {
+				if (this.isStopping || !peer.isUsed()) {
+					return;
+				}
+				LOGGER.error(e.getMessage(), e);
+			}
+
+		}
+
+	}
+
+	public void broadcastUnconfirmedToPeer_old(List<Transaction> transactions, Peer peer) {
 
 		byte[] peerByte = peer.getAddress().getAddress();
 		DCSet dcSet = DCSet.getInstance();
@@ -952,6 +999,8 @@ public class Controller extends Observable {
 			if (this.isStopping || !peer.isUsed()) {
 				return;
 			}
+
+			LOGGER.error("REC TIME: " + transaction.viewTimestamp());
 
 			if (transaction.getDeadline() < NTP.getTime()) {
 				dcMap.delete(transaction.getSignature());
@@ -1028,11 +1077,10 @@ public class Controller extends Observable {
 			return;
 
 		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-		if (!this.isStopping) {
-			List<Transaction> transactions = this.dcSet.getTransactionMap().getTransactions(0, 100, true);
-			if (transactions != null && !transactions.isEmpty())
-				this.broadcastUnconfirmedToPeer(transactions, peer);
-		}
+		if (this.isStopping)
+			return;
+		
+		this.broadcastUnconfirmedToPeer(peer);
 
 		// GET CURRENT WIN BLOCK
 		Block winBlock = this.blockChain.getWaitWinBuffer();
