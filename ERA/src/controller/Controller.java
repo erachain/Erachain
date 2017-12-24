@@ -94,6 +94,7 @@ import network.message.GetSignaturesMessage;
 import network.message.HWeightMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import network.message.SignaturesMessage;
 import network.message.TransactionMessage;
 import network.message.VersionMessage;
 import ntp.NTP;
@@ -1045,8 +1046,14 @@ public class Controller extends Observable {
 			return;
 
 		// GET GENESIS BLOCK - TEST WRONG CHAIN
-		// byte[] genesisBlockSign =
-		// Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
+		byte[] genesisBlockSign = this.blockChain.getGenesisBlock().getSignature();
+		// CHECK GENESIS BLOCK on CONNECT
+		Message mess = MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign);
+		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess);
+		if (response == null || response.getSignatures().isEmpty()) {
+			this.banPeerOnError(peer, "wrong GENESIS BLOCK");
+			return;
+		}
 
 		/*
 		 * // SEND GENESIS BLOCK MESSAGE
