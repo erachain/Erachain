@@ -286,7 +286,7 @@ public abstract class DCMap<T, U> extends Observable {
 			this.outUses();
 			return;
 		}
-		if (this.parent == null) {
+		if (value != null && this.parent == null) {
 
 			// IT IS NOT FORK
 			// if (!(this.databaseSet instanceof DWSet &&
