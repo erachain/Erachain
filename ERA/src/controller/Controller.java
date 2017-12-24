@@ -1045,13 +1045,21 @@ public class Controller extends Observable {
 				MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))
 			return;
 
-		// GET GENESIS BLOCK - TEST WRONG CHAIN
-		byte[] genesisBlockSign = this.blockChain.getGenesisBlock().getSignature();
-		// CHECK GENESIS BLOCK on CONNECT
-		Message mess = MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign);
+		// GET CHECKPOINT BLOCK - TEST WRONG CHAIN
+		byte[] checkBlockSign;
+		int checkPoint = BlockChain.getCheckPoint(dcSet);
+		if (checkPoint < 10) {
+			checkBlockSign = this.blockChain.getGenesisBlock().getSignature();
+		} else {
+			checkBlockSign = this.dcSet.getBlockHeightsMap().get(checkPoint);
+		}
+		// CHECK CHECKPOINT BLOCK on CONNECT
+		Message mess = MessageFactory.getInstance().createGetHeadersMessage(checkBlockSign);
 		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess);
-		if (response == null || response.getSignatures().isEmpty()) {
-			this.banPeerOnError(peer, "wrong GENESIS BLOCK");
+		if (response == null)
+			;
+		else if (response.getSignatures().isEmpty()) {
+			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES <<3, "wrong GENESIS BLOCK");
 			return;
 		}
 
