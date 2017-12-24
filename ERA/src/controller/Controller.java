@@ -1725,7 +1725,7 @@ public class Controller extends Observable {
 
 		if (this.peerHWeight.size() == 0) {
 			this.status = STATUS_NO_CONNECTIONS;
-			return false;
+			return true;
 		}
 
 		if (isStopping)

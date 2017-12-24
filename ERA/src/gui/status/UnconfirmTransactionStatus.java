@@ -43,9 +43,12 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 	public UnconfirmTransactionStatus(){
 	super("| "+Lang.getInstance().translate("Unconfirmed Records") + ": 0 |");
 	
-	counter=0;
+	
 	map = DCSet.getInstance().getTransactionMap();
 	map.addObserver(this);
+	DCSet.getInstance().getBlockMap().addObserver(this);
+	counter = map.size();
+	refresh();
 	
 	this.addMouseListener(new MouseListener(){
 
@@ -98,11 +101,13 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
 		///LOGGER.error("update - type:" + message.getType());
 
-		if(message.getType() == ObserverMessage.COUNT_UNC_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE || message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)
 		{
 			counter = (int)message.getValue();
+			refresh();
 		}
-		
+	}
+	private void refresh(){
 		if (counter > 0) {
 			this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			setText("<HTML>| <A href = ' '>"+Lang.getInstance().translate("Unconfirmed Records") + ": " + counter +"</a> |");
