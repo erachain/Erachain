@@ -220,9 +220,10 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 			} while (item.getDeadline() < dTime && iterator.hasNext());
 		}
 		
-		if (!this.contains(signature))
-			this.getDCSet().updateUncTxCounter(1);
-		
+		if (!this.contains(signature)) {
+			this.getDCSet().updateUncTxCounter(1);		
+		}
+
 		return super.set(signature, transaction);
 		
 	}
@@ -316,10 +317,10 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		// delete BROADCASTS
 		if (this.peersBroadcasted.containsKey(signature)) {
 			this.peersBroadcasted.remove(signature);
-		}
 
-		if (this.contains(signature))
-			this.getDCSet().updateUncTxCounter(-1);
+			if (this.contains(signature))
+				this.getDCSet().updateUncTxCounter(-1);
+		}
 
 		super.delete(signature);
 	}

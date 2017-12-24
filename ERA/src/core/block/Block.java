@@ -1200,6 +1200,8 @@ public class Block {
 			// empty transactions
 		} else {
 			int seq = 1;
+			byte[] blockSignature = this.getSignature();
+			byte[] transactionSignature;
 			this.getTransactions();
 			
 			long timerProcess = 0;
@@ -1289,17 +1291,20 @@ public class Block {
 						transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), validatingDC);
 				}
 
+				transactionSignature = transaction.getSignature();
+
 				if (andProcess) {
+					
 					//SET PARENT
 					///LOGGER.debug("[" + seq + "] try refsMap.set" );
 					timerStart = System.currentTimeMillis();
-					refsMap.set(transaction, this);
+					refsMap.set(transactionSignature, blockSignature);
 					timerRefsMap_set += System.currentTimeMillis() - timerStart;
 	
 					//REMOVE FROM UNCONFIRMED DATABASE
 					///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
 					timerStart = System.currentTimeMillis();
-					unconfirmedMap.delete(transaction);
+					unconfirmedMap.delete(transactionSignature);
 					timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 	
 					Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
@@ -1313,14 +1318,14 @@ public class Block {
 					timerFinalMap_set += System.currentTimeMillis() - timerStart;
 					//LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
 					timerStart = System.currentTimeMillis();
-					transFinalMapSinds.set(transaction.getSignature(), key);
+					transFinalMapSinds.set(transactionSignature, key);
 					timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 					
 					seq++;
 				
 				}
 
-				transactionsSignatures = Bytes.concat(transactionsSignatures, transaction.getSignature());
+				transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
 			}
 			
 			transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
@@ -1399,7 +1404,6 @@ public class Block {
 		}
 
 	}
-
 	
 	// TODO - make it trownable
 	public void process(DCSet dcSet) throws Exception
@@ -1426,6 +1430,8 @@ public class Block {
 
 		//PROCESS TRANSACTIONS
 		int seq = 1;
+		byte[] blockSignature = this.getSignature();
+		byte[] transactionSignature;
 		this.getTransactions();
 		//DBSet dbSet = Controller.getInstance().getDBSet();
 		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
@@ -1460,16 +1466,18 @@ public class Block {
 					transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
 			}
 
+			transactionSignature = transaction.getSignature();
+			
 			//SET PARENT
 			///LOGGER.debug("[" + seq + "] try refsMap.set" );
 			timerStart = System.currentTimeMillis();
-			refsMap.set(transaction, this);
+			refsMap.set(transactionSignature, blockSignature);
 			timerRefsMap_set += System.currentTimeMillis() - timerStart;
 
 			//REMOVE FROM UNCONFIRMED DATABASE
 			///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
 			timerStart = System.currentTimeMillis();
-			unconfirmedMap.delete(transaction);
+			unconfirmedMap.delete(transactionSignature);
 			timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
@@ -1483,7 +1491,7 @@ public class Block {
 			timerFinalMap_set += System.currentTimeMillis() - timerStart;
 			//LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
 			timerStart = System.currentTimeMillis();
-			transFinalMapSinds.set(transaction.getSignature(), key);
+			transFinalMapSinds.set(transactionSignature, key);
 			timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 			
 			seq++;
