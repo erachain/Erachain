@@ -169,14 +169,20 @@ public class BlockGenerator extends Thread implements Observer
 		ctrl.addObserver(this);
 	}
 	
-	public void addUnconfirmedTransaction(Transaction transaction)
+	public boolean addUnconfirmedTransaction(Transaction transaction)
 	{
-		this.addUnconfirmedTransaction(DCSet.getInstance(), transaction);
+		return this.addUnconfirmedTransaction(DCSet.getInstance(), transaction);
 	}
-	public void addUnconfirmedTransaction(DCSet db, Transaction transaction) 
+	public boolean addUnconfirmedTransaction(DCSet db, Transaction transaction) 
 	{
+		
+		if (transaction.getDeadline() < NTP.getTime())
+			return false;
+		
 		//ADD TO TRANSACTION DATABASE 
 		db.getTransactionMap().add(transaction);
+		
+		return true;
 	}
 		
 	private List<PrivateKeyAccount> getKnownAccounts()

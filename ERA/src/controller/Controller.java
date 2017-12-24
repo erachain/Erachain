@@ -1605,9 +1605,7 @@ public class Controller extends Observable {
 				if (!this.dcSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature())
 						&& !this.dcSet.getTransactionMap().contains(transaction.getSignature())) {
 					// ADD TO UNCONFIRMED TRANSACTIONS
-					this.blockGenerator.addUnconfirmedTransaction(transaction);
-
-					if (this.isStopping)
+					if (!this.blockGenerator.addUnconfirmedTransaction(transaction) || this.isStopping)
 						return;
 
 					// BROADCAST
@@ -2603,7 +2601,8 @@ public class Controller extends Observable {
 
 	public void onTransactionCreate(Transaction transaction) {
 		// ADD TO UNCONFIRMED TRANSACTIONS
-		this.blockGenerator.addUnconfirmedTransaction(transaction);
+		if (!this.blockGenerator.addUnconfirmedTransaction(transaction))
+			return;
 
 		// NOTIFY OBSERVERS - AUTO in database.wallet.TransactionMap
 		if (false) {
