@@ -47,7 +47,7 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 	private NavigableSet<Tuple2<Integer, byte[]>> heightIndex;
 
 	// PEERS for transaction signature
-	private Map<byte[], List<byte[]>> peersBroadcasted = new WeakHashMap<byte[], List<byte[]>>();
+	private Map<byte[], List<byte[]>> peersBroadcasted = new HashMap<byte[], List<byte[]>>();
 
 	public TransactionMap(DCSet databaseSet, DB database)
 	{
@@ -58,9 +58,9 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 			if (databaseSet.isDynamicGUI()) {
 				this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
+				this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
 			}
 			//this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-			this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
 		}
 		
 	}
