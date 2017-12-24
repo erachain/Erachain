@@ -177,7 +177,16 @@ public class DCSet implements Observer, IDB {
 			this.uses--;
 		}
 	}
-	
+
+	public void setUncTxCounter(int value)
+	{
+		if (parent == null) {
+			this.uses++;
+			this.database.getAtomicLong(UNC_TX_COUNTER).set(value);
+			this.uses--;
+		}
+	}
+
 	public long getUncTxCounter()
 	{
 		long u = this.database.getAtomicLong(UNC_TX_COUNTER).longValue();
