@@ -332,9 +332,15 @@ public class BlockChain
 		if(dcSet.getBlockMap().contains(parentSignature))
 		{
 			
+			int packet;
+			if (Arrays.equals(parentSignature, this.genesisBlock.getSignature())) {
+				packet = 3;
+			} else {
+				packet = SYNCHRONIZE_PACKET;
+			}
 			ChildMap childsMap = dcSet.getChildMap();			
 			int counter = 0;
-			while(parentSignature != null && counter++ < SYNCHRONIZE_PACKET)
+			while(parentSignature != null && counter++ < packet)
 			{				
 				headers.add(parentSignature);
 				parentSignature = childsMap.getChildBlock(parentSignature);
