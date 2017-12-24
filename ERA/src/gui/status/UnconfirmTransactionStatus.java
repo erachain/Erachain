@@ -103,7 +103,8 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
 		if(message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE || message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)
 		{
-			counter = (int)message.getValue();
+			//counter = (int)message.getValue();
+			counter = map.size();
 			refresh();
 		}
 	}
