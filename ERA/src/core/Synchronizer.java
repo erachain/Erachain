@@ -465,7 +465,7 @@ public class Synchronizer
 		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response;
 		try {
-			response = (SignaturesMessage) peer.getResponse(message, 10000);
+			response = (SignaturesMessage) peer.getResponse(message, 30000);
 		} catch (java.lang.ClassCastException e) {
 			peer.ban(1, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			

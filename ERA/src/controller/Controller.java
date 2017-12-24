@@ -1055,7 +1055,7 @@ public class Controller extends Observable {
 		}
 		// CHECK CHECKPOINT BLOCK on CONNECT
 		Message mess = MessageFactory.getInstance().createGetHeadersMessage(checkBlockSign);
-		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess);
+		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess, 5000);
 		if (response == null)
 			;
 		else if (response.getSignatures().isEmpty()) {
