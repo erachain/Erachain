@@ -273,10 +273,9 @@ public abstract class DCMap<T, U> extends Observable {
 
 		this.addUses();
 		U value = null;
-		try {
-			value = this.map.remove(key);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		value = this.map.remove(key);
+
+		if (value == null) {
 			if (this.parent != null) {
 				if (this.deleted == null) {
 					this.deleted = new ArrayList<T>();
@@ -285,15 +284,8 @@ public abstract class DCMap<T, U> extends Observable {
 			}
 			this.outUses();
 			return;
-		}
-		if (value != null && this.parent == null) {
 
-			// IT IS NOT FORK
-			// if (!(this.databaseSet instanceof DWSet &&
-			// Controller.getInstance().isProcessingWalletSynchronize())) {
-			// COMMIT
-			///// this.databaseSet.commit();
-			// }
+		} else if (this.parent == null) {
 
 			// NOTIFY REMOVE
 			if (this.getObservableData().containsKey(DBMap.NOTIFY_REMOVE)) {
