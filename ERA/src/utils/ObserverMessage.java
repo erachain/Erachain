@@ -11,6 +11,7 @@ public class ObserverMessage {
 	public static final int ADD_TRANSACTION_TYPE = 7;
 	public static final int REMOVE_TRANSACTION_TYPE = 8;
 	public static final int LIST_TRANSACTION_TYPE = 9;
+	public static final int COUNT_TRANSACTION_TYPE = 10;
 	
 	public static final int RESET_UNC_TRANSACTION_TYPE = 11;
 	public static final int ADD_UNC_TRANSACTION_TYPE = 12;
