@@ -951,6 +951,7 @@ public class Controller extends Observable {
 		Transaction transaction;
 		Message message;
 		int counter = 0;
+		long dTime = NTP.getTime();
 		
 		while (iterator.hasNext()) {
 			
@@ -959,8 +960,10 @@ public class Controller extends Observable {
 			}
 
 			transaction = map.get(iterator.next());
+			if (transaction == null)
+				break;
 			
-			if (transaction.getDeadline() < NTP.getTime()) {
+			if (transaction.getDeadline() < dTime) {
 				map.delete(transaction);
 				continue;
 			}
