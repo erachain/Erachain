@@ -37,7 +37,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 
 	private long key;
 	private String[] columnNames = Lang.getInstance()
-			.translate(new String[] { "key Asset", "Asset", "Balance A", "Balance B", "Balance C", "Balance D" });
+			.translate(new String[] { "key Asset", "Asset", "Balance A", "Balance B", "Balance C" });
 	// balances;
 	private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 	Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
