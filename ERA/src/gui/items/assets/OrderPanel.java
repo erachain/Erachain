@@ -165,12 +165,13 @@ public class OrderPanel extends JPanel
 		
 		//LABEL FROM
 		labelGBC.gridy = ++labelGBC.gridy;
-		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-		this.add(fromLabel, labelGBC);
+		//JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
+		//this.add(fromLabel, labelGBC);
 		
 		//COMBOBOX FROM
+		detailGBC.gridx = 0;
 		detailGBC.gridy = ++detailGBC.gridy;
-		detailGBC.gridwidth = 2;
+		detailGBC.gridwidth = 3;
 		this.cbxAccount = new JComboBox<Account>(new AccountsComboBoxModel());
 		this.cbxAccount.setRenderer(new AccountRenderer(this.have.getKey()));
 	// select accounts in combobox			
@@ -189,6 +190,7 @@ public class OrderPanel extends JPanel
 
 		
 		this.add(this.cbxAccount, detailGBC);
+		detailGBC.gridx = 1;
 		detailGBC.gridwidth = 1;
 		//ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
