@@ -43,7 +43,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 	Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
 	Object tab_Balances;
 	private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance;
-	private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1;
+	private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1;
 	Tuple2<Long, String> asset;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -79,8 +79,8 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 			BigDecimal sumCB = new BigDecimal(0);
 			BigDecimal sumDB = new BigDecimal(0);
 			BigDecimal sumEB = new BigDecimal(0);
-			for (Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.table_balance1) {
-				if (k.getB().getA() == i) {
+			for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k: this.table_balance1) {
+				if (k.getB().getA().b == i ) {
 
 					sumAA = sumAA.add(k.getB().getB().a.a);
 					sumBA = sumBA.add(k.getB().getB().b.a);
