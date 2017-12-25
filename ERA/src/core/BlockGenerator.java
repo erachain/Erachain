@@ -677,8 +677,8 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin;
 		
 		long start = System.currentTimeMillis();
-		// List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
-		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
+		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
+		//List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
 		long tickets = System.currentTimeMillis() - start;
 		int txCount = orderedTransactions.size();
 		long ticketsCount = System.currentTimeMillis() - tickets;
