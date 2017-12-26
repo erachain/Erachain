@@ -166,7 +166,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 		//	this.transactions.add((Transaction)message.getValue());
 			Pair<byte[], Transaction> ss = (Pair<byte[], Transaction>) message.getValue();
 			this.transactions.add(ss.getB());
-			this.fireTableRowsInserted(0, 0);			
+			this.fireTableRowsInserted(0, 0);
 			if (this.transactions.size() > MAX_ROWS) {
 				this.transactions.remove(MAX_ROWS);
 				this.fireTableDataChanged();							
@@ -176,8 +176,23 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 		{
 			//CHECK IF LIST UPDATED
 			Transaction transaction = (Transaction)message.getValue();
-			this.transactions.remove(transaction);
-			this.fireTableDataChanged();			
+			
+			int i = 0;
+			int size = this.transactions.size();
+
+			do {
+				if (Arrays.equals(transaction.getSignature(), this.transactions.get(i).getSignature())) {
+					this.transactions.remove(i);
+		
+					if (size > 10) {
+						this.fireTableRowsDeleted(i, i);
+					} else {
+						resetRows();
+					}
+
+					break;
+				}
+			} while (size < ++i);
 		}	
 		
 	}
