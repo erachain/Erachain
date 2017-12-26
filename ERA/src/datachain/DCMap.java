@@ -216,6 +216,7 @@ public abstract class DCMap<T, U> extends Observable {
 		}
 
 		this.addUses();
+
 		try {
 
 			U old = this.map.put(key, value);
@@ -227,31 +228,30 @@ public abstract class DCMap<T, U> extends Observable {
 			// COMMIT and NOTIFY if not FORKED
 			if (this.parent == null) {
 				// IT IS NOT FORK
-				if (!(this.databaseSet instanceof DWSet && Controller.getInstance().isProcessingWalletSynchronize())) {
+				if (false && !(this.databaseSet instanceof DWSet
+						&& Controller.getInstance().isProcessingWalletSynchronize())) {
 					// TODO
 					///// this.databaseSet.commit();
 				}
 
-				if (this.parent == null) {
-					// NOTIFY ADD
-					if (this.getObservableData().containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
-						this.setChanged();
-						if (this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_AT_TX_TYPE)
-								|| this.getObservableData().get(DBMap.NOTIFY_ADD)
-										.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)) {
-							this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD),
-									new Pair<T, U>(key, value)));
-						} else {
-							this.notifyObservers(
-									new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD), value));
-						}
-					}
-
-					if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
-						this.setChanged();
+				// NOTIFY ADD
+				if (this.getObservableData().containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
+					this.setChanged();
+					if (this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_AT_TX_TYPE)
+							|| this.getObservableData().get(DBMap.NOTIFY_ADD)
+									.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)) {
+						this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD),
+								new Pair<T, U>(key, value)));
+					} else {
 						this.notifyObservers(
-								new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.size()));
+								new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD), value));
 					}
+				}
+
+				if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
+					this.setChanged();
+					this.notifyObservers(
+							new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.size()));
 				}
 			}
 
