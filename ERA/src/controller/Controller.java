@@ -1704,14 +1704,12 @@ public class Controller extends Observable {
 
 	public void broadcastTransaction(Transaction transaction) {
 
-		if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-			// CREATE MESSAGE
-			Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
+		// CREATE MESSAGE
+		Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
-			// BROADCAST MESSAGE
-			List<Peer> excludes = new ArrayList<Peer>();
-			this.network.broadcast(message, excludes, true);
-		}
+		// BROADCAST MESSAGE
+		List<Peer> excludes = new ArrayList<Peer>();
+		this.network.broadcast(message, excludes, true);
 	}
 
 	// SYNCHRONIZE
