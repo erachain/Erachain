@@ -27,6 +27,7 @@ import controller.Controller;
 import core.block.Block;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import database.DBMap;
 import datachain.BlockMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
@@ -701,6 +702,7 @@ public class Synchronizer
 
 		int blockSize = 500 + (block.getDataLength(false))>>(hardFlush?0:2);
 		dcSet.getBlockMap().setProcessing(true);
+		Integer countObserv = dcSet.getTransactionMap().deleteObservableData(DBMap.NOTIFY_COUNT);
 
 		if(doOrphan)
 		{
@@ -729,6 +731,11 @@ public class Synchronizer
 				} else {
 					throw new Exception(e);					
 				}
+			} finally {
+				if (countObserv != null) {
+					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv);
+				}
+
 			}
 			
 		} else {
@@ -764,8 +771,17 @@ public class Synchronizer
 				} else {
 					throw new Exception(e);					
 				}
+			} finally {
+				if (countObserv != null) {
+					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv);
+				}
 			}
 		}
+		
+		if (countObserv != null) {
+			dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv);
+		}
+
 	}
 
 	

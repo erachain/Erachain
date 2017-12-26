@@ -59,8 +59,8 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 				this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-				this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
 			}
+			this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
 		}
 		
 	}
@@ -92,6 +92,13 @@ public class TransactionMap extends DCMap<byte[],  Transaction> implements Obser
 		});
 	}
 
+	public Integer deleteObservableData(int index) {
+		return this.observableData.remove(index);
+	}
+	public Integer setObservableData(int index, Integer data) {
+		return this.observableData.put(index, data);
+	}
+	
 	@Override
 	protected Map<byte[],  Transaction> getMap(DB database) 
 	{
