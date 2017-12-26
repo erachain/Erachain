@@ -3883,8 +3883,17 @@ function start() {
 	
 	if(params.hasOwnProperty('block'))
 	{
-		
-		asyncAjax('blockexplorer.json?block=' + params['block']+'&lang='+params['lang'], 'mainQuery');
+		var page;
+		if(params.hasOwnProperty('page') && isFinite(params['page']))
+		{
+			page = params['page'];
+		}
+		else
+		{
+			page = 1;
+		}
+
+		asyncAjax('blockexplorer.json?block=' + params['block'] + '&lang=' + params['lang'] + '&page=' + page, 'mainQuery');
 		
 		document.title = title + ' - Block - ' + params['block'];
 		

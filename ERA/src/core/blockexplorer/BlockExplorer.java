@@ -406,7 +406,12 @@ public class BlockExplorer
 			{
 				output.put("lastBlock", jsonQueryLastBlock());
 
-				output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block")));
+				int transPage = 1;
+				if (info.getQueryParameters().containsKey("page"))
+				{
+					transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
+				}
+				output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), transPage));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -565,7 +570,7 @@ public class BlockExplorer
 		Map help = new LinkedHashMap();
 
 		help.put("Unconfirmed Transactions", "blockexplorer.json?unconfirmed");
-		help.put("Block", "blockexplorer.json?block={block}");
+		help.put("Block", "blockexplorer.json?block={block}[&page={page}]");
 		help.put("Blocks List", "blockexplorer.json?blocks[&start={height}]");
 		help.put("Assets List", "blockexplorer.json?assets");
 		help.put("Assets List Lite", "blockexplorer.json?assetsLite");
@@ -2143,14 +2148,18 @@ if ( asset_1 == null) {
 		return output;
 	}	
 
-	
 	public LinkedHashMap Transactions_JSON(List<Transaction> transactions){
+		return Transactions_JSON(transactions, 0, 0);
+	}
+	
+	public LinkedHashMap Transactions_JSON(List<Transaction> transactions, int fromIndex, int toIndex){
 		
 		LinkedHashMap output = new LinkedHashMap();
 		DCSet db = DCSet.getInstance();
 		int i1 = 0;
 		LinkedHashMap transactionsJSON = new LinkedHashMap();
-		for (Transaction trans:transactions){
+		List<Transaction> transactions2 = (toIndex == 0) ? transactions : transactions.subList(fromIndex, Math.min(toIndex, transactions.size()));
+		for (Transaction trans:transactions2){
 			LinkedHashMap transactionJSON = new LinkedHashMap();
 				
 					/*
@@ -4016,7 +4025,7 @@ if ( asset_1 == null) {
 		return output;
 	}
 
-	public Map jsonQueryBlock(String query)
+	public Map jsonQueryBlock(String query, int transPage)
 	{
 		DCSet db = DCSet.getInstance();
 
@@ -4029,7 +4038,7 @@ if ( asset_1 == null) {
 
 		if(query.matches("\\d+"))
 		{
-			block = Controller.getInstance().getBlockByHeight(db, Integer.valueOf(query));
+			block = Controller.getInstance().getBlockByHeight(db, Integer.parseInt(query));
 		}
 		else if (query.equals("last"))
 		{
@@ -4047,7 +4056,9 @@ if ( asset_1 == null) {
 		}
 
 		// Transactions view
-		output.put("Transactions", Transactions_JSON(block.getTransactions()));
+		output.put("Transactions", Transactions_JSON(block.getTransactions(), (transPage - 1) * 100, transPage * 100));
+		output.put("pageCount", (int)Math.ceil((double)(block.getTransactions().size()) / 100d));
+		output.put("pageNumber", transPage);
 		
 		int txsCount = all.size();
 
