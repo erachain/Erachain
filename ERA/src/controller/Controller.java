@@ -952,12 +952,17 @@ public class Controller extends Observable {
 		Transaction transaction;
 		Message message;
 		int counter = 0;
+		int maxCount =  datachain.TransactionMap.MAX_MAP_SIZE>>2;
 		long dTime = NTP.getTime();
 		
 		while (iterator.hasNext()) {
 			
 			if (this.isStopping) {
 				return;
+			}
+
+			if (counter > maxCount) {
+				break;
 			}
 
 			transaction = map.get(iterator.next());

@@ -40,7 +40,7 @@ import database.DBMap;
 public class TransactionMap extends DCMap<byte[],  Transaction> implements Observer
 {
 	public static final int TIMESTAMP_INDEX = 1;
-	private static final int MAX_MAP_SIZE = core.BlockChain.HARD_WORK?100000:5000;
+	public static final int MAX_MAP_SIZE = core.BlockChain.HARD_WORK?100000:5000;
 	
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
