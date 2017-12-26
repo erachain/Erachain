@@ -28,6 +28,7 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public class Debug_Transactions_Table_Model extends AbstractTableModel implements Observer {
 	
+	private static final int MAX_ROWS = 1000;
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_TYPE = 1;
 	public static final int COLUMN_FEE = 2;
@@ -148,7 +149,9 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 		ObserverMessage message = (ObserverMessage) arg;
 		int type = message.getType();
 		
-		if(type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE)
+		if(type == ObserverMessage.LIST_UNC_TRANSACTION_TYPE
+				|| type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+				|| type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE)
 		{
 			//CHECK IF NEW LIST
 
@@ -164,8 +167,8 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 			Pair<byte[], Transaction> ss = (Pair<byte[], Transaction>) message.getValue();
 			this.transactions.add(ss.getB());
 			this.fireTableRowsInserted(0, 0);			
-			if (this.transactions.size() > 100) {
-				this.transactions.remove(100);
+			if (this.transactions.size() > MAX_ROWS) {
+				this.transactions.remove(MAX_ROWS);
 				this.fireTableDataChanged();							
 			}
 		}		
@@ -185,7 +188,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 		byte[] key;
 		Iterator<byte[]> iterator = map.getIterator(0, true);
 		int i = 0;
-		while (iterator.hasNext() && i++ < 100) {
+		while (iterator.hasNext() && i++ < MAX_ROWS) {
 			
 			key = iterator.next();
 			this.transactions.add(map.get(key));
