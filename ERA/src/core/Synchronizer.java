@@ -138,7 +138,11 @@ public class Synchronizer {
 					if (myWeight >= fork.getBlockSignsMap().getFullWeight()) {
 						// INVALID BLOCK THROW EXCEPTION
 						String mess = "Dishonest peer by weak FullWeight, heigh: " + heigh;
-						peer.ban(BAN_BLOCK_TIMES, mess);
+						if (cnt.getActivePeersCounter() + 4 > Settings.getInstance().getMaxConnections())
+							peer.ban(BAN_BLOCK_TIMES, mess);
+						else
+							peer.ban(BAN_BLOCK_TIMES>>3, mess);
+
 						throw new Exception(mess);
 					}
 				}
