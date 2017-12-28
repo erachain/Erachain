@@ -2169,6 +2169,8 @@ if ( asset_1 == null) {
 		for (Transaction trans:transactions2){
 			LinkedHashMap transactionJSON = new LinkedHashMap();
 				
+			trans.setDC(dcSet, false);
+			
 					/*
 					String itemName = "-";
 					Long itemKey = 0L;
