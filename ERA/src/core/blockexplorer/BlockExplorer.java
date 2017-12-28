@@ -330,6 +330,11 @@ public class BlockExplorer
 				String showOnly = "";
 				String showWithout = "";
 
+				int transPage = 1;
+				if (info.getQueryParameters().containsKey("page"))
+				{
+					transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
+				}
 				if(info.getQueryParameters().containsKey("start"))
 				{
 					start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
@@ -361,7 +366,7 @@ public class BlockExplorer
 				}
 				
 				output.put("lastBlock", jsonQueryLastBlock());
-				output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), start, txOnPage, filter, allOnOnePage, showOnly, showWithout));
+				output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), transPage, start, txOnPage, filter, allOnOnePage, showOnly, showWithout));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -2148,9 +2153,11 @@ if ( asset_1 == null) {
 		return output;
 	}	
 
+	
 	public LinkedHashMap Transactions_JSON(List<Transaction> transactions){
 		return Transactions_JSON(transactions, 0, 0);
 	}
+	
 	
 	public LinkedHashMap Transactions_JSON(List<Transaction> transactions, int fromIndex, int toIndex){
 		
@@ -2793,7 +2800,7 @@ if ( asset_1 == null) {
 	
 	
 	@SuppressWarnings({ "serial", "static-access" })
-	public Map jsonQueryAddress(List<String> addresses, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
+	public Map jsonQueryAddress(List<String> addresses, int transPage, int start, int txOnPage, String filter, boolean allOnOnePage, String showOnly, String showWithout)
 	{
 		DCSet db = DCSet.getInstance();
 		
@@ -2826,7 +2833,10 @@ if ( asset_1 == null) {
 		output.put("Balance", Balance_JSON(new Account(addresses.get(0))));
 				
 		// Transactions view
-		output.put("Transactions", Transactions_JSON(tt));
+		output.put("Transactions", Transactions_JSON(tt, (transPage - 1) * 100, transPage * 100));
+		output.put("pageCount", (int)Math.ceil((double)(tt.size()) / 100d));
+		output.put("pageNumber", transPage);
+
 		
 		output.put("type", "standardAccount");
 				

@@ -185,7 +185,7 @@ public class BlockExplorerTest {
 			List<String> listaddr = new ArrayList<>();
 			listaddr.add(addr);
 			
-			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, start, txOnPage, filter, allOnOnePage, showOnly, showWithout);
+			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, 1, start, txOnPage, filter, allOnOnePage, showOnly, showWithout);
 	
 			Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 			
