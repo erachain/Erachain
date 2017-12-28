@@ -22,6 +22,8 @@ import datachain.BlockMap;
 import datachain.ChildMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
+import network.Peer;
+import network.message.MessageFactory;
 import ntp.NTP;
 import settings.Settings;
 import utils.Pair;
@@ -364,7 +366,7 @@ public class BlockChain
 		return dcSet.getBlockMap().get(signature);
 	}
 
-	public int isNewBlockValid(DCSet dcSet, Block block) {
+	public int isNewBlockValid(DCSet dcSet, Block block, Peer peer) {
 		
 		//CHECK IF NOT GENESIS
 		if(block.getVersion() == 0 || block instanceof GenesisBlock)
@@ -400,6 +402,7 @@ public class BlockChain
 					return 4;
 				} else {
 					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> weak...");
+					peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(lastBlock));
 					return -4;
 				}
 			}

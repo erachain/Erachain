@@ -93,8 +93,8 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 	public void update(Observable arg0, Object arg1) {
 
 		// TODO Auto-generated method stub
-		if (Controller.getInstance().needUpToDate())
-			return;
+		// if (Controller.getInstance().needUpToDate())
+		// return;
 
 		ObserverMessage message = (ObserverMessage) arg1;
 
@@ -110,9 +110,10 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 				|| message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
 			counter = map.size();
 			refresh();
-		} else if (message.getType() == ObserverMessage.COUNT_UNC_TRANSACTION_TYPE) {
-			counter = (int) message.getValue();
-			refresh();
+			// } else if (message.getType() ==
+			// ObserverMessage.COUNT_UNC_TRANSACTION_TYPE) {
+			// counter = (int) message.getValue();
+			// refresh();
 		}
 	}
 

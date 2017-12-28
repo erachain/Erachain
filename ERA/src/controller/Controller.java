@@ -1377,12 +1377,16 @@ public class Controller extends Observable {
 					break;
 				}
 
-				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
+				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
 				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
 					/// NOT BAN - WATCH it
 					if (isNewWinBlockValid < -10) {
 						info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
 						banPeerOnError(message.getSender(), info);
+						return;
+					} else if (isNewWinBlockValid == -4) {
+						// reference to PARENT last block >>> weak...
+						// already - BROADCASTED to him
 						return;
 					} else if (isNewWinBlockValid < 0) {
 						if (this.network.getActivePeersCounter(false) > Settings.getInstance().getMaxConnections() - 3) {
@@ -1525,7 +1529,7 @@ public class Controller extends Observable {
 				 * }
 				 */
 
-				int isNewBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
+				int isNewBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
 				if (isNewBlockValid == 4) {
 					// fork branch! disconnect!
 					//// NOT !!! this.onDisconnect(message.getSender());

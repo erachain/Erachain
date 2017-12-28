@@ -138,7 +138,11 @@ public class Synchronizer {
 					if (myWeight >= fork.getBlockSignsMap().getFullWeight()) {
 						// INVALID BLOCK THROW EXCEPTION
 						String mess = "Dishonest peer by weak FullWeight, heigh: " + heigh;
-						peer.ban(BAN_BLOCK_TIMES, mess);
+						if (cnt.getActivePeersCounter() + 4 > Settings.getInstance().getMaxConnections())
+							peer.ban(BAN_BLOCK_TIMES, mess);
+						else
+							peer.ban(BAN_BLOCK_TIMES>>3, mess);
+
 						throw new Exception(mess);
 					}
 				}
@@ -683,10 +687,22 @@ public class Synchronizer {
 				// FARDFLUSH not use in each case - only after accumulate size
 				dcSet.flush(blockSize, false);
 
-				if (Controller.getInstance().isOnStopping())
-					throw new Exception("on stoping");
+				if (cnt.isOnStopping())
+					return;
 
-				// NOTIFY to WALLET
+			} catch (Exception e) {
+
+				if (cnt.isOnStopping()) {
+					return;
+				} else {
+					dcSet.rollback();
+					throw new Exception(e);
+				}
+			} finally {
+				if (cnt.isOnStopping()) {
+					throw new Exception("on stoping");					
+				}
+
 				if (observOn) {
 
 					if (countObserv_ADD != null) {
@@ -700,26 +716,6 @@ public class Synchronizer {
 					}
 
 					dcSet.getBlockMap().notifyOrphanChain(block);
-				}
-
-			} catch (Exception e) {
-
-				dcSet.rollback();
-
-				if (cnt.isOnStopping()) {
-					throw new Exception("on stoping");
-				} else {
-					throw new Exception(e);
-				}
-			} finally {
-				if (countObserv_ADD != null) {
-					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
-				}
-				if (countObserv_REMOVE != null) {
-					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
-				}
-				if (countObserv_COUNT != null) {
-					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
 				}
 
 			}
@@ -737,10 +733,24 @@ public class Synchronizer {
 					cnt.NotifyIncoming(block.getTransactions());
 				}
 
-				if (Controller.getInstance().isOnStopping())
-					throw new Exception("on stoping");
+				if (cnt.isOnStopping())
+					return;
 
 				// NOTIFY to WALLET
+
+			} catch (Exception e) {
+
+				if (cnt.isOnStopping()) {
+					return;
+				} else {
+					dcSet.rollback();
+					throw new Exception(e);
+				}
+			} finally {
+				if (cnt.isOnStopping()) {
+					throw new Exception("on stoping");					
+				}
+
 				if (observOn) {
 
 					if (countObserv_ADD != null) {
@@ -754,29 +764,6 @@ public class Synchronizer {
 					}
 
 					dcSet.getBlockMap().notifyProcessChain(block);
-				}
-
-			} catch (Exception e) {
-
-				if (Controller.getInstance().isOnStopping())
-					return;
-
-				dcSet.rollback();
-
-				if (cnt.isOnStopping()) {
-					throw new Exception("on stoping");
-				} else {
-					throw new Exception(e);
-				}
-			} finally {
-				if (countObserv_ADD != null) {
-					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
-				}
-				if (countObserv_REMOVE != null) {
-					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
-				}
-				if (countObserv_COUNT != null) {
-					dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_COUNT, countObserv_COUNT);
 				}
 			}
 		}
