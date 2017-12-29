@@ -1617,9 +1617,6 @@ public class Controller extends Observable {
 					if (!this.blockGenerator.addUnconfirmedTransaction(transaction) || this.isStopping)
 						return;
 
-					if (!this.isStatusOK())
-						return;
-
 					// BROADCAST
 					List<Peer> excludes = new ArrayList<Peer>();
 					excludes.add(message.getSender());

@@ -166,6 +166,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	@Override
 	public void update(Observable o, Object arg) {
+		
+		if(true)
+			return;
+		
 		ObserverMessage message = (ObserverMessage) arg;
 
 		// ON NEW BLOCK
@@ -216,15 +220,17 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 		if (!this.contains(signature)) {
 			this.getDCSet().updateUncTxCounter(1);
+			super.set(signature, transaction);
+			return false;
 		}
-
-		return super.set(signature, transaction);
+		
+		return true;
 
 	}
 
-	public void add(Transaction transaction) {
+	public boolean add(Transaction transaction) {
 
-		this.set(transaction.getSignature(), transaction);
+		return this.set(transaction.getSignature(), transaction);
 
 	}
 

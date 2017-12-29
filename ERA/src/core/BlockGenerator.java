@@ -180,9 +180,8 @@ public class BlockGenerator extends Thread implements Observer
 			return false;
 		
 		//ADD TO TRANSACTION DATABASE 
-		db.getTransactionMap().add(transaction);
+		return !db.getTransactionMap().add(transaction);
 		
-		return true;
 	}
 		
 	private List<PrivateKeyAccount> getKnownAccounts()
