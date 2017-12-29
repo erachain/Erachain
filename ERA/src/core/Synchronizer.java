@@ -142,7 +142,7 @@ public class Synchronizer {
 							peer.ban(BAN_BLOCK_TIMES, mess);
 						else
 							peer.ban(BAN_BLOCK_TIMES>>3, mess);
-
+						
 						throw new Exception(mess);
 					}
 				}
@@ -190,8 +190,6 @@ public class Synchronizer {
 		// ============ by EQUAL SIGNATURE !!!!!
 		byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
 		while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature))
-		/// while(!Arrays.equals(lastBlock.getReference(),
-		/// lastCommonBlock.getReference())) /// !!!
 		{
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
@@ -204,11 +202,8 @@ public class Synchronizer {
 				orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);
 			}
 			LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
-
-			// runedBlock = lastBlock; // FOR quick STOPPING
 			LOGGER.debug("*** synchronize - orphan block...");
 			this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
-			/// kjhjk
 			lastBlock = dcSet.getBlockMap().getLastBlock();
 		}
 
@@ -273,7 +268,6 @@ public class Synchronizer {
 			);
 		}
 
-		// IF
 		Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
 		byte[] lastCommonBlockSignature = headers.a;
 		List<byte[]> signatures = headers.b;
