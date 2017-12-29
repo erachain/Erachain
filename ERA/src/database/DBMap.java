@@ -335,7 +335,7 @@ public abstract class DBMap<T, U> extends Observable {
 		if(this.getObservableData().containsKey(NOTIFY_COUNT))
 		{
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), 0));
+			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this));
 		}
 
 		this.outUses();

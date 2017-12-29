@@ -58,8 +58,8 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		super(databaseSet, database);
 
 		if (false && databaseSet.isWithObserver()) {
-			this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_TRANSACTION_TYPE);
 			if (databaseSet.isDynamicGUI()) {
+				this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);

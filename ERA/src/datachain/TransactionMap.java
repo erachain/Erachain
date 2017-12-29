@@ -52,9 +52,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		super(databaseSet, database);
 
 		if (databaseSet.isWithObserver()) {
-			// this.observableData.put(DBMap.NOTIFY_RESET,
-			// ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
 			if (databaseSet.isDynamicGUI()) {
+				this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);

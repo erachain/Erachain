@@ -431,7 +431,7 @@ public abstract class DCMap<T, U> extends Observable {
 
 		if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), 0));
+			this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this));
 		}
 
 		this.outUses();
