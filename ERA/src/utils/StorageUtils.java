@@ -79,7 +79,7 @@ public class StorageUtils {
 	@SuppressWarnings("unchecked")
 	public static void addListPairtoJson(
 			List<Pair<String, String>> addListKeys, JSONObject json, String key) {
-		if (addListKeys != null !&& addListKeys.isEmpty()) {
+		if (addListKeys != null && !addListKeys.isEmpty()) {
 			JSONObject innerJsonObject = new JSONObject();
 
 			for (Pair<String, String> pair : addListKeys) {
