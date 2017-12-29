@@ -63,8 +63,9 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 				this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_TRANSACTION_TYPE);
+			} else {
+				this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_TRANSACTION_TYPE);
 			}
-			this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_TRANSACTION_TYPE);
 		}
 	}
 
