@@ -91,7 +91,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 			payments.add(payment.toJson());
 		}
 		
-		if(payments.size()>0) {
+		if(!payments.isEmpty()) {
 			transaction.put("payments", payments);
 		}
 		

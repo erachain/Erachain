@@ -193,7 +193,7 @@ public class BlockGenerator extends Thread implements Observer
 			List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
 			
 			//IF ACCOUNTS EXISTS
-			if(privateKeyAccounts.size() > 0)
+			if(!privateKeyAccounts.isEmpty())
 			{
 				//CACHE ACCOUNTS
 				this.cachedAccounts = privateKeyAccounts;
@@ -820,7 +820,7 @@ public class BlockGenerator extends Thread implements Observer
 	public void syncForgingStatus()
 	{
 		
-		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().size() == 0) {
+		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().isEmpty()) {
 			setForgingStatus(ForgingStatus.FORGING_DISABLED);
 			return;
 		}

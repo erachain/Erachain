@@ -421,9 +421,9 @@ public class Peer extends Thread{
 		
 		/*
 		Message message = MessageFactory.getInstance().createGetHWeightMessage();
-		while (this.messages.size() > 0) {
+		while (!this.messages.isEmpty()) {
 			for(int item: this.messages.keySet()) {
-				if (this.messages.get(item).size() == 0) {
+				if (this.messages.get(item).isEmpty()) {
 					this.messages.get(item).add(message);
 				}
 				break;

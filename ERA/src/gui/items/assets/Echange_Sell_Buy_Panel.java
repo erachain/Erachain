@@ -186,7 +186,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 		JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
 		trades.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(sellOrdersTableModel.getSortableList().size()==0)return;
+				if(sellOrdersTableModel.getSortableList().isEmpty())return;
 				
 				int row = sellOrdersTable.getSelectedRow();
 				if (row <0) return;
@@ -200,7 +200,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 		JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
 		cancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(sellOrdersTableModel.getSortableList().size()==0)return;
+				if(sellOrdersTableModel.getSortableList().isEmpty())return;
 				int row = sellOrdersTable.getSelectedRow();
 				if (row <0) return;
 				int row1 = sellOrdersTable.convertRowIndexToModel(row);
@@ -289,7 +289,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 		buyTrades.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SortableList<BigInteger, Order> sl = buyOrdersTableModel.getSortableList();
-				if (sl.size()==0) return;
+				if (sl.isEmpty()) return;
 				
 				int row = buyOrdersTable.getSelectedRow();
 				if (row <0) return;
@@ -304,7 +304,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 		buyCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				SortableList<BigInteger, Order> sl = buyOrdersTableModel.getSortableList();
-				if (sl.size()==0) return;
+				if (sl.isEmpty()) return;
 				int row = buyOrdersTable.getSelectedRow();
 				if (row <0) return;
 				row = buyOrdersTable.convertRowIndexToModel(row);

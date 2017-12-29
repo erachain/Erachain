@@ -142,7 +142,7 @@ public class AT_Constants {
 	}
 	
 	public int MAX_PAYLOAD_FOR_BLOCK( int height ){
-		//if (MAX_PAYLOAD_FOR_BLOCK.size() == 0) return 0;
+		//if (MAX_PAYLOAD_FOR_BLOCK.isEmpty()) return 0;
 		return MAX_PAYLOAD_FOR_BLOCK.get( AT_VERSION( height ) );
 	}
 

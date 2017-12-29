@@ -417,10 +417,10 @@ public class Synchronizer {
 	 * peer) throws Exception { //ASK NEXT 500 HEADERS SINCE START byte[]
 	 * startSignature = start.getSignature(); List<byte[]> headers =
 	 * this.getBlockSignatures(startSignature, peer); List<byte[]> nextHeaders;
-	 * if(headers.size() > 0 && headers.size() < amount) { do { nextHeaders =
+	 * if(!headers.isEmpty() && headers.size() < amount) { do { nextHeaders =
 	 * this.getBlockSignatures(headers.get(headers.size()-1), peer);
 	 * headers.addAll(nextHeaders); } while(headers.size() < amount &&
-	 * nextHeaders.size() > 0); }
+	 * !nextHeaders.isEmpty()); }
 	 * 
 	 * return headers; }
 	 */
@@ -474,7 +474,7 @@ public class Synchronizer {
 			byte[] signCheck = dcSet.getBlockHeightsMap().get(checkPointHeight);
 
 			List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
-			if (headersCheck.size() == 0) {
+			if (headersCheck.isEmpty()) {
 				String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> not found";
 				peer.ban(BAN_BLOCK_TIMES, mess);
 				throw new Exception(mess);

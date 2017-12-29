@@ -143,7 +143,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	public Object getValueAt(int row, int column) 
 	{
 		
-		if (transactions_Asset.size() == 0) return null;
+		if (transactions_Asset.isEmpty()) return null;
 		
 	/*	if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
 		{

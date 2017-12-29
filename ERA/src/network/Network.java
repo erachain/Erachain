@@ -616,7 +616,7 @@ public class Network extends Observable implements ConnectionCallback {
 	{
 		this.run = false;
 		this.onMessage(null);
-		while (this.knownPeers.size() > 0) {
+		while (!this.knownPeers.isEmpty()) {
 			try {
 				this.knownPeers.get(0).close();
 				this.knownPeers.remove(0); // icreator

@@ -1006,7 +1006,7 @@ public class API {
 		else
 		{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
-		if (addresses.size() == 0){
+		if (addresses.isEmpty()){
 			out.put("null", "null");
 		}else{
 		Set<String> ad = addresses.keySet();
@@ -1448,7 +1448,7 @@ public class API {
 						}
 					}
 					
-				if (ansver.size()== 0) {
+				if (ansver.isEmpty()) {
 					
 					ansver.put("Error", "Public Key Not Found");
 				}

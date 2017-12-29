@@ -190,7 +190,7 @@ public class PersonConfirmDialog extends JDialog  {
 	    	if (userAccount3.isValid()) sertifiedPublicKeys.add(userAccount3);
 	    }
 
-		if (sertifiedPublicKeys.size() == 0 ) {
+		if (sertifiedPublicKeys.isEmpty()) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Nothing to personalize"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			
 			Button_Confirm.setEnabled(true);

@@ -128,7 +128,7 @@ public class Lang {
 			langJsonObject = new JSONObject();
 		}
 
-		if( langJsonObject.size() == 0 ) {
+		if( langJsonObject.isEmpty() ) {
 			LOGGER.error("ERROR reading language file " + filename + ".");	
 		}
 				
@@ -150,7 +150,7 @@ public class Lang {
         		try {
 					LOGGER.debug("try lang file: " + fileList.get(i));	
         			JSONObject langFile = openLangFile(fileList.get(i));
-        			if (langFile.size() == 0)
+        			if (langFile.isEmpty())
         				continue;
         			
         			String lang_name = (String)langFile.get("_lang_name_");
@@ -185,7 +185,7 @@ public class Lang {
         		try {
 					LOGGER.debug("try lang file: " + fileList.get(i));	
 					JSONObject langFile = openLangFile(fileList.get(i));
-        			if (langFile.size() == 0)
+        			if (langFile.isEmpty())
         				continue;
         			
         			lngList.add( new Tuple2<String, String>(fileList.get(i).replaceAll(".json", ""), (String)langFile.get("_lang_name_") ));

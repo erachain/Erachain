@@ -251,7 +251,7 @@ public abstract class DCMap<T, U> extends Observable {
 				if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
 					this.setChanged();
 					this.notifyObservers(
-							new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.size()));
+							new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
 				}
 			}
 
@@ -301,7 +301,7 @@ public abstract class DCMap<T, U> extends Observable {
 			if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
 				this.setChanged();
 				this.notifyObservers(
-						new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.size()));
+						new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
 			}
 
 		}
@@ -359,7 +359,7 @@ public abstract class DCMap<T, U> extends Observable {
 		if (this.getObservableData().containsKey(DBMap.NOTIFY_COUNT)) {
 			this.setChanged();
 			this.notifyObservers(
-					new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this.map.size()));
+					new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_COUNT), this)); /// SLOW .size()));
 		}
 
 		this.outUses();

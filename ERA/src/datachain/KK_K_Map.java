@@ -138,7 +138,7 @@ public class KK_K_Map extends DCMap<
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(itemKey);
 
 		//stack.elementAt()
-		return stack != null? stack.size()> 0? stack.peek(): null : null;
+		return stack != null? !stack.isEmpty()? stack.peek(): null : null;
 	}
 	
 	// remove only last item from stack for this key of itemKey
@@ -159,7 +159,7 @@ public class KK_K_Map extends DCMap<
 		}
 
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(itemKey);
-		if (stack==null || stack.size() == 0) return;
+		if (stack==null || stack.isEmpty()) return;
 
 		if (this.parent == null) {
 			stack.pop();

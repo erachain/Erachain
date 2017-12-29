@@ -552,7 +552,7 @@ public class Controller extends Observable {
 			about_frame.set_console_Text(Lang.getInstance().translate("Wallet OK"));
 
 		if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
-				&& this.wallet.getAccounts().size() > 0) {
+				&& !this.wallet.getAccounts().isEmpty()) {
 			this.wallet.synchronize(true);
 		}
 
@@ -1203,7 +1203,7 @@ public class Controller extends Observable {
 
 			this.peersVersions.remove(peer);
 
-			if (this.peerHWeight.size() == 0) {
+			if (this.peerHWeight.isEmpty()) {
 
 				if (this.getToOfflineTime() == 0L) {
 					// SET START OFFLINE TIME
@@ -1294,7 +1294,7 @@ public class Controller extends Observable {
 				 * " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
 				 * + Base58.encode(getHeadersMessage.getParent()));
 				 * 
-				 * if (headers.size() > 0) {
+				 * if (!headers.isEmpty()) {
 				 * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
 				 * Base58.encode( headers.get(0) )); LOGGER.
 				 * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
@@ -1733,7 +1733,7 @@ public class Controller extends Observable {
 			return true;
 		}
 
-		if (this.peerHWeight.size() == 0) {
+		if (this.peerHWeight.isEmpty()) {
 			this.status = STATUS_NO_CONNECTIONS;
 			return true;
 		}
@@ -1807,7 +1807,7 @@ public class Controller extends Observable {
 	public boolean isReadyForging() {
 
 		/*
-		 * if (this.peerHWeight.size() == 0) { return false; }
+		 * if (this.peerHWeight.isEmpty()) { return false; }
 		 * 
 		 * if (true) { int maxPeerHeight = this.getMaxPeerHWeight().a; int
 		 * chainHeight = this.blockChain.getHWeight(dcSet, false).a; int diff =
@@ -1915,7 +1915,7 @@ public class Controller extends Observable {
 
 		} while (!this.isStopping && !isUpToDate);
 
-		if (this.peerHWeight.size() == 0 || peer == null) {
+		if (this.peerHWeight.isEmpty() || peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
 			// } else if (!this.isUpToDate()) {

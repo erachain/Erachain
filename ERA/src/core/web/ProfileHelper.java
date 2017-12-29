@@ -24,7 +24,7 @@ public class ProfileHelper {
 
 	public ProfileHelper() {
 		List<Profile> enabledProfiles = Profile.getEnabledProfiles();
-		if (enabledProfiles.size() > 0) {
+		if (!enabledProfiles.isEmpty()) {
 			currentProfile = enabledProfiles.get(0);
 		}
 	}

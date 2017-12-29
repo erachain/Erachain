@@ -993,7 +993,7 @@ if ( asset_1 == null) {
 
 		List<Poll> pools = new ArrayList< Poll > (DCSet.getInstance().getPollMap().getValuesAll());
 
-		if(pools.size() == 0)
+		if(pools.isEmpty())
 		{
 			output.put("error", "There is no Polls.");
 			return output;

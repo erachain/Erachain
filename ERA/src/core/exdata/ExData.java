@@ -74,7 +74,7 @@ public class ExData {
 		byte[] JSON_Bytes ;
 		byte[] size_Json;
 		
-		if (files == null || files.size() == 0){
+		if (files == null || files.isEmpty()){
 			JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
 			// convert int to byte
 			size_Json = ByteBuffer.allocate(DATA_JSON_PART_LENGTH).putInt( JSON_Bytes.length).array();
@@ -256,14 +256,14 @@ public class ExData {
 			params_Map.put( key1.getKey(), key1.getValue());
 		}
 		}
-		if (params_Map.size()>0) out_Map.put("PR", params_Map);
+		if (!params_Map.isEmpty()) out_Map.put("PR", params_Map);
 // add hashes			
 		Iterator<Entry<String, String>> it_Hash = hashes_Map.entrySet().iterator();
 		while (it_Hash.hasNext()){
 			Entry<String, String> hash = it_Hash.next();
 			hashes_JSON.put(hash.getKey(),hash.getValue());
 		}
-		if (hashes_JSON.size()>0) out_Map.put("HS", hashes_JSON);
+		if (!hashes_JSON.isEmpty()) out_Map.put("HS", hashes_JSON);
 		
 // add Message		
 		if (message.length()>0)	out_Map.put("MS", message);

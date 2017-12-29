@@ -264,7 +264,7 @@ public  class WEB_PersonStatusesModel extends  AbstractTableModel implements Obs
 
 		for ( long statusKey: statuses.keySet()) {
 			Stack<Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statuses.get(statusKey);
-			if (statusStack == null || statusStack.size() == 0) {
+			if (statusStack == null || statusStack.isEmpty()) {
 				return;
 			}
 			

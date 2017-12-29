@@ -206,7 +206,7 @@ public class API_TransactionsResource {
 		TransactionsTableModel a = new TransactionsTableModel();
 		a.setBlockNumber(block);
 		result = a.getTransactions();
-		if (result == null || result.size() == 0) {
+		if (result == null || result.isEmpty()) {
 
 			ff.put("message", "null");
 			return ff.toJSONString();

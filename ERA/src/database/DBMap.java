@@ -176,7 +176,7 @@ public abstract class DBMap<T, U> extends Observable {
 			if(this.getObservableData().containsKey(NOTIFY_COUNT))
 			{
 				this.setChanged();
-				this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this.map.size()));
+				this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
 			}
 			
 			this.outUses();
@@ -212,7 +212,7 @@ public abstract class DBMap<T, U> extends Observable {
 				if(this.getObservableData().containsKey(NOTIFY_COUNT))
 				{
 					this.setChanged();
-					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this.map.size()));
+					this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
 				}
 
 			}
@@ -264,7 +264,7 @@ public abstract class DBMap<T, U> extends Observable {
 		if(this.getObservableData().containsKey(NOTIFY_COUNT))
 		{
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this.map.size()));
+			this.notifyObservers(new ObserverMessage(this.getObservableData().get(NOTIFY_COUNT), this)); /// SLOW .size()));
 		}
 
 		this.outUses();

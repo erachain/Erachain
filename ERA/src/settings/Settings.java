@@ -314,7 +314,7 @@ public class Settings {
 			
 			knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 			
-			if(!core.BlockChain.DEVELOP_USE && (knownPeers.size() == 0 || loadPeersFromInternet))
+			if(!core.BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet))
 			{
 				knownPeers.addAll(getKnownPeersFromInternet());
 			}
@@ -337,7 +337,7 @@ public class Settings {
 				this.cacheInternetPeers = new ArrayList<Peer>();
 			}
 				
-			if(this.cacheInternetPeers.size() == 0 || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
+			if(this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
 			{
 				this.timeLoadInternetPeers = NTP.getTime();
 				URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");

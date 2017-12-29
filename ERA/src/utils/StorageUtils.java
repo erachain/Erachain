@@ -54,7 +54,7 @@ public class StorageUtils {
 
 		addListPairtoJson(addCompleteKeys, json, ADD_COMPLETE_KEY);
 
-		if (removeCompleteKeys != null && removeCompleteKeys.size() > 0) {
+		if (removeCompleteKeys != null && !removeCompleteKeys.isEmpty()) {
 			JSONObject jsonRemoveComplete = new JSONObject();
 
 			for (String key : removeCompleteKeys) {
@@ -79,7 +79,7 @@ public class StorageUtils {
 	@SuppressWarnings("unchecked")
 	public static void addListPairtoJson(
 			List<Pair<String, String>> addListKeys, JSONObject json, String key) {
-		if (addListKeys != null && addListKeys.size() > 0) {
+		if (addListKeys != null !&& addListKeys.isEmpty()) {
 			JSONObject innerJsonObject = new JSONObject();
 
 			for (Pair<String, String> pair : addListKeys) {

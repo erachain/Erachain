@@ -166,7 +166,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	@Override
 	public Object getValueAt(int row, int column) {
 		// if(this.r_Trans == null || row > this.r_Trans.size() - 1 ||
-		// this.r_Trans.size() == 0 )
+		// this.r_Trans.isEmpty() )
 		// {
 		// return null;
 		// }
@@ -327,7 +327,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-			if (this.r_Trans.size() == 0) {
+			if (this.r_Trans.isEmpty()) {
 				ss = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
 				//ss.registerObserver();
 				Controller.getInstance().wallet.database.getTransactionMap().addObserver(ss);
@@ -396,7 +396,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				trr.ammount = tttt.getAmount();
 	//if send for *-1
 				// view all types
-				if (actionTypes == null || actionTypes.size() == 0 ){
+				if (actionTypes == null || actionTypes.isEmpty() ){
 				
 				if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
 					trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));
@@ -445,7 +445,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				trr.recipient = ttt1.getRecipient();
 					
 				// view all types					
-				if (actionTypes == null || actionTypes.size() == 0 ){
+				if (actionTypes == null || actionTypes.isEmpty() ){
 			
 				trans_Hash_Map.put(ttt.viewSignature(), trr);
 				return;

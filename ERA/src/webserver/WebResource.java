@@ -391,7 +391,7 @@ public class WebResource {
 				}
 			}
 
-			if (namesAsList.size() > 0) {
+			if (!namesAsList.isEmpty()) {
 
 				if (name == null) {
 					Profile activeProfileOpt = ProfileHelper.getInstance()
@@ -479,7 +479,7 @@ public class WebResource {
 					List<Name> namesAsList = new CopyOnWriteArrayList<Name>(
 							Controller.getInstance().getNamesAsList());
 
-					if (namesAsList.size() > 0) {
+					if (!namesAsList.isEmpty()) {
 						name = namesAsList.get(0).getName();
 					}
 				}
@@ -935,7 +935,7 @@ public class WebResource {
 			name = Controller.getInstance().getName(profileName);
 		}
 
-		if (namesAsList.size() > 0) {
+		if (!namesAsList.isEmpty()) {
 
 			if (name == null) {
 				Profile activeProfileOpt = ProfileHelper.getInstance()
@@ -1073,7 +1073,7 @@ public class WebResource {
 	public static String selectFirstElementOpt(Document htmlDoc, String tag) {
 		Elements titleElements = htmlDoc.select(tag);
 		String title = null;
-		if (titleElements.size() > 0) {
+		if (!titleElements.isEmpty()) {
 			title = titleElements.get(0).text();
 		}
 		return title;
@@ -1082,7 +1082,7 @@ public class WebResource {
 	public static String selectDescriptionOpt(Document htmlDoc) {
 		String result = "";
 		Elements descriptions = htmlDoc.select("meta[name=\"description\"]");
-		if (descriptions.size() > 0) {
+		if (!descriptions.isEmpty()) {
 			Element descr = descriptions.get(0);
 			if (descr.hasAttr("content")) {
 				result = descr.attr("content");
@@ -1587,7 +1587,7 @@ public class WebResource {
 			}
 
 			// are we allowed to post
-			if (resultingNames.size() == 0 && resultingAccounts.size() == 0) {
+			if (resultingNames.isEmpty() && resultingAccounts.isEmpty()) {
 
 				pebbleHelper
 						.getContextMap()
@@ -1664,7 +1664,7 @@ public class WebResource {
 			}
 
 			// are we allowed to post
-			if (resultingNames.size() == 0 && resultingAccounts.size() == 0) {
+			if (resultingNames.isEmpty() && resultingAccounts.isEmpty()) {
 
 				pebbleHelper
 						.getContextMap()
