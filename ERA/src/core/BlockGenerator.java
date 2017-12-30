@@ -371,6 +371,8 @@ public class BlockGenerator extends Thread implements Observer
 						height = bchain.getHeight(dcSet) + 1;
 						target = bchain.getTarget(dcSet);
 		
+						///if (height > BlockChain.BLOCK_COUNT) return;
+
 						//PREVENT CONCURRENT MODIFY EXCEPTION
 						List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 						synchronized(knownAccounts)
