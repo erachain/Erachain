@@ -945,6 +945,8 @@ public class Controller extends Observable {
 
 	public void broadcastUnconfirmedToPeer(Peer peer) {
 		
+		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
+
 		byte[] peerByte = peer.getAddress().getAddress();
 
 		TransactionMap map = this.dcSet.getTransactionMap();
@@ -981,6 +983,10 @@ public class Controller extends Observable {
 
 			message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
+			if (!peer.isUsed()) {
+				break;
+			}
+
 			try {
 				if (peer.sendMessage(message)) {
 					counter++;
@@ -995,7 +1001,7 @@ public class Controller extends Observable {
 
 		}
 		
-		LOGGER.info(" sended UNCONFIRMED  counter: " + counter + " - " + peer.getAddress().getHostName());
+		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED  counter: " + counter);
 
 	}
 
@@ -1101,12 +1107,6 @@ public class Controller extends Observable {
 		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
 			return;
 
-		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-		if (this.isStopping)
-			return;
-		
-		this.broadcastUnconfirmedToPeer(peer);
-
 		// GET CURRENT WIN BLOCK
 		Block winBlock = this.blockChain.getWaitWinBuffer();
 		if (winBlock != null) {
@@ -1135,6 +1135,7 @@ public class Controller extends Observable {
 			this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
 
 		}
+		
 	}
 
 	public void actionAfterConnect() {
@@ -1287,7 +1288,12 @@ public class Controller extends Observable {
 				GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
 
 				// ASK SIGNATURES FROM BLOCKCHAIN
+				long time1 = System.currentTimeMillis();
 				List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
+				LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: " + (System.currentTimeMillis() - time1)
+						+ " for headers: " + headers.size()
+						+ " from Height: " + (headers.isEmpty()?"-1":
+							this.blockChain.getBlock(dcSet, headers.get(0)).getHeight(dcSet)));
 
 				/*
 				 * LOGGER.error(message.getId() +
@@ -1607,23 +1613,25 @@ public class Controller extends Observable {
 					return;
 				}
 
-				// CHECK IF TRANSACTION HAS MINIMUM FEE AND MINIMUM FEE PER BYTE
 				// AND UNCONFIRMED
 				// TODO fee
 				// transaction.calcFee();
-				if (!this.dcSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature())
-						&& !this.dcSet.getTransactionMap().contains(transaction.getSignature())) {
-					// ADD TO UNCONFIRMED TRANSACTIONS
-					if (!this.blockGenerator.addUnconfirmedTransaction(transaction) || this.isStopping)
-						return;
+				byte[] signature = transaction.getSignature();
+				if (this.dcSet.getTransactionMap().contains(signature)
+						|| this.dcSet.getTransactionRef_BlockRef_Map().contains(signature)
+						|| this.isStopping)
+					return;
+				
+				// ADD TO UNCONFIRMED TRANSACTIONS
+				if (!this.blockGenerator.addUnconfirmedTransaction(this.dcSet, transaction))
+					return;
 
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes, true);
-				}
+				// BROADCAST
+				List<Peer> excludes = new ArrayList<Peer>();
+				excludes.add(message.getSender());
+				this.network.broadcast(message, excludes, false);
 
-				break;
+				return;
 
 			case Message.VERSION_TYPE:
 

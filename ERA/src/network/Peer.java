@@ -99,7 +99,9 @@ public class Peer extends Thread{
 			//LOGGER.error(e.getMessage(), e);
 
 		}
-		
+						
+		this.runed = true;
+
 		if (this.pinger == null) {
 
 			//START COMMUNICATON THREAD
@@ -113,15 +115,6 @@ public class Peer extends Thread{
 		} else {
 			// already started
 			this.callback.onConnect(this, false);
-		}
-		
-		this.runed = true;
-
-		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-		if(!Controller.getInstance().isOnStopping()){
-		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions();
-		if (transactions != null && !transactions.isEmpty())
-			this.callback.broadcastUnconfirmedToPeer(transactions, this);
 		}
 
 	}
@@ -200,11 +193,15 @@ public class Peer extends Thread{
 				this.pinger = new Pinger(this);
 			else
 				this.pinger.setPing(Integer.MAX_VALUE);
-			
+
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, true);
 
+			// IT is STARTED
 			this.runed = true;
+
+			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+			Controller.getInstance().broadcastUnconfirmedToPeer(this);
 
 			//LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 			
@@ -278,9 +275,13 @@ public class Peer extends Thread{
 				// already started
 				this.callback.onConnect(this, false);
 			}
-
-			this.runed = true;
 						
+			// IT is STARTED
+			this.runed = true;
+
+			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+			Controller.getInstance().broadcastUnconfirmedToPeer(this);
+
 			//LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
 
 		}
@@ -328,14 +329,16 @@ public class Peer extends Thread{
 			//CREATE STRINGWRITER
 			this.out = socket.getOutputStream();
 									
+			this.pinger.setPing(Integer.MAX_VALUE);
+						
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, false);			
 
-			this.pinger.setPing(Integer.MAX_VALUE);
-
+			// IT is STARTED
 			this.runed = true;
-						
-			//LOGGER.debug("@@@ reconnect(socket) : " + socket.getInetAddress().getHostAddress());
+
+			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+			Controller.getInstance().broadcastUnconfirmedToPeer(this);
 
 		}
 		catch(Exception e)

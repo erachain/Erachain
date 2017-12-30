@@ -218,13 +218,13 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 			} while (item.getDeadline() < dTime && iterator.hasNext());
 		}
 
-		if (!this.contains(signature)) {
-			this.getDCSet().updateUncTxCounter(1);
-			super.set(signature, transaction);
-			return false;
+		if (this.map.containsKey(signature)) {
+			return true;
 		}
 		
-		return true;
+		this.getDCSet().updateUncTxCounter(1);
+		
+		return super.set(signature, transaction);		
 
 	}
 
@@ -250,8 +250,6 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 		if (peers.add(peer))
 			this.peersBroadcasted.put(signature, peers);
-		peers = null;
-		signature = null;
 	}
 
 	public List<Transaction> getTransactions(int from, int count, boolean descending) {

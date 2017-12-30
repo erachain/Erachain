@@ -448,7 +448,7 @@ public class BlockGenerator extends Thread implements Observer
 				
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
-														
+										
 								generatedBlock = null;
 								try {
 									generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
@@ -572,26 +572,46 @@ public class BlockGenerator extends Thread implements Observer
 					
 					if (peer != null) {
 						
-						 if (bchain.getHeight(dcSet) > 1) {
-						
-							SignaturesMessage response;
-							try {
-								response = (SignaturesMessage) peer.getResponse(
-										MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
-										30000);
-							} catch (java.lang.ClassCastException e) {
-								peer.ban(1, "Cannot retrieve headers");
-								throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			
-							}
+						Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+						if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
+							
+							if (bchain.getHeight(dcSet) > 1) {
 	
-							if (response == null) {
-								ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-							}
-						 } else {
-							 if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
-								 continue;
-						 }
-
+								LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer);
+	 
+								SignaturesMessage response;
+								try {
+									try
+									{
+										Thread.sleep(1000);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+	
+									response = (SignaturesMessage) peer.getResponse(
+											MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
+											30000);
+								} catch (java.lang.ClassCastException e) {
+									peer.ban(1, "Cannot retrieve headers - from UPDATE");
+									throw new Exception("Failed to communicate with peer (retrieve headers) - response = null - from UPDATE");			
+								}
+		
+								if (response != null) {
+									List<byte[]> headers = response.getSignatures();
+									byte[] header = headers.get(0);
+									byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+									if (!Arrays.equals(header, lastSignature)) {
+										ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+									} else if (headers.size() == 1) {
+										ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+									}
+								}
+							 } else {
+								 if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
+									 continue;
+							 }
+						}
 					}
 				} else { 
 					shift_height = 0;
