@@ -449,8 +449,14 @@ public class BlockGenerator extends Thread implements Observer
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
 														
-								generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
+								generatedBlock = null;
+								try {
+									generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
 										getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
+								} catch (java.lang.OutOfMemoryError e) {
+									// TRY CATCH OUTofMemory error - heap space
+									LOGGER.error(e.getMessage(), e);									
+								}
 					
 								solvingBlock = null;
 									
@@ -458,7 +464,17 @@ public class BlockGenerator extends Thread implements Observer
 									if (ctrl.isOnStopping()) {
 										return;
 									}
-									LOGGER.info("my BLOCK is weak ((...");
+									
+									LOGGER.error("generateNextBlock is NULL... try wait");
+									try
+									{
+										Thread.sleep(10000);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+
+									continue;
 								} else {
 									
 									//PASS BLOCK TO CONTROLLER
