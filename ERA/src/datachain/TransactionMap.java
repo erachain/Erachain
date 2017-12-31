@@ -269,19 +269,28 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		return values;
 	}
 
+	public boolean needBroadcasting(Transaction transaction, byte[] peerBYtes) {
+
+		byte[] signature = transaction.getSignature();
+		List<byte[]> peers = this.peersBroadcasted.get(signature);
+		if (peers == null || peers.isEmpty()
+				|| (!peers.contains(peerBYtes) && peers.size() < 4)) {
+			return true;
+		}
+
+		return false;
+
+	}
+
 	// HOW many PEERS broadcasted by this TRANSACTION
 	public int getBroadcasts(Transaction transaction) {
 
 		byte[] signature = transaction.getSignature();
-		if (!this.peersBroadcasted.containsKey(signature)) {
+		List<byte[]> peers = this.peersBroadcasted.get(signature);
+		if (peers == null || peers.isEmpty())
 			return 0;
-		} else {
-			List<byte[]> peers = this.peersBroadcasted.get(signature);
-			if (peers == null || peers.isEmpty())
-				return 0;
-
-			return peers.size();
-		}
+		
+		return peers.size();
 
 	}
 

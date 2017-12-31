@@ -988,7 +988,7 @@ public class Controller extends Observable {
 
 			//LOGGER.error(" time " + transaction.viewTimestamp());
 
-			if (map.isBroadcastedToPeer(transaction, peerByte) || map.getBroadcasts(transaction) > 2)
+			if (!map.needBroadcasting(transaction, peerByte))
 				continue;
 
 			message = MessageFactory.getInstance().createTransactionMessage(transaction);
