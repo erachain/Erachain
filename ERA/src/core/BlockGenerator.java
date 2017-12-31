@@ -570,12 +570,12 @@ public class BlockGenerator extends Thread implements Observer
 						peer = maxPeer.c;
 					}
 					
-					if (peer != null) {
+					if (peer != null && ctrl.getActivePeersCounter() > 3) {
 						
 						Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-						if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
+						if (myHW.a < maxPeer.a || myHW.b <= maxPeer.b) {
 							
-							if (bchain.getHeight(dcSet) > 1) {
+							if (myHW.a > 1) {
 	
 								LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer);
 	 
@@ -589,9 +589,9 @@ public class BlockGenerator extends Thread implements Observer
 									{
 									}
 	
+									byte[] prevSignature = dcSet.getBlockHeightsMap().get(myHW.a - 1);
 									response = (SignaturesMessage) peer.getResponse(
-											MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
-											30000);
+											MessageFactory.getInstance().createGetHeadersMessage(prevSignature), 30000);
 								} catch (java.lang.ClassCastException e) {
 									peer.ban(1, "Cannot retrieve headers - from UPDATE");
 									throw new Exception("Failed to communicate with peer (retrieve headers) - response = null - from UPDATE");			
@@ -599,12 +599,22 @@ public class BlockGenerator extends Thread implements Observer
 		
 								if (response != null) {
 									List<byte[]> headers = response.getSignatures();
-									byte[] header = headers.get(0);
 									byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-									if (!Arrays.equals(header, lastSignature)) {
-										ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-									} else if (headers.size() == 1) {
-										ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+									int headersSize = headers.size();
+									if (headersSize == 2) {
+										if (Arrays.equals(headers.get(1), lastSignature)) {
+											ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+											try
+											{
+												Thread.sleep(15000);
+											}
+											catch (InterruptedException e) 
+											{
+											}
+											continue;
+										} else {
+											ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+										} 
 									}
 								}
 							 } else {
@@ -614,7 +624,7 @@ public class BlockGenerator extends Thread implements Observer
 						}
 					}
 				} else { 
-					shift_height = 0;
+					//shift_height = 0;
 				}
 
 				/// CHECK PEERS HIGHER 
