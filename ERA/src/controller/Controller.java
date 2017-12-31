@@ -957,25 +957,14 @@ public class Controller extends Observable {
 		Transaction transaction;
 		Message message;
 		int counter = 0;
-		int maxCount = datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		///////// big maxCounter freeze network and make bans on response headers and blocks
+		int maxCount = 100; //datachain.TransactionMap.MAX_MAP_SIZE>>2;
 		long dTime = NTP.getTime();
 		
-		while (iterator.hasNext()) {
+		while (iterator.hasNext() && counter < maxCount && peer.isUsed()) {
 			
-			if (counter % 500 == 0) {
-				// NEED WAIT for rest NETWORK and prevent a bans
-				try {
-					Thread.sleep(10000);
-				} catch (InterruptedException e) {
-				}
-				break;
-			}
 			if (this.isStopping) {
 				return;
-			}
-
-			if (counter > maxCount || !peer.isUsed()) {
-				break;
 			}
 
 			transaction = map.get(iterator.next());
