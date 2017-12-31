@@ -962,12 +962,13 @@ public class Controller extends Observable {
 		
 		while (iterator.hasNext()) {
 			
-			if (counter % 100 == 0) {
+			if (counter % 500 == 0) {
 				// NEED WAIT for rest NETWORK and prevent a bans
 				try {
 					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 				}
+				break;
 			}
 			if (this.isStopping) {
 				return;

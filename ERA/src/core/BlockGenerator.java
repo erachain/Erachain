@@ -615,6 +615,8 @@ public class BlockGenerator extends Thread implements Observer
 										} else {
 											ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
 										} 
+									} else if (headersSize < 2 ) {
+										ctrl.orphanInPipe(bchain.getLastBlock(dcSet));										
 									}
 								}
 							 } else {
