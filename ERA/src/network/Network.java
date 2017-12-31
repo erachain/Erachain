@@ -283,6 +283,7 @@ public class Network extends Observable implements ConnectionCallback {
 				if(this.handledMessages.size() > MAX_HANDLED_MESSAGES_SIZE)
 				{
 					this.handledMessages.remove(this.handledMessages.first());
+					LOGGER.error("handledMessages size OVERHEAT! "); 
 				}
 				
 				this.handledMessages.add(hash);

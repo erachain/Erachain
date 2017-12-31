@@ -335,9 +335,6 @@ public class Peer extends Thread{
 			this.runed = true;
 			this.pinger.initConnection();
 
-			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			Controller.getInstance().broadcastUnconfirmedToPeer(this);
-
 		}
 		catch(Exception e)
 		{
@@ -694,8 +691,14 @@ public class Peer extends Thread{
 			this.requestKey = 1;
 		}
 		
+		long counter = 0;
 		while (this.messages.containsKey(this.requestKey)) {
 			this.requestKey +=1;
+			counter++;
+		}
+		
+		if (counter > 100) {
+			LOGGER.error("getResponseKey find counter: " + counter); 
 		}
 		
 		return this.requestKey;

@@ -957,7 +957,9 @@ public class Controller extends Observable {
 		Transaction transaction;
 		Message message;
 		int counter = 0;
-		int maxCount =  datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		///////// big maxCounter freeze network and make bans on response headers and blocks
+		/////////datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		int maxCount = 100;
 		long dTime = NTP.getTime();
 		
 		while (iterator.hasNext()) {

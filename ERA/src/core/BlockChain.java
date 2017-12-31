@@ -50,7 +50,7 @@ public class BlockChain
 	public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK?2:1;
 	
 	public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
-	public static final int SYNCHRONIZE_PACKET = 1000; // when synchronize - get blocks packet by transactions
+	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
