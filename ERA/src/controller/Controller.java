@@ -957,24 +957,29 @@ public class Controller extends Observable {
 		Transaction transaction;
 		Message message;
 		int counter = 0;
-		///////// big maxCounter freeze network and make bans on response headers and blocks
-		/////////datachain.TransactionMap.MAX_MAP_SIZE>>2;
-		int maxCount = 100;
+		int maxCount = datachain.TransactionMap.MAX_MAP_SIZE>>2;
 		long dTime = NTP.getTime();
 		
 		while (iterator.hasNext()) {
 			
+			if (counter % 100 == 0) {
+				// NEED WAIT for rest NETWORK and prevent a bans
+				try {
+					Thread.sleep(10000);
+				} catch (InterruptedException e) {
+				}
+			}
 			if (this.isStopping) {
 				return;
 			}
 
-			if (counter > maxCount) {
+			if (counter > maxCount || !peer.isUsed()) {
 				break;
 			}
 
 			transaction = map.get(iterator.next());
 			if (transaction == null)
-				break;
+				continue;
 			
 			if (transaction.getDeadline() < dTime) {
 				map.delete(transaction);
@@ -983,7 +988,7 @@ public class Controller extends Observable {
 
 			//LOGGER.error(" time " + transaction.viewTimestamp());
 
-			if (map.isBroadcastedToPeer(transaction, peerByte))
+			if (map.isBroadcastedToPeer(transaction, peerByte) || map.getBroadcasts(transaction) > 2)
 				continue;
 
 			message = MessageFactory.getInstance().createTransactionMessage(transaction);
