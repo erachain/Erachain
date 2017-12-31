@@ -574,7 +574,7 @@ public class BlockGenerator extends Thread implements Observer
 					if (peer != null && ctrl.getActivePeersCounter() > 3) {
 						
 						Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-						if (myHW.a < maxPeer.a || myHW.b <= maxPeer.b) {
+						if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
 							
 							if (myHW.a > 1) {
 	
