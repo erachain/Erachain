@@ -102,9 +102,6 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
-		
-		//PASS TO CONTROLLER
-		Controller.getInstance().onConnect(peer);
 
 	}
 

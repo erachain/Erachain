@@ -100,8 +100,6 @@ public class Peer extends Thread{
 
 		}
 						
-		this.runed = true;
-
 		if (this.pinger == null) {
 
 			//START COMMUNICATON THREAD
@@ -116,6 +114,9 @@ public class Peer extends Thread{
 			// already started
 			this.callback.onConnect(this, false);
 		}
+
+		this.runed = true;
+		this.pinger.initConnection();
 
 	}
 	
@@ -199,9 +200,7 @@ public class Peer extends Thread{
 
 			// IT is STARTED
 			this.runed = true;
-
-			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			Controller.getInstance().broadcastUnconfirmedToPeer(this);
+			this.pinger.initConnection();
 
 			//LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 			
@@ -278,9 +277,7 @@ public class Peer extends Thread{
 						
 			// IT is STARTED
 			this.runed = true;
-
-			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-			Controller.getInstance().broadcastUnconfirmedToPeer(this);
+			this.pinger.initConnection();
 
 			//LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
 
@@ -336,6 +333,7 @@ public class Peer extends Thread{
 
 			// IT is STARTED
 			this.runed = true;
+			this.pinger.initConnection();
 
 			// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
 			Controller.getInstance().broadcastUnconfirmedToPeer(this);

@@ -22,6 +22,7 @@ public class Pinger extends Thread
 	private int ping;
 	private Message messageQueue;
 	private Message messageQueuePing;
+	private boolean initConnection = true;
 	
 	public Pinger(Peer peer)
 	{
@@ -55,6 +56,10 @@ public class Pinger extends Thread
 		this.messageQueuePing = message;
 	}
 
+	public void initConnection() {
+		this.initConnection = true;
+	}
+	
 	/*
 	public boolean isRun()
 	{
@@ -151,6 +156,11 @@ public class Pinger extends Thread
 						//FAILED TO SLEEP
 					}
 					continue;
+				}
+				
+				if (initConnection) {
+					Controller.getInstance().onConnect(peer);
+					initConnection = false;
 				}
 				
 				if (messageQueue != null) {

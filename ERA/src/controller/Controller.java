@@ -949,6 +949,9 @@ public class Controller extends Observable {
 
 		byte[] peerByte = peer.getAddress().getAddress();
 
+		if (this.isStopping)
+			return;
+
 		TransactionMap map = this.dcSet.getTransactionMap();
 		Iterator<byte[]> iterator = map.getIterator(0, false);
 		Transaction transaction;
@@ -1135,7 +1138,10 @@ public class Controller extends Observable {
 			this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
 
 		}
-		
+	
+		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+		this.broadcastUnconfirmedToPeer(peer);
+
 	}
 
 	public void actionAfterConnect() {
