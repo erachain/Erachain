@@ -565,6 +565,7 @@ public class BlockGenerator extends Thread implements Observer
 				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
+
 					Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(-1);
 					if (maxPeer != null) {
 						peer = maxPeer.c;
@@ -603,6 +604,7 @@ public class BlockGenerator extends Thread implements Observer
 									int headersSize = headers.size();
 									if (headersSize == 2) {
 										if (Arrays.equals(headers.get(1), lastSignature)) {
+											ctrl.pingAllPeers(false);
 											ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
 											try
 											{
