@@ -22,7 +22,6 @@ public class Pinger extends Thread
 	private int ping;
 	private Message messageQueue;
 	private Message messageQueuePing;
-	private boolean initConnection = true;
 	
 	public Pinger(Peer peer)
 	{
@@ -54,10 +53,6 @@ public class Pinger extends Thread
 
 	public void setMessageQueuePing(Message message) {
 		this.messageQueuePing = message;
-	}
-
-	public void initConnection() {
-		this.initConnection = true;
 	}
 	
 	/*
@@ -116,7 +111,7 @@ public class Pinger extends Thread
 	}
 	
 	public boolean tryPing() {
-		return tryPing(10000l);
+		return tryPing(60000l);
 	}
 	
 	public void run()
@@ -157,12 +152,7 @@ public class Pinger extends Thread
 					}
 					continue;
 				}
-				
-				if (initConnection) {
-					Controller.getInstance().onConnect(peer);
-					initConnection = false;
-				}
-				
+								
 				if (messageQueue != null) {
 					//LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer.getAddress());
 					///this.peer.so(message);

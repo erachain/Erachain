@@ -100,8 +100,10 @@ public class Network extends Observable implements ConnectionCallback {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));		
 		
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+		//this.setChanged();
+		//this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+
+		Controller.getInstance().onConnect(peer);
 
 	}
 
@@ -608,6 +610,13 @@ public class Network extends Observable implements ConnectionCallback {
 		    return true;
 		}
 	    return false;
+	}
+
+	public void notifyObserveUpdatePeer(Peer peer) {
+		//NOTIFY OBSERVERS
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));		
+
 	}
 
 	public void stop() 

@@ -36,7 +36,9 @@ public class Peer extends Thread{
 	private Socket socket;
 	// KEEP_ALIVE = false - as web browser - getConnectionTimeout will break connection
 	private static boolean KEEP_ALIVE = true;
-	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<11:1024<<6;
+	// Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
+	// поэтому нужно ожидание дольще делать
+	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<7:1024<<4;
 	private OutputStream out;
 	private Pinger pinger;
 	private boolean white;
@@ -45,6 +47,8 @@ public class Peer extends Thread{
 	private boolean runed;
 	private int errors;
 	private int requestKey = 0;
+	
+	private long sendedBeforePing = 0l;
 	
 	private Map<Integer, BlockingQueue<Message>> messages;
 	
@@ -108,15 +112,22 @@ public class Peer extends Thread{
 			//START PINGER
 			this.pinger = new Pinger(this);
 
+			// IT is STARTED
+			this.runed = true;
+
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, true);			
 		} else {
+
+			// IT is STARTED
+			this.runed = true;
+
 			// already started
 			this.callback.onConnect(this, false);
 		}
 
-		this.runed = true;
-		this.pinger.initConnection();
+		//this.runed = true;
+		//this.pinger.initConnection();
 
 	}
 	
@@ -172,6 +183,7 @@ public class Peer extends Thread{
 			this.pingCounter = 0;
 			this.connectionTime = NTP.getTime();
 			this.errors = 0;
+			this.sendedBeforePing = 0l;
 			this.setName("Thread Peer - "+ this.getId());
 			
 			//ENABLE KEEPALIVE
@@ -195,12 +207,13 @@ public class Peer extends Thread{
 			else
 				this.pinger.setPing(Integer.MAX_VALUE);
 
+			// IT is STARTED
+			this.runed = true;
+
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, true);
 
-			// IT is STARTED
-			this.runed = true;
-			this.pinger.initConnection();
+			//this.pinger.initConnection();
 
 			//LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 			
@@ -231,6 +244,7 @@ public class Peer extends Thread{
 		this.pingCounter = 0;
 		this.connectionTime = NTP.getTime();
 		this.errors = 0;
+		this.sendedBeforePing = 0l;
 		
 		int steep = 0;
 		try
@@ -265,19 +279,23 @@ public class Peer extends Thread{
 				steep++;
 				this.start();
 
+				// IT is STARTED
+				this.runed = true;
+
 				//ON SOCKET CONNECT
 				steep++;
 				this.callback.onConnect(this, true);			
 			} else {
 				this.pinger.setPing(Integer.MAX_VALUE);
 
+				// IT is STARTED
+				this.runed = true;
+
 				// already started
 				this.callback.onConnect(this, false);
 			}
 						
-			// IT is STARTED
-			this.runed = true;
-			this.pinger.initConnection();
+			//this.pinger.initConnection();
 
 			//LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
 
@@ -313,6 +331,7 @@ public class Peer extends Thread{
 			this.pingCounter = 0;
 			this.connectionTime = NTP.getTime();
 			this.errors = 0;
+			this.sendedBeforePing = 0l;
 			
 			//ENABLE KEEPALIVE
 			this.socket.setKeepAlive(KEEP_ALIVE);
@@ -328,12 +347,13 @@ public class Peer extends Thread{
 									
 			this.pinger.setPing(Integer.MAX_VALUE);
 						
+			// IT is STARTED
+			this.runed = true;
+
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, false);			
 
-			// IT is STARTED
-			this.runed = true;
-			this.pinger.initConnection();
+			//this.pinger.initConnection();
 
 		}
 		catch(Exception e)
@@ -394,12 +414,10 @@ public class Peer extends Thread{
 		return this.pinger.getPing();
 	}
 
-	/*
-	public boolean tryPing()
+	public boolean tryPing(long timer)
 	{
-		return this.pinger.tryPing();
+		return this.pinger.tryPing(timer);
 	}
-	*/
 
 	public void setPing(int ping)
 	{		
@@ -636,12 +654,25 @@ public class Peer extends Thread{
 				}
 			}
 
+			byte[] bytes = message.toBytes();
+			if (message.getType() == Message.GET_PING_TYPE
+					|| message.getType() == Message.GET_HWEIGHT_TYPE) {
+				this.sendedBeforePing = 0l;		
+			} else {
+				this.sendedBeforePing += bytes.length;
+			}
+
+			if (this.sendedBeforePing > SOCKET_BUFFER_SIZE>>4) {
+				this.pinger.tryPing();
+			}
+			
 			//SEND MESSAGE
 			synchronized(this.out)
 			{
 				//if (sendUsed > 0) LOGGER.debug("sendUsed: " + sendUsed);
 				//sendUsed++;
-				this.out.write(message.toBytes());
+
+				this.out.write(bytes);
 				this.out.flush();
 				//--sendUsed;
 			}

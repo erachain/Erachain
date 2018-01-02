@@ -951,22 +951,23 @@ public class Controller extends Observable {
 
 		if (this.isStopping)
 			return;
-
+		
 		TransactionMap map = this.dcSet.getTransactionMap();
 		Iterator<byte[]> iterator = map.getIterator(0, false);
 		Transaction transaction;
 		Message message;
+		long ping = 0;
 		int counter = 0;
 		///////// big maxCounter freeze network and make bans on response headers and blocks
-		int maxCount = 100; //datachain.TransactionMap.MAX_MAP_SIZE>>2;
-		long dTime = NTP.getTime();
+		int steepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		long dTime = this.blockChain.getTimestamp(this.dcSet);
 		
-		while (iterator.hasNext() && counter < maxCount && peer.isUsed()) {
+		while (iterator.hasNext()) {
 			
 			if (this.isStopping) {
 				return;
 			}
-
+			
 			transaction = map.get(iterator.next());
 			if (transaction == null)
 				continue;
@@ -983,20 +984,46 @@ public class Controller extends Observable {
 
 			message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
-			if (!peer.isUsed()) {
-				break;
-			}
-
 			try {
 				if (peer.sendMessage(message)) {
 					counter++;
 					map.addBroadcastedPeer(transaction, peerByte);
+				} else {
+					break;
 				}
 			} catch (Exception e) {
-				if (this.isStopping || !peer.isUsed()) {
+				if (this.isStopping) {
 					return;
 				}
 				LOGGER.error(e.getMessage(), e);
+			}
+			
+			if (counter % steepCount == 0) {
+				
+				peer.tryPing(60000);
+				this.network.notifyObserveUpdatePeer(peer);
+				
+				ping = peer.getPing();
+				if (ping < 0 || ping > 3000) {
+					
+					if (steepCount < 4) {
+						break;
+					}
+					
+					steepCount >>= 1;
+					
+					LOGGER.debug(peer.getAddress() + " steepCount down " + steepCount);
+					try {
+						Thread.sleep(3000);
+					}
+					catch (Exception e) {		
+					}
+
+				} else if (ping < 200) {
+					steepCount <<= 1;
+					LOGGER.debug(peer.getAddress() + " steepCount UP " + steepCount + " for PING: " + ping);
+				}
+				
 			}
 
 		}
