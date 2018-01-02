@@ -23,6 +23,8 @@ public class ObserverMessage {
 	public static final int ADD_PEER_TYPE = 17;
 	public static final int REMOVE_PEER_TYPE = 18;
 	public static final int LIST_PEER_TYPE = 19;
+	public static final int UPDATE_PEER_TYPE = 20;
+	
 	
 	public static final int ADD_ACCOUNT_TYPE = 21;
 	public static final int REMOVE_ACCOUNT_TYPE = 22;

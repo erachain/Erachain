@@ -168,22 +168,7 @@ public class BlockGenerator extends Thread implements Observer
 		}.start();
 		ctrl.addObserver(this);
 	}
-	
-	public boolean addUnconfirmedTransaction(Transaction transaction)
-	{
-		return this.addUnconfirmedTransaction(DCSet.getInstance(), transaction);
-	}
-	public boolean addUnconfirmedTransaction(DCSet db, Transaction transaction) 
-	{
-		
-		if (transaction.getDeadline() < NTP.getTime())
-			return false;
-		
-		//ADD TO TRANSACTION DATABASE 
-		return !db.getTransactionMap().add(transaction);
-		
-	}
-		
+			
 	private List<PrivateKeyAccount> getKnownAccounts()
 	{
 		//CHECK IF CACHING ENABLED

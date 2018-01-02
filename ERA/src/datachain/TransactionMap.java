@@ -24,6 +24,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import controller.Controller;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.transaction.Transaction;
@@ -175,6 +176,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		// ON NEW BLOCK
 		if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
 
+			long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
+
 			Transaction item;
 			long start = System.currentTimeMillis();
 
@@ -188,7 +191,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 				item = this.get(key);
 
 				// CHECK IF DEADLINE PASSED
-				if (i > MAX_MAP_SIZE || item.getDeadline() < NTP.getTime()) {
+				if (i > MAX_MAP_SIZE || item.getDeadline() < dTime) {
 					iterator.remove();
 					continue;
 				}
@@ -208,7 +211,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		if (this.size() > MAX_MAP_SIZE) {
 			Iterator<byte[]> iterator = this.getIterator(0, false);
 			Transaction item;
-			long dTime = NTP.getTime();
+			long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 
 			do {
 				byte[] key = iterator.next();

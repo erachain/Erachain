@@ -1626,8 +1626,7 @@ public class Controller extends Observable {
 					return;
 				
 				// ADD TO UNCONFIRMED TRANSACTIONS
-				if (!this.blockGenerator.addUnconfirmedTransaction(this.dcSet, transaction))
-					return;
+				this.dcSet.getTransactionMap().add(transaction);
 
 				// BROADCAST
 				List<Peer> excludes = new ArrayList<Peer>();
@@ -2619,8 +2618,7 @@ public class Controller extends Observable {
 
 	public void onTransactionCreate(Transaction transaction) {
 		// ADD TO UNCONFIRMED TRANSACTIONS
-		if (!this.blockGenerator.addUnconfirmedTransaction(transaction))
-			return;
+		this.dcSet.getTransactionMap().add(transaction);
 
 		// NOTIFY OBSERVERS - AUTO in database.wallet.TransactionMap
 		if (false) {
