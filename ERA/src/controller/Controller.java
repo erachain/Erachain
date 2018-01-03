@@ -1456,7 +1456,7 @@ public class Controller extends Observable {
 						this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, false);
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
-						this.network.asyncBroadcast(message, excludes, true);
+						this.network.asyncBroadcast(message, excludes, false);
 					} catch (Exception e) {
 						if (this.isOnStopping()) {
 							return;
@@ -1477,7 +1477,7 @@ public class Controller extends Observable {
 							this.blockChain.setWaitWinBuffer(dcSet, newBlock);
 							List<Peer> excludes = new ArrayList<Peer>();
 							excludes.add(message.getSender());
-							this.network.asyncBroadcast(message, excludes, true);
+							this.network.asyncBroadcast(message, excludes, false);
 						}
 					} catch (Exception e) {
 						if (this.isOnStopping()) {
@@ -1492,114 +1492,6 @@ public class Controller extends Observable {
 				} else {
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid " + " for Height: "
 							+ this.getMyHeight() + ", code: " + isNewWinBlockValid + ", " + newBlock.toString(dcSet));
-				}
-
-				break;
-
-			case Message.BLOCK_TYPE:
-
-				if (true)
-					return;
-
-				// send GENESIS block for test NODE
-				BlockMessage blockMessage = (BlockMessage) message;
-				int newBlockHeight = blockMessage.getHeight();
-				if (newBlockHeight < 1) {
-					// BLOCK NOT FOUND!!!
-					String mess = "Block NOT FOUND on NODE" + ": " + message.getSender().getAddress().getHostAddress();
-					// banPeerOnError(message.getSender(), mess);
-					return;
-				}
-
-				////// ALL IINCOMED BLOCKS ignored now!!!
-				if (this.status != STATUS_OK || this.isProcessingWalletSynchronize()) {
-					break;
-				}
-
-				// ASK BLOCK FROM BLOCKCHAIN
-				if (newBlockHeight == 1) {
-					// genesis block
-					newBlock = (GenesisBlock) blockMessage.getBlock();
-				} else
-					newBlock = blockMessage.getBlock();
-
-				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
-				LOGGER.debug(" received new chain Block " + newBlock.toString(dcSet));
-
-				/*
-				 * synchronized (this.peerHWeight) { Tuple2<Integer, Long>
-				 * peerHM = this.peerHWeight.get(message.getSender()); long
-				 * hmVal; if (peerHM == null || peerHM.b == null) { hmVal = 0; }
-				 * else { hmVal = peerHM.b; }
-				 * 
-				 * int peerHeight = blockWinMessage.getHeight(); if (peerHeight
-				 * < 0) { peerHeight = newBlock.getHeightByParent(dcSet); }
-				 * this.peerHWeight.put(message.getSender(), new Tuple2<Integer,
-				 * Long>(peerHeight, hmVal +
-				 * newBlock.calcWinValueTargeted(dcSet)));
-				 * 
-				 * }
-				 */
-
-				int isNewBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
-				if (isNewBlockValid == 4) {
-					// fork branch! disconnect!
-					//// NOT !!! this.onDisconnect(message.getSender());
-					return;
-				} else if (isNewBlockValid != 0) {
-					return;
-				}
-
-				// may be it block need in WIN battle with MY winBlock?
-				Block waitWinBlock = this.blockChain.getWaitWinBuffer();
-				if (waitWinBlock != null
-				// alreday checced && waitWinBlock.getHeightByParent(dcSet) ==
-				// newBlock.getHeightByParent(dcSet)
-				) {
-					// same candidate for win
-					if (this.blockChain.setWaitWinBuffer(dcSet, newBlock)) {
-						// need to BROADCAST
-						this.broadcastWinBlock(newBlock, null);
-					}
-					return;
-				}
-
-				// CHECK IF VALID
-				if (newBlock.isSignatureValid() && newBlock.isValid(dcSet, false)) {
-					try {
-						this.synchronizer.pipeProcessOrOrphan(dcSet, newBlock, false, false);
-					} catch (Exception e) {
-						if (this.isOnStopping()) {
-							return; // throw new Exception("on stoping");
-						} else {
-							LOGGER.error(e.getMessage(), e);
-						}
-					}
-					/*
-					 * synchronized (this.peerHWeight) { Tuple2<Integer, Long>
-					 * peerHM = this.peerHWeight.get(message.getSender()); long
-					 * hmVal; if (peerHM == null || peerHM.b == null) { hmVal =
-					 * 0; } else { hmVal = peerHM.b; }
-					 * 
-					 * this.peerHWeight.put(message.getSender(), new
-					 * Tuple2<Integer, Long>(blockMessage.getHeight(), hmVal +
-					 * newBlock.calcWinValueTargeted(dcSet)));
-					 * 
-					 * }
-					 */
-
-					/*
-					 * LOGGER.info(Lang.getInstance().
-					 * translate("received new valid block"));
-					 */
-
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes, true);
-
-				} else {
-					banPeerOnError(message.getSender(), "Block (" + newBlock.toString(dcSet) + ") is Invalid");
 				}
 
 				break;
@@ -1698,7 +1590,7 @@ public class Controller extends Observable {
 			return;
 
 		// BROADCAST MESSAGE
-		this.network.asyncBroadcastPing(message, excludes);
+		this.network.asyncBroadcastWinBlock(message, excludes, false);
 
 		LOGGER.info("broadcasted!");
 
@@ -1728,7 +1620,7 @@ public class Controller extends Observable {
 
 		// BROADCAST MESSAGE
 		List<Peer> excludes = new ArrayList<Peer>();
-		this.network.broadcast(message, excludes, true);
+		this.network.broadcast(message, excludes, false);
 	}
 
 	// SYNCHRONIZE

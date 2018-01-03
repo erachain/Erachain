@@ -390,6 +390,10 @@ public class Peer extends Thread{
 		this.pinger.setMessageQueue(message);
 	}
 
+	public void setMessageWinBlock(Message message) {
+		this.pinger.setMessageWinBlock(message);
+	}
+
 	public void setMessageQueuePing(Message message) {
 		this.pinger.setMessageQueuePing(message);
 	}
@@ -429,22 +433,7 @@ public class Peer extends Thread{
 	{
 		return this.socket != null && this.socket.isConnected() && this.runed;
 	}
-		
-	private void clearResponse() {
-		
-		/*
-		Message message = MessageFactory.getInstance().createGetHWeightMessage();
-		while (!this.messages.isEmpty()) {
-			for(int item: this.messages.keySet()) {
-				if (this.messages.get(item).isEmpty()) {
-					this.messages.get(item).add(message);
-				}
-				break;
-			}
-		}
-		*/
-	}
-	
+			
 	public void run()
 	{
 		byte[] messageMagic = null;	
@@ -661,7 +650,7 @@ public class Peer extends Thread{
 
 			if (this.sendedBeforePing > this.maxBeforePing) {
 
-				LOGGER.debug("PING >> send to " + this.address + " " + Message.viewType(message.getType())
+				LOGGER.debug("PING >> send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
 				+ " bytes:" + this.sendedBeforePing
 				+ " maxBeforePing: " + this.maxBeforePing);
 				
@@ -674,17 +663,17 @@ public class Peer extends Thread{
 					this.maxBeforePing >>=2;			
 				} else if (ping > 5000 && this.maxBeforePing > MAX_BEFORE_PING>>3) {
 					this.maxBeforePing >>=1;			
-					LOGGER.debug("PING << send to " + this.address + " " + Message.viewType(message.getType())
+					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
 					+ " ms: " + ping
 					+ " maxBeforePing: " + this.maxBeforePing);
 				} else if (ping < 100 && this.maxBeforePing < MAX_BEFORE_PING<<3) {
 					this.maxBeforePing <<=1;
-					LOGGER.debug("PING << send to " + this.address + " " + Message.viewType(message.getType())
+					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
 					+ " ms: " + ping
 					+ " maxBeforePing: " + this.maxBeforePing);
 				} else if (ping < 50 && this.maxBeforePing < MAX_BEFORE_PING<<3) {
 					this.maxBeforePing <<=2;
-					LOGGER.debug("PING << send to " + this.address + " " + Message.viewType(message.getType())
+					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
 					+ " ms: " + ping
 					+ " maxBeforePing: " + this.maxBeforePing);
 				}
@@ -803,15 +792,6 @@ public class Peer extends Thread{
 	{
 		return getResponse(message, Settings.getInstance().getConnectionTimeout());
 	}
-
-	// call from ping
-	public void onPingFail(String mess)
-	{
-		// , 
-		//this.callback.tryDisconnect(this, 5, "onPingFail : " + this.address.getHostAddress() + " - " + mess);
-		this.callback.tryDisconnect(this, 0, "");
-	}
-	
 
 	// TRUE = You;  FALSE = Remote
 	public boolean isWhite()
