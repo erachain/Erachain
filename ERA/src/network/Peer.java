@@ -38,7 +38,8 @@ public class Peer extends Thread{
 	private static boolean KEEP_ALIVE = true;
 	// Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
 	// поэтому нужно ожидание дольще делать
-	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<7:1024<<4;
+	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<9:1024<<6;
+	private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE>>1;
 	private OutputStream out;
 	private Pinger pinger;
 	private boolean white;
@@ -49,6 +50,7 @@ public class Peer extends Thread{
 	private int requestKey = 0;
 	
 	private long sendedBeforePing = 0l;
+	private long maxBeforePing;
 	
 	private Map<Integer, BlockingQueue<Message>> messages;
 	
@@ -126,9 +128,6 @@ public class Peer extends Thread{
 			this.callback.onConnect(this, false);
 		}
 
-		//this.runed = true;
-		//this.pinger.initConnection();
-
 	}
 	
 	
@@ -184,6 +183,8 @@ public class Peer extends Thread{
 			this.connectionTime = NTP.getTime();
 			this.errors = 0;
 			this.sendedBeforePing = 0l;
+			this.maxBeforePing = MAX_BEFORE_PING;
+
 			this.setName("Thread Peer - "+ this.getId());
 			
 			//ENABLE KEEPALIVE
@@ -212,8 +213,6 @@ public class Peer extends Thread{
 
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, true);
-
-			//this.pinger.initConnection();
 
 			//LOGGER.debug("@@@ new Peer(ConnectionCallback callback, Socket socket) : " + socket.getInetAddress().getHostAddress());
 			
@@ -245,6 +244,7 @@ public class Peer extends Thread{
 		this.connectionTime = NTP.getTime();
 		this.errors = 0;
 		this.sendedBeforePing = 0l;
+		this.maxBeforePing = MAX_BEFORE_PING;
 		
 		int steep = 0;
 		try
@@ -294,8 +294,6 @@ public class Peer extends Thread{
 				// already started
 				this.callback.onConnect(this, false);
 			}
-						
-			//this.pinger.initConnection();
 
 			//LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
 
@@ -332,6 +330,7 @@ public class Peer extends Thread{
 			this.connectionTime = NTP.getTime();
 			this.errors = 0;
 			this.sendedBeforePing = 0l;
+			this.maxBeforePing = MAX_BEFORE_PING;
 			
 			//ENABLE KEEPALIVE
 			this.socket.setKeepAlive(KEEP_ALIVE);
@@ -352,8 +351,6 @@ public class Peer extends Thread{
 
 			//ON SOCKET CONNECT
 			this.callback.onConnect(this, false);			
-
-			//this.pinger.initConnection();
 
 		}
 		catch(Exception e)
@@ -662,8 +659,36 @@ public class Peer extends Thread{
 				this.sendedBeforePing += bytes.length;
 			}
 
-			if (this.sendedBeforePing > SOCKET_BUFFER_SIZE>>4) {
+			if (this.sendedBeforePing > this.maxBeforePing) {
+
+				LOGGER.debug("PING >> send to " + this.address + " " + Message.viewType(message.getType())
+				+ " bytes:" + this.sendedBeforePing
+				+ " maxBeforePing: " + this.maxBeforePing);
+				
 				this.pinger.tryPing();
+				Controller.getInstance().notifyObserveUpdatePeer(this);
+
+				long ping = this.getPing(); 
+
+				if (ping < 0 && this.maxBeforePing > MAX_BEFORE_PING>>3) {
+					this.maxBeforePing >>=2;			
+				} else if (ping > 5000 && this.maxBeforePing > MAX_BEFORE_PING>>3) {
+					this.maxBeforePing >>=1;			
+					LOGGER.debug("PING << send to " + this.address + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing: " + this.maxBeforePing);
+				} else if (ping < 100 && this.maxBeforePing < MAX_BEFORE_PING<<3) {
+					this.maxBeforePing <<=1;
+					LOGGER.debug("PING << send to " + this.address + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing: " + this.maxBeforePing);
+				} else if (ping < 50 && this.maxBeforePing < MAX_BEFORE_PING<<3) {
+					this.maxBeforePing <<=2;
+					LOGGER.debug("PING << send to " + this.address + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing: " + this.maxBeforePing);
+				}
+				
 			}
 			
 			//SEND MESSAGE

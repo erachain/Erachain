@@ -577,7 +577,8 @@ public class BlockGenerator extends Thread implements Observer
 	
 									byte[] prevSignature = dcSet.getBlockHeightsMap().get(myHW.a - 1);
 									response = (SignaturesMessage) peer.getResponse(
-											MessageFactory.getInstance().createGetHeadersMessage(prevSignature), 30000);
+											MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+											Synchronizer.GET_BLOCK_TIMEOUT);
 								} catch (java.lang.ClassCastException e) {
 									peer.ban(1, "Cannot retrieve headers - from UPDATE");
 									throw new Exception("Failed to communicate with peer (retrieve headers) - response = null - from UPDATE");			

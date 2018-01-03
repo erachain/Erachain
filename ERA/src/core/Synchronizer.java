@@ -37,7 +37,7 @@ import com.google.common.primitives.Bytes;
 
 public class Synchronizer {
 
-	public static final int GET_BLOCK_TIMEOUT = 60000;
+	public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
 	private static final int BYTES_MAX_GET = 1024 << 12;
 	private static int MAX_ORPHAN_TRANSACTIONS = 100000;
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
@@ -237,7 +237,7 @@ public class Synchronizer {
 				throw new Exception("on stoping");
 
 			// CHECK IF DEADLINE PASSED
-			if (!(transaction.getDeadline() < NTP.getTime() || map.contains(transaction.getSignature()))) {
+			if (!map.contains(transaction.getSignature())) {
 				orphanedTransactionsList.add(transaction);
 			}
 		}
@@ -441,7 +441,7 @@ public class Synchronizer {
 		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response;
 		try {
-			response = (SignaturesMessage) peer.getResponse(message, 30000);
+			response = (SignaturesMessage) peer.getResponse(message, GET_BLOCK_TIMEOUT);
 		} catch (java.lang.ClassCastException e) {
 			peer.ban(1, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
@@ -510,7 +510,8 @@ public class Synchronizer {
 
 		try {
 			// try get common block from PEER
-			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, true);
+			// not need CHECK peer on ping = false
+			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
 		} catch (Exception e) {
 			String mess = "in getBlock:\n" + e.getMessage() + "\n *** in Peer: " + peer.getAddress().getHostAddress();
 			//// banned in getBlock -- peer.ban(BAN_BLOCK_TIMES>>3, mess);
@@ -583,14 +584,13 @@ public class Synchronizer {
 		Controller cnt = Controller.getInstance();
 
 		int bytesGet = 0;
-		boolean checkPeer = true;
 		for (byte[] signature : signatures) {
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
 			}
 
 			// ADD TO LIST
-			Block block = getBlock(signature, peer, checkPeer);
+			Block block = getBlock(signature, peer, true);
 			if (block == null)
 				break;
 
@@ -616,7 +616,7 @@ public class Synchronizer {
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 
 		// SEND MESSAGE TO PEER
-		BlockMessage response = (BlockMessage) peer.getResponse(message, GET_BLOCK_TIMEOUT);
+		BlockMessage response = (BlockMessage) peer.getResponse(message, check?GET_BLOCK_TIMEOUT<<1:GET_BLOCK_TIMEOUT>>1);
 
 		// CHECK IF WE GOT RESPONSE
 		if (response == null) {

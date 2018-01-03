@@ -82,6 +82,15 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		//LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
 
+		// WAIT start PINGER
+		try 
+		{
+			Thread.sleep(1000);
+		} 
+		catch (InterruptedException e)
+		{
+		}
+
 		if (asNew) {
 			//ADD TO CONNECTED PEERS
 			synchronized(this.knownPeers)
