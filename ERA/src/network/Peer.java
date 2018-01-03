@@ -614,116 +614,105 @@ public class Peer extends Thread{
 		}
 	}
 	
-	private int sendUsed = 0;
 	public boolean sendMessage(Message message)
 	{
-		try 
+		//CHECK IF SOCKET IS STILL ALIVE
+		if(!this.socket.isConnected())
 		{
-			//CHECK IF SOCKET IS STILL ALIVE
-			if(!this.socket.isConnected())
-			{
-				//ERROR
-				callback.tryDisconnect(this, 0, "SEND - socket not still alive");
-				
-				return false;
-			}
+			//ERROR
+			callback.tryDisconnect(this, 0, "SEND - socket not still alive");
 			
-			//if (message.getType() != Message.TRANSACTION_TYPE) {
-			//	LOGGER.debug("try sendMessage to: " + this.socket.getInetAddress() + " " + message.viewType());
-			//}
+			return false;
+		}
+		
+		byte[] bytes = message.toBytes();
+		int messageSize = bytes.length;
+		if (message.getType() == Message.GET_PING_TYPE
+				|| message.getType() == Message.GET_HWEIGHT_TYPE) {
+			this.sendedBeforePing = 0l;		
+		} else {
+			this.sendedBeforePing += bytes.length;
+		}
 
-			while(false && sendUsed > 0) {
-				try {
-					Thread.sleep(10);
-				}
-				catch (Exception e) {
-				}
-			}
-
-			byte[] bytes = message.toBytes();
-			if (message.getType() == Message.GET_PING_TYPE
-					|| message.getType() == Message.GET_HWEIGHT_TYPE) {
-				this.sendedBeforePing = 0l;		
-			} else {
-				this.sendedBeforePing += bytes.length;
-			}
-
-			if (this.sendedBeforePing > this.maxBeforePing) {
-
+		if (this.sendedBeforePing > this.maxBeforePing) {
+			
+			if (messageSize < this.maxBeforePing) {
+				
 				LOGGER.debug("PING >> send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
 				+ " bytes:" + this.sendedBeforePing
 				+ " maxBeforePing: " + this.maxBeforePing);
-				
+
 				this.pinger.tryPing();
 				Controller.getInstance().notifyObserveUpdatePeer(this);
 
 				long ping = this.getPing(); 
 
-				if (ping < 0 && this.maxBeforePing > MAX_BEFORE_PING>>3) {
-					this.maxBeforePing >>=2;			
-				} else if (ping > 5000 && this.maxBeforePing > MAX_BEFORE_PING>>3) {
-					this.maxBeforePing >>=1;			
-					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-					+ " ms: " + ping
-					+ " maxBeforePing: " + this.maxBeforePing);
-				} else if (ping < 100 && this.maxBeforePing < MAX_BEFORE_PING<<3) {
-					this.maxBeforePing <<=1;
-					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-					+ " ms: " + ping
-					+ " maxBeforePing: " + this.maxBeforePing);
-				} else if (ping < 50 && this.maxBeforePing < MAX_BEFORE_PING<<3) {
-					this.maxBeforePing <<=2;
-					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-					+ " ms: " + ping
-					+ " maxBeforePing: " + this.maxBeforePing);
-				}
-				
+				if (ping < 0) {
+					if (this.maxBeforePing > MAX_BEFORE_PING>>3) {
+						this.maxBeforePing >>=2;			
+						LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+						+ " ms: " + ping
+						+ " maxBeforePing >>=2: " + this.maxBeforePing);
+					}
+				} else if (ping > 5000) {
+					if (this.maxBeforePing > MAX_BEFORE_PING>>3) {
+						this.maxBeforePing >>=1;			
+						LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+						+ " ms: " + ping
+						+ " maxBeforePing >>=1: " + this.maxBeforePing);
+					}
+				} else if (ping < 100) {
+					if (this.maxBeforePing < MAX_BEFORE_PING<<3) {
+						this.maxBeforePing <<=1;
+						LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+						+ " ms: " + ping
+						+ " maxBeforePing: <<=1" + this.maxBeforePing);
+					}
+				} else if (ping < 50) {
+					if (this.maxBeforePing < MAX_BEFORE_PING<<3) {
+						this.maxBeforePing <<=2;
+						LOGGER.debug("PING << send to <<=2" + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+						+ " ms: " + ping
+						+ " maxBeforePing: " + this.maxBeforePing);
+					}
+				}					
 			}
 			
-			//SEND MESSAGE
-			synchronized(this.out)
-			{
-				//if (sendUsed > 0) LOGGER.debug("sendUsed: " + sendUsed);
-				//sendUsed++;
+		}
+		
+		//SEND MESSAGE
+		synchronized(this.out)
+		{
 
+			try {
 				this.out.write(bytes);
 				this.out.flush();
-				//--sendUsed;
+			}
+			catch (IOException e) 
+			{
+				//ERROR
+				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
+				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+				callback.tryDisconnect(this, 0, "");
+
+				//RETURN
+				return false;
+			}
+			catch (Exception e) 
+			{
+				//ERROR
+				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
+				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+				callback.tryDisconnect(this, 0, "");
+
+				//RETURN
+				return false;
 			}
 
-			if (false && message.getType() != Message.TRANSACTION_TYPE) {
-				LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()));
-			}
-
-			//if (message.getType() != Message.TRANSACTION_TYPE) {
-			//	LOGGER.debug("try sendMessage OK ");
-			//}
-
-			//RETURN
-			return true;
 		}
-		catch (IOException e) 
-		{
-			//ERROR
-			//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-			//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-			callback.tryDisconnect(this, 0, "");
 
-			//RETURN
-			//--sendUsed;
-			return false;
-		}
-		catch (Exception e) 
-		{
-			//ERROR
-			//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-			//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-			callback.tryDisconnect(this, 0, "");
-
-			//RETURN
-			//--sendUsed;
-			return false;
-		}
+		//RETURN
+		return true;
 	}
 
 	public synchronized int getResponseKey()

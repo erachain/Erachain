@@ -37,7 +37,8 @@ import com.google.common.primitives.Bytes;
 
 public class Synchronizer {
 
-	public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
+	public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+	public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT>>1;
 	private static final int BYTES_MAX_GET = 1024 << 12;
 	private static int MAX_ORPHAN_TRANSACTIONS = 100000;
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
@@ -441,8 +442,8 @@ public class Synchronizer {
 		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response;
 		try {
-			response = (SignaturesMessage) peer.getResponse(message, GET_BLOCK_TIMEOUT);
-		} catch (java.lang.ClassCastException e) {
+			response = (SignaturesMessage) peer.getResponse(message, GET_HEADERS_TIMEOUT);
+		} catch (Exception e) {
 			peer.ban(1, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
 		}
