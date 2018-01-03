@@ -616,7 +616,7 @@ public class Synchronizer {
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 
 		// SEND MESSAGE TO PEER
-		BlockMessage response = (BlockMessage) peer.getResponse(message, check?GET_BLOCK_TIMEOUT<<1:GET_BLOCK_TIMEOUT>>1);
+		BlockMessage response = (BlockMessage) peer.getResponse(message, check?GET_BLOCK_TIMEOUT<<1:GET_BLOCK_TIMEOUT);
 
 		// CHECK IF WE GOT RESPONSE
 		if (response == null) {

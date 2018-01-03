@@ -38,7 +38,7 @@ public class Peer extends Thread{
 	private static boolean KEEP_ALIVE = true;
 	// Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
 	// поэтому нужно ожидание дольще делать
-	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<9:1024<<6;
+	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<11:1024<<8;
 	private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE>>1;
 	private OutputStream out;
 	private Pinger pinger;
