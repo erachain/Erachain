@@ -12,7 +12,7 @@ public class Chain {
 	public static int hw_Test() {
 		
 		Controller cnt = Controller.getInstance();
-		if (cnt.getPeerHWeights().size() == 0) {
+		if (cnt.getPeerHWeights().isEmpty()) {
 			return 0;
 		}
 

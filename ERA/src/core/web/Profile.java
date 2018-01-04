@@ -397,11 +397,11 @@ public class Profile {
 
 						oldValues.removeAll(newValues);
 
-						if (copyNewValues.size() > 0) {
+						if (!copyNewValues.isEmpty()) {
 							addListKeys.add(new Pair<String, String>(key,
 									StringUtils.join(copyNewValues, ";")));
 						}
-						if (oldValues.size() > 0) {
+						if (!oldValues.isEmpty()) {
 							removeListKeys.add(new Pair<String, String>(key,
 									StringUtils.join(oldValues, ";")));
 						}
@@ -475,7 +475,7 @@ public class Profile {
 	}
 
 	private void addMultiPaymentsOnDemand(List<Payment> paymentsOpt, JSONObject jsonResult) {
-		if(paymentsOpt != null && paymentsOpt.size() > 0)
+		if(paymentsOpt != null && !paymentsOpt.isEmpty())
 		{
 			JSONObject innerpayments = new JSONObject();
 			

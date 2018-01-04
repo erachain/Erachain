@@ -188,7 +188,7 @@ public class KK_Map extends DCMap<
 	{
 		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> value = this.get(key);
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value.get(itemKey);
-		return stack != null? stack.size()> 0? stack.peek(): null : null;
+		return stack != null? !stack.isEmpty()? stack.peek(): null : null;
 	}
 	public Stack<Tuple5<Long, Long, byte[], Integer, Integer>> getStack(Long key, Long itemKey)
 	{
@@ -210,7 +210,7 @@ public class KK_Map extends DCMap<
 		}
 
 		Stack<Tuple5<Long, Long, byte[], Integer, Integer>> stack = value_new.get(itemKey);
-		if (stack==null || stack.size() == 0)
+		if (stack==null || stack.isEmpty())
 			return;
 
 		if (this.parent == null) {

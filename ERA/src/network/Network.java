@@ -82,6 +82,15 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		//LOGGER.info(Lang.getInstance().translate("Connection successfull : ") + peer.getAddress());
 
+		// WAIT start PINGER
+		try 
+		{
+			Thread.sleep(1000);
+		} 
+		catch (InterruptedException e)
+		{
+		}
+
 		if (asNew) {
 			//ADD TO CONNECTED PEERS
 			synchronized(this.knownPeers)
@@ -100,10 +109,9 @@ public class Network extends Observable implements ConnectionCallback {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_PEER_TYPE, peer));		
 		
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
-		
-		//PASS TO CONTROLLER
+		//this.setChanged();
+		//this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+
 		Controller.getInstance().onConnect(peer);
 
 	}
@@ -286,6 +294,7 @@ public class Network extends Observable implements ConnectionCallback {
 				if(this.handledMessages.size() > MAX_HANDLED_MESSAGES_SIZE)
 				{
 					this.handledMessages.remove(this.handledMessages.first());
+					///LOGGER.error("handledMessages size OVERHEAT! "); 
 				}
 				
 				this.handledMessages.add(hash);
@@ -388,41 +397,31 @@ public class Network extends Observable implements ConnectionCallback {
 		BlockChain chain = cnt.getBlockChain();
 		Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 
-		//try
-		if (true)
+		for(int i=0; i < this.knownPeers.size() ; i++)
 		{
-			for(int i=0; i < this.knownPeers.size() ; i++)
-			{
-				
-				if (!this.run)
-					return;
-				
-				Peer peer = this.knownPeers.get(i);
-				if (peer == null || !peer.isUsed()) {
+			
+			if (!this.run)
+				return;
+			
+			Peer peer = this.knownPeers.get(i);
+			if (peer == null || !peer.isUsed()) {
+				continue;
+			}
+			
+			if (onlySynchronized) {
+				// USE PEERS than SYNCHRONIZED to ME
+				Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+				if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
 					continue;
 				}
-				
-				if (onlySynchronized) {
-					// USE PEERS than SYNCHRONIZED to ME
-					Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
-					if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
-						continue;
-					}
-				}
-				
-				//EXCLUDE PEERS
-				if(exclude == null || !exclude.contains(peer))
-				{
-					peer.setNeedPing();
-				}
-			}	
-		}
-		//catch(Exception e)
-		else
-		{
-			//error broadcasting
-			//LOGGER.error(e.getMessage(),e);
-		}
+			}
+			
+			//EXCLUDE PEERS
+			if(exclude == null || !exclude.contains(peer))
+			{
+				peer.setNeedPing();
+			}
+		}	
 		
 		LOGGER.debug("Broadcasting PING ALL end");
 	}
@@ -433,40 +432,30 @@ public class Network extends Observable implements ConnectionCallback {
 		
 		LOGGER.debug("ASYNC Broadcasting with Ping before " + message.viewType());
 		
-		try
-		//if (true)
+		for(int i=0; i < this.knownPeers.size() ; i++)
 		{
-			for(int i=0; i < this.knownPeers.size() ; i++)
+			
+			if (!this.run)
+				return;
+			
+			Peer peer = this.knownPeers.get(i);
+			if (peer == null || !peer.isUsed()) {
+				continue;
+			}
+							
+			//EXCLUDE PEERS
+			if(exclude == null || !exclude.contains(peer))
 			{
-				
-				if (!this.run)
-					return;
-				
-				Peer peer = this.knownPeers.get(i);
-				if (peer == null || !peer.isUsed()) {
-					continue;
+				if (true || message.getDataLength() > PINGED_MESSAGES_SIZE) {
+					//LOGGER.debug("PEER rty + Ping " + peer.getAddress().getHostAddress());
+					peer.setMessageQueuePing(message);
+				} else {
+					//LOGGER.debug("PEER rty " + peer.getAddress().getHostAddress());
+					peer.setMessageQueue(message);
 				}
-								
-				//EXCLUDE PEERS
-				if(exclude == null || !exclude.contains(peer))
-				{
-					if (true || message.getDataLength() > PINGED_MESSAGES_SIZE) {
-						//LOGGER.debug("PEER rty + Ping " + peer.getAddress().getHostAddress());
-						peer.setMessageQueuePing(message);
-					} else {
-						//LOGGER.debug("PEER rty " + peer.getAddress().getHostAddress());
-						peer.setMessageQueue(message);
-					}
 
-				}
-			}	
-		}
-		catch(Exception e)
-		//else
-		{
-			//error broadcasting
-			//LOGGER.error(e.getMessage(),e);
-		}
+			}
+		}	
 		
 		LOGGER.debug("ASYNC Broadcasting with Ping before ENDED " + message.viewType());
 	}
@@ -479,104 +468,110 @@ public class Network extends Observable implements ConnectionCallback {
 		BlockChain chain = cnt.getBlockChain();
 		Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 		
-		try
-		//if (true)
+		for(int i=0; i < this.knownPeers.size() ; i++)
 		{
-			for(int i=0; i < this.knownPeers.size() ; i++)
-			{
-				
-				if (!this.run)
-					return;
-				
-				Peer peer = this.knownPeers.get(i);
-				if (peer == null || !peer.isUsed()) {
+			
+			if (!this.run)
+				return;
+			
+			Peer peer = this.knownPeers.get(i);
+			if (peer == null || !peer.isUsed()) {
+				continue;
+			}
+			
+			if (onlySynchronized) {
+				// USE PEERS than SYNCHRONIZED to ME
+				Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+				if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
 					continue;
 				}
-				
-				if (onlySynchronized) {
-					// USE PEERS than SYNCHRONIZED to ME
-					Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
-					if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
-						continue;
-					}
-				}
-				
-				//EXCLUDE PEERS
-				if(exclude == null || !exclude.contains(peer))
-				{
-					peer.setMessageQueue(message);
-					/*
-					try {
-						Thread.sleep(1000);
-					}
-					catch (Exception e) {
-					}
-					*/
-
-				}
-			}	
-		}
-		catch(Exception e)
-		//else
-		{
-			//error broadcasting
-			//LOGGER.error(e.getMessage(),e);
-		}
+			}
+			
+			//EXCLUDE PEERS
+			if(exclude == null || !exclude.contains(peer))
+			{
+				peer.setMessageQueue(message);
+			}
+		}	
 		
 		LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
 	}
 
 	public void broadcast(Message message, List<Peer> exclude, boolean onlySynchronized) 
 	{		
-		//LOGGER.info(Lang.getInstance().translate("Broadcasting"));
 		Controller cnt = Controller.getInstance();
 		BlockChain chain = cnt.getBlockChain();
 		Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
 		
-		try
+		for(int i=0; i < this.knownPeers.size() ; i++)
 		{
-			for(int i=0; i < this.knownPeers.size() ; i++)
-			{
-				
-				if (!this.run)
-					return;
-				
-				Peer peer = this.knownPeers.get(i);
-				if (peer == null || !peer.isUsed()) {
+			
+			if (!this.run)
+				return;
+			
+			Peer peer = this.knownPeers.get(i);
+			if (peer == null || !peer.isUsed()) {
+				continue;
+			}
+			
+			if (onlySynchronized) {
+				// USE PEERS than SYNCHRONIZED to ME
+				Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+				if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
 					continue;
 				}
-				
-				if (onlySynchronized) {
-					// USE PEERS than SYNCHRONIZED to ME
-					Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
-					if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
-						continue;
-					}
-				}
-				
-				//EXCLUDE PEERS
-				if(exclude == null || !exclude.contains(peer))
+			}
+			
+			//EXCLUDE PEERS
+			if(exclude == null || !exclude.contains(peer))
+			{
+				try
 				{
-					long start = System.currentTimeMillis();
-					if (message.getType() == Message.WIN_BLOCK_TYPE) {
-						int length = message.toBytes().length;
-						LOGGER.debug("SEND WIN_BLOCK_TYPE to " + peer.getAddress()+ " bytes length (kB): " + (length>>10) );
-					}
 					peer.sendMessage(message);
-					if (message.getType() == Message.WIN_BLOCK_TYPE) {
-						long tickets = System.currentTimeMillis() - start;
-						LOGGER.debug("SENDED time " + tickets);
-					}
 				}
+				catch(Exception e)
+				{
+					LOGGER.error(e.getMessage(),e);
+				}				
 			}
 		}
-		catch(Exception e)
-		{
-			//error broadcasting
-			//LOGGER.error(e.getMessage(),e);
-		}
+	}
+
+	public void asyncBroadcastWinBlock(Message message, List<Peer> exclude, boolean onlySynchronized) 
+	{		
 		
-		//LOGGER.info(Lang.getInstance().translate("Broadcasting end"));
+		LOGGER.debug("ASYNC Broadcasting " + message.viewType());
+		Controller cnt = Controller.getInstance();
+		BlockChain chain = cnt.getBlockChain();
+		Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
+		
+		for(int i=0; i < this.knownPeers.size() ; i++)
+		{
+			
+			if (!this.run)
+				return;
+			
+			Peer peer = this.knownPeers.get(i);
+			if (peer == null || !peer.isUsed()) {
+				continue;
+			}
+			
+			if (onlySynchronized) {
+				// USE PEERS than SYNCHRONIZED to ME
+				Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+				if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
+					continue;
+				}
+			}
+			
+			//EXCLUDE PEERS
+			if(exclude == null || !exclude.contains(peer))
+			{
+				peer.setMessageWinBlock(message);
+			}
+		}	
+		
+		LOGGER.debug("ASYNC Broadcasting end " + message.viewType());
 	}
 
 	@Override
@@ -612,11 +607,18 @@ public class Network extends Observable implements ConnectionCallback {
 	    return false;
 	}
 
+	public void notifyObserveUpdatePeer(Peer peer) {
+		//NOTIFY OBSERVERS
+		this.setChanged();
+		this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));		
+
+	}
+
 	public void stop() 
 	{
 		this.run = false;
 		this.onMessage(null);
-		while (this.knownPeers.size() > 0) {
+		while (!this.knownPeers.isEmpty()) {
 			try {
 				this.knownPeers.get(0).close();
 				this.knownPeers.remove(0); // icreator

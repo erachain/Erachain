@@ -130,7 +130,7 @@ public class KN_Map extends DCMap<
 	{
 		TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 		Stack<Tuple3<Long, Integer, byte[]>> stack = value.get(nameKey);
-		return stack != null? stack.size()> 0? stack.peek(): null : null;
+		return stack != null? !stack.isEmpty()? stack.peek(): null : null;
 	}
 	
 	// remove only last item from stack for this key of nameKey

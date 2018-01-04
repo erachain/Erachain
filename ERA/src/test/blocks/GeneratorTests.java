@@ -632,7 +632,7 @@ public class GeneratorTests {
 			payment.process(snapshot, genesisBlock, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
-			blockGenerator.addUnconfirmedTransaction(dcSet, payment);
+			dcSet.getTransactionMap().add(payment);
 						
 		}
 		
@@ -705,7 +705,8 @@ public class GeneratorTests {
 			payment.process(snapshot, genesisBlock, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
-			blockGenerator.addUnconfirmedTransaction(dcSet, payment);
+			dcSet.getTransactionMap().add(payment);
+
 		}
 		
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
@@ -774,8 +775,8 @@ public class GeneratorTests {
 		assertEquals(payment.isValid(dcSet, null), Transaction.VALIDATE_OK);
 			
 		//ADD TO UNCONFIRMED TRANSACTIONS
-		blockGenerator.addUnconfirmedTransaction(dcSet, payment);
-		
+		dcSet.getTransactionMap().add(payment);
+
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
 		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet), null, 0l).a;
 		

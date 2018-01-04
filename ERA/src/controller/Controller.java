@@ -552,7 +552,7 @@ public class Controller extends Observable {
 			about_frame.set_console_Text(Lang.getInstance().translate("Wallet OK"));
 
 		if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
-				&& this.wallet.getAccounts().size() > 0) {
+				&& !this.wallet.getAccounts().isEmpty()) {
 			this.wallet.synchronize(true);
 		}
 
@@ -943,31 +943,38 @@ public class Controller extends Observable {
 		this.toOfflineTime = time;
 	}
 
+	public void notifyObserveUpdatePeer(Peer peer) {
+		this.network.notifyObserveUpdatePeer(peer);
+	}
+
 	public void broadcastUnconfirmedToPeer(Peer peer) {
 		
+		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
+
 		byte[] peerByte = peer.getAddress().getAddress();
 
+		if (this.isStopping)
+			return;
+		
 		TransactionMap map = this.dcSet.getTransactionMap();
 		Iterator<byte[]> iterator = map.getIterator(0, false);
 		Transaction transaction;
 		Message message;
+		long ping = 0;
 		int counter = 0;
-		int maxCount =  datachain.TransactionMap.MAX_MAP_SIZE>>2;
-		long dTime = NTP.getTime();
+		///////// big maxCounter freeze network and make bans on response headers and blocks
+		int steepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		long dTime = this.blockChain.getTimestamp(this.dcSet);
 		
-		while (iterator.hasNext()) {
+		while (iterator.hasNext() && steepCount > 8) {
 			
 			if (this.isStopping) {
 				return;
 			}
-
-			if (counter > maxCount) {
-				break;
-			}
-
+			
 			transaction = map.get(iterator.next());
 			if (transaction == null)
-				break;
+				continue;
 			
 			if (transaction.getDeadline() < dTime) {
 				map.delete(transaction);
@@ -976,7 +983,7 @@ public class Controller extends Observable {
 
 			//LOGGER.error(" time " + transaction.viewTimestamp());
 
-			if (map.isBroadcastedToPeer(transaction, peerByte))
+			if (!map.needBroadcasting(transaction, peerByte))
 				continue;
 
 			message = MessageFactory.getInstance().createTransactionMessage(transaction);
@@ -985,56 +992,52 @@ public class Controller extends Observable {
 				if (peer.sendMessage(message)) {
 					counter++;
 					map.addBroadcastedPeer(transaction, peerByte);
+				} else {
+					break;
 				}
 			} catch (Exception e) {
-				if (this.isStopping || !peer.isUsed()) {
+				if (this.isStopping) {
 					return;
 				}
 				LOGGER.error(e.getMessage(), e);
 			}
+			
+			if (counter % steepCount == 0) {
+				
+				peer.tryPing(30000);
+				this.network.notifyObserveUpdatePeer(peer);
+				
+				ping = peer.getPing();
+				if (ping < 0 || ping > 1000) {
+										
+					steepCount >>= 1;
+			
+					if (ping < 0) {
+						steepCount >>= 1;
+						try {
+							Thread.sleep(10000);
+						}
+						catch (Exception e) {		
+						}
+					} else if (ping > 10000) {
+						steepCount >>= 1;
+					}
+					
+					LOGGER.debug(peer.getAddress() + " steepCount down " + steepCount);
+
+				} else if (ping < 200) {
+					steepCount <<= 1;
+					LOGGER.debug(peer.getAddress() + " steepCount UP " + steepCount + " for PING: " + ping);
+				}
+				
+			}
 
 		}
 		
-		LOGGER.info(" sended UNCONFIRMED  counter: " + counter + " - " + peer.getAddress().getHostName());
-
+		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED  counter: " + counter);
+		
 	}
-
-	public void broadcastUnconfirmedToPeer_old(List<Transaction> transactions, Peer peer) {
-
-		byte[] peerByte = peer.getAddress().getAddress();
-		DCSet dcSet = DCSet.getInstance();
-		datachain.TransactionMap dcMap = dcSet.getTransactionMap();
-
-		for (Transaction transaction : transactions) {
-
-			if (this.isStopping || !peer.isUsed()) {
-				return;
-			}
-
-			LOGGER.error("REC TIME: " + transaction.viewTimestamp());
-
-			if (transaction.getDeadline() < NTP.getTime()) {
-				dcMap.delete(transaction.getSignature());
-				continue;
-			}
-
-			Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
-
-			if (dcMap.isBroadcastedToPeer(transaction, peerByte))
-				continue;
-
-			try {
-				if (peer.sendMessage(message)) {
-					dcMap.addBroadcastedPeer(transaction, peerByte);
-				}
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage(), e);
-			}
-		}
-
-		// LOGGER.info("Broadcasting end");
-	}
-
+	
 	public void onConnect(Peer peer) {
 
 		if (this.isStopping)
@@ -1044,6 +1047,12 @@ public class Controller extends Observable {
 		if (!peer.sendMessage(
 				MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
 			return;
+
+		try {
+			Thread.sleep(300);
+		}
+		catch (Exception e) {
+		}
 
 		// SEND VERSION MESSAGE
 		if (!peer.sendMessage(
@@ -1060,9 +1069,9 @@ public class Controller extends Observable {
 		}
 		// CHECK CHECKPOINT BLOCK on CONNECT
 		Message mess = MessageFactory.getInstance().createGetHeadersMessage(checkBlockSign);
-		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess, 5000);
+		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess, 20000);
 		if (response == null)
-			;
+			return;
 		else if (response.getSignatures().isEmpty()) {
 			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES <<3, "wrong GENESIS BLOCK");
 			return;
@@ -1095,30 +1104,12 @@ public class Controller extends Observable {
 		 * // WRONG GENESIS BLOCK }
 		 */
 
-		// GET HEIGHT
-		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeightFull(dcSet);
-		// SEND HEIGTH MESSAGE
-		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
-			return;
-
-		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-		if (this.isStopping)
-			return;
-		
-		this.broadcastUnconfirmedToPeer(peer);
-
 		// GET CURRENT WIN BLOCK
 		Block winBlock = this.blockChain.getWaitWinBuffer();
 		if (winBlock != null) {
 			// SEND MESSAGE
 			if (!peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
 				return;
-		}
-
-		/// it FREEZE all peer.tryPing();
-		if (false) {
-			// set not truli ping on connect - try peer.setNeedPing() later!
-			peer.setNeedPing();
 		}
 
 		if (this.isStopping)
@@ -1135,6 +1126,22 @@ public class Controller extends Observable {
 			this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
 
 		}
+
+		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+		this.broadcastUnconfirmedToPeer(peer);
+		
+		/*
+		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeightFull(dcSet);
+		// SEND HEIGTH MESSAGE
+		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
+			return;
+
+		//peer.setNeedPing();
+		peer.tryPing(30000);
+		this.network.notifyObserveUpdatePeer(peer);
+		*/
+
 	}
 
 	public void actionAfterConnect() {
@@ -1203,7 +1210,7 @@ public class Controller extends Observable {
 
 			this.peersVersions.remove(peer);
 
-			if (this.peerHWeight.size() == 0) {
+			if (this.peerHWeight.isEmpty()) {
 
 				if (this.getToOfflineTime() == 0L) {
 					// SET START OFFLINE TIME
@@ -1287,14 +1294,19 @@ public class Controller extends Observable {
 				GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
 
 				// ASK SIGNATURES FROM BLOCKCHAIN
+				long time1 = System.currentTimeMillis();
 				List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
+				LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: " + (System.currentTimeMillis() - time1)
+						+ " for headers: " + headers.size()
+						+ " from Height: " + (headers.isEmpty()?"-1":
+							this.blockChain.getBlock(dcSet, headers.get(0)).getHeight(dcSet)));
 
 				/*
 				 * LOGGER.error(message.getId() +
 				 * " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
 				 * + Base58.encode(getHeadersMessage.getParent()));
 				 * 
-				 * if (headers.size() > 0) {
+				 * if (!headers.isEmpty()) {
 				 * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
 				 * Base58.encode( headers.get(0) )); LOGGER.
 				 * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
@@ -1377,12 +1389,16 @@ public class Controller extends Observable {
 					break;
 				}
 
-				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
+				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
 				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
 					/// NOT BAN - WATCH it
 					if (isNewWinBlockValid < -10) {
 						info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
 						banPeerOnError(message.getSender(), info);
+						return;
+					} else if (isNewWinBlockValid == -4) {
+						// reference to PARENT last block >>> weak...
+						// already - BROADCASTED to him
 						return;
 					} else if (isNewWinBlockValid < 0) {
 						if (this.network.getActivePeersCounter(false) > Settings.getInstance().getMaxConnections() - 3) {
@@ -1416,7 +1432,7 @@ public class Controller extends Observable {
 						// BROADCAST
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
-						this.network.asyncBroadcastPing(message, excludes);
+						this.network.asyncBroadcast(message, excludes, false);
 						return;
 					} else {
 						// SEND IF my WIN BLOCK as RESPONCE
@@ -1440,7 +1456,7 @@ public class Controller extends Observable {
 						this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, false);
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
-						this.network.asyncBroadcast(message, excludes, true);
+						this.network.asyncBroadcast(message, excludes, false);
 					} catch (Exception e) {
 						if (this.isOnStopping()) {
 							return;
@@ -1461,7 +1477,7 @@ public class Controller extends Observable {
 							this.blockChain.setWaitWinBuffer(dcSet, newBlock);
 							List<Peer> excludes = new ArrayList<Peer>();
 							excludes.add(message.getSender());
-							this.network.asyncBroadcast(message, excludes, true);
+							this.network.asyncBroadcast(message, excludes, false);
 						}
 					} catch (Exception e) {
 						if (this.isOnStopping()) {
@@ -1476,114 +1492,6 @@ public class Controller extends Observable {
 				} else {
 					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid " + " for Height: "
 							+ this.getMyHeight() + ", code: " + isNewWinBlockValid + ", " + newBlock.toString(dcSet));
-				}
-
-				break;
-
-			case Message.BLOCK_TYPE:
-
-				if (true)
-					return;
-
-				// send GENESIS block for test NODE
-				BlockMessage blockMessage = (BlockMessage) message;
-				int newBlockHeight = blockMessage.getHeight();
-				if (newBlockHeight < 1) {
-					// BLOCK NOT FOUND!!!
-					String mess = "Block NOT FOUND on NODE" + ": " + message.getSender().getAddress().getHostAddress();
-					// banPeerOnError(message.getSender(), mess);
-					return;
-				}
-
-				////// ALL IINCOMED BLOCKS ignored now!!!
-				if (this.status != STATUS_OK || this.isProcessingWalletSynchronize()) {
-					break;
-				}
-
-				// ASK BLOCK FROM BLOCKCHAIN
-				if (newBlockHeight == 1) {
-					// genesis block
-					newBlock = (GenesisBlock) blockMessage.getBlock();
-				} else
-					newBlock = blockMessage.getBlock();
-
-				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
-				LOGGER.debug(" received new chain Block " + newBlock.toString(dcSet));
-
-				/*
-				 * synchronized (this.peerHWeight) { Tuple2<Integer, Long>
-				 * peerHM = this.peerHWeight.get(message.getSender()); long
-				 * hmVal; if (peerHM == null || peerHM.b == null) { hmVal = 0; }
-				 * else { hmVal = peerHM.b; }
-				 * 
-				 * int peerHeight = blockWinMessage.getHeight(); if (peerHeight
-				 * < 0) { peerHeight = newBlock.getHeightByParent(dcSet); }
-				 * this.peerHWeight.put(message.getSender(), new Tuple2<Integer,
-				 * Long>(peerHeight, hmVal +
-				 * newBlock.calcWinValueTargeted(dcSet)));
-				 * 
-				 * }
-				 */
-
-				int isNewBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
-				if (isNewBlockValid == 4) {
-					// fork branch! disconnect!
-					//// NOT !!! this.onDisconnect(message.getSender());
-					return;
-				} else if (isNewBlockValid != 0) {
-					return;
-				}
-
-				// may be it block need in WIN battle with MY winBlock?
-				Block waitWinBlock = this.blockChain.getWaitWinBuffer();
-				if (waitWinBlock != null
-				// alreday checced && waitWinBlock.getHeightByParent(dcSet) ==
-				// newBlock.getHeightByParent(dcSet)
-				) {
-					// same candidate for win
-					if (this.blockChain.setWaitWinBuffer(dcSet, newBlock)) {
-						// need to BROADCAST
-						this.broadcastWinBlock(newBlock, null);
-					}
-					return;
-				}
-
-				// CHECK IF VALID
-				if (newBlock.isSignatureValid() && newBlock.isValid(dcSet, false)) {
-					try {
-						this.synchronizer.pipeProcessOrOrphan(dcSet, newBlock, false, false);
-					} catch (Exception e) {
-						if (this.isOnStopping()) {
-							return; // throw new Exception("on stoping");
-						} else {
-							LOGGER.error(e.getMessage(), e);
-						}
-					}
-					/*
-					 * synchronized (this.peerHWeight) { Tuple2<Integer, Long>
-					 * peerHM = this.peerHWeight.get(message.getSender()); long
-					 * hmVal; if (peerHM == null || peerHM.b == null) { hmVal =
-					 * 0; } else { hmVal = peerHM.b; }
-					 * 
-					 * this.peerHWeight.put(message.getSender(), new
-					 * Tuple2<Integer, Long>(blockMessage.getHeight(), hmVal +
-					 * newBlock.calcWinValueTargeted(dcSet)));
-					 * 
-					 * }
-					 */
-
-					/*
-					 * LOGGER.info(Lang.getInstance().
-					 * translate("received new valid block"));
-					 */
-
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes, true);
-
-				} else {
-					banPeerOnError(message.getSender(), "Block (" + newBlock.toString(dcSet) + ") is Invalid");
 				}
 
 				break;
@@ -1603,26 +1511,24 @@ public class Controller extends Observable {
 					return;
 				}
 
-				// CHECK IF TRANSACTION HAS MINIMUM FEE AND MINIMUM FEE PER BYTE
 				// AND UNCONFIRMED
 				// TODO fee
 				// transaction.calcFee();
-				if (!this.dcSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature())
-						&& !this.dcSet.getTransactionMap().contains(transaction.getSignature())) {
-					// ADD TO UNCONFIRMED TRANSACTIONS
-					if (!this.blockGenerator.addUnconfirmedTransaction(transaction) || this.isStopping)
-						return;
+				byte[] signature = transaction.getSignature();
+				if (this.dcSet.getTransactionMap().contains(signature)
+						|| this.dcSet.getTransactionRef_BlockRef_Map().contains(signature)
+						|| this.isStopping)
+					return;
+				
+				// ADD TO UNCONFIRMED TRANSACTIONS
+				this.dcSet.getTransactionMap().add(transaction);
 
-					if (!this.isStatusOK())
-						return;
+				// BROADCAST
+				List<Peer> excludes = new ArrayList<Peer>();
+				excludes.add(message.getSender());
+				this.network.broadcast(message, excludes, false);
 
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes, true);
-				}
-
-				break;
+				return;
 
 			case Message.VERSION_TYPE:
 
@@ -1684,7 +1590,7 @@ public class Controller extends Observable {
 			return;
 
 		// BROADCAST MESSAGE
-		this.network.asyncBroadcastPing(message, excludes);
+		this.network.asyncBroadcastWinBlock(message, excludes, false);
 
 		LOGGER.info("broadcasted!");
 
@@ -1714,7 +1620,7 @@ public class Controller extends Observable {
 
 		// BROADCAST MESSAGE
 		List<Peer> excludes = new ArrayList<Peer>();
-		this.network.broadcast(message, excludes, true);
+		this.network.broadcast(message, excludes, false);
 	}
 
 	// SYNCHRONIZE
@@ -1729,7 +1635,7 @@ public class Controller extends Observable {
 			return true;
 		}
 
-		if (this.peerHWeight.size() == 0) {
+		if (this.peerHWeight.isEmpty()) {
 			this.status = STATUS_NO_CONNECTIONS;
 			return true;
 		}
@@ -1803,7 +1709,7 @@ public class Controller extends Observable {
 	public boolean isReadyForging() {
 
 		/*
-		 * if (this.peerHWeight.size() == 0) { return false; }
+		 * if (this.peerHWeight.isEmpty()) { return false; }
 		 * 
 		 * if (true) { int maxPeerHeight = this.getMaxPeerHWeight().a; int
 		 * chainHeight = this.blockChain.getHWeight(dcSet, false).a; int diff =
@@ -1899,6 +1805,7 @@ public class Controller extends Observable {
 							;
 						} else {
 							LOGGER.error(e.getMessage(), e);
+							return;
 						}
 					}
 				}
@@ -1911,7 +1818,7 @@ public class Controller extends Observable {
 
 		} while (!this.isStopping && !isUpToDate);
 
-		if (this.peerHWeight.size() == 0 || peer == null) {
+		if (this.peerHWeight.isEmpty() || peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
 			// } else if (!this.isUpToDate()) {
@@ -2607,8 +2514,7 @@ public class Controller extends Observable {
 
 	public void onTransactionCreate(Transaction transaction) {
 		// ADD TO UNCONFIRMED TRANSACTIONS
-		if (!this.blockGenerator.addUnconfirmedTransaction(transaction))
-			return;
+		this.dcSet.getTransactionMap().add(transaction);
 
 		// NOTIFY OBSERVERS - AUTO in database.wallet.TransactionMap
 		if (false) {

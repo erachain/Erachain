@@ -66,7 +66,7 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
 			ByteArrayUtils.remove(list, signatureOfComment);
 		}
 		
-		if(list.size() == 0)
+		if(list.isEmpty())
 		{
 			delete(signatureOfPost);
 		}else

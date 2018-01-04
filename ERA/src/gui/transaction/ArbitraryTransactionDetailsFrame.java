@@ -89,7 +89,7 @@ public class ArbitraryTransactionDetailsFrame extends Rec_DetailsFrame
 		AreaDataTextScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
       	this.add(AreaDataTextScroll, detailGBC);
 		
-		if(arbitraryTransaction.getPayments().size() > 0)
+		if(!arbitraryTransaction.getPayments().isEmpty())
 		{
 			
 			//LABEL PAYMENTS

@@ -35,7 +35,7 @@ public class CoreRowSorter extends RowSorter<TableModel> {
         	if(this.indexes.containsKey(column))
         	{  	
         		SortOrder order = SortOrder.ASCENDING;
-        		if(this.keys.size() > 0 && this.keys.get(0).getColumn() == column && this.keys.get(0).getSortOrder().equals(SortOrder.ASCENDING))
+        		if(!this.keys.isEmpty() && this.keys.get(0).getColumn() == column && this.keys.get(0).getSortOrder().equals(SortOrder.ASCENDING))
         		{
         			order = SortOrder.DESCENDING;
         		}

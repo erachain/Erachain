@@ -168,23 +168,7 @@ public class BlockGenerator extends Thread implements Observer
 		}.start();
 		ctrl.addObserver(this);
 	}
-	
-	public boolean addUnconfirmedTransaction(Transaction transaction)
-	{
-		return this.addUnconfirmedTransaction(DCSet.getInstance(), transaction);
-	}
-	public boolean addUnconfirmedTransaction(DCSet db, Transaction transaction) 
-	{
-		
-		if (transaction.getDeadline() < NTP.getTime())
-			return false;
-		
-		//ADD TO TRANSACTION DATABASE 
-		db.getTransactionMap().add(transaction);
-		
-		return true;
-	}
-		
+			
 	private List<PrivateKeyAccount> getKnownAccounts()
 	{
 		//CHECK IF CACHING ENABLED
@@ -193,7 +177,7 @@ public class BlockGenerator extends Thread implements Observer
 			List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
 			
 			//IF ACCOUNTS EXISTS
-			if(privateKeyAccounts.size() > 0)
+			if(!privateKeyAccounts.isEmpty())
 			{
 				//CACHE ACCOUNTS
 				this.cachedAccounts = privateKeyAccounts;
@@ -372,6 +356,8 @@ public class BlockGenerator extends Thread implements Observer
 						height = bchain.getHeight(dcSet) + 1;
 						target = bchain.getTarget(dcSet);
 		
+						///if (height > BlockChain.BLOCK_COUNT) return;
+
 						//PREVENT CONCURRENT MODIFY EXCEPTION
 						List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 						synchronized(knownAccounts)
@@ -447,9 +433,15 @@ public class BlockGenerator extends Thread implements Observer
 				
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
-														
-								generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
+										
+								generatedBlock = null;
+								try {
+									generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
 										getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
+								} catch (java.lang.OutOfMemoryError e) {
+									// TRY CATCH OUTofMemory error - heap space
+									LOGGER.error(e.getMessage(), e);									
+								}
 					
 								solvingBlock = null;
 									
@@ -457,7 +449,17 @@ public class BlockGenerator extends Thread implements Observer
 									if (ctrl.isOnStopping()) {
 										return;
 									}
-									LOGGER.info("my BLOCK is weak ((...");
+									
+									LOGGER.error("generateNextBlock is NULL... try wait");
+									try
+									{
+										Thread.sleep(10000);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+
+									continue;
 								} else {
 									
 									//PASS BLOCK TO CONTROLLER
@@ -548,36 +550,71 @@ public class BlockGenerator extends Thread implements Observer
 				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
+
 					Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(-1);
 					if (maxPeer != null) {
 						peer = maxPeer.c;
 					}
 					
-					if (peer != null) {
+					if (peer != null && ctrl.getActivePeersCounter() > 3) {
 						
-						 if (bchain.getHeight(dcSet) > 1) {
-						
-							SignaturesMessage response;
-							try {
-								response = (SignaturesMessage) peer.getResponse(
-										MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
-										30000);
-							} catch (java.lang.ClassCastException e) {
-								peer.ban(1, "Cannot retrieve headers");
-								throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			
-							}
+						Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+						if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
+							
+							if (myHW.a > 1) {
 	
-							if (response == null) {
-								ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-							}
-						 } else {
-							 if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
-								 continue;
-						 }
-
+								LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer);
+	 
+								SignaturesMessage response;
+								try {
+									try
+									{
+										Thread.sleep(1000);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+	
+									byte[] prevSignature = dcSet.getBlockHeightsMap().get(myHW.a - 1);
+									response = (SignaturesMessage) peer.getResponse(
+											MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+											Synchronizer.GET_BLOCK_TIMEOUT);
+								} catch (java.lang.ClassCastException e) {
+									peer.ban(1, "Cannot retrieve headers - from UPDATE");
+									throw new Exception("Failed to communicate with peer (retrieve headers) - response = null - from UPDATE");			
+								}
+		
+								if (response != null) {
+									List<byte[]> headers = response.getSignatures();
+									byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+									int headersSize = headers.size();
+									if (headersSize == 2) {
+										if (Arrays.equals(headers.get(1), lastSignature)) {
+											ctrl.pingAllPeers(false);
+											ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+											try
+											{
+												Thread.sleep(15000);
+											}
+											catch (InterruptedException e) 
+											{
+											}
+											continue;
+										} else {
+											ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+										} 
+									} else if (headersSize < 2 ) {
+										ctrl.orphanInPipe(bchain.getLastBlock(dcSet));										
+									}
+								}
+							 } else {
+								 if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
+									 continue;
+							 }
+						}
 					}
 				} else { 
-					shift_height = 0;
+					//shift_height = 0;
 				}
 
 				/// CHECK PEERS HIGHER 
@@ -820,7 +857,7 @@ public class BlockGenerator extends Thread implements Observer
 	public void syncForgingStatus()
 	{
 		
-		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().size() == 0) {
+		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().isEmpty()) {
 			setForgingStatus(ForgingStatus.FORGING_DISABLED);
 			return;
 		}

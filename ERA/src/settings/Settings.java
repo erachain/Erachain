@@ -44,7 +44,7 @@ public class Settings {
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>3; // 10000 
+	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2; // 10000 
 	private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
@@ -314,7 +314,7 @@ public class Settings {
 			
 			knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 			
-			if(!core.BlockChain.DEVELOP_USE && (knownPeers.size() == 0 || loadPeersFromInternet))
+			if(!core.BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet))
 			{
 				knownPeers.addAll(getKnownPeersFromInternet());
 			}
@@ -337,7 +337,7 @@ public class Settings {
 				this.cacheInternetPeers = new ArrayList<Peer>();
 			}
 				
-			if(this.cacheInternetPeers.size() == 0 || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
+			if(this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
 			{
 				this.timeLoadInternetPeers = NTP.getTime();
 				URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");

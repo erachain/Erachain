@@ -118,7 +118,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
 		try {
-			if (this.transactions == null || this.transactions.size() == 0) return null;
+			if (this.transactions == null || this.transactions.isEmpty()) return null;
 
 			 R_SertifyPubKeys transaction = this.transactions.get(row);
 			if (transaction == null)
@@ -174,7 +174,7 @@ public class Person_Vouch_From_Table_Model extends AbstractTableModel implements
 			@SuppressWarnings("unchecked")
 			SortableList<byte[], Transaction> ss = (SortableList<byte[], Transaction>) message.getValue();
 			Iterator<Pair<byte[], Transaction>> s = ss.iterator();
-			if (this.transactions.size() == 0){
+			if (this.transactions.isEmpty()){
 				
 			while (s.hasNext()){
 				Pair<byte[], Transaction> a = s.next();

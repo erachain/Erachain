@@ -92,14 +92,14 @@ public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
 	public Tuple3<Long, Integer, Integer> getItem(byte[] hash)
 	{
 		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
-		return value.size()>0? value.peek(): null;
+		return !value.isEmpty()? value.peek(): null;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public void removeItem(byte[] hash)
 	{
 		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
-		if (value==null || value.size() == 0) return;
+		if (value==null || value.isEmpty()) return;
 
 		Stack<Tuple3<Long, Integer, Integer>> value_new;
 		if (this.parent == null)

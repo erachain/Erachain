@@ -207,7 +207,7 @@ public class PeersResource
 			o.put("whitePingCounter", peerInfo.getWhitePingCouner());
 		}
 		
-		if(o.size() == 0){
+		if(o.isEmpty()){
 			o.put("status", "unknown disconnected");
 		}
 		

@@ -125,7 +125,7 @@ public class PersonAddressMap extends DCMap<
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> tree = this.get(person);
 		Stack<Tuple3<Integer, Integer, Integer>> stack = tree.get(address);
 		if (stack == null) return null;
-		return stack.size()> 0? stack.peek(): null;
+		return !stack.isEmpty()? stack.peek(): null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -143,7 +143,7 @@ public class PersonAddressMap extends DCMap<
 		}
 
 		Stack<Tuple3<Integer, Integer, Integer>> stack = value_new.get(address);
-		if (stack==null || stack.size() == 0) return;
+		if (stack==null || stack.isEmpty()) return;
 
 		if (this.parent == null) {
 			stack.pop();

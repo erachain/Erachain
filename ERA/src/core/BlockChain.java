@@ -22,6 +22,8 @@ import datachain.BlockMap;
 import datachain.ChildMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
+import network.Peer;
+import network.message.MessageFactory;
 import ntp.NTP;
 import settings.Settings;
 import utils.Pair;
@@ -48,7 +50,7 @@ public class BlockChain
 	public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK?2:1;
 	
 	public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
-	public static final int SYNCHRONIZE_PACKET = 1000; // when synchronize - get blocks packet by transactions
+	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
 	public static final int TARGET_COUNT = 100;
 	public static final int BASE_TARGET = 1024 * 3;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
@@ -364,7 +366,7 @@ public class BlockChain
 		return dcSet.getBlockMap().get(signature);
 	}
 
-	public int isNewBlockValid(DCSet dcSet, Block block) {
+	public int isNewBlockValid(DCSet dcSet, Block block, Peer peer) {
 		
 		//CHECK IF NOT GENESIS
 		if(block.getVersion() == 0 || block instanceof GenesisBlock)
@@ -400,6 +402,7 @@ public class BlockChain
 					return 4;
 				} else {
 					LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> weak...");
+					peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(lastBlock));
 					return -4;
 				}
 			}

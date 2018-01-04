@@ -148,7 +148,7 @@ public class TransactionCreator
 	public long getReference(PublicKeyAccount creator)
 	{
 		this.checkUpdate();
-		return creator.getLastTimestamp(this.fork);
+		return 0l;
 	}
 
 	public Pair<Transaction, Integer> createNameRegistration(PrivateKeyAccount creator, Name name, int feePow)
@@ -160,7 +160,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 		
 		//CREATE NAME REGISTRATION
-		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, (byte)feePow, time, 0l);
 		nameRegistration.sign(creator, false);
 		nameRegistration.setDC(this.fork, false);
 		
@@ -177,7 +177,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//CREATE NAME UPDATE
-		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, (byte)feePow, time, 0l);
 		nameUpdate.sign(creator, false);
 		nameUpdate.setDC(this.fork, false);
 		
@@ -193,7 +193,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 								
 		//CREATE NAME SALE
-		SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, (byte)feePow, time, 0l);
 		nameSaleTransaction.sign(creator, false);
 		nameSaleTransaction.setDC(this.fork, false);
 				
@@ -209,7 +209,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 								
 		//CREATE CANCEL NAME SALE
-		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), (byte)feePow, time, 0l);
 		cancelNameSaleTransaction.sign(creator, false);
 		cancelNameSaleTransaction.setDC(this.fork, false);
 				
@@ -226,7 +226,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 								
 		//CREATE NAME PURCHASE
-		BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), (byte)feePow, time, 0l);
 		namePurchase.sign(creator, false);
 		namePurchase.setDC(this.fork, false);
 				
@@ -243,7 +243,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 					
 		//CREATE POLL CREATION
-		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, (byte)feePow, time, 0l);
 		pollCreation.sign(creator, false);
 		pollCreation.setDC(this.fork, false);
 
@@ -262,7 +262,7 @@ public class TransactionCreator
 						
 					
 		//CREATE POLL VOTE
-		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, (byte)feePow, time, 0l);
 		pollVote.sign(creator, false);
 		pollVote.setDC(this.fork, false);
 						
@@ -280,7 +280,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 
 		Transaction arbitraryTransaction;
-		arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte)feePow, time, 0l);
 		arbitraryTransaction.sign(creator, false);
 		arbitraryTransaction.setDC(this.fork, false);
 		
@@ -303,7 +303,7 @@ public class TransactionCreator
 		AssetCls asset = new AssetVenture(creator, name, icon, image, description, movable, quantity, scale, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, creator.getLastTimestamp(this.fork));										
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, 0l);										
 		issueAssetTransaction.sign(creator, false);
 		issueAssetTransaction.setDC(this.fork, false);
 
@@ -344,7 +344,7 @@ public class TransactionCreator
 		NoteCls note = new Note(creator, name, icon, image, description);
 							
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(creator, note, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(creator, note, (byte)feePow, time, 0l);
 		issueNoteRecord.sign(creator, false);
 		issueNoteRecord.setDC(this.fork, false);
 										
@@ -389,7 +389,7 @@ public class TransactionCreator
 
 		long lastReference;
 		if (forIssue) {
-			lastReference = creator.getLastTimestamp(this.fork);
+			lastReference = 0l;
 			
 		} else {
 			lastReference = time - 1000l;
@@ -438,7 +438,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 
 		long lastReference;
-		lastReference = creator.getLastTimestamp(this.fork);
+		lastReference = 0l;
 
 		//CREATE ISSUE NOTE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte)feePow, time, lastReference);
@@ -464,7 +464,7 @@ public class TransactionCreator
 		StatusCls status = new Status(creator, name, icon, image, description, unique);
 							
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, 0l);
 		issueStatusRecord.sign(creator, false);
 		issueStatusRecord.setDC(this.fork, false);
 
@@ -484,7 +484,7 @@ public class TransactionCreator
 		UnionCls union = new Union(creator, name, birthday, parent, icon, image, description);
 							
 		//CREATE ISSUE NOTE TRANSACTION
-		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, 0l);
 		issueUnionRecord.sign(creator, false);
 		issueUnionRecord.setDC(this.fork, false);
 					
@@ -501,7 +501,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 															
 		//CREATE ORDER TRANSACTION
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amountHave, amounWant, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(), amountHave, amounWant, (byte)feePow, time, 0l);
 		
 		/*
 		int res = createOrderTransaction.isValid(this.fork, null);
@@ -525,7 +525,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 															
 		//CREATE PRDER TRANSACTION
-		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), (byte)feePow, time, 0l);
 		cancelOrderTransaction.sign(creator, false);
 		cancelOrderTransaction.setDC(this.fork, false);
 								
@@ -542,7 +542,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//CREATE MULTI PAYMENTS
-		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, (byte)feePow, time, 0l);
 		multiPayment.sign(creator, false);
 		multiPayment.setDC(this.fork, false);
 
@@ -559,7 +559,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 				
 		//DEPLOY AT
-		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, (byte)feePow, time, creator.getLastTimestamp(this.fork));
+		DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, (byte)feePow, time, 0l);
 		deployAT.sign(creator, false);
 		deployAT.setDC(this.fork, false);
 
@@ -580,7 +580,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		//messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, creator.getLastTimestamp(this.fork));
+		//messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
 		messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
 		messageTx.sign(creator, false);
 		messageTx.setDC(this.fork, false);
@@ -600,7 +600,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new R_Send(version, property1, property2, creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, creator.getLastTimestamp(this.fork));
+		messageTx = new R_Send(version, property1, property2, creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
 		messageTx.sign(creator, false);
 		messageTx.setDC(this.fork, false);
 			
@@ -619,7 +619,7 @@ public class TransactionCreator
 		
 		//CREATE MESSAGE TRANSACTION
 		recordNoteTx = new R_SignNote(version, property1, property1,
-				creator, (byte)feePow, key, message, isText, encrypted, timestamp, creator.getLastTimestamp(this.fork));
+				creator, (byte)feePow, key, message, isText, encrypted, timestamp, 0l);
 		recordNoteTx.sign(creator, asPack);
 		recordNoteTx.setDC(this.fork, asPack);
 		
@@ -642,7 +642,7 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_SertifyPubKeys(version, creator, (byte)feePow, key,
 				userAccounts,
-				add_day,  timestamp, creator.getLastTimestamp(this.fork));
+				add_day, timestamp, 0l);
 		record.sign(creator, asPack);
 		record.setDC(this.fork, asPack);
 			
@@ -663,7 +663,7 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_Vouch(creator, (byte)feePow,
 				height, seq,
-				timestamp, creator.getLastTimestamp(this.fork));
+				timestamp, 0l);
 		record.sign(creator, asPack);
 		record.setDC(this.fork, asPack);
 			
@@ -688,7 +688,7 @@ public class TransactionCreator
 		}
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new R_Hashes(creator, (byte)feePow, url, data, hashes, timestamp, creator.getLastTimestamp(this.fork));
+		messageTx = new R_Hashes(creator, (byte)feePow, url, data, hashes, timestamp, 0l);
 		messageTx.sign(creator, false);
 		messageTx.setDC(this.fork, false);
 			
@@ -727,7 +727,7 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
 				beg_date, end_date, value_1, value_2, data, refParent,
-				timestamp, creator.getLastReference(this.fork));
+				timestamp, 0l);
 		record.sign(creator, asPack);
 		record.setDB(this.fork, asPack);
 			
@@ -752,7 +752,7 @@ public class TransactionCreator
 		//int version = 5; // without user sign
 		record = new R_SetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
 				beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
-				timestamp, creator.getLastTimestamp(this.fork));
+				timestamp, 0l);
 		record.sign(creator, asPack);
 		record.setDC(this.fork, asPack);
 			
@@ -771,7 +771,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, 0l);
 		messageTx.sign(creator);
 		record.setDB(this.fork, asPack);
 			
@@ -803,7 +803,7 @@ public class TransactionCreator
 		long timestamp = NTP.getTime();
 		
 		//CREATE MESSAGE TRANSACTION
-		Transaction messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, creator.getLastReference(this.fork));
+		Transaction messageTx = new JsonTransaction(creator, recipient, key, amount, (byte)feePow, message, isText, encryptMessage, timestamp, 0l);
 		messageTx.sign(creator);
 		record.setDB(this.fork, asPack);
 			

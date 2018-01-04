@@ -24,6 +24,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import controller.Controller;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.transaction.Transaction;
@@ -52,14 +53,14 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		super(databaseSet, database);
 
 		if (databaseSet.isWithObserver()) {
-			// this.observableData.put(DBMap.NOTIFY_RESET,
-			// ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
 			if (databaseSet.isDynamicGUI()) {
+				this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
 				this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
+			} else {
+				this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
 			}
-			this.observableData.put(DBMap.NOTIFY_COUNT, ObserverMessage.COUNT_UNC_TRANSACTION_TYPE);
 		}
 
 	}
@@ -166,10 +167,16 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	@Override
 	public void update(Observable o, Object arg) {
+		
+		if(true)
+			return;
+		
 		ObserverMessage message = (ObserverMessage) arg;
 
 		// ON NEW BLOCK
 		if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+
+			long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 
 			Transaction item;
 			long start = System.currentTimeMillis();
@@ -184,7 +191,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 				item = this.get(key);
 
 				// CHECK IF DEADLINE PASSED
-				if (i > MAX_MAP_SIZE || item.getDeadline() < NTP.getTime()) {
+				if (i > MAX_MAP_SIZE || item.getDeadline() < dTime) {
 					iterator.remove();
 					continue;
 				}
@@ -204,7 +211,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		if (this.size() > MAX_MAP_SIZE) {
 			Iterator<byte[]> iterator = this.getIterator(0, false);
 			Transaction item;
-			long dTime = NTP.getTime();
+			long dTime = Controller.getInstance().getBlockChain().getTimestamp(DCSet.getInstance());
 
 			do {
 				byte[] key = iterator.next();
@@ -214,17 +221,19 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 			} while (item.getDeadline() < dTime && iterator.hasNext());
 		}
 
-		if (!this.contains(signature)) {
-			this.getDCSet().updateUncTxCounter(1);
+		if (this.map.containsKey(signature)) {
+			return true;
 		}
-
-		return super.set(signature, transaction);
+		
+		this.getDCSet().updateUncTxCounter(1);
+		
+		return super.set(signature, transaction);		
 
 	}
 
-	public void add(Transaction transaction) {
+	public boolean add(Transaction transaction) {
 
-		this.set(transaction.getSignature(), transaction);
+		return this.set(transaction.getSignature(), transaction);
 
 	}
 
@@ -244,8 +253,6 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 		if (peers.add(peer))
 			this.peersBroadcasted.put(signature, peers);
-		peers = null;
-		signature = null;
 	}
 
 	public List<Transaction> getTransactions(int from, int count, boolean descending) {
@@ -265,19 +272,28 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		return values;
 	}
 
+	public boolean needBroadcasting(Transaction transaction, byte[] peerBYtes) {
+
+		byte[] signature = transaction.getSignature();
+		List<byte[]> peers = this.peersBroadcasted.get(signature);
+		if (peers == null || peers.isEmpty()
+				|| (!peers.contains(peerBYtes) && peers.size() < 4)) {
+			return true;
+		}
+
+		return false;
+
+	}
+
 	// HOW many PEERS broadcasted by this TRANSACTION
 	public int getBroadcasts(Transaction transaction) {
 
 		byte[] signature = transaction.getSignature();
-		if (!this.peersBroadcasted.containsKey(signature)) {
+		List<byte[]> peers = this.peersBroadcasted.get(signature);
+		if (peers == null || peers.isEmpty())
 			return 0;
-		} else {
-			List<byte[]> peers = this.peersBroadcasted.get(signature);
-			if (peers == null || peers.isEmpty())
-				return 0;
-
-			return peers.size();
-		}
+		
+		return peers.size();
 
 	}
 

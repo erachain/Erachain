@@ -119,7 +119,7 @@ public class Rec_HashesResource {
 				hashes = hashesStr.split(" ");
 			}
 			twins = R_Hashes.findTwins(DCSet.getInstance(), hashes);
-			if (twins.size() > 0) {
+			if (!twins.isEmpty()) {
 				JSONObject json_result = new JSONObject();
 				json_result.put("error", "twin hashes");
 				JSONArray twins_array = new JSONArray();

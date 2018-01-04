@@ -3,6 +3,7 @@ package gui.models;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -264,6 +265,21 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 				
 				n++;
 			}	
+		} else if (message.getType() == ObserverMessage.UPDATE_PEER_TYPE) {
+			Peer peer1 = (Peer) message.getValue();
+			int n = 0;
+			for(Peer peer2: this.peers)
+			{
+				if(Arrays.equals(peer1.getAddress().getAddress(),
+						peer2.getAddress().getAddress()))
+				{
+					///this.peersStatus.set(n, true);
+					break;
+				}
+				n++;
+			}
+			this.fireTableRowsUpdated(n, n);
+			
 		} else if (message.getType() == ObserverMessage.ADD_PEER_TYPE) {
 			//this.peers.add((Peer) message.getValue());
 			this.fireTableDataChanged();

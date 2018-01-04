@@ -476,7 +476,7 @@ public class NameStorageResource {
 
 	public String getMultiPaymentsWarning(List<Payment> resultPayments) {
 		
-		if(resultPayments.size() == 0)
+		if(resultPayments.isEmpty())
 		{
 			return "";
 		}

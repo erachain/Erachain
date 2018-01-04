@@ -37,7 +37,8 @@ import com.google.common.primitives.Bytes;
 
 public class Synchronizer {
 
-	public static final int GET_BLOCK_TIMEOUT = 60000;
+	public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+	public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT>>1;
 	private static final int BYTES_MAX_GET = 1024 << 12;
 	private static int MAX_ORPHAN_TRANSACTIONS = 100000;
 	private static final Logger LOGGER = Logger.getLogger(Synchronizer.class);
@@ -138,7 +139,11 @@ public class Synchronizer {
 					if (myWeight >= fork.getBlockSignsMap().getFullWeight()) {
 						// INVALID BLOCK THROW EXCEPTION
 						String mess = "Dishonest peer by weak FullWeight, heigh: " + heigh;
-						peer.ban(BAN_BLOCK_TIMES, mess);
+						if (cnt.getActivePeersCounter() + 4 > Settings.getInstance().getMaxConnections())
+							peer.ban(BAN_BLOCK_TIMES, mess);
+						else
+							peer.ban(BAN_BLOCK_TIMES>>3, mess);
+						
 						throw new Exception(mess);
 					}
 				}
@@ -186,8 +191,6 @@ public class Synchronizer {
 		// ============ by EQUAL SIGNATURE !!!!!
 		byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
 		while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature))
-		/// while(!Arrays.equals(lastBlock.getReference(),
-		/// lastCommonBlock.getReference())) /// !!!
 		{
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
@@ -200,11 +203,8 @@ public class Synchronizer {
 				orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);
 			}
 			LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
-
-			// runedBlock = lastBlock; // FOR quick STOPPING
 			LOGGER.debug("*** synchronize - orphan block...");
 			this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
-			/// kjhjk
 			lastBlock = dcSet.getBlockMap().getLastBlock();
 		}
 
@@ -238,7 +238,7 @@ public class Synchronizer {
 				throw new Exception("on stoping");
 
 			// CHECK IF DEADLINE PASSED
-			if (!(transaction.getDeadline() < NTP.getTime() || map.contains(transaction.getSignature()))) {
+			if (!map.contains(transaction.getSignature())) {
 				orphanedTransactionsList.add(transaction);
 			}
 		}
@@ -269,7 +269,6 @@ public class Synchronizer {
 			);
 		}
 
-		// IF
 		Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
 		byte[] lastCommonBlockSignature = headers.a;
 		List<byte[]> signatures = headers.b;
@@ -419,10 +418,10 @@ public class Synchronizer {
 	 * peer) throws Exception { //ASK NEXT 500 HEADERS SINCE START byte[]
 	 * startSignature = start.getSignature(); List<byte[]> headers =
 	 * this.getBlockSignatures(startSignature, peer); List<byte[]> nextHeaders;
-	 * if(headers.size() > 0 && headers.size() < amount) { do { nextHeaders =
+	 * if(!headers.isEmpty() && headers.size() < amount) { do { nextHeaders =
 	 * this.getBlockSignatures(headers.get(headers.size()-1), peer);
 	 * headers.addAll(nextHeaders); } while(headers.size() < amount &&
-	 * nextHeaders.size() > 0); }
+	 * !nextHeaders.isEmpty()); }
 	 * 
 	 * return headers; }
 	 */
@@ -443,8 +442,8 @@ public class Synchronizer {
 		// type = GET_SIGNATURES_TYPE
 		SignaturesMessage response;
 		try {
-			response = (SignaturesMessage) peer.getResponse(message, 30000);
-		} catch (java.lang.ClassCastException e) {
+			response = (SignaturesMessage) peer.getResponse(message, GET_HEADERS_TIMEOUT);
+		} catch (Exception e) {
 			peer.ban(1, "Cannot retrieve headers");
 			throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
 		}
@@ -476,7 +475,7 @@ public class Synchronizer {
 			byte[] signCheck = dcSet.getBlockHeightsMap().get(checkPointHeight);
 
 			List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
-			if (headersCheck.size() == 0) {
+			if (headersCheck.isEmpty()) {
 				String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> not found";
 				peer.ban(BAN_BLOCK_TIMES, mess);
 				throw new Exception(mess);
@@ -512,7 +511,8 @@ public class Synchronizer {
 
 		try {
 			// try get common block from PEER
-			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, true);
+			// not need CHECK peer on ping = false
+			checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
 		} catch (Exception e) {
 			String mess = "in getBlock:\n" + e.getMessage() + "\n *** in Peer: " + peer.getAddress().getHostAddress();
 			//// banned in getBlock -- peer.ban(BAN_BLOCK_TIMES>>3, mess);
@@ -585,14 +585,13 @@ public class Synchronizer {
 		Controller cnt = Controller.getInstance();
 
 		int bytesGet = 0;
-		boolean checkPeer = true;
 		for (byte[] signature : signatures) {
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
 			}
 
 			// ADD TO LIST
-			Block block = getBlock(signature, peer, checkPeer);
+			Block block = getBlock(signature, peer, true);
 			if (block == null)
 				break;
 
@@ -618,7 +617,7 @@ public class Synchronizer {
 		Message message = MessageFactory.getInstance().createGetBlockMessage(signature);
 
 		// SEND MESSAGE TO PEER
-		BlockMessage response = (BlockMessage) peer.getResponse(message, GET_BLOCK_TIMEOUT);
+		BlockMessage response = (BlockMessage) peer.getResponse(message, check?GET_BLOCK_TIMEOUT<<1:GET_BLOCK_TIMEOUT);
 
 		// CHECK IF WE GOT RESPONSE
 		if (response == null) {

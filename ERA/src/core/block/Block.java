@@ -1203,6 +1203,7 @@ public class Block {
 			byte[] blockSignature = this.getSignature();
 			byte[] transactionSignature;
 			this.getTransactions();
+			boolean isPrimarySet = !dcSet.isFork();
 			
 			long timerProcess = 0;
 			long timerRefsMap_set = 0;
@@ -1301,11 +1302,13 @@ public class Block {
 					refsMap.set(transactionSignature, blockSignature);
 					timerRefsMap_set += System.currentTimeMillis() - timerStart;
 	
-					//REMOVE FROM UNCONFIRMED DATABASE
-					///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
-					timerStart = System.currentTimeMillis();
-					unconfirmedMap.delete(transactionSignature);
-					timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
+					if (isPrimarySet) {
+						//REMOVE FROM UNCONFIRMED DATABASE
+						///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
+						timerStart = System.currentTimeMillis();
+						unconfirmedMap.delete(transactionSignature);
+						timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
+					}
 	
 					Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
 

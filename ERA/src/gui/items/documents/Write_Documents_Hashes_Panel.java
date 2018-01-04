@@ -196,7 +196,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 		List<String> hashes = this.table_Model.getValues(0);
 
 		List<String> twins = R_Hashes.findTwins(DCSet.getInstance(), hashes);
-		if (twins.size() > 0) {
+		if (!twins.isEmpty()) {
 			JOptionPane.showMessageDialog(new JFrame(),
 					Lang.getInstance().translate("Twin hashes")+": " + twins.toString(),
 					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
