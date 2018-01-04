@@ -248,7 +248,7 @@ public class DCSet implements Observer, IDB {
 		return new DCSet(database, false, false);
 	}
 
-	public static DB сreateForkbase() {
+	public static DB createForkbase() {
 
 		//OPEN DB
 		File dbFile = new File(Settings.getInstance().getLocalDir(), "fork.dat");
@@ -847,7 +847,7 @@ public class DCSet implements Observer, IDB {
 	public DCSet forkinFile()
 	{
 		this.addUses();
-		DCSet fork = new DCSet(this, сreateForkbase());
+		DCSet fork = new DCSet(this, createForkbase());
 		this.outUses();
 		
 		return fork;
