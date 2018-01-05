@@ -37,7 +37,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	private static final long serialVersionUID = 1L;
 	Params_Template_Model params_Template_Model;
 	public JComboBox<NoteCls> jComboBox_Template;
-	public NoteCls sel_note;
+	public NoteCls sel_note = null;
 	private ComboBoxModelItemsNotes comboBoxModelNotes;
 	public JCheckBox add_Tamplate;
 	
@@ -165,6 +165,15 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 				jComboBox_Template.setEnabled(add_Tamplate.isSelected());
 				jTextPane_Message_Public.setVisible(add_Tamplate.isSelected());
 				jTable_Params_Message_Public.setVisible(add_Tamplate.isSelected());
+				if (add_Tamplate.isSelected())
+				{
+					set_Template((NoteCls) jComboBox_Template.getSelectedItem());
+				}else
+				{
+					sel_note = null;
+					
+				} 
+				
 			}
 			
 		
@@ -290,7 +299,10 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 
 }
 	 private void set_Template(NoteCls item){
-		 if (item == null)return;
+		 sel_note = null;
+		 
+		 if (item == null || !add_Tamplate.isSelected()) 
+			 	return;
 		 sel_note = item; //(NoteCls) jComboBox_Template.getSelectedItem();
 			String ww = sel_note.getDescription();
 			
