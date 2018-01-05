@@ -1,13 +1,12 @@
 @ECHO OFF
 set app=erachain
 set xms=512
-set xmx=1024
 
 :start
 
 IF EXIST java (
-	::start "%app%" java -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
-	java -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
+	::start "%app%" java -Xms%xms%m -jar %app%.jar
+	java -Xms%xms%m -jar %app%.jar
 	goto continue
 )
 
@@ -15,8 +14,8 @@ REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome" >n
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
-	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
+	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
+	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
 	goto continue
 	EXIT /b
 )
@@ -27,8 +26,8 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
-	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
+	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
+	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
 	goto continue
 	EXIT /b
 )
@@ -39,8 +38,8 @@ REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome" >n
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 	
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
-	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
+	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
+	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
 	goto continue
 	EXIT /b
 )
@@ -51,20 +50,23 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
-	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar
+	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
+	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar
 	goto continue
 	EXIT /b
 )
-
-
-:continue
-
-timeout /t 20
-goto start
-
 	
 :NOTFOUND4
 
 ECHO Java software not found on your system. Please go to http://java.com to download a copy of Java.
 PAUSE
+
+goto end
+
+:continue
+
+timeout /t 30
+if %ERRORLEVEL% == 0 GOTO end
+goto start
+
+:end

@@ -1035,6 +1035,9 @@ public class Controller extends Observable {
 
 		}
 		
+		peer.tryPing(10000);
+		this.network.notifyObserveUpdatePeer(peer);
+
 		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED  counter: " + counter);
 		
 	}
