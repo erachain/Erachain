@@ -118,6 +118,7 @@ public class Controller extends Observable {
 	private static final String version = "4.3.02 alpha";
 	private static final String buildTime = "2017-11-19 15:33:33 UTC";
 	private static long buildTimestamp;
+	public final static long MIN_MEMORY_TAIL = 50000000;
 
 	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in
 	// code!
