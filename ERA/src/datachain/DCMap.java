@@ -50,6 +50,13 @@ public abstract class DCMap<T, U> extends Observable {
 
 	public DCMap(DCMap<T, U> parent, DCSet dcSet) {
 
+		if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+			// System.out.println("########################### Free Memory:"
+			// + Runtime.getRuntime().freeMemory());
+			if (Runtime.getRuntime().freeMemory() < 50000000) System.gc();
+			if (Runtime.getRuntime().freeMemory() < 1000000)  Controller.getInstance().stopAll(99);
+		}
+
 		this.parent = parent;
 
 		this.databaseSet = dcSet;

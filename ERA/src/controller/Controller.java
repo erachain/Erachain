@@ -966,7 +966,7 @@ public class Controller extends Observable {
 		int steepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
 		long dTime = this.blockChain.getTimestamp(this.dcSet);
 		
-		while (iterator.hasNext() && steepCount > 8) {
+		while (iterator.hasNext() && steepCount > 4) {
 			
 			if (this.isStopping) {
 				return;
@@ -1004,11 +1004,11 @@ public class Controller extends Observable {
 			
 			if (counter % steepCount == 0) {
 				
-				peer.tryPing(30000);
+				peer.tryPing(10000);
 				this.network.notifyObserveUpdatePeer(peer);
 				
 				ping = peer.getPing();
-				if (ping < 0 || ping > 1000) {
+				if (ping < 0 || ping > 500) {
 										
 					steepCount >>= 1;
 			
@@ -1019,15 +1019,15 @@ public class Controller extends Observable {
 						}
 						catch (Exception e) {		
 						}
-					} else if (ping > 10000) {
+					} else if (ping > 5000) {
 						steepCount >>= 1;
 					}
 					
-					LOGGER.debug(peer.getAddress() + " steepCount down " + steepCount);
+					//LOGGER.debug(peer.getAddress() + " steepCount down " + steepCount);
 
-				} else if (ping < 200) {
+				} else if (ping < 100) {
 					steepCount <<= 1;
-					LOGGER.debug(peer.getAddress() + " steepCount UP " + steepCount + " for PING: " + ping);
+					//LOGGER.debug(peer.getAddress() + " steepCount UP " + steepCount + " for PING: " + ping);
 				}
 				
 			}
