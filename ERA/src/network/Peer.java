@@ -617,16 +617,12 @@ public class Peer extends Thread{
 	public boolean sendMessage(Message message)
 	{
 		//CHECK IF SOCKET IS STILL ALIVE
-		if(this.socket == null)
+		if(!this.runed || this.socket == null)
 		{
-			try {
-				Thread.sleep(100);
-			}
-			catch (Exception e) {		
-			}
+			return false;
 		}
 		
-		if(this.socket == null || !this.socket.isConnected())
+		if(!this.socket.isConnected())
 		{
 			//ERROR
 			callback.tryDisconnect(this, 0, "SEND - socket not still alive");
