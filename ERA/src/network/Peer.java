@@ -698,7 +698,7 @@ public class Peer extends Thread{
 				//ERROR
 				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
 				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-				callback.tryDisconnect(this, 0, "");
+				callback.tryDisconnect(this, 0, "try write");
 
 				//RETURN
 				return false;

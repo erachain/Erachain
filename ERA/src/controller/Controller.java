@@ -1064,19 +1064,20 @@ public class Controller extends Observable {
 			return;
 
 		// GET CHECKPOINT BLOCK - TEST WRONG CHAIN
-		byte[] checkBlockSign;
+		byte[] hardCheckBlockSign;
 		int checkPoint = BlockChain.getCheckPoint(dcSet);
 		if (checkPoint < 10) {
-			checkBlockSign = this.blockChain.getGenesisBlock().getSignature();
+			hardCheckBlockSign = this.blockChain.getGenesisBlock().getSignature();
 		} else {
-			checkBlockSign = this.dcSet.getBlockHeightsMap().get(checkPoint);
+			hardCheckBlockSign = this.blockChain.CHECKPOINT.b;
 		}
 		// CHECK CHECKPOINT BLOCK on CONNECT
-		Message mess = MessageFactory.getInstance().createGetHeadersMessage(checkBlockSign);
+		Message mess = MessageFactory.getInstance().createGetHeadersMessage(hardCheckBlockSign);
 		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess, 20000);
 		if (response == null)
-			return;
+			; // MAY BE IT HARD BUSY
 		else if (response.getSignatures().isEmpty()) {
+			// NO
 			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES <<3, "wrong GENESIS BLOCK");
 			return;
 		}
@@ -1303,7 +1304,8 @@ public class Controller extends Observable {
 				LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: " + (System.currentTimeMillis() - time1)
 						+ " for headers: " + headers.size()
 						+ " from Height: " + (headers.isEmpty()?"-1":
-							this.blockChain.getBlock(dcSet, headers.get(0)).getHeight(dcSet)));
+							this.blockChain.getBlock(dcSet, headers.get(0))==null?
+									"CHECK":this.blockChain.getBlock(dcSet, headers.get(0)).getHeight(dcSet)));
 
 				/*
 				 * LOGGER.error(message.getId() +
