@@ -9,6 +9,7 @@ set pars=-nogui
 IF EXIST java (
 	::start "%app%" java -Xms%xms%m -jar %app%.jar %pars%
 	java -Xms%xms%m -jar %app%.jar %pars%
+	if %ERRORLEVEL% == 0 GOTO end
 	goto continue
 )
 
@@ -18,6 +19,7 @@ REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome" >n
 IF EXIST "%JAVAHOME%\bin\java.exe" (
 	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
 	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
+	if %ERRORLEVEL% == 0 GOTO end
 	goto continue
 	EXIT /b
 )
@@ -30,6 +32,7 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "
 IF EXIST "%JAVAHOME%\bin\java.exe" (
 	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
 	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
+	if %ERRORLEVEL% == 0 GOTO end
 	goto continue
 	EXIT /b
 )
@@ -42,6 +45,7 @@ REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome" >n
 IF EXIST "%JAVAHOME%\bin\java.exe" (
 	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
 	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
+	if %ERRORLEVEL% == 0 GOTO end
 	goto continue
 	EXIT /b
 )
@@ -54,6 +58,7 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "
 IF EXIST "%JAVAHOME%\bin\java.exe" (
 	::start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
 	"%JAVAHOME%\bin\java.exe" -Xms%xms%m -jar %app%.jar %pars%
+	if %ERRORLEVEL% == 0 GOTO end
 	goto continue
 	EXIT /b
 )
@@ -75,7 +80,6 @@ goto end
 :continue
 
 timeout /t 30
-if %ERRORLEVEL% == 0 GOTO end
 goto start
 
 :end

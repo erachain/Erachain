@@ -820,6 +820,7 @@ public class BlockGenerator extends Thread implements Observer
 		//while(counter < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
 		orderedTransactions = null;
 		waitWin = null;
+		newBlockDb.close();
 		newBlockDb = null;
 
 		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"ms for trans: " + counter );

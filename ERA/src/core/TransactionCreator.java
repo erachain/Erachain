@@ -100,6 +100,9 @@ public class TransactionCreator
 	private void updateFork()
 	{
 		//CREATE NEW FORK
+		if (this.fork != null) {
+			this.fork.close();
+		}
 		this.fork = DCSet.getInstance().fork();
 		
 		//UPDATE LAST BLOCK

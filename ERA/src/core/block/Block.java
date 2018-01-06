@@ -1331,6 +1331,10 @@ public class Block {
 				transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
 			}
 			
+			if (validatingDC.isFork()) {
+				validatingDC.close();
+			}
+			
 			transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
 			if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
 				LOGGER.debug("*** Block[" + height + "].digest(transactionsSignatures) invalid");

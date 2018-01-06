@@ -172,13 +172,18 @@ public class Synchronizer {
 
 		Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
 
+		DCSet fork;
 		// VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
 		if (core.BlockGenerator.TEST_001) {
 			/// checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks,
 			/// peer);
-			checkNewBlocks(myHW, dcSet.fork(), lastCommonBlock, checkPointHeight, newBlocks, peer);
+			fork = dcSet.fork();
+			checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
+			fork.close();
 		} else {
-			checkNewBlocks(myHW, dcSet.fork(), lastCommonBlock, checkPointHeight, newBlocks, peer);
+			fork = dcSet.fork();
+			checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
+			fork.close();
 		}
 
 		// NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
