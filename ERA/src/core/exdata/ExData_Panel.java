@@ -755,7 +755,7 @@ public class ExData_Panel extends javax.swing.JPanel {
 					(Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
 		}
 
-		return ExData.To_Byte_V2(jTextField_Title_Message.getText(), fill_Template_Panel.sel_Template,
+		return ExData.toByte_V2(jTextField_Title_Message.getText(), fill_Template_Panel.sel_Template,
 				this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message_Private.getText(), files_1);
 
 	}

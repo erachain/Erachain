@@ -17,7 +17,7 @@ public class IssueStatusMap extends Issue_ItemMap
 	
 	public IssueStatusMap(DCSet databaseSet, DB database)
 	{
-		super(databaseSet, database, "ststus");
+		super(databaseSet, database, "status");
 	}
 
 	public IssueStatusMap(IssueStatusMap parent) 

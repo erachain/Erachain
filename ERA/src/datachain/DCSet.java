@@ -90,6 +90,7 @@ public class DCSet implements Observer, IDB {
 	private IssueImprintMap issueImprintMap;
 	private ItemTemplateMap itemTemplateMap;
 	private IssueTemplateMap issueTemplateMap;
+	private ItemStatementMap itemStatementMap;
 	private IssueStatementMap issueStatementMap;
 	private ItemPersonMap itemPersonMap;
 	private IssuePersonMap issuePersonMap;
@@ -335,6 +336,7 @@ public class DCSet implements Observer, IDB {
 			this.issueImprintMap = new IssueImprintMap(this, database);
 			this.itemTemplateMap = new ItemTemplateMap(this, database);
 			this.issueTemplateMap = new IssueTemplateMap(this, database);
+			this.itemStatementMap = new ItemStatementMap(this, database);
 			this.issueStatementMap = new IssueStatementMap(this, database);
 			this.itemPersonMap = new ItemPersonMap(this, database);
 			this.issuePersonMap = new IssuePersonMap(this, database);
@@ -420,6 +422,7 @@ public class DCSet implements Observer, IDB {
 		this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap);
 		this.itemTemplateMap = new ItemTemplateMap(parent.itemTemplateMap);
 		this.issueTemplateMap = new IssueTemplateMap(parent.getIssueTemplateMap());
+		this.itemStatementMap = new ItemStatementMap(parent.itemStatementMap);		
 		this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap);		
 		this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap());
 		this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap());
@@ -486,6 +489,7 @@ public class DCSet implements Observer, IDB {
 		this.issueImprintMap.reset();
 		this.imprintMap.reset();
 		this.issueTemplateMap.reset();
+		this.itemStatementMap.reset();
 		this.issueStatementMap.reset();
 		this.itemTemplateMap.reset();
 		this.issuePersonMap.reset();
@@ -763,6 +767,11 @@ public class DCSet implements Observer, IDB {
 	public IssueTemplateMap getIssueTemplateMap()
 	{
 		return this.issueTemplateMap;
+	}
+
+	public ItemStatementMap getItemStatementMap()
+	{
+		return this.itemStatementMap;
 	}
 	public IssueStatementMap getIssueStatementMap()
 	{
