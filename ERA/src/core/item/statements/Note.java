@@ -15,9 +15,9 @@ public class Note extends StatementCls {
 	
 	private static final int TYPE_ID = StatementCls.NOTE;
 
-	public Note(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique)
+	public Note(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
-		super(TYPE_ID, owner, name, icon, image, description, unique);
+		super(TYPE_ID, owner, name, icon, image, description);
 	}
 	public Note(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{

@@ -24,16 +24,20 @@ import com.google.common.primitives.Longs;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.item.ItemCls;
+import core.item.statements.StatementCls;
 import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 
 
 
-public class R_SignNote2 extends Transaction {
+public class R_SignNote2 extends Issue_ItemRecord { //Transaction {
 
 	private static final byte TYPE_ID = (byte) SIGN_NOTE2_TRANSACTION;
-	private static final String NAME_ID = "Sign Note 2";
+	private static final String NAME_ID = "Issue Note 2";
 
 	protected static final byte HAS_TEMPLATE_MASK = (byte)(1 << 7);
 	/*
@@ -69,10 +73,10 @@ public class R_SignNote2 extends Transaction {
 	protected PublicKeyAccount[] signers; // for all it need encrypt
 	protected byte[][] signatures; // - multi sign
 	
-	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, long timestamp, Long reference) {
 		
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, statement, feePow, timestamp, reference);
 
 		this.key = templateKey;
 		this.publicData = publicData;
@@ -80,11 +84,11 @@ public class R_SignNote2 extends Transaction {
 		this.encryptedData = encryptedData;
 		this.encryptedData_isText = encData_isText;
 	}
-	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files,
 			long timestamp, Long reference) {
 		
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, statement, feePow, timestamp, reference);
 
 		this.key = templateKey;
 		this.publicData = publicData;
@@ -96,26 +100,26 @@ public class R_SignNote2 extends Transaction {
 		this.files = files;
 	}
 	
-	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, long timestamp, Long reference, byte[] signature) {
-		this(typeBytes, creator, feePow, templateKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
+		this(typeBytes, creator, statement, feePow, templateKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
 		this.signature = signature;
 		//this.calcFee();
 	}
-	public R_SignNote2(PublicKeyAccount creator, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference) {
 
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, 
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, statement, feePow, templateKey, 
 				publicData, pubData_isText,
 				encryptedData, encData_isText, parents, hashes, files,
 				timestamp, reference);
 		// set props
 		this.setTypeBytes();
 	}
-	public R_SignNote2(PublicKeyAccount creator, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference, byte[] signature) {
 
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, 
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, statement, feePow, templateKey, 
 				publicData, pubData_isText,
 				encryptedData, encData_isText, parents, hashes, files,
 				timestamp, reference);
@@ -123,13 +127,19 @@ public class R_SignNote2 extends Transaction {
 		// set props
 		this.setTypeBytes();
 	}
-	public R_SignNote2(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow,  long templateKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, StatementCls statement, byte feePow,  long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference)
 	{
-		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, templateKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
+		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, statement, feePow, templateKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
 	}
 
 	//GETTERS/SETTERS
+
+	// NOT GENESIS ISSUE START FRON NUM
+	protected long getStartKey() {
+		return 0l;
+	}
+
 	public void setSidnerSignature(int index, byte[] signature) {
 		if (signatures == null)
 			signatures = new byte[signers.length][];
@@ -486,27 +496,6 @@ public class R_SignNote2 extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
-	/*
-	public void process(DBSet db, boolean asPack) {
-
-		//UPDATE SENDER
-		super.process(db, asPack);
-		
-		// it in any time is unconfirmed! byte[] ref = this.getDBRef(db);
-		db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, this.signature);
-
-	}
-
-	public void orphan(DBSet db, boolean asPack) {
-
-		//UPDATE SENDER
-		super.orphan(db, asPack);
-						
-		db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
-
-	}
-	*/
-
 	@Override
 	public HashSet<Account> getInvolvedAccounts()
 	{

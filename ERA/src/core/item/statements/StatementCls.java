@@ -16,7 +16,7 @@ public abstract class StatementCls extends ItemCls {
 	{
 		super(typeBytes, owner, name, icon, image, description);
 	}
-	public StatementCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean unique)
+	public StatementCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
