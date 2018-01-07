@@ -22,20 +22,20 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.notes.NoteCls;
-import core.item.notes.NoteFactory;
+import core.item.templates.TemplateCls;
+import core.item.templates.TemplateFactory;
 import datachain.DCSet;
-import datachain.ItemNoteMap;
+import datachain.ItemTemplateMap;
 
-public class GenesisIssueNoteRecord extends GenesisIssue_ItemRecord 
+public class GenesisIssueTemplateRecord extends GenesisIssue_ItemRecord 
 {
 	
-	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_NOTE_TRANSACTION;
-	private static final String NAME_ID = "GENESIS Issue Note";
+	private static final byte TYPE_ID = (byte)GENESIS_ISSUE_TEMPLATE_TRANSACTION;
+	private static final String NAME_ID = "GENESIS Issue Template";
 	
-	public GenesisIssueNoteRecord(NoteCls note) 
+	public GenesisIssueTemplateRecord(TemplateCls template) 
 	{
-		super(TYPE_ID, NAME_ID, note);
+		super(TYPE_ID, NAME_ID, template);
 	}
 
 	//PARSE CONVERT
@@ -50,12 +50,11 @@ public class GenesisIssueNoteRecord extends GenesisIssue_ItemRecord
 		// READ TYPE
 		int position = SIMPLE_TYPE_LENGTH;
 	
-		//READ NOTE
+		//READ PLATE
 		// read without reference
-		NoteCls note = NoteFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
-		//position += note.getDataLength(false);
+		TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
 						
-		return new GenesisIssueNoteRecord(note);
+		return new GenesisIssueTemplateRecord(template);
 	}	
 	
 }

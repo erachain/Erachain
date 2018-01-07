@@ -1,4 +1,4 @@
-package core.item.notes;
+package core.item.templates;
 
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
 
-public abstract class NoteCls extends ItemCls {
+public abstract class TemplateCls extends ItemCls {
 	
 	// PERS KEY
 	public static final long EMPTY_KEY = 1l;
@@ -22,7 +22,7 @@ public abstract class NoteCls extends ItemCls {
 	public static final long HIRING_KEY = 5l;
 	public static final long UNHIRING_KEY = 6l;
 
-	protected static final int NOTE = 1;
+	protected static final int PLATE = 1;
 	protected static final int SAMPLE = 2;
 	protected static final int PAPER = 3;
 
@@ -31,12 +31,12 @@ public abstract class NoteCls extends ItemCls {
 	private List<String> variables;
 	private static Pattern varsPattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
 
-	public NoteCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public TemplateCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		super(typeBytes, owner, name, icon, image, description);
 		
 	}
-	public NoteCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public TemplateCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
 		this.typeBytes[0] = (byte)type;
@@ -44,8 +44,8 @@ public abstract class NoteCls extends ItemCls {
 
 	//GETTERS/SETTERS
 		
-	public int getItemTypeInt() { return ItemCls.NOTE_TYPE; }
-	public String getItemTypeStr() { return "note"; }
+	public int getItemTypeInt() { return ItemCls.TEMPLATE_TYPE; }
+	public String getItemTypeStr() { return "template"; }
 	
 	public List<String> getVarNames() {
 		if (variables != null)
@@ -64,11 +64,11 @@ public abstract class NoteCls extends ItemCls {
 	// DB
 	public Item_Map getDBMap(DCSet db)
 	{
-		return db.getItemNoteMap();
+		return db.getItemTemplateMap();
 	}
 	public Issue_ItemMap getDBIssueMap(DCSet db)
 	{
-		return db.getIssueNoteMap();
+		return db.getIssueTemplateMap();
 	}	
 	
 }

@@ -14,7 +14,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
@@ -27,9 +27,9 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 	public static final int COLUMN_NOTE_NAME = 2;
 	public static final int COLUMN_TEXT = 3;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Note Key", "Note Name", "Own Text"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Template Key", "Template Name", "Own Text"});
 	private List<PublicKeyAccount> publicKeyAccounts;
-	private NoteCls note;
+	private TemplateCls template;
 	
 	public AccountStatementsTableModel()
 	{
@@ -56,9 +56,9 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 		return publicKeyAccounts.get(row);
 	}
 	
-	public void setAsset(NoteCls note) 
+	public void setAsset(TemplateCls note) 
 	{
-		this.note = note;
+		this.template = note;
 		this.fireTableDataChanged();
 	}
 	
@@ -95,13 +95,13 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 		case COLUMN_ADDRESS:			
 			return account.getPersonAsString();
 		case COLUMN_NOTE_KEY:
-			if (this.note == null) return "-";
-			return this.note.getKey(DCSet.getInstance());			
+			if (this.template == null) return "-";
+			return this.template.getKey(DCSet.getInstance());			
 		case COLUMN_NOTE_NAME:
-			if (this.note == null) return "-";
-			return this.note.getName();
+			if (this.template == null) return "-";
+			return this.template.getName();
 		case COLUMN_TEXT:
-			if (this.note == null) return "-";
+			if (this.template == null) return "-";
 			return "+";
 			
 			

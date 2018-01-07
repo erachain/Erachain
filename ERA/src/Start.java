@@ -22,7 +22,7 @@ import controller.Controller;
 import core.BlockChain;
 import core.BlockGenerator.ForgingStatus;
 import core.item.assets.AssetCls;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import datachain.DCSet;
 import settings.Settings;
 import utils.SysTray;
@@ -170,14 +170,14 @@ public class Start {
 							if (Controller.getInstance().doesWalletExists() &&
 									Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
 								// TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
-						        //ItemCls.NOTE_TYPE
-						        NoteCls note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(Controller.LICENSE_KEY);
-						        if (note == null) {
+						        //ItemCls.TEMPLATE_TYPE
+						        TemplateCls template = (TemplateCls)DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
+						        if (template == null) {
 						        	// USE default LICENSE
-							        note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(2l);
+							        template = (TemplateCls)DCSet.getInstance().getItemTemplateMap().get(2l);
 						        }
-							//	new License_JFrame(note);
-								Controller.getInstance().setWalletLicense(note.getKey());
+							//	new License_JFrame(template);
+								Controller.getInstance().setWalletLicense(template.getKey());
 							}
 						}
 					} catch(Exception e1) {

@@ -1,4 +1,4 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import gui.MainFrame;
 import gui.PasswordPane;
@@ -6,7 +6,7 @@ import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
-import gui.transaction.IssueNoteDetailsFrame;
+import gui.transaction.IssueTemplateDetailsFrame;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -42,12 +42,12 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
-import core.transaction.IssueNoteRecord;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
-public class IssueNotePanel extends JPanel
+public class IssueTemplatePanel extends JPanel
 {
 	private JComboBox<Account> jComboBox_Account_Creator;
 //	private JTextField txtScale;
@@ -57,11 +57,11 @@ public class IssueNotePanel extends JPanel
 //	private JTextField txtQuantity;
 //	private JCheckBox chkDivisible;
 	//private JButton jButton_Create;
-	private IssueNotePanel th;
+	private IssueTemplatePanel th;
 
-	public IssueNotePanel()
+	public IssueTemplatePanel()
 	{
-//		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Note"));
+//		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Template"));
 		
 		//CLOSE
 //		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -248,19 +248,19 @@ public class IssueNotePanel extends JPanel
 		byte[] icon = null;
 		byte[] image = null;
 
-		//CREATE NOTE
+		//CREATE PLATE
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		IssueNoteRecord issueNote = (IssueNoteRecord) Controller.getInstance().issueNote(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(),
+		IssueTemplateRecord issueTemplate = (IssueTemplateRecord) Controller.getInstance().issueTemplate(creator, this.jTextField_Title.getText(), this.jTextArea_Content.getText(),
 				icon, image, feePow);
 	
 		//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 		String text = "<HTML><body>";
 		text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Template") + "<br><br><br>";
-	    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueNote.getCreator() +"<br>";
-	    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueNote.getItem().getName() +"<br>";
-	    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueNote.getItem().getDescription())+"<br>";
-	    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueNote.viewSize(false)+" Bytes, ";
-	    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueNote.getFee().toString()+" COMPU</b><br></body></HTML>";
+	    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueTemplate.getCreator() +"<br>";
+	    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueTemplate.getItem().getName() +"<br>";
+	    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueTemplate.getItem().getDescription())+"<br>";
+	    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueTemplate.viewSize(false)+" Bytes, ";
+	    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueTemplate.getFee().toString()+" COMPU</b><br></body></HTML>";
 		    
 	    //System.out.print("\n"+ text +"\n");
 		//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -271,7 +271,7 @@ public class IssueNotePanel extends JPanel
 	    
 	    
 		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction") + " "  + Lang.getInstance().translate("Issue Template") );
-		IssueNoteDetailsFrame ww =   new IssueNoteDetailsFrame(issueNote);
+		IssueTemplateDetailsFrame ww =   new IssueTemplateDetailsFrame(issueTemplate);
 		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(th);
 		dd.setVisible(true);
@@ -288,7 +288,7 @@ public class IssueNotePanel extends JPanel
 		
 				
 		//VALIDATE AND PROCESS
-		int result = Controller.getInstance().getTransactionCreator().afterCreate(issueNote, false);
+		int result = Controller.getInstance().getTransactionCreator().afterCreate(issueTemplate, false);
 		
 		
 		
@@ -349,7 +349,7 @@ public class IssueNotePanel extends JPanel
 	    //    jComboBox_Account_Creator = new javax.swing.JComboBox<>();
 	        jTextField_Fee = new javax.swing.JTextField();
 	        jLabel_Template = new javax.swing.JLabel();
-	        jLabel_Issue_Note = new javax.swing.JLabel();
+	        jLabel_Issue_Template = new javax.swing.JLabel();
 	        jComboBox_Template = new javax.swing.JComboBox<>();
 	        jCheckBox_Encrypted = new javax.swing.JCheckBox();
 	        jButton_Create = new javax.swing.JButton();
@@ -457,9 +457,9 @@ public class IssueNotePanel extends JPanel
 	        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
 	 //       add(jLabel_Template, gridBagConstraints);
 
-	 //       jLabel_Issue_Note.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-	        jLabel_Issue_Note.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-	        jLabel_Issue_Note.setText(Lang.getInstance().translate("Issue Template"));
+	 //       jLabel_Issue_Template.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+	        jLabel_Issue_Template.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+	        jLabel_Issue_Template.setText(Lang.getInstance().translate("Issue Template"));
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;
 	        gridBagConstraints.gridy = 0;
@@ -467,7 +467,7 @@ public class IssueNotePanel extends JPanel
 	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 	        gridBagConstraints.weightx = 0.1;
 	        gridBagConstraints.insets = new java.awt.Insets(12, 15, 0, 15);
-	        add(jLabel_Issue_Note, gridBagConstraints);
+	        add(jLabel_Issue_Template, gridBagConstraints);
 
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 2;
@@ -549,7 +549,7 @@ public class IssueNotePanel extends JPanel
 	    private javax.swing.JLabel jLabel_Account_Creator;
 	    private javax.swing.JLabel jLabel_Content;
 	    private javax.swing.JLabel jLabel_Fee;
-	    private javax.swing.JLabel jLabel_Issue_Note;
+	    private javax.swing.JLabel jLabel_Issue_Template;
 	    private javax.swing.JLabel jLabel_Template;
 	    private javax.swing.JLabel jLabel_Title;
 	    private javax.swing.JLabel jLabel_auto_saze;

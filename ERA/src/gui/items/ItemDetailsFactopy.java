@@ -49,7 +49,7 @@ public class ItemDetailsFactopy extends JPanel {
 			return null;
 		case ItemCls.IMPRINT_TYPE:
 			return null;
-		case ItemCls.NOTE_TYPE:
+		case ItemCls.TEMPLATE_TYPE:
 			return null;
 		case ItemCls.PERSON_TYPE:
 			return null;

@@ -256,7 +256,7 @@ public abstract class AT_Controller {
 				return AT_Error.INCORRECT_CREATION_TX.getCode();
 			}
 
-			//TODO note: run code in demo mode for checking if is valid
+			//TODO template: run code in demo mode for checking if is valid
 
 		} catch ( BufferUnderflowException e ) 
 		{

@@ -53,13 +53,13 @@ import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.DeployATTransaction;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteRecord;
+import core.transaction.GenesisIssueTemplateRecord;
 import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
-import core.transaction.IssueNoteRecord;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
@@ -546,10 +546,10 @@ public class LightWallet {
 				//return IssueImprintRecord.Parse(data, releaserReference);
 				break;
 	
-			case Transaction.ISSUE_NOTE_TRANSACTION:
+			case Transaction.ISSUE_TEMPLATE_TRANSACTION:
 				
-				//PARSE ISSUE NOTE TRANSACTION
-				//return IssueNoteRecord.Parse(data, releaserReference);
+				//PARSE ISSUE PLATE TRANSACTION
+				//return IssueTemplateRecord.Parse(data, releaserReference);
 				break;
 	
 			case Transaction.ISSUE_PERSON_TRANSACTION:
@@ -560,13 +560,13 @@ public class LightWallet {
 	
 			case Transaction.ISSUE_STATUS_TRANSACTION:
 				
-				//PARSE ISSUE NOTE TRANSACTION
+				//PARSE ISSUE PLATE TRANSACTION
 				//return IssueStatusRecord.Parse(data, releaserReference);
 				break;
 	
 			case Transaction.ISSUE_UNION_TRANSACTION:
 				
-				//PARSE ISSUE NOTE TRANSACTION
+				//PARSE ISSUE PLATE TRANSACTION
 				//return IssueUnionRecord.Parse(data, releaserReference);
 				break;
 				
@@ -582,10 +582,10 @@ public class LightWallet {
 				//return GenesisIssuePersonRecord.Parse(data);
 				break;
 	
-			case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+			case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
 				
-				//PARSE ISSUE NOTE TRANSACTION
-				//return GenesisIssueNoteRecord.Parse(data);
+				//PARSE ISSUE PLATE TRANSACTION
+				//return GenesisIssueTemplateRecord.Parse(data);
 				break;
 	
 			case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:

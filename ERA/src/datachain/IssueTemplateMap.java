@@ -13,15 +13,15 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 
-public class IssueNoteMap extends Issue_ItemMap 
+public class IssueTemplateMap extends Issue_ItemMap 
 {
 	
-	public IssueNoteMap(DCSet databaseSet, DB database)
+	public IssueTemplateMap(DCSet databaseSet, DB database)
 	{
-		super(databaseSet, database, "note");
+		super(databaseSet, database, "template");
 	}
 
-	public IssueNoteMap(IssueNoteMap parent) 
+	public IssueTemplateMap(IssueTemplateMap parent) 
 	{
 		super(parent);
 	}

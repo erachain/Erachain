@@ -112,7 +112,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 				
 				
 				
-				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
+				return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey()).toString();
 			*/	
 
 			case COLUMN_BODY:

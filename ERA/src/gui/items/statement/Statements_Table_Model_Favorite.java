@@ -112,7 +112,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 				
 		//	case COLUMN_NOTE:
 
-			//	return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
+			//	return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey()).toString();
 
 			case COLUMN_BODY:
 

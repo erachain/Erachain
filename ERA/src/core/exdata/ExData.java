@@ -21,7 +21,7 @@ import org.mapdb.Fun.Tuple5;
 import com.github.rjeschke.txtmark.Processor;
 import com.google.common.primitives.Ints;
 import core.BlockChain;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import utils.StrJSonFine;
 
@@ -40,7 +40,7 @@ public class ExData {
 	 * "MS" - message
 	 * 
 	 *  PARAMS
-	 * template:NoteCls
+	 * template:TemplateCls
 	 * param_keys: [id:text]
 	 * hashes_Set: [name:hash]
 	 * mess: message
@@ -242,14 +242,14 @@ public class ExData {
 	
 	//
 	@SuppressWarnings({ "unchecked", "unused", "rawtypes" })
-	public static byte[] To_Byte_V2(String title, NoteCls note, HashMap<String, String> params_Template, HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set) throws Exception{
+	public static byte[] To_Byte_V2(String title, TemplateCls template, HashMap<String, String> params_Template, HashMap<String, String> hashes_Map, String message, Set<Tuple3<String, Boolean, byte[]>> files_Set) throws Exception{
 		// messageBytes =	 StrJSonFine.convert(out_Map).getBytes( Charset.forName("UTF-8") );
 		JSONObject out_Map = new JSONObject();
 		JSONObject params_Map = new JSONObject();
 		JSONObject hashes_JSON= new JSONObject();
 //add template params
-		if (note !=null ){
-		out_Map.put("TM", note.getKey()+"");
+		if (template !=null ){
+		out_Map.put("TM", template.getKey()+"");
 		Iterator<Entry<String, String>> it_templ = params_Template.entrySet().iterator();
 		while (it_templ.hasNext()){ 
 			Entry<String, String> key1 = it_templ.next();

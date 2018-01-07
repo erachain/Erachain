@@ -44,9 +44,6 @@ import gui.items.assets.Search_Assets_Tab;
 import gui.items.mails.Incoming_Mails_SplitPanel;
 import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
-import gui.items.notes.IssueNotePanel;
-import gui.items.notes.Search_Notes_Tab;
-import gui.items.notes.Templates_Favorite_SplitPanel;
 import gui.items.other.Other_Split_Panel;
 import gui.items.other.other_Panel;
 import gui.items.persons.InsertPersonPanel;
@@ -65,6 +62,9 @@ import gui.items.statuses.IssueStatusPanel;
 import gui.items.statuses.My_Statuses_Tab;
 import gui.items.statuses.Search_Statuses_Tab;
 import gui.items.statuses.Statuses_Favorite_SplitPanel;
+import gui.items.templates.IssueTemplatePanel;
+import gui.items.templates.Search_Templates_Tab;
+import gui.items.templates.Templates_Favorite_SplitPanel;
 import gui.items.unions.IssueUnionPanel;
 import gui.items.unions.My_Unions_Tab;
 import gui.items.unions.Search_Union_Tab;
@@ -411,7 +411,7 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("My Balance"), new My_Balance_Tab());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("My Orders"))     || str.equals("My_Order_Tab")){
+		if ( str.equals( Lang.getInstance().translate("My Orders")) || str.equals("My_Order_Tab")){
 			ccase1( Lang.getInstance().translate("My Orders"), new My_Order_Tab());
 			return;
 		}
@@ -423,16 +423,16 @@ public class Main_Panel extends javax.swing.JPanel {
 			ccase1( Lang.getInstance().translate("Exchange"), new Exchange_Panel(null,null,null,null));
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("Search Templates"))   || str.equals("Search_Notes_Tab")){
-			ccase1( Lang.getInstance().translate("Search Templates"), new Search_Notes_Tab());
+		if ( str.equals( Lang.getInstance().translate("Search Templates")) || str.equals("Search_Templates_Tab")){
+			ccase1( Lang.getInstance().translate("Search Templates"), new Search_Templates_Tab());
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Favorite Templates"))   || str.equals("Templates_Favorite_SplitPanel")){
 			ccase1( Lang.getInstance().translate("Favorite Templates"), new Templates_Favorite_SplitPanel());
 			return;
 		}
-		if ( str.equals( Lang.getInstance().translate("Issue Template"))  || str.equals("IssueNotePanel")){
-			ccase1( Lang.getInstance().translate("Issue Template"), new IssueNotePanel());
+		if ( str.equals( Lang.getInstance().translate("Issue Template")) || str.equals("IssueTemplatePanel")){
+			ccase1( Lang.getInstance().translate("Issue Template"), new IssueTemplatePanel());
 			return;
 		}
 		if ( str.equals( Lang.getInstance().translate("Create Status")) || str.equals("IssueStatusPanel") ){

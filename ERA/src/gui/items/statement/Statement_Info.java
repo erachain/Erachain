@@ -19,7 +19,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 import core.exdata.ExData;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import datachain.DCSet;
@@ -79,10 +79,10 @@ public class Statement_Info extends javax.swing.JPanel {
 
 		initComponents();
 
-		NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
+		TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, statement.getKey());
 		// jTextArea_Body.setContentType("text/html");
 
-		String description = note.getDescription();
+		String description = template.getDescription();
 
 		file_Panel.setVisible(false);
 
@@ -131,7 +131,7 @@ public class Statement_Info extends javax.swing.JPanel {
 			} catch (ParseException e) {
 
 				// e.printStackTrace();
-				List<String> vars = note.getVarNames();
+				List<String> vars = template.getVarNames();
 				if (vars != null && !vars.isEmpty()) {
 					// try replace variables
 					String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
@@ -152,13 +152,13 @@ public class Statement_Info extends javax.swing.JPanel {
 					}
 				}
 
-				jTextArea_Body.setText(note.getName() + "\n\n" + description + "\n\n"
+				jTextArea_Body.setText(template.getName() + "\n\n" + description + "\n\n"
 						+ new String(statement.getData(), Charset.forName("UTF-8")));
 
 			}
 
 		} else {
-			jTextArea_Body.setText(note.getName() + "\n" + Lang.getInstance().translate("Encrypted"));
+			jTextArea_Body.setText(template.getName() + "\n" + Lang.getInstance().translate("Encrypted"));
 		}
 
 		jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);
@@ -322,10 +322,10 @@ public class Statement_Info extends javax.swing.JPanel {
 			// v2.0
 			if (jSON.containsKey("Template")) {
 
-				NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,
+				TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,
 						new Long((String) jSON.get("Template")));
-				if (note != null) {
-					description = note.getDescription();
+				if (template != null) {
+					description = template.getDescription();
 
 					if (jSON.containsKey("Statement_Params")) {
 						str = jSON.get("Statement_Params").toString();
@@ -343,10 +343,10 @@ public class Statement_Info extends javax.swing.JPanel {
 			// v 2.1
 			if (jSON.containsKey("TM")) {
 
-				NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,
+				TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,
 						new Long((String) jSON.get("TM")));
-				if (note != null) {
-					description = note.getDescription();
+				if (template != null) {
+					description = template.getDescription();
 					jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + map.b);
 
 					if (jSON.containsKey("PR")) {

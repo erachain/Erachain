@@ -119,13 +119,13 @@ public class Union extends UnionCls {
 		}
 		
 		//RETURN
-		Union note = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
+		Union union = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
 		if (includeReference)
 		{
-			note.setReference(reference);
+			union.setReference(reference);
 		}
 
-		return note;
+		return union;
 	}
 	
 }

@@ -97,10 +97,10 @@ public class ObserverMessage {
 	public static final int REMOVE_IMPRINT_TYPE = 113;
 	public static final int LIST_IMPRINT_TYPE = 114;
 
-	public static final int RESET_NOTE_TYPE = 116;
-	public static final int ADD_NOTE_TYPE = 117;
-	public static final int REMOVE_NOTE_TYPE = 118;
-	public static final int LIST_NOTE_TYPE = 119;
+	public static final int RESET_TEMPLATE_TYPE = 116;
+	public static final int ADD_TEMPLATE_TYPE = 117;
+	public static final int REMOVE_TEMPLATE_TYPE = 118;
+	public static final int LIST_TEMPLATE_TYPE = 119;
 		
 	public static final int RESET_PERSON_TYPE = 121;
 	public static final int ADD_PERSON_TYPE = 122;
@@ -234,13 +234,13 @@ public class ObserverMessage {
 	public static final int WALLET_LIST_IMPRINT_TYPE = 1074;
 	public static final int LIST_IMPRINT_FAVORITES_TYPE = 1075;
 
-	public static final int WALLET_RESET_NOTE_TYPE = 1081;
-	public static final int WALLET_ADD_NOTE_TYPE = 1082;
-	public static final int WALLET_REMOVE_NOTE_TYPE = 1083;
-	public static final int WALLET_LIST_NOTE_TYPE = 1084;
-	public static final int LIST_NOTE_FAVORITES_TYPE = 1086;
-	public static final int ADD_NOTE_TYPE_FAVORITES_TYPE = 1087;
-	public static final int DELETE_NOTE_FAVORITES_TYPE = 1088;
+	public static final int WALLET_RESET_TEMPLATE_TYPE = 1081;
+	public static final int WALLET_ADD_TEMPLATE_TYPE = 1082;
+	public static final int WALLET_REMOVE_TEMPLATE_TYPE = 1083;
+	public static final int WALLET_LIST_TEMPLATE_TYPE = 1084;
+	public static final int LIST_TEMPLATE_FAVORITES_TYPE = 1086;
+	public static final int ADD_TEMPLATE_TYPE_FAVORITES_TYPE = 1087;
+	public static final int DELETE_TEMPLATE_FAVORITES_TYPE = 1088;
 
 	public static final int WALLET_RESET_PERSON_TYPE = 1091;
 	public static final int WALLET_ADD_PERSON_TYPE = 1092;

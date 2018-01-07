@@ -125,10 +125,9 @@ public class TableModelItemStatuses extends TableModelItems
 		if (!text.matches("[0-9]*"))return;
 			key_filter = new Long(text);
 			list =new ArrayList<ItemCls>();
-			// Controller.getInstance().getNote(key_filter);
-			StatusCls note = (StatusCls) db.get(key_filter);
-			if ( note == null) return;
-			list.add(note);
+			StatusCls status = (StatusCls) db.get(key_filter);
+			if ( status == null) return;
+			list.add(status);
 						
 			this.fireTableDataChanged();
 		

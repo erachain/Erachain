@@ -39,10 +39,11 @@ public abstract class ItemCls {
 
 	public static final int ASSET_TYPE = 1;
 	public static final int IMPRINT_TYPE = 2;
-	public static final int NOTE_TYPE = 3;
+	public static final int TEMPLATE_TYPE = 3;
 	public static final int PERSON_TYPE = 4;
 	public static final int STATUS_TYPE = 5;
 	public static final int UNION_TYPE = 6;
+	public static final int STATEMENT_TYPE = 7;
 
 	protected static final int TYPE_LENGTH = 2;
 	protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;

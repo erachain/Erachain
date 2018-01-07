@@ -21,46 +21,46 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
-import core.item.notes.NoteFactory;
+import core.item.templates.TemplateCls;
+import core.item.templates.TemplateFactory;
 import datachain.DCSet;
 
-public class IssueNoteRecord extends Issue_ItemRecord 
+public class IssueTemplateRecord extends Issue_ItemRecord 
 {
-	private static final byte TYPE_ID = (byte)ISSUE_NOTE_TRANSACTION;
-	private static final String NAME_ID = "Issue Note";
+	private static final byte TYPE_ID = (byte)ISSUE_TEMPLATE_TRANSACTION;
+	private static final String NAME_ID = "Issue Template";
 	
-	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference) 
+	public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) 
 	{
-		super(typeBytes, NAME_ID, creator, note, feePow, timestamp, reference);		
+		super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference);		
 	}
-	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference, byte[] signature) 
+	public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
-		super(typeBytes, NAME_ID, creator, note, feePow, timestamp, reference, signature);		
+		super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);		
 	}
-	public IssueNoteRecord(byte[] typeBytes, PublicKeyAccount creator, NoteCls note, byte[] signature) 
+	public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte[] signature) 
 	{
-		super(typeBytes, NAME_ID, creator, note, (byte)0, 0l, null, signature);		
+		super(typeBytes, NAME_ID, creator, template, (byte)0, 0l, null, signature);		
 	}
-	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference, byte[] signature) 
+	public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) 
 	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, note, feePow, timestamp, reference, signature);
+		this(new byte[]{TYPE_ID,0,0,0}, creator, template, feePow, timestamp, reference, signature);
 	}
-	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte[] signature) 
+	public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte[] signature) 
 	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, note, (byte)0, 0l, null, signature);
+		this(new byte[]{TYPE_ID,0,0,0}, creator, template, (byte)0, 0l, null, signature);
 	}
-	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note, byte feePow, long timestamp, Long reference) 
+	public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) 
 	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, note, feePow, timestamp, reference);
+		this(new byte[]{TYPE_ID,0,0,0}, creator, template, feePow, timestamp, reference);
 	}
-	public IssueNoteRecord(PublicKeyAccount creator, NoteCls note) 
+	public IssueTemplateRecord(PublicKeyAccount creator, TemplateCls template) 
 	{
-		this(new byte[]{TYPE_ID,0,0,0}, creator, note, (byte)0, 0l, null);
+		this(new byte[]{TYPE_ID,0,0,0}, creator, template, (byte)0, 0l, null);
 	}
 
 	//GETTERS/SETTERS
-	//public static String getName() { return "Issue Note"; }
+	//public static String getName() { return "Issue Template"; }
 	
 	// NOT GENESIS ISSUE STRT FRON NUM
 	protected long getStartKey() {
@@ -135,15 +135,15 @@ public class IssueNoteRecord extends Issue_ItemRecord
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		position += SIGNATURE_LENGTH;
 		
-		//READ NOTE
-		// note parse without reference - if is = signature
-		NoteCls note = NoteFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
-		position += note.getDataLength(false);
+		//READ PLATE
+		// template parse without reference - if is = signature
+		TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+		position += template.getDataLength(false);
 				
 		if (!asPack) {
-			return new IssueNoteRecord(typeBytes, creator, note, feePow, timestamp, reference, signatureBytes);
+			return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes);
 		} else {
-			return new IssueNoteRecord(typeBytes, creator, note, signatureBytes);
+			return new IssueTemplateRecord(typeBytes, creator, template, signatureBytes);
 		}
 	}	
 	

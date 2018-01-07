@@ -1,8 +1,15 @@
-package core.item.notes;
+package core.item.templates;
 
+//import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
-//import org.apache.log4j.Logger;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -12,25 +19,25 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 
-public class Note extends NoteCls {
+public class Sample_2 extends TemplateCls {
 	
-	private static final int TYPE_ID = NoteCls.NOTE;
+	private static final int TYPE_ID = TemplateCls.SAMPLE;
 
-	public Note(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public Sample_2(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		super(TYPE_ID, owner, name, icon, image, description);
 	}
-	public Note(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public Sample_2(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		super(typeBytes, owner, name, icon, image, description);
 	}
 
 	//GETTERS/SETTERS
-	public String getItemSubType() { return "note"; }
-
+	public String getItemSubType() { return "sample"; }
+	
 	//PARSE
 	// includeReference - TRUE only for store in local DB
-	public static Note parse(byte[] data, boolean includeReference) throws Exception
+	public static Sample_2 parse(byte[] data, boolean includeReference) throws Exception
 	{	
 
 		// READ TYPE
@@ -107,13 +114,13 @@ public class Note extends NoteCls {
 		}
 		
 		//RETURN
-		Note note = new Note(typeBytes, owner, name, icon, image, description);
+		Sample_2 template = new Sample_2(typeBytes, owner, name, icon, image, description);
 		if (includeReference)
 		{
-			note.setReference(reference);
+			template.setReference(reference);
 		}
 
-		return note;
+		return template;
 	}
 	
 }

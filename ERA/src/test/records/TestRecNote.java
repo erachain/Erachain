@@ -25,14 +25,14 @@ import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import core.item.notes.Note;
-import core.item.notes.NoteCls;
-import core.transaction.IssueNoteRecord;
+import core.item.templates.Template;
+import core.item.templates.TemplateCls;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.R_SignNote;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import datachain.DCSet;
-import datachain.ItemNoteMap;
+import datachain.ItemTemplateMap;
 import utils.Corekeys;
 import webserver.WebResource;
 
@@ -64,19 +64,19 @@ public class TestRecNote {
 	byte[] seed = Crypto.getInstance().digest("test".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
-	NoteCls note;
+	TemplateCls note;
 	long noteKey = -1;
-	IssueNoteRecord issueNoteRecord;
+	IssueTemplateRecord issueTemplateRecord;
 	R_SignNote signNoteRecord;
 
 	
-	ItemNoteMap noteMap;
+	ItemTemplateMap noteMap;
 
 	// INIT NOTES
 	private void init() {
 		
 		db = DCSet.createEmptyDatabaseSet();
-		noteMap = db.getItemNoteMap();
+		noteMap = db.getItemTemplateMap();
 		
 		gb = new GenesisBlock();
 		try {
@@ -93,13 +93,13 @@ public class TestRecNote {
 	}
 	private void initNote(boolean process) {
 		
-		note = new Note(maker, "test132", icon, image, "12345678910strontje");
+		note = new Template(maker, "test132", icon, image, "12345678910strontje");
 				
-		//CREATE ISSUE NOTE TRANSACTION
-		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issueNoteRecord.sign(maker, false);
+		//CREATE ISSUE PLATE TRANSACTION
+		issueTemplateRecord = new IssueTemplateRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+		issueTemplateRecord.sign(maker, false);
 		if (process) {
-			issueNoteRecord.process(db, gb, false);
+			issueTemplateRecord.process(db, gb, false);
 			noteKey = note.getKey(db);
 		}
 	}
@@ -111,7 +111,7 @@ public class TestRecNote {
 		assertEquals(-1111, vers);
 	}
 	
-	//ISSUE NOTE TRANSACTION
+	//ISSUE PLATE TRANSACTION
 	
 	@Test
 	public void validateSignatureIssueNoteTransaction() 
@@ -121,14 +121,14 @@ public class TestRecNote {
 		
 		initNote(false);
 		
-		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
-		assertEquals(true, issueNoteRecord.isSignatureValid());
+		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
+		assertEquals(true, issueTemplateRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
-		issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
+		issueTemplateRecord = new IssueTemplateRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
-		//CHECK IF ISSUE NOTE IS INVALID
-		assertEquals(false, issueNoteRecord.isSignatureValid());
+		//CHECK IF ISSUE PLATE IS INVALID
+		assertEquals(false, issueTemplateRecord.isSignatureValid());
 	}
 		
 
@@ -139,53 +139,53 @@ public class TestRecNote {
 		
 		init();
 		
-		NoteCls note = new Note(maker, "test132", icon, image, "12345678910strontje");
+		TemplateCls note = new Template(maker, "test132", icon, image, "12345678910strontje");
 		byte[] raw = note.toBytes(false, false);
 		assertEquals(raw.length, note.getDataLength(false));
 				
-		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issueNoteRecord.sign(maker, false);
-		issueNoteRecord.process(db, gb, false);
+		//CREATE ISSUE PLATE TRANSACTION
+		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+		issueTemplateRecord.sign(maker, false);
+		issueTemplateRecord.process(db, gb, false);
 		
 		//CONVERT TO BYTES
-		byte[] rawIssueNoteTransaction = issueNoteRecord.toBytes(true, null);
+		byte[] rawIssueNoteTransaction = issueTemplateRecord.toBytes(true, null);
 		
 		//CHECK DATA LENGTH
-		assertEquals(rawIssueNoteTransaction.length, issueNoteRecord.getDataLength(false));
+		assertEquals(rawIssueNoteTransaction.length, issueTemplateRecord.getDataLength(false));
 		
 		try 
 		{	
 			//PARSE FROM BYTES
-			IssueNoteRecord parsedIssueNoteTransaction = (IssueNoteRecord) TransactionFactory.getInstance().parse(rawIssueNoteTransaction, releaserReference);
+			IssueTemplateRecord parsedIssueNoteTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueNoteTransaction, releaserReference);
 			LOGGER.info("parsedIssueNoteTransaction: " + parsedIssueNoteTransaction);
 
 			//CHECK INSTANCE
-			assertEquals(true, parsedIssueNoteTransaction instanceof IssueNoteRecord);
+			assertEquals(true, parsedIssueNoteTransaction instanceof IssueTemplateRecord);
 			
 			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(issueNoteRecord.getSignature(), parsedIssueNoteTransaction.getSignature()));
+			assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueNoteTransaction.getSignature()));
 			
 			//CHECK ISSUER
-			assertEquals(issueNoteRecord.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
+			assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueNoteTransaction.getCreator().getAddress());
 			
 			//CHECK OWNER
-			assertEquals(issueNoteRecord.getItem().getOwner().getAddress(), parsedIssueNoteTransaction.getItem().getOwner().getAddress());
+			assertEquals(issueTemplateRecord.getItem().getOwner().getAddress(), parsedIssueNoteTransaction.getItem().getOwner().getAddress());
 			
 			//CHECK NAME
-			assertEquals(issueNoteRecord.getItem().getName(), parsedIssueNoteTransaction.getItem().getName());
+			assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueNoteTransaction.getItem().getName());
 				
 			//CHECK DESCRIPTION
-			assertEquals(issueNoteRecord.getItem().getDescription(), parsedIssueNoteTransaction.getItem().getDescription());
+			assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueNoteTransaction.getItem().getDescription());
 							
 			//CHECK FEE
-			assertEquals(issueNoteRecord.getFee(), parsedIssueNoteTransaction.getFee());	
+			assertEquals(issueTemplateRecord.getFee(), parsedIssueNoteTransaction.getFee());	
 			
 			//CHECK REFERENCE
-			//assertEquals(issueNoteRecord.getReference(), parsedIssueNoteTransaction.getReference());	
+			//assertEquals(issueTemplateRecord.getReference(), parsedIssueNoteTransaction.getReference());	
 			
 			//CHECK TIMESTAMP
-			assertEquals(issueNoteRecord.getTimestamp(), parsedIssueNoteTransaction.getTimestamp());				
+			assertEquals(issueTemplateRecord.getTimestamp(), parsedIssueNoteTransaction.getTimestamp());				
 		}
 		catch (Exception e) 
 		{
@@ -201,36 +201,36 @@ public class TestRecNote {
 		
 		init();				
 		
-		Note note = new Note(maker, "test", icon, image, "strontje");
+		Template template = new Template(maker, "test", icon, image, "strontje");
 				
-		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+		//CREATE ISSUE PLATE TRANSACTION
+		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		
-		assertEquals(Transaction.VALIDATE_OK, issueNoteRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(db, releaserReference));
 		
-		issueNoteRecord.sign(maker, false);
-		issueNoteRecord.process(db, gb, false);
+		issueTemplateRecord.sign(maker, false);
+		issueTemplateRecord.process(db, gb, false);
 		int mapSize = noteMap.size();
 		
-		LOGGER.info("note KEY: " + note.getKey(db));
+		LOGGER.info("template KEY: " + template.getKey(db));
 				
-		//CHECK NOTE EXISTS SENDER
-		long key = db.getIssueNoteMap().get(issueNoteRecord);
+		//CHECK PLATE EXISTS SENDER
+		long key = db.getIssueTemplateMap().get(issueTemplateRecord);
 		assertEquals(true, noteMap.contains(key));
 		
-		NoteCls note_2 = new Note(maker, "test132_2", icon, image, "2_12345678910strontje");				
-		IssueNoteRecord issueNoteTransaction_2 = new IssueNoteRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
+		TemplateCls note_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");				
+		IssueTemplateRecord issueNoteTransaction_2 = new IssueTemplateRecord(maker, note_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
 		issueNoteTransaction_2.sign(maker, false);
 		issueNoteTransaction_2.process(db, gb, false);
 		LOGGER.info("note_2 KEY: " + note_2.getKey(db));
 		issueNoteTransaction_2.orphan(db, false);
 		assertEquals(mapSize, noteMap.size());
 		
-		//CHECK NOTE IS CORRECT
-		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true, false), note.toBytes(true, false)));
+		//CHECK PLATE IS CORRECT
+		assertEquals(true, Arrays.equals(noteMap.get(key).toBytes(true, false), template.toBytes(true, false)));
 					
 		//CHECK REFERENCE SENDER
-		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
+		assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 	}
 	
 	
@@ -240,27 +240,27 @@ public class TestRecNote {
 		
 		init();
 				
-		Note note = new Note(maker, "test", icon, image, "strontje");
+		Template template = new Template(maker, "test", icon, image, "strontje");
 				
-		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(maker, note, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issueNoteRecord.sign(maker, false);
-		issueNoteRecord.process(db, gb, false);
-		long key = db.getIssueNoteMap().get(issueNoteRecord);
-		assertEquals(issueNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
+		//CREATE ISSUE PLATE TRANSACTION
+		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+		issueTemplateRecord.sign(maker, false);
+		issueTemplateRecord.process(db, gb, false);
+		long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+		assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 		
-		issueNoteRecord.orphan(db, false);
+		issueTemplateRecord.orphan(db, false);
 				
-		//CHECK NOTE EXISTS SENDER
+		//CHECK PLATE EXISTS SENDER
 		assertEquals(false, noteMap.contains(key));
 						
 		//CHECK REFERENCE SENDER
-		//assertEquals(issueNoteRecord.getReference(), maker.getLastReference(db));
+		//assertEquals(issueTemplateRecord.getReference(), maker.getLastReference(db));
 	}
 	
 	// TODO - in statement - valid on key = 999
 
-	//SIGN NOTE TRANSACTION
+	//SIGN PLATE TRANSACTION
 	
 	@Test
 	public void validateSignatureSignNoteTransaction() 
@@ -273,13 +273,13 @@ public class TestRecNote {
 		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
 		signNoteRecord.sign(maker, asPack);
 		
-		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
+		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
 		assertEquals(true, signNoteRecord.isSignatureValid());
 		
 		//INVALID SIGNATURE
 		signNoteRecord = new R_SignNote(maker, FEE_POWER, noteKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
 		
-		//CHECK IF ISSUE NOTE IS INVALID
+		//CHECK IF ISSUE PLATE IS INVALID
 		assertEquals(false, signNoteRecord.isSignatureValid());
 	}
 		

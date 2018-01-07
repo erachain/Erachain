@@ -1,11 +1,11 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JMenuItem;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.items.Item_SplitPanel;
@@ -25,7 +25,7 @@ public class Templates_Favorite_SplitPanel extends Item_SplitPanel {
 		vouch_menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DCSet db = DCSet.getInstance();
-				Transaction trans = db.getTransactionFinalMap().getTransaction(((NoteCls) th.item_Menu).getReference());
+				Transaction trans = db.getTransactionFinalMap().getTransaction(((TemplateCls) th.item_Menu).getReference());
 				new VouchRecordDialog(trans.getBlockHeight(db), trans.getSeqNo(db));
 				
 			}
@@ -36,7 +36,7 @@ public class Templates_Favorite_SplitPanel extends Item_SplitPanel {
 	// show details
 	@Override
 	public Component get_show(ItemCls item) {
-		return  new Info_Notes((NoteCls) item);
+		return  new Info_Notes((TemplateCls) item);
 	}
 	
 	@Override

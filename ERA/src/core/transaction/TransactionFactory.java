@@ -146,10 +146,10 @@ public class TransactionFactory {
 			//PARSE ISSUE IMPRINT TRANSACTION
 			return IssueImprintRecord.Parse(data, releaserReference);
 
-		case Transaction.ISSUE_NOTE_TRANSACTION:
+		case Transaction.ISSUE_TEMPLATE_TRANSACTION:
 			
-			//PARSE ISSUE NOTE TRANSACTION
-			return IssueNoteRecord.Parse(data, releaserReference);
+			//PARSE ISSUE PLATE TRANSACTION
+			return IssueTemplateRecord.Parse(data, releaserReference);
 
 		case Transaction.ISSUE_PERSON_TRANSACTION:
 			
@@ -158,12 +158,12 @@ public class TransactionFactory {
 
 		case Transaction.ISSUE_STATUS_TRANSACTION:
 			
-			//PARSE ISSUE NOTE TRANSACTION
+			//PARSE ISSUE PLATE TRANSACTION
 			return IssueStatusRecord.Parse(data, releaserReference);
 
 		case Transaction.ISSUE_UNION_TRANSACTION:
 			
-			//PARSE ISSUE NOTE TRANSACTION
+			//PARSE ISSUE PLATE TRANSACTION
 			return IssueUnionRecord.Parse(data, releaserReference);
 
 		/*
@@ -190,10 +190,10 @@ public class TransactionFactory {
 			//PARSE ISSUE PERSON TRANSACTION
 			return GenesisIssuePersonRecord.Parse(data);
 
-		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+		case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
 			
-			//PARSE ISSUE NOTE TRANSACTION
-			return GenesisIssueNoteRecord.Parse(data);
+			//PARSE ISSUE PLATE TRANSACTION
+			return GenesisIssueTemplateRecord.Parse(data);
 
 		case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
 			

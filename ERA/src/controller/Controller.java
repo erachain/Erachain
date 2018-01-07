@@ -63,10 +63,10 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
+import core.item.templates.TemplateCls;
 import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
@@ -617,15 +617,6 @@ public class Controller extends Observable {
 		}
 	}
 
-	/*
-	 * public void replaseAssetsFavorites() { if(this.wallet != null) {
-	 * this.wallet.replaseAssetFavorite(); } } public void
-	 * replaseNotesFavorites() { if(this.wallet != null) {
-	 * this.wallet.replaseNoteFavorite(); } } public void
-	 * replasePersonsFavorites() { if(this.wallet != null) {
-	 * this.wallet.replasePersonFavorite(); } }
-	 */
-
 	public void replaseFavoriteItems(int type) {
 		this.wallet.replaseFavoriteItems(type);
 	}
@@ -769,8 +760,8 @@ public class Controller extends Observable {
 			// ADD OBSERVER TO IMPRINTS
 			this.dcSet.getItemImprintMap().addObserver(o);
 
-			// ADD OBSERVER TO NOTES
-			this.dcSet.getItemNoteMap().addObserver(o);
+			// ADD OBSERVER TO TEMPLATES
+			this.dcSet.getItemTemplateMap().addObserver(o);
 
 			// ADD OBSERVER TO PERSONS
 			this.dcSet.getItemPersonMap().addObserver(o);
@@ -2106,6 +2097,10 @@ public class Controller extends Observable {
 		return this.wallet.unlock(password);
 	}
 
+	public boolean unlockOnceWallet(String password) {
+		return this.wallet.unlockOnce(password);
+	}
+
 	public void setSecondsToUnlock(int seconds) {
 		this.wallet.setSecondsToUnlock(seconds);
 	}
@@ -2209,22 +2204,14 @@ public class Controller extends Observable {
 		this.wallet.addItemFavorite(item);
 	}
 
-	/*
-	 * public void removeAssetFavorite(AssetCls asset) {
-	 * this.wallet.removeAssetFavorite(asset); } public void
-	 * removeNoteFavorite(NoteCls note) { this.wallet.removeNoteFavorite(note);
-	 * } public void removePersonFavorite(PersonCls person) {
-	 * this.wallet.removePersonFavorite(person); }
-	 */
-
 	public Item_Map getItemMap(int type) {
 		switch (type) {
 		case ItemCls.ASSET_TYPE:
 			return this.dcSet.getItemAssetMap();
 		case ItemCls.IMPRINT_TYPE:
 			return this.dcSet.getItemImprintMap();
-		case ItemCls.NOTE_TYPE:
-			return this.dcSet.getItemNoteMap();
+		case ItemCls.TEMPLATE_TYPE:
+			return this.dcSet.getItemTemplateMap();
 		case ItemCls.PERSON_TYPE:
 			return this.dcSet.getItemPersonMap();
 		}
@@ -2235,15 +2222,6 @@ public class Controller extends Observable {
 		this.wallet.removeItemFavorite(item);
 	}
 
-	/*
-	 * public boolean isAssetFavorite(AssetCls asset) { return
-	 * this.wallet.isAssetFavorite(asset); }
-	 * 
-	 * public boolean isNoteFavorite(NoteCls note) { return
-	 * this.wallet.isNoteFavorite(note); } public boolean
-	 * isPersonFavorite(PersonCls person) { return
-	 * this.wallet.isPersonFavorite(person); }
-	 */
 	public boolean isItemFavorite(ItemCls item) {
 		return this.wallet.isItemFavorite(item);
 	}
@@ -2255,15 +2233,6 @@ public class Controller extends Observable {
 	public Collection<ItemCls> getAllItems(int type) {
 		return getItemMap(type).getValuesAll();
 	}
-
-	/*
-	 * public Collection<ItemCls> getAllAssets() { return
-	 * this.dcSet.getAssetMap().getValuesAll(); }
-	 * 
-	 * public Collection<ItemCls> getAllNotes() { return
-	 * this.dcSet.getNoteMap().getValuesAll(); } public Collection<ItemCls>
-	 * getAllPersons() { return this.dcSet.getPersonMap().getValuesAll(); }
-	 */
 
 	public void onDatabaseCommit() {
 		this.wallet.commit();
@@ -2435,8 +2404,8 @@ public class Controller extends Observable {
 		return (StatusCls) this.dcSet.getItemStatusMap().get(key);
 	}
 
-	public NoteCls getNote(long key) {
-		return (NoteCls) this.dcSet.getItemNoteMap().get(key);
+	public TemplateCls getTemplate(long key) {
+		return (TemplateCls) this.dcSet.getItemTemplateMap().get(key);
 	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
@@ -2460,9 +2429,9 @@ public class Controller extends Observable {
 		return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
 	}
 
-	// NOTES
-	public NoteCls getItemNote(long key) {
-		return (NoteCls) this.dcSet.getItemNoteMap().get(key);
+	// TEMPLATES
+	public TemplateCls getItemTemplate(long key) {
+		return (TemplateCls) this.dcSet.getItemTemplateMap().get(key);
 	}
 
 	// PERSONS
@@ -2490,8 +2459,8 @@ public class Controller extends Observable {
 		case ItemCls.IMPRINT_TYPE: {
 			return db.getItemImprintMap().get(key);
 		}
-		case ItemCls.NOTE_TYPE: {
-			return db.getItemNoteMap().get(key);
+		case ItemCls.TEMPLATE_TYPE: {
+			return db.getItemTemplateMap().get(key);
 		}
 		case ItemCls.PERSON_TYPE: {
 			return db.getItemPersonMap().get(key);
@@ -2663,11 +2632,11 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Transaction issueNote(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
+	public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssueNoteTransaction(creator, name, description, icon, image, feePow);
+			return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image, feePow);
 		}
 	}
 

@@ -145,7 +145,7 @@ public interface AT_API {
 	 */
 	public void swap_A_and_B( AT_Machine_State state );
 	
-	// note: these 8 math ops are intended for a future implementaion so no need to support them
+	// template: these 8 math ops are intended for a future implementaion so no need to support them
 	
 	/**
 	 * adds A to B (result in B)
@@ -217,7 +217,7 @@ public interface AT_API {
 	 */
 	public void xor_B_with_A( AT_Machine_State state );
 	
-	// end note
+	// end template
 	// end range 0x0100..0x01ff
 	
 	

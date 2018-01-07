@@ -10,7 +10,7 @@ import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
@@ -18,11 +18,11 @@ import gui.Gui;
 import utils.ObserverMessage;
 
 
-public class NotesFavorites implements Observer{
+public class TemplatesFavorites implements Observer{
 
 	private List<Long> favorites;
 	
-	public NotesFavorites() {
+	public TemplatesFavorites() {
 		this.favorites = new ArrayList<Long>(); 
 		
 		Controller.getInstance().addWalletListener(this);
@@ -34,15 +34,15 @@ public class NotesFavorites implements Observer{
 		return this.favorites;
 	}
 	
-	public List<NoteCls> getNotes()
+	public List<TemplateCls> getTemplates()
 	{
-		List<NoteCls> notes = new ArrayList<NoteCls>();
-		//notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY));		
-		//notes.add(Controller.getInstance().getNote(Transaction.FEE_KEY + 1l));		
+		List<TemplateCls> template = new ArrayList<TemplateCls>();
+		//template.add(Controller.getInstance().getTemplate(Transaction.FEE_KEY));		
+		//template.add(Controller.getInstance().getTemplate(Transaction.FEE_KEY + 1l));		
 		for (Long key : this.favorites) {
-			notes.add(Controller.getInstance().getItemNote(key));
+			template.add(Controller.getInstance().getItemTemplate(key));
 		}
-		return notes;
+		return template;
 	}
 	
 	
@@ -84,7 +84,7 @@ public class NotesFavorites implements Observer{
 			
 			////////this.favorites = favoritesUpadate;
 
-			///////Controller.getInstance().replaseNotesFavorites();
+			///////Controller.getInstance().replaseTemplatesFavorites();
 		}
 	}
 }

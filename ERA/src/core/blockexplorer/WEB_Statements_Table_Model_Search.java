@@ -249,7 +249,7 @@ public class WEB_Statements_Table_Model_Search extends AbstractTableModel implem
 		*/
 
 			case COLUMN_NOTE:
-				ItemCls it = ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				ItemCls it = ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey());
 				if (it == null) return "";
 				return it.toString();
 				

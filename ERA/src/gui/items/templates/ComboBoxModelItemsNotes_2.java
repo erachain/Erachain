@@ -1,4 +1,4 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import javax.swing.DefaultComboBoxModel;
 import utils.ObserverMessage;
 import controller.Controller;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import gui.items.ComboBoxModelItems;
 
 @SuppressWarnings("serial")
@@ -22,6 +22,6 @@ public class ComboBoxModelItemsNotes_2 extends ComboBoxModelItems
 	
 	public ComboBoxModelItemsNotes_2()
 	{
-		super(ObserverMessage.LIST_NOTE_FAVORITES_TYPE, ItemCls.NOTE_TYPE);
+		super(ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE, ItemCls.TEMPLATE_TYPE);
 	}
 }

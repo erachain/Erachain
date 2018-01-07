@@ -13,20 +13,20 @@ import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.item.templates.TemplateCls;
 import core.item.unions.UnionCls;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.CreatePollTransaction;
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteRecord;
+import core.transaction.GenesisIssueTemplateRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
-import core.transaction.IssueNoteRecord;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
@@ -104,8 +104,8 @@ public class WEB_Transactions_HTML {
 		case Transaction.ISSUE_IMPRINT_TRANSACTION:
 			out= out+ issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction);
 			break;
-		case Transaction.ISSUE_NOTE_TRANSACTION:
-			out= out+ issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+		case Transaction.ISSUE_TEMPLATE_TRANSACTION:
+			out= out+ issue_Template_HTML(transaction, langObj) + get_Vouches(transaction);
 			break;
 		case Transaction.ISSUE_STATUS_TRANSACTION:
 			out= out+ issue_Status_HTML(transaction, langObj) + get_Vouches(transaction);
@@ -146,8 +146,8 @@ public class WEB_Transactions_HTML {
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			out= out+ genesis_Issue_Asset_HTML(transaction, langObj) + get_Vouches(transaction);
 			break;
-		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
-			out= out+ genesis_Issue_Note_HTML(transaction, langObj) + get_Vouches(transaction);
+		case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
+			out= out+ genesis_Issue_Template_HTML(transaction, langObj) + get_Vouches(transaction);
 			break;
 		case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
 			out= out+ genesis_Certify_Person_HTML(transaction, langObj) + get_Vouches(transaction);
@@ -198,13 +198,13 @@ public class WEB_Transactions_HTML {
 		return out;
 	}
 
-	private String genesis_Issue_Note_HTML(Transaction transaction, JSONObject langObj) {
+	private String genesis_Issue_Template_HTML(Transaction transaction, JSONObject langObj) {
 		// TODO Auto-generated method stub
 		String out = "";
-		GenesisIssueNoteRecord noteIssue =(GenesisIssueNoteRecord)transaction;
-		NoteCls note = (NoteCls)noteIssue.getItem();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +note.getName();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + library.viewDescriptionHTML(note.getDescription());
+		GenesisIssueTemplateRecord templateIssue =(GenesisIssueTemplateRecord)transaction;
+		TemplateCls template = (TemplateCls)templateIssue.getItem();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +template.getName();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + library.viewDescriptionHTML(template.getDescription());
 		return out;
 	}
 
@@ -387,7 +387,7 @@ public class WEB_Transactions_HTML {
 		R_SignNote r_Statement = (R_SignNote)transaction;
 			if (r_Statement.getKey() > 0) {
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Key", langObj) + ":</b> "
-						+ Controller.getInstance().getNote( r_Statement.getKey()).toString() + "<br>";
+						+ Controller.getInstance().getTemplate( r_Statement.getKey()).toString() + "<br>";
 			}
 			if (r_Statement.getData() != null) {
 				String ss = (( r_Statement.isText() ) ? library.viewDescriptionHTML(new String(r_Statement.getData(), Charset.forName("UTF-8"))) : library.viewDescriptionHTML(Converter.toHex(r_Statement.getData())));
@@ -444,14 +444,14 @@ public class WEB_Transactions_HTML {
 		return out;
 	}
 
-	private String issue_Note_HTML(Transaction transaction, JSONObject langObj) {
+	private String issue_Template_HTML(Transaction transaction, JSONObject langObj) {
 		// TODO Auto-generated method stub
 		String out = "";
-		IssueNoteRecord noteIssue = (IssueNoteRecord) transaction;
+		IssueTemplateRecord templateIssue = (IssueTemplateRecord) transaction;
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
-				+ noteIssue.getItem().getName() + "<br>";
+				+ templateIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-				+ library.viewDescriptionHTML(noteIssue.getItem().getDescription()) + "<br>";
+				+ library.viewDescriptionHTML(templateIssue.getItem().getDescription()) + "<br>";
 
 		return out;
 	}

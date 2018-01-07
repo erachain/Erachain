@@ -32,8 +32,8 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.templates.TemplateCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.transaction.ArbitraryTransaction;
@@ -45,7 +45,7 @@ import core.transaction.CreatePollTransaction;
 import core.transaction.Issue_ItemRecord;
 //import core.transaction.IssueAssetTransaction;
 //import core.transaction.IssueImprintRecord;
-//import core.transaction.IssueNoteRecord;
+//import core.transaction.IssueTemplateRecord;
 //import core.transaction.IssuePersonRecord;
 //import core.transaction.IssueUnionRecord;
 import core.transaction.R_Send;
@@ -60,7 +60,7 @@ import core.voting.Poll;
 
 //import core.wallet.ItemsFavorites;
 import core.wallet.AssetsFavorites;
-import core.wallet.NotesFavorites;
+import core.wallet.TemplatesFavorites;
 import core.wallet.PersonsFavorites;
 import database.wallet.SecureWalletDatabase;
 import database.wallet.BlockMap;
@@ -88,7 +88,7 @@ public class Wallet extends Observable implements Observer
 	private int syncHeight;
 	
 	AssetsFavorites assetsFavorites; 
-	NotesFavorites notesFavorites; 
+	TemplatesFavorites templatesFavorites; 
 	PersonsFavorites personsFavorites; 
 	
 	static Logger LOGGER = Logger.getLogger(Wallet.class.getName());
@@ -126,8 +126,8 @@ public class Wallet extends Observable implements Observer
 		if(this.assetsFavorites == null){
 			this.assetsFavorites = new AssetsFavorites();
 		}
-		if(this.notesFavorites == null){
-			this.notesFavorites = new NotesFavorites();
+		if(this.templatesFavorites == null){
+			this.templatesFavorites = new TemplatesFavorites();
 		}
 		if(this.personsFavorites == null){
 			this.personsFavorites = new PersonsFavorites();
@@ -345,41 +345,6 @@ public class Wallet extends Observable implements Observer
 		this.database.addItemToFavorite(item);
 	}
 
-	/*
-	public void replaseAssetFavorite()
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		if(this.assetsFavorites != null) {
-			this.database.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());	
-		}
-	}
-	public void replaseNoteFavorite()
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		if(this.notesFavorites != null) {
-			this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());	
-		}
-	}
-	public void replasePersonFavorite()
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		if(this.personsFavorites != null) {
-			this.database.getPersonFavoritesSet().replace(this.personsFavorites.getKeys());	
-		}
-	}
-	*/
 	// тут нужно понять где это используется
 	public void replaseFavoriteItems(int type)
 	{
@@ -393,9 +358,9 @@ public class Wallet extends Observable implements Observer
 				if(this.assetsFavorites != null) {
 					this.database.getAssetFavoritesSet().replace(this.assetsFavorites.getKeys());
 				}
-			case ItemCls.NOTE_TYPE:
-				if(this.notesFavorites != null) {
-					this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());
+			case ItemCls.TEMPLATE_TYPE:
+				if(this.templatesFavorites != null) {
+					this.database.getTemplateFavoritesSet().replace(this.templatesFavorites.getKeys());
 				}
 			case ItemCls.PERSON_TYPE:
 				if(this.personsFavorites != null) {
@@ -404,26 +369,6 @@ public class Wallet extends Observable implements Observer
 		}
 	}
 	
-	/*
-	public void removeAssetFavorite(AssetCls asset)
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		this.database.getAssetFavoritesSet().delete(asset.getKey());
-	}
-	public void removeNoteFavorite(NoteCls note)
-	{
-		if(!this.exists())
-		{
-			return;
-		}
-		
-		this.database.getNoteFavoritesSet().delete(note.getKey());
-	}
-	*/
 	public void removeItemFavorite(ItemCls item)
 	{
 		if(!this.exists())
@@ -434,26 +379,6 @@ public class Wallet extends Observable implements Observer
 		this.database.removeItemFromFavorite(item);
 	}
 	
-	/*
-	public boolean isAssetFavorite(AssetCls asset)
-	{
-		if(!this.exists())
-		{
-			return false;
-		}
-		
-		return this.database.getAssetFavoritesSet().contains(asset.getKey());
-	}
-	public boolean isNoteFavorite(NoteCls note)
-	{
-		if(!this.exists())
-		{
-			return false;
-		}
-		
-		return this.database.getNoteFavoritesSet().contains(note.getKey());
-	}
-	*/
 	public boolean isItemFavorite(ItemCls item)
 	{
 		if(!this.exists())
@@ -652,7 +577,7 @@ public class Wallet extends Observable implements Observer
 			this.database.getPollMap().reset();
 			this.database.getAssetMap().reset();
 			this.database.getImprintMap().reset();
-			this.database.getNoteMap().reset();
+			this.database.getTemplateMap().reset();
 			this.database.getPersonMap().reset();
 			this.database.getStatusMap().reset();
 			this.database.getUnionMap().reset();
@@ -761,142 +686,11 @@ public class Wallet extends Observable implements Observer
 					ObserverMessage.NETWORK_STATUS, Controller.STATUS_SYNCHRONIZING));
 		}
 		
-		//SET LAST BLOCK
-		
-		/*//SCAN TRANSACTIONS
-		Map<Account, List<Transaction>> transactions;
-		synchronized(accounts)
-		{
-			transactions = Controller.getInstance().scanTransactions(accounts);
-		}
-		
-		//DELETE TRANSACTIONS
-		this.database.getTransactionMap().deleteAll(accounts);
-		
-		//ADD TRANSACTIONS
-		this.database.getTransactionMap().addAll(transactions);
-	    	
-		//TODO SCAN UNCONFIRMED TRANSACTIONS    
-	    	    
-	    //SCAN BLOCKS
-	    Map<Account, List<Block>> blocks;
-	    synchronized(accounts)
-		{
-	    	blocks = Controller.getInstance().scanBlocks(accounts);
-		}
-	    
-	    //DELETE BLOCKS
-	  	this.database.getBlockMap().deleteAll(accounts);
-	  	
-	  	//ADD BLOCKS
-	  	this.database.getBlockMap().addAll(blocks);
-	    
-	    //SCAN NAMES
-	    Map<Account, List<Name>> names;
-	    synchronized(accounts)
-		{
-	    	names = Controller.getInstance().scanNames(accounts);
-		}
-	    
-	    //DELETE NAMES
-	  	this.database.getNameMap().deleteAll(accounts);
-	  	
-	  	//ADD NAMES
-	  	this.database.getNameMap().addAll(names);
-	  	
-	  	//TODO SCAN UNCONFIRMED NAMES
-	    
-	  	//SCAN NAMESALES
-	    Map<Account, List<NameSale>> nameSales;
-	    synchronized(accounts)
-		{
-	    	nameSales = Controller.getInstance().scanNameSales(accounts);
-		}
-	    
-	    //DELETE NAMESALES
-	  	this.database.getNameSaleMap().deleteAll(accounts);
-	  	
-	  	//ADD NAMES
-	  	this.database.getNameSaleMap().addAll(nameSales);
-	  	
-	  	//SCAN POLLS
-	  	Map<Account, List<Poll>> polls;
-	  	synchronized(accounts)
-	  	{
-	  		polls = Controller.getInstance().scanPolls(accounts);
-	  	}
-	  	
-	  	//DELETE POLLS
-	  	this.database.getPollMap().deleteAll(accounts);
-	  	
-	  	//ADD POLLS
-	  	this.database.getPollMap().addAll(polls);
-	  	
-	  	//SCAN ASSETS
-		Map<Account, List<Asset>> assets;
-	  	synchronized(accounts)
-	  	{
-	  		assets = Controller.getInstance().scanAssets(accounts);
-	  	}
-	  	
-	  	//DELETE ASSETS
-	  	this.database.getAssetMap().deleteAll(accounts);
-	  	
-	  	//ADD ASSETS
-	  	this.database.getAssetMap().addAll(assets);
-
-	  	//SCAN ORDERS
-	  	Map<Account, List<Order>> orders;
-	  	synchronized(accounts)
-	  	{
-	  		orders = Controller.getInstance().scanOrders(accounts);
-	  	}
-	  	
-	  	//DELETE ASSETS
-	  	this.database.getOrderMap().deleteAll(accounts);
-	  	
-	  	//ADD ASSETS
-	  	this.database.getOrderMap().addAll(orders);
-
-	  	//SCAN NOTES --------
-	  	 * notes!
-		Map<Account, List<NoteCls>> notes;
-	  	synchronized(accounts)
-	  	{
-	  		assets = Controller.getInstance().scanAssets(accounts);
-	  	}
-	  	
-	  	//DELETE NOTES
-	  	this.database.getAssetMap().deleteAll(accounts);
-	  	
-	  	//ADD ASSETS
-	  	this.database.getAssetMap().addAll(assets);
-
-	  	//SCAN ORDERS
-	  	Map<Account, List<Order>> orders;
-	  	synchronized(accounts)
-	  	{
-	  		orders = Controller.getInstance().scanOrders(accounts);
-	  	}
-	  	
-	  	//DELETE ASSETS
-	  	this.database.getOrderMap().deleteAll(accounts);
-	  	
-	  	//ADD ASSETS ---- notes
-	  	this.database.getOrderMap().addAll(orders);
-
-	  	//SET LAST BLOCK
-	  	this.database.setLastBlockSignature(Controller.getInstance().getLastBlock().getSignature());*/
 	}
 	
 	//UNLOCK
-	
-	public boolean unlock(String password)
+	public boolean unlockOnce(String password)
 	{
-		if(this.isUnlocked())
-		{
-			return true;
-		}
 		
 		//TRY TO UNLOCK
 		try
@@ -909,6 +703,18 @@ public class Wallet extends Observable implements Observer
 			return false;
 		}
 	}
+	
+	public boolean unlock(String password)
+	{
+		if(this.isUnlocked())
+		{
+			return true;
+		}
+		
+		//TRY TO UNLOCK
+		return unlockOnce(password);
+		
+		}
 	
 	public boolean unlock(SecureWalletDatabase secureDatabase)
 	{
@@ -1061,8 +867,8 @@ public class Wallet extends Observable implements Observer
 		//REGISTER ON IMPRINTS
 		this.database.getImprintMap().addObserver(o);
 
-		//REGISTER ON NOTES
-		this.database.getNoteMap().addObserver(o);
+		//REGISTER ON TEMPLATES
+		this.database.getTemplateMap().addObserver(o);
 
 		//REGISTER ON PERSONS
 		this.database.getPersonMap().addObserver(o);
@@ -1079,8 +885,8 @@ public class Wallet extends Observable implements Observer
 		//REGISTER ON ASSET FAVORITES
 		this.database.getAssetFavoritesSet().addObserver(o);
 		
-		//REGISTER ON NOTE FAVORITES
-		this.database.getNoteFavoritesSet().addObserver(o);
+		//REGISTER ON PLATE FAVORITES
+		this.database.getTemplateFavoritesSet().addObserver(o);
 
 		//REGISTER ON PERSON FAVORITES
 		this.database.getPersonFavoritesSet().addObserver(o);

@@ -1,7 +1,7 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import core.block.GenesisBlock;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.library.Accounts_Library_Panel;
@@ -15,11 +15,11 @@ public class Info_Notes extends javax.swing.JPanel {
 
     /**
      * Creates new form Info_Notes
-     * @param note 
+     * @param template 
      */
-	NoteCls note;
+	TemplateCls note;
 	
-    public Info_Notes(NoteCls note) {
+    public Info_Notes(TemplateCls note) {
     	this.note = note;
         initComponents();
         
@@ -144,7 +144,7 @@ public class Info_Notes extends javax.swing.JPanel {
 		// statuses panel
 		
 
-//		jTabbedPane1.add(new Statuses_Library_Panel(note..getOwner()));
+//		jTabbedPane1.add(new Statuses_Library_Panel(template..getOwner()));
 
 		
 

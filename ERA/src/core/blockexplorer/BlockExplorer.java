@@ -48,8 +48,8 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.templates.TemplateCls;
 import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransaction;
@@ -3646,7 +3646,7 @@ if ( asset_1 == null) {
 		output.put("block",block);
 		output.put("Seg_No",seg_No);
 		
-		NoteCls statement = (NoteCls)ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, trans.getKey());
+		TemplateCls statement = (TemplateCls)ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, trans.getKey());
 			
 		
 		if (!trans.isEncrypted()) {
@@ -3677,9 +3677,9 @@ if ( asset_1 == null) {
 	// V2.0 Template
 					if (jSON.containsKey("Template") ){
 						Long key = new Long(jSON.get("Template")+"");
-						NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,key);
-						 if (note != null){
-							 String description = note.getDescription(); 	
+						TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,key);
+						 if (template != null){
+							 String description = template.getDescription(); 	
 					
 	// Template Params
 						if (jSON.containsKey("Statement_Params") ){
@@ -3704,9 +3704,9 @@ if ( asset_1 == null) {
 	// V2.1 Template
 					if ( jSON.containsKey("TM")){
 						Long key = new Long(jSON.get("TM")+"");
-						NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE,key);
-						if (note != null){
-							 String description = note.getDescription(); 
+						TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE,key);
+						if (template != null){
+							 String description = template.getDescription(); 
 						 
 	// Template Params
 							 if (jSON.containsKey("PR")){
@@ -3864,9 +3864,9 @@ if ( asset_1 == null) {
 			 String str;
 			 JSONObject params = new JSONObject();
 			 JSONObject data = new JSONObject();
-			 NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
-			 if (note != null){
-			 description = note.getDescription(); 
+			 TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, statement.getKey());
+			 if (template != null){
+			 description = template.getDescription(); 
 			 data = (JSONObject) JSONValue.parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
 				str = data.get("Statement_Params").toString();
 				 params = (JSONObject) JSONValue.parseWithException(str);
@@ -3912,8 +3912,8 @@ if ( asset_1 == null) {
 		
 		} else {
 			
-			NoteCls note = (NoteCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, statement.getKey());
-			output.put("statement",note.getName() + "<br>"
+			TemplateCls template = (TemplateCls) ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, statement.getKey());
+			output.put("statement",template.getName() + "<br>"
 					+  Lang.getInstance().translate_from_langObj("Encrypted",langObj));			
 		}
 

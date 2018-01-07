@@ -14,24 +14,24 @@ import database.serializer.ItemSerializer;
 //import database.serializer.ItemSerializer;
 import datachain.DCSet;
 
-public class ItemNoteMap extends Item_Map 
+public class ItemTemplateMap extends Item_Map 
 {
-	static final String NAME = "item_notes";
-	static final int TYPE = ItemCls.NOTE_TYPE;
+	static final String NAME = "item_templates";
+	static final int TYPE = ItemCls.TEMPLATE_TYPE;
 	
-	public ItemNoteMap(DCSet databaseSet, DB database)
+	public ItemTemplateMap(DCSet databaseSet, DB database)
 	{
 		super(databaseSet, database,
 				//TYPE,
-				"item_notes",
-				ObserverMessage.RESET_NOTE_TYPE,
-				ObserverMessage.ADD_NOTE_TYPE,
-				ObserverMessage.REMOVE_NOTE_TYPE,
-				ObserverMessage.LIST_NOTE_TYPE
+				"item_templates",
+				ObserverMessage.RESET_TEMPLATE_TYPE,
+				ObserverMessage.ADD_TEMPLATE_TYPE,
+				ObserverMessage.REMOVE_TEMPLATE_TYPE,
+				ObserverMessage.LIST_TEMPLATE_TYPE
 				);		
 	}
 
-	public ItemNoteMap(ItemNoteMap parent) 
+	public ItemTemplateMap(ItemTemplateMap parent) 
 	{
 		super(parent);
 	}
@@ -43,7 +43,6 @@ public class ItemNoteMap extends Item_Map
 		//OPEN MAP
 		return database.createTreeMap(NAME)
 				.valueSerializer(new ItemSerializer(TYPE))
-				//.valueSerializer(new NoteSerializer())
 				.makeOrGet();
 	}
 

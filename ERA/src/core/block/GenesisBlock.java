@@ -31,16 +31,16 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 //import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
-import core.item.notes.NoteCls;
-import core.item.notes.Note;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
+import core.item.templates.Template;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteRecord;
+import core.transaction.GenesisIssueTemplateRecord;
 import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusRecord;
 import core.transaction.GenesisTransferAssetTransaction;
@@ -503,9 +503,9 @@ public class GenesisBlock extends Block{
 		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++) 
 			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
-		///// NOTES
-		for (int i = 1; i <= NoteCls.UNHIRING_KEY; i++) 
-			transactions.add(new GenesisIssueNoteRecord(makeNote(i)));
+		///// TEMPLATES
+		for (int i = 1; i <= TemplateCls.UNHIRING_KEY; i++) 
+			transactions.add(new GenesisIssueTemplateRecord(makeTemplate(i)));
 
 		///// STATUSES
 		for (int i = 1; i <= StatusCls.MEMBER_KEY; i++)
@@ -552,18 +552,18 @@ public class GenesisBlock extends Block{
 		}
 		return null;
 	}
-	// make notes
-	public static Note makeNote(int key) 
+	// make templates
+	public static Template makeTemplate(int key) 
 	{
 		switch(key)
 		{
-		case (int)NoteCls.LICENSE_KEY:
+		case (int)TemplateCls.LICENSE_KEY:
 			String license = "";
 			try {
 				//FileInputStream fis = new FileInputStream("Aronicle License ERA.txt");
 				//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
 				//Reader in = new BufferedReader(isr);
-				File file = new File("Aronicle License ERA.txt");
+				File file = new File("License Erachain.txt");
 				//READ SETTINS JSON FILE
 				List<String> lines = Files.readLines(file, Charsets.UTF_8);
 				
@@ -575,23 +575,24 @@ public class GenesisBlock extends Block{
 				return null;
 			}
 		
-			return new Note(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
+			return new Template(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
 					//+ " \"" + Controller.APP_NAME + "\"", icon, image,
 					+ " \"ERM4\"", icon, image,
 					license
 					);
-		case (int)NoteCls.MARRIAGE_KEY:
-			return new Note(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
-		case (int)NoteCls.UNMARRIAGE_KEY:
-			return new Note(CREATOR, "Заявление о разводе", icon, image, "Я, %person1%, развожусь с %person2%");
-		case (int)NoteCls.HIRING_KEY:
-			return new Note(CREATOR, "Заявление о приёме на работу", icon, image, "Прошу принять меня в объединение %union%, на должность %job%");
-		case (int)NoteCls.UNHIRING_KEY:
-			return new Note(CREATOR, "Заявление об уволнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
+		case (int)TemplateCls.MARRIAGE_KEY:
+			return new Template(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
+		case (int)TemplateCls.UNMARRIAGE_KEY:
+			return new Template(CREATOR, "Заявление о разводе", icon, image, "Я, %person1%, развожусь с %person2%");
+		case (int)TemplateCls.HIRING_KEY:
+			return new Template(CREATOR, "Заявление о приёме на работу", icon, image, "Прошу принять меня в объединение %union%, на должность %job%");
+		case (int)TemplateCls.UNHIRING_KEY:
+			return new Template(CREATOR, "Заявление об уволнении", icon, image, "Прошу уволить меня из объединения %union% по собственному желанию");
 		}
-		return new Note(CREATOR, "empty", icon, image, "empty");
+		return new Template(CREATOR, "empty", icon, image, "empty");
 	}
-	// make notes
+	
+	// make statuses
 	public static Status makeStatus(int key)
 	{
 		if (key == StatusCls.MEMBER_KEY) return new Status(CREATOR,

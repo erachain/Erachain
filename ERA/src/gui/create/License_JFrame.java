@@ -28,8 +28,8 @@ import core.BlockChain;
 import core.block.GenesisBlock;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
+import core.item.templates.TemplateCls;
 import datachain.DCSet;
 import lang.Lang;
 
@@ -38,31 +38,31 @@ public class License_JFrame extends JDialog {
 	boolean needAccept;
 	NoWalletFrame parent;
 	boolean goCreateWallet;
-	NoteCls note;
+	TemplateCls template;
 
 	static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
 
-    public License_JFrame(NoteCls note, boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
-    	this.note = note;
+    public License_JFrame(TemplateCls template, boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
+    	this.template = template;
     	this.needAccept = needAccept;
     	this.parent = parent;
     	this.goCreateWallet = goCreateWallet;
     	initComponents();
     }
-    public License_JFrame(NoteCls note, boolean needAccept) {
-    	this.note = note;
+    public License_JFrame(TemplateCls template, boolean needAccept) {
+    	this.template = template;
     	this.needAccept = needAccept;
     	initComponents();
     }
 
-    public License_JFrame(NoteCls note) {
-    	this.note = note;
+    public License_JFrame(TemplateCls template) {
+    	this.template = template;
     	needAccept = true;
         initComponents();
     }
     	
     public License_JFrame() {
-    	this.note = (NoteCls)DCSet.getInstance().getItemNoteMap().get(Controller.getInstance().getWalletLicense());
+    	this.template = (TemplateCls)DCSet.getInstance().getItemTemplateMap().get(Controller.getInstance().getWalletLicense());
     	needAccept = false;
         initComponents();
     }
@@ -213,7 +213,7 @@ public class License_JFrame extends JDialog {
         jTextArea1.setLineWrap(true);
         jTextArea1.setEditable(false);
         jTextArea1.setRows(5);
-        jTextArea1.setText(note.getDescription());
+        jTextArea1.setText(template.getDescription());
         jScrollPane1.setViewportView(jTextArea1);
         
  /*       

@@ -71,6 +71,8 @@ public class Rec_HashesResource {
 			String data = (String) jsonObject.get("data");
 			String hashesStr = (String) jsonObject.get("hashes"); // :"12312 12123 234234"
 			
+			String password = (String) jsonObject.get("password");
+
 			/*
 			String isTextMessageString = (String) jsonObject
 					.get("istextmessage");
@@ -90,7 +92,10 @@ public class Rec_HashesResource {
 			// TODO this is duplicate code -> Send money Panel, we should add
 			// check this up here to avoid leaking wallet information to remote user
 			// full check is later to prompt user with calculated fee
-			APIUtils.disallowRemote(request);
+			//APIUtils.disallowRemote(request);
+			password = null;
+			APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request);
+
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {

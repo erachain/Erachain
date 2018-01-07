@@ -16,22 +16,22 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.github.rjeschke.txtmark.Processor;
-
 import core.crypto.Base58;
-import core.item.notes.NoteCls;
-import core.transaction.IssueNoteRecord;
+import core.item.templates.TemplateCls;
+import core.transaction.GenesisIssueTemplateRecord;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class IssueNoteDetailsFrame extends Rec_DetailsFrame
+public class GenesisIssueTemplateDetailsFrame extends RecGenesis_DetailsFrame
 {
-	public IssueNoteDetailsFrame(IssueNoteRecord noteIssue)
+	public GenesisIssueTemplateDetailsFrame(GenesisIssueTemplateRecord templateIssue)
 	{
-		super(noteIssue);
-				
+		super(templateIssue);
+		
+		TemplateCls template = (TemplateCls)templateIssue.getItem();
+		
 		//LABEL NAME
 		++labelGBC.gridy;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
@@ -39,7 +39,7 @@ public class IssueNoteDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(noteIssue.getItem().getName());
+		JTextField name = new JTextField(template.getName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		
@@ -51,18 +51,17 @@ public class IssueNoteDetailsFrame extends Rec_DetailsFrame
 				
 		//DESCRIPTION
 		++detailGBC.gridy;
-		JTextArea txtAreaDescription = new JTextArea(noteIssue.getItem().getDescription());
+		JTextArea txtAreaDescription = new JTextArea(template.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
 		MenuPopupUtil.installContextMenu(txtAreaDescription);
 		this.add(txtAreaDescription, detailGBC);		
-						           
+						
         //PACK
-//		this.pack();
-  //      this.setResizable(false);
-  //      this.setLocationRelativeTo(null);
+	//	this.pack();
+    //    this.setResizable(false);
+    //    this.setLocationRelativeTo(null);
         this.setVisible(true);
-        
 	}
 }

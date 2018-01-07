@@ -123,7 +123,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 
 			case COLUMN_NOTE:
 				
-				ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey());
 				return item==null?null:item.toString();
 				
 			case COLUMN_BODY:				

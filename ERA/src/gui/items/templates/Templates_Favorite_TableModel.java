@@ -1,4 +1,4 @@
-package gui.items.notes;
+package gui.items.templates;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -8,8 +8,8 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 import controller.Controller;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
+import core.item.templates.TemplateCls;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
@@ -24,7 +24,7 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
 	
-	private List<NoteCls> templates;
+	private List<TemplateCls> templates;
 	
 	
 	
@@ -56,7 +56,7 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
 		return o==null?Null.class:o.getClass();
     }
 	
-	public NoteCls getItem(int row)
+	public TemplateCls getItem(int row)
 	{
 		return this.templates.get(row);
 		
@@ -89,7 +89,7 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
 			return null;
 		}
 		
-		NoteCls status = this.templates.get(row);
+		TemplateCls status = this.templates.get(row);
 		if (status == null)
 			return null;
 		
@@ -141,35 +141,35 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_NOTE_FAVORITES_TYPE && templates==null)
+		if(message.getType() == ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE && templates==null)
 		{
-			templates = new ArrayList<NoteCls>();
+			templates = new ArrayList<TemplateCls>();
 			fill((Set<Long>) message.getValue());
 			fireTableDataChanged();
 			}
-		if(message.getType() == ObserverMessage.ADD_NOTE_TYPE_FAVORITES_TYPE){
-			templates.add(Controller.getInstance().getNote((long) message.getValue()));
+		if(message.getType() == ObserverMessage.ADD_TEMPLATE_TYPE_FAVORITES_TYPE){
+			templates.add(Controller.getInstance().getTemplate((long) message.getValue()));
 			fireTableDataChanged();
 			}
-		if(message.getType() == ObserverMessage.DELETE_NOTE_FAVORITES_TYPE){
-			templates.remove(Controller.getInstance().getNote((long) message.getValue()));
+		if(message.getType() == ObserverMessage.DELETE_TEMPLATE_FAVORITES_TYPE){
+			templates.remove(Controller.getInstance().getTemplate((long) message.getValue()));
 			fireTableDataChanged();
 			}
 	}
 		
 	public void fill(Set<Long> set){
 		for(Long s:set){
-				templates.add ( Controller.getInstance().getNote(s));
+				templates.add ( Controller.getInstance().getTemplate(s));
 		}
 	}
 	
 	public void removeObservers() 
 	{
-		Controller.getInstance().wallet.database.getNoteFavoritesSet().deleteObserver(this);
+		Controller.getInstance().wallet.database.getTemplateFavoritesSet().deleteObserver(this);
 	}
 	public void addObservers(){
 		
-		Controller.getInstance().wallet.database.getNoteFavoritesSet().addObserver(this);
+		Controller.getInstance().wallet.database.getTemplateFavoritesSet().addObserver(this);
 	}
 
 	

@@ -7,13 +7,13 @@ import org.mapdb.Fun.Tuple2;
 
 import utils.ObserverMessage;
 import controller.Controller;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, String>, NoteCls> implements Observer
+public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, String>, TemplateCls> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -21,23 +21,23 @@ public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, Stri
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
 	
-	private SortableList<Tuple2<String, String>, NoteCls> notes;
+	private SortableList<Tuple2<String, String>, TemplateCls> templates;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed", "Favorite"});
 	
-	public WalletItemNotesTableModel()
+	public WalletItemTemplatesTableModel()
 	{
 		Controller.getInstance().addWalletListener(this);
 	}
 	
 	@Override
-	public SortableList<Tuple2<String, String>, NoteCls> getSortableList() {
-		return this.notes;
+	public SortableList<Tuple2<String, String>, TemplateCls> getSortableList() {
+		return this.templates;
 	}
 	
-	public NoteCls getItem(int row)
+	public TemplateCls getItem(int row)
 	{
-		return this.notes.get(row).getB();
+		return this.templates.get(row).getB();
 	}
 	
 	@Override
@@ -55,40 +55,40 @@ public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, Stri
 	@Override
 	public int getRowCount() 
 	{
-		 return this.notes.size();
+		 return this.templates.size();
 	}
 
 	@Override
 	public Object getValueAt(int row, int column) 
 	{
-		if(this.notes == null || row > this.notes.size() - 1 )
+		if(this.templates == null || row > this.templates.size() - 1 )
 		{
 			return null;
 		}
 		
-		NoteCls note = this.notes.get(row).getB();
+		TemplateCls template = this.templates.get(row).getB();
 		
 		switch(column)
 		{
 		case COLUMN_KEY:
 			
-			return note.getKey(DCSet.getInstance());
+			return template.getKey(DCSet.getInstance());
 		
 		case COLUMN_NAME:
 			
-			return note.getName();
+			return template.getName();
 		
 		case COLUMN_ADDRESS:
 			
-			return note.getOwner().getPersonAsString();
+			return template.getOwner().getPersonAsString();
 						
 		case COLUMN_CONFIRMED:
 			
-			return note.isConfirmed();
+			return template.isConfirmed();
 			
 		case COLUMN_FAVORITE:
 			
-			return note.isFavorite();
+			return template.isFavorite();
 			
 		}
 		
@@ -114,20 +114,20 @@ public class WalletItemNotesTableModel extends TableModelCls<Tuple2<String, Stri
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_NOTE_TYPE)
+		if(message.getType() == ObserverMessage.LIST_TEMPLATE_TYPE)
 		{
-			if(this.notes == null)
+			if(this.templates == null)
 			{
-				this.notes = (SortableList<Tuple2<String, String>, NoteCls>) message.getValue();
-				this.notes.registerObserver();
-				//this.notes.sort(PollMap.NAME_INDEX);
+				this.templates = (SortableList<Tuple2<String, String>, TemplateCls>) message.getValue();
+				this.templates.registerObserver();
+				//this.templates.sort(PollMap.NAME_INDEX);
 			}
 			
 			this.fireTableDataChanged();
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_NOTE_TYPE || message.getType() == ObserverMessage.REMOVE_NOTE_TYPE)
+		if(message.getType() == ObserverMessage.ADD_TEMPLATE_TYPE || message.getType() == ObserverMessage.REMOVE_TEMPLATE_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	

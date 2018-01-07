@@ -405,7 +405,7 @@ public class JsonReader implements Closeable
     /**
      * Map args = ["USE_MAPS": true]
      * Use JsonReader.jsonToJava(String json, args)
-     * Note that the return type will match the JSON type (array, object, string, long, boolean, or null).
+     * Template that the return type will match the JSON type (array, object, string, long, boolean, or null).
      * No longer recommended: Use jsonToJava with USE_MAPS:true
      * @param json String of JSON content
      * @return Map representing JSON content.  Each object is represented by a Map.
@@ -418,7 +418,7 @@ public class JsonReader implements Closeable
     /**
      * Map args = ["USE_MAPS": true]
      * Use JsonReader.jsonToJava(String json, args)
-     * Note that the return type will match the JSON type (array, object, string, long, boolean, or null).
+     * Template that the return type will match the JSON type (array, object, string, long, boolean, or null).
      * No longer recommended: Use jsonToJava with USE_MAPS:true
      * @param json String of JSON content
      * @param optionalArgs Map of optional arguments to control customization.  See readme file for
@@ -450,7 +450,7 @@ public class JsonReader implements Closeable
     /**
      * Map args = ["USE_MAPS": true]
      * Use JsonReader.jsonToJava(inputStream, args)
-     * Note that the return type will match the JSON type (array, object, string, long, boolean, or null).
+     * Template that the return type will match the JSON type (array, object, string, long, boolean, or null).
      * No longer recommended: Use jsonToJava with USE_MAPS:true
      * @param inputStream containing JSON content
      * @param optionalArgs Map of optional arguments to control customization.  See readme file for

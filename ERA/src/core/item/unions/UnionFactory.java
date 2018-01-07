@@ -30,7 +30,7 @@ public class UnionFactory {
 		{
 		case UnionCls.UNION:
 			
-			//PARSE SIMPLE NOTE
+			//PARSE SIMPLE PLATE
 			return Union.parse(data, includeReference);
 						
 		}

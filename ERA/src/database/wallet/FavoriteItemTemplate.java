@@ -5,15 +5,15 @@ import java.util.Observer;
 
 import org.mapdb.DB;
 
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import utils.ObserverMessage;
 
-public class FavoriteItemNote extends FavoriteItem {
+public class FavoriteItemTemplate extends FavoriteItem {
 	
 	// favorites init SET
-	public FavoriteItemNote(DWSet dWSet, DB database) 
+	public FavoriteItemTemplate(DWSet dWSet, DB database) 
 	{
-		super(dWSet, database, ObserverMessage.LIST_NOTE_FAVORITES_TYPE, "note", NoteCls.INITIAL_FAVORITES);
+		super(dWSet, database, ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE, "template", TemplateCls.INITIAL_FAVORITES);
 	}
 	
 	public void replace(List<Long> keys)
@@ -33,7 +33,7 @@ public class FavoriteItemNote extends FavoriteItem {
 		
 		//NOTIFY
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_NOTE_TYPE_FAVORITES_TYPE, key));
+		this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_TEMPLATE_TYPE_FAVORITES_TYPE, key));
 	}
 	
 	public void delete(Long key)
@@ -44,7 +44,7 @@ public class FavoriteItemNote extends FavoriteItem {
 		//NOTIFY
 		//this.notifyFavorites();
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(ObserverMessage.DELETE_NOTE_FAVORITES_TYPE, key));
+		this.notifyObservers(new ObserverMessage(ObserverMessage.DELETE_TEMPLATE_FAVORITES_TYPE, key));
 	}
 	
 	@Override

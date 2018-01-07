@@ -165,7 +165,7 @@ public abstract class Transaction {
 	public static final int ITEM_DOES_NOT_EXIST = 101;
 	public static final int ITEM_ASSET_NOT_EXIST = 102;
 	public static final int ITEM_IMPRINT_DOES_NOT_EXIST = 103;
-	public static final int ITEM_NOTE_NOT_EXIST = 104;
+	public static final int ITEM_TEMPLATE_NOT_EXIST = 104;
 	public static final int ITEM_PERSON_NOT_EXIST = 105;
 	public static final int ITEM_STATUS_NOT_EXIST = 106;
 	public static final int ITEM_UNION_NOT_EXIST = 107;
@@ -201,7 +201,7 @@ public abstract class Transaction {
 	public static final int EXTENDED = 0;
 	// genesis
 	public static final int GENESIS_ISSUE_ASSET_TRANSACTION = 1;
-	public static final int GENESIS_ISSUE_NOTE_TRANSACTION = 2;
+	public static final int GENESIS_ISSUE_TEMPLATE_TRANSACTION = 2;
 	public static final int GENESIS_ISSUE_PERSON_TRANSACTION = 3;
 	public static final int GENESIS_ISSUE_STATUS_TRANSACTION = 4;
 	public static final int GENESIS_ISSUE_UNION_TRANSACTION = 5; //
@@ -213,7 +213,7 @@ public abstract class Transaction {
 	// ISSUE ITEMS
 	public static final int ISSUE_ASSET_TRANSACTION = 21;
 	public static final int ISSUE_IMPRINT_TRANSACTION = 22;
-	public static final int ISSUE_NOTE_TRANSACTION = 23;
+	public static final int ISSUE_TEMPLATE_TRANSACTION = 23;
 	public static final int ISSUE_PERSON_TRANSACTION = 24;
 	public static final int ISSUE_STATUS_TRANSACTION = 25;
 	public static final int ISSUE_UNION_TRANSACTION = 26;

@@ -1,4 +1,4 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

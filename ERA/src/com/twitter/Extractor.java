@@ -577,7 +577,7 @@ public class Extractor {
      * @return the code unit index that corresponds to the specified code point index.
      */
     int codePointsToCodeUnits(int codePointIndex) {
-      // Note that offsetByCodePoints accepts negative indices.
+      // Template that offsetByCodePoints accepts negative indices.
       this.charIndex = text.offsetByCodePoints(this.charIndex, codePointIndex - this.codePointIndex);
       this.codePointIndex = codePointIndex;
       return this.charIndex;

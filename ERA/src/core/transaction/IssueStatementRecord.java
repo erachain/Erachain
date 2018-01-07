@@ -39,11 +39,11 @@ public class IssueStatementRecord extends Transaction {
 	PROPERTIES:
 	[0] - type
 	[1] - version 
-	[2] bits[0] - =1 - has Note 
+	[2] bits[0] - =1 - has Template 
 	[2] bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3 
 	[3] - < 0 - has DATA
 		*/
-	protected long key; // key for Note
+	protected long key; // key for Template
 	protected byte[] data;
 	protected byte[] encrypted;
 	protected byte[] isText;
@@ -136,7 +136,7 @@ public class IssueStatementRecord extends Transaction {
 				prop1 = (byte)4;
 			}
 		}
-		// set has NOTE byte
+		// set has PLATE byte
 		if (this.key > 0) prop1 = (byte) (HAS_NOTE_MASK | prop1);
 			
 		byte prop2 = 0;
@@ -239,7 +239,7 @@ public class IssueStatementRecord extends Transaction {
 		}
 
 		if (this.key > 0)
-			transaction.put("note", this.key);
+			transaction.put("template", this.key);
 
 		if (signers != null && signers.length >0) {
 			transaction.put("singers", this.getSignersB58());
@@ -431,7 +431,7 @@ public class IssueStatementRecord extends Transaction {
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		// ITEM EXIST? - for assets transfer not need - amount expect instead
-		if (!db.getItemNoteMap().contains(this.key))
+		if (!db.getItemTemplateMap().contains(this.key))
 			return Transaction.ITEM_DOES_NOT_EXIST;
 
 		return Transaction.VALIDATE_OK;

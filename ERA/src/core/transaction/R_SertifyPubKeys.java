@@ -32,17 +32,9 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.statuses.StatusCls;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
-import core.item.notes.NoteFactory;
-import core.item.persons.PersonCls;
-import core.item.persons.PersonFactory;
 
-import utils.Converter;
-import utils.DateTimeFormat;
 
 // if person has not ALIVE status - add it
 // end_day = this.add_day + this.timestanp(days)
@@ -216,7 +208,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("key", this.key);
-		List<String> pbKeys = new ArrayList<String>();
+		//List<String> pbKeys = new ArrayList<String>();
 		transaction.put("sertified_public_keys", this.getSertifiedPublicKeysB58());
 		transaction.put("sertified_signatures", this.getSertifiedSignaturesB58());
 		transaction.put("add_day", this.add_day);
@@ -376,7 +368,7 @@ public class R_SertifyPubKeys extends Transaction {
 	@Override
 	public int getDataLength(boolean asPack)
 	{
-		// not include note reference
+		// not include reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
 		int accountsSize = this.sertifiedPublicKeys.size(); 
 		len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;

@@ -40,39 +40,32 @@ public class APIUtils {
 		return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
 	}
 
-	public static String processPayment(String password, String sender,
-			String feePowStr, String recipient, String assetKeyString, String amount,
-			String x, HttpServletRequest request) {
-		
-		// PARSE AMOUNT		
+	public static String processPayment(String password, String sender, String feePowStr, String recipient,
+			String assetKeyString, String amount, String x, HttpServletRequest request) {
+
+		// PARSE AMOUNT
 		AssetCls asset;
-		
-		if(assetKeyString == null)
-		{
+
+		if (assetKeyString == null) {
 			asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-		}
-		else
-		{
+		} else {
 			try {
 				asset = Controller.getInstance().getAsset(new Long(assetKeyString));
 			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(
-						Transaction.ITEM_ASSET_NOT_EXIST);
+				throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
 			}
 		}
-		
-		if (asset == null )
-			throw ApiErrorFactory.getInstance().createError(
-					Transaction.ITEM_ASSET_NOT_EXIST);
-		
+
+		if (asset == null)
+			throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
+
 		// PARSE AMOUNT
 		BigDecimal bdAmount;
 		try {
 			bdAmount = new BigDecimal(amount);
 			bdAmount = bdAmount.setScale(8);
 		} catch (Exception e) {
-			throw ApiErrorFactory.getInstance().createError(
-					Transaction.INVALID_AMOUNT);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_AMOUNT);
 		}
 
 		// PARSE FEE POWER
@@ -80,21 +73,17 @@ public class APIUtils {
 		try {
 			feePow = Integer.parseInt(feePowStr);
 		} catch (Exception e) {
-			throw ApiErrorFactory.getInstance().createError(
-					Transaction.INVALID_FEE_POWER);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
 		}
 
 		// CHECK ADDRESS
 		if (!Crypto.getInstance().isValidAddress(sender)) {
-			throw ApiErrorFactory.getInstance().createError(
-					Transaction.INVALID_MAKER_ADDRESS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
 		}
-
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
 
 		// TRU UNLOCK
@@ -102,172 +91,158 @@ public class APIUtils {
 
 		// CHECK WALLET UNLOCKED
 		if (!Controller.getInstance().isWalletUnlocked()) {
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_WALLET_LOCKED);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
 		}
 
 		// GET ACCOUNT
-		PrivateKeyAccount account = Controller.getInstance()
-				.getPrivateKeyAccountByAddress(sender);
+		PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender);
 		if (account == null) {
-			throw ApiErrorFactory.getInstance().createError(
-					Transaction.INVALID_MAKER_ADDRESS);
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
 		}
 
 		// TODO R_Send insert!
 		Integer result;
 		// SEND ASSET PAYMENT
-		Transaction transaction = Controller.getInstance()
-			.r_Send(account, feePow, new Account(recipient), asset.getKey(DCSet.getInstance()), bdAmount);
-			
-	
+		Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
+				asset.getKey(DCSet.getInstance()), bdAmount);
 
-		  String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(true)+" Bytes, ";
-		    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
-		
-		
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+		String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(true)
+				+ " Bytes, ";
+		Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
+				+ " COMPU</b><br></body></HTML>";
+
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+				Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450), Status_text,
+				Lang.getInstance().translate("Confirmation Transaction"));
 		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
-		 
+
 		// ww.jTabbedPane1.setVisible(false);
 		dd.jScrollPane1.setViewportView(ww);
 		dd.setLocationRelativeTo(null);
 		dd.setVisible(true);
-		
-	//	JOptionPane.OK_OPTION
-		if (dd.isConfirm){
-		
-		
-		
-		
-		result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
-		
-		
-		
-		
-		
-		if (result == Transaction.VALIDATE_OK)
-			return transaction.toJson().toJSONString();
-		else {
 
-			//Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
-			throw ApiErrorFactory.getInstance().createError(result);
-			
-		}
+		// JOptionPane.OK_OPTION
+		if (dd.isConfirm) {
+
+			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+
+			if (result == Transaction.VALIDATE_OK)
+				return transaction.toJson().toJSONString();
+			else {
+
+				// Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
+				throw ApiErrorFactory.getInstance().createError(result);
+
+			}
 		}
 		return "";
 	}
 
 	public static void disallowRemote(HttpServletRequest request) throws WebApplicationException {
 		if (ServletUtils.isRemoteRequest(request)) {
-			throw ApiErrorFactory
-				      .getInstance()
-				      .createError(
-					      ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
 		}
 	}
 
-	public static void askAPICallAllowed(String password,
-			final String messageToDisplay, HttpServletRequest request) throws WebApplicationException {
+	public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request)
+			throws WebApplicationException {
 		// CHECK API CALL ALLOWED
-		
+
 		try {
 			disallowRemote(request);
 
-			if(password != null && password.length() > 0) {
-				if (false && Controller.getInstance().isWalletUnlocked())
-						return;
-
-				if (Controller.getInstance().unlockWallet(password))
-					return;
-			}
-
 			if (!gui.Gui.isGuiStarted()) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+
+				if (!ServletUtils.isRemoteRequest(request)) {
+					if (Controller.getInstance().isWalletUnlocked())
+						return;
+					if (password != null && password.length() > 0 && Controller.getInstance().unlockOnceWallet(password))
+						return;
+				} else {
+					if (password != null && password.length() > 0
+							&& Controller.getInstance().unlockOnceWallet(password))
+						return;
+				}
+
+				throw ApiErrorFactory.getInstance()
+						.createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+
 			}
 
-			int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay,	request); 
-			
-			if(answer == ApiClient.SELF_CALL) {
+			int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay, request);
+
+			if (answer == ApiClient.SELF_CALL) {
 				return;
 			}
-			
+
 			if (answer != JOptionPane.YES_OPTION) {
-				throw ApiErrorFactory
-						.getInstance()
-						.createError(
-								ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+				throw ApiErrorFactory.getInstance()
+						.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
 			}
-			
-			if(!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled()))
-			{	
-				if(true || !Controller.getInstance().isWalletUnlocked()) {
-					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance()); 
-					if(!password.equals("") && !Controller.getInstance().unlockWallet(password))
-					{
-						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet", JOptionPane.ERROR_MESSAGE);
+
+			if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
+				if (true || !Controller.getInstance().isWalletUnlocked()) {
+					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
+					if (!password.equals("") && !Controller.getInstance().unlockWallet(password)) {
+						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
+								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
-			
+
 		} catch (Exception e) {
 			if (e instanceof WebApplicationException) {
 				throw (WebApplicationException) e;
 			}
-			LOGGER.error(e.getMessage(),e);
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_UNKNOWN);
+			LOGGER.error(e.getMessage(), e);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);
 		}
 
 	}
-	
-	public static Tuple3<JSONObject, PrivateKeyAccount, Integer> postPars( HttpServletRequest request, String x) {
-		
-		try
-		{
-			
+
+	public static Tuple3<JSONObject, PrivateKeyAccount, Integer> postPars(HttpServletRequest request, String x) {
+
+		try {
+
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String creator;
 			if (jsonObject.containsKey("creator")) {
 				creator = (String) jsonObject.get("creator");
 			} else if (jsonObject.containsKey("maker")) {
-					creator = (String) jsonObject.get("maker");
+				creator = (String) jsonObject.get("maker");
 			} else {
 				creator = (String) jsonObject.get("sender");
 			}
-			
+
 			String password = (String) jsonObject.get("password");
 
 			// PARSE FEE POWER
 			int feePow;
 			try {
-				feePow = (int)(long)jsonObject.get("feepow");
+				feePow = (int) (long) jsonObject.get("feepow");
 			} catch (Exception e0) {
 				try {
 					String feePowStr = (String) jsonObject.get("feepow");
 					feePow = Integer.parseInt(feePowStr);
 				} catch (Exception e) {
-					throw ApiErrorFactory.getInstance().createError(
-							Transaction.INVALID_FEE_POWER);
+					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
 				}
 			}
 
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(creator)) {
-				throw ApiErrorFactory.getInstance().createError(
-						Transaction.INVALID_MAKER_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
 			}
 
-			// check this up here to avoid leaking wallet information to remote user
+			// check this up here to avoid leaking wallet information to remote
+			// user
 			// full check is later to prompt user with calculated fee
 			disallowRemote(request);
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 			}
 
 			// TRY UNLOCK
@@ -275,16 +250,13 @@ public class APIUtils {
 
 			// CHECK WALLET UNLOCKED
 			if (!Controller.getInstance().isWalletUnlocked()) {
-				throw ApiErrorFactory.getInstance().createError(
-						ApiErrorFactory.ERROR_WALLET_LOCKED);
+				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
 			}
 
 			// GET ACCOUNT
-			PrivateKeyAccount account = Controller.getInstance()
-					.getPrivateKeyAccountByAddress(creator);
+			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(creator);
 			if (account == null) {
-				throw ApiErrorFactory.getInstance().createError(
-						Transaction.INVALID_MAKER_ADDRESS);
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
 			}
 
 			return new Tuple3<JSONObject, PrivateKeyAccount, Integer>(jsonObject, account, feePow);
@@ -292,11 +264,9 @@ public class APIUtils {
 		} catch (NullPointerException | ClassCastException e) {
 			// JSON EXCEPTION
 			// LOGGER.info(e);
-			throw ApiErrorFactory.getInstance().createError(
-					ApiErrorFactory.ERROR_JSON);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
-		
-	}
 
+	}
 
 }

@@ -25,12 +25,12 @@ import core.item.assets.AssetVenture;
 import core.item.assets.Order;
 import core.item.imprints.Imprint;
 import core.item.imprints.ImprintCls;
-import core.item.notes.Note;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonHuman;
 import core.item.persons.PersonCls;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
+import core.item.templates.Template;
+import core.item.templates.TemplateCls;
 import core.item.unions.Union;
 import core.item.unions.UnionCls;
 import core.naming.Name;
@@ -46,7 +46,7 @@ import core.transaction.DeployATTransaction;
 import core.transaction.Issue_ItemRecord;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
-import core.transaction.IssueNoteRecord;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
@@ -334,7 +334,7 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
 	}
 
-	public Transaction createIssueNoteTransaction(PrivateKeyAccount creator, String name, String description,
+	public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, String name, String description,
 			byte[] icon, byte[] image,
 			int feePow) 
 	{
@@ -344,15 +344,15 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		NoteCls note = new Note(creator, name, icon, image, description);
+		TemplateCls template = new Template(creator, name, icon, image, description);
 							
-		//CREATE ISSUE NOTE TRANSACTION
-		IssueNoteRecord issueNoteRecord = new IssueNoteRecord(creator, note, (byte)feePow, time, 0l);
-		issueNoteRecord.sign(creator, false);
-		issueNoteRecord.setDC(this.fork, false);
+		//CREATE ISSUE PLATE TRANSACTION
+		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(creator, template, (byte)feePow, time, 0l);
+		issueTemplateRecord.sign(creator, false);
+		issueTemplateRecord.setDC(this.fork, false);
 										
 		//VALIDATE AND PROCESS
-		return issueNoteRecord;
+		return issueTemplateRecord;
 	}
 
 	public Pair<Transaction, Integer> createIssuePersonTransaction(
@@ -397,7 +397,7 @@ public class TransactionCreator
 		} else {
 			lastReference = time - 1000l;
 		}
-		//CREATE ISSUE NOTE TRANSACTION
+		//CREATE ISSUE PLATE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte)feePow, time, lastReference);
 		issuePersonRecord.sign(creator, false);
 		issuePersonRecord.setDC(this.fork, false);
@@ -443,7 +443,7 @@ public class TransactionCreator
 		long lastReference;
 		lastReference = 0l;
 
-		//CREATE ISSUE NOTE TRANSACTION
+		//CREATE ISSUE PLATE TRANSACTION
 		IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte)feePow, time, lastReference);
 		issuePersonRecord.sign(creator, false);
 		issuePersonRecord.setDC(this.fork, false);
@@ -466,7 +466,7 @@ public class TransactionCreator
 								
 		StatusCls status = new Status(creator, name, icon, image, description, unique);
 							
-		//CREATE ISSUE NOTE TRANSACTION
+		//CREATE ISSUE PLATE TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte)feePow, time, 0l);
 		issueStatusRecord.sign(creator, false);
 		issueStatusRecord.setDC(this.fork, false);
@@ -486,7 +486,7 @@ public class TransactionCreator
 								
 		UnionCls union = new Union(creator, name, birthday, parent, icon, image, description);
 							
-		//CREATE ISSUE NOTE TRANSACTION
+		//CREATE ISSUE PLATE TRANSACTION
 		IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte)feePow, time, 0l);
 		issueUnionRecord.sign(creator, false);
 		issueUnionRecord.setDC(this.fork, false);

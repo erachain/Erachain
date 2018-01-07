@@ -599,7 +599,7 @@ public class R_SetStatusToItem extends Transaction {
 	@Override
 	public int getDataLength(boolean asPack)
 	{
-		// not include note reference
+		// not include reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
 		len +=    (this.value_1 == 0? 0: VALUE_LENGTH)
 				+ (this.value_2 == 0? 0: VALUE_LENGTH)

@@ -1,4 +1,4 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +12,13 @@ import javax.swing.DefaultComboBoxModel;
 
 import utils.ObserverMessage;
 import controller.Controller;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 
 @SuppressWarnings("serial")
-public class ComboBoxModelItemsNotes extends DefaultComboBoxModel<NoteCls> implements Observer {
+public class ComboBoxModelItemsTemplates extends DefaultComboBoxModel<TemplateCls> implements Observer {
 	Lock lock = new ReentrantLock();
 	
-	public ComboBoxModelItemsNotes()
+	public ComboBoxModelItemsTemplates()
 	{
 		Controller.getInstance().addWalletListener(this);
 	}
@@ -50,42 +50,42 @@ public class ComboBoxModelItemsNotes extends DefaultComboBoxModel<NoteCls> imple
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.LIST_NOTE_FAVORITES_TYPE)
+		if(message.getType() == ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE)
 		{
 			//GET SELECTED ITEM
-			NoteCls selected = (NoteCls) this.getSelectedItem();
+			TemplateCls selected = (TemplateCls) this.getSelectedItem();
 						
 			//EMPTY LIST
 			this.removeAllElements();
 				
 			//INSERT ALL ACCOUNTS
 			Set<Long> keys = (Set<Long>) message.getValue();
-			List<NoteCls> notes = new ArrayList<NoteCls>();
+			List<TemplateCls> templates = new ArrayList<TemplateCls>();
 			for(Long key: keys)
 			{
 				/* key 0 - need as EMPTY
 				if(key==0) {
-					notes.add(null);
+					templates.add(null);
 					continue;
 				}
 				*/
 
-				//GET NOTE
-				NoteCls note = Controller.getInstance().getItemNote(key);
-				notes.add(note);
+				//GET PLATE
+				TemplateCls template = Controller.getInstance().getItemTemplate(key);
+				templates.add(template);
 				
 				//ADD
-				this.addElement(note);
+				this.addElement(template);
 			}
 				
 			//RESET SELECTED ITEM
 			if(this.getIndexOf(selected) != -1)
 			{
-				for(NoteCls note: notes)
+				for(TemplateCls template: templates)
 				{
-					if(note.getKey() == selected.getKey())
+					if(template.getKey() == selected.getKey())
 					{
-						this.setSelectedItem(note);
+						this.setSelectedItem(template);
 						return;
 					}
 				}

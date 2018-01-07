@@ -1,4 +1,4 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -26,8 +26,8 @@ import javax.swing.table.TableRowSorter;
 
 import controller.Controller;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
 import core.item.statuses.StatusCls;
+import core.item.templates.TemplateCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.Split_Panel;
@@ -39,13 +39,13 @@ import lang.Lang;
 import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
-public class Search_Notes_Tab extends Item_Search_SplitPanel {
+public class Search_Templates_Tab extends Item_Search_SplitPanel {
 	private static TableModelNotes tableModelNotes = new TableModelNotes();
-	private Search_Notes_Tab th;
+	private Search_Templates_Tab th;
 	
 	
-	public Search_Notes_Tab(){
-		super (tableModelNotes,"Search_Notes_Tab", "Search_Notes_Tab");
+	public Search_Templates_Tab(){
+		super (tableModelNotes,"Search_Templates_Tab", "Search_Templates_Tab");
 		this.th = this;
 		setName(Lang.getInstance().translate("Search Templates"));
 		JMenuItem vouch_Item= new JMenuItem(Lang.getInstance().translate("Vouch"));
@@ -55,7 +55,7 @@ public class Search_Notes_Tab extends Item_Search_SplitPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			 NoteCls note =(NoteCls) th.item_Menu ;
+			 TemplateCls note =(TemplateCls) th.item_Menu ;
 			if (note == null) return;
 				Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(note.getReference());
 				new VouchRecordDialog(trans.getBlockHeight(DCSet.getInstance()),trans.getSeqNo(DCSet.getInstance()));
@@ -68,7 +68,7 @@ public class Search_Notes_Tab extends Item_Search_SplitPanel {
 //show details
 	@Override
 	protected Component get_show(ItemCls item) {
-		return  new Info_Notes((NoteCls) item);
+		return  new Info_Notes((TemplateCls) item);
 
 	}
 

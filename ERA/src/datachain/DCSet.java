@@ -88,8 +88,8 @@ public class DCSet implements Observer, IDB {
 	private IssueStatusMap issueStatusMap;
 	private ItemImprintMap imprintMap;
 	private IssueImprintMap issueImprintMap;
-	private ItemNoteMap itemNoteMap;
-	private IssueNoteMap issueNoteMap;
+	private ItemTemplateMap itemTemplateMap;
+	private IssueTemplateMap issueTemplateMap;
 	private IssueStatementMap issueStatementMap;
 	private ItemPersonMap itemPersonMap;
 	private IssuePersonMap issuePersonMap;
@@ -333,8 +333,8 @@ public class DCSet implements Observer, IDB {
 			this.tradeMap = new TradeMap(this, database);
 			this.imprintMap = new ItemImprintMap(this, database);
 			this.issueImprintMap = new IssueImprintMap(this, database);
-			this.itemNoteMap = new ItemNoteMap(this, database);
-			this.issueNoteMap = new IssueNoteMap(this, database);
+			this.itemTemplateMap = new ItemTemplateMap(this, database);
+			this.issueTemplateMap = new IssueTemplateMap(this, database);
 			this.issueStatementMap = new IssueStatementMap(this, database);
 			this.itemPersonMap = new ItemPersonMap(this, database);
 			this.issuePersonMap = new IssuePersonMap(this, database);
@@ -418,8 +418,8 @@ public class DCSet implements Observer, IDB {
 		this.tradeMap = new TradeMap(parent.tradeMap, this);
 		this.imprintMap = new ItemImprintMap(parent.imprintMap);
 		this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap);
-		this.itemNoteMap = new ItemNoteMap(parent.itemNoteMap);
-		this.issueNoteMap = new IssueNoteMap(parent.getIssueNoteMap());
+		this.itemTemplateMap = new ItemTemplateMap(parent.itemTemplateMap);
+		this.issueTemplateMap = new IssueTemplateMap(parent.getIssueTemplateMap());
 		this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap);		
 		this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap());
 		this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap());
@@ -485,9 +485,9 @@ public class DCSet implements Observer, IDB {
 		this.itemAssetMap.reset();
 		this.issueImprintMap.reset();
 		this.imprintMap.reset();
-		this.issueNoteMap.reset();
+		this.issueTemplateMap.reset();
 		this.issueStatementMap.reset();
-		this.itemNoteMap.reset();
+		this.itemTemplateMap.reset();
 		this.issuePersonMap.reset();
 		this.itemPersonMap.reset();
 		this.issueStatusMap.reset();
@@ -756,13 +756,13 @@ public class DCSet implements Observer, IDB {
 	{
 		return this.issueImprintMap;
 	}
-	public ItemNoteMap getItemNoteMap()
+	public ItemTemplateMap getItemTemplateMap()
 	{
-		return this.itemNoteMap;
+		return this.itemTemplateMap;
 	}	
-	public IssueNoteMap getIssueNoteMap()
+	public IssueTemplateMap getIssueTemplateMap()
 	{
-		return this.issueNoteMap;
+		return this.issueTemplateMap;
 	}
 	public IssueStatementMap getIssueStatementMap()
 	{
@@ -804,8 +804,8 @@ public class DCSet implements Observer, IDB {
 			case ItemCls.IMPRINT_TYPE: {
 				return this.getItemImprintMap();
 			}
-			case ItemCls.NOTE_TYPE: {
-				return this.getItemNoteMap();
+			case ItemCls.TEMPLATE_TYPE: {
+				return this.getItemTemplateMap();
 			}
 			case ItemCls.PERSON_TYPE: {
 				return this.getItemPersonMap();

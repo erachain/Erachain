@@ -1,11 +1,11 @@
-package gui.items.notes;
+package gui.items.templates;
 
 import java.util.ArrayList;
 import javax.validation.constraints.Null;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import datachain.DCSet;
-import datachain.ItemNoteMap;
+import datachain.ItemTemplateMap;
 import datachain.SortableList;
 import gui.items.TableModelItems;
 import gui.models.TableModelCls;
@@ -23,12 +23,12 @@ public class TableModelNotes extends TableModelItems
 	private Long key_filter;
 	private ArrayList<ItemCls> list;
 	private String filter_Name;
-	private ItemNoteMap db;
+	private ItemTemplateMap db;
 	
 	public TableModelNotes()
 	{
 		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
-		db= DCSet.getInstance().getItemNoteMap();
+		db= DCSet.getInstance().getItemTemplateMap();
 	}
 	
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
@@ -52,9 +52,9 @@ public class TableModelNotes extends TableModelItems
 		}	
 	
 	
-	public NoteCls getNote(int row)
+	public TemplateCls getNote(int row)
 	{
-		return (NoteCls) list.get(row);
+		return (TemplateCls) list.get(row);
 	}
 	
 	@Override
@@ -83,7 +83,7 @@ public class TableModelNotes extends TableModelItems
 			return null;
 		}
 		
-		NoteCls note = (NoteCls) list.get(row);
+		TemplateCls note = (TemplateCls) list.get(row);
 		
 		switch(column)
 		{
@@ -117,7 +117,7 @@ public class TableModelNotes extends TableModelItems
 			key_filter = new Long(text);
 			list =new ArrayList<ItemCls>();
 			// Controller.getInstance().getNote(key_filter);
-			 NoteCls note = (NoteCls) db.get(key_filter);
+			 TemplateCls note = (TemplateCls) db.get(key_filter);
 			if ( note == null) return;
 			list.add(note);
 						
