@@ -32,7 +32,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-//	public static final int COLUMN_NOTE = 2;
+//	public static final int COLUMN_TEMPLATE = 2;
 	public static final int COLUMN_BODY = 2;
 	public static final int COLUMN_FAVORITE = 3;
 	SortableList<Tuple2<String,String>,Transaction> transactions;
@@ -110,7 +110,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
 				return record.viewTimestamp(); 
 				
-		//	case COLUMN_NOTE:
+		//	case COLUMN_TEMPLATE:
 
 			//	return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey()).toString();
 

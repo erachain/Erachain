@@ -23,8 +23,8 @@ import lang.Lang;
 public class AccountStatementsTableModel extends AbstractTableModel implements Observer
 {
 	private static final int COLUMN_ADDRESS = 0;
-	public static final int COLUMN_NOTE_KEY = 1;
-	public static final int COLUMN_NOTE_NAME = 2;
+	public static final int COLUMN_TEMPLATE_KEY = 1;
+	public static final int COLUMN_TEMPLATE_NAME = 2;
 	public static final int COLUMN_TEXT = 3;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Template Key", "Template Name", "Own Text"});
@@ -56,9 +56,9 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 		return publicKeyAccounts.get(row);
 	}
 	
-	public void setAsset(TemplateCls note) 
+	public void setAsset(TemplateCls template) 
 	{
-		this.template = note;
+		this.template = template;
 		this.fireTableDataChanged();
 	}
 	
@@ -94,10 +94,10 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 		{
 		case COLUMN_ADDRESS:			
 			return account.getPersonAsString();
-		case COLUMN_NOTE_KEY:
+		case COLUMN_TEMPLATE_KEY:
 			if (this.template == null) return "-";
 			return this.template.getKey(DCSet.getInstance());			
-		case COLUMN_NOTE_NAME:
+		case COLUMN_TEMPLATE_NAME:
 			if (this.template == null) return "-";
 			return this.template.getName();
 		case COLUMN_TEXT:

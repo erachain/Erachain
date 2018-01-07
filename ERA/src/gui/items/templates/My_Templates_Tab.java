@@ -43,7 +43,7 @@ import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletItemImprintsTableModel;
 import lang.Lang;
 
-public class My_Notes_Tab extends Split_Panel {
+public class My_Templates_Tab extends Split_Panel {
 	
 	/**
 	 * 
@@ -54,11 +54,11 @@ public class My_Notes_Tab extends Split_Panel {
 	final MTable table;
 	protected int row;
 
-	public My_Notes_Tab()
+	public My_Templates_Tab()
 	{
-		super ("My_Notes_Tab");
+		super ("My_Templates_Tab");
 	
-	this.setName("My Notes");
+	this.setName("My Template");
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	// not show buttons
 		button1_ToolBar_LeftPanel.setVisible(false);

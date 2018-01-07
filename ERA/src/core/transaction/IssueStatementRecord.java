@@ -34,7 +34,7 @@ public class IssueStatementRecord extends Transaction {
 	private static final byte TYPE_ID = (byte) ISSUE_STATEMENT_TRANSACTION;
 	private static final String NAME_ID = "Issue Statement";
 
-	protected static final byte HAS_NOTE_MASK = (byte)(1 << 7);
+	protected static final byte HAS_TEMPLATE_MASK = (byte)(1 << 7);
 	/*
 	PROPERTIES:
 	[0] - type
@@ -50,56 +50,56 @@ public class IssueStatementRecord extends Transaction {
 	protected PublicKeyAccount[] signers; // for all it need ecnrypt
 	protected byte[][] signatures; // - multi sign
 	
-	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
 		
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
-		this.key = noteKey;
+		this.key = templateKey;
 		this.data = data;
 		this.encrypted = encrypted;
 		this.isText = isText;
 	}
-	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-		this(typeBytes, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
+		this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
 		this.signature = signature;
 		//this.calcFee();
 	}
 	// asPack
-	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long noteKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
-		this(typeBytes, creator, (byte)0, noteKey, data, isText, encrypted, 0l, reference);
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
+		this(typeBytes, creator, (byte)0, templateKey, data, isText, encrypted, 0l, reference);
 		this.signature = signature;
 		// not need this.calcFee();
 	}
-	public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference, signature);
+	public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
 		// set props
 		this.setTypeBytes();
 	}
-	public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
+	public IssueStatementRecord(PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
 		// set props
 		this.setTypeBytes();
 	}
-	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data,
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
 			byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp, Long reference, byte[] signature)
 	{
-		this(typeBytes, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference, signature);
+		this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
 		this.signers = signers;
 		this.signatures = signatures;
 		this.setTypeBytes();
 	}
 	// as Pack
-	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long noteKey, byte[] data,
+	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data,
 			byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, Long reference, byte[] signature)
 	{
-		this(typeBytes, creator, noteKey, data, isText, encrypted, reference, signature);
+		this(typeBytes, creator, templateKey, data, isText, encrypted, reference, signature);
 		this.signers = signers;
 		this.signatures = signatures;
 		this.setTypeBytes();
 	}
-	public IssueStatementRecord(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long noteKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference)
+	public IssueStatementRecord(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference)
 	{
-		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, noteKey, data, isText, encrypted, timestamp, reference);
+		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
 	}
 
 	//GETTERS/SETTERS
@@ -111,15 +111,15 @@ public class IssueStatementRecord extends Transaction {
 		
 	}
 	
-	public static boolean hasNote(byte[] typeBytes) {
+	public static boolean hasTemplate(byte[] typeBytes) {
 		if (typeBytes[2] < 0 ) return true;
 		return false;
 	}
-	protected boolean hasNote() {
-		return hasNote(this.typeBytes);
+	protected boolean hasTemplate() {
+		return hasTemplate(this.typeBytes);
 	}
 	public static int getSignersLength(byte[] typeBytes) {
-		byte mask = ~HAS_NOTE_MASK;
+		byte mask = ~HAS_TEMPLATE_MASK;
 		return typeBytes[2] & mask;
 	}
 	
@@ -137,7 +137,7 @@ public class IssueStatementRecord extends Transaction {
 			}
 		}
 		// set has PLATE byte
-		if (this.key > 0) prop1 = (byte) (HAS_NOTE_MASK | prop1);
+		if (this.key > 0) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
 			
 		byte prop2 = 0;
 		if (data != null && data.length > 0) {
@@ -303,7 +303,7 @@ public class IssueStatementRecord extends Transaction {
 		//////// local parameters
 		
 		long key = 0l;
-		if (hasNote(typeBytes)) 
+		if (hasTemplate(typeBytes)) 
 		{
 			//READ KEY
 			byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);

@@ -40,12 +40,12 @@ import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
 public class Search_Templates_Tab extends Item_Search_SplitPanel {
-	private static TableModelNotes tableModelNotes = new TableModelNotes();
+	private static TableModelTemplates tableModelTemplates = new TableModelTemplates();
 	private Search_Templates_Tab th;
 	
 	
 	public Search_Templates_Tab(){
-		super (tableModelNotes,"Search_Templates_Tab", "Search_Templates_Tab");
+		super (tableModelTemplates,"Search_Templates_Tab", "Search_Templates_Tab");
 		this.th = this;
 		setName(Lang.getInstance().translate("Search Templates"));
 		JMenuItem vouch_Item= new JMenuItem(Lang.getInstance().translate("Vouch"));
@@ -55,9 +55,9 @@ public class Search_Templates_Tab extends Item_Search_SplitPanel {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			
-			 TemplateCls note =(TemplateCls) th.item_Menu ;
-			if (note == null) return;
-				Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(note.getReference());
+			 TemplateCls template =(TemplateCls) th.item_Menu ;
+			if (template == null) return;
+				Transaction trans = DCSet.getInstance().getTransactionFinalMap().getTransaction(template.getReference());
 				new VouchRecordDialog(trans.getBlockHeight(DCSet.getInstance()),trans.getSeqNo(DCSet.getInstance()));
 		}
 	});
@@ -68,7 +68,7 @@ public class Search_Templates_Tab extends Item_Search_SplitPanel {
 //show details
 	@Override
 	protected Component get_show(ItemCls item) {
-		return  new Info_Notes((TemplateCls) item);
+		return  new Info_Templates((TemplateCls) item);
 
 	}
 

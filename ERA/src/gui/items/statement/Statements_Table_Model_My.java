@@ -35,7 +35,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-	public static final int COLUMN_NOTE = 2;
+	public static final int COLUMN_TEMPLATE = 2;
 	public static final int COLUMN_BODY = 3;
 	List<Transaction> transactions;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
@@ -121,7 +121,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 				//return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
 				return record.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
-			case COLUMN_NOTE:
+			case COLUMN_TEMPLATE:
 				
 				ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey());
 				return item==null?null:item.toString();

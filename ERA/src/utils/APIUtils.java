@@ -30,7 +30,7 @@ import gui.library.Issue_Confirm_Dialog;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 import settings.Settings;
-//import test.records.TestRecNote;
+//import test.records.TestRecTemplate;
 
 public class APIUtils {
 

@@ -36,7 +36,7 @@ public class Templates_Favorite_SplitPanel extends Item_SplitPanel {
 	// show details
 	@Override
 	public Component get_show(ItemCls item) {
-		return  new Info_Notes((TemplateCls) item);
+		return  new Info_Templates((TemplateCls) item);
 	}
 	
 	@Override

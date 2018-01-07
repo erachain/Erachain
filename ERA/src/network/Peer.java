@@ -39,7 +39,7 @@ public class Peer extends Thread{
 	// Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
 	// поэтому нужно ожидание дольще делать
 	private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK?1024<<11:1024<<8;
-	private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE>>1;
+	private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE<<1;
 	private OutputStream out;
 	private Pinger pinger;
 	private boolean white;
@@ -632,14 +632,22 @@ public class Peer extends Thread{
 		
 		byte[] bytes = message.toBytes();
 		int messageSize = bytes.length;
-		if (message.getType() == Message.GET_PING_TYPE
-				|| message.getType() == Message.GET_HWEIGHT_TYPE) {
+		int type = message.getType(); 
+		if (type == Message.GET_PING_TYPE
+				|| type == Message.GET_HWEIGHT_TYPE) {
 			this.sendedBeforePing = 0l;		
 		} else {
 			this.sendedBeforePing += bytes.length;
 		}
 
-		if (this.sendedBeforePing > this.maxBeforePing) {
+		// странно - если идет передача блоков в догоняющую ноду в ее буфер
+		// и тут пинговать то она зависает в ожидании надолго и синхронизация удаленной ноды встает на 30-50 секунд
+		// ели урать тут пинги то блоки передаются без останова быстро
+		if (false && type != Message.GET_PING_TYPE
+				&& type != Message.GET_HWEIGHT_TYPE
+				&& type != Message.HWEIGHT_TYPE
+				&& type != Message.GET_BLOCK_TYPE
+				&& this.sendedBeforePing > this.maxBeforePing) {
 			
 			if (messageSize < this.maxBeforePing) {
 				
@@ -647,39 +655,39 @@ public class Peer extends Thread{
 				+ " bytes:" + this.sendedBeforePing
 				+ " maxBeforePing: " + this.maxBeforePing);
 
-				this.pinger.tryPing();
+				this.pinger.tryPing(10000);
 				Controller.getInstance().notifyObserveUpdatePeer(this);
 
 				long ping = this.getPing(); 
 
 				if (ping < 0) {
-					if (this.maxBeforePing > MAX_BEFORE_PING>>3) {
+					if (this.maxBeforePing > MAX_BEFORE_PING>>2) {
 						this.maxBeforePing >>=2;			
-						LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-						+ " ms: " + ping
-						+ " maxBeforePing >>=2: " + this.maxBeforePing);
 					}
+					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing >>=2: " + this.maxBeforePing);
 				} else if (ping > 5000) {
-					if (this.maxBeforePing > MAX_BEFORE_PING>>3) {
+					if (this.maxBeforePing > MAX_BEFORE_PING>>2) {
 						this.maxBeforePing >>=1;			
-						LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-						+ " ms: " + ping
-						+ " maxBeforePing >>=1: " + this.maxBeforePing);
 					}
-				} else if (ping < 100) {
-					if (this.maxBeforePing < MAX_BEFORE_PING<<3) {
-						this.maxBeforePing <<=1;
-						LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-						+ " ms: " + ping
-						+ " maxBeforePing: <<=1" + this.maxBeforePing);
-					}
+					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing >>=1: " + this.maxBeforePing);
 				} else if (ping < 50) {
 					if (this.maxBeforePing < MAX_BEFORE_PING<<3) {
 						this.maxBeforePing <<=2;
-						LOGGER.debug("PING << send to <<=2" + this.address.getHostAddress() + " " + Message.viewType(message.getType())
-						+ " ms: " + ping
-						+ " maxBeforePing: " + this.maxBeforePing);
 					}
+					LOGGER.debug("PING << send to <<=2" + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing: " + this.maxBeforePing);
+				} else if (ping < 100) {
+					if (this.maxBeforePing < MAX_BEFORE_PING<<3) {
+						this.maxBeforePing <<=1;
+					}
+					LOGGER.debug("PING << send to " + this.address.getHostAddress() + " " + Message.viewType(message.getType())
+					+ " ms: " + ping
+					+ " maxBeforePing: <<=1" + this.maxBeforePing);
 				}					
 			}
 			

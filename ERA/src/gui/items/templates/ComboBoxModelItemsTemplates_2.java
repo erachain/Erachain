@@ -17,10 +17,10 @@ import core.item.templates.TemplateCls;
 import gui.items.ComboBoxModelItems;
 
 @SuppressWarnings("serial")
-public class ComboBoxModelItemsNotes_2 extends ComboBoxModelItems
+public class ComboBoxModelItemsTemplates_2 extends ComboBoxModelItems
 {
 	
-	public ComboBoxModelItemsNotes_2()
+	public ComboBoxModelItemsTemplates_2()
 	{
 		super(ObserverMessage.LIST_TEMPLATE_FAVORITES_TYPE, ItemCls.TEMPLATE_TYPE);
 	}
