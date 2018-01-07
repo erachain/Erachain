@@ -28,6 +28,9 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.statements.StatementCls;
+import core.item.statements.StatementFactory;
+import core.item.statuses.StatusCls;
+import core.item.statuses.StatusFactory;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
@@ -349,6 +352,11 @@ public class R_SignNote2 extends Issue_ItemRecord { //Transaction {
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		position += SIGNATURE_LENGTH;
 
+		//READ STATEMENT
+		// Statement parse without reference - if is = signature
+		StatementCls statement = StatementFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+		position += statement.getDataLength(false);
+
 		//////// local parameters
 		
 		long key = 0l;
@@ -406,7 +414,7 @@ public class R_SignNote2 extends Issue_ItemRecord { //Transaction {
 		if (signersLen == 0) {
 			if (!asPack) {
 				return null;
-				//new R_SignNote2(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+				//new R_SignNote2(typeBytes, creator, statement, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 			} else {
 				return null;
 				//new R_SignNote2(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);

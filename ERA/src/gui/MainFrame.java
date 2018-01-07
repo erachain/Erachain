@@ -37,79 +37,66 @@ import settings.Settings;
 import utils.ObserverMessage;
 import utils.SaveStrToFile;
 
-
 @SuppressWarnings("serial")
-public class MainFrame extends JFrame implements Observer{
+public class MainFrame extends JFrame implements Observer {
 	private JSONObject settingsJSONbuf;
 	private JSONObject main_Frame_settingsJSON;
 	// Variables declaration - do not modify
-		private Menu_Files jMenu1;
-		private Menu_Deals jMenu2;
-		private javax.swing.JMenuBar jMenuBar1;
-		private Main_Panel mainPanel;
-		private StatusPanel statusPanel;
-		private javax.swing.JTabbedPane jTabbedPane1;
-		// End of variables declaration
-		private MainFrame th;
+	private Menu_Files jMenu1;
+	private Menu_Deals jMenu2;
+	private javax.swing.JMenuBar jMenuBar1;
+	private Main_Panel mainPanel;
+	private StatusPanel statusPanel;
+	private javax.swing.JTabbedPane jTabbedPane1;
+	// End of variables declaration
+	private MainFrame th;
 
-private static MainFrame instance;
-public static MainFrame getInstance()
-{
-	if(instance == null)
-	{
-		instance = new MainFrame();
-	}
-	
-	return instance;
-}
+	private static MainFrame instance;
 
-
-
-	private MainFrame()
-	{
-		
-		//CREATE FRAME
-		super(controller.Controller.APP_NAME +  " v." + Controller.getVersion());
-		this.setVisible(false);
-		if(Settings.getInstance().isTestnet()) {
-			setTitle(controller.Controller.APP_NAME + " TestNet "
-					 +  "v." + Controller.getVersion()
-					 + " TS:" + Settings.getInstance().getGenesisStamp());
+	public static MainFrame getInstance() {
+		if (instance == null) {
+			instance = new MainFrame();
 		}
-		
-	th = this;
-	
-       
-		Controller.getInstance().addObserver(this);	
-             
+
+		return instance;
+	}
+
+	private MainFrame() {
+
+		// CREATE FRAME
+		super(controller.Controller.APP_NAME + " v." + Controller.getVersion());
+		this.setVisible(false);
+		if (Settings.getInstance().isTestnet()) {
+			setTitle(controller.Controller.APP_NAME + " TestNet " + "v." + Controller.getVersion() + " TS:"
+					+ Settings.getInstance().getGenesisStamp());
+		}
+
+		th = this;
+
+		Controller.getInstance().addObserver(this);
+
 		settingsJSONbuf = new JSONObject();
 		settingsJSONbuf = Settings.getInstance().Dump();
 		initComponents();
-		
-		
-		
-        // WALLET STATS
-        this.add(new StatusPanel(), BorderLayout.SOUTH);
-        
-        
-		
-         this.setVisible(true);
- 	}
 
-	 
+		// WALLET STATS
+		this.add(new StatusPanel(), BorderLayout.SOUTH);
+
+		this.setVisible(true);
+	}
+
 	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed" desc="Generated Code">
-public void initComponents() {
+	public void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		jTabbedPane1 = new javax.swing.JTabbedPane();
 		mainPanel = Main_Panel.getInstance();
-		//statusPanel = new StatusPanel();
+		// statusPanel = new StatusPanel();
 		jMenuBar1 = new javax.swing.JMenuBar();
 		jMenu1 = new Menu_Files();
 		jMenu2 = new Menu_Deals();
 
-		
 		// getContentPane().setLayout(new java.awt.GridBagLayout());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -128,12 +115,13 @@ public void initComponents() {
 
 		add(mainPanel, BorderLayout.CENTER);
 
-	//	javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(statusPanel);
-	//	statusPanel.setLayout(jPanel2Layout);
-	//	jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	//			.addGap(0, 0, Short.MAX_VALUE));
-	//	jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-	//			.addGap(0, 0, Short.MAX_VALUE));
+		// javax.swing.GroupLayout jPanel2Layout = new
+		// javax.swing.GroupLayout(statusPanel);
+		// statusPanel.setLayout(jPanel2Layout);
+		// jPanel2Layout.setHorizontalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+		// .addGap(0, 0, Short.MAX_VALUE));
+		// jPanel2Layout.setVerticalGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+		// .addGap(0, 0, Short.MAX_VALUE));
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -141,7 +129,7 @@ public void initComponents() {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.2;
 		// getContentPane().add(jPanel2, gridBagConstraints);
-		//this.add(new StatusPanel(), BorderLayout.SOUTH);
+		// this.add(new StatusPanel(), BorderLayout.SOUTH);
 
 		jMenu1.setText(Lang.getInstance().translate("File"));
 		jMenuBar1.add(jMenu1);
@@ -151,7 +139,6 @@ public void initComponents() {
 
 		setJMenuBar(jMenuBar1);
 
-	
 		addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -176,16 +163,16 @@ public void initComponents() {
 				HashMap outOpenTabbeds = new HashMap();
 				JSONObject settingsJSON = new JSONObject();
 				settingsJSONbuf = Settings.getInstance().read_setting_JSON();
-				if (settingsJSONbuf.containsKey("Main_Frame_Setting"))  settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+				if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
+					settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
 				if (th.getExtendedState() != MAXIMIZED_BOTH) {
 					settingsJSON.put("Main_Frame_is_Max", "false");
-				settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
-				settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
-				settingsJSON.put("Main_Frame_Loc_X", getX() + ""); // высота
-				settingsJSON.put("Main_Frame_Loc_Y", getY() + ""); // высота
-				}
-				else{
-					
+					settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
+					settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина
+					settingsJSON.put("Main_Frame_Loc_X", getX() + ""); // высота
+					settingsJSON.put("Main_Frame_Loc_Y", getY() + ""); // высота
+				} else {
+
 					settingsJSON.put("Main_Frame_is_Max", "true");
 				}
 
@@ -207,7 +194,7 @@ public void initComponents() {
 						HashMap outTabbedDiv = new HashMap();
 
 						sP = ((Split_Panel) comp);
-						outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation()+"");
+						outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation() + "");
 
 						// write
 
@@ -217,41 +204,39 @@ public void initComponents() {
 						outTabbedDiv.put("Div_Last_Loc", lDiv + "");
 						outTabbedDiv.put("Div_Loc", div + "");
 
-						settingsJSON.put(comp.getClass().getSimpleName(),
-								outTabbedDiv);
+						settingsJSON.put(comp.getClass().getSimpleName(), outTabbedDiv);
 					}
-					
+
 					settingsJSON.put("OpenTabbeds", outOpenTabbeds);
-					
 
 				}
-				settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex()+ "");
-				
+				settingsJSON.put("Main_Frame_Selected_Tab", mainPanel.jTabbedPane1.getSelectedIndex() + "");
+
 				settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
 				settingsJSONbuf.put("FileChooser_Path", new String(My_JFileChooser.get_Default_Path()));
 				settingsJSONbuf.put("FileChooser_Wight", My_JFileChooser.get_Default_Width());
 				settingsJSONbuf.put("FileChooser_Height", My_JFileChooser.get_Default_Height());
-				
-				// saving menu 
+
+				// saving menu
 				int tree_Row = 0;
 				HashMap treeJSON = new HashMap();
-				for (int rr = 0; rr< mainPanel.mlp.tree.tree.getRowCount();rr++){
-				
-				if (mainPanel.mlp.tree.tree.isCollapsed(rr)){
-					// write to Json
-					//TreePath tree_Component = mainPanel.mlp.tree.tree.getPathForRow(rr);
-					treeJSON.put(tree_Row++, rr);
-					
-				};
-							
+				for (int rr = 0; rr < mainPanel.mlp.tree.tree.getRowCount(); rr++) {
+
+					if (mainPanel.mlp.tree.tree.isCollapsed(rr)) {
+						// write to Json
+						// TreePath tree_Component =
+						// mainPanel.mlp.tree.tree.getPathForRow(rr);
+						treeJSON.put(tree_Row++, rr);
+
+					}
+					;
+
 				}
-				if (!treeJSON.isEmpty()){
+				if (!treeJSON.isEmpty()) {
 					settingsJSONbuf.put("Main_Tree", treeJSON);
-					
+
 				}
-				
-				
-				
+
 				// save setting to setting file
 				try {
 					SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
@@ -284,7 +269,7 @@ public void initComponents() {
 			}
 
 			@Override
-			public void windowOpened(WindowEvent arg0) { 
+			public void windowOpened(WindowEvent arg0) {
 				// TODO Auto-generated method stub
 			}
 
@@ -294,44 +279,43 @@ public void initComponents() {
 		// set perameters size $ split panel
 		int devLastLoc = 250;
 		int devLoc = 250;
-		int x =0;
-		int y =0;
+		int x = 0;
+		int y = 0;
 		Toolkit kit = Toolkit.getDefaultToolkit();
-        Dimension screens = kit.getScreenSize();
-		int h = screens.height-50;
-		int w = screens.width-50;
-		int orientation=1;
+		Dimension screens = kit.getScreenSize();
+		int h = screens.height - 50;
+		int w = screens.width - 50;
+		int orientation = 1;
 
 		if (settingsJSONbuf.containsKey("Main_Frame_Setting")) {
 			main_Frame_settingsJSON = new JSONObject();
 			main_Frame_settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
-			
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Loc_X")) x = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_X")); // x
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Loc_Y")) y = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_Y")); // y
-			
-			
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Height")) h = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Width")) w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
-			
-			
-			
-			
-			
-			
-			if(main_Frame_settingsJSON.containsKey("Main_Frame_is_Max")){
-				Boolean bb = new Boolean((String)main_Frame_settingsJSON.get("Main_Frame_is_Max"));
-				if (bb){
+
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Loc_X"))
+				x = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_X")); // x
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Loc_Y"))
+				y = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Loc_Y")); // y
+
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Height"))
+				h = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Height")); // высота
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Width"))
+				w = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Width")); // длина
+
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_is_Max")) {
+				Boolean bb = new Boolean((String) main_Frame_settingsJSON.get("Main_Frame_is_Max"));
+				if (bb) {
 					this.setExtendedState(MAXIMIZED_BOTH);
 				}
 			}
-			
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Orientation")) orientation = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Orientation"));
-			
-			
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Loc")) devLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Loc"));
-			
-			if( main_Frame_settingsJSON.containsKey("Main_Frame_Div_Last_Loc")) devLastLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Last_Loc"));
-			
+
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Div_Orientation"))
+				orientation = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Orientation"));
+
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Div_Loc"))
+				devLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Loc"));
+
+			if (main_Frame_settingsJSON.containsKey("Main_Frame_Div_Last_Loc"))
+				devLastLoc = new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Div_Last_Loc"));
 
 			// load tabs
 			if (main_Frame_settingsJSON.containsKey("OpenTabbeds")) {
@@ -339,25 +323,23 @@ public void initComponents() {
 				Set ot = openTabes.keySet();
 				for (int i = 0; i < ot.size(); i++) {
 					String value = (String) openTabes.get(i + "");
-					mainPanel.dylay(value);
+					mainPanel.addTab(value);
 				}
-				
+
 				if (main_Frame_settingsJSON.containsKey("Main_Frame_Selected_Tab"))
 					try {
-					mainPanel.jTabbedPane1.setSelectedIndex(
-							new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Selected_Tab")));
+						mainPanel.jTabbedPane1.setSelectedIndex(
+								new Integer((String) main_Frame_settingsJSON.get("Main_Frame_Selected_Tab")));
 					} catch (Exception e) {
 					}
 			}
-		
-		
-		} 
-		else {
+
+		} else {
 			this.setExtendedState(MAXIMIZED_BOTH);
-			
-	//		setExtendedState(MAXIMIZED_BOTH);
+
+			// setExtendedState(MAXIMIZED_BOTH);
 			// mainPanel.jSplitPane1.setDividerLocation(250);
-	//		mainPanel.jSplitPane1.setLastDividerLocation(300);
+			// mainPanel.jSplitPane1.setLastDividerLocation(300);
 
 		}
 		setLocation(x, y);
@@ -367,53 +349,45 @@ public void initComponents() {
 		mainPanel.jSplitPane1.setDividerLocation(devLoc);
 		mainPanel.jSplitPane1.set_button_title(); // set title diveders
 													// buttons
-		
+
 		// reat Main tree
-		
-		if (settingsJSONbuf.containsKey("Main_Tree")){
-		JSONObject aa =  (JSONObject) settingsJSONbuf.get("Main_Tree");
-		Iterator<?> it = aa.values().iterator();
-		TreeSet s1 = new TreeSet();
-		while (it.hasNext()){
-			     long d2 = (long) it.next();
-			     s1.add(d2);
-			
-		}
-		Iterator <?> s1_It = s1.iterator();
-		while (s1_It.hasNext()){
-			long sa =  (long) s1_It.next();
-			mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
-			
-		}
-		
-		
-		
+
+		if (settingsJSONbuf.containsKey("Main_Tree")) {
+			JSONObject aa = (JSONObject) settingsJSONbuf.get("Main_Tree");
+			Iterator<?> it = aa.values().iterator();
+			TreeSet s1 = new TreeSet();
+			while (it.hasNext()) {
+				long d2 = (long) it.next();
+				s1.add(d2);
+
+			}
+			Iterator<?> s1_It = s1.iterator();
+			while (s1_It.hasNext()) {
+				long sa = (long) s1_It.next();
+				mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
+
+			}
+
 		}
 	}// </editor-fold>
 
-	
-	
-
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		
+
 		ObserverMessage message = (ObserverMessage) arg1;
-		if(message.getType() == ObserverMessage.NETWORK_STATUS)
-		{
+		if (message.getType() == ObserverMessage.NETWORK_STATUS) {
 			int status = (int) message.getValue();
-			
-			if(status == Controller.STATUS_NO_CONNECTIONS)
-			{
+
+			if (status == Controller.STATUS_NO_CONNECTIONS) {
 				List<Image> icons = new ArrayList<Image>();
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_No.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_No.png"));
 				this.setIconImages(icons);
-				
+
 			}
-			if(status == Controller.STATUS_SYNCHRONIZING)
-			{
+			if (status == Controller.STATUS_SYNCHRONIZING) {
 				List<Image> icons = new ArrayList<Image>();
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16_Se.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
@@ -421,9 +395,8 @@ public void initComponents() {
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32_Se.png"));
 				this.setIconImages(icons);
 			}
-			if(status == Controller.STATUS_OK)
-			{
-				//ICON
+			if (status == Controller.STATUS_OK) {
+				// ICON
 				List<Image> icons = new ArrayList<Image>();
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
@@ -431,9 +404,7 @@ public void initComponents() {
 				icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 				this.setIconImages(icons);
 			}
-		}	
-		
-		
+		}
+
 	}
 }
-
