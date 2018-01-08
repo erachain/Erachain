@@ -631,6 +631,43 @@ public class Peer extends Thread{
 		}
 		
 		byte[] bytes = message.toBytes();
+
+		
+		//SEND MESSAGE
+		synchronized(this.out)
+		{
+
+			try {
+				this.out.write(bytes);
+				this.out.flush();
+			}
+			catch (IOException e) 
+			{
+				//ERROR
+				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
+				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+				callback.tryDisconnect(this, 0, "try write");
+
+				//RETURN
+				return false;
+			}
+			catch (Exception e) 
+			{
+				//ERROR
+				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
+				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
+				callback.tryDisconnect(this, 0, "");
+
+				//RETURN
+				return false;
+			}
+
+		}
+
+		// странно - если идет передача блоков в догоняющую ноду в ее буфер
+		// и тут пинговать то она зависает в ожидании надолго и синхронизация удаленной ноды встает на 30-50 секунд
+		// ели урать тут пинги то блоки передаются без останова быстро
+		// ХОТЯ! при передаче неподтвержденных заявок пингт нормально работают - видимо тут влоенный вызов запрещен по synchronized
 		int messageSize = bytes.length;
 		int type = message.getType(); 
 		if (type == Message.GET_PING_TYPE
@@ -640,9 +677,6 @@ public class Peer extends Thread{
 			this.sendedBeforePing += bytes.length;
 		}
 
-		// странно - если идет передача блоков в догоняющую ноду в ее буфер
-		// и тут пинговать то она зависает в ожидании надолго и синхронизация удаленной ноды встает на 30-50 секунд
-		// ели урать тут пинги то блоки передаются без останова быстро
 		if (false && type != Message.GET_PING_TYPE
 				&& type != Message.GET_HWEIGHT_TYPE
 				&& type != Message.HWEIGHT_TYPE
@@ -691,37 +725,6 @@ public class Peer extends Thread{
 				}					
 			}
 			
-		}
-		
-		//SEND MESSAGE
-		synchronized(this.out)
-		{
-
-			try {
-				this.out.write(bytes);
-				this.out.flush();
-			}
-			catch (IOException e) 
-			{
-				//ERROR
-				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-				callback.tryDisconnect(this, 0, "try write");
-
-				//RETURN
-				return false;
-			}
-			catch (Exception e) 
-			{
-				//ERROR
-				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
-				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-				callback.tryDisconnect(this, 0, "");
-
-				//RETURN
-				return false;
-			}
-
 		}
 
 		//RETURN
