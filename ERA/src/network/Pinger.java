@@ -94,7 +94,10 @@ public class Pinger extends Thread
 		{
 
 			//UPDATE PING
-			this.ping = -1;
+			if (this.ping < 0)
+				this.ping -= 1;
+			else
+				this.ping = -1;
 			
 			//PING FAILES
 			///peer.onPingFail("on Ping fail - @ms " + this.ping);
