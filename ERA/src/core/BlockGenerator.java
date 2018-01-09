@@ -421,8 +421,11 @@ public class BlockGenerator extends Thread implements Observer
 										break;
 									}
 											
-								} while (wait_steep-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+								} while (this.orphanto <= 0 && wait_steep-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
 							}
+							
+							if (this.orphanto > 0)
+								continue;
 
 							if (newWinner)
 							{
@@ -497,7 +500,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 						status = 1;
 		
-						while (flushPoint > NTP.getTime()) {
+						while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
 							try
 							{
 								Thread.sleep(100);
@@ -511,6 +514,9 @@ public class BlockGenerator extends Thread implements Observer
 								return;
 							}
 						}
+						
+						if (this.orphanto > 0)
+							continue;
 						
 						// FLUSH WINER to DB MAP
 						LOGGER.debug("TRY to FLUSH WINER to DB MAP");
