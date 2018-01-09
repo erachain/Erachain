@@ -568,18 +568,8 @@ public class Peer extends Thread{
 					continue;
 				}
 				
-				if (false && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-					LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-					LOGGER.debug("isRequest " + message.isRequest() + " hasId " + message.hasId());
-					LOGGER.debug(" Id " + message.getId() + " containsKey: " + this.messages.containsKey(message.getId()));
-				}
-				if (message.getType() != Message.TRANSACTION_TYPE) {
-					//LOGGER.debug("received message " + message.viewType() + " from " + this.address.toString());
-				}
-
 				//CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-				if(message.getType() != Message.GET_PING_TYPE
-						&& !message.isRequest()
+				if(!message.isRequest()
 						&& message.hasId()
 						&& this.messages.containsKey(message.getId()) ) {
 						//ADD TO OUR OWN LIST
@@ -748,7 +738,7 @@ public class Peer extends Thread{
 			counter++;
 		}
 		
-		if (counter > 100) {
+		if (counter > 100000) {
 			LOGGER.error("getResponseKey find counter: " + counter); 
 		}
 		
