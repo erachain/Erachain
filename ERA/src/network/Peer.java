@@ -619,6 +619,7 @@ public class Peer extends Thread{
 		//CHECK IF SOCKET IS STILL ALIVE
 		if(!this.runed || this.socket == null)
 		{
+			callback.tryDisconnect(this, 0, "SEND - not runned");
 			return false;
 		}
 		
@@ -646,7 +647,7 @@ public class Peer extends Thread{
 				//ERROR
 				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
 				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-				callback.tryDisconnect(this, 0, "try write");
+				callback.tryDisconnect(this, 0, "try write 1");
 
 				//RETURN
 				return false;
@@ -656,7 +657,7 @@ public class Peer extends Thread{
 				//ERROR
 				//LOGGER.debug("try sendMessage to " + this.address + " " + Message.viewType(message.getType()) + " ERROR: " + e.getMessage());
 				//callback.tryDisconnect(this, 5, "SEND - " + e.getMessage());
-				callback.tryDisconnect(this, 0, "");
+				callback.tryDisconnect(this, 0, "try write 2");
 
 				//RETURN
 				return false;

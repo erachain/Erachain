@@ -1161,11 +1161,6 @@ public class Controller extends Observable {
 		!this.doesWalletExists() || !this.useGui)
 			return;
 
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-		}
-
 		this.timer.cancel();
 		this.timer = new Timer();
 

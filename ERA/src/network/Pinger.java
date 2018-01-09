@@ -136,7 +136,14 @@ public class Pinger extends Thread
 		while(true)
 		{
 
-			sleepStepTimeCounter = sleepSteeps;
+			if (this.ping < 0) {
+				sleepStepTimeCounter = 10000;
+			} else if (this.ping > 10000) {
+				sleepStepTimeCounter = 30000;				
+			} else {
+				sleepStepTimeCounter = sleepSteeps;				
+			}
+		
 			while (sleepStepTimeCounter-- > 0) {
 				
 				//SLEEP
