@@ -927,11 +927,12 @@ public class API {
 		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) 	
 		{
 			JSONArray array = new JSONArray();
-			array.add(assetsBalance.getB().a);
-			array.add(assetsBalance.getB().b);
-			array.add(assetsBalance.getB().c);
-			array.add(assetsBalance.getB().d);
-			array.add(assetsBalance.getB().e);
+			JSONObject a = new JSONObject();
+			array.add(setJSONArray(assetsBalance.getB().a));
+			array.add(setJSONArray(assetsBalance.getB().b));
+			array.add(setJSONArray(assetsBalance.getB().c));
+			array.add(setJSONArray(assetsBalance.getB().d));
+			array.add(setJSONArray(assetsBalance.getB().e));
 			out.put(assetsBalance.getA().b, array);
 		}
 		
@@ -940,6 +941,13 @@ public class API {
 				.header("Access-Control-Allow-Origin", "*")
 				.entity(StrJSonFine.convert(out))
 				.build();
+	}
+	
+	private JSONArray setJSONArray (Tuple2 t){
+		JSONArray array = new JSONArray();
+		array.add(t.a);
+		array.add(t.b);
+	return array;
 	}
 
 	@GET
