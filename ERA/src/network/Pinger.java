@@ -71,7 +71,7 @@ public class Pinger extends Thread
 	
 	public boolean tryPing(long timeSOT) {
 		
-		//LOGGER.info("try PING " + this.peer.getAddress());
+		LOGGER.info("try PING " + this.peer.getAddress());
 
 		peer.addPingCounter();
 
@@ -105,6 +105,7 @@ public class Pinger extends Thread
 			//PING FAILES
 			if (this.ping < -4) {
 				this.peer.ban(10, "on PING FAILES");
+				return false;
 			}
 
 		} else {
@@ -221,7 +222,7 @@ public class Pinger extends Thread
 				} else if(this.needPing) {
 					// PING NOW
 					this.needPing = false;
-					tryPing();
+					this.tryPing();
 					pingOld = this.ping;
 					sleepStepTimeCounter = sleepSteeps;
 					continue;

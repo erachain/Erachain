@@ -396,21 +396,23 @@ public class Network extends Observable implements ConnectionCallback {
 		Controller cnt = Controller.getInstance();
 		BlockChain chain = cnt.getBlockChain();
 		Integer myHeight = chain.getHWeightFull(DCSet.getInstance()).a;
-
+		Peer peer;
+		Tuple2<Integer, Long> peerHWeight;
+		
 		for(int i=0; i < this.knownPeers.size() ; i++)
 		{
 			
 			if (!this.run)
 				return;
 			
-			Peer peer = this.knownPeers.get(i);
+			peer = this.knownPeers.get(i);
 			if (peer == null || !peer.isUsed()) {
 				continue;
 			}
 			
 			if (onlySynchronized) {
 				// USE PEERS than SYNCHRONIZED to ME
-				Tuple2<Integer, Long> peerHWeight = Controller.getInstance().getHWeightOfPeer(peer);
+				peerHWeight = cnt.getHWeightOfPeer(peer);
 				if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
 					continue;
 				}
@@ -423,6 +425,7 @@ public class Network extends Observable implements ConnectionCallback {
 			}
 		}	
 		
+		peer = null;
 		LOGGER.debug("Broadcasting PING ALL end");
 	}
 
