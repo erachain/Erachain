@@ -103,8 +103,8 @@ public class Pinger extends Thread
 				return false;
 
 			//PING FAILES
-			if (this.ping < -2) {
-				this.peer.ban(3, "on PING FAILES");
+			if (this.ping < -4) {
+				this.peer.ban(10, "on PING FAILES");
 			}
 
 		} else {
