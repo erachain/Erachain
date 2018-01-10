@@ -92,15 +92,21 @@ public class Pinger extends Thread
 		//CHECK IF VALID PING
 		if(response == null)
 		{
-
+			
 			//UPDATE PING
 			if (this.ping < 0)
 				this.ping -= 1;
 			else
 				this.ping = -1;
-			
+
+			if (!this.peer.isUsed())
+				return false;
+
 			//PING FAILES
-			///peer.onPingFail("on Ping fail - @ms " + this.ping);
+			if (this.ping < -2) {
+				this.peer.ban(3, "on PING FAILES");
+			}
+
 		} else {
 			//UPDATE PING
 			this.ping = (int)(System.currentTimeMillis() - start);
