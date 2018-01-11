@@ -522,7 +522,7 @@ public class BlockExplorer
 
 				output.put("lastBlock", jsonQueryLastBlock());
 
-				output.putAll(jsonQueryStatements(start));
+				output.putAll(jsonQueryStatements2());
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -3626,6 +3626,18 @@ if ( asset_1 == null) {
 		return output;
 	}
 	
+	public Map jsonQueryStatements2(){
+		Map output=new LinkedHashMap();
+		WEB_Statements_Table_Model_Search model_Statements =  new WEB_Statements_Table_Model_Search();
+		int column_Count = model_Statements.getColumnCount();
+		
+		for (int column=0; column < column_Count; column++ ){
+				
+			output.put("Label_"+ model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'),  Lang.getInstance().translate_from_langObj(model_Statements.getColumnNameNO_Translate(column),langObj));
+		}
+		
+		return output;
+	}
 	
 	private Map jsonQueryStatement(String block, String seg_No) {
 		// TODO Auto-generated method stub
