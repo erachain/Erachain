@@ -161,7 +161,7 @@ public class Block {
 
 	public Block getChild(DCSet db)
 	{
-		return db.getChildMap().getChildBlock(this);
+		return db.getBlockHeightsMap().getChildBlock(this);
 	}
 
 	public int compareWin(Block block, DCSet db)

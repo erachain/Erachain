@@ -59,7 +59,6 @@ public class DCSet implements Observer, IDB {
 	
 	private AddressTime_SignatureMap addressTime_SignatureMap;
 	private BlockMap blockMap;
-	private ChildMap childMap;
 	private BlockSignsMap blockSignsMap;
 	private BlockHeightsMap blockHeightsMap;
 	private ReferenceMap referenceMap;
@@ -284,7 +283,6 @@ public class DCSet implements Observer, IDB {
 			this.actions = 0l;
 
 			this.blockMap = new BlockMap(this, database);
-			this.childMap = new ChildMap(this, database);
 			this.blockSignsMap = new BlockSignsMap(this, database);
 			this.blockHeightsMap = new BlockHeightsMap(this, database);
 			this.referenceMap = new ReferenceMap(this, database);
@@ -393,7 +391,6 @@ public class DCSet implements Observer, IDB {
 		
 		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
 		this.blockMap = new BlockMap(parent.blockMap, this);
-		this.childMap = new ChildMap(parent.childMap, this);
 		this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap);
 		this.blockHeightsMap = new BlockHeightsMap(parent.blockHeightsMap);
 		this.referenceMap = new ReferenceMap(parent.referenceMap);
@@ -612,11 +609,6 @@ public class DCSet implements Observer, IDB {
 	public BlockMap getBlockMap() 
 	{
 		return this.blockMap;
-	}
-
-	public ChildMap getChildMap() 
-	{
-		return this.childMap;
 	}
 
 	public BlockSignsMap getBlockSignsMap() 

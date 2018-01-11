@@ -126,4 +126,26 @@ public class BlockHeightsMap extends DCMap<Integer, byte[]>
 		
 		return this.get(height);
 	}
+
+	public Block getChildBlock(Block parent)
+	{
+		try {
+			return this.getDCSet().getBlockMap().get(this.get(parent.getHeight(this.getDCSet())+1));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+		
+	}
+	
+	public byte[] getChildBlock(byte[] parent)
+	{
+		try {
+			return this.get(this.getDCSet().getBlockSignsMap().get(parent).a+1);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return null;
+		}
+		
+	}
 }

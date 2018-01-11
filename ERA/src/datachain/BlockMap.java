@@ -265,7 +265,6 @@ public class BlockMap extends DCMap<byte[], Block>
 	//		System.out.println("/n ####################sign:" + new String(ss));
 	//		System.out.println("/n ####################refe:" + new String(s1));
 			int height = parent.getHeight(dcSet) + 1;
-			dcSet.getChildMap().set(parent, block);
 			dcSet.getBlockSignsMap().set(signature,	height, win_value);
 			dcSet.getBlockHeightsMap().set(height, signature);
 	//		long heightInMap = dcSet.getBlockHeightsMap().add(signature);
@@ -304,12 +303,6 @@ public class BlockMap extends DCMap<byte[], Block>
 		
 		this.setLastBlockSignature(parentSign);
 		
-		if (dcSet.getChildMap().contains(parent.getSignature())) {
-			dcSet.getChildMap().delete(block.getSignature());
-		}
-		
-		dcSet.getChildMap().delete(parent.getSignature());
-	
 		// ORPHAN FORGING DATA
 		int height = parent.getHeight(dcSet) + 1;
 		if (height > 1) {
