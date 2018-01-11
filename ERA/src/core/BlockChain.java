@@ -3,14 +3,10 @@ package core;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
-
 import controller.Controller;
 import core.account.Account;
 import core.block.Block;
@@ -18,8 +14,8 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
+import datachain.BlockHeightsMap;
 import datachain.BlockMap;
-import datachain.ChildMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import network.Peer;
@@ -27,7 +23,6 @@ import network.message.MessageFactory;
 import ntp.NTP;
 import settings.Settings;
 import utils.Pair;
-import utils.TransactionTimestampComparator;
 
 public class BlockChain
 {
@@ -341,7 +336,7 @@ public class BlockChain
 			} else {
 				packet = SYNCHRONIZE_PACKET;
 			}
-			ChildMap childsMap = dcSet.getChildMap();			
+			BlockHeightsMap childsMap = dcSet.getBlockHeightsMap();			
 			int counter = 0;
 			while(parentSignature != null && counter++ < packet)
 			{				
