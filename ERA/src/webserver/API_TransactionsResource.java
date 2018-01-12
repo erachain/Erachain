@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -299,7 +300,8 @@ public class API_TransactionsResource {
 				@QueryParam("limit") Integer limit)
 		{
 			 JSONObject out = new JSONObject();
-			
+			if (timestamp == null) timestamp = new Date().getTime();
+			if (limit == null) limit = Integer.MAX_VALUE; 
 			List<Transaction> transs = new ArrayList<Transaction>();
 			List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
 			Collections.sort(trans, new TransactionTimestampComparator().reversed());
