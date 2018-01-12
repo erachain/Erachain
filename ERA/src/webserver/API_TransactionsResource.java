@@ -3,6 +3,8 @@ package webserver;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,6 +55,7 @@ import lang.Lang;
 import utils.Converter;
 import utils.Pair;
 import utils.StrJSonFine;
+import utils.TransactionTimestampComparator;
 
 @Path("apirecords")
 @Produces(MediaType.APPLICATION_JSON)
@@ -86,12 +89,11 @@ public class API_TransactionsResource {
 				Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));		
 		
+		help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}","Get last Records from Unix Timestamp milisec(1512777600000)");
+		
 		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
 	
-		
-	
-		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -288,5 +290,39 @@ public class API_TransactionsResource {
 		// json.put("transactions", array);
 		return array.toJSONString();
 	}
+	//"apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
+		@GET
+		@Path("getlastbyaddress")	
+		public Response getLastByAddress(
+				@QueryParam("address") String address,
+				@QueryParam("timestamp") Long timestamp,
+				@QueryParam("limit") Integer limit)
+		{
+			 JSONObject out = new JSONObject();
+			
+			List<Transaction> transs = new ArrayList<Transaction>();
+			List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
+			Collections.sort(trans, new TransactionTimestampComparator().reversed());
+			for (Transaction tr:trans){
+				Long t = tr.getTimestamp();
+					if (tr.getTimestamp()<timestamp)
+						transs.add(tr);
+			}
+			Collections.sort(transs, new TransactionTimestampComparator().reversed());
+			if (limit > transs.size()) limit = transs.size();
+			List<Transaction> transss = transs.subList(0, limit);
+			int i = 0;
+			for (Transaction tr:transss){
+			out.put(i, tr.toJson());
+			i++;
+		}
+			//out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+
+			return Response.status(200)
+					.header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(StrJSonFine.convert(out))
+					.build();
+		}
 	
 }
