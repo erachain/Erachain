@@ -1365,14 +1365,8 @@ public class Controller extends Observable {
 						return;
 				}
 
-				info = "mess from " + blockWinMessage.getSender().getAddress();
+				info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " " + newBlock.toString(dcSet);
 				LOGGER.debug(info);
-				if (Controller.useGui)
-					about_frame.set_console_Text(info);
-				info = " received new WIN Block " + newBlock.toString(dcSet);
-				LOGGER.debug(info);
-				if (Controller.useGui)
-					about_frame.set_console_Text(info);
 
 				if (this.status == STATUS_SYNCHRONIZING) {
 					// SET for FUTURE without CHECK
@@ -1406,8 +1400,6 @@ public class Controller extends Observable {
 				if (!newBlock.isValid(dcSet, false)) {
 					info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
 					banPeerOnError(message.getSender(), info);
-					if (Controller.useGui)
-						about_frame.set_console_Text(info);
 					return;
 				}
 
@@ -1781,7 +1773,7 @@ public class Controller extends Observable {
 					info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress() + " WH: "
 							+ getHWeightOfPeer(peer);
 					LOGGER.info(info);
-					if (Controller.useGui)
+					if (Controller.useGui && about_frame.isVisible())
 						about_frame.set_console_Text(info);
 					try {
 						// SYNCHRONIZE FROM PEER
