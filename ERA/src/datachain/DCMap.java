@@ -56,7 +56,7 @@ public abstract class DCMap<T, U> extends Observable {
 			if (Runtime.getRuntime().freeMemory() < controller.Controller.MIN_MEMORY_TAIL) {
 				System.gc();
 				if (Runtime.getRuntime().freeMemory() < controller.Controller.MIN_MEMORY_TAIL>>1)
-					Controller.getInstance().stopAll(99);
+					Controller.getInstance().stopAll(97);
 			}
 		}
 
