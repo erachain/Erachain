@@ -29,8 +29,6 @@ import datachain.DCSet;
 import datachain.TransactionFinalMap;
 import datachain.TransactionFinalMapSigns;
 import datachain.TransactionMap;
-import datachain.TransactionRef_BlockRef_Map;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
@@ -1226,7 +1224,6 @@ public class Block {
 			}
 			
 			//DBSet dbSet = Controller.getInstance().getDBSet();
-			TransactionRef_BlockRef_Map refsMap = validatingDC.getTransactionRef_BlockRef_Map();
 			TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
 			TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
 			TransactionFinalMapSigns transFinalMapSinds = validatingDC.getTransactionFinalMapSigns();
@@ -1298,10 +1295,6 @@ public class Block {
 					
 					//SET PARENT
 					///LOGGER.debug("[" + seq + "] try refsMap.set" );
-					timerStart = System.currentTimeMillis();
-					refsMap.set(transactionSignature, blockSignature);
-					timerRefsMap_set += System.currentTimeMillis() - timerStart;
-	
 					if (isPrimarySet) {
 						//REMOVE FROM UNCONFIRMED DATABASE
 						///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
@@ -1441,7 +1434,6 @@ public class Block {
 		byte[] transactionSignature;
 		this.getTransactions();
 		//DBSet dbSet = Controller.getInstance().getDBSet();
-		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
 		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
 		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
 		TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
@@ -1477,10 +1469,7 @@ public class Block {
 			
 			//SET PARENT
 			///LOGGER.debug("[" + seq + "] try refsMap.set" );
-			timerStart = System.currentTimeMillis();
-			refsMap.set(transactionSignature, blockSignature);
-			timerRefsMap_set += System.currentTimeMillis() - timerStart;
-
+			
 			//REMOVE FROM UNCONFIRMED DATABASE
 			///LOGGER.debug("[" + seq + "] try unconfirmedMap delete" );
 			timerStart = System.currentTimeMillis();
@@ -1591,7 +1580,6 @@ public class Block {
 		Controller cnt = Controller.getInstance();
 		//DBSet dbSet = Controller.getInstance().getDBSet();
 
-		TransactionRef_BlockRef_Map refsMap = dcSet.getTransactionRef_BlockRef_Map();
 		TransactionMap unconfirmedMap = dcSet.getTransactionMap();
 		TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
 		TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
@@ -1625,9 +1613,6 @@ public class Block {
 			finalMap.delete(key);
 			transFinalMapSinds.delete(transaction.getSignature());
 	
-			//DELETE ORPHANED TRANASCTIONS FROM PARENT DATABASE
-			refsMap.delete(transaction.getSignature());
-
 		}
 	}
 

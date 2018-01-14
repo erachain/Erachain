@@ -697,7 +697,7 @@ public class BlockExplorer
 		}
 		else
 		{
-			if(!(signatureBytes == null) && (DCSet.getInstance().getTransactionRef_BlockRef_Map().contains(signatureBytes)))
+			if(!(signatureBytes == null) && (DCSet.getInstance().getTransactionFinalMapSigns().contains(signatureBytes)))
 			{
 				i++;
 				foundList.put(i, "transactionSignature");
@@ -728,8 +728,8 @@ public class BlockExplorer
 
 			try
 			{
-				if(DCSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[0])) || 
-						DCSet.getInstance().getTransactionRef_BlockRef_Map().contains(Base58.decode(signatures[1])))
+				if(DCSet.getInstance().getTransactionFinalMapSigns().contains(Base58.decode(signatures[0])) || 
+						DCSet.getInstance().getTransactionFinalMapSigns().contains(Base58.decode(signatures[1])))
 				{
 					i++;
 					foundList.put(i, "trade");

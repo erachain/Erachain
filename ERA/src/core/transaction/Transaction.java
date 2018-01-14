@@ -615,7 +615,7 @@ public abstract class Transaction {
 		if (block != null)
 			return block;
 		
-		block = db.getTransactionRef_BlockRef_Map().getParent(this.signature);
+		block =db.getBlockMap().get(db.getBlockHeightsMap().get(db.getTransactionFinalMapSigns().get(this.signature).a));
 
 		return block;
 	}
@@ -1172,7 +1172,7 @@ public abstract class Transaction {
 	
 	public boolean isConfirmed(DCSet db)
 	{
-		return db.getTransactionRef_BlockRef_Map().contains(this.getSignature());
+		return db.getTransactionFinalMapSigns().contains(this.getSignature());
 	}
 	
 	public int getConfirmations(DCSet db)

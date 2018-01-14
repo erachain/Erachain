@@ -1508,7 +1508,7 @@ public class Controller extends Observable {
 				// transaction.calcFee();
 				byte[] signature = transaction.getSignature();
 				if (this.dcSet.getTransactionMap().contains(signature)
-						|| this.dcSet.getTransactionRef_BlockRef_Map().contains(signature)
+						|| this.dcSet.getTransactionFinalMapSigns().contains(signature)
 						|| this.isStopping)
 					return;
 				
@@ -2118,11 +2118,10 @@ public class Controller extends Observable {
 	public Transaction getTransaction(byte[] signature, DCSet database) {
 
 		// CHECK IF IN BLOCK
-		Block block = database.getTransactionRef_BlockRef_Map().getParent(signature);
-		if (block != null) {
-			return block.getTransaction(signature);
+		Tuple2<Integer, Integer> tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
+		if (tuple_Tx != null)	{
+			return database.getTransactionFinalMap().get(tuple_Tx);
 		}
-
 		// CHECK IF IN TRANSACTION DATABASE
 		if (this.dcSet.getTransactionMap().contains(signature)) {
 			return this.dcSet.getTransactionMap().get(signature);

@@ -72,7 +72,6 @@ public class DCSet implements Observer, IDB {
 	private LocalDataMap localDataMap;
 	private BlogPostMap blogPostMap;
 	private HashtagPostMap hashtagPostMap;
-	private TransactionRef_BlockRef_Map transactionRef_BlockRef_Map;
 	private NameExchangeMap nameExchangeMap;
 	private UpdateNameMap updateNameMap;
 	private CancelSellNameMap cancelSellNameMap;
@@ -320,7 +319,6 @@ public class DCSet implements Observer, IDB {
 			this.localDataMap = new LocalDataMap(this, database);
 			this.blogPostMap = new BlogPostMap(this, database);
 			this.hashtagPostMap = new HashtagPostMap(this, database);
-			this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(this, database);
 			this.nameExchangeMap = new NameExchangeMap(this, database);
 			this.updateNameMap = new UpdateNameMap(this, database);
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
@@ -404,7 +402,6 @@ public class DCSet implements Observer, IDB {
 		this.localDataMap = new LocalDataMap(parent.localDataMap);
 		this.blogPostMap = new BlogPostMap(parent.blogPostMap);
 		this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-		this.transactionRef_BlockRef_Map = new TransactionRef_BlockRef_Map(parent.transactionRef_BlockRef_Map, this);
 		this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
 		this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
 		this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
@@ -472,7 +469,6 @@ public class DCSet implements Observer, IDB {
 		this.localDataMap.reset();
 		this.blogPostMap.reset();
 		this.hashtagPostMap.reset();
-		this.transactionRef_BlockRef_Map.reset();
 		this.nameExchangeMap.reset();
 		this.updateNameMap.reset();
 		this.cancelSellNameMap.reset();
@@ -688,11 +684,6 @@ public class DCSet implements Observer, IDB {
 	public HashtagPostMap getHashtagPostMap()
 	{
 		return this.hashtagPostMap;
-	}
-	
-	public TransactionRef_BlockRef_Map getTransactionRef_BlockRef_Map()
-	{
-		return this.transactionRef_BlockRef_Map;
 	}
 	
 	public NameExchangeMap getNameExchangeMap()
