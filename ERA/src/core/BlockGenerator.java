@@ -444,6 +444,8 @@ public class BlockGenerator extends Thread implements Observer
 								} catch (java.lang.OutOfMemoryError e) {
 									// TRY CATCH OUTofMemory error - heap space
 									LOGGER.error(e.getMessage(), e);									
+								} finally {
+									System.gc();
 								}
 					
 								solvingBlock = null;
