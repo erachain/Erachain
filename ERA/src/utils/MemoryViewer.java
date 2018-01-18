@@ -7,31 +7,45 @@ import controller.Controller;
 public class MemoryViewer extends Thread {
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
-	public MemoryViewer() {
+	Controller controller;
+	
+	public MemoryViewer(Controller controller) {
 
+		this.controller = controller;
 		setName("Memory manager");
 
 	}
 
 	public void run() {
+
+		try {
+			sleep(100000);
+		} catch (Exception e) {
+		}
+		
 		// if memory !Ok
 		while (true) {
 			try {
-				sleep(100);
+				sleep(1000);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
+			//threads
 			if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
 				// System.out.println("########################### Free Memory:"
 				// + Runtime.getRuntime().freeMemory());
-				if (Runtime.getRuntime().freeMemory() < controller.Controller.MIN_MEMORY_TAIL) {
+				if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
 					System.gc();
-					if (Runtime.getRuntime().freeMemory() < controller.Controller.MIN_MEMORY_TAIL>>1)
+
+					if (controller.isAllThreadsGood()) {
+						continue;	
+					}
+
+					if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL>>2)
 						Controller.getInstance().stopAll(99);
 				}
 			}
+			
 		}
 	}
 

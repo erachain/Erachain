@@ -112,6 +112,7 @@ public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
+	private static List<Thread> threads = new ArrayList<Thread>();
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
@@ -284,6 +285,18 @@ public class Controller extends Observable {
 	public Wallet getWallet() {
 		return this.wallet;
 	}
+	
+	public boolean isAllThreadsGood() {
+		if (!this.blockGenerator.isAlive()) {
+			return false;
+		}
+		
+		for (Thread thread: this.threads) {
+			if (thread.isInterrupted() || !thread.isAlive())
+				return false;
+		}
+		return true;
+	}
 
 	public int getWalletSyncHeight() {
 		return this.wallet.getSyncHeight();
@@ -389,10 +402,6 @@ public class Controller extends Observable {
 	}
 
 	public void start() throws Exception {
-
-		// start memory viewer
-		MemoryViewer mamoryViewer = new MemoryViewer();
-		mamoryViewer.start();
 
 		this.toOfflineTime = NTP.getTime();
 		if (Controller.useGui)
@@ -605,6 +614,11 @@ public class Controller extends Observable {
 		// REGISTER DATABASE OBSERVER
 		// this.addObserver(this.dbSet.getPeerMap());
 		this.addObserver(this.dcSet);
+		
+		// start memory viewer
+		MemoryViewer mamoryViewer = new MemoryViewer(this);
+		mamoryViewer.start();
+
 	}
 
 	// need for TESTS
