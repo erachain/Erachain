@@ -2958,8 +2958,8 @@ if ( asset_1 == null) {
 				
 				Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().getTarget().toByteArray());
 				
-				all.add( new BlExpUnit(txInitiator.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()),
-						txTarget.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
+				all.add( new BlExpUnit(txInitiator.getBlockHeightByParentOrLast(DCSet.getInstance()),
+						txTarget.getBlockHeightByParentOrLast(DCSet.getInstance()), txInitiator.getSeqNo(db), txTarget.getSeqNo(db), trade.getValue() ) );
 			}
 			
 			Set<BlExpUnit> atTransactions = DCSet.getInstance().getATTransactionMap().getBlExpATTransactionsByRecipient(address);

@@ -457,7 +457,7 @@ public class DeployATTransaction extends Transaction
 		bf.put( this.creator.getPublicKey() );
 		bf.put( this.creationBytes );
 		
-		bf.putInt( getBlock(db).getHeight(db) );
+		bf.putInt( getBlockHeightByParentOrLast(db) );
 
 		String atId = Crypto.getInstance().getATAddress( bf.array().clone() );
 

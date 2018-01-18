@@ -615,23 +615,24 @@ public abstract class Transaction {
 		if (block != null)
 			return block;
 		
-		block =db.getBlockMap().get(db.getBlockHeightsMap().get(db.getTransactionFinalMapSigns().get(this.signature).a));
+		//block = db.getTransactionRef_BlockRef_Map().getParent(this.signature);
+		Tuple2<Integer, Integer> blockHeightSeqNo = db.getTransactionFinalMapSigns().get(this.signature);
+		if (blockHeightSeqNo == null)
+			return null;
+		
+		block = db.getBlockMap().get(db.getBlockHeightsMap().get(blockHeightSeqNo.a));
 
 		return block;
 	}
 	
-	public Tuple2<Integer, Integer> getHeightSeqNo(DCSet db, Block block) {
+	public Tuple2<Integer, Integer> getHeightSeqNo(DCSet db) {
 		int transactionIndex = -1;
-		int blockIndex = -1;
+		int blockIndex;
 		if (block == null) {
-			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+			//blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+			blockIndex = -1;
 		} else {
-			blockIndex = block.getHeight(db);
-			if (blockIndex < 1 ) {
-				// if block not is confirmed - get last block + 1
-				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
-			}
-			//transactionIndex = this.getSeqNo(db);
+			blockIndex = block.getHeightByParent(db);
 			transactionIndex = block.getTransactionSeq(signature);
 		}
 		

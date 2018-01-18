@@ -188,7 +188,7 @@ public class AT_API_Platform_Impl extends AT_API_Impl {
 
 			if ( !transaction.getClass().equals( AT_Transaction.class ))
 			{
-				txBlockHeight = transaction.getBlock(dcSet).getHeight(dcSet);
+				txBlockHeight = transaction.getBlockHeightByParentOrLast(dcSet);
 				senderPublicKey = transaction.getCreator().getPublicKey();
 			}
 			else

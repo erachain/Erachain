@@ -209,7 +209,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return library.getBlockSegToBigInteger(r_Tran.transaction);
 		case COLUMN_TRANSACTION:
 
-			if (r_Tran.transaction.isConfirmed(DCSet.getInstance())) return r_Tran.transaction.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()) + "-" + r_Tran.transaction.getSeqNo(DCSet.getInstance());
+			if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
+				return r_Tran.transaction.viewHeightSeq(DCSet.getInstance());
 			return -1;
 		case COLUMN_AMOUNT:
 		//	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
