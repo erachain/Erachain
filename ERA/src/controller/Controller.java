@@ -969,10 +969,10 @@ public class Controller extends Observable {
 		long ping = 0;
 		int counter = 0;
 		///////// big maxCounter freeze network and make bans on response headers and blocks
-		int steepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		int stepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
 		long dTime = this.blockChain.getTimestamp(this.dcSet);
 		
-		while (iterator.hasNext() && steepCount > 4) {
+		while (iterator.hasNext() && stepCount > 4) {
 			
 			if (this.isStopping) {
 				return;
@@ -1008,7 +1008,7 @@ public class Controller extends Observable {
 				LOGGER.error(e.getMessage(), e);
 			}
 			
-			if (counter % steepCount == 0) {
+			if (counter % stepCount == 0) {
 				
 				peer.tryPing(10000);
 				this.network.notifyObserveUpdatePeer(peer);
@@ -1016,24 +1016,24 @@ public class Controller extends Observable {
 				ping = peer.getPing();
 				if (ping < 0 || ping > 500) {
 										
-					steepCount >>= 1;
+					stepCount >>= 1;
 			
 					if (ping < 0) {
-						steepCount >>= 1;
+						stepCount >>= 1;
 						try {
 							Thread.sleep(10000);
 						}
 						catch (Exception e) {		
 						}
 					} else if (ping > 5000) {
-						steepCount >>= 1;
+						stepCount >>= 1;
 					}
 					
-					//LOGGER.debug(peer.getAddress() + " steepCount down " + steepCount);
+					//LOGGER.debug(peer.getAddress() + " stepCount down " + stepCount);
 
 				} else if (ping < 100) {
-					steepCount <<= 1;
-					//LOGGER.debug(peer.getAddress() + " steepCount UP " + steepCount + " for PING: " + ping);
+					stepCount <<= 1;
+					//LOGGER.debug(peer.getAddress() + " stepCount UP " + stepCount + " for PING: " + ping);
 				}
 				
 			}

@@ -346,7 +346,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 		//READ CREATOR
 		Account sender = (Account) this.cbxFrom.getSelectedItem();
 		
-		int parseSteep = 0;
+		int parsestep = 0;
 		try
 		{
 
@@ -354,16 +354,16 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			int feePow = Integer.parseInt(this.txtFeePow.getText());
 
 			//READ SCALE
-			parseSteep++;
+			parsestep++;
 			byte scale = Byte.parseByte(this.txtScale.getText());
 						
 			//READ QUANTITY
-			parseSteep++;
+			parsestep++;
 			long quantity = Long.parseLong(this.txtQuantity.getText());
 			boolean asPack = false;
 			
 			//CREATE ASSET
-			parseSteep++;
+			parsestep++;
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(),  add_Logo_Icon_Panel.imgButes, add_Image_Panel.imgButes, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
 					 feePow);			
@@ -458,7 +458,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 		}
 		catch(Exception e)
 		{
-			switch(parseSteep)
+			switch(parsestep)
 			{
 			case 0:				
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Fee Power!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

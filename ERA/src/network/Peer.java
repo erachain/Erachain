@@ -246,29 +246,29 @@ public class Peer extends Thread{
 		this.sendedBeforePing = 0l;
 		this.maxBeforePing = MAX_BEFORE_PING;
 		
-		int steep = 0;
+		int step = 0;
 		try
 		{
 			//OPEN SOCKET
-			steep++;
+			step++;
 			if (this.socket != null)
 				this.socket.close();
 			
 			this.socket = new Socket(address, Controller.getInstance().getNetworkPort());
 			
 			//ENABLE KEEPALIVE
-			steep++;
+			step++;
 			this.socket.setKeepAlive(KEEP_ALIVE);
 
 			//TIMEOUT
-			steep++;
+			step++;
 			this.socket.setSoTimeout(Settings.getInstance().getConnectionTimeout());
 			
 			this.socket.setReceiveBufferSize(SOCKET_BUFFER_SIZE);
 			this.socket.setSendBufferSize(SOCKET_BUFFER_SIZE);
 
 			//CREATE STRINGWRITER
-			steep++;
+			step++;
 			this.out = socket.getOutputStream();
 						
 			if (this.pinger == null) {
@@ -276,14 +276,14 @@ public class Peer extends Thread{
 				this.pinger = new Pinger(this);
 
 				//START COMMUNICATON THREAD
-				steep++;
+				step++;
 				this.start();
 
 				// IT is STARTED
 				this.runed = true;
 
 				//ON SOCKET CONNECT
-				steep++;
+				step++;
 				this.callback.onConnect(this, true);			
 			} else {
 				this.pinger.setPing(Integer.MAX_VALUE);
@@ -301,9 +301,9 @@ public class Peer extends Thread{
 		catch(Exception e)
 		{
 			//FAILED TO CONNECT NO NEED TO BLACKLIST
-			if (steep != 1) {
+			if (step != 1) {
 				LOGGER.error(e.getMessage(), e);
-				LOGGER.debug("Failed to connect to : " + address + " on steep: " + steep);
+				LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
 			}
 		}
 	}

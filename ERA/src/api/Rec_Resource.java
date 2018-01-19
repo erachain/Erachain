@@ -223,21 +223,21 @@ public class Rec_Resource {
 		long timestamp;
 		long reference;
 		
-		int steep = 0;
+		int step = 0;
 		try {			
 			feePow = jsonObject.containsKey("feePow")?Integer.parseInt(((List<String>)jsonObject.get("feePow")).get(0)):0;
 			
-			steep++;
+			step++;
 			version = jsonObject.containsKey("version")?Integer.parseInt(((List<String>)jsonObject.get("version")).get(0)):0;
 			
-			steep++;
+			step++;
 			timestamp = jsonObject.containsKey("timestamp")?Long.parseLong(((List<String>)jsonObject.get("timestamp")).get(0)):NTP.getTime();
 			
-			steep++;
+			step++;
 			reference = jsonObject.containsKey("reference")?Long.parseLong(((List<String>)jsonObject.get("reference")).get(0)):0l;
 		} catch (Exception e1) {
 			//LOGGER.info(e1);
-			return APIUtils.errorMess(-steep, e1.toString() + " on steep: " + steep);
+			return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
 		} 
 		
 
@@ -297,12 +297,12 @@ public class Rec_Resource {
 	@Path("/broadcast")
 	public String broadcastFromRaw(String rawDataBase58)
 	{
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] transactionBytes = Base58.decode(rawDataBase58);
 	
-			steep++;
+			step++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 			if(result.getB() == Transaction.VALIDATE_OK) {
 				return "+";
@@ -312,7 +312,7 @@ public class Rec_Resource {
 
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
+			return APIUtils.errorMess(-1, e.toString() + " on step: " + step);
 		}
 	}
 

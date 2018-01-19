@@ -1038,7 +1038,7 @@ public abstract class Transaction {
 	public void process_gifts(DCSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
 		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(db);
 		//byte[] recordSignature = record.getSignature();
-		// TODO if PERSON die - skip it steep
+		// TODO if PERSON die - skip it step
 		if (personDuration == null) {
 			// USE all GIFT for current ACCOUNT
 			//creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift, BlockChain.FEE_SCALE), db);

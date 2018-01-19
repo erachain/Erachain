@@ -226,7 +226,7 @@ public class BlockGenerator extends Thread implements Observer
 		Block generatedBlock;
 
 		int wait_new_block_broadcast;
-		long wait_steep;
+		long wait_step;
 		boolean newWinner;
 
 
@@ -399,7 +399,7 @@ public class BlockGenerator extends Thread implements Observer
 								
 								LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast/1000);
 								// SLEEP and WATCH break
-								wait_steep = wait_new_block_broadcast / 100;
+								wait_step = wait_new_block_broadcast / 100;
 								do {
 									try
 									{
@@ -421,7 +421,7 @@ public class BlockGenerator extends Thread implements Observer
 										break;
 									}
 											
-								} while (this.orphanto <= 0 && wait_steep-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+								} while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
 							}
 							
 							if (this.orphanto > 0)

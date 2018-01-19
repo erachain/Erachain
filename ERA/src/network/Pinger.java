@@ -138,8 +138,8 @@ public class Pinger extends Thread
 		BlockChain chain = cnt.getBlockChain();
 
 		int sleepTimeFull = Settings.getInstance().getPingInterval();
-		int sleepTimeSteep = 10;
-		int sleepSteeps = sleepTimeFull / sleepTimeSteep + 10;
+		int sleepTimestep = 10;
+		int sleepsteps = sleepTimeFull / sleepTimestep + 10;
 		int sleepStepTimeCounter;
 		long pingOld = 100;
 		boolean resultSend;
@@ -151,7 +151,7 @@ public class Pinger extends Thread
 			} else if (this.ping > 10000) {
 				sleepStepTimeCounter = 30000;				
 			} else {
-				sleepStepTimeCounter = sleepSteeps;				
+				sleepStepTimeCounter = sleepsteps;				
 			}
 		
 			while (sleepStepTimeCounter-- > 0) {
@@ -159,7 +159,7 @@ public class Pinger extends Thread
 				//SLEEP
 				try 
 				{
-					Thread.sleep(sleepTimeSteep);
+					Thread.sleep(sleepTimestep);
 				} 
 				catch (InterruptedException e)
 				{
@@ -216,7 +216,7 @@ public class Pinger extends Thread
 
 					this.needPing = false;
 					this.messageQueuePing = null;
-					sleepStepTimeCounter = sleepSteeps;
+					sleepStepTimeCounter = sleepsteps;
 					continue;
 					
 				} else if(this.needPing) {
@@ -224,7 +224,7 @@ public class Pinger extends Thread
 					this.needPing = false;
 					this.tryPing();
 					pingOld = this.ping;
-					sleepStepTimeCounter = sleepSteeps;
+					sleepStepTimeCounter = sleepsteps;
 					continue;
 				}
 				

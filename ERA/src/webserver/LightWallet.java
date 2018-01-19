@@ -255,21 +255,21 @@ public class LightWallet {
 		long timestamp;
 		long reference;
 		
-		int steep = 0;
+		int step = 0;
 		try {			
 			feePow = jsonObject.containsKey("feePow")?Integer.parseInt(((List<String>)jsonObject.get("feePow")).get(0)):0;
 			
-			steep++;
+			step++;
 			version = jsonObject.containsKey("version")?Integer.parseInt(((List<String>)jsonObject.get("version")).get(0)):0;
 			
-			steep++;
+			step++;
 			timestamp = jsonObject.containsKey("timestamp")?Long.parseLong(((List<String>)jsonObject.get("timestamp")).get(0)):NTP.getTime();
 			
-			steep++;
+			step++;
 			reference = jsonObject.containsKey("reference")?Long.parseLong(((List<String>)jsonObject.get("reference")).get(0)):0l;
 		} catch (Exception e1) {
 			//LOGGER.info(e1);
-			return APIUtils.errorMess(-steep, e1.toString() + " on steep: " + steep);
+			return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
 		} 
 		
 		// TODO add PORT
@@ -353,7 +353,7 @@ public class LightWallet {
 		}
 		creatorPK = new PublicKeyAccount(Base58.decode(creator));
 
-		int steep = 0;
+		int step = 0;
 
 		if (reference == 0) {
 			reference = Controller.getInstance().getTransactionCreator().getReference(creatorPK);
@@ -452,7 +452,7 @@ public class LightWallet {
 				byte[] isText = null;
 				byte[] encryptMessage = null;
 				try {
-					steep++;
+					step++;
 					if (!jsonObject.containsKey("recipient"))
 						return ApiErrorFactory.getInstance().createErrorJSON(Transaction.INVALID_ADDRESS).toJSONString();
 					String recipientStr = ((List<String>)jsonObject.get("recipient")).get(0);
@@ -463,30 +463,30 @@ public class LightWallet {
 					}
 					recipient = recipientRes.a;
 					
-					steep++;
+					step++;
 					if (jsonObject.containsKey("key"))
 						key = Long.parseLong(((List<String>)jsonObject.get("key")).get(0));
 					
-					steep++;
+					step++;
 					if (jsonObject.containsKey("amount"))
 						amount = new BigDecimal(((List<String>)jsonObject.get("amount")).get(0)).setScale(8);
 					
-					steep++;
+					step++;
 					if (jsonObject.containsKey("head"))
 						head = ((List<String>)jsonObject.get("head")).get(0);
 					
-					steep++;
+					step++;
 					if (jsonObject.containsKey("data"))
 						data = Base58.decode(((List<String>)jsonObject.get("data")).get(0));
 					
-					steep++;
+					step++;
 					if (jsonObject.containsKey("isText")
 							&& Integer.parseInt(((List<String>)jsonObject.get("isText")).get(0))==0)
 						isText = new byte[]{0};
 					else
 						isText = new byte[]{1};
 	
-					steep++;
+					step++;
 					if (jsonObject.containsKey("encryptMessage")
 							&& Integer.parseInt(((List<String>)jsonObject.get("encryptMessage")).get(0)) == 0)
 						encryptMessage = new byte[]{0};
@@ -495,7 +495,7 @@ public class LightWallet {
 					
 				} catch (Exception e1) {
 					//LOGGER.info(e1);
-					return APIUtils.errorMess(-steep, e1.toString() + " on steep: " + steep);
+					return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
 				} 
 				record = new R_Send((byte)version, (byte)property1, (byte)property2,
 						creatorPK,
@@ -612,7 +612,7 @@ public class LightWallet {
 			
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			return APIUtils.errorMess(-steep, e.toString() + " on steep: " + steep);
+			return APIUtils.errorMess(-step, e.toString() + " on step: " + step);
 		} 
 			
 	}
@@ -624,17 +624,17 @@ public class LightWallet {
 	public String broadcastFromRaw1()
 	{
 		
-		int steep = 0;
+		int step = 0;
 		try {
 			MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 			
-			steep++;
+			step++;
 			if (queryParameters.containsKey("data"))
 
-				steep++;
+				step++;
 				byte[] transactionBytes = Base58.decode(queryParameters.get("data").get(0));
 
-				steep++;
+				step++;
 				Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 				if(result.getB() == Transaction.VALIDATE_OK) {
 					return result.getA().toJson().toJSONString();
@@ -644,7 +644,7 @@ public class LightWallet {
 
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
+			return APIUtils.errorMess(-1, e.toString() + " on step: " + step);
 		} 
 		
 	}
@@ -655,12 +655,12 @@ public class LightWallet {
 	public String broadcastFromRaw(String rawDataBase58)
 	{
 
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] transactionBytes = Base58.decode(rawDataBase58);
 	
-			steep++;
+			step++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 			if(result.getB() == Transaction.VALIDATE_OK) {
 				return "+";
@@ -670,7 +670,7 @@ public class LightWallet {
 
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			return APIUtils.errorMess(-1, e.toString() + " on steep: " + steep);
+			return APIUtils.errorMess(-1, e.toString() + " on step: " + step);
 		}
 		
 		/*

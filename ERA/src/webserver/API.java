@@ -207,21 +207,21 @@ public class API {
 		byte[] signatureBytes;
 		Map out = new LinkedHashMap();
 		
-		int steep = 1;
+		int step = 1;
 		try
 		{
 			signatureBytes = Base58.decode(signature);
 
-			++steep;
+			++step;
 			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(signatureBytes);
 			out.put("child", Base58.encode(childSign));
 		}
 		catch(Exception e)
 		{
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "child not found");
 			else
 				out.put("message", e.getMessage());
@@ -242,21 +242,21 @@ public class API {
 		byte[] signatureBytes;
 		Map out = new LinkedHashMap();
 		
-		int steep = 1;
+		int step = 1;
 		try
 		{
 			signatureBytes = Base58.decode(signature);
 
-			++steep;
+			++step;
 			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(signatureBytes);
 			out = dcSet.getBlockMap().get(childSign).toJson();
 		}
 		catch(Exception e)
 		{
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "child not found");
 			else
 				out.put("message", e.getMessage());
@@ -276,26 +276,26 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] key = Base58.decode(signature);
 
-			++steep;
+			++step;
 			Block block = dcSet.getBlockMap().get(key);			
 			out.put("block", block.toJson());
 			
-			++steep;
+			++step;
 			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -314,26 +314,26 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			int height = Integer.parseInt(heightStr);
 			
-			++steep;
+			++step;
 			Block block = cntrl.getBlockByHeight(dcSet, height);
 			out.put("block", block.toJson());
 			
-			++steep;
+			++step;
 			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -354,12 +354,12 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			int height = Integer.parseInt(heightStr);
 			
-			++steep;
+			++step;
 			Block block;
 			LinkedList eee = null;
 			//LinkedList eee = ((LinkedList) dcSet.getBlockMap().map);//.keySet());
@@ -372,17 +372,17 @@ public class API {
 			//block = dcSet.getBlockMap().get(iterator.next());
 			out.put("block", block.toJson());
 
-			++steep;
+			++step;
 			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(block.getSignature());
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value " + e.getMessage());
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found " + e.getMessage());
 			else
 				out.put("message", e.getMessage());
@@ -406,7 +406,7 @@ public class API {
 			limit = 30;
 
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
@@ -426,10 +426,10 @@ public class API {
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -452,7 +452,7 @@ public class API {
 			limit = 100;
 
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
@@ -471,10 +471,10 @@ public class API {
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -530,21 +530,21 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] key = Base58.decode(signature);
 
-			++steep;
+			++step;
 			Transaction record = cntrl.getTransaction(key, dcSet);		
 			out = record.toJson();
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -563,7 +563,7 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
@@ -571,16 +571,16 @@ public class API {
 			int height = Integer.parseInt(strA[0]);
 			int seq = Integer.parseInt(strA[1]);
 			
-			++steep;	
+			++step;	
 			Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.toJson();
 						
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height-sequence error, use integer-integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -601,21 +601,21 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] key = Base58.decode(signature);
 
-			++steep;
+			++step;
 			Transaction record = cntrl.getTransaction(key, dcSet);		
 			out = record.rawToJson();
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -634,7 +634,7 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
@@ -642,16 +642,16 @@ public class API {
 			int height = Integer.parseInt(strA[0]);
 			int seq = Integer.parseInt(strA[1]);
 			
-			++steep;	
+			++step;	
 			Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.rawToJson();
 						
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height-sequence error, use integer-integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -697,7 +697,7 @@ public class API {
 	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public JSONObject broadcastFromRawPost1( String rawDataBase58)
 	{
-		int steep = 1;
+		int step = 1;
 		JSONObject out = new JSONObject();
 		try {
 		//	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
@@ -705,7 +705,7 @@ public class API {
 			byte[] transactionBytes = Base58.decode(rawDataBase58);
 		
 	
-			steep++;
+			step++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 			if(result.getB() == Transaction.VALIDATE_OK) {
 				out.put("status", "ok");
@@ -718,7 +718,7 @@ public class API {
 
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			out.put("error", APIUtils.errorMess(-1, e.toString() + " on steep: " + steep));
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
 			return out;
 		}
 	}

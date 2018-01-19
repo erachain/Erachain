@@ -532,15 +532,15 @@ public class Synchronizer {
 
 		// GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN
 		// CHECKED
-		// int steep = BlockChain.SYNCHRONIZE_PACKET>>2;
-		int steep = 2;
+		// int step = BlockChain.SYNCHRONIZE_PACKET>>2;
+		int step = 2;
 		byte[] lastCommonBlockSignature;
 		do {
 			if (cnt.isOnStopping()) {
 				throw new Exception("on stoping");
 			}
 
-			maxChainHeight -= steep;
+			maxChainHeight -= step;
 
 			if (maxChainHeight < checkPointHeight) {
 				maxChainHeight = checkPointHeight;
@@ -550,7 +550,7 @@ public class Synchronizer {
 			}
 
 			LOGGER.debug(
-					"findHeaders try found COMMON header" + " steep: " + steep + " maxChainHeight: " + maxChainHeight);
+					"findHeaders try found COMMON header" + " step: " + step + " maxChainHeight: " + maxChainHeight);
 
 			headers = this.getBlockSignatures(lastCommonBlockSignature, peer);
 
@@ -565,8 +565,8 @@ public class Synchronizer {
 				break;
 			}
 
-			if (steep < 1000)
-				steep <<= 1;
+			if (step < 1000)
+				step <<= 1;
 
 		} while (maxChainHeight > checkPointHeight && headers.isEmpty());
 
