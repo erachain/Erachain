@@ -1,5 +1,5 @@
-# ARONICLE base 
-GIT for the ARONICLE datachain (blockchain 3.0) project.
+# Erachain base 
+GIT for the Erachain datachain (blockchain 3.0) project.
 
 * [Website](http://datachains.world)
 * [API](http://datachains.world)
