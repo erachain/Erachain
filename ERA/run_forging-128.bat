@@ -4,16 +4,16 @@ set xms=128
 set xmx=256
 
 IF EXIST java (
-	start "%app%" java -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
-	rem EXIT /b
+	set run=java
+	goto continue
 )
 
 REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome" >nul 2>nul || ( GOTO NOTFOUND1 )
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
-	EXIT /b
+	set run="%JAVAHOME%\bin\java.exe"
+	goto continue
 )
 
 :NOTFOUND1
@@ -22,8 +22,8 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
-	EXIT /b
+	set run="%JAVAHOME%\bin\java.exe"
+	goto continue
 )
 
 :NOTFOUND2
@@ -32,8 +32,8 @@ REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome" >n
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 	
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
-	EXIT /b
+	set run="%JAVAHOME%\bin\java.exe"
+	goto continue
 )
 
 :NOTFOUND3
@@ -42,9 +42,15 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
-	EXIT /b
+	set run="%JAVAHOME%\bin\java.exe"
+	goto continue
 )
+
+:continue
+%run% -Xms%xms%m -Xmx%xmx%m -jar %app%.jar -pass=1
+timeout /t 30
+goto continue
+
 	
 :NOTFOUND4
 
