@@ -78,7 +78,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			return;
 		}
 		
-		transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
+		transactions = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
 		this.fireTableDataChanged();
 		
 	}
