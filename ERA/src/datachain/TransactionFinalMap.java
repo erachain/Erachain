@@ -49,8 +49,8 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	@SuppressWarnings("rawtypes")
 	private NavigableSet typeKey;
 
-	@SuppressWarnings("rawtypes")
-	private NavigableSet block_Key;
+	//@SuppressWarnings("rawtypes")
+	//private NavigableSet block_Key;
 	// private NavigableSet <Tuple2<String,Tuple2<Integer,
 	// Integer>>>signature_key;
 
@@ -92,14 +92,14 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			}
 		});
 
-		this.block_Key = database.createTreeSet("Block_txs").comparator(Fun.COMPARATOR).makeOrGet();
+	//	this.block_Key = database.createTreeSet("Block_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
-		Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Transaction>() {
-			@Override
-			public Integer run(Tuple2<Integer, Integer> key, Transaction val) {
-				return val.getBlockHeightByParentOrLast(getDCSet());
-			}
-		});
+	//	Bind.secondaryKey(map, this.block_Key, new Fun.Function2<Integer, Tuple2<Integer, Integer>, Transaction>() {
+	//		@Override
+	//		public Integer run(Tuple2<Integer, Integer> key, Transaction val) {
+	//			return val.getBlockHeightByParentOrLast(getDCSet());
+	//		}
+	//	});
 
 		this.recipientKey = database.createTreeSet("recipient_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
@@ -213,12 +213,13 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 		return txs;
 	}
 
-	public List<Transaction> getTransactionsByBlock(Integer block) {
+	public  Collection<Transaction> getTransactionsByBlock(Integer block) {
 		return getTransactionsByBlock(block, 0);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<Transaction> getTransactionsByBlock(Integer block, int limit) {
+	public  Collection<Transaction> getTransactionsByBlock(Integer block, int limit) {
+		/*
 		Iterable keys = Fun.filter(this.block_Key, block);
 		Iterator iter = keys.iterator();
 		keys = null;
@@ -229,7 +230,14 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 			counter++;
 		}
 		iter = null;
-		return txs;
+		*/
+		//BTreeMap map = (BTreeMap) this.map;
+		// GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
+		 Collection<Transaction> keys1 = ((BTreeMap) map)
+				.subMap(Fun.t2(block, null), Fun.t2(block, Fun.HI())).values();
+		
+		
+		return keys1;
 	}
 
 	public List<Transaction> getTransactionsBySender(String address) {
