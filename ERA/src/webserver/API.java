@@ -60,6 +60,7 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import datachain.BlockHeightsMap;
 import datachain.BlockMap;
 import datachain.DCSet;
 import datachain.ItemAssetMap;
@@ -382,7 +383,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(block.getSignature());
+			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
@@ -420,16 +421,14 @@ public class API {
 		try {
 			
 			JSONArray array = new JSONArray();
-			
 			BlockMap blockMap = dcSet.getBlockMap();
+			int max = blockMap.size();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = dcSet.getBlockHeightsMap().getSignByHeight(i);
-				if (signature == null) {
+				if (height >= max) {
 					out.put("end", 1);
 					break;
-				} else {
-					array.add(blockMap.get(signature).toJson());
 				}
+				array.add(blockMap.get(i));
 			}
 			out.put("blocks", array);
 			
@@ -466,15 +465,14 @@ public class API {
 		try {
 			
 			JSONArray array = new JSONArray();
-			BlockMap blockMap = dcSet.getBlockMap();
+			BlockHeightsMap blockHeightsMap = dcSet.getBlockHeightsMap();
+			int max = dcSet.getBlockMap().size();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = dcSet.getBlockHeightsMap().getSignByHeight(i);
-				if (signature == null) {
+				if (height >= max) {
 					out.put("end", 1);
 					break;
-				} else {
-					array.add(Base58.encode(signature));
 				}
+				array.add(Base58.encode(blockHeightsMap.get(i)));
 			}
 			out.put("signatures", array);
 			
