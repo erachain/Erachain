@@ -11,10 +11,10 @@ import java.net.URISyntaxException;
 import javax.swing.JLabel;
 
 
-public class AronicleStatus extends JLabel {
+public class ErachainStatus extends JLabel {
 
 	
-	public AronicleStatus(){
+	public ErachainStatus(){
 	super("<HTML><a href =''> Erachain.org </a>&nbsp;|");
 	this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	

@@ -1,6 +1,8 @@
 package core.item.assets;
 
 
+import org.json.simple.JSONObject;
+
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
@@ -133,6 +135,19 @@ public abstract class AssetCls extends ItemCls {
 		return 8;
 	}
 
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject toJson() {
+		
+		JSONObject itemJSON = super.toJson();
+
+		// ADD DATA
+		itemJSON.put("divisible", this.isDivisible());
+		itemJSON.put("movable", this.isMovable());
+		
+		return itemJSON;
+
+	}
 	/*
 	public byte[] toBytes(boolean includeReference)
 	{
