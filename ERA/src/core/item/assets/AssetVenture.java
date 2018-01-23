@@ -224,7 +224,8 @@ public class AssetVenture extends AssetCls {
 		// ADD DATA
 		assetJSON.put("quantity", this.getQuantity(DCSet.getInstance()));
 		assetJSON.put("scale", this.getScale());
-		assetJSON.put("isDivisible", this.isDivisible());
+		assetJSON.put("divisible", this.isDivisible());
+		assetJSON.put("movable", this.isMovable());
 		
 		return assetJSON;
 	}
