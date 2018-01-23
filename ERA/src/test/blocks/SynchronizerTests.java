@@ -136,7 +136,7 @@ public class SynchronizerTests {
 			synchronizer.synchronize_blocks(databaseSet, null, 1, newBlocks, null);
 			
 			//CHECK LAST 5 BLOCKS
-			lastBlock = databaseSet.getBlockMap().getLastBlock();
+			lastBlock = databaseSet.getBlockMap().last();
 			for(int i=4; i>=0; i--)
 			{
 				//CHECK LAST BLOCK
@@ -156,7 +156,7 @@ public class SynchronizerTests {
 			assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
 			
 			//CHECK HEIGHT
-			assertEquals(11, databaseSet.getBlockMap().getLastBlock().getHeight(databaseSet));
+			assertEquals(11, databaseSet.getBlockMap().last().getHeight(databaseSet));
 		}
 		catch(Exception e)
 		{
@@ -289,7 +289,7 @@ public class SynchronizerTests {
 		}	
 			
 		//CHECK BLOCKS
-		lastBlock = databaseSet1.getBlockMap().getLastBlock();
+		lastBlock = databaseSet1.getBlockMap().last();
 		for(int i=9; i>=0; i--)
 		{
 			//CHECK LAST BLOCK
@@ -301,6 +301,6 @@ public class SynchronizerTests {
 		assertEquals(true, Arrays.equals(lastBlock.getSignature(), gb1.getSignature()));
 		
 		//CHECK HEIGHT
-		assertEquals(11, databaseSet1.getBlockMap().getLastBlock().getHeight(databaseSet1));
+		assertEquals(11, databaseSet1.getBlockMap().last().getHeight(databaseSet1));
 	}	
 }

@@ -464,7 +464,7 @@ public class Account {
 		BigDecimal rent = balance.b.b;
 		BigDecimal hold = balance.c.b;
 		
-		Block block = db.getBlockMap().getLastBlock();
+		Block block = db.getBlockMap().last();
 		
 		for(int i=1; i<confirmations && block != null && block.getVersion()>0; i++)
 		{

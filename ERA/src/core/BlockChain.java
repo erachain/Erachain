@@ -16,6 +16,7 @@ import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
 import datachain.BlockHeightsMap;
 import datachain.BlockMap;
+import datachain.BlockSignsMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import network.Peer;
@@ -155,7 +156,7 @@ public class BlockChain
 			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
 		}
 		
-		if(	!dcSet.getBlockMap().contains(genesisBlock.getSignature()) )
+		if(	!dcSet.getBlockSignsMap().contains(genesisBlock.getSignature()) )
 		// process genesis block
 		{
 			if(dcSet_in == null && dcSet.getBlockMap().getLastBlockSignature() != null)
@@ -326,7 +327,8 @@ public class BlockChain
 		List<byte[]> headers = new ArrayList<byte[]>();
 		
 		//CHECK IF BLOCK EXISTS
-		if(dcSet.getBlockMap().contains(parentSignature))
+		Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(parentSignature);
+		if(heightWT != null && heightWT.a > 0)
 		{
 			
 			int packet;
@@ -336,12 +338,14 @@ public class BlockChain
 			} else {
 				packet = SYNCHRONIZE_PACKET;
 			}
-			BlockHeightsMap childsMap = dcSet.getBlockHeightsMap();			
+			//BlockHeightsMap childsMap = dcSet.getBlockHeightsMap();
+			BlockHeightsMap map = dcSet.getBlockHeightsMap();
 			int counter = 0;
+			int height = heightWT.a;
 			while(parentSignature != null && counter++ < packet)
 			{				
 				headers.add(parentSignature);
-				parentSignature = childsMap.getChildBlock(parentSignature);
+				parentSignature = map.get(++height);
 			}
 			//LOGGER.debug("get size " + counter);
 		} else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
@@ -355,12 +359,11 @@ public class BlockChain
 
 	public Block getBlock(DCSet dcSet, byte[] header) {
 
-		return dcSet.getBlockMap().get(header);
+		return dcSet.getBlockSignsMap().getBlock(header);
 	}
 	public Block getBlock(DCSet dcSet, int height) {
 
-		byte[] signature = dcSet.getBlockHeightsMap().get(height);
-		return dcSet.getBlockMap().get(signature);
+		return dcSet.getBlockMap().get(height);
 	}
 
 	public int isNewBlockValid(DCSet dcSet, Block block, Peer peer) {
@@ -379,8 +382,9 @@ public class BlockChain
 			return -200;
 		}
 		
-		BlockMap dbMap = dcSet.getBlockMap();
-		byte[] lastSignature = dbMap.getLastBlockSignature();
+		//int height = dcSet.getBlockHeightsMap().getSize();
+		BlockSignsMap dbMap = dcSet.getBlockSignsMap();
+		byte[] lastSignature = dcSet.getBlockHeightsMap().last();
 		byte[] newBlockReference = block.getReference();
 		if(!Arrays.equals(lastSignature, newBlockReference)) {
 			
@@ -391,7 +395,7 @@ public class BlockChain
 				return 3;
 			}
 
-			Block lastBlock = dbMap.get(lastSignature);
+			Block lastBlock = dcSet.getBlockMap().last();
 			if(Arrays.equals(lastBlock.getReference(), block.getReference())) {
 				// CONCURENT for LAST BLOCK
 				if (block.calcWinValue(dcSet) > lastBlock.calcWinValue(dcSet)) {
@@ -500,7 +504,7 @@ public class BlockChain
 	
 	public Block getLastBlock(DCSet dcSet) 
 	{	
-		return dcSet.getBlockMap().getLastBlock();
+		return dcSet.getBlockMap().last();
 	}
 	public byte[] getLastBlockSignature(DCSet dcSet) 
 	{	
@@ -511,7 +515,7 @@ public class BlockChain
 	public List<Block> getLastBlocksForTarget(DCSet dcSet) 
 	{	
 
-		Block last = dcSet.getBlockMap().getLastBlock();
+		Block last = dcSet.getBlockMap().last();
 		
 		/*
 		if (this.lastBlocksForTarget != null

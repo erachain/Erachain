@@ -620,7 +620,7 @@ public abstract class Transaction {
 		if (blockHeightSeqNo == null)
 			return null;
 		
-		block = db.getBlockMap().get(db.getBlockHeightsMap().get(blockHeightSeqNo.a));
+		block = db.getBlockMap().get(blockHeightSeqNo.a);
 
 		return block;
 	}

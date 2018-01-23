@@ -1,5 +1,7 @@
 package datachain;
 
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,34 +10,35 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
+import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
+import org.mapdb.Fun.Tuple2;
 
+import core.block.Block;
 import core.item.ItemCls;
 import database.DBMap;
-import datachain.DCSet;
-import utils.ObserverMessage;
 import utils.Pair;
 
-public abstract class Item_Map extends DCMap<Long, ItemCls> {
-
+// Block Height -> creator
+public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> 
+{
 	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
+		
 	// protected int type;
 
-	protected Atomic.Long atomicKey;
-	protected long key;
+	protected Atomic.Integer atomicKey;
+	protected int key;
 
 	static Logger LOGGER = Logger.getLogger(Item_Map.class.getName());
 
-	public Item_Map(DCSet databaseSet, DB database, String name) {
+	public AutoIntegerByte(DCSet databaseSet, DB database, String name) {
 		super(databaseSet, database);
 
-		this.atomicKey = database.getAtomicLong(name + "_key");
+		this.atomicKey = database.getAtomicInteger(name + "_key");
 		this.key = this.atomicKey.get();
 	}
 
-	public Item_Map(DCSet databaseSet, DB database,
-			// int type,
+	public AutoIntegerByte(DCSet databaseSet, DB database,
 			String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
 
 		this(databaseSet, database, name);
@@ -54,17 +57,17 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 		}
 	}
 
-	public Item_Map(Item_Map parent) {
+	public AutoIntegerByte(AutoIntegerByte parent) {
 		super(parent, null);
 
 		this.key = parent.getSize();
 	}
 
-	public long getSize() {
+	public int getSize() {
 		return this.key;
 	}
 
-	public void setSize(long size) {
+	public void setSize(int size) {
 		// INCREMENT ATOMIC KEY IF EXISTS
 		if (this.atomicKey != null) {
 			this.atomicKey.set(size);
@@ -76,12 +79,12 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 	}
 
 	@Override
-	protected Map<Long, ItemCls> getMemoryMap() {
-		return new HashMap<Long, ItemCls>();
+	protected Map<Integer, byte[]> getMemoryMap() {
+		return new HashMap<Integer, byte[]>();
 	}
 
 	@Override
-	protected ItemCls getDefaultValue() {
+	protected byte[] getDefaultValue() {
 		return null;
 	}
 
@@ -90,7 +93,7 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 		return this.observableData;
 	}
 
-	public long add(ItemCls item) {
+	public long add(byte[] item) {
 		// INCREMENT ATOMIC KEY IF EXISTS
 		if (this.atomicKey != null) {
 			this.atomicKey.incrementAndGet();
@@ -98,7 +101,6 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
 		// INCREMENT KEY
 		this.key++;
-		item.setKey(key);
 
 		// INSERT WITH NEW KEY
 		this.set(this.key, item);
@@ -107,6 +109,10 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 		return this.key;
 	}
 
+	public byte[] last() {
+		return this.get(this.key);		
+	}
+	
 	public void remove() {
 		super.delete(key);
 
@@ -119,25 +125,4 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
 	}
 
-	// get list items in name substring str
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
-		List<ItemCls> txs = new ArrayList<>();
-		if (str == null || str.length() < 3)
-			return null;
-
-		Iterator<Pair<Long, ItemCls>> it = this.getList().iterator();
-		while (it.hasNext()) {
-			Pair<Long, ItemCls> a = it.next();
-			String s1 = a.getB().getName();
-			if (!caseCharacter) {
-				s1 = s1.toLowerCase();
-				str = str.toLowerCase();
-			}
-			if (s1.contains(str))
-				txs.add(a.getB());
-		}
-
-		return txs;
-	}
 }

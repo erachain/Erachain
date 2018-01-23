@@ -69,7 +69,7 @@ public class Synchronizer {
 		// ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
 
 		// GET LAST BLOCK
-		Block lastBlock = blockMap.getLastBlock();
+		Block lastBlock = blockMap.last();
 
 		int lastHeight = lastBlock.getHeight(fork);
 		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]\n" + " newBlocks.size = "
@@ -112,7 +112,7 @@ public class Synchronizer {
 			lastBlock.orphan(fork);
 
 			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
-			lastBlock = blockMap.get(lastBlock.getReference());
+			lastBlock = blockMap.last();
 		}
 
 		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]");
@@ -190,7 +190,7 @@ public class Synchronizer {
 		//// Map<String, byte[]> states = new TreeMap<String, byte[]>();
 
 		// GET LAST BLOCK
-		Block lastBlock = dcSet.getBlockMap().getLastBlock();
+		Block lastBlock = dcSet.getBlockMap().last();
 
 		// ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
 		// ============ by EQUAL SIGNATURE !!!!!
@@ -210,7 +210,7 @@ public class Synchronizer {
 			LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
 			LOGGER.debug("*** synchronize - orphan block...");
 			this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
-			lastBlock = dcSet.getBlockMap().getLastBlock();
+			lastBlock = dcSet.getBlockMap().last();
 		}
 
 		// PROCESS THE NEW BLOCKS
@@ -391,7 +391,7 @@ public class Synchronizer {
 				throw new Exception("on stoping");
 			}
 
-			Block lastCommonBlock = dcSet.getBlockMap().get(lastCommonBlockSignature);
+			Block lastCommonBlock = dcSet.getBlockSignsMap().getBlock(lastCommonBlockSignature);
 
 			// SYNCHRONIZE BLOCKS
 			LOGGER.error("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeightByParent(dcSet)
@@ -512,7 +512,7 @@ public class Synchronizer {
 		// TODO fix it error
 		byte[] checkPointHeightSignature;
 		Block checkPointHeightCommonBlock = null;
-		checkPointHeightSignature = dcSet.getBlockHeightsMap().getSignByHeight(checkPointHeight);
+		checkPointHeightSignature = dcSet.getBlockHeightsMap().get(checkPointHeight);
 
 		try {
 			// try get common block from PEER
@@ -546,7 +546,7 @@ public class Synchronizer {
 				maxChainHeight = checkPointHeight;
 				lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
 			} else {
-				lastCommonBlockSignature = dcSet.getBlockHeightsMap().getSignByHeight(maxChainHeight);
+				lastCommonBlockSignature = dcSet.getBlockHeightsMap().get(maxChainHeight);
 			}
 
 			LOGGER.debug(
@@ -573,7 +573,7 @@ public class Synchronizer {
 		LOGGER.info("findHeaders AFTER try found COMMON header" + " founded headers: " + headers.size());
 
 		// CLEAR head of common headers exclude LAST!
-		while (headers.size() > 1 && dcSet.getBlockMap().contains(headers.get(0))) {
+		while (headers.size() > 1 && dcSet.getBlockSignsMap().contains(headers.get(0))) {
 			lastCommonBlockSignature = headers.remove(0);
 		}
 

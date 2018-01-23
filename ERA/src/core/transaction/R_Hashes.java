@@ -390,12 +390,12 @@ public class R_Hashes extends Transaction {
 		int transactionIndex = -1;
 		int blockIndex = -1;
 		if (block == null) {
-			blockIndex = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
+			blockIndex = dcSet.getBlockMap().last().getHeight(dcSet);
 		} else {
 			blockIndex = block.getHeight(dcSet);
 			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
-				blockIndex = dcSet.getBlockMap().getLastBlock().getHeight(dcSet) + 1;
+				blockIndex = dcSet.getBlockMap().last().getHeight(dcSet) + 1;
 			}			
 			transactionIndex = block.getTransactionSeq(signature);
 		}

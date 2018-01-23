@@ -152,14 +152,14 @@ public class Block {
 	public Block getParent(DCSet db)
 	{
 		if (parentBlock == null) {
-			this.parentBlock = db.getBlockMap().get(this.reference);
+			this.parentBlock = db.getBlockSignsMap().getBlock(this.reference);
 		}
 		return parentBlock;
 	}
 
 	public Block getChild(DCSet db)
 	{
-		return db.getBlockHeightsMap().getChildBlock(this);
+		return db.getBlockMap().get(this.getHeight(db) + 1);
 	}
 
 	public int compareWin(Block block, DCSet db)
@@ -1172,7 +1172,7 @@ public class Block {
 			try
 			{
 
-				AT_Block atBlock = AT_Controller.validateATs( this.getBlockATs() , dcSet.getBlockMap().getLastBlock().getHeight(dcSet)+1 , dcSet);
+				AT_Block atBlock = AT_Controller.validateATs( this.getBlockATs() , dcSet.getBlockMap().last().getHeight(dcSet)+1 , dcSet);
 				//this.atFees = atBlock.getTotalFees();
 			}
 			catch(NoSuchAlgorithmException | AT_Exception e)
@@ -1186,7 +1186,7 @@ public class Block {
 
 		if (andProcess) {
 			//ADD TO DB
-			dcSet.getBlockMap().set(this);
+			dcSet.getBlockMap().add(this);
 			LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
 			
 			this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
@@ -1423,7 +1423,7 @@ public class Block {
 
 		//ADD TO DB
 		long timerStart = System.currentTimeMillis();
-		dcSet.getBlockMap().set(this);
+		dcSet.getBlockMap().add(this);
 		LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
 		
 		this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
@@ -1561,7 +1561,7 @@ public class Block {
 		this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee, true);
 		
 		//DELETE BLOCK FROM DB
-		dcSet.getBlockMap().delete(this);
+		dcSet.getBlockMap().remove();
 		
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
 

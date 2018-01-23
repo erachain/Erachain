@@ -276,7 +276,7 @@ public class ATResource
 			long lFee = Longs.fromByteArray(feePowBytes);
 			
 			
-			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DCSet.getInstance().getBlockMap().getLastBlock()
+			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( DCSet.getInstance().getBlockMap().last()
 					.getHeight(DCSet.getInstance())) > lFee )
 			{
 				throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_FEE_POWER );
@@ -301,7 +301,7 @@ public class ATResource
 			ByteBuffer creation = ByteBuffer.allocate(creationLength);
 			creation.order(ByteOrder.LITTLE_ENDIAN);
 			
-			creation.putShort(AT_Constants.getInstance().AT_VERSION( DCSet.getInstance().getBlockMap().getLastBlock()
+			creation.putShort(AT_Constants.getInstance().AT_VERSION( DCSet.getInstance().getBlockMap().last()
 					.getHeight(DCSet.getInstance()) ));
 			creation.putShort((short)0);
 			creation.putShort((short)cpages);

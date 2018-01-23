@@ -236,26 +236,13 @@ public class BlocksResource
 	{
 		DCSet db = DCSet.getInstance();
 		
-		byte[] signature = db.getBlockHeightsMap().getSignByHeight(height - 1);
-		if(signature == null)
-		{
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
-		}
-		
-		List<byte[]> headers = Controller.getInstance().getNextHeaders(signature);
-		
-		//CHECK IF BLOCK EXISTS
-		if(headers == null)
-		{
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
-		}
-		
-		
 		JSONArray array = new JSONArray();
 		
-		BlockMap dbMap = db.getBlockMap();
-		for ( byte[] header: headers) {
-			array.add(dbMap.get(header).toJson());
+		BlockMap map = db.getBlockMap();
+		Block block;
+		while (height < map.size()) {
+			block = map.get(height++);
+			array.add(block.toJson());
 		}
 		
 		return array.toJSONString();
@@ -276,7 +263,7 @@ public class BlocksResource
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 
-		Block block = DCSet.getInstance().getBlockMap().get(signatureBytes);
+		Block block = DCSet.getInstance().getBlockSignsMap().getBlock(signatureBytes);
 				
 		//CHECK IF BLOCK EXISTS
 		if(block == null)

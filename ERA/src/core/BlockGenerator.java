@@ -224,6 +224,7 @@ public class BlockGenerator extends Thread implements Observer
 		int height = BlockChain.getHeight(dcSet) + 1;
 		long target = bchain.getTarget(dcSet);
 		Block generatedBlock;
+		Block solvingBlock;
 
 		int wait_new_block_broadcast;
 		long wait_step;
@@ -320,7 +321,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 						//SET NEW BLOCK TO SOLVE
 						this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
-						Block solvingBlock = dcSet.getBlockMap().get(this.solvingReference);
+						solvingBlock = dcSet.getBlockMap().last();
 								
 						if(ctrl.isOnStopping()) {
 							status = -1;

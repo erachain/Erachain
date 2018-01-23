@@ -373,10 +373,10 @@ public class DeployATFrame extends JFrame {
 			long lFee = Longs.fromByteArray(balanceBytes);
 			DCSet dcSet = DCSet.getInstance();
 			
-			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( dcSet.getBlockMap().getLastBlock().getHeight(dcSet)) > lFee )
+			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( dcSet.getBlockMap().last().getHeight(dcSet)) > lFee )
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fees should be at least ") + (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( 
-						dcSet.getBlockMap().getLastBlock().getHeight(dcSet)) + " !", "Error", JOptionPane.ERROR_MESSAGE);
+						dcSet.getBlockMap().last().getHeight(dcSet)) + " !", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
@@ -400,7 +400,7 @@ public class DeployATFrame extends JFrame {
 			ByteBuffer creation = ByteBuffer.allocate(creationLength);
 			creation.order(ByteOrder.LITTLE_ENDIAN);
 			
-			creation.putShort(AT_Constants.getInstance().AT_VERSION( dcSet.getBlockMap().getLastBlock().getHeight(dcSet) ));
+			creation.putShort(AT_Constants.getInstance().AT_VERSION( dcSet.getBlockMap().last().getHeight(dcSet) ));
 			creation.putShort((short)0);
 			creation.putShort((short)cpages);
 			creation.putShort((short)dpages);

@@ -189,7 +189,7 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		Block lastBlock = dcSet.getBlockMap().getLastBlock();
+		Block lastBlock = dcSet.getBlockMap().last();
 		out = lastBlock.toJson();
 		
 		return Response.status(200)
@@ -213,8 +213,13 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(signatureBytes);
-			out.put("child", Base58.encode(childSign));
+			Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			if (heightWT != null && heightWT.a > 0) {
+				byte[] childSign = dcSet.getBlockHeightsMap().get(heightWT.a + 1);
+				out.put("child", Base58.encode(childSign));
+			} else {
+				out.put("message", "signature not found");				
+			}
 		}
 		catch(Exception e)
 		{
@@ -248,8 +253,12 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(signatureBytes);
-			out = dcSet.getBlockMap().get(childSign).toJson();
+			Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			if (heightWT != null && heightWT.a > 0) {
+				out = dcSet.getBlockMap().get(heightWT.a + 1).toJson();
+			} else {
+				out.put("message", "signature not found");				
+			}
 		}
 		catch(Exception e)
 		{
@@ -282,11 +291,11 @@ public class API {
 			byte[] key = Base58.decode(signature);
 
 			++step;
-			Block block = dcSet.getBlockMap().get(key);			
+			Block block = dcSet.getBlockSignsMap().getBlock(key);			
 			out.put("block", block.toJson());
 			
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(block.getSignature());
+			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -324,7 +333,7 @@ public class API {
 			out.put("block", block.toJson());
 			
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().getChildBlock(block.getSignature());
+			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			

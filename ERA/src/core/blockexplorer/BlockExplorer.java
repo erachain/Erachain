@@ -680,7 +680,7 @@ public class BlockExplorer
 			}
 		}
 		
-		if (signatureBytes != null && DCSet.getInstance().getBlockMap().contains(signatureBytes))
+		if (signatureBytes != null && DCSet.getInstance().getBlockSignsMap().contains(signatureBytes))
 		{
 			i++;
 			foundList.put(i, "blockSignature");
@@ -2925,11 +2925,11 @@ if ( asset_1 == null) {
 
 		for (String address : addresses) {
 			if (!address.startsWith("A")) {
-				Collection<byte[]> blocks = DCSet.getInstance().getBlockMap().getGeneratorBlocks(address);
+				Collection<Integer> block_heights = DCSet.getInstance().getBlockMap().getGeneratorBlocks(address);
 				
-				for (byte[] b : blocks)
+				for (int height : block_heights)
 				{
-					Block block = DCSet.getInstance().getBlockMap().get(b);
+					Block block = DCSet.getInstance().getBlockMap().get(height);
 					all.add( new BlExpUnit( block.getHeight(DCSet.getInstance()), 0, block ) );
 				}
 			}
@@ -4440,7 +4440,7 @@ if ( asset_1 == null) {
 	
 	public Block getLastBlock() 
 	{	
-		return DCSet.getInstance().getBlockMap().getLastBlock();
+		return DCSet.getInstance().getBlockMap().last();
 	}
 	
 	public static class Stopwatch { 

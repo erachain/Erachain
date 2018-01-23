@@ -42,9 +42,9 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Long>>
 		//startedInForkHeight = 0;
 	}
 
-	public BlockSignsMap(BlockSignsMap parent) 
+	public BlockSignsMap(BlockSignsMap parent, DCSet dcSet) 
 	{
-		super(parent, null);
+		super(parent, dcSet);
 		this.fullWeight = parent.getFullWeight();
 		//startedInForkHeight
 	}
@@ -103,6 +103,16 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Long>>
 	{
 		return this.get(block.getSignature());
 	}
+	
+	public Block getBlock(byte[] signature)
+	{
+		Tuple2<Integer, Long> key = this.get(signature);
+		if (key != null && key.a > 0)
+			return this.getDCSet().getBlockMap().get(key.a);
+		
+		return null;
+	}
+
 	public Integer getHeight(Block block)
 	{
 		if (this.contains(block.getSignature()))

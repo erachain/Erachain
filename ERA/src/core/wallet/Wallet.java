@@ -593,7 +593,7 @@ public class Wallet extends Observable implements Observer
 				synchronize(true);
 				return;	
 			}
-			block = dcSet.getBlockMap().get(this.database.getLastBlockSignature());
+			block = dcSet.getBlockSignsMap().getBlock(this.database.getLastBlockSignature());
 			if (block == null) {
 				synchronize(true);
 				return;
@@ -1049,7 +1049,7 @@ public class Wallet extends Observable implements Observer
 	
 	private boolean findLastBlockOff(byte[] lastBlockSignature, Block block) {
 		
-		datachain.BlockMap blockMap = DCSet.getInstance().getBlockMap();
+		datachain.BlockSignsMap blockSignsMap = DCSet.getInstance().getBlockSignsMap();
 		
 		//LOGGER.error("findLastBlockOff for [" + block.getHeightByParent(DCSet.getInstance()) + "]");
 		
@@ -1064,7 +1064,7 @@ public class Wallet extends Observable implements Observer
 			///this.update(this, new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
 			this.orphanBlock(block);
 			
-			block = blockMap.get(reference);
+			block = blockSignsMap.getBlock(reference);
 
 			if (block == null) {
 				return false;

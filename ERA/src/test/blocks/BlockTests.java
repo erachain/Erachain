@@ -643,7 +643,7 @@ public class BlockTests
 		assertEquals(2, block.getTransactionCount());
 		
 		//CHECK LAST BLOCK
-		assertEquals(true, Arrays.equals(block.getSignature(), db.getBlockMap().getLastBlock().getSignature()));
+		assertEquals(true, Arrays.equals(block.getSignature(), db.getBlockMap().last().getSignature()));
 	
 
 		////////////////////////////////////
@@ -675,6 +675,6 @@ public class BlockTests
 		assertEquals((long)recipient2.getLastTimestamp(db), (long)0);
 		
 		//CHECK LAST BLOCK
-		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().getLastBlock().getSignature()));
+		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().last().getSignature()));
 	}
 }

@@ -2292,7 +2292,7 @@ public class Controller extends Observable {
 	}
 
 	public long getNextBlockGeneratingBalance() {
-		Block block = this.dcSet.getBlockMap().getLastBlock();
+		Block block = this.dcSet.getBlockMap().last();
 		return block.getGeneratingBalance(dcSet);
 	}
 
@@ -2801,8 +2801,7 @@ public class Controller extends Observable {
 	 */
 
 	public Block getBlockByHeight(DCSet db, int parseInt) {
-		byte[] b = db.getBlockHeightsMap().getSignByHeight(parseInt);
-		return db.getBlockMap().get(b);
+		return db.getBlockMap().get(parseInt);
 	}
 
 	public Block getBlockByHeight(int parseInt) {
