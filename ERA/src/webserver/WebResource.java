@@ -3251,10 +3251,10 @@ public class WebResource {
 		}
 	}
 	
-	@Path("index/libs/js/third-party/qrcode.js")
+	@Path("index/libs/js/third-party/qrcode.min.js")
 	@GET
 	public Response qrcodejs() {
-		File file = new File("web/libs/js/third-party/qrcode.js");
+		File file = new File("web/libs/js/third-party/qrcode.min.js");
 
 		if (file.exists()) {
 			return Response.ok(file, "text/javascript").build();

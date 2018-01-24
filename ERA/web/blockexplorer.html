@@ -11,6 +11,7 @@
 	<script src="/index/libs/js/explorerStatements.js"></script>
 	<script src="/index/libs/js/explorerTemplates.js"></script>
 	<script src="/index/libs/js/explorerTransactionsTable.js"></script>
+	<script src="/index/libs/js/third-party/qrcode.min.js"></script>
 	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
 	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
 	<style type="text/css">
@@ -233,7 +234,7 @@ function asyncAjax (url, type){
 				
 				{
 					document.getElementById('main').innerHTML = person(data);
-				
+					new QRCode(document.getElementById("qrcode"), location.href);
 				}
 				
 				
@@ -3357,7 +3358,6 @@ function parseUrlQuery() {
 
 function person(data)
 {
-
 output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
 output += '<tr><td align=left>';
 output += '<table><tr><td>';
@@ -3375,9 +3375,11 @@ else
 }
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
-output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td></tr>';
+output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td>';
+output +=   '<td style ="padding-left:20px">';
+output +=   '<div id="qrcode"></div>';
+output +=   '</td></tr>';
 output +=   '</table>';
-//output = + '<br> img:' + data.img;
 
 
 //statuses
