@@ -1089,8 +1089,10 @@ public class Block {
 			repeatsMin = 0;
 		if (height < 100000 && repeatsMin > 9)
 			repeatsMin = 9;
-		else if (height < 110000 && repeatsMin > 40)
-			repeatsMin = 40;
+		else if (height < 100000 && repeatsMin > 30)
+			repeatsMin = 30;
+		else if (height < 150000 && repeatsMin > 30)
+			repeatsMin = 30;
 		else if (repeatsMin > 100)
 			repeatsMin = 100;
 
@@ -1102,7 +1104,7 @@ public class Block {
 				return 0;
 				
 			if (testBlock.getCreator().equals(accountCreator)) {
-				return i;
+				return repeatsMin - i;
 			}
 		}
 	

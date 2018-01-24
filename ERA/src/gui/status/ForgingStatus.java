@@ -76,7 +76,7 @@ public class ForgingStatus extends JLabel implements Observer {
 		        {
 		        	//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
 		        	timeForge = "" + (BlockChain.BASE_TARGET * winBalance / target);
-		        	timeForge = winBalance2>0?timeForge:("("+timeForge+")");
+		        	timeForge = winBalance2>0?timeForge:("("+winBalance2+")");
 		        	timeForge = timeForge + " " + winAccount.getAddress();
 		        	timeForge = Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
 		        }
