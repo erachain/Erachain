@@ -9,6 +9,7 @@
 	<script src="/index/libs/js/sidebar.js"></script>
 	<script src="/index/libs/js/common.js"></script>
 	<script src="/index/libs/js/explorerStatements.js"></script>
+	<script src="/index/libs/js/explorerTemplates.js"></script>
 	<script src="/index/libs/js/explorerTransactionsTable.js"></script>
 	<link href="/index/libs/css/sidebar.css" rel="stylesheet">
 	<script src="/index/libs/js/Base58.js" charset="utf-8"></script>
@@ -205,9 +206,9 @@ function asyncAjax (url, type){
 					document.getElementById('main').innerHTML = peers(data);
 				}
 				
-				if(type == 'statements')
+				if(type == 'templates')
 				{
-					document.getElementById('main').innerHTML = statements2(data);
+					document.getElementById('main').innerHTML = templates(data);
 				}
 				
 				if(type == 'statement')
@@ -3295,6 +3296,11 @@ function search(data)
 				foundList += '<li><a href="?atTx='+encodeURIComponent(data.query)+get_lang()+'">AT Transaction: '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?atTx='+encodeURIComponent(data.query);
 				break	
+			case 'statement':
+				var params = data.query.split('-');
+				foundList += '<li><a href="?statement='+params[0]+'&Seg_No='+params[1]+get_lang()+'">Statement: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?statement='+params[0]+'&Seg_No='+params[1];
+				break	
 		}
 	}
 
@@ -3525,7 +3531,7 @@ function start() {
 	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
 	document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
 	document.getElementById('menu_peers').href ='?peers&lang='+ params['lang'] ;
-	document.getElementById('menu_statements').href ='?statements&lang='+ params['lang'] ;
+	document.getElementById('menu_templates').href ='?templates&lang='+ params['lang'] ;
 	
 	
 				
@@ -3891,9 +3897,9 @@ function start() {
 		document.title = title ;
 		return;
 	}	
-	if(params.hasOwnProperty('statements'))
+	if(params.hasOwnProperty('templates'))
 	{
-		asyncAjax('blockexplorer.json?statements&lang='+params['lang'], 'statements');
+		asyncAjax('blockexplorer.json?templates&lang='+params['lang'], 'templates');
 		document.title = title ;
 		return;
 	}	
@@ -4013,7 +4019,7 @@ function Lang_setting(){
 				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
 				<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	
 				<li id=menupeers><a href="?peers" id=menu_peers><translate>Peers</translate></a></li>				
-				<li id=menustatements><a href="?statements" id=menu_statements><translate>Statements</translate></a></li>		
+				<li id=menutemplates><a href="?templates" id=menu_templates><translate>Templates</translate></a></li>		
               </ul>
             </div>
           </div>

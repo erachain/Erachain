@@ -1313,6 +1313,18 @@ public class WebResource {
 		}
 	}
 	
+	@Path("index/libs/js/explorerTemplates.js")
+	@GET
+	public Response explorerTemplates() {
+		File file = new File("web/libs/js/explorerTemplates.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/explorerTemplates").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
 	@Path("index/libs/js/explorerTransactionsTable.js")
 	@GET
 	public Response explorerTransactionsTable() {
