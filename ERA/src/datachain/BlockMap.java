@@ -271,6 +271,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		int height = this.size();
 		// Block block = this.get(height);
 		// this.setLastBlockSignature(block.getReference());
+		dcSet.getBlockSignsMap().delete(this.getLastBlockSignature());
 
 		// ORPHAN FORGING DATA
 		if (height > 1) {
@@ -282,8 +283,6 @@ public class BlockMap extends DCMap<Integer, Block> {
 			creator.delForgingData(dcSet, height);
 
 		}
-
-		dcSet.getBlockSignsMap().delete(this.getLastBlockSignature());
 
 		this.setLastBlockSignature(null);
 
