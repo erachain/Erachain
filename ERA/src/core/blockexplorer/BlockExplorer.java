@@ -511,7 +511,7 @@ public class BlockExplorer
 			}
 			
 			
-			if(info.getQueryParameters().containsKey("statements"))
+			if(info.getQueryParameters().containsKey("templates"))
 			{
 				int start = -1;
 
@@ -522,11 +522,12 @@ public class BlockExplorer
 
 				output.put("lastBlock", jsonQueryLastBlock());
 
-				output.putAll(jsonQueryStatements2());
+				output.putAll(jsonQueryTemplates(start));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
 			}
+
 			
 			if(info.getQueryParameters().containsKey("statement"))
 			{
@@ -3626,18 +3627,55 @@ if ( asset_1 == null) {
 		return output;
 	}
 	
-	public Map jsonQueryStatements2(){
+
+	public Map jsonQueryTemplates(int start)
+	{
 		Map output=new LinkedHashMap();
-		WEB_Statements_Table_Model_Search model_Statements =  new WEB_Statements_Table_Model_Search();
-		int column_Count = model_Statements.getColumnCount();
+
+		SortableList<Long, ItemCls> it = DCSet.getInstance().getItemTemplateMap().getList();
+
+
+		int view_Row = 21;
+		int end = start + view_Row;
+		if (end > it.size()) end = it.size();
 		
-		for (int column=0; column < column_Count; column++ ){
-				
-			output.put("Label_"+ model_Statements.getColumnNameNO_Translate(column).replace(' ', '_'),  Lang.getInstance().translate_from_langObj(model_Statements.getColumnNameNO_Translate(column),langObj));
+		output.put("start_row", start);
+		int i;
+		Map templatesJSON = new LinkedHashMap();
+		for (i=start ; i< end; i++){
+			 
+			TemplateCls template = (TemplateCls) it.get(i).getB();
+			 
+			Map templateJSON=new LinkedHashMap();
+			
+			templateJSON.put("key", template.getKey());
+			templateJSON.put("name", template.getName());
+			if (template.getOwner().getPerson() != null)
+			{
+				templateJSON.put("person_key", template.getOwner().getPerson().b.getKey());
+				templateJSON.put("person_name", template.getOwner().getPerson().b.getName());
+			}
+			templateJSON.put("creator", template.getOwner().getAddress());
+
+			templatesJSON.put(template.getKey(), templateJSON);
 		}
-		
+		output.put("view_Row", view_Row);
+		output.put("hasLess", start > view_Row);
+		output.put("hasMore", end < it.size());
+		output.put("templates", templatesJSON);
+		output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
+		output.put("label_table_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+		output.put("label_table_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+		output.put("label_table_movable", Lang.getInstance().translate_from_langObj("Movable",langObj));
+		output.put("label_table_description", Lang.getInstance().translate_from_langObj("Description",langObj));
+		output.put("label_table_divisible", Lang.getInstance().translate_from_langObj("Divisible",langObj));
+		output.put("label_table_amount", Lang.getInstance().translate_from_langObj("Amount",langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+		output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+			
 		return output;
 	}
+
 	
 	private Map jsonQueryStatement(String block, String seg_No) {
 		// TODO Auto-generated method stub

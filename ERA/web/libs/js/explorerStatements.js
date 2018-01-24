@@ -71,7 +71,7 @@ function statements2(data){
 	output += '<label>' + data.Label_Statement + '</label>&nbsp;&nbsp;';
 	output += '<div class="input-group">'; 
 	output += '<label for="name" class="sr-only">Search</label>';
-	output += '<input id="statement_search_q" size="55" type="text" value="" class="form-control">';
+	output += '<input id="statement_search_q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) openStatement()">';
 	output += '<span class="input-group-btn"> <button id="stbutton" type="button" class="btn btn-link" onclick="openStatement()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>'; 
 	output += '</div>';
 	output += '</div>';
