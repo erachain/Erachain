@@ -224,14 +224,11 @@ function asyncAjax (url, type){
 				}
 				
 				if (type == 'persons')
-				
 				{
 					document.getElementById('main').innerHTML = persons(data);
-				
 				}
 				
 				if (type == 'person')
-				
 				{
 					document.getElementById('main').innerHTML = person(data);
 					new QRCode(document.getElementById("qrcode"), location.href);
@@ -247,6 +244,10 @@ function asyncAjax (url, type){
 					if(window.location.hash)
 					{
 						window.location.href = window.location.hash;
+					}
+					if (document.getElementById("qrcode") != null)
+					{
+						new QRCode(document.getElementById("qrcode"), location.href);
 					}
 				}
 				
@@ -275,7 +276,8 @@ function asyncAjax (url, type){
 				
 				if(type == 'asset')
 				{
-					document.getElementById('main').innerHTML = asset(data)
+					document.getElementById('main').innerHTML = asset(data);
+					new QRCode(document.getElementById("qrcode"), location.href);
 				}
 				
 				if(type == 'trades')
@@ -971,7 +973,10 @@ function asset(data)
 	output += '<td>'+addCommas(data.asset.totalOrdersVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 	output += '<td>' + data.asset.totalTradesCount;
 	output += '<td>'+addCommas(data.asset.totalTradesVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
-	output += '<td>';
+	output += '<td></td></tr></table>';
+	
+	output += '<div style="padding-left:40px"><div id="qrcode"></div></div>';
+
 
 	return output;
 }
@@ -1498,8 +1503,7 @@ function mainQuery(data) {
 		//	output += data.Json ;
 
 
-
-
+			output += '<div style="padding: 20px;"><div id="qrcode"></div></div>'
 
 			return output;
 		}
