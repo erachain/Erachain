@@ -3296,6 +3296,11 @@ function search(data)
 				foundList += '<li><a href="?atTx='+encodeURIComponent(data.query)+get_lang()+'">AT Transaction: '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?atTx='+encodeURIComponent(data.query);
 				break	
+			case 'statement':
+				var params = data.query.split('-');
+				foundList += '<li><a href="?statement='+params[0]+'&Seg_No='+params[1]+get_lang()+'">Statement: '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?statement='+params[0]+'&Seg_No='+params[1];
+				break	
 		}
 	}
 

@@ -23,6 +23,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.ws.rs.core.UriInfo;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
@@ -755,6 +758,20 @@ public class BlockExplorer
 			{
 				i++;
 				foundList.put(i, "atTx");
+			}
+		}
+		
+		Pattern statementPattern = Pattern.compile("^(\\d*)-(\\d*)$");
+		Matcher matcher = statementPattern.matcher(query);
+		if (matcher.matches())
+		{
+			Integer statement = Integer.valueOf(matcher.group(1));
+			Integer seqno = Integer.valueOf(matcher.group(2));
+			
+			if (DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2(statement, seqno)))
+			{
+				i++;
+				foundList.put(i, "statement");
 			}
 		}
 
