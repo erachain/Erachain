@@ -1161,7 +1161,7 @@ public class Block {
 		// TEST STRONG of win Value
 		int base = BlockChain.getMinTarget(height);
 		int targetedWinValue = this.calcWinValueTargeted(dcSet); 
-		if (!cnt.isTestNet() && base > targetedWinValue + (targetedWinValue>>2)) {
+		if (!cnt.isTestNet() && (base>>1) > targetedWinValue + (targetedWinValue>>2)) {
 			targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
 			return false;
