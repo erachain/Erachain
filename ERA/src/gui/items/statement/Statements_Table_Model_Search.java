@@ -172,9 +172,9 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 		// база данных
 		DCSet dcSet = DCSet.getInstance();
 		// читаем все блоки
-		SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
+		SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
-		for (Pair<byte[], Block> list : lists) {
+		for (Pair<Integer, Block> list : lists) {
 
 			// читаем транзакции из блока
 			db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();

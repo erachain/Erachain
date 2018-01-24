@@ -285,6 +285,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 		dcSet.getBlockSignsMap().delete(this.getLastBlockSignature());
 
+		this.setLastBlockSignature(null);
+
 		// use SUPER.class only!
 		super.delete(height);
 	}

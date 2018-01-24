@@ -137,7 +137,7 @@ public class BlockChain
 	//private byte[] lastBlockSignature;
 	//private Tuple2<Integer, Long> HWeight;
 
-	
+
 	//private DBSet dcSet;
 	
 	// dcSet_in = db() - for test

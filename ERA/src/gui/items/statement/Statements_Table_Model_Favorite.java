@@ -205,7 +205,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 	
 	}
 
-	private List<Transaction> read_Statement() {
+	private List<Transaction> read_Statement_old() {
 		List<Transaction> tran;
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
@@ -213,9 +213,9 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 		// база данных
 		DCSet dcSet = DCSet.getInstance();
 		// читаем все блоки
-		SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
+		SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
-		for (Pair<byte[], Block> list : lists) {
+		for (Pair<Integer, Block> list : lists) {
 
 			// читаем транзакции из блока
 			db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
