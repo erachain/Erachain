@@ -382,20 +382,20 @@ public class AddressesResource {
 		JSONArray item4 = new JSONArray();
 		JSONArray item5 = new JSONArray();
 		
-		item1.add(balance.a.a);
-		item1.add(balance.a.b);
+		item1.add(balance.a.a.toPlainString());
+		item1.add(balance.a.b.toPlainString());
 
-		item2.add(balance.b.a);
-		item2.add(balance.b.b);
+		item2.add(balance.b.a.toPlainString());
+		item2.add(balance.b.b.toPlainString());
 
-		item3.add(balance.c.a);
-		item3.add(balance.c.b);
+		item3.add(balance.c.a.toPlainString());
+		item3.add(balance.c.b.toPlainString());
 
-		item4.add(balance.d.a);
-		item4.add(balance.d.b);
+		item4.add(balance.d.a.toPlainString());
+		item4.add(balance.d.b.toPlainString());
 
-		item5.add(balance.e.a);
-		item5.add(balance.e.b);
+		item5.add(balance.e.a.toPlainString());
+		item5.add(balance.e.b.toPlainString());
 
 		JSONArray result = new JSONArray();
 		result.add(item1);
