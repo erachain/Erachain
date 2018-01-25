@@ -861,7 +861,7 @@ public class Block {
 			previousForgingHeight = creator.getLastForgingData(dcSet);			
 		}
 		
-		if (!BlockChain.DEVELOP_USE) {
+		if (false && !BlockChain.DEVELOP_USE) {
 			if (height > 87090 && height - previousForgingHeight < 10 ) {
 				return -1;
 			}
@@ -1069,13 +1069,10 @@ public class Block {
 		*/
 	}
 
-	public static int isSoRapidly(DCSet dcSet, int height, Account accountCreator, List<Block> lastBlocksForTarget) {
+	public static int isSoRapidly(DCSet dcSet, int height, Account accountCreator,
+			int previousForgingHeight) {
 		
 		// NEED CHECK ONLY ON START
-		// test repeated win account
-		if (lastBlocksForTarget == null || lastBlocksForTarget.isEmpty()) {
-			return 0;
-		}
 		
 		int usedBalance = accountCreator.getBalanceUSE(1, dcSet).intValue();
 		if (usedBalance < BlockChain.MIN_GENERATING_BALANCE) {
@@ -1086,29 +1083,18 @@ public class Block {
 		repeatsMin  = (repeatsMin>>1) + (repeatsMin>>3);
 		if (height < BlockChain.REPEAT_WIN<<1)
 			repeatsMin = BlockChain.REPEAT_WIN;
-		if (height < 89000)
-			repeatsMin = 0;
-		if (height < 100000 && repeatsMin > 9)
-			repeatsMin = 9;
-		else if (height < 100000 && repeatsMin > 30)
-			repeatsMin = 30;
-		else if (height < 150000 && repeatsMin > 50)
-			repeatsMin = 50;
-		else if (repeatsMin > 100)
-			repeatsMin = 100;
+		
+		if (height < 100500)
+			return 0;
+		if (height < 190000 && repeatsMin > 40)
+			repeatsMin = 40;
 		else if (repeatsMin < 10)
 			repeatsMin = 10;
 
-		
-		// NEED CHECK ONLY ON START
-		int i = 0;
-		for (Block testBlock: lastBlocksForTarget) {
-			if ( ++i > repeatsMin)
-				return 0;
-				
-			if (testBlock.getCreator().equals(accountCreator)) {
-				return repeatsMin - i;
-			}
+
+		int def = height - previousForgingHeight - repeatsMin; 
+		if (def > 0) {
+			return def;
 		}
 	
 	return 0;
@@ -1156,9 +1142,12 @@ public class Block {
 			return false;
 		}
 		
-		// STOP IF SO RAPIDLY			
-		if (!cnt.isTestNet() && isSoRapidly(dcSet, height, this.getCreator(),
-				cnt.getBlockChain().getLastBlocksForTarget(dcSet)) > 0) {
+		// STOP IF SO RAPIDLY
+		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this.getCreator(), height);
+		if (previousForgingHeight < 1 || !cnt.isTestNet() && isSoRapidly(dcSet, height, this.getCreator(),
+				//cnt.getBlockChain().getLastBlocksForTarget(dcSet)
+				previousForgingHeight
+				) > 0) {
 			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}

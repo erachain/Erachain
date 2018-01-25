@@ -343,7 +343,7 @@ public class Synchronizer {
 				}
 
 				if (!blockFromPeer.isValid(dcSet, false)) {
-					errorMess = "invalid Transactions";
+					errorMess = "invalid BLOCK";
 					banTime = BAN_BLOCK_TIMES;
 					break;
 				}
