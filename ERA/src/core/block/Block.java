@@ -1083,6 +1083,7 @@ public class Block {
 		}
 		
 		int repeatsMin = BlockChain.GENESIS_ERA_TOTAL/usedBalance;
+		repeatsMin  = (repeatsMin>>1) + (repeatsMin>>3);
 		if (height < BlockChain.REPEAT_WIN<<1)
 			repeatsMin = BlockChain.REPEAT_WIN;
 		if (height < 89000)
@@ -1091,10 +1092,12 @@ public class Block {
 			repeatsMin = 9;
 		else if (height < 100000 && repeatsMin > 30)
 			repeatsMin = 30;
-		else if (height < 150000 && repeatsMin > 30)
-			repeatsMin = 30;
+		else if (height < 150000 && repeatsMin > 50)
+			repeatsMin = 50;
 		else if (repeatsMin > 100)
 			repeatsMin = 100;
+		else if (repeatsMin < 10)
+			repeatsMin = 10;
 
 		
 		// NEED CHECK ONLY ON START
