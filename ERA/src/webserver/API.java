@@ -91,10 +91,12 @@ public class API {
 		
 		Map help = new LinkedHashMap();
 
+		help.put("*** CHAIN ***", "");
 		help.put("GET Height", "height");
-		help.put("*** BLOCK ***", "");
 		help.put("GET First Block", "firstblock");
 		help.put("GET Last Block", "lastblock");
+
+		help.put("*** BLOCK ***", "");
 		help.put("GET Block", "block/{signature}");
 		help.put("GET Block by Height", "blockbyheight/{height}");
 		help.put("GET Child Block Signature", "childblocksignature/{signature}");
