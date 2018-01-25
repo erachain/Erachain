@@ -11,18 +11,15 @@ function templates(data){
 	output += '<table width="1280" border=0><tr><td align=left><br>';
 
 	output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<thead><tr><td><b>'+ data.label_table_key  +'</b></td><td><b>' + data.label_table_name + '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
+	output += '<thead><tr><td><b>'+ data.label_table_key  +': ' + data.label_table_name + '</b></td><td><b>' + data.label_table_description + '</b></td><td><b>' + data.label_table_creator + '</b></td></tr></thead>';
 	
-	for(var i in data.templates)
+	for(var key in data.templates)
 	{
-		output += '<tr><td>'+ data.templates[i].key + '</td>';
-		output += '<td>'+ data.templates[i].name + '</td>';
-		output += '<td>';
-		if (data.templates[i].person_name != null)
-		{
-			output += '<a href=?person='+ data.templates[i].person_key + get_lang() +'>'+ data.templates[i].person_name +'</a>';
-		}
-		output += '</td></tr>';
+		output += '<tr><td>'+ key + ': ';
+		output += '<b>'+ data.templates[key].name + '</b></td>';
+		output += '<td>' + data.templates[key].description.substr(0, 100) + '</td>';
+		output += '<td><a href=?addr='+ data.templates[key].owner + get_lang() +'>'+ htmlFilter(data.templates[key].owner) +'</a></td>';
+		output += '</tr>';
 	}
 	output += '<tr><td colspan=2>';
 	if(data.hasMore)

@@ -231,7 +231,6 @@ function asyncAjax (url, type){
 				if (type == 'person')
 				{
 					document.getElementById('main').innerHTML = person(data);
-					new QRCode(document.getElementById("qrcode"), location.href);
 				}
 				
 				
@@ -244,10 +243,6 @@ function asyncAjax (url, type){
 					if(window.location.hash)
 					{
 						window.location.href = window.location.hash;
-					}
-					if (document.getElementById("qrcode") != null)
-					{
-						new QRCode(document.getElementById("qrcode"), location.href);
 					}
 				}
 				
@@ -277,7 +272,6 @@ function asyncAjax (url, type){
 				if(type == 'asset')
 				{
 					document.getElementById('main').innerHTML = asset(data);
-					new QRCode(document.getElementById("qrcode"), location.href);
 				}
 				
 				if(type == 'trades')
@@ -799,7 +793,7 @@ function assets(data)
 	// style="background: #f4f4f4;"
 	
 	var table = '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;"><tr>';
-	table += '<td><b>'+data.label_table_key+'<td><td><b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
+	table += '<td><b>'+data.label_table_key+': <b>'+data.label_table_asset_name+'<td><b>Operations<td><b>'+ data.label_table_asset_description+'<td><b>'+ data.label_table_asset_creator;
 	table += '<td><b>'+ data.label_table_asset_movable+'<td><b>'+data.label_table_asset_amount+'<td><b>'+data.label_table_asset_divisible;
 
 	for(key in data.assets) {
@@ -974,8 +968,6 @@ function asset(data)
 	output += '<td>' + data.asset.totalTradesCount;
 	output += '<td>'+addCommas(data.asset.totalTradesVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 	output += '<td></td></tr></table>';
-	
-	output += '<div style="padding-left:40px"><div id="qrcode"></div></div>';
 
 
 	return output;
@@ -1501,9 +1493,6 @@ function mainQuery(data) {
 		//	output += '<br>';	
 			output += data.body + '<br>';
 		//	output += data.Json ;
-
-
-			output += '<div style="padding: 20px;"><div id="qrcode"></div></div>'
 
 			return output;
 		}
@@ -3380,9 +3369,7 @@ else
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td>';
-output +=   '<td style ="padding-left:20px">';
-output +=   '<div id="qrcode"></div>';
-output +=   '</td></tr>';
+output +=   '</tr>';
 output +=   '</table>';
 
 
@@ -4008,6 +3995,9 @@ function Lang_setting(){
 			 <select id ="Langs" OnChange="Lang_setting()">
 			 </select>
 		   </div>
+		   <div class="navbar-form navbar-right">
+		   	<button type="button" class="btn" data-toggle="modal" data-target="#qrModal">QR</button>
+		   </div>
         </div>
       </div>
     </nav>
@@ -4060,6 +4050,27 @@ function Lang_setting(){
 </table>
 
 </table>
+
+<div class="modal" id="qrModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document" style="top: 20%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">QR</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><div id="qr"></div></p>
+        <script type="text/javascript">new QRCode(document.getElementById("qr"), location.href);</script>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 
 </html>

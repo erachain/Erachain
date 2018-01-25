@@ -3667,12 +3667,8 @@ if ( asset_1 == null) {
 			
 			templateJSON.put("key", template.getKey());
 			templateJSON.put("name", template.getName());
-			if (template.getOwner().getPerson() != null)
-			{
-				templateJSON.put("person_key", template.getOwner().getPerson().b.getKey());
-				templateJSON.put("person_name", template.getOwner().getPerson().b.getName());
-			}
-			templateJSON.put("creator", template.getOwner().getAddress());
+			templateJSON.put("description", Processor.process(template.getDescription()));
+			templateJSON.put("owner", template.getOwner().getAddress());
 
 			templatesJSON.put(template.getKey(), templateJSON);
 		}
