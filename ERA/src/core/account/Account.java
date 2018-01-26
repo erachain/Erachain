@@ -907,19 +907,19 @@ public class Account {
 		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
 			return 0l;
 		
-		// test repeated win account
-		if (!Controller.getInstance().isTestNet()) {
-			int repeated = Block.isSoRapidly(dcSet, height, this, lastBlocksForTarget);
-			if (repeated > 0) {
-				return -repeated;
-			}
-		}
-		
 		// TEST STRONG of win Value
 		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this, height);
 		if (previousForgingHeight < 1)
 			return 0l;
 
+		// test repeated win account
+		if (!Controller.getInstance().isTestNet()) {
+			int repeated = Block.isSoRapidly(dcSet, height, this, previousForgingHeight);
+			if (repeated > 0) {
+				return -repeated;
+			}
+		}
+		
 		long winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
 
 		int base = BlockChain.getMinTarget(height);
