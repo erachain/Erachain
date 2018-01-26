@@ -270,30 +270,6 @@ public class Peer extends Thread{
 			//CREATE STRINGWRITER
 			step++;
 			this.out = socket.getOutputStream();
-						
-			if (this.pinger == null) {
-				//START PINGER
-				this.pinger = new Pinger(this);
-
-				//START COMMUNICATON THREAD
-				step++;
-				this.start();
-
-				// IT is STARTED
-				this.runed = true;
-
-				//ON SOCKET CONNECT
-				step++;
-				this.callback.onConnect(this, true);			
-			} else {
-				this.pinger.setPing(Integer.MAX_VALUE);
-
-				// IT is STARTED
-				this.runed = true;
-
-				// already started
-				this.callback.onConnect(this, false);
-			}
 
 			//LOGGER.debug("@@@ connect(callback) : " + address.getHostAddress());
 
@@ -306,8 +282,32 @@ public class Peer extends Thread{
 				LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
 			}
 		}
-	}
 
+		if (this.pinger == null) {
+			//START PINGER
+			this.pinger = new Pinger(this);
+
+			//START COMMUNICATON THREAD
+			step++;
+			this.start();
+
+			// IT is STARTED
+			this.runed = true;
+
+			//ON SOCKET CONNECT
+			step++;
+			this.callback.onConnect(this, true);			
+		} else {
+			this.pinger.setPing(Integer.MAX_VALUE);
+
+			// IT is STARTED
+			this.runed = true;
+
+			// already started
+			this.callback.onConnect(this, false);
+		}
+		
+	}
 
 	// connect to old reused peer
 	public void reconnect(Socket socket)

@@ -335,7 +335,7 @@ public class Synchronizer {
 					banTime = BAN_BLOCK_TIMES << 1;
 					break;
 				}
-				LOGGER.debug("BLOCK is Signature Valid");
+				LOGGER.debug("BLOCK Signature is Valid");
 
 				if (blockFromPeer.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
 					errorMess = "invalid Timestamp from FUTURE";
