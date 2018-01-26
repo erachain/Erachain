@@ -211,6 +211,11 @@ function asyncAjax (url, type){
 				{
 					document.getElementById('main').innerHTML = templates(data);
 				}
+
+				if(type == 'template')
+				{
+					document.getElementById('main').innerHTML = template(data);
+				}
 				
 				if(type == 'statement')
 				{
@@ -3895,7 +3900,14 @@ function start() {
 		asyncAjax('blockexplorer.json?templates&lang='+params['lang'], 'templates');
 		document.title = title ;
 		return;
-	}	
+	}
+	
+	if(params.hasOwnProperty('template'))
+	{
+		asyncAjax('blockexplorer.json?template=' + params['template'] + '&lang='+params['lang'], 'template');
+		document.title = title ;
+		return;
+	}
 	
 	if(params.hasOwnProperty('statement'))
 	{
@@ -3996,7 +4008,7 @@ function Lang_setting(){
 			 </select>
 		   </div>
 		   <div class="navbar-form navbar-right">
-		   	<button type="button" class="btn" data-toggle="modal" data-target="#qrModal">QR</button>
+				<button type="button" class="btn" data-toggle="modal" data-target="#qrModal">QR</button>
 		   </div>
         </div>
       </div>

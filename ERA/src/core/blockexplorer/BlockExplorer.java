@@ -530,6 +530,17 @@ public class BlockExplorer
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
 			}
+			
+			
+			if(info.getQueryParameters().containsKey("template"))
+			{
+				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
 
 			
 			if(info.getQueryParameters().containsKey("statement"))
@@ -3679,13 +3690,32 @@ if ( asset_1 == null) {
 		output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
 		output.put("label_table_name", Lang.getInstance().translate_from_langObj("Name",langObj));
 		output.put("label_table_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
-		output.put("label_table_movable", Lang.getInstance().translate_from_langObj("Movable",langObj));
 		output.put("label_table_description", Lang.getInstance().translate_from_langObj("Description",langObj));
-		output.put("label_table_divisible", Lang.getInstance().translate_from_langObj("Divisible",langObj));
-		output.put("label_table_amount", Lang.getInstance().translate_from_langObj("Amount",langObj));
 		output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
 		output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
 			
+		return output;
+	}
+
+
+	public Map jsonQueryTemplate(Long key) {
+		Map output=new LinkedHashMap();
+		
+		TemplateCls template = (TemplateCls)DCSet.getInstance().getItemTemplateMap().get(key);
+		
+		Map templateJSON = new LinkedHashMap();
+		templateJSON.put("key", template.getKey());
+		templateJSON.put("name", template.getName());
+		templateJSON.put("description", Processor.process(template.getDescription()));
+		templateJSON.put("owner", template.getOwner().getAddress());
+		
+		output.put("template", templateJSON);
+		
+		output.put("label_Template", Lang.getInstance().translate_from_langObj("Template", langObj));
+		output.put("label_Key", Lang.getInstance().translate_from_langObj("Key", langObj));
+		output.put("label_Creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+		output.put("label_Description", Lang.getInstance().translate_from_langObj("Description", langObj));
+
 		return output;
 	}
 
