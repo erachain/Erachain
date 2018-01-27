@@ -1185,10 +1185,11 @@ public class Block {
 
 		if (andProcess) {
 			//ADD TO DB
-			dcSet.getBlockMap().add(this);
-			LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
-			
+			//LOGGER.debug("getBlockMap() [" + dcSet.getBlockMap().size() + "]");
+			dcSet.getBlockMap().add(this);			
 			this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
+			LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+
 
 		}
 		//CHECK TRANSACTIONS
@@ -1560,7 +1561,7 @@ public class Block {
 		this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee, true);
 		
 		//DELETE BLOCK FROM DB
-		dcSet.getBlockMap().remove();
+		dcSet.getBlockMap().remove(this.signature, this.reference);
 		
 		//LOGGER.debug("<<< core.block.Block.orphan(DBSet) #4");
 
@@ -1569,7 +1570,7 @@ public class Block {
 				+ " for records:" + this.getTransactionCount() + " millsec/record:" + tickets/(this.getTransactionCount()+1) );
 
 		this.heightBlock = -1;
-		this.parentBlock = null;
+		//this.parentBlock = null;
 
 	}
 

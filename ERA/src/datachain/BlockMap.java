@@ -42,6 +42,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
+	protected Atomic.Integer atomicKey;
+	protected int key;
+
 	// private Var<byte[]> lastBlockVar;
 	private byte[] lastBlockSignature;
 
@@ -59,6 +62,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public BlockMap(DCSet databaseSet, DB database) {
 		super(databaseSet, database);
 
+		this.atomicKey = database.getAtomicInteger("block_map" + "_key");
+		this.key = this.atomicKey.get();
+
 		if (databaseSet.isWithObserver()) {
 			// this.observableData.put(DBMap.NOTIFY_RESET,
 			// ObserverMessage.RESET_BLOCK_TYPE);
@@ -73,9 +79,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 
 		// LAST BLOCK
-		if (database.getCatalog().get(("lastBlock" + ".type")) == null) {
-			database.createAtomicVar("lastBlock", new byte[0], null);
-		}
+		//if (database.getCatalog().get(("lastBlock" + ".type")) == null) {
+		//	database.createAtomicVar("lastBlock", new byte[0], null);
+		//}
 		// this.lastBlockVar = database.getAtomicVar("lastBlock");
 		// this.lastBlockSignature = this.lastBlockVar.get();
 
@@ -91,10 +97,16 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public BlockMap(BlockMap parent, DCSet dcSet) {
 		super(parent, dcSet);
 
+		this.key = parent.getSize();
+
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.feePool = parent.getFeePool();
 		this.processing = false; /// parent.isProcessing();
 
+	}
+
+	public int getSize() {
+		return this.key;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -149,7 +161,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 		// OPEN MAP
 		return database.createTreeMap("blocks").keySerializer(BTreeKeySerializer.BASIC)
 				// .comparator(UnsignedBytes.lexicographicalComparator())
-				.valueSerializer(new BlockSerializer()).valuesOutsideNodesEnable().counterEnable().makeOrGet();
+				.valueSerializer(new BlockSerializer()).valuesOutsideNodesEnable()
+				//.counterEnable() - auto increment atomicKey
+				.makeOrGet();
 	}
 
 	@Override
@@ -215,6 +229,14 @@ public class BlockMap extends DCMap<Integer, Block> {
 		return false;
 	}
 
+	@Override
+	public int size() {
+		// size from Map as .size() - .deleted() + parent.size() for numbered key is WRONG
+		// if same key in .deleted() and in parent.map - поправил с помощью shiftSize
+		// so use this KEY
+		return this.key;
+	}
+
 	public void setProcessing(boolean processing) {
 		if (this.processingVar != null) {
 			if (DCSet.isStoped()) {
@@ -229,11 +251,18 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();
 
+		// INCREMENT ATOMIC KEY IF EXISTS
+		if (this.atomicKey != null) {
+			this.atomicKey.incrementAndGet();
+		}
+
+		// INCREMENT KEY
+		this.key++;		
+		int height = this.key;
+
 		byte[] signature = block.getSignature();
 		// calc before insert record
 		int win_value = block.calcWinValueTargeted(dcSet);
-
-		int height = this.size() + 1;
 
 		if (block.getVersion() == 0) {
 			// GENESIS block
@@ -265,13 +294,13 @@ public class BlockMap extends DCMap<Integer, Block> {
 	}
 
 	// TODO make CHAIN deletes - only for LAST block!
-	public void remove() {
+	public void remove(byte[] signature, byte[] reference) {
 		DCSet dcSet = getDCSet();
 
-		int height = this.size();
-		// Block block = this.get(height);
-		// this.setLastBlockSignature(block.getReference());
-		dcSet.getBlockSignsMap().delete(this.getLastBlockSignature());
+		int height = this.key;
+		
+		this.setLastBlockSignature(reference);
+		dcSet.getBlockSignsMap().delete(signature);
 
 		// ORPHAN FORGING DATA
 		if (height > 1) {
@@ -284,10 +313,16 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 		}
 
-		this.setLastBlockSignature(null);
-
 		// use SUPER.class only!
 		super.delete(height);
+		
+		if (this.atomicKey != null) {
+			this.atomicKey.decrementAndGet();
+		}
+
+		// DECREMENT KEY
+		--this.key;
+
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })

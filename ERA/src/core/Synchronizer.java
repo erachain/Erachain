@@ -125,10 +125,11 @@ public class Synchronizer {
 		int newHeight = lastBlock.getHeight(fork) + newBlocks.size();
 		boolean checkFullWeight = newHeight < myHeight + 2;
 
-		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
+		LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
 		for (Block block : newBlocks) {
 			int heigh = block.getHeightByParent(fork);
+			LOGGER.debug("*** checkNewBlocks - VALIDATE [" + heigh + "]");
 
 			// CHECK IF VALID
 			if (block.isSignatureValid() && block.isValid(fork, true)) {

@@ -34,6 +34,7 @@ public abstract class DCMap<T, U> extends Observable {
 	protected List<T> deleted;
 	private Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 	private boolean worked;
+	private int shiftSize;
 
 	static Logger LOGGER = Logger.getLogger(DCMap.class.getName());
 
@@ -120,15 +121,20 @@ public abstract class DCMap<T, U> extends Observable {
 		}
 	}
 
+	// ОШИБКА если ключ не уникальный для каждлшл значения:
+	// пос удаления из форка ключа который есть в родителе происходит неверный подстчет
+	// так как из .deleted ключ удален а в родителе нет и полчается что удаленных меньше и размер на 1 увеличивается
 	public int size() {
 		this.addUses();
 
 		int u = this.map.size();
 
 		if (this.parent != null) {
-			u += this.parent.size();
 			if (this.deleted != null)
 				u -= this.deleted.size();
+			
+			u -= this.shiftSize;
+			u += this.parent.size();
 		}
 
 		this.outUses();
@@ -231,12 +237,15 @@ public abstract class DCMap<T, U> extends Observable {
 
 			U old = this.map.put(key, value);
 
-			if (this.deleted != null) {
-				this.deleted.remove(key);
-			}
+			if (this.parent != null) {
+				if (this.deleted != null) {
+					this.deleted.remove(key);
+					if (old != null)
+						++this.shiftSize;
+				}
+			} else {
+				// COMMIT and NOTIFY if not FORKED
 
-			// COMMIT and NOTIFY if not FORKED
-			if (this.parent == null) {
 				// IT IS NOT FORK
 				if (false && !(this.databaseSet instanceof DWSet
 						&& Controller.getInstance().isProcessingWalletSynchronize())) {
