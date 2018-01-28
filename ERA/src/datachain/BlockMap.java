@@ -267,19 +267,18 @@ public class BlockMap extends DCMap<Integer, Block> {
 		if (block.getVersion() == 0) {
 			// GENESIS block
 			dcSet.getBlockSignsMap().set(signature, 1, core.BlockChain.GENESIS_WIN_VALUE);
-			dcSet.getBlockHeightsMap().add(signature);
 		} else {
 			dcSet.getBlockSignsMap().set(signature, height, win_value);
-			dcSet.getBlockHeightsMap().set(height, signature);
 
 			PublicKeyAccount creator = block.getCreator();
-			dcSet.getBlockCreatorMap().set(height, creator.getPublicKey());
+			dcSet.getBlockCreatorMap().add(creator.getPublicKey());
 			// PROCESS FORGING DATA
 			creator.setForgingData(dcSet, height);
 
 		}
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
 		// (System.currentTimeMillis() - start)*0.001);
+		dcSet.getBlockHeightsMap().add(signature);
 		this.setLastBlockSignature(signature);
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
 		// (System.currentTimeMillis() - start)*0.001);
@@ -292,7 +291,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		return sss;
 
 	}
-
+	
 	// TODO make CHAIN deletes - only for LAST block!
 	public void remove(byte[] signature, byte[] reference) {
 		DCSet dcSet = getDCSet();
@@ -304,7 +303,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 		// ORPHAN FORGING DATA
 		if (height > 1) {
-			dcSet.getBlockHeightsMap().delete(height);
+			dcSet.getBlockHeightsMap().remove();
+			dcSet.getBlockCreatorMap().remove();
 
 			byte[] creatorByte = dcSet.getBlockCreatorMap().get(height);
 			PublicKeyAccount creator = new PublicKeyAccount(creatorByte);

@@ -27,9 +27,9 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]>
 	// protected int type;
 
 	protected Atomic.Integer atomicKey;
-	protected int key;
+	protected int key = -1;
 
-	static Logger LOGGER = Logger.getLogger(Item_Map.class.getName());
+	static Logger LOGGER = Logger.getLogger(AutoIntegerByte.class.getName());
 
 	public AutoIntegerByte(DCSet databaseSet, DB database, String name) {
 		super(databaseSet, database);
@@ -64,6 +64,11 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]>
 	}
 
 	public int getSize() {
+		if (this.key < 0) {
+			// init if TABLE make without .key
+			this.key = this.size();
+		}
+		
 		return this.key;
 	}
 

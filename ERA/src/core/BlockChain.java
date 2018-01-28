@@ -384,7 +384,9 @@ public class BlockChain
 		
 		//int height = dcSet.getBlockHeightsMap().getSize();
 		BlockSignsMap dbMap = dcSet.getBlockSignsMap();
-		byte[] lastSignature = dcSet.getBlockHeightsMap().last();
+		//byte[] lastSignature = dcSet.getBlockHeightsMap().last();
+		byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
+
 		byte[] newBlockReference = block.getReference();
 		if(!Arrays.equals(lastSignature, newBlockReference)) {
 			

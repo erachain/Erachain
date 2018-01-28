@@ -283,7 +283,7 @@ public class BlockGenerator extends Thread implements Observer
 					status = 0;
 
 					// GET real HWeight
-					ctrl.pingAllPeers(false);						
+					ctrl.pingAllPeers(false);				
 					
 				}
 				

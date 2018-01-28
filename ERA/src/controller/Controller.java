@@ -1825,6 +1825,7 @@ public class Controller extends Observable {
 			/// update();
 		} else {
 			this.status = STATUS_OK;
+			this.pingAllPeers(false);				
 		}
 
 		// send to ALL my HW
