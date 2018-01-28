@@ -210,6 +210,8 @@ public class BlockGenerator extends Thread implements Observer
 		DCSet dcSet = DCSet.getInstance();
 
 		Peer peer = null;
+		Tuple3<Integer, Long, Peer> maxPeer;
+		SignaturesMessage response;
 		long timeTmp;
 		long timePoint = 0;
 		long flushPoint = 0;
@@ -560,7 +562,8 @@ public class BlockGenerator extends Thread implements Observer
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
 
-					Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(-1);
+					peer = null;
+					maxPeer = ctrl.getMaxPeerHWeight(-1);
 					if (maxPeer != null) {
 						peer = maxPeer.c;
 					}
@@ -572,13 +575,13 @@ public class BlockGenerator extends Thread implements Observer
 							
 							if (myHW.a > 1) {
 	
-								LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer);
+								LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer.a + ":" + maxPeer.b);
 	 
-								SignaturesMessage response;
+								response = null;
 								try {
 									try
 									{
-										Thread.sleep(1000);
+										Thread.sleep(10000);
 									}
 									catch (InterruptedException e) 
 									{
