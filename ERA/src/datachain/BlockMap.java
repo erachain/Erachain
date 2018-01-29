@@ -97,16 +97,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public BlockMap(BlockMap parent, DCSet dcSet) {
 		super(parent, dcSet);
 
-		this.key = parent.getSize();
+		this.key = parent.size();
 
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.feePool = parent.getFeePool();
 		this.processing = false; /// parent.isProcessing();
 
-	}
-
-	public int getSize() {
-		return this.key;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -198,12 +194,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	public Block last() {
 		// return this.get(this.getLastBlockSignature());
-		return this.get(this.size());
+		return this.get(this.key);
 	}
 
 	public byte[] getLastBlockSignature() {
 		if (this.lastBlockSignature == null) {
-			this.lastBlockSignature = getDCSet().getBlockHeightsMap().get(this.size());
+			this.lastBlockSignature = getDCSet().getBlockHeightsMap().get(this.key);
 		}
 		return this.lastBlockSignature;
 	}
@@ -303,13 +299,14 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 		// ORPHAN FORGING DATA
 		if (height > 1) {
-			dcSet.getBlockHeightsMap().remove();
-			dcSet.getBlockCreatorMap().remove();
 
-			byte[] creatorByte = dcSet.getBlockCreatorMap().get(height);
+			byte[] creatorByte = dcSet.getBlockCreatorMap().last();
 			PublicKeyAccount creator = new PublicKeyAccount(creatorByte);
 			// INITIAL forging DATA no need remove!
 			creator.delForgingData(dcSet, height);
+
+			dcSet.getBlockHeightsMap().remove();
+			dcSet.getBlockCreatorMap().remove();
 
 		}
 

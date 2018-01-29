@@ -27,7 +27,7 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]>
 	// protected int type;
 
 	protected Atomic.Integer atomicKey;
-	protected int key = -1;
+	protected int key;
 
 	static Logger LOGGER = Logger.getLogger(AutoIntegerByte.class.getName());
 
@@ -60,15 +60,11 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]>
 	public AutoIntegerByte(AutoIntegerByte parent) {
 		super(parent, null);
 
-		this.key = parent.getSize();
+		this.key = parent.size();
 	}
 
-	public int getSize() {
-		if (this.key < 0) {
-			// init if TABLE make without .key
-			this.key = this.size();
-		}
-		
+	@Override
+	public int size() {
 		return this.key;
 	}
 
