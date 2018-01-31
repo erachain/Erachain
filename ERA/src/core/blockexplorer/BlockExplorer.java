@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1762,8 +1763,6 @@ if ( asset_1 == null) {
 			output.put("creator_name", "");
 		}
 		
-			
-			
 		
 		output.put("name", person.getName());
 		////////output.put("birthday", df.format(new Date(person.getBirthday())).toString());
@@ -1829,10 +1828,13 @@ if ( asset_1 == null) {
 		
 		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
 		if (rowCount >0){
-		for (int i = 0; i<rowCount; i++){
-			Map accountJSON=new LinkedHashMap();
-			accountJSON.put("adress", personModel.getValueAt(i, 0));
-			accountJSON.put("data", personModel.getValueAt(i, 1));
+			BigDecimal eraBalance = new BigDecimal(0);
+			BigDecimal compuBalance = new BigDecimal(0);
+
+			for (int i = 0; i<rowCount; i++){
+				Map accountJSON=new LinkedHashMap();
+				accountJSON.put("adress", personModel.getValueAt(i, 0));
+				accountJSON.put("data", personModel.getValueAt(i, 1));
 				PersonCls  cc= (PersonCls) personModel.getValueAt(i, 3);
 				
 				accountJSON.put("creator", personModel.getValueAt(i, 2));
@@ -1850,13 +1852,29 @@ if ( asset_1 == null) {
 			
 			
 			
-			accountsJSON.put(i, accountJSON);	
+				accountsJSON.put(i, accountJSON);	
+				
+				String acc = personModel.getValueAt(i, 0).toString();
+				 
+				my_Issue_Persons.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
 			
-			String acc = personModel.getValueAt(i, 0).toString();
-			 my_Issue_Persons.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(acc,Transaction.ISSUE_PERSON_TRANSACTION, 0));
-		
+				WEB_Balance_from_Adress_TableModel balanceTableModel = new WEB_Balance_from_Adress_TableModel(new Account(acc));
 
-		}
+				for (int idr = 0; idr < balanceTableModel.getRowCount(); idr++)
+				{
+					switch ((String)balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_NAME))
+					{
+						case "ERA":
+							eraBalance = eraBalance.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A)).add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
+							break;
+						case "COMPU":
+							compuBalance = compuBalance.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A)).add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
+							break;
+					}
+				}
+			}
+			output.put("era_balance", NumberAsString.getInstance().numberAsString(eraBalance));
+			output.put("compu_balance", NumberAsString.getInstance().numberAsString(compuBalance));
 		}
 		output.put("accounts", accountsJSON);
 		

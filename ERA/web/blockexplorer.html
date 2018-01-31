@@ -3373,10 +3373,16 @@ else
 }
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
-output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br></td>';
+output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
+if (data.era_balance) {
+	output +=   'ERA: &nbsp&nbsp<b>' + data.era_balance + '</b><br>';
+}
+if (data.compu_balance) {
+	output +=   'COMPU: &nbsp&nbsp<b>' + data.compu_balance + '</b><br>';
+}
+output +=   '</td>';
 output +=   '</tr>';
 output +=   '</table>';
-
 
 //statuses
 output += '<br>'+ data.Label_statuses +':';
