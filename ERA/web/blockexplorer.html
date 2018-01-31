@@ -3372,13 +3372,13 @@ else
 	output +=   data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator + '</b><br>';
 }
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
-output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
-if (data.era_balance) {
-	output +=   'ERA: &nbsp&nbsp<b>' + data.era_balance + '</b><br>';
+output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
+if (data.era_balance_a) {
+	output +=   '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
 }
 if (data.compu_balance) {
-	output +=   'COMPU: &nbsp&nbsp<b>' + data.compu_balance + '</b><br>';
+	output +=   '<h4>COMPU: &nbsp&nbsp' + data.compu_balance + '</h4><br>';
 }
 output +=   '</td>';
 output +=   '</tr>';

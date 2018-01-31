@@ -1828,7 +1828,10 @@ if ( asset_1 == null) {
 		
 		List<Transaction> my_Issue_Persons = new ArrayList<Transaction>();
 		if (rowCount >0){
-			BigDecimal eraBalance = new BigDecimal(0);
+			BigDecimal eraBalanceA = new BigDecimal(0);
+			BigDecimal eraBalanceB = new BigDecimal(0);
+			BigDecimal eraBalanceC = new BigDecimal(0);
+			BigDecimal eraBalanceTotal = new BigDecimal(0);
 			BigDecimal compuBalance = new BigDecimal(0);
 
 			for (int i = 0; i<rowCount; i++){
@@ -1865,15 +1868,21 @@ if ( asset_1 == null) {
 					switch ((String)balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_NAME))
 					{
 						case "ERA":
-							eraBalance = eraBalance.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A)).add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
+							eraBalanceA = eraBalanceA.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A));
+							eraBalanceB = eraBalanceB.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
+							eraBalanceC = eraBalanceC.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_C));
+							eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
 							break;
 						case "COMPU":
-							compuBalance = compuBalance.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A)).add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
+							compuBalance = compuBalance.add((BigDecimal)balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A));
 							break;
 					}
 				}
 			}
-			output.put("era_balance", NumberAsString.getInstance().numberAsString(eraBalance));
+			output.put("era_balance_a", NumberAsString.getInstance().numberAsString(eraBalanceA));
+			output.put("era_balance_b", NumberAsString.getInstance().numberAsString(eraBalanceB));
+			output.put("era_balance_c", NumberAsString.getInstance().numberAsString(eraBalanceC));
+			output.put("era_balance_total", NumberAsString.getInstance().numberAsString(eraBalanceTotal));
 			output.put("compu_balance", NumberAsString.getInstance().numberAsString(compuBalance));
 		}
 		output.put("accounts", accountsJSON);
