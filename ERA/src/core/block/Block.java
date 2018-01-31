@@ -157,6 +157,14 @@ public class Block {
 		return parentBlock;
 	}
 
+	public Tuple2<Integer, Long> getParentKey(DCSet db)
+	{
+		Tuple2<Integer, Long> key = db.getBlockSignsMap().get(this.reference);
+		if (key == null || key.a < 1)
+			return null;
+		return key;
+	}
+
 	public Block getChild(DCSet db)
 	{
 		return db.getBlockMap().get(this.getHeight(db) + 1);
@@ -974,7 +982,7 @@ public class Block {
 		
 		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, this.creator, height);
 		if (previousForgingHeight == -1) {
-			this.winValue = 1l;
+			this.winValue = -1l;
 			return this.winValue;
 		}
 		
@@ -1091,6 +1099,8 @@ public class Block {
 			repeatsMin  = repeatsMin>>2;
 		}
 		
+		if (height < 110000 && repeatsMin > 40)
+			repeatsMin = 40;
 		if (height < 150000 && repeatsMin > 50)
 			repeatsMin = 50;
 		else if (repeatsMin < 10)
@@ -1122,7 +1132,7 @@ public class Block {
 		*/
 		
 		//CHECK IF PARENT EXISTS
-		if(height < 2 || this.reference == null || this.getParent(dcSet) == null)
+		if(height < 2 || this.reference == null || this.getParentKey(dcSet) == null)
 		{
 			LOGGER.debug("*** Block[" + height + "].reference invalid");
 			return false;
@@ -1147,6 +1157,7 @@ public class Block {
 			return false;
 		}
 		
+		/*
 		// STOP IF SO RAPIDLY
 		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this.getCreator(), height);
 		if (previousForgingHeight < 1 || !cnt.isTestNet() && isSoRapidly(dcSet, height, this.getCreator(),
@@ -1156,13 +1167,17 @@ public class Block {
 			LOGGER.debug("*** Block[" + height + "] REPEATED WIN invalid");
 			return false;
 		}
+		*/
 		
 		// TEST STRONG of win Value
-		int base = BlockChain.getMinTarget(height);
-		int targetedWinValue = this.calcWinValueTargeted(dcSet); 
-		if (!cnt.isTestNet() && (base>>1) > targetedWinValue + (targetedWinValue>>2)) {
-			targetedWinValue = this.calcWinValueTargeted(dcSet);
-			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + base);
+		//int base = BlockChain.getMinTarget(height);
+		///int targetedWinValue = this.calcWinValueTargeted(dcSet);
+						
+		long target = BlockChain.getTarget(dcSet, this);
+    	long win_value = this.creator.calcWinValue(dcSet, height, target);
+		if (!cnt.isTestNet() && win_value < 1) {
+			//targetedWinValue = this.calcWinValueTargeted(dcSet);
+			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + win_value + " < " + target);
 			return false;
 		}
 
