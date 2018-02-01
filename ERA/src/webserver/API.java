@@ -905,11 +905,11 @@ public class API {
 		
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
 		JSONArray array = new JSONArray();
-		array.add(balance.a);
-		array.add(balance.b);
-		array.add(balance.c);
-		array.add(balance.d);
-		array.add(balance.e);
+		array.add(balance.a.a);
+		array.add(balance.b.a);
+		array.add(balance.c.a);
+		array.add(balance.d.a);
+		array.add(balance.e.a);
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
