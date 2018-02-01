@@ -1139,7 +1139,7 @@ public class Block {
 		}
 
 		byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
-		if(Arrays.equals(lastSignature, this.reference))
+		if(!Arrays.equals(lastSignature, this.reference))
 		{
 			LOGGER.debug("*** Block[" + height + "].reference from fork");
 			return false;
@@ -1593,6 +1593,13 @@ public class Block {
 
 		this.heightBlock = -1;
 		//this.parentBlock = null;
+		byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
+		if(!Arrays.equals(lastSignature, this.reference)) {
+			LOGGER.debug("[" + this.heightBlock + "] orphaning time: " +  (System.currentTimeMillis() - start)*0.001
+					+ "  ERROR " );
+			
+		}
+
 
 	}
 
