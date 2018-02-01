@@ -1132,9 +1132,16 @@ public class Block {
 		*/
 		
 		//CHECK IF PARENT EXISTS
-		if(height < 2 || this.reference == null || this.getParentKey(dcSet) == null)
+		if(height < 2 || this.reference == null)
 		{
 			LOGGER.debug("*** Block[" + height + "].reference invalid");
+			return false;
+		}
+
+		byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
+		if(Arrays.equals(lastSignature, this.reference))
+		{
+			LOGGER.debug("*** Block[" + height + "].reference from fork");
 			return false;
 		}
 
