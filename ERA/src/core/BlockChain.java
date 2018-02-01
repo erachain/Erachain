@@ -29,7 +29,7 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = true;
+	public static final boolean DEVELOP_USE = false;
 	public static final boolean HARD_WORK = false;
 	public static final boolean PERSON_SEND_PROTECT = true;
 	//public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -514,7 +514,7 @@ public class BlockChain
 	}
 
 	// get last blocks for target
-	public List<Block> getLastBlocksForTarget(DCSet dcSet) 
+	public List<Block> getLastBlocksForTarget_old(DCSet dcSet) 
 	{	
 
 		Block last = dcSet.getBlockMap().last();
@@ -621,8 +621,10 @@ public class BlockChain
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
 		else if ( height < 32100)
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
+		else if ( height < 105000)
+			base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
 		else
-			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
 
 		return base;
 

@@ -51,7 +51,7 @@ public class BlockGenerator extends Thread implements Observer
 	static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
 	static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
 	private PrivateKeyAccount acc_winner;
-	private List<Block> lastBlocksForTarget;
+	//private List<Block> lastBlocksForTarget;
 	private byte[] solvingReference;
 	
 	private List<PrivateKeyAccount> cachedAccounts;
@@ -218,11 +218,11 @@ public class BlockGenerator extends Thread implements Observer
 		Block waitWin = null;
 		long timeUpdate = 0;
 		int shift_height = 0;
-		byte[] unconfirmedTransactionsHash;
+		//byte[] unconfirmedTransactionsHash;
 		long max_winned_value;
 		long winned_value;				
-		long winned_value_account;
-		long max_winned_value_account;
+		//long winned_value_account;
+		//long max_winned_value_account;
 		int height = BlockChain.getHeight(dcSet) + 1;
 		long target = bchain.getTarget(dcSet);
 		Block generatedBlock;
@@ -349,13 +349,13 @@ public class BlockGenerator extends Thread implements Observer
 						status = 4;
 						
 						//GENERATE NEW BLOCKS
-						this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
+						//this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
 						this.acc_winner = null;
 						
 						
-						unconfirmedTransactionsHash = null;
+						//unconfirmedTransactionsHash = null;
 						max_winned_value = 0;
-						max_winned_value_account = 0;
+						//max_winned_value_account = 0;
 						height = bchain.getHeight(dcSet) + 1;
 						target = bchain.getTarget(dcSet);
 		
@@ -371,8 +371,8 @@ public class BlockGenerator extends Thread implements Observer
 							for(PrivateKeyAccount account: knownAccounts)
 							{
 							
-								winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
-								winned_value = account.calcWinValue(dcSet, bchain, this.lastBlocksForTarget, height, target);
+								//winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
+								winned_value = account.calcWinValue(dcSet, height, target);
 								if(winned_value < 1l)
 									continue;
 								
@@ -380,7 +380,7 @@ public class BlockGenerator extends Thread implements Observer
 									//this.winners.put(account, winned_value);
 									acc_winner = account;
 									max_winned_value = winned_value;
-									max_winned_value_account = winned_value_account;
+									//max_winned_value_account = winned_value_account;
 									
 								}
 							}
@@ -527,7 +527,16 @@ public class BlockGenerator extends Thread implements Observer
 						LOGGER.debug("TRY to FLUSH WINER to DB MAP");
 		
 						try {
-							
+							if (flushPoint + FLUSH_TIMEPOINT < NTP.getTime()) {
+								try
+								{
+									Thread.sleep(10000);
+								}
+								catch (InterruptedException e) 
+								{
+								}
+							}
+
 							status = 2;
 							if (!ctrl.flushNewBlockGenerated()) {
 								// NEW BLOCK not FLUSHED

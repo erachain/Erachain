@@ -900,7 +900,7 @@ public class Account {
 	*/
 	
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public long calcWinValue(DCSet dcSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {
+	public long calcWinValue(DCSet dcSet, int height, long target) {
 		
 		int generatingBalance = Block.calcGeneratingBalance(dcSet, this, height);
 		
