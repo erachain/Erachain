@@ -183,7 +183,7 @@ public class APIUtils {
 			if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
 				if (true || !Controller.getInstance().isWalletUnlocked()) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
-					if (!password.equals("") && !Controller.getInstance().unlockWallet(password)) {
+					if (password.length() < 1 || !Controller.getInstance().unlockWallet(password)) {
 						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
 								JOptionPane.ERROR_MESSAGE);
 					}

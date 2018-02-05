@@ -706,7 +706,7 @@ public class Wallet extends Observable implements Observer
 	
 	public boolean unlock(String password)
 	{
-		if(this.isUnlocked())
+		if(false && this.isUnlocked())
 		{
 			return true;
 		}
