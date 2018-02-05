@@ -16,6 +16,8 @@ import java.awt.Image;
 public class Account_Send_Dialog extends JDialog {
 
 	private static final long serialVersionUID = 1L;
+	public Account_Send_Panel panel;
+	
 
 	public Account_Send_Dialog(AssetCls asset, Account account, Account account_To, PersonCls person) {
 
@@ -26,7 +28,7 @@ public class Account_Send_Dialog extends JDialog {
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		this.setIconImages(icons);
-		Account_Send_Panel panel = new Account_Send_Panel(asset, account, account_To, person);
+		panel = new Account_Send_Panel(asset, account, account_To, person);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		this.setTitle(Lang.getInstance().translate("Send"));
 		this.setResizable(true);
@@ -34,8 +36,21 @@ public class Account_Send_Dialog extends JDialog {
 		setModal(true);
 		this.pack();
 		this.setLocationRelativeTo(null);
-		this.setVisible(true);
+		this.setVisible(false);
 
+	}
+	public void  sertParams(String ammount, String title, String message){
+		
+		panel.txtAmount.setText(ammount);
+		panel.txtMessage.setText(title);
+		panel.txt_Title.setText(message);
+		
+	}
+	
+	public void setNoRecive(boolean noR){
+		
+		panel.noRecive = noR;
+		
 	}
 
 }

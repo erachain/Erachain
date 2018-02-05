@@ -7,6 +7,7 @@ import gui.items.assets.AssetsComboBoxModel;
 import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
+import gui.library.My_JFileChooser;
 import gui.models.AccountsComboBoxModel;
 import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
@@ -23,17 +24,23 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.DataFormatException;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JInternalFrame;
@@ -49,6 +56,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.mapdb.Fun.Tuple2;
 
@@ -59,6 +67,7 @@ import utils.MenuPopupUtil;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
+import utils.Zip_Bytes;
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -82,21 +91,22 @@ public class Account_Send_Panel extends JPanel
     
 	protected JComboBox<Account> cbxFrom;
 	protected JComboBox cbx_To;
-	protected JTextField txtTo;
-	protected JTextField txtAmount;
+	public JTextField txtTo;
+	public JTextField txtAmount;
 	protected JTextField txtFeePow;
 	protected JTextArea txtMessage;
 	protected JCheckBox encrypted;
 	protected JCheckBox isText;
 	protected MButton sendButton;
 	protected AccountsComboBoxModel accountsModel;
-	protected JComboBox<AssetCls> cbxFavorites;
+	public JComboBox<AssetCls> cbxFavorites;
 	protected JTextField txtRecDetails;
 	protected JLabel messageLabel;
 	int y;
-	private JTextField txt_Title;
+	public JTextField txt_Title;
 	PersonCls person;
 	private Transaction transaction;
+	public boolean noRecive = false;
 	
 	public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
 	{
@@ -827,6 +837,65 @@ public class Account_Send_Panel extends JPanel
 		
 	//	JOptionPane.OK_OPTION
 		if (dd.isConfirm){
+			
+			if(noRecive){
+				
+			//	String raw = Base58.encode(transaction.toBytes(false, null));
+				My_JFileChooser chooser = new My_JFileChooser();
+  			chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
+  			//chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+  			chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+  			chooser.setMultiSelectionEnabled(false);
+  			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+  			//FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
+  			//chooser.setFileFilter(filter);
+  			
+  			//chooser.setAcceptAllFileFilterUsed(false); 
+  			
+  			 if ( chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
+  	          
+  				String pp = chooser.getSelectedFile().getPath();
+  				
+  				File ff = new File (pp);
+  				// if file  
+  				if (ff.exists() && ff.isFile()) {
+  					int aaa = JOptionPane.showConfirmDialog(chooser, Lang.getInstance().translate("File")  +  Lang.getInstance().translate("Exists") + "! " + Lang.getInstance().translate("Overwrite") + "?",  Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE );
+  				System.out.print("\n gggg " + aaa);	
+  				if (aaa != 0){
+  					return;
+  				}
+  				ff.delete();
+  				
+  				}
+  				
+  				 try ( FileWriter fw = new FileWriter(ff) ) {
+  	                fw.write(transaction.toJson().toJSONString());
+  	            }
+  	            catch ( IOException e ) {
+  	                System.out.println("Всё погибло!");
+  	            }
+  				
+  			/*	 try(FileOutputStream fos=new FileOutputStream(pp))
+  		        {
+  		            // перевод строки в байты
+  				//	String ssst = model.getValueAt(row, 2).toString();
+  		            byte[] buffer =transaction.toBytes(false, null);
+  		            // if ZIP
+  		           
+  		            fos.wri.write(buffer, 0, buffer.length);
+  		          		        
+  		        }
+  		        catch(IOException ex){
+  
+  		            System.out.println(ex.getMessage());
+  		        } 
+  	          */ 
+  	        }
+  			
+  		//	JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("File save"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+  						
+				
+			}else{
 		
 		
 		
@@ -859,6 +928,7 @@ public class Account_Send_Panel extends JPanel
 			}
 		} else {		
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		}
 		}
 		}
 		//ENABLE

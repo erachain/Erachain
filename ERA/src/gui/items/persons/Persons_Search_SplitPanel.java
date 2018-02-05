@@ -31,7 +31,7 @@ public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
-				new Account_Send_Dialog(null, null, null, (PersonCls) th.item_Menu);
+				new Account_Send_Dialog(null, null, null, (PersonCls) th.item_Menu).show();
 			}
 		});
 

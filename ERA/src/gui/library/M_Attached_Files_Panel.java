@@ -126,7 +126,8 @@ public class M_Attached_Files_Panel extends JPanel{
   			
   			
   			
-			}});
+			}
+		});
     	
     	menu.add(vsend_Coins_Item);
     	

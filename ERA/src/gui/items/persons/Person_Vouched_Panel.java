@@ -212,7 +212,7 @@ menu.addAncestorListener(new AncestorListener(){
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Account account =(Account) model.get_Public_Account(row);
-				new Account_Send_Dialog(null, null, account, null);
+				new Account_Send_Dialog(null, null, account, null).show();;
 
 			}
 		});

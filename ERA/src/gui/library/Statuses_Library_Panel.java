@@ -178,7 +178,7 @@ public Statuses_Library_Panel(PersonCls person){
 	Send_Coins_item_Menu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Account account = statusModel.get_Creator_Account(row);
-			new Account_Send_Dialog(null, null, account, null);
+			new Account_Send_Dialog(null, null, account, null).show();
 
 		}
 	});
