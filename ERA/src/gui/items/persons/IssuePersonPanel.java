@@ -492,7 +492,7 @@ public class IssuePersonPanel extends JPanel
         mainScrollPane1 = new javax.swing.JScrollPane();
         add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image (%1% - %2% bytes)")
         		.replace("%1%", "" + (IssuePersonRecord.MAX_IMAGE_LENGTH - (IssuePersonRecord.MAX_IMAGE_LENGTH>>2)))
-        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350,0);
+        		.replace("%2%", "" + IssuePersonRecord.MAX_IMAGE_LENGTH), 350,350);
         alive_CheckBox = new JCheckBox();
     	
         this.issueButton.addActionListener(new ActionListener()

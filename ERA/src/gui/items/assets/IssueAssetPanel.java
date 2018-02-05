@@ -135,9 +135,9 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         txtFeePow = new javax.swing.JTextField();
         issue_jButton = new javax.swing.JButton();
         // size from widht
-        add_Image_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Image (max %1%kB)").replace("%1%", "1024"), 250 , 0); 
+        add_Image_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Image (max %1%kB)").replace("%1%", "1024"), 250 , 250); 
         // size from height
-        add_Logo_Icon_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 0 , 50);
+        add_Logo_Icon_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50 , 50);
 
         setLayout(new java.awt.GridBagLayout());
 
