@@ -35,6 +35,7 @@ public abstract class ImageCropDialog extends JDialog {
         setContentPane(contentPanel);
 
         pack();
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setResizable(false);
         setModal(true);
         setVisible(true);
