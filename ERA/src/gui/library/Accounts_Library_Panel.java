@@ -183,7 +183,7 @@ public class Accounts_Library_Panel extends JPanel {
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				Account account = person_Accounts_Model.getAccount(row);
-				new Account_Send_Dialog(null, null, account, null);
+				new Account_Send_Dialog(null, null, account, null).show();;
 
 			}
 		});

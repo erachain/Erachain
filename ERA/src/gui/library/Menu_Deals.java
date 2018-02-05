@@ -43,7 +43,7 @@ public class Menu_Deals extends JMenu {
 		        	public void actionPerformed(ActionEvent e)
 		        	{
 		        		// 
-		        		new Account_Send_Dialog(null, null,null,null);
+		        		new Account_Send_Dialog(null, null,null,null).show();;
 		        	}
 		        });
 		       add(dealsMenuSendMessage);

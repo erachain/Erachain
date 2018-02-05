@@ -133,7 +133,7 @@ menu.addAncestorListener(new AncestorListener(){
 		JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
 		Send_Coins_item_Menu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new Account_Send_Dialog(null, null,null, person_Accounts_Model.getPerson(row));
+				new Account_Send_Dialog(null, null,null, person_Accounts_Model.getPerson(row)).show();;
 
 			}
 		});
