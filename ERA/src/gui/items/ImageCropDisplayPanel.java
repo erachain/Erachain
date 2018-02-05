@@ -132,7 +132,7 @@ public class ImageCropDisplayPanel extends JPanel {
 
 
     public BufferedImage getSnapshot() {
-        BufferedImage snapshot = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+        BufferedImage snapshot = new BufferedImage(Math.max(image.getWidth(), cropX + cropWidth), Math.max(image.getHeight(), cropY + cropHeight), image.getType());
         Graphics2D g2d = (Graphics2D)snapshot.getGraphics();
         g2d.scale(zoom, zoom);
         g2d.drawImage(image, imageX, imageY, this);
