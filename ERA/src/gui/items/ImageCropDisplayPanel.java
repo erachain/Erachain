@@ -15,9 +15,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ImageCropDisplayPanel extends JPanel {
-    private final int cropX;
+    private int cropX;
     private final int cropY;
-    private final int cropWidth;
+    private int cropWidth;
+    private final int originalCropWidth;
     private final int cropHeight;
     private BufferedImage image;
     private int imageX;
@@ -34,6 +35,7 @@ public class ImageCropDisplayPanel extends JPanel {
         setPreferredSize(new Dimension(600, 500));
 
         this.cropWidth = cropWidth;
+        this.originalCropWidth = cropWidth;
         this.cropHeight = cropHeight;
         this.cropX = getPreferredSize().width / 2 - cropWidth / 2;
         this.cropY = getPreferredSize().height / 2 - cropHeight / 2;
@@ -131,32 +133,41 @@ public class ImageCropDisplayPanel extends JPanel {
     }
 
 
+    public void setFrameRate(int value)
+    {
+        cropWidth = originalCropWidth - originalCropWidth * value / 100;
+        cropX = getPreferredSize().width / 2 - cropWidth / 2;
+        moveImageBy(0, 0);
+    }
+
+
     public BufferedImage getSnapshot() {
         BufferedImage snapshot = new BufferedImage(Math.max(image.getWidth(), cropX + cropWidth), Math.max(image.getHeight(), cropY + cropHeight), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = (Graphics2D)snapshot.getGraphics();
         g2d.scale(zoom, zoom);
         g2d.drawImage(image, imageX, imageY, this);
-        int subLeft = cropX;
-        int subTop = cropY;
-        int subRight = cropX + cropWidth;
-        int subBottom = cropY + cropHeight;
-        if ((imageX > subLeft) && (imageX < subRight) && (imageX - subLeft < 0.15 * cropWidth))
-        {
-            subLeft = imageX;
-        }
-        if ((imageY > subTop) && (imageY < subBottom) && (imageY - subTop < 0.15 * cropHeight))
-        {
-            subTop = imageY;
-        }
-        if ((imageX + image.getWidth() > subLeft) && (imageX + image.getWidth() < subRight) && (subRight - imageX - image.getWidth() < 0.15 * cropWidth))
-        {
-            subRight = imageX + image.getWidth();
-        }
-        if ((imageY + image.getHeight() > subTop) && (imageY + image.getHeight() < subBottom) && (subBottom - imageY - image.getHeight() < 0.15 * cropHeight))
-        {
-            subBottom = imageY + image.getHeight();
-        }
-        return snapshot.getSubimage(subLeft, subTop, subRight - subLeft, subBottom - subTop);
+//        int subLeft = cropX;
+//        int subTop = cropY;
+//        int subRight = cropX + cropWidth;
+//        int subBottom = cropY + cropHeight;
+//        if ((imageX > subLeft) && (imageX < subRight) && (imageX - subLeft < 0.15 * cropWidth))
+//        {
+//            subLeft = imageX;
+//        }
+//        if ((imageY > subTop) && (imageY < subBottom) && (imageY - subTop < 0.15 * cropHeight))
+//        {
+//            subTop = imageY;
+//        }
+//        if ((imageX + image.getWidth() > subLeft) && (imageX + image.getWidth() < subRight) && (subRight - imageX - image.getWidth() < 0.15 * cropWidth))
+//        {
+//            subRight = imageX + image.getWidth();
+//        }
+//        if ((imageY + image.getHeight() > subTop) && (imageY + image.getHeight() < subBottom) && (subBottom - imageY - image.getHeight() < 0.15 * cropHeight))
+//        {
+//            subBottom = imageY + image.getHeight();
+//        }
+//        return snapshot.getSubimage(subLeft, subTop, subRight - subLeft, subBottom - subTop);
+        return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
     }
 
 
