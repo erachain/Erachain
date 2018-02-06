@@ -558,15 +558,15 @@ public class Synchronizer {
 			LOGGER.debug("findHeaders try found COMMON header" + " founded headers: " + headers.size());
 
 			if (headers.size() > 1) {
-				if (maxChainHeight == checkPointHeight) {
-					String mess = "Dishonest peer by headers.size > 1 " + peer.getAddress().getHostAddress();
+				if (maxChainHeight < checkPointHeight) {
+					String mess = "Dishonest peer by maxChainHeight < checkPointHeight " + peer.getAddress().getHostAddress();
 					peer.ban(BAN_BLOCK_TIMES, mess);
 					throw new Exception(mess);
 				}
 				break;
 			}
 
-			if (step < 1000)
+			if (step < 10000)
 				step <<= 1;
 
 		} while (maxChainHeight > checkPointHeight && headers.isEmpty());
