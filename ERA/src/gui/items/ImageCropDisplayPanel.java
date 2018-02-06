@@ -132,11 +132,31 @@ public class ImageCropDisplayPanel extends JPanel {
 
 
     public BufferedImage getSnapshot() {
-        BufferedImage snapshot = new BufferedImage(Math.max(image.getWidth(), cropX + cropWidth), Math.max(image.getHeight(), cropY + cropHeight), image.getType());
+        BufferedImage snapshot = new BufferedImage(Math.max(image.getWidth(), cropX + cropWidth), Math.max(image.getHeight(), cropY + cropHeight), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = (Graphics2D)snapshot.getGraphics();
         g2d.scale(zoom, zoom);
         g2d.drawImage(image, imageX, imageY, this);
-        return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
+        int subLeft = cropX;
+        int subTop = cropY;
+        int subRight = cropX + cropWidth;
+        int subBottom = cropY + cropHeight;
+        if ((imageX > subLeft) && (imageX < subRight) && (imageX - subLeft < 0.15 * cropWidth))
+        {
+            subLeft = imageX;
+        }
+        if ((imageY > subTop) && (imageY < subBottom) && (imageY - subTop < 0.15 * cropHeight))
+        {
+            subTop = imageY;
+        }
+        if ((imageX + image.getWidth() > subLeft) && (imageX + image.getWidth() < subRight) && (subRight - imageX - image.getWidth() < 0.15 * cropWidth))
+        {
+            subRight = imageX + image.getWidth();
+        }
+        if ((imageY + image.getHeight() > subTop) && (imageY + image.getHeight() < subBottom) && (subBottom - imageY - image.getHeight() < 0.15 * cropHeight))
+        {
+            subBottom = imageY + image.getHeight();
+        }
+        return snapshot.getSubimage(subLeft, subTop, subRight - subLeft, subBottom - subTop);
     }
 
 
