@@ -281,6 +281,9 @@ public class Peer extends Thread{
 				LOGGER.error(e.getMessage(), e);
 				LOGGER.debug("Failed to connect to : " + address + " on step: " + step);
 			}
+			
+			return;
+			
 		}
 
 		if (this.pinger == null) {
