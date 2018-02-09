@@ -156,7 +156,8 @@ public class BlockChain
 			LOGGER.info( ((GenesisBlock)genesisBlock).getTestNetInfo() );
 		}
 		
-		if(	!dcSet.getBlockSignsMap().contains(genesisBlock.getSignature()) )
+		int height = dcSet.getBlockMap().size();
+		if(height == 0 )
 		// process genesis block
 		{
 			if(dcSet_in == null && dcSet.getBlockMap().getLastBlockSignature() != null)
@@ -173,6 +174,12 @@ public class BlockChain
 
         	//PROCESS
         	genesisBlock.process(dcSet);
+
+        } else {
+			if (!dcSet.getBlockSignsMap().contains(genesisBlock.getSignature()) ) {
+				
+				throw new Exception("wrong DB for GENESIS BLOCK");
+			}
 
         }
 		

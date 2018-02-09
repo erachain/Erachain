@@ -352,7 +352,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs", 3), //
 					Arrays.asList("7NLEQV71W4X9YqopA15k5VNk2WFiKc3ePE", 1),
 					Arrays.asList("7MJyC8L6AQGtckhJaF4BS1MiMQHBeuk5ss", 1),
-					Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1),
+					Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1), //// 11111
 					Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 1),
 					
 					Arrays.asList("7RVngd4icw21J1ePCg8977sBetgQFARBUL", 1),
