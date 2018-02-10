@@ -4535,10 +4535,10 @@ if ( asset_1 == null) {
 	public int getHeight() {
 		
 		//GET LAST BLOCK
-		byte[] lastBlockSignature = DCSet.getInstance().getBlockMap().getLastBlockSignature();
-		
+		//byte[] lastBlockSignature = DCSet.getInstance().getBlockMap().getLastBlockSignature();
 		//RETURN HEIGHT
-		return DCSet.getInstance().getBlockSignsMap().getHeight(lastBlockSignature);
+		//return DCSet.getInstance().getBlockSignsMap().getHeight(lastBlockSignature);
+		return DCSet.getInstance().getBlockMap().size();
 	}
 	public Tuple2<Integer, Long> getHWeightFull() {
 		

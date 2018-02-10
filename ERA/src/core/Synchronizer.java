@@ -111,11 +111,11 @@ public class Synchronizer {
 			countTransactionToOrphan += lastBlock.getTransactionCount();
 			lastBlock.orphan(fork);
 
-			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned!");
+			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
 			lastBlock = blockMap.last();
 		}
 
-		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastHeight + "]");
+		LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastBlock.getHeight(fork) + "]");
 
 		// VALIDATE THE NEW BLOCKS
 
@@ -128,18 +128,43 @@ public class Synchronizer {
 		LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
 		for (Block block : newBlocks) {
-			int heigh = block.getHeightByParent(fork);
-			LOGGER.debug("*** checkNewBlocks - VALIDATE [" + heigh + "]");
+			int height = block.getHeightByParent(fork);
+			
+			if (height == fork.getBlockMap().size()) {
+				if (Arrays.equals(block.getSignature(), fork.getBlockMap().getLastBlockSignature())) {
+					LOGGER.error("*** checkNewBlocks - already LAST! [" + height + "] "
+							+ Base58.encode(block.getSignature())
+							+ " from peer: " + peer.getAddress());
+					continue;
+				} else {
+					String mess = "*** checkNewBlocks - already LAST and not equal SIGN! [" + height + "] "
+							+ Base58.encode(block.getSignature())
+							+ " from peer: " + peer.getAddress();
+					peer.ban(BAN_BLOCK_TIMES>>3, mess);					
+					throw new Exception(mess);
+				}
+			} else {
+				//Tuple2<Integer, Long> item = fork.getBlockSignsMap().get(block);
+				if (fork.getBlockSignsMap().contains(block.getSignature())) {
+				LOGGER.error("*** checkNewBlocks - DUPLICATE SIGN! [" + height + "] "
+						+ Base58.encode(block.getSignature())		
+						+ " from peer: " + peer.getAddress());
+				continue;
+					
+				}
+			}
+			
+			LOGGER.debug("*** checkNewBlocks - VALIDATE [" + height + "]");
 
 			// CHECK IF VALID
 			if (block.isSignatureValid() && block.isValid(fork, true)) {
 				// PROCESS TO VALIDATE NEXT BLOCKS
 				// runedBlock = block;
 				/// already in Validate block.process(fork);
-				if (checkFullWeight && myHeight == heigh) {
+				if (checkFullWeight && myHeight == height) {
 					if (myWeight >= fork.getBlockSignsMap().getFullWeight()) {
 						// INVALID BLOCK THROW EXCEPTION
-						String mess = "Dishonest peer by weak FullWeight, heigh: " + heigh;
+						String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
 						if (cnt.getActivePeersCounter() + 4 > Settings.getInstance().getMaxConnections())
 							peer.ban(BAN_BLOCK_TIMES, mess);
 						else
@@ -155,7 +180,7 @@ public class Synchronizer {
 				// block.isValid(fork);
 
 				// INVALID BLOCK THROW EXCEPTION
-				String mess = "Dishonest peer by not is Valid block, heigh: " + heigh;
+				String mess = "Dishonest peer by not is Valid block, heigh: " + height;
 				peer.ban(BAN_BLOCK_TIMES, mess);
 				throw new Exception(mess);
 			}
@@ -209,17 +234,27 @@ public class Synchronizer {
 				orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);
 			}
 			LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
-			LOGGER.debug("*** synchronize - orphan block...");
+			LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
 			this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
 			lastBlock = dcSet.getBlockMap().last();
 		}
 
+		LOGGER.debug("*** chain size after orphan " + dcSet.getBlockMap().size());
+
+		
 		// PROCESS THE NEW BLOCKS
 		LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
 		for (Block block : newBlocks) {
 
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
+
+			if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
+				LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeightByParent(dcSet) + "] "
+						+ Base58.encode(block.getSignature())		
+						+ " from peer: " + peer.getAddress());
+				continue;
+			}
 
 			// SYNCHRONIZED PROCESSING
 			LOGGER.debug("*** begin PIPE");
@@ -498,7 +533,8 @@ public class Synchronizer {
 
 		// int myChainHeight =
 		// Controller.getInstance().getBlockChain().getHeight();
-		int maxChainHeight = dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
+		//int maxChainHeight = dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
+		int maxChainHeight = dcSet.getBlockMap().size();
 		if (maxChainHeight < checkPointHeight) {
 			String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight + "\n -> not found";
 			peer.ban(BAN_BLOCK_TIMES, mess);

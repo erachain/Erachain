@@ -955,7 +955,7 @@ public class Controller extends Observable {
 
 	public void broadcastUnconfirmedToPeer(Peer peer) {
 		
-		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
+		//LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
 
 		byte[] peerByte = peer.getAddress().getAddress();
 
@@ -1043,7 +1043,7 @@ public class Controller extends Observable {
 		peer.tryPing(10000);
 		this.network.notifyObserveUpdatePeer(peer);
 
-		LOGGER.info(peer.getAddress() + " sended UNCONFIRMED  counter: " + counter);
+		//LOGGER.info(peer.getAddress() + " sended UNCONFIRMED  counter: " + counter);
 		
 	}
 	

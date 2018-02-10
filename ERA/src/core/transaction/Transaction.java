@@ -666,11 +666,11 @@ public abstract class Transaction {
 		if (block != null)
 			return block.getHeightByParent(dc);
 		
-		Tuple2<Integer, Long> hWeight = dc.getBlockSignsMap().get(dc.getBlockMap().getLastBlockSignature());
-		if (hWeight == null || hWeight.a == -1)
-			return -1;
-
-		return hWeight.a + 1;
+		//Tuple2<Integer, Long> hWeight = dc.getBlockSignsMap().get(dc.getBlockMap().getLastBlockSignature());
+		//if (hWeight == null || hWeight.a == -1)
+		//	return -1;
+		//return hWeight.a + 1;
+		return dc.getBlockMap().size() + 1;
 	}
 
 	public int getSeqNo(DCSet db)
@@ -1188,16 +1188,17 @@ public abstract class Transaction {
 		}
 		
 		//CALCULATE CONFIRMATIONS
-		int lastBlockHeight = db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature());
+		//int lastBlockHeight = db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature());
 		//Block block = DBSet.getInstance().getTransactionRef_BlockRef_Map().getParent(this.signature);
 		Block block = this.getBlock(db);
 		
-		if (block == null)return 0;
+		if (block == null)
+			return 0;
 		
 		int transactionBlockHeight = db.getBlockSignsMap().getHeight(block);
 		
 		//RETURN
-		return 1 + lastBlockHeight - transactionBlockHeight;
+		return 1 + db.getBlockMap().size() - transactionBlockHeight;
 
 		} catch(Exception e) {
 			LOGGER.error(e.getMessage(),e);

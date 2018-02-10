@@ -250,8 +250,13 @@ public class R_Vouch extends Transaction {
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 			*/
 		Transaction tx = db.getTransactionFinalMap().getTransaction(height, seq);
-		if (tx == null )
-			return INVALID_BLOCK_TRANS_SEQ_ERROR;
+		if (tx == null ) {
+			if (height == 104841 && seq == 1) {
+				// "32tebyLDxbucXod4N4TAZZGCMqLJdXtDQuY4o1P4gxDBcBKkdCi41LdAxVD9Xzy3rmPQ41yHXtFJvhD6SPkrfaa3
+			} else {
+				return INVALID_BLOCK_TRANS_SEQ_ERROR;
+			}
+		}
 
 		return Transaction.VALIDATE_OK;
 		

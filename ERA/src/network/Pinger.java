@@ -71,7 +71,7 @@ public class Pinger extends Thread
 	
 	public boolean tryPing(long timeSOT) {
 		
-		LOGGER.info("try PING " + this.peer.getAddress());
+		//LOGGER.info("try PING " + this.peer.getAddress());
 
 		peer.addPingCounter();
 

@@ -131,8 +131,14 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
 		
-		if (heightBlock < 1)
-			heightBlock = db.getBlockSignsMap().get(this.signature).a;
+		if (heightBlock < 1) {
+			Tuple2<Integer, Long> item = db.getBlockSignsMap().get(this.signature);
+			if (item == null) {
+				heightBlock = -1;
+			} else {
+				heightBlock = item.a;				
+			}
+		}
 
 		return heightBlock;
 
@@ -1087,7 +1093,7 @@ public class Block {
 			return 1;			
 		}
 
-		if (height < 100400)
+		if (height < 104000)
 			return 0;
 
 		int repeatsMin;
@@ -1267,7 +1273,8 @@ public class Block {
 						LOGGER.debug("*** Block[" + height
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 						+ transaction.viewFullTypeName() + "]"
-						+ "signature not valid!");
+						+ "signature not valid!"
+						+ " " + Base58.encode(transaction.getSignature()));
 						return false;
 					}
 		
@@ -1279,16 +1286,20 @@ public class Block {
 						LOGGER.debug("*** Block[" + height
 							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 							+ transaction.viewFullTypeName() + "]"
-							+ "invalid code: " + transaction.isValid(validatingDC, null));
+							+ "invalid code: " + transaction.isValid(validatingDC, null)
+							+ " " + Base58.encode(transaction.getSignature()));
 						return false;
 					}
 		
 					//CHECK TIMESTAMP AND DEADLINE
 					long transactionTimestamp = transaction.getTimestamp();
 					if( transactionTimestamp > timestampEnd
-							|| transaction.getDeadline() <= timestampBeg)
+							//|| transaction.getDeadline() <= timestampBeg
+							&& height > 105999
+							)
 					{
-						LOGGER.debug("*** Block[" + height + "].TX.timestamp invalid");
+						LOGGER.debug("*** Block[" + height + "].TX.timestamp invalid "
+								+ Base58.encode(transaction.getSignature()));
 						return false;
 					}
 
@@ -1445,7 +1456,10 @@ public class Block {
 
 		//ADD TO DB
 		long timerStart = System.currentTimeMillis();
-		dcSet.getBlockMap().add(this);
+		
+		if (dcSet.getBlockMap().add(this))
+			throw new Exception("block already exist!!");
+		
 		LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
 		
 		this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);

@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.crypto.Base58;
 import core.transaction.Transaction;
 import database.serializer.BlockSerializer;
 import settings.Settings;
@@ -247,6 +248,14 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();
 
+		byte[] signature = block.getSignature();
+		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(signature);
+		if (item != null && item.a > 0) {
+			LOGGER.error("already EXIST : " + this.key
+					+ " SIGN: " + Base58.encode(signature));
+			return true;
+		}
+
 		// INCREMENT ATOMIC KEY IF EXISTS
 		if (this.atomicKey != null) {
 			this.atomicKey.incrementAndGet();
@@ -256,7 +265,6 @@ public class BlockMap extends DCMap<Integer, Block> {
 		this.key++;		
 		int height = this.key;
 
-		byte[] signature = block.getSignature();
 		// calc before insert record
 		int win_value = block.calcWinValueTargeted(dcSet);
 
@@ -288,6 +296,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	}
 	
+	/*
+	public boolean set(int height, Block block) {
+		return false;
+	}
+	*/
+	
 	// TODO make CHAIN deletes - only for LAST block!
 	public void remove(byte[] signature, byte[] reference) {
 		DCSet dcSet = getDCSet();
@@ -304,6 +318,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 			PublicKeyAccount creator = new PublicKeyAccount(creatorByte);
 			// INITIAL forging DATA no need remove!
 			creator.delForgingData(dcSet, height);
+			// 		db.getAddressForging().delete(this.address, height);
+
 
 			dcSet.getBlockHeightsMap().remove();
 			dcSet.getBlockCreatorMap().remove();
@@ -321,7 +337,13 @@ public class BlockMap extends DCMap<Integer, Block> {
 		--this.key;
 
 	}
-	
+
+	/*
+	public void delete(int height) {
+		//return ;
+	}
+	*/
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Collection<Integer> getGeneratorBlocks(String address)
 	{

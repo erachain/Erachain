@@ -242,8 +242,9 @@ public class BlockChain
 	public static int getHeight(DCSet dcSet) {
 		
 		//GET LAST BLOCK
-		byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
-		return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
+		///byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
+		///return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
+		return dcSet.getBlockMap().size();
 	}
 
 	/*

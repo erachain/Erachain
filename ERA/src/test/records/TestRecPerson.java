@@ -781,7 +781,7 @@ public class TestRecPerson {
 		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-		assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+		assertEquals(false, userAccount2.isPerson(db, db.getBlockMap().size()));
 		assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
 		
 		initPersonalize();

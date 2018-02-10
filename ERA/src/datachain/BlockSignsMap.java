@@ -70,7 +70,8 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Long>>
 	@Override
 	protected Tuple2<Integer, Long> getDefaultValue() 
 	{
-		return new Tuple2<Integer, Long>(-1,-1L);
+		//return new Tuple2<Integer, Long>(-1,-1L);
+		return null;
 	}
 	
 	public Long getFullWeight() {

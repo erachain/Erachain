@@ -82,6 +82,7 @@ public abstract class TransactionAmount extends Transaction {
 			Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
 			Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
 			Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
+			Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
 			};
 	private static final Long[] VALID_REF = new Long[]{
 			1496474042552L
@@ -479,7 +480,16 @@ public abstract class TransactionAmount extends Transaction {
 						//
 					} else if (absKey == FEE_KEY) {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
-							return NO_BALANCE;
+							boolean ok = true;
+							for ( byte[] valid_item: VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									ok = false;
+									break;
+								}
+							}
+							
+							if (ok)
+								return NO_BALANCE;
 						}
 						
 					} else {
