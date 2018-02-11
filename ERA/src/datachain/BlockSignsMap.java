@@ -58,6 +58,7 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Long>>
 		return database.createTreeMap("height")
 			.keySerializer(BTreeKeySerializer.BASIC)
 			.comparator(UnsignedBytes.lexicographicalComparator())
+			.counterEnable()
 			.makeOrGet();
 	}
 

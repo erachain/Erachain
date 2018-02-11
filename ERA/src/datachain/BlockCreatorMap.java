@@ -37,6 +37,7 @@ public class BlockCreatorMap extends AutoIntegerByte
 		//OPEN MAP
 		return database.createTreeMap(NAME)
 				.keySerializer(BTreeKeySerializer.BASIC)
+				.counterEnable()
 				.makeOrGet();
 	}
 	

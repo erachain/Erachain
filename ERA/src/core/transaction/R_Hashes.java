@@ -14,6 +14,7 @@ import java.util.HashSet;
 //import java.util.Map;
 //import org.apache.log4j.Logger;
 import java.util.List;
+import java.util.Stack;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -139,9 +140,9 @@ public class R_Hashes extends Transaction {
 	
 	}
 
-	public static byte[] findRecord(DCSet db, byte[] hash) 
+	public static Stack<Tuple3<Long, Integer, Integer>> findRecord(DCSet db, byte[] hash) 
 	{
-		return db.getHashesMap().get(hash);
+		return db.getHashesSignsMap().get(hash);
 	}
 	
 	// find twins before insert a record
@@ -149,7 +150,7 @@ public class R_Hashes extends Transaction {
 	{
 		List<String> twins = new ArrayList<String>();
 		for (String hash58: hashes58) {
-			if (db.getHashesMap().contains(Base58.decode(hash58))) {
+			if (db.getHashesSignsMap().contains(Base58.decode(hash58))) {
 				twins.add(hash58);
 			}
 		}
@@ -159,7 +160,7 @@ public class R_Hashes extends Transaction {
 	{
 		List<String> twins = new ArrayList<String>();
 		for (String hash58: hashes58) {
-			if (db.getHashesMap().contains(Base58.decode(hash58))) {
+			if (db.getHashesSignsMap().contains(Base58.decode(hash58))) {
 				twins.add(hash58);
 			}
 		}
@@ -388,6 +389,7 @@ public class R_Hashes extends Transaction {
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 		
 		int transactionIndex = -1;
+		/*
 		int blockIndex = -1;
 		if (block == null) {
 			blockIndex = dcSet.getBlockMap().last().getHeight(dcSet);
@@ -399,6 +401,7 @@ public class R_Hashes extends Transaction {
 			}			
 			transactionIndex = block.getTransactionSeq(signature);
 		}
+		*/
 
 		long personKey;
 		Tuple2<Integer, PersonCls> asPerson = this.creator.getPerson(dcSet, height);
@@ -410,7 +413,7 @@ public class R_Hashes extends Transaction {
 		
 		HashesSignsMap map = dcSet.getHashesSignsMap();
 		for (byte[] hash: hashes) {
-			map.addItem(hash, new Tuple3<Long, Integer, Integer>(personKey, blockIndex, transactionIndex));
+			map.addItem(hash, new Tuple3<Long, Integer, Integer>(personKey, height, transactionIndex));
 		}
 	}
 
