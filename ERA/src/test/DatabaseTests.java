@@ -210,7 +210,12 @@ public class DatabaseTests {
 	public void databaseAssets()
 	{
 		
-		DCSet.reCreateDatabase(false, false);
+		try {
+			DCSet.reCreateDatabase(false, false);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 				
 		GenesisBlock gb = new GenesisBlock();
 		try {

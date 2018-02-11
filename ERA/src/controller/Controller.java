@@ -116,7 +116,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
-	private static final String version = "4.8.02 alpha";
+	private static final String version = "4.9.01 alpha";
 	private static final String buildTime = "2017-11-19 15:33:33 UTC";
 	private static long buildTimestamp;
 	public final static long MIN_MEMORY_TAIL = 50000000;
@@ -696,7 +696,7 @@ public class Controller extends Observable {
 		return this.dbSet;
 	}
 
-	public void startFromScratchOnDemand() throws IOException {
+	public void startFromScratchOnDemand() throws IOException, Exception {
 		String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
 
 		if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
