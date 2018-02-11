@@ -12,17 +12,13 @@ import com.google.common.primitives.UnsignedBytes;
 import core.transaction.Transaction;
 import datachain.DCSet;
 
-public class Issue_ItemMap extends DCMap<byte[], Long> 
+public abstract class Issue_ItemMap extends DCMap<byte[], Long> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 	
-	protected String name;
-
-	public Issue_ItemMap(DCSet databaseSet, DB database, String name)
+	public Issue_ItemMap(DCSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		this.name = name;
-
 	}
 
 	public Issue_ItemMap(Issue_ItemMap parent) 
@@ -31,16 +27,6 @@ public class Issue_ItemMap extends DCMap<byte[], Long>
 	}
 	
 	protected void createIndexes(DB database){}
-
-	@Override
-	protected Map<byte[], Long> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap(this.name + "_OrphanData")
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.comparator(UnsignedBytes.lexicographicalComparator())
-				.makeOrGet();
-	}
 
 	@Override
 	protected Map<byte[], Long> getMemoryMap() 

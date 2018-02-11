@@ -18,11 +18,23 @@ public class IssueTemplateMap extends Issue_ItemMap
 	
 	public IssueTemplateMap(DCSet databaseSet, DB database)
 	{
-		super(databaseSet, database, "template");
+		super(databaseSet, database);
 	}
 
 	public IssueTemplateMap(IssueTemplateMap parent) 
 	{
 		super(parent);
 	}
+	
+	@Override
+	protected Map<byte[], Long> getMap(DB database) 
+	{
+		//OPEN MAP
+		return database.createTreeMap("template_OrphanData")
+				.keySerializer(BTreeKeySerializer.BASIC)
+				.comparator(UnsignedBytes.lexicographicalComparator())
+				.counterEnable()
+				.makeOrGet();
+	}
+	
 }
