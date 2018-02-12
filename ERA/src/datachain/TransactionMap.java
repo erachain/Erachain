@@ -322,15 +322,6 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	}
 
-	/* .counterEnable()!
-	@Override
-	public int size() {
-		if (parent == null)
-			return (int) this.getDCSet().getUncTxCounter();
-		return -1;
-	}
-	*/
-
 	public void delete(byte[] signature) {
 
 		// delete BROADCASTS

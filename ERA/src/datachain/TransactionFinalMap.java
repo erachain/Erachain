@@ -472,16 +472,6 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
 	}
 
-	/* .counterEnable()!
-	@Override
-	public int size() {
-		if (parent == null)
-			return (int) this.getDCSet().getTxCounter();
-
-		return -1;
-	}
-	*/
-
 	public Transaction getTransaction(byte[] seg) {
 		return this.get(getDCSet().getTransactionFinalMapSigns().get(seg));
 
