@@ -104,7 +104,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		// OPEN MAP
 		return database.createTreeMap("transactions").keySerializer(BTreeKeySerializer.BASIC)
 				.comparator(UnsignedBytes.lexicographicalComparator()).valueSerializer(new TransactionSerializer())
-				.counterEnable().makeOrGet();
+				.counterEnable()
+				.makeOrGet();
 	}
 
 	@Override
@@ -321,12 +322,14 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	}
 
+	/* .counterEnable()!
 	@Override
 	public int size() {
 		if (parent == null)
 			return (int) this.getDCSet().getUncTxCounter();
 		return -1;
 	}
+	*/
 
 	public void delete(byte[] signature) {
 

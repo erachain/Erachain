@@ -436,7 +436,7 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		int result = super.isValid(dcSet, releaserReference);
 		if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
-			long personsCount = dcSet.getItemPersonMap().getSize();
+			long personsCount = dcSet.getItemPersonMap().getLastKey();
 			if (personsCount < 20) {
 				// FIRST Persons only by ME
 				// FIRST Persons only by ADMINS

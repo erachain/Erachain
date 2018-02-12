@@ -57,19 +57,19 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 	public Item_Map(Item_Map parent) {
 		super(parent, null);
 
-		this.key = parent.getSize();
+		this.key = parent.getLastKey();
 	}
 
-	public long getSize() {
+	public long getLastKey() {
 		return this.key;
 	}
 
-	public void setSize(long size) {
+	public void setLastKey(long key) {
 		// INCREMENT ATOMIC KEY IF EXISTS
 		if (this.atomicKey != null) {
-			this.atomicKey.set(size);
+			this.atomicKey.set(key);
 		}
-		this.key = size;
+		this.key = key;
 	}
 
 	protected void createIndexes(DB database) {

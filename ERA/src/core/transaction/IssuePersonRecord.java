@@ -142,7 +142,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		boolean creator_admin = false;
 		int res = super.isValid(db, releaserReference);
 		if ( res == Transaction.CREATOR_NOT_PERSONALIZED) {
-			long count = db.getItemPersonMap().getSize();
+			long count = db.getItemPersonMap().getLastKey();
 			if (count < 20) {
 				// FIRST Persons only by ME
 				// FIRST Persons only by ADMINS

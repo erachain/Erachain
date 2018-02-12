@@ -1049,7 +1049,7 @@ public class API {
 	@Path("assetheight")
 	public Response assetHeight() {
 		
-		long height = dcSet.getItemAssetMap().getSize();
+		long height = dcSet.getItemAssetMap().getLastKey();
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -1173,7 +1173,7 @@ public class API {
 	@Path("personheight")
 	public Response personHeight() {
 		
-		long height = dcSet.getItemPersonMap().getSize();
+		long height = dcSet.getItemPersonMap().getLastKey();
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")

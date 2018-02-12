@@ -191,7 +191,7 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.getSize();
+		long key = dbMap.getLastKey();
 		return key;
 		
 	}
@@ -433,10 +433,10 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.getSize();
+		long key = dbMap.getLastKey();
 		if (key < startKey) {
 			// IF this not GENESIS issue - start from 1000
-			dbMap.setSize(startKey);
+			dbMap.setLastKey(startKey);
 		}
 		key = dbMap.add(this);
 		

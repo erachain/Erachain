@@ -1973,7 +1973,7 @@ if ( asset_1 == null) {
 		int counter = start; 
  */
 				
-		long maxRow = DCSet.getInstance().getItemPersonMap().getSize(); 
+		long maxRow = DCSet.getInstance().getItemPersonMap().getLastKey(); 
 		long view_Row = 21;	
 			Long startRow;
 			try {
@@ -2060,7 +2060,7 @@ if ( asset_1 == null) {
 		}
 		while(i > k);
 		
-		output.put("maxHeight",DCSet.getInstance().getItemPersonMap().getSize());
+		output.put("maxHeight",DCSet.getInstance().getItemPersonMap().getLastKey());
 		output.put("row", i);
 		output.put("view_Row", view_Row);
 		

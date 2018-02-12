@@ -80,7 +80,9 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	private Map<Tuple2<Integer, Integer>, Transaction> openMap(DB database) {
 
 		BTreeMap<Tuple2<Integer, Integer>, Transaction> map = database.createTreeMap("height_seq_transactions")
-				.keySerializer(BTreeKeySerializer.TUPLE2).valueSerializer(new TransactionSerializer()).makeOrGet();
+				.keySerializer(BTreeKeySerializer.TUPLE2).valueSerializer(new TransactionSerializer())
+				.counterEnable()
+				.makeOrGet();
 
 		this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
@@ -470,6 +472,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
 	}
 
+	/* .counterEnable()!
 	@Override
 	public int size() {
 		if (parent == null)
@@ -477,6 +480,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
 		return -1;
 	}
+	*/
 
 	public Transaction getTransaction(byte[] seg) {
 		return this.get(getDCSet().getTransactionFinalMapSigns().get(seg));
