@@ -2,6 +2,7 @@ package core.block;
 
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -1152,10 +1153,12 @@ public class Block {
 		}
 
 		// TODO - show it to USER
-		long myTime = this.getTimestamp(dcSet); 
+		long myTime = this.getTimestamp(dcSet);
+		//LOGGER.debug("*** Block[" + height + "] " + new Timestamp(myTime));
+		
 		if(myTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
 			LOGGER.debug("*** Block[" + height + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-					+ NTP.getTime() + " \n diff sec: " + (this.getTimestamp(dcSet) - NTP.getTime())/1000);
+					+ NTP.getTime() + " \n " +  new Timestamp(myTime) + " diff sec: " + (this.getTimestamp(dcSet) - NTP.getTime())/1000);
 			return false;			
 		}
 		
