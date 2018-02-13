@@ -524,6 +524,7 @@ public class Synchronizer {
 		} else if (headersSize == 1) {
 			String mess = "Peer is SAME as me";
 			cnt.resetWeightOfPeer(peer);
+			peer.ban(BAN_BLOCK_TIMES>>2, mess);
 			throw new Exception(mess);
 		} else {
 			// end of my CHAIN is common

@@ -1152,9 +1152,10 @@ public class Block {
 		}
 
 		// TODO - show it to USER
-		if(this.getTimestamp(dcSet) + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
+		long myTime = this.getTimestamp(dcSet); 
+		if(myTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS>>2) > NTP.getTime()) {
 			LOGGER.debug("*** Block[" + height + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-					+ NTP.getTime() + " + sec: " + (this.getTimestamp(dcSet) - NTP.getTime())/1000);
+					+ NTP.getTime() + " \n diff sec: " + (this.getTimestamp(dcSet) - NTP.getTime())/1000);
 			return false;			
 		}
 		
