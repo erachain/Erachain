@@ -210,7 +210,7 @@ public class library {
 		UIManager.put("OptionPane.yesButtonText", Lang.getInstance().translate("Confirm"));
 		UIManager.put("OptionPane.noButtonText", Lang.getInstance().translate("Cancel"));
 		UIManager.put("OptionPane.cancelButtonText", Lang.getInstance().translate("Cancel"));
-		UIManager.put("OptionPane.okButtonText", Lang.getInstance().translate("Yes"));
+		UIManager.put("OptionPane.okButtonText", Lang.getInstance().translate("OK"));
 		UIManager.put("OptionPane.titleFont", font);
 
 		UIManager.put("SplitPane.oneTouchButtonSize", size_font * 2);
