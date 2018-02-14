@@ -134,8 +134,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 		//// MESSAGE ONLY
 		r_SendV3.orphan(db, false);
@@ -181,8 +181,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 
 		//// AMOUNT ONLY
@@ -227,8 +227,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.getKey(), messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 		//// EMPTY - NOT AMOUNT and NOT TEXT
 		r_SendV3.orphan(db, false);
@@ -271,8 +271,8 @@ public class TestRec_Send {
 		assertEquals(0, messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 		// NEGATE for test HOLD ///////////////////
 		amount = amount.negate();
@@ -315,8 +315,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 }
 	
@@ -407,8 +407,8 @@ public class TestRec_Send {
 		assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
 		assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-		assertEquals(arbitraryTransactionV3.isSignatureValid(), true);
-		assertEquals(arbitraryTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+		assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);		
 	}	
 	
 	@Test
@@ -474,8 +474,8 @@ public class TestRec_Send {
 		assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
 		assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-		assertEquals(arbitraryTransactionV3.isSignatureValid(), true);
-		assertEquals(arbitraryTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+		assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);		
 	}	
 	
 }

@@ -964,7 +964,7 @@ public abstract class Transaction {
 
 	//VALIDATE
 
-	public boolean isSignatureValid() {
+	public boolean isSignatureValid(DCSet dcSet) {
 
 		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
 				|| Arrays.equals(this.signature, new byte[Crypto.SIGNATURE_LENGTH]))
@@ -977,7 +977,10 @@ public abstract class Transaction {
 		// for skip NOT VALID SIGNs
 		for ( byte[] valid_item: VALID_SIGN) {
 			if (Arrays.equals(signature, valid_item)) {
-				return true;
+				if (dcSet.getTransactionFinalMapSigns().contains(signature))
+					return false;
+				else
+					return true;
 			}
 		}
 

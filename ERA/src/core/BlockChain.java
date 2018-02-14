@@ -673,7 +673,7 @@ public class BlockChain
 			}
 			
 			//CHECK IF VALID
-			if(!transaction.isSignatureValid()) {
+			if(!transaction.isSignatureValid(DCSet.getInstance())) {
 				// INVALID TRANSACTION
 				unconfirmedMap.delete(key);
                 continue;

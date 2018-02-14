@@ -780,7 +780,8 @@ public class BlockGenerator extends Thread implements Observer
 				try{
 
 					//CHECK TRANSACTION TIMESTAMP AND DEADLINE
-					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp || !transaction.isSignatureValid()) {
+					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp
+							|| !transaction.isSignatureValid(newBlockDb)) {
 						// INVALID TRANSACTION
 						// REMOVE FROM LIST
 						//transactionProcessed = true;

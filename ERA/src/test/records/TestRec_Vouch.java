@@ -89,13 +89,13 @@ public class TestRec_Vouch {
 		vouchRecord.sign(maker, false);
 		
 		//CHECK IF TRANSACTION IS VALID
-		assertEquals(true, vouchRecord.isSignatureValid());
+		assertEquals(true, vouchRecord.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		vouchRecord = new R_Vouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF VOUCH IS INVALID
-		assertEquals(false, vouchRecord.isSignatureValid());
+		assertEquals(false, vouchRecord.isSignatureValid(db));
 	}
 		
 	@Test

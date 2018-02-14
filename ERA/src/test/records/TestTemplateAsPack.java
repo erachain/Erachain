@@ -85,13 +85,13 @@ public class TestTemplateAsPack {
 		issueTemplateTransaction.sign(maker, asPack);
 		
 		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
-		assertEquals(true, issueTemplateTransaction.isSignatureValid());
+		assertEquals(true, issueTemplateTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueTemplateTransaction = new IssueTemplateRecord(maker, template, new byte[64]);
 		
 		//CHECK IF ISSUE PLATE IS INVALID
-		assertEquals(false, issueTemplateTransaction.isSignatureValid());
+		assertEquals(false, issueTemplateTransaction.isSignatureValid(db));
 	}
 		
 

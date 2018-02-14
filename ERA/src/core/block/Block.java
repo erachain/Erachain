@@ -1272,7 +1272,7 @@ public class Block {
 						 // ALL GENESIS transaction
 						return false;
 					
-					if(!transaction.isSignatureValid()) {
+					if(!transaction.isSignatureValid(validatingDC)) {
 						// 
 						LOGGER.debug("*** Block[" + height
 						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "

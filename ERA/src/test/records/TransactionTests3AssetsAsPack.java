@@ -97,13 +97,13 @@ public class TransactionTests3AssetsAsPack {
 		issueAssetTransaction.sign(maker, asPack);
 		
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
-		assertEquals(true, issueAssetTransaction.isSignatureValid());
+		assertEquals(true, issueAssetTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference, new byte[64]);
 		
 		//CHECK IF ISSUE ASSET IS INVALID
-		assertEquals(false, issueAssetTransaction.isSignatureValid());
+		assertEquals(false, issueAssetTransaction.isSignatureValid(db));
 	}
 		
 
@@ -289,7 +289,7 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer.sign(maker, asPack);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
-		assertEquals(true, assetTransfer.isSignatureValid());
+		assertEquals(true, assetTransfer.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), releaserReference);
@@ -297,7 +297,7 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(101).setScale(8), -123L);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
-		assertEquals(false, assetTransfer.isSignatureValid());
+		assertEquals(false, assetTransfer.isSignatureValid(db));
 	}
 	
 	@Test
@@ -506,13 +506,13 @@ public class TransactionTests3AssetsAsPack {
 		Transaction cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, releaserReference);
 		cancelOrderTransaction.sign(maker, asPack);
 		//CHECK IF ORDER CANCEL IS VALID
-		assertEquals(true, cancelOrderTransaction.isSignatureValid());
+		assertEquals(true, cancelOrderTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, releaserReference, new byte[1]);
 		
 		//CHECK IF ORDER CANCEL
-		assertEquals(false, cancelOrderTransaction.isSignatureValid());
+		assertEquals(false, cancelOrderTransaction.isSignatureValid(db));
 	}
 	
 	@Test
@@ -776,8 +776,8 @@ public class TransactionTests3AssetsAsPack {
 		assertEquals(r_Send.isEncrypted(), messageTransaction_2.isEncrypted());
 		assertEquals(r_Send.isText(), messageTransaction_2.isText());
 		
-		assertEquals(r_Send.isSignatureValid(), true);
-		assertEquals(messageTransaction_2.isSignatureValid(), true);		
+		assertEquals(r_Send.isSignatureValid(db), true);
+		assertEquals(messageTransaction_2.isSignatureValid(db), true);		
 	}
 	
 

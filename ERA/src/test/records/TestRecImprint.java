@@ -99,7 +99,7 @@ public class TestRecImprint {
 		issueImprintTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE IMPRINT TRANSACTION IS VALID
-		assertEquals(true, issueImprintTransaction.isSignatureValid());
+		assertEquals(true, issueImprintTransaction.isSignatureValid(db));
 
 		// CHECK REFERENCE OF ITEM NOT CHANGED
 		Imprint impr_1 = (Imprint) issueImprintTransaction.getItem();
@@ -109,7 +109,7 @@ public class TestRecImprint {
 		issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp, new byte[64]);
 		
 		//CHECK IF ISSUE IMPRINT IS INVALID
-		assertEquals(false, issueImprintTransaction.isSignatureValid());
+		assertEquals(false, issueImprintTransaction.isSignatureValid(db));
 	}
 		
 

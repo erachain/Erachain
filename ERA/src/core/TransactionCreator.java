@@ -132,7 +132,7 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
 		for(Transaction transactionAccount: accountTransactions)
 		{
-			if(!transactionAccount.isSignatureValid()) {
+			if(!transactionAccount.isSignatureValid(this.fork)) {
 				//THE TRANSACTION BECAME INVALID LET 
 				this.fork.getTransactionMap().delete(transactionAccount);			
 			} else {

@@ -378,7 +378,7 @@ public class R_SertifyPubKeys extends Transaction {
 	//VALIDATE
 
 	@Override
-	public boolean isSignatureValid() {
+	public boolean isSignatureValid(DCSet dcSet) {
 
 		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
 				|| this.signature == new byte[Crypto.SIGNATURE_LENGTH] )

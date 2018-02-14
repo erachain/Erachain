@@ -122,13 +122,13 @@ public class TestRecTemplate {
 		initTemplate(false);
 		
 		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
-		assertEquals(true, issueTemplateRecord.isSignatureValid());
+		assertEquals(true, issueTemplateRecord.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE PLATE IS INVALID
-		assertEquals(false, issueTemplateRecord.isSignatureValid());
+		assertEquals(false, issueTemplateRecord.isSignatureValid(db));
 	}
 		
 
@@ -274,13 +274,13 @@ public class TestRecTemplate {
 		signNoteRecord.sign(maker, asPack);
 		
 		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
-		assertEquals(true, signNoteRecord.isSignatureValid());
+		assertEquals(true, signNoteRecord.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE PLATE IS INVALID
-		assertEquals(false, signNoteRecord.isSignatureValid());
+		assertEquals(false, signNoteRecord.isSignatureValid(db));
 	}
 		
 
