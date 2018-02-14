@@ -240,7 +240,18 @@ public class Account {
 	{
 		return this.getBalance(DCSet.getInstance(), key);
 	}
-	
+
+	public BigDecimal getForSale(DCSet dcSet, long key)
+	{
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this.getBalance(dcSet, key);
+		BigDecimal ownVol = balance.a.b;
+		BigDecimal inDebt = balance.b.b;
+		if (inDebt.signum() < 0) {
+			ownVol = ownVol.add(inDebt);
+		}
+		return ownVol;
+	}
+
 	public Tuple5<
 	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
 	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> getBalance(DCSet db, long key)

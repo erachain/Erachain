@@ -496,10 +496,9 @@ public abstract class TransactionAmount extends Transaction {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-						BigDecimal balanceOWN = this.creator.getBalance(dcSet, absKey, actionType).b;
-						BigDecimal balanceUSE = this.creator.getBalanceUSE(absKey, dcSet);
+						BigDecimal forSale = this.creator.getForSale(dcSet, absKey);
 						
-						if (amount.compareTo(balanceOWN) > 0 || amount.compareTo(balanceUSE) > 0) {
+						if (amount.compareTo(forSale) > 0) {
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
 							boolean ok = true;
