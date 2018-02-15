@@ -315,7 +315,8 @@ private void init(){
  				
 
  			
- 			txt_Sign.setText(Base58.encode(person.getOwnerSignature()));
+ 			txt_Sign.setText(person.isSignatureValid()?Base58.encode(person.getOwnerSignature())
+ 					: Lang.getInstance().translate("Wrong signaryte for data owner"));
  			txt_public_key.setText(Base58.encode(person.getOwner().getPublicKey()));
 
  		}
