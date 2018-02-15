@@ -9,7 +9,7 @@ import java.util.Arrays;
 //import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-//import java.util.List;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -415,6 +415,11 @@ public abstract class Transaction {
 		return this.creator;
 	}
 
+	public List<PublicKeyAccount> getPublicKeys() 
+	{
+		return null;
+	}
+
 	public Long getTimestamp()
 	{
 		return this.timestamp;
@@ -506,6 +511,11 @@ public abstract class Transaction {
 	public byte[] getSignature()
 	{
 		return this.signature;
+	}
+
+	public List<byte[]> getSignatures()
+	{
+		return null;
 	}
 	
 	/*

@@ -23,6 +23,7 @@ import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
@@ -315,7 +316,7 @@ private void init(){
  				
 
  			
- 			txt_Sign.setText(person.isSignatureValid()?Base58.encode(person.getOwnerSignature())
+ 			txt_Sign.setText(person.isSignatureValid(DCSet.getInstance())?Base58.encode(person.getOwnerSignature())
  					: Lang.getInstance().translate("Wrong signaryte for data owner"));
  			txt_public_key.setText(Base58.encode(person.getOwner().getPublicKey()));
 

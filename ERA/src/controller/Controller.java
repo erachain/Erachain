@@ -2824,9 +2824,9 @@ public class Controller extends Observable {
 			}
 		}
 
-		DCSet db = this.dcSet;
+		//DCSet db = this.dcSet;
 		// get last transaction from this address
-		byte[] sign = db.getAddressTime_SignatureMap().get(address);
+		byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
 		if (sign == null) {
 			return null;
 		}
@@ -2842,6 +2842,19 @@ public class Controller extends Observable {
 			return null;
 		}
 
-		return transaction.getCreator().getPublicKey();
+		if (transaction.getCreator().equals(address))
+			return transaction.getCreator().getPublicKey();
+		else {
+			List<PublicKeyAccount> pKeys = transaction.getPublicKeys();
+			if (pKeys != null) {
+				for (PublicKeyAccount pKey: pKeys) {
+					if (pKey.equals(address)) {
+						return pKey.getPublicKey();
+					}
+				}
+			}
+		}
+		
+		return null;
 	}
 }

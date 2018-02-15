@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import static org.junit.Assert.assertEquals;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.BlockChain;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -25,7 +27,9 @@ import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
+import core.payment.Payment;
 import core.transaction.Transaction;
+import datachain.AddressTime_SignatureMap;
 import datachain.DCSet;
 
 public class IssuePersonRecord extends Issue_ItemRecord 
@@ -72,7 +76,28 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		return 0l;
 	}
 
-	
+	@Override
+	public List<byte[]> getSignatures() {
+		PersonHuman person = (PersonHuman)this.item;
+		if (person.isMustBeSigned()) {
+			List<byte[]> items = new ArrayList<byte[]>();
+			items.add(person.getOwnerSignature());
+			return items;
+		}
+		return null;
+	}
+
+	@Override
+	public List<PublicKeyAccount> getPublicKeys() {
+		PersonHuman person = (PersonHuman)this.item;
+		if (person.isMustBeSigned()) {
+			List<PublicKeyAccount> items = new ArrayList<PublicKeyAccount>();
+			items.add(person.getOwner());
+			return items;
+		}
+		return null;
+	}
+
 	/*
 	@Override
 	public boolean hasPublicText() {
@@ -133,7 +158,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 				if (human.getOwnerSignature() == null) {
 					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
 				}
-				if (!human.isSignatureValid()) {
+				if (!human.isSignatureValid(db)) {
 					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;				
 				}
 			}
@@ -235,6 +260,22 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		
 	
 	//PROCESS/ORPHAN
+
+	public void process(DCSet db, Block block, boolean asPack)
+	{
+		//UPDATE CREATOR
+		super.process(db, block, asPack);
+		
+		// for quick search public keys
+		PersonHuman person = (PersonHuman)this.item;
+		if (person.isMustBeSigned()) {
+			AddressTime_SignatureMap dbASmap = db.getAddressTime_SignatureMap();
+			String creatorAddress = person.getOwner().getAddress();
+			if (!dbASmap.contains(creatorAddress)) {
+				dbASmap.set(creatorAddress, this.signature);
+			}
+		}
+	}
 
 	@Override
 	public int calcBaseFee() {

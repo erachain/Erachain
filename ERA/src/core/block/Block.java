@@ -1352,6 +1352,12 @@ public class Block {
 					//LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
 					timerStart = System.currentTimeMillis();
 					transFinalMapSinds.set(transactionSignature, key);
+					List<byte[]> signatures = transaction.getSignatures(); 
+					if (signatures != null) {
+						for (byte[] itemSignature: signatures) {
+							transFinalMapSinds.set(itemSignature, key);							
+						}
+					}
 					timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 					
 					seq++;
@@ -1528,6 +1534,12 @@ public class Block {
 			//LOGGER.debug("[" + seq + "] try transFinalMapSinds.set" );
 			timerStart = System.currentTimeMillis();
 			transFinalMapSinds.set(transactionSignature, key);
+			List<byte[]> signatures = transaction.getSignatures(); 
+			if (signatures != null) {
+				for (byte[] itemSignature: signatures) {
+					transFinalMapSinds.set(itemSignature, key);							
+				}
+			}
 			timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 			
 			seq++;
@@ -1659,7 +1671,13 @@ public class Block {
 			Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height, i);
 			finalMap.delete(key);
 			transFinalMapSinds.delete(transaction.getSignature());
-	
+			List<byte[]> signatures = transaction.getSignatures(); 
+			if (signatures != null) {
+				for (byte[] itemSignature: signatures) {
+					transFinalMapSinds.delete(itemSignature);							
+				}
+			}
+
 		}
 	}
 

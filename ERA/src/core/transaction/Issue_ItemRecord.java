@@ -37,7 +37,7 @@ public abstract class Issue_ItemRecord extends Transaction
 	//private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
 	//private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-	private ItemCls item;
+	protected ItemCls item;
 	
 	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) 
 	{

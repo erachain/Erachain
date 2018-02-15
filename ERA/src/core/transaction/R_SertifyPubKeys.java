@@ -34,6 +34,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import datachain.DCSet;
 import core.item.ItemCls;
+import core.item.persons.PersonHuman;
 
 
 // if person has not ALIVE status - add it
@@ -139,10 +140,18 @@ public class R_SertifyPubKeys extends Transaction {
 		return this.key;
 	}
 
+	@Override
+	public List<PublicKeyAccount> getPublicKeys() 
+	{
+		return this.sertifiedPublicKeys;
+	}
+
 	public List<PublicKeyAccount> getSertifiedPublicKeys() 
 	{
 		return this.sertifiedPublicKeys;
 	}
+
+	
 	public List<String> getSertifiedPublicKeysB58() 
 	{
 		List<String> pbKeys = new ArrayList<String>();
@@ -166,7 +175,12 @@ public class R_SertifyPubKeys extends Transaction {
 		};
 		return items;
 	}
-	
+
+	@Override
+	public List<byte[]> getSignatures() {
+		return sertifiedSignatures;
+	}
+
 	public int getAddDay() 
 	{
 		return this.add_day;
@@ -572,7 +586,12 @@ public class R_SertifyPubKeys extends Transaction {
 		{
 			address = publicAccount.getAddress();
 			db.getAddressPersonMap().addItem(address, itemA);
-			db.getPersonAddressMap().addItem(this.key, address, itemP);			
+			db.getPersonAddressMap().addItem(this.key, address, itemP);
+			
+			if (!db.getAddressTime_SignatureMap().contains(address)) {
+				db.getAddressTime_SignatureMap().set(address, this.signature);
+			}
+
 		}
 
 	}
