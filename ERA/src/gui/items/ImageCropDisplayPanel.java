@@ -152,6 +152,8 @@ public class ImageCropDisplayPanel extends JPanel {
         g2d.scale(zoom, zoom);
         g2d.drawImage(image, imageX, imageY, this);
 
+        //g2d.rotate(theta);
+        
         int cropXnew = cropX;
         int cropYnew = cropY;
         int cropWidthNew = cropWidth;
@@ -191,6 +193,7 @@ public class ImageCropDisplayPanel extends JPanel {
             	cropHeightNew = imageYnew + imageHeight - cropY;
         }
 
+        
         return snapshot.getSubimage(cropXnew, cropYnew, cropWidthNew, cropHeightNew);
     }
 
