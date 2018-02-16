@@ -128,8 +128,13 @@ public class ImageCropDisplayPanel extends JPanel {
 
     public void setZoom(double zoom)
     {
-        this.zoom = zoom;
-        moveImageBy(0, 0);
+
+    	int deltaX = (int)(image.getWidth() / this.zoom - image.getWidth() / zoom);
+    	int deltaY = (int)(image.getHeight() / this.zoom - image.getHeight() / zoom);
+    	this.zoom = zoom;
+        imageX -= deltaX>>1;
+        imageY -= deltaY>>1;
+        repaint();
     }
 
 
@@ -162,10 +167,14 @@ public class ImageCropDisplayPanel extends JPanel {
         
         if (imageXnew > cropX) {
         	cropXnew = imageXnew;
+            if (imageXnew + imageWidth > cropX + cropWidth)
+            	cropWidthNew = cropX + cropWidth - cropXnew;
         }
 
         if (imageYnew > cropY) {
         	cropYnew = imageYnew; 
+            if (imageYnew + imageHeight > cropY + cropHeight)
+            	cropHeightNew = cropY + cropHeight - cropYnew;
         }
         
         if (imageXnew + imageWidth < cropX + cropWidth) {
