@@ -41,6 +41,8 @@ import gui.items.assets.My_Assets_Tab;
 import gui.items.assets.My_Balance_Tab;
 import gui.items.assets.My_Order_Tab;
 import gui.items.assets.Search_Assets_Tab;
+import gui.items.imprints.Issue_Split_Panel;
+import gui.items.imprints.Search_Hash;
 import gui.items.mails.Incoming_Mails_SplitPanel;
 import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
@@ -477,6 +479,26 @@ public class Main_Panel extends javax.swing.JPanel {
 																						// other_Panel());
 			return;
 		}
+		
+		//hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Hashes")));
+		  
+		  
+		   
+		   if (str.equals(Lang.getInstance().translate("Search_Hash")) || str.equals("Search_Hash")) {
+				insertTab(Lang.getInstance().translate("Search_Hash"), new Search_Hash()); // new
+																							// other_Panel());
+				return;
+			}
+		
+		   if (str.equals(Lang.getInstance().translate("Issue Hash")) || str.equals("Issue_Split_Panel")) {
+				insertTab(Lang.getInstance().translate("Issue Hash"), new Issue_Split_Panel()); // new
+																							// other_Panel());
+				return;
+			}
+		
+		
+		
+		
 		if (BlockChain.DEVELOP_USE) {
 			if (str.equals(Lang.getInstance().translate("Wallets Manager"))
 					|| str.equals("Wallets_Manager_SplitPanel")) {

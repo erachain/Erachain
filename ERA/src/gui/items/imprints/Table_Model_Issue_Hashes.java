@@ -83,10 +83,8 @@ public class Table_Model_Issue_Hashes extends DefaultTableModel {
 		{
 			String value = String.valueOf(this.getValueAt(i, column));
 			
-			if(value.length() > column)
-			{
-		//		values.add(value);
-			}
+			if (value.length() >24) values.add(value);
+			
 		}
 		
 		return values;

@@ -73,6 +73,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 	@Override
 	public int getRowCount() 
 	{
+		if (this.imprints == null) return 0;
 		return this.imprints.size();
 		
 	}

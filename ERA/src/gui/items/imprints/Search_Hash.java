@@ -26,6 +26,10 @@ import lang.Lang;
 public class Search_Hash extends Split_Panel {
 	
 	
+	private Table_Model_Search_Hash tamleModel;
+	private JTable Table_Hash;
+
+
 	public Search_Hash(){
 		super("Search_Hash");
 	
@@ -33,6 +37,7 @@ public class Search_Hash extends Split_Panel {
 	this.jButton1_jToolBar_RightPanel.setVisible(false);
 	this.searth_Favorite_JCheckBox_LeftPanel.setVisible(false);
 	this.searth_My_JCheckBox_LeftPanel.setVisible(false);
+	this.searchToolBar_LeftPanel.setVisible(true);
 	this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Hash"));
 	this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500,20));
 	this.searchTextField_SearchToolBar_LeftPanel.setPreferredSize(new Dimension(500,20));
@@ -51,15 +56,10 @@ public class Search_Hash extends Split_Panel {
 			
 	});
 		
-	TableModelImprints aaa = new TableModelImprints();
-	JTable Table_Hash = new JTable(aaa);
+	tamleModel = new Table_Model_Search_Hash();
+	Table_Hash = new JTable(tamleModel);
 	
 	this.jScrollPanel_LeftPanel.setViewportView(Table_Hash);
-	
-	DCSet db = DCSet.getInstance();
-	HashesSignsMap map = db.getHashesSignsMap();
-	byte[] a = "3j2AAAJYRoYVEtdoXZeLZBhjA6eWmJyr4Ng9F6N3whwY".getBytes();
-	Object hashs = map.get("3j2AAAJYRoYVEtdoXZeLZBhjA6eWmJyr4Ng9F6N3whwY".getBytes());
 			
 		
 		
@@ -135,7 +135,7 @@ public class Search_Hash extends Split_Panel {
 				//	table_Model.addRow(new Object[] { hashes,
 				//			Lang.getInstance().translate("from file ") + file_name });
 					this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
-
+					tamleModel.setHash(hashe);
 			
 		
 		
