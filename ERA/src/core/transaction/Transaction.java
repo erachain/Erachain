@@ -984,13 +984,15 @@ public abstract class Transaction {
 		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
 
-		// for skip NOT VALID SIGNs
-		for ( byte[] valid_item: VALID_SIGN) {
-			if (Arrays.equals(signature, valid_item)) {
-				if (dcSet.getTransactionFinalMapSigns().contains(signature))
-					return false;
-				else
-					return true;
+		if (dcSet.getBlockHeightsMap().size() < 100000) {
+			// for skip NOT VALID SIGNs
+			for ( byte[] valid_item: VALID_SIGN) {
+				if (Arrays.equals(signature, valid_item)) {
+					if (dcSet.getTransactionFinalMapSigns().contains(signature))
+						return false;
+					else
+						return true;
+				}
 			}
 		}
 
