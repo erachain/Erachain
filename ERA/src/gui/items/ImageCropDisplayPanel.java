@@ -128,8 +128,13 @@ public class ImageCropDisplayPanel extends JPanel {
 
     public void setZoom(double zoom)
     {
-        this.zoom = zoom;
-        moveImageBy(0, 0);
+
+    	int deltaX = (int)(image.getWidth() / this.zoom - image.getWidth() / zoom);
+    	int deltaY = (int)(image.getHeight() / this.zoom - image.getHeight() / zoom);
+    	this.zoom = zoom;
+        imageX -= deltaX>>1;
+        imageY -= deltaY>>1;
+        repaint();
     }
 
 
@@ -142,32 +147,54 @@ public class ImageCropDisplayPanel extends JPanel {
 
 
     public BufferedImage getSnapshot() {
-        BufferedImage snapshot = new BufferedImage(Math.max(image.getWidth(), cropX + cropWidth), Math.max(image.getHeight(), cropY + cropHeight), BufferedImage.TYPE_INT_RGB);
+        BufferedImage snapshot = new BufferedImage(Math.max((int)(image.getWidth() * zoom) + 1, cropX + cropWidth), Math.max((int)(image.getHeight() * zoom) + 1, cropY + cropHeight), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = (Graphics2D)snapshot.getGraphics();
         g2d.scale(zoom, zoom);
         g2d.drawImage(image, imageX, imageY, this);
-//        int subLeft = cropX;
-//        int subTop = cropY;
-//        int subRight = cropX + cropWidth;
-//        int subBottom = cropY + cropHeight;
-//        if ((imageX > subLeft) && (imageX < subRight) && (imageX - subLeft < 0.15 * cropWidth))
-//        {
-//            subLeft = imageX;
-//        }
-//        if ((imageY > subTop) && (imageY < subBottom) && (imageY - subTop < 0.15 * cropHeight))
-//        {
-//            subTop = imageY;
-//        }
-//        if ((imageX + image.getWidth() > subLeft) && (imageX + image.getWidth() < subRight) && (subRight - imageX - image.getWidth() < 0.15 * cropWidth))
-//        {
-//            subRight = imageX + image.getWidth();
-//        }
-//        if ((imageY + image.getHeight() > subTop) && (imageY + image.getHeight() < subBottom) && (subBottom - imageY - image.getHeight() < 0.15 * cropHeight))
-//        {
-//            subBottom = imageY + image.getHeight();
-//        }
-//        return snapshot.getSubimage(subLeft, subTop, subRight - subLeft, subBottom - subTop);
-        return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
+
+        //g2d.rotate(theta);
+        
+        int cropXnew = cropX;
+        int cropYnew = cropY;
+        int cropWidthNew = cropWidth;
+        int cropHeightNew = cropHeight;
+        int imageXnew = imageX;
+        imageXnew *= zoom;
+        int imageYnew = imageY;
+        imageYnew *= zoom;
+        int imageWidth = image.getWidth();
+        imageWidth *= zoom;
+        int imageHeight = image.getHeight();
+        imageHeight *= zoom;
+        
+        if (imageXnew > cropX) {
+        	cropXnew = imageXnew;
+            if (imageXnew + imageWidth > cropX + cropWidth)
+            	cropWidthNew = cropX + cropWidth - cropXnew;
+        }
+
+        if (imageYnew > cropY) {
+        	cropYnew = imageYnew; 
+            if (imageYnew + imageHeight > cropY + cropHeight)
+            	cropHeightNew = cropY + cropHeight - cropYnew;
+        }
+        
+        if (imageXnew + imageWidth < cropX + cropWidth) {
+            if (imageXnew > cropX)
+            	cropWidthNew = imageWidth;
+            else
+            	cropWidthNew = imageXnew + imageWidth - cropX;
+        }
+
+        if (imageYnew + imageHeight < cropY + cropHeight) {
+            if (imageYnew > cropY)
+            	cropHeightNew = imageHeight;
+            else
+            	cropHeightNew = imageYnew + imageHeight - cropY;
+        }
+
+        
+        return snapshot.getSubimage(cropXnew, cropYnew, cropWidthNew, cropHeightNew);
     }
 
 
