@@ -137,6 +137,9 @@ public class API {
 		help.put("GET Assets Full", "assetsfull");
 		help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");		
 		
+		help.put("*** EXCHANGE ***", "");
+		help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
+		
 		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
@@ -1183,8 +1186,8 @@ public class API {
 	 * ************* EXCHANGE **************
 	 */
 	@GET
-	@Path("getassetorders/{have}/{want}")
-	public Response getAssetOrders(@PathParam("have") long have, @PathParam("want") long want) {
+	@Path("exchangeorders/{have}/{want}")
+	public Response exchangeOrders(@PathParam("have") long have, @PathParam("want") long want) {
 		
 		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 		// DOES ASSETID EXIST
@@ -1201,16 +1204,52 @@ public class API {
 				
 		SortableList<BigInteger, Order> ordersA = this.dcSet.getOrderMap().getOrdersSortableList(have, want, true);
 		
+		JSONArray arrayA = new JSONArray();
+		
+		if (!ordersA.isEmpty()) {
+			for(Pair<BigInteger, Order> pair: ordersA)
+			{
+				Order order = pair.getB();
+				JSONArray itemJson = new JSONArray();
+				itemJson.add(order.getAmountHaveLeft());
+				itemJson.add(order.getPriceCalc());
+				
+				arrayA.add(itemJson);
+			}
+		}
+
+		SortableList<BigInteger, Order> ordersB = this.dcSet.getOrderMap().getOrdersSortableList(want, have, true);
+		
+		JSONArray arrayB = new JSONArray();
+		
+		if (!ordersA.isEmpty()) {
+			for(Pair<BigInteger, Order> pair: ordersB)
+			{
+				Order order = pair.getB();
+				JSONArray itemJson = new JSONArray();
+				itemJson.add(order.getAmountHaveLeft());
+				itemJson.add(order.getPriceCalc());
+				
+				arrayB.add(itemJson);
+			}
+		}
+
+		JSONObject itemJSON = new JSONObject();
+
+		// ADD DATA
+		itemJSON.put("buy", arrayA);
+		itemJSON.put("sell", arrayB);
+		itemJSON.put("pair", have + ":" + want);
+
+		
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity("" + ordersA)
+				//.entity(StrJSonFine.convert(itemJSON))
+				.entity(itemJSON.toJSONString())
+				//.entity(itemJSON.toString())
 				.build();
 		
-	}
-
-	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {
-		return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
 	}
 
 
