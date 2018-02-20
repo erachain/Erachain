@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
@@ -134,7 +136,7 @@ public class API {
 		help.put("GET Assets", "assets");
 		help.put("GET Assets Full", "assetsfull");
 		help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");		
-
+		
 		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
@@ -612,21 +614,32 @@ public class API {
 
 		int step = 1;
 
+		byte[] key;
+		Transaction record = null;
 		try {
-			byte[] key = Base58.decode(signature);
+			key = Base58.decode(signature);
+			++step;
+			record = cntrl.getTransaction(key, dcSet);
 
 			++step;
-			Transaction record = cntrl.getTransaction(key, dcSet);		
-			out = record.rawToJson();
+			if (record == null) {
+				out.put("error", step);
+				out.put("message", "record not found");
+			} else {	
+				++step;
+				try {
+					out = record.rawToJson();
+				} catch (Exception e) {			
+					out.put("error", step);
+					out.put("message", e.getMessage());
+				}
+			}
 			
-		} catch (Exception e) {
-			
+		} catch (Exception e) {			
 			out.put("error", step);
 			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (step == 2)
-				out.put("message", "record not found");
-			else
+			else 
 				out.put("message", e.getMessage());
 		}
 		
@@ -1165,6 +1178,41 @@ public class API {
 				.build();
 		
 	}
+
+	/*
+	 * ************* EXCHANGE **************
+	 */
+	@GET
+	@Path("getassetorders/{have}/{want}")
+	public Response getAssetOrders(@PathParam("have") long have, @PathParam("want") long want) {
+		
+		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		// DOES ASSETID EXIST
+		if (!map.contains(have)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+		if (!map.contains(want)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+				
+		SortableList<BigInteger, Order> ordersA = this.dcSet.getOrderMap().getOrdersSortableList(have, want, true);
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity("" + ordersA)
+				.build();
+		
+	}
+
+	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {
+		return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
+	}
+
 
 	/*
 	 * ************* PERSON **************

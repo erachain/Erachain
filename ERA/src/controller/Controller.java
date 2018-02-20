@@ -2130,8 +2130,8 @@ public class Controller extends Observable {
 			return database.getTransactionFinalMap().get(tuple_Tx);
 		}
 		// CHECK IF IN TRANSACTION DATABASE
-		if (this.dcSet.getTransactionMap().contains(signature)) {
-			return this.dcSet.getTransactionMap().get(signature);
+		if (database.getTransactionMap().contains(signature)) {
+			return database.getTransactionMap().get(signature);
 		}
 		return null;
 	}

@@ -873,18 +873,18 @@ public abstract class Transaction {
 			transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
 		}
 
-		transaction.put("height", height);
-		if (height > 0)
+		if (height > 0) {
 			transaction.put("sequence", this.getSeqNo(localDCSet));
+			transaction.put("block", Base58.encode(block.getSignature()));
+			transaction.put("block_seq", viewHeightSeq(localDCSet));
+			transaction.put("height", height);
+		}
 		
 		boolean isSigned = this.signature!=null;
 		transaction.put("signature", isSigned?Base58.encode(this.signature):"null");
 		
 		transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
-		
-		transaction.put("block", block);
-		transaction.put("nom_in_block", viewHeightSeq(localDCSet));
-		
+				
 		return transaction;
 	}
 
