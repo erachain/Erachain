@@ -1617,7 +1617,7 @@ public class API {
 	
 	@POST
 	@Path("verifysignature")
-	public String verifysignature(String x) {
+	public Response verifysignature(String x) {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
@@ -1646,8 +1646,13 @@ public class API {
 
 			}
 
-			return String.valueOf(Crypto.getInstance().verify(publicKeyBytes,
-					signatureBytes, message.getBytes(StandardCharsets.UTF_8)));
+			return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(String.valueOf(Crypto.getInstance().verify(publicKeyBytes,
+						signatureBytes, message.getBytes(StandardCharsets.UTF_8))))
+				.build();
+			
 		} catch (NullPointerException e) {
 			// JSON EXCEPTION
 			throw ApiErrorFactory.getInstance().createError(
