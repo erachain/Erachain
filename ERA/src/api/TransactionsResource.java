@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 // 30/03
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -531,6 +532,44 @@ public class TransactionsResource {
 						array.add(transaction.toJson());
 						break;
 					}
+				}
+			}
+		}
+
+		return array.toJSONString();
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("incoming/{height}/{address}")
+	public String incoming(@PathParam("height") int height, @PathParam("address") String address) {
+
+		// CHECK IF WALLET EXISTS
+		if (!Controller.getInstance().doesWalletExists()) {
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+		}
+
+		Block block;
+		try {
+			block = Controller.getInstance().getBlockByHeight(height);
+			if (block == null) {
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+			}
+		} catch (Exception e) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+		}
+
+		JSONArray array = new JSONArray();
+		DCSet dcSet = DCSet.getInstance();
+
+		for (Transaction transaction : block.getTransactions()) {
+			HashSet<Account> recipients = transaction.getRecipientAccounts();
+			for (Account recipient: recipients) {
+				if (recipient.equals(address)) {
+					transaction.setDC(dcSet, false);
+					array.add(transaction.toJson());
+					break;
 				}
 			}
 		}

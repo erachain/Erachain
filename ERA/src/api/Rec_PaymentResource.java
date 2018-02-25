@@ -6,7 +6,9 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -26,6 +28,33 @@ public class Rec_PaymentResource
 	@Context
 	HttpServletRequest request;
 	
+	@GET
+	//@Consumes(MediaType.WILDCARD)
+	@Path("{feePow}/{sender}/{assetKey}/{amount}/{recipient}")
+	public String createPaymentGet(
+			@PathParam("feePow") String feePow,
+			@PathParam("sender") String sender,
+			@PathParam("assetKey") String assetKey,
+			@PathParam("amount") String amount,
+			@PathParam("recipient") String recipient,
+			@QueryParam("password") String password
+			)
+	{
+		try
+		{
+
+			// it check below APIUtils.askAPICallAllowed(password, "GET payment\n ", request);
+		
+			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, "", request );
+		}
+		catch(NullPointerException| ClassCastException e)
+		{
+			//JSON EXCEPTION
+			LOGGER.info(e);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+		}
+
+	}
 	@POST
 	//@GET
 	@Consumes(MediaType.WILDCARD)

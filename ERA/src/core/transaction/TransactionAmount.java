@@ -445,7 +445,7 @@ public abstract class TransactionAmount extends Transaction {
 					
 					// SPEND ASSET
 					
-					if (absKey == RIGHTS_KEY) {
+					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE) {
 						
 						if (height > Transaction.FREEZE_FROM) {
 							// LOCK PAYMENTS

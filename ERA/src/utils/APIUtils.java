@@ -106,23 +106,29 @@ public class APIUtils {
 		Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
 				asset.getKey(DCSet.getInstance()), bdAmount);
 
-		String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(true)
-				+ " Bytes, ";
-		Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
-				+ " COMPU</b><br></body></HTML>";
+		boolean confirmed = true;
+		if (gui.Gui.isGuiStarted()) {
+			String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(true)
+					+ " Bytes, ";
+			Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
+					+ " COMPU</b><br></body></HTML>";
+	
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+					Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450), Status_text,
+					Lang.getInstance().translate("Confirmation Transaction"));
+			Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
+	
+			// ww.jTabbedPane1.setVisible(false);
+			dd.jScrollPane1.setViewportView(ww);
+			dd.setLocationRelativeTo(null);
+			dd.setVisible(true);
 
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
-				Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450), Status_text,
-				Lang.getInstance().translate("Confirmation Transaction"));
-		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
+			// JOptionPane.OK_OPTION
+			confirmed = dd.isConfirm;
 
-		// ww.jTabbedPane1.setVisible(false);
-		dd.jScrollPane1.setViewportView(ww);
-		dd.setLocationRelativeTo(null);
-		dd.setVisible(true);
+		}
 
-		// JOptionPane.OK_OPTION
-		if (dd.isConfirm) {
+		if (confirmed) {
 
 			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
 
@@ -135,7 +141,7 @@ public class APIUtils {
 
 			}
 		}
-		return "";
+		return "error";
 	}
 
 	public static void disallowRemote(HttpServletRequest request) throws WebApplicationException {
