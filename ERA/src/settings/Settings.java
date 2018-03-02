@@ -235,6 +235,7 @@ public class Settings {
 		return this.userPath;
 	}
 
+	// http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
 	public String getNotifyIncomingURL()
 	{
 		if(this.settingsJSON.containsKey("notify_incoming_url"))
@@ -248,7 +249,7 @@ public class Settings {
 	{
 		if(this.settingsJSON.containsKey("notify_incoming_confirmations"))
 		{
-			return (int) this.settingsJSON.get("notify_incoming_confirmations");
+			return (int) (long)this.settingsJSON.get("notify_incoming_confirmations");
 		}
 		
 		return NOTEFY_INCOMING_CONFIRMATIONS;

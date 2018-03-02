@@ -9,6 +9,8 @@ import java.io.IOError;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -116,7 +118,7 @@ public class Controller extends Observable {
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
 	public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
-	private static final String version = "4.9.02 alpha";
+	private static final String version = "4.9.03 alpha";
 	private static final String buildTime = "2017-11-19 15:33:33 UTC";
 	private static long buildTimestamp;
 	public final static long MIN_MEMORY_TAIL = 50000000;
@@ -1720,6 +1722,7 @@ public class Controller extends Observable {
 		return true;
 	}
 
+    // https://127.0.0.1/7pay_in/tools/block_proc/ERA
 	public void NotifyIncoming(List<Transaction> transactions) {
 
 		List<Account> accounts = this.wallet.getAccounts();
@@ -1744,8 +1747,22 @@ public class Controller extends Observable {
 
 		// SEE -
 		// http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
-		String url = Settings.getInstance().getNotifyIncomingURL();
-		// http(url)
+		String url_string = Settings.getInstance().getNotifyIncomingURL();
+		try
+		{
+			
+			//CREATE CONNECTION
+			URL url = new URL(url_string);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			
+			//EXECUTE
+			int res = connection.getResponseCode();
+		}					
+		catch(Exception e)
+		{
+			//return -1;
+		}
+		
 
 	}
 
