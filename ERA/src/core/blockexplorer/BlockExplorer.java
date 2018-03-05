@@ -171,6 +171,16 @@ public class BlockExplorer
 			if(info.getQueryParameters().containsKey("q"))
 			{
 				output.put("lastBlock", jsonQueryLastBlock());
+				
+				if(info.getQueryParameters().containsKey("search")) {
+					
+					String type = info.getQueryParameters().get("search").get(0);
+					if (type.equals("persons") || type.equals("person") ){
+					output.put("search", type);
+					output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
+					return output;
+					}
+				}
 				output.putAll(jsonQuerySearch(URLDecoder.decode(info.getQueryParameters().getFirst("q"), "UTF-8")));
 				return output;
 			}
@@ -1982,6 +1992,142 @@ if ( asset_1 == null) {
 		
 		return output;
 	}
+	
+	
+	public Map jsonQuerySearchPersons(String search)
+	{
+	/*	Block block;
+		if(start > 0)
+		{
+			block = Controller.getInstance().getBlockByHeight(start);
+		}
+		else
+		{
+			block = getLastBlock();	
+			start = block.getHeight(DBSet.getInstance()); 
+		}
+*/
+		Map output=new LinkedHashMap();
+		
+		
+
+		
+
+		output.put("unconfirmedTxs", DCSet.getInstance().getTransactionMap().size());
+		
+		// TODO translate_web(
+		
+		output.put("Label_key", Lang.getInstance().translate_from_langObj("Key",langObj));
+		output.put("Label_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+		output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+		output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+		
+		
+		
+	/*	
+		output.put("Label_Unconfirmed_transactions", "Unconfirmed transactions");
+		output.put("Label_Height", "Height");
+		output.put("Label_Time", "Time");
+		output.put("Label_Generator", "Creator");
+		output.put("Label_Gen_balance", "Gen.Balance");
+		output.put("Label_TXs", "TXs");
+		output.put("Label_Fee", "Fee");
+		output.put("Label_AT_Amount", "AT_Amount");
+		output.put("Label_Amount", "Amount");
+		output.put("Label_Later", "Later");
+		output.put("Label_Previous", "Previous");
+		
+		int counter = start; 
+ */
+				
+		
+		
+	//	if (i <0) i =i + maxRow - start_Web;
+	//		k =  maxRow - i;
+		List<ItemCls> listPerson = new ArrayList();
+		if (search != ""){
+			
+			if (search.matches("\\d+") && DCSet.getInstance().getItemPersonMap().contains(Long.valueOf(search))){
+				listPerson.add(DCSet.getInstance().getItemPersonMap().get(Long.valueOf(search)));
+			}else{
+				listPerson = DCSet.getInstance().getItemPersonMap().get_By_Name(search, true);
+			}
+		}
+		
+			
+		
+	//	if (k> DBSet.getInstance().getItemPersonMap().getSize()) k= DBSet.getInstance().getItemPersonMap().getSize();
+		
+		int i=0;
+		for(ItemCls pers:listPerson){
+			
+			PersonCls person = (PersonCls) pers;
+						
+			
+			Map blockJSON=new LinkedHashMap();
+			blockJSON.put("key", person.getKey());
+			blockJSON.put("name", person.getName());
+			blockJSON.put("creator",person.getOwner().getAddress());
+			String img = Base64.encodeBase64String(person.getImage());
+			blockJSON.put("img",img);
+			
+	
+		/*	
+			blockJSON.put("generatingBalance", block.getGeneratingBalance(DBSet.getInstance()));
+			//blockJSON.put("winValue", block.calcWinValue(DBSet.getInstance()));
+			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(DBSet.getInstance()));
+			blockJSON.put("transactionCount", block.getTransactionCount());
+			blockJSON.put("timestamp", block.getTimestamp(DBSet.getInstance()));
+			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
+			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
+
+			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
+			for (Transaction transaction : block.getTransactions()) {
+				for (Account account : transaction.getInvolvedAccounts()) {
+					BigDecimal amount = transaction.getAmount(account); 
+					if(amount.compareTo(BigDecimal.ZERO) > 0)
+					{
+						totalAmount = totalAmount.add(amount);
+					}
+				}
+			}
+
+			blockJSON.put("totalAmount", totalAmount.toPlainString());
+
+			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DBSet.getInstance().getATTransactionMap().getATTransactions(counter);
+
+			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
+
+			for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e : aTtxs.entrySet())
+			{	
+				totalATAmount = totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount() , 8));
+			}
+
+			blockJSON.put("totalATAmount", totalATAmount.toPlainString());
+			//blockJSON.put("aTfee", block.getATfee().toPlainString());
+
+			output.put(counter, blockJSON);
+
+			counter --;
+			block = block.getParent(DBSet.getInstance());
+		*/	
+			output.put(i, blockJSON);
+			i++;
+			
+		}
+		
+		output.put("start_row", listPerson.size()-1);
+		output.put("maxHeight",DCSet.getInstance().getItemPersonMap().getLastKey());
+		output.put("row", -1);
+		output.put("view_Row", listPerson.size()-1);
+		
+		
+		
+		
+		return output;
+	}
+
 	
 	
 	public Map jsonQueryPersons(String start_Web)

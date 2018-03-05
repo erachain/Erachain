@@ -194,7 +194,7 @@ function asyncAjax (url, type){
 				
 	*/			
 				
-				
+					$("#searchparam").val (type);
 				document.getElementById('Langs').innerHTML = langs(data);
 
 				if(type == 'blocks')
@@ -286,7 +286,8 @@ function asyncAjax (url, type){
 				
 				if(type == 'search')
 				{
-					document.getElementById('main').innerHTML = search(data)
+					document.getElementById('main').innerHTML = search(data);
+					$('#searchparam').val(data.search);
 				}
 				
 				document.getElementById('loading').style.display = 'none';
@@ -3428,7 +3429,6 @@ output += '<tr><td>'+data.My_Persons[key].date+'<td>'+ data.My_Persons[key].key 
 
 output += '</table><br>';
 output += '</table><br>';
-
 return output;
 }
 
@@ -3485,7 +3485,7 @@ var output = '';
 			output += '<a href=?persons&startPerson='+ (data.start_row + data.view_Row )   + get_lang()+'>'+data.Label_Later;
 		}
 	
-	
+
 	
 	return output;
 
@@ -3519,7 +3519,7 @@ function getQueryParams(name) {
 }
 
 function buttonSearch() {
-   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() ;
+   document.location.href = '?q=' + encodeURIComponent(document.getElementById('q').value)+ get_lang() + '&search=' + $("#searchparam").val (); 
 }
 
 function start() {
@@ -3538,7 +3538,7 @@ function start() {
 	document.getElementById('menu_percons').href ='?persons&startPerson&lang='+ params['lang'] ;
 	document.getElementById('menu_pals_asset').href ='?polls&asset=1&lang='+ params['lang'] ;
 	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
-	document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
+	//document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
 	document.getElementById('menu_peers').href ='?peers&lang='+ params['lang'] ;
 	document.getElementById('menu_templates').href ='?templates&lang='+ params['lang'] ;
 	
@@ -3549,7 +3549,7 @@ function start() {
 	document.getElementById('menuTop100Richest').setAttribute('class', '');
 	document.getElementById('menuPolls').setAttribute('class', '');
 	document.getElementById('menuAssets').setAttribute('class', '');
-	document.getElementById('menuATs').setAttribute('class', '');
+//	document.getElementById('menuATs').setAttribute('class', '');
 	
 
 	
@@ -3569,7 +3569,7 @@ function start() {
 		
 		document.title = title + ' - AT';
 	
-		document.getElementById('menuATs').setAttribute('class', 'active');
+	//	document.getElementById('menuATs').setAttribute('class', 'active');
 		
 		return;
 	}
@@ -3868,7 +3868,9 @@ function start() {
 	
 	if(params.hasOwnProperty('q'))
 	{
-		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang'], 'search');
+	var ss = 'search';
+	if (params['search'] == 'person' || params['search'] == 'persons') ss = params['search']; 
+		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang']+'&search='+params['search'], ss);
 
 		document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
 		document.getElementById('q').value = params['q'];
@@ -4014,7 +4016,8 @@ function Lang_setting(){
               <label for="name" class="sr-only">Search</label>
               <input id="q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
                 <button id="button" type="button" value="!searchval!" class="btn btn-link" onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
-            </div>
+				<input  id="searchparam">
+		  </div>
 			 <select id ="Langs" OnChange="Lang_setting()">
 			 </select>
 		   </div>
@@ -4036,7 +4039,7 @@ function Lang_setting(){
 				<li id=menuPersons><a href="?persons&startPerson" id =menu_percons><translate>Persons</translate></a></li>
 				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>
 				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
-				<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	
+		<!--		<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	-->
 				<li id=menupeers><a href="?peers" id=menu_peers><translate>Peers</translate></a></li>				
 				<li id=menutemplates><a href="?templates" id=menu_templates><translate>Templates</translate></a></li>		
               </ul>
