@@ -3873,7 +3873,7 @@ function start() {
 		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang']+'&search='+params['search'], ss);
 
 		document.title = title + ' - Search - ' + decodeURIComponent(params['q']);
-		document.getElementById('q').value = params['q'];
+		document.getElementById('q').value = decodeURIComponent(params['q']);
 		
 		return;
 	}
@@ -4016,7 +4016,7 @@ function Lang_setting(){
               <label for="name" class="sr-only">Search</label>
               <input id="q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) buttonSearch()"><span class="input-group-btn">
                 <button id="button" type="button" value="!searchval!" class="btn btn-link" onClick="buttonSearch()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>
-				<input  id="searchparam">
+				<input  hidden id="searchparam">
 		  </div>
 			 <select id ="Langs" OnChange="Lang_setting()">
 			 </select>
