@@ -1,5 +1,6 @@
 package api;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -197,6 +199,24 @@ public class TransactionsResource {
 		for (Transaction transaction : transactions) {
 			if (transaction.getCreator().getAddress().equals(address))
 				array.add(transaction.toJson());
+		}
+
+		return array.toJSONString();
+	}
+
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("/unconfirmedincomes/{address}")
+	// get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
+	public String getNetworkIncomesTransactions(@PathParam("address") String address) {
+		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
+		JSONArray array = new JSONArray();
+		
+		DCSet dcSet = DCSet.getInstance();
+
+		for (Transaction record: dcSet.getTransactionMap().getIncomedTransactions(address)) {
+			record.setDC(dcSet, false);
+			array.add(record.toJson());
 		}
 
 		return array.toJSONString();
@@ -723,4 +743,70 @@ public class TransactionsResource {
 		return out.toJSONString();
 	}
 
+	
+	// GET transactions/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
+	@GET
+	//@Produces("text/plain")
+	@Path("datadecrypt/{signature}")
+	public String dataDecrypt(@PathParam("signature") String signature, @QueryParam("password") String password) {
+
+		byte[] signatureBytes;
+		try {
+			signatureBytes = Base58.decode(signature);
+		} catch (Exception e) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+		}
+
+		// GET TRANSACTION
+		Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+
+		// CHECK IF TRANSACTION EXISTS
+		if (transaction == null) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
+		}
+
+		JSONObject out = new JSONObject();
+		
+		R_Send r_Send = (R_Send) transaction;
+		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
+		byte[] r_data = r_Send.getData();
+		if (r_data == null || r_data.length == 0)
+			return null;
+
+		APIUtils.askAPICallAllowed(password, "POST decrypt\n " + signature, request);
+		
+		byte[] privateKey = null; 
+		byte[] publicKey = null;
+		//IF SENDER ANOTHER
+		if(account == null)
+		{
+    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
+			privateKey = accountRecipient.getPrivateKey();		
+			
+			publicKey = r_Send.getCreator().getPublicKey();    				
+		}
+		//IF SENDER ME
+		else
+		{
+    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
+			privateKey = accountRecipient.getPrivateKey();		
+			
+			publicKey = Controller.getInstance().getPublicKeyByAddress(r_Send.getRecipient().getAddress());    				
+		}
+
+		try {
+    		byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
+    		if (r_Send.isText()) {
+        		String str = (new String(ddd, "UTF-8"));
+        		return str;    			
+    		} else {
+        		String str = Base58.encode(ddd);
+        		return str;
+    			
+    		}
+		} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
+			return e1.getMessage();
+		}
+
+	}
 }

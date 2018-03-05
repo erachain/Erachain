@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 import com.google.common.primitives.UnsignedBytes;
 
 import controller.Controller;
+import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.transaction.Transaction;
@@ -270,6 +272,25 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		}
 		iterator = null;
 		map = null;
+		return values;
+	}
+
+	public List<Transaction> getIncomedTransactions(String address) {
+
+		ArrayList<Transaction> values = new ArrayList<Transaction>();
+		Iterator<byte[]> iterator = this.getIterator(0, false);
+		Account account = new Account(address);
+		
+		while(iterator.hasNext()) {
+			Transaction transaction = map.get(iterator.next());
+			HashSet<Account> recipients = transaction.getRecipientAccounts();
+			if (recipients == null || recipients.isEmpty())
+				continue;
+			
+			if (recipients.contains(account)) {
+				values.add(transaction);
+			}
+		}
 		return values;
 	}
 

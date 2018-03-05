@@ -180,6 +180,11 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET transactions/unconfirmedincomes/<address>", 
+				"Returns an array of all the unconfirmed incomed transactions of address known to the client.",
+				""
+			},
+			{
 				"POST transactions/scan {\"start\": \"<startBlockSign>, \"blocklimit\":<amountBlocks>, \"transactionlimit\":<amountTransactions>, \"type\":<type>, \"service\":<service>, \"address\":\"<address>\"}", 
 				"Returns all the transactions that match the filters. All filters are optional but please limit that amount of transactions or blocks to scan to avoid running into issues. Requests that don't specify a blocklimit <= 360 will be denied to remote users. Return the last block it scanned, the amount of blocks it scanned and the scanned transactions.",
 				"Filters:\nstart - The signature of the starting block. \nblocklimit - The maximum amount of blocks to scan. \ntransactionlimit - The maximum amount of transactions to return.\ntype - Only return transactions with the given type.\nservice - Only return Arbitrary Transactions with the given service.\naddress - Only return transactions where the given address is involved.\nErrors: 1 -Json error. 102 - Invalid address. 101 - Invalid signature. 301 - Block does not exist.",
@@ -213,6 +218,11 @@ public class ApiClient {
 				"POST transactions/find {\"address\":\"<address>\", \"sender\":\"<sender>\", \"recipient\":\"<recipient>\", \"type\":<type>, \"service\":<service>, \"offset\":<offset>, \"limit\":<limit>, \"minHeight\":<minHeight>, \"maxHeight\":<maxHeight>, \"desc\":<true/false>, \"count\":<true/false>}",
 				"Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"service\" means service of ArbitraryTransaction. \"minHeight\" and \"maxHeight\" means height of blocks. All params are optional, but must be specified at least one address field.",
 				"Errors: 102 - Invalid address."
+			},
+			{
+				"GET transactions/datadecrypt/{signature}?password={password}",
+				"Returns decrypted data for transaction.",
+				""
 			},
 			{
 				"GET blocks/addresses/<limit>", 
