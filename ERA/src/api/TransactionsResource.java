@@ -66,16 +66,18 @@ public class TransactionsResource {
 		return this.getTransactionsLimited(50);
 	}
 
+	/*
 	@GET
 	@Path("/{address}")
 	public String getTransactions(@PathParam("address") String address) {
 		return this.getTransactionsLimited(address, 50);
 	}
+	*/
 
 	@GET
 	@Path("address/{address}")
 	public String getTransactionsTwo(@PathParam("address") String address) {
-		return this.getTransactions(address);
+		return this.getTransactionsLimited(address, 50);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -546,9 +548,9 @@ public class TransactionsResource {
 			// FOR ALL ACCOUNTS
 			synchronized (accounts) {
 				for (Account account : accounts) {
+					transaction.setDC(dcSet, false);
 					// CHECK IF INVOLVED
 					if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
-						transaction.setDC(dcSet, false);
 						array.add(transaction.toJson());
 						break;
 					}
@@ -563,7 +565,7 @@ public class TransactionsResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("incoming/{height}/{address}")
-	public String incoming(@PathParam("height") int height, @PathParam("address") String address) {
+	public String incomingRecipient(@PathParam("height") int height, @PathParam("address") String address) {
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -584,10 +586,10 @@ public class TransactionsResource {
 		DCSet dcSet = DCSet.getInstance();
 
 		for (Transaction transaction : block.getTransactions()) {
+			transaction.setDC(dcSet, false);
 			HashSet<Account> recipients = transaction.getRecipientAccounts();
 			for (Account recipient: recipients) {
 				if (recipient.equals(address)) {
-					transaction.setDC(dcSet, false);
 					array.add(transaction.toJson());
 					break;
 				}
