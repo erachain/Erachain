@@ -1123,7 +1123,7 @@ public class WebResource {
 	}
 
 	String[] imgsArray = { "Erachain.org.png", "logo_header.png", "Erachain.org-user.png",
-			"logo_bottom.svg", "banner_01.png", "loading.gif",
+			"logo_bottom.png", "banner_01.png", "loading.gif",
 			"00_generating.png", "01_genesis.jpg", "02_payment_in.png",
 			"02_payment_out.png", "03_name_registration.png",
 			"04_name_update.png", "05_name_sale.png",
