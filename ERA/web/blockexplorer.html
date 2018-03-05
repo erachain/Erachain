@@ -3256,49 +3256,54 @@ function search(data)
 	var foundOne = "";
 	
 	for(key in data.foundList) {
-		switch (data.foundList[key]) {
+		var row = data.foundList[key];
+		switch (row[1]) {
 			case 'standardAccount':
-				foundList += '<li><a href="?addr='+encodeURIComponent(data.query)+get_lang()+'">Standard Account: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?addr='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?addr='+encodeURIComponent(data.query);
 				break
 			case 'atAccount':
-				foundList += '<li><a href="?addr='+encodeURIComponent(data.query)+get_lang()+'">AT Account: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?addr='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?addr='+encodeURIComponent(data.query);
 				break
 			case 'transactionSignature':
-				foundList += '<li><a href="?tx='+encodeURIComponent(data.query)+get_lang()+'">Transaction: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?tx='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?tx='+encodeURIComponent(data.query);
 				break
 			case 'blockSignature':
 			case 'blockHeight':
 			case 'blockLast':
-				foundList += '<li><a href="?block='+encodeURIComponent(data.query)+get_lang()+'">Block: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?block='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?block='+encodeURIComponent(data.query);
 				break
 			case 'name':
-				foundList += '<li><a href="?name='+encodeURIComponent(data.query)+get_lang()+'">Name: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?name='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?name='+encodeURIComponent(data.query);
 				break	
 			case 'asset':
-				foundList += '<li><a href="?asset='+encodeURIComponent(data.query)+get_lang()+'">Asset: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?asset='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?asset='+encodeURIComponent(data.query);
 				break	
 			case 'pool':
-				foundList += '<li><a href="?pool='+encodeURIComponent(data.query)+get_lang()+'">Pool: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?pool='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?pool='+encodeURIComponent(data.query);
 				break	
 			case 'trade':
-				foundList += '<li><a href="?trade='+encodeURIComponent(data.query)+get_lang()+'">Trade: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?trade='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?trade='+encodeURIComponent(data.query);
 				break	
 			case 'atTx':
-				foundList += '<li><a href="?atTx='+encodeURIComponent(data.query)+get_lang()+'">AT Transaction: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?atTx='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?atTx='+encodeURIComponent(data.query);
 				break	
 			case 'statement':
 				var params = data.query.split('-');
-				foundList += '<li><a href="?statement='+params[0]+'&Seg_No='+params[1]+get_lang()+'">Statement: '+htmlFilter(data.query)+'</a></li>';
+				foundList += '<li><a href="?statement='+params[0]+'&Seg_No='+params[1]+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
 				foundOne = '?statement='+params[0]+'&Seg_No='+params[1];
+				break	
+			case 'person':
+				foundList += '<li><a href="?person='+encodeURIComponent(data.query)+get_lang()+'">'+row[2]+ ': '+htmlFilter(data.query)+'</a></li>';
+				foundOne = '?person='+encodeURIComponent(data.query);
 				break	
 		}
 	}
@@ -3313,12 +3318,12 @@ function search(data)
 	
 	if(data.foundCount == 0)
 	{
-		output += "<h2>Search no results</h2>";
+		output += "<h2>"+data["title"]+"</h2>";
 	}
 	else 
 	{
 		output += '<table width="" border=0><tr><td align=left>';
-		output += "<h2>Search results:</h2>";
+		output += "<h2>"+data["title"]+":</h2>";
 		output += "<ul>";
 		output += foundList;
 		output += "</ul>";
