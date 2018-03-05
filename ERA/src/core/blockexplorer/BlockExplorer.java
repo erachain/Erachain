@@ -2060,6 +2060,7 @@ if ( asset_1 == null) {
 	//	if (k> DBSet.getInstance().getItemPersonMap().getSize()) k= DBSet.getInstance().getItemPersonMap().getSize();
 		
 		int i=0;
+		if (listPerson != null){
 		for(ItemCls pers:listPerson){
 			
 			PersonCls person = (PersonCls) pers;
@@ -2117,11 +2118,12 @@ if ( asset_1 == null) {
 			
 		}
 		
+		
 		output.put("start_row", listPerson.size()-1);
 		output.put("maxHeight",DCSet.getInstance().getItemPersonMap().getLastKey());
 		output.put("row", -1);
 		output.put("view_Row", listPerson.size()-1);
-		
+		}
 		
 		
 		
