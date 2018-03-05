@@ -625,6 +625,7 @@ public class BlockExplorer
 	public Map jsonQuerySearch(String query)
 	{
 		Map output=new LinkedHashMap();
+		Map outputItem=new LinkedHashMap();
 		Map foundList=new LinkedHashMap();
 
 		output.put("query", query);
@@ -647,13 +648,19 @@ public class BlockExplorer
 			if(query.startsWith("7"))
 			{
 				i++;
-				foundList.put(i, "standardAccount");
+				outputItem=new LinkedHashMap();
+				outputItem.put(1, "standardAccount");
+				outputItem.put(2, Lang.getInstance().translate_from_langObj("Standard Account",langObj));
+				foundList.put(i,outputItem);
 			}
 
 			if(query.startsWith("A"))
 			{
 				i++;
-				foundList.put(i, "atAccount");
+				outputItem=new LinkedHashMap();
+				outputItem.put(1,"atAccount");
+				outputItem.put(2,  Lang.getInstance().translate_from_langObj("At Account",langObj));
+				foundList.put(i,outputItem);
 			}
 
 			output.put("foundCount", i);
@@ -686,7 +693,10 @@ public class BlockExplorer
 			if (isAddresses) 
 			{
 				i++;
-				foundList.put(i, "multiAccount");
+				outputItem=new LinkedHashMap();
+				outputItem.put(1, "multiAccount");
+				outputItem.put(2,  Lang.getInstance().translate_from_langObj("Multi Account",langObj));
+				foundList.put(i, outputItem);
 
 				output.put("foundCount", i);
 				output.put("foundList", foundList);
@@ -699,43 +709,76 @@ public class BlockExplorer
 		if (signatureBytes != null && DCSet.getInstance().getBlockSignsMap().contains(signatureBytes))
 		{
 			i++;
-			foundList.put(i, "blockSignature");
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"blockSignature");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("Block Signature",langObj));
+			foundList.put(i, outputItem);
 		}
 		else if(query.matches("\\d+") && Integer.valueOf(query) > 0 && Integer.valueOf(query) <= getHeight())
 		{
 			i++;
-			foundList.put(i, "blockHeight");
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"blockHeight");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("Block",langObj));
+			foundList.put(i,outputItem);
 		}
 		else if (query.equals("last"))
 		{
 			i++;
-			foundList.put(i, "blockLast");
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"blockLast");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("Block Last",langObj));
+			foundList.put(i,outputItem);
 		}
 		else
 		{
 			if(!(signatureBytes == null) && (DCSet.getInstance().getTransactionFinalMapSigns().contains(signatureBytes)))
 			{
 				i++;
-				foundList.put(i, "transactionSignature");
+				outputItem=new LinkedHashMap();
+				outputItem.put(1,"transactionSignature");
+				outputItem.put(2, Lang.getInstance().translate_from_langObj("Transaction Signature",langObj));
+				foundList.put(i,outputItem);
+				
 			}
 		}
 
 		if (DCSet.getInstance().getNameMap().contains(query))
 		{
 			i++;
-			foundList.put(i, "name");
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"name");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("Name",langObj));
+			foundList.put(i, outputItem);
 		}	
 
 		if (query.matches("\\d+") && DCSet.getInstance().getItemAssetMap().contains(Long.valueOf(query)))
 		{
 			i++;
-			foundList.put(i, "asset");
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"asset");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("Asset",langObj));
+			foundList.put(i, outputItem);
 		}	
+		
+		if (query.matches("\\d+") && DCSet.getInstance().getItemPersonMap().contains(Long.valueOf(query)))
+		{
+			i++;
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"person");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("Person",langObj));
+			foundList.put(i, outputItem);
+		}	
+		
 
 		if (DCSet.getInstance().getPollMap().contains(query))
 		{
 			i++;
-			foundList.put(i, "pool");
+			outputItem=new LinkedHashMap();
+			outputItem.put(1,"pool");
+			outputItem.put(2, Lang.getInstance().translate_from_langObj("pool",langObj));
+			
+			foundList.put(i, outputItem);
 		}	
 
 		if (query.indexOf('/') != -1 )
@@ -748,7 +791,10 @@ public class BlockExplorer
 						DCSet.getInstance().getTransactionFinalMapSigns().contains(Base58.decode(signatures[1])))
 				{
 					i++;
-					foundList.put(i, "trade");
+					outputItem=new LinkedHashMap();
+					outputItem.put(1,"trade");
+					outputItem.put(2, Lang.getInstance().translate_from_langObj("Trade",langObj));					
+					foundList.put(i, outputItem);
 				}
 			}
 			catch (Exception e) 
@@ -769,7 +815,10 @@ public class BlockExplorer
 			if(atTxs.size()>seq)
 			{
 				i++;
-				foundList.put(i, "atTx");
+				outputItem=new LinkedHashMap();
+				outputItem.put(1,"atTx");
+				outputItem.put(2, Lang.getInstance().translate_from_langObj("atTx",langObj));	
+				foundList.put(i, outputItem);
 			}
 		}
 		
@@ -783,13 +832,22 @@ public class BlockExplorer
 			if (DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2(statement, seqno)))
 			{
 				i++;
-				foundList.put(i, "statement");
+				outputItem=new LinkedHashMap();
+				outputItem.put(1,"statement");
+				outputItem.put(2, Lang.getInstance().translate_from_langObj("Statement",langObj));
+				foundList.put(i,outputItem);
 			}
 		}
 
 		output.put("foundCount", i);
 		output.put("foundList", foundList);
 
+		if (i <1 ) {
+			output.put("title", Lang.getInstance().translate_from_langObj("Search no results",langObj));
+			}
+		else {
+			output.put("title", Lang.getInstance().translate_from_langObj("Search results",langObj));
+			};
 		return output;
 	}
 
