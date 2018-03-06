@@ -3870,6 +3870,9 @@ function start() {
 	{
 	var ss = 'search';
 	if (params['search'] == 'person' || params['search'] == 'persons') ss = params['search']; 
+	if (params['search'] == 'asset' || params['search'] == 'assets') ss = params['search']; 
+	
+	
 		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang']+'&search='+params['search'], ss);
 
 		document.title = title + ' - Search - ' + decodeURIComponent(params['q']);

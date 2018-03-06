@@ -176,9 +176,16 @@ public class BlockExplorer
 					
 					String type = info.getQueryParameters().get("search").get(0);
 					if (type.equals("persons") || type.equals("person") ){
+						// search persons
 					output.put("search", type);
 					output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
 					return output;
+					}
+					else if (type.equals("assets") || type.equals("asset") ){
+						// search assets
+						output.put("search", type);
+						output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
+						return output;
 					}
 				}
 				output.putAll(jsonQuerySearch(URLDecoder.decode(info.getQueryParameters().getFirst("q"), "UTF-8")));
@@ -1056,6 +1063,87 @@ public class BlockExplorer
 		return output;
 	}
 	
+	public Map jsonQuerySearchAssets(String search)
+	{
+		Map output=new LinkedHashMap();
+
+		
+		
+		List<ItemCls> listAssets = new ArrayList();
+		if (search != ""){
+			
+			if (search.matches("\\d+") && DCSet.getInstance().getItemAssetMap().contains(Long.valueOf(search))){
+				listAssets .add(DCSet.getInstance().getItemAssetMap().get(Long.valueOf(search)));
+			}else{
+				listAssets = DCSet.getInstance().getItemAssetMap().get_By_Name(search, false);
+			}
+		}
+		
+		   
+		
+		
+	
+		 int view_Row = listAssets.size();
+		 int end = 0 + view_Row;
+		 if (end > listAssets.size()) end = listAssets.size();
+		
+		 output.put("start_row", 0);
+		 int i ;
+		 Map assetsJSON=new LinkedHashMap();
+		 for ( ItemCls asset1:listAssets){
+			 
+			  AssetCls asset = (AssetCls) asset1;
+			 
+				
+			Map assetJSON=new LinkedHashMap();
+			
+			assetJSON.put("key", asset.getKey());
+			assetJSON.put("name", asset.getName());
+			assetJSON.put("description", Processor.process(asset.getDescription()));
+			assetJSON.put("owner", asset.getOwner().getAddress());
+			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(dcSet)));
+			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			assetJSON.put("isDivisible", a);
+			a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			assetJSON.put("isMovable", a);
+			
+			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
+			List<Order> orders = DCSet.getInstance().getOrderMap().getOrders(asset.getKey());
+			List<Trade> trades = DCSet.getInstance().getTradeMap().getTrades(asset.getKey());
+
+			assetJSON.put("operations", orders.size() + trades.size());
+
+			assetsJSON.put(asset.getKey(), assetJSON);
+			
+			
+		}
+		 output.put("assets", assetsJSON);
+		 	output.put("maxHeight",listAssets.size());
+			output.put("row", listAssets.size());
+			output.put("view_Row", view_Row);
+			output.put("label_Title",  Lang.getInstance().translate_from_langObj("Assets",langObj));
+			output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
+			output.put("label_table_asset_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+			output.put("label_table_asset_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+			output.put("label_table_asset_movable", Lang.getInstance().translate_from_langObj("Movable",langObj));
+			output.put("label_table_asset_description", Lang.getInstance().translate_from_langObj("Description",langObj));
+			output.put("label_table_asset_divisible", Lang.getInstance().translate_from_langObj("Divisible",langObj));
+			output.put("label_table_asset_amount", Lang.getInstance().translate_from_langObj("Amount",langObj));
+			output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+			output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+			
+			
+
+			
+
+			
+			
+			
+		return output;
+	}
 	
 
 	public Map jsonQueryATs()
@@ -2051,7 +2139,7 @@ if ( asset_1 == null) {
 			if (search.matches("\\d+") && DCSet.getInstance().getItemPersonMap().contains(Long.valueOf(search))){
 				listPerson.add(DCSet.getInstance().getItemPersonMap().get(Long.valueOf(search)));
 			}else{
-				listPerson = DCSet.getInstance().getItemPersonMap().get_By_Name(search, true);
+				listPerson = DCSet.getInstance().getItemPersonMap().get_By_Name(search, false);
 			}
 		}
 		
