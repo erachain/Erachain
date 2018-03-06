@@ -53,6 +53,7 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.persons.PersonCls;
+import core.item.statuses.StatusCls;
 import core.item.templates.TemplateCls;
 import core.naming.Name;
 import core.payment.Payment;
@@ -549,6 +550,31 @@ public class BlockExplorer
 				return output;
 			}
 			
+			if(info.getQueryParameters().containsKey("statuses"))
+			{
+				int start = -1;
+
+				if(info.getQueryParameters().containsKey("start"))
+				{
+					
+					try {
+						start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+					} catch (NumberFormatException e) {
+						// TODO Auto-generated catch block
+						start = 0;
+					}
+				}
+
+				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryStatuses(start));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+			
+			
 			
 			if(info.getQueryParameters().containsKey("template"))
 			{
@@ -560,6 +586,17 @@ public class BlockExplorer
 				return output;
 			}
 
+			if(info.getQueryParameters().containsKey("status"))
+			{
+				output.put("lastBlock", jsonQueryLastBlock());
+
+				output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
+			
+		
 			
 			if(info.getQueryParameters().containsKey("Seg_No"))
 			{
@@ -4018,6 +4055,46 @@ if ( asset_1 == null) {
 		return output;
 	}
 
+	public Map jsonQueryStatuses(int start)
+	{
+		Map output=new LinkedHashMap();
+
+		SortableList<Long, ItemCls> it = DCSet.getInstance().getItemStatusMap().getList();
+
+
+		int view_Row = 21;
+		int end = start + view_Row;
+		if (end > it.size()) end = it.size();
+		
+		output.put("start_row", start);
+		int i;
+		Map templatesJSON = new LinkedHashMap();
+		for (i=start ; i< end; i++){
+			 
+			StatusCls template = (StatusCls) it.get(i).getB();
+			 
+			Map templateJSON=new LinkedHashMap();
+			
+			templateJSON.put("key", template.getKey());
+			templateJSON.put("name", template.getName());
+			templateJSON.put("description", Processor.process(template.getDescription()));
+			templateJSON.put("owner", template.getOwner().getAddress());
+
+			templatesJSON.put(template.getKey(), templateJSON);
+		}
+		output.put("view_Row", view_Row);
+		output.put("hasLess", start > view_Row);
+		output.put("hasMore", end < it.size());
+		output.put("templates", templatesJSON);
+		output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
+		output.put("label_table_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+		output.put("label_table_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+		output.put("label_table_description", Lang.getInstance().translate_from_langObj("Description",langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+		output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+			
+		return output;
+	}
 
 	public Map jsonQueryTemplate(Long key) {
 		Map output=new LinkedHashMap();
@@ -4040,6 +4117,27 @@ if ( asset_1 == null) {
 		return output;
 	}
 
+	public Map jsonQueryStatus(Long key) {
+		Map output=new LinkedHashMap();
+		
+		StatusCls template = (StatusCls)DCSet.getInstance().getItemStatusMap().get(key);
+		
+		Map templateJSON = new LinkedHashMap();
+		templateJSON.put("key", template.getKey());
+		templateJSON.put("name", template.getName());
+		templateJSON.put("description", Processor.process(template.getDescription()));
+		templateJSON.put("owner", template.getOwner().getAddress());
+		
+		output.put("status", templateJSON);
+		
+		output.put("label_Template", Lang.getInstance().translate_from_langObj("Status", langObj));
+		output.put("label_Key", Lang.getInstance().translate_from_langObj("Key", langObj));
+		output.put("label_Creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
+		output.put("label_Description", Lang.getInstance().translate_from_langObj("Description", langObj));
+
+		return output;
+	}
+	
 	
 	private Map jsonQueryStatement(String block, String seg_No) {
 		// TODO Auto-generated method stub

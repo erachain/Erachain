@@ -9,6 +9,7 @@
 	<script src="/index/libs/js/sidebar.js"></script>
 	<script src="/index/libs/js/common.js"></script>
 	<script src="/index/libs/js/explorerStatements.js"></script>
+	<script src="/index/libs/js/explorerStatuses.js"></script>
 	<script src="/index/libs/js/explorerTemplates.js"></script>
 	<script src="/index/libs/js/explorerTransactionsTable.js"></script>
 	<script src="/index/libs/js/third-party/qrcode.min.js"></script>
@@ -288,6 +289,15 @@ function asyncAjax (url, type){
 				{
 					document.getElementById('main').innerHTML = search(data);
 					$('#searchparam').val(data.search);
+				}
+				if (type == 'statuses')
+				{
+					document.getElementById('main').innerHTML = statuses(data);
+				}
+				
+				if (type == 'status')
+				{
+					document.getElementById('main').innerHTML = status(data);
 				}
 				
 				document.getElementById('loading').style.display = 'none';
@@ -3538,7 +3548,7 @@ function start() {
 	document.getElementById('menu_percons').href ='?persons&startPerson&lang='+ params['lang'] ;
 	document.getElementById('menu_pals_asset').href ='?polls&asset=1&lang='+ params['lang'] ;
 	document.getElementById('menu_assets').href ='?assets&lang='+ params['lang'] ;
-	//document.getElementById('menu_aTs').href ='?aTs&lang='+ params['lang'] ;
+	document.getElementById('menu_statuses').href ='?statuses&lang='+ params['lang'] ;
 	document.getElementById('menu_peers').href ='?peers&lang='+ params['lang'] ;
 	document.getElementById('menu_templates').href ='?templates&lang='+ params['lang'] ;
 	
@@ -3549,7 +3559,7 @@ function start() {
 	document.getElementById('menuTop100Richest').setAttribute('class', '');
 	document.getElementById('menuPolls').setAttribute('class', '');
 	document.getElementById('menuAssets').setAttribute('class', '');
-//	document.getElementById('menuATs').setAttribute('class', '');
+	document.getElementById('menuStatuses').setAttribute('class', '');
 	
 
 	
@@ -3593,6 +3603,18 @@ function start() {
 		document.title = title + ' - Assets';
 		
 		document.getElementById('menuAssets').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	if(params.hasOwnProperty('statuses'))
+	{
+		asyncAjax('blockexplorer.json?statuses'+'&lang='+params['lang']+'&start=' + params['start'], 'statuses')
+		
+		
+		document.title = title + ' - Statuses';
+		
+		document.getElementById('menuStatuses').setAttribute('class', 'active');
 		
 		return;
 	}
@@ -3824,6 +3846,30 @@ function start() {
 		return;
 	}
 	
+	if(params.hasOwnProperty('status'))
+	{
+		var assets = getQueryParams('status');
+		if(assets.length == 2)
+		{
+			asyncAjax('blockexplorer.json?status=' + assets[0] + '&status='+assets[1]+'&lang='+params['lang'], 'trades');
+			
+			document.title = title + ' - Trades - ' + assets[0] + ' - '+ assets[1];
+		}
+		else
+		{
+			asyncAjax('blockexplorer.json?status=' + params['status']+'&lang='+params['lang'], 'status');
+			
+			document.title = title + ' - Asset - ' + params['status'];
+			
+			document.getElementById('q').value = decodeURIComponent(params['status']);
+		}
+		
+		document.getElementById('menuStatuses').setAttribute('class', 'active');
+		
+		return;
+	}
+	
+	
 	if(params.hasOwnProperty('block'))
 	{
 		var page;
@@ -3871,7 +3917,7 @@ function start() {
 	var ss = 'search';
 	if (params['search'] == 'person' || params['search'] == 'persons') ss = params['search']; 
 	if (params['search'] == 'asset' || params['search'] == 'assets') ss = params['search']; 
-	
+	if (params['search'] == 'status' || params['search'] == 'statuses') ss = params['search']; 
 	
 		asyncAjax('blockexplorer.json?q=' + params['q']+'&lang='+params['lang']+'&search='+params['search'], ss);
 
@@ -4042,7 +4088,7 @@ function Lang_setting(){
 				<li id=menuPersons><a href="?persons&startPerson" id =menu_percons><translate>Persons</translate></a></li>
 				<li id=menuPolls><a href="?polls&asset=1" id =menu_pals_asset><translate>Polls</translate></a></li>
 				<li id=menuAssets><a href="?assets" id =menu_assets><translate>Assets</translate></a></li>
-		<!--		<li id=menuATs><a href="?aTs" id =menu_aTs><translate>ATs</translate></a></li>	-->
+				<li id=menuStatuses><a href="?statuses" id =menu_statuses><translate>Statuses</translate></a></li>	
 				<li id=menupeers><a href="?peers" id=menu_peers><translate>Peers</translate></a></li>				
 				<li id=menutemplates><a href="?templates" id=menu_templates><translate>Templates</translate></a></li>		
               </ul>
