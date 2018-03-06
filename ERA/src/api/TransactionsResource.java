@@ -606,7 +606,7 @@ public class TransactionsResource {
 	public String incomingRecipientDecrypt(@PathParam("height") int height, @PathParam("address") String address,
 			@PathParam("password") String password) {
 
-		APIUtils.askAPICallAllowed(password, "GET incoming + decrypt data\n", request);
+		APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] decrypt data - password: " + password + "\n", request);
 		
 
 		// CHECK IF WALLET EXISTS

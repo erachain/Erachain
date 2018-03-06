@@ -554,11 +554,11 @@ public class BlockExplorer
 			}
 
 			
-			if(info.getQueryParameters().containsKey("statement"))
+			if(info.getQueryParameters().containsKey("Seg_No"))
 			{
 				
 				output.put("lastBlock", jsonQueryLastBlock());
-				output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),info.getQueryParameters().getFirst("Seg_No")));
+				output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("block"),info.getQueryParameters().getFirst("Seg_No")));
 
 				output.put("queryTimeMs", stopwatchAll.elapsedTime());
 				return output;
@@ -836,10 +836,10 @@ public class BlockExplorer
 		Matcher matcher = statementPattern.matcher(query);
 		if (matcher.matches())
 		{
-			Integer statement = Integer.valueOf(matcher.group(1));
-			Integer seqno = Integer.valueOf(matcher.group(2));
+			Integer blockNo = Integer.valueOf(matcher.group(1));
+			Integer seqNo = Integer.valueOf(matcher.group(2));
 			
-			if (DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2(statement, seqno)))
+			if (DCSet.getInstance().getTransactionFinalMap().contains(new Tuple2(blockNo, seqNo)))
 			{
 				i++;
 				outputItem=new LinkedHashMap();
@@ -3959,8 +3959,6 @@ if ( asset_1 == null) {
 		
 		R_SignNote trans = (R_SignNote) DCSet.getInstance().getTransactionFinalMap().getTransaction(new Integer(block), new Integer(seg_No));
 		
-		
-		
 	//	output.put("Label_title", Lang.getInstance().translate_from_langObj("Title",langObj));
 		output.put("Label_statement", Lang.getInstance().translate_from_langObj("Statement",langObj));
 		output.put("Label_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
@@ -3973,7 +3971,6 @@ if ( asset_1 == null) {
 		output.put("Seg_No",seg_No);
 		
 		TemplateCls statement = (TemplateCls)ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, trans.getKey());
-			
 		
 		if (!trans.isEncrypted()) {
 			
@@ -4316,7 +4313,7 @@ if ( asset_1 == null) {
 		for (int i = 0; i < signatures.length; i++) {
 			signatureBytes = Base58.decode(signatures[i]);
 			Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
-			transaction.calcFee();
+			transaction.setDC(db, false);
 			List<Transaction>tt = new ArrayList<Transaction>();
 			tt.add(transaction);
 		//	output.put("transaction_Header",Transactions_JSON(tt));

@@ -86,7 +86,7 @@ public class AboutFrame extends JDialog{
         //ADD GENERAL TABPANE TO FRAME
         getContentPane().add(this.aboutPanel);
         GridBagLayout gbl_aboutPanel = new GridBagLayout();
-        gbl_aboutPanel.columnWidths = new int[]{310, 181, 70, 5};
+        gbl_aboutPanel.columnWidths = new int[]{310, 181, 70, 200};
         gbl_aboutPanel.rowHeights = new int[]{252, 0, 0, 0, 0, 0};
         gbl_aboutPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_aboutPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};

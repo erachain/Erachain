@@ -2119,7 +2119,8 @@ public class Controller extends Observable {
 			Object[] options = { Lang.getInstance().translate("Yes"), Lang.getInstance().translate("No") };
 
 			StringBuilder sb = new StringBuilder(Lang.getInstance().translate("Permission Request: "));
-			sb.append(Lang.getInstance().translate("Do you want to authorize the following API call?\n\n") + json);
+			sb.append(Lang.getInstance().translate("Do you want to authorize the following API call?\n\n") + json
+					+ " \n" + request.getRequestURL());
 			JTextArea jta = new JTextArea(sb.toString());
 			jta.setLineWrap(true);
 			jta.setEditable(false);
