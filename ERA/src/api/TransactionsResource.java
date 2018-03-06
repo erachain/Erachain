@@ -606,8 +606,7 @@ public class TransactionsResource {
 	public String incomingRecipientDecrypt(@PathParam("height") int height, @PathParam("address") String address,
 			@PathParam("password") String password) {
 
-		APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] decrypt data - password: " + password + "\n", request);
-		
+		boolean needPass = true; 
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -646,6 +645,10 @@ public class TransactionsResource {
 						
 							if (r_data != null && r_data.length > 0) {
 	
+								if (needPass) {
+									APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] DECRYPT data - password: " + password + "\n", request);
+									needPass = false;
+								}
 								r_data = cntr.decrypt(transaction.getCreator(), recipient, r_data);
 								if (r_data == null) {
 						    		json.put("data", "error decryption");
