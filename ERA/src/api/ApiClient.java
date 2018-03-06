@@ -215,6 +215,12 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET transactions/incoming/{height}/{address}/decrypt/{password}",
+				"Returns an array of the transactions of a specific block height and recipient with decryption.",
+				""
+			},
+			
+			{
 				"POST transactions/find {\"address\":\"<address>\", \"sender\":\"<sender>\", \"recipient\":\"<recipient>\", \"type\":<type>, \"service\":<service>, \"offset\":<offset>, \"limit\":<limit>, \"minHeight\":<minHeight>, \"maxHeight\":<maxHeight>, \"desc\":<true/false>, \"count\":<true/false>}",
 				"Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"service\" means service of ArbitraryTransaction. \"minHeight\" and \"maxHeight\" means height of blocks. All params are optional, but must be specified at least one address field.",
 				"Errors: 102 - Invalid address."

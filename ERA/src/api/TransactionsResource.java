@@ -600,6 +600,80 @@ public class TransactionsResource {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("incoming/{height}/{address}/decrypt/{password}")
+	public String incomingRecipientDecrypt(@PathParam("height") int height, @PathParam("address") String address,
+			@PathParam("password") String password) {
+
+		APIUtils.askAPICallAllowed(password, "GET incoming + decrypt data\n", request);
+		
+
+		// CHECK IF WALLET EXISTS
+		if (!Controller.getInstance().doesWalletExists()) {
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+		}
+
+		Block block;
+		try {
+			block = Controller.getInstance().getBlockByHeight(height);
+			if (block == null) {
+				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+			}
+		} catch (Exception e) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+		}
+
+		JSONArray array = new JSONArray();
+		Controller cntr = Controller.getInstance();
+		DCSet dcSet = DCSet.getInstance();
+
+		for (Transaction transaction : block.getTransactions()) {
+			transaction.setDC(dcSet, false);
+			HashSet<Account> recipients = transaction.getRecipientAccounts();
+			for (Account recipient: recipients) {
+				if (recipient.equals(address)) {
+					
+					JSONObject json = transaction.toJson();
+										
+					if (json.containsKey("encrypted")) {
+						
+						byte[] r_data = null;
+						
+						if (transaction instanceof R_Send) {
+							R_Send r_Send = (R_Send) transaction;
+							r_data = r_Send.getData();
+						
+							if (r_data != null && r_data.length > 0) {
+	
+								r_data = cntr.decrypt(transaction.getCreator(), recipient, r_data);
+								if (r_data == null) {
+						    		json.put("data", "error decryption");
+								} else {
+									if (r_Send.isText()) {
+										try {
+								    		json.put("data", new String(r_data, "UTF-8"));
+										} catch (UnsupportedEncodingException e) {
+								    		json.put("data", "error UTF-8");
+										}
+									} else {
+							    		json.put("data", Base58.encode(r_data));
+									}
+								}
+							}
+						}
+					}
+
+					array.add(json);
+					break;
+				}
+			}
+		}
+
+		return array.toJSONString();
+
+	}
+
 	// check1 = 1 - check transaction. not save in chain. return fee
 	@SuppressWarnings("unchecked")
 	@GET
@@ -775,40 +849,23 @@ public class TransactionsResource {
 		if (r_data == null || r_data.length == 0)
 			return null;
 
-		APIUtils.askAPICallAllowed(password, "POST decrypt\n " + signature, request);
+		APIUtils.askAPICallAllowed(password, "POST decrypt data\n " + signature, request);
 		
-		byte[] privateKey = null; 
-		byte[] publicKey = null;
-		//IF SENDER ANOTHER
-		if(account == null)
-		{
-    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(r_Send.getRecipient().getAddress());
-			privateKey = accountRecipient.getPrivateKey();		
-			
-			publicKey = r_Send.getCreator().getPublicKey();    				
+		byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
+		if (ddd == null) {
+			return "wrong decryption";
 		}
-		//IF SENDER ME
-		else
-		{
-    		PrivateKeyAccount accountRecipient = Controller.getInstance().getPrivateKeyAccountByAddress(account.getAddress());
-			privateKey = accountRecipient.getPrivateKey();		
-			
-			publicKey = Controller.getInstance().getPublicKeyByAddress(r_Send.getRecipient().getAddress());    				
+		
+		if (r_Send.isText()) {
+			try {
+    		String str = (new String(ddd, "UTF-8"));
+    		return str;    			
+			} catch (UnsupportedEncodingException e) {
+				return "error UTF-8";
+			}
+		} else {
+    		String str = Base58.encode(ddd);
+    		return str;			
 		}
-
-		try {
-    		byte[] ddd = AEScrypto.dataDecrypt(r_data, privateKey, publicKey);
-    		if (r_Send.isText()) {
-        		String str = (new String(ddd, "UTF-8"));
-        		return str;    			
-    		} else {
-        		String str = Base58.encode(ddd);
-        		return str;
-    			
-    		}
-		} catch (UnsupportedEncodingException | InvalidCipherTextException e1) {
-			return e1.getMessage();
-		}
-
 	}
 }

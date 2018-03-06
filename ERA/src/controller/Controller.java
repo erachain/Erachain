@@ -7,6 +7,7 @@ import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -34,6 +35,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -58,6 +61,7 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
+import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -2005,6 +2009,38 @@ public class Controller extends Observable {
 		} else {
 			return null;
 		}
+	}
+
+	public byte[] decrypt(PublicKeyAccount creator, Account recipient, byte[] data) {
+		
+		Account account = this.getAccountByAddress(creator.getAddress());	
+		
+		byte[] privateKey = null; 
+		byte[] publicKey = null;
+		
+		//IF SENDER ANOTHER
+		if(account == null)
+		{
+    		PrivateKeyAccount accountRecipient = this.getPrivateKeyAccountByAddress(recipient.getAddress());
+			privateKey = accountRecipient.getPrivateKey();		
+			
+			publicKey = creator.getPublicKey();    				
+		}
+		//IF SENDER ME
+		else
+		{
+    		PrivateKeyAccount accountRecipient = this.getPrivateKeyAccountByAddress(account.getAddress());
+			privateKey = accountRecipient.getPrivateKey();		
+			
+			publicKey = this.getPublicKeyByAddress(recipient.getAddress());    				
+		}
+
+		try {
+    		return AEScrypto.dataDecrypt(data, privateKey, publicKey);
+		} catch (InvalidCipherTextException e1) {
+			return null;
+		}
+		
 	}
 
 	public Account getAccountByAddress(String address) {
