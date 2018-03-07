@@ -188,6 +188,13 @@ public class BlockExplorer
 						output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
 						return output;
 					}
+					else if (type.equals("status") || type.equals("statuses") ){
+						// search assets
+						output.put("search", type);
+						output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
+						return output;
+					}
+					
 				}
 				output.putAll(jsonQuerySearch(URLDecoder.decode(info.getQueryParameters().getFirst("q"), "UTF-8")));
 				return output;
@@ -4095,7 +4102,48 @@ if ( asset_1 == null) {
 			
 		return output;
 	}
+	public Map jsonQuerySearchStatuses(String search)
+	{
+		
+		List<ItemCls> listPerson = new ArrayList();
+		if (search != ""){
+			
+			if (search.matches("\\d+") && DCSet.getInstance().getItemStatusMap().contains(Long.valueOf(search))){
+				listPerson.add(DCSet.getInstance().getItemPersonMap().get(Long.valueOf(search)));
+			}else{
+				listPerson = DCSet.getInstance().getItemStatusMap().get_By_Name(search, false);
+			}
+		}
+		Map output=new LinkedHashMap();
+		Map templatesJSON = new LinkedHashMap();
+		if (listPerson != null){
+			for(ItemCls pers:listPerson){
+			 
+			StatusCls template = (StatusCls) pers;
+			 
+			Map templateJSON=new LinkedHashMap();
+			
+			templateJSON.put("key", template.getKey());
+			templateJSON.put("name", template.getName());
+			templateJSON.put("description", Processor.process(template.getDescription()));
+			templateJSON.put("owner", template.getOwner().getAddress());
 
+			templatesJSON.put(template.getKey(), templateJSON);
+		}
+		output.put("view_Row", listPerson.size()-1);
+		output.put("hasLess", false);
+		output.put("hasMore", true);
+		output.put("templates", templatesJSON);
+		output.put("label_table_key", Lang.getInstance().translate_from_langObj("Key",langObj));
+		output.put("label_table_name", Lang.getInstance().translate_from_langObj("Name",langObj));
+		output.put("label_table_creator", Lang.getInstance().translate_from_langObj("Creator",langObj));
+		output.put("label_table_description", Lang.getInstance().translate_from_langObj("Description",langObj));
+		output.put("Label_Later", Lang.getInstance().translate_from_langObj(">>",langObj));
+		output.put("Label_Previous", Lang.getInstance().translate_from_langObj("<<",langObj));
+		}	
+		return output;
+	}
+	
 	public Map jsonQueryTemplate(Long key) {
 		Map output=new LinkedHashMap();
 		
