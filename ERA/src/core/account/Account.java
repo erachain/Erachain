@@ -73,8 +73,8 @@ public class Account {
 
 
 	protected String address;
-	
-	//private byte[] lastBlockSignature;
+	protected byte[] bytes;
+	protected byte[] shortBytes;
 	//private long generatingBalance; //used  for forging balance
 	
 	protected Account()
@@ -86,8 +86,9 @@ public class Account {
 	{
 
 		// ///test address
-		assert(Base58.decode(address) instanceof byte[] );
-		
+		assert(Base58.decode(address) instanceof byte[]);
+		this.bytes = Base58.decode(address);
+		this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
 		this.address = address;
 	}
 	
@@ -130,11 +131,30 @@ public class Account {
 		}
 
 	}
+
 	public String getAddress()
 	{
 		return address;
 	}
-	
+
+	public byte[] getBytes()
+	{
+		if (this.bytes == null) {
+			this.bytes = Base58.decode(address);
+			this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
+		}
+		return bytes;
+	}
+
+	public byte[] getShortBytes()
+	{
+		if (this.bytes == null) {
+			this.bytes = Base58.decode(address);
+			this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
+		}
+		return this.shortBytes;
+	}
+
 	//BALANCE
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(long key)
 	{
@@ -245,6 +265,25 @@ public class Account {
 	{
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this.getBalance(dcSet, key);
 		BigDecimal ownVol = balance.a.b;
+		
+		int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
+		if (item != null) {
+			if (item[0][0] < 0) {
+				return BigDecimal.ZERO;
+			}
+			
+			int height = dcSet.getBlockMap().size();
+			BigDecimal freeze = BigDecimal.ZERO;
+			for (int[] point: item) {
+				if (height < point[0]) {
+					freeze = new BigDecimal(point[1]).setScale(8);
+					break;
+				}
+			}
+			ownVol = ownVol.subtract(freeze);
+		}
+		
+		
 		BigDecimal inDebt = balance.b.b;
 		if (inDebt.signum() < 0) {
 			ownVol = ownVol.add(inDebt);
@@ -794,9 +833,16 @@ public class Account {
 	public boolean equals(Object b)
 	{
 		if(b instanceof Account) {
-			return this.getAddress().equals(((Account) b).getAddress());
+			return this.address.equals(((Account) b).getAddress());
 		} else if (b instanceof String) {
-			return this.getAddress().equals((String) b);			
+			return this.address.equals((String) b);	
+		} else if (b instanceof byte[]) {
+			byte[] bs = (byte[]) b;
+			if (bytes.length == ADDRESS_LENGTH) {
+				return Arrays.equals(this.bytes, bs);
+			} else {
+				return Arrays.equals(this.shortBytes, bs);
+			}
 		}
 		
 		return false;	

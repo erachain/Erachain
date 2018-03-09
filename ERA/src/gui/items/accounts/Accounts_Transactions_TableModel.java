@@ -79,7 +79,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	private HashSet actionTypes;
 
 	public Accounts_Transactions_TableModel() {
-		sender = new Account("");
+		//sender = new Account("");
 		// trans_List = new ArrayList<Trans>();
 
 		r_Trans = new ArrayList<Transaction>();
@@ -174,7 +174,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		
 		
 		
-		if (this.trans_List == null || this.trans_List.length == 0) {
+		if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {
 			return null;
 		}
 		// summa
@@ -363,7 +363,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
 	public void get_R_Send() {
 
-		if (this.sender.getAddress() == null || this.asset == null)
+		if (this.sender == null || this.asset == null)
 			return;
 		this.r_Trans.clear();
 		trans_Hash_Map = new HashMap<String, Trans>();

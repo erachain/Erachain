@@ -88,6 +88,10 @@ public abstract class TransactionAmount extends Transaction {
 			1496474042552L
 		};
 
+	private static final byte[][] TRUSTED_FOR_ANONYMOUS_SEND = new byte[][]{
+		Base58.decode("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ")
+		};
+
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
@@ -339,18 +343,31 @@ public abstract class TransactionAmount extends Transaction {
 	@Override // - fee + balance - calculate here
 	public int isValid(DCSet dcSet, Long releaserReference) {
 
+		int height = this.getBlockHeightByParentOrLast(dcSet);
+		boolean wrong = true;
+
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
 		{
-			return INVALID_ADDRESS;
+			if (height < 120000) {
+				wrong = true;
+				for ( byte[] valid_address: Transaction.VALID_ADDRESSES) {
+					if (Arrays.equals(this.recipient.getBytes(), valid_address)) {
+						wrong = false;
+						break;
+					}
+				}
+				
+				if (wrong) {
+					return INVALID_ADDRESS;
+				}
+			}
 		}
 		
 		//CHECK IF REFERENCE IS OK
 		Long reference = releaserReference==null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
-
-		int height = this.getBlockHeightByParentOrLast(dcSet);
 
 		boolean isPerson = this.creator.isPerson(dcSet, height);
 
@@ -445,23 +462,27 @@ public abstract class TransactionAmount extends Transaction {
 					
 					// SPEND ASSET
 					
-					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE) {
+					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
+							) {
 						
-						if (height > Transaction.FREEZE_FROM) {
+						//byte[] ss = this.creator.getAddress();
+						if (height > Transaction.FREEZE_FROM
+								&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 							// LOCK PAYMENTS
-							boolean wrong = true;
+							wrong = true;
 							for ( String address: Transaction.TRUE_ADDRESSES) {
-								if (this.creator.equals(address)
-										|| this.recipient.equals(address)) {
+								if (this.recipient.equals(address)
+										// || this.creator.equals(address)
+										) {
 									wrong = false;
 									break;
 								}
 							}
 							
 							if (wrong) {
-								int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();								
-								if (balance > 3000)
-									return INVALID_ADDRESS;
+								//int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();								
+								//if (balance > 3000)
+									return INVALID_CREATOR;
 							}
 
 						}
@@ -479,16 +500,17 @@ public abstract class TransactionAmount extends Transaction {
 						// not make RETURN - check validate next
 						//
 					} else if (absKey == FEE_KEY) {
-						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
-							boolean ok = true;
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0
+								&& height < 120000) {
+							wrong = true;
 							for ( byte[] valid_item: VALID_BAL) {
 								if (Arrays.equals(this.signature, valid_item)) {
-									ok = false;
+									wrong = false;
 									break;
 								}
 							}
 							
-							if (ok)
+							if (wrong)
 								return NO_BALANCE;
 						}
 						
@@ -501,15 +523,15 @@ public abstract class TransactionAmount extends Transaction {
 						if (amount.compareTo(forSale) > 0) {
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
-							boolean ok = true;
+							wrong = true;
 							for ( byte[] valid_item: VALID_BAL) {
 								if (Arrays.equals(this.signature, valid_item)) {
-									ok = false;
+									wrong = false;
 									break;
 								}
 							}
 							
-							if (ok)
+							if (wrong)
 								return NO_BALANCE;
 						}
 						
@@ -529,7 +551,16 @@ public abstract class TransactionAmount extends Transaction {
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
 				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(dcSet, height)) {
-					return RECEIVER_NOT_PERSONALIZED;
+					for (byte[] trusted_address: TRUSTED_FOR_ANONYMOUS_SEND) {
+						if (Arrays.equals(this.recipient.getBytes(), trusted_address)) {
+							wrong = false;
+							break;
+						}
+					}
+					
+					if (wrong) {
+						return RECEIVER_NOT_PERSONALIZED;
+					}
 				}
 			}
 

@@ -18,6 +18,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -249,25 +250,15 @@ public class CreateOrderTransaction extends Transaction {
 		long have = this.order.getHave();
 		long want = this.order.getWant();
 
-		if (have == RIGHTS_KEY && want != FEE_KEY) {
+		if (have == RIGHTS_KEY && !BlockChain.DEVELOP_USE
+				//&& want != FEE_KEY
+				) {
 			// have ERA
 			int height = this.getBlockHeightByParentOrLast(db);
-			if (height > Transaction.FREEZE_FROM) {
+			if (height > Transaction.FREEZE_FROM
+					&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 				// LOCK ERA sell
-				boolean wrong = true;
-				for (String address : Transaction.TRUE_ADDRESSES) {
-					if (this.creator.equals(address)) {
-						wrong = false;
-						break;
-					}
-				}
-
-				if (wrong) {
-					int balance = this.creator.getBalance(dcSet, RIGHTS_KEY, 1).b.intValue();
-					if (balance > 3000)
-						return INVALID_ADDRESS;
-				}
-
+				return INVALID_CREATOR;
 			}
 		}
 

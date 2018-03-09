@@ -26,6 +26,7 @@ import com.google.common.primitives.UnsignedBytes;
 //import com.sun.media.jfxmedia.logging.Logger;
 import org.apache.log4j.Logger;
 
+import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
@@ -245,9 +246,25 @@ public class BlockMap extends DCMap<Integer, Block> {
 		this.processing = processing;
 	}
 
+	static boolean init1 = true;
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();
 
+		if (init1) {
+			init1 = false;
+			Iterator<Integer> iterator = this.getIterator(0, true);
+			while (iterator.hasNext()) {
+				Integer key = iterator.next();
+				Block itemBlock = this.get(key);
+				byte[] pkb = itemBlock.getCreator().getPublicKey();
+				PublicKeyAccount pk = new PublicKeyAccount(pkb);
+				if (((Account)pk).equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")) {
+					LOGGER.error(key + " - 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y : " + Base58.encode(pkb));
+				}
+				
+			}
+		}
+		
 		byte[] signature = block.getSignature();
 		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(signature);
 		if (item != null && item.a > 0) {

@@ -57,10 +57,13 @@ public class PublicKeyAccount extends Account {
 	{
 		if (b instanceof PublicKeyAccount) {
 			return Arrays.equals(publicKey, ((PublicKeyAccount) b).getPublicKey());
+		} else if (b instanceof byte[]) {
+			byte[] bs = (byte[]) b;
+			return Arrays.equals(this.publicKey, bs);
 		} else if (b instanceof Account) {
-			return this.getAddress().equals(((Account) b).getAddress());
+			return this.address.equals(((Account) b).getAddress());
 		} else if (b instanceof String) {
-			return this.getAddress().equals((String) b);			
+			return this.address.equals((String) b);			
 		}
 		
 		return false;	

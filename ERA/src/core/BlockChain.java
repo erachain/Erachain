@@ -3,8 +3,12 @@ package core;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import controller.Controller;
@@ -85,6 +89,10 @@ public class BlockChain
 		};
 
 
+	public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
+	public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
+
+
 	// CHAIN
 	public static final int CONFIRMS_HARD = 3; // for reference by signature 
 	// MAX orphan CHAIN
@@ -146,6 +154,64 @@ public class BlockChain
 		//CREATE GENESIS BLOCK
 		genesisBlock = new GenesisBlock();
 		genesisTimestamp = genesisBlock.getTimestamp(null);
+		
+		// TEST
+		FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
+		
+		// ERACHAIN FUNDATION
+		FOUNDATION_ADDRESSES.add("74a73pykkNwmuwkZdh5Lt2xTbK7anG5B6i");
+		FOUNDATION_ADDRESSES.add("7QTDHp15vcHN3F4zP2BTcDXJkeotzQZkG4");
+		FOUNDATION_ADDRESSES.add("7FiXN8VTgjMsLrZUQY9ZBFNfek7SsDP6Uc");
+		FOUNDATION_ADDRESSES.add("74QcLxHgPkuMSPsKTh7zGpJsd5aAxpWpFA");
+		FOUNDATION_ADDRESSES.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+		FOUNDATION_ADDRESSES.add("7P3HR8kdj4ojXPvpTnEtVnpEwenipvrcH1");
+		FOUNDATION_ADDRESSES.add("75Mb8cGchcG4DF31wavhNrnoycWsoLQqP4");
+		FOUNDATION_ADDRESSES.add("75LzKAoxx4TgAAkpMRStve26YEY625TCRE");
+
+		FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // STOLEN
+		FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // LOSED
+		FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // FREEZED
+		
+
+		// TEST
+		//FREEZED_BALANCES.put("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7",
+		//		new int[][]{{9000, 110000}, {3200, 90000}, {138000, 7000}, {547500, 5000}});
+
+		// TEAM 2
+		FREEZED_BALANCES.put("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
+				new int[][]{{219000, 110000}, {328500, 90000}, {438000, 70000}, {547500, 50000}});
+		FREEZED_BALANCES.put("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs",
+				new int[][]{{219000, 110000}, {328500, 90000}, {438000, 70000}, {547500, 50000}});
+		FREEZED_BALANCES.put("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G",
+				new int[][]{{219000, 110000}, {328500, 90000}, {438000, 70000}, {547500, 50000}});
+
+		// TEAM 3
+		FREEZED_BALANCES.put("7GMENsugxjV8PToyUyHNUQF7yr9Gy6tJou",
+				new int[][]{{219000, 150000}, {328500, 100000}, {438000, 70000}, {547500, 30000}});
+		FREEZED_BALANCES.put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm",
+				new int[][]{{219000, 150000}, {328500, 100000}, {438000, 70000}, {547500, 30000}});
+		FREEZED_BALANCES.put("7QUeuMiWQjoQ3MZiriwhKfEG558RJWUUis",
+				new int[][]{{219000, 150000}, {328500, 100000}, {438000, 70000}, {547500, 30000}});
+		FREEZED_BALANCES.put("7MxscS3mS6VWim8B9K3wEzFAUWYbsMkVon",
+				new int[][]{{219000, 140000}, {328500, 90000}, {438000, 60000}, {547500, 30000}});
+		FREEZED_BALANCES.put("79NMuuW7thad2JodQ5mKxbMoyf1DjNT9Ap",
+				new int[][]{{219000, 130000}, {328500, 90000}, {438000, 50000}, {547500, 20000}});
+		FREEZED_BALANCES.put("7MhifBHaZsUcjgckwFN57bAE9fPJVDLDQq",
+				new int[][]{{219000, 110000}, {328500, 80000}, {438000, 50000}, {547500, 20000}});
+		FREEZED_BALANCES.put("7FRWJ4ww3VstdyAyKFwYfZnucJBK7Y4zmT",
+				new int[][]{{219000, 100000}, {328500, 70000}, {438000, 40000}, {547500, 20000}});
+		FREEZED_BALANCES.put("7FNAphtSYXtP5ycn88B2KEywuHXzM3XNLK",
+				new int[][]{{219000, 90000}, {328500, 60000}, {438000, 30000}, {547500, 20000}});
+		FREEZED_BALANCES.put("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u",
+				new int[][]{{219000, 80000}, {328500, 60000}, {438000, 30000}, {547500, 20000}});
+		
+		// TEAM 1
+		FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
+				new int[][]{{219000, 200000}, {328500, 150000}, {438000, 100000}, {547500, 50000}});
+		FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+				new int[][]{{219000, 1000000}, {328500, 750000}, {438000, 500000}, {547500, 250000}});
+		
+		
 		
 		DCSet dcSet = dcSet_in;
 		if (dcSet == null) {
