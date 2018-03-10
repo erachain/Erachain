@@ -132,12 +132,13 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//CHECK NAME LENGTH
 		String name = this.item.getName();
-		if(name.length() < item.getMinNameLen())
+		int nameUTFlen = name.getBytes(StandardCharsets.UTF_8).length;
+		if(nameUTFlen < item.getMinNameLen() && this.getBlockHeightByParentOrLast(db) > 114000)
 		{
-			// TEST OMLY CHARS
+			// TEST ONLY CHARS
 			return INVALID_NAME_LENGTH;
 		}
-		if(name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH)
+		if(nameUTFlen > ItemCls.MAX_NAME_LENGTH)
 		{
 			// TEST ALL BYTES for database FIELD
 			return INVALID_NAME_LENGTH;
