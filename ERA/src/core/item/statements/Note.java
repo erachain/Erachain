@@ -27,6 +27,8 @@ public class Note extends StatementCls {
 	//GETTERS/SETTERS
 
 	public String getItemSubType() { return "note"; }
+	
+	public int getMinNameLen() { return 4; }
 
 	//PARSE
 	// includeReference - TRUE only for store in local DB

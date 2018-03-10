@@ -557,7 +557,7 @@ public class IssueAssetPanel1 extends JPanel
 				
 				JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance()
 						.translate("Name must be between %m and %M characters!")
-						.replace("%m", ""+ItemCls.MIN_NAME_LENGTH)
+						.replace("%m", ""+ issueAssetTransaction.getItem().getMinNameLen())
 						.replace("%M", ""+ItemCls.MAX_NAME_LENGTH),
 						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;	

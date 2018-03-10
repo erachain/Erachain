@@ -40,6 +40,8 @@ public class AssetUnique extends AssetCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "unique"; }
 
+	public int getMinNameLen() { return 12; }
+
 	public Long getQuantity(DCSet dc) {
 		return 1L;
 	}

@@ -35,6 +35,8 @@ public class Sample_2 extends TemplateCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "sample"; }
 	
+	public int getMinNameLen() { return 12; }
+
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static Sample_2 parse(byte[] data, boolean includeReference) throws Exception

@@ -30,6 +30,8 @@ public class Union extends UnionCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "union"; }
 
+	public int getMinNameLen() { return 12; }
+
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static Union parse(byte[] data, boolean includeReference) throws Exception

@@ -56,6 +56,8 @@ public class AssetVenture extends AssetCls {
 	
 	public String getItemSubType() { return "venture"; }
 
+	public int getMinNameLen() { return 12; }
+
 	public Long getQuantity(DCSet dc) {		
 		return this.quantity;
 	}

@@ -61,7 +61,10 @@ public class PersonHuman extends PersonCls {
 
 	//GETTERS/SETTERS
 
+
 	public String getItemSubType() { return "human"; }
+
+	public int getMinNameLen() { return 6; }
 
 	public byte[] getOwnerSignature() { return ownerSignature; }
 

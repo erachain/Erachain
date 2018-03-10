@@ -28,6 +28,8 @@ public class Status extends StatusCls {
 
 	public String getItemSubType() { return "status"; }
 
+	public int getMinNameLen() { return 12; }
+
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static Status parse(byte[] data, boolean includeReference) throws Exception

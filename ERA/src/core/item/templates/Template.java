@@ -28,6 +28,8 @@ public class Template extends TemplateCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "plate"; }
 
+	public int getMinNameLen() { return 12; }
+
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static Template parse(byte[] data, boolean includeReference) throws Exception
