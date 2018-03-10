@@ -261,26 +261,28 @@ public class Account {
 		return this.getBalance(DCSet.getInstance(), key);
 	}
 
-	public BigDecimal getForSale(DCSet dcSet, long key)
+	public BigDecimal getForSale(DCSet dcSet, long key, int height)
 	{
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this.getBalance(dcSet, key);
 		BigDecimal ownVol = balance.a.b;
 		
-		int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
-		if (item != null) {
-			if (item[0][0] < 0) {
-				return BigDecimal.ZERO;
-			}
-			
-			int height = dcSet.getBlockMap().size();
-			BigDecimal freeze = BigDecimal.ZERO;
-			for (int[] point: item) {
-				if (height < point[0]) {
-					freeze = new BigDecimal(point[1]).setScale(8);
-					break;
+		if (height > Transaction.FREEZE_FROM) {
+			int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
+			if (item != null) {
+				if (item[0][0] < 0) {
+					return BigDecimal.ZERO;
 				}
+				
+				//int height = dcSet.getBlockMap().size();
+				BigDecimal freeze = BigDecimal.ZERO;
+				for (int[] point: item) {
+					if (height < point[0]) {
+						freeze = new BigDecimal(point[1]).setScale(8);
+						break;
+					}
+				}
+				ownVol = ownVol.subtract(freeze);
 			}
-			ownVol = ownVol.subtract(freeze);
 		}
 		
 		

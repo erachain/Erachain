@@ -246,6 +246,8 @@ public class CreateOrderTransaction extends Transaction {
 			}
 		}
 
+		int height = this.getBlockHeightByParentOrLast(db);
+
 		// CHECK IF ASSETS NOT THE SAME
 		long have = this.order.getHave();
 		long want = this.order.getWant();
@@ -254,7 +256,6 @@ public class CreateOrderTransaction extends Transaction {
 				//&& want != FEE_KEY
 				) {
 			// have ERA
-			int height = this.getBlockHeightByParentOrLast(db);
 			if (height > Transaction.FREEZE_FROM
 					&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 				// LOCK ERA sell
@@ -297,7 +298,7 @@ public class CreateOrderTransaction extends Transaction {
 
 			if (!unLimited) {
 				
-				BigDecimal forSale = this.creator.getForSale(db, have);
+				BigDecimal forSale = this.creator.getForSale(db, have, height);
 
 				if (forSale.compareTo(this.order.getAmountHave()) < 0) {
 					return NO_BALANCE;
