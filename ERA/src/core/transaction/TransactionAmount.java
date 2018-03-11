@@ -88,10 +88,6 @@ public abstract class TransactionAmount extends Transaction {
 			1496474042552L
 		};
 
-	private static final byte[][] TRUSTED_FOR_ANONYMOUS_SEND = new byte[][]{
-		Base58.decode("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ")
-		};
-
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
@@ -551,14 +547,7 @@ public abstract class TransactionAmount extends Transaction {
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
 				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(dcSet, height)) {
-					for (byte[] trusted_address: TRUSTED_FOR_ANONYMOUS_SEND) {
-						if (Arrays.equals(this.recipient.getBytes(), trusted_address)) {
-							wrong = false;
-							break;
-						}
-					}
-					
-					if (wrong) {
+					if (!BlockChain.TRUSTED_FOR_ANONYMOUS_SEND.contains(this.recipient.getAddress())) {
 						return RECEIVER_NOT_PERSONALIZED;
 					}
 				}

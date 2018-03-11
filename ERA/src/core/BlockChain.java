@@ -89,6 +89,7 @@ public class BlockChain
 		};
 
 
+	public static HashSet<String> TRUSTED_FOR_ANONYMOUS_SEND = new HashSet<String>();
 	public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
 	public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
 
@@ -154,7 +155,10 @@ public class BlockChain
 		//CREATE GENESIS BLOCK
 		genesisBlock = new GenesisBlock();
 		genesisTimestamp = genesisBlock.getTimestamp(null);
-		
+
+		//
+		TRUSTED_FOR_ANONYMOUS_SEND.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+
 		// TEST
 		FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		
@@ -209,9 +213,7 @@ public class BlockChain
 		FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
 				new int[][]{{219000, 200000}, {328500, 150000}, {438000, 100000}, {547500, 50000}});
 		FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
-				new int[][]{{219000, 1000000}, {328500, 750000}, {438000, 500000}, {547500, 250000}});
-		
-		
+				new int[][]{{115000, 0}, {219000, 1000000}, {328500, 750000}, {438000, 500000}, {547500, 250000}});
 		
 		DCSet dcSet = dcSet_in;
 		if (dcSet == null) {

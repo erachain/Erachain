@@ -250,6 +250,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();
 
+		/*
 		if (init1) {
 			init1 = false;
 			Iterator<Integer> iterator = this.getIterator(0, true);
@@ -264,6 +265,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 				
 			}
 		}
+		*/
 		
 		byte[] signature = block.getSignature();
 		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(signature);
