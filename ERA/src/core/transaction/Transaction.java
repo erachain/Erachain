@@ -54,8 +54,6 @@ public abstract class Transaction {
 	protected static final String[] TRUE_ADDRESSES = new String[] { "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
 			"7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv", "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ",
 	};
-	protected static final byte[][] VALID_ADDRESSES = new byte[][] {
-			Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3") };
 
 	public static final byte[][] DISCREDIR_ADDRESSES = new byte[][] {
 			Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
@@ -1000,7 +998,9 @@ public abstract class Transaction {
 				if (!good)
 					return CREATOR_NOT_PERSONALIZED;
 			} else {
-				return CREATOR_NOT_PERSONALIZED;
+				if (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())) {
+					return CREATOR_NOT_PERSONALIZED;
+				}
 			}
 		}
 

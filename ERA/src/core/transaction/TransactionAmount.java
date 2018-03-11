@@ -78,16 +78,6 @@ public abstract class TransactionAmount extends Transaction {
 	
 	public static final byte BACKWARD_MASK = 64;
 
-	private static final byte[][] VALID_BAL = new byte[][]{
-			Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
-			Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
-			Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
-			Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
-			};
-	private static final Long[] VALID_REF = new Long[]{
-			1496474042552L
-		};
-
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
@@ -347,7 +337,7 @@ public abstract class TransactionAmount extends Transaction {
 		{
 			if (height < 120000) {
 				wrong = true;
-				for ( byte[] valid_address: Transaction.VALID_ADDRESSES) {
+				for ( byte[] valid_address: BlockChain.VALID_ADDRESSES) {
 					if (Arrays.equals(this.recipient.getBytes(), valid_address)) {
 						wrong = false;
 						break;
@@ -499,7 +489,7 @@ public abstract class TransactionAmount extends Transaction {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0
 								&& height < 120000) {
 							wrong = true;
-							for ( byte[] valid_item: VALID_BAL) {
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
 								if (Arrays.equals(this.signature, valid_item)) {
 									wrong = false;
 									break;
@@ -520,7 +510,7 @@ public abstract class TransactionAmount extends Transaction {
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
 							wrong = true;
-							for ( byte[] valid_item: VALID_BAL) {
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
 								if (Arrays.equals(this.signature, valid_item)) {
 									wrong = false;
 									break;
@@ -547,8 +537,11 @@ public abstract class TransactionAmount extends Transaction {
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
 				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(dcSet, height)) {
-					if (!BlockChain.TRUSTED_FOR_ANONYMOUS_SEND.contains(this.recipient.getAddress())) {
-						return RECEIVER_NOT_PERSONALIZED;
+					HashSet<Account> recipients = this.getRecipientAccounts();
+					for (Account recipient: recipients) {
+						if (!BlockChain.TRUSTED_ANONYMOUS.contains(recipient.getAddress())) {
+							return RECEIVER_NOT_PERSONALIZED;
+						}
 					}
 				}
 			}

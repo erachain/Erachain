@@ -87,9 +87,16 @@ public class BlockChain
 
 	public static final byte[][] VALID_RECORDS = new byte[][]{
 		};
+	public static final byte[][] VALID_ADDRESSES = new byte[][] {
+		Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3") };
+	public static final byte[][] VALID_BAL = new byte[][]{
+		Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
+		Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
+		Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
+		Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
+		};
 
-
-	public static HashSet<String> TRUSTED_FOR_ANONYMOUS_SEND = new HashSet<String>();
+	public static HashSet<String> TRUSTED_ANONYMOUS = new HashSet<String>();
 	public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
 	public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
 	public static HashMap<String, Pair<Integer, byte[]>> NOVA_ASSETS = new HashMap<String, Pair<Integer, byte[]>>();
@@ -158,7 +165,10 @@ public class BlockChain
 		genesisTimestamp = genesisBlock.getTimestamp(null);
 
 		// GENERAL TRUST
-		TRUSTED_FOR_ANONYMOUS_SEND.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+		// TEST
+		TRUSTED_ANONYMOUS.add("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+
+		TRUSTED_ANONYMOUS.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
 
 		// TIKER = KEY + CREATOR
 		NOVA_ASSETS.put("BTC",
