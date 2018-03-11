@@ -35,6 +35,8 @@ public class PublicKeyAccount extends Account {
 	{
 		this.publicKey = publicKey;
 		this.address = Crypto.getInstance().getAddress(publicKey);
+		this.bytes = Base58.decode(address);
+		this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
 	}
 	public PublicKeyAccount(String publicKey)
 	{
@@ -59,7 +61,13 @@ public class PublicKeyAccount extends Account {
 			return Arrays.equals(publicKey, ((PublicKeyAccount) b).getPublicKey());
 		} else if (b instanceof byte[]) {
 			byte[] bs = (byte[]) b;
-			return Arrays.equals(this.publicKey, bs);
+			if (bs.length == 20) {
+				return Arrays.equals(this.shortBytes, bs);
+			} else if (bs.length == 25) {
+					return Arrays.equals(this.bytes, bs);				
+			} else {
+				return Arrays.equals(this.publicKey, bs);
+			}
 		} else if (b instanceof Account) {
 			return this.address.equals(((Account) b).getAddress());
 		} else if (b instanceof String) {

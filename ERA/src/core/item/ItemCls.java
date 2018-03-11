@@ -19,6 +19,7 @@ import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -434,35 +435,47 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.getLastKey();
-		if (key < startKey) {
-			// IF this not GENESIS issue - start from 1000
-			dbMap.setLastKey(startKey);
+		
+		long newKey;
+		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+		if (pair == null) {
+		
+			newKey = dbMap.getLastKey();
+			if (newKey < startKey) {
+				// IF this not GENESIS issue - start from startKey
+				dbMap.setLastKey(startKey);
+			}
+			newKey = dbMap.add(this);
+
+		} else {
+			// INSERT WITH NEW KEY
+			newKey = pair.getA();
+			dbMap.set(newKey, this);
+
 		}
-		key = dbMap.add(this);
-		
+
+		this.key = newKey;
 		//SET ORPHAN DATA
-		this.getDBIssueMap(db).set(this.reference, key);
-		//this.key = key;
-		
-		//return key;
+		this.getDBIssueMap(db).set(this.reference, newKey);
 		
 	}
 	
 	public long removeFromMap(DCSet db)
 	{
 		//DELETE FROM DATABASE
-		Issue_ItemMap issueDB = this.getDBIssueMap(db);
-		//long key = ;
-		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1, key: " + key);
 
 		long thisKey = this.getKey(db);
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
-		this.getDBMap(db).remove();	
+		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+		if (pair == null) {
+			this.getDBMap(db).remove();
+		} else {
+			this.getDBMap(db).delete(thisKey);			
+		}
 				
 		//DELETE ORPHAN DATA
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
-		issueDB.delete(this.reference);
+		this.getDBIssueMap(db).delete(this.reference);
 		
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 

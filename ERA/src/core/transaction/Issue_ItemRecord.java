@@ -28,6 +28,7 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import datachain.DCSet;
+import utils.Pair;
 
 public abstract class Issue_ItemRecord extends Transaction 
 {
@@ -132,15 +133,25 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//CHECK NAME LENGTH
 		String name = this.item.getName();
-		int nameUTFlen = name.getBytes(StandardCharsets.UTF_8).length;
-		if(nameUTFlen < item.getMinNameLen() && this.getBlockHeightByParentOrLast(db) > 114000)
+		// TEST ONLY CHARS
+		int nameLen = name.length();
+		if(nameLen < item.getMinNameLen()
+				&& (BlockChain.DEVELOP_USE
+						|| this.getBlockHeightByParentOrLast(db) > 114000)
+				)
 		{
-			// TEST ONLY CHARS
-			return INVALID_NAME_LENGTH;
+			// IF already in DB
+			Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(name);
+			if (pair == null
+					|| this.item.getKey(db) > 0
+					|| !this.getCreator().equals(pair.getB())) { 
+				return INVALID_NAME_LENGTH;
+			}
 		}
-		if(nameUTFlen > ItemCls.MAX_NAME_LENGTH)
+
+		// TEST ALL BYTES for database FIELD
+		if(name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH)
 		{
-			// TEST ALL BYTES for database FIELD
 			return INVALID_NAME_LENGTH;
 		}
 

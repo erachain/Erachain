@@ -92,6 +92,7 @@ public class BlockChain
 	public static HashSet<String> TRUSTED_FOR_ANONYMOUS_SEND = new HashSet<String>();
 	public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
 	public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
+	public static HashMap<String, Pair<Integer, byte[]>> NOVA_ASSETS = new HashMap<String, Pair<Integer, byte[]>>();
 
 
 	// CHAIN
@@ -156,9 +157,21 @@ public class BlockChain
 		genesisBlock = new GenesisBlock();
 		genesisTimestamp = genesisBlock.getTimestamp(null);
 
-		//
+		// GENERAL TRUST
 		TRUSTED_FOR_ANONYMOUS_SEND.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
 
+		// TIKER = KEY + CREATOR
+		NOVA_ASSETS.put("BTC",
+				new Pair<Integer, byte[]>(21, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		NOVA_ASSETS.put("@@USD",
+				new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		NOVA_ASSETS.put("¤¤RUB",
+				new Pair<Integer, byte[]>(93, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		NOVA_ASSETS.put("ERARUB",
+				new Pair<Integer, byte[]>(91, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		NOVA_ASSETS.put("ERAUSD",
+				new Pair<Integer, byte[]>(85, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		
 		// TEST
 		FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
 		

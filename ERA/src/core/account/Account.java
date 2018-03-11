@@ -139,19 +139,11 @@ public class Account {
 
 	public byte[] getBytes()
 	{
-		if (this.bytes == null) {
-			this.bytes = Base58.decode(address);
-			this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
-		}
 		return bytes;
 	}
 
 	public byte[] getShortBytes()
 	{
-		if (this.bytes == null) {
-			this.bytes = Base58.decode(address);
-			this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
-		}
 		return this.shortBytes;
 	}
 
