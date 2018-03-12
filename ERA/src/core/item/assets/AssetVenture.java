@@ -56,7 +56,7 @@ public class AssetVenture extends AssetCls {
 	
 	public String getItemSubType() { return "venture"; }
 
-	public int getMinNameLen() { return 12; }
+	public int getMinNameLen() { return BlockChain.DEVELOP_USE?10:12; }
 
 	public Long getQuantity(DCSet dc) {		
 		return this.quantity;

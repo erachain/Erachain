@@ -136,8 +136,8 @@ public abstract class Issue_ItemRecord extends Transaction
 		// TEST ONLY CHARS
 		int nameLen = name.length();
 		if(nameLen < item.getMinNameLen()
-				&& (BlockChain.DEVELOP_USE
-						|| this.getBlockHeightByParentOrLast(db) > 114000)
+				//&& !BlockChain.DEVELOP_USE
+				&& this.getBlockHeightByParentOrLast(db) > 114000
 				)
 		{
 			// IF already in DB
