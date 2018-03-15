@@ -26,7 +26,7 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 
 	public Wallet_Orphan_Button() {
 
-		super(Lang.getInstance().translate("Orphan Bloks"));
+		super(Lang.getInstance().translate("Roll back Blocks"));
 		th = this;
 		this.addActionListener(new ActionListener() {
 
@@ -58,8 +58,8 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 					@Override
 					public void run() {
 						
-						String message = "Insert orphan Blocks ";
-						String retVal = JOptionPane.showInputDialog(null, message, " ");
+						String message = Lang.getInstance().translate("Insert Quantity") + ":";
+						String retVal = JOptionPane.showInputDialog(null, message, "10");
 						if (retVal != null){
 							
 							Integer retValint = Integer.valueOf(retVal);
