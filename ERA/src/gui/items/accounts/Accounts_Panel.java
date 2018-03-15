@@ -2,6 +2,8 @@ package gui.items.accounts;
 
 import gui.items.assets.AssetsComboBoxModel;
 import gui.library.MTable;
+import gui.library.Wallet_Create_Account_Button;
+import gui.library.Wallet_Sync_Button;
 import gui.models.AccountsTableModel;
 import lang.Lang;
 import java.awt.GridBagConstraints;
@@ -58,7 +60,8 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 	
 	public JComboBox<AssetCls> cbxFavorites;
 	public AccountsTableModel tableModel;
-	public JButton newAccount_Button;
+	public Wallet_Create_Account_Button newAccount_Button;
+	public Wallet_Sync_Button reload_Button;
 	MTable table;
 	private Accounts_Panel th;
 	protected AssetCls asset;
@@ -80,7 +83,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		GridBagConstraints tableGBC = new GridBagConstraints();
 		tableGBC.fill = GridBagConstraints.BOTH; 
 		tableGBC.anchor = GridBagConstraints.NORTHWEST;
-		tableGBC.gridwidth =2;
+		tableGBC.gridwidth =3;
 		tableGBC.weightx = 1.0;
 		tableGBC.weighty = 0.1;
 		tableGBC.gridx = 1;	
@@ -111,57 +114,25 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		favoritesGBC.insets = new Insets(10, 10, 10, 0);
 		favoritesGBC.fill = GridBagConstraints.BOTH;  
 		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
-		favoritesGBC.weightx = 0.2;
+		favoritesGBC.weightx = 0.1;
 		favoritesGBC.gridx = 2;	
 		favoritesGBC.gridy = 0;	
 		
 		
-		newAccount_Button = new JButton(Lang.getInstance().translate("New Account"));
+		newAccount_Button = new Wallet_Create_Account_Button();
 		this.add(newAccount_Button, favoritesGBC);
-		newAccount_Button.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				// check synchronize Walet 
-				if(Controller.getInstance().isProcessingWalletSynchronize()) {
-					return;
-				}
-				  //CHECK IF WALLET UNLOCKED
-				  if(!Controller.getInstance().isWalletUnlocked())
-				  {
-				   //ASK FOR PASSWORD
-				   String password = PasswordPane.showUnlockWalletDialog(th); 
-				   if(!Controller.getInstance().unlockWallet(password))
-				   {
-				    //WRONG PASSWORD
-				    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
-				    return;
-				   }
-				  }
-				  
-				  //GENERATE NEW ACCOUNT
-				  newAccount_Button.setText(Lang.getInstance().translate("Waiting...")+"...");
-				  newAccount_Button.setEnabled(false);
-				// creane new thread
-					 new Thread()
-					{
-						@Override
-						public void run() {
-					
-									Controller.getInstance().generateNewAccountWithSynch();
-									
-									newAccount_Button.setText(Lang.getInstance().translate("New Account"));					
-									newAccount_Button.setEnabled(true);
-						}
-					}.start();
-					
-				  
-				  
-				 }
-			
-			
-		});
+		
+		
+		reload_Button = new Wallet_Sync_Button();
+		favoritesGBC.insets = new Insets(10, 10, 10, 0);
+		favoritesGBC.fill = GridBagConstraints.BOTH;  
+		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
+		favoritesGBC.weightx = 0.1;
+		favoritesGBC.gridx = 3;	
+		favoritesGBC.gridy = 0;	
+	       
+	        this.add( reload_Button, favoritesGBC);
+		
 		
 		//TABLE
 		tableModel = new AccountsTableModel();

@@ -90,7 +90,7 @@ public class NetworkStatus extends JLabel implements Observer
 		if(type == ObserverMessage.WALLET_SYNC_STATUS)
 		{
 			currentHeight = (int)message.getValue();
-			int height = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a;
+			int height = DCSet.getInstance().getBlockMap().size();
 			if(currentHeight== 0 || currentHeight == height)
 			{
 				this.update(null, new ObserverMessage(
