@@ -8,11 +8,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import controller.Controller;
+import core.BlockGenerator;
 import core.wallet.Wallet;
 import datachain.DCSet;
 import gui.PasswordPane;
@@ -49,6 +51,13 @@ public class Wallet_Sync_Button extends JButton implements Observer {
 					}
 				}
 
+				
+				int n = JOptionPane.showConfirmDialog(
+						new JFrame(), Lang.getInstance().translate("Sync Wallet") + "?",
+						Lang.getInstance().translate("Confirmation"),
+		                JOptionPane.OK_CANCEL_OPTION);
+				if (n != JOptionPane.OK_OPTION) return;
+				
 				// GENERATE NEW ACCOUNT
 
 				// newAccount_Button.setEnabled(false);
@@ -78,6 +87,29 @@ public class Wallet_Sync_Button extends JButton implements Observer {
 				return;
 			}
 			th.setEnabled(false);
-		}
+		}else if(message.getType() == ObserverMessage.FORGING_STATUS)
+		{
+			BlockGenerator.ForgingStatus status = (BlockGenerator.ForgingStatus) message.getValue();
+			
+						
+			if (status == BlockGenerator.ForgingStatus.FORGING_WAIT || status == BlockGenerator.ForgingStatus.FORGING_ENABLED)
+				th.setEnabled(false);
+				else{
+				th.setEnabled(true);
+				}
+		}else if(type == ObserverMessage.NETWORK_STATUS)
+		{
+			int status = (int) message.getValue();
+			
+			
+			if(status == Controller.STATUS_SYNCHRONIZING)
+			{
+				
+				//this.setText(Lang.getInstance().translate("Synchronizing"));
+				th.setEnabled(false);
+			}	else{
+				th.setEnabled(true);
+			}
+		}	
 	}
 }

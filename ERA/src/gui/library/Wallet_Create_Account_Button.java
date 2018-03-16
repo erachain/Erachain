@@ -13,6 +13,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import controller.Controller;
+import core.BlockGenerator;
 import core.wallet.Wallet;
 import datachain.DCSet;
 import gui.PasswordPane;
@@ -83,6 +84,29 @@ public void update(Observable arg0, Object arg1) {
 				return;
 			}
 			th.setEnabled(false);
+		}else if(message.getType() == ObserverMessage.FORGING_STATUS)
+		{
+			BlockGenerator.ForgingStatus status = (BlockGenerator.ForgingStatus) message.getValue();
+			
+						
+			if (status == BlockGenerator.ForgingStatus.FORGING_WAIT || status == BlockGenerator.ForgingStatus.FORGING_ENABLED)
+				th.setEnabled(false);
+				else{
+				th.setEnabled(true);
+				}
+		}	else if(type == ObserverMessage.NETWORK_STATUS)
+		{
+			int status = (int) message.getValue();
+			
+			
+			if(status == Controller.STATUS_SYNCHRONIZING)
+			{
+				
+				//this.setText(Lang.getInstance().translate("Synchronizing"));
+				th.setEnabled(false);
+			}	else{
+				th.setEnabled(true);
+			}
 		}
 	}
 }
