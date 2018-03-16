@@ -82,8 +82,18 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 	public void update(Observable arg0, Object arg1) 
 	{
 		ObserverMessage message = (ObserverMessage) arg1;
+		int type = message.getType();
+		if (type == ObserverMessage.WALLET_SYNC_STATUS) {
+			int currentHeight = (int) message.getValue();
+			if (currentHeight == 0 || currentHeight == DCSet.getInstance().getBlockMap().size())
+			{
+				th.setEnabled(true);
+				return;
+			}
+			th.setEnabled(false);
+		}
 		
-		if(message.getType() == ObserverMessage.FORGING_STATUS)
+		else if(type == ObserverMessage.FORGING_STATUS)
 		{
 			BlockGenerator.ForgingStatus status = (BlockGenerator.ForgingStatus) message.getValue();
 			
@@ -93,6 +103,19 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 				else{
 				th.setEnabled(true);
 				}
+		}else if(type == ObserverMessage.NETWORK_STATUS)
+		{
+			int status = (int) message.getValue();
+			
+			
+			if(status == Controller.STATUS_SYNCHRONIZING)
+			{
+				
+				//this.setText(Lang.getInstance().translate("Synchronizing"));
+				th.setEnabled(false);
+			}	else{
+				th.setEnabled(true);
+			}
 		}		
 	}
 
