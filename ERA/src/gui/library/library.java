@@ -322,17 +322,17 @@ public class library {
 			// MARK DOWN
 			return Processor.process(descr);
 
-		if (descr.startsWith("]"))
+		if (descr.startsWith("["))
 			// FORUM CKeditor
 			// TODO CK_editor INSERT
 			return Processor.process(descr);
 
-		if (descr.startsWith("}"))
+		if (descr.startsWith("{"))
 			// it is DOCX
 			// TODO DOCX insert
 			return descr;
 
-		if (descr.startsWith(">"))
+		if (descr.startsWith("<"))
 			// it is HTML
 			return descr;
 
