@@ -1268,17 +1268,23 @@ public class Block {
 				if (!transaction.isWiped()) {
 
 					//CHECK IF NOT GENESIS TRANSACTION
-					if(transaction.getCreator() == null)
+					if(transaction.getCreator() == null) {
 						 // ALL GENESIS transaction
+						LOGGER.debug("*** Block[" + height
+							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
+							+ transaction.viewFullTypeName() + "]"
+							+ "creator is Null!"
+							);
 						return false;
+					}
 					
 					if(!transaction.isSignatureValid(validatingDC)) {
 						// 
 						LOGGER.debug("*** Block[" + height
-						+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
-						+ transaction.viewFullTypeName() + "]"
-						+ "signature not valid!"
-						+ " " + Base58.encode(transaction.getSignature()));
+							+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
+							+ transaction.viewFullTypeName() + "]"
+							+ "signature not valid!"
+							+ " " + Base58.encode(transaction.getSignature()));
 						return false;
 					}
 		
