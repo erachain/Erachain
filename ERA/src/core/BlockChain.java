@@ -167,7 +167,6 @@ public class BlockChain
 		// GENERAL TRUST
 		// TEST
 		TRUSTED_ANONYMOUS.add("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-
 		TRUSTED_ANONYMOUS.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
 
 		// TIKER = KEY + CREATOR

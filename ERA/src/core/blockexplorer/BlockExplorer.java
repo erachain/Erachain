@@ -39,7 +39,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
-import com.github.rjeschke.txtmark.Processor;
 import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
@@ -79,7 +78,6 @@ import core.voting.Poll;
 import core.voting.PollOption;
 import datachain.DCSet;
 import datachain.SortableList;
-import gui.library.library;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import lang.Lang;
@@ -1006,7 +1004,8 @@ public class BlockExplorer
 
 			assetJSON.put("key", asset.getKey());
 			assetJSON.put("name", asset.getName());
-			assetJSON.put("description", Processor.process(asset.getDescription()));
+			assetJSON.put("description", asset.getDescription());
+			//assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(DCSet.getInstance())));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
@@ -1061,7 +1060,7 @@ public class BlockExplorer
 			
 			assetJSON.put("key", asset.getKey());
 			assetJSON.put("name", asset.getName());
-			assetJSON.put("description", Processor.process(asset.getDescription()));
+			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(dcSet)));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
@@ -1143,7 +1142,7 @@ public class BlockExplorer
 			
 			assetJSON.put("key", asset.getKey());
 			assetJSON.put("name", asset.getName());
-			assetJSON.put("description", Processor.process(asset.getDescription()));
+			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(dcSet)));
 			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
@@ -1284,7 +1283,7 @@ if ( asset_1 == null) {
 
 		pollJSON.put("creator", poll.getCreator().getAddress());
 		pollJSON.put("name", poll.getName());
-		pollJSON.put("description", Processor.process(poll.getDescription()));
+		pollJSON.put("description", poll.getDescription());
 		pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
 		
@@ -1605,7 +1604,7 @@ if ( asset_1 == null) {
 			pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
 			pairJSON.put("asset", pair.getKey());
 			pairJSON.put("assetName", assetWant.getName());
-			pairJSON.put("description", Processor.process(assetWant.getDescription()));
+			pairJSON.put("description", assetWant.getDescription());
 			pairsJSON.put(pair.getKey(), pairJSON);
 		}
 
@@ -1967,7 +1966,7 @@ if ( asset_1 == null) {
 		output.put("name", person.getName());
 		////////output.put("birthday", df.format(new Date(person.getBirthday())).toString());
 		output.put("birthday", person.getBirthdayStr());
-		output.put("description", Processor.process(person.getDescription()));
+		output.put("description", person.getDescription());
 		
 		String gender = Lang.getInstance().translate_from_langObj("Man",langObj);
 		if (person.getGender() != 0) gender = Lang.getInstance().translate_from_langObj("Woman",langObj);
@@ -4043,7 +4042,7 @@ if ( asset_1 == null) {
 			
 			templateJSON.put("key", template.getKey());
 			templateJSON.put("name", template.getName());
-			templateJSON.put("description", Processor.process(template.getDescription()));
+			templateJSON.put("description", template.getDescription());
 			templateJSON.put("owner", template.getOwner().getAddress());
 
 			templatesJSON.put(template.getKey(), templateJSON);
@@ -4084,7 +4083,7 @@ if ( asset_1 == null) {
 			
 			templateJSON.put("key", template.getKey());
 			templateJSON.put("name", template.getName());
-			templateJSON.put("description", Processor.process(template.getDescription()));
+			templateJSON.put("description", template.getDescription());
 			templateJSON.put("owner", template.getOwner().getAddress());
 
 			templatesJSON.put(template.getKey(), templateJSON);
@@ -4125,7 +4124,7 @@ if ( asset_1 == null) {
 			
 			templateJSON.put("key", template.getKey());
 			templateJSON.put("name", template.getName());
-			templateJSON.put("description", Processor.process(template.getDescription()));
+			templateJSON.put("description", template.getDescription());
 			templateJSON.put("owner", template.getOwner().getAddress());
 
 			templatesJSON.put(template.getKey(), templateJSON);
@@ -4152,7 +4151,7 @@ if ( asset_1 == null) {
 		Map templateJSON = new LinkedHashMap();
 		templateJSON.put("key", template.getKey());
 		templateJSON.put("name", template.getName());
-		templateJSON.put("description", Processor.process(template.getDescription()));
+		templateJSON.put("description", template.getDescription());
 		templateJSON.put("owner", template.getOwner().getAddress());
 		
 		output.put("template", templateJSON);
@@ -4173,7 +4172,7 @@ if ( asset_1 == null) {
 		Map templateJSON = new LinkedHashMap();
 		templateJSON.put("key", template.getKey());
 		templateJSON.put("name", template.getName());
-		templateJSON.put("description", Processor.process(template.getDescription()));
+		templateJSON.put("description", template.getDescription());
 		templateJSON.put("owner", template.getOwner().getAddress());
 		
 		output.put("status", templateJSON);
@@ -4285,7 +4284,7 @@ if ( asset_1 == null) {
 					
 						}
 							 //str_HTML+= description + "<br>";
-							 str_HTML += Processor.process(description) + "<br>"; 
+							 str_HTML += description + "<br>"; 
 
 					}
 						 
@@ -4297,7 +4296,7 @@ if ( asset_1 == null) {
 					if (jSON.containsKey("MS")) {
 						String mess = (String)jSON.get("MS");
 						str_HTML += "<b>"+ Lang.getInstance().translate_from_langObj("Message", langObj)
-								+ ": </b><br>" + library.viewDescriptionHTML(mess) + "<br><br>";
+								+ ": </b><br>" + mess + "<br><br>";
 
 					}
 	// Hashes
@@ -4406,7 +4405,7 @@ if ( asset_1 == null) {
 				
 				
 				
-				output.put("statement", library.to_HTML(str_HTML));	
+				output.put("statement", str_HTML);	
 				//output.put("statement", str_HTML);	
 			}
 			
@@ -4453,7 +4452,7 @@ if ( asset_1 == null) {
 			
 			
 				 //output.put("statement", library.to_HTML(sT));
-				 output.put("statement", Processor.process(sT)); 
+				 output.put("statement", sT); 
 				 
 			 
 		 } catch (ParseException e) {
@@ -4462,7 +4461,7 @@ if ( asset_1 == null) {
 		
 		
 		
-		output.put("statement", Processor.process(new String( trans.getData(), Charset.forName("UTF-8") )));
+		output.put("statement", new String( trans.getData(), Charset.forName("UTF-8") ));
 		
 		 }
 		 }
@@ -4490,7 +4489,7 @@ if ( asset_1 == null) {
 		
 	//	output.put("name", person.getName());
 		output.put("date", df.format(new Date(trans.getTimestamp())).toString());
-	//	output.put("description", Processor.process(person.getDescription()));
+	//	output.put("description", person.getDescription());
 		
 		// vouchers
 		output.put("Label_vouchs", Lang.getInstance().translate_from_langObj("Certified",langObj));
