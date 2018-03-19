@@ -232,10 +232,10 @@ public class BlockChain
 				new int[][]{{219000, 80000}, {328500, 60000}, {438000, 30000}, {547500, 20000}});
 		
 		// TEAM 1
-		FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
-				new int[][]{{219000, 200000}, {328500, 150000}, {438000, 100000}, {547500, 50000}});
-		FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
-				new int[][]{{115000, 0}, {219000, 1000000}, {328500, 750000}, {438000, 500000}, {547500, 250000}});
+		//FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
+		//		new int[][]{{219000, 200000}, {328500, 150000}, {438000, 100000}, {547500, 50000}});
+		//FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+		//		new int[][]{{115000, 0}, {219000, 1000000}, {328500, 750000}, {438000, 500000}, {547500, 250000}});
 		
 		DCSet dcSet = dcSet_in;
 		if (dcSet == null) {
