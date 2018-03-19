@@ -87,6 +87,7 @@ import core.web.ServletUtils;
 import core.web.WebNameStorageHistoryHelper;
 import core.web.blog.BlogEntry;
 import datachain.DCSet;
+import datachain.ItemAssetMap;
 import datachain.ItemPersonMap;
 import datachain.NameMap;
 import lang.Lang;
@@ -1215,6 +1216,39 @@ public class WebResource {
 		
 	}
 
+	@Path("index/assetimage")
+	@GET
+	@Produces({"image/png", "image/jpg"})
+	public Response getAssetImage() {
+		
+		long key = new Long(request.getParameter("key"));
+	 if (key <=0) {
+		  return error404(request, null);
+	 }
+		
+	 ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_PERSON_NOT_EXIST);
+		}
+		
+		AssetCls person = (AssetCls)map.get(key);
+		JSONObject jj = new JSONObject();
+		byte[] b = person.getImage();
+		if (b.length<=0){	
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Invalid Image");
+			
+		
+		}
+		
+	return Response.ok(new ByteArrayInputStream(b)).build();
+	//	return Response.ok(file, "image/png").build();
+		
+	}
 
 	@Path("index/libs/css/style.css")
 	@GET
