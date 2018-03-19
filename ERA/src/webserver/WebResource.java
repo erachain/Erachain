@@ -1231,7 +1231,7 @@ public class WebResource {
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-					Transaction.ITEM_PERSON_NOT_EXIST);
+					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 		
 		AssetCls person = (AssetCls)map.get(key);
