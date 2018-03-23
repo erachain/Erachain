@@ -97,7 +97,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 			}	
 		});
 		
-		//HAVE/WANT KEY
+		// WANT/HAVE KEY
 		this.wantHaveKeyMap = database.createTreeMap("orders_key_want_have")
 				.comparator(Fun.COMPARATOR)
 				.makeOrGet();
@@ -140,6 +140,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+				//Fun.t4(have, want, null, null),
 				Fun.t4(have, want, null, null),
 				Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
 		
@@ -279,7 +280,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 
 
 		Order order = this.get(key);
-		if (order.getAmountHaveLeft().compareTo(BigDecimal.ZERO) == 0)
+		if (order.getAmountHaveLeft().compareTo(BigDecimal.ZERO) <= 0)
 			return false;
 		BigDecimal price = order.getPriceCalcReverse();
 		if ( !order.isWantDivisible(db)
@@ -343,12 +344,30 @@ public class OrderMap extends DCMap<BigInteger, Order>
 	public SortableList<BigInteger, Order> getOrdersSortableList(long have, long want, boolean filter)
 	{
 		//FILTER ALL KEYS
-		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+		Collection<BigInteger> keys;
+		if (false) {
+			keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
 				Fun.t4(have, want, null, null),
 				Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-				
+		} else if (false) {
+			keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
+				Fun.t4(have, want, null, null),
+				Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
+		} else if (false) {			
+			keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+				Fun.t4(want, have, null, null),
+				Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
+		} else {
+			// CORRECT! - haveWantKeyMap LOSES some orders!
+			// https://github.com/icreator/Erachain/issues/178
+			keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
+					Fun.t4(want, have, null, null),
+					Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
+		}
+
+		// 3736689355080347897954007846376144397840229205698623203564810984254622835951327166579305402606772203148742040644598072529939453854935677087096743677805573
 		//Filters orders with unacceptably small amount. These orders have not worked
-		if(filter){
+		if(filter) {
 			List<BigInteger> keys2 = new ArrayList<BigInteger>();
 			
 			DCSet db = getDCSet();
