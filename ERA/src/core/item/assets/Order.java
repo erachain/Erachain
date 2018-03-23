@@ -434,6 +434,16 @@ public class Order implements Comparable<Order>
 		
 		//ADD ORDER TO DATABASE
 		db.getOrderMap().add(this.copy());
+
+		if (false & !db.isFork() &&
+				(this.getHave() == 1027l && this.getWant() == 2l
+						|| this.getHave() == 2l && this.getWant() == 1027l)) {		
+			Order order_new = db.getOrderMap().get(this.getId());
+			if (order_new == null) {
+				int iii = 1 ;
+			}
+		}
+
 		
 		//GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
 		//TRY AND COMPLETE ORDERS
