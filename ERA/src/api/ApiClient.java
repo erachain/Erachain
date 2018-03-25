@@ -431,8 +431,23 @@ public class ApiClient {
 				"Errors: 201 - Wallet does not exist."
 			},
 			{
-				"POST payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
+				"POST rec_payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
 				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
+			},
+			{
+				"GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}", 
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
+			},
+			{
+				"POST rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}", 
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
+			},
+			{
+				"GET rec_payment/telegram/{feePow}/{sender}/{assetKey}/{amount}/{recipient}", 
+				"Send TELEGRAM as a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 			{
