@@ -33,6 +33,7 @@ public abstract class Message {
 	public static final int GET_PING_TYPE = 11;
 	public static final int VERSION_TYPE = 12;
 	public static final int FIND_MYSELF_TYPE = 13;
+	public static final int TELEGRAM_TYPE = 14;
 
 	private int type;
 	private Peer sender;

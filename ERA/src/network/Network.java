@@ -11,13 +11,16 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 // import org.apache.log4j.Logger;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.internal.util.Base64;
 import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
+import core.Synchronizer;
 //import core.BlockChain;
 import core.transaction.Transaction;
 //import database.DBSet;
@@ -27,6 +30,7 @@ import datachain.DCSet;
 import network.message.FindMyselfMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import network.message.TelegramMessage;
 import ntp.NTP;
 import settings.Settings;
 import utils.ObserverMessage;
@@ -37,7 +41,9 @@ public class Network extends Observable implements ConnectionCallback {
 	public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK?0:1;
 	private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
 	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<4;
-	
+
+	private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
+
 	private ConnectionCreator creator;
 	private ConnectionAcceptor acceptor;
 
@@ -46,6 +52,8 @@ public class Network extends Observable implements ConnectionCallback {
 	private List<Peer> knownPeers;
 	
 	private SortedSet<String> handledMessages;
+	private TreeMap<String, Message> handledTelegrams;
+	private TreeMap<Long, List<String>> telegramsTime;
 	
 	private boolean run;
 	
@@ -67,6 +75,8 @@ public class Network extends Observable implements ConnectionCallback {
 	private void start()
 	{
 		this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
+		this.handledTelegrams = new TreeMap<String, Message>();
+		this.telegramsTime = new TreeMap<Long, List<String>>();
 		
 		//START ConnectionCreator THREAD
 		creator = new ConnectionCreator(this);
@@ -305,6 +315,58 @@ public class Network extends Observable implements ConnectionCallback {
 			//LOGGER.error(e.getMessage(),e);
 		}
 	}
+	
+	private boolean addTelegram(TelegramMessage message)
+	{
+		
+		Transaction transaction;
+		
+		synchronized(this.handledTelegrams)
+		{
+			//CHECK IF LIST IS FULL
+			if(this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE)
+			{
+				List<String> signatires = this.telegramsTime.remove(this.telegramsTime.firstKey());
+				for (String signature: signatires) {
+					this.handledTelegrams.remove(signature);
+					///LOGGER.error("handledMessages size OVERHEAT! "); 						
+				}
+			}
+			
+			
+			transaction = message.getTransaction();
+			String key = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+			
+			Message old_value = this.handledTelegrams.put(key, message);
+			if (old_value != null)
+				return true;
+			
+			long timestamp = transaction.getTimestamp();
+			List<String> timeSignatires = this.telegramsTime.get(timestamp);
+			if (timeSignatires == null) {
+				timeSignatires = new ArrayList<String>();
+			} else {
+				timeSignatires.add(key);
+			}
+			
+			this.telegramsTime.put(timestamp, timeSignatires);
+		}
+		
+		// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
+		if (transaction.getCreator() != null & !transaction.isSignatureValid(DCSet.getInstance())) {
+			// DISHONEST PEER
+			this.tryDisconnect(message.getSender(), Synchronizer.BAN_BLOCK_TIMES, "ban PeerOnError - invalid transaction signature");
+			return true;
+		}
+
+		// BROADCAST
+		List<Peer> excludes = new ArrayList<Peer>();
+		excludes.add(message.getSender());
+		this.asyncBroadcast(message, excludes, false);
+
+		return false;
+	}
+
 
 	@Override
 	public void onMessage(Message message) {
@@ -314,7 +376,13 @@ public class Network extends Observable implements ConnectionCallback {
 		{
 			return;
 		}
-		
+
+		if(message.getType() == Message.TELEGRAM_TYPE) {
+			
+			addTelegram((TelegramMessage) message);
+			return;
+		}
+
 		//ONLY HANDLE BLOCK AND TRANSACTION MESSAGES ONCE
 		if(message.getType() == Message.TRANSACTION_TYPE
 				|| message.getType() == Message.BLOCK_TYPE

@@ -161,6 +161,14 @@ public class MessageFactory {
 			
 		switch(type)
 		{
+
+		// TELEGRAM
+		case Message.TELEGRAM_TYPE:
+			
+			//CREATE MESSAGE FROM DATA
+			message = TelegramMessage.parse(data);
+			break;
+
 		//TODO: delete PING and GET HWeight
 		case Message.GET_PING_TYPE:
 			
