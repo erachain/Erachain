@@ -49,10 +49,10 @@ public class NamePaymentResource {
 			{
 				String recipient = nameToAdress.getA().getAddress();
 				password = null;
-				return APIUtils.processPayment(password, sender, feePow, recipient, assetKey,  amount, x, request);
+				return APIUtils.processPayment(password, sender, feePow, recipient, assetKey,  amount, x, request, false);
 			}else
 			{
-				return APIUtils.processPayment(password, sender, feePow, nameName, assetKey,  amount, x, request);
+				return APIUtils.processPayment(password, sender, feePow, nameName, assetKey,  amount, x, request, false);
 			}
 		}
 		catch(NullPointerException | ClassCastException e)

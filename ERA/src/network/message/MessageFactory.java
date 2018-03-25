@@ -90,7 +90,12 @@ public class MessageFactory {
 	{
 		return new TransactionMessage(transaction);
 	}
-	
+
+	public Message createTelegramMessage(Transaction transaction, String callback)
+	{
+		return new TelegramMessage(transaction, callback);
+	}
+
 	public Message parse(Peer sender, DataInputStream inputStream) throws Exception
 	{
 		//READ MESSAGE TYPE

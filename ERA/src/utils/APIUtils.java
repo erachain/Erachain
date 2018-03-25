@@ -2,6 +2,8 @@ package utils;
 
 import java.awt.GraphicsEnvironment;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
@@ -29,6 +31,7 @@ import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
+import network.Peer;
 import settings.Settings;
 //import test.records.TestRecTemplate;
 
@@ -41,7 +44,7 @@ public class APIUtils {
 	}
 
 	public static String processPayment(String password, String sender, String feePowStr, String recipient,
-			String assetKeyString, String amount, String x, HttpServletRequest request) {
+			String assetKeyString, String amount, String x, HttpServletRequest request, boolean asTelegram) {
 
 		// PARSE AMOUNT
 		AssetCls asset;
@@ -130,16 +133,25 @@ public class APIUtils {
 
 		if (confirmed) {
 
-			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+			if (asTelegram) {
+				// BROADCAST as TELEGRAM
+				transaction.sign(account, false);
+				Controller.getInstance().broadcastTelegram(transaction, "");
+				
+				return transaction.toJson().toJSONString();				
+			} else {
+				result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);				
 
-			if (result == Transaction.VALIDATE_OK)
-				return transaction.toJson().toJSONString();
-			else {
+				if (result == Transaction.VALIDATE_OK)
+					return transaction.toJson().toJSONString();
+				else {
 
-				// Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
-				throw ApiErrorFactory.getInstance().createError(result);
+					// Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
+					throw ApiErrorFactory.getInstance().createError(result);
 
+				}
 			}
+
 		}
 		return "error";
 	}
