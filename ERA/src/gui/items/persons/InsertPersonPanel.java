@@ -434,7 +434,7 @@ private void init(){
 							erase_Fields();
 						
 						}
-						}	
+					}	
 				} else {		
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result.getB())), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
