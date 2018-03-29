@@ -69,7 +69,7 @@ public class TelegramsResource {
 	@GET
 	@Path("address/{address}")
 	public String getTelegramsTwo(@PathParam("address") String address) {
-		return this.getTransactionsLimited(address, 50);
+		return this.getTelegramsLimited(address, 50);
 	}
 
 	@SuppressWarnings("unchecked")
