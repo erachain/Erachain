@@ -32,7 +32,7 @@ import utils.Pair;
 public class TelegramManager extends Thread {
 
 	private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
-	private static final int KEEP_TIME = 60000;
+	private static final int KEEP_TIME = 60000 * 10;
 
 	private Network network;
 	private boolean isRun;
@@ -40,11 +40,11 @@ public class TelegramManager extends Thread {
 	static Logger LOGGER = Logger.getLogger(TelegramManager.class.getName());
 
 	// pool of messages
-	private HashMap<String, TelegramMessage> handledTelegrams;
+	private Map<String, TelegramMessage> handledTelegrams;
 	// timestamp lists for clear
 	private TreeMap<Long, List<String>> telegramsForTime;
 	// lists for address
-	private HashMap<String, List<String>> telegramsForAddress;
+	private Map<String, List<String>> telegramsForAddress;
 
 	public TelegramManager(Network network)
 	{
@@ -108,7 +108,7 @@ public class TelegramManager extends Thread {
 		return telegrams;
 	}
 
-	public boolean addTelegram(TelegramMessage message)
+	public synchronized boolean addTelegram(TelegramMessage message)
 	{
 		
 		String address;
@@ -136,44 +136,41 @@ public class TelegramManager extends Thread {
 			return true;			
 		}
 
-		synchronized(this.handledTelegrams)
+		//CHECK IF LIST IS FULL
+		if(this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE)
 		{
-			//CHECK IF LIST IS FULL
-			if(this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE)
-			{
-				List<String> signatires = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
-				for (String signature: signatires) {
-					this.handledTelegrams.remove(signature);
-					///LOGGER.error("handledMessages size OVERHEAT! "); 						
-				}
+			List<String> signatires = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
+			for (String signature: signatires) {
+				this.handledTelegrams.remove(signature);
+				///LOGGER.error("handledMessages size OVERHEAT! "); 						
 			}
+		}
 			
-			String signatureKey = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
-			
-			Message old_value = this.handledTelegrams.put(signatureKey, message);
-			if (old_value != null)
-				return true;
-			
-			// MAP timestamps
-			List<String> timeSignatures = this.telegramsForTime.get(timestamp);
-			if (timeSignatures == null) {
-				timeSignatures = new ArrayList<String>();
-			}
-			timeSignatures.add(signatureKey);
-			this.telegramsForTime.put(timestamp, timeSignatures);
-			
-			// MAP addresses
-			recipients = transaction.getRecipientAccounts();
-			if (recipients != null) {
-				for (Account recipient: recipients) {
-					address = recipient.getAddress();
-					List<String> addressSignatures = this.telegramsForAddress.get(address);
-					if (addressSignatures == null) {
-						addressSignatures = new ArrayList<String>();
-					}
-					addressSignatures.add(signatureKey);
-					this.telegramsForAddress.put(address, addressSignatures);
+		String signatureKey = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+		
+		Message old_value = this.handledTelegrams.put(signatureKey, message.copy());
+		if (old_value != null)
+			return true;
+		
+		// MAP timestamps
+		List<String> timeSignatures = this.telegramsForTime.get(timestamp);
+		if (timeSignatures == null) {
+			timeSignatures = new ArrayList<String>();
+		}
+		timeSignatures.add(signatureKey);
+		this.telegramsForTime.put((Long)timestamp, timeSignatures);
+		
+		// MAP addresses
+		recipients = transaction.getRecipientAccounts();
+		if (recipients != null) {
+			for (Account recipient: recipients) {
+				address = recipient.getAddress();
+				List<String> addressSignatures = this.telegramsForAddress.get(address);
+				if (addressSignatures == null) {
+					addressSignatures = new ArrayList<String>();
 				}
+				addressSignatures.add(signatureKey);
+				this.telegramsForAddress.put(address, addressSignatures);
 			}
 		}
 
@@ -191,13 +188,15 @@ public class TelegramManager extends Thread {
 		while(this.isRun && !this.isInterrupted())
 		{
 			try{ 
-				Thread.sleep(100);	
+				Thread.sleep(1000);	
 			} catch(InterruptedException  es) {
+				return;
 			}
+
+			long timestamp = NTP.getTime();
 
 			synchronized(this.handledTelegrams)
 			{
-				long timestamp = NTP.getTime();
 				
 				do {
 					Entry<Long, List<String>> firstItem = this.telegramsForTime.firstEntry();
@@ -206,7 +205,7 @@ public class TelegramManager extends Thread {
 					
 					long timeKey = firstItem.getKey();
 					
-					if (timeKey < timestamp) {
+					if (timeKey + KEEP_TIME < timestamp) {
 						List<String> signatires = firstItem.getValue();
 						// for all signatures on this TIME
 						for (String signature: signatires) {
@@ -227,7 +226,12 @@ public class TelegramManager extends Thread {
 												i++;
 											}
 										}
-										this.telegramsForAddress.put(address, addressSignatures);
+										// IF list is empty
+										if (addressSignatures.isEmpty()) {
+											this.telegramsForAddress.remove(address);
+										} else {
+											this.telegramsForAddress.put(address, addressSignatures);
+										}
 									}
 								}
 							}

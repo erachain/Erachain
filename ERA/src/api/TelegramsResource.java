@@ -127,12 +127,12 @@ public class TelegramsResource {
 	}
 
 	@GET
-	@Path("signature/{signature}")
-	// GET telegrams/signature/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
+	@Path("get/{signature}")
+	// GET telegrams/get/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
 	public String getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
 
-		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET telegrams/signature/" + signature, request);
+		///String password = null;
+		///APIUtils.askAPICallAllowed(password, "GET telegrams/get/" + signature, request);
 
 		// DECODE SIGNATURE
 		byte[] signatureBytes;

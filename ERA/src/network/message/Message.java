@@ -96,6 +96,8 @@ public abstract class Message {
 				return "VERSION_TYPE";
 			case 13:
 				return "FIND_MYSELF_TYPE";
+			case 14:
+				return "TELEGRAM_TYPE";
 			default:
 				return "!!!" + type;
 		}

@@ -742,8 +742,8 @@ public class ApiClient {
 				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
 			},
 			{
-				"GET telegrams/signature/<signature>", 
-				"Returns the telegram that matches the given signature.",
+				"GET telegrams/get/<signature>", 
+				"Get the telegram that matches the given signature.",
 				"Errors: 101 - Invalid signature. 311 - Telegram does not exist."
 			},
 			{
