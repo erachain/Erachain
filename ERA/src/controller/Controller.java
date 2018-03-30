@@ -101,6 +101,7 @@ import network.message.HWeightMessage;
 import network.message.Message;
 import network.message.MessageFactory;
 import network.message.SignaturesMessage;
+import network.message.TelegramMessage;
 import network.message.TransactionMessage;
 import network.message.VersionMessage;
 import ntp.NTP;
@@ -2210,6 +2211,17 @@ public class Controller extends Observable {
 
 	public List<Block> getLastBlocks(Account account, int limit) {
 		return this.wallet.getLastBlocks(account, limit);
+	}
+
+	public List<TelegramMessage> getLastTelegrams(Account account, long timestamp) {
+		return this.network.getTelegramsForAddress(account.getAddress(), timestamp);
+	}
+	public List<TelegramMessage> getLastTelegrams(long timestamp) {
+		return this.network.getTelegramsFromTimestamp(timestamp);
+	}
+
+	public TelegramMessage getTelegram(String signature) {
+		return this.network.getTelegram(signature);
 	}
 
 	public List<Pair<Account, Name>> getNames() {

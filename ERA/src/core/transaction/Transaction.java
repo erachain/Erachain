@@ -194,6 +194,8 @@ public abstract class Transaction {
 	public static final int INVALID_BLOCK_HEIGHT = 200;
 	public static final int INVALID_BLOCK_TRANS_SEQ_ERROR = 201;
 
+	public static final int TELEGRAM_DOES_NOT_EXIST = 240;
+
 	public static final int NOT_YET_RELEASED = 299;
 	public static final int AT_ERROR = 300;
 

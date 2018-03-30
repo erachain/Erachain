@@ -1,9 +1,13 @@
 package network.message;
 
+import org.json.simple.JSONObject;
+
 import com.google.common.primitives.Bytes;
 
+import core.crypto.Base58;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import datachain.DCSet;
 
 public class TelegramMessage extends Message{
 
@@ -12,7 +16,7 @@ public class TelegramMessage extends Message{
 	
 	public TelegramMessage(Transaction transaction, String callback)
 	{
-		super(TELEGRAM_TYPE);	
+		super(TELEGRAM_TYPE);
 		
 		this.callback = callback;
 		this.transaction = transaction;
@@ -53,7 +57,20 @@ public class TelegramMessage extends Message{
 		data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
 		
 		return data;
-	}	
+	}
+	
+	@SuppressWarnings("unchecked")
+	public JSONObject toJson() {
+
+		//DCSet localDCSet = DCSet.getInstance();
+		JSONObject telegram = new JSONObject();
+
+		telegram.put("transaction", transaction.toJson());
+		telegram.put("callback", callback);
+		
+		return telegram;
+
+	}
 	
 	@Override
 	public int getDataLength()

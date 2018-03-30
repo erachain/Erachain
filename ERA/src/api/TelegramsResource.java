@@ -47,6 +47,7 @@ import gui.library.Issue_Confirm_Dialog;
 import gui.transaction.OnDealClick;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
+import network.message.TelegramMessage;
 import settings.Settings;
 import utils.APIUtils;
 import utils.Converter;
@@ -69,58 +70,37 @@ public class TelegramsResource {
 	@GET
 	@Path("address/{address}")
 	public String getTelegramsTwo(@PathParam("address") String address) {
-		return this.getTelegramsLimited(address, 50);
+		return this.getTelegramsTimestamp(address, 0);
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("limit/{limit}")
-	public String getTelegramsLimited(@PathParam("limit") int limit) {
+	@Path("timestamp/{timestamp}")
+	public String getTelegramsLimited(@PathParam("timestamp") int timestamp) {
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET transactions/limit/" + limit, request);
+		APIUtils.askAPICallAllowed(password, "GET transactions/timestamp/" + timestamp, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
 
-		// GET TRANSACTIONS
-		List<Pair<Account, Transaction>> transactions = Controller.getInstance().getLastTransactions(limit);
-
-		// ORGANIZE TRANSACTIONS
-		Map<Account, List<Transaction>> orderedTransactions = new HashMap<Account, List<Transaction>>();
-		for (Pair<Account, Transaction> transaction : transactions) {
-			if (!orderedTransactions.containsKey(transaction.getA())) {
-				orderedTransactions.put(transaction.getA(), new ArrayList<Transaction>());
-			}
-
-			orderedTransactions.get(transaction.getA()).add(transaction.getB());
-		}
-
 		// CREATE JSON OBJECT
-		JSONArray orderedTransactionsJSON = new JSONArray();
+		JSONArray array = new JSONArray();
 
-		for (Account account : orderedTransactions.keySet()) {
-			JSONArray transactionsJSON = new JSONArray();
-			for (Transaction transaction : orderedTransactions.get(account)) {
-				transactionsJSON.add(transaction.toJson());
-			}
-
-			JSONObject accountTransactionsJSON = new JSONObject();
-			accountTransactionsJSON.put("account", account.getAddress());
-			accountTransactionsJSON.put("transactions", transactionsJSON);
-			orderedTransactionsJSON.add(accountTransactionsJSON);
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp)) {
+			array.add(telegram.toJson());
 		}
 
-		return orderedTransactionsJSON.toJSONString();
+		return array.toJSONString();
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("address/{address}/limit/{limit}")
-	public String getTelegramsLimited(@PathParam("address") String address, @PathParam("limit") int limit) {
+	@Path("address/{address}/timestamp/{timestamp}")
+	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") int timestamp) {
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET transactions/address/" + address + "/limit/" + limit, request);
+		APIUtils.askAPICallAllowed(password, "GET telegrams/address/" + address + "/timestamp/" + timestamp, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -139,8 +119,8 @@ public class TelegramsResource {
 		}
 
 		JSONArray array = new JSONArray();
-		for (Transaction transaction : Controller.getInstance().getLastTransactions(account, limit)) {
-			array.add(transaction.toJson());
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account, timestamp)) {
+			array.add(telegram.toJson());
 		}
 
 		return array.toJSONString();
@@ -148,7 +128,16 @@ public class TelegramsResource {
 
 	@GET
 	@Path("signature/{signature}")
-	public static String getTelegramsBySignature(@PathParam("signature") String signature) throws Exception {
+	public String getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
+
+		String password = null;
+		APIUtils.askAPICallAllowed(password, "GET telegram/signature/" + signature, request);
+
+		// CHECK IF WALLET EXISTS
+		if (!Controller.getInstance().doesWalletExists()) {
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+		}
+
 		// DECODE SIGNATURE
 		byte[] signatureBytes;
 		try {
@@ -158,477 +147,25 @@ public class TelegramsResource {
 		}
 
 		// GET TRANSACTION
-		Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+		TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
 
 		// CHECK IF TRANSACTION EXISTS
-		if (transaction == null) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
+		if (telegram == null) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.TELEGRAM_DOES_NOT_EXIST);
 		}
 
-		return transaction.toJson().toJSONString();
+		return telegram.toJson().toJSONString();
 	}
 
-	@SuppressWarnings("unchecked")
-	@POST
-	@Path("/scan")
-	public String scanTransactions(String x) {
-		try {
-			// READ JSON
-			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
-
-			// GET BLOCK
-			Block block = null;
-			if (jsonObject.containsKey("start")) {
-				byte[] signatureBytes;
-				try {
-					String signature = (String) jsonObject.get("start");
-					signatureBytes = Base58.decode(signature);
-				} catch (Exception e) {
-					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
-				}
-
-				block = Controller.getInstance().getBlock(signatureBytes);
-
-				// CHECK IF BLOCK EXISTS
-				if (block == null) {
-					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-				}
-			}
-
-			// CHECK FOR BLOCKLIMIT
-			int blockLimit = -1;
-			try {
-				blockLimit = ((Long) jsonObject.get("blocklimit")).intValue();
-
-				if (blockLimit > 360) // 360 ensures at least six hours of
-										// blocks can be queried at once
-				{
-					APIUtils.disallowRemote(request);
-				}
-			} catch (NullPointerException e) {
-				// OPTION DOES NOT EXIST
-				APIUtils.disallowRemote(request);
-			} catch (ClassCastException e) {
-				// JSON EXCEPTION
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-
-			// CHECK FOR TRANSACTIONLIMIT
-			int transactionLimit = -1;
-			try {
-				transactionLimit = ((Long) jsonObject.get("transactionlimit")).intValue();
-			} catch (NullPointerException e) {
-				// OPTION DOES NOT EXIST
-			} catch (ClassCastException e) {
-				// JSON EXCEPTION
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-
-			// CHECK FOR TYPE
-			int type = 0;
-			try {
-				type = ((Long) jsonObject.get("type")).intValue();
-			} catch (NullPointerException e) {
-				// OPTION DOES NOT EXIST
-			} catch (ClassCastException e) {
-				// JSON EXCEPTION
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-
-			// CHECK FOR SERVICE
-			int service = -1;
-			try {
-				service = ((Long) jsonObject.get("service")).intValue();
-			} catch (NullPointerException e) {
-				// OPTION DOES NOT EXIST
-			} catch (ClassCastException e) {
-				// JSON EXCEPTION
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-
-			// CHECK FOR ACCOUNT
-			Account account = null;
-			try {
-				if (jsonObject.containsKey("address")) {
-					String address = (String) jsonObject.get("address");
-
-					// CHECK ADDRESS
-					if (!Crypto.getInstance().isValidAddress(address)) {
-						throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-					}
-
-					account = new Account(address);
-				}
-
-			} catch (NullPointerException e) {
-				// OPTION DOES NOT EXIST
-			} catch (ClassCastException e) {
-				// JSON EXCEPTION
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-
-			// SCAN
-			Pair<Block, List<Transaction>> result = Controller.getInstance().scanTransactions(block, blockLimit,
-					transactionLimit, type, service, account);
-
-			// CONVERT RESULT TO JSON
-			JSONObject json = new JSONObject();
-
-			json.put("lastscanned", Base58.encode(result.getA().getSignature()));
-
-			if (block != null) {
-				json.put("amount",
-						result.getA().getHeight(DCSet.getInstance()) - block.getHeight(DCSet.getInstance()) + 1);
-			} else {
-				json.put("amount", result.getA().getHeight(DCSet.getInstance()));
-			}
-
-			JSONArray transactions = new JSONArray();
-			for (Transaction transaction : result.getB()) {
-				transactions.add(transaction.toJson());
-			}
-			json.put("transactions", transactions);
-
-			// RETURN
-			return json.toJSONString();
-		} catch (NullPointerException | ClassCastException e) {
-			// JSON EXCEPTION
-			LOGGER.info(e);
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("recipient/{address}/limit/{limit}")
-	public String getTelegramsByRecipient(@PathParam("address") String address, @PathParam("limit") int limit) {
-		JSONArray array = new JSONArray();
-		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(address, limit);
-		for (Transaction transaction : txs) {
-			array.add(transaction.toJson());
-		}
-
-		return array.toJSONString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@POST
-	@Path("find")
-	public String getTelegramsFind(String x) {
-		JSONObject jsonObject = null;
-		try {
-			jsonObject = (JSONObject) JSONValue.parse(x);
-		} catch (Exception e) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-		}
-
-		String address = (String) jsonObject.get("address");
-
-		// CHECK IF VALID ADDRESS
-		if (address != null && !Crypto.getInstance().isValidAddress(address)) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-		}
-
-		String sender = (String) jsonObject.get("sender");
-
-		// CHECK IF VALID ADDRESS
-		if (sender != null && !Crypto.getInstance().isValidAddress(sender)) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-		}
-
-		String recipient = (String) jsonObject.get("recipient");
-
-		// CHECK IF VALID ADDRESS
-		if (recipient != null && !Crypto.getInstance().isValidAddress(recipient)) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-		}
-
-		boolean count = false;
-		if (jsonObject.containsKey("count")) {
-			try {
-				count = (boolean) jsonObject.get("count");
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		boolean desc = false;
-		if (jsonObject.containsKey("desc")) {
-			try {
-				desc = (boolean) jsonObject.get("desc");
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		int offset = 0;
-		if (jsonObject.containsKey("offset")) {
-			try {
-				offset = ((Long) jsonObject.get("offset")).intValue();
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		int limit = 0;
-		if (jsonObject.containsKey("limit")) {
-			try {
-				limit = ((Long) jsonObject.get("limit")).intValue();
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		int minHeight = 0;
-		if (jsonObject.containsKey("minHeight")) {
-			try {
-				minHeight = ((Long) jsonObject.get("minHeight")).intValue();
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		int maxHeight = 0;
-		if (jsonObject.containsKey("maxHeight")) {
-			try {
-				maxHeight = ((Long) jsonObject.get("maxHeight")).intValue();
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		int type = 0;
-		if (jsonObject.containsKey("type")) {
-			try {
-				type = ((Long) jsonObject.get("type")).intValue();
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-		}
-
-		int service = -1;
-		if ((type == Transaction.ARBITRARY_TRANSACTION || type == 0) && jsonObject.containsKey("service")) {
-			try {
-				service = ((Long) jsonObject.get("service")).intValue();
-			} catch (Exception e) {
-				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-			}
-
-			type = Transaction.ARBITRARY_TRANSACTION;
-		}
-
-		if (count) {
-			return String.valueOf(DCSet.getInstance().getTransactionFinalMap().findTransactionsCount(address, sender,
-					recipient, minHeight, maxHeight, type, service, desc, offset, limit));
-		}
-
-		JSONArray array = new JSONArray();
-		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
-				recipient, minHeight, maxHeight, type, service, desc, offset, limit);
-		for (Transaction transaction : txs) {
-			array.add(transaction.toJson());
-		}
-
-		return array.toJSONString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("sender/{address}/limit/{limit}")
-	public String getTelegramsBySender(@PathParam("address") String address, @PathParam("limit") int limit) {
-
-		JSONArray array = new JSONArray();
-		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender(address, limit);
-		for (Transaction transaction : txs) {
-			array.add(transaction.toJson());
-		}
-
-		return array.toJSONString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("address/{address}/type/{type}/limit/{limit}")
-	public String getTransactionsByTypeAndAddress(@PathParam("address") String address, @PathParam("type") int type,
-			@PathParam("limit") int limit) {
-
-		JSONArray array = new JSONArray();
-		List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
-				type, limit);
-		for (Transaction transaction : txs) {
-			array.add(transaction.toJson());
-		}
-
-		return array.toJSONString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("incoming/{height}")
-	public String incoming(@PathParam("height") int height) {
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
-
-		Block block;
-		try {
-			block = Controller.getInstance().getBlockByHeight(height);
-			if (block == null) {
-				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-			}
-		} catch (Exception e) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-		}
-
-		// GET ACCOUNTS
-		List<Account> accounts = Controller.getInstance().getAccounts();
-
-		JSONArray array = new JSONArray();
-		DCSet dcSet = DCSet.getInstance();
-
-		for (Transaction transaction : block.getTransactions()) {
-			// FOR ALL ACCOUNTS
-			synchronized (accounts) {
-				for (Account account : accounts) {
-					transaction.setDC(dcSet, false);
-					// CHECK IF INVOLVED
-					if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
-						array.add(transaction.toJson());
-						break;
-					}
-				}
-			}
-		}
-
-		return array.toJSONString();
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("incoming/{height}/{address}")
-	public String incomingRecipient(@PathParam("height") int height, @PathParam("address") String address) {
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
-
-		Block block;
-		try {
-			block = Controller.getInstance().getBlockByHeight(height);
-			if (block == null) {
-				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-			}
-		} catch (Exception e) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-		}
-
-		JSONArray array = new JSONArray();
-		DCSet dcSet = DCSet.getInstance();
-
-		for (Transaction transaction : block.getTransactions()) {
-			transaction.setDC(dcSet, false);
-			HashSet<Account> recipients = transaction.getRecipientAccounts();
-			for (Account recipient: recipients) {
-				if (recipient.equals(address)) {
-					array.add(transaction.toJson());
-					break;
-				}
-			}
-		}
-
-		return array.toJSONString();
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("incoming/{height}/{address}/decrypt/{password}")
-	public String incomingRecipientDecrypt(@PathParam("height") int height, @PathParam("address") String address,
-			@PathParam("password") String password) {
-
-		boolean needPass = true; 
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
-
-		Block block;
-		try {
-			block = Controller.getInstance().getBlockByHeight(height);
-			if (block == null) {
-				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-			}
-		} catch (Exception e) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
-		}
-
-		JSONArray array = new JSONArray();
-		Controller cntr = Controller.getInstance();
-		DCSet dcSet = DCSet.getInstance();
-
-		for (Transaction transaction : block.getTransactions()) {
-			transaction.setDC(dcSet, false);
-			HashSet<Account> recipients = transaction.getRecipientAccounts();
-			for (Account recipient: recipients) {
-				if (recipient.equals(address)) {
-					
-					JSONObject json = transaction.toJson();
-										
-					if (json.containsKey("encrypted")) {
-						
-						byte[] r_data = null;
-						
-						if (transaction instanceof R_Send) {
-							R_Send r_Send = (R_Send) transaction;
-							r_data = r_Send.getData();
-						
-							if (r_data != null && r_data.length > 0) {
-	
-								if (needPass) {
-									APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] DECRYPT data - password: " + password + "\n", request);
-									needPass = false;
-								}
-								r_data = cntr.decrypt(transaction.getCreator(), recipient, r_data);
-								if (r_data == null) {
-						    		json.put("data", "error decryption");
-								} else {
-									if (r_Send.isText()) {
-										try {
-								    		json.put("data", new String(r_data, "UTF-8"));
-										} catch (UnsupportedEncodingException e) {
-								    		json.put("data", "error UTF-8");
-										}
-									} else {
-							    		json.put("data", Base58.encode(r_data));
-									}
-								}
-							}
-						}
-					}
-
-					array.add(json);
-					break;
-				}
-			}
-		}
-
-		return array.toJSONString();
-
-	}
 
 	// check1 = 1 - check transaction. not save in chain. return fee
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("sendAsset")
+	@Path("send")
 	public String sendAsset(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
 			@QueryParam("amount") String amount1, @QueryParam("message") String message1,
 			@QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
-			@QueryParam("check") String check1) {
+			 @QueryParam("callback") String callback) {
 
 		JSONObject out = new JSONObject();
 
@@ -733,41 +270,21 @@ public class TelegramsResource {
 		transaction = Controller.getInstance().r_Send(
 				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
 				head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
-		// test result = new Pair<Transaction, Integer>(null,
-		// Transaction.VALIDATE_OK);
 		if (transaction == null) 
-			throw new Exception("");
+			throw new Exception("transaction == null");
 		} catch (Exception e) {
 			out.put("status_code", Transaction.INVALID_TRANSACTION_TYPE);
 			out.put("status", "Invalid Transaction");
 			return out.toJSONString();
 		}
 
-		if (check1 != null || check1 == "1") {
-			out.put("fee", transaction.viewFee());
-			out.put("status_code", "1");
-			out.put("status", "ok");
-			return out.toJSONString();
+		Controller.getInstance().broadcastTelegram(transaction, callback);
 
-		}
-
-		Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
-
-		// CHECK VALIDATE MESSAGE
-		if (result != Transaction.VALIDATE_OK) {
-			out.put("status_code", result);
-			out.put("status", "error");
-			return out.toJSONString();
-
-		}
-		out.put("status", "ok");
-		out.put("status_code", "1");
 		out.put("signature", Base58.encode(transaction.getSignature()));
 		return out.toJSONString();
 	}
 
-	
-	// GET transactions/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
+	// GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
 	@GET
 	//@Produces("text/plain")
 	@Path("datadecrypt/{signature}")
@@ -781,22 +298,20 @@ public class TelegramsResource {
 		}
 
 		// GET TRANSACTION
-		Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+		TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
 
 		// CHECK IF TRANSACTION EXISTS
-		if (transaction == null) {
+		if (telegram == null) {
 			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
 		}
 
-		JSONObject out = new JSONObject();
 		
-		R_Send r_Send = (R_Send) transaction;
-		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
+		R_Send r_Send = (R_Send) telegram.getTransaction();
 		byte[] r_data = r_Send.getData();
 		if (r_data == null || r_data.length == 0)
 			return null;
 
-		APIUtils.askAPICallAllowed(password, "POST decrypt data\n " + signature, request);
+		APIUtils.askAPICallAllowed(password, "POST decrypt telegram data\n " + signature, request);
 		
 		byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
 		if (ddd == null) {

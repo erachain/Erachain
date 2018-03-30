@@ -5,8 +5,12 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -14,6 +18,7 @@ import org.apache.log4j.Logger;
 import controller.Controller;
 import core.BlockChain;
 import core.Synchronizer;
+import core.account.Account;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.PeerMap;
@@ -27,6 +32,7 @@ import utils.Pair;
 public class TelegramManager extends Thread {
 
 	private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
+	private static final int KEEP_TIME = 60000;
 
 	private Network network;
 	private boolean isRun;
@@ -34,23 +40,153 @@ public class TelegramManager extends Thread {
 	static Logger LOGGER = Logger.getLogger(TelegramManager.class.getName());
 
 	// pool of messages
-	private TreeMap<String, Message> handledTelegrams;
+	private HashMap<String, TelegramMessage> handledTelegrams;
 	// timestamp lists for clear
-	private TreeMap<Long, List<String>> telegramsTime;
+	private TreeMap<Long, List<String>> telegramsForTime;
+	// lists for address
+	private HashMap<String, List<String>> telegramsForAddress;
 
 	public TelegramManager(Network network)
 	{
 	
 		this.network = network;
-		this.handledTelegrams = new TreeMap<String, Message>();
-		this.telegramsTime = new TreeMap<Long, List<String>>();
+		this.handledTelegrams = new HashMap<String, TelegramMessage>();
+		this.telegramsForTime = new TreeMap<Long, List<String>>();
+		this.telegramsForAddress = new HashMap<String, List<String>>();
 
 	}
+
+	// GET telegram
+	public TelegramMessage getTelegram(String signature)
+	{
+		return handledTelegrams.get(signature);
+	}
 	
+	// GET telegrams for RECIPIENT from TIME
+	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp)
+	{
+		TelegramMessage telegram;
+		List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
+		//ASK DATABASE FOR A LIST OF PEERS
+		if(!Controller.getInstance().isOnStopping()) {
+			List<String> keys = telegramsForAddress.get(address);
+			for (String key: keys) {
+				telegram = handledTelegrams.get(key);
+				if (timestamp > 0) {
+					if (telegram.getTransaction().getTimestamp() >= timestamp)
+						telegrams.add(telegram);
+				} else {
+					telegrams.add(telegram);
+				}
+			}
+		}
+		
+		//RETURN
+		return telegrams;
+	}
+
+	// GET telegrams for RECIPIENT from TIME
+	public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp)
+	{
+		TelegramMessage telegram;
+		List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
+		if(!Controller.getInstance().isOnStopping()) {
+			
+			SortedMap<Long, List<String>> subMap = telegramsForTime.tailMap(timestamp);
+			for (Entry<Long, List<String>> item: subMap.entrySet()) {
+				List<String> signatures = item.getValue();
+				if (signatures != null) {
+					for (String signature: signatures) {
+						telegram = handledTelegrams.get(signature);
+						telegrams.add(telegram);						
+					}
+				}
+			}
+		}
+		
+		//RETURN
+		return telegrams;
+	}
+
+	public boolean addTelegram(TelegramMessage message)
+	{
+		
+		String address;
+		HashSet<Account> recipients;
+		
+		Transaction transaction = message.getTransaction();
+		
+		// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
+		Account creator = transaction.getCreator();
+		if (creator == null
+				|| !transaction.isSignatureValid(DCSet.getInstance())) {
+			// DISHONEST PEER
+			this.network.tryDisconnect(message.getSender(), Synchronizer.BAN_BLOCK_TIMES, "ban PeerOnError - invalid telegram signature");
+			return true;
+		}
+		
+		long timestamp = transaction.getTimestamp();
+		if (timestamp > NTP.getTime() + 10000) {
+			// DISHONEST PEER
+			this.network.tryDisconnect(message.getSender(), Synchronizer.BAN_BLOCK_TIMES, "ban PeerOnError - invalid telegram timestamp >>");
+			return true;			
+		} else if (KEEP_TIME + timestamp < NTP.getTime()) {
+			// DISHONEST PEER
+			this.network.tryDisconnect(message.getSender(), Synchronizer.BAN_BLOCK_TIMES, "ban PeerOnError - invalid telegram timestamp <<");
+			return true;			
+		}
+
+		synchronized(this.handledTelegrams)
+		{
+			//CHECK IF LIST IS FULL
+			if(this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE)
+			{
+				List<String> signatires = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
+				for (String signature: signatires) {
+					this.handledTelegrams.remove(signature);
+					///LOGGER.error("handledMessages size OVERHEAT! "); 						
+				}
+			}
+			
+			String signatureKey = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+			
+			Message old_value = this.handledTelegrams.put(signatureKey, message);
+			if (old_value != null)
+				return true;
+			
+			// MAP timestamps
+			List<String> timeSignatures = this.telegramsForTime.get(timestamp);
+			if (timeSignatures == null) {
+				timeSignatures = new ArrayList<String>();
+			}
+			timeSignatures.add(signatureKey);
+			this.telegramsForTime.put(timestamp, timeSignatures);
+			
+			// MAP addresses
+			recipients = transaction.getRecipientAccounts();
+			if (recipients != null) {
+				for (Account recipient: recipients) {
+					address = recipient.getAddress();
+					List<String> addressSignatures = this.telegramsForAddress.get(address);
+					if (addressSignatures == null) {
+						addressSignatures = new ArrayList<String>();
+					}
+					addressSignatures.add(signatureKey);
+					this.telegramsForAddress.put(address, addressSignatures);
+				}
+			}
+		}
+
+		return false;
+	}
+
 	public void run()
 	{
+		int i;
 		this.isRun = true;
-		
+		TelegramMessage telegram;
+		String address;
+		HashSet<Account> recipients;
 		
 		while(this.isRun && !this.isInterrupted())
 		{
@@ -62,12 +198,45 @@ public class TelegramManager extends Thread {
 			synchronized(this.handledTelegrams)
 			{
 				long timestamp = NTP.getTime();
-				List<String> timeSignatures = this.telegramsTime.get(timestamp);
-				if (timeSignatures == null) {
-					timeSignatures = new ArrayList<String>();
-				} else {
-					timeSignatures.add(key);
-				}
+				
+				do {
+					Entry<Long, List<String>> firstItem = this.telegramsForTime.firstEntry();
+					if (firstItem == null)
+						break;
+					
+					long timeKey = firstItem.getKey();
+					
+					if (timeKey < timestamp) {
+						List<String> signatires = firstItem.getValue();
+						// for all signatures on this TIME
+						for (String signature: signatires) {
+							telegram = this.handledTelegrams.remove(signature);
+							if (telegram != null) {
+								recipients = telegram.getTransaction().getRecipientAccounts();
+								if (recipients != null) {
+									for (Account recipient: recipients) {
+										address = recipient.getAddress();
+										List<String> addressSignatures = this.telegramsForAddress.get(address);
+										if (addressSignatures != null) {
+											i = 0;
+											for (String item_sign: addressSignatures) {
+												if (item_sign.equals(signature)) {
+													addressSignatures.remove(i);
+													break;
+												}
+												i++;
+											}
+										}
+										this.telegramsForAddress.put(address, addressSignatures);
+									}
+								}
+							}
+						}
+						this.telegramsForTime.remove(timeKey);
+					} else {
+						break;
+					}
+				} while (true);
 			}
 		}
 	}
@@ -75,83 +244,6 @@ public class TelegramManager extends Thread {
 	public void halt()
 	{		
 		this.isRun = false;
-	}
-
-	public List<Peer> getBestPeers()
-	{
-		return Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxSentPeers(), false);
-	}
-	
-	
-	public List<Peer> getKnownPeers()
-	{
-		List<Peer> knownPeers = new ArrayList<Peer>();
-		//ASK DATABASE FOR A LIST OF PEERS
-		if(!Controller.getInstance().isOnStopping()){
-			knownPeers = Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxReceivePeers(), true);
-		}
-		
-		//RETURN
-		return knownPeers;
-	}
-	
-	public void addPeer(Peer peer, int banForMinutes)
-	{
-		//ADD TO DATABASE
-		if(!Controller.getInstance().isOnStopping()){
-			Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, banForMinutes);
-		}
-	}
-		
-	public boolean isBanned(Peer peer)
-	{
-		return Controller.getInstance().getDBSet().getPeerMap().isBanned(peer.getAddress());
-	}
-	
-	public boolean addTelegram(TelegramMessage message)
-	{
-		
-		Transaction transaction = message.getTransaction();
-		
-		// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-		if (transaction.getCreator() == null
-				|| !transaction.isSignatureValid(DCSet.getInstance())) {
-			// DISHONEST PEER
-			this.network.tryDisconnect(message.getSender(), Synchronizer.BAN_BLOCK_TIMES, "ban PeerOnError - invalid telegram signature");
-			return true;
-		}
-
-		synchronized(this.handledTelegrams)
-		{
-			//CHECK IF LIST IS FULL
-			if(this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE)
-			{
-				List<String> signatires = this.telegramsTime.remove(this.telegramsTime.firstKey());
-				for (String signature: signatires) {
-					this.handledTelegrams.remove(signature);
-					///LOGGER.error("handledMessages size OVERHEAT! "); 						
-				}
-			}
-			
-			String key = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
-			
-			Message old_value = this.handledTelegrams.put(key, message);
-			if (old_value != null)
-				return true;
-			
-			long timestamp = transaction.getTimestamp();
-			List<String> timeSignatures = this.telegramsTime.get(timestamp);
-			if (timeSignatures == null) {
-				timeSignatures = new ArrayList<String>();
-			} else {
-				timeSignatures.add(key);
-			}
-			
-			this.telegramsTime.put(timestamp, timeSignatures);
-		}
-		
-
-		return false;
 	}
 
 }
