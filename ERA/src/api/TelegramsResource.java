@@ -128,15 +128,11 @@ public class TelegramsResource {
 
 	@GET
 	@Path("signature/{signature}")
+	// GET telegrams/signature/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
 	public String getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
 
 		String password = null;
 		APIUtils.askAPICallAllowed(password, "GET telegrams/signature/" + signature, request);
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
 
 		// DECODE SIGNATURE
 		byte[] signatureBytes;
@@ -279,7 +275,7 @@ public class TelegramsResource {
 			return out.toJSONString();
 		}
 
-		cntr.broadcastTelegram(transaction, callback);
+		cntr.broadcastTelegram(transaction, callback, true);
 
 		out.put("signature", Base58.encode(transaction.getSignature()));
 		return out.toJSONString();

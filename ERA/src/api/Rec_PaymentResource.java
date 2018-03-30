@@ -51,7 +51,7 @@ public class Rec_PaymentResource
 
 			// it check below APIUtils.askAPICallAllowed(password, "GET payment\n ", request);
 		
-			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, "", request, false);
+			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, "", request);
 		}
 		catch(NullPointerException| ClassCastException e)
 		{
@@ -82,7 +82,7 @@ public class Rec_PaymentResource
 			password = null;
 			APIUtils.askAPICallAllowed(password, "POST payment\n " + x, request);
 		
-			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, x, request, false);
+			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, x, request);
 		}
 		catch(NullPointerException| ClassCastException e)
 		{
@@ -111,7 +111,7 @@ public class Rec_PaymentResource
 
 			// it check below APIUtils.askAPICallAllowed(password, "GET payment\n ", request);
 		
-			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, "", request, true);
+			return APIUtils.processPayment(password, sender,  feePow, recipient, assetKey, amount, "", request);
 		}
 		catch(NullPointerException| ClassCastException e)
 		{

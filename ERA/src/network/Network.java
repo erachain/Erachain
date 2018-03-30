@@ -252,6 +252,10 @@ public class Network extends Observable implements ConnectionCallback {
 		return counter;
 	}
 
+	public boolean addTelegram(TelegramMessage telegram) {		
+		return this.telegramer.addTelegram(telegram);
+	}
+
 	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp) {		
 		return this.telegramer.getTelegramsForAddress(address, timestamp);
 	}

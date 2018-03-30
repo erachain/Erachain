@@ -49,7 +49,7 @@ public class APIUtils {
 	}
 
 	public static String processPayment(String password, String sender, String feePowStr, String recipient,
-			String assetKeyString, String amount, String x, HttpServletRequest request, boolean asTelegram) {
+			String assetKeyString, String amount, String x, HttpServletRequest request) {
 
 		// PARSE AMOUNT
 		AssetCls asset;
@@ -138,23 +138,15 @@ public class APIUtils {
 
 		if (confirmed) {
 
-			if (asTelegram) {
-				// BROADCAST as TELEGRAM
-				transaction.sign(account, false);
-				Controller.getInstance().broadcastTelegram(transaction, "");
-				
-				return transaction.toJson().toJSONString();				
-			} else {
-				result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);				
+			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);				
 
-				if (result == Transaction.VALIDATE_OK)
-					return transaction.toJson().toJSONString();
-				else {
+			if (result == Transaction.VALIDATE_OK)
+				return transaction.toJson().toJSONString();
+			else {
 
-					// Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
-					throw ApiErrorFactory.getInstance().createError(result);
+				// Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
+				throw ApiErrorFactory.getInstance().createError(result);
 
-				}
 			}
 
 		}
@@ -199,8 +191,8 @@ public class APIUtils {
 						.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
 				
 			} else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
-				////if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
-				if (true) {
+				if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
+				//if (true) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(Gui.getInstance());
@@ -212,6 +204,8 @@ public class APIUtils {
 						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
 								JOptionPane.ERROR_MESSAGE);
 					}
+				} else {
+					return;
 				}
 			}
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);				

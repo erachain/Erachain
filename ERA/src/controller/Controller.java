@@ -1628,14 +1628,18 @@ public class Controller extends Observable {
 		this.network.broadcast(message, excludes, false);
 	}
 
-	public void broadcastTelegram(Transaction transaction, String callback) {
+	public void broadcastTelegram(Transaction transaction, String callback, boolean store) {
 
 		// CREATE MESSAGE
-		Message message = MessageFactory.getInstance().createTelegramMessage(transaction, callback);
+		Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction, callback);
+		
+		if (store) {
+			this.network.addTelegram((TelegramMessage)telegram);
+		}
 
 		// BROADCAST MESSAGE
 		List<Peer> excludes = new ArrayList<Peer>();
-		this.network.asyncBroadcast(message, excludes, false);
+		this.network.asyncBroadcast(telegram, excludes, false);
 	}
 
 	// SYNCHRONIZE
