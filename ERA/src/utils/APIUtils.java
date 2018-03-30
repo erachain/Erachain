@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.ws.rs.WebApplicationException;
 
 import org.apache.log4j.Logger;
@@ -17,6 +18,7 @@ import org.mapdb.Fun.Tuple3;
 import api.ApiClient;
 import api.ApiErrorFactory;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -25,6 +27,7 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.web.ServletUtils;
 import datachain.DCSet;
+import gui.DebugTabPane;
 import gui.Gui;
 import gui.MainFrame;
 import gui.PasswordPane;
@@ -196,11 +199,12 @@ public class APIUtils {
 						.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
 				
 			} else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
-				//if (answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
+				////if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
 				if (true) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(Gui.getInstance());
+					//password = PasswordPane.showUnlockWalletDialog(new DebugTabPane());
 					
 					if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
 						return;
