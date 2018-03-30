@@ -2474,7 +2474,7 @@ public class Controller extends Observable {
 	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
-		return this.getOrders(have, want, false);
+		return this.getOrders(have, want, true);
 	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {

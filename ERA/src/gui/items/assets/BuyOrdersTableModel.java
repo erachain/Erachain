@@ -41,7 +41,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		this.have = have;
 		this.want= want;
 		
-		this.orders = Controller.getInstance().getOrders(have, want, false);
+		this.orders = Controller.getInstance().getOrders(have, want, true);
 		
 		columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
 		columnNames[COLUMN_BUYING_AMOUNT] += " " + want.getShort();
@@ -193,7 +193,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
 				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
-			this.orders = Controller.getInstance().getOrders(have, want, false);
+			this.orders = Controller.getInstance().getOrders(have, want, true);
 			totalCalc();
 			this.fireTableDataChanged();
 		}

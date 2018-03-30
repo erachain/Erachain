@@ -38,7 +38,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 	{
 		this.have = have;
 		this.want= want;
-		this.orders = Controller.getInstance().getOrders(have, want, false);
+		this.orders = Controller.getInstance().getOrders(have, want, true);
 				
 		columnNames[COLUMN_PRICE] += " " + want.getShort();
 		columnNames[COLUMN_AMOUNT] += " " + have.getShort();
@@ -177,7 +177,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
 				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
-			this.orders = Controller.getInstance().getOrders(this.have, want, false);
+			this.orders = Controller.getInstance().getOrders(this.have, want, true);
 			//List<Order> items = DCSet.getInstance().getOrderMap().getOrders(have.getKey(), want.getKey(), false);
 			totalCalc();
 			this.fireTableDataChanged();

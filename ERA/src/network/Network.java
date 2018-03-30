@@ -42,18 +42,15 @@ public class Network extends Observable implements ConnectionCallback {
 	private static final int MAX_HANDLED_MESSAGES_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
 	private static final int PINGED_MESSAGES_SIZE = BlockChain.HARD_WORK?1024<<5:1024<<4;
 
-	private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK?4096<<4:4096;
-
 	private ConnectionCreator creator;
 	private ConnectionAcceptor acceptor;
+	private TelegramManager telegramer;
 
 	private static final Logger LOGGER = Logger.getLogger(Network.class);
 
 	private List<Peer> knownPeers;
 	
 	private SortedSet<String> handledMessages;
-	private TreeMap<String, Message> handledTelegrams;
-	private TreeMap<Long, List<String>> telegramsTime;
 	
 	private boolean run;
 	
@@ -75,8 +72,6 @@ public class Network extends Observable implements ConnectionCallback {
 	private void start()
 	{
 		this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
-		this.handledTelegrams = new TreeMap<String, Message>();
-		this.telegramsTime = new TreeMap<Long, List<String>>();
 		
 		//START ConnectionCreator THREAD
 		creator = new ConnectionCreator(this);
@@ -85,6 +80,9 @@ public class Network extends Observable implements ConnectionCallback {
 		//START ConnectionAcceptor THREAD
 		acceptor = new ConnectionAcceptor(this);
 		acceptor.start();
+		
+		telegramer = new TelegramManager(this);
+		telegramer.start();
 	}
 	
 	@Override
@@ -316,56 +314,6 @@ public class Network extends Observable implements ConnectionCallback {
 		}
 	}
 	
-	private boolean addTelegram(TelegramMessage message)
-	{
-		
-		Transaction transaction;
-		
-		synchronized(this.handledTelegrams)
-		{
-			//CHECK IF LIST IS FULL
-			if(this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE)
-			{
-				List<String> signatires = this.telegramsTime.remove(this.telegramsTime.firstKey());
-				for (String signature: signatires) {
-					this.handledTelegrams.remove(signature);
-					///LOGGER.error("handledMessages size OVERHEAT! "); 						
-				}
-			}
-			
-			
-			transaction = message.getTransaction();
-			String key = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
-			
-			Message old_value = this.handledTelegrams.put(key, message);
-			if (old_value != null)
-				return true;
-			
-			long timestamp = transaction.getTimestamp();
-			List<String> timeSignatires = this.telegramsTime.get(timestamp);
-			if (timeSignatires == null) {
-				timeSignatires = new ArrayList<String>();
-			} else {
-				timeSignatires.add(key);
-			}
-			
-			this.telegramsTime.put(timestamp, timeSignatires);
-		}
-		
-		// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-		if (transaction.getCreator() != null & !transaction.isSignatureValid(DCSet.getInstance())) {
-			// DISHONEST PEER
-			this.tryDisconnect(message.getSender(), Synchronizer.BAN_BLOCK_TIMES, "ban PeerOnError - invalid transaction signature");
-			return true;
-		}
-
-		// BROADCAST
-		List<Peer> excludes = new ArrayList<Peer>();
-		excludes.add(message.getSender());
-		this.asyncBroadcast(message, excludes, false);
-
-		return false;
-	}
 
 
 	@Override
@@ -379,7 +327,13 @@ public class Network extends Observable implements ConnectionCallback {
 
 		if(message.getType() == Message.TELEGRAM_TYPE) {
 			
-			addTelegram((TelegramMessage) message);
+			if (!this.telegramer.addTelegram((TelegramMessage) message)) {
+				// BROADCAST
+				List<Peer> excludes = new ArrayList<Peer>();
+				excludes.add(message.getSender());
+				this.asyncBroadcast(message, excludes, false);
+			}
+
 			return;
 		}
 
