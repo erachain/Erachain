@@ -192,15 +192,20 @@ public class APIUtils {
 			if (answer == JOptionPane.NO_OPTION) {
 				throw ApiErrorFactory.getInstance()
 						.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+				
 			} else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
-				if (answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
+				//if (answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
+				if (true) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
-					if (password.length() < 1 || !Controller.getInstance().unlockWallet(password)) {
+					if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
+						return;
+					} else {
 						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
 								JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);				
 
 		} catch (Exception e) {
 			if (e instanceof WebApplicationException) {
