@@ -189,17 +189,11 @@ public class APIUtils {
 
 			int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay, request);
 
-			if (answer == ApiClient.SELF_CALL) {
-				return;
-			}
-
-			if (answer != JOptionPane.YES_OPTION) {
+			if (answer == JOptionPane.NO_OPTION) {
 				throw ApiErrorFactory.getInstance()
 						.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
-			}
-
-			if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
-				if (true || !Controller.getInstance().isWalletUnlocked()) {
+			} else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
+				if (answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
 					if (password.length() < 1 || !Controller.getInstance().unlockWallet(password)) {
 						JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",

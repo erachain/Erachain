@@ -725,6 +725,33 @@ public class ApiClient {
 				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERA).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
+			/// telegrams
+			{
+				"GET telegrams/address/<address>", 
+				"Returns an array of the telegrams of a specific address.",
+				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
+			},
+			{
+				"GET telegrams/timestamp/<timestamp>", 
+				"Returns an array of last telegrams from given timestamp.",
+				"Errors: 201 - Wallet does not exist."
+			},
+			{
+				"GET telegrams/address/<address>/timestamp/<timestamp>", 
+				"Returns an array of the telegrams of a specific address from given timestamp.",
+				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
+			},
+			{
+				"GET telegrams/signature/<signature>", 
+				"Returns the telegram that matches the given signature.",
+				"Errors: 101 - Invalid signature. 311 - Telegram does not exist."
+			},
+			{
+				"POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"callback\": \"<callback>\", \"password\": \"<password>\"}",
+				"Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+				""
+			},
+
 		};
 	
 

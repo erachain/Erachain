@@ -78,7 +78,7 @@ public class TelegramsResource {
 	@Path("timestamp/{timestamp}")
 	public String getTelegramsLimited(@PathParam("timestamp") int timestamp) {
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET transactions/timestamp/" + timestamp, request);
+		APIUtils.askAPICallAllowed(password, "GET telegrams/timestamp/" + timestamp, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -131,7 +131,7 @@ public class TelegramsResource {
 	public String getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
 
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET telegram/signature/" + signature, request);
+		APIUtils.askAPICallAllowed(password, "GET telegrams/signature/" + signature, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -146,10 +146,10 @@ public class TelegramsResource {
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 
-		// GET TRANSACTION
+		// GET TELEGRAM
 		TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
 
-		// CHECK IF TRANSACTION EXISTS
+		// CHECK IF TELEGRAM EXISTS
 		if (telegram == null) {
 			throw ApiErrorFactory.getInstance().createError(Transaction.TELEGRAM_DOES_NOT_EXIST);
 		}
@@ -158,25 +158,21 @@ public class TelegramsResource {
 	}
 
 
-	// check1 = 1 - check transaction. not save in chain. return fee
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("send")
-	public String sendAsset(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
-			@QueryParam("amount") String amount1, @QueryParam("message") String message1,
-			@QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
-			 @QueryParam("callback") String callback) {
+	public String send(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
+			@QueryParam("asset") long asset1, @QueryParam("amount") String amount1,
+			@QueryParam("title") String title1, @QueryParam("message") String message1,
+			@QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
+			@QueryParam("callback") String callback,
+			@QueryParam("password") String password) {
+
+		APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
 
 		JSONObject out = new JSONObject();
-
-		if (pass == null || pass.length() == 0
-				|| !Controller.getInstance().unlockOnceWallet(pass))
-		{
-			out.put("status_code", 0);
-			out.put("status", "Invalid Password");
-			return out.toJSONString();
-		}
-
+		Controller cntr = Controller.getInstance();
+		
 		// READ SENDER
 		Account sender;
 		try {
@@ -238,7 +234,7 @@ public class TelegramsResource {
 
 		// asset
 		try {
-			AssetCls asset = Controller.getInstance().getAsset(asset1);
+			AssetCls asset = cntr.getAsset(asset1);
 			if (asset == null)
 				throw new Exception("");
 		} catch (Exception e) {
@@ -266,9 +262,14 @@ public class TelegramsResource {
 
 		// CREATE TX MESSAGE
 		Transaction transaction;
+		PrivateKeyAccount account = cntr.getPrivateKeyAccountByAddress(sender.getAddress());
+		if (account == null) {
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);	
+		}
+		
 		try {
-		transaction = Controller.getInstance().r_Send(
-				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
+		transaction = cntr.r_Send(
+				account, 0, recip, asset1, amount,
 				head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
 		if (transaction == null) 
 			throw new Exception("transaction == null");
@@ -278,12 +279,41 @@ public class TelegramsResource {
 			return out.toJSONString();
 		}
 
-		Controller.getInstance().broadcastTelegram(transaction, callback);
+		cntr.broadcastTelegram(transaction, callback);
 
 		out.put("signature", Base58.encode(transaction.getSignature()));
 		return out.toJSONString();
 	}
 
+// "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"callback\": \"<callback>\", \"password\": \"<password>\"}",
+// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "callback": "https:/127.0.0.1:9000/ccc", "password": "122"}
+	@SuppressWarnings("unchecked")
+	@POST
+	@Path("send")
+	public String sendPost(String x) {
+		
+		JSONObject jsonObject;
+		try {
+			// READ JSON
+			jsonObject = (JSONObject) JSONValue.parse(x);
+		} catch (NullPointerException | ClassCastException e) {
+			// JSON EXCEPTION
+			LOGGER.info(e);
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+		}
+		/*
+		public String sendPost(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
+			@QueryParam("amount") String amount1, @QueryParam("message") String message1,
+			@QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
+			 @QueryParam("callback") String callback) {
+		*/
+		
+		return send((String)jsonObject.get("sender"), (String)jsonObject.get("recipient"),
+				(long)jsonObject.get("asset"), (String)jsonObject.get("amount"),
+				(String)jsonObject.get("title"), (String)jsonObject.get("message"),
+				(boolean)jsonObject.get("istextmessage"), (boolean)jsonObject.get("encrypt"),
+				(String)jsonObject.get("callback"), (String)jsonObject.get("password"));
+	}
 	// GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
 	@GET
 	//@Produces("text/plain")
@@ -297,10 +327,10 @@ public class TelegramsResource {
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
 		}
 
-		// GET TRANSACTION
+		// GET TELEGRAM
 		TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
 
-		// CHECK IF TRANSACTION EXISTS
+		// CHECK IF TELEGRAM EXISTS
 		if (telegram == null) {
 			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
 		}
