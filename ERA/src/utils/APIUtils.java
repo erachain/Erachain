@@ -25,11 +25,13 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.web.ServletUtils;
 import datachain.DCSet;
+import gui.Gui;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.transaction.Send_RecordDetailsFrame;
+import gui2.Main_Panel;
 import lang.Lang;
 import network.Peer;
 import settings.Settings;
@@ -197,6 +199,9 @@ public class APIUtils {
 				//if (answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
 				if (true) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
+					//password = PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
+					//password = PasswordPane.showUnlockWalletDialog(Gui.getInstance());
+					
 					if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
 						return;
 					} else {
