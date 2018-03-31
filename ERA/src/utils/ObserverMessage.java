@@ -233,6 +233,8 @@ public class ObserverMessage {
 	public static final int WALLET_REMOVE_IMPRINT_TYPE = 1073;
 	public static final int WALLET_LIST_IMPRINT_TYPE = 1074;
 	public static final int LIST_IMPRINT_FAVORITES_TYPE = 1075;
+	public static final int ADD_IMPRINT_TYPE_FAVORITES_TYPE = 1077;
+	public static final int DELETE_IMPRINT_FAVORITES_TYPE = 1078;
 
 	public static final int WALLET_RESET_TEMPLATE_TYPE = 1081;
 	public static final int WALLET_ADD_TEMPLATE_TYPE = 1082;

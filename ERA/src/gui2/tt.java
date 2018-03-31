@@ -48,7 +48,7 @@ public tt() {
    DefaultMutableTreeNode statuses_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Statuses"));
    DefaultMutableTreeNode unions_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unions"));
    DefaultMutableTreeNode votings_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Votings"));
-   DefaultMutableTreeNode hashes_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Hashes"));
+   DefaultMutableTreeNode hashes_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unique Hashes"));
    DefaultMutableTreeNode records_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Records"));
    DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
    DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
@@ -132,10 +132,10 @@ public tt() {
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
    
- 
-   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Hashes")));
-   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search_Hash")));
-   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Hash")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Unique Hashes")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unique Hashes")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unique Hashes")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Unique Hash")));
    
 
    // ������� ������� ���������� � ��������� ������� ������

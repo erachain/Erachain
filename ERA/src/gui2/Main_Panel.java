@@ -41,8 +41,13 @@ import gui.items.assets.My_Assets_Tab;
 import gui.items.assets.My_Balance_Tab;
 import gui.items.assets.My_Order_Tab;
 import gui.items.assets.Search_Assets_Tab;
+import gui.items.imprints.Imprints_Favorite_SplitPanel;
+import gui.items.imprints.Imprints_Search_SplitPanel;
+import gui.items.imprints.IssueImprintPanel;
 import gui.items.imprints.Issue_Split_Panel;
+import gui.items.imprints.My_Imprints_Tab;
 import gui.items.imprints.Search_Hash;
+import gui.items.imprints.Search_Imprints_Tab;
 import gui.items.mails.Incoming_Mails_SplitPanel;
 import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
@@ -483,20 +488,44 @@ public class Main_Panel extends javax.swing.JPanel {
 		//hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Hashes")));
 		  
 		  
+		 if (str.equals(Lang.getInstance().translate("My Unique Hashes")) || str.equals("My_Imprints_Tab")) {
+				insertTab(Lang.getInstance().translate("My Unique Hashes"), new My_Imprints_Tab()); // new
+																							// other_Panel());
+				return;
+			}
 		   
-		   if (str.equals(Lang.getInstance().translate("Search_Hash")) || str.equals("Search_Hash")) {
-				insertTab(Lang.getInstance().translate("Search_Hash"), new Search_Hash()); // new
+		//   if (str.equals(Lang.getInstance().translate("Search_Hash")) || str.equals("Search_Hash")) {
+		//		insertTab(Lang.getInstance().translate("Search_Hash"), new Search_Hash()); // new
+																							// other_Panel());
+		//		return;
+		//	}
+		   
+		   if (str.equals(Lang.getInstance().translate("Search Unique Hashes")) || str.equals("Imprints_Search_SplitPanel")) {
+				insertTab(Lang.getInstance().translate("Search Unique Hashes"), new Imprints_Search_SplitPanel()); // new
+																							// other_Panel());
+				return;
+			} 
+		   
+		   if (str.equals(Lang.getInstance().translate("Favorite Unique Hashes")) || str.equals("Imprints_Favorite_SplitPanel")) {
+				insertTab(Lang.getInstance().translate("Favorite Unique Hashes"), new Imprints_Favorite_SplitPanel()); // new
+																							// other_Panel());
+				return;
+			} 
+		   
+		   
+		
+		//   if (str.equals(Lang.getInstance().translate("Issue Hash")) || str.equals("Issue_Split_Panel")) {
+		//		insertTab(Lang.getInstance().translate("Issue Hash"), new Issue_Split_Panel()); // new
+																							// other_Panel());
+		//		return;
+		//	}
+		
+		   if (str.equals(Lang.getInstance().translate("Issue Unique Hash")) || str.equals("IssueImprintPanel")) {
+				insertTab(Lang.getInstance().translate("Issue Unique Hash"), new IssueImprintPanel()); // new
 																							// other_Panel());
 				return;
 			}
-		
-		   if (str.equals(Lang.getInstance().translate("Issue Hash")) || str.equals("Issue_Split_Panel")) {
-				insertTab(Lang.getInstance().translate("Issue Hash"), new Issue_Split_Panel()); // new
-																							// other_Panel());
-				return;
-			}
-		
-		
+		   
 		
 		
 		if (BlockChain.DEVELOP_USE) {

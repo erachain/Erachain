@@ -1,5 +1,6 @@
 package gui.items.imprints;
 
+import javax.swing.JLabel;
 import javax.swing.table.TableColumn;
 import core.item.imprints.ImprintCls;
 import gui.library.MTable;
@@ -169,7 +170,8 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 8, 9, 9);
-		add(jScrollPane2, gridBagConstraints);
+//		add(jScrollPane2, gridBagConstraints);
+		add(new JLabel(""), gridBagConstraints);
 	}// </editor-fold>
 
 	private void key_jTextFieldActionPerformed(java.awt.event.ActionEvent evt) {

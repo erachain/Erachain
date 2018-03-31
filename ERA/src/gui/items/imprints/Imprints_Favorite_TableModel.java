@@ -1,22 +1,22 @@
-package gui.models;
-////////
+package gui.items.imprints;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-
+import java.util.Set;
 import javax.validation.constraints.Null;
-
 import org.mapdb.Fun.Tuple2;
-
 import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
+import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.SortableList;
+import gui.models.TableModelCls;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
+public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, String>, PersonCls> implements Observer
 {
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
@@ -24,20 +24,28 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
 	
-	private SortableList<Tuple2<String, String>, PersonCls> persons;
+	private List <ImprintCls> persons;
+	
+	
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
-	public WalletItemPersonsTableModel()
+	public Imprints_Favorite_TableModel()
 	{
-		//Controller.getInstance().addWalletListener(this);
+		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		addObservers();
+		
+		
+		//addObservers();
+		//fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
+		
+		
 	}
 	
 	@Override
 	public SortableList<Tuple2<String, String>, PersonCls> getSortableList() {
-		return this.persons;
+		return null;
 	}
 	// читаем колонки которые изменяем высоту	   
 		public Boolean[] get_Column_AutoHeight(){
@@ -54,13 +62,10 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		return o==null?Null.class:o.getClass();
     }
 	
-	public PersonCls getItem(int row)
+	public ImprintCls getItem(int row)
 	{
-		Pair<Tuple2<String, String>, PersonCls> personRes = this.persons.get(row);
-		if (personRes == null)
-			return null;
+		return this.persons.get(row);
 		
-		return personRes.getB();
 	}
 	
 	@Override
@@ -78,8 +83,8 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	@Override
 	public int getRowCount() 
 	{
-		 
-		return this.persons==null?0:this.persons.size();
+		if (persons == null) return 0;
+		return this.persons.size();
 	}
 
 	@Override
@@ -90,11 +95,11 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 			return null;
 		}
 		
-		Pair<Tuple2<String, String>, PersonCls> personRes = this.persons.get(row);
-		if (personRes == null)
+		ImprintCls person = this.persons.get(row);
+		if (person == null)
 			return null;
 		
-		PersonCls person = personRes.getB();
+		
 		
 		switch(column)
 		{
@@ -126,14 +131,14 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-		try
-		{
+	//	try
+	//	{
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
+	//	}
+	//	catch(Exception e)
+	//	{
 			//GUI ERROR
-		}
+	//	}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -142,38 +147,55 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_LIST_PERSON_TYPE)
+		if(message.getType() == ObserverMessage.LIST_IMPRINT_FAVORITES_TYPE && persons==null)
 		{
-			if(this.persons == null)
-			{
-				this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-				this.persons.registerObserver();
+			persons = new ArrayList<ImprintCls>();
+			fill((Set<Long>) message.getValue());
+			fireTableDataChanged();
 			}
+		if(message.getType() == ObserverMessage.ADD_IMPRINT_TYPE_FAVORITES_TYPE){
+			persons.add( Controller.getInstance().getImprint((long) message.getValue()));
+			fireTableDataChanged();
+			}
+		if(message.getType() == ObserverMessage.DELETE_IMPRINT_FAVORITES_TYPE){
+			persons.remove( Controller.getInstance().getImprint((long) message.getValue()));
+			fireTableDataChanged();
+			}
+	
+	
+	}
 			
-			this.fireTableDataChanged();
+		
+		
+	public void fill(Set<Long> set){
+		
+	//	persons.clear();
+			
+		for(Long s:set){
+			
+				persons.add ( Controller.getInstance().getImprint(s));
+			
+			
 		}
 		
-		//CHECK IF LIST UPDATED
-		
-		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE
-				|| message.getType() == ObserverMessage.WALLET_ADD_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_PERSON_TYPE)
-		{
-	//		this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-			this.fireTableDataChanged();
-		}	
-	}
-	public void addObservers(){
-		Controller.getInstance().wallet.database.getPersonMap().addObserver(this);
-		
 		
 	}
+			
+			
+			
+		
 	
 	
 	public void removeObservers() 
 	{
-		//this.persons.removeObserver();
-		//Controller.getInstance().deleteWalletObserver(this);
-		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
-		persons.removeObserver();
+		
+		Controller.getInstance().wallet.database.getImprintFavoritesSet().deleteObserver(this);
+		
 	}
+	public void addObservers(){
+		
+		Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
+	}
+
+	
 }

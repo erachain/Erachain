@@ -2,6 +2,7 @@ package gui.items.statement;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
 import utils.ObserverMessage;
+import utils.Pair;
 
 public class Statements_Table_Model_My extends AbstractTableModel implements Observer {
 
@@ -211,6 +213,23 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			this.fireTableDataChanged();
 		}	
+		if(message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+
+			Transaction record = (Transaction) message.getValue(); 
+			byte[] signKey = record.getSignature();
+			for (int i=0; i < this.transactions.size() - 1; i++) {
+				Transaction item = this.transactions.get(i);
+				if (item == null)
+					return;
+				if (Arrays.equals(signKey, item.getSignature())) {
+					this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();			
+				}
+			}
+			this.fireTableDataChanged();
+			if (false)
+				this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
+					new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
+		}
 	}	
 	
 	

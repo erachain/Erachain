@@ -2480,6 +2480,10 @@ public class Controller extends Observable {
 	public PersonCls getPerson(long key) {
 		return (PersonCls) this.dcSet.getItemPersonMap().get(key);
 	}
+	
+	public ImprintCls getImprint(long key) {
+		return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
+	}
 
 	public StatusCls getStatus(long key) {
 		return (StatusCls) this.dcSet.getItemStatusMap().get(key);

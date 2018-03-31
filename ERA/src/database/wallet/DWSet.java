@@ -45,6 +45,8 @@ public class DWSet implements IDB
 	private OrderMap orderMap;
 	private FavoriteItemAsset assetFavoritesSet;
 	private FavoriteItemTemplate templateFavoritesSet;
+	private FavoriteItemImprint imprintFavoritesSet;
+	
 	private FavoriteItemPerson personFavoritesSet;
 	private FavoriteItemStatus statusFavoritesSet;
 	private FavoriteItemUnion unionFavoritesSet;
@@ -92,6 +94,7 @@ public class DWSet implements IDB
 	    this.orderMap = new OrderMap(this, this.database);
 	    this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
 	    this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
+	    this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
 	    this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
 	    this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
 	    this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
@@ -266,6 +269,12 @@ public class DWSet implements IDB
 	{
 		return this.templateFavoritesSet;
 	}
+	public FavoriteItemImprint getImprintFavoritesSet()
+	{
+		return this.imprintFavoritesSet;
+	}
+	
+
 	public FavoriteItemPerson getPersonFavoritesSet()
 	{
 		return this.personFavoritesSet;
@@ -286,8 +295,8 @@ public class DWSet implements IDB
 	{
 		if (item instanceof AssetCls) { 
 			return this.assetFavoritesSet;
-		//} else if (item instanceof ImprintCls) { 
-		//	return this.imprintFavoritesSet;
+		} else if (item instanceof ImprintCls) { 
+			return this.imprintFavoritesSet;
 		} else if (item instanceof TemplateCls) { 
 			return this.templateFavoritesSet;
 		} else if (item instanceof PersonCls) { 
