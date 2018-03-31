@@ -23,11 +23,7 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_CONFIRMED = 3;
 	public static final int COLUMN_FAVORITE = 4;
-	
 	private List <ImprintCls> persons;
-	
-	
-	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false};
 	
@@ -35,12 +31,6 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 	{
 		super.COLUMN_FAVORITE = COLUMN_FAVORITE;
 		addObservers();
-		
-		
-		//addObservers();
-		//fill((Set<Long>) Controller.getInstance().wallet.database.getPersonFavoritesSet());
-		
-		
 	}
 	
 	@Override
@@ -99,8 +89,6 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 		if (person == null)
 			return null;
 		
-		
-		
 		switch(column)
 		{
 		case COLUMN_KEY:
@@ -131,14 +119,14 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 	@Override
 	public void update(Observable o, Object arg) 
 	{	
-	//	try
-	//	{
+		try
+		{
 			this.syncUpdate(o, arg);
-	//	}
-	//	catch(Exception e)
-	//	{
+		}
+		catch(Exception e)
+		{
 			//GUI ERROR
-	//	}
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -161,41 +149,21 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 			persons.remove( Controller.getInstance().getImprint((long) message.getValue()));
 			fireTableDataChanged();
 			}
-	
-	
 	}
 			
-		
-		
 	public void fill(Set<Long> set){
-		
-	//	persons.clear();
-			
 		for(Long s:set){
-			
 				persons.add ( Controller.getInstance().getImprint(s));
-			
-			
 		}
-		
-		
 	}
-			
-			
-			
-		
-	
 	
 	public void removeObservers() 
 	{
-		
 		Controller.getInstance().wallet.database.getImprintFavoritesSet().deleteObserver(this);
-		
 	}
+
 	public void addObservers(){
 		
 		Controller.getInstance().wallet.database.getImprintFavoritesSet().addObserver(this);
 	}
-
-	
 }
