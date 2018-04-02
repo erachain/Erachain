@@ -133,6 +133,8 @@ public tt() {
    
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
+   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));
+   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Blocks")));
    
    hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Unique Hashes")));
    hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unique Hashes")));

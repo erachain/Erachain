@@ -54,7 +54,7 @@ public class DebugTabPane extends JTabbedPane{
         }
         
         this.peersTableModel = new PeersTableModel();
-		this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new MTable(this.peersTableModel)));
+	//	this.addTab(Lang.getInstance().translate("Peers"), new JScrollPane(new MTable(this.peersTableModel)));
         
 		//TRANSACTIONS TABLE MODEL
 		this.transactionsTableModel = new Debug_Transactions_Table_Model();
@@ -87,7 +87,7 @@ public class DebugTabPane extends JTabbedPane{
 		});
 		
 		//ADD TRANSACTIONS TABLE
-		this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable)); 
+	//	this.addTab(Lang.getInstance().translate("Transactions"), new JScrollPane(this.transactionsTable)); 
 	           
 		//BLOCKS TABLE MODEL
 		this.blocksTableModel = new BlocksTableModel(false);
@@ -118,7 +118,7 @@ public class DebugTabPane extends JTabbedPane{
 			});
 			pppp.add(bb);
 			
-			this.addTab(Lang.getInstance().translate("OffRun"), new JScrollPane(pppp)); 
+	//		this.addTab(Lang.getInstance().translate("OffRun"), new JScrollPane(pppp)); 
 			
 			
 		}
@@ -127,7 +127,7 @@ public class DebugTabPane extends JTabbedPane{
         JScrollPane scrollPane = new JScrollPane(this.loggerTextArea);
         JScrollBar vertical = scrollPane.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());
-        this.addTab("Logger", scrollPane);
+  //      this.addTab("Logger", scrollPane);
 	}
 
 	public void close() 

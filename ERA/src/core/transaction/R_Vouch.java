@@ -89,21 +89,7 @@ public class R_Vouch extends Transaction {
 		return this.seq;
 	}
 	
-	public static Transaction getVouchingRecord(DCSet db, String refStr) { 
-		try {
-			String[] strA = refStr.split("\\-");
-			int height = Integer.parseInt(strA[0]);
-			int seq = Integer.parseInt(strA[1]);
 	
-			return db.getTransactionFinalMap().getTransaction(height, seq);
-		} catch (Exception e1) {
-			try {
-				return db.getTransactionFinalMap().getTransaction(Base58.decode(refStr));
-			} catch (Exception e2) {
-				return null;
-			}
-		}
-	}
 
 	public boolean hasPublicText() {
 		return false;

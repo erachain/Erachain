@@ -220,7 +220,7 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public  Collection<Transaction> getTransactionsByBlock(Integer block, int limit) {
+	public  List<Transaction> getTransactionsByBlock(Integer block, int limit) {
 		/*
 		Iterable keys = Fun.filter(this.block_Key, block);
 		Iterator iter = keys.iterator();
@@ -239,7 +239,15 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 				.subMap(Fun.t2(block, null), Fun.t2(block, Fun.HI())).values();
 		
 		
-		return keys1;
+		
+		List<Transaction> txs = new ArrayList<>();
+		for (Transaction bb:keys1){
+			txs.add(bb);
+			bb=null;
+		}
+		keys1=null;
+		return txs;
+		
 	}
 
 	public List<Transaction> getTransactionsBySender(String address) {
@@ -475,6 +483,22 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 	public Transaction getTransaction(byte[] seg) {
 		return this.get(getDCSet().getTransactionFinalMapSigns().get(seg));
 
+	}
+	
+	public Transaction getRecord(DCSet db, String refStr) { 
+		try {
+			String[] strA = refStr.split("\\-");
+			int height = Integer.parseInt(strA[0]);
+			int seq = Integer.parseInt(strA[1]);
+	
+			return db.getTransactionFinalMap().getTransaction(height, seq);
+		} catch (Exception e1) {
+			try {
+				return db.getTransactionFinalMap().getTransaction(Base58.decode(refStr));
+			} catch (Exception e2) {
+				return null;
+			}
+		}
 	}
 
 }

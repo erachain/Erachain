@@ -34,16 +34,18 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 	
 	//public static final int COLUMN_NO = 0;
 	public static final int COLUMN_TIMESTAMP = 0;
-	public static final int COLUMN_TYPE = 1;
-	public static final int COLUMN_AMOUNT = 2;
-	public static final int COLUMN_FEE = 3;
+	public static final int COLUMN_BLOCK = 1;
+	public static final int COLUMN_SEQ_NO = 2;
+	public static final int COLUMN_TYPE = 3;
+	public static final int COLUMN_AMOUNT = 4;
+	public static final int COLUMN_FEE = 5;
 	
 	//private SortableList<byte[], Transaction> transactions;
 	private Integer blockNo = null;
 	Long block_Height;
 	Integer block_No;
 	List<Transaction> transactions;
-	private String[] columnNames = Lang.getInstance().translate(new String[]{ "Timestamp", "Type", "Amount", AssetCls.FEE_NAME});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{ "Timestamp", "Block", "Seq_No", "Type", "Amount", AssetCls.FEE_NAME});
 	private String ac;
 
 	static Logger LOGGER = Logger.getLogger(TransactionsTableModel.class.getName());
@@ -70,7 +72,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 			block_No = Integer.parseInt(string);
 		} catch (NumberFormatException e) {
 			transactions = new ArrayList<>();
-			Transaction transaction = core.transaction.R_Vouch.getVouchingRecord(DCSet.getInstance(), string);
+			Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), string);
 			if (transaction != null) {
 				transactions.add(transaction);
 			}
@@ -226,7 +228,14 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 				
 			case COLUMN_FEE:
 				
-				return transaction.getFee();		
+				return transaction.getFee();	
+			
+			case COLUMN_BLOCK:
+				
+				return transaction.getBlockHeight(DCSet.getInstance());
+				
+			case COLUMN_SEQ_NO:
+				return transaction.getSeqNo(DCSet.getInstance());
 			
 	//		case COLUMN_NO:
 	//			return row;

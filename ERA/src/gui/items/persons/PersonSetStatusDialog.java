@@ -131,7 +131,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			return record;
 		}
 		
-		record = R_Vouch.getVouchingRecord(DCSet.getInstance(), jParentRecTxt.getText());
+		record = DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), jParentRecTxt.getText());
 		if (record == null) {
 			infoPanel.show_mess(Lang.getInstance().translate("Error")+" - use 1233-321.");
 	        jLabel_RecordInfo.setViewportView(infoPanel);

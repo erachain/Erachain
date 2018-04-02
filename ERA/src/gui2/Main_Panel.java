@@ -31,14 +31,14 @@ import gui.items.imprints.Imprints_Favorite_SplitPanel;
 import gui.items.imprints.Imprints_Search_SplitPanel;
 import gui.items.imprints.IssueImprintPanel;
 import gui.items.imprints.My_Imprints_Tab;
-import gui.items.imprints.Search_Imprints_Tab;
 import gui.items.link_hashes.Issue_Linked_Hash_Panel;
 import gui.items.link_hashes.Search_Linked_Hash;
 import gui.items.mails.Incoming_Mails_SplitPanel;
 import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
+import gui.items.other.Other_Console_Panel;
+import gui.items.other.Other_Search_Blocks;
 import gui.items.other.Other_Split_Panel;
-import gui.items.other.other_Panel;
 import gui.items.persons.InsertPersonPanel;
 import gui.items.persons.IssuePersonPanel;
 import gui.items.persons.Persons_Favorite_SplitPanel;
@@ -52,7 +52,6 @@ import gui.items.statement.Statements_Favorite_SplitPanel;
 import gui.items.statement.Statements_My_SplitPanel;
 import gui.items.statement.Statements_Search_SplitPanel;
 import gui.items.statuses.IssueStatusPanel;
-import gui.items.statuses.My_Statuses_Tab;
 import gui.items.statuses.Search_Statuses_Tab;
 import gui.items.statuses.Statuses_Favorite_SplitPanel;
 import gui.items.templates.IssueTemplatePanel;
@@ -474,7 +473,20 @@ public class Main_Panel extends javax.swing.JPanel {
 																						
 			return;
 		}
-		  
+		 
+		if (str.equals(Lang.getInstance().translate("Console")) || str.equals("Other_Console_Panel")) {
+			insertTab(Lang.getInstance().translate("Console"), new Other_Console_Panel()); 
+																						
+			return;
+		}
+		
+		if (str.equals(Lang.getInstance().translate("Blocks")) || str.equals("Other_Search_Blocks")) {
+			insertTab(Lang.getInstance().translate("Blocks"), new Other_Search_Blocks()); 
+																						
+			return;
+		}
+		
+		
 		 if (str.equals(Lang.getInstance().translate("My Unique Hashes")) || str.equals("My_Imprints_Tab")) {
 				insertTab(Lang.getInstance().translate("My Unique Hashes"), new My_Imprints_Tab()); 
 																							
