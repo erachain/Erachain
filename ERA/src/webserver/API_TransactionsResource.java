@@ -58,7 +58,7 @@ import utils.Pair;
 import utils.StrJSonFine;
 import utils.TransactionTimestampComparator;
 
-@Path("apitelegrams")
+@Path("apirecords")
 @Produces(MediaType.APPLICATION_JSON)
 public class API_TransactionsResource {
 

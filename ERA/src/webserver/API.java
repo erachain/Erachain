@@ -160,7 +160,10 @@ public class API {
 		
 		help.put("POST Broadcast" , "/broadcast JSON {raw=raw(BASE58)}");
 		help.put("GET Broadcast" , "/broadcast/{raw(BASE58)}");
-		
+
+		help.put("POST Broadcasttelegram" , "/Broadcasttelegram JSON {\"callback\": URL, \"raw\": raw(BASE58)}");
+		help.put("GET Broadcasttelegram" , "/Broadcasttelegram/{raw(BASE58)}?callback=URL");
+
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
@@ -692,7 +695,7 @@ public class API {
 
 	@GET
 	@Path("broadcast/{raw}")
-	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	// http://127.0.0.1:9047/api/broadcast?raw=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public Response broadcastRaw(@PathParam("raw") String raw)
 	{
 		
@@ -700,7 +703,7 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity(StrJSonFine.convert(broadcastFromRawPost1(raw)))
+				.entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
 				.build();
 	}
 
@@ -714,13 +717,13 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity(StrJSonFine.convert(broadcastFromRawPost1(raw)))
+				.entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
 				.build();
 		
 	}
 	
-	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-	public JSONObject broadcastFromRawPost1( String rawDataBase58)
+	// http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public JSONObject broadcastFromRaw_1( String rawDataBase58)
 	{
 		int step = 1;
 		JSONObject out = new JSONObject();
@@ -748,6 +751,69 @@ public class API {
 		}
 	}
 
+	// http://127.0.0.1:9047/lightwallet/broadcastTelegram1?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public JSONObject broadcastTelegram_1(String callback, String rawDataBase58)
+	{
+		JSONObject out = new JSONObject();
+		byte[] transactionBytes;
+		Transaction transaction;
+		
+		try {
+			transactionBytes = Base58.decode(rawDataBase58);
+		} catch (Exception e) {
+			//LOGGER.info(e);
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
+			return out;
+		}		
+
+		try {
+			transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
+		} catch (Exception e) {
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " parse ERROR"));
+			return out;
+		}
+
+		// CHECK IF RECORD VALID
+		if (!transaction.isSignatureValid(DCSet.getInstance())) {
+			out.put("error", APIUtils.errorMess(-1, " INVALID_SIGNATURE"));
+			return out;
+		}
+
+		Controller.getInstance().broadcastTelegram(transaction, callback, true);
+		out.put("status", "ok");
+		return out;
+	}
+
+	@GET
+	//@Path("broadcasttelegram/{raw}?callback={callback}")
+	@Path("broadcasttelegram/{raw}")
+	// http://127.0.0.1:9047/broadcasttelegram?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public Response broadcastTelegram(@PathParam("raw") String raw, @QueryParam("callback") String callback)
+	{
+		
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(broadcastTelegram_1(callback, raw)))
+				.build();
+	}
+
+	@POST
+	@Path("broadcasttelegram")
+	public Response broadcastTelegramPost(@Context HttpServletRequest request,
+			MultivaluedMap<String, String> form){
+		
+		String callback = form.getFirst("callback");
+		String raw = form.getFirst("raw");
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(broadcastTelegram_1(callback, raw)))
+				.build();
+		
+	}
 
 	/*
 	 * ********** ADDRESS **********

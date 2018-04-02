@@ -23,7 +23,6 @@ public class WebService {
 		Set<Class<?>> s = new HashSet<Class<?>>();
         s.add(API.class);
         s.add(WebResource.class);
-        s.add(LightWallet.class);
         s.add(API_TransactionsResource.class);
         s.add(API_TelegramsResource.class);
         
