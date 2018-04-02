@@ -32,7 +32,7 @@ import org.mapdb.Fun.Tuple3;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.templates.TemplateCls;
-import gui.items.imprints.Table_Model_Issue_Hashes;
+import gui.items.link_hashes.Table_Model_Issue_Hashes;
 import gui.library.MButton;
 import gui.library.MImprintEDIT_Pane;
 import gui.library.MSplitPane;

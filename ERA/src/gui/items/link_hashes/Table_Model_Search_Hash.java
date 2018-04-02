@@ -1,4 +1,4 @@
-package gui.items.imprints;
+package gui.items.link_hashes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,6 +12,7 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple3;
 
 import core.crypto.Base58;
+import core.item.ItemCls;
 import datachain.DCSet;
 import datachain.HashesSignsMap;
 import lang.Lang;
@@ -49,6 +50,18 @@ public class Table_Model_Search_Hash extends DefaultTableModel {
 	{
 		if (this.lhh == null) return 0;
 		return this.lhh.size();
+		
+	}
+	
+	public void clear(){
+		lhh = null;
+		lhh =new ArrayList();
+		this.fireTableDataChanged();
+		
+	}
+	
+	public  Tuple3<Long, Integer, Integer> getHashInfo(int row){
+		return lhh.get(row);
 		
 	}
 	

@@ -1,42 +1,24 @@
-package gui.items.imprints;
+package gui.items.link_hashes;
 
-import java.awt.Button;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.imprints.Imprint;
-
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import com.google.common.primitives.Longs;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -46,18 +28,17 @@ import datachain.DCSet;
 import gui.PasswordPane;
 import gui.Split_Panel;
 import gui.library.My_JFileChooser;
-import gui.models.Renderer_Hashes;
 import lang.Lang;
 import utils.Pair;
 
-public class Issue_Split_Panel extends Split_Panel {
+public class Issue_Linked_Hash_Panel extends Split_Panel {
 	Table_Model_Issue_Hashes table_Model;
 	private JTable Table_Hash;
 	private JButton jButton3_jToolBar_RightPanel;
 	Issue_Hash_Imprint issue_Hash_Imprint;
 
-	public Issue_Split_Panel() {
-		super("Issue_Split_Panel");
+	public Issue_Linked_Hash_Panel() {
+		super("Issue_Linked_Hash_Panel");
 		// left panel
 
 		this.toolBar_LeftPanel.setVisible(false);

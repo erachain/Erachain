@@ -30,10 +30,10 @@ import gui.items.assets.Search_Assets_Tab;
 import gui.items.imprints.Imprints_Favorite_SplitPanel;
 import gui.items.imprints.Imprints_Search_SplitPanel;
 import gui.items.imprints.IssueImprintPanel;
-import gui.items.imprints.Issue_Split_Panel;
 import gui.items.imprints.My_Imprints_Tab;
-import gui.items.imprints.Search_Hash;
 import gui.items.imprints.Search_Imprints_Tab;
+import gui.items.link_hashes.Issue_Linked_Hash_Panel;
+import gui.items.link_hashes.Search_Linked_Hash;
 import gui.items.mails.Incoming_Mails_SplitPanel;
 import gui.items.mails.Mail_Send_Panel;
 import gui.items.mails.Outcoming_Mails_SplitPanel;
@@ -470,53 +470,48 @@ public class Main_Panel extends javax.swing.JPanel {
 			return;
 		}
 		if (str.equals(Lang.getInstance().translate("Other")) || str.equals("Other_Split_Panel")) {
-			insertTab(Lang.getInstance().translate("Other"), new Other_Split_Panel()); // new
-																						// other_Panel());
+			insertTab(Lang.getInstance().translate("Other"), new Other_Split_Panel()); 
+																						
 			return;
 		}
-		
-		//hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Hashes")));
-		  
 		  
 		 if (str.equals(Lang.getInstance().translate("My Unique Hashes")) || str.equals("My_Imprints_Tab")) {
-				insertTab(Lang.getInstance().translate("My Unique Hashes"), new My_Imprints_Tab()); // new
-																							// other_Panel());
+				insertTab(Lang.getInstance().translate("My Unique Hashes"), new My_Imprints_Tab()); 
+																							
 				return;
 			}
 		   
-		//   if (str.equals(Lang.getInstance().translate("Search_Hash")) || str.equals("Search_Hash")) {
-		//		insertTab(Lang.getInstance().translate("Search_Hash"), new Search_Hash()); // new
-																							// other_Panel());
-		//		return;
-		//	}
-		   
-		   if (str.equals(Lang.getInstance().translate("Search Unique Hashes")) || str.equals("Imprints_Search_SplitPanel")) {
-				insertTab(Lang.getInstance().translate("Search Unique Hashes"), new Imprints_Search_SplitPanel()); // new
-																							// other_Panel());
+		 if (str.equals(Lang.getInstance().translate("Search Unique Hashes")) || str.equals("Imprints_Search_SplitPanel")) {
+				insertTab(Lang.getInstance().translate("Search Unique Hashes"), new Imprints_Search_SplitPanel());
+																							
 				return;
 			} 
 		   
 		   if (str.equals(Lang.getInstance().translate("Favorite Unique Hashes")) || str.equals("Imprints_Favorite_SplitPanel")) {
-				insertTab(Lang.getInstance().translate("Favorite Unique Hashes"), new Imprints_Favorite_SplitPanel()); // new
-																							// other_Panel());
+				insertTab(Lang.getInstance().translate("Favorite Unique Hashes"), new Imprints_Favorite_SplitPanel()); 
+																							
 				return;
 			} 
-		   
-		   
-		
-		//   if (str.equals(Lang.getInstance().translate("Issue Hash")) || str.equals("Issue_Split_Panel")) {
-		//		insertTab(Lang.getInstance().translate("Issue Hash"), new Issue_Split_Panel()); // new
-																							// other_Panel());
-		//		return;
-		//	}
 		
 		   if (str.equals(Lang.getInstance().translate("Issue Unique Hash")) || str.equals("IssueImprintPanel")) {
-				insertTab(Lang.getInstance().translate("Issue Unique Hash"), new IssueImprintPanel()); // new
-																							// other_Panel());
+				insertTab(Lang.getInstance().translate("Issue Unique Hash"), new IssueImprintPanel());
+																							
 				return;
 			}
 		   
-		
+		   if (str.equals(Lang.getInstance().translate("Issue Linked Hash")) || str.equals("Issue_Linked_Hash_Panel")) {
+				insertTab(Lang.getInstance().translate("Issue Linked Hash"), new Issue_Linked_Hash_Panel()); 
+																						
+				return;
+			}
+		   
+		   if (str.equals(Lang.getInstance().translate("Search Linked Hash")) || str.equals("Search_Linked_Hash")) {
+				insertTab(Lang.getInstance().translate("Search Linked Hash"), new Search_Linked_Hash()); 
+																						
+				return;
+			}
+		   
+		   
 		
 		if (BlockChain.DEVELOP_USE) {
 			if (str.equals(Lang.getInstance().translate("Wallets Manager"))

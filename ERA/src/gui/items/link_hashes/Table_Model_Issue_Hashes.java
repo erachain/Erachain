@@ -1,4 +1,4 @@
-package gui.items.imprints;
+package gui.items.link_hashes;
 
 import java.util.ArrayList;
 import java.util.List;
