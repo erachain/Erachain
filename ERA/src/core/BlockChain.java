@@ -168,6 +168,10 @@ public class BlockChain
 		// TEST
 		TRUSTED_ANONYMOUS.add("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		TRUSTED_ANONYMOUS.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+		TRUSTED_ANONYMOUS.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+		
+		//7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV // Paderin
+		//7JgaYPXY2AofGzwvhHtL4ykc56C2bny3ab // Kuzin
 
 		// TIKER = KEY + CREATOR
 		NOVA_ASSETS.put("BTC",
