@@ -60,9 +60,9 @@ import utils.TransactionTimestampComparator;
 
 @Path("apitelegrams")
 @Produces(MediaType.APPLICATION_JSON)
-public class API_TransactionsResource {
+public class API_TelegramsResource {
 
-	static Logger LOGGER = Logger.getLogger(API_TransactionsResource.class.getName());
+	static Logger LOGGER = Logger.getLogger(API_TelegramsResource.class.getName());
 
 	@Context
 	HttpServletRequest request;
@@ -83,14 +83,14 @@ public class API_TransactionsResource {
 
 		Map<String, String> help = new LinkedHashMap<String, String>();
 
-		help.put("apirecords/getbyaddress?address={address}&asset={asset}",
+		help.put("apitelegrams/getbyaddress?address={address}&asset={asset}",
 				Lang.getInstance().translate("Get all Records for Address & Asset Key"));
 		help.put(
-				"apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
+				"apitelegrams/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
 				Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
-		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
+		help.put("apitelegrams/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
-		help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}",
+		help.put("apitelegrams/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}",
 				"Get last Records from Unix Timestamp milisec(1512777600000)");
 
 		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -310,7 +310,7 @@ public class API_TransactionsResource {
 				.entity(array.toJSONString()).build();
 	}
 
-	// "apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
+	// "apitelegrams/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
 	@GET
 	@Path("getlastbyaddress")
 	public Response getLastByAddress(@QueryParam("address") String address, @QueryParam("timestamp") Long timestamp,

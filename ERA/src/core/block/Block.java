@@ -1,6 +1,7 @@
 package core.block;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -184,12 +185,10 @@ public class Block {
 		
 		if(myWin < itWin) return -1;
 		if (myWin > itWin) return 1;
-
-		int myHash = Arrays.hashCode(this.signature);
-		int itHash = Arrays.hashCode(block.signature);
-		if (myHash < itHash) return -1;
-		if (myHash > itHash) return 1;
-		return 0;
+		
+		BigInteger myBI = new BigInteger(this.signature);
+		BigInteger itBI = new BigInteger(block.signature);
+		return myBI.compareTo(itBI);
 			
 	}
 

@@ -253,7 +253,7 @@ public class Network extends Observable implements ConnectionCallback {
 	}
 
 	public boolean addTelegram(TelegramMessage telegram) {		
-		return this.telegramer.addTelegram(telegram);
+		return this.telegramer.pipeAddRemove(telegram, null, 0);
 	}
 
 	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp) {		
@@ -343,7 +343,7 @@ public class Network extends Observable implements ConnectionCallback {
 
 		if(message.getType() == Message.TELEGRAM_TYPE) {
 			
-			if (!this.telegramer.addTelegram((TelegramMessage) message)) {
+			if (!this.telegramer.pipeAddRemove((TelegramMessage) message, null, 0)) {
 				// BROADCAST
 				List<Peer> excludes = new ArrayList<Peer>();
 				excludes.add(message.getSender());
