@@ -287,4 +287,8 @@ import utils.MenuPopupUtil;
 	//		  if (c1.getClass() == this.info_Panel.getClass()) voush_Library_Panel.delay_on_close();
 			
 		}
+	 
+	 public void listener (){
+		 transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
+	 }
 }

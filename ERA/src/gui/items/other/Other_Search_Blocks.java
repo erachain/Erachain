@@ -29,6 +29,7 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.HashesSignsMap;
 import gui.Split_Panel;
+import gui.items.records.Records_Search_SplitPanel;
 import gui.library.My_JFileChooser;
 import gui.transaction.HashesDetailsFrame;
 import gui.transaction.Rec_DetailsFrame;
@@ -40,6 +41,7 @@ public class Other_Search_Blocks extends Split_Panel {
 	private JTable Table_Hash;
 	private int start;
 	private int end;
+	  Records_Search_SplitPanel rp = new Records_Search_SplitPanel();
 
 	public Other_Search_Blocks() {
 		super("Other_Search_Blocks");
@@ -82,9 +84,15 @@ public class Other_Search_Blocks extends Split_Panel {
 						if (item_Table_Selected == null)
 							return;
 						
-			//			 Transaction tr = DCSet.getInstance().getTransactionFinalMap().getTransaction(item_Table_Selected.b, item_Table_Selected.c);
-
-			//			jScrollPane_jPanel_RightPanel.setViewportView(new Rec_DetailsFrame(tr));
+					//	  tr = DCSet.getInstance().getTransactionFinalMap().getTransaction(item_Table_Selected.b, item_Table_Selected.c);
+						  
+						  
+						
+						  rp.searchToolBar_LeftPanel.setVisible(false);
+						  rp.toolBar_LeftPanel.setVisible(false);
+						  rp.searchTextField_SearchToolBar_LeftPanel.setText(item_Table_Selected.getHeight(DCSet.getInstance())+"");
+						  rp.listener();
+						jScrollPane_jPanel_RightPanel.setViewportView(rp);
 			//			item_Table_Selected = null;
 
 					}
