@@ -2216,9 +2216,16 @@ public class Controller extends Observable {
 		return this.network.getTelegramsFromTimestamp(timestamp);
 	}
 
+	public TelegramMessage getTelegram(byte[] signature) {
+		return this.network.getTelegram(signature);
+	}
+
 	public TelegramMessage getTelegram(String signature) {
 		return this.network.getTelegram(signature);
 	}
+	//public TelegramMessage getTelegram(String signature) {
+	//	return this.network.getTelegram(signature);
+	//}
 
 	public List<Pair<Account, Name>> getNames() {
 		return this.wallet.getNames();

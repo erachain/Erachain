@@ -21,6 +21,7 @@ import org.mapdb.Fun.Tuple2;
 import controller.Controller;
 import core.BlockChain;
 import core.Synchronizer;
+import core.crypto.Base58;
 //import core.BlockChain;
 import core.transaction.Transaction;
 //import database.DBSet;
@@ -264,10 +265,16 @@ public class Network extends Observable implements ConnectionCallback {
 		return this.telegramer.getTelegramsFromTimestamp(timestamp);
 	}
 	
+	public TelegramMessage getTelegram(byte[] signature) {		
+		return this.telegramer.getTelegram(Base58.encode(signature));
+	}
 	public TelegramMessage getTelegram(String signature) {		
 		return this.telegramer.getTelegram(signature);
 	}
-	
+	//public TelegramMessage getTelegram64(String signature) {		
+	//	return this.telegramer.getTelegram64(signature);
+	//}
+
 	public Peer startPeer(Socket socket) {
 		
 		// REUSE known peer

@@ -154,6 +154,7 @@ public class TelegramsResource {
 	}
 
 
+	// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "callback": "https:/127.0.0.1:9000/ccc", "password": "122"}
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("send")

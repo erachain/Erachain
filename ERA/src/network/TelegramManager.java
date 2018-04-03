@@ -19,6 +19,7 @@ import controller.Controller;
 import core.BlockChain;
 import core.Synchronizer;
 import core.account.Account;
+import core.crypto.Base58;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.PeerMap;
@@ -59,8 +60,8 @@ public class TelegramManager extends Thread {
 	}
 
 	// GET telegram
-	public TelegramMessage getTelegram(String signature) {
-		return handledTelegrams.get(signature);
+	public TelegramMessage getTelegram(String signatureKey) {
+		return handledTelegrams.get(signatureKey);
 	}
 
 	// GET telegrams for RECIPIENT from TIME
@@ -138,13 +139,15 @@ public class TelegramManager extends Thread {
 			if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
 				List<TelegramMessage> telegrams = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
 				for (TelegramMessage telegram_item: telegrams) {
-					signatureKey = java.util.Base64.getEncoder().encodeToString(telegram_item.getTransaction().getSignature());
+					//signatureKey = java.util.Base64.getEncoder().encodeToString(telegram_item.getTransaction().getSignature());
+					signatureKey = Base58.encode(telegram_item.getTransaction().getSignature());
 					this.handledTelegrams.remove(signatureKey);
 					/// LOGGER.error("handledMessages size OVERHEAT! ");
 				}
 			}
 
-			signatureKey = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+			//signatureKey = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+			signatureKey = Base58.encode(transaction.getSignature());
 
 			Message old_value = this.handledTelegrams.put(signatureKey, telegram.copy());
 			if (old_value != null)
@@ -193,7 +196,7 @@ public class TelegramManager extends Thread {
 			List<TelegramMessage> telegrams = firstItem.getValue();
 			// for all signatures on this TIME
 			for (TelegramMessage telegram_item : telegrams) {
-				telegram = this.handledTelegrams.remove(telegram_item);
+				telegram = this.handledTelegrams.remove(Base58.encode(telegram_item.getTransaction().getSignature()));
 				if (telegram != null) {
 					transaction = telegram.getTransaction();
 					byte[] signature = transaction.getSignature();
