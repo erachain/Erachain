@@ -64,21 +64,21 @@ public class TelegramsResource {
 
 	@GET
 	public String getTelegrams() {
-		return this.getTelegramsLimited(50);
+		return this.getTelegramsLimited(50,"");
 	}
 
 	@GET
 	@Path("address/{address}")
 	public String getTelegramsTwo(@PathParam("address") String address) {
-		return this.getTelegramsTimestamp(address, 0);
+		return this.getTelegramsTimestamp(address, 0,"");
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("timestamp/{timestamp}")
-	public String getTelegramsLimited(@PathParam("timestamp") int timestamp) {
+	@Path("timestamp/{timestamp}/filter/{filter}")
+	public String getTelegramsLimited(@PathParam("timestamp") int timestamp, @PathParam("filter") String filter) {
 		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET telegrams/timestamp/" + timestamp, request);
+		APIUtils.askAPICallAllowed(password, "GET telegrams/timestamp/" + timestamp + "filter/"+ filter, request);
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -88,7 +88,7 @@ public class TelegramsResource {
 		// CREATE JSON OBJECT
 		JSONArray array = new JSONArray();
 
-		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp)) {
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, filter)) {
 			array.add(telegram.toJson());
 		}
 
@@ -97,8 +97,8 @@ public class TelegramsResource {
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("address/{address}/timestamp/{timestamp}")
-	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") int timestamp) {
+	@Path("address/{address}/timestamp/{timestamp}/filter/{filter}")
+	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") int timestamp, @PathParam("filter") String filter) {
 		String password = null;
 		APIUtils.askAPICallAllowed(password, "GET telegrams/address/" + address + "/timestamp/" + timestamp, request);
 
@@ -119,7 +119,7 @@ public class TelegramsResource {
 		}
 
 		JSONArray array = new JSONArray();
-		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account, timestamp)) {
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account, timestamp, filter)) {
 			array.add(telegram.toJson());
 		}
 

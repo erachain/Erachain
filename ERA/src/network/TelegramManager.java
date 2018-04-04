@@ -20,6 +20,7 @@ import core.BlockChain;
 import core.Synchronizer;
 import core.account.Account;
 import core.crypto.Base58;
+import core.transaction.R_Send;
 import core.transaction.Transaction;
 import database.DBSet;
 import database.PeerMap;
@@ -65,37 +66,27 @@ public class TelegramManager extends Thread {
 	}
 
 	// GET telegrams for RECIPIENT from TIME
-	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp) {
-		//TelegramMessage telegram;
+	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
+		// TelegramMessage telegram;
 		List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
 		// ASK DATABASE FOR A LIST OF PEERS
 		if (!Controller.getInstance().isOnStopping()) {
 			List<TelegramMessage> telegramsAddress = telegramsForAddress.get(address);
-			for (TelegramMessage telegram: telegramsAddress) {
-				if (timestamp > 0) {
-					if (telegram.getTransaction().getTimestamp() >= timestamp)
-						telegrams.add(telegram);
-				} else {
+			for (TelegramMessage telegram : telegramsAddress) {
+				if (filter == null)
 					telegrams.add(telegram);
-				}
-			}
-		}
-
-		// RETURN
-		return telegrams;
-	}
-
-	// GET telegrams for RECIPIENT from TIME
-	public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp) {
-		List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
-		if (!Controller.getInstance().isOnStopping()) {
-
-			SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
-			for (Entry<Long, List<TelegramMessage>> item : subMap.entrySet()) {
-				List<TelegramMessage> telegramsTimestamp = item.getValue();
-				if (telegramsTimestamp != null) {
-					for (TelegramMessage telegram: telegramsTimestamp) {
-						telegrams.add(telegram);
+				else {
+					Transaction transaction = telegram.getTransaction();
+					if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
+						;
+					String head = ((R_Send) transaction).getHead();
+					if (head.equals(filter)) {
+						if (timestamp > 0) {
+							if (telegram.getTransaction().getTimestamp() >= timestamp)
+								telegrams.add(telegram);
+						} else {
+							telegrams.add(telegram);
+						}
 					}
 				}
 			}
@@ -105,7 +96,39 @@ public class TelegramManager extends Thread {
 		return telegrams;
 	}
 
-	public synchronized boolean pipeAddRemove(TelegramMessage telegram, Entry<Long, List<TelegramMessage>> firstItem, long timeKey) {
+	// GET telegrams for RECIPIENT from TIME
+	public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String filter) {
+		List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
+		if (!Controller.getInstance().isOnStopping()) {
+
+			SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
+			for (Entry<Long, List<TelegramMessage>> item : subMap.entrySet()) {
+				List<TelegramMessage> telegramsTimestamp = item.getValue();
+				if (telegramsTimestamp != null) {
+					for (TelegramMessage telegram : telegramsTimestamp) {
+						if (filter == null) {
+							telegrams.add(telegram);
+						} else {
+							Transaction transactopn = telegram.getTransaction();
+							// if (transactopn instanceof R_Send) {
+							if (transactopn.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+								String head = ((R_Send) transactopn).getHead();
+								if (head.equals(filter)) {
+									telegrams.add(telegram);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// RETURN
+		return telegrams;
+	}
+
+	public synchronized boolean pipeAddRemove(TelegramMessage telegram, Entry<Long, List<TelegramMessage>> firstItem,
+			long timeKey) {
 
 		if (firstItem == null) {
 
@@ -134,19 +157,21 @@ public class TelegramManager extends Thread {
 			}
 
 			String signatureKey;
-			
+
 			// CHECK IF LIST IS FULL
 			if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
 				List<TelegramMessage> telegrams = this.telegramsForTime.remove(this.telegramsForTime.firstKey());
-				for (TelegramMessage telegram_item: telegrams) {
-					//signatureKey = java.util.Base64.getEncoder().encodeToString(telegram_item.getTransaction().getSignature());
+				for (TelegramMessage telegram_item : telegrams) {
+					// signatureKey =
+					// java.util.Base64.getEncoder().encodeToString(telegram_item.getTransaction().getSignature());
 					signatureKey = Base58.encode(telegram_item.getTransaction().getSignature());
 					this.handledTelegrams.remove(signatureKey);
 					/// LOGGER.error("handledMessages size OVERHEAT! ");
 				}
 			}
 
-			//signatureKey = java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
+			// signatureKey =
+			// java.util.Base64.getEncoder().encodeToString(transaction.getSignature());
 			signatureKey = Base58.encode(transaction.getSignature());
 
 			Message old_value = this.handledTelegrams.put(signatureKey, telegram.copy());
@@ -158,7 +183,7 @@ public class TelegramManager extends Thread {
 			if (timestampTelegrams == null) {
 				timestampTelegrams = new ArrayList<TelegramMessage>();
 			}
-			
+
 			timestampTelegrams.add(telegram);
 			this.telegramsForTime.put((Long) timestamp, timestampTelegrams);
 
@@ -223,13 +248,13 @@ public class TelegramManager extends Thread {
 							}
 						}
 					}
-					
+
 					// CREATOR counts
 					address = transaction.getCreator().getAddress();
 					Integer count = this.telegramsCounts.get(address);
 					if (count != null) {
 						if (count < 2) {
-							this.telegramsCounts.remove(address);							
+							this.telegramsCounts.remove(address);
 						} else {
 							this.telegramsCounts.put(address, count - 1);
 						}
@@ -238,7 +263,7 @@ public class TelegramManager extends Thread {
 			}
 			this.telegramsForTime.remove(timeKey);
 		}
-		
+
 		return false;
 
 	}

@@ -2209,11 +2209,11 @@ public class Controller extends Observable {
 		return this.wallet.getLastBlocks(account, limit);
 	}
 
-	public List<TelegramMessage> getLastTelegrams(Account account, long timestamp) {
-		return this.network.getTelegramsForAddress(account.getAddress(), timestamp);
+	public List<TelegramMessage> getLastTelegrams(Account account, long timestamp, String filter) {
+		return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter);
 	}
-	public List<TelegramMessage> getLastTelegrams(long timestamp) {
-		return this.network.getTelegramsFromTimestamp(timestamp);
+	public List<TelegramMessage> getLastTelegrams(long timestamp, String filter) {
+		return this.network.getTelegramsFromTimestamp(timestamp, filter);
 	}
 
 	public TelegramMessage getTelegram(byte[] signature) {

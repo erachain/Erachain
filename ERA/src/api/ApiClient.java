@@ -732,13 +732,13 @@ public class ApiClient {
 				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
 			},
 			{
-				"GET telegrams/timestamp/<timestamp>", 
-				"Returns an array of last telegrams from given timestamp.",
+				"GET telegrams/timestamp/<timestamp>/filter/<filter>", 
+				"Returns an array of last telegrams from given timestamp by filter. Filter is optional parametr",
 				"Errors: 201 - Wallet does not exist."
 			},
 			{
-				"GET telegrams/address/<address>/timestamp/<timestamp>", 
-				"Returns an array of the telegrams of a specific address from given timestamp.",
+				"GET telegrams/address/<address>/timestamp/<timestamp>/filte/<filter>", 
+				"Returns an array of the telegrams of a specific address from given timestamp by head filter. Filter is optional parametr.",
 				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
 			},
 			{

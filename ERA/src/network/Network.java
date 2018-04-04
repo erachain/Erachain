@@ -257,12 +257,12 @@ public class Network extends Observable implements ConnectionCallback {
 		return this.telegramer.pipeAddRemove(telegram, null, 0);
 	}
 
-	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp) {		
-		return this.telegramer.getTelegramsForAddress(address, timestamp);
+	public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {		
+		return this.telegramer.getTelegramsForAddress(address, timestamp, filter);
 	}
 
-	public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp) {		
-		return this.telegramer.getTelegramsFromTimestamp(timestamp);
+	public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String filter) {		
+		return this.telegramer.getTelegramsFromTimestamp(timestamp , filter);
 	}
 	
 	public TelegramMessage getTelegram(byte[] signature) {		
