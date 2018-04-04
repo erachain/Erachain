@@ -130,29 +130,31 @@ public class TelegramManager extends Thread {
 	public synchronized boolean pipeAddRemove(TelegramMessage telegram, Entry<Long, List<TelegramMessage>> firstItem,
 			long timeKey) {
 
+		Transaction transaction;
+		
 		if (firstItem == null) {
 
-			Transaction transaction = telegram.getTransaction();
+			transaction = telegram.getTransaction();
 
 			// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
 			Account creator = transaction.getCreator();
 			if (creator == null || !transaction.isSignatureValid(DCSet.getInstance())) {
 				// DISHONEST PEER
-				this.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-						"ban PeerOnError - invalid telegram signature");
+				///this.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+				///		"ban PeerOnError - invalid telegram signature");
 				return true;
 			}
 
 			long timestamp = transaction.getTimestamp();
 			if (timestamp > NTP.getTime() + 10000) {
 				// DISHONEST PEER
-				this.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-						"ban PeerOnError - invalid telegram timestamp >>");
+				///this.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+				///		"ban PeerOnError - invalid telegram timestamp >>");
 				return true;
-			} else if (KEEP_TIME + timestamp < NTP.getTime()) {
+			} else if (30000 + timestamp < NTP.getTime()) {
 				// DISHONEST PEER
-				this.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-						"ban PeerOnError - invalid telegram timestamp <<");
+				///this.network.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
+				///		"ban PeerOnError - invalid telegram timestamp <<");
 				return true;
 			}
 
@@ -215,7 +217,6 @@ public class TelegramManager extends Thread {
 
 			HashSet<Account> recipients;
 			String address;
-			Transaction transaction;
 			int i;
 
 			List<TelegramMessage> telegrams = firstItem.getValue();
