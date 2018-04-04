@@ -200,7 +200,7 @@ public class IssueStatusPanel extends JPanel
 		
         // JCheckBox jCheck_Unique;
         labelGBC.gridy = gridy;
-        JLabel unoqueLabel = new JLabel(Lang.getInstance().translate("Unique") + ":");
+        JLabel unoqueLabel = new JLabel(Lang.getInstance().translate("Single") + ":");
       	this.add(unoqueLabel, labelGBC);
       	
       	txtGBC.gridy = gridy++;
