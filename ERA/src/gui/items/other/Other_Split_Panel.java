@@ -53,6 +53,7 @@ public class Other_Split_Panel extends Split_Panel{
 	private Peer item_Peer_Menu;
 	private Wallet_Sync_Button sync_Button;
 	private Wallet_Orphan_Button return_Button;
+	private JMenuItem connect_Item;
 
 	public Other_Split_Panel() {
 		super("Other_Split_Panel");
@@ -85,14 +86,28 @@ public class Other_Split_Panel extends Split_Panel{
  			
  				// TODO Auto-generated method stub
  				item_Peer_Menu = peersTableModel.get_Peers(jTable_Peers.convertRowIndexToModel(jTable_Peers.getSelectedRow()));
-
- 				 				
+ 				 				 				
  			}
  			
  			
  			
  		});
          
+         
+         connect_Item = new JMenuItem(Lang.getInstance().translate("Connect"));
+         connect_Item.addActionListener(new ActionListener(){
+
+ 			@Override
+ 			public void actionPerformed(ActionEvent arg0) {
+ 				// TODO Auto-generated method stub
+ 			
+			//	item_Peer_Menu.ban(10, "banned by user");
+ 				item_Peer_Menu.connect(item_Peer_Menu.callback);
+				
+ 			}
+       	
+         });
+         peers_Menu.add(connect_Item);
          
          JMenuItem Baned_2_Min_Item = new JMenuItem(Lang.getInstance().translate("Ban in 10 min."));
          Baned_2_Min_Item.addActionListener(new ActionListener(){

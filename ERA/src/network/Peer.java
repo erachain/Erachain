@@ -32,7 +32,7 @@ public class Peer extends Thread{
 
 	private final static boolean need_wait = false;
 	private InetAddress address;
-	private ConnectionCallback callback;
+	public ConnectionCallback callback;
 	private Socket socket;
 	// KEEP_ALIVE = false - as web browser - getConnectionTimeout will break connection
 	private static boolean KEEP_ALIVE = true;

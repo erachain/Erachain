@@ -21,6 +21,7 @@ import com.github.rjeschke.txtmark.Processor;
 import core.crypto.Base58;
 import core.item.templates.TemplateCls;
 import core.transaction.IssueTemplateRecord;
+import gui.library.library;
 import lang.Lang;
 import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
@@ -51,11 +52,12 @@ public class IssueTemplateDetailsFrame extends Rec_DetailsFrame
 				
 		//DESCRIPTION
 		++detailGBC.gridy;
-		JTextArea txtAreaDescription = new JTextArea(templateIssue.getItem().getDescription());
-		txtAreaDescription.setRows(4);
+		String txt = "<HTML>"+ library.to_HTML(templateIssue.getItem().getDescription());
+		JLabel txtAreaDescription = new JLabel(txt);
+		//txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
-		txtAreaDescription.setEditable(false);
-		MenuPopupUtil.installContextMenu(txtAreaDescription);
+		//txtAreaDescription.setEditable(false);
+		//MenuPopupUtil.installContextMenu(txtAreaDescription);
 		this.add(txtAreaDescription, detailGBC);		
 						           
         //PACK
