@@ -1298,6 +1298,31 @@ public class WebResource {
 		}
 	}
 
+	
+	@Path("index/libs/js/utils.js")
+	@GET
+	public Response utilsjs() {
+		File file = new File("web/libs/js/utils.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	@Path("index/libs/js/marked.js")
+	@GET
+	public Response markedjs() {
+		File file = new File("web/libs/js/marked.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
 	@Path("index/libs/js/third-party/highlight.pack.js")
 	@GET
 	public Response highlightpackjs() {

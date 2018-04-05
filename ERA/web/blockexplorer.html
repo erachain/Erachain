@@ -8,6 +8,8 @@
 	<link href="/index/libs/css/style.css" rel="stylesheet">
 	<script src="/index/libs/js/sidebar.js"></script>
 	<script src="/index/libs/js/common.js"></script>
+	<script src="/index/libs/js/marked.js"></script>
+	<script src="/index/libs/js/utils.js"></script>
 	<script src="/index/libs/js/explorerStatements.js"></script>
 	<script src="/index/libs/js/explorerStatuses.js"></script>
 	<script src="/index/libs/js/explorerTemplates.js"></script>
@@ -437,7 +439,7 @@ function aTs (data)
 		output += '<br><b>Creator:</b> <a href=?addr='+data.aTs[key].creator+get_lang()+'>'+data.aTs[key].creator+'</a>';
 		output += '<br><b>AT Type:</b> ' + data.aTs[key].type;
 		
-		output += '<br><b>Description:</b> ' + htmlFilter(wordwrap(data.aTs[key].description, 80, '\n', true));
+		output += '<br><b>Description:</b> ' + htmlFilter(wordwrap(fformat(data.aTs[key].description), 80, '\n', true));
 		output += '<br><b>Tags:</b> ' + htmlFilter(wordwrap(data.aTs[key].tags, 80, '\n', true));
 		//output += '<br><b>Dead:</b> ' + data.aTs[key].state.dead;
 		//output += '<br><b>Frozen:</b> ' + data.aTs[key].state.frozen;
@@ -738,7 +740,7 @@ function poll(data)
 	output += '<font size=+1><b>Poll:</b> <a href=?poll='+encodeURIComponent(data.pool.name)+get_lang()+'>'+htmlFilter(data.pool.name)+'</a></font><br><br>';
 	
 	
-	output += '<b>Description:</b><br>'+htmlFilter(wordwrap(data.pool.description, 100, '\n', true))+'<br><br>';
+	output += '<b>Description:</b><br>'+htmlFilter(wordwrap(fformat(data.pool.description), 100, '\n', true))+'<br><br>';
 
 	output += '<b>Creator:</b> <a href=?addr='+data.pool.creator+get_lang()+'>'+data.pool.creator+'</a><br><br>';
 	
@@ -821,7 +823,7 @@ function assets(data)
 		 
 		table += '<td>' + data.assets[key].operations;
 	
-		table += '<td>' + data.assets[key].description.substr(0, 100);
+		table += '<td>' + fformat(data.assets[key].description).substr(0, 100);
 		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
 		table += '<td>' + htmlFilter(data.assets[key].isMovable);
 		table += '<td>' +data.assets[key].quantity;
@@ -894,7 +896,7 @@ function asset(data)
 	output += '<br><br>';
 	
 	
-	output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(data.asset.this.description, 80, '\n', true);
+	output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(fformat(data.asset.this.description), 80, '\n', true);
 	
 	output += '<br><br>';
 	
@@ -976,7 +978,7 @@ function asset(data)
 			output += '<br><font color=black>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 		}
 		
-		output += '<td>' + htmlFilter(data.asset.pairs[key].description);
+		output += '<td>' + htmlFilter(fformat(data.asset.pairs[key].description));
 	}
 	output += '<tr><td><b>'+ data.asset.label_Total+':';
 	output += '<td>' + data.asset.totalOpenOrdersCount;
@@ -1540,7 +1542,7 @@ function mainQuery(data) {
 			output += '<table width="100%" border=0><tr><td valign=top align=left rowspan=2>';	
 			output += '<br><b>Creator:</b> <a href=?addr='+data.at.creator+get_lang()+'>' + data.at.creator + '</a>';
 			output += '<br><br><b>AT Type:</b> ' + data.at.type;
-			output += '<br><br><b>Description:</b> ' + htmlFilter(wordwrap(data.at.description, 80, '\n', true));
+			output += '<br><br><b>Description:</b> ' + htmlFilter(wordwrap(fformat(data.at.description), 80, '\n', true));
 			output += '<br><br><b>Tags:</b> ' + htmlFilter(wordwrap(data.at.tags, 80, '\n', true));
 			output += '<br><br><b>Min Activation Amount:</b> ' + data.at.minActivation + ' ERA';
 			output += '<br><br><b>Dead:</b> ' + data.at.state.dead;
@@ -2319,7 +2321,7 @@ function mainQuery(data) {
 							output += '<td>'+printBalance(data[i].balance)+'</td>';
 						}
 						output += '</tr>';
-						output += '<tr><td colspan=2><b>Description:</b> ' + htmlFilter(data[i].transaction.description);
+						output += '<tr><td colspan=2><b>Description:</b> ' + htmlFilter(fformat(data[i].transaction.description));
 						output += '</table>';
 						
 						output += '</table><br>';
@@ -2520,7 +2522,7 @@ function mainQuery(data) {
 						}
 						output += '<td>'+addCommas(data[i].transaction.fee)+' <font size="-2">ERA</font></td>';
 						
-						output += '<td><b>Description:</b> '+htmlFilter(data[i].transaction.description)+'</td>';
+						output += '<td><b>Description:</b> '+htmlFilter(fformat(data[i].transaction.description))+'</td>';
 						
 						output += '<td align=center>'+data[i].transaction.asset+'</td>';
 						output += '<td align=center>'+addCommas(data[i].transaction.quantity)+'</td>';
@@ -2989,7 +2991,7 @@ function mainQuery(data) {
 							output += '<br><b>AT Address: </b><a href=?addr='+data[i].transaction.atAddress+get_lang()+'>' + data[i].transaction.atAddress + '</a>';
 						}
 						output += '<br><b>AT Type:</b> ' + data[i].transaction.atType;
-						output += '<br><b>Description:</b> ' + data[i].transaction.description;
+						output += '<br><b>Description:</b> ' + fformat(data[i].transaction.description);
 						output += '<br><b>Tags:</b> ' + data[i].transaction.tags;
 						output += '</td>';
 						
@@ -3389,7 +3391,7 @@ else
 }
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
-output +=   data.Label_description + ': &nbsp&nbsp<b> ' + data.description + '</b><br>';
+output +=   data.Label_description + ': &nbsp&nbsp<b> ' + fformat(data.description) + '</b><br>';
 if (data.era_balance_a) {
 	output +=   '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
 }
