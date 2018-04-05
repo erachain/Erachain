@@ -72,6 +72,8 @@ public class TelegramManager extends Thread {
 		// ASK DATABASE FOR A LIST OF PEERS
 		if (!Controller.getInstance().isOnStopping()) {
 			List<TelegramMessage> telegramsAddress = telegramsForAddress.get(address);
+			if (telegramsAddress == null)
+				return telegrams;
 			for (TelegramMessage telegram : telegramsAddress) {
 				if (filter == null)
 					telegrams.add(telegram);
