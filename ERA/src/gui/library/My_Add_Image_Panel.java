@@ -151,22 +151,36 @@ public class My_Add_Image_Panel extends JLabel {
 			} else {
 				th.setText(image_Label_text);
 			}*/
-			new ImageCropDialog(file, max_widht, max_Height) {
-				@Override
-				public void onFinish(BufferedImage image) {
-					th.setIcon(new ImageIcon(image));
-					th.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
-					th.setText(image_Label_text);
-                    ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
-                    try {
-                    	ImageIO.write(image, "jpeg", imageStream);
-                    	imgButes = imageStream.toByteArray();
-                    }
-                    catch (Exception e) {
-                    	e.printStackTrace();
-                    }
-				}
-			};
+			
+			if (true || file.length() > 21000) {
+				new ImageCropDialog(file, max_widht, max_Height) {
+					@Override
+					public void onFinish(BufferedImage image) {
+						th.setIcon(new ImageIcon(image));
+						th.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+						th.setText(image_Label_text);
+	                    ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
+	                    try {
+	                    	ImageIO.write(image, "jpeg", imageStream);
+	                    	imgButes = imageStream.toByteArray();
+	                    }
+	                    catch (Exception e) {
+	                    	e.printStackTrace();
+	                    }
+					}
+				};				
+			} else {
+                try {
+    				imgButes = getBytesFromFile(file);
+        			InputStream inputStream = new ByteArrayInputStream(imgButes);
+    				BufferedImage image1 = ImageIO.read(inputStream);
+    				ImageIcon image = new ImageIcon(image1);
+                	imgButes = getBytesFromFile(file);
+                }
+                catch (Exception e) {
+                	e.printStackTrace();
+                }
+			}
 		}
 	}
 

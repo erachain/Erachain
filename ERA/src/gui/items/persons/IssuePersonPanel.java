@@ -90,7 +90,7 @@ public class IssuePersonPanel extends JPanel {
 
 	// End of variables declaration
 
-	protected byte[] imgButes;
+	//protected byte[] imgButes;
 	protected JPanel Panel;
 	protected JPanel mainPanel;
 	protected JScrollPane mainScrollPane1;
