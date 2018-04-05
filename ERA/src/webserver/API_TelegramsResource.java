@@ -92,11 +92,11 @@ public class API_TelegramsResource {
 	public Response Default() {
 
 		Map<String, String> help = new LinkedHashMap<String, String>();
-
+/*
 		help.put("apitelegrams/getbyaddress?address={address}&asset={asset}",
 				Lang.getInstance().translate("Get all Records for Address & Asset Key"));
-		help.put(
-				"apitelegrams/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
+		
+		help.put("apitelegrams/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
 				Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
 		help.put("apitelegrams/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
@@ -108,15 +108,13 @@ public class API_TelegramsResource {
 		help.put("apitelegrams/getTelegramBySignature?signature={signature}", "Get Telegramm signature");
 
 		help.put("apitelegrams/getTelegramsTimestamp?address={adress}&timestamp={timestamp}", "Get last message by assress and timestamp");
-
-		help.put("apitelegrams/timestamp?timestamp={timestamp}&filter={filter}", "Get last message by filter. Filter is optional parametr");
-		
-		help.put("apitelegrams/datadecrypt?signature={signature}", "Decypt data by signature");
-				
+*/
+		help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}", "Get messages by filter. Filter is title.");
+							
 		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
 	}
-
+/*
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("timestamp/{timestamp}")
@@ -387,15 +385,15 @@ public class API_TelegramsResource {
 				.header("Access-Control-Allow-Origin", "*")
 				.entity(StrJSonFine.convert(telegram.toJson().toJSONString())).build();
 	}
-
+*/
+	///timestamp/{timestamp}/filter/{filter}
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("address/{address}/timestamp/{timestamp}/filter/{filter}") 
+	@Path("get/{address}/{timestamp}/{filter}") 
 	public Response getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") int timestamp, @PathParam("filter") String filter) {
 		//String password = null;
 		// APIUtils.askAPICallAllowed(password, "GET telegrams/address/" +
 		// address + "/timestamp/" + timestamp, request);
-
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
