@@ -15,24 +15,16 @@ import datachain.DCSet;
 public class TelegramMessage extends Message{
 
 	private Transaction transaction;
-	private String callback;
 	
-	public TelegramMessage(Transaction transaction, String callback)
+	public TelegramMessage(Transaction transaction)
 	{
 		super(TELEGRAM_TYPE);
-		
-		this.callback = callback;
 		this.transaction = transaction;
 	}
 	
 	public Transaction getTransaction()
 	{
 		return this.transaction;
-	}
-
-	public String getCallback()
-	{
-		return this.callback;
 	}
 	
 	public boolean isRequest()
@@ -46,11 +38,8 @@ public class TelegramMessage extends Message{
 		int length = data.length;
 		
 		Transaction transaction = TransactionFactory.getInstance().parse(data, null);
-		int position = transaction.getDataLength(false);
-		byte[] callbackBytes = Arrays.copyOfRange(data, position, position + length);
-		String callback =  new String( callbackBytes, Charset.forName("UTF-8") );
 
-		return new TelegramMessage(transaction, callback);
+		return new TelegramMessage(transaction);
 	}
 	
 	public byte[] toBytes() 
@@ -60,10 +49,6 @@ public class TelegramMessage extends Message{
 		//WRITE BLOCK
 		byte[] blockBytes = this.transaction.toBytes(true, null);
 		data = Bytes.concat(data, blockBytes);
-
-		// CALLBACK
-		byte[] callbackBytes = this.callback.getBytes( Charset.forName("UTF-8") );
-		data = Bytes.concat(data, callbackBytes);
 
 		//ADD CHECKSUM
 		data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
@@ -91,7 +76,6 @@ public class TelegramMessage extends Message{
 		JSONObject telegram = new JSONObject();
 
 		telegram.put("transaction", transaction.toJson());
-		telegram.put("callback", callback);
 		
 		return telegram;
 

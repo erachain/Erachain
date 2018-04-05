@@ -154,7 +154,7 @@ public class TelegramsResource {
 	}
 
 
-	// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "callback": "https:/127.0.0.1:9000/ccc", "password": "122"}
+	// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("send")
@@ -162,7 +162,6 @@ public class TelegramsResource {
 			@QueryParam("asset") long asset1, @QueryParam("amount") String amount1,
 			@QueryParam("title") String title1, @QueryParam("message") String message1,
 			@QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
-			@QueryParam("callback") String callback,
 			@QueryParam("password") String password) {
 
 		APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
@@ -276,14 +275,14 @@ public class TelegramsResource {
 			return out.toJSONString();
 		}
 
-		cntr.broadcastTelegram(transaction, callback, true);
+		cntr.broadcastTelegram(transaction, true);
 
 		out.put("signature", Base58.encode(transaction.getSignature()));
 		return out.toJSONString();
 	}
 
-// "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"callback\": \"<callback>\", \"password\": \"<password>\"}",
-// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "callback": "https:/127.0.0.1:9000/ccc", "password": "122"}
+// "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
 	@SuppressWarnings("unchecked")
 	@POST
 	@Path("send")
@@ -302,14 +301,14 @@ public class TelegramsResource {
 		public String sendPost(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
 			@QueryParam("amount") String amount1, @QueryParam("message") String message1,
 			@QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
-			 @QueryParam("callback") String callback) {
+			) {
 		*/
 		
 		return send((String)jsonObject.get("sender"), (String)jsonObject.get("recipient"),
 				(long)jsonObject.get("asset"), (String)jsonObject.get("amount"),
 				(String)jsonObject.get("title"), (String)jsonObject.get("message"),
 				(boolean)jsonObject.get("istextmessage"), (boolean)jsonObject.get("encrypt"),
-				(String)jsonObject.get("callback"), (String)jsonObject.get("password"));
+				(String)jsonObject.get("password"));
 	}
 	// GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
 	@GET

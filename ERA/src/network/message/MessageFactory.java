@@ -91,9 +91,9 @@ public class MessageFactory {
 		return new TransactionMessage(transaction);
 	}
 
-	public Message createTelegramMessage(Transaction transaction, String callback)
+	public Message createTelegramMessage(Transaction transaction)
 	{
-		return new TelegramMessage(transaction, callback);
+		return new TelegramMessage(transaction);
 	}
 
 	public Message parse(Peer sender, DataInputStream inputStream) throws Exception

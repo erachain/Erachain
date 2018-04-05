@@ -1620,10 +1620,10 @@ public class Controller extends Observable {
 		this.network.broadcast(message, excludes, false);
 	}
 
-	public void broadcastTelegram(Transaction transaction, String callback, boolean store) {
+	public void broadcastTelegram(Transaction transaction, boolean store) {
 
 		// CREATE MESSAGE
-		Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction, callback);
+		Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
 		
 		if (store) {
 			this.network.addTelegram((TelegramMessage)telegram);
