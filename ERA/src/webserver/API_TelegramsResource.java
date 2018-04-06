@@ -91,7 +91,7 @@ public class API_TelegramsResource {
 	@GET
 	public Response Default() {
 		Map<String, String> help = new LinkedHashMap<String, String>();
-		help.put("apitelegrams/getTelegramBySignature?signature={signature}", "Get Telegramm by signature");
+		help.put("apitelegrams/getbysignature/{signature}", "Get Telegramm by signature");
 		help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}",
 				"Get messages by filter. Filter is title.");
 
@@ -106,9 +106,9 @@ public class API_TelegramsResource {
 	 * @return telegram
 	 */
 	@GET
-	@Path("getBySignature/{signature}")
+	@Path("getbysignature/{signature}")
 	// GET
-	// telegrams/get/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
+	// telegrams/getbysignature/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
 	public Response getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
 
 		// DECODE SIGNATURE
