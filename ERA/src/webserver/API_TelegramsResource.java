@@ -90,31 +90,59 @@ public class API_TelegramsResource {
 
 	@GET
 	public Response Default() {
-
 		Map<String, String> help = new LinkedHashMap<String, String>();
-/*
-		help.put("apitelegrams/getbyaddress?address={address}&asset={asset}",
-				Lang.getInstance().translate("Get all Records for Address & Asset Key"));
-		
-		help.put("apitelegrams/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
-				Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
-		help.put("apitelegrams/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
+		help.put("apitelegrams/getTelegramBySignature?signature={signature}", "Get Telegramm by signature");
+		help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}",
+				"Get messages by filter. Filter is title.");
 
-		help.put("apitelegrams/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}",
-				"Get last Records from Unix Timestamp milisec(1512777600000)");
-		
-		help.put("apitelegrams/getTelegramslimited?timestamp={timestamp}", "Get last message by timestamp");
-		
-		help.put("apitelegrams/getTelegramBySignature?signature={signature}", "Get Telegramm signature");
-
-		help.put("apitelegrams/getTelegramsTimestamp?address={adress}&timestamp={timestamp}", "Get last message by assress and timestamp");
-*/
-		help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}", "Get messages by filter. Filter is title.");
-							
 		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
 	}
 
+	/**
+	 * @author Ruslan
+	 * @param signature
+	 *            is signature message
+	 * @return telegram
+	 */
+	@GET
+	@Path("getBySignature/{signature}")
+	// GET
+	// telegrams/get/6kdJgbiTxtqFt2zQDz9Lb29Z11Fa1TSwfZvjU21j6Cn9umSUEK4jXmNU19Ww4RcXpFyQiJTCaSz6Lc5YKn26hsR
+	public Response getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
+
+		// DECODE SIGNATURE
+		@SuppressWarnings("unused")
+		byte[] signatureBytes;
+		try {
+			signatureBytes = Base58.decode(signature);
+		} catch (Exception e) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+		}
+
+		// GET TELEGRAM\
+		TelegramMessage telegram = Controller.getInstance().getTelegram(signature);
+
+		// CHECK IF TELEGRAM EXISTS
+		if (telegram == null) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.TELEGRAM_DOES_NOT_EXIST);
+		}
+
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(telegram.toJson().toJSONString())).build();
+	}
+
+	/**
+	 * @author Ruslan
+	 * @return json string all find message by filter
+	 * @param address
+	 *            account user
+	 * @param timestamp
+	 *            value time
+	 * @param filter
+	 *            is title message.
+	 */
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("get/{address}/{timestamp}/{filter}") 
