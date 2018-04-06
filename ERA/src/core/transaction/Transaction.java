@@ -988,8 +988,9 @@ public abstract class Transaction {
 
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 
-		if (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
-				&& this.hasPublicText() && !this.creator.isPerson(dcSet, height)) {
+		if (this.hasPublicText()
+				&& !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
+				&& !this.creator.isPerson(dcSet, height)) {
 			if (BlockChain.DEVELOP_USE) {
 				boolean good = false;
 				for (String admin : BlockChain.GENESIS_ADMINS) {

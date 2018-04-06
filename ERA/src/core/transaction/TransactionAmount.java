@@ -536,10 +536,11 @@ public abstract class TransactionAmount extends Transaction {
 				
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
-				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(dcSet, height)) {
+				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY) {
 					HashSet<Account> recipients = this.getRecipientAccounts();
 					for (Account recipient: recipients) {
-						if (!BlockChain.TRUSTED_ANONYMOUS.contains(recipient.getAddress())) {
+						if (!recipient.isPerson(dcSet, height)
+								&& !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
 							return RECEIVER_NOT_PERSONALIZED;
 						}
 					}

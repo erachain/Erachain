@@ -89,6 +89,7 @@ public class BlockChain
 		};
 	public static final byte[][] VALID_ADDRESSES = new byte[][] {
 		Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3") };
+		
 	public static final byte[][] VALID_BAL = new byte[][]{
 		Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
 		Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
@@ -97,6 +98,7 @@ public class BlockChain
 		};
 
 	public static HashSet<String> TRUSTED_ANONYMOUS = new HashSet<String>();
+	public static HashSet<String> ANONYMASERS = new HashSet<String>();
 	public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
 	public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
 	public static HashMap<String, Pair<Integer, byte[]>> NOVA_ASSETS = new HashMap<String, Pair<Integer, byte[]>>();
@@ -165,25 +167,22 @@ public class BlockChain
 		genesisTimestamp = genesisBlock.getTimestamp(null);
 
 		// GENERAL TRUST
-		// TEST
-		TRUSTED_ANONYMOUS.add("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-		TRUSTED_ANONYMOUS.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
-		TRUSTED_ANONYMOUS.add("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+		TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
 		
-		//7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV // Paderin
-		//7JgaYPXY2AofGzwvhHtL4ykc56C2bny3ab // Kuzin
+		// ANOMIMASER for incomes from PRSONALIZED
+		ANONYMASERS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
 
 		// TIKER = KEY + CREATOR
 		NOVA_ASSETS.put("BTC",
 				new Pair<Integer, byte[]>(21, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
-		NOVA_ASSETS.put("@@USD",
-				new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
-		NOVA_ASSETS.put("¤¤RUB",
-				new Pair<Integer, byte[]>(93, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
-		NOVA_ASSETS.put("ERARUB",
-				new Pair<Integer, byte[]>(91, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
-		NOVA_ASSETS.put("ERAUSD",
-				new Pair<Integer, byte[]>(85, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		//NOVA_ASSETS.put("@@USD",
+		//		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		//NOVA_ASSETS.put("¤¤RUB",
+		//		new Pair<Integer, byte[]>(93, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		//NOVA_ASSETS.put("ERARUB",
+		//		new Pair<Integer, byte[]>(91, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		//NOVA_ASSETS.put("ERAUSD",
+		//		new Pair<Integer, byte[]>(85, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
 		
 		// TEST
 		//FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -209,42 +208,42 @@ public class BlockChain
 
 		// TEAM 2
 		FREEZED_BALANCES.put("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
-				new int[][]{{219000, 110000}, {328500, 90000}, {438000, 70000}, {547500, 50000}});
+				new int[][]{{225655, 90000}, {333655, 60000}});
 		FREEZED_BALANCES.put("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs",
-				new int[][]{{219000, 110000}, {328500, 90000}, {438000, 70000}, {547500, 50000}});
+				new int[][]{{225655, 80000}, {333655, 53000}});
 		FREEZED_BALANCES.put("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G",
-				new int[][]{{219000, 110000}, {328500, 90000}, {438000, 70000}, {547500, 50000}});
+				new int[][]{{225655, 97000}, {333655, 65000}});
 
 		// TEAM 3
 		FREEZED_BALANCES.put("7GMENsugxjV8PToyUyHNUQF7yr9Gy6tJou",
-				new int[][]{{219000, 150000}, {328500, 100000}, {438000, 70000}, {547500, 30000}});
+				new int[][]{{225655, 197000}, {333655, 131000}});
 		FREEZED_BALANCES.put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm",
-				new int[][]{{219000, 150000}, {328500, 100000}, {438000, 70000}, {547500, 30000}});
+				new int[][]{{225655, 150000}, {333655, 100000}});
 		FREEZED_BALANCES.put("7QUeuMiWQjoQ3MZiriwhKfEG558RJWUUis",
-				new int[][]{{219000, 150000}, {328500, 100000}, {438000, 70000}, {547500, 30000}});
+				new int[][]{{225655, 150000}, {333655, 100000}});
 		FREEZED_BALANCES.put("7MxscS3mS6VWim8B9K3wEzFAUWYbsMkVon",
-				new int[][]{{219000, 140000}, {328500, 90000}, {438000, 60000}, {547500, 30000}});
+				new int[][]{{225655, 140000}, {333655, 90000}});
 		FREEZED_BALANCES.put("79NMuuW7thad2JodQ5mKxbMoyf1DjNT9Ap",
-				new int[][]{{219000, 130000}, {328500, 90000}, {438000, 50000}, {547500, 20000}});
+				new int[][]{{225655, 130000}, {333655, 90000}});
 		FREEZED_BALANCES.put("7MhifBHaZsUcjgckwFN57bAE9fPJVDLDQq",
-				new int[][]{{219000, 110000}, {328500, 80000}, {438000, 50000}, {547500, 20000}});
+				new int[][]{{225655, 110000}, {333655, 80000}});
 		FREEZED_BALANCES.put("7FRWJ4ww3VstdyAyKFwYfZnucJBK7Y4zmT",
-				new int[][]{{219000, 100000}, {328500, 70000}, {438000, 40000}, {547500, 20000}});
+				new int[][]{{225655, 100000}, {333655, 70000}});
 		FREEZED_BALANCES.put("7FNAphtSYXtP5ycn88B2KEywuHXzM3XNLK",
-				new int[][]{{219000, 90000}, {328500, 60000}, {438000, 30000}, {547500, 20000}});
+				new int[][]{{225655, 90000}, {333655, 60000}});
 		FREEZED_BALANCES.put("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u",
-				new int[][]{{219000, 80000}, {328500, 60000}, {438000, 30000}, {547500, 20000}});
+				new int[][]{{225655, 80000}, {333655, 60000}});
 		
 		// TEAM 1
-		//FREEZED_BALANCES.put("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y",
-		//		new int[][]{{219000, 100000}, {328500, 50000}, {438000, 10000}, {547500, 5000}});
-		//FREEZED_BALANCES.put("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV",
-		//		new int[][]{{219000, 100000}, {328500, 50000}, {438000, 10000}, {547500, 5000}});
+		FREEZED_BALANCES.put("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y",
+				new int[][]{{225655, 20000}, {333655, 10000}});
+		FREEZED_BALANCES.put("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV",
+				new int[][]{{225655, 60000}, {333655, 40000}});
 		
-		//FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
-		//		new int[][]{{219000, 200000}, {328500, 150000}, {438000, 100000}, {547500, 50000}});
-		//FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
-		//		new int[][]{{115000, 0}, {219000, 1000000}, {328500, 750000}, {438000, 500000}, {547500, 250000}});
+		FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
+				new int[][]{{225655, 150000}, {333655, 100000}});
+		FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+				new int[][]{{115000, 656000}, {225655, 441000}});
 		
 		DCSet dcSet = dcSet_in;
 		if (dcSet == null) {
