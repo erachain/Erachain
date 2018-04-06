@@ -32,8 +32,13 @@ import settings.Settings;
 import utils.Pair;
 
 public class TelegramManager extends Thread {
-
+	/**
+	 * count telegrams
+	 */
 	private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 4096 << 4 : 4096;
+	/**
+	 * time to live telegram
+	 */
 	private static final int KEEP_TIME = 60000 * 10;
 
 	private Network network;
@@ -270,6 +275,10 @@ public class TelegramManager extends Thread {
 		return false;
 
 	}
+
+	/**
+	 * endless cycle remove telegrams by time
+	 */
 
 	public void run() {
 		int i;

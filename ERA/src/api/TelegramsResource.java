@@ -228,18 +228,7 @@ public class TelegramsResource {
 		byte[] encrypted = new byte[] { 0 };
 		byte[] isTextByte = new byte[] { 1 };
 
-		// asset
-		try {
-			AssetCls asset = cntr.getAsset(asset1);
-			if (asset == null)
-				throw new Exception("");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			out.put("status_code", 1000000);
-			out.put("status", "Invalid asset");
-			return out.toJSONString();
-		}
+
 		// title
 		String head;
 		try {

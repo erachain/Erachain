@@ -161,8 +161,8 @@ public class API {
 		help.put("POST Broadcast" , "/broadcast JSON {raw=raw(BASE58)}");
 		help.put("GET Broadcast" , "/broadcast/{raw(BASE58)}");
 
-		help.put("POST Broadcasttelegram" , "/Broadcasttelegram JSON {\"raw\": raw(BASE58)}");
-		help.put("GET Broadcasttelegram" , "/Broadcasttelegram/{raw(BASE58)}");
+		help.put("POST Broadcasttelegram" , "/broadcasttelegram JSON {\"raw\": raw(BASE58)}");
+		help.put("GET Broadcasttelegram" , "/broadcasttelegram/{raw(BASE58)}");
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")

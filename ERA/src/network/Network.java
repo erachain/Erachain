@@ -94,7 +94,7 @@ public class Network extends Observable implements ConnectionCallback {
 		// WAIT start PINGER
 		try 
 		{
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		} 
 		catch (InterruptedException e)
 		{
