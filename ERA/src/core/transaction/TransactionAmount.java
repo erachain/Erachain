@@ -452,11 +452,11 @@ public abstract class TransactionAmount extends Transaction {
 							) {
 						
 						//byte[] ss = this.creator.getAddress();
-						if (height > Transaction.FREEZE_FROM
+						if (height > BlockChain.FREEZE_FROM
 								&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 							// LOCK PAYMENTS
 							wrong = true;
-							for ( String address: Transaction.TRUE_ADDRESSES) {
+							for ( String address: BlockChain.TRUE_ADDRESSES) {
 								if (this.recipient.equals(address)
 										// || this.creator.equals(address)
 										) {
@@ -519,6 +519,12 @@ public abstract class TransactionAmount extends Transaction {
 							
 							if (wrong)
 								return NO_BALANCE;
+						}
+						
+						if (height > BlockChain.FREEZE_FROM) {
+							String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+							if ( unlock != null && !this.recipient.equals(unlock))
+								return INVALID_CREATOR;
 						}
 						
 					}

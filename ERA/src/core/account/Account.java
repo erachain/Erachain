@@ -258,7 +258,7 @@ public class Account {
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this.getBalance(dcSet, key);
 		BigDecimal ownVol = balance.a.b;
 		
-		if (!BlockChain.DEVELOP_USE && key == Transaction.RIGHTS_KEY && height > Transaction.FREEZE_FROM) {
+		if (!BlockChain.DEVELOP_USE && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
 			int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
 			if (item != null) {
 				if (item[0][0] < 0) {

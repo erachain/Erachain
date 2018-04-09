@@ -50,11 +50,6 @@ public abstract class Transaction {
 
 	protected static final int TODO_h1 = 69000;
 
-	public static final int FREEZE_FROM = BlockChain.DEVELOP_USE ? 12980 : 113000;
-	protected static final String[] TRUE_ADDRESSES = new String[] { "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
-			"7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv", "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ",
-	};
-
 	public static final byte[][] DISCREDIR_ADDRESSES = new byte[][] {
 			Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
 			Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
@@ -989,7 +984,8 @@ public abstract class Transaction {
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 
 		if (this.hasPublicText()
-				&& !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
+				&& (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
+					|| BlockChain.NOVA_ASSETS.get(this.creator.getAddress()) == null)
 				&& !this.creator.isPerson(dcSet, height)) {
 			if (BlockChain.DEVELOP_USE) {
 				boolean good = false;
