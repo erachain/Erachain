@@ -181,7 +181,7 @@ public class ApiClient {
 			},
 			{
 				"GET transactions/unconfirmedincomes/<address>", 
-				"Returns an array of all the unconfirmed incomed transactions of address known to the client.",
+				"Returns an array of all the unconfirmed incoming transactions of address known to the client.",
 				""
 			},
 			{
