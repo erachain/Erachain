@@ -747,6 +747,11 @@ public class ApiClient {
 				"Errors: 101 - Invalid signature. 311 - Telegram does not exist."
 			},
 			{
+				"GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122",
+				"Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+				""
+			},
+			{
 				"POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
 				"Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
 				""

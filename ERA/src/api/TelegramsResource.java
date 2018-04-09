@@ -154,15 +154,15 @@ public class TelegramsResource {
 	}
 
 
-	// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
+	// GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("send")
-	public String send(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
-			@QueryParam("asset") long asset1, @QueryParam("amount") String amount1,
-			@QueryParam("title") String title1, @QueryParam("message") String message1,
-			@QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
-			@QueryParam("password") String password) {
+	@Path("send/{sender}/{recipient}/{asset}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
+	public String send(@PathParam("sender") String sender1, @PathParam("recipient") String recipient1,
+			@PathParam("asset") long asset1, @PathParam("amount") String amount1,
+			@PathParam("title") String title1, @PathParam("message") String message1,
+			@PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
+			@PathParam("password") String password) {
 
 		APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
 
