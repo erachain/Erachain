@@ -145,8 +145,8 @@ public class API_TelegramsResource {
 	 */
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("get/{address}/{timestamp}/{filter}") 
-	public Response getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") int timestamp, @PathParam("filter") String filter) {
+	@Path("get")
+	public Response getTelegramsTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp, @QueryParam("filter") String filter) {
 
 		// CHECK ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
