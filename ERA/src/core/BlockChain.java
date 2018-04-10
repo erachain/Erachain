@@ -257,7 +257,7 @@ public class BlockChain
 		
 		FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
 				new int[][]{{225655, 150000}, {333655, 100000}});
-		FREEZED_BALANCES.put("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+		FREEZED_BALANCES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6",
 				new int[][]{{115000, 656000}, {225655, 441000}});
 		
 		DCSet dcSet = dcSet_in;
