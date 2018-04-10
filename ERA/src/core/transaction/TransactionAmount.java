@@ -486,8 +486,10 @@ public abstract class TransactionAmount extends Transaction {
 						// not make RETURN - check validate next
 						//
 					} else if (absKey == FEE_KEY) {
-						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0
-								&& height < 120000) {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
+							if (height > 120000)
+								return NO_BALANCE;
+								
 							wrong = true;
 							for ( byte[] valid_item: BlockChain.VALID_BAL) {
 								if (Arrays.equals(this.signature, valid_item)) {
@@ -506,7 +508,10 @@ public abstract class TransactionAmount extends Transaction {
 						}
 						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 						
-						if (amount.compareTo(forSale) > 0 && height < 120000) {
+						if (amount.compareTo(forSale) > 0) {
+							if (height > 120000)
+								return NO_BALANCE;
+							
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
 							wrong = true;
