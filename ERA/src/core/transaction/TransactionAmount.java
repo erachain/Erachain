@@ -506,7 +506,7 @@ public abstract class TransactionAmount extends Transaction {
 						}
 						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 						
-						if (amount.compareTo(forSale) > 0) {
+						if (amount.compareTo(forSale) > 0 && height < 120000) {
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
 							wrong = true;
