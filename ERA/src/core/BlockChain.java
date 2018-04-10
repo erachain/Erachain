@@ -97,11 +97,19 @@ public class BlockChain
 		Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
 		};
 
+	public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 123100;
+	public static final String[] TRUE_ADDRESSES = new String[] {
+			"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
+			//"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+			// "7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv", 
+		};
+
 	public static HashSet<String> TRUSTED_ANONYMOUS = new HashSet<String>();
 	public static HashSet<String> ANONYMASERS = new HashSet<String>();
 	public static HashSet<String> FOUNDATION_ADDRESSES = new HashSet<String>();
 	public static HashMap<String, int[][]> FREEZED_BALANCES = new HashMap<String, int[][]>();
 	public static HashMap<String, Pair<Integer, byte[]>> NOVA_ASSETS = new HashMap<String, Pair<Integer, byte[]>>();
+	public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
 
 
 	// CHAIN
@@ -168,13 +176,16 @@ public class BlockChain
 
 		// GENERAL TRUST
 		TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+		//TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 		
 		// ANOMIMASER for incomes from PRSONALIZED
 		ANONYMASERS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+		ANONYMASERS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+		
 
 		// TIKER = KEY + CREATOR
 		NOVA_ASSETS.put("BTC",
-				new Pair<Integer, byte[]>(21, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+				new Pair<Integer, byte[]>(21, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortBytes()));
 		//NOVA_ASSETS.put("@@USD",
 		//		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
 		//NOVA_ASSETS.put("¤¤RUB",
@@ -183,6 +194,10 @@ public class BlockChain
 		//		new Pair<Integer, byte[]>(91, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
 		//NOVA_ASSETS.put("ERAUSD",
 		//		new Pair<Integer, byte[]>(85, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+		
+		// LOCKED ->
+		LOCKED__ADDRESSES.put("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh", "79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+		LOCKED__ADDRESSES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6", "79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 		
 		// TEST
 		//FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");

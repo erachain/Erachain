@@ -256,7 +256,7 @@ public class CreateOrderTransaction extends Transaction {
 				//&& want != FEE_KEY
 				) {
 			// have ERA
-			if (height > Transaction.FREEZE_FROM
+			if (height > BlockChain.FREEZE_FROM
 					&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 				// LOCK ERA sell
 				return INVALID_CREATOR;
@@ -304,6 +304,11 @@ public class CreateOrderTransaction extends Transaction {
 					return NO_BALANCE;
 				}
 			}
+			
+			
+			if (height > BlockChain.FREEZE_FROM && BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress()) != null)
+				return INVALID_CREATOR;
+			 
 		}
 
 		// CHECK IF HAVE IS NOT DIVISBLE
