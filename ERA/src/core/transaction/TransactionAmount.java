@@ -448,8 +448,7 @@ public abstract class TransactionAmount extends Transaction {
 					
 					// SPEND ASSET
 					
-					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
-							) {
+					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE) {
 						
 						//byte[] ss = this.creator.getAddress();
 						if (height > BlockChain.FREEZE_FROM
@@ -487,7 +486,7 @@ public abstract class TransactionAmount extends Transaction {
 						//
 					} else if (absKey == FEE_KEY) {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
-							if (height > 120000)
+							if (height > 120000 || BlockChain.DEVELOP_USE)
 								return NO_BALANCE;
 								
 							wrong = true;
@@ -509,7 +508,7 @@ public abstract class TransactionAmount extends Transaction {
 						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 						
 						if (amount.compareTo(forSale) > 0) {
-							if (height > 120000)
+							if (height > 120000 || BlockChain.DEVELOP_USE)
 								return NO_BALANCE;
 							
 							// TODO: delete wrong check in new CHAIN
@@ -526,7 +525,7 @@ public abstract class TransactionAmount extends Transaction {
 								return NO_BALANCE;
 						}
 						
-						if (height > BlockChain.FREEZE_FROM) {
+						if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
 							String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
 							if ( unlock != null && !this.recipient.equals(unlock))
 								return INVALID_CREATOR;
