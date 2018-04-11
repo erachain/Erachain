@@ -5,9 +5,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
-
 import javax.validation.constraints.Null;
-
 import controller.Controller;
 import core.item.assets.AssetCls;
 import datachain.DCSet;
@@ -49,7 +47,6 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 		public void set_get_Column_AutoHeight( Boolean[] arg0){
 			this.column_AutuHeight = arg0;	
 		}
-		
 	
 	@Override
 	public SortableList<Long, AssetCls> getSortableList() 

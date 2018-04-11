@@ -25,7 +25,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
 		vsend_Coins_Item.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new Account_Send_Dialog(null, null, null, (PersonCls) th.item_Menu);
+				new Account_Send_Dialog(null, null, null, (PersonCls) th.item_Menu).show();
 			}
 		});
 

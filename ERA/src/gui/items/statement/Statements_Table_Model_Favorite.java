@@ -32,7 +32,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-//	public static final int COLUMN_NOTE = 2;
+//	public static final int COLUMN_TEMPLATE = 2;
 	public static final int COLUMN_BODY = 2;
 	public static final int COLUMN_FAVORITE = 3;
 	SortableList<Tuple2<String,String>,Transaction> transactions;
@@ -110,9 +110,9 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 
 				return record.viewTimestamp(); 
 				
-		//	case COLUMN_NOTE:
+		//	case COLUMN_TEMPLATE:
 
-			//	return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
+			//	return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey()).toString();
 
 			case COLUMN_BODY:
 
@@ -205,7 +205,7 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 	
 	}
 
-	private List<Transaction> read_Statement() {
+	private List<Transaction> read_Statement_old() {
 		List<Transaction> tran;
 		ArrayList<Transaction> db_transactions;
 		db_transactions = new ArrayList<Transaction>();
@@ -213,9 +213,9 @@ public class Statements_Table_Model_Favorite extends AbstractTableModel implemen
 		// база данных
 		DCSet dcSet = DCSet.getInstance();
 		// читаем все блоки
-		SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
+		SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
-		for (Pair<byte[], Block> list : lists) {
+		for (Pair<Integer, Block> list : lists) {
 
 			// читаем транзакции из блока
 			db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();

@@ -65,7 +65,7 @@ public class Poll
 	{
 		for(PollOption option: this.options)
 		{
-			if(option.getVoters().size() > 0)
+			if(!option.getVoters().isEmpty())
 			{
 				return true;
 			}

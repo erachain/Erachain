@@ -123,8 +123,8 @@ public class TransactionV3Tests {
 		assertEquals(messageTransactionV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(messageTransactionV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(messageTransactionV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(messageTransactionV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 	}
 	
 	
@@ -214,8 +214,8 @@ public class TransactionV3Tests {
 		assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
 		assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-		assertEquals(arbitraryTransactionV3.isSignatureValid(), true);
-		assertEquals(arbitraryTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+		assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);		
 	}	
 	
 	@Test
@@ -281,8 +281,8 @@ public class TransactionV3Tests {
 		assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
 		assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-		assertEquals(arbitraryTransactionV3.isSignatureValid(), true);
-		assertEquals(arbitraryTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+		assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);		
 	}	
 	
 }

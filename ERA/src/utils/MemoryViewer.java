@@ -6,26 +6,46 @@ import controller.Controller;
 
 public class MemoryViewer extends Thread {
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
+
+	Controller controller;
 	
-	public MemoryViewer(){
-		
+	public MemoryViewer(Controller controller) {
+
+		this.controller = controller;
 		setName("Memory manager");
-		
+
 	}
-	public void run(){
-		// if memory !Ok
-		while(true){
+
+	public void run() {
+
 		try {
-			sleep(100);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			sleep(100000);
+		} catch (Exception e) {
 		}
 		
-	if (Runtime.getRuntime().maxMemory()== Runtime.getRuntime().totalMemory()){
-	//	System.out.println("########################### Free Memory:" + Runtime.getRuntime().freeMemory());
-	 if(Runtime.getRuntime().freeMemory()< 1000000) Controller.getInstance().stopAll(99);
-		}
+		// if memory !Ok
+		while (true) {
+			try {
+				sleep(1000);
+			} catch (InterruptedException e) {
+			}
+
+			//threads
+			if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+				// System.out.println("########################### Free Memory:"
+				// + Runtime.getRuntime().freeMemory());
+				if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+					System.gc();
+
+					if (controller.isAllThreadsGood()) {
+						continue;	
+					}
+
+					if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL>>2)
+						Controller.getInstance().stopAll(99);
+				}
+			}
+			
 		}
 	}
 

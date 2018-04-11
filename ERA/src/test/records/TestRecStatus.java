@@ -97,13 +97,13 @@ public class TestRecStatus {
 		issueStatusTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE STATUS TRANSACTION IS VALID
-		assertEquals(true, issueStatusTransaction.isSignatureValid());
+		assertEquals(true, issueStatusTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
-		assertEquals(false, issueStatusTransaction.isSignatureValid());
+		assertEquals(false, issueStatusTransaction.isSignatureValid(db));
 	}
 		
 

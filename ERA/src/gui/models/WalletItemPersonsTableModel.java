@@ -147,16 +147,13 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 			if(this.persons == null)
 			{
 				this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
-				Controller.getInstance().wallet.database.getPersonMap().addObserver(persons);
-				//this.persons.sort(PollMap.NAME_INDEX);
+				this.persons.registerObserver();
 			}
 			
 			this.fireTableDataChanged();
 		}
 		
 		//CHECK IF LIST UPDATED
-		
-		int a = message.getType();
 		
 		if(message.getType() == ObserverMessage.ADD_PERSON_TYPE || message.getType() == ObserverMessage.REMOVE_PERSON_TYPE
 				|| message.getType() == ObserverMessage.WALLET_ADD_PERSON_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_PERSON_TYPE)
@@ -177,6 +174,6 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		//this.persons.removeObserver();
 		//Controller.getInstance().deleteWalletObserver(this);
 		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(this);
-		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(persons);
+		persons.removeObserver();
 	}
 }

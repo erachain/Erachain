@@ -168,7 +168,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 		
 		for (Transaction messagetx : all_transactions) {
 			boolean is = false;
-			if (this.transactions.size() != 0){
+			if (!this.transactions.isEmpty()){
 			for (R_Send message1 : this.transactions) {
 				if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
 					is = true;

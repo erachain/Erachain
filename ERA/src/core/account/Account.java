@@ -73,8 +73,8 @@ public class Account {
 
 
 	protected String address;
-	
-	//private byte[] lastBlockSignature;
+	protected byte[] bytes;
+	protected byte[] shortBytes;
 	//private long generatingBalance; //used  for forging balance
 	
 	protected Account()
@@ -86,8 +86,9 @@ public class Account {
 	{
 
 		// ///test address
-		assert(Base58.decode(address) instanceof byte[] );
-		
+		assert(Base58.decode(address) instanceof byte[]);
+		this.bytes = Base58.decode(address);
+		this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
 		this.address = address;
 	}
 	
@@ -130,11 +131,22 @@ public class Account {
 		}
 
 	}
+
 	public String getAddress()
 	{
 		return address;
 	}
-	
+
+	public byte[] getBytes()
+	{
+		return bytes;
+	}
+
+	public byte[] getShortBytes()
+	{
+		return this.shortBytes;
+	}
+
 	//BALANCE
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(long key)
 	{
@@ -240,7 +252,39 @@ public class Account {
 	{
 		return this.getBalance(DCSet.getInstance(), key);
 	}
-	
+
+	public BigDecimal getForSale(DCSet dcSet, long key, int height)
+	{
+		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this.getBalance(dcSet, key);
+		BigDecimal ownVol = balance.a.b;
+		
+		if (!BlockChain.DEVELOP_USE && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
+			int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
+			if (item != null) {
+				if (item[0][0] < 0) {
+					return BigDecimal.ZERO;
+				}
+				
+				//int height = dcSet.getBlockMap().size();
+				BigDecimal freeze = BigDecimal.ZERO;
+				for (int[] point: item) {
+					if (height < point[0]) {
+						freeze = new BigDecimal(point[1]).setScale(8);
+						break;
+					}
+				}
+				ownVol = ownVol.subtract(freeze);
+			}
+		}
+		
+		
+		BigDecimal inDebt = balance.b.b;
+		if (inDebt.signum() < 0) {
+			ownVol = ownVol.add(inDebt);
+		}
+		return ownVol;
+	}
+
 	public Tuple5<
 	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
 	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> getBalance(DCSet db, long key)
@@ -464,7 +508,7 @@ public class Account {
 		BigDecimal rent = balance.b.b;
 		BigDecimal hold = balance.c.b;
 		
-		Block block = db.getBlockMap().getLastBlock();
+		Block block = db.getBlockMap().last();
 		
 		for(int i=1; i<confirmations && block != null && block.getVersion()>0; i++)
 		{
@@ -783,9 +827,16 @@ public class Account {
 	public boolean equals(Object b)
 	{
 		if(b instanceof Account) {
-			return this.getAddress().equals(((Account) b).getAddress());
+			return this.address.equals(((Account) b).getAddress());
 		} else if (b instanceof String) {
-			return this.getAddress().equals((String) b);			
+			return this.address.equals((String) b);	
+		} else if (b instanceof byte[]) {
+			byte[] bs = (byte[]) b;
+			if (bytes.length == ADDRESS_LENGTH) {
+				return Arrays.equals(this.bytes, bs);
+			} else {
+				return Arrays.equals(this.shortBytes, bs);
+			}
 		}
 		
 		return false;	
@@ -900,26 +951,26 @@ public class Account {
 	*/
 	
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public long calcWinValue(DCSet dcSet, BlockChain bchain, List<Block> lastBlocksForTarget, int height, long target) {
+	public long calcWinValue(DCSet dcSet, int height, long target) {
 		
 		int generatingBalance = Block.calcGeneratingBalance(dcSet, this, height);
 		
 		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
 			return 0l;
 		
-		// test repeated win account
-		if (!Controller.getInstance().isTestNet()) {
-			int repeated = Block.isSoRapidly(height, this, lastBlocksForTarget);
-			if (repeated > 0) {
-				return -repeated;
-			}
-		}
-		
 		// TEST STRONG of win Value
 		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this, height);
 		if (previousForgingHeight < 1)
 			return 0l;
 
+		// test repeated win account
+		if (!Controller.getInstance().isTestNet()) {
+			int repeated = Block.isSoRapidly(dcSet, height, this, previousForgingHeight);
+			if (repeated > 0) {
+				return -repeated;
+			}
+		}
+		
 		long winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
 
 		int base = BlockChain.getMinTarget(height);

@@ -16,137 +16,128 @@ import datachain.DCSet;
 import utils.ObserverMessage;
 import utils.Pair;
 
-public abstract class Item_Map extends DCMap<Long, ItemCls> 
-{
+public abstract class Item_Map extends DCMap<Long, ItemCls> {
 
 	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
-	//protected int type;
-	
+
+	// protected int type;
+
 	protected Atomic.Long atomicKey;
 	protected long key;
-	
+
 	static Logger LOGGER = Logger.getLogger(Item_Map.class.getName());
-	
-	public Item_Map(DCSet databaseSet, DB database,
-			//int type,
-			String name,
-			int observeReset, int observeAdd,	int observeRemove,	int observeList
-			)
-	{
+
+	public Item_Map(DCSet databaseSet, DB database, String name) {
 		super(databaseSet, database);
-		
-		//this.type = type;
-		this.atomicKey = database.getAtomicLong(name +"_key");
-		// restore key from dbase
+
+		this.atomicKey = database.getAtomicLong(name + "_key");
 		this.key = this.atomicKey.get();
-		
+	}
+
+	public Item_Map(DCSet databaseSet, DB database,
+			// int type,
+			String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
+
+		this(databaseSet, database, name);
+
 		if (databaseSet.isWithObserver()) {
-			this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+			if (observeReset > 0)
+				this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
 			if (databaseSet.isDynamicGUI()) {
-				this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-				this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+				if (observeAdd > 0)
+					this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+				if (observeRemove > 0)
+					this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
 			}
-			this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+			if (observeList > 0)
+				this.observableData.put(DBMap.NOTIFY_LIST, observeList);
 		}
 	}
 
-	
-	public Item_Map(Item_Map parent) 
-	{
+	public Item_Map(Item_Map parent) {
 		super(parent, null);
-		
-		this.key = parent.getSize();
+
+		this.key = parent.getLastKey();
 	}
-	
-	public long getSize()
-	{	
+
+	public long getLastKey() {
 		return this.key;
 	}
-	
-	public void setSize(long size)
-	{	
-		//INCREMENT ATOMIC KEY IF EXISTS
-		if(this.atomicKey != null)
-		{
-			this.atomicKey.set(size);
+
+	public void setLastKey(long key) {
+		// INCREMENT ATOMIC KEY IF EXISTS
+		if (this.atomicKey != null) {
+			this.atomicKey.set(key);
 		}
-		this.key = size;
+		this.key = key;
 	}
 
-	protected void createIndexes(DB database){}
+	protected void createIndexes(DB database) {
+	}
 
 	@Override
-	protected Map<Long, ItemCls> getMemoryMap() 
-	{
+	protected Map<Long, ItemCls> getMemoryMap() {
 		return new HashMap<Long, ItemCls>();
 	}
 
 	@Override
-	protected ItemCls getDefaultValue() 
-	{
+	protected ItemCls getDefaultValue() {
 		return null;
 	}
-	
+
 	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
+	protected Map<Integer, Integer> getObservableData() {
 		return this.observableData;
 	}
-	
-	public long add(ItemCls item)
-	{
-		//INCREMENT ATOMIC KEY IF EXISTS
-		if(this.atomicKey != null)
-		{
+
+	public long add(ItemCls item) {
+		// INCREMENT ATOMIC KEY IF EXISTS
+		if (this.atomicKey != null) {
 			this.atomicKey.incrementAndGet();
 		}
-		
-		//INCREMENT KEY
+
+		// INCREMENT KEY
 		this.key++;
 		item.setKey(key);
-		
-		//INSERT WITH NEW KEY
+
+		// INSERT WITH NEW KEY
 		this.set(this.key, item);
-		
-		//RETURN KEY
+
+		// RETURN KEY
 		return this.key;
 	}
-	
-	
-	public void remove()
-	{
+
+	public void remove() {
 		super.delete(key);
-		
-		if(this.atomicKey != null)
-		{
+
+		if (this.atomicKey != null) {
 			this.atomicKey.decrementAndGet();
 		}
-			
-		//DECREMENT KEY
+
+		// DECREMENT KEY
 		--this.key;
-		 
+
 	}
-	
+
 	// get list items in name substring str
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public List<ItemCls> get_By_Name(String str, boolean caseCharacter)
-	{
-	List<ItemCls> txs = new ArrayList<>();
+	public List<ItemCls> get_By_Name(String str, boolean caseCharacter) {
+		List<ItemCls> txs = new ArrayList<>();
 		if (str == null || str.length() < 3)
 			return null;
-		
+
 		Iterator<Pair<Long, ItemCls>> it = this.getList().iterator();
-		while (it.hasNext()){
+		while (it.hasNext()) {
 			Pair<Long, ItemCls> a = it.next();
-			String s1 =  a.getB().getName() ;
-			if (!caseCharacter){
-			s1 = s1.toLowerCase();
-			str = str.toLowerCase();
+			String s1 = a.getB().getName();
+			if (!caseCharacter) {
+				s1 = s1.toLowerCase();
+				str = str.toLowerCase();
 			}
-				if (s1.contains(str))txs.add(a.getB());
-			}
-		
+			if (s1.contains(str))
+				txs.add(a.getB());
+		}
+
 		return txs;
 	}
 }

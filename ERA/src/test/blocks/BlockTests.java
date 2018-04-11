@@ -103,7 +103,7 @@ public class BlockTests
 		// SIGNATURE invalid
 		assertEquals(false, gb.isSignatureValid());		
 
-		assertEquals(true, gb.isValid(db));
+		assertEquals(true, gb.isValid(db, false));
 
 	}
 	
@@ -112,7 +112,7 @@ public class BlockTests
 	{
 				
 		//CHECK IF VALID
-		assertEquals(true, gb.isValid(db));
+		assertEquals(true, gb.isValid(db, false));
 		
 		//ADD INVALID GENESIS TRANSACTION
 		List<Transaction> transactions = gb.getTransactions();
@@ -121,13 +121,13 @@ public class BlockTests
 		gb.setTransactions(transactions);
 		
 		//CHECK IF INVALID
-		assertEquals(false, gb.isValid(db));
+		assertEquals(false, gb.isValid(db, false));
 		
 		//CREATE NEW BLOCK
 		gb = new GenesisBlock();
 		
 		//CHECK IF VALID
-		assertEquals(true, gb.isValid(db));
+		assertEquals(true, gb.isValid(db, false));
 		
 		//PROCESS
 		try {
@@ -138,7 +138,7 @@ public class BlockTests
 		}
 		
 		//CHECK IF INVALID
-		assertEquals(false, gb.isValid(db));
+		assertEquals(false, gb.isValid(db, false));
 	}
 	
 	@Test
@@ -213,7 +213,7 @@ public class BlockTests
 												
 		//CHECK VALID
 		assertEquals(true, genesisBlock.isSignatureValid());
-		assertEquals(true, genesisBlock.isValid(db));
+		assertEquals(true, genesisBlock.isValid(db, false));
 		
 		//PROCESS BLOCK
 		try {
@@ -349,7 +349,7 @@ public class BlockTests
 		newBlock.sign(generator);
 		
 		//CHECK INVALID TRANSACTION SIGNATURE
-		assertEquals(false, newBlock.isValid(db));
+		assertEquals(false, newBlock.isValid(db, false));
 		// BUT valid HERE
 		assertEquals(true, newBlock.isSignatureValid());	
 	}
@@ -397,14 +397,14 @@ public class BlockTests
 		newBlock.makeTransactionsHash();
 		
 		//CHECK IF VALID
-		assertEquals(true, newBlock.isValid(db));
+		assertEquals(true, newBlock.isValid(db, false));
 		
 		//CHANGE REFERENCE
 		Block invalidBlock = BlockFactory.getInstance().create(newBlock.getVersion(), new byte[128], newBlock.getCreator(), transactionsHash, atBytes);
 		invalidBlock.sign(generator);
 		
 		//CHECK IF INVALID
-		assertEquals(false, invalidBlock.isValid(db));
+		assertEquals(false, invalidBlock.isValid(db, false));
 						
 		//ADD INVALID TRANSACTION
 		invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
@@ -421,7 +421,7 @@ public class BlockTests
 		invalidBlock.sign(generator);
 		
 		//CHECK IF INVALID
-		assertEquals(false, invalidBlock.isValid(db));
+		assertEquals(false, invalidBlock.isValid(db, false));
 		
 		//ADD GENESIS TRANSACTION
 		invalidBlock = BlockGenerator.generateNextBlock(db, generator, gb, transactionsHash);
@@ -435,7 +435,7 @@ public class BlockTests
 		invalidBlock.sign(generator);
 		
 		//CHECK IF INVALID
-		assertEquals(false, invalidBlock.isValid(db));
+		assertEquals(false, invalidBlock.isValid(db, false));
 	}
 	
 	@Test
@@ -603,7 +603,7 @@ public class BlockTests
 		
 		//CHECK VALID
 		assertEquals(true, block.isSignatureValid());
-		assertEquals(true, block.isValid(db));
+		assertEquals(true, block.isValid(db, false));
 		
 		//PROCESS BLOCK
 		try {
@@ -643,7 +643,7 @@ public class BlockTests
 		assertEquals(2, block.getTransactionCount());
 		
 		//CHECK LAST BLOCK
-		assertEquals(true, Arrays.equals(block.getSignature(), db.getBlockMap().getLastBlock().getSignature()));
+		assertEquals(true, Arrays.equals(block.getSignature(), db.getBlockMap().last().getSignature()));
 	
 
 		////////////////////////////////////
@@ -675,6 +675,6 @@ public class BlockTests
 		assertEquals((long)recipient2.getLastTimestamp(db), (long)0);
 		
 		//CHECK LAST BLOCK
-		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().getLastBlock().getSignature()));
+		assertEquals(true, Arrays.equals(gb.getSignature(), db.getBlockMap().last().getSignature()));
 	}
 }

@@ -127,7 +127,7 @@ public class TestRecSetStatusToItem {
 		setStatusTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE STATUS TRANSACTION IS VALID
-		assertEquals(true, setStatusTransaction.isSignatureValid());
+		assertEquals(true, setStatusTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		setStatusTransaction = new R_SetStatusToItem(maker, FEE_POWER, status_key,
@@ -136,7 +136,7 @@ public class TestRecSetStatusToItem {
 				timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE STATUS IS INVALID
-		assertEquals(false, setStatusTransaction.isSignatureValid());
+		assertEquals(false, setStatusTransaction.isSignatureValid(db));
 	}
 		
 

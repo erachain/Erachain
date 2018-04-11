@@ -379,7 +379,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 			gridBagConstraints.weightx = 0.2;
 			gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
 
-			jTextField_Owner_Sign.setText(human.isSignatureValid() ? Base58.encode(human.getOwnerSignature())
+			jTextField_Owner_Sign.setText(human.isSignatureValid(DCSet.getInstance()) ? Base58.encode(human.getOwnerSignature())
 					: Lang.getInstance().translate("Wrong signaryte for data owner"));
 		//	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
 		}

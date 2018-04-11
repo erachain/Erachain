@@ -160,7 +160,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 		//CHECK NAME LENGTH
 		ItemCls item = this.getItem();
 		int nameLength = item.getName().getBytes().length;
-		if(nameLength > 40 || nameLength < 10)
+		if(nameLength > 40 || nameLength < item.getMinNameLen() )
 		{
 			return INVALID_NAME_LENGTH;
 		}

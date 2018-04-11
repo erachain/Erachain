@@ -119,7 +119,7 @@ public abstract class AddressItem_Refs extends Transaction
 		
 		//CHECK NAME LENGTH
 		int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < 3)
+		if(nameLength > ItemCls.MAX_NAME_LENGTH || nameLength < item.getMinNameLen())
 		{
 			return INVALID_NAME_LENGTH;
 		}

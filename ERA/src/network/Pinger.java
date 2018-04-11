@@ -16,10 +16,13 @@ public class Pinger extends Thread
 {
 	
 	private static final Logger LOGGER = Logger.getLogger(Pinger.class);
+	private static final int DEFAULT_QUICK_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>3; 
+
 	private Peer peer;
 	private boolean needPing = false;
 	//private boolean run;
 	private int ping;
+	private Message messageWinBlock;
 	private Message messageQueue;
 	private Message messageQueuePing;
 	
@@ -51,10 +54,14 @@ public class Pinger extends Thread
 		this.messageQueue = message;
 	}
 
+	public void setMessageWinBlock(Message message) {
+		this.messageWinBlock = message;
+	}
+
 	public void setMessageQueuePing(Message message) {
 		this.messageQueuePing = message;
 	}
-
+	
 	/*
 	public boolean isRun()
 	{
@@ -85,12 +92,22 @@ public class Pinger extends Thread
 		//CHECK IF VALID PING
 		if(response == null)
 		{
-
-			//UPDATE PING
-			this.ping = -1;
 			
+			//UPDATE PING
+			if (this.ping < 0)
+				this.ping -= 1;
+			else
+				this.ping = -1;
+
+			if (!this.peer.isUsed())
+				return false;
+
 			//PING FAILES
-			///peer.onPingFail("on Ping fail - @ms " + this.ping);
+			if (this.ping < -4) {
+				this.peer.ban(10, "on PING FAILES");
+				return false;
+			}
+
 		} else {
 			//UPDATE PING
 			this.ping = (int)(System.currentTimeMillis() - start);
@@ -106,12 +123,12 @@ public class Pinger extends Thread
 			Controller.getInstance().setWeightOfPeer(peer, hW);
 		}
 		
-		return ping > 0;
+		return ping >= 0;
 
 	}
 	
 	public boolean tryPing() {
-		return tryPing(10000l);
+		return tryPing(60000l);
 	}
 	
 	public void run()
@@ -121,20 +138,28 @@ public class Pinger extends Thread
 		BlockChain chain = cnt.getBlockChain();
 
 		int sleepTimeFull = Settings.getInstance().getPingInterval();
-		int sleepTimeSteep = 10;
-		int sleepSteeps = sleepTimeFull / sleepTimeSteep + 10;
+		int sleepTimestep = 10;
+		int sleepsteps = sleepTimeFull / sleepTimestep + 10;
 		int sleepStepTimeCounter;
 		long pingOld = 100;
+		boolean resultSend;
 		while(true)
 		{
 
-			sleepStepTimeCounter = sleepSteeps;
+			if (this.ping < 0) {
+				sleepStepTimeCounter = 10000;
+			} else if (this.ping > 10000) {
+				sleepStepTimeCounter = 30000;				
+			} else {
+				sleepStepTimeCounter = sleepsteps;				
+			}
+		
 			while (sleepStepTimeCounter-- > 0) {
 				
 				//SLEEP
 				try 
 				{
-					Thread.sleep(sleepTimeSteep);
+					Thread.sleep(sleepTimestep);
 				} 
 				catch (InterruptedException e)
 				{
@@ -152,17 +177,31 @@ public class Pinger extends Thread
 					}
 					continue;
 				}
-				
+								
 				if (messageQueue != null) {
 					//LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer.getAddress());
-					///this.peer.so(message);
-					//long start = System.currentTimeMillis();
 
-					boolean resultSend = this.peer.sendMessage(messageQueue);
+					resultSend = this.peer.sendMessage(messageQueue);
+					messageQueue = null;
 
+					if (!resultSend)
+						continue;
+					
 					//LOGGER.debug("try ASYNC send " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
 
-					messageQueue = null;
+				}
+
+				if (messageWinBlock != null) {
+					//LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " - " + this.peer.getAddress());
+
+					resultSend = this.peer.sendMessage(messageWinBlock);
+					messageWinBlock = null;
+
+					if (!resultSend)
+						continue;
+					
+					//LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
+
 				}
 
 				pingOld = this.ping;
@@ -172,47 +211,27 @@ public class Pinger extends Thread
 					//LOGGER.debug("try ASYNC PING sendMessage " + messageQueuePing.viewType() + " - " + this.peer.getAddress());
 					///this.peer.so(message);
 					
-					if (tryPing(2000)) {
-						Tuple2<Integer, Long> peerHWeight = cnt.getHWeightOfPeer(this.peer);
-						int peerHeight = peerHWeight==null?-1:(int)peerHWeight.a;
-						int myHeight = chain.getHeight(DCSet.getInstance());
-						if (peerHWeight != null 
-								&& peerHeight == myHeight
-								//&& peerHeight > myHeight - 2
-								) {
-							LOGGER.debug("try ASYNC send " + messageQueuePing.viewType() + " " + this.peer.getAddress()	+ " after PING: " + this.ping);
-							boolean resultSend = this.peer.sendMessage(this.messageQueuePing);
-						}
-					} else {
-						if (pingOld < 0) {
-							peer.onPingFail("on Ping fail - @ms " + this.ping);
-						}
-							
-						//LOGGER.debug("skip ASYNC send " + messageQueuePing.viewType() + " " + this.peer.getAddress()	+ " after PING: " + this.ping);						
-					}
+					this.tryPing(DEFAULT_QUICK_PING_TIMEOUT);
+					this.peer.sendMessage(this.messageQueuePing);
 
 					this.needPing = false;
 					this.messageQueuePing = null;
-					sleepStepTimeCounter = sleepSteeps;
+					sleepStepTimeCounter = sleepsteps;
 					continue;
 					
 				} else if(this.needPing) {
 					// PING NOW
 					this.needPing = false;
-					;
-					if (!tryPing() && pingOld < 0) {
-						peer.onPingFail("on Ping fail - @ms " + this.ping);
-					}
-					sleepStepTimeCounter = sleepSteeps;
+					this.tryPing();
+					pingOld = this.ping;
+					sleepStepTimeCounter = sleepsteps;
 					continue;
 				}
 				
 			}
 			
 			if(this.peer.isUsed()) {
-				if (!tryPing() && pingOld < 0) {
-					peer.onPingFail("on Ping fail - @ms " + this.ping);
-				}
+				tryPing();
 				pingOld = this.ping;
 			}
 			

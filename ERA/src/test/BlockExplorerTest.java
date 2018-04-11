@@ -185,7 +185,7 @@ public class BlockExplorerTest {
 			List<String> listaddr = new ArrayList<>();
 			listaddr.add(addr);
 			
-			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, start, txOnPage, filter, allOnOnePage, showOnly, showWithout);
+			Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr, 1, start, txOnPage, filter, allOnOnePage, showOnly, showWithout);
 	
 			Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 			
@@ -355,11 +355,11 @@ public class BlockExplorerTest {
 	public Transaction getTransaction(byte[] signature, DCSet database) {
 		
 		// CHECK IF IN BLOCK
-		Block block = database.getTransactionRef_BlockRef_Map()
-				.getParent(signature);
-		if (block != null) {
-			return block.getTransaction(signature);
-		}
+		Tuple2<Integer, Integer> tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
+		if (tuple_Tx != null)	{
+			return database.getTransactionFinalMap().get(tuple_Tx);
+		
+	}
 		
 		// CHECK IF IN TRANSACTION DATABASE
 		return DCSet.getInstance().getTransactionMap().get(signature);

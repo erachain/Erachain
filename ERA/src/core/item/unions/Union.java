@@ -30,6 +30,8 @@ public class Union extends UnionCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "union"; }
 
+	public int getMinNameLen() { return 12; }
+
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static Union parse(byte[] data, boolean includeReference) throws Exception
@@ -119,13 +121,13 @@ public class Union extends UnionCls {
 		}
 		
 		//RETURN
-		Union note = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
+		Union union = new Union(typeBytes, owner, name, birthday, parent, icon, image, description);
 		if (includeReference)
 		{
-			note.setReference(reference);
+			union.setReference(reference);
 		}
 
-		return note;
+		return union;
 	}
 	
 }

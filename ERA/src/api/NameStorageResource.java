@@ -136,12 +136,16 @@ public class NameStorageResource {
 	public String updateEntry(String x, @PathParam("name") String name) {
 		
 		DCSet dcSet = DCSet.getInstance();
-		
-		try {
-			APIUtils.disallowRemote(request);
 
+		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
+			String password = (String) jsonObject.get("password");
+
+			//password = null;
+			//APIUtils.askAPICallAllowed(password, "POST update\n " + x, request);
+			APIUtils.disallowRemote(request);
+
 
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
@@ -381,7 +385,7 @@ public class NameStorageResource {
 //					basicInfo += StringUtils.join(askApicalls, "\n");
 					basicInfo += apicalls;
 
-					String password = null;
+					//String password = null;
 					APIUtils.askAPICallAllowed(password, basicInfo, request);
 
 					//CHECK WALLET UNLOCKED
@@ -435,7 +439,7 @@ public class NameStorageResource {
 			*/
 			
 			
-			String password = null;
+			//String password = null;
 			APIUtils.askAPICallAllowed(password, basicInfo +
 									"POST namestorage/update/" + name + "\n"
 											+ GZIP.webDecompress(jsonString) + "\nfee: "
@@ -476,7 +480,7 @@ public class NameStorageResource {
 
 	public String getMultiPaymentsWarning(List<Payment> resultPayments) {
 		
-		if(resultPayments.size() == 0)
+		if(resultPayments.isEmpty())
 		{
 			return "";
 		}

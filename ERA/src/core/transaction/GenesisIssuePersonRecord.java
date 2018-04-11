@@ -63,7 +63,6 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord
 		//READ PERSON
 		// read without reference
 		PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
-		//position += note.getDataLength(false);
 
 		return new GenesisIssuePersonRecord(person);
 		

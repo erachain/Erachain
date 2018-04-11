@@ -24,9 +24,9 @@ import javax.validation.constraints.Null;
 
 import com.github.rjeschke.txtmark.Processor;
 
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import gui.MainFrame;
-import gui.items.notes.ComboBoxModelItemsNotes;
+import gui.items.templates.ComboBoxModelItemsTemplates;
 import lang.Lang;
 
 public class M_Fill_Template_Panel extends javax.swing.JPanel {
@@ -36,16 +36,16 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 	Params_Template_Model params_Template_Model;
-	public JComboBox<NoteCls> jComboBox_Template;
-	public NoteCls sel_note;
-	private ComboBoxModelItemsNotes comboBoxModelNotes;
+	public JComboBox<TemplateCls> jComboBox_Template;
+	public TemplateCls sel_Template = null;
+	private ComboBoxModelItemsTemplates comboBoxModelTemplates;
 	public JCheckBox add_Tamplate;
 	
 	
 	
 	public M_Fill_Template_Panel() {
 		jTextPane_Message_Public = new MImprintEDIT_Pane();
-		comboBoxModelNotes = new ComboBoxModelItemsNotes();
+		comboBoxModelTemplates = new ComboBoxModelItemsTemplates();
     	jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener(){
     		
 			@Override
@@ -82,7 +82,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		
 		initComponents();
 		
-		set_Template(comboBoxModelNotes.getElementAt(0));
+		set_Template(comboBoxModelTemplates.getElementAt(0));
 		
 		 jComboBox_Template.addItemListener(new ItemListener(){
 
@@ -94,7 +94,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 					if(e.getStateChange() == ItemEvent.SELECTED) 
 					{		
 						
-						set_Template((NoteCls) jComboBox_Template.getSelectedItem());
+						set_Template((TemplateCls) jComboBox_Template.getSelectedItem());
 					}
 					
 					
@@ -109,8 +109,8 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		
 	}
 	
-	public NoteCls get_TemplateCls(){
-		return (NoteCls) jComboBox_Template.getSelectedItem();
+	public TemplateCls get_TemplateCls(){
+		return (TemplateCls) jComboBox_Template.getSelectedItem();
 		
 	}
 
@@ -120,7 +120,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		jLabel_Template1 = new javax.swing.JLabel();
-		jComboBox_Template = new JComboBox<NoteCls>(comboBoxModelNotes);
+		jComboBox_Template = new JComboBox<TemplateCls>(comboBoxModelTemplates);
 		jCheckBox_Is_Text = new javax.swing.JCheckBox();
 		jCheckBox_Is_Encripted = new javax.swing.JCheckBox();
 		sp_pan = new MSplitPane();
@@ -165,6 +165,15 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 				jComboBox_Template.setEnabled(add_Tamplate.isSelected());
 				jTextPane_Message_Public.setVisible(add_Tamplate.isSelected());
 				jTable_Params_Message_Public.setVisible(add_Tamplate.isSelected());
+				if (add_Tamplate.isSelected())
+				{
+					set_Template((TemplateCls) jComboBox_Template.getSelectedItem());
+				}else
+				{
+					sel_Template = null;
+					
+				} 
+				
 			}
 			
 		
@@ -289,10 +298,13 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	   
 
 }
-	 private void set_Template(NoteCls item){
-		 if (item == null)return;
-		 sel_note = item; //(NoteCls) jComboBox_Template.getSelectedItem();
-			String ww = sel_note.getDescription();
+	 private void set_Template(TemplateCls item){
+		 sel_Template = null;
+		 
+		 if (item == null || !add_Tamplate.isSelected()) 
+			 	return;
+		 sel_Template = item; //(TemplateCls) jComboBox_Template.getSelectedItem();
+			String ww = sel_Template.getDescription();
 			
 			int ee = params_Template_Model.getRowCount()-1;
 			int ccc;

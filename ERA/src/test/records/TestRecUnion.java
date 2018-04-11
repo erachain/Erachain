@@ -162,12 +162,12 @@ public class TestRecUnion {
 		issueUnionTransaction.sign(certifier, false);
 
 		//CHECK IF ISSUE UNION TRANSACTION IS VALID
-		assertEquals(true, issueUnionTransaction.isSignatureValid());
+		assertEquals(true, issueUnionTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db), new byte[64]);		
 		//CHECK IF ISSUE UNION IS INVALID
-		assertEquals(false, issueUnionTransaction.isSignatureValid());
+		assertEquals(false, issueUnionTransaction.isSignatureValid(db));
 
 	}
 		

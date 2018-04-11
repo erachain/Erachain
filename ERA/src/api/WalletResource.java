@@ -16,7 +16,7 @@ import org.json.simple.JSONValue;
 import utils.APIUtils;
 import controller.Controller;
 import core.crypto.Base58;
-import core.item.notes.NoteCls;
+import core.item.templates.TemplateCls;
 import datachain.DCSet;
 
 @Path("wallet")

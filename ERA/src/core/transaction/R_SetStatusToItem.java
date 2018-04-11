@@ -599,7 +599,7 @@ public class R_SetStatusToItem extends Transaction {
 	@Override
 	public int getDataLength(boolean asPack)
 	{
-		// not include note reference
+		// not include reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
 		len +=    (this.value_1 == 0? 0: VALUE_LENGTH)
 				+ (this.value_2 == 0? 0: VALUE_LENGTH)
@@ -682,7 +682,7 @@ public class R_SetStatusToItem extends Transaction {
 		// pack additional data
 		byte[] add_data = packData();
 
-		Tuple2<Integer, Integer> heightSeqNo = this.getHeightSeqNo(db, block);
+		Tuple2<Integer, Integer> heightSeqNo = this.getHeightSeqNo(db);
 		
 		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
 				new Tuple5<Long, Long, byte[], Integer, Integer>

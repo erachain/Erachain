@@ -252,8 +252,8 @@ public class IssueUnionPanel extends JPanel
 
 	        account_jLabel = new javax.swing.JLabel();
 	        name_jLabel = new javax.swing.JLabel();
-	        add_logo_panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 0, 50);
-	        add_image_panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image (max %1%kB)").replace("%1%", "1024"), 250,0);
+	        add_logo_panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
+	        add_image_panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image (max %1%kB)").replace("%1%", "1024"), 250,250);
 	        jScrollPane1 = new javax.swing.JScrollPane();
 	        title_jLabel = new javax.swing.JLabel();
 	        description_jLabel = new javax.swing.JLabel();

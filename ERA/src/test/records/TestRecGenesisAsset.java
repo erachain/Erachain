@@ -275,7 +275,7 @@ public class TestRecGenesisAsset {
 		//assetTransfer.sign(sender);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
-		assertEquals(true, assetTransfer.isSignatureValid());		
+		assertEquals(true, assetTransfer.isSignatureValid(db));		
 	}
 	
 	@Test

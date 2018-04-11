@@ -8,9 +8,9 @@ import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.imprints.ImprintCls;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
+import core.item.templates.TemplateCls;
 import core.item.unions.UnionCls;
 import datachain.IDB;
 
@@ -38,13 +38,15 @@ public class DWSet implements IDB
 	private PollMap pollMap;
 	private WItemAssetMap assetMap;
 	private WItemImprintMap imprintMap;
-	private WItemNoteMap noteMap;
+	private WItemTemplateMap TemplateMap;
 	private WItemPersonMap personMap;
 	private WItemStatusMap statusMap;
 	private WItemUnionMap unionMap;
 	private OrderMap orderMap;
 	private FavoriteItemAsset assetFavoritesSet;
-	private FavoriteItemNote noteFavoritesSet;
+	private FavoriteItemTemplate templateFavoritesSet;
+	private FavoriteItemImprint imprintFavoritesSet;
+	
 	private FavoriteItemPerson personFavoritesSet;
 	private FavoriteItemStatus statusFavoritesSet;
 	private FavoriteItemUnion unionFavoritesSet;
@@ -85,13 +87,14 @@ public class DWSet implements IDB
 	    this.pollMap = new PollMap(this, this.database);
 	    this.assetMap = new WItemAssetMap(this, this.database);
 	    this.imprintMap = new WItemImprintMap(this, this.database);
-	    this.noteMap = new WItemNoteMap(this, this.database);
+	    this.TemplateMap = new WItemTemplateMap(this, this.database);
 	    this.personMap = new WItemPersonMap(this, this.database);
 	    this.statusMap = new WItemStatusMap(this, this.database);
 	    this.unionMap = new WItemUnionMap(this, this.database);
 	    this.orderMap = new OrderMap(this, this.database);
 	    this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
-	    this.noteFavoritesSet = new FavoriteItemNote(this, this.database);
+	    this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
+	    this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
 	    this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
 	    this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
 	    this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
@@ -187,9 +190,9 @@ public class DWSet implements IDB
 	{
 		return this.imprintMap;
 	}
-	public WItemNoteMap getNoteMap()
+	public WItemTemplateMap getTemplateMap()
 	{
-		return this.noteMap;
+		return this.TemplateMap;
 	}
 	public WItemPersonMap getPersonMap()
 	{
@@ -209,8 +212,8 @@ public class DWSet implements IDB
 			return this.assetMap;
 		} else if (item instanceof ImprintCls) { 
 			return this.imprintMap;
-		} else if (item instanceof NoteCls) { 
-			return this.noteMap;
+		} else if (item instanceof TemplateCls) { 
+			return this.TemplateMap;
 		} else if (item instanceof PersonCls) { 
 			return this.personMap;
 		} else if (item instanceof StatusCls) { 
@@ -229,8 +232,8 @@ public class DWSet implements IDB
 				return this.assetMap;
 			case ItemCls.IMPRINT_TYPE:
 				return this.imprintMap;
-			case ItemCls.NOTE_TYPE:
-				return this.noteMap;
+			case ItemCls.TEMPLATE_TYPE:
+				return this.TemplateMap;
 			case ItemCls.PERSON_TYPE:
 				return this.personMap;
 			case ItemCls.STATUS_TYPE:
@@ -252,25 +255,6 @@ public class DWSet implements IDB
 	public boolean isItemFavorite(ItemCls item) {
 		return getItemFavoritesSet(item).contains(item.getKey());
 	}
-	
-	/*
-	public boolean replace(ItemCls item)
-	{
-		//if(this.notesFavorites != null) {
-		//	this.database.getNoteFavoritesSet().replace(this.notesFavorites.getKeys());	
-		//}
-		if (item instanceof NoteCls) { 
-			return this.noteMap.replace(this.notesFavorites.getKeys();
-		} else if (item instanceof AssetCls) { 
-			return this.assetMap.replace(this.assetsFavorites.getKeys();
-		} else if (item instanceof PersonCls) { 
-			return this.personMap.replace(this.personsFavorites.getKeys();
-		} else {
-			return false;
-		}
-	}
-	*/
-
 
 	public OrderMap getOrderMap()
 	{
@@ -281,10 +265,16 @@ public class DWSet implements IDB
 	{
 		return this.assetFavoritesSet;
 	}
-	public FavoriteItemNote getNoteFavoritesSet()
+	public FavoriteItemTemplate getTemplateFavoritesSet()
 	{
-		return this.noteFavoritesSet;
+		return this.templateFavoritesSet;
 	}
+	public FavoriteItemImprint getImprintFavoritesSet()
+	{
+		return this.imprintFavoritesSet;
+	}
+	
+
 	public FavoriteItemPerson getPersonFavoritesSet()
 	{
 		return this.personFavoritesSet;
@@ -305,10 +295,10 @@ public class DWSet implements IDB
 	{
 		if (item instanceof AssetCls) { 
 			return this.assetFavoritesSet;
-		//} else if (item instanceof ImprintCls) { 
-		//	return this.imprintFavoritesSet;
-		} else if (item instanceof NoteCls) { 
-			return this.noteFavoritesSet;
+		} else if (item instanceof ImprintCls) { 
+			return this.imprintFavoritesSet;
+		} else if (item instanceof TemplateCls) { 
+			return this.templateFavoritesSet;
 		} else if (item instanceof PersonCls) { 
 			return this.personFavoritesSet;
 		} else if (item instanceof StatusCls) { 
@@ -332,7 +322,7 @@ public class DWSet implements IDB
 		this.pollMap.delete(account);
 		this.assetMap.delete(account);
 		this.imprintMap.delete(account);
-		this.noteMap.delete(account);
+		this.TemplateMap.delete(account);
 		this.unionMap.delete(account);
 		this.personMap.delete(account);
 		this.statusMap.delete(account);

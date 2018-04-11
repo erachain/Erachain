@@ -196,7 +196,7 @@ public class BlogResource {
 		List<byte[]> txlist = DCSet.getInstance().getBlogPostMap()
 				.get(blogname == null ? "Erachain.org" : blogname);
 		
-		if(txlist.size() == 0)
+		if(txlist.isEmpty())
 		{
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_BLOG_EMPTY);

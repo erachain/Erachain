@@ -79,7 +79,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	private HashSet actionTypes;
 
 	public Accounts_Transactions_TableModel() {
-		sender = new Account("");
+		//sender = new Account("");
 		// trans_List = new ArrayList<Trans>();
 
 		r_Trans = new ArrayList<Transaction>();
@@ -166,7 +166,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 	@Override
 	public Object getValueAt(int row, int column) {
 		// if(this.r_Trans == null || row > this.r_Trans.size() - 1 ||
-		// this.r_Trans.size() == 0 )
+		// this.r_Trans.isEmpty() )
 		// {
 		// return null;
 		// }
@@ -174,7 +174,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 		
 		
 		
-		if (this.trans_List == null || this.trans_List.length == 0) {
+		if (this.trans_List == null || this.trans_List.length == 0 || sender == null) {
 			return null;
 		}
 		// summa
@@ -209,7 +209,8 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 			return library.getBlockSegToBigInteger(r_Tran.transaction);
 		case COLUMN_TRANSACTION:
 
-			if (r_Tran.transaction.isConfirmed(DCSet.getInstance())) return r_Tran.transaction.getBlock(DCSet.getInstance()).getHeight(DCSet.getInstance()) + "-" + r_Tran.transaction.getSeqNo(DCSet.getInstance());
+			if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
+				return r_Tran.transaction.viewHeightSeq(DCSet.getInstance());
 			return -1;
 		case COLUMN_AMOUNT:
 		//	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
@@ -327,7 +328,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-			if (this.r_Trans.size() == 0) {
+			if (this.r_Trans.isEmpty()) {
 				ss = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
 				//ss.registerObserver();
 				Controller.getInstance().wallet.database.getTransactionMap().addObserver(ss);
@@ -362,7 +363,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
 	public void get_R_Send() {
 
-		if (this.sender.getAddress() == null || this.asset == null)
+		if (this.sender == null || this.asset == null)
 			return;
 		this.r_Trans.clear();
 		trans_Hash_Map = new HashMap<String, Trans>();
@@ -396,7 +397,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				trr.ammount = tttt.getAmount();
 	//if send for *-1
 				// view all types
-				if (actionTypes == null || actionTypes.size() == 0 ){
+				if (actionTypes == null || actionTypes.isEmpty() ){
 				
 				if (tttt.getCreator().getAddress().equals(this.sender.getAddress()))
 					trr.ammount = tttt.getAmount().multiply(new BigDecimal("-1"));
@@ -445,7 +446,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 				trr.recipient = ttt1.getRecipient();
 					
 				// view all types					
-				if (actionTypes == null || actionTypes.size() == 0 ){
+				if (actionTypes == null || actionTypes.isEmpty() ){
 			
 				trans_Hash_Map.put(ttt.viewSignature(), trr);
 				return;

@@ -99,7 +99,7 @@ public class KeyValueTableModel extends AbstractTableModel implements Observer{
 	//CONSISTENCY CHECK
 	public Pair<Boolean, String> checkUpdateable()
 	{
-		if(keyvaluepairs.size() == 0)
+		if(keyvaluepairs.isEmpty())
 		{
 			return new Pair<Boolean, String>(false, Lang.getInstance().translate("You need to add atleast one key/value pair to properly update the name."));
 		}

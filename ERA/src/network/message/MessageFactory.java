@@ -90,7 +90,12 @@ public class MessageFactory {
 	{
 		return new TransactionMessage(transaction);
 	}
-	
+
+	public Message createTelegramMessage(Transaction transaction)
+	{
+		return new TelegramMessage(transaction);
+	}
+
 	public Message parse(Peer sender, DataInputStream inputStream) throws Exception
 	{
 		//READ MESSAGE TYPE
@@ -161,6 +166,14 @@ public class MessageFactory {
 			
 		switch(type)
 		{
+
+		// TELEGRAM
+		case Message.TELEGRAM_TYPE:
+			
+			//CREATE MESSAGE FROM DATA
+			message = TelegramMessage.parse(data);
+			break;
+
 		//TODO: delete PING and GET HWeight
 		case Message.GET_PING_TYPE:
 			

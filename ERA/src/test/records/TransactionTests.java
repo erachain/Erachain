@@ -125,13 +125,13 @@ public class TransactionTests {
 		Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp, last_ref);
 		payment.sign(maker, false);		
 		//CHECK IF PAYMENT SIGNATURE IS VALID
-		assertEquals(true, payment.isSignatureValid());
+		assertEquals(true, payment.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(8), timestamp+1, last_ref, new byte[64]);
 		
 		//CHECK IF PAYMENT SIGNATURE IS INVALID
-		assertEquals(false, payment.isSignatureValid());
+		assertEquals(false, payment.isSignatureValid(db));
 	}
 	
 	@Test
@@ -309,14 +309,14 @@ public class TransactionTests {
 		nameRegistration.sign(maker, false);
 		
 		//CHECK IF NAME REGISTRATION IS VALID
-		assertEquals(true, nameRegistration.isSignatureValid());
+		assertEquals(true, nameRegistration.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		nameRegistration = new RegisterNameTransaction(
 				maker, name, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(false, nameRegistration.isSignatureValid());
+		assertEquals(false, nameRegistration.isSignatureValid(db));
 	}
 	
 	@Test
@@ -525,14 +525,14 @@ public class TransactionTests {
 		Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 		nameUpdate.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
-		assertEquals(true, nameUpdate.isSignatureValid());
+		assertEquals(true, nameUpdate.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		nameUpdate = new RegisterNameTransaction(
 				maker, name, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(false, nameUpdate.isSignatureValid());
+		assertEquals(false, nameUpdate.isSignatureValid(db));
 
 	}
 	
@@ -773,14 +773,14 @@ public class TransactionTests {
 		Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
-		assertEquals(true, nameSaleTransaction.isSignatureValid());
+		assertEquals(true, nameSaleTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		nameSaleTransaction = new SellNameTransaction(
 				maker, nameSale, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(false, nameSaleTransaction.isSignatureValid());
+		assertEquals(false, nameSaleTransaction.isSignatureValid(db));
 	}
 	
 	@Test
@@ -1016,14 +1016,14 @@ public class TransactionTests {
 		Transaction nameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
 		nameSaleTransaction.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
-		assertEquals(true, nameSaleTransaction.isSignatureValid());
+		assertEquals(true, nameSaleTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		nameSaleTransaction = new CancelSellNameTransaction(
 				maker, "test", FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(false, nameSaleTransaction.isSignatureValid());
+		assertEquals(false, nameSaleTransaction.isSignatureValid(db));
 	}
 	
 	@Test
@@ -1275,14 +1275,14 @@ public class TransactionTests {
 		Transaction buyNameTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
 		buyNameTransaction.sign(maker, false);
 		//CHECK IF NAME UPDATE IS VALID
-		assertEquals(true, buyNameTransaction.isSignatureValid());
+		assertEquals(true, buyNameTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		buyNameTransaction = new BuyNameTransaction(
 				maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(false, buyNameTransaction.isSignatureValid());
+		assertEquals(false, buyNameTransaction.isSignatureValid(db));
 	}
 	
 	@Test
@@ -1563,14 +1563,14 @@ public class TransactionTests {
 		Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 		pollCreation.sign(maker, false);
 		//CHECK IF POLL CREATION IS VALID
-		assertEquals(true, pollCreation.isSignatureValid());
+		assertEquals(true, pollCreation.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		pollCreation = new CreatePollTransaction(
 				maker, poll, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(false, pollCreation.isSignatureValid());
+		assertEquals(false, pollCreation.isSignatureValid(db));
 	}
 		
 	@Test
@@ -1799,14 +1799,14 @@ public class TransactionTests {
 		Transaction pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);
 		pollVote.sign(maker, false);
 		//CHECK IF POLL VOTE IS VALID
-		assertEquals(true, pollVote.isSignatureValid());
+		assertEquals(true, pollVote.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		pollVote = new VoteOnPollTransaction(
 				maker, "test", 5, FEE_POWER, timestamp, last_ref, new byte[64]);
 		
 		//CHECK IF POLL VOTE IS INVALID
-		assertEquals(false, pollVote.isSignatureValid());
+		assertEquals(false, pollVote.isSignatureValid(db));
 	}
 		
 	@Test
@@ -2059,14 +2059,14 @@ public class TransactionTests {
 		arbitraryTransaction.sign(maker, false);
 		
 		//CHECK IF ARBITRARY TRANSACTION IS VALID
-		assertEquals(true, arbitraryTransaction.isSignatureValid());
+		assertEquals(true, arbitraryTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		arbitraryTransaction = new ArbitraryTransactionV3(
 				maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, last_ref, new byte[64]);
 		//arbitraryTransaction.sign(maker);
 		//CHECK IF ARBITRARY TRANSACTION IS INVALID
-		assertEquals(false, arbitraryTransaction.isSignatureValid());
+		assertEquals(false, arbitraryTransaction.isSignatureValid(db));
 	}
 		
 	@Test
@@ -2288,14 +2288,14 @@ public class TransactionTests {
 		issueAssetTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
-		assertEquals(true, issueAssetTransaction.isSignatureValid());
+		assertEquals(true, issueAssetTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueAssetTransaction = new IssueAssetTransaction(
 				maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE ASSET IS INVALID
-		assertEquals(false, issueAssetTransaction.isSignatureValid());
+		assertEquals(false, issueAssetTransaction.isSignatureValid(db));
 	}
 		
 

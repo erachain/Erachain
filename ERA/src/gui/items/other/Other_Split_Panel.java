@@ -10,6 +10,7 @@ import java.awt.event.ComponentListener;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -27,6 +28,8 @@ import core.item.ItemCls;
 import gui.CoreRowSorter;
 import gui.Split_Panel;
 import gui.library.MTable;
+import gui.library.Wallet_Orphan_Button;
+import gui.library.Wallet_Sync_Button;
 import gui.models.BlocksTableModel;
 import gui.models.PeersTableModel;
 import gui.models.WalletBlocksTableModel;
@@ -48,6 +51,9 @@ public class Other_Split_Panel extends Split_Panel{
 	private MTable jTable_My_Block;
 	private JPopupMenu peers_Menu;
 	private Peer item_Peer_Menu;
+	private Wallet_Sync_Button sync_Button;
+	private Wallet_Orphan_Button return_Button;
+	private JMenuItem connect_Item;
 
 	public Other_Split_Panel() {
 		super("Other_Split_Panel");
@@ -80,14 +86,28 @@ public class Other_Split_Panel extends Split_Panel{
  			
  				// TODO Auto-generated method stub
  				item_Peer_Menu = peersTableModel.get_Peers(jTable_Peers.convertRowIndexToModel(jTable_Peers.getSelectedRow()));
-
- 				 				
+ 				 				 				
  			}
  			
  			
  			
  		});
          
+         
+         connect_Item = new JMenuItem(Lang.getInstance().translate("Connect"));
+         connect_Item.addActionListener(new ActionListener(){
+
+ 			@Override
+ 			public void actionPerformed(ActionEvent arg0) {
+ 				// TODO Auto-generated method stub
+ 			
+			//	item_Peer_Menu.ban(10, "banned by user");
+ 				item_Peer_Menu.connect(item_Peer_Menu.callback);
+				
+ 			}
+       	
+         });
+         peers_Menu.add(connect_Item);
          
          JMenuItem Baned_2_Min_Item = new JMenuItem(Lang.getInstance().translate("Ban in 10 min."));
          Baned_2_Min_Item.addActionListener(new ActionListener(){
@@ -228,6 +248,18 @@ public class Other_Split_Panel extends Split_Panel{
          gridBagConstraints.weightx = 0.1;
          gridBagConstraints.insets = new java.awt.Insets(10, 11, 0, 11);
          jPanel7.add(jLabel_My_Block_Title, gridBagConstraints);
+         
+         sync_Button = new Wallet_Sync_Button();
+         gridBagConstraints = new java.awt.GridBagConstraints();
+         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+         gridBagConstraints.weightx = 0.1;
+         gridBagConstraints.gridx = 1;
+         gridBagConstraints.insets = new java.awt.Insets(10, 11, 0, 11);
+         jPanel7.add(sync_Button , gridBagConstraints);
+         
+         
+         
+         
          JScrollPane jScrollPane_My_Block_Table = new JScrollPane();
          jScrollPane_My_Block_Table.setBorder(null);
 
@@ -237,6 +269,7 @@ public class Other_Split_Panel extends Split_Panel{
          gridBagConstraints.gridx = 0;
          gridBagConstraints.gridy = 1;
          gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+         gridBagConstraints.gridwidth =2;
          gridBagConstraints.weightx = 0.1;
          gridBagConstraints.weighty = 0.1;
          gridBagConstraints.insets = new java.awt.Insets(5, 11, 11, 11);
@@ -254,6 +287,16 @@ public class Other_Split_Panel extends Split_Panel{
          gridBagConstraints.weightx = 0.1;
          gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
          jPanel8.add(jLabel_All_Block, gridBagConstraints);
+         
+         return_Button = new Wallet_Orphan_Button();
+         
+         gridBagConstraints = new java.awt.GridBagConstraints();
+         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+         gridBagConstraints.weightx = 0.1;
+         gridBagConstraints.insets = new java.awt.Insets(11, 11, 0, 11);
+         jPanel8.add(return_Button, gridBagConstraints);
+         
+                  
          JScrollPane jScrollPane_All_Block_Table = new JScrollPane();
          jScrollPane_All_Block_Table.setBorder(null);
 
@@ -263,6 +306,7 @@ public class Other_Split_Panel extends Split_Panel{
          gridBagConstraints = new java.awt.GridBagConstraints();
          gridBagConstraints.gridx = 0;
          gridBagConstraints.gridy = 1;
+         gridBagConstraints.gridwidth = 2;
          gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
          gridBagConstraints.weightx = 0.1;
          gridBagConstraints.weighty = 0.1;
@@ -287,6 +331,8 @@ public class Other_Split_Panel extends Split_Panel{
 		blocksModel.deleteObserver();	
 		peersTableModel.deleteObserver();
 		All_Blocks_TableModel.removeObservers();
+		Controller.getInstance().addObserver(sync_Button);
+		
 	}
 	
 

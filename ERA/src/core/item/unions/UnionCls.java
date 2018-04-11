@@ -33,7 +33,7 @@ public abstract class UnionCls extends ItemCls{
 	protected static final int PARENT_LENGTH = Transaction.KEY_LENGTH;
 	protected static final int BASE_LENGTH = BIRTHDAY_LENGTH + PARENT_LENGTH;
 
-	// TODO add setNote - document for birth union
+	// TODO add setTemplate - document for birth union
 	protected long birthday; // timestamp
 	protected long parent; // parent union
 

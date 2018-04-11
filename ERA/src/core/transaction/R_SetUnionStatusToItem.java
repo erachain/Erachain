@@ -271,7 +271,7 @@ public class R_SetUnionStatusToItem extends Transaction {
 	@Override
 	public int getDataLength(boolean asPack)
 	{
-		// not include note reference
+		// not include reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
 		return len;
 	}

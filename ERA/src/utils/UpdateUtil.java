@@ -26,7 +26,7 @@ public class UpdateUtil {
 		DCSet.getInstance().getOrphanNameStorageMap().reset();
 		DCSet.getInstance().getHashtagPostMap().reset();
 
-		SortableList<byte[], Block> blocks = DCSet.getInstance().getBlockMap()
+		SortableList<Integer, Block> blocks = DCSet.getInstance().getBlockMap()
 				.getList();
 		blocks.sort(BlockMap.HEIGHT_INDEX);
 

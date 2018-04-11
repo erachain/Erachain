@@ -342,6 +342,38 @@ public class AddressesResource {
 		return getGeneratingBalance(address, 1);
 	}
 
+	public JSONArray tuple5_toJson(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance) {
+		JSONArray item1 = new JSONArray();
+		JSONArray item2 = new JSONArray();
+		JSONArray item3 = new JSONArray();
+		JSONArray item4 = new JSONArray();
+		JSONArray item5 = new JSONArray();
+		
+		item1.add(balance.a.a.toPlainString());
+		item1.add(balance.a.b.toPlainString());
+
+		item2.add(balance.b.a.toPlainString());
+		item2.add(balance.b.b.toPlainString());
+
+		item3.add(balance.c.a.toPlainString());
+		item3.add(balance.c.b.toPlainString());
+
+		item4.add(balance.d.a.toPlainString());
+		item4.add(balance.d.b.toPlainString());
+
+		item5.add(balance.e.a.toPlainString());
+		item5.add(balance.e.b.toPlainString());
+
+		JSONArray result = new JSONArray();
+		result.add(item1);
+		result.add(item2);
+		result.add(item3);
+		result.add(item4);
+		result.add(item5);
+		
+		return result;
+
+	}
 	///  get addresses/assetbalance/1/7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
 	@GET
 	@Path("assetbalance/{assetid}/{address}")
@@ -376,35 +408,8 @@ public class AddressesResource {
 		}
 
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
-		JSONArray item1 = new JSONArray();
-		JSONArray item2 = new JSONArray();
-		JSONArray item3 = new JSONArray();
-		JSONArray item4 = new JSONArray();
-		JSONArray item5 = new JSONArray();
-		
-		item1.add(balance.a.a);
-		item1.add(balance.a.b);
 
-		item2.add(balance.b.a);
-		item2.add(balance.b.b);
-
-		item3.add(balance.c.a);
-		item3.add(balance.c.b);
-
-		item4.add(balance.d.a);
-		item4.add(balance.d.b);
-
-		item5.add(balance.e.a);
-		item5.add(balance.e.b);
-
-		JSONArray result = new JSONArray();
-		result.add(item1);
-		result.add(item2);
-		result.add(item3);
-		result.add(item4);
-		result.add(item5);
-
-		return result.toJSONString();
+		return tuple5_toJson(balance).toJSONString();
 	}
 
 	@GET
@@ -499,7 +504,7 @@ public class AddressesResource {
 		
 		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) 	
 		{
-			assetsBalancesJSON.put(assetsBalance.getA().b, assetsBalance.getB().toString());
+			assetsBalancesJSON.put(assetsBalance.getA().b, tuple5_toJson(assetsBalance.getB()));
 		}
 		
 		return assetsBalancesJSON.toJSONString();

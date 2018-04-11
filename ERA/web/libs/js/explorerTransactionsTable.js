@@ -1,6 +1,55 @@
+function makePageUri(page){
+	// parse url
+	var urlParams;
+    var match,
+        pl     = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query  = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+       urlParams[decode(match[1])] = decode(match[2]);
+    
+    urlParams['page'] = page;
+    var uri = '';
+    
+    for (var paramKey in urlParams){
+    	if (uri === '') {
+    		uri += '?';
+    	}
+    	else{
+    		uri += '&';
+    	}
+    		
+    	uri += paramKey + '=' + encodeURIComponent(urlParams[paramKey]);
+    }
+    
+    return uri;
+}
+
+function transactionsTablePages(data){
+	var output = '';
+	
+	if (data.pageCount > 1){
+		output += 'Pages: ';
+		for (var page = 1; page <= data.pageCount; page++){
+			if (page == data.pageNumber){
+				output += '<b>' + page + '</b>&nbsp;';
+			}
+			else {
+				output += '<a href="' + makePageUri(page) + '">' + page + '</a>&nbsp;';
+			}
+		}
+	}
+	
+	return output;
+}
+
 function transactions_Table(data){
 
-	output = data.Transactions.label_transactions_table + ':<br>';
+	var output = data.Transactions.label_transactions_table + ':<br>';
+	output += transactionsTablePages(data);
 	output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 			
 	output += '<tr bgcolor="f1f1f1"><td><b>'+data.Transactions.label_block+'<td><b>'+ data.Transactions.label_signature+'<td><b>'+data.Transactions.label_type_transaction+'<td><b>'+data.Transactions.label_amount_key+'<td><b>'+ data.Transactions.label_date+'<td><b>'+data.Transactions.label_creator+'<td><b>'+data.Transactions.label_size+'<td><b>'+data.Transactions.label_fee+'<td><b>'+ data.Transactions.label_confirmations+'</tr>';
@@ -17,6 +66,7 @@ function transactions_Table(data){
 			
 			}
 	output +='</table></td></tr></table>';
+	output += transactionsTablePages(data);
 
  return output;
 

@@ -172,13 +172,13 @@ public class OrderTestsMy
 		orderCreation.sign(accountA, false);
 		
 		//CHECK IF ORDER CREATION SIGNATURE IS VALID
-		assertEquals(true, orderCreation.isSignatureValid());
+		assertEquals(true, orderCreation.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 3l, BigDecimal.valueOf(100).setScale(8), BigDecimal.valueOf(1).setScale(8), (byte)0, timestamp, accountA.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ORDER CREATION SIGNATURE IS INVALID
-		assertEquals(false, orderCreation.isSignatureValid());
+		assertEquals(false, orderCreation.isSignatureValid(db));
 	}
 	
 	@Test
@@ -1585,13 +1585,13 @@ public class OrderTestsMy
 		Transaction cancelOrderTransaction = new CancelOrderTransaction(accountA, BigInteger.TEN, FEE_POWER, timestamp, accountA.getLastTimestamp(db));
 		cancelOrderTransaction.sign(accountA, false);
 		//CHECK IF ORDER CANCEL IS VALID
-		assertEquals(true, cancelOrderTransaction.isSignatureValid());
+		assertEquals(true, cancelOrderTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		cancelOrderTransaction = new CancelOrderTransaction(accountA, BigInteger.TEN, FEE_POWER, timestamp, accountA.getLastTimestamp(db), new byte[1]);
 		
 		//CHECK IF ORDER CANCEL
-		assertEquals(false, cancelOrderTransaction.isSignatureValid());
+		assertEquals(false, cancelOrderTransaction.isSignatureValid(db));
 	}
 	
 	@Test

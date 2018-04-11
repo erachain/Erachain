@@ -175,6 +175,33 @@ public class WEB_Balance_from_Adress_TableModel extends AbstractTableModel imple
 		return null;
 	}
 
+	
+	public Object getBalanceAt(int row, int column) 
+	{
+		if(table_balance == null || row > table_balance.size() - 1 )
+		{
+			return null;
+		} 
+		
+		switch(column)
+		{
+			case COLUMN_A:
+			
+				return table_balance.get(row).getB().getB().a;
+				
+			case COLUMN_B:
+				
+				return table_balance.get(row).getB().getB().b;
+				
+			case COLUMN_C:
+				
+				return table_balance.get(row).getB().getB().c;
+			
+		}	
+		
+		return null;
+	}
+
 	@Override
 	public void update(Observable o, Object arg) 
 	{

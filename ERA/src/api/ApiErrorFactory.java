@@ -285,15 +285,19 @@ public class ApiErrorFactory
 	public WebApplicationException createError(int error)
 	{
 		//return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
-		return new WebApplicationException(Response.status(Response.Status.OK).entity(
-				createErrorJSON(error).toJSONString()).build());
+		return new WebApplicationException(Response.status(Response.Status.OK)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(createErrorJSON(error).toJSONString()).build());
 	}
 
 	@SuppressWarnings("unchecked")
 	public WebApplicationException createError(String error)
 	{
 		//return new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity(
-		return new WebApplicationException(Response.status(Response.Status.OK).entity(
-				createErrorJSON(error).toJSONString()).build());
+		return new WebApplicationException(Response.status(Response.Status.OK)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(createErrorJSON(error).toJSONString()).build());
 	}
 }

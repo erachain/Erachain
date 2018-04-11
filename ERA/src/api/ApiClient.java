@@ -180,6 +180,11 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET transactions/unconfirmedincomes/<address>", 
+				"Returns an array of all the unconfirmed incoming transactions of address known to the client.",
+				""
+			},
+			{
 				"POST transactions/scan {\"start\": \"<startBlockSign>, \"blocklimit\":<amountBlocks>, \"transactionlimit\":<amountTransactions>, \"type\":<type>, \"service\":<service>, \"address\":\"<address>\"}", 
 				"Returns all the transactions that match the filters. All filters are optional but please limit that amount of transactions or blocks to scan to avoid running into issues. Requests that don't specify a blocklimit <= 360 will be denied to remote users. Return the last block it scanned, the amount of blocks it scanned and the scanned transactions.",
 				"Filters:\nstart - The signature of the starting block. \nblocklimit - The maximum amount of blocks to scan. \ntransactionlimit - The maximum amount of transactions to return.\ntype - Only return transactions with the given type.\nservice - Only return Arbitrary Transactions with the given service.\naddress - Only return transactions where the given address is involved.\nErrors: 1 -Json error. 102 - Invalid address. 101 - Invalid signature. 301 - Block does not exist.",
@@ -200,9 +205,30 @@ public class ApiClient {
 				""
 			},
 			{
+				"GET transactions/incoming/{height}",
+				"Returns an array of the transactions of a specific block height.",
+				""
+			},
+			{
+				"GET transactions/incoming/{height}/{recipient}",
+				"Returns an array of the transactions of a specific block height and recipient.",
+				""
+			},
+			{
+				"GET transactions/incoming/{height}/{address}/decrypt/{password}",
+				"Returns an array of the transactions of a specific block height and recipient with decryption.",
+				""
+			},
+			
+			{
 				"POST transactions/find {\"address\":\"<address>\", \"sender\":\"<sender>\", \"recipient\":\"<recipient>\", \"type\":<type>, \"service\":<service>, \"offset\":<offset>, \"limit\":<limit>, \"minHeight\":<minHeight>, \"maxHeight\":<maxHeight>, \"desc\":<true/false>, \"count\":<true/false>}",
 				"Returns an array of the <limit> transactions from given <offset> with a specific params. Set parameter \"count\" to true to find out the number of transactions. Set parameter \"desc\" to true for reverse order. Parameter \"service\" means service of ArbitraryTransaction. \"minHeight\" and \"maxHeight\" means height of blocks. All params are optional, but must be specified at least one address field.",
 				"Errors: 102 - Invalid address."
+			},
+			{
+				"GET transactions/datadecrypt/{signature}?password={password}",
+				"Returns decrypted data for transaction.",
+				""
 			},
 			{
 				"GET blocks/addresses/<limit>", 
@@ -405,8 +431,23 @@ public class ApiClient {
 				"Errors: 201 - Wallet does not exist."
 			},
 			{
-				"POST payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
+				"POST rec_payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}", 
 				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
+			},
+			{
+				"GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}", 
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
+			},
+			{
+				"POST rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}", 
+				"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
+			},
+			{
+				"GET rec_payment/telegram/{feePow}/{sender}/{assetKey}/{amount}/{recipient}", 
+				"Send TELEGRAM as a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
 			{
@@ -684,6 +725,38 @@ public class ApiClient {
 				"Send a new multipayment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 0 is provided (default asset: ERA).",
 				"Errors: 1 - Json error. 104 - Invalid amount. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 			},
+			/// telegrams
+			{
+				"GET telegrams/address/<address>", 
+				"Returns an array of the telegrams of a specific address.",
+				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
+			},
+			{
+				"GET telegrams/timestamp/<timestamp>/filter/<filter>", 
+				"Returns an array of last telegrams from given timestamp by filter. Filter is optional parametr",
+				"Errors: 201 - Wallet does not exist."
+			},
+			{
+				"GET telegrams/address/<address>/timestamp/<timestamp>/filte/<filter>", 
+				"Returns an array of the telegrams of a specific address from given timestamp by head filter. Filter is optional parametr.",
+				"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
+			},
+			{
+				"GET telegrams/get/<signature>", 
+				"Get the telegram that matches the given signature.",
+				"Errors: 101 - Invalid signature. 311 - Telegram does not exist."
+			},
+			{
+				"GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122",
+				"Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+				""
+			},
+			{
+				"POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+				"Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+				""
+			},
+
 		};
 	
 

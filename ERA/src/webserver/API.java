@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -57,9 +58,11 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
+import datachain.BlockHeightsMap;
 import datachain.BlockMap;
 import datachain.DCSet;
 import datachain.ItemAssetMap;
@@ -90,10 +93,12 @@ public class API {
 		
 		Map help = new LinkedHashMap();
 
+		help.put("*** CHAIN ***", "");
 		help.put("GET Height", "height");
-		help.put("*** BLOCK ***", "");
 		help.put("GET First Block", "firstblock");
 		help.put("GET Last Block", "lastblock");
+
+		help.put("*** BLOCK ***", "");
 		help.put("GET Block", "block/{signature}");
 		help.put("GET Block by Height", "blockbyheight/{height}");
 		help.put("GET Child Block Signature", "childblocksignature/{signature}");
@@ -131,7 +136,10 @@ public class API {
 		help.put("GET Assets", "assets");
 		help.put("GET Assets Full", "assetsfull");
 		help.put("GET Assets by Name Filter", "assetsfilter/{filter_name_string}");		
-
+		
+		help.put("*** EXCHANGE ***", "");
+		help.put("GET Exchange Orders", "exchangeorders/{have}/{want}");
+		
 		help.put("*** PERSON ***", "");
 		help.put("GET Person Height", "personheight");
 		help.put("GET Person", "person/{key}");
@@ -152,7 +160,10 @@ public class API {
 		
 		help.put("POST Broadcast" , "/broadcast JSON {raw=raw(BASE58)}");
 		help.put("GET Broadcast" , "/broadcast/{raw(BASE58)}");
-		
+
+		help.put("POST Broadcasttelegram" , "/broadcasttelegram JSON {\"raw\": raw(BASE58)}");
+		help.put("GET Broadcasttelegram" , "/broadcasttelegram/{raw(BASE58)}");
+
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
@@ -189,7 +200,7 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		Block lastBlock = dcSet.getBlockMap().getLastBlock();
+		Block lastBlock = dcSet.getBlockMap().last();
 		out = lastBlock.toJson();
 		
 		return Response.status(200)
@@ -207,21 +218,26 @@ public class API {
 		byte[] signatureBytes;
 		Map out = new LinkedHashMap();
 		
-		int steep = 1;
+		int step = 1;
 		try
 		{
 			signatureBytes = Base58.decode(signature);
 
-			++steep;
-			byte[] childSign = dcSet.getChildMap().getChildBlock(signatureBytes);
-			out.put("child", Base58.encode(childSign));
+			++step;
+			Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			if (heightWT != null && heightWT.a > 0) {
+				byte[] childSign = dcSet.getBlockHeightsMap().get(heightWT.a + 1);
+				out.put("child", Base58.encode(childSign));
+			} else {
+				out.put("message", "signature not found");				
+			}
 		}
 		catch(Exception e)
 		{
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "child not found");
 			else
 				out.put("message", e.getMessage());
@@ -242,21 +258,25 @@ public class API {
 		byte[] signatureBytes;
 		Map out = new LinkedHashMap();
 		
-		int steep = 1;
+		int step = 1;
 		try
 		{
 			signatureBytes = Base58.decode(signature);
 
-			++steep;
-			byte[] childSign = dcSet.getChildMap().getChildBlock(signatureBytes);
-			out = dcSet.getBlockMap().get(childSign).toJson();
+			++step;
+			Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			if (heightWT != null && heightWT.a > 0) {
+				out = dcSet.getBlockMap().get(heightWT.a + 1).toJson();
+			} else {
+				out.put("message", "signature not found");				
+			}
 		}
 		catch(Exception e)
 		{
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "child not found");
 			else
 				out.put("message", e.getMessage());
@@ -276,26 +296,26 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] key = Base58.decode(signature);
 
-			++steep;
-			Block block = dcSet.getBlockMap().get(key);			
+			++step;
+			Block block = dcSet.getBlockSignsMap().getBlock(key);			
 			out.put("block", block.toJson());
 			
-			++steep;
-			byte[] childSign = dcSet.getChildMap().getChildBlock(block.getSignature());
+			++step;
+			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -314,26 +334,26 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			int height = Integer.parseInt(heightStr);
 			
-			++steep;
+			++step;
 			Block block = cntrl.getBlockByHeight(dcSet, height);
 			out.put("block", block.toJson());
 			
-			++steep;
-			byte[] childSign = dcSet.getChildMap().getChildBlock(block.getSignature());
+			++step;
+			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -354,12 +374,12 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			int height = Integer.parseInt(heightStr);
 			
-			++steep;
+			++step;
 			Block block;
 			LinkedList eee = null;
 			//LinkedList eee = ((LinkedList) dcSet.getBlockMap().map);//.keySet());
@@ -372,17 +392,17 @@ public class API {
 			//block = dcSet.getBlockMap().get(iterator.next());
 			out.put("block", block.toJson());
 
-			++steep;
-			byte[] childSign = dcSet.getChildMap().getChildBlock(block.getSignature());
+			++step;
+			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value " + e.getMessage());
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found " + e.getMessage());
 			else
 				out.put("message", e.getMessage());
@@ -406,30 +426,28 @@ public class API {
 			limit = 30;
 
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
 			JSONArray array = new JSONArray();
-			
 			BlockMap blockMap = dcSet.getBlockMap();
+			int max = blockMap.size();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = dcSet.getBlockHeightsMap().getSignByHeight(i);
-				if (signature == null) {
+				if (height >= max) {
 					out.put("end", 1);
 					break;
-				} else {
-					array.add(blockMap.get(signature).toJson());
 				}
+				array.add(blockMap.get(i));
 			}
 			out.put("blocks", array);
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -452,29 +470,28 @@ public class API {
 			limit = 100;
 
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
 			JSONArray array = new JSONArray();
-			BlockMap blockMap = dcSet.getBlockMap();
+			BlockHeightsMap blockHeightsMap = dcSet.getBlockHeightsMap();
+			int max = dcSet.getBlockMap().size();
 			for (int i = height; i < height + limit + 1; ++i) {
-				byte[] signature = dcSet.getBlockHeightsMap().getSignByHeight(i);
-				if (signature == null) {
+				if (height >= max) {
 					out.put("end", 1);
 					break;
-				} else {
-					array.add(Base58.encode(signature));
 				}
+				array.add(Base58.encode(blockHeightsMap.get(i)));
 			}
 			out.put("signatures", array);
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height error, use integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "block not found");
 			else
 				out.put("message", e.getMessage());
@@ -530,21 +547,21 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		int steep = 1;
+		int step = 1;
 
 		try {
 			byte[] key = Base58.decode(signature);
 
-			++steep;
+			++step;
 			Transaction record = cntrl.getTransaction(key, dcSet);		
 			out = record.toJson();
 			
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -563,7 +580,7 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
@@ -571,16 +588,16 @@ public class API {
 			int height = Integer.parseInt(strA[0]);
 			int seq = Integer.parseInt(strA[1]);
 			
-			++steep;	
+			++step;	
 			Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.toJson();
 						
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height-sequence error, use integer-integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -601,23 +618,34 @@ public class API {
 		
 		Map out = new LinkedHashMap();
 
-		int steep = 1;
+		int step = 1;
 
+		byte[] key;
+		Transaction record = null;
 		try {
-			byte[] key = Base58.decode(signature);
+			key = Base58.decode(signature);
+			++step;
+			record = cntrl.getTransaction(key, dcSet);
 
-			++steep;
-			Transaction record = cntrl.getTransaction(key, dcSet);		
-			out = record.rawToJson();
-			
-		} catch (Exception e) {
-			
-			out.put("error", steep);
-			if (steep == 1)
-				out.put("message", "signature error, use Base58 value");
-			else if (steep == 2)
+			++step;
+			if (record == null) {
+				out.put("error", step);
 				out.put("message", "record not found");
-			else
+			} else {	
+				++step;
+				try {
+					out = record.rawToJson();
+				} catch (Exception e) {			
+					out.put("error", step);
+					out.put("message", e.getMessage());
+				}
+			}
+			
+		} catch (Exception e) {			
+			out.put("error", step);
+			if (step == 1)
+				out.put("message", "signature error, use Base58 value");
+			else 
 				out.put("message", e.getMessage());
 		}
 		
@@ -634,7 +662,7 @@ public class API {
 	{
 		
 		Map out = new LinkedHashMap();
-		int steep = 1;
+		int step = 1;
 
 		try {
 			
@@ -642,16 +670,16 @@ public class API {
 			int height = Integer.parseInt(strA[0]);
 			int seq = Integer.parseInt(strA[1]);
 			
-			++steep;	
+			++step;	
 			Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
 			out = record.rawToJson();
 						
 		} catch (Exception e) {
 			
-			out.put("error", steep);
-			if (steep == 1)
+			out.put("error", step);
+			if (step == 1)
 				out.put("message", "height-sequence error, use integer-integer value");
-			else if (steep == 2)
+			else if (step == 2)
 				out.put("message", "record not found");
 			else
 				out.put("message", e.getMessage());
@@ -667,7 +695,7 @@ public class API {
 
 	@GET
 	@Path("broadcast/{raw}")
-	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	// http://127.0.0.1:9047/api/broadcast?raw=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
 	public Response broadcastRaw(@PathParam("raw") String raw)
 	{
 		
@@ -675,7 +703,7 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity(StrJSonFine.convert(broadcastFromRawPost1(raw)))
+				.entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
 				.build();
 	}
 
@@ -689,15 +717,15 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity(StrJSonFine.convert(broadcastFromRawPost1(raw)))
+				.entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
 				.build();
 		
 	}
 	
-	// http://127.0.0.1:9047/lightwallet/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
-	public JSONObject broadcastFromRawPost1( String rawDataBase58)
+	// http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public JSONObject broadcastFromRaw_1( String rawDataBase58)
 	{
-		int steep = 1;
+		int step = 1;
 		JSONObject out = new JSONObject();
 		try {
 		//	JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
@@ -705,7 +733,7 @@ public class API {
 			byte[] transactionBytes = Base58.decode(rawDataBase58);
 		
 	
-			steep++;
+			step++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 			if(result.getB() == Transaction.VALIDATE_OK) {
 				out.put("status", "ok");
@@ -718,11 +746,73 @@ public class API {
 
 		} catch (Exception e) {
 			//LOGGER.info(e);
-			out.put("error", APIUtils.errorMess(-1, e.toString() + " on steep: " + steep));
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " on step: " + step));
 			return out;
 		}
 	}
 
+	// http://127.0.0.1:9047/lightwallet/broadcastTelegram1?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public JSONObject broadcastTelegram_1(String rawDataBase58)
+	{
+		JSONObject out = new JSONObject();
+		byte[] transactionBytes;
+		Transaction transaction;
+		
+		try {
+			transactionBytes = Base58.decode(rawDataBase58);
+		} catch (Exception e) {
+			//LOGGER.info(e);
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " INVALID_RAW_DATA"));
+			return out;
+		}		
+
+		try {
+			transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
+		} catch (Exception e) {
+			out.put("error", APIUtils.errorMess(-1, e.toString() + " parse ERROR"));
+			return out;
+		}
+
+		// CHECK IF RECORD VALID
+		if (!transaction.isSignatureValid(DCSet.getInstance())) {
+			out.put("error", APIUtils.errorMess(-1, " INVALID_SIGNATURE"));
+			return out;
+		}
+
+		Controller.getInstance().broadcastTelegram(transaction, true);
+		out.put("status", "ok");
+		return out;
+	}
+
+	@GET
+	//@Path("broadcasttelegram/{raw}")
+	@Path("broadcasttelegram/{raw}")
+	// http://127.0.0.1:9047/broadcasttelegram?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
+	public Response broadcastTelegram(@PathParam("raw") String raw)
+	{
+		
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+				.build();
+	}
+
+	@POST
+	@Path("broadcasttelegram")
+	public Response broadcastTelegramPost(@Context HttpServletRequest request,
+			MultivaluedMap<String, String> form){
+		
+		String raw = form.getFirst("raw");
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+				.build();
+		
+	}
 
 	/*
 	 * ********** ADDRESS **********
@@ -896,11 +986,12 @@ public class API {
 		
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
 		JSONArray array = new JSONArray();
-		array.add(balance.a);
-		array.add(balance.b);
-		array.add(balance.c);
-		array.add(balance.d);
-		array.add(balance.e);
+
+		array.add(setJSONArray(balance.a));
+		array.add(setJSONArray(balance.b));
+		array.add(setJSONArray(balance.c));
+		array.add(setJSONArray(balance.d));
+		array.add(setJSONArray(balance.e));
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -927,11 +1018,12 @@ public class API {
 		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) 	
 		{
 			JSONArray array = new JSONArray();
-			array.add(assetsBalance.getB().a);
-			array.add(assetsBalance.getB().b);
-			array.add(assetsBalance.getB().c);
-			array.add(assetsBalance.getB().d);
-			array.add(assetsBalance.getB().e);
+			JSONObject a = new JSONObject();
+			array.add(setJSONArray(assetsBalance.getB().a));
+			array.add(setJSONArray(assetsBalance.getB().b));
+			array.add(setJSONArray(assetsBalance.getB().c));
+			array.add(setJSONArray(assetsBalance.getB().d));
+			array.add(setJSONArray(assetsBalance.getB().e));
 			out.put(assetsBalance.getA().b, array);
 		}
 		
@@ -940,6 +1032,13 @@ public class API {
 				.header("Access-Control-Allow-Origin", "*")
 				.entity(StrJSonFine.convert(out))
 				.build();
+	}
+	
+	private JSONArray setJSONArray (Tuple2 t){
+		JSONArray array = new JSONArray();
+		array.add(t.a);
+		array.add(t.b);
+	return array;
 	}
 
 	@GET
@@ -1006,7 +1105,7 @@ public class API {
 		else
 		{
 		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(new Long(key));
-		if (addresses.size() == 0){
+		if (addresses.isEmpty()){
 			out.put("null", "null");
 		}else{
 		Set<String> ad = addresses.keySet();
@@ -1031,7 +1130,7 @@ public class API {
 	@Path("assetheight")
 	public Response assetHeight() {
 		
-		long height = dcSet.getItemAssetMap().getSize();
+		long height = dcSet.getItemAssetMap().getLastKey();
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -1149,13 +1248,84 @@ public class API {
 	}
 
 	/*
+	 * ************* EXCHANGE **************
+	 */
+	@GET
+	@Path("exchangeorders/{have}/{want}")
+	public Response exchangeOrders(@PathParam("have") long have, @PathParam("want") long want) {
+		
+		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		// DOES ASSETID EXIST
+		if (!map.contains(have)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+		if (!map.contains(want)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+				
+		SortableList<BigInteger, Order> ordersA = this.dcSet.getOrderMap().getOrdersSortableList(have, want, true);
+		
+		JSONArray arrayA = new JSONArray();
+		
+		if (!ordersA.isEmpty()) {
+			for(Pair<BigInteger, Order> pair: ordersA)
+			{
+				Order order = pair.getB();
+				JSONArray itemJson = new JSONArray();
+				itemJson.add(order.getAmountHaveLeft());
+				itemJson.add(order.getPriceCalc());
+				
+				arrayA.add(itemJson);
+			}
+		}
+
+		SortableList<BigInteger, Order> ordersB = this.dcSet.getOrderMap().getOrdersSortableList(want, have, true);
+		
+		JSONArray arrayB = new JSONArray();
+		
+		if (!ordersA.isEmpty()) {
+			for(Pair<BigInteger, Order> pair: ordersB)
+			{
+				Order order = pair.getB();
+				JSONArray itemJson = new JSONArray();
+				itemJson.add(order.getAmountHaveLeft());
+				itemJson.add(order.getPriceCalc());
+				
+				arrayB.add(itemJson);
+			}
+		}
+
+		JSONObject itemJSON = new JSONObject();
+
+		// ADD DATA
+		itemJSON.put("buy", arrayA);
+		itemJSON.put("sell", arrayB);
+		itemJSON.put("pair", have + ":" + want);
+
+		
+		return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				//.entity(StrJSonFine.convert(itemJSON))
+				.entity(itemJSON.toJSONString())
+				//.entity(itemJSON.toString())
+				.build();
+		
+	}
+
+
+	/*
 	 * ************* PERSON **************
 	 */
 	@GET
 	@Path("personheight")
 	public Response personHeight() {
 		
-		long height = dcSet.getItemPersonMap().getSize();
+		long height = dcSet.getItemPersonMap().getLastKey();
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
@@ -1448,7 +1618,7 @@ public class API {
 						}
 					}
 					
-				if (ansver.size()== 0) {
+				if (ansver.isEmpty()) {
 					
 					ansver.put("Error", "Public Key Not Found");
 				}
@@ -1512,7 +1682,7 @@ public class API {
 	
 	@POST
 	@Path("verifysignature")
-	public String verifysignature(String x) {
+	public Response verifysignature(String x) {
 		try {
 			// READ JSON
 			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
@@ -1541,8 +1711,13 @@ public class API {
 
 			}
 
-			return String.valueOf(Crypto.getInstance().verify(publicKeyBytes,
-					signatureBytes, message.getBytes(StandardCharsets.UTF_8)));
+			return Response.status(200)
+				.header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(String.valueOf(Crypto.getInstance().verify(publicKeyBytes,
+						signatureBytes, message.getBytes(StandardCharsets.UTF_8))))
+				.build();
+			
 		} catch (NullPointerException e) {
 			// JSON EXCEPTION
 			throw ApiErrorFactory.getInstance().createError(

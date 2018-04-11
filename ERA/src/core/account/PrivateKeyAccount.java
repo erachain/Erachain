@@ -1,5 +1,8 @@
 package core.account;
 
+import java.util.Arrays;
+
+import core.crypto.Base58;
 import core.crypto.Crypto;
 import utils.Pair;
 
@@ -14,6 +17,8 @@ public class PrivateKeyAccount extends PublicKeyAccount {
 		this.keyPair = Crypto.getInstance().createKeyPair(seed);
 		this.publicKey = keyPair.getB();
 		this.address = Crypto.getInstance().getAddress(this.publicKey);
+		this.bytes = Base58.decode(address);
+		this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
 	}
 	
 	public byte[] getSeed()

@@ -26,17 +26,18 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-//	public static final int COLUMN_NOTE = 2;
+	// public static final int COLUMN_TEMPLATE = 2;
 	public static final int COLUMN_BODY = 2;
 	public static final int COLUMN_FAVORITE = 3;
 	List<R_SignNote> transactions;
-	private String[] columnNames = new String[] { "Timestamp", "Creator"/*, "Template"*/, "Statement" , "Favorite"};// ,
-																									// AssetCls.FEE_NAME});
+	private String[] columnNames = new String[] { "Timestamp",
+			"Creator"/* , "Template" */, "Statement", "Favorite" };// ,
+	// AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[] { true, true, true, false };
 
 	public Statements_Table_Model_Search() {
 
-	clear();
+		clear();
 	}
 
 	// set class
@@ -89,82 +90,80 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int row, int column) {
 		// TODO Auto-generated method stub
-	//	try {
-			if (this.transactions == null || this.transactions.size() - 1 < row) {
-				return null;
-			}
+		// try {
+		if (this.transactions == null || this.transactions.size() - 1 < row) {
+			return null;
+		}
 
-			R_SignNote record = (R_SignNote) this.transactions.get(row);
+		R_SignNote record = (R_SignNote) this.transactions.get(row);
 
-			switch (column) {
-			case COLUMN_TIMESTAMP:
+		switch (column) {
+		case COLUMN_TIMESTAMP:
 
-				return record.viewTimestamp(); 
-	/*			
-			case COLUMN_NOTE:
+			return record.viewTimestamp();
+		/*
+		 * case COLUMN_TEMPLATE:
+		 * 
+		 * if (record.getVersion() ==2) {
+		 * 
+		 * 
+		 * return " "; } //view version 1
+		 * 
+		 * 
+		 * 
+		 * return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE,
+		 * record.getKey()).toString();
+		 */
 
-				if (record.getVersion() ==2) {
-					
-					
-					return " ";
-				}
-				//view version 1
-				
-				
-				
-				return ItemCls.getItem(DBSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey()).toString();
-			*/	
+		case COLUMN_BODY:
 
-			case COLUMN_BODY:
+			if (record.getData() == null)
+				return "";
 
-				if (record.getData() == null)
-					return "";
-				
-				if(record.getVersion() == 2){
-					Tuple3<String, String, JSONObject> a;
-					try {
-						a = record.parse_Data_V2_Without_Files();
-					
-					return a.b;} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-							
-				
-				String str = "";
+			if (record.getVersion() == 2) {
+				Tuple3<String, String, JSONObject> a;
 				try {
-					JSONObject data = (JSONObject) JSONValue
-							.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
-					str = (String) data.get("!!&_Title");
-					if (str == null)
-						str = (String) data.get("Title");
+					a = record.parse_Data_V2_Without_Files();
+
+					return a.b;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
-
-					str = new String(record.getData(), Charset.forName("UTF-8"));
+					e.printStackTrace();
 				}
-				if (str == null)
-					return "";
-				if (str.length() > 50)
-					return str.substring(0, 50) + "...";
-				return str;// transaction.viewReference();//.viewProperies();
-			case COLUMN_CREATOR:
-
-				return record.getCreator().getPersonAsString();
-			case COLUMN_FAVORITE:
-				return record.isFavorite();
 			}
 
-			return null;
+			String str = "";
+			try {
+				JSONObject data = (JSONObject) JSONValue
+						.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
+				str = (String) data.get("!!&_Title");
+				if (str == null)
+					str = (String) data.get("Title");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
 
-		//} catch (Exception e) {
-			// LOGGER.error(e.getMessage(),e);
-		//	return null;
-		//}
+				str = new String(record.getData(), Charset.forName("UTF-8"));
+			}
+			if (str == null)
+				return "";
+			if (str.length() > 50)
+				return str.substring(0, 50) + "...";
+			return str;// transaction.viewReference();//.viewProperies();
+		case COLUMN_CREATOR:
+
+			return record.getCreator().getPersonAsString();
+		case COLUMN_FAVORITE:
+			return record.isFavorite();
+		}
+
+		return null;
+
+		// } catch (Exception e) {
+		// LOGGER.error(e.getMessage(),e);
+		// return null;
+		// }
 	}
 
-	
 	private List<R_SignNote> read_Statement(String str, Long key, boolean b) {
 		List<R_SignNote> tran;
 		ArrayList<Transaction> db_transactions;
@@ -173,89 +172,94 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 		// база данных
 		DCSet dcSet = DCSet.getInstance();
 		// читаем все блоки
-		SortableList<byte[], Block> lists = dcSet.getBlockMap().getList();
+		SortableList<Integer, Block> lists = dcSet.getBlockMap().getList();
 		// проходим по блокам
-		for (Pair<byte[], Block> list : lists) {
+		for (Pair<Integer, Block> list : lists) {
 
 			// читаем транзакции из блока
 			db_transactions = (ArrayList<Transaction>) list.getB().getTransactions();
 			// проходим по транзакциям
 			for (Transaction transaction : db_transactions) {
 				// если ноте то пишем в transactions
-				
-				if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION){
+
+				if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
 					R_SignNote statement = (R_SignNote) transaction;
 					// filter Title
 					statement = (R_SignNote) transaction;
-					if (str != null && !str.equals("")){
-						
-						if (filter_str(str, statement, b ))	tran.add(statement);
+					if (str != null && !str.equals("")) {
+
+						if (filter_str(str, statement, b))
+							tran.add(statement);
 					}
-					if (key >0){
-						if(statement.getKey() == key) tran.add(statement);
-						
+					if (key > 0) {
+						if (statement.getKey() == key)
+							tran.add(statement);
+
 					}
 				}
 			}
 
 		}
-		
+
 		// filter key
-		if (key >0){
-			
+		if (key > 0) {
+
 		}
-		
+
 		return tran;
 
 	}
-	
+
 	public void Find_item_from_key(String text) {
 		// TODO Auto-generated method stub
-		if (text.equals("") || text == null) return;
-		if (!text.matches("[0-9]*"))return;
-		if (new Long(text) < 1) return;
-		transactions = read_Statement("", new Long (text), false);
+		if (text.equals("") || text == null)
+			return;
+		if (!text.matches("[0-9]*"))
+			return;
+		if (new Long(text) < 1)
+			return;
+		transactions = read_Statement("", new Long(text), false);
 		fireTableDataChanged();
-		
-		
+
 	}
-	public void clear(){
+
+	public void clear() {
 		transactions = new ArrayList<R_SignNote>();
 		fireTableDataChanged();
-		
-		
+
 	}
-	public void set_Filter_By_Name(String str, boolean b){
+
+	public void set_Filter_By_Name(String str, boolean b) {
 		transactions = read_Statement(str, (long) -1, b);
 		fireTableDataChanged();
-		
-		
+
 	}
-	private boolean filter_str(String filter, R_SignNote record, boolean case1){
+
+	private boolean filter_str(String filter, R_SignNote record, boolean case1) {
 		if (record.getData() == null)
 			return false;
-		
-		if(record.getVersion() == 2){
+
+		if (record.getVersion() == 2) {
 			Tuple3<String, String, JSONObject> a;
 			try {
 				a = record.parse_Data_V2_Without_Files();
 				String base = a.b;
-				if (!case1){
-				filter = filter.toLowerCase();
-				base = base.toLowerCase();
+				if (!case1) {
+					filter = filter.toLowerCase();
+					base = base.toLowerCase();
 				}
-				if (base.contains(filter)) return true;
-				
+				if (base.contains(filter))
+					return true;
+
 				return false;
-					} catch (Exception e) {
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return false;
 			}
-			
+
 		}
-					
-		
+
 		String str = "";
 		try {
 			JSONObject data = (JSONObject) JSONValue
@@ -270,11 +274,10 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 		}
 		if (str == null)
 			return false;
-		if (str.contains(filter)) return true;
+		if (str.contains(filter))
+			return true;
 		return false;// t
-		
-		
-		
+
 	}
 
 }

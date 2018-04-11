@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import core.item.ItemCls;
+import gui.items.ImageCropDialog;
 import lang.Lang;
 
 
@@ -98,14 +100,14 @@ public class My_Add_Image_Panel extends JLabel {
 			System.out.println("You chose to open this file: " + chooser.getSelectedFile().getName());
 			File file = new File(chooser.getSelectedFile().getPath());
 			// если размер больше 30к то не вставляем
-			if (file.length() > ItemCls.MAX_IMAGE_LENGTH) {
+			/*if (file.length() > ItemCls.MAX_IMAGE_LENGTH) {
 				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("File too Large"),
 						Lang.getInstance().translate("File too Large"), JOptionPane.ERROR_MESSAGE);
 				return;
-			}
+			}*/
 
 			// его надо в базу вставлять
-			imgButes = null;
+			/*imgButes = null;
 			try {
 				imgButes = getBytesFromFile(file);
 			} catch (IOException e) {
@@ -148,6 +150,36 @@ public class My_Add_Image_Panel extends JLabel {
 				th.setText("");
 			} else {
 				th.setText(image_Label_text);
+			}*/
+			
+			if (true || file.length() > 21000) {
+				new ImageCropDialog(file, max_widht, max_Height) {
+					@Override
+					public void onFinish(BufferedImage image) {
+						th.setIcon(new ImageIcon(image));
+						th.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+						th.setText(image_Label_text);
+	                    ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
+	                    try {
+	                    	ImageIO.write(image, "jpeg", imageStream);
+	                    	imgButes = imageStream.toByteArray();
+	                    }
+	                    catch (Exception e) {
+	                    	e.printStackTrace();
+	                    }
+					}
+				};				
+			} else {
+                try {
+    				imgButes = getBytesFromFile(file);
+        			InputStream inputStream = new ByteArrayInputStream(imgButes);
+    				BufferedImage image1 = ImageIO.read(inputStream);
+    				ImageIcon image = new ImageIcon(image1);
+                	imgButes = getBytesFromFile(file);
+                }
+                catch (Exception e) {
+                	e.printStackTrace();
+                }
 			}
 		}
 	}

@@ -3,6 +3,10 @@ package gui.items.persons;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.Null;
+
+import org.apache.log4j.Logger;
+
+import core.BlockGenerator;
 import core.item.ItemCls;
 import core.item.persons.PersonCls;
 import datachain.DCSet;
@@ -12,6 +16,8 @@ import lang.Lang;
 
 @SuppressWarnings("serial")
 public class TableModelPersons extends TableModelItems {
+	
+	static Logger LOGGER = Logger.getLogger(TableModelPersons.class.getName());
 	public static final int COLUMN_KEY = 0;
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_BORN = 2;
@@ -136,7 +142,13 @@ public class TableModelPersons extends TableModelItems {
 			PersonCls pers = (PersonCls) db.get(key_filter);
 			if ( pers == null) return;
 			list.add(pers);
-			this.fireTableDataChanged();
+			try {
+				this.fireTableDataChanged();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				LOGGER.info("fireTableDataChanged ?");
+			}
 		
 		
 	}

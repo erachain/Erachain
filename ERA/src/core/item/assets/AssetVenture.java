@@ -56,6 +56,8 @@ public class AssetVenture extends AssetCls {
 	
 	public String getItemSubType() { return "venture"; }
 
+	public int getMinNameLen() { return BlockChain.DEVELOP_USE?10:12; }
+
 	public Long getQuantity(DCSet dc) {		
 		return this.quantity;
 	}
@@ -224,7 +226,8 @@ public class AssetVenture extends AssetCls {
 		// ADD DATA
 		assetJSON.put("quantity", this.getQuantity(DCSet.getInstance()));
 		assetJSON.put("scale", this.getScale());
-		assetJSON.put("isDivisible", this.isDivisible());
+		assetJSON.put("divisible", this.isDivisible());
+		assetJSON.put("movable", this.isMovable());
 		
 		return assetJSON;
 	}

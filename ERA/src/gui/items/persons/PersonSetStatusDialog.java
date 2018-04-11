@@ -1,5 +1,6 @@
 package gui.items.persons;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.nio.charset.Charset;
@@ -103,12 +104,14 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		    jFeeTxt.setText("0");
 		    jParentRecTxt.setText("0");
 		setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+	//	 this.setPreferredSize(new Dimension(600,450));
         setModal(true);
  		//PACK
-	//	this.pack();
+        this.pack();
      //   this.setResizable(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+       
 	   
 	}
 	
@@ -131,7 +134,7 @@ this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 			return record;
 		}
 		
-		record = R_Vouch.getVouchingRecord(DCSet.getInstance(), jParentRecTxt.getText());
+		record = DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), jParentRecTxt.getText());
 		if (record == null) {
 			infoPanel.show_mess(Lang.getInstance().translate("Error")+" - use 1233-321.");
 	        jLabel_RecordInfo.setViewportView(infoPanel);

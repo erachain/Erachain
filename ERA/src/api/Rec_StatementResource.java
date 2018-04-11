@@ -56,22 +56,22 @@ public class Rec_StatementResource {
 			PrivateKeyAccount maker = resultRequet.b;
 			int feePow = resultRequet.c;
 
-			String noteKeyString = (String) jsonObject.get("note");
+			String templateKeyString = (String) jsonObject.get("template");
 			String message = (String) jsonObject.get("message");
 			String isTextMessageString = (String) jsonObject.get("istextmessage");
 			String encryptString = (String) jsonObject.get("encrypt");
 
 			if (maker == null)
-				return "use parameters: note=12&maker=ADDRESS&message=MESS&istextmessage=true&encrypt=true&password=PASSWORD";
+				return "use parameters: template=12&maker=ADDRESS&message=MESS&istextmessage=true&encrypt=true&password=PASSWORD";
 					
 			boolean isTextMessage = true;
 			if (isTextMessageString != null) {
 				isTextMessage = Boolean.valueOf(isTextMessageString);
 			}
 
-			long noteKey = 0l;
-			if (noteKeyString != null) {
-				noteKey = Long.valueOf(noteKeyString);
+			long templateKey = 0l;
+			if (templateKeyString != null) {
+				templateKey = Long.valueOf(templateKeyString);
 			}
 			
 			
@@ -118,7 +118,7 @@ public class Rec_StatementResource {
 		/*	Pair<Transaction, Integer> result = Controller.getInstance()
 					.signNote(false,
 							maker,
-							feePow, noteKey, messageBytes,
+							feePow, templateKey, messageBytes,
 							isTextByte, encrypted);
 	
 			if (result.getB() == Transaction.VALIDATE_OK)

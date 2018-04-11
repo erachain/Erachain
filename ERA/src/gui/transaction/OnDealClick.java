@@ -295,8 +295,8 @@ public class OnDealClick
 		case Transaction.ITEM_IMPRINT_DOES_NOT_EXIST:
 			mess = "Item imprint does not exist";
 			break;
-		case Transaction.ITEM_NOTE_NOT_EXIST:
-			mess = "Item note does not exist";
+		case Transaction.ITEM_TEMPLATE_NOT_EXIST:
+			mess = "Item template does not exist";
 			break;
 		case Transaction.ITEM_PERSON_NOT_EXIST:
 			mess = "Item person does not exist";

@@ -61,10 +61,10 @@ public class RecStatementDetailsFrame extends Rec_DetailsFrame
 			++detailGBC.gridy;
 			detailGBC.gridx = 1;
 			detailGBC.gridwidth = 3;		           
-			JTextField note = new JTextField(Controller.getInstance().getNote( r_Statement.getKey()).toString());
-			note.setEditable(false);
-			MenuPopupUtil.installContextMenu(note);
-			this.add(note, detailGBC);	
+			JTextField template = new JTextField(Controller.getInstance().getTemplate( r_Statement.getKey()).toString());
+			template.setEditable(false);
+			MenuPopupUtil.installContextMenu(template);
+			this.add(template, detailGBC);	
 		}
 		
 		if (r_Statement.getData() != null) {

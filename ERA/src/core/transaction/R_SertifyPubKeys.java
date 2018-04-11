@@ -32,17 +32,10 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.statuses.StatusCls;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
 import core.item.ItemCls;
-import core.item.notes.NoteCls;
-import core.item.notes.NoteFactory;
-import core.item.persons.PersonCls;
-import core.item.persons.PersonFactory;
+import core.item.persons.PersonHuman;
 
-import utils.Converter;
-import utils.DateTimeFormat;
 
 // if person has not ALIVE status - add it
 // end_day = this.add_day + this.timestanp(days)
@@ -147,10 +140,18 @@ public class R_SertifyPubKeys extends Transaction {
 		return this.key;
 	}
 
+	@Override
+	public List<PublicKeyAccount> getPublicKeys() 
+	{
+		return this.sertifiedPublicKeys;
+	}
+
 	public List<PublicKeyAccount> getSertifiedPublicKeys() 
 	{
 		return this.sertifiedPublicKeys;
 	}
+
+	
 	public List<String> getSertifiedPublicKeysB58() 
 	{
 		List<String> pbKeys = new ArrayList<String>();
@@ -174,7 +175,12 @@ public class R_SertifyPubKeys extends Transaction {
 		};
 		return items;
 	}
-	
+
+	@Override
+	public List<byte[]> getSignatures() {
+		return sertifiedSignatures;
+	}
+
 	public int getAddDay() 
 	{
 		return this.add_day;
@@ -216,7 +222,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 		//ADD CREATOR/SERVICE/DATA
 		transaction.put("key", this.key);
-		List<String> pbKeys = new ArrayList<String>();
+		//List<String> pbKeys = new ArrayList<String>();
 		transaction.put("sertified_public_keys", this.getSertifiedPublicKeysB58());
 		transaction.put("sertified_signatures", this.getSertifiedSignaturesB58());
 		transaction.put("add_day", this.add_day);
@@ -376,7 +382,7 @@ public class R_SertifyPubKeys extends Transaction {
 	@Override
 	public int getDataLength(boolean asPack)
 	{
-		// not include note reference
+		// not include reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
 		int accountsSize = this.sertifiedPublicKeys.size(); 
 		len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;
@@ -386,7 +392,7 @@ public class R_SertifyPubKeys extends Transaction {
 	//VALIDATE
 
 	@Override
-	public boolean isSignatureValid() {
+	public boolean isSignatureValid(DCSet dcSet) {
 
 		if ( this.signature == null || this.signature.length != Crypto.SIGNATURE_LENGTH
 				|| this.signature == new byte[Crypto.SIGNATURE_LENGTH] )
@@ -444,7 +450,7 @@ public class R_SertifyPubKeys extends Transaction {
 		
 		int result = super.isValid(dcSet, releaserReference);
 		if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
-			long personsCount = dcSet.getItemPersonMap().getSize();
+			long personsCount = dcSet.getItemPersonMap().getLastKey();
 			if (personsCount < 20) {
 				// FIRST Persons only by ME
 				// FIRST Persons only by ADMINS
@@ -500,12 +506,12 @@ public class R_SertifyPubKeys extends Transaction {
 		int blockIndex = -1;
 		//Block block = this.getBlock(db);// == null (((
 		if (block == null) {
-			blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
+			blockIndex = db.getBlockMap().last().getHeight(db);
 		} else {
 			blockIndex = block.getHeight(db);
 			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
-				blockIndex = db.getBlockMap().getLastBlock().getHeight(db) + 1;
+				blockIndex = db.getBlockMap().last().getHeight(db) + 1;
 			}
 			//transactionIndex = this.getSeqNo(db);
 			transactionIndex = block.getTransactionSeq(signature);
@@ -580,7 +586,12 @@ public class R_SertifyPubKeys extends Transaction {
 		{
 			address = publicAccount.getAddress();
 			db.getAddressPersonMap().addItem(address, itemA);
-			db.getPersonAddressMap().addItem(this.key, address, itemP);			
+			db.getPersonAddressMap().addItem(this.key, address, itemP);
+			
+			if (!db.getAddressTime_SignatureMap().contains(address)) {
+				db.getAddressTime_SignatureMap().set(address, this.signature);
+			}
+
 		}
 
 	}

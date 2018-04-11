@@ -110,13 +110,13 @@ public class TestRecAsset {
 		issueAssetTransaction.sign(maker, false);
 		
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
-		assertEquals(true, issueAssetTransaction.isSignatureValid());
+		assertEquals(true, issueAssetTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 		
 		//CHECK IF ISSUE ASSET IS INVALID
-		assertEquals(false, issueAssetTransaction.isSignatureValid());
+		assertEquals(false, issueAssetTransaction.isSignatureValid(db));
 	}
 		
 
@@ -300,7 +300,7 @@ public class TestRecAsset {
 		assetTransfer.sign(maker, false);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
-		assertEquals(true, assetTransfer.isSignatureValid());
+		assertEquals(true, assetTransfer.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		assetTransfer = new R_Send(maker, FEE_POWER, recipient, 0, BigDecimal.valueOf(100).setScale(8), timestamp, maker.getLastTimestamp(db));
@@ -308,7 +308,7 @@ public class TestRecAsset {
 		assetTransfer = new R_Send(maker, FEE_POWER, recipient, 0, BigDecimal.valueOf(100).setScale(8), timestamp+1, maker.getLastTimestamp(db), assetTransfer.getSignature());
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
-		assertEquals(false, assetTransfer.isSignatureValid());
+		assertEquals(false, assetTransfer.isSignatureValid(db));
 	}
 	
 	@Test
@@ -542,7 +542,7 @@ public class TestRecAsset {
 		messageTransaction.sign(maker, false);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
-		assertEquals(true, messageTransaction.isSignatureValid());
+		assertEquals(true, messageTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(8),
@@ -554,7 +554,7 @@ public class TestRecAsset {
 				timestamp+1, maker.getLastTimestamp(db), messageTransaction.getSignature());
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
-		assertEquals(false, messageTransaction.isSignatureValid());
+		assertEquals(false, messageTransaction.isSignatureValid(db));
 	}
 	
 	@Test

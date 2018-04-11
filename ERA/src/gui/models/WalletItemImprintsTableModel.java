@@ -21,10 +21,11 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	public static final int COLUMN_CONFIRMED = 3;
+	public static final int COLUMN_FAVORITE = 4;
 	
 	private SortableList<Tuple2<String, String>, ImprintCls> imprints;
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Confirmed" , "Favorite"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false};
 	
 	public WalletItemImprintsTableModel()
@@ -100,7 +101,9 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		case COLUMN_CONFIRMED:
 			
 			return imprint.isConfirmed();
+		case COLUMN_FAVORITE:
 			
+			return imprint.isFavorite();	
 		}
 		
 		return null;
@@ -125,7 +128,7 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_IMPRINT_TYPE)
+		if(message.getType() == ObserverMessage.LIST_IMPRINT_TYPE || message.getType() == ObserverMessage.WALLET_LIST_IMPRINT_TYPE)
 		{
 			if(this.imprints == null)
 			{
@@ -138,21 +141,25 @@ public class WalletItemImprintsTableModel extends TableModelCls<Tuple2<String, S
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.REMOVE_IMPRINT_TYPE)
+		if(message.getType() == ObserverMessage.ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.REMOVE_IMPRINT_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_IMPRINT_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	
 	}
-	public void addObservers() 
-	{
+	public void addObservers(){
+		Controller.getInstance().wallet.database.getImprintMap().addObserver(this);
 		
-		Controller.getInstance().addWalletListener(this);
+		
 	}
 	
 	
 	public void removeObservers() 
 	{
-	
-		Controller.getInstance().deleteObserver(this);
+		//this.persons.removeObserver();
+		//Controller.getInstance().deleteWalletObserver(this);
+		Controller.getInstance().wallet.database.getImprintMap().deleteObserver(this);
+		//Controller.getInstance().wallet.database.getImprintMap().deleteObserver(imprints);
+		imprints.removeObserver();
 	}
 }

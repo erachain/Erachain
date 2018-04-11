@@ -12,14 +12,18 @@ import ntp.NTP;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
+import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
@@ -39,7 +43,7 @@ public class TestRec_Send {
 
 	long ERM_KEY = 3;
 	long FEE_KEY = AssetCls.FEE_KEY;
-	byte FEE_POWER = (byte)1;
+	byte FEE_POWER = (byte)0;
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
@@ -134,8 +138,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 		//// MESSAGE ONLY
 		r_SendV3.orphan(db, false);
@@ -181,8 +185,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 
 		//// AMOUNT ONLY
@@ -227,8 +231,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.getKey(), messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 		//// EMPTY - NOT AMOUNT and NOT TEXT
 		r_SendV3.orphan(db, false);
@@ -271,8 +275,8 @@ public class TestRec_Send {
 		assertEquals(0, messageTransactionV3_2.getKey());
 		assertEquals(r_SendV3.getAmount(), messageTransactionV3_2.getAmount());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 		// NEGATE for test HOLD ///////////////////
 		amount = amount.negate();
@@ -315,8 +319,8 @@ public class TestRec_Send {
 		assertEquals(r_SendV3.isEncrypted(), messageTransactionV3_2.isEncrypted());
 		assertEquals(r_SendV3.isText(), messageTransactionV3_2.isText());
 		
-		assertEquals(r_SendV3.isSignatureValid(), true);
-		assertEquals(messageTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(r_SendV3.isSignatureValid(db), true);
+		assertEquals(messageTransactionV3_2.isSignatureValid(db), true);		
 
 }
 	
@@ -407,8 +411,8 @@ public class TestRec_Send {
 		assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
 		assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-		assertEquals(arbitraryTransactionV3.isSignatureValid(), true);
-		assertEquals(arbitraryTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+		assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);		
 	}	
 	
 	@Test
@@ -474,8 +478,40 @@ public class TestRec_Send {
 		assertEquals(arbitraryTransactionV3.getService(), arbitraryTransactionV3_2.getService());
 		assertEquals(arbitraryTransactionV3.getCreator(), arbitraryTransactionV3_2.getCreator());
 
-		assertEquals(arbitraryTransactionV3.isSignatureValid(), true);
-		assertEquals(arbitraryTransactionV3_2.isSignatureValid(), true);		
+		assertEquals(arbitraryTransactionV3.isSignatureValid(db), true);
+		assertEquals(arbitraryTransactionV3_2.isSignatureValid(db), true);		
 	}	
+
+	@Test
+	public void makeMessageTransactionV3_DISCREDIR_ADDRESSES() 
+	{
+		
+		// HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7 - 
+		PublicKeyAccount maker = new PublicKeyAccount(Transaction.DISCREDIR_ADDRESSES[0]);
+		Account recipient = new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
+		BigDecimal amount = BigDecimal.valueOf(49800).setScale(8); 
+		
+		long era_key = 1l;
+		/// DISCREDIR_ADDRESSES
+		R_Send r_Send = new R_Send(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
+		
+		byte[] data = r_Send.toBytes(false, null);
+		int port = Controller.getInstance().getNetworkPort();
+		data = Bytes.concat(data, Ints.toByteArray(port));
+		byte[] digest = Crypto.getInstance().digest(data);
+		digest = Bytes.concat(digest, digest);
+
+		R_Send r_SendSigned = new R_Send(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l, digest);
+		String raw = Base58.encode(r_SendSigned.toBytes(true, null));
+		System.out.print(raw);
+		
+		//DCSet dcSet = DCSet.getInstance();
+		//assertEquals(r_SendSigned.isSignatureValid(dcSet), true);
+		//r_SendSigned.setDC(dcSet, false);
+		//assertEquals(r_SendSigned.isValid(dcSet, null), Transaction.VALIDATE_OK);
+		//Controller.getInstance().broadcastTransaction(r_SendSigned);
+
+	}
 	
+
 }

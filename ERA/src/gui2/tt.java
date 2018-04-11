@@ -48,6 +48,8 @@ public tt() {
    DefaultMutableTreeNode statuses_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Statuses"));
    DefaultMutableTreeNode unions_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unions"));
    DefaultMutableTreeNode votings_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Votings"));
+   DefaultMutableTreeNode hashes_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Unique Hashes"));
+   DefaultMutableTreeNode linked_hashes_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Linked Hashes"));
    DefaultMutableTreeNode records_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Records"));
    DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
    DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
@@ -66,6 +68,8 @@ public tt() {
    root.add(statuses_Node);
    root.add(unions_Node);
    root.add(votings_Node);
+   root.add(hashes_Node);
+   root.add(linked_hashes_Node);
    root.add(records_Node);
    root.add(other_Node);
 
@@ -129,8 +133,17 @@ public tt() {
    
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
+   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));
+   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Blocks")));
+   
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Unique Hashes")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unique Hashes")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unique Hashes")));
+   hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Unique Hash")));
    
    
+   linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Linked Hash")));
+   linked_hashes_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Linked Hash")));
 
    // ������� ������� ���������� � ��������� ������� ������
    tree = new JTree(root);

@@ -193,6 +193,12 @@ public class CancelOrderTransaction extends Transaction
 
 	public static void process_it(DCSet db, Order order) 
 	{
+		if (false & !db.isFork() &&
+				(order.getHave() == 1027l && order.getWant() == 2l
+				|| order.getHave() == 2l && order.getWant() == 1027l)) {
+			int ii = 123;
+			ii++;
+		}
 		//SET ORPHAN DATA
 		db.getCompletedOrderMap().add(order);
 		

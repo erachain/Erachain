@@ -86,8 +86,8 @@ import core.web.ProfileHelper;
 import core.web.ServletUtils;
 import core.web.WebNameStorageHistoryHelper;
 import core.web.blog.BlogEntry;
-import database.DBSet;
 import datachain.DCSet;
+import datachain.ItemAssetMap;
 import datachain.ItemPersonMap;
 import datachain.NameMap;
 import lang.Lang;
@@ -392,7 +392,7 @@ public class WebResource {
 				}
 			}
 
-			if (namesAsList.size() > 0) {
+			if (!namesAsList.isEmpty()) {
 
 				if (name == null) {
 					Profile activeProfileOpt = ProfileHelper.getInstance()
@@ -480,7 +480,7 @@ public class WebResource {
 					List<Name> namesAsList = new CopyOnWriteArrayList<Name>(
 							Controller.getInstance().getNamesAsList());
 
-					if (namesAsList.size() > 0) {
+					if (!namesAsList.isEmpty()) {
 						name = namesAsList.get(0).getName();
 					}
 				}
@@ -936,7 +936,7 @@ public class WebResource {
 			name = Controller.getInstance().getName(profileName);
 		}
 
-		if (namesAsList.size() > 0) {
+		if (!namesAsList.isEmpty()) {
 
 			if (name == null) {
 				Profile activeProfileOpt = ProfileHelper.getInstance()
@@ -1074,7 +1074,7 @@ public class WebResource {
 	public static String selectFirstElementOpt(Document htmlDoc, String tag) {
 		Elements titleElements = htmlDoc.select(tag);
 		String title = null;
-		if (titleElements.size() > 0) {
+		if (!titleElements.isEmpty()) {
 			title = titleElements.get(0).text();
 		}
 		return title;
@@ -1083,7 +1083,7 @@ public class WebResource {
 	public static String selectDescriptionOpt(Document htmlDoc) {
 		String result = "";
 		Elements descriptions = htmlDoc.select("meta[name=\"description\"]");
-		if (descriptions.size() > 0) {
+		if (!descriptions.isEmpty()) {
 			Element descr = descriptions.get(0);
 			if (descr.hasAttr("content")) {
 				result = descr.attr("content");
@@ -1124,7 +1124,7 @@ public class WebResource {
 	}
 
 	String[] imgsArray = { "Erachain.org.png", "logo_header.png", "Erachain.org-user.png",
-			"logo_bottom.svg", "banner_01.png", "loading.gif",
+			"logo_bottom.png", "banner_01.png", "loading.gif",
 			"00_generating.png", "01_genesis.jpg", "02_payment_in.png",
 			"02_payment_out.png", "03_name_registration.png",
 			"04_name_update.png", "05_name_sale.png",
@@ -1216,6 +1216,39 @@ public class WebResource {
 		
 	}
 
+	@Path("index/assetimage")
+	@GET
+	@Produces({"image/png", "image/jpg"})
+	public Response getAssetImage() {
+		
+		long key = new Long(request.getParameter("key"));
+	 if (key <=0) {
+		  return error404(request, null);
+	 }
+		
+	 ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		// DOES EXIST
+		if (!map.contains(key)) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					Transaction.ITEM_ASSET_NOT_EXIST);
+		}
+		
+		AssetCls person = (AssetCls)map.get(key);
+		JSONObject jj = new JSONObject();
+		byte[] b = person.getImage();
+		if (b.length<=0){	
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
+					"Invalid Image");
+			
+		
+		}
+		
+	return Response.ok(new ByteArrayInputStream(b)).build();
+	//	return Response.ok(file, "image/png").build();
+		
+	}
 
 	@Path("index/libs/css/style.css")
 	@GET
@@ -1265,6 +1298,31 @@ public class WebResource {
 		}
 	}
 
+	
+	@Path("index/libs/js/utils.js")
+	@GET
+	public Response utilsjs() {
+		File file = new File("web/libs/js/utils.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	@Path("index/libs/js/marked.js")
+	@GET
+	public Response markedjs() {
+		File file = new File("web/libs/js/marked.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/javascript").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
 	@Path("index/libs/js/third-party/highlight.pack.js")
 	@GET
 	public Response highlightpackjs() {
@@ -1309,6 +1367,30 @@ public class WebResource {
 
 		if (file.exists()) {
 			return Response.ok(file, "text/explorerStatements").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	@Path("index/libs/js/explorerTemplates.js")
+	@GET
+	public Response explorerTemplates() {
+		File file = new File("web/libs/js/explorerTemplates.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/explorerTemplates").build();
+		} else {
+			return error404(request, null);
+		}
+	}
+	
+	@Path("index/libs/js/explorerStatuses.js")
+	@GET
+	public Response explorerStatuses() {
+		File file = new File("web/libs/js/explorerStatuses.js");
+
+		if (file.exists()) {
+			return Response.ok(file, "text/explorerStatuses").build();
 		} else {
 			return error404(request, null);
 		}
@@ -1588,7 +1670,7 @@ public class WebResource {
 			}
 
 			// are we allowed to post
-			if (resultingNames.size() == 0 && resultingAccounts.size() == 0) {
+			if (resultingNames.isEmpty() && resultingAccounts.isEmpty()) {
 
 				pebbleHelper
 						.getContextMap()
@@ -1665,7 +1747,7 @@ public class WebResource {
 			}
 
 			// are we allowed to post
-			if (resultingNames.size() == 0 && resultingAccounts.size() == 0) {
+			if (resultingNames.isEmpty() && resultingAccounts.isEmpty()) {
 
 				pebbleHelper
 						.getContextMap()
@@ -3240,10 +3322,10 @@ public class WebResource {
 		}
 	}
 	
-	@Path("index/libs/js/third-party/qrcode.js")
+	@Path("index/libs/js/third-party/qrcode.min.js")
 	@GET
 	public Response qrcodejs() {
-		File file = new File("web/libs/js/third-party/qrcode.js");
+		File file = new File("web/libs/js/third-party/qrcode.min.js");
 
 		if (file.exists()) {
 			return Response.ok(file, "text/javascript").build();

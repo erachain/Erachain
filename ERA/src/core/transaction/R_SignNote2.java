@@ -24,25 +24,32 @@ import com.google.common.primitives.Longs;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.block.Block;
 import core.crypto.Base58;
 import core.item.ItemCls;
+import core.item.statements.StatementCls;
+import core.item.statements.StatementFactory;
+import core.item.statuses.StatusCls;
+import core.item.statuses.StatusFactory;
 import datachain.DCSet;
+import datachain.Issue_ItemMap;
+import datachain.Item_Map;
 
 
 
-public class R_SignNote2 extends Transaction {
+public class R_SignNote2 extends Issue_ItemRecord { //Transaction {
 
 	private static final byte TYPE_ID = (byte) SIGN_NOTE2_TRANSACTION;
-	private static final String NAME_ID = "Sign Note 2";
+	private static final String NAME_ID = "Issue Note 2";
 
-	protected static final byte HAS_NOTE_MASK = (byte)(1 << 7);
+	protected static final byte HAS_TEMPLATE_MASK = (byte)(1 << 7);
 	/*
 	PROPERTIES:
 	[0] - type
 	[1] - version 
 	******* prop 1
 	[2] bits [0] - has HEAD
-	[2] bits [1] - has NOTE and .key > 0
+	[2] bits [1] - has PLATE and .key > 0
 	[2] bits [2] - has DATA
 	[2] bits [3] - has encryptedDATA
 	[2] bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3 
@@ -57,7 +64,7 @@ public class R_SignNote2 extends Transaction {
 		*/
 	
 	protected String head;
-	protected long key; // key for Note
+	protected long key; // key for Template
 	protected byte[] publicData;
 	protected boolean publicData_isText;
 	protected byte[] encryptedData;
@@ -69,24 +76,24 @@ public class R_SignNote2 extends Transaction {
 	protected PublicKeyAccount[] signers; // for all it need encrypt
 	protected byte[][] signatures; // - multi sign
 	
-	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, long timestamp, Long reference) {
 		
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, statement, feePow, timestamp, reference);
 
-		this.key = noteKey;
+		this.key = templateKey;
 		this.publicData = publicData;
 		this.publicData_isText = pubData_isText;
 		this.encryptedData = encryptedData;
 		this.encryptedData_isText = encData_isText;
 	}
-	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files,
 			long timestamp, Long reference) {
 		
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+		super(typeBytes, NAME_ID, creator, statement, feePow, timestamp, reference);
 
-		this.key = noteKey;
+		this.key = templateKey;
 		this.publicData = publicData;
 		this.publicData_isText = pubData_isText;
 		this.encryptedData = encryptedData;
@@ -96,26 +103,26 @@ public class R_SignNote2 extends Transaction {
 		this.files = files;
 	}
 	
-	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long noteKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte[] typeBytes, PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, long timestamp, Long reference, byte[] signature) {
-		this(typeBytes, creator, feePow, noteKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
+		this(typeBytes, creator, statement, feePow, templateKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
 		this.signature = signature;
 		//this.calcFee();
 	}
-	public R_SignNote2(PublicKeyAccount creator, byte feePow, long noteKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference) {
 
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, noteKey, 
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, statement, feePow, templateKey, 
 				publicData, pubData_isText,
 				encryptedData, encData_isText, parents, hashes, files,
 				timestamp, reference);
 		// set props
 		this.setTypeBytes();
 	}
-	public R_SignNote2(PublicKeyAccount creator, byte feePow, long noteKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(PublicKeyAccount creator, StatementCls statement, byte feePow, long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference, byte[] signature) {
 
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, noteKey, 
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, statement, feePow, templateKey, 
 				publicData, pubData_isText,
 				encryptedData, encData_isText, parents, hashes, files,
 				timestamp, reference);
@@ -123,13 +130,19 @@ public class R_SignNote2 extends Transaction {
 		// set props
 		this.setTypeBytes();
 	}
-	public R_SignNote2(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, byte feePow,  long noteKey, byte[] publicData, boolean pubData_isText,
+	public R_SignNote2(byte prop1, byte prop2, byte prop3, PublicKeyAccount creator, StatementCls statement, byte feePow,  long templateKey, byte[] publicData, boolean pubData_isText,
 			byte[] encryptedData, boolean encData_isText, Long[] parents, byte[][] hashes, byte[][] files, long timestamp, Long reference)
 	{
-		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, feePow, noteKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
+		this(new byte[]{TYPE_ID, prop1, prop2, prop3}, creator, statement, feePow, templateKey, publicData, pubData_isText, encryptedData, encData_isText, timestamp, reference);
 	}
 
 	//GETTERS/SETTERS
+
+	// NOT GENESIS ISSUE START FRON NUM
+	protected long getStartKey() {
+		return 0l;
+	}
+
 	public void setSidnerSignature(int index, byte[] signature) {
 		if (signatures == null)
 			signatures = new byte[signers.length][];
@@ -138,15 +151,15 @@ public class R_SignNote2 extends Transaction {
 		
 	}
 	
-	public static boolean hasNote(byte[] typeBytes) {
+	public static boolean hasTemplate(byte[] typeBytes) {
 		if (typeBytes[2] < 0 ) return true;
 		return false;
 	}
-	protected boolean hasNote() {
-		return hasNote(this.typeBytes);
+	protected boolean hasTemplate() {
+		return hasTemplate(this.typeBytes);
 	}
 	public static int getSignersLength(byte[] typeBytes) {
-		byte mask = ~HAS_NOTE_MASK;
+		byte mask = ~HAS_TEMPLATE_MASK;
 		return typeBytes[2] & mask;
 	}
 	
@@ -164,8 +177,8 @@ public class R_SignNote2 extends Transaction {
 				prop1 = (byte)4;
 			}
 		}
-		// set has NOTE byte
-		if (this.key > 0) prop1 = (byte) (HAS_NOTE_MASK | prop1);
+		// set has TEMPLATE byte
+		if (this.key > 0) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
 			
 		byte prop2 = 0;
 		if (publicData != null && publicData.length > 0) {
@@ -278,7 +291,7 @@ public class R_SignNote2 extends Transaction {
 		}
 
 		if (this.key > 0)
-			transaction.put("note", this.key);
+			transaction.put("template", this.key);
 
 		if (signers != null && signers.length >0) {
 			transaction.put("singers", this.getSignersB58());
@@ -339,10 +352,15 @@ public class R_SignNote2 extends Transaction {
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		position += SIGNATURE_LENGTH;
 
+		//READ STATEMENT
+		// Statement parse without reference - if is = signature
+		StatementCls statement = StatementFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
+		position += statement.getDataLength(false);
+
 		//////// local parameters
 		
 		long key = 0l;
-		if (hasNote(typeBytes)) 
+		if (hasTemplate(typeBytes)) 
 		{
 			//READ KEY
 			byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
@@ -396,7 +414,7 @@ public class R_SignNote2 extends Transaction {
 		if (signersLen == 0) {
 			if (!asPack) {
 				return null;
-				//new R_SignNote2(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+				//new R_SignNote2(typeBytes, creator, statement, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
 			} else {
 				return null;
 				//new R_SignNote2(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
@@ -477,7 +495,7 @@ public class R_SignNote2 extends Transaction {
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		// ITEM EXIST? - for assets transfer not need - amount expect instead
-		if (this.key > 0 && !db.getItemNoteMap().contains(this.key))
+		if (this.key > 0 && !db.getItemTemplateMap().contains(this.key))
 			return Transaction.ITEM_DOES_NOT_EXIST;
 
 		return Transaction.VALIDATE_OK;
@@ -486,27 +504,6 @@ public class R_SignNote2 extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
-	/*
-	public void process(DBSet db, boolean asPack) {
-
-		//UPDATE SENDER
-		super.process(db, asPack);
-		
-		// it in any time is unconfirmed! byte[] ref = this.getDBRef(db);
-		db.getAddressStatement_Refs().set(this.creator.getAddress(), this.key, this.signature);
-
-	}
-
-	public void orphan(DBSet db, boolean asPack) {
-
-		//UPDATE SENDER
-		super.orphan(db, asPack);
-						
-		db.getAddressStatement_Refs().delete(this.creator.getAddress(), this.key);
-
-	}
-	*/
-
 	@Override
 	public HashSet<Account> getInvolvedAccounts()
 	{

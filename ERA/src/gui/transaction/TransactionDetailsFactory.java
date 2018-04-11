@@ -15,12 +15,12 @@ import core.transaction.CreatePollTransaction;
 
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueNoteRecord;
+import core.transaction.GenesisIssueTemplateRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
-import core.transaction.IssueNoteRecord;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueUnionRecord;
@@ -289,13 +289,13 @@ public class TransactionDetailsFactory
 			
 			return issueImprintDetailsFrame ;	
 
-		case Transaction.ISSUE_NOTE_TRANSACTION:
+		case Transaction.ISSUE_TEMPLATE_TRANSACTION:
 			
-			IssueNoteRecord issueNote = (IssueNoteRecord) transaction;
-			IssueNoteDetailsFrame issueNoteDetailsFrame =   new IssueNoteDetailsFrame(issueNote);
-			gridBagConstraints.gridy = issueNoteDetailsFrame.labelGBC.gridy+1; 
-			issueNoteDetailsFrame. add(jLabel9, gridBagConstraints);
-			return issueNoteDetailsFrame;	
+			IssueTemplateRecord issueTemplate = (IssueTemplateRecord) transaction;
+			IssueTemplateDetailsFrame issueTemplateDetailsFrame =   new IssueTemplateDetailsFrame(issueTemplate);
+			gridBagConstraints.gridy = issueTemplateDetailsFrame.labelGBC.gridy+1; 
+			issueTemplateDetailsFrame. add(jLabel9, gridBagConstraints);
+			return issueTemplateDetailsFrame;	
 
 		case Transaction.ISSUE_UNION_TRANSACTION:
 			
@@ -323,14 +323,14 @@ public class TransactionDetailsFactory
 			
 			return genesisTransferAssetDetailsFrame;		
 			
-		case Transaction.GENESIS_ISSUE_NOTE_TRANSACTION:
+		case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
 			
-			GenesisIssueNoteRecord genesisIssueNoteRecord = (GenesisIssueNoteRecord) transaction;
-			GenesisIssueNoteDetailsFrame genesisIssueNoteDetailsFrame =    new GenesisIssueNoteDetailsFrame(genesisIssueNoteRecord);
-			gridBagConstraints.gridy = genesisIssueNoteDetailsFrame.labelGBC.gridy+1; 
-			genesisIssueNoteDetailsFrame. add(jLabel9, gridBagConstraints);
+			GenesisIssueTemplateRecord genesisIssueTemplateRecord = (GenesisIssueTemplateRecord) transaction;
+			GenesisIssueTemplateDetailsFrame genesisIssueTemplateDetailsFrame =    new GenesisIssueTemplateDetailsFrame(genesisIssueTemplateRecord);
+			gridBagConstraints.gridy = genesisIssueTemplateDetailsFrame.labelGBC.gridy+1; 
+			genesisIssueTemplateDetailsFrame. add(jLabel9, gridBagConstraints);
 			
-			return genesisIssueNoteDetailsFrame;	
+			return genesisIssueTemplateDetailsFrame;	
 
 		case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
 			

@@ -24,6 +24,7 @@ public class ApiService {
         s.add(SeedResource.class);  
         s.add(PeersResource.class);    
         s.add(TransactionsResource.class);
+        s.add(TelegramsResource.class);
         s.add(BlocksResource.class);
         s.add(AddressesResource.class);
         s.add(WalletResource.class);

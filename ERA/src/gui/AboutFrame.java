@@ -86,7 +86,7 @@ public class AboutFrame extends JDialog{
         //ADD GENERAL TABPANE TO FRAME
         getContentPane().add(this.aboutPanel);
         GridBagLayout gbl_aboutPanel = new GridBagLayout();
-        gbl_aboutPanel.columnWidths = new int[]{483, 181, 70, 0};
+        gbl_aboutPanel.columnWidths = new int[]{310, 181, 70, 200};
         gbl_aboutPanel.rowHeights = new int[]{252, 0, 0, 0, 0, 0};
         gbl_aboutPanel.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_aboutPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
@@ -96,7 +96,7 @@ public class AboutFrame extends JDialog{
         		//+ "Ермолаев Дмитрий Сергеевич");
         		+ Lang.getInstance().translate("Dmitrii Ermolaev"));
         lblAuthorsLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
-        lblAuthorsLabel.setForeground(Color.WHITE);
+        lblAuthorsLabel.setForeground(Color.RED);
         lblAuthorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
         GridBagConstraints gbc_lblAuthorsLabel = new GridBagConstraints();
         gbc_lblAuthorsLabel.fill = GridBagConstraints.BOTH;
@@ -108,7 +108,7 @@ public class AboutFrame extends JDialog{
 
         JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getVersion());
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
-        lblversionLabel.setForeground(Color.WHITE);
+        lblversionLabel.setForeground(Color.RED);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);
         GridBagConstraints gbc_lbllversionLabel = new GridBagConstraints();
         gbc_lbllversionLabel.fill = GridBagConstraints.BOTH;
@@ -120,7 +120,7 @@ public class AboutFrame extends JDialog{
         
         JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getBuildDateString());
         label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setForeground(Color.WHITE);
+        label.setForeground(Color.RED);
         label.setFont(new Font("Tahoma", Font.PLAIN, 13));
         GridBagConstraints gbc_label = new GridBagConstraints();
         gbc_label.insets = new Insets(0, 0, 5, 5);
@@ -133,6 +133,7 @@ public class AboutFrame extends JDialog{
         console_Text.setEditable(false);
         console_Text.setText("");
       //  console_Text.setSize(100,26);
+        console_Text.setForeground(Color.BLUE);
         console_Text.setFont(new Font("Tahoma", Font.PLAIN, 13));
         GridBagConstraints gbc_Console = new GridBagConstraints();
         gbc_Console.insets = new Insets(5, 5, 5, 5);

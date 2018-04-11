@@ -58,7 +58,7 @@ public Statuses_Library_Panel(PersonCls person){
        		//favoriteColumn.setCellRenderer(new Renderer_Boolean()); //personsTable.getDefaultRenderer(Boolean.class));
     //   		int rr = (int) (getFontMetrics( UIManager.getFont("Table.font")).stringWidth("0022-22-2222"));	
        		to_Date_Column1.setMinWidth(80);
-       		to_Date_Column1.setMaxWidth(200);
+      // 		to_Date_Column1.setMaxWidth(200);
        		to_Date_Column1.setPreferredWidth(120);//.setWidth(30);
       
        		
@@ -178,7 +178,7 @@ public Statuses_Library_Panel(PersonCls person){
 	Send_Coins_item_Menu.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Account account = statusModel.get_Creator_Account(row);
-			new Account_Send_Dialog(null, null, account, null);
+			new Account_Send_Dialog(null, null, account, null).show();
 
 		}
 	});

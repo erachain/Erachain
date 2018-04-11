@@ -39,12 +39,12 @@ public class Settings {
 	private static final Logger LOGGER = Logger.getLogger(Settings.class);
 
 	//NETWORK
-	private static final int DEFAULT_MIN_CONNECTIONS = 8; // for OWN maked connections
-	private static final int DEFAULT_MAX_CONNECTIONS = 20;
+	private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections
+	private static final int DEFAULT_MAX_CONNECTIONS = 32;
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>3; // 10000 
+	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2; // 10000 
 	private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
@@ -235,6 +235,7 @@ public class Settings {
 		return this.userPath;
 	}
 
+	// http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
 	public String getNotifyIncomingURL()
 	{
 		if(this.settingsJSON.containsKey("notify_incoming_url"))
@@ -248,7 +249,7 @@ public class Settings {
 	{
 		if(this.settingsJSON.containsKey("notify_incoming_confirmations"))
 		{
-			return (int) this.settingsJSON.get("notify_incoming_confirmations");
+			return (int) (long)this.settingsJSON.get("notify_incoming_confirmations");
 		}
 		
 		return NOTEFY_INCOMING_CONFIRMATIONS;
@@ -314,7 +315,7 @@ public class Settings {
 			
 			knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 			
-			if(!core.BlockChain.DEVELOP_USE && (knownPeers.size() == 0 || loadPeersFromInternet))
+			if(!core.BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet))
 			{
 				knownPeers.addAll(getKnownPeersFromInternet());
 			}
@@ -337,7 +338,7 @@ public class Settings {
 				this.cacheInternetPeers = new ArrayList<Peer>();
 			}
 				
-			if(this.cacheInternetPeers.size() == 0 || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
+			if(this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
 			{
 				this.timeLoadInternetPeers = NTP.getTime();
 				URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");
@@ -968,7 +969,7 @@ public class Settings {
 			//correcting single backslash bug
 			if(line.contains("userpath"))
 			{
-				line = line.replace("\\", "/");
+				line = line.replace("\\", File.separator);
 			}
 			
 			jsonString += line;
@@ -985,9 +986,9 @@ public class Settings {
 		{
 			this.userPath = (String) this.settingsJSON.get("userpath");
 			
-			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/")))
+			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator)))
 			{
-				this.userPath += "\\"; 
+				this.userPath += File.separator; 
 			}
 		}
 		else
@@ -1002,9 +1003,9 @@ public class Settings {
 			
 		
 			try {
-				if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/")))
+				if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/")|| this.getBackUpPath.endsWith(File.separator)))
 				{
-					this.getBackUpPath += "\\"; 
+					this.getBackUpPath += File.separator; 
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

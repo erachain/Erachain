@@ -78,15 +78,6 @@ public abstract class TransactionAmount extends Transaction {
 	
 	public static final byte BACKWARD_MASK = 64;
 
-	private static final byte[][] VALID_BAL = new byte[][]{
-			Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
-			Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
-			Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
-			};
-	private static final Long[] VALID_REF = new Long[]{
-			1496474042552L
-		};
-
 	// need for calculate fee
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
 	{
@@ -338,18 +329,31 @@ public abstract class TransactionAmount extends Transaction {
 	@Override // - fee + balance - calculate here
 	public int isValid(DCSet dcSet, Long releaserReference) {
 
+		int height = this.getBlockHeightByParentOrLast(dcSet);
+		boolean wrong = true;
+
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
 		{
-			return INVALID_ADDRESS;
+			if (height < 120000) {
+				wrong = true;
+				for ( byte[] valid_address: BlockChain.VALID_ADDRESSES) {
+					if (Arrays.equals(this.recipient.getBytes(), valid_address)) {
+						wrong = false;
+						break;
+					}
+				}
+				
+				if (wrong) {
+					return INVALID_ADDRESS;
+				}
+			}
 		}
 		
 		//CHECK IF REFERENCE IS OK
 		Long reference = releaserReference==null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
 		if (reference.compareTo(this.timestamp) >= 0)
 			return INVALID_TIMESTAMP;
-
-		int height = this.getBlockHeightByParentOrLast(dcSet);
 
 		boolean isPerson = this.creator.isPerson(dcSet, height);
 
@@ -444,23 +448,26 @@ public abstract class TransactionAmount extends Transaction {
 					
 					// SPEND ASSET
 					
-					if (absKey == RIGHTS_KEY) {
+					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE) {
 						
-						if (height > Transaction.FREEZE_FROM) {
+						//byte[] ss = this.creator.getAddress();
+						if (height > BlockChain.FREEZE_FROM
+								&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 							// LOCK PAYMENTS
-							boolean wrong = true;
-							for ( String address: Transaction.TRUE_ADDRESSES) {
-								if (this.creator.equals(address)
-										|| this.recipient.equals(address)) {
+							wrong = true;
+							for ( String address: BlockChain.TRUE_ADDRESSES) {
+								if (this.recipient.equals(address)
+										// || this.creator.equals(address)
+										) {
 									wrong = false;
 									break;
 								}
 							}
 							
 							if (wrong) {
-								int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();								
-								if (balance > 3000)
-									return INVALID_ADDRESS;
+								//int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();								
+								//if (balance > 3000)
+									return INVALID_CREATOR;
 							}
 
 						}
@@ -479,29 +486,49 @@ public abstract class TransactionAmount extends Transaction {
 						//
 					} else if (absKey == FEE_KEY) {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
-							return NO_BALANCE;
+							if (height > 120000 || BlockChain.DEVELOP_USE)
+								return NO_BALANCE;
+								
+							wrong = true;
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
+								}
+							}
+							
+							if (wrong)
+								return NO_BALANCE;
 						}
 						
 					} else {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
 							return NOT_ENOUGH_FEE;
 						}
-						BigDecimal balanceOWN = this.creator.getBalance(dcSet, absKey, actionType).b;
-						BigDecimal balanceUSE = this.creator.getBalanceUSE(absKey, dcSet);
+						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 						
-						if (amount.compareTo(balanceOWN) > 0 || amount.compareTo(balanceUSE) > 0) {
+						if (amount.compareTo(forSale) > 0) {
+							if (height > 120000 || BlockChain.DEVELOP_USE)
+								return NO_BALANCE;
+							
 							// TODO: delete wrong check in new CHAIN
 							// SOME PAYMENTs is WRONG
-							boolean ok = true;
-							for ( byte[] valid_item: VALID_BAL) {
+							wrong = true;
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
 								if (Arrays.equals(this.signature, valid_item)) {
-									ok = false;
+									wrong = false;
 									break;
 								}
 							}
 							
-							if (ok)
+							if (wrong)
 								return NO_BALANCE;
+						}
+						
+						if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
+							String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+							if ( unlock != null && !this.recipient.equals(unlock))
+								return INVALID_CREATOR;
 						}
 						
 					}
@@ -519,8 +546,14 @@ public abstract class TransactionAmount extends Transaction {
 				
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
-				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY && !this.recipient.isPerson(dcSet, height)) {
-					return RECEIVER_NOT_PERSONALIZED;
+				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY) {
+					HashSet<Account> recipients = this.getRecipientAccounts();
+					for (Account recipient: recipients) {
+						if (!recipient.isPerson(dcSet, height)
+								&& !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
+							return RECEIVER_NOT_PERSONALIZED;
+						}
+					}
 				}
 			}
 

@@ -3,6 +3,7 @@ package gui.items.assets;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -30,19 +31,24 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 	
 	BigDecimal sumAmount;
 	BigDecimal sumTotal;
+	private AssetCls have;
+	private AssetCls want;
 	 
 	public SellOrdersTableModel(AssetCls have, AssetCls want)
 	{
-		Controller.getInstance().addObserver(this);
+		this.have = have;
+		this.want= want;
 		this.orders = Controller.getInstance().getOrders(have, want, true);
-		
-		this.orders.registerObserver();
-		
+				
 		columnNames[COLUMN_PRICE] += " " + want.getShort();
 		columnNames[COLUMN_AMOUNT] += " " + have.getShort();
 		columnNames[COLUMN_TOTAL] += " " + want.getShort();
 		
 		totalCalc();
+
+		Controller.getInstance().addObserver(this);
+		//this.orders.registerObserver();
+
 	}
 	
 	private void totalCalc()
@@ -171,6 +177,8 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
 				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
+			this.orders = Controller.getInstance().getOrders(this.have, want, true);
+			//List<Order> items = DCSet.getInstance().getOrderMap().getOrders(have.getKey(), want.getKey(), false);
 			totalCalc();
 			this.fireTableDataChanged();
 		}

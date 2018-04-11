@@ -3,6 +3,9 @@ package webserver;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,13 +56,14 @@ import lang.Lang;
 import utils.Converter;
 import utils.Pair;
 import utils.StrJSonFine;
+import utils.TransactionTimestampComparator;
 
 @Path("apirecords")
 @Produces(MediaType.APPLICATION_JSON)
 public class API_TransactionsResource {
 
 	static Logger LOGGER = Logger.getLogger(API_TransactionsResource.class.getName());
-	
+
 	@Context
 	HttpServletRequest request;
 
@@ -71,7 +75,7 @@ public class API_TransactionsResource {
 
 	private static Thread thread;
 	private static int sleep;
-	private static  BigDecimal amm;
+	private static BigDecimal amm;
 	private static byte[] mes;
 
 	@GET
@@ -84,25 +88,28 @@ public class API_TransactionsResource {
 		help.put(
 				"apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
 				Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
-		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));		
-		
+		help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
+
+		help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}",
+				"Get last Records from Unix Timestamp milisec(1512777600000)");
+
 		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-				.header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
-	
-		
-	
-		
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(help)).build();
+
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("getbyaddress")
-	public String getByAddress(@QueryParam("address") String address, @QueryParam("asset") String asset) {
+	public Response getByAddress(@QueryParam("address") String address, @QueryParam("asset") String asset) {
 		List<Transaction> result;
 		if (address == null || address.equals("")) {
 			JSONObject ff = new JSONObject();
 			ff.put("Error", "Invalid Address");
-			return ff.toJSONString();
+			return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(ff.toJSONString()).build();
 		}
 		// TransactionsTableModel a = new TransactionsTableModel();
 		// a.Find_Transactions_from_Address(address);
@@ -112,9 +119,10 @@ public class API_TransactionsResource {
 		if (result == null) {
 			JSONObject ff = new JSONObject();
 			ff.put("message", "null");
-			return ff.toJSONString();
+			return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(ff.toJSONString()).build();
 		}
-		;
 
 		JSONArray array = new JSONArray();
 		for (Transaction transaction : result) {
@@ -127,14 +135,17 @@ public class API_TransactionsResource {
 			}
 		}
 		// json.put("transactions", array);
-		return array.toJSONString();
+		///return array.toJSONString();
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(array.toJSONString()).build();
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("getbyaddressfromtransactionlimit")
-	public String getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset,
+	public Response getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset,
 			@QueryParam("start") long start, @QueryParam("end") long end, @QueryParam("type") String type1,
 			@QueryParam("sort") String sort) {
 		List<Transaction> result;
@@ -142,7 +153,9 @@ public class API_TransactionsResource {
 		if (address == null || address.equals("")) {
 			JSONObject ff = new JSONObject();
 			ff.put("Error", "Invalid Address");
-			return ff.toJSONString();
+			return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(ff.toJSONString()).build();
 		}
 		// TransactionsTableModel a = new TransactionsTableModel();
 		// a.Find_Transactions_from_Address(address);
@@ -161,9 +174,10 @@ public class API_TransactionsResource {
 		if (result == null) {
 			JSONObject ff = new JSONObject();
 			ff.put("message", "null");
-			return ff.toJSONString();
+			return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(ff.toJSONString()).build();
 		}
-		;
 
 		// 7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC
 
@@ -192,26 +206,29 @@ public class API_TransactionsResource {
 		}
 
 		// json.put("transactions", array);
-		return new JSONObject(k_Map.subMap(start, end)).toJSONString();
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(new JSONObject(k_Map.subMap(start, end)).toJSONString()).build();
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("getbyblock")
-	public String getByBlock(@QueryParam("block") String block) {
+	public Response getByBlock(@QueryParam("block") String block) {
 		JSONObject ff = new JSONObject();
 		List<Transaction> result;
 
 		TransactionsTableModel a = new TransactionsTableModel();
 		a.setBlockNumber(block);
 		result = a.getTransactions();
-		if (result == null || result.size() == 0) {
+		if (result == null || result.isEmpty()) {
 
 			ff.put("message", "null");
-			return ff.toJSONString();
+			return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+					.header("Access-Control-Allow-Origin", "*")
+					.entity(ff.toJSONString()).build();
 		}
-		;
 
 		JSONArray array = new JSONArray();
 		for (Transaction trans : result) {
@@ -219,14 +236,16 @@ public class API_TransactionsResource {
 			array.add(trans.toJson());
 		}
 		// json.put("transactions", array);
-		return array.toJSONString();
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(array.toJSONString()).build();
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("find")
-	public String getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender,
+	public Response getTransactionsFind(@QueryParam("address") String address, @QueryParam("sender") String sender,
 			@QueryParam("recipient") String recipient, @QueryParam("startblock") String s_minHeight,
 			@QueryParam("endblock") String s_maxHeight, @QueryParam("type") String s_type,
 			@QueryParam("service") String s_service, @QueryParam("desc") String s_desc,
@@ -286,7 +305,43 @@ public class API_TransactionsResource {
 			array.add(trans.toJson());
 		}
 		// json.put("transactions", array);
-		return array.toJSONString();
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(array.toJSONString()).build();
 	}
-	
+
+	// "apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}"
+	@GET
+	@Path("getlastbyaddress")
+	public Response getLastByAddress(@QueryParam("address") String address, @QueryParam("timestamp") Long timestamp,
+			@QueryParam("limit") Integer limit) {
+		JSONObject out = new JSONObject();
+		if (timestamp == null)
+			timestamp = new Date().getTime();
+		if (limit == null)
+			limit = 20;
+		List<Transaction> transs = new ArrayList<Transaction>();
+		List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address);
+		Collections.sort(trans, new TransactionTimestampComparator().reversed());
+		for (Transaction tr : trans) {
+			Long t = tr.getTimestamp();
+			if (tr.getTimestamp() < timestamp)
+				transs.add(tr);
+		}
+		Collections.sort(transs, new TransactionTimestampComparator().reversed());
+		if (limit > transs.size())
+			limit = transs.size();
+		List<Transaction> transss = transs.subList(0, limit);
+		int i = 0;
+		for (Transaction tr : transss) {
+			out.put(i, tr.toJson());
+			i++;
+		}
+		// out =
+		// Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(out)).build();
+	}
+
 }

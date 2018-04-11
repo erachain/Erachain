@@ -24,7 +24,7 @@ public class curve_sigs {
 
          mont_x = (ed_y + ed_z) / (ed_z - ed_y)
 
-         NOTE: ed_y=1 is converted to mont_x=0 since fe_invert is mod-exp
+         PLATE: ed_y=1 is converted to mont_x=0 since fe_invert is mod-exp
       */
 
       ge_scalarmult_base.ge_scalarmult_base(ed, curve25519_privkey_in);
@@ -82,7 +82,7 @@ public class curve_sigs {
 
          ed_y = (mont_x - 1) / (mont_x + 1)
 
-         NOTE: mont_x=-1 is converted to ed_y=0 since fe_invert is mod-exp
+         PLATE: mont_x=-1 is converted to ed_y=0 since fe_invert is mod-exp
 
          Then move the sign bit into the pubkey from the signature.
       */

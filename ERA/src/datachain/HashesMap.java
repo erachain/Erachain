@@ -36,6 +36,7 @@ public class HashesMap extends DCMap<byte[], byte[]>
 		return database.createTreeMap("hashes_keys")
 				.keySerializer(BTreeKeySerializer.BASIC)
 				.comparator(UnsignedBytes.lexicographicalComparator())
+				.counterEnable()
 				.makeOrGet();
 	}
 

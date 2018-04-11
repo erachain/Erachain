@@ -191,12 +191,12 @@ public class TestRecPerson {
 		issuePersonTransaction.sign(certifier, false);
 
 		//CHECK IF ISSUE PERSON TRANSACTION IS VALID
-		assertEquals(true, issuePersonTransaction.isSignatureValid());
+		assertEquals(true, issuePersonTransaction.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(db), new byte[64]);		
 		//CHECK IF ISSUE PERSON IS INVALID
-		assertEquals(false, issuePersonTransaction.isSignatureValid());
+		assertEquals(false, issuePersonTransaction.isSignatureValid(db));
 
 	}
 		
@@ -457,7 +457,7 @@ public class TestRecPerson {
 		
 		r_SertifyPubKeys.sign(certifier, false);
 		// TRUE
-		assertEquals(true, r_SertifyPubKeys.isSignatureValid());
+		assertEquals(true, r_SertifyPubKeys.isSignatureValid(db));
 
 		version = 1;
 		r_SertifyPubKeys = new R_SertifyPubKeys(version, certifier, FEE_POWER, personKey,
@@ -469,25 +469,25 @@ public class TestRecPerson {
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		// true !
 		//CHECK IF PERSONALIZE RECORD SIGNATURE IS VALID
-		assertEquals(true, r_SertifyPubKeys.isSignatureValid());
+		assertEquals(true, r_SertifyPubKeys.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		r_SertifyPubKeys.setTimestamp(r_SertifyPubKeys.getTimestamp() + 1);
 		
 		//CHECK IF PERSONALIZE RECORD SIGNATURE IS INVALID
-		assertEquals(false, r_SertifyPubKeys.isSignatureValid());
+		assertEquals(false, r_SertifyPubKeys.isSignatureValid(db));
 
 		// BACK TO VALID
 		r_SertifyPubKeys.setTimestamp(r_SertifyPubKeys.getTimestamp() - 1);
-		assertEquals(true, r_SertifyPubKeys.isSignatureValid());
+		assertEquals(true, r_SertifyPubKeys.isSignatureValid(db));
 
 		r_SertifyPubKeys.sign(null, false);
 		//CHECK IF PERSONALIZE RECORD SIGNATURE IS INVALID
-		assertEquals(false, r_SertifyPubKeys.isSignatureValid());
+		assertEquals(false, r_SertifyPubKeys.isSignatureValid(db));
 
 		// BACK TO VALID
 		r_SertifyPubKeys.sign(certifier, false);
-		assertEquals(true, r_SertifyPubKeys.isSignatureValid());
+		assertEquals(true, r_SertifyPubKeys.isSignatureValid(db));
 
 	}
 	
@@ -781,7 +781,7 @@ public class TestRecPerson {
 		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
 		assertEquals(false, userAccount1.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
-		assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
+		assertEquals(false, userAccount2.isPerson(db, db.getBlockMap().size()));
 		assertEquals(false, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
 		
 		initPersonalize();

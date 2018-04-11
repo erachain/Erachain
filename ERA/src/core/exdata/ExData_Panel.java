@@ -31,8 +31,8 @@ import javax.validation.constraints.Null;
 import org.mapdb.Fun.Tuple3;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.notes.NoteCls;
-import gui.items.imprints.Table_Model_Issue_Hashes;
+import core.item.templates.TemplateCls;
+import gui.items.link_hashes.Table_Model_Issue_Hashes;
 import gui.library.MButton;
 import gui.library.MImprintEDIT_Pane;
 import gui.library.MSplitPane;
@@ -51,7 +51,7 @@ public class ExData_Panel extends javax.swing.JPanel {
 	private Table_Model_Issue_Hashes hashes_Table_Model;
 	private DefaultTableModel attached_Files_Model;
 	private DefaultTableModel params_Template_Model;
-	protected NoteCls sel_note;
+	protected TemplateCls sel_Template;
 	public MSplitPane sp_pan;
 	public M_Fill_Template_Panel fill_Template_Panel;
 	private ExData_Panel th;
@@ -755,7 +755,7 @@ public class ExData_Panel extends javax.swing.JPanel {
 					(Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
 		}
 
-		return ExData.To_Byte_V2(jTextField_Title_Message.getText(), fill_Template_Panel.sel_note,
+		return ExData.toByte_V2(jTextField_Title_Message.getText(), fill_Template_Panel.sel_Template,
 				this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message_Private.getText(), files_1);
 
 	}

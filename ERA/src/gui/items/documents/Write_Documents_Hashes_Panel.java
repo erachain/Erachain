@@ -1,42 +1,21 @@
 package gui.items.documents;
 
-import java.awt.Button;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.imprints.Imprint;
-
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import javax.imageio.ImageIO;
-import javax.swing.AbstractButton;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import com.google.common.primitives.Longs;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -45,11 +24,10 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.PasswordPane;
 import gui.Split_Panel;
-import gui.items.imprints.Issue_Hash_Imprint;
-import gui.items.imprints.Table_Model_Issue_Hashes;
+import gui.items.link_hashes.Issue_Hash_Imprint;
+import gui.items.link_hashes.Table_Model_Issue_Hashes;
 import gui.library.MTable;
 import gui.library.My_JFileChooser;
-import gui.models.Renderer_Hashes;
 import lang.Lang;
 import utils.Pair;
 
@@ -196,7 +174,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 		List<String> hashes = this.table_Model.getValues(0);
 
 		List<String> twins = R_Hashes.findTwins(DCSet.getInstance(), hashes);
-		if (twins.size() > 0) {
+		if (!twins.isEmpty()) {
 			JOptionPane.showMessageDialog(new JFrame(),
 					Lang.getInstance().translate("Twin hashes")+": " + twins.toString(),
 					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

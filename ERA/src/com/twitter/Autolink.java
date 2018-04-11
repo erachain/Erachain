@@ -197,7 +197,7 @@ public class Autolink {
       // Method: Whenever possible, we actually emit HTML that contains expanded_url, and use
       // font-size:0 to hide those parts that should not be displayed (because they are not part of display_url).
       // Elements with font-size:0 get copied even though they are not visible.
-      // Note that display:none doesn't work here. Elements with display:none don't get copied.
+      // Template that display:none doesn't work here. Elements with display:none don't get copied.
       //
       // Additionally, we want to *display* ellipses, but we don't want them copied.  To make this happen we
       // wrap the ellipses in a tco-ellipsis class and provide an onCopy handler that sets display:none on

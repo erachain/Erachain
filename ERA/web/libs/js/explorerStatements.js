@@ -57,6 +57,35 @@ function statements(data){
 
 }
 
+function statements2(data){
+	var output = '';
+	
+	if(data.hasOwnProperty('error'))
+	{
+		return '<h2>' + data.error + '</h2>';
+	}
+	
+	output += lastBlock(data.lastBlock);
+	
+	output += '<div class="navbar-form">';
+	output += '<label>' + data.Label_Statement + '</label>&nbsp;&nbsp;';
+	output += '<div class="input-group">'; 
+	output += '<label for="name" class="sr-only">Search</label>';
+	output += '<input id="statement_search_q" size="55" type="text" value="" class="form-control" onkeydown="if (event.keyCode == 13) openStatement()">';
+	output += '<span class="input-group-btn"> <button id="stbutton" type="button" class="btn btn-link" onclick="openStatement()"><span class="glyphicon glyphicon-search"></span><span class="sr-only">Search</span></button></span>'; 
+	output += '</div>';
+	output += '</div>';
+	
+	return output;
+}
+
+function openStatement(){
+	var params = document.getElementById('statement_search_q').value.split('-');
+	if (params.length > 1){
+		document.location.href = '?statement=' + params[0] + '&Seg_No=' + params[1] + get_lang() ;
+	}
+}
+
 function statement(data){
 
 	var output = '';

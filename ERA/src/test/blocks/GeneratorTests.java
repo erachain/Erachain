@@ -77,27 +77,22 @@ public class GeneratorTests {
 		Transaction transaction;
 		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(1000000).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(10000000).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(300000).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(3000000).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
 		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
 		assertEquals(1000000, generator1.getBalanceUSE(ERM_KEY, dcSet).longValue());
@@ -134,8 +129,8 @@ public class GeneratorTests {
 			assertEquals(true, newBlock.isSignatureValid());
 			
 			//CHECK IF BLOCK IS VALID
-			if (!newBlock.isValid(dcSet))
-				assertEquals(true, newBlock.isValid(dcSet));
+			if (!newBlock.isValid(dcSet, false))
+				assertEquals(true, newBlock.isValid(dcSet, false));
 			
 			height = Controller.getInstance().getMyHeight();
 			assertEquals(height, i + 1);
@@ -316,58 +311,47 @@ public class GeneratorTests {
 		Transaction transaction;
 		transaction = new GenesisTransferAssetTransaction(generator0, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 10).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 10).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 20).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.045).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
 		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.045).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator5, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.03).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator6, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.02).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator7, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.02).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator8, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.03).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		transaction = new GenesisTransferAssetTransaction(generator9, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.033).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		///////////////
 		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(8));
 		transaction.process(dcSet, genesisBlock, false);
-		dcSet.getTransactionRef_BlockRef_Map().set(transaction.getSignature(), genesisBlock.getSignature());
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 		
 		assertEquals(1000000, generator1.getBalanceUSE(ERM_KEY, dcSet).longValue());
@@ -422,8 +406,8 @@ public class GeneratorTests {
 			
 			long weight_old = newBlock.calcWinValueTargeted(dcSet);
 			//CHECK IF BLOCK IS VALID
-			if (!newBlock.isValid(dcSet))
-				assertEquals(false, newBlock.isValid(dcSet));
+			if (!newBlock.isValid(dcSet, false))
+				assertEquals(false, newBlock.isValid(dcSet, false));
 
 			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
 
@@ -632,7 +616,7 @@ public class GeneratorTests {
 			payment.process(snapshot, genesisBlock, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
-			blockGenerator.addUnconfirmedTransaction(dcSet, payment);
+			dcSet.getTransactionMap().add(payment);
 						
 		}
 		
@@ -646,7 +630,7 @@ public class GeneratorTests {
 		newBlock.setTransactions(transactions);
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(dcSet));
+		assertEquals(true, newBlock.isValid(dcSet, false));
 
 		newBlock.sign(generator);
 		//CHECK IF BLOCK IS VALID
@@ -705,7 +689,8 @@ public class GeneratorTests {
 			payment.process(snapshot, genesisBlock, false);
 			
 			//ADD TO UNCONFIRMED TRANSACTIONS
-			blockGenerator.addUnconfirmedTransaction(dcSet, payment);
+			dcSet.getTransactionMap().add(payment);
+
 		}
 		
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
@@ -725,7 +710,7 @@ public class GeneratorTests {
 		assertEquals(transactions.size(), newBlock.getTransactionCount());
 		
 		//CHECK IF BLOCK IS VALID
-		assertEquals(true, newBlock.isValid(dcSet));
+		assertEquals(true, newBlock.isValid(dcSet, false));
 	}
 
 	@Test
@@ -774,8 +759,8 @@ public class GeneratorTests {
 		assertEquals(payment.isValid(dcSet, null), Transaction.VALIDATE_OK);
 			
 		//ADD TO UNCONFIRMED TRANSACTIONS
-		blockGenerator.addUnconfirmedTransaction(dcSet, payment);
-		
+		dcSet.getTransactionMap().add(payment);
+
 		//ADD UNCONFIRMED TRANSACTIONS TO BLOCK
 		transactions = BlockGenerator.getUnconfirmedTransactions(dcSet, newBlock.getTimestamp(dcSet), null, 0l).a;
 		

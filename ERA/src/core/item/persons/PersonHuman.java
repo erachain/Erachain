@@ -18,6 +18,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
+import datachain.DCSet;
 import utils.ByteArrayUtils;
 
 //  typeBytes[1] ::: ownerSignature==null?(byte)0:(byte)1
@@ -60,7 +61,10 @@ public class PersonHuman extends PersonCls {
 
 	//GETTERS/SETTERS
 
+
 	public String getItemSubType() { return "human"; }
+
+	public int getMinNameLen() { return 6; }
 
 	public byte[] getOwnerSignature() { return ownerSignature; }
 
@@ -295,16 +299,21 @@ public class PersonHuman extends PersonCls {
 
 	}
 	
-	public boolean isSignatureValid() {
+	public boolean isSignatureValid(DCSet dcSet) {
 
 		if ( this.ownerSignature == null || this.ownerSignature.length != Crypto.SIGNATURE_LENGTH
 				|| Arrays.equals(this.ownerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
 			return false;
 		
-		// for skip NOT VALID SIGNs
-		for ( byte[] valid_item: Transaction.VALID_SIGN) {
-			if (Arrays.equals(this.reference, valid_item)) {
-				return true;
+		if (dcSet.getBlockHeightsMap().size() < 100000) {
+			// for skip NOT VALID SIGNs
+			for ( byte[] valid_item: Transaction.VALID_SIGN) {
+				if (Arrays.equals(this.reference, valid_item)) {
+					if (dcSet.getTransactionFinalMapSigns().contains(this.reference))
+						return false;
+					else
+						return true;
+				}
 			}
 		}
 

@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import gui.Split_Panel;
@@ -60,8 +61,8 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 	public void delay_on_close(){
 		rightPanel.table_Model.deleteObserver();
 		accountPanel.tableModel.deleteObserver();
-		
-		
+		Controller.getInstance().deleteObserver(accountPanel.reload_Button);
+		Controller.getInstance().deleteObserver(accountPanel.newAccount_Button);
 	}
 
 	class Account_Tab_Listener implements ListSelectionListener {

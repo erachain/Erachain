@@ -45,6 +45,7 @@ public Search_Imprints_Tab(){
 
 	setName(Lang.getInstance().translate("Search Imprints"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
+	searthLabel_SearchToolBar_LeftPanel.setVisible(true);
 // not show buttons
 	button1_ToolBar_LeftPanel.setVisible(false);
 	button2_ToolBar_LeftPanel.setVisible(false);

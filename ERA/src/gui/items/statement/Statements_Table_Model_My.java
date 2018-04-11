@@ -2,6 +2,7 @@ package gui.items.statement;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,7 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
 import utils.ObserverMessage;
+import utils.Pair;
 
 public class Statements_Table_Model_My extends AbstractTableModel implements Observer {
 
@@ -35,7 +37,7 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_CREATOR = 1;
-	public static final int COLUMN_NOTE = 2;
+	public static final int COLUMN_TEMPLATE = 2;
 	public static final int COLUMN_BODY = 3;
 	List<Transaction> transactions;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Creator", "Template", "Statement"});//, AssetCls.FEE_NAME});
@@ -121,9 +123,9 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 				//return DateTimeFormat.timestamptoString(transaction.getTimestamp()) + " " + transaction.getTimestamp();
 				return record.viewTimestamp(); // + " " + transaction.getTimestamp() / 1000;
 
-			case COLUMN_NOTE:
+			case COLUMN_TEMPLATE:
 				
-				ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.NOTE_TYPE, record.getKey());
+				ItemCls item = ItemCls.getItem(DCSet.getInstance(), ItemCls.TEMPLATE_TYPE, record.getKey());
 				return item==null?null:item.toString();
 				
 			case COLUMN_BODY:				
@@ -211,6 +213,23 @@ public class Statements_Table_Model_My extends AbstractTableModel implements Obs
 			
 			this.fireTableDataChanged();
 		}	
+		if(message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+
+			Transaction record = (Transaction) message.getValue(); 
+			byte[] signKey = record.getSignature();
+			for (int i=0; i < this.transactions.size() - 1; i++) {
+				Transaction item = this.transactions.get(i);
+				if (item == null)
+					return;
+				if (Arrays.equals(signKey, item.getSignature())) {
+					this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();			
+				}
+			}
+			this.fireTableDataChanged();
+			if (false)
+				this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
+					new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
+		}
 	}	
 	
 	

@@ -51,7 +51,7 @@ public class BlockGenerator extends Thread implements Observer
 	static final int FLUSH_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
 	static final int WIN_TIMEPOINT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2;
 	private PrivateKeyAccount acc_winner;
-	private List<Block> lastBlocksForTarget;
+	//private List<Block> lastBlocksForTarget;
 	private byte[] solvingReference;
 	
 	private List<PrivateKeyAccount> cachedAccounts;
@@ -168,17 +168,7 @@ public class BlockGenerator extends Thread implements Observer
 		}.start();
 		ctrl.addObserver(this);
 	}
-	
-	public void addUnconfirmedTransaction(Transaction transaction)
-	{
-		this.addUnconfirmedTransaction(DCSet.getInstance(), transaction);
-	}
-	public void addUnconfirmedTransaction(DCSet db, Transaction transaction) 
-	{
-		//ADD TO TRANSACTION DATABASE 
-		db.getTransactionMap().add(transaction);
-	}
-		
+			
 	private List<PrivateKeyAccount> getKnownAccounts()
 	{
 		//CHECK IF CACHING ENABLED
@@ -187,7 +177,7 @@ public class BlockGenerator extends Thread implements Observer
 			List<PrivateKeyAccount> privateKeyAccounts = ctrl.getPrivateKeyAccounts();
 			
 			//IF ACCOUNTS EXISTS
-			if(privateKeyAccounts.size() > 0)
+			if(!privateKeyAccounts.isEmpty())
 			{
 				//CACHE ACCOUNTS
 				this.cachedAccounts = privateKeyAccounts;
@@ -219,24 +209,27 @@ public class BlockGenerator extends Thread implements Observer
 		BlockChain bchain = ctrl.getBlockChain();
 		DCSet dcSet = DCSet.getInstance();
 
-		Peer peer;
+		Peer peer = null;
+		Tuple3<Integer, Long, Peer> maxPeer;
+		SignaturesMessage response;
 		long timeTmp;
 		long timePoint = 0;
 		long flushPoint = 0;
 		Block waitWin = null;
 		long timeUpdate = 0;
 		int shift_height = 0;
-		byte[] unconfirmedTransactionsHash;
+		//byte[] unconfirmedTransactionsHash;
 		long max_winned_value;
 		long winned_value;				
-		long winned_value_account;
-		long max_winned_value_account;
+		//long winned_value_account;
+		//long max_winned_value_account;
 		int height = BlockChain.getHeight(dcSet) + 1;
 		long target = bchain.getTarget(dcSet);
 		Block generatedBlock;
+		Block solvingBlock;
 
 		int wait_new_block_broadcast;
-		long wait_steep;
+		long wait_step;
 		boolean newWinner;
 
 
@@ -245,7 +238,7 @@ public class BlockGenerator extends Thread implements Observer
 			try {
 				
 				try {
-					Thread.sleep(100);
+					Thread.sleep(1000);
 				}
 				catch (InterruptedException e) {
 				}
@@ -290,7 +283,7 @@ public class BlockGenerator extends Thread implements Observer
 					status = 0;
 
 					// GET real HWeight
-					ctrl.pingAllPeers(false);						
+					ctrl.pingAllPeers(false);				
 					
 				}
 				
@@ -330,7 +323,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 						//SET NEW BLOCK TO SOLVE
 						this.solvingReference = dcSet.getBlockMap().getLastBlockSignature();
-						Block solvingBlock = dcSet.getBlockMap().get(this.solvingReference);
+						solvingBlock = dcSet.getBlockMap().last();
 								
 						if(ctrl.isOnStopping()) {
 							status = -1;
@@ -356,16 +349,18 @@ public class BlockGenerator extends Thread implements Observer
 						status = 4;
 						
 						//GENERATE NEW BLOCKS
-						this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
+						//this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);				
 						this.acc_winner = null;
 						
 						
-						unconfirmedTransactionsHash = null;
+						//unconfirmedTransactionsHash = null;
 						max_winned_value = 0;
-						max_winned_value_account = 0;
+						//max_winned_value_account = 0;
 						height = bchain.getHeight(dcSet) + 1;
 						target = bchain.getTarget(dcSet);
 		
+						///if (height > BlockChain.BLOCK_COUNT) return;
+
 						//PREVENT CONCURRENT MODIFY EXCEPTION
 						List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
 						synchronized(knownAccounts)
@@ -376,8 +371,8 @@ public class BlockGenerator extends Thread implements Observer
 							for(PrivateKeyAccount account: knownAccounts)
 							{
 							
-								winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
-								winned_value = account.calcWinValue(dcSet, bchain, this.lastBlocksForTarget, height, target);
+								//winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
+								winned_value = account.calcWinValue(dcSet, height, target);
 								if(winned_value < 1l)
 									continue;
 								
@@ -385,7 +380,7 @@ public class BlockGenerator extends Thread implements Observer
 									//this.winners.put(account, winned_value);
 									acc_winner = account;
 									max_winned_value = winned_value;
-									max_winned_value_account = winned_value_account;
+									//max_winned_value_account = winned_value_account;
 									
 								}
 							}
@@ -407,7 +402,7 @@ public class BlockGenerator extends Thread implements Observer
 								
 								LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast/1000);
 								// SLEEP and WATCH break
-								wait_steep = wait_new_block_broadcast / 100;
+								wait_step = wait_new_block_broadcast / 100;
 								do {
 									try
 									{
@@ -429,8 +424,11 @@ public class BlockGenerator extends Thread implements Observer
 										break;
 									}
 											
-								} while (wait_steep-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+								} while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
 							}
+							
+							if (this.orphanto > 0)
+								continue;
 
 							if (newWinner)
 							{
@@ -441,9 +439,17 @@ public class BlockGenerator extends Thread implements Observer
 				
 								// GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
 								LOGGER.info("GENERATE my BLOCK");
-														
-								generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
+										
+								generatedBlock = null;
+								try {
+									generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
 										getUnconfirmedTransactions(dcSet, timePoint, bchain, max_winned_value));
+								} catch (java.lang.OutOfMemoryError e) {
+									// TRY CATCH OUTofMemory error - heap space
+									LOGGER.error(e.getMessage(), e);									
+								} finally {
+									System.gc();
+								}
 					
 								solvingBlock = null;
 									
@@ -451,7 +457,17 @@ public class BlockGenerator extends Thread implements Observer
 									if (ctrl.isOnStopping()) {
 										return;
 									}
-									LOGGER.info("my BLOCK is weak ((...");
+									
+									LOGGER.error("generateNextBlock is NULL... try wait");
+									try
+									{
+										Thread.sleep(10000);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+
+									continue;
 								} else {
 									
 									//PASS BLOCK TO CONTROLLER
@@ -489,7 +505,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 						status = 1;
 		
-						while (flushPoint > NTP.getTime()) {
+						while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
 							try
 							{
 								Thread.sleep(100);
@@ -504,11 +520,23 @@ public class BlockGenerator extends Thread implements Observer
 							}
 						}
 						
+						if (this.orphanto > 0)
+							continue;
+						
 						// FLUSH WINER to DB MAP
 						LOGGER.debug("TRY to FLUSH WINER to DB MAP");
 		
 						try {
-							
+							if (flushPoint + FLUSH_TIMEPOINT < NTP.getTime()) {
+								try
+								{
+									Thread.sleep(10000);
+								}
+								catch (InterruptedException e) 
+								{
+								}
+							}
+
 							status = 2;
 							if (!ctrl.flushNewBlockGenerated()) {
 								// NEW BLOCK not FLUSHED
@@ -542,32 +570,72 @@ public class BlockGenerator extends Thread implements Observer
 				if(timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) < 0) {
 					// MAY BE PAT SITUATION
 					//shift_height = -1;
-					peer = ctrl.getMaxPeerHWeight(-1).c;
-					if (peer != null) {
-						
-						 if (bchain.getHeight(dcSet) > 1) {
-						
-							SignaturesMessage response;
-							try {
-								response = (SignaturesMessage) peer.getResponse(
-										MessageFactory.getInstance().createGetHeadersMessage(bchain.getLastBlockSignature(dcSet)),
-										30000);
-							} catch (java.lang.ClassCastException e) {
-								peer.ban(1, "Cannot retrieve headers");
-								throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");			
-							}
-	
-							if (response == null) {
-								ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-							}
-						 } else {
-							 if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
-								 continue;
-						 }
 
+					peer = null;
+					maxPeer = ctrl.getMaxPeerHWeight(-1);
+					if (maxPeer != null) {
+						peer = maxPeer.c;
+					}
+					
+					if (peer != null && ctrl.getActivePeersCounter() > 3) {
+						
+						Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+						if (myHW.a < maxPeer.a || myHW.b < maxPeer.b) {
+							
+							if (myHW.a > 1) {
+	
+								LOGGER.error("ctrl.getMaxPeerHWeight(-1) " + peer.getAddress() + " - " + maxPeer.a + ":" + maxPeer.b);
+	 
+								response = null;
+								try {
+									try
+									{
+										Thread.sleep(10000);
+									}
+									catch (InterruptedException e) 
+									{
+									}
+	
+									byte[] prevSignature = dcSet.getBlockHeightsMap().get(myHW.a - 1);
+									response = (SignaturesMessage) peer.getResponse(
+											MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+											Synchronizer.GET_BLOCK_TIMEOUT);
+								} catch (java.lang.ClassCastException e) {
+									peer.ban(1, "Cannot retrieve headers - from UPDATE");
+									throw new Exception("Failed to communicate with peer (retrieve headers) - response = null - from UPDATE");			
+								}
+		
+								if (response != null) {
+									List<byte[]> headers = response.getSignatures();
+									byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+									int headersSize = headers.size();
+									if (headersSize == 2) {
+										if (Arrays.equals(headers.get(1), lastSignature)) {
+											ctrl.pingAllPeers(false);
+											ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+											try
+											{
+												Thread.sleep(15000);
+											}
+											catch (InterruptedException e) 
+											{
+											}
+											continue;
+										} else {
+											ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+										} 
+									} else if (headersSize < 2 ) {
+										ctrl.orphanInPipe(bchain.getLastBlock(dcSet));										
+									}
+								}
+							 } else {
+								 if (ctrl.getActivePeersCounter() < BlockChain.NEED_PEERS_FOR_UPDATE)
+									 continue;
+							 }
+						}
 					}
 				} else { 
-					shift_height = 0;
+					//shift_height = 0;
 				}
 
 				/// CHECK PEERS HIGHER 
@@ -668,6 +736,7 @@ public class BlockGenerator extends Thread implements Observer
 		
 		long start = System.currentTimeMillis();
 		List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getSubSet(timestamp));
+		//List<Transaction> orderedTransactions = new ArrayList<Transaction>(dcSet.getTransactionMap().getValuesAll());
 		long tickets = System.currentTimeMillis() - start;
 		int txCount = orderedTransactions.size();
 		long ticketsCount = System.currentTimeMillis() - tickets;
@@ -686,13 +755,13 @@ public class BlockGenerator extends Thread implements Observer
 		
 		List<Transaction> transactionsList = new ArrayList<Transaction>();
 
-		boolean transactionProcessed;
+	//	boolean transactionProcessed;
 		long totalBytes = 0;
 		int counter = 0;
 
-		do
-		{
-			transactionProcessed = false;
+		//do
+		//{
+		//	transactionProcessed = false;
 						
 			for(Transaction transaction: orderedTransactions)
 			{
@@ -711,21 +780,13 @@ public class BlockGenerator extends Thread implements Observer
 				try{
 
 					//CHECK TRANSACTION TIMESTAMP AND DEADLINE
-					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp) {
-						// OFF TIME
-						// REMOVE FROM LIST
-						transactionProcessed = true;
-						orderedTransactions.remove(transaction);
-						break;
-					}
-					
-					//CHECK IF VALID
-					if(!transaction.isSignatureValid()) {
+					if(transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp
+							|| !transaction.isSignatureValid(newBlockDb)) {
 						// INVALID TRANSACTION
 						// REMOVE FROM LIST
-						transactionProcessed = true;
-						orderedTransactions.remove(transaction);
-						break;
+						//transactionProcessed = true;
+						//orderedTransactions.remove(transaction);
+						continue;
 					}
 						
 					transaction.setDC(newBlockDb, false);
@@ -733,9 +794,9 @@ public class BlockGenerator extends Thread implements Observer
 					if (transaction.isValid(newBlockDb, null) != Transaction.VALIDATE_OK) {
 						// INVALID TRANSACTION
 						// REMOVE FROM LIST
-						transactionProcessed = true;
-						orderedTransactions.remove(transaction);
-						break;
+						//transactionProcessed = true;
+						//orderedTransactions.remove(transaction);
+						continue;
 					}
 														
 					//CHECK IF ENOUGH ROOM
@@ -751,16 +812,16 @@ public class BlockGenerator extends Thread implements Observer
 					transactionsList.add(transaction);
 								
 					//REMOVE FROM LIST
-					orderedTransactions.remove(transaction);
+					//orderedTransactions.remove(transaction);
 								
 					//PROCESS IN NEWBLOCKDB
 					transaction.process(newBlockDb, null, false);
 								
 					//TRANSACTION PROCESSES
-					transactionProcessed = true;
+					//transactionProcessed = true;
 										
 					// GO TO NEXT TRANSACTION
-					break;
+					continue;
 						
 				} catch (Exception e) {
 					
@@ -768,7 +829,7 @@ public class BlockGenerator extends Thread implements Observer
 						return null;
 					}
 
-                    transactionProcessed = true;
+               //     transactionProcessed = true;
 
                     LOGGER.error(e.getMessage(), e);
                     //REMOVE FROM LIST
@@ -777,10 +838,11 @@ public class BlockGenerator extends Thread implements Observer
 				}
 				
 			}
-		}
-		while(counter < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
+		//}
+		//while(counter < MAX_BLOCK_SIZE && totalBytes < MAX_BLOCK_SIZE_BYTE && transactionProcessed == true);
 		orderedTransactions = null;
 		waitWin = null;
+		newBlockDb.close();
 		newBlockDb = null;
 
 		LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) +"ms for trans: " + counter );
@@ -818,7 +880,7 @@ public class BlockGenerator extends Thread implements Observer
 	public void syncForgingStatus()
 	{
 		
-		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().size() == 0) {
+		if(!Settings.getInstance().isForgingEnabled() || getKnownAccounts().isEmpty()) {
 			setForgingStatus(ForgingStatus.FORGING_DISABLED);
 			return;
 		}

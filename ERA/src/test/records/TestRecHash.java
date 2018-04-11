@@ -88,14 +88,14 @@ public class TestRecHash {
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 		hashesRecord.sign(maker, asPack);
 		
-		//CHECK IF ISSUE NOTE TRANSACTION IS VALID
-		assertEquals(true, hashesRecord.isSignatureValid());
+		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
+		assertEquals(true, hashesRecord.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
 		
-		//CHECK IF ISSUE NOTE IS INVALID
-		assertEquals(false, hashesRecord.isSignatureValid());
+		//CHECK IF ISSUE PLATE IS INVALID
+		assertEquals(false, hashesRecord.isSignatureValid(db));
 	}
 		
 

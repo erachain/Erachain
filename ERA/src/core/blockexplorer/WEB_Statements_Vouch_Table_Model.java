@@ -183,7 +183,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
 
 		// CHECK IF NEW LIST
 		if (message.getType() == ObserverMessage.LIST_VOUCH_TYPE) {
-			if (this.transactions.size() == 0) {
+			if (this.transactions.isEmpty()) {
 				transactions = read_Sign_Accoutns();
 				this.fireTableDataChanged();
 			}

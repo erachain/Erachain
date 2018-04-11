@@ -1,13 +1,15 @@
 package controller;
+
 // 04/01 +- 
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -21,6 +23,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +33,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -39,7 +42,6 @@ import org.apache.commons.io.FileUtils;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
-
 import com.google.common.primitives.Longs;
 import api.ApiClient;
 import api.ApiService;
@@ -53,7 +55,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.block.GenesisBlock;
+import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -61,10 +63,10 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
-import core.item.notes.NoteCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
 import core.item.statuses.StatusCls;
+import core.item.templates.TemplateCls;
 import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
@@ -85,13 +87,14 @@ import gui.Gui;
 import lang.Lang;
 import network.Network;
 import network.Peer;
-import network.message.BlockMessage;
 import network.message.BlockWinMessage;
 import network.message.GetBlockMessage;
 import network.message.GetSignaturesMessage;
 import network.message.HWeightMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import network.message.SignaturesMessage;
+import network.message.TelegramMessage;
 import network.message.TransactionMessage;
 import network.message.VersionMessage;
 import ntp.NTP;
@@ -102,31 +105,33 @@ import utils.ObserverMessage;
 import utils.Pair;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import utils.SysTray;
-import utils.UpdateUtil;
 import webserver.WebService;
 
 public class Controller extends Observable {
 
 	private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
+	private static List<Thread> threads = new ArrayList<Thread>();
 	// IF new abilities is made - new license insert in CHAIN and set this KEY
 	public static final long LICENSE_KEY = 1014l;
-	public static final String APP_NAME = BlockChain.DEVELOP_USE?"Erachain-dev":"Erachain";
-	private static final String version = "4.2.04 alpha";
+	public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
+	private static final String version = "4.10.01 alpha";
 	private static final String buildTime = "2017-11-19 15:33:33 UTC";
 	private static long buildTimestamp;
-	
-	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in code!
+	public final static long MIN_MEMORY_TAIL = 50000000;
+
+	// used in controller.Controller.startFromScratchOnDemand() - 0 uses in
+	// code!
 	// for reset DB if DB PROTOCOL is CHANGED
 	public static final String releaseVersion = "3.02.01";
 
-//	TODO ENUM would be better here
+	// TODO ENUM would be better here
 	public static final int STATUS_NO_CONNECTIONS = 0;
 	public static final int STATUS_SYNCHRONIZING = 1;
 	public static final int STATUS_OK = 2;
 	public static boolean useGui = true;
 
-	private boolean processingWalletSynchronize = false; 
+	private boolean processingWalletSynchronize = false;
 	private int status;
 	private boolean dcSetWithObserver = false;
 	private boolean dynamicGUI = false;
@@ -145,8 +150,8 @@ public class Controller extends Observable {
 	private Random random = new SecureRandom();
 	private byte[] foundMyselfID = new byte[128];
 	private byte[] messageMagic;
-	private long toOfflineTime; 
-	
+	private long toOfflineTime;
+
 	private Map<Peer, Tuple2<Integer, Long>> peerHWeight;
 
 	private Map<Peer, Pair<String, Long>> peersVersions;
@@ -157,15 +162,14 @@ public class Controller extends Observable {
 	private DBSet dbSet; // = DBSet.getInstance();
 	private DCSet dcSet; // = DBSet.getInstance();
 
-//	private JSONObject Setting_Json;
-
+	// private JSONObject Setting_Json;
 
 	private AboutFrame about_frame;
 
 	public boolean isProcessingWalletSynchronize() {
 		return processingWalletSynchronize;
 	}
-	
+
 	public void setProcessingWalletSynchronize(boolean isPocessing) {
 		this.processingWalletSynchronize = isPocessing;
 	}
@@ -181,6 +185,7 @@ public class Controller extends Observable {
 	public static String getVersion() {
 		return version;
 	}
+
 	public void setDCSet(DCSet db) {
 		this.dcSet = db;
 	}
@@ -189,110 +194,121 @@ public class Controller extends Observable {
 		return this.dbSet;
 	}
 
-
 	public int getNetworkPort() {
-		if(Settings.getInstance().isTestnet()) {
+		if (Settings.getInstance().isTestnet()) {
 			return BlockChain.TESTNET_PORT;
 		} else {
 			return BlockChain.MAINNET_PORT;
 		}
 	}
+
 	public boolean isTestNet() {
 		return Settings.getInstance().isTestnet();
 	}
-	
-	public static String getBuildDateTimeString(){
+
+	public static String getBuildDateTimeString() {
 		return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd HH:mm:ss z", "UTC");
 	}
-	
-	public static String getBuildDateString(){
+
+	public static String getBuildDateString() {
 		return DateTimeFormat.timestamptoString(getBuildTimestamp(), "yyyy-MM-dd", "UTC");
 	}
-	
-	public static long getBuildTimestamp() {
-	    if(buildTimestamp == 0) {
-		    Date date = new Date();
-		    ////URL resource = getClass().getResource(getClass().getSimpleName() + ".class");
-		    //URL resource = Controller.class.getResource(Controller.class.getSimpleName() + ".class");
-		    //if (resource != null && resource.getProtocol().equals("file")) {
-        	File f = null;
-            Path p = null;
-            BasicFileAttributes attr = null;
-        	try {
-	        	f = new File(Controller.APP_NAME + ".jar");
-	            p = f.toPath();
-	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
-        	} catch (Exception e1) {
-            	try {
-    	        	f = new File(Controller.APP_NAME + ".exe");
-    	            p = f.toPath();
-    	            attr = Files.readAttributes(p, BasicFileAttributes.class);			     
-            	} catch (Exception e2) {
-            	}
-        	}
 
-        	if (attr != null) {
-	            buildTimestamp = attr.lastModifiedTime().toMillis();
-	            return buildTimestamp;
-        	}
-	            
-	    	DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-	    	try {
-				date = (Date)formatter.parse(buildTime);
-			    buildTimestamp = date.getTime();
-			} catch (ParseException e) {
-				LOGGER.error(e.getMessage(),e);
+	public static long getBuildTimestamp() {
+		if (buildTimestamp == 0) {
+			Date date = new Date();
+			//// URL resource =
+			//// getClass().getResource(getClass().getSimpleName() + ".class");
+			// URL resource =
+			//// Controller.class.getResource(Controller.class.getSimpleName() +
+			//// ".class");
+			// if (resource != null && resource.getProtocol().equals("file")) {
+			File f = null;
+			Path p = null;
+			BasicFileAttributes attr = null;
+			try {
+				f = new File(Controller.APP_NAME + ".jar");
+				p = f.toPath();
+				attr = Files.readAttributes(p, BasicFileAttributes.class);
+			} catch (Exception e1) {
+				try {
+					f = new File(Controller.APP_NAME + ".exe");
+					p = f.toPath();
+					attr = Files.readAttributes(p, BasicFileAttributes.class);
+				} catch (Exception e2) {
+				}
 			}
-	    }
-	    return buildTimestamp;
+
+			if (attr != null) {
+				buildTimestamp = attr.lastModifiedTime().toMillis();
+				return buildTimestamp;
+			}
+
+			DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+			try {
+				date = (Date) formatter.parse(buildTime);
+				buildTimestamp = date.getTime();
+			} catch (ParseException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+		return buildTimestamp;
 	}
-	
+
 	public byte[] getMessageMagic() {
-		if(this.messageMagic == null) {
+		if (this.messageMagic == null) {
 			long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-			if(Settings.getInstance().isTestnet()){
+			if (Settings.getInstance().isTestnet()) {
 				byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
-				this.messageMagic =  Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);	
+				this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
 			} else {
 				this.messageMagic = Message.MAINNET_MAGIC;
 			}
 		}
 		return this.messageMagic;
 	}
-	
-	public void statusInfo()
-	{
-		LOGGER.info(
-			"STATUS " + this.getStatus() + "\n" 
-			+ "| Last Block Signature: " + Base58.encode(this.blockChain.getLastBlock(dcSet).getSignature()) + "\n"
-			+ "| Last Block Height: " + this.blockChain.getLastBlock(dcSet).getHeight(this.dcSet) + "\n"
-			+ "| Last Block Time: " + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet)) + "\n"
-			+ "| Last Block Found " + DateTimeFormat.timeAgo(this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet)) + " ago."
-			);
+
+	public void statusInfo() {
+		LOGGER.info("STATUS " + this.getStatus() + "\n" + "| Last Block Signature: "
+				+ Base58.encode(this.blockChain.getLastBlock(dcSet).getSignature()) + "\n" + "| Last Block Height: "
+				+ this.blockChain.getLastBlock(dcSet).getHeight(this.dcSet) + "\n" + "| Last Block Time: "
+				+ DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet)) + "\n"
+				+ "| Last Block Found "
+				+ DateTimeFormat.timeAgo(this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet)) + " ago.");
 	}
-	
+
 	public byte[] getFoundMyselfID() {
 		return this.foundMyselfID;
 	}
 
-	public  Wallet getWallet()
-	{
+	public Wallet getWallet() {
 		return this.wallet;
 	}
+	
+	public boolean isAllThreadsGood() {
+		if (!this.blockGenerator.isAlive()) {
+			return false;
+		}
+		
+		for (Thread thread: this.threads) {
+			if (thread.isInterrupted() || !thread.isAlive())
+				return false;
+		}
+		return true;
+	}
 
-	public int getWalletSyncHeight()
-	{
+	public int getWalletSyncHeight() {
 		return this.wallet.getSyncHeight();
 	}
-	
-	public void sendMyHWeightToPeer (Peer peer) {
-	
+
+	public void sendMyHWeightToPeer(Peer peer) {
+
 		// SEND HEIGTH MESSAGE
 		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(this.blockChain.getHWeightFull(dcSet)));
 	}
-	
+
 	public TransactionCreator getTransactionCreator() {
-		return  transactionCreator;
+		return transactionCreator;
 	}
 
 	public Map<Peer, Tuple2<Integer, Long>> getPeerHWeights() {
@@ -300,34 +316,32 @@ public class Controller extends Observable {
 	}
 
 	public Tuple2<Integer, Long> getHWeightOfPeer(Peer peer) {
-		if(peerHWeight!=null && peerHWeight.containsKey(peer)){
+		if (peerHWeight != null && peerHWeight.containsKey(peer)) {
 			return peerHWeight.get(peer);
-		}
-		else
-		{
+		} else {
 			return null;
 		}
 	}
+
 	public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
-		if(peerHWeight!=null){
+		if (peerHWeight != null) {
 			peerHWeight.put(peer, hWeight);
 		}
 	}
+
 	public void resetWeightOfPeer(Peer peer) {
 		peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
 	}
-	
+
 	public Map<Peer, Pair<String, Long>> getPeersVersions() {
 		return peersVersions;
 	}
-	
+
 	public Pair<String, Long> getVersionOfPeer(Peer peer) {
-		if(peersVersions!=null && peersVersions.containsKey(peer)){
+		if (peersVersions != null && peersVersions.containsKey(peer)) {
 			return peersVersions.get(peer);
-		}
-		else
-		{
-			return new Pair<String, Long>("", 0l); 
+		} else {
+			return new Pair<String, Long>("", 0l);
 		}
 	}
 
@@ -341,22 +355,19 @@ public class Controller extends Observable {
 		return instance;
 	}
 	/*
-	public static Controller getInstance(boolean withObserver, boolean dynamicGUI) {
-		if (instance == null) {
-			instance = new Controller();
-			instance.setDCSetWithObserver(withObserver);
-			instance.setDynamicGUI(dynamicGUI);
-		}
+	 * public static Controller getInstance(boolean withObserver, boolean
+	 * dynamicGUI) { if (instance == null) { instance = new Controller();
+	 * instance.setDCSetWithObserver(withObserver);
+	 * instance.setDynamicGUI(dynamicGUI); }
+	 * 
+	 * return instance; }
+	 * 
+	 */
 
-		return instance;
-	}
-	
-	*/
-
-	
 	public int getStatus() {
 		return this.status;
 	}
+
 	public boolean needUpToDate() {
 		return this.status != STATUS_OK && this.status != STATUS_NO_CONNECTIONS;
 	}
@@ -368,16 +379,15 @@ public class Controller extends Observable {
 	public boolean checkNeedSyncWallet() {
 		if (this.wallet == null || this.wallet.database == null)
 			return false;
-		
-		//CHECK IF WE NEED TO RESYNC
+
+		// CHECK IF WE NEED TO RESYNC
 		byte[] lastBlockSignature = this.wallet.database.getLastBlockSignature();
-		if(lastBlockSignature == null
-				/////|| !findLastBlockOff(lastBlockSignature, block)
-				|| !Arrays.equals(lastBlockSignature, this.getBlockChain().getLastBlockSignature(dcSet)))
-		{
+		if (lastBlockSignature == null
+				///// || !findLastBlockOff(lastBlockSignature, block)
+				|| !Arrays.equals(lastBlockSignature, this.getBlockChain().getLastBlockSignature(dcSet))) {
 			return true;
 		}
-		
+
 		return false;
 
 	}
@@ -385,196 +395,176 @@ public class Controller extends Observable {
 	public void setNeedSyncWallet(boolean needSync) {
 		this.needSyncWallet = needSync;
 	}
-	
+
 	public boolean isNeedSyncWallet() {
 		return this.needSyncWallet;
 	}
-	
+
 	public void start() throws Exception {
-		
-		// start memory viewer
-		MemoryViewer mamoryViewer = new MemoryViewer();
-		mamoryViewer.start();
-		
-		
+
 		this.toOfflineTime = NTP.getTime();
-		if (Controller.useGui) about_frame = AboutFrame.getInstance();
+		if (Controller.useGui)
+			about_frame = AboutFrame.getInstance();
 		this.foundMyselfID = new byte[128];
 		this.random.nextBytes(this.foundMyselfID);
-		
+
 		this.peerHWeight = new LinkedHashMap<Peer, Tuple2<Integer, Long>>();
-		// LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING FROM LONGEST CONNECTION ALIVE)
+		// LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
+		// FROM LONGEST CONNECTION ALIVE)
 
 		this.peersVersions = new LinkedHashMap<Peer, Pair<String, Long>>();
 
-		
 		// CHECK NETWORK PORT AVAILABLE
 		if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
-			throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").
-					replace("%port%", String.valueOf(Controller.getInstance().getNetworkPort())));
+			throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
+					String.valueOf(Controller.getInstance().getNetworkPort())));
 		}
 
 		// CHECK RPC PORT AVAILABLE
 		if (Settings.getInstance().isRpcEnabled()) {
 			if (!Network.isPortAvailable(Settings.getInstance().getRpcPort())) {
-				throw new Exception(Lang.getInstance().translate("Rpc port %port% already in use!").
-						replace("%port%", String.valueOf(Settings.getInstance().getRpcPort())));
+				throw new Exception(Lang.getInstance().translate("Rpc port %port% already in use!").replace("%port%",
+						String.valueOf(Settings.getInstance().getRpcPort())));
 			}
 		}
 
 		// CHECK WEB PORT AVAILABLE
 		if (Settings.getInstance().isWebEnabled()) {
-			if (!Network.isPortAvailable(Settings.getInstance().getWebPort())) {	
-				LOGGER.error(Lang.getInstance().translate("Web port %port% already in use!").
-						replace("%port%", String.valueOf(Settings.getInstance().getWebPort())));
+			if (!Network.isPortAvailable(Settings.getInstance().getWebPort())) {
+				LOGGER.error(Lang.getInstance().translate("Web port %port% already in use!").replace("%port%",
+						String.valueOf(Settings.getInstance().getWebPort())));
 			}
 		}
-		
+
 		this.transactionCreator = new TransactionCreator();
-		
-		
-	//	Setting_Json = new JSONObject();
-	//	Setting_Json = Settings.getInstance().read_setting_JSON();
-		
-		
-		
-		
-			
+
+		// Setting_Json = new JSONObject();
+		// Setting_Json = Settings.getInstance().read_setting_JSON();
 
 		int error = 0;
-		//OPEN DATABASE
+		// OPEN DATABASE
+		
+			try {
+				if (Controller.useGui)
+					about_frame.set_console_Text(Lang.getInstance().translate("Open DataLocale"));
+				this.dbSet = DBSet.getinstanse();
+				if (Controller.useGui)
+					about_frame.set_console_Text(Lang.getInstance().translate("DataLocale OK"));
+				LOGGER.info("DataLocale OK");
+			} catch (Throwable e) {
+				// TODO Auto-generated catch block
+				//e1.printStackTrace();
+				reCreateDB();
+				LOGGER.error("Error during startup detected trying to restore backup DataLocale...");
+			}
+		
+			// OPENING DATABASES
 		try {
-		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open database"));
-		this.dbSet = new DBSet();
-		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Database OK"));
-
-		// OPENING DATABASES
-		
-		
-			if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open datachain"));
+			if (Controller.useGui)
+				about_frame.set_console_Text(Lang.getInstance().translate("Open DataChain"));
 			this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
+			if (Controller.useGui)
+				about_frame.set_console_Text(Lang.getInstance().translate("DataChain OK"));
+			LOGGER.info("DataChain OK");
 		} catch (Throwable e) {
-			//Error open DB
-			error =1;
-			//LOGGER.error(e.getMessage(),e);
-			LOGGER.error(Lang.getInstance().translate("Error during startup detected trying to restore backup database..."));
-			
-			if (this.dbSet != null) this.dbSet.close();
-			reCreateDB();
-			this.dbSet = new DBSet();
+			// Error open DB
+			error = 1;
+			// LOGGER.error(e.getMessage(),e);
+			LOGGER.error("Error during startup detected trying to restore backup DataChain...");
+			reCreateDC();
 		}
-		if (error ==0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()){
-			
-			if (Settings.getInstance().getbacUpAskToStart()){
-			// ask dialog
-			int n = JOptionPane.showConfirmDialog(
-				null, Lang.getInstance().translate("BackUp Database?"),
-				Lang.getInstance().translate("Confirmation"),
-		        JOptionPane.OK_CANCEL_OPTION);
-			if (n == JOptionPane.OK_OPTION) {
+		if (error == 0 && Controller.useGui && Settings.getInstance().getbacUpEnabled()) {
+
+			if (Settings.getInstance().getbacUpAskToStart()) {
+				// ask dialog
+				int n = JOptionPane.showConfirmDialog(null, Lang.getInstance().translate("BackUp Database?"),
+						Lang.getInstance().translate("Confirmation"), JOptionPane.OK_CANCEL_OPTION);
+				if (n == JOptionPane.OK_OPTION) {
+					about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
+					// delete & copy files in BackUp dir
+					createDataCheckpoint();
+				}
+			} else {
 				about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
 				// delete & copy files in BackUp dir
 				createDataCheckpoint();
 			}
-			}else{
-			about_frame.set_console_Text(Lang.getInstance().translate("BackUp datachain"));
-			// delete & copy files in BackUp dir
-			createDataCheckpoint();
-			}
-			
 		}
-		
-
-		////  startFromScratchOnDemand();
-
 		if (this.dcSet.getBlockMap().isProcessing()) {
 			try {
 				this.dcSet.close();
 			} catch (Throwable e) {
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.error(e.getMessage(), e);
 			}
-			
-			if (this.dbSet != null) this.dbSet.close();
-			reCreateDB();
-			this.dbSet = new DBSet();
+			reCreateDC();
 		}
 
-		
-		
-		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Datachain Ok"));
-	//	createDataCheckpoint();
-				
-		//CHECK IF DB NEEDS UPDATE
-/*
-		try {
-			if(this.dcSet.getBlockMap().getLastBlockSignature() != null)
-			{
-				//CHECK IF NAME STORAGE NEEDS UPDATE
-				if (this.dcSet.getLocalDataMap().get("nsupdate") == null )
-				{
-					//FIRST NAME STORAGE UPDATE
-					UpdateUtil.repopulateNameStorage( 70000 );
-					this.dcSet.getLocalDataMap().set("nsupdate", "1");
-				}
-				//CREATE TRANSACTIONS FINAL MAP
-				if (this.dcSet.getLocalDataMap().get("txfinalmap") == null
-						|| !this.dcSet.getLocalDataMap().get("txfinalmap").equals("2"))
-				{
-					//FIRST NAME STORAGE UPDATE
-					UpdateUtil.repopulateTransactionFinalMap(  );
-					this.dcSet.getLocalDataMap().set("txfinalmap", "2");
-				}
-				
-				if (this.dcSet.getLocalDataMap().get("blogpostmap") == null ||  !this.dcSet.getLocalDataMap().get("blogpostmap").equals("2"))
-				{
-					//recreate comment postmap
-					UpdateUtil.repopulateCommentPostMap();
-					this.dcSet.getLocalDataMap().set("blogpostmap", "2");
-				}
-			} else {
-				this.dcSet.getLocalDataMap().set("nsupdate", "1");
-				this.dcSet.getLocalDataMap().set("txfinalmap", "2");
-				this.dcSet.getLocalDataMap().set("blogpostmap", "2");
-			}
-		} catch (Exception e12) {
-			createDataCheckpoint();
-//			Setting_Json.put("DB_OPEN", "Open BAD - try reCreate");			
-		}
-*/
-		
+		if (Controller.useGui)
+			about_frame.set_console_Text(Lang.getInstance().translate("Datachain Ok"));
+		// createDataCheckpoint();
+
+		// CHECK IF DB NEEDS UPDATE
+		/*
+		 * try { if(this.dcSet.getBlockMap().getLastBlockSignature() != null) {
+		 * //CHECK IF NAME STORAGE NEEDS UPDATE if
+		 * (this.dcSet.getLocalDataMap().get("nsupdate") == null ) { //FIRST
+		 * NAME STORAGE UPDATE UpdateUtil.repopulateNameStorage( 70000 );
+		 * this.dcSet.getLocalDataMap().set("nsupdate", "1"); } //CREATE
+		 * TRANSACTIONS FINAL MAP if
+		 * (this.dcSet.getLocalDataMap().get("txfinalmap") == null ||
+		 * !this.dcSet.getLocalDataMap().get("txfinalmap").equals("2")) {
+		 * //FIRST NAME STORAGE UPDATE UpdateUtil.repopulateTransactionFinalMap(
+		 * ); this.dcSet.getLocalDataMap().set("txfinalmap", "2"); }
+		 * 
+		 * if (this.dcSet.getLocalDataMap().get("blogpostmap") == null ||
+		 * !this.dcSet.getLocalDataMap().get("blogpostmap").equals("2")) {
+		 * //recreate comment postmap UpdateUtil.repopulateCommentPostMap();
+		 * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } else {
+		 * this.dcSet.getLocalDataMap().set("nsupdate", "1");
+		 * this.dcSet.getLocalDataMap().set("txfinalmap", "2");
+		 * this.dcSet.getLocalDataMap().set("blogpostmap", "2"); } } catch
+		 * (Exception e12) { createDataCheckpoint(); //
+		 * Setting_Json.put("DB_OPEN", "Open BAD - try reCreate"); }
+		 */
+
 		// CREATE SYNCHRONIZOR
 		this.synchronizer = new Synchronizer();
 
 		// CREATE BLOCKCHAIN
 		this.blockChain = new BlockChain(dcSet);
-		
+
 		// START API SERVICE
 		if (Settings.getInstance().isRpcEnabled()) {
-			if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Start API Service"));
+			if (Controller.useGui)
+				about_frame.set_console_Text(Lang.getInstance().translate("Start API Service"));
 			this.rpcService = new ApiService();
 			this.rpcService.start();
 		}
 
 		// START WEB SERVICE
 		if (Settings.getInstance().isWebEnabled()) {
-			if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Service"));
+			if (Controller.useGui)
+				about_frame.set_console_Text(Lang.getInstance().translate("Start WEB Service"));
 			this.webService = new WebService();
 			this.webService.start();
 		}
 
 		// CREATE WALLET
-		if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Open Wallet"));
+		if (Controller.useGui)
+			about_frame.set_console_Text(Lang.getInstance().translate("Open Wallet"));
 		this.wallet = new Wallet();
 
-	    if(this.wallet.isWalletDatabaseExisting()){
-	    	this.wallet.initiateItemsFavorites();
-	    }
-	    if (Controller.useGui) about_frame.set_console_Text(Lang.getInstance().translate("Wallet OK"));
-	    
-		if(Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting() && this.wallet.getAccounts().size() > 0) {
-			this.wallet.synchronize(true);	
+		if (this.wallet.isWalletDatabaseExisting()) {
+			this.wallet.initiateItemsFavorites();
 		}
-		
+		if (Controller.useGui)
+			about_frame.set_console_Text(Lang.getInstance().translate("Wallet OK"));
+
+		if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
+				&& !this.wallet.getAccounts().isEmpty()) {
+			this.wallet.synchronize(true);
+		}
+
 		// CREATE BLOCKGENERATOR
 		this.blockGenerator = new BlockGenerator(true);
 		// START UPDATES and BLOCK BLOCKGENERATOR
@@ -590,45 +580,44 @@ public class Controller extends Observable {
 				stopAll(0);
 			}
 		});
-		
-		
+
 		if (false) {
-			//TIMER TO SEND HEIGHT TO NETWORK EVERY 5 MIN 
-			
+			// TIMER TO SEND HEIGHT TO NETWORK EVERY 5 MIN
+
 			this.timerPeerHeightUpdate.cancel();
 			this.timerPeerHeightUpdate = new Timer();
-			
-			TimerTask action = new TimerTask() {
-		        public void run() {
-		        	
-		        	if(Controller.getInstance().getStatus() == STATUS_OK)
-		        	{
-			        	List<Peer> peers = Controller.getInstance().getActivePeers();
-			        	int peersCounter = peers.size();
-		        		if( peersCounter > 0)
-		        		{
-		        			Peer peer = peers.get(random.nextInt(peers.size()));
-		        			if(peer != null){
-		        				Controller.getInstance().sendMyHWeightToPeer(peer);
-		        			}
-		        		}
-		        	}
-		        }
-			};
-			
-			this.timerPeerHeightUpdate.schedule(action, 
-					BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>4, BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2);
-		}
-		
-		 
-	
 
-		if( Settings.getInstance().isTestnet()) 
+			TimerTask action = new TimerTask() {
+				public void run() {
+
+					if (Controller.getInstance().getStatus() == STATUS_OK) {
+						List<Peer> peers = Controller.getInstance().getActivePeers();
+						int peersCounter = peers.size();
+						if (peersCounter > 0) {
+							Peer peer = peers.get(random.nextInt(peers.size()));
+							if (peer != null) {
+								Controller.getInstance().sendMyHWeightToPeer(peer);
+							}
+						}
+					}
+				}
+			};
+
+			this.timerPeerHeightUpdate.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4,
+					BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2);
+		}
+
+		if (Settings.getInstance().isTestnet())
 			this.status = STATUS_OK;
-		
+
 		// REGISTER DATABASE OBSERVER
-		//this.addObserver(this.dbSet.getPeerMap());
+		// this.addObserver(this.dbSet.getPeerMap());
 		this.addObserver(this.dcSet);
+		
+		// start memory viewer
+		MemoryViewer mamoryViewer = new MemoryViewer(this);
+		mamoryViewer.start();
+
 	}
 
 	// need for TESTS
@@ -641,108 +630,73 @@ public class Controller extends Observable {
 		}
 	}
 
-	/*
-	public void replaseAssetsFavorites() {
-		if(this.wallet != null) {
-			this.wallet.replaseAssetFavorite();
-		}
-	}
-	public void replaseNotesFavorites() {
-		if(this.wallet != null) {
-			this.wallet.replaseNoteFavorite();
-		}
-	}
-	public void replasePersonsFavorites() {
-		if(this.wallet != null) {
-			this.wallet.replasePersonFavorite();
-		}
-	}
-	*/
-	
 	public void replaseFavoriteItems(int type) {
 		this.wallet.replaseFavoriteItems(type);
 	}
-	
-	public DCSet reCreateDB() throws IOException, Exception {
-		return reCreateDB(true);
-	}
-	
-	public DCSet reCreateDB(boolean useDataBak) throws IOException, Exception {
 
-	// delete  DataChain
-		
-	// copy BackUp to Datachain
-		
-	// delete DataLocal
-		
-	// copy BackUp to DataLocal
-		
-	// if ok reopen DB	
-		int error = 0;
-		
+	public DCSet reCreateDC() throws IOException, Exception {
 		File dataChain = new File(Settings.getInstance().getDataDir());
-		File dataLocal = new File(Settings.getInstance().getLocalDir());
-
-		File  dataChainBackUp  = new File(Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_DATA_DIR +"\\");
-		File   dataLocalBackUp = new File(Settings.getInstance().getBackUpDir() + "\\"+  Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
-		
-		// del datachain
+		File dataChainBackUp = new File(
+				Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+				// del datachain
 		if (dataChain.exists()) {
 			try {
-				Files.walkFileTree(
-						dataChain.toPath(),
-						new SimpleFileVisitorForRecursiveFolderDeletion());
+				Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
 			} catch (IOException e) {
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.error(e.getMessage(), e);
 			}
 		}
-		// del DataLocal
-				if (dataLocal.exists()) {
-					try {
-						Files.walkFileTree(
-								dataLocal.toPath(),
-								new SimpleFileVisitorForRecursiveFolderDeletion());
-					} catch (IOException e) {
-						LOGGER.error(e.getMessage(),e);
-					}
-				}
-		
-		// copy Back dir to DataChain 
+		// copy Back dir to DataChain
 		if (dataChainBackUp.exists()) {
-			
+
 			try {
 				FileUtils.copyDirectory(dataChainBackUp, dataChain);
-				LOGGER.info("Copy BackUp/DataChain to DataChain is Ok");
+				LOGGER.info("Restore BackUp/DataChain to DataChain is Ok");
 			} catch (IOException e) {
-				error = 1;
-				LOGGER.error(e.getMessage(),e);
+				LOGGER.error(e.getMessage(), e);
 			}
 
 		}
-		
-		
-		// copy Loc dir to Back 
-					if (dataLocalBackUp.exists()) {
-						
-						try {
-							FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
-							LOGGER.info("Copy BackUp/DataLocal to DataLocal is Ok");
-						} catch (IOException e) {
-							error = 1;
-							LOGGER.error(e.getMessage(),e);
-						}
 
-					}
-		
-		
+
 		DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
 		this.dcSet = DCSet.getInstance();
 		return this.dcSet;
 	}
 
-	public void startFromScratchOnDemand() throws IOException {
-		String dataVersion = this.dcSet.getLocalDataMap()
-				.get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
+	// recreate DB locate
+	public DBSet reCreateDB() throws IOException, Exception {
+
+		File dataLocal = new File(Settings.getInstance().getLocalDir());
+		File dataLocalBackUp = new File(
+				Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
+
+		// del DataLocal
+		if (dataLocal.exists()) {
+			try {
+				Files.walkFileTree(dataLocal.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+		}
+		// copy Loc dir to Back
+		if (dataLocalBackUp.exists()) {
+
+			try {
+				FileUtils.copyDirectory(dataLocalBackUp, dataLocal);
+				LOGGER.info("Restore BackUp/DataLocal to DataLocal is Ok");
+			} catch (IOException e) {
+				LOGGER.error(e.getMessage(), e);
+			}
+
+		}
+		DBSet.reCreateDatabase();
+		this.dbSet = DBSet.getinstanse();
+		return this.dbSet;
+	}
+
+	public void startFromScratchOnDemand() throws IOException, Exception {
+		String dataVersion = this.dcSet.getLocalDataMap().get(LocalDataMap.LOCAL_DATA_VERSION_KEY);
 
 		if (dataVersion == null || !dataVersion.equals(releaseVersion)) {
 			File dataDir = new File(Settings.getInstance().getDataDir());
@@ -751,22 +705,17 @@ public class Controller extends Observable {
 
 			if (dataDir.exists()) {
 				// delete data folder
-				java.nio.file.Files.walkFileTree(dataDir.toPath(),
-						new SimpleFileVisitorForRecursiveFolderDeletion());
+				java.nio.file.Files.walkFileTree(dataDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
 
 			}
 
 			if (dataBak.exists()) {
 				// delete data folder
-				java.nio.file.Files.walkFileTree(dataBak.toPath(),
-						new SimpleFileVisitorForRecursiveFolderDeletion());
+				java.nio.file.Files.walkFileTree(dataBak.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
 			}
 			DCSet.reCreateDatabase(this.dcSetWithObserver, this.dynamicGUI);
 
-			this.dcSet
-					.getLocalDataMap()
-					.set(LocalDataMap.LOCAL_DATA_VERSION_KEY,
-							Controller.releaseVersion);
+			this.dcSet.getLocalDataMap().set(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
 
 		}
 	}
@@ -776,7 +725,8 @@ public class Controller extends Observable {
 	}
 
 	public void rpcServiceRestart() {
-		this.rpcService.stop();
+		if (this.rpcService != null)
+			this.rpcService.stop();
 
 		// START API SERVICE
 		if (Settings.getInstance().isRpcEnabled()) {
@@ -786,8 +736,9 @@ public class Controller extends Observable {
 	}
 
 	public void webServiceRestart() {
-	
-		if (this.webService != null) this.webService.stop();
+
+		if (this.webService != null)
+			this.webService.stop();
 
 		// START API SERVICE
 		if (Settings.getInstance().isWebEnabled()) {
@@ -798,62 +749,61 @@ public class Controller extends Observable {
 
 	@Override
 	public void addObserver(Observer o) {
-		
+
 		this.dcSet.getBlockMap().addObserver(o);
 		this.dcSet.getTransactionMap().addObserver(o);
-//		this.dcSet.getTransactionFinalMap().addObserver(o);
+		// this.dcSet.getTransactionFinalMap().addObserver(o);
 
 		if (false && this.dcSetWithObserver) {
 			// ADD OBSERVER TO SYNCHRONIZER
 			// this.synchronizer.addObserver(o);
-	
+
 			// ADD OBSERVER TO BLOCKGENERATOR
 			// this.blockGenerator.addObserver(o);
 
 			// ADD OBSERVER TO NAMESALES
 			this.dcSet.getNameExchangeMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO POLLS
 			this.dcSet.getPollMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO ASSETS
 			this.dcSet.getItemAssetMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO IMPRINTS
 			this.dcSet.getItemImprintMap().addObserver(o);
-	
-			// ADD OBSERVER TO NOTES
-			this.dcSet.getItemNoteMap().addObserver(o);
-	
+
+			// ADD OBSERVER TO TEMPLATES
+			this.dcSet.getItemTemplateMap().addObserver(o);
+
 			// ADD OBSERVER TO PERSONS
 			this.dcSet.getItemPersonMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO STATUSES
 			this.dcSet.getItemStatusMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO UNIONS
 			this.dcSet.getItemUnionMap().addObserver(o);
-			
+
 			// ADD OBSERVER TO ORDERS
 			this.dcSet.getOrderMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO TRADES
 			this.dcSet.getTradeMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO BALANCES
 			this.dcSet.getAssetBalanceMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO ATMAP
 			this.dcSet.getATMap().addObserver(o);
-	
+
 			// ADD OBSERVER TO ATTRANSACTION MAP
 			this.dcSet.getATTransactionMap().addObserver(o);
 		}
 
 		// ADD OBSERVER TO CONTROLLER
 		super.addObserver(o);
-		o.update(this, new ObserverMessage(ObserverMessage.NETWORK_STATUS,
-				this.status));
+		o.update(this, new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
 	}
 
 	@Override
@@ -869,7 +819,6 @@ public class Controller extends Observable {
 
 	private boolean isStopping = false;
 
-
 	private String info;
 
 	public boolean isOnStopping() {
@@ -878,90 +827,87 @@ public class Controller extends Observable {
 
 	public void stopAll(Integer par) {
 		// PREVENT MULTIPLE CALLS
-		if (this.isStopping)  return;
-		this.isStopping = true; 
+		if (this.isStopping)
+			return;
+		this.isStopping = true;
 
-			
-			// STOP MESSAGE PROCESSOR
-			LOGGER.info("Stopping message processor");
-			this.network.stop();
+		// STOP MESSAGE PROCESSOR
+		LOGGER.info("Stopping message processor");
+		this.network.stop();
 
-			// STOP BLOCK PROCESSOR
-			LOGGER.info("Stopping block processor");
-			//boolean a = this.blockGenerator.isAlive() ;
-			//this.blockGenerator.interrupt();
-			//a = this.blockGenerator.isAlive() ;
-			//while(this.blockGenerator.isAlive()){				
-			//};
-			this.synchronizer.stop();
+		// STOP BLOCK PROCESSOR
+		LOGGER.info("Stopping block processor");
+		// boolean a = this.blockGenerator.isAlive() ;
+		// this.blockGenerator.interrupt();
+		// a = this.blockGenerator.isAlive() ;
+		// while(this.blockGenerator.isAlive()){
+		// };
+		this.synchronizer.stop();
 
-			// CLOSE DATABABASE
-			LOGGER.info("Closing database");
-			this.dcSet.close();
+		// CLOSE DATABABASE
+		LOGGER.info("Closing database");
+		this.dcSet.close();
 
-			// CLOSE WALLET
-			LOGGER.info("Closing wallet");
-			this.wallet.close();
-		
+		// CLOSE WALLET
+		LOGGER.info("Closing wallet");
+		this.wallet.close();
 
-			LOGGER.info("Closed.");
-			// FORCE CLOSE
-			LOGGER.info("EXIT parameter:" + par);
-			System.exit(par);
-		//	bat
-		//	if %errorlevel% neq 0 exit /b %errorlevel%
-		
+		LOGGER.info("Closed.");
+		// FORCE CLOSE
+		LOGGER.info("EXIT parameter:" + par);
+		System.exit(par);
+		// bat
+		// if %errorlevel% neq 0 exit /b %errorlevel%
+
 	}
 
 	private void createDataCheckpoint() {
-		if (!this.dcSet.getBlockMap().isProcessing()){
-	//			&& Settings.getInstance().isCheckpointingEnabled()) {
-	//		this.dcSet.close();
+		if (!this.dcSet.getBlockMap().isProcessing()) {
+			// && Settings.getInstance().isCheckpointingEnabled()) {
+			// this.dcSet.close();
 
 			File dataDir = new File(Settings.getInstance().getDataDir());
 			File dataLoc = new File(Settings.getInstance().getLocalDir());
 
-			File dataBakDC = new File(Settings.getInstance().getBackUpDir() + "\\" + Settings.getInstance().DEFAULT_DATA_DIR +"\\");
-			File dataBakLoc = new File(Settings.getInstance().getBackUpDir() + "\\"+  Settings.getInstance().DEFAULT_LOCAL_DIR + "\\");
-			// copy Data dir to Back 
+			File dataBakDC = new File(
+					Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+			File dataBakLoc = new File(
+					Settings.getInstance().getBackUpDir() + File.separator + Settings.getInstance().DEFAULT_LOCAL_DIR + File.separator);
+			// copy Data dir to Back
 			if (dataDir.exists()) {
 				if (dataBakDC.exists()) {
 					try {
-						Files.walkFileTree(
-								dataBakDC.toPath(),
-								new SimpleFileVisitorForRecursiveFolderDeletion());
+						Files.walkFileTree(dataBakDC.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
 					} catch (IOException e) {
-						LOGGER.error(e.getMessage(),e);
+						LOGGER.error(e.getMessage(), e);
 					}
 				}
 				try {
 					FileUtils.copyDirectory(dataDir, dataBakDC);
-					LOGGER.info("Copy DataChain to BakUp");
+					LOGGER.info("Copy DataChain to BackUp");
 				} catch (IOException e) {
-					LOGGER.error(e.getMessage(),e);
+					LOGGER.error(e.getMessage(), e);
 				}
 
 			}
-			// copy Loc dir to Back 
-						if (dataLoc.exists()) {
-							if (dataBakLoc.exists()) {
-								try {
-									Files.walkFileTree(
-											dataBakLoc.toPath(),
-											new SimpleFileVisitorForRecursiveFolderDeletion());
-								} catch (IOException e) {
-									LOGGER.error(e.getMessage(),e);
-								}
-							}
-							try {
-								FileUtils.copyDirectory(dataLoc, dataBakLoc);
-								LOGGER.info("Copy DataLocal to BakUp");
-							} catch (IOException e) {
-								LOGGER.error(e.getMessage(),e);
-							}
+			// copy Loc dir to Back
+			if (dataLoc.exists()) {
+				if (dataBakLoc.exists()) {
+					try {
+						Files.walkFileTree(dataBakLoc.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+					} catch (IOException e) {
+						LOGGER.error(e.getMessage(), e);
+					}
+				}
+				try {
+					FileUtils.copyDirectory(dataLoc, dataBakLoc);
+					LOGGER.info("Copy DataLocal to BackUp");
+				} catch (IOException e) {
+					LOGGER.error(e.getMessage(), e);
+				}
 
-						}
-			
+			}
+
 		}
 
 	}
@@ -975,7 +921,8 @@ public class Controller extends Observable {
 
 	public void pingAllPeers(boolean onlySynchronized) {
 		// PINF ALL ACTIVE PEERS
-		if (this.network != null) this.network.pingAllPeers(null, onlySynchronized);
+		if (this.network != null)
+			this.network.pingAllPeers(null, onlySynchronized);
 	}
 
 	public int getActivePeersCounter() {
@@ -985,149 +932,193 @@ public class Controller extends Observable {
 
 	public void walletSyncStatusUpdate(int height) {
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.WALLET_SYNC_STATUS, height));
+		this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_SYNC_STATUS, height));
 	}
-	
+
 	public void blockchainSyncStatusUpdate(int height) {
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
+		this.notifyObservers(new ObserverMessage(ObserverMessage.BLOCKCHAIN_SYNC_STATUS, height));
 	}
-		
+
 	public long getToOfflineTime() {
 		return this.toOfflineTime;
 	}
-	
+
 	public void setToOfflineTime(long time) {
 		this.toOfflineTime = time;
 	}
 
-	public void broadcastUnconfirmedToPeer(List<Transaction> transactions, Peer peer) 
-	{		
-
-		byte[] peerByte = peer.getAddress().getAddress();
-		DCSet dcSet = DCSet.getInstance();
-		datachain.TransactionMap dcMap = dcSet.getTransactionMap();
-		
-		for (Transaction transaction: transactions) {
-
-			if (this.isStopping || !peer.isUsed()) {
-				return;
-			}
-
-			if(transaction.getDeadline() < NTP.getTime())
-			{
-				dcMap.delete(transaction.getSignature());
-				continue;
-			}
-			
-			Message message = MessageFactory.getInstance()
-					.createTransactionMessage(transaction);
-
-			if (dcMap.isBroadcastedToPeer(transaction, peerByte))
-				continue;
-			
-			try
-			{
-				if (peer.sendMessage(message)) {
-					dcMap.addBroadcastedPeer(transaction, peerByte);
-				}
-			} catch(Exception e)
-			{
-				LOGGER.error(e.getMessage(),e);
-			}
-		}
-		
-		//LOGGER.info("Broadcasting end");
+	public void notifyObserveUpdatePeer(Peer peer) {
+		this.network.notifyObserveUpdatePeer(peer);
 	}
 
+	public void broadcastUnconfirmedToPeer(Peer peer) {
+		
+		//LOGGER.info(peer.getAddress() + " sended UNCONFIRMED ++++ START ");
+
+		byte[] peerByte = peer.getAddress().getAddress();
+
+		if (this.isStopping)
+			return;
+		
+		TransactionMap map = this.dcSet.getTransactionMap();
+		Iterator<byte[]> iterator = map.getIterator(0, false);
+		Transaction transaction;
+		Message message;
+		long ping = 0;
+		int counter = 0;
+		///////// big maxCounter freeze network and make bans on response headers and blocks
+		int stepCount = 128; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+		long dTime = this.blockChain.getTimestamp(this.dcSet);
+		
+		while (iterator.hasNext() && stepCount > 4) {
+			
+			if (this.isStopping) {
+				return;
+			}
+			
+			transaction = map.get(iterator.next());
+			if (transaction == null)
+				continue;
+			
+			if (transaction.getDeadline() < dTime) {
+				map.delete(transaction);
+				continue;
+			}
+
+			//LOGGER.error(" time " + transaction.viewTimestamp());
+
+			if (!map.needBroadcasting(transaction, peerByte))
+				continue;
+
+			message = MessageFactory.getInstance().createTransactionMessage(transaction);
+
+			try {
+				if (peer.sendMessage(message)) {
+					counter++;
+					map.addBroadcastedPeer(transaction, peerByte);
+				} else {
+					break;
+				}
+			} catch (Exception e) {
+				if (this.isStopping) {
+					return;
+				}
+				LOGGER.error(e.getMessage(), e);
+			}
+			
+			if (counter % stepCount == 0) {
+				
+				peer.tryPing(10000);
+				this.network.notifyObserveUpdatePeer(peer);
+				
+				ping = peer.getPing();
+				if (ping < 0 || ping > 500) {
+										
+					stepCount >>= 1;
+			
+					if (ping < 0) {
+						stepCount >>= 1;
+						try {
+							Thread.sleep(10000);
+						}
+						catch (Exception e) {		
+						}
+					} else if (ping > 5000) {
+						stepCount >>= 1;
+					}
+					
+					//LOGGER.debug(peer.getAddress() + " stepCount down " + stepCount);
+
+				} else if (ping < 100) {
+					stepCount <<= 1;
+					//LOGGER.debug(peer.getAddress() + " stepCount UP " + stepCount + " for PING: " + ping);
+				}
+				
+			}
+
+		}
+		
+		peer.tryPing(10000);
+		this.network.notifyObserveUpdatePeer(peer);
+
+		//LOGGER.info(peer.getAddress() + " sended UNCONFIRMED  counter: " + counter);
+		
+	}
+	
 	public void onConnect(Peer peer) {
 
-		if(this.isStopping)
+		if (this.isStopping)
 			return;
-		
+
 		// SEND FOUNDMYSELF MESSAGE
-		if (!peer.sendMessage( MessageFactory.getInstance().createFindMyselfMessage( 
-			Controller.getInstance().getFoundMyselfID() 
-			)))
+		if (!peer.sendMessage(
+				MessageFactory.getInstance().createFindMyselfMessage(Controller.getInstance().getFoundMyselfID())))
 			return;
+
+		try {
+			Thread.sleep(300);
+		}
+		catch (Exception e) {
+		}
 
 		// SEND VERSION MESSAGE
-		if (!peer.sendMessage( MessageFactory.getInstance().createVersionMessage( 
-			Controller.getVersion(), getBuildTimestamp() )))
+		if (!peer.sendMessage(
+				MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))
 			return;
-		
-		// GET GENESIS BLOCK - TEST WRONG CHAIN
-		//byte[]  genesisBlockSign = Controller.getInstance().getBlockChain().getGenesisBlock().getSignature();
-		
+
+		// GET CHECKPOINT BLOCK - TEST WRONG CHAIN
+		byte[] hardCheckBlockSign;
+		int checkPoint = BlockChain.getCheckPoint(dcSet);
+		if (checkPoint < 10) {
+			hardCheckBlockSign = this.blockChain.getGenesisBlock().getSignature();
+		} else {
+			hardCheckBlockSign = this.blockChain.CHECKPOINT.b;
+		}
+		// CHECK CHECKPOINT BLOCK on CONNECT
+		Message mess = MessageFactory.getInstance().createGetHeadersMessage(hardCheckBlockSign);
+		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess, 20000);
+		if (response == null)
+			; // MAY BE IT HARD BUSY
+		else if (response.getSignatures().isEmpty()) {
+			// NO
+			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES <<3, "wrong GENESIS BLOCK");
+			return;
+		}
+
 		/*
-		// SEND GENESIS BLOCK MESSAGE
-		////peer.sendMessage(MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign));
-		//SEND MESSAGE TO PEER
-		Message mess = MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign);
-		BlockMessage response = (BlockMessage) peer.getResponse(mess);
-		
-		//CHECK IF WE GOT RESPONSE
-		if(response == null)
-		{
-			//ERROR
-			//error = true;
-			return; // WRONG GENESIS BLOCK
-		}
-		
-		Block block = response.getBlock();
-		//CHECK BLOCK SIGNATURE
-		if(block == null || !(block instanceof GenesisBlock))
-		{
-			//error = true;
-			return; // WRONG GENESIS BLOCK
-		}
-		
-		// TODO CHECK GENESIS BLOCK on CONNECT
-		Message mess = MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign);
-		GetSignaturesMessage response = (GetSignaturesMessage) peer.getResponse(mess);
-		
-		//CHECK IF WE GOT RESPONSE
-		if(response == null)
-		{
-			//ERROR
-			//error = true;
-			return; // WRONG GENESIS BLOCK
-		}
-		
-		byte[] header = response.getParent();
-		if (header == null)
-		{
-			return; // WRONG GENESIS BLOCK
-		}
-		*/
-
-		// GET HEIGHT
-		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeightFull(dcSet);
-		// SEND HEIGTH MESSAGE
-		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
-			return;
-
-		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
-		if(!this.isStopping) {
-			List<Transaction> transactions = this.dcSet.getTransactionMap().getTransactions(0, 100, true);
-			if (transactions != null && !transactions.isEmpty())
-				this.broadcastUnconfirmedToPeer(transactions, peer);
-		}
+		 * // SEND GENESIS BLOCK MESSAGE
+		 * ////peer.sendMessage(MessageFactory.getInstance().
+		 * createGetBlockMessage(genesisBlockSign)); //SEND MESSAGE TO PEER
+		 * Message mess =
+		 * MessageFactory.getInstance().createGetBlockMessage(genesisBlockSign);
+		 * BlockMessage response = (BlockMessage) peer.getResponse(mess);
+		 * 
+		 * //CHECK IF WE GOT RESPONSE if(response == null) { //ERROR //error =
+		 * true; return; // WRONG GENESIS BLOCK }
+		 * 
+		 * Block block = response.getBlock(); //CHECK BLOCK SIGNATURE if(block
+		 * == null || !(block instanceof GenesisBlock)) { //error = true;
+		 * return; // WRONG GENESIS BLOCK }
+		 * 
+		 * // TODO CHECK GENESIS BLOCK on CONNECT Message mess =
+		 * MessageFactory.getInstance().createGetHeadersMessage(genesisBlockSign
+		 * ); GetSignaturesMessage response = (GetSignaturesMessage)
+		 * peer.getResponse(mess);
+		 * 
+		 * //CHECK IF WE GOT RESPONSE if(response == null) { //ERROR //error =
+		 * true; return; // WRONG GENESIS BLOCK }
+		 * 
+		 * byte[] header = response.getParent(); if (header == null) { return;
+		 * // WRONG GENESIS BLOCK }
+		 */
 
 		// GET CURRENT WIN BLOCK
 		Block winBlock = this.blockChain.getWaitWinBuffer();
 		if (winBlock != null) {
-			// SEND  MESSAGE
-			if(!peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
-					return;
-		}
-
-		/// it FREEZE all peer.tryPing();
-		if (false) {
-			// set not truli ping on connect - try peer.setNeedPing() later! 
-			peer.setNeedPing();
+			// SEND MESSAGE
+			if (!peer.sendMessage(MessageFactory.getInstance().createWinBlockMessage(winBlock)))
+				return;
 		}
 
 		if (this.isStopping)
@@ -1141,101 +1132,104 @@ public class Controller extends Observable {
 
 			// NOTIFY
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
-			
+			this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+
 		}
+
+		// BROADCAST UNCONFIRMED TRANSACTIONS to PEER
+		this.broadcastUnconfirmedToPeer(peer);
+		
+		/*
+		// GET HEIGHT
+		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeightFull(dcSet);
+		// SEND HEIGTH MESSAGE
+		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
+			return;
+
+		//peer.setNeedPing();
+		peer.tryPing(30000);
+		this.network.notifyObserveUpdatePeer(peer);
+		*/
+
 	}
 
-	public void actionAfterConnect() 
-	{
-		
+	public void actionAfterConnect() {
+
 		///////// UNCONFIRMED MAP CLEAR
 		this.timerUnconfirmed.cancel();
 		this.timerUnconfirmed = new Timer();
 
 		TimerTask actionUnconfirmed = new TimerTask() {
-	        public void run() {
-	        	
-				//LOGGER.debug("timerUnconfirmed ---------------- ");
-	       		Controller.getInstance().clearUnconfirmedRecords();	        	
+			public void run() {
 
-	        }
+				// LOGGER.debug("timerUnconfirmed ---------------- ");
+				Controller.getInstance().clearUnconfirmedRecords();
+
+			}
 		};
-			
-		this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
 
-		if (//BlockChain.HARD_WORK || 
-				!this.doesWalletExists() || !this.useGui)
+		this.timerUnconfirmed.schedule(actionUnconfirmed, BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1);
+
+		if (// BlockChain.HARD_WORK ||
+		!this.doesWalletExists() || !this.useGui)
 			return;
-		
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-		}
 
 		this.timer.cancel();
 		this.timer = new Timer();
 
 		TimerTask action = new TimerTask() {
-	        public void run() {
+			public void run() {
 
-				//LOGGER.error("actionAfterConnect --->>>>>> ");
+				// LOGGER.error("actionAfterConnect --->>>>>> ");
 
-	        	if(Controller.getInstance().getStatus() == STATUS_OK)
-		        {
-	    			//Controller.getInstance().statusInfo();
+				if (Controller.getInstance().getStatus() == STATUS_OK) {
+					// Controller.getInstance().statusInfo();
 
-		        	Controller.getInstance().setToOfflineTime(0L);
-		        	
-		        	
-			       	if((Controller.getInstance().isNeedSyncWallet() || checkNeedSyncWallet())
-			       			&& !Controller.getInstance().isProcessingWalletSynchronize())
-			       	{
-						//LOGGER.error("actionAfterConnect --->>>>>> synchronizeWallet");
-			       		Controller.getInstance().synchronizeWallet();
-			       	}
-		        }
-	        }
+					Controller.getInstance().setToOfflineTime(0L);
+
+					if ((Controller.getInstance().isNeedSyncWallet() || checkNeedSyncWallet())
+							&& !Controller.getInstance().isProcessingWalletSynchronize()) {
+						// LOGGER.error("actionAfterConnect --->>>>>>
+						// synchronizeWallet");
+						Controller.getInstance().synchronizeWallet();
+					}
+				}
+			}
 		};
-			
-		this.timer.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1);
-		
+
+		this.timer.schedule(action, BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1);
+
 	}
-	
-	
+
 	public void forgingStatusChanged(ForgingStatus status) {
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.FORGING_STATUS, status));
+		this.notifyObservers(new ObserverMessage(ObserverMessage.FORGING_STATUS, status));
 	}
 
 	// used from NETWORK
 	public void afterDisconnect(Peer peer) {
 		synchronized (this.peerHWeight) {
-			
+
 			this.peerHWeight.remove(peer);
-			
+
 			this.peersVersions.remove(peer);
-			
-			if (this.peerHWeight.size() == 0) {
-				
-				if(this.getToOfflineTime() == 0L) {
-					//SET START OFFLINE TIME
+
+			if (this.peerHWeight.isEmpty()) {
+
+				if (this.getToOfflineTime() == 0L) {
+					// SET START OFFLINE TIME
 					this.setToOfflineTime(NTP.getTime());
 				}
-				
+
 				// UPDATE STATUS
 				if (isTestNet())
 					this.status = STATUS_OK;
 				else
 					this.status = STATUS_NO_CONNECTIONS;
 
-				
 				// NOTIFY
 				this.setChanged();
-				this.notifyObservers(new ObserverMessage(
-						ObserverMessage.NETWORK_STATUS, this.status));
+				this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
 			}
 		}
 	}
@@ -1244,11 +1238,10 @@ public class Controller extends Observable {
 		return this.blockChain.getSignatures(dcSet, signature);
 	}
 
-    public void setOrphanTo(int height)
-    {
-    	this.blockChain.clearWaitWinBuffer();
-    	this.blockGenerator.setOrphanTo(height);
-    }	
+	public void setOrphanTo(int height) {
+		this.blockChain.clearWaitWinBuffer();
+		this.blockGenerator.setOrphanTo(height);
+	}
 
 	public void clearWaitWinBufferProcessed() {
 		waitWinBufferProcessed = new HashSet<byte[]>();
@@ -1262,23 +1255,21 @@ public class Controller extends Observable {
 		if (this.isStopping)
 			return;
 
-		////synchronized (this) {
+		//// synchronized (this) {
 		if (true) {
 			switch (message.getType()) {
 
 			/*
-			case Message.HEIGHT_TYPE:
-
-				HeightMessage heightMessage = (HeightMessage) message;
-
-				// ADD TO LIST
-				synchronized (this.peerHWeight) {
-					this.peerHWeight.put(heightMessage.getSender(),
-							heightMessage.getHeight());
-				}
-
-				break;
-				*/
+			 * case Message.HEIGHT_TYPE:
+			 * 
+			 * HeightMessage heightMessage = (HeightMessage) message;
+			 * 
+			 * // ADD TO LIST synchronized (this.peerHWeight) {
+			 * this.peerHWeight.put(heightMessage.getSender(),
+			 * heightMessage.getHeight()); }
+			 * 
+			 * break;
+			 */
 
 			case Message.HWEIGHT_TYPE:
 
@@ -1286,46 +1277,52 @@ public class Controller extends Observable {
 
 				// TEST TIMESTAMP of PEER
 				Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
-				if ( this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP.getTime()) {
+				if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP
+						.getTime()) {
 					// IT PEER from FUTURE
-					this.banPeerOnError(hWeightMessage.getSender(),"peer from FUTURE");
+					this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
 					return;
 				}
 
 				// ADD TO LIST
 				synchronized (this.peerHWeight) {
-					this.peerHWeight.put(hWeightMessage.getSender(),
-							hWeightMessage.getHWeight());
+					this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
 				}
-				
-				//this.checkStatusAndObserve(0);
-				
+
+				// this.checkStatusAndObserve(0);
+
 				break;
 
 			case Message.GET_SIGNATURES_TYPE:
-				
+
 				GetSignaturesMessage getHeadersMessage = (GetSignaturesMessage) message;
 
 				// ASK SIGNATURES FROM BLOCKCHAIN
+				long time1 = System.currentTimeMillis();
 				List<byte[]> headers = getNextHeaders(getHeadersMessage.getParent());
+				LOGGER.debug(message.getSender().getAddress() + " getNextHeaders time: " + (System.currentTimeMillis() - time1)
+						+ " for headers: " + headers.size()
+						+ " from Height: " + (headers.isEmpty()?"-1":
+							this.blockChain.getBlock(dcSet, headers.get(0))==null?
+									"CHECK":this.blockChain.getBlock(dcSet, headers.get(0)).getHeight(dcSet)));
 
 				/*
-				LOGGER.error(message.getId() + " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
-						+ Base58.encode(getHeadersMessage.getParent()));
+				 * LOGGER.error(message.getId() +
+				 * " controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE ->"
+				 * + Base58.encode(getHeadersMessage.getParent()));
+				 * 
+				 * if (!headers.isEmpty()) {
+				 * LOGGER.error("this.blockChain.getSignatures.get(0) -> " +
+				 * Base58.encode( headers.get(0) )); LOGGER.
+				 * error("this.blockChain.getSignatures.get(headers.size()-1) -> "
+				 * + Base58.encode( headers.get(headers.size()-1) )); } else {
+				 * LOGGER.
+				 * error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!"
+				 * ); }
+				 */
 
-				if (headers.size() > 0) {
-				LOGGER.error("this.blockChain.getSignatures.get(0) -> "
-						+ Base58.encode( headers.get(0) ));
-				LOGGER.error("this.blockChain.getSignatures.get(headers.size()-1) -> "
-						+ Base58.encode( headers.get(headers.size()-1) ));
-				} else {
-					LOGGER.error("controller.Controller.onMessage(Message).GET_SIGNATURES_TYPE -> NOT FOUND!");					
-				}
-				*/
-				
 				// CREATE RESPONSE WITH SAME ID
-				response = MessageFactory.getInstance().createHeadersMessage(
-						headers);
+				response = MessageFactory.getInstance().createHeadersMessage(headers);
 				response.setId(message.getId());
 
 				// SEND RESPONSE BACK WITH SAME ID
@@ -1338,14 +1335,14 @@ public class Controller extends Observable {
 				GetBlockMessage getBlockMessage = (GetBlockMessage) message;
 
 				/*
-				LOGGER.error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
-						+ " form PEER: " + getBlockMessage.getSender().toString()
-						+ " sign: " + Base58.encode(getBlockMessage.getSignature()));
-				*/
+				 * LOGGER.
+				 * error("controller.Controller.onMessage(Message).GET_BLOCK_TYPE ->.getSignature()"
+				 * + " form PEER: " + getBlockMessage.getSender().toString() +
+				 * " sign: " + Base58.encode(getBlockMessage.getSignature()));
+				 */
 
 				// ASK BLOCK FROM BLOCKCHAIN
-				newBlock = this.blockChain
-						.getBlock(dcSet, getBlockMessage.getSignature());
+				newBlock = this.blockChain.getBlock(dcSet, getBlockMessage.getSignature());
 
 				// CREATE RESPONSE WITH SAME ID
 				response = MessageFactory.getInstance().createBlockMessage(newBlock);
@@ -1358,7 +1355,7 @@ public class Controller extends Observable {
 					String mess = "Block NOT FOUND for sign:" + getBlockMessage.getSignature();
 					banPeerOnError(message.getSender(), mess);
 				}
-				
+
 				break;
 
 			case Message.WIN_BLOCK_TYPE:
@@ -1374,19 +1371,15 @@ public class Controller extends Observable {
 
 				// if already it block in process
 				byte[] key = newBlock.getSignature();
-				
+
 				synchronized (this.waitWinBufferProcessed) {
 					if (!waitWinBufferProcessed.add(key)
 							|| Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), key))
 						return;
 				}
 
-				info = "mess from " + blockWinMessage.getSender().getAddress();
+				info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " " + newBlock.toString(dcSet);
 				LOGGER.debug(info);
-				if (Controller.useGui) about_frame.set_console_Text(info);
-				info = " received new WIN Block " + newBlock.toString(dcSet);
-				LOGGER.debug(info);
-				if (Controller.useGui) about_frame.set_console_Text(info);
 
 				if (this.status == STATUS_SYNCHRONIZING) {
 					// SET for FUTURE without CHECK
@@ -1395,41 +1388,54 @@ public class Controller extends Observable {
 					break;
 				}
 
-
-				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
+				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
 				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
 					/// NOT BAN - WATCH it
-					this.network.tryDisconnect(message.getSender(), 0, "");			
-					////info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
-					////banPeerOnError(message.getSender(), info);
+					if (isNewWinBlockValid < -10) {
+						info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
+						banPeerOnError(message.getSender(), info);
+						return;
+					} else if (isNewWinBlockValid == -4) {
+						// reference to PARENT last block >>> weak...
+						// already - BROADCASTED to him
+						return;
+					} else if (isNewWinBlockValid < 0) {
+						if (this.network.getActivePeersCounter(false) > Settings.getInstance().getMaxConnections() - 3) {
+							this.network.tryDisconnect(message.getSender(), 0, "");
+						}
+						return;
+					} else if (isNewWinBlockValid == 3 || isNewWinBlockValid == 41) {
+						return;
+					}
 					return;
 				}
 
-				if (!newBlock.isValid(dcSet)) {
+				if (!newBlock.isValid(dcSet, false)) {
 					info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
 					banPeerOnError(message.getSender(), info);
-					if (Controller.useGui) about_frame.set_console_Text(info);
 					return;
 				}
 
 				// CHECK IF VALID
-				if(isNewWinBlockValid == 0)	{
+				if (isNewWinBlockValid == 0) {
 					if (blockChain.setWaitWinBuffer(dcSet, newBlock)) {
 						// IF IT WIN
 						/*
-						LOGGER.info(Lang.getInstance().translate("received new valid WIN Block")
-								+ " for Height: " + this.getMyHeight());
-								*/
-		
+						 * LOGGER.info(Lang.getInstance().
+						 * translate("received new valid WIN Block") +
+						 * " for Height: " + this.getMyHeight());
+						 */
+
 						// BROADCAST
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
-						this.network.asyncBroadcastPing(message, excludes);
+						this.network.asyncBroadcast(message, excludes, false);
 						return;
 					} else {
 						// SEND IF my WIN BLOCK as RESPONCE
 						if (blockChain.compareNewWin(dcSet, newBlock) < 0) {
-							Message messageBestWin = MessageFactory.getInstance().createWinBlockMessage(blockChain.getWaitWinBuffer());
+							Message messageBestWin = MessageFactory.getInstance()
+									.createWinBlockMessage(blockChain.getWaitWinBuffer());
 							message.getSender().sendMessage(messageBestWin);
 						}
 						return;
@@ -1447,7 +1453,7 @@ public class Controller extends Observable {
 						this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, false);
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
-						this.network.asyncBroadcast(message, excludes, true);
+						this.network.asyncBroadcast(message, excludes, false);
 					} catch (Exception e) {
 						if (this.isOnStopping()) {
 							return;
@@ -1464,11 +1470,11 @@ public class Controller extends Observable {
 					ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();
 					this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
 					try {
-						if (this.flushNewBlockGenerated()) {				
-							this.blockChain.setWaitWinBuffer(dcSet, newBlock);					
+						if (this.flushNewBlockGenerated()) {
+							this.blockChain.setWaitWinBuffer(dcSet, newBlock);
 							List<Peer> excludes = new ArrayList<Peer>();
 							excludes.add(message.getSender());
-							this.network.asyncBroadcast(message, excludes, true);
+							this.network.asyncBroadcast(message, excludes, false);
 						}
 					} catch (Exception e) {
 						if (this.isOnStopping()) {
@@ -1481,131 +1487,10 @@ public class Controller extends Observable {
 					this.blockGenerator.setForgingStatus(tempStatus);
 					return;
 				} else {
-					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid "
-							+ " for Height: " + this.getMyHeight()
-							+ ", code: " + isNewWinBlockValid
-							+ ", " + newBlock.toString(dcSet));
+					LOGGER.debug("controller.Controller.onMessage BLOCK_TYPE -> WIN block not valid " + " for Height: "
+							+ this.getMyHeight() + ", code: " + isNewWinBlockValid + ", " + newBlock.toString(dcSet));
 				}
 
-				break;
-
-			case Message.BLOCK_TYPE:
-				
-				if (true)
-					return;
-
-				// send GENESIS block for test NODE
-				BlockMessage blockMessage = (BlockMessage) message;
-				int newBlockHeight = blockMessage.getHeight();
-				if (newBlockHeight < 1) {
-					// BLOCK NOT FOUND!!!
-					String mess = "Block NOT FOUND on NODE" + ": " + message.getSender().getAddress().getHostAddress();
-					//banPeerOnError(message.getSender(), mess);
-					return;
-				}
-
-				////// ALL IINCOMED BLOCKS ignored now!!!
-				if (this.status != STATUS_OK
-						|| this.isProcessingWalletSynchronize()) {
-					break;
-				}
-
-
-				// ASK BLOCK FROM BLOCKCHAIN
-				if (newBlockHeight == 1) {
-					// genesis block
-					newBlock = (GenesisBlock) blockMessage.getBlock();
-				} else 
-					newBlock = blockMessage.getBlock();
-				
-				LOGGER.debug("mess from " + blockMessage.getSender().getAddress());
-				LOGGER.debug(" received new chain Block " + newBlock.toString(dcSet));
-
-				/*
-				synchronized (this.peerHWeight) {
-					Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
-					long hmVal;
-					if (peerHM == null || peerHM.b == null) {
-						hmVal = 0;
-					} else {
-						hmVal = peerHM.b;
-					}
-						
-					int peerHeight =  blockWinMessage.getHeight();
-					if (peerHeight < 0) {
-						peerHeight = newBlock.getHeightByParent(dcSet);
-					}
-					this.peerHWeight.put(message.getSender(),							
-							new Tuple2<Integer, Long>(peerHeight,
-									hmVal + newBlock.calcWinValueTargeted(dcSet)));
-					
-				}
-				*/
-
-				int isNewBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock);
-				if (isNewBlockValid == 4) {
-					// fork branch! disconnect!
-					//// NOT !!! this.onDisconnect(message.getSender());
-					return;
-				} else if (isNewBlockValid != 0) {
-					return;
-				}
-				
-				// may be it block need in WIN battle with MY winBlock?
-				Block waitWinBlock = this.blockChain.getWaitWinBuffer();
-				if (waitWinBlock != null
-						// alreday checced && waitWinBlock.getHeightByParent(dcSet) == newBlock.getHeightByParent(dcSet)
-						) {
-					// same candidate for win
-					if (this.blockChain.setWaitWinBuffer(dcSet, newBlock)) {
-						// need to BROADCAST
-						this.broadcastWinBlock(newBlock, null);
-					}
-					return;
-				}	
-				
-				// CHECK IF VALID
-				if(newBlock.isSignatureValid() && newBlock.isValid(dcSet))
-				{
-					try {
-						this.synchronizer.pipeProcessOrOrphan(dcSet, newBlock, false, false);
-					} catch (Exception e) {
-						if (this.isOnStopping()) {
-							return; //throw new Exception("on stoping");
-						} else {
-							LOGGER.error(e.getMessage(),e);
-						}
-					}
-					/*
-					synchronized (this.peerHWeight) {
-						Tuple2<Integer, Long> peerHM = this.peerHWeight.get(message.getSender());
-						long hmVal;
-						if (peerHM == null || peerHM.b == null) {
-							hmVal = 0;
-						} else {
-							hmVal = peerHM.b;
-						}
-							
-						this.peerHWeight.put(message.getSender(),
-								new Tuple2<Integer, Long>(blockMessage.getHeight(),
-										hmVal + newBlock.calcWinValueTargeted(dcSet)));
-						
-					}
-					*/
-
-					/*
-					LOGGER.info(Lang.getInstance().translate("received new valid block"));
-					*/
-
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes, true);
-
-				} else {
-					banPeerOnError(message.getSender(), "Block (" + newBlock.toString(dcSet) + ") is Invalid");
-				}
-				
 				break;
 
 			case Message.TRANSACTION_TYPE:
@@ -1616,35 +1501,32 @@ public class Controller extends Observable {
 				Transaction transaction = transactionMessage.getTransaction();
 
 				// CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
-				if (transaction.getCreator() != null 
-						& !transaction.isSignatureValid()) {
+				if (transaction.getCreator() != null & !transaction.isSignatureValid(DCSet.getInstance())) {
 					// DISHONEST PEER
 					banPeerOnError(message.getSender(), "invalid transaction signature");
 
 					return;
 				}
 
-				// CHECK IF TRANSACTION HAS MINIMUM FEE AND MINIMUM FEE PER BYTE
 				// AND UNCONFIRMED
 				// TODO fee
 				// transaction.calcFee();
-				if (!this.dcSet.getTransactionRef_BlockRef_Map().contains(transaction.getSignature())
-						&& !this.dcSet.getTransactionMap().contains(transaction.getSignature())
-								) {
-					// ADD TO UNCONFIRMED TRANSACTIONS
-					this.blockGenerator.addUnconfirmedTransaction(transaction);
-
-					if (this.isStopping)
-						return;
-
-					// BROADCAST
-					List<Peer> excludes = new ArrayList<Peer>();
-					excludes.add(message.getSender());
-					this.network.broadcast(message, excludes, true);
-				}
-
-				break;
+				byte[] signature = transaction.getSignature();
+				if (this.dcSet.getTransactionMap().contains(signature)
+						|| this.dcSet.getTransactionFinalMapSigns().contains(signature)
+						|| this.isStopping)
+					return;
 				
+				// ADD TO UNCONFIRMED TRANSACTIONS
+				this.dcSet.getTransactionMap().add(transaction);
+
+				// BROADCAST
+				List<Peer> excludes = new ArrayList<Peer>();
+				excludes.add(message.getSender());
+				this.network.broadcast(message, excludes, false);
+
+				return;
+
 			case Message.VERSION_TYPE:
 
 				VersionMessage versionMessage = (VersionMessage) message;
@@ -1652,37 +1534,37 @@ public class Controller extends Observable {
 				// ADD TO LIST
 				synchronized (this.peersVersions) {
 					this.peersVersions.put(versionMessage.getSender(),
-							new Pair<String, Long>(versionMessage.getStrVersion(), versionMessage.getBuildDateTime()) );
+							new Pair<String, Long>(versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
 				}
 
 				break;
 
 			default:
-				
+
 				Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
 				if (HWeight == null)
 					HWeight = new Tuple2<Integer, Long>(-1, -1L);
-				
+
 				// TODO - for OLD versions
-				//CREATE PING
+				// CREATE PING
 				response = MessageFactory.getInstance().createHWeightMessage(HWeight);
 				// CREATE RESPONSE WITH SAME ID
 				response.setId(message.getId());
-				
-				//SEND BACK TO SENDER
+
+				// SEND BACK TO SENDER
 				boolean result11 = message.getSender().sendMessage(response);
 				if (!result11) {
 					LOGGER.debug("error on response GET_HWEIGHT_TYPE to " + message.getSender().getAddress());
 				}
-								
+
 			}
 		}
 	}
 
 	public void banPeerOnError(Peer peer, String mess) {
-		if ( Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1 ) {
+		if (Settings.getInstance().getMaxConnections() - this.network.getActivePeersCounter(false) < 1) {
 			// BAN if ALL connection USED
-			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES>>2, "ban PeerOnError - " + mess);			
+			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES >> 2, "ban PeerOnError - " + mess);
 		}
 	}
 
@@ -1700,48 +1582,60 @@ public class Controller extends Observable {
 
 		// CREATE MESSAGE
 		Message message = MessageFactory.getInstance().createWinBlockMessage(newBlock);
-		
+
 		if (this.isOnStopping())
 			return;
 
 		// BROADCAST MESSAGE
-		this.network.asyncBroadcastPing(message, excludes);
+		this.network.asyncBroadcastWinBlock(message, excludes, false);
 
 		LOGGER.info("broadcasted!");
-		
+
 	}
+
 	public void broadcastHWeightFull(List<Peer> excludes) {
 
-		//LOGGER.info("broadcast winBlock " + newBlock.toString(this.dcSet));
+		// LOGGER.info("broadcast winBlock " + newBlock.toString(this.dcSet));
 
 		// CREATE MESSAGE
- 		// GET HEIGHT
+		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeightFull(dcSet);
 		if (HWeight == null)
 			return;
-		
+
 		Message messageHW = MessageFactory.getInstance().createHWeightMessage(HWeight);
-		
-		// BROADCAST MESSAGE		
+
+		// BROADCAST MESSAGE
 		this.network.asyncBroadcast(messageHW, excludes, false);
-		
+
 	}
-	
+
 	public void broadcastTransaction(Transaction transaction) {
 
-		if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-			// CREATE MESSAGE
-			Message message = MessageFactory.getInstance()
-					.createTransactionMessage(transaction);
+		// CREATE MESSAGE
+		Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
 
-			// BROADCAST MESSAGE
-			List<Peer> excludes = new ArrayList<Peer>();
-			this.network.broadcast(message, excludes, true);
+		// BROADCAST MESSAGE
+		List<Peer> excludes = new ArrayList<Peer>();
+		this.network.broadcast(message, excludes, false);
+	}
+
+	public void broadcastTelegram(Transaction transaction, boolean store) {
+
+		// CREATE MESSAGE
+		Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
+		
+		if (store) {
+			this.network.addTelegram((TelegramMessage)telegram);
 		}
+
+		// BROADCAST MESSAGE
+		List<Peer> excludes = new ArrayList<Peer>();
+		this.network.asyncBroadcast(telegram, excludes, false);
 	}
 
 	// SYNCHRONIZE
-	
+
 	public void orphanInPipe(Block block) throws Exception {
 		this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, true);
 	}
@@ -1751,189 +1645,182 @@ public class Controller extends Observable {
 			this.status = STATUS_OK;
 			return true;
 		}
-		
-		if (this.peerHWeight.size() == 0) {
+
+		if (this.peerHWeight.isEmpty()) {
 			this.status = STATUS_NO_CONNECTIONS;
-			return false;
+			return true;
 		}
 
 		if (isStopping)
 			return true;
-		
+
 		Tuple2<Integer, Long> thisHW = this.blockChain.getHWeightFull(dcSet);
 		if (thisHW == null) {
 			this.status = STATUS_OK;
 			return true;
 		}
-		
+
 		// withWinBuffer
 		Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift);
 		if (maxHW.c == null) {
 			this.status = STATUS_OK;
 			return true;
 		}
-		
-		if (maxHW.a > thisHW.a + shift ) {
+
+		if (maxHW.a > thisHW.a + shift) {
 			this.status = STATUS_SYNCHRONIZING;
 			return false;
-		//} else if (maxHW.a < thisHW.a) {
+			// } else if (maxHW.a < thisHW.a) {
 		} else {
 			this.status = STATUS_OK;
 			return true;
 		}
-		
+
 		/*
-		long maxPeerWeight = maxHW.b;
-		long chainWeight = thisHW.b;
-		if (maxPeerWeight > chainWeight) {
-			// SAME last block?
-			int pickTarget = BlockChain.BASE_TARGET >>2;
-			if (true || (maxPeerWeight - chainWeight < pickTarget)) {
-				byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
-
-				Block maxBlock = null;
-				try {
-					maxBlock = core.Synchronizer.getBlock(lastBlockSignature, maxHW.c, true);
-				} catch (Exception e) {
-					// error on peer - disconnect!
-					this.status = STATUS_SYNCHRONIZING;
-					this.network.tryDisconnect(maxHW.c, 0, "checkStatus - core.Synchronizer.getBlock - " + e.getMessage());
-					return false;
-				}
-				if (maxBlock != null) {
-					// SAME LAST BLOCK
-					//this.blockChain.getHWeight(dcSet, false);
-					dcSet.getBlockSignsMap().setFullWeight(maxPeerWeight);
-					this.status = STATUS_OK;
-					return true;
-				}
-			}
-		}
-		//LOGGER.info("Controller.isUpToDate getMaxPeerHWeight:" + maxPeerWeight + "<=" + chainWeight);
-
-		boolean result = maxPeerWeight <= chainWeight;
-		if (result) {
-			 this.status = STATUS_OK;
-			 return true;
-		}
-
-		this.status = STATUS_SYNCHRONIZING;
-		return false;
-		*/
+		 * long maxPeerWeight = maxHW.b; long chainWeight = thisHW.b; if
+		 * (maxPeerWeight > chainWeight) { // SAME last block? int pickTarget =
+		 * BlockChain.BASE_TARGET >>2; if (true || (maxPeerWeight - chainWeight
+		 * < pickTarget)) { byte[] lastBlockSignature =
+		 * dcSet.getBlockMap().getLastBlockSignature();
+		 * 
+		 * Block maxBlock = null; try { maxBlock =
+		 * core.Synchronizer.getBlock(lastBlockSignature, maxHW.c, true); }
+		 * catch (Exception e) { // error on peer - disconnect! this.status =
+		 * STATUS_SYNCHRONIZING; this.network.tryDisconnect(maxHW.c, 0,
+		 * "checkStatus - core.Synchronizer.getBlock - " + e.getMessage());
+		 * return false; } if (maxBlock != null) { // SAME LAST BLOCK
+		 * //this.blockChain.getHWeight(dcSet, false);
+		 * dcSet.getBlockSignsMap().setFullWeight(maxPeerWeight); this.status =
+		 * STATUS_OK; return true; } } }
+		 * //LOGGER.info("Controller.isUpToDate getMaxPeerHWeight:" +
+		 * maxPeerWeight + "<=" + chainWeight);
+		 * 
+		 * boolean result = maxPeerWeight <= chainWeight; if (result) {
+		 * this.status = STATUS_OK; return true; }
+		 * 
+		 * this.status = STATUS_SYNCHRONIZING; return false;
+		 */
 
 	}
 
 	public int checkStatusAndObserve(int shift) {
-		
+
 		int statusOld = this.status;
 		checkStatus(shift);
 		if (statusOld != this.status) {
 			// NOTIFY
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
-			
-		}
-		
-		return this.status;
-	}
-	
-	public boolean isReadyForging() {
-		
-		/*
-		if (this.peerHWeight.size() == 0) {
-			return false;
+			this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+
 		}
 
-		if (true) {
-			int maxPeerHeight = this.getMaxPeerHWeight().a;
-			int chainHeight = this.blockChain.getHWeight(dcSet, false).a;
-			int diff = chainHeight - maxPeerHeight;
-			return diff >= 0;
-		} else {
-			long maxPeerWeight = this.getMaxPeerHWeight().b;
-			long chainWeight = this.blockChain.getHWeight(dcSet, false).b;
-			long diff = chainWeight - maxPeerWeight;
-			return diff >= 0 && diff < 999;
-		}
-		*/
-		
+		return this.status;
+	}
+
+	public boolean isReadyForging() {
+
+		/*
+		 * if (this.peerHWeight.isEmpty()) { return false; }
+		 * 
+		 * if (true) { int maxPeerHeight = this.getMaxPeerHWeight().a; int
+		 * chainHeight = this.blockChain.getHWeight(dcSet, false).a; int diff =
+		 * chainHeight - maxPeerHeight; return diff >= 0; } else { long
+		 * maxPeerWeight = this.getMaxPeerHWeight().b; long chainWeight =
+		 * this.blockChain.getHWeight(dcSet, false).b; long diff = chainWeight -
+		 * maxPeerWeight; return diff >= 0 && diff < 999; }
+		 */
+
 		return true;
 	}
-	
+
+    // https://127.0.0.1/7pay_in/tools/block_proc/ERA
 	public void NotifyIncoming(List<Transaction> transactions) {
-		
-		List<Account> accounts = this.wallet.getAccounts();	
+
+		List<Account> accounts = this.wallet.getAccounts();
 		List<Integer> seqs = new ArrayList<Integer>();
 
 		int seq = 0;
-		for (Transaction transaction: transactions) {
-			//FOR ALL ACCOUNTS
-			synchronized(accounts)
-			{		
-				for(Account account: accounts)
-				{
-					//CHECK IF INVOLVED
-					if(!account.equals(transaction.getCreator()) && transaction.isInvolved(account))
-					{
+		for (Transaction transaction : transactions) {
+			// FOR ALL ACCOUNTS
+			synchronized (accounts) {
+				for (Account account : accounts) {
+					// CHECK IF INVOLVED
+					if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
 						seqs.add(++seq);
 						break;
 					}
 				}
 			}
 		}
-		
+
 		if (seqs.isEmpty())
 			return;
+
+		// SEE -
+		// http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+		String url_string = Settings.getInstance().getNotifyIncomingURL();
+		try
+		{
+			
+			//CREATE CONNECTION
+			URL url = new URL(url_string);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			
+			//EXECUTE
+			int res = connection.getResponseCode();
+		}					
+		catch(Exception e)
+		{
+			//return -1;
+		}
 		
-		// SEE - http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
-		String url = Settings.getInstance().getNotifyIncomingURL();
-		//http(url)
-		
+
 	}
-	
+
 	public boolean isNSUpToDate() {
 		return !Settings.getInstance().updateNameStorage();
 	}
 
 	public void update(int shift) {
 		// UPDATE STATUS
-				
+
 		if (this.status == STATUS_NO_CONNECTIONS) {
 			return;
 		}
-		
-		///this.status = STATUS_SYNCHRONIZING;
-		
-		//DBSet dcSet = DBSet.getInstance();
+
+		/// this.status = STATUS_SYNCHRONIZING;
+
+		// DBSet dcSet = DBSet.getInstance();
 
 		Peer peer = null;
-		//Block lastBlock = getLastBlock();
-		//int lastTrueBlockHeight = this.getMyHeight() - Settings.BLOCK_MAX_SIGNATURES;
+		// Block lastBlock = getLastBlock();
+		// int lastTrueBlockHeight = this.getMyHeight() -
+		// Settings.BLOCK_MAX_SIGNATURES;
 		int checkPointHeight = BlockChain.getCheckPoint(dcSet);
-		
+
 		boolean isUpToDate;
 		// WHILE NOT UPTODATE
 		do {
-			
+
 			// NOTIFY
 			this.setChanged();
-			this.notifyObservers(new ObserverMessage(
-					ObserverMessage.NETWORK_STATUS, this.status));
+			this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
 
 			// START UPDATE FROM HIGHEST HEIGHT PEER
 			// withWinBuffer = true
-			Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift);				
+			Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift);
 			if (peerHW != null) {
 				peer = peerHW.c;
 				if (peer != null) {
-					info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress()
-							+ " WH: " + getHWeightOfPeer(peer);
+					info = "update from MaxHeightPeer:" + peer.getAddress().getHostAddress() + " WH: "
+							+ getHWeightOfPeer(peer);
 					LOGGER.info(info);
-					if (Controller.useGui) about_frame.set_console_Text(info);
+					if (Controller.useGui && about_frame.isVisible())
+						about_frame.set_console_Text(info);
 					try {
 						// SYNCHRONIZE FROM PEER
-						if (!this.isOnStopping()) this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a);			
+						if (!this.isOnStopping())
+							this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a);
 						if (this.isOnStopping())
 							return;
 					} catch (Exception e) {
@@ -1944,84 +1831,68 @@ public class Controller extends Observable {
 							;
 						} else {
 							LOGGER.error(e.getMessage(), e);
+							return;
 						}
 					}
 				}
-				
+
 				blockchainSyncStatusUpdate(getMyHeight());
 			}
-			
+
 			isUpToDate = checkStatus(shift);
 			this.checkStatusAndObserve(shift);
-			
-		} while (!this.isStopping && !isUpToDate);			
 
-		if (this.peerHWeight.size() == 0
-				|| peer == null) {
+		} while (!this.isStopping && !isUpToDate);
+
+		if (this.peerHWeight.isEmpty() || peer == null) {
 			// UPDATE STATUS
 			this.status = STATUS_NO_CONNECTIONS;
-		//} else if (!this.isUpToDate()) {
-			//////this.s/tatus = STATUS_SYNCHRONIZING;
+			// } else if (!this.isUpToDate()) {
+			////// this.s/tatus = STATUS_SYNCHRONIZING;
 			// UPDATE RENEW
-		///	update();
+			/// update();
 		} else {
 			this.status = STATUS_OK;
+			this.pingAllPeers(false);				
 		}
-		
+
 		// send to ALL my HW
-		////broadcastHWeight(null);
+		//// broadcastHWeight(null);
 		if (this.isStopping)
 			return;
 
 		// NOTIFY
 		this.setChanged();
-		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.NETWORK_STATUS, this.status));
-		
+		this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+
 		this.statusInfo();
 
 	}
 
 	/*
-	private Peer getMaxWeightPeer() {
-		Peer highestPeer = null;
-		
-		// NOT USE GenesisBlocks
-		long weight = BlockChain.BASE_TARGET + BlockChain.BASE_TARGET>>1;
-
-		try {
-			synchronized (this.peerHWeight) {
-				for (Peer peer : this.peerHWeight.keySet()) {
-					if (highestPeer == null && peer != null) {
-						highestPeer = peer;
-					} else {
-						// IF HEIGHT IS BIGGER
-						if (weight < this.peerHWeight.get(peer).b) {
-							highestPeer = peer;
-							weight = this.peerHWeight.get(peer).b;
-						} else if (weight == this.peerHWeight.get(peer).b) {
-							// IF HEIGHT IS SAME
-							// CHECK IF PING OF PEER IS BETTER
-							if (peer.getPing() < highestPeer.getPing()) {
-								highestPeer = peer;
-							}
-						}
-					}
-				}
-			}
-		} catch (Exception e) {
-			// PEER REMOVED WHILE ITERATING
-		}
-
-		return highestPeer;
-	}
-	*/
+	 * private Peer getMaxWeightPeer() { Peer highestPeer = null;
+	 * 
+	 * // NOT USE GenesisBlocks long weight = BlockChain.BASE_TARGET +
+	 * BlockChain.BASE_TARGET>>1;
+	 * 
+	 * try { synchronized (this.peerHWeight) { for (Peer peer :
+	 * this.peerHWeight.keySet()) { if (highestPeer == null && peer != null) {
+	 * highestPeer = peer; } else { // IF HEIGHT IS BIGGER if (weight <
+	 * this.peerHWeight.get(peer).b) { highestPeer = peer; weight =
+	 * this.peerHWeight.get(peer).b; } else if (weight ==
+	 * this.peerHWeight.get(peer).b) { // IF HEIGHT IS SAME // CHECK IF PING OF
+	 * PEER IS BETTER if (peer.getPing() < highestPeer.getPing()) { highestPeer
+	 * = peer; } } } } } } catch (Exception e) { // PEER REMOVED WHILE ITERATING
+	 * }
+	 * 
+	 * return highestPeer; }
+	 */
 
 	public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift) {
-		
+
 		if (this.isStopping || this.dcSet.isStoped())
 			return null;
-		
+
 		Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
 		int height = myHWeight.a + shift;
 		long weight = myHWeight.b;
@@ -2031,9 +1902,7 @@ public class Controller extends Observable {
 			synchronized (this.peerHWeight) {
 				for (Peer peer : this.peerHWeight.keySet()) {
 					Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-					if (height < whPeer.a
-							|| ( maxPeer != null && height == whPeer.a && weight < whPeer.b)
-							) {
+					if (height < whPeer.a || (maxPeer != null && height == whPeer.a && weight < whPeer.b)) {
 						height = whPeer.a;
 						weight = whPeer.b;
 						maxPeer = peer;
@@ -2052,10 +1921,10 @@ public class Controller extends Observable {
 		if (peerHeight > hWeightMy.a) {
 			hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b + 10000l);
 		} else {
-			hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b - 10000l);							
+			hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b - 10000l);
 		}
 		this.peerHWeight.put(peer, hWeightMy);
-		////blockchainSyncStatusUpdate(this.getMyHeight());
+		//// blockchainSyncStatusUpdate(this.getMyHeight());
 	}
 
 	// WALLET
@@ -2072,24 +1941,21 @@ public class Controller extends Observable {
 	// use license KEY
 	public boolean createWallet(long licenseKey, byte[] seed, String password, int amount) {
 		// IF NEW WALLET CREADED
-		if(this.wallet.create(seed, password, amount, false)) {
+		if (this.wallet.create(seed, password, amount, false)) {
 			this.setWalletLicense(licenseKey);
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
-	
+
 	public boolean recoverWallet(byte[] seed, String password, int amount) {
-		if(this.wallet.create(seed, password, amount, false))
-		{
+		if (this.wallet.create(seed, password, amount, false)) {
 			LOGGER.info("Wallet needs to synchronize!");
 			this.actionAfterConnect();
 			this.setNeedSyncWallet(true);
 
 			return true;
-		}
-		else
+		} else
 			return false;
 	}
 
@@ -2111,20 +1977,19 @@ public class Controller extends Observable {
 
 		return this.wallet.getAccounts();
 	}
-	
-	public boolean isAddressIsMine(String address)
-	{
-		if(!this.doesWalletExists())
+
+	public boolean isAddressIsMine(String address) {
+		if (!this.doesWalletExists())
 			return false;
 
 		List<Account> accounts = this.wallet.getAccounts();
-		for (Account account: accounts) {
+		for (Account account : accounts) {
 			if (account.getAddress().equals(address))
 				return true;
 		}
 		return false;
 	}
-	
+
 	public List<PublicKeyAccount> getPublicKeyAccounts() {
 
 		return this.wallet.getPublicKeyAccounts();
@@ -2144,19 +2009,49 @@ public class Controller extends Observable {
 		this.wallet.synchronize(true);
 		return ss;
 	}
-	
-	
-	
+
 	public PrivateKeyAccount getPrivateKeyAccountByAddress(String address) {
-		if(this.doesWalletExists()) {
+		if (this.doesWalletExists()) {
 			return this.wallet.getPrivateKeyAccount(address);
 		} else {
 			return null;
 		}
 	}
 
+	public byte[] decrypt(PublicKeyAccount creator, Account recipient, byte[] data) {
+		
+		Account account = this.getAccountByAddress(creator.getAddress());	
+		
+		byte[] privateKey = null; 
+		byte[] publicKey = null;
+		
+		//IF SENDER ANOTHER
+		if(account == null)
+		{
+    		PrivateKeyAccount accountRecipient = this.getPrivateKeyAccountByAddress(recipient.getAddress());
+			privateKey = accountRecipient.getPrivateKey();		
+			
+			publicKey = creator.getPublicKey();    				
+		}
+		//IF SENDER ME
+		else
+		{
+    		PrivateKeyAccount accountRecipient = this.getPrivateKeyAccountByAddress(account.getAddress());
+			privateKey = accountRecipient.getPrivateKey();		
+			
+			publicKey = this.getPublicKeyByAddress(recipient.getAddress());    				
+		}
+
+		try {
+    		return AEScrypto.dataDecrypt(data, privateKey, publicKey);
+		} catch (InvalidCipherTextException e1) {
+			return null;
+		}
+		
+	}
+
 	public Account getAccountByAddress(String address) {
-		if(this.doesWalletExists()) {
+		if (this.doesWalletExists()) {
 			return this.wallet.getAccount(address);
 		} else {
 			return null;
@@ -2164,15 +2059,15 @@ public class Controller extends Observable {
 	}
 
 	public boolean isMyAccountByAddress(String address) {
-		if(this.doesWalletExists()) {
+		if (this.doesWalletExists()) {
 			return this.wallet.accountExists(address);
 		}
 		return false;
 	}
-	
-	//public BigDecimal getUnconfirmedBalance(String address, long key) {
-	//	return this.wallet.getUnconfirmedBalance(address, key);
-	//}
+
+	// public BigDecimal getUnconfirmedBalance(String address, long key) {
+	// return this.wallet.getUnconfirmedBalance(address, key);
+	// }
 	public Tuple3<BigDecimal, BigDecimal, BigDecimal> getUnconfirmedBalance(Account account, long key) {
 		return this.wallet.getUnconfirmedBalance(account, key);
 	}
@@ -2209,13 +2104,11 @@ public class Controller extends Observable {
 		return this.wallet.isUnlocked();
 	}
 
-	public int checkAPICallAllowed(String json, HttpServletRequest request)
-			throws Exception {
+	public int checkAPICallAllowed(String json, HttpServletRequest request) throws Exception {
 		int result = 0;
 
 		if (request != null) {
-			Enumeration<String> headers = request
-					.getHeaders(ApiClient.APICALLKEY);
+			Enumeration<String> headers = request.getHeaders(ApiClient.APICALLKEY);
 			String uuid = null;
 			if (headers.hasMoreElements()) {
 				uuid = headers.nextElement();
@@ -2225,38 +2118,35 @@ public class Controller extends Observable {
 			}
 		}
 
-		if (!GraphicsEnvironment.isHeadless() &&  (Settings.getInstance().isGuiEnabled() || Settings.getInstance().isSysTrayEnabled()) ) {
+		if (!GraphicsEnvironment.isHeadless()
+				&& (Settings.getInstance().isGuiEnabled() || Settings.getInstance().isSysTrayEnabled())) {
 			Gui gui = Gui.getInstance();
 			SysTray.getInstance().sendMessage(Lang.getInstance().translate("INCOMING API CALL"),
 					Lang.getInstance().translate("An API call needs authorization!"), MessageType.WARNING);
 			Object[] options = { Lang.getInstance().translate("Yes"), Lang.getInstance().translate("No") };
 
-			 StringBuilder sb = new StringBuilder(Lang.getInstance().translate("Permission Request: "));
-	            sb.append(Lang.getInstance().translate("Do you want to authorize the following API call?\n\n")
-						+ json);
-	            JTextArea jta = new JTextArea(sb.toString());
-	            jta.setLineWrap(true);
-	            jta.setEditable(false);
-	            JScrollPane jsp = new JScrollPane(jta){
-	                /**
-					 *
-					 */
-					private static final long serialVersionUID = 1L;
+			StringBuilder sb = new StringBuilder(Lang.getInstance().translate("Permission Request: "));
+			sb.append(Lang.getInstance().translate("Do you want to authorize the following API call?\n\n") + json
+					+ " \n" + request.getRequestURL());
+			JTextArea jta = new JTextArea(sb.toString());
+			jta.setLineWrap(true);
+			jta.setEditable(false);
+			JScrollPane jsp = new JScrollPane(jta) {
+				/**
+				 *
+				 */
+				private static final long serialVersionUID = 1L;
 
-					@Override
-	                public Dimension getPreferredSize() {
-	                    return new Dimension(480, 200);
-	                }
-	            };
+				@Override
+				public Dimension getPreferredSize() {
+					return new Dimension(480, 200);
+				}
+			};
 
 			gui.bringtoFront();
-			
-			result = JOptionPane
-					.showOptionDialog(gui,
-							jsp, Lang.getInstance().translate("INCOMING API CALL"),
-							JOptionPane.YES_NO_OPTION,
-							JOptionPane.QUESTION_MESSAGE, null, options,
-							options[1]);
+
+			result = JOptionPane.showOptionDialog(gui, jsp, Lang.getInstance().translate("INCOMING API CALL"),
+					JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 		}
 
 		return result;
@@ -2268,6 +2158,10 @@ public class Controller extends Observable {
 
 	public boolean unlockWallet(String password) {
 		return this.wallet.unlock(password);
+	}
+
+	public boolean unlockOnceWallet(String password) {
+		return this.wallet.unlockOnce(password);
 	}
 
 	public void setSecondsToUnlock(int seconds) {
@@ -2282,25 +2176,23 @@ public class Controller extends Observable {
 
 		return getTransaction(signature, this.dcSet);
 	}
-	
+
 	// by account addres + timestamp get signature
 	public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
 
 		return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
 	}
-	
+
 	public Transaction getTransaction(byte[] signature, DCSet database) {
-		
+
 		// CHECK IF IN BLOCK
-		Block block = database.getTransactionRef_BlockRef_Map()
-				.getParent(signature);
-		if (block != null) {
-			return block.getTransaction(signature);
+		Tuple2<Integer, Integer> tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
+		if (tuple_Tx != null)	{
+			return database.getTransactionFinalMap().get(tuple_Tx);
 		}
-		
 		// CHECK IF IN TRANSACTION DATABASE
-		if (this.dcSet.getTransactionMap().contains(signature)) {
-			return this.dcSet.getTransactionMap().get(signature);
+		if (database.getTransactionMap().contains(signature)) {
+			return database.getTransactionMap().get(signature);
 		}
 		return null;
 	}
@@ -2316,6 +2208,27 @@ public class Controller extends Observable {
 	public List<Block> getLastBlocks(Account account, int limit) {
 		return this.wallet.getLastBlocks(account, limit);
 	}
+
+	public List<TelegramMessage> getLastTelegrams(Account account, long timestamp, String filter) {
+		return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter);
+	}
+	public List<TelegramMessage> getLastTelegrams(String address, long timestamp, String filter) {
+		return this.network.getTelegramsForAddress(address, timestamp, filter);
+	}
+	public List<TelegramMessage> getLastTelegrams(long timestamp, String filter) {
+		return this.network.getTelegramsFromTimestamp(timestamp, filter);
+	}
+
+	public TelegramMessage getTelegram(byte[] signature) {
+		return this.network.getTelegram(signature);
+	}
+
+	public TelegramMessage getTelegram(String signature) {
+		return this.network.getTelegram(signature);
+	}
+	//public TelegramMessage getTelegram(String signature) {
+	//	return this.network.getTelegram(signature);
+	//}
 
 	public List<Pair<Account, Name>> getNames() {
 		return this.wallet.getNames();
@@ -2367,37 +2280,23 @@ public class Controller extends Observable {
 	}
 
 	/*
-	public void addAssetFavorite(AssetCls asset) {
-		this.wallet.addAssetFavorite(asset);
-	}
-	*/
+	 * public void addAssetFavorite(AssetCls asset) {
+	 * this.wallet.addAssetFavorite(asset); }
+	 */
 	public void addItemFavorite(ItemCls item) {
 		this.wallet.addItemFavorite(item);
 	}
 
-	/*
-	public void removeAssetFavorite(AssetCls asset) {
-		this.wallet.removeAssetFavorite(asset);
-	}
-	public void removeNoteFavorite(NoteCls note) {
-		this.wallet.removeNoteFavorite(note);
-	}
-	public void removePersonFavorite(PersonCls person) {
-		this.wallet.removePersonFavorite(person);
-	}
-	*/
-	
 	public Item_Map getItemMap(int type) {
-		switch(type)
-			{
-			case ItemCls.ASSET_TYPE:
-				return this.dcSet.getItemAssetMap();
-			case ItemCls.IMPRINT_TYPE:
-				return this.dcSet.getItemImprintMap();
-			case ItemCls.NOTE_TYPE:
-				return this.dcSet.getItemNoteMap();
-			case ItemCls.PERSON_TYPE:
-				return this.dcSet.getItemPersonMap();
+		switch (type) {
+		case ItemCls.ASSET_TYPE:
+			return this.dcSet.getItemAssetMap();
+		case ItemCls.IMPRINT_TYPE:
+			return this.dcSet.getItemImprintMap();
+		case ItemCls.TEMPLATE_TYPE:
+			return this.dcSet.getItemTemplateMap();
+		case ItemCls.PERSON_TYPE:
+			return this.dcSet.getItemPersonMap();
 		}
 		return null;
 	}
@@ -2406,18 +2305,6 @@ public class Controller extends Observable {
 		this.wallet.removeItemFavorite(item);
 	}
 
-	/*
-	public boolean isAssetFavorite(AssetCls asset) {
-		return this.wallet.isAssetFavorite(asset);
-	}
-	
-	public boolean isNoteFavorite(NoteCls note) {
-		return this.wallet.isNoteFavorite(note);
-	}
-	public boolean isPersonFavorite(PersonCls person) {
-		return this.wallet.isPersonFavorite(person);
-	}
-	*/
 	public boolean isItemFavorite(ItemCls item) {
 		return this.wallet.isItemFavorite(item);
 	}
@@ -2430,19 +2317,6 @@ public class Controller extends Observable {
 		return getItemMap(type).getValuesAll();
 	}
 
-	/*
-	public Collection<ItemCls> getAllAssets() {
-		return this.dcSet.getAssetMap().getValuesAll();
-	}
-
-	public Collection<ItemCls> getAllNotes() {
-		return this.dcSet.getNoteMap().getValuesAll();
-	}
-	public Collection<ItemCls> getAllPersons() {
-		return this.dcSet.getPersonMap().getValuesAll();
-	}
-	*/
-
 	public void onDatabaseCommit() {
 		this.wallet.commit();
 	}
@@ -2454,6 +2328,7 @@ public class Controller extends Observable {
 	public ForgingStatus getForgingStatus() {
 		return this.blockGenerator.getForgingStatus();
 	}
+
 	public void setForgingStatus(ForgingStatus status) {
 		this.blockGenerator.setForgingStatus(status);
 	}
@@ -2464,17 +2339,17 @@ public class Controller extends Observable {
 		return this.blockChain;
 	}
 
-
 	public int getMyHeight() {
 		// need for TESTs
 		if (this.isOnStopping())
 			return -1;
-		
-		
-		///return this.blockChain != null? this.blockChain.getHWeightFull(dcSet).a: -1;
+
+		/// return this.blockChain != null?
+		/// this.blockChain.getHWeightFull(dcSet).a: -1;
 		Tuple2<Integer, Long> hWeight = dcSet.getBlockSignsMap().get(blockChain.getLastBlockSignature(dcSet));
-		if (hWeight == null || hWeight.a == -1) return -1;
-		
+		if (hWeight == null || hWeight.a == -1)
+			return -1;
+
 		return hWeight.a;
 	}
 
@@ -2482,45 +2357,39 @@ public class Controller extends Observable {
 		Block block = this.blockChain.getLastBlock(dcSet);
 		if (block == null)
 			return this.blockChain.getGenesisBlock();
-		return this.blockChain.getLastBlock(dcSet);
+		return block;
 	}
-	
+
 	public byte[] getWalletLastBlockSign() {
 		return this.wallet.getLastBlockSignature();
 	}
-	
+
 	public Block getBlock(byte[] header) {
 		return this.blockChain.getBlock(dcSet, header);
 	}
 
-	public Pair<Block, List<Transaction>> scanTransactions(Block block,
-			int blockLimit, int transactionLimit, int type, int service,
-			Account account) {
-		return this.blockChain.scanTransactions(dcSet, block, blockLimit,
-				transactionLimit, type, service, account);
+	public Pair<Block, List<Transaction>> scanTransactions(Block block, int blockLimit, int transactionLimit, int type,
+			int service, Account account) {
+		return this.blockChain.scanTransactions(dcSet, block, blockLimit, transactionLimit, type, service, account);
 
 	}
 
 	public long getNextBlockGeneratingBalance() {
-		Block block = this.dcSet.getBlockMap().getLastBlock();
+		Block block = this.dcSet.getBlockMap().last();
 		return block.getGeneratingBalance(dcSet);
 	}
-
 
 	// FORGE
 
 	/*
-	public boolean newBlockGenerated(Block newBlock) {
-		
-		Tuple2<Boolean, Block> result = this.blockChain.setWaitWinBuffer(dcSet, newBlock); 
-		if ( result.a ) {
-			// need to BROADCAST
-			this.broadcastBlock(result.b);
-		}
-		
-		return result.a;
-	}
-	*/
+	 * public boolean newBlockGenerated(Block newBlock) {
+	 * 
+	 * Tuple2<Boolean, Block> result = this.blockChain.setWaitWinBuffer(dcSet,
+	 * newBlock); if ( result.a ) { // need to BROADCAST
+	 * this.broadcastBlock(result.b); }
+	 * 
+	 * return result.a; }
+	 */
 
 	// FLUSH BLOCK from win Buffer - to MAP and NERWORK
 	public boolean flushNewBlockGenerated() throws Exception {
@@ -2528,31 +2397,30 @@ public class Controller extends Observable {
 		Block newBlock = this.blockChain.popWaitWinBuffer();
 		if (newBlock == null)
 			return false;
-		
+
 		// if last block is changed by core.Synchronizer.process(DBSet, Block)
 		// clear this win block
 		if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
 			return false;
 		}
 
-		LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: "
-				+ newBlock.toString(this.dcSet));
+		LOGGER.debug("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString(this.dcSet));
 
 		boolean isValid = false;
 		if (isMyAccountByAddress(newBlock.getCreator().getAddress())) {
 			isValid = true; // GENERATE by ME
 		} else {
-			isValid= newBlock.isSignatureValid() && newBlock.isValid(this.dcSet);
+			isValid = newBlock.isSignatureValid() && newBlock.isValid(this.dcSet, false);
 			LOGGER.debug("+++ flushNewBlockGenerated Validated records: " + newBlock.getTransactionCount());
 		}
- 
+
 		if (!isValid)
 			return false;
-			
+
 		try {
 			this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
 			this.clearWaitWinBufferProcessed();
-			
+
 		} catch (Exception e) {
 			if (this.isOnStopping()) {
 				throw new Exception("on stoping");
@@ -2563,15 +2431,14 @@ public class Controller extends Observable {
 
 		LOGGER.debug("+++ flushNewBlockGenerated OK");
 
-		///LOGGER.info("and broadcast it");
-		
+		/// LOGGER.info("and broadcast it");
+
 		// broadcast my HW
 		broadcastHWeightFull(null);
-					
+
 		return true;
 	}
 
-	
 	public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
 		return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
 
@@ -2579,12 +2446,14 @@ public class Controller extends Observable {
 
 	// BALANCES
 
-	public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(long key) {
+	public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
+			long key) {
 		return this.dcSet.getAssetBalanceMap().getBalancesSortableList(key);
 	}
 
-	public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(Account account) {
-				
+	public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
+			Account account) {
+
 		return this.dcSet.getAssetBalanceMap().getBalancesSortableList(account);
 	}
 
@@ -2609,90 +2478,93 @@ public class Controller extends Observable {
 	public AssetCls getAsset(long key) {
 		return (AssetCls) this.dcSet.getItemAssetMap().get(key);
 	}
+
 	public PersonCls getPerson(long key) {
 		return (PersonCls) this.dcSet.getItemPersonMap().get(key);
 	}
+	
+	public ImprintCls getImprint(long key) {
+		return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
+	}
+
 	public StatusCls getStatus(long key) {
 		return (StatusCls) this.dcSet.getItemStatusMap().get(key);
 	}
-	public NoteCls getNote(long key) {
-		return (NoteCls) this.dcSet.getItemNoteMap().get(key);
+
+	public TemplateCls getTemplate(long key) {
+		return (TemplateCls) this.dcSet.getItemTemplateMap().get(key);
 	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
-		return this.getOrders(have, want, false);
+		return this.getOrders(have, want, true);
 	}
 
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {
-		return this.dcSet.getOrderMap()
-				.getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
-	}
-	
-	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(
-			AssetCls have, AssetCls want) {
-		return this.dcSet.getTradeMap()
-				.getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
+		return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
 	}
 
-	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(
-			Order order) {
+	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(AssetCls have, AssetCls want) {
+		return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
+	}
+
+	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(Order order) {
 		return this.dcSet.getTradeMap().getTrades(order);
 	}
 
 	// IMPRINTS
 	public ImprintCls getItemImprint(long key) {
-		return (ImprintCls)this.dcSet.getItemImprintMap().get(key);
+		return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
 	}
 
-	// NOTES
-	public NoteCls getItemNote(long key) {
-		return (NoteCls)this.dcSet.getItemNoteMap().get(key);
+	// TEMPLATES
+	public TemplateCls getItemTemplate(long key) {
+		return (TemplateCls) this.dcSet.getItemTemplateMap().get(key);
 	}
 
 	// PERSONS
 	public PersonCls getItemPerson(long key) {
-		return (PersonCls)this.dcSet.getItemPersonMap().get(key);
+		return (PersonCls) this.dcSet.getItemPersonMap().get(key);
 	}
 
 	// STATUSES
 	public StatusCls getItemStatus(long key) {
-		return (StatusCls)this.dcSet.getItemStatusMap().get(key);
+		return (StatusCls) this.dcSet.getItemStatusMap().get(key);
 	}
+
 	// UNIONS
 	public UnionCls getItemUnion(long key) {
-		return (UnionCls)this.dcSet.getItemUnionMap().get(key);
+		return (UnionCls) this.dcSet.getItemUnionMap().get(key);
 	}
 
 	// ALL ITEMS
 	public ItemCls getItem(DCSet db, int type, long key) {
-		
-		switch(type)
-			{
-			case ItemCls.ASSET_TYPE: {
-				return db.getItemAssetMap().get(key);
-			}
-			case ItemCls.IMPRINT_TYPE: {
-				return db.getItemImprintMap().get(key);
-			}
-			case ItemCls.NOTE_TYPE: {
-				return db.getItemNoteMap().get(key);
-			}
-			case ItemCls.PERSON_TYPE: {
-				return db.getItemPersonMap().get(key);
-			}
-			case ItemCls.STATUS_TYPE: {
-				return db.getItemStatusMap().get(key);	
-			}
-			case ItemCls.UNION_TYPE: {
-				return db.getItemUnionMap().get(key);
-			}
+
+		switch (type) {
+		case ItemCls.ASSET_TYPE: {
+			return db.getItemAssetMap().get(key);
+		}
+		case ItemCls.IMPRINT_TYPE: {
+			return db.getItemImprintMap().get(key);
+		}
+		case ItemCls.TEMPLATE_TYPE: {
+			return db.getItemTemplateMap().get(key);
+		}
+		case ItemCls.PERSON_TYPE: {
+			return db.getItemPersonMap().get(key);
+		}
+		case ItemCls.STATUS_TYPE: {
+			return db.getItemStatusMap().get(key);
+		}
+		case ItemCls.UNION_TYPE: {
+			return db.getItemUnionMap().get(key);
+		}
 		}
 		return null;
 	}
+
 	public ItemCls getItem(int type, long key) {
 		return this.getItem(this.dcSet, type, key);
 	}
-		
 
 	// ATs
 
@@ -2704,72 +2576,60 @@ public class Controller extends Observable {
 
 	public void onTransactionCreate(Transaction transaction) {
 		// ADD TO UNCONFIRMED TRANSACTIONS
-		this.blockGenerator.addUnconfirmedTransaction(transaction);
+		this.dcSet.getTransactionMap().add(transaction);
 
 		// NOTIFY OBSERVERS - AUTO in database.wallet.TransactionMap
-		if (false ) {
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.WALLET_LIST_TRANSACTION_TYPE, this.dcSet.getTransactionMap().getValuesAll()));
+		if (false) {
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_LIST_TRANSACTION_TYPE,
+					this.dcSet.getTransactionMap().getValuesAll()));
 
-		this.setChanged();
-		this.notifyObservers(new ObserverMessage(
-				ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, transaction));
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.WALLET_ADD_TRANSACTION_TYPE, transaction));
 		}
 
 		// BROADCAST
 		this.broadcastTransaction(transaction);
 	}
 
-	public Pair<Transaction, Integer> registerName(
-			PrivateKeyAccount registrant, Account owner, String name,
-			String value,int feePow) {
+	public Pair<Transaction, Integer> registerName(PrivateKeyAccount registrant, Account owner, String name,
+			String value, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createNameRegistration(registrant,
-					new Name(owner, name, value), feePow);
+			return this.transactionCreator.createNameRegistration(registrant, new Name(owner, name, value), feePow);
 		}
 	}
 
-
-	public Pair<Transaction, Integer> updateName(PrivateKeyAccount owner,
-			Account newOwner, String name, String value, int feePow) {
+	public Pair<Transaction, Integer> updateName(PrivateKeyAccount owner, Account newOwner, String name, String value,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createNameUpdate(owner, new Name(
-					newOwner, name, value), feePow);
+			return this.transactionCreator.createNameUpdate(owner, new Name(newOwner, name, value), feePow);
 		}
 	}
 
-	public Pair<Transaction, Integer> sellName(PrivateKeyAccount owner,
-			String name, BigDecimal amount,int feePow) {
+	public Pair<Transaction, Integer> sellName(PrivateKeyAccount owner, String name, BigDecimal amount, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createNameSale(owner, new NameSale(
-					name, amount), feePow);
+			return this.transactionCreator.createNameSale(owner, new NameSale(name, amount), feePow);
 		}
 	}
 
-	public Pair<Transaction, Integer> cancelSellName(PrivateKeyAccount owner,
-			NameSale nameSale,int feePow) {
+	public Pair<Transaction, Integer> cancelSellName(PrivateKeyAccount owner, NameSale nameSale, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createCancelNameSale(owner,
-					nameSale, feePow);
+			return this.transactionCreator.createCancelNameSale(owner, nameSale, feePow);
 		}
 	}
 
-	public Pair<Transaction, Integer> BuyName(PrivateKeyAccount buyer,
-			NameSale nameSale,int feePow) {
+	public Pair<Transaction, Integer> BuyName(PrivateKeyAccount buyer, NameSale nameSale, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createNamePurchase(buyer, nameSale,
-					feePow);
+			return this.transactionCreator.createNamePurchase(buyer, nameSale, feePow);
 		}
 	}
 
-	public Transaction createPoll(PrivateKeyAccount creator,
-			String name, String description, List<String> options,
+	public Transaction createPoll(PrivateKeyAccount creator, String name, String description, List<String> options,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
@@ -2782,51 +2642,45 @@ public class Controller extends Observable {
 			// CREATE POLL
 			Poll poll = new Poll(creator, name, description, pollOptions);
 
-			return this.transactionCreator.createPollCreation(creator, poll,
-					feePow);
+			return this.transactionCreator.createPollCreation(creator, poll, feePow);
 		}
 	}
 
-	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator,
-			Poll poll, PollOption option,int feePow) {
+	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator, Poll poll, PollOption option,
+			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			// GET OPTION INDEX
 			int optionIndex = poll.getOptions().indexOf(option);
 
-			return this.transactionCreator.createPollVote(creator,
-					poll.getName(), optionIndex, feePow);
+			return this.transactionCreator.createPollVote(creator, poll.getName(), optionIndex, feePow);
 		}
 	}
 
-	public Pair<Transaction, Integer> createArbitraryTransaction(
-			PrivateKeyAccount creator, List<Payment> payments, int service, byte[] data,int feePow) {
-		
-		if(payments == null) {
+	public Pair<Transaction, Integer> createArbitraryTransaction(PrivateKeyAccount creator, List<Payment> payments,
+			int service, byte[] data, int feePow) {
+
+		if (payments == null) {
 			payments = new ArrayList<Payment>();
 		}
-		
+
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createArbitraryTransaction(creator, payments,
-					service, data, feePow);
+			return this.transactionCreator.createArbitraryTransaction(creator, payments, service, data, feePow);
 		}
 	}
 
 	/*
-	public Pair<Transaction, Integer> createTransactionFromRaw(
-			byte[] rawData) {
-		
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createTransactionFromRaw(rawData);
-		}
-	}
-	*/
+	 * public Pair<Transaction, Integer> createTransactionFromRaw( byte[]
+	 * rawData) {
+	 * 
+	 * synchronized (this.transactionCreator) { return
+	 * this.transactionCreator.createTransactionFromRaw(rawData); } }
+	 */
 
-	public Pair<Transaction, Integer> lightCreateTransactionFromRaw(
-			byte[] rawData) {
-		
-		//CREATE TRANSACTION FROM RAW
+	public Pair<Transaction, Integer> lightCreateTransactionFromRaw(byte[] rawData) {
+
+		// CREATE TRANSACTION FROM RAW
 		Transaction transaction;
 		try {
 			transaction = TransactionFactory.getInstance().parse(rawData, null);
@@ -2834,273 +2688,215 @@ public class Controller extends Observable {
 			return new Pair<Transaction, Integer>(null, Transaction.INVALID_RAW_DATA);
 		}
 
-		//CHECK IF RECORD VALID
-		if (!transaction.isSignatureValid()) 
+		// CHECK IF RECORD VALID
+		if (!transaction.isSignatureValid(DCSet.getInstance()))
 			return new Pair<Transaction, Integer>(null, Transaction.INVALID_SIGNATURE);
-			
-		//CHECK FOR UPDATES
+
+		// CHECK FOR UPDATES
 		int valid = this.transactionCreator.afterCreateRaw(transaction, false);
 		if (valid != Transaction.VALIDATE_OK)
 			return new Pair<Transaction, Integer>(null, valid);
-			
+
 		return new Pair<Transaction, Integer>(transaction, valid);
-		
+
 	}
 
-	public Transaction issueAsset(PrivateKeyAccount creator,
-			String name, String description,
-			byte[] icon, byte[] image,
-			boolean movable, long quantity, byte scale, boolean divisible,
-			int feePow) {
+	public Transaction issueAsset(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
+			boolean movable, long quantity, byte scale, boolean divisible, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssueAssetTransaction(creator,
-					name, description, icon, image, movable, quantity, scale, divisible, feePow);
+			return this.transactionCreator.createIssueAssetTransaction(creator, name, description, icon, image, movable,
+					quantity, scale, divisible, feePow);
 		}
 	}
 
-	public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator,
-			String name, String description,
-			byte[] icon, byte[] image,
-			int feePow) {
+	public Pair<Transaction, Integer> issueImprint(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssueImprintTransaction(creator,
-					name, description, icon, image, feePow);
-		}
-	}
-
-	public Transaction issueNote(PrivateKeyAccount creator,
-			String name, String description,
-			byte[] icon, byte[] image,
-			int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssueNoteTransaction(creator,
-					name, description, icon, image, feePow);
-		}
-	}
-
-	public Pair<Transaction, Integer> issuePerson(
-			boolean forIssue,
-			PrivateKeyAccount creator, String fullName, int feePow,
-			long birthday, long deathday,
-			byte gender, String race, float birthLatitude, float birthLongitude,
-			String skinColor, String eyeColor, String hairСolor, int height,
-			byte[] icon, byte[] image, String description,
-			PublicKeyAccount owner, byte[] ownerSignature) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssuePersonTransaction(
-					forIssue,
-					creator, fullName, feePow, birthday, deathday,
-					gender, race, birthLatitude, birthLongitude,
-					skinColor, eyeColor, hairСolor, height,
-					icon, image, description,
-					owner, ownerSignature);
-		}
-	}
-	public Pair<Transaction, Integer> issuePersonHuman(
-			PrivateKeyAccount creator, int feePow, PersonHuman human) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssuePersonHumanTransaction(
-					creator, feePow, human);
-		}
-	}
-
-	public Transaction issueStatus(PrivateKeyAccount creator,
-			String name, String description, boolean unique,
-			byte[] icon, byte[] image,
-			int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssueStatusTransaction(creator,
-					name, description, icon, image, unique, feePow);
-		}
-	}
-
-	public Transaction issueUnion(PrivateKeyAccount creator,
-			String name, long birthday, long parent, String description,
-			byte[] icon, byte[] image,
-			int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createIssueUnionTransaction(creator,
-					name, birthday, parent, description, icon, image, feePow);
-		}
-	}
-
-	public Transaction createOrder(PrivateKeyAccount creator,
-			AssetCls have, AssetCls want, BigDecimal amountHave, BigDecimal amountWant,
-			int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) { 
-			return this.transactionCreator.createOrderTransaction(creator,
-					have, want, amountHave, amountWant, feePow);
-		}
-	}
-
-	public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator,
-			Order order,int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createCancelOrderTransaction(
-					creator, order, feePow);
-		}
-	}
-
-	public Pair<Transaction, Integer> deployAT(PrivateKeyAccount creator,
-			String name, String description, String type, String tags,
-			byte[] creationBytes, BigDecimal quantity,int feePow) {
-
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.deployATTransaction(creator, name,
-					description, type, tags, creationBytes, quantity, feePow);
-		}
-	}
-
-	public Pair<Transaction, Integer> sendMultiPayment(
-			PrivateKeyAccount sender, List<Payment> payments,int feePow) {
-		// CREATE ONLY ONE TRANSACTION AT A TIME
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.sendMultiPayment(sender, payments,
+			return this.transactionCreator.createIssueImprintTransaction(creator, name, description, icon, image,
 					feePow);
 		}
 	}
 
-	public Transaction r_Send(PrivateKeyAccount sender,
-			int feePow, Account recipient, long key, BigDecimal amount) {
-		return this.r_Send(sender, feePow, recipient,
-				key, amount, "", null, null, null);
-	}
-	public Transaction r_Send(PrivateKeyAccount sender,
-			int feePow, Account recipient, long key,BigDecimal amount,
-			String head, byte[] isText, byte[] message, byte[] encryptMessage) {
+	public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
+			int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_Send(sender, recipient,
-					key, amount, feePow, head, message, isText, encryptMessage);
-		}
-	}
-	public Transaction r_Send(byte version, byte property1, byte property2, 
-			PrivateKeyAccount sender,
-			int feePow, Account recipient, long key,BigDecimal amount,
-			String head, byte[] isText, byte[] message, byte[] encryptMessage) {
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_Send(version, property1, property2,
-					sender, recipient,
-					key, amount, feePow, head, message, isText, encryptMessage);
+			return this.transactionCreator.createIssueTemplateTransaction(creator, name, description, icon, image, feePow);
 		}
 	}
 
-	public Transaction r_SignNote(byte version, byte property1, byte property2, 
-			boolean asPack, PrivateKeyAccount sender,
-			int feePow,	long key, byte[] message, byte[] isText, byte[] encrypted) {
+	public Pair<Transaction, Integer> issuePerson(boolean forIssue, PrivateKeyAccount creator, String fullName,
+			int feePow, long birthday, long deathday, byte gender, String race, float birthLatitude,
+			float birthLongitude, String skinColor, String eyeColor, String hairСolor, int height, byte[] icon,
+			byte[] image, String description, PublicKeyAccount owner, byte[] ownerSignature) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_SignNote(version, property1, property2,
-					asPack, sender, feePow, key, message, isText, encrypted);
+			return this.transactionCreator.createIssuePersonTransaction(forIssue, creator, fullName, feePow, birthday,
+					deathday, gender, race, birthLatitude, birthLongitude, skinColor, eyeColor, hairСolor, height, icon,
+					image, description, owner, ownerSignature);
 		}
 	}
 
-	public Transaction r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator,
-			int feePow, long key,
+	public Pair<Transaction, Integer> issuePersonHuman(PrivateKeyAccount creator, int feePow, PersonHuman human) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssuePersonHumanTransaction(creator, feePow, human);
+		}
+	}
+
+	public Transaction issueStatus(PrivateKeyAccount creator, String name, String description, boolean unique,
+			byte[] icon, byte[] image, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueStatusTransaction(creator, name, description, icon, image, unique,
+					feePow);
+		}
+	}
+
+	public Transaction issueUnion(PrivateKeyAccount creator, String name, long birthday, long parent,
+			String description, byte[] icon, byte[] image, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueUnionTransaction(creator, name, birthday, parent, description,
+					icon, image, feePow);
+		}
+	}
+
+	public Transaction createOrder(PrivateKeyAccount creator, AssetCls have, AssetCls want, BigDecimal amountHave,
+			BigDecimal amountWant, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createOrderTransaction(creator, have, want, amountHave, amountWant, feePow);
+		}
+	}
+
+	public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createCancelOrderTransaction(creator, order, feePow);
+		}
+	}
+
+	public Pair<Transaction, Integer> deployAT(PrivateKeyAccount creator, String name, String description, String type,
+			String tags, byte[] creationBytes, BigDecimal quantity, int feePow) {
+
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.deployATTransaction(creator, name, description, type, tags, creationBytes,
+					quantity, feePow);
+		}
+	}
+
+	public Pair<Transaction, Integer> sendMultiPayment(PrivateKeyAccount sender, List<Payment> payments, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.sendMultiPayment(sender, payments, feePow);
+		}
+	}
+
+	public Transaction r_Send(PrivateKeyAccount sender, int feePow, Account recipient, long key, BigDecimal amount) {
+		return this.r_Send(sender, feePow, recipient, key, amount, "", null, null, null);
+	}
+
+	public Transaction r_Send(PrivateKeyAccount sender, int feePow, Account recipient, long key, BigDecimal amount,
+			String head, byte[] isText, byte[] message, byte[] encryptMessage) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, head, message, isText,
+					encryptMessage);
+		}
+	}
+
+	public Transaction r_Send(byte version, byte property1, byte property2, PrivateKeyAccount sender, int feePow,
+			Account recipient, long key, BigDecimal amount, String head, byte[] isText, byte[] message,
+			byte[] encryptMessage) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_Send(version, property1, property2, sender, recipient, key, amount, feePow,
+					head, message, isText, encryptMessage);
+		}
+	}
+
+	public Transaction r_SignNote(byte version, byte property1, byte property2, boolean asPack,
+			PrivateKeyAccount sender, int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.r_SignNote(version, property1, property2, asPack, sender, feePow, key,
+					message, isText, encrypted);
+		}
+	}
+
+	public Transaction r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator, int feePow, long key,
 			List<PublicKeyAccount> userAccounts, int add_day) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_SertifyPerson( version, asPack,
-					creator, feePow, key,
-					userAccounts, add_day);
+			return this.transactionCreator.r_SertifyPerson(version, asPack, creator, feePow, key, userAccounts,
+					add_day);
 		}
 	}
 
-	public Transaction r_Vouch(int version, boolean asPack,
-			PrivateKeyAccount creator, int feePow,
-			int height, int seq) {
+	public Transaction r_Vouch(int version, boolean asPack, PrivateKeyAccount creator, int feePow, int height,
+			int seq) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_Vouch( version, asPack,
-					creator, feePow,
-					height, seq);
+			return this.transactionCreator.r_Vouch(version, asPack, creator, feePow, height, seq);
 		}
 	}
 
-	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender,
-			int feePow, String url, String data, String hashes) {
+	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
+			String hashes) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_Hashes(sender, feePow,
-					url, data, hashes);
+			return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
 		}
 	}
 
-	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender,
-			int feePow, String url, String data, String[] hashes) {
+	public Pair<Transaction, Integer> r_Hashes(PrivateKeyAccount sender, int feePow, String url, String data,
+			String[] hashes) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_Hashes(sender, feePow,
-					url, data, hashes);
+			return this.transactionCreator.r_Hashes(sender, feePow, url, data, hashes);
 		}
 	}
 
 	/*
-	// ver 1
-	public Pair<Transaction, Integer> r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
-			int feePow, long key,
-			ItemCls item, Long beg_date, Long end_date,
-			int value_1, int value_2, byte[] data, long refParent
-			) {
+	 * // ver 1 public Pair<Transaction, Integer> r_SetStatusToItem(int version,
+	 * boolean asPack, PrivateKeyAccount creator, int feePow, long key, ItemCls
+	 * item, Long beg_date, Long end_date, int value_1, int value_2, byte[]
+	 * data, long refParent ) { synchronized (this.transactionCreator) { return
+	 * this.transactionCreator.r_SetStatusToItem( 0, asPack, creator, feePow,
+	 * key, item, beg_date, end_date, value_1, value_2, data, refParent ); } }
+	 */
+	// ver2
+	public Transaction r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator, int feePow, long key,
+			ItemCls item, Long beg_date, Long end_date, long value_1, long value_2, byte[] data_1, byte[] data_2,
+			long refParent, byte[] description) {
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_SetStatusToItem( 0, asPack,
-					creator, feePow, key,
-					item, beg_date, end_date,
-					value_1, value_2, data, refParent
-					);
-		}
-	}
-	*/
-	// ver2 
-	public Transaction r_SetStatusToItem(int version, boolean asPack, PrivateKeyAccount creator,
-			int feePow, long key,
-			ItemCls item, Long beg_date, Long end_date,
-			long value_1, long value_2, byte[] data_1, byte[] data_2, long refParent, byte[] description
-			) {
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.r_SetStatusToItem( 1, asPack,
-					creator, feePow, key,
-					item, beg_date, end_date,
-					value_1, value_2, data_1, data_2, refParent, description
-					);
+			return this.transactionCreator.r_SetStatusToItem(1, asPack, creator, feePow, key, item, beg_date, end_date,
+					value_1, value_2, data_1, data_2, refParent, description);
 		}
 	}
 
 	/*
-	public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount,int feePow,
-			byte[] isText, byte[] message, byte[] encryptMessage) {
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createJson(sender, recipient,
-					key, amount, feePow, message, isText, encryptMessage);
-		}
-	}
-	public Pair<Transaction, Integer> sendAccounting(PrivateKeyAccount sender,
-			Account recipient, long key, BigDecimal amount,int feePow,
-			byte[] isText, byte[] message, byte[] encryptMessage) {
-		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createAccounting(sender, recipient,
-					key, amount, feePow, message, isText, encryptMessage);
-		}
+	 * public Pair<Transaction, Integer> sendJson(PrivateKeyAccount sender,
+	 * Account recipient, long key, BigDecimal amount,int feePow, byte[] isText,
+	 * byte[] message, byte[] encryptMessage) { synchronized
+	 * (this.transactionCreator) { return
+	 * this.transactionCreator.createJson(sender, recipient, key, amount,
+	 * feePow, message, isText, encryptMessage); } } public Pair<Transaction,
+	 * Integer> sendAccounting(PrivateKeyAccount sender, Account recipient, long
+	 * key, BigDecimal amount,int feePow, byte[] isText, byte[] message, byte[]
+	 * encryptMessage) { synchronized (this.transactionCreator) { return
+	 * this.transactionCreator.createAccounting(sender, recipient, key, amount,
+	 * feePow, message, isText, encryptMessage); }
+	 * 
+	 * }
+	 */
 
-	}
-	*/
-	
 	public Block getBlockByHeight(DCSet db, int parseInt) {
-		byte[] b = db.getBlockHeightsMap().getSignByHeight(parseInt);
-		return db.getBlockMap().get(b);
+		return db.getBlockMap().get(parseInt);
 	}
+
 	public Block getBlockByHeight(int parseInt) {
 		return getBlockByHeight(this.dcSet, parseInt);
 	}
 
-
 	public byte[] getPublicKeyByAddress(String address) {
 
-		
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			return null;
 		}
@@ -3114,25 +2910,37 @@ public class Controller extends Observable {
 			}
 		}
 
-		DCSet db = this.dcSet;
+		//DCSet db = this.dcSet;
 		// get last transaction from this address
-		byte[] sign = db.getAddressTime_SignatureMap().get(address);
+		byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
 		if (sign == null) {
 			return null;
 		}
 
 		/*
-		long lastReference = db.getReferenceMap().get(address);
-		byte[] sign = getSignatureByAddrTime(db, address, lastReference);
-		if (sign == null)
-			return null;
-			*/
-				
+		 * long lastReference = db.getReferenceMap().get(address); byte[] sign =
+		 * getSignatureByAddrTime(db, address, lastReference); if (sign == null)
+		 * return null;
+		 */
+
 		Transaction transaction = cntr.getTransaction(sign);
 		if (transaction == null) {
 			return null;
 		}
 
-		return transaction.getCreator().getPublicKey();
+		if (transaction.getCreator().equals(address))
+			return transaction.getCreator().getPublicKey();
+		else {
+			List<PublicKeyAccount> pKeys = transaction.getPublicKeys();
+			if (pKeys != null) {
+				for (PublicKeyAccount pKey: pKeys) {
+					if (pKey.equals(address)) {
+						return pKey.getPublicKey();
+					}
+				}
+			}
+		}
+		
+		return null;
 	}
 }

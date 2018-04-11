@@ -36,6 +36,8 @@ public class Imprint extends ImprintCls {
 	//GETTERS/SETTERS
 	public String getItemSubType() { return "cutted58"; }
 
+	public int getMinNameLen() { return 20; }
+
 	public static String hashNameToBase58(String name_total)
 	{
 		byte[] digest = Crypto.getInstance().digest(name_total.getBytes());

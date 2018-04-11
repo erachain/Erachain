@@ -1,6 +1,8 @@
 package core.item.assets;
 
 
+import org.json.simple.JSONObject;
+
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;

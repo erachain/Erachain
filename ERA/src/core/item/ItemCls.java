@@ -19,6 +19,7 @@ import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
@@ -39,15 +40,16 @@ public abstract class ItemCls {
 
 	public static final int ASSET_TYPE = 1;
 	public static final int IMPRINT_TYPE = 2;
-	public static final int NOTE_TYPE = 3;
+	public static final int TEMPLATE_TYPE = 3;
 	public static final int PERSON_TYPE = 4;
 	public static final int STATUS_TYPE = 5;
 	public static final int UNION_TYPE = 6;
+	public static final int STATEMENT_TYPE = 7;
 
 	protected static final int TYPE_LENGTH = 2;
 	protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
 	protected static final int NAME_SIZE_LENGTH = 1;
-	public static final int MIN_NAME_LENGTH = 10;
+	//public static final int MIN_NAME_LENGTH = 10;
 	public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
 	protected static final int ICON_SIZE_LENGTH = 2;
 	public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
@@ -92,6 +94,7 @@ public abstract class ItemCls {
 
 	//GETTERS/SETTERS
 
+	public abstract int getMinNameLen();
 	public abstract int getItemTypeInt();
 	public abstract String getItemTypeStr();
 	public abstract String getItemSubType();
@@ -190,7 +193,7 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.getSize();
+		long key = dbMap.getLastKey();
 		return key;
 		
 	}
@@ -432,35 +435,47 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.getSize();
-		if (key < startKey) {
-			// IF this not GENESIS issue - start from 1000
-			dbMap.setSize(startKey);
+		
+		long newKey;
+		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+		if (pair == null) {
+		
+			newKey = dbMap.getLastKey();
+			if (newKey < startKey) {
+				// IF this not GENESIS issue - start from startKey
+				dbMap.setLastKey(startKey);
+			}
+			newKey = dbMap.add(this);
+
+		} else {
+			// INSERT WITH NEW KEY
+			newKey = pair.getA();
+			dbMap.set(newKey, this);
+
 		}
-		key = dbMap.add(this);
-		
+
+		this.key = newKey;
 		//SET ORPHAN DATA
-		this.getDBIssueMap(db).set(this.reference, key);
-		//this.key = key;
-		
-		//return key;
+		this.getDBIssueMap(db).set(this.reference, newKey);
 		
 	}
 	
 	public long removeFromMap(DCSet db)
 	{
 		//DELETE FROM DATABASE
-		Issue_ItemMap issueDB = this.getDBIssueMap(db);
-		//long key = ;
-		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1, key: " + key);
 
 		long thisKey = this.getKey(db);
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
-		this.getDBMap(db).remove();	
+		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+		if (pair == null) {
+			this.getDBMap(db).remove();
+		} else {
+			this.getDBMap(db).delete(thisKey);			
+		}
 				
 		//DELETE ORPHAN DATA
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
-		issueDB.delete(this.reference);
+		this.getDBIssueMap(db).delete(this.reference);
 		
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 

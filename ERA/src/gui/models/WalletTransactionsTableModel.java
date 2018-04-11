@@ -22,6 +22,7 @@ import utils.PlaySound;
 import utils.SysTray;
 import controller.Controller;
 import core.account.Account;
+import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
@@ -326,9 +327,14 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 				}
 			}
 			
-			int i = this.transactions.size();
-			this.transactions.add((Pair<Tuple2<String, String>, Transaction>)message.getValue());
-			this.fireTableRowsInserted(i, i); //.fireTableDataChanged();			
+		//	int i = this.transactions.size();
+		//	Transaction tt = (Transaction)message.getValue();
+		//	String aa = "";
+		//	if (tt.getCreator() != null) aa = tt.getCreator().getAddress();
+		//	Tuple2<String, String> ee = new Tuple2(aa, Base58.encode(tt.getSignature()));
+		//	Pair pp = new Pair(ee,(Transaction)message.getValue());
+		//	this.transactions.add(pp);
+			this.fireTableDataChanged();	// 		
 			
 		} else 
 		if(message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
@@ -343,7 +349,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 					this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();			
 				}
 			}
-			
+			this.fireTableDataChanged();
 			if (false)
 				this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
 					new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
@@ -365,5 +371,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 	
 		////Controller.getInstance().deleteObserver(this);
 		Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
+		Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
 	}
 }

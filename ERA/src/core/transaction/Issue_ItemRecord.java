@@ -28,6 +28,7 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import datachain.DCSet;
+import utils.Pair;
 
 public abstract class Issue_ItemRecord extends Transaction 
 {
@@ -37,7 +38,7 @@ public abstract class Issue_ItemRecord extends Transaction
 	//private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
 	//private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-	private ItemCls item;
+	protected ItemCls item;
 	
 	public Issue_ItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) 
 	{
@@ -132,14 +133,25 @@ public abstract class Issue_ItemRecord extends Transaction
 		
 		//CHECK NAME LENGTH
 		String name = this.item.getName();
-		if(name.length() < ItemCls.MIN_NAME_LENGTH)
+		// TEST ONLY CHARS
+		int nameLen = name.length();
+		if(nameLen < item.getMinNameLen()
+				//&& !BlockChain.DEVELOP_USE
+				&& this.getBlockHeightByParentOrLast(db) > 114000
+				)
 		{
-			// TEST OMLY CHARS
-			return INVALID_NAME_LENGTH;
+			// IF already in DB
+			Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(name);
+			if (pair == null
+					|| this.item.getKey(db) > 0
+					|| !this.getCreator().equals(pair.getB())) { 
+				return INVALID_NAME_LENGTH;
+			}
 		}
+
+		// TEST ALL BYTES for database FIELD
 		if(name.getBytes(StandardCharsets.UTF_8).length > ItemCls.MAX_NAME_LENGTH)
 		{
-			// TEST ALL BYTES for database FIELD
 			return INVALID_NAME_LENGTH;
 		}
 
