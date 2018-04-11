@@ -275,7 +275,9 @@ public class PeerMap extends DBMap<byte[], byte[]>
 
 				// 1. we have not reached the amount of peers
 				// 2. we have read all records
-				while(iterator.hasNext() && listPeerInfo.size() < amount)
+				while(iterator.hasNext() 
+						//&& listPeerInfo.size() < amount - take all known before SORT
+						)
 				{
 					//GET ADDRESS
 					byte[] addressBI = iterator.next();
@@ -325,8 +327,8 @@ public class PeerMap extends DBMap<byte[], byte[]>
 				for (Peer knownPeer : knownPeers) {
 					try
 					{
-						if(!allFromSettings && peers.size() >= amount)
-							break;
+						//if(!allFromSettings && peers.size() >= amount)
+						//	break;
 						
 						int i = 0;
 						int found = -1;
