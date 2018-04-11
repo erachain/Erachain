@@ -39,8 +39,8 @@ public class Settings {
 	private static final Logger LOGGER = Logger.getLogger(Settings.class);
 
 	//NETWORK
-	private static final int DEFAULT_MIN_CONNECTIONS = 8; // for OWN maked connections
-	private static final int DEFAULT_MAX_CONNECTIONS = 20;
+	private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections
+	private static final int DEFAULT_MAX_CONNECTIONS = 32;
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
