@@ -67,8 +67,8 @@ public class SignaturesMessage extends Message{
 		byte[] data = new byte[0];
 		
 		//WRITE LENGTH
-		int length = this.signatures.size();
-		byte[] lengthBytes = Ints.toByteArray(length);
+		int listSize = this.signatures.size();
+		byte[] lengthBytes = Ints.toByteArray(listSize);
 		lengthBytes = Bytes.ensureCapacity(lengthBytes, DATA_LENGTH, 0);
 		data = Bytes.concat(data, lengthBytes);
 		
