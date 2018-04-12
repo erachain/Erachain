@@ -182,7 +182,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 				if(res == null) {
 					return Lang.getInstance().translate("Waiting...");
 				} else {
-					return res;
+					return res.a.toString() + " " + res.b.toString();
 				}
 			
 			case COLUMN_PINGMC:

@@ -47,8 +47,8 @@ public class TelegramMessage extends Message{
 		byte[] data = new byte[0];
 		
 		//WRITE BLOCK
-		byte[] blockBytes = this.transaction.toBytes(true, null);
-		data = Bytes.concat(data, blockBytes);
+		byte[] telegramBytes = this.transaction.toBytes(true, null);
+		data = Bytes.concat(data, telegramBytes);
 
 		//ADD CHECKSUM
 		data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
