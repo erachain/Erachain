@@ -88,7 +88,7 @@ public class Account {
 		// ///test address
 		assert(Base58.decode(address) instanceof byte[]);
 		this.bytes = Base58.decode(address);
-		this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
+		this.shortBytes = Arrays.copyOfRange(this.bytes, 1, this.bytes.length - 4);
 		this.address = address;
 	}
 	
