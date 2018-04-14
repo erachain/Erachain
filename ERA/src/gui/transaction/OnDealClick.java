@@ -286,7 +286,7 @@ public class OnDealClick
 			mess = "Invalid duplicte item";
 			break;
 		case Transaction.INVALID_CREATOR:
-			mess = "Invalis creator";
+			mess = "Invalid creator";
 			break;
 			
 		case Transaction.ITEM_ASSET_NOT_EXIST:
