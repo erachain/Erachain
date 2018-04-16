@@ -2,7 +2,6 @@ package api;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -21,7 +20,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
@@ -40,10 +38,10 @@ import utils.Pair;
 @Path("addresses")
 @Produces(MediaType.APPLICATION_JSON)
 public class AddressesResource {
-	
+
 	@Context
 	HttpServletRequest request;
-	
+
 	@SuppressWarnings("unchecked")
 	@GET
 	public String getAddresses() {
@@ -73,57 +71,57 @@ public class AddressesResource {
 	@GET
 	@Path("/lastreference/{address}")
 	public String getLastReference(@PathParam("address") String address) {
-		
+
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
 					Transaction.INVALID_ADDRESS);
 		}
-		
+
 		// GET ACCOUNT
 		Account account = new Account(address);
 
 		Long lastTimestamp = account.getLastTimestamp();
-		
+
 		// RETURN
-		
+
 		if(lastTimestamp == null) {
-			return "false"; 
+			return "false";
 		} else {
 			return ""+lastTimestamp;
 		}
 	}
-	
+
 	@GET
 	@Path("/lastreference/{address}/unconfirmed")
 	public String getLastReferenceUnconfirmed(@PathParam("address") String address) {
-		
+
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ADDRESS);
 					Transaction.INVALID_ADDRESS);
 		}
-		
+
 		// GET ACCOUNT
 		Account account = new Account(address);
 
 		HashSet<byte[]> isSomeoneReference = new HashSet<byte[]>();
-		
+
 		Controller cntrl = Controller.getInstance();
 
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 10, true);
-		
+
 		DCSet db = DCSet.getInstance();
 		Long lastTimestamp = account.getLastTimestamp(db);
 		byte[] signature;
-		if(!(lastTimestamp == null)) 
+		if(!(lastTimestamp == null))
 		{
 			signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
 			transactions.add(cntrl.getTransaction(signature));
-		}	
-		
+		}
+
 		for (Transaction tx : transactions)
 		{
 			if (tx.getCreator().equals(account))
@@ -137,14 +135,14 @@ public class AddressesResource {
 						break;
 					}
 				}
-			}	
+			}
 		}
-		
+
 		if(isSomeoneReference.isEmpty())
 		{
 			return getLastReference(address);
 		}
-		
+
 		for (Transaction tx : cntrl.getUnconfirmedTransactions(0, 10, true))
 		{
 			if (tx.getCreator().equals(account))
@@ -156,11 +154,11 @@ public class AddressesResource {
 				}
 			}
 		}
-		
-		return "false"; 
+
+		return "false";
 	}
 
-	
+
 	@GET
 	@Path("/validate/{address}")
 	public String validate(@PathParam("address") String address) {
@@ -172,7 +170,7 @@ public class AddressesResource {
 	@Path("/seed/{address}")
 	public String getSeed(@PathParam("address") String address) {
 		String password = null;
-		
+
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -193,7 +191,7 @@ public class AddressesResource {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_WALLET_LOCKED);
 		}
-		
+
 		// CHECK ACCOUNT IN WALLET
 		Account account = Controller.getInstance().getAccountByAddress(address);
 		if (account == null) {
@@ -264,7 +262,7 @@ public class AddressesResource {
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_WALLET_LOCKED);
 			}
-			
+
 			// DECODE SEED
 			byte[] seedBytes;
 			try {
@@ -289,7 +287,7 @@ public class AddressesResource {
 	@DELETE
 	@Path("/{address}")
 	public String deleteAddress(@PathParam("address") String address) {
-		
+
 		String password = null;
 		APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request );
 
@@ -304,7 +302,7 @@ public class AddressesResource {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_WALLET_LOCKED);
 		}
-		
+
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -348,7 +346,7 @@ public class AddressesResource {
 		JSONArray item3 = new JSONArray();
 		JSONArray item4 = new JSONArray();
 		JSONArray item5 = new JSONArray();
-		
+
 		item1.add(balance.a.a.toPlainString());
 		item1.add(balance.a.b.toPlainString());
 
@@ -370,7 +368,7 @@ public class AddressesResource {
 		result.add(item3);
 		result.add(item4);
 		result.add(item5);
-		
+
 		return result;
 
 	}
@@ -443,7 +441,7 @@ public class AddressesResource {
 					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
-		
+
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
 
 		return balance.a.b.toPlainString();
@@ -480,7 +478,7 @@ public class AddressesResource {
 					Transaction.ITEM_ASSET_NOT_EXIST);
 
 		}
-		
+
 		Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
 
 		return balance.a.a.toPlainString();
@@ -501,15 +499,15 @@ public class AddressesResource {
 		SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
 
 		JSONObject assetsBalancesJSON = new JSONObject();
-		
-		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) 	
+
+		for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances)
 		{
 			assetsBalancesJSON.put(assetsBalance.getA().b, tuple5_toJson(assetsBalance.getB()));
 		}
-		
+
 		return assetsBalancesJSON.toJSONString();
 	}
-			
+
 
 	@GET
 	@Path("balance/{address}/{confirmations}")
@@ -530,7 +528,7 @@ public class AddressesResource {
 	@POST
 	@Path("sign/{address}")
 	public String sign(String x, @PathParam("address") String address) {
-		
+
 		String password = null;
 		APIUtils.askAPICallAllowed(password, "POST addresses/sign/"+ address, request);
 
@@ -545,7 +543,7 @@ public class AddressesResource {
 			throw ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_WALLET_LOCKED);
 		}
-		
+
 		// CHECK IF VALID ADDRESS
 		if (!Crypto.getInstance().isValidAddress(address)) {
 			throw ApiErrorFactory.getInstance().createError(
@@ -650,4 +648,24 @@ public class AddressesResource {
 			return Base58.encode(publicKey);
 		}
 	}
+
+	@GET
+	@Path("/publickeygetaddress/{publickey}")
+	public String getAddressByPublicKey(@PathParam("publickey") String publickey) {
+
+		byte[] publicKeyBytes;
+		try {
+			publicKeyBytes = Base58.decode(publickey);
+		} catch (Exception e) {
+			throw ApiErrorFactory.getInstance().createError(
+					//ApiErrorFactory.ERROR_INVALID_PUBLIC_KEY);
+					Transaction.INVALID_PUBLIC_KEY);
+
+		}
+
+		PublicKeyAccount publicKey = new PublicKeyAccount(publicKeyBytes);
+
+		return publicKey.getAddress();
+	}
+
 }
