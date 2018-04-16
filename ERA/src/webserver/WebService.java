@@ -24,6 +24,7 @@ public class WebService {
         s.add(API.class);
         s.add(WebResource.class);
         s.add(API_TransactionsResource.class);
+        s.add(API_Trade.class);
         s.add(API_TelegramsResource.class);
         
         ResourceConfig config = new ResourceConfig(s);

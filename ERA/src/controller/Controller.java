@@ -2511,6 +2511,10 @@ public class Controller extends Observable {
 		return this.dcSet.getTradeMap().getTrades(order);
 	}
 
+	public List<Trade> getTradeByTimestmp(long have, long want, long timestamp) {
+		return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);	
+	}
+
 	// IMPRINTS
 	public ImprintCls getItemImprint(long key) {
 		return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
