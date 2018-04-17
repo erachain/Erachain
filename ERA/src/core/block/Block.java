@@ -357,7 +357,7 @@ public class Block {
 		BigDecimal fee = this.getTotalFeeForProcess(db);
 
 		// TODO calculate AT FEE
-		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
+		// fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
 		int inDay30 = BlockChain.BLOCKS_PER_DAY*30;
 
 		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
@@ -395,16 +395,16 @@ public class Block {
 		}
 
 		// TODO calculate AT FEE
-		// fee = fee.add(BigDecimal.valueOf(this.atFees, 8));
+		// fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
 
-		return BigDecimal.valueOf(fee, 8);
+		return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
 
 	}
 
 	/*
 	public BigDecimal getATfee()
 	{
-		return BigDecimal.valueOf(this.atFees, 8);
+		return BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE);
 	}
 	 */
 

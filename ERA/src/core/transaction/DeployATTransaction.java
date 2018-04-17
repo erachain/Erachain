@@ -6,32 +6,30 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jetty.util.StringUtil;
 import org.json.simple.JSONObject;
 
-import utils.Converter;
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
 import at.AT;
 import at.AT_Constants;
 import at.AT_Controller;
 import at.AT_Exception;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
-
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
+import utils.Converter;
 
 public class DeployATTransaction extends Transaction
 {
@@ -56,7 +54,7 @@ public class DeployATTransaction extends Transaction
 	private BigDecimal amount;
 	private byte[] creationBytes;
 
-	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, Long reference) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, long timestamp, Long reference)
 	{
 		super(typeBytes, NAME_ID, creator, (byte)0, timestamp, reference);
 
@@ -67,31 +65,32 @@ public class DeployATTransaction extends Transaction
 		this.tags = tags;
 		this.amount = quantity;
 	}
-	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference, byte[] signature) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference, byte[] signature)
 	{
 		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.signature = signature;
 		this.feePow = feePow;
 		//this.calcFee();
 	}
-	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference) 
+	public DeployATTransaction(byte[] typeBytes, PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference)
 	{
 		this(typeBytes, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 		this.feePow = feePow;
 	}
-	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference) 
+	public DeployATTransaction(PublicKeyAccount creator, String name, String description, String type, String tags, byte[] creationBytes, BigDecimal quantity, byte feePow, long timestamp, Long reference)
 	{
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, description, type, tags, creationBytes, quantity, timestamp, reference);
 	}
 
 	//PARSE/CONVERT
 	//public static String getName() { return "OLD: Deploy AT"; }
+	@Override
 	public boolean hasPublicText() {
 		return true;
 	}
 
 
-	public static Transaction Parse(byte[] data) throws Exception 
+	public static Transaction Parse(byte[] data) throws Exception
 	{
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
@@ -106,12 +105,12 @@ public class DeployATTransaction extends Transaction
 
 		//READ TIMESTAMP
 		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);	
+		long timestamp = Longs.fromByteArray(timestampBytes);
 		position += TIMESTAMP_LENGTH;
 
 		//READ REFERENCE
 		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		long reference = Longs.fromByteArray(referenceBytes);	
+		long reference = Longs.fromByteArray(referenceBytes);
 		position += REFERENCE_LENGTH;
 
 		//READ CREATOR
@@ -190,9 +189,9 @@ public class DeployATTransaction extends Transaction
 
 		//READ AMOUNT
 		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
-		position += AMOUNT_LENGTH;	
-		
+		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+		position += AMOUNT_LENGTH;
+
 		//READ FEE POWER
 		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
 		byte feePow = feePowBytes[0];
@@ -209,7 +208,7 @@ public class DeployATTransaction extends Transaction
 	public JSONObject toJson()
 	{
 		JSONObject transaction = this.getJsonBase();
-		
+
 		transaction.put("creator", this.creator.getAddress());
 		transaction.put("name", this.name);
 		transaction.put("description", this.description);
@@ -217,12 +216,12 @@ public class DeployATTransaction extends Transaction
 		transaction.put("tags", this.tags);
 		transaction.put("creationBytes", Converter.toHex(this.creationBytes));
 		transaction.put("amount", this.amount.toPlainString());
-		
+
 		return transaction;
 	}
 
 	@Override
-	public byte[] toBytes(boolean withSign, Long releaserReference) 
+	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		byte[] data = new byte[0];
 
@@ -291,7 +290,7 @@ public class DeployATTransaction extends Transaction
 		byte[] fillAmount = new byte[AMOUNT_LENGTH - amountBytes.length];
 		amountBytes = Bytes.concat(fillAmount, amountBytes);
 		data = Bytes.concat(data, amountBytes);
-		
+
 		//WRITE FEE POWER
 		byte[] feePowBytes = new byte[1];
 		feePowBytes[0] = this.feePow;
@@ -304,14 +303,14 @@ public class DeployATTransaction extends Transaction
 	}
 
 	@Override
-	public int getDataLength(boolean asPack) 
-	{	
-		return BASE_LENGTH +  
-				this.name.getBytes(StandardCharsets.UTF_8).length + 
-				this.description.getBytes(StandardCharsets.UTF_8).length + 
-				this.type.getBytes(StandardCharsets.UTF_8).length + 
-				this.tags.getBytes(StandardCharsets.UTF_8).length + 
-				this.creationBytes.length;	
+	public int getDataLength(boolean asPack)
+	{
+		return BASE_LENGTH +
+				this.name.getBytes(StandardCharsets.UTF_8).length +
+				this.description.getBytes(StandardCharsets.UTF_8).length +
+				this.type.getBytes(StandardCharsets.UTF_8).length +
+				this.tags.getBytes(StandardCharsets.UTF_8).length +
+				this.creationBytes.length;
 	}
 
 	//VALIDATE
@@ -323,7 +322,7 @@ public class DeployATTransaction extends Transaction
 	}
 
 	//
-	public int isValid(DCSet db, Integer forkHeight) 
+	public int isValid(DCSet db, Integer forkHeight)
 	{
 		/*
 		//CHECK IF RELEASED
@@ -331,8 +330,8 @@ public class DeployATTransaction extends Transaction
 		{
 			return NOT_YET_RELEASED;
 		}
-		*/
-		
+		 */
+
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
 		if(nameLength > AT_Constants.NAME_MAX_LENGTH || nameLength < 1)
@@ -346,27 +345,27 @@ public class DeployATTransaction extends Transaction
 		{
 			return INVALID_DESCRIPTION_LENGTH;
 		}
-		
+
 		int typeLength = this.type.getBytes(StandardCharsets.UTF_8).length;
 		if(typeLength > AT_Constants.TYPE_MAX_LENGTH || typeLength < 1)
 		{
 			return INVALID_TYPE_LENGTH;
 		}
-		
+
 		int tagsLength = this.tags.getBytes(StandardCharsets.UTF_8).length;
 		if(tagsLength > AT_Constants.TYPE_MAX_LENGTH || tagsLength < 1)
 		{
 			return INVALID_TAGS_LENGTH;
 		}
-		
+
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
-				
+
 		//CHECK IF CREATIONBYTES VALID
-		try 
+		try
 		{
 			int height = db.getBlockMap().last().getHeight(db) + 1;
 			byte[] balanceBytes = this.getFee().unscaledValue().toByteArray();
@@ -379,15 +378,15 @@ public class DeployATTransaction extends Transaction
 			{
 				return returnCode + AT_ERROR;
 			}
-			
+
 			String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 			if ( db.getATMap().getAT(atId)!=null)
 			{
 				return 12 + AT_ERROR;
 			}
-			
+
 		}
-		catch(AT_Exception e) 
+		catch(AT_Exception e)
 		{
 			//TODO CAN BE CHANGED TO HANDLE THE ERRORS BETTER
 			return INVALID_CREATION_BYTES;
@@ -400,7 +399,8 @@ public class DeployATTransaction extends Transaction
 	//PROCESS/ORPHAN
 
 	//@Override
-	public void process(DCSet db, Block block, boolean asPack) 
+	@Override
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 		//UPDATE ISSUER
 		super.process(db, block, asPack);
@@ -411,16 +411,16 @@ public class DeployATTransaction extends Transaction
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
 
 		Account atAccount = new Account(atId);
-	
+
 		//atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
 		atAccount.changeBalance(db, false, Transaction.FEE_KEY, this.amount, false);
-		
+
 		//UPDATE REFERENCE OF RECIPIENT
 		if( true || atAccount.getLastTimestamp(db) == null)
 		{
 			atAccount.setLastTimestamp(this.timestamp, db);
 		}
-		
+
 		//CREATE AT - public key or address? Is that the correct height?
 		AT at = new AT( Base58.decode( atId ), Base58.decode(this.creator.getAddress()) , this.name , this.description, this.type, this.tags , this.creationBytes , db.getBlockMap().last().getHeight(db) + 1 );
 
@@ -444,7 +444,7 @@ public class DeployATTransaction extends Transaction
 		bf.putInt( db.getBlockMap().last().getHeight(db) + 1 );
 		return bf.array().clone();
 	}
-	
+
 	public Account getATaccount(DCSet db)
 	{
 		byte[] name = StringUtil.getUtf8Bytes(this.name );
@@ -456,7 +456,7 @@ public class DeployATTransaction extends Transaction
 		bf.put( desc );
 		bf.put( this.creator.getPublicKey() );
 		bf.put( this.creationBytes );
-		
+
 		bf.putInt( getBlockHeightByParentOrLast(db) );
 
 		String atId = Crypto.getInstance().getATAddress( bf.array().clone() );
@@ -465,35 +465,37 @@ public class DeployATTransaction extends Transaction
 	}
 
 	//@Override
+	@Override
 	public void orphan(DCSet db, boolean asPack) {
 
 		//UPDATE ISSUER
 		super.orphan(db, asPack);
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
 		this.creator.changeBalance(db, false, Transaction.FEE_KEY, this.amount, true);
-		
+
 		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
-		
+
 		Account atAccount = new Account(atId);
-		
+
 		//UPDATE RECIPIENT
 		//atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
 		atAccount.changeBalance(db, true, Transaction.FEE_KEY, this.amount, true);
-			
+
 		//UPDATE REFERENCE OF SENDER
 		this.creator.setLastTimestamp(this.reference, db);
-				
+
 	}
 
 	//REST
 
+	@Override
 	public BigDecimal getAmount()
 	{
 		return this.amount;
 	}
-	
+
 	@Override
-	public HashSet<Account> getInvolvedAccounts() 
+	public HashSet<Account> getInvolvedAccounts()
 	{
 		HashSet<Account> accounts = new HashSet<>();
 		accounts.add(this.creator);
@@ -508,9 +510,9 @@ public class DeployATTransaction extends Transaction
 		accounts.add(this.getATaccount(dcSet));
 		return accounts;
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
 
@@ -523,12 +525,13 @@ public class DeployATTransaction extends Transaction
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	//@Override
-	public BigDecimal getAmount(Account account) 
+	@Override
+	public BigDecimal getAmount(Account account)
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
@@ -538,18 +541,19 @@ public class DeployATTransaction extends Transaction
 		return BigDecimal.ZERO;
 	}
 	//@Override
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-		
+
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		
+
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.amount);
 		assetAmount = addAssetAmount(assetAmount, this.getATaccount(dcSet).getAddress(), FEE_KEY, this.amount);
-		
+
 		return assetAmount;
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return calcCommonFee();
 	}

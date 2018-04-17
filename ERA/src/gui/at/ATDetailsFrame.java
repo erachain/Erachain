@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import at.AT;
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
@@ -29,9 +30,9 @@ public class ATDetailsFrame extends JFrame {
 	private static final long serialVersionUID = 4763074704570450206L;
 
 	public ATDetailsFrame(AT at)
-	{	
+	{
 		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("AT Details"));
-		
+
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -39,7 +40,7 @@ public class ATDetailsFrame extends JFrame {
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		this.setIconImages(icons);
-		
+
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -52,17 +53,17 @@ public class ATDetailsFrame extends JFrame {
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(0, 5, 5, 0);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelGBC.fill = GridBagConstraints.HORIZONTAL;
 		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
+		labelGBC.weightx = 0;
 		labelGBC.gridx = 0;
 
 		//DETAIL GBC
 		GridBagConstraints detailGBC = new GridBagConstraints();
 		detailGBC.insets = new Insets(0, 5, 5, 0);
-		detailGBC.fill = GridBagConstraints.HORIZONTAL;  
+		detailGBC.fill = GridBagConstraints.HORIZONTAL;
 		detailGBC.anchor = GridBagConstraints.NORTHWEST;
-		detailGBC.weightx = 1;	
+		detailGBC.weightx = 1;
 		detailGBC.gridwidth = 2;
 		detailGBC.gridx = 1;
 
@@ -77,7 +78,7 @@ public class ATDetailsFrame extends JFrame {
 		address.setEditable(false);
 		this.add(address, detailGBC);
 
-		
+
 		//LABEL AT TYPE
 		labelGBC.gridy = 1;
 		JLabel keyLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
@@ -87,7 +88,7 @@ public class ATDetailsFrame extends JFrame {
 		detailGBC.gridy = 1;
 		JTextField txtKey = new JTextField(at.getType());
 		txtKey.setEditable(false);
-		this.add(txtKey, detailGBC);	
+		this.add(txtKey, detailGBC);
 
 		//LABEL NAME
 		labelGBC.gridy = 2;
@@ -98,7 +99,7 @@ public class ATDetailsFrame extends JFrame {
 		detailGBC.gridy = 2;
 		JTextField txtName = new JTextField(at.getName());
 		txtName.setEditable(false);
-		this.add(txtName, detailGBC);		
+		this.add(txtName, detailGBC);
 
 		//LABEL DESCRIPTION
 		labelGBC.gridy = 3;
@@ -111,7 +112,7 @@ public class ATDetailsFrame extends JFrame {
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(txtName.getBorder());
 		txtAreaDescription.setEditable(false);
-		this.add(txtAreaDescription, detailGBC);	
+		this.add(txtAreaDescription, detailGBC);
 
 		//LABEL OWNER
 		labelGBC.gridy = 4;
@@ -133,7 +134,7 @@ public class ATDetailsFrame extends JFrame {
 		detailGBC.gridy = 5;
 		JTextField txtQuantity = new JTextField(new Account(Base58.encode(at.getId())).getBalanceUSE(Transaction.FEE_KEY).toPlainString());
 		txtQuantity.setEditable(false);
-		this.add(txtQuantity, detailGBC);		
+		this.add(txtQuantity, detailGBC);
 
 		//LABEL DIVISIBLE
 		labelGBC.gridy = 6;
@@ -145,7 +146,7 @@ public class ATDetailsFrame extends JFrame {
 		JCheckBox chkDivisible = new JCheckBox();
 		chkDivisible.setSelected(at.getMachineState().isDead());
 		chkDivisible.setEnabled(false);
-		this.add(chkDivisible, detailGBC);	
+		this.add(chkDivisible, detailGBC);
 
 		//CODE LABEL - TEXT
 		labelGBC.gridy = 7;
@@ -174,13 +175,13 @@ public class ATDetailsFrame extends JFrame {
 		txtAreaData.setAutoscrolls(true);
 		this.add(txtAreaData, detailGBC);
 		((JFrame)txtAreaData.getTopLevelAncestor()).pack();
-		
+
 		//CODE LABEL - TEXT
 		labelGBC.gridy = 9;
 		JLabel minActivationLabel = new JLabel(Lang.getInstance().translate("Min Activation Amount") + ":");
 		this.add(minActivationLabel, labelGBC);
 		detailGBC.gridy = 9;
-		JTextField txtMinActiv = new JTextField( BigDecimal.valueOf(at.minActivationAmount() , 8).toPlainString());
+		JTextField txtMinActiv = new JTextField( BigDecimal.valueOf(at.minActivationAmount() , BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
 		txtMinActiv.setEditable(false);
 		this.add(txtMinActiv, detailGBC);
 

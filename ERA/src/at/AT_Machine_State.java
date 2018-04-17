@@ -8,22 +8,23 @@
 
 package at;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.TreeSet;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.TreeSet;
 
 import org.json.simple.JSONObject;
 
+import core.BlockChain;
 import utils.Converter;
 
 
 public class AT_Machine_State
 {
 
-	public class Machine_State 
+	public class Machine_State
 	{
 		transient boolean running;
 		transient boolean stopped;
@@ -37,7 +38,7 @@ public class AT_Machine_State
 
 		int cs;
 		int us;
-		
+
 		int err;
 
 		int steps;
@@ -66,17 +67,17 @@ public class AT_Machine_State
 		{
 			return running;
 		}
-		
+
 		public boolean isStopped()
 		{
 			return stopped;
 		}
-		
+
 		public boolean isFinished()
 		{
 			return finished;
 		}
-		
+
 		public boolean isDead()
 		{
 			return dead;
@@ -106,20 +107,20 @@ public class AT_Machine_State
 
 			ByteBuffer bytes = ByteBuffer.allocate( getSize() );
 			bytes.order( ByteOrder.LITTLE_ENDIAN );
-			
+
 			flags[0] = (byte) (( running? 1 : 0)
 					| (stopped?1:0) << 1
 					| (finished?1:0 << 2)
 					| (dead?1:0) << 3);
-			
+
 			bytes.put( flags );
-			
+
 			bytes.putInt( machineState.pc );
 			bytes.putInt( machineState.pcs );
 			bytes.putInt( machineState.cs );
 			bytes.putInt( machineState.us );
 			bytes.putInt( machineState.err );
-			
+
 			bytes.put( A1 );
 			bytes.put( A2 );
 			bytes.put( A3 );
@@ -128,24 +129,24 @@ public class AT_Machine_State
 			bytes.put( B2 );
 			bytes.put( B3 );
 			bytes.put( B4 );
-			
-			
+
+
 			return bytes.array();
 		}
-		
+
 		private void setMachineState( byte[] machineState )
 		{
 			ByteBuffer bf = ByteBuffer.allocate( getSize() );
 			bf.order( ByteOrder.LITTLE_ENDIAN );
 			bf.put( machineState );
 			bf.flip();
-			
+
 			bf.get( flags , 0 , 2 );
 			running = ( flags[0] & 1) == 1;
 			stopped = ( flags[0] >>> 1 & 1) == 1;
 			finished = ( flags[0] >>> 2 & 1) == 1;
 			dead = ( flags[0] >>> 3 & 1) == 1;
-			
+
 			pc = bf.getInt();
 			pcs = bf.getInt();
 			cs = bf.getInt();
@@ -159,7 +160,7 @@ public class AT_Machine_State
 			bf.get( B2 , 0 , 8 );
 			bf.get( B3 , 0 , 8 );
 			bf.get( B4 , 0 , 8 );
-			
+
 		}
 
 		public int getSize() {
@@ -189,26 +190,26 @@ public class AT_Machine_State
 	private int creationBlockHeight;
 
 	private int waitForNumberOfBlocks;
-	
+
 	private int sleepBetween;
 
 	private boolean freezeWhenSameBalance;
-	
+
 	private long minActivationAmount;
 
 
 	private transient ByteBuffer ap_data;
 
 	private transient ByteBuffer ap_code;
-	
+
 	private int height;
 
 	private LinkedList<AT_Transaction> transactions;
-	
+
 	public AT_Machine_State ( 	byte[] atId , byte[] creator , short version ,
-								byte[] stateBytes, int csize , int dsize , int c_user_stack_bytes , int c_call_stack_bytes ,
-								int creationBlockHeight , int sleepBetween,
-								long minActivationAmount , byte[] apCode )
+			byte[] stateBytes, int csize , int dsize , int c_user_stack_bytes , int c_call_stack_bytes ,
+			int creationBlockHeight , int sleepBetween,
+			long minActivationAmount , byte[] apCode )
 	{
 		this.atID = atId;
 		this.creator = creator;
@@ -223,19 +224,19 @@ public class AT_Machine_State
 		this.sleepBetween = sleepBetween;
 		this.minActivationAmount = minActivationAmount;
 		//this.height = height;
-		
+
 		this.ap_code = ByteBuffer.allocate( apCode.length );
 		ap_code.order( ByteOrder.LITTLE_ENDIAN );
 		ap_code.put( apCode );
 		ap_code.clear();
-		
+
 		transactions = new LinkedList< AT_Transaction >();
-		
-		
-		
+
+
+
 	}
 
-	public AT_Machine_State( byte[] atId , byte[] creator , byte[] creationBytes , int height ) 
+	public AT_Machine_State( byte[] atId , byte[] creator , byte[] creationBytes , int height )
 	{
 		this.version = AT_Constants.getInstance().AT_VERSION( height );
 		this.atID = atId;
@@ -243,10 +244,10 @@ public class AT_Machine_State
 
 		ByteBuffer b = ByteBuffer.allocate( creationBytes.length );
 		b.order( ByteOrder.LITTLE_ENDIAN );
-		
+
 		b.put( creationBytes );
 		b.clear();
-		
+
 		this.version = b.getShort();
 
 		b.getShort(); //future: reserved for future needs
@@ -261,7 +262,7 @@ public class AT_Machine_State
 		this.dsize = dataPages * pageSize;
 		this.c_call_stack_bytes = callStackPages * pageSize;
 		this.c_user_stack_bytes = userStackPages * pageSize;
-		
+
 		this.minActivationAmount = b.getLong();
 
 		int codeLen = 0;
@@ -308,7 +309,7 @@ public class AT_Machine_State
 		}
 		byte[] data = new byte[ dataLen ];
 		b.get( data , 0 , dataLen );
-		
+
 		this.ap_data = ByteBuffer.allocate( this.dsize + this.c_call_stack_bytes + this.c_user_stack_bytes );
 		this.ap_data.order( ByteOrder.LITTLE_ENDIAN );
 		this.ap_data.put( data );
@@ -324,26 +325,26 @@ public class AT_Machine_State
 		this.height = height;
 		this.machineState = new Machine_State();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public JSONObject getStateJSON()
 	{
 		JSONObject json = new JSONObject();
 		json.put("machineCode", Converter.toHex(ap_code.array()) );
 		json.put("machineData", Converter.toHex(ap_data.array()) );
-		json.put("currentBalance", BigDecimal.valueOf(getG_balance(), 8).toPlainString() );
-        json.put("prevBalance", BigDecimal.valueOf(getP_balance(), 8).toPlainString() );
-        json.put("frozen", freezeOnSameBalance());
-        json.put("running", getMachineState().isRunning());
-        json.put("stopped", getMachineState().isStopped());
-        json.put("finished", getMachineState().isFinished());
-        json.put("dead", getMachineState().isDead());
-        
-        return json;
-		
+		json.put("currentBalance", BigDecimal.valueOf(getG_balance(), BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString() );
+		json.put("prevBalance", BigDecimal.valueOf(getP_balance(), BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString() );
+		json.put("frozen", freezeOnSameBalance());
+		json.put("running", getMachineState().isRunning());
+		json.put("stopped", getMachineState().isStopped());
+		json.put("finished", getMachineState().isFinished());
+		json.put("dead", getMachineState().isDead());
+
+		return json;
+
 	}
-	
-   
+
+
 	protected byte[] get_A1()
 	{
 		return machineState.A1;
@@ -439,12 +440,12 @@ public class AT_Machine_State
 		return transactions;
 	}
 
-	protected ByteBuffer getAp_code() 
+	protected ByteBuffer getAp_code()
 	{
 		return ap_code;
 	}
 
-	public ByteBuffer getAp_data() 
+	public ByteBuffer getAp_data()
 	{
 		return ap_data;
 	}
@@ -453,33 +454,33 @@ public class AT_Machine_State
 	{
 		return ap_code.array().clone();
 	}
-	
-	protected int getC_call_stack_bytes() 
+
+	protected int getC_call_stack_bytes()
 	{
 		return c_call_stack_bytes;
 	}
 
-	protected int getC_user_stack_bytes() 
+	protected int getC_user_stack_bytes()
 	{
 		return c_user_stack_bytes;
 	}
 
-	protected int getCsize() 
+	protected int getCsize()
 	{
 		return csize;
 	}
 
-	protected int getDsize() 
+	protected int getDsize()
 	{
 		return dsize;
 	}
 
-	public Long getG_balance() 
+	public Long getG_balance()
 	{
 		return g_balance;
 	}
 
-	public Long getP_balance() 
+	public Long getP_balance()
 	{
 		return p_balance;
 	}
@@ -489,47 +490,47 @@ public class AT_Machine_State
 		return atID;
 	}
 
-	public Machine_State getMachineState() 
+	public Machine_State getMachineState()
 	{
 		return machineState;
 	}
 
-	protected void setC_call_stack_bytes(int c_call_stack_bytes) 
+	protected void setC_call_stack_bytes(int c_call_stack_bytes)
 	{
 		this.c_call_stack_bytes = c_call_stack_bytes;
 	}
 
-	protected void setC_user_stack_bytes(int c_user_stack_bytes) 
+	protected void setC_user_stack_bytes(int c_user_stack_bytes)
 	{
 		this.c_user_stack_bytes = c_user_stack_bytes;
 	}
 
-	protected void setCsize(int csize) 
+	protected void setCsize(int csize)
 	{
 		this.csize = csize;
 	}
 
-	protected void setDsize(int dsize) 
+	protected void setDsize(int dsize)
 	{
 		this.dsize = dsize;
 	}
 
-	protected void setG_balance(Long g_balance) 
+	protected void setG_balance(Long g_balance)
 	{
 		this.g_balance = g_balance;
 	}
 
-	protected void setP_balance(Long p_balance) 
+	protected void setP_balance(Long p_balance)
 	{
 		this.p_balance = p_balance;
 	}
 
-	protected void setMachineState(Machine_State machineState) 
+	protected void setMachineState(Machine_State machineState)
 	{
 		this.machineState = machineState;
 	}
 
-	protected void setWaitForNumberOfBlocks(int waitForNumberOfBlocks) 
+	protected void setWaitForNumberOfBlocks(int waitForNumberOfBlocks)
 	{
 		this.waitForNumberOfBlocks = waitForNumberOfBlocks;
 	}
@@ -539,12 +540,12 @@ public class AT_Machine_State
 		return this.waitForNumberOfBlocks;
 	}
 
-	public byte[] getCreator() 
+	public byte[] getCreator()
 	{
 		return this.creator;
 	}
 
-	public int getCreationBlockHeight() 
+	public int getCreationBlockHeight()
 	{
 		return this.creationBlockHeight;
 	}
@@ -553,17 +554,17 @@ public class AT_Machine_State
 	{
 		return this.freezeWhenSameBalance;
 	}
-	
+
 	public long minActivationAmount()
 	{
 		return this.minActivationAmount;
 	}
-	
+
 	protected void setMinActivationAmount(long minActivationAmount)
 	{
 		this.minActivationAmount = minActivationAmount;
 	}
-	
+
 	public short getVersion()
 	{
 		return version;
@@ -573,17 +574,17 @@ public class AT_Machine_State
 	{
 		return sleepBetween;
 	}
-	
+
 	public int getHeight()
 	{
 		return height;
 	}
-	
+
 	protected void setHeight(int height)
 	{
 		this.height = height;
 	}
-	
+
 	public byte[] getState()
 	{
 		byte[] stateBytes = machineState.getMachineStateBytes();
@@ -602,45 +603,45 @@ public class AT_Machine_State
 
 		return b.array();
 	}
-	
+
 	public void setState( byte[] state )
 	{
 		ByteBuffer b = ByteBuffer.allocate( state.length );
 		b.order( ByteOrder.LITTLE_ENDIAN );
 		b.put( state );
 		b.flip();
-		
+
 		int stateSize = this.machineState.getSize();
 		byte[] machineState = new byte[ stateSize ];
 		b.get( machineState , 0 , stateSize );
 		this.machineState.setMachineState( machineState );
-		
+
 		g_balance = b.getLong();
 		p_balance = b.getLong();
 		height = b.getInt();
 		waitForNumberOfBlocks = b.getInt();
-		
+
 		freezeWhenSameBalance = ( b.get() == 0 ) ? false: true;
-		
+
 		byte[] apData = new byte[ b.capacity() - b.position() ];
 		b.get( apData );
 		ap_data = ByteBuffer.allocate( apData.length );
 		ap_data.order( ByteOrder.LITTLE_ENDIAN );
 		ap_data.put( apData );
 		ap_data.clear();
-		
+
 	}
-	
+
 	protected int getStateSize() {
 		return ( this.machineState.getSize() + 8 + 8 + 4 + 4 + 1 + ap_data.capacity() ) ;
 	}
-	
+
 	protected byte[] getBytes() {
 		byte[] state = getState();
-		
+
 		ByteBuffer bf = ByteBuffer.allocate( getSize() );
 		bf.order( ByteOrder.LITTLE_ENDIAN );
-		
+
 		bf.put( atID );
 		bf.put( creator );
 		bf.putShort( version );
@@ -654,19 +655,19 @@ public class AT_Machine_State
 		//bf.put( (byte) (( freezeWhenSameBalance ) ? 1 : 0) );
 		bf.put( ap_code.array() );
 		bf.put( state );
-		
+
 		return bf.array();
-		
+
 	}
-	
+
 	protected int getSize() {
 		return getStateSize() + atID.length + creator.length + 2 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + ap_code.capacity();
 	}
-	
+
 	protected void setFreeze( boolean freeze )
 	{
 		this.freezeWhenSameBalance = freeze;
 	}
-	
+
 
 }

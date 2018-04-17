@@ -2,20 +2,14 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import core.BlockChain;
@@ -40,9 +34,10 @@ public class CreateOrderTransaction extends Transaction {
 	private Order order;
 
 	public static final byte[][] VALID_REC = new byte[][] {
-			Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
-			Base58.decode(
-					"4fWbpHBsEzyG9paXH5oJswn3YMhvxw6fRssk6qZmB7jxQ72sRXJunEQhi9bnTwg2cUjwGCZy54u4ZseLRM7xh2x6"), };
+		Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
+		Base58.decode(
+				"4fWbpHBsEzyG9paXH5oJswn3YMhvxw6fRssk6qZmB7jxQ72sRXJunEQhi9bnTwg2cUjwGCZy54u4ZseLRM7xh2x6")
+	};
 
 	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want,
 			BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
@@ -83,6 +78,37 @@ public class CreateOrderTransaction extends Transaction {
 	 */
 
 	@Override
+	public void setDC(DCSet dcSet, boolean asPack) {
+		super.setDC(dcSet, asPack);
+
+		AssetCls asset = this.order.getHaveAsset(dcSet);
+		int scaleHave;
+		if (this.order.getHave() < BlockChain.AMOUNT_SCALE_FROM) {
+			scaleHave = 8;
+		} else {
+			scaleHave = asset.getScale();
+		}
+
+		asset = this.order.getWantAsset(dcSet);
+		int scaleWant;
+		if (this.order.getWant() < BlockChain.AMOUNT_SCALE_FROM) {
+			scaleWant = 8;
+		} else {
+			scaleWant = asset.getScale();
+		}
+
+		if (scaleHave != BlockChain.AMOUNT_DEDAULT_SCALE
+				|| scaleWant != BlockChain.AMOUNT_DEDAULT_SCALE) {
+			// RESCALE AMOUNTs
+			BigDecimal amountHave = new BigDecimal(this.order.getAmountHave().unscaledValue(), scaleHave);
+			BigDecimal amountWant = new BigDecimal(this.order.getAmountWant().unscaledValue(), scaleWant);
+			this.order = new Order(new BigInteger(signature), creator, this.order.getHave(), this.order.getWant(),
+					amountHave, amountWant, timestamp);
+		}
+
+	}
+
+	@Override
 	public BigDecimal getAmount() {
 		return this.order.getAmountHave();
 	}
@@ -96,11 +122,13 @@ public class CreateOrderTransaction extends Transaction {
 		return this.order;
 	}
 
+	@Override
 	public boolean hasPublicText() {
 		return false;
 	}
 
 	// @Override
+	@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack) {
 		super.sign(creator, asPack);
 		// in IMPRINT reference already setted before sign
@@ -168,12 +196,12 @@ public class CreateOrderTransaction extends Transaction {
 
 		// READ AMOUNT HAVE
 		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), 8);
+		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		// READ AMOUNT WANT
 		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), 8);
+		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
@@ -202,6 +230,7 @@ public class CreateOrderTransaction extends Transaction {
 	}
 
 	// @Override
+	@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference) {
 		byte[] data = super.toBytes(withSign, releaserReference);
 
@@ -253,7 +282,7 @@ public class CreateOrderTransaction extends Transaction {
 		long want = this.order.getWant();
 
 		if (have == RIGHTS_KEY && !BlockChain.DEVELOP_USE
-				//&& want != FEE_KEY
+				// && want != FEE_KEY
 				) {
 			// have ERA
 			if (height > BlockChain.FREEZE_FROM
@@ -268,8 +297,9 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		// CHECK IF AMOUNT POSITIVE
-		if (this.order.getAmountHave().compareTo(BigDecimal.ZERO) <= 0
-				|| this.order.getAmountWant().compareTo(BigDecimal.ZERO) <= 0) {
+		BigDecimal amountHave = this.order.getAmountHave();
+		BigDecimal amountWant = this.order.getAmountWant();
+		if (amountHave.compareTo(BigDecimal.ZERO) <= 0 || amountWant.compareTo(BigDecimal.ZERO) <= 0) {
 			return NEGATIVE_AMOUNT;
 		}
 
@@ -282,7 +312,7 @@ public class CreateOrderTransaction extends Transaction {
 
 		// CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if (FEE_KEY == have) {
-			if (this.creator.getBalance(db, FEE_KEY).a.b.compareTo(this.order.getAmountHave().add(this.fee)) == -1) {
+			if (this.creator.getBalance(db, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
 				return NO_BALANCE;
 			}
 		} else {
@@ -297,24 +327,23 @@ public class CreateOrderTransaction extends Transaction {
 					&& haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
 
 			if (!unLimited) {
-				
+
 				BigDecimal forSale = this.creator.getForSale(db, have, height);
 
-				if (forSale.compareTo(this.order.getAmountHave()) < 0) {
+				if (forSale.compareTo(amountHave) < 0) {
 					return NO_BALANCE;
 				}
 			}
-			
-			
+
 			if (height > BlockChain.FREEZE_FROM && BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress()) != null)
 				return INVALID_CREATOR;
-			 
+
 		}
 
 		// CHECK IF HAVE IS NOT DIVISBLE
 		if (!haveAsset.isDivisible()) {
 			// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if (this.order.getAmountHave().stripTrailingZeros().scale() > 0) {
+			if (amountHave.stripTrailingZeros().scale() > 0) {
 				// AMOUNT HAS DECIMALS
 				return INVALID_AMOUNT;
 			}
@@ -329,16 +358,33 @@ public class CreateOrderTransaction extends Transaction {
 
 		//
 		Long maxWant = wantAsset.getQuantity(db);
-		if (maxWant > 0 && new BigDecimal(maxWant).compareTo(this.order.getAmountWant()) < 0)
+		if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
 			return INVALID_QUANTITY;
 
 		// CHECK IF WANT IS NOT DIVISIBLE
 		if (!wantAsset.isDivisible()) {
 			// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if (this.order.getAmountWant().stripTrailingZeros().scale() > 0) {
+			if (amountWant.stripTrailingZeros().scale() > 0) {
 				// AMOUNT HAS DECIMALS
 				return INVALID_RETURN;
 			}
+		}
+
+		// for PARSE and toBYTES need only AMOUNT_LENGTH bytes
+		// and SCALE
+		byte[] amountBytes = amountHave.unscaledValue().toByteArray();
+		if (amountBytes.length > AMOUNT_LENGTH) {
+			return AMOUNT_LENGHT_SO_LONG;
+		}
+		if (amountHave.scale() != haveAsset.getScale()) {
+			return AMOUNT_SCALE_WRONG;
+		}
+		amountBytes = amountWant.unscaledValue().toByteArray();
+		if (amountBytes.length > AMOUNT_LENGTH) {
+			return AMOUNT_LENGHT_SO_LONG;
+		}
+		if (amountWant.scale() != wantAsset.getScale()) {
+			return AMOUNT_SCALE_WRONG;
 		}
 
 		return super.isValid(db, releaserReference);
@@ -347,6 +393,7 @@ public class CreateOrderTransaction extends Transaction {
 	// PROCESS/ORPHAN
 
 	// @Override
+	@Override
 	public void process(DCSet db, Block block, boolean asPack) {
 		// UPDATE CREATOR
 		super.process(db, block, asPack);
@@ -358,6 +405,7 @@ public class CreateOrderTransaction extends Transaction {
 	}
 
 	// @Override
+	@Override
 	public void orphan(DCSet db, boolean asPack) {
 		// UPDATE CREATOR
 		super.orphan(db, asPack);
@@ -408,6 +456,7 @@ public class CreateOrderTransaction extends Transaction {
 		return assetAmount;
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return 5 * calcCommonFee();
 	}

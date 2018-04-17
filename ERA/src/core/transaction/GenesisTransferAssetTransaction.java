@@ -2,34 +2,25 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
-
-import utils.NumberAsString;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
-import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
-import core.crypto.Crypto;
-import core.item.ItemCls;
-import datachain.AddressForging;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
+import utils.NumberAsString;
 
 public class GenesisTransferAssetTransaction extends Genesis_Record {
 
@@ -44,8 +35,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	private Account recipient;
 	private BigDecimal amount;
 	private long key;
-	
-	public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount) 
+
+	public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount)
 	{
 		super(TYPE_ID, NAME_ID);
 		this.recipient = recipient;
@@ -55,13 +46,13 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			this.generateSignature();
 	}
 	// RENT
-	public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account owner) 
+	public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account owner)
 	{
 		this(recipient, key, amount);
 		this.owner = owner;
 		this.generateSignature();
 	}
-	
+
 	//GETTERS/SETTERS
 	//public static String getName() { return NAME; }
 
@@ -73,25 +64,28 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 		return this.recipient;
 	}
-	
-	public BigDecimal getAmount() 
+
+	@Override
+	public BigDecimal getAmount()
 	{
 		return this.amount;
 	}
-	
+
+	@Override
 	public long getKey()
 	{
 		return this.key;
 	}
+	@Override
 	public long getAssetKey()
 	{
 		return this.key;
 	}
-	
+
 	@Override
 	public BigDecimal getAmount(String address) {
 		BigDecimal amount = BigDecimal.ZERO.setScale(8);
-		
+
 		if(address.equals(this.recipient.getAddress()))
 		{
 			//IF RECIPIENT
@@ -127,49 +121,49 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public JSONObject toJson() 
+	public JSONObject toJson()
 	{
 		//GET BASE
 		JSONObject transaction = super.toJson();
-				
+
 		//ADD CREATOR/RECIPIENT/AMOUNT/ASSET
 		if (this.owner != null)
 			transaction.put("owner", this.owner.getAddress());
-		
+
 		transaction.put("recipient", this.recipient.getAddress());
 		transaction.put("asset", this.key);
 		transaction.put("amount", this.amount.toPlainString());
-				
-		return transaction;	
+
+		return transaction;
 	}
 
 	//PARSE/CONVERT
-	
+
 	public static Transaction Parse(byte[] data) throws Exception{
-		
+
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
 		{
 			throw new Exception("Data does not match block length: " + data.length + " in " + NAME_ID);
 		}
-		
+
 		// READ TYPE
 		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
 		int position = SIMPLE_TYPE_LENGTH;
-		
+
 		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
 		Account recipient = new Account(Base58.encode(recipientBytes));
 		position += RECIPIENT_LENGTH;
-		
+
 		//READ KEY
 		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-		long key = Longs.fromByteArray(keyBytes);	
+		long key = Longs.fromByteArray(keyBytes);
 		position += KEY_LENGTH;
-		
+
 		//READ AMOUNT
 		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), 8);
+		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		if (key < 0) {
@@ -177,29 +171,29 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
 			Account owner = new Account(Base58.encode(ownerBytes));
 			position += OWNER_LENGTH;
-			return new GenesisTransferAssetTransaction(recipient, key, amount, owner);	
+			return new GenesisTransferAssetTransaction(recipient, key, amount, owner);
 		} else {
 			return new GenesisTransferAssetTransaction(recipient, key, amount);
 		}
 
-	}	
-	
+	}
+
 	@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		//byte[] data = new byte[0];
-		
+
 		//WRITE TYPE
 		byte[] data = new byte[]{TYPE_ID};
-		
+
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
-		
+
 		//WRITE KEY
 		byte[] keyBytes = Longs.toByteArray(this.key);
 		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
-		
+
 		//WRITE AMOUNT
 		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
 		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
@@ -215,7 +209,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	}
 
 	@Override
-	public int getDataLength(boolean asPack) 
+	public int getDataLength(boolean asPack)
 	{
 		return BASE_LENGTH + (this.key<0?OWNER_LENGTH:0);
 	}
@@ -224,9 +218,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference)
 	{
-		
+
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if (!"1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3".equals(this.recipient.getAddress())) {
 			Tuple2<Account, String> result = Account.tryMakeAccount(this.recipient.getAddress());
@@ -235,7 +229,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 				return INVALID_ADDRESS;
 			}
 		}
-						
+
 		//CHECK IF AMOUNT IS DIVISIBLE
 		// genesis assets not in DB yet and need take it from genesis maker
 		if(!GenesisBlock.makeAsset((int)this.getAbsKey()).isDivisible())
@@ -247,27 +241,27 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 				return INVALID_AMOUNT;
 			}
 		}
-				
+
 		//CHECK IF AMOUNT IS POSITIVE
 		if(this.amount.compareTo(BigDecimal.ZERO) <= 0)
 		{
 			return NEGATIVE_AMOUNT;
 		}
-				
+
 		return VALIDATE_OK;
 	}
 
 	//PROCESS/ORPHAN
-	
+
 	@Override
-	public void process(DCSet db, Block block, boolean asPack) 
+	public void process(DCSet db, Block block, boolean asPack)
 	{
 
 		long key = this.key;
 
 		//UPDATE RECIPIENT OWN or RENT
 		this.recipient.changeBalance(db, false, key, this.amount, false);
-		
+
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.setLastTimestamp(this.timestamp, db);
 
@@ -284,29 +278,29 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			db.getCredit_AddressesMap().add(
 					new Tuple3<String, Long, String>(
 							this.owner.getAddress(), -key,
-							this.recipient.getAddress()), 
+							this.recipient.getAddress()),
 					//new Tuple3<String, Long, String>(this.owner.getAddress(), -key, this.recipient.getAddress()),
 					this.amount);
 		} else {
 			// CREATOR update
-			GenesisBlock.CREATOR.changeBalance(db, true, key, this.amount, false);			
+			GenesisBlock.CREATOR.changeBalance(db, true, key, this.amount, false);
 		}
 	}
 
 	@Override
-	public void orphan(DCSet db, boolean asPack) 
+	public void orphan(DCSet db, boolean asPack)
 	{
 		// RISE ERROR
 		DCSet err = null;
 		err.commit();
-		
+
 		/* IT CANNOT BE orphanED !!!
-		 * 
+		 *
 		long key = this.key;
 		//UPDATE RECIPIENT
 		//this.recipient.setBalance(key, this.recipient.getBalance(db, key).subtract(this.amount), db);
 		this.recipient.changeBalance(db, true, key, this.amount);
-		
+
 		//UPDATE REFERENCE OF RECIPIENT
 		this.recipient.removeReference(db);
 
@@ -324,14 +318,14 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 					this.amount);
 		} else {
 			// CREATOR update
-			GenesisBlock.CREATOR.changeBalance(db, false, key, this.amount);			
+			GenesisBlock.CREATOR.changeBalance(db, false, key, this.amount);
 		}
-		*/
+		 */
 
 	}
 
 	//REST
-	
+
 
 	@Override
 	public HashSet<Account> getRecipientAccounts()
@@ -340,47 +334,47 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		accounts.add(this.recipient);
 		return accounts;
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
-		
+
 		if(address.equals(recipient.getAddress())
 				|| owner != null && address.equals(owner.getAddress()))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	//@Override
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-				
+
 		assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
-		
+
 		return assetAmount;
 	}
 	public String viewActionType() {
 		int amo_sign = this.amount.compareTo(BigDecimal.ZERO);
-		
+
 		if (this.key > 0) {
-				if (amo_sign > 0) {
-					return TransactionAmount.NAME_ACTION_TYPE_PROPERTY;
-				} else { 
-					return TransactionAmount.NAME_ACTION_TYPE_HOLD;
-				}
+			if (amo_sign > 0) {
+				return TransactionAmount.NAME_ACTION_TYPE_PROPERTY;
 			} else {
-				if (amo_sign > 0) {
-					return TransactionAmount.NAME_CREDIT;
-				} else { 
-					return TransactionAmount.NAME_SPEND;
-				}
+				return TransactionAmount.NAME_ACTION_TYPE_HOLD;
+			}
+		} else {
+			if (amo_sign > 0) {
+				return TransactionAmount.NAME_CREDIT;
+			} else {
+				return TransactionAmount.NAME_SPEND;
 			}
 		}
-	
-	
+	}
+
+
 }

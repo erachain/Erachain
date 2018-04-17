@@ -20,6 +20,7 @@ import org.mapdb.Fun.Tuple2;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -28,7 +29,7 @@ import datachain.DCSet;
 
 public abstract class AT_Controller {
 
-	
+
 	private static final Logger LOGGER = Logger.getLogger(AT_Controller.class);
 
 	public static int runSteps( AT_Machine_State state , int blockHeight )
@@ -137,13 +138,13 @@ public abstract class AT_Controller {
 		state.getMachineState().steps = osteps;
 		state.getMachineState().pc = opc;
 	}
-	
+
 
 	public static int checkCreationBytes( byte[] creation , String type, long fee, int height, int forkHeight, DCSet db ) throws AT_Exception{
 		if ( creation == null )
 			throw new AT_Exception( "Creation bytes cannot be null" );
 
-		try 
+		try
 		{
 			ByteBuffer b = ByteBuffer.allocate( creation.length );
 			b.order( ByteOrder.LITTLE_ENDIAN );
@@ -192,7 +193,7 @@ public abstract class AT_Controller {
 			int codeLen;
 			if ( codePages * 256 < 257 )
 			{
-				codeLen = (int)(b.get() & 0xff);
+				codeLen = b.get() & 0xff;
 			}
 			else if ( codePages * 256 < Short.MAX_VALUE + 1 )
 			{
@@ -214,7 +215,7 @@ public abstract class AT_Controller {
 			b.get( code , 0 , codeLen );
 
 			byte[] digestedCode = Crypto.getInstance().digest( Bytes.ensureCapacity(code, codePages * 256, 0));
-			
+
 			if ( !db.getATMap().validTypeHash(digestedCode, type, forkHeight) )
 			{
 				return AT_Error.INCORRECT_TYPE.getCode();
@@ -245,7 +246,7 @@ public abstract class AT_Controller {
 			b.get( data , 0 , dataLen );
 
 			int totalPages = codePages + dataPages + userStackPages + callStackPages;
-			
+
 			if ( totalPages * AT_Constants.getInstance().COST_PER_PAGE( height ) > fee )
 			{
 				return AT_Error.INCORRECT_CREATION_FEE.getCode();
@@ -258,7 +259,7 @@ public abstract class AT_Controller {
 
 			//TODO template: run code in demo mode for checking if is valid
 
-		} catch ( BufferUnderflowException e ) 
+		} catch ( BufferUnderflowException e )
 		{
 			throw new AT_Exception( AT_Error.INCORRECT_CREATION_TX.getDescription() );
 		}
@@ -371,7 +372,7 @@ public abstract class AT_Controller {
 		//HashMap< String, Long > atFees = new HashMap< String, Long >();
 
 		boolean validated = true;
-		
+
 		MessageDigest digest = MessageDigest.getInstance( "MD5" );
 		byte[] md5 = null;
 		for ( ByteBuffer atIdBuffer : ats.keySet() )
@@ -428,7 +429,7 @@ public abstract class AT_Controller {
 				{
 					throw new AT_Exception( "Calculated md5 and recieved md5 are not matching" );
 				}
-				tempAtStates.put( new String(at.getId() , "UTF-8") , state ); 
+				tempAtStates.put( new String(at.getId() , "UTF-8") , state );
 			}
 			catch ( Exception e )
 			{
@@ -448,7 +449,7 @@ public abstract class AT_Controller {
 			//atLastState.put( atId ,  tempAtStates.get( atId ) );
 			dcSet.getATMap().update( at , blockHeight );
 			dcSet.getATStateMap().addOrUpdate( blockHeight , at.getId(), at.getState() );
-			
+
 			Tuple2<Long, Long> results = makeTransactions( at , dcSet, blockHeight, seq, true);
 			totalAmount += results.a;
 			totalFee += results.b;
@@ -489,7 +490,7 @@ public abstract class AT_Controller {
 			{
 				throw new AT_Exception( "AT included in block multiple times" );
 			}
-			ats.put( atId , md5 ); 
+			ats.put( atId , md5 );
 		}
 
 		if ( b.position() != b.capacity() )
@@ -526,7 +527,7 @@ public abstract class AT_Controller {
 	}
 
 	//platform based implementations
-	//platform based 
+	//platform based
 	private static Tuple2<Long, Long> makeTransactions( AT at , DCSet dcSet, int height, int seq, boolean yes) {
 		long totalAmount = 0;
 		long totalFees = 0;
@@ -547,21 +548,21 @@ public abstract class AT_Controller {
 					{
 						recipient.setLastTimestamp(-1L, dcSet);
 					}
-					//recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dcSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dcSet );
+					//recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dcSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE) ) , dcSet );
 				}
 				else
 				{
 					totalFees += tx.getAmount();
 				}
-				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() , 8 ) ) , dcSet );
-				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , 8 ), false );
+				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE) ) , dcSet );
+				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE), false );
 				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dcSet, Transaction.FEE_KEY));
 			}
 
 		}
 		return new Tuple2<Long, Long>(totalAmount, totalFees);
 	}
-	
+
 
 	private static long getATAccountBalance( byte[] id )
 	{
@@ -581,7 +582,7 @@ public abstract class AT_Controller {
 		return Longs.fromByteArray(balanceBytes);
 	}
 
-	
+
 
 
 

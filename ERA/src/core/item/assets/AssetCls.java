@@ -68,6 +68,9 @@ public abstract class AssetCls extends ItemCls {
 	
 	public static final int INITIAL_FAVORITES = 4;
 		
+	protected byte scale;
+	protected boolean divisible;
+
 	protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
 		super(typeBytes, owner, name, icon, image, description);
@@ -129,10 +132,17 @@ public abstract class AssetCls extends ItemCls {
 	public abstract Long getTotalQuantity(DCSet dc);
 
 	public boolean isDivisible() {
-		return true;
+		if (this.key < BlockChain.AMOUNT_SCALE_FROM)
+			return divisible;
+		
+		return this.scale > 0;
 	}
+	
 	public int getScale() {
-		return 8;
+		if (this.key < BlockChain.AMOUNT_SCALE_FROM)
+			return 8;
+			
+		return this.scale;
 	}
 
 	/*

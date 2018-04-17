@@ -15,12 +15,13 @@ import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
+import core.BlockChain;
 import core.crypto.Base58;
 import utils.Converter;
 
 
 public class AT_Transaction{
-	
+
 	private byte[] senderId = new byte[ AT_Constants.AT_ID_SIZE ];
 	private byte[] recipientId = new byte[ AT_Constants.AT_ID_SIZE ];
 	private long key;
@@ -29,7 +30,7 @@ public class AT_Transaction{
 	private int blockHeight;
 	private int seq;
 	private final int BASE_SIZE = 2 * AT_Constants.AT_ID_SIZE + 8 + 4 + 4 + 4;
-	
+
 	AT_Transaction( byte[] senderId , byte[] recipientId , long key, long amount, byte[] message ){
 		this.senderId = senderId.clone();
 		this.recipientId = recipientId.clone();
@@ -37,7 +38,7 @@ public class AT_Transaction{
 		this.amount = amount;
 		this.message = (message != null) ? message.clone() : null;
 	}
-	
+
 	public AT_Transaction(int blockHeight, int seq, byte[] senderId,
 			byte[] recipientId, long key, long amount, byte[] message) {
 		this.blockHeight = blockHeight;
@@ -55,34 +56,34 @@ public class AT_Transaction{
 	public Long getAmount(){
 		return this.amount;
 	}
-	
+
 	public byte[] getSenderId(){
 		return this.senderId;
 	}
-	
+
 	public byte[] getRecipientId(){
 		return this.recipientId;
 	}
-	
+
 	public byte[] getMessage() {
 		return this.message;
 	}
-	
+
 	public int getBlockHeight()
 	{
 		return this.blockHeight;
 	}
-	
+
 	public int getSeq()
 	{
 		return this.seq;
 	}
-	
+
 	public int getSize()
 	{
 		return ( this.message != null ) ? BASE_SIZE + this.message.length : BASE_SIZE;
 	}
-	
+
 	public byte[] toBytes()
 	{
 		int size = BASE_SIZE;
@@ -90,11 +91,11 @@ public class AT_Transaction{
 		{
 			size += message.length;
 		}
-		
+
 		ByteBuffer bf = ByteBuffer.allocate( size );
 		bf.order( ByteOrder.LITTLE_ENDIAN );
 		bf.clear();
-		
+
 		bf.putInt( blockHeight );
 		bf.putInt( seq );
 		bf.put( senderId );
@@ -106,18 +107,18 @@ public class AT_Transaction{
 		{
 			bf.put( message );
 		}
-		
-		
+
+
 		return bf.array().clone();
-		
+
 	}
-	
+
 	public static AT_Transaction fromBytes( byte[] data )
 	{
 		ByteBuffer bf = ByteBuffer.wrap( data );
 		bf.order( ByteOrder.LITTLE_ENDIAN );
 		bf.clear();
-		
+
 		int blockHeight = bf.getInt();
 		int seq = bf.getInt();
 		byte[] senderId = new byte[AT_Constants.AT_ID_SIZE];
@@ -133,15 +134,15 @@ public class AT_Transaction{
 			message = new byte[messageLength];
 			bf.get(message, 0, messageLength);
 		}
-		
+
 		return new AT_Transaction(blockHeight, seq, senderId, recipientId, key, amount, message);
-		
+
 	}
-	
+
 	public void setBlockHeight(Integer blockHeight) {
 		this.blockHeight = blockHeight;
 	}
-	
+
 	public void setSeq(Integer seq) {
 		this.seq = seq;
 	}
@@ -162,19 +163,19 @@ public class AT_Transaction{
 		ob.put("sender", getSender());
 		ob.put("recipient", getRecipient());
 		ob.put("key", key);
-		ob.put("amount", BigDecimal.valueOf( amount , 8).toPlainString());
+		ob.put("amount", BigDecimal.valueOf( amount , BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
 		ob.put("message", ( message != null ) ? Converter.toHex(message) : "");
 		return ob;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean equals(Object otherObject)
 	{
 		if(otherObject instanceof AT_Transaction)
 		{
 			AT_Transaction otherAtTx = (AT_Transaction) otherObject;
-			
-			return 		(this.getBlockHeight() == otherAtTx.getBlockHeight()) 
+
+			return 		(this.getBlockHeight() == otherAtTx.getBlockHeight())
 					&& 	(this.getSeq() == otherAtTx.getSeq())
 					&&	(Arrays.equals(this.getSenderId(), otherAtTx.getSenderId()))
 					&&	(Arrays.equals(this.getRecipientId(), otherAtTx.getRecipientId()))
@@ -182,7 +183,7 @@ public class AT_Transaction{
 					&&	(this.getKey() == otherAtTx.getKey())
 					&&	(this.getAmount() == otherAtTx.getAmount());
 		}
-		
+
 		return false;
 	}
 }

@@ -33,8 +33,6 @@ public class AssetVenture extends AssetCls {
 	private static final int TYPE_ID = AssetCls.VENTURE;
 
 	protected long quantity = 0;
-	protected byte scale;
-	protected boolean divisible;
 
 	public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, long quantity, byte scale, boolean divisible)
 	{
@@ -81,11 +79,7 @@ public class AssetVenture extends AssetCls {
 	public boolean isDivisible() {
 		return this.divisible;
 	}
-	@Override
-	public int getScale() {
-		return this.scale;
-	}
-
+	
 	//PARSE
 	// includeReference - TRUE only for store in local DB
 	public static AssetVenture parse(byte[] data, boolean includeReference) throws Exception

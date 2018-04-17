@@ -2,12 +2,9 @@ package core.transaction;
 
 // import org.apache.log4j.Logger;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
 //import java.math.RoundingMode;
 //import java.math.MathContext;
 import java.util.Arrays;
-import java.util.HashMap;
 //import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -21,7 +18,6 @@ import org.apache.log4j.Logger;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.Bytes;
@@ -38,10 +34,8 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import core.item.assets.Order;
 import datachain.AddressTime_SignatureMap;
 import datachain.DCSet;
-import settings.Settings;
 //import lang.Lang;
 //import settings.Settings;
 import utils.DateTimeFormat;
@@ -51,30 +45,31 @@ public abstract class Transaction {
 	protected static final int TODO_h1 = 69000;
 
 	public static final byte[][] DISCREDIR_ADDRESSES = new byte[][] {
-			Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
-			Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
-		};
+		Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
+		Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
+	};
 
 	public static final byte[][] VALID_SIGN = new byte[][] {
-			Base58.decode("5DnTfBxw2y8fDshzkdqppB24y5P98vnc873z4cofQZ31JskfJbnpRPjU5uZMQwfSYJYkJZzMxMYq6EeNCys18sEq"),
-			Base58.decode("4CqzJSD9j4GNGcYVtNvMic98Zq9aQALLdkFkuXMLGnGqUTgdHqHcoSU7wJ24wvaAAukg2g1Kw1SA6UFQo7h3VasN"),
-			Base58.decode("E4pUUdCqQt6HWCJ1pUeEtCDngow7pEJjyRtLZTLEDWFEFwicvxVXAgJbUPyASueZVUobZ28xtX6ZgDLb5cxeXy2"),
-			Base58.decode("4UPo6sAF63fkqhgkAXh94tcF43XYz8d7f6PqBGSX13eo3UWCENptrk72qkLxtXYEEsHs1wS2eH6VnZEVctnPdUkb"),
-			Base58.decode("3aYMNRUVYxVaozihhGkxU8JTeAFT73Ua7JDqUfvrDUpDNPs7mS4pxHUaaDiZsGYi91fK5c2yVLWVQW9tqqDGCK2a"),
-			Base58.decode("KhVG9kHf4nttWSEvM6Rd99wuTtRtFAQvSwwo9ae4WFJ2fWaidY4jF33WTRDvYEtaWWu2cmh6x4tEX7ded6QDSGt"),
-			Base58.decode("2KW1mywfP99GcEo5hV8mdHxgPDkFJj5ABcVjNa7vQd1GPC13HRqBERUPKfLZ5HrQ3Dyp42u8PWrzBKUP3cUHG3N4"),
-			Base58.decode("2SsSCv8EuMnZrGYq4jFhvJ3gRdbdEU92Unp6u4JNwrw4D7SHHaRpH2b9VuLtTA3zuUVx1EqTB5wJQWxeuJbwxYvs"),
-			Base58.decode("4iM1HvHgSV3WTXJ3M4XVMZ4AcfrDaA3bdyFmZcX5BJJkacNTjVURWuhp2gLyhxCJok7eAHkd94nM4q3VcDAc2zCJ"),
-			Base58.decode("3THvTzHcyEDPGisprZAN955RMEhye84ygnBMPxrFRT6bCocQ84xt1jaSaNyD9px9dxq3zCNbebXnmL251JZhfCHm"),
-			Base58.decode("M7jNQ8w2fCjD3Mvo8cH2G5JYFTnGfLYSQv7xCCso7BsmMKJ7Ruc3pnr1rbpFwVrBkQG3auB5SGCmoWbCq9pw8hU"),
-			Base58.decode("m1ryu4QMHLaoALYwx35ugNtQec1QAS1KZe8kkx8bQ8UKcesGGbCbqRYhJrtrPDy3gsxVp4hTQGr7qY3NsndBebr"),
-			Base58.decode("3Lzamim6R4khdsVfpdsCzyuhqbguCM6yQTyJPJmvPC7agsaBk7UhYuRxZ8tduLpRhZEMpJwAVd5ucRAiXY8cX6ZE"),
-			Base58.decode("44chQvtt3NKgRjphBwKTgRfz4rD7YvpHs4k17w1Xvt6drmjBwJWXsFXBfHV97LbMx4kMkzpHCXgN7mNjDUZeTL6M"),
-			Base58.decode("xckfcdNWJN1uoGGTe5nXg5JmGUEyzoJQYkt3bUB6vGUGs8p9j8uhVKeYsY5g2sj67w4pz6CcxdhrVFPzGZnkba2"),
-			Base58.decode("2x8QSztNRFDKmMjotzfTvbAkDo7s7Uqh9HpyFVQTiDqYpfweV4z1wzcMjn6GtVHszqBZp6ynuUr4JP9PAEBPLtiy"),
-			Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
-			Base58.decode(
-					"4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W"), };
+		Base58.decode("5DnTfBxw2y8fDshzkdqppB24y5P98vnc873z4cofQZ31JskfJbnpRPjU5uZMQwfSYJYkJZzMxMYq6EeNCys18sEq"),
+		Base58.decode("4CqzJSD9j4GNGcYVtNvMic98Zq9aQALLdkFkuXMLGnGqUTgdHqHcoSU7wJ24wvaAAukg2g1Kw1SA6UFQo7h3VasN"),
+		Base58.decode("E4pUUdCqQt6HWCJ1pUeEtCDngow7pEJjyRtLZTLEDWFEFwicvxVXAgJbUPyASueZVUobZ28xtX6ZgDLb5cxeXy2"),
+		Base58.decode("4UPo6sAF63fkqhgkAXh94tcF43XYz8d7f6PqBGSX13eo3UWCENptrk72qkLxtXYEEsHs1wS2eH6VnZEVctnPdUkb"),
+		Base58.decode("3aYMNRUVYxVaozihhGkxU8JTeAFT73Ua7JDqUfvrDUpDNPs7mS4pxHUaaDiZsGYi91fK5c2yVLWVQW9tqqDGCK2a"),
+		Base58.decode("KhVG9kHf4nttWSEvM6Rd99wuTtRtFAQvSwwo9ae4WFJ2fWaidY4jF33WTRDvYEtaWWu2cmh6x4tEX7ded6QDSGt"),
+		Base58.decode("2KW1mywfP99GcEo5hV8mdHxgPDkFJj5ABcVjNa7vQd1GPC13HRqBERUPKfLZ5HrQ3Dyp42u8PWrzBKUP3cUHG3N4"),
+		Base58.decode("2SsSCv8EuMnZrGYq4jFhvJ3gRdbdEU92Unp6u4JNwrw4D7SHHaRpH2b9VuLtTA3zuUVx1EqTB5wJQWxeuJbwxYvs"),
+		Base58.decode("4iM1HvHgSV3WTXJ3M4XVMZ4AcfrDaA3bdyFmZcX5BJJkacNTjVURWuhp2gLyhxCJok7eAHkd94nM4q3VcDAc2zCJ"),
+		Base58.decode("3THvTzHcyEDPGisprZAN955RMEhye84ygnBMPxrFRT6bCocQ84xt1jaSaNyD9px9dxq3zCNbebXnmL251JZhfCHm"),
+		Base58.decode("M7jNQ8w2fCjD3Mvo8cH2G5JYFTnGfLYSQv7xCCso7BsmMKJ7Ruc3pnr1rbpFwVrBkQG3auB5SGCmoWbCq9pw8hU"),
+		Base58.decode("m1ryu4QMHLaoALYwx35ugNtQec1QAS1KZe8kkx8bQ8UKcesGGbCbqRYhJrtrPDy3gsxVp4hTQGr7qY3NsndBebr"),
+		Base58.decode("3Lzamim6R4khdsVfpdsCzyuhqbguCM6yQTyJPJmvPC7agsaBk7UhYuRxZ8tduLpRhZEMpJwAVd5ucRAiXY8cX6ZE"),
+		Base58.decode("44chQvtt3NKgRjphBwKTgRfz4rD7YvpHs4k17w1Xvt6drmjBwJWXsFXBfHV97LbMx4kMkzpHCXgN7mNjDUZeTL6M"),
+		Base58.decode("xckfcdNWJN1uoGGTe5nXg5JmGUEyzoJQYkt3bUB6vGUGs8p9j8uhVKeYsY5g2sj67w4pz6CcxdhrVFPzGZnkba2"),
+		Base58.decode("2x8QSztNRFDKmMjotzfTvbAkDo7s7Uqh9HpyFVQTiDqYpfweV4z1wzcMjn6GtVHszqBZp6ynuUr4JP9PAEBPLtiy"),
+		Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
+		Base58.decode(
+				"4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
+	};
 
 	// VALIDATION CODE
 	public static final int VALIDATE_OK = 1;
@@ -89,8 +84,8 @@ public abstract class Transaction {
 	public static final int INVALID_RAW_DATA = 13;
 	public static final int INVALID_DATE = 14;
 	public static final int INVALID_CREATOR = 15; // for some reasons that
-													// creator is invalid (same
-													// as trade order)
+	// creator is invalid (same
+	// as trade order)
 	public static final int INVALID_SIGNATURE = 16;
 	public static final int NO_DEBT_BALANCE = 17;
 	public static final int NO_HOLD_BALANCE = 18;
@@ -171,6 +166,9 @@ public abstract class Transaction {
 	public static final int ITEM_DUPLICATE = 111;
 
 	public static final int AMOUNT_DIVISIBLE = 115;
+	public static final int AMOUNT_LENGHT_SO_LONG = 116;
+	public static final int AMOUNT_SCALE_SO_BIG = 117;
+	public static final int AMOUNT_SCALE_WRONG = 118;
 
 	public static final int ITEM_PERSON_LATITUDE_ERROR = 120;
 	public static final int ITEM_PERSON_LONGITUDE_ERROR = 121;
@@ -231,7 +229,7 @@ public abstract class Transaction {
 	public static final int SET_STATUS_TO_ITEM_TRANSACTION = 37;
 	public static final int SET_UNION_TO_ITEM_TRANSACTION = 38;
 	public static final int SET_UNION_STATUS_TO_ITEM_TRANSACTION = 39; // not in
-																		// gui
+	// gui
 
 	// confirms other transactions
 	// NOT EDIT - fkr CONCORCIUM = 40 !!!
@@ -279,24 +277,24 @@ public abstract class Transaction {
 	 * / public static long getVOTING_RELEASE() {
 	 * if(Settings.getInstance().isTestnet()) { return
 	 * Settings.getInstance().getGenesisStamp(); } return VOTING_RELEASE; }
-	 * 
+	 *
 	 * public static long getARBITRARY_TRANSACTIONS_RELEASE() {
 	 * if(Settings.getInstance().isTestnet()) { return
 	 * Settings.getInstance().getGenesisStamp(); } return
 	 * ARBITRARY_TRANSACTIONS_RELEASE; }
-	 * 
+	 *
 	 * public static int getAT_BLOCK_HEIGHT_RELEASE() {
 	 * if(Settings.getInstance().isTestnet()) { return 1; } return
 	 * AT_BLOCK_HEIGHT_RELEASE; }
-	 * 
+	 *
 	 * public static int getMESSAGE_BLOCK_HEIGHT_RELEASE() {
 	 * if(Settings.getInstance().isTestnet()) { return 1; } return
 	 * MESSAGE_BLOCK_HEIGHT_RELEASE; }
-	 * 
+	 *
 	 * public static long getASSETS_RELEASE() {
 	 * if(Settings.getInstance().isTestnet()) { return
 	 * Settings.getInstance().getGenesisStamp(); } return ASSETS_RELEASE; }
-	 * 
+	 *
 	 * public static long getPOWFIX_RELEASE() {
 	 * if(Settings.getInstance().isTestnet()) { return
 	 * Settings.getInstance().getGenesisStamp(); } return POWFIX_RELEASE; }
@@ -338,7 +336,7 @@ public abstract class Transaction {
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
 	protected Long reference = 0l;
 	protected BigDecimal fee = BigDecimal.ZERO.setScale(8); // - for genesis
-															// transactions
+	// transactions
 	// protected BigDecimal fee = new BigDecimal.valueOf(999000).setScale(8);
 	protected byte feePow = 0;
 	protected byte[] signature;
@@ -507,7 +505,7 @@ public abstract class Transaction {
 		 * { //byte[] publicKey = cnt.getPublicKeyByAddress(acc.getAddress());
 		 * if (!acc.isPerson(bchain.getDB())) { anonimuus +=
 		 * BlockChain.FEE_FOR_ANONIMOUSE; } }
-		 * 
+		 *
 		 * if ( anonimuus == 0 && this.creator != null) { byte[] publicKey =
 		 * cnt.getPublicKeyByAddress(this.creator.getAddress()); if (publicKey
 		 * == null) { anonimuus += BlockChain.FEE_FOR_ANONIMOUSE; } }
@@ -517,7 +515,7 @@ public abstract class Transaction {
 			len *= anonimous;
 		}
 
-		return (int) len * BlockChain.FEE_PER_BYTE;
+		return len * BlockChain.FEE_PER_BYTE;
 	}
 
 	// get fee
@@ -531,7 +529,7 @@ public abstract class Transaction {
 		BigDecimal fee = new BigDecimal(calcBaseFee()).multiply(BlockChain.FEE_RATE).setScale(8, BigDecimal.ROUND_UP);
 
 		if (this.feePow > 0) {
-			this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow((int) this.feePow)).setScale(8,
+			this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(8,
 					BigDecimal.ROUND_UP);
 		} else {
 			this.fee = fee;
@@ -558,7 +556,7 @@ public abstract class Transaction {
 	}
 
 	public BigDecimal feeToBD(int fee) {
-		return BigDecimal.valueOf(fee, 8);
+		return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
 	}
 
 	public void setBlock(Block block) {
@@ -956,7 +954,7 @@ public abstract class Transaction {
 					if (Arrays.equals(this.signature, digest)) {
 						wrong = false;
 					}
-					break;					
+					break;
 				}
 			}
 
@@ -985,7 +983,7 @@ public abstract class Transaction {
 
 		if (this.hasPublicText()
 				&& (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
-					|| BlockChain.NOVA_ASSETS.get(this.creator.getAddress()) == null)
+						|| BlockChain.NOVA_ASSETS.get(this.creator.getAddress()) == null)
 				&& !this.creator.isPerson(dcSet, height)) {
 			if (BlockChain.DEVELOP_USE) {
 				boolean good = false;
@@ -1014,15 +1012,15 @@ public abstract class Transaction {
 
 	// PROCESS/ORPHAN
 
-	public void process_gifts(DCSet db, int level, int fee_gift, Account creator, boolean asOrphan) {
-		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(db);
+	public void process_gifts(int level, int fee_gift, Account creator, boolean asOrphan) {
+		Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
 		// byte[] recordSignature = record.getSignature();
 		// TODO if PERSON die - skip it step
 		if (personDuration == null) {
 			// USE all GIFT for current ACCOUNT
 			// creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift,
 			// BlockChain.FEE_SCALE), db);
-			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
+			creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
 			return;
 		}
 
@@ -1030,11 +1028,11 @@ public abstract class Transaction {
 		// FIND person
 		long personKey = personDuration.a;
 		// ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
-		ItemCls person = db.getItemPersonMap().get(personKey);
+		ItemCls person = this.dcSet.getItemPersonMap().get(personKey);
 		Account invitedAccount = person.getOwner();
 		if (creator.equals(invitedAccount)) {
 			// IT IS ME - all fee!
-			creator.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
+			creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
 			return;
 		}
 
@@ -1046,11 +1044,11 @@ public abstract class Transaction {
 
 		int fee_gift_get = fee_gift - fee_gift_next;
 		// invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
-		invitedAccount.changeBalance(db, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE),
+		invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE),
 				asOrphan);
 
 		if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
-			process_gifts(db, ++level, fee_gift_next, invitedAccount, asOrphan);
+			process_gifts(++level, fee_gift_next, invitedAccount, asOrphan);
 		}
 	}
 
@@ -1069,17 +1067,17 @@ public abstract class Transaction {
 
 			}
 
-			process_gifts(db, 0, getInvitedFee(db), this.creator, false);
+			process_gifts(0, getInvitedFee(db), this.creator, false);
 
 			String creatorAddress = this.creator.getAddress();
 			AddressTime_SignatureMap dbASmap = db.getAddressTime_SignatureMap();
 			if (!dbASmap.contains(creatorAddress)) {
 				dbASmap.set(creatorAddress, signature); // for quick search
-														// public keys
+				// public keys
 			}
 			dbASmap.set(creatorAddress, timestamp, signature); // for search
-																// records by
-																// time
+			// records by
+			// time
 
 			// UPDATE REFERENCE OF SENDER
 			if (this.isReferenced())
@@ -1100,7 +1098,7 @@ public abstract class Transaction {
 			}
 
 			// calc INVITED FEE
-			process_gifts(db, 0, getInvitedFee(db), this.creator, true);
+			process_gifts(0, getInvitedFee(db), this.creator, true);
 
 			// UPDATE REFERENCE OF SENDER
 			if (this.isReferenced()) {

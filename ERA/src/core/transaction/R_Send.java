@@ -5,11 +5,14 @@ import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
 import org.json.simple.JSONObject;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
@@ -40,7 +43,7 @@ typeBytes[2].1 = -64 if backward - CONFISCATE CREDIT
 #### PROPERTY 2
 typeBytes[3].0 = -128 if NO DATA
 
-*/
+ */
 
 public class R_Send extends TransactionAmount {
 
@@ -178,13 +181,13 @@ public class R_Send extends TransactionAmount {
 			} else {
 				if (this.data.length > MAX_DATA_VIEW << 4) {
 					return new String(data, Charset.forName("UTF-8")); // "{{" +
-																		// new
-																		// String(Arrays.copyOfRange(data,
-																		// 0,
-																		// MAX_DATA_VIEW),
-																		// Charset.forName("UTF-8"))
-																		// +
-																		// "...}}";
+					// new
+					// String(Arrays.copyOfRange(data,
+					// 0,
+					// MAX_DATA_VIEW),
+					// Charset.forName("UTF-8"))
+					// +
+					// "...}}";
 				}
 				return new String(this.data, Charset.forName("UTF-8"));
 			}
@@ -215,6 +218,7 @@ public class R_Send extends TransactionAmount {
 		return (Arrays.equals(this.encrypted, new byte[1])) ? false : true;
 	}
 
+	@Override
 	public boolean hasPublicText() {
 		if (head.length() > 2)
 			return true;
@@ -318,7 +322,7 @@ public class R_Send extends TransactionAmount {
 
 			// READ AMOUNT
 			byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-			amount = new BigDecimal(new BigInteger(amountBytes), 8);
+			amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 			position += AMOUNT_LENGTH;
 		}
 
@@ -405,6 +409,7 @@ public class R_Send extends TransactionAmount {
 	}
 
 	// @Override
+	@Override
 	public int isValid(DCSet db, Long releaserReference) {
 
 		if (head.getBytes(StandardCharsets.UTF_8).length > 256)
