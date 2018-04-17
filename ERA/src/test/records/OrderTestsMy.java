@@ -1721,12 +1721,12 @@ public class OrderTestsMy
 		init();
 
 		//CREATE ORDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), accountA.getBalanceUSE( keyA, db));
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), accountA.getBalanceUSE( keyA, db));
 		orderCreation.sign(accountA, false);
 		orderCreation.process(null, false);
 		BigInteger orderID = orderCreation.getOrder().getId();
 
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db))
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
 				.subtract(orderCreation.getOrder().getAmountHave()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
 				accountA.getBalanceUSE( keyA, db));
 
@@ -1738,7 +1738,7 @@ public class OrderTestsMy
 		cancelOrderTransaction.process(null, false);
 
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
 				accountA.getBalanceUSE(keyA, db));
 
 		//CHECK REFERENCE SENDER
@@ -1749,11 +1749,11 @@ public class OrderTestsMy
 
 		////////// OPHRAN ////////////////
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), accountA.getBalanceUSE( keyA, db));
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), accountA.getBalanceUSE( keyA, db));
 		cancelOrderTransaction.orphan(false);
 
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity(db))
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
 				.subtract(orderCreation.getOrder().getAmountHave()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
 				accountA.getBalanceUSE( keyA, db));
 

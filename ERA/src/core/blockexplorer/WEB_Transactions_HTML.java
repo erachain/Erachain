@@ -4,9 +4,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import javax.swing.JTable;
 import javax.swing.table.TableRowSorter;
+
 import org.json.simple.JSONObject;
+
 import controller.Controller;
 import core.crypto.Base58;
 import core.item.ItemCls;
@@ -25,9 +28,9 @@ import core.transaction.GenesisIssueTemplateRecord;
 import core.transaction.GenesisTransferAssetTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
-import core.transaction.IssueTemplateRecord;
 import core.transaction.IssuePersonRecord;
 import core.transaction.IssueStatusRecord;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.IssueUnionRecord;
 import core.transaction.R_Hashes;
 import core.transaction.R_Send;
@@ -49,8 +52,8 @@ import utils.DateTimeFormat;
 public class WEB_Transactions_HTML {
 	private static WEB_Transactions_HTML instance;
 	JSONObject langObj;
-	
-	
+
+
 	public static WEB_Transactions_HTML getInstance() {
 		if (instance == null) {
 			instance = new WEB_Transactions_HTML();
@@ -65,29 +68,29 @@ public class WEB_Transactions_HTML {
 		tt.add(transaction);
 		LinkedHashMap json = BlockExplorer.getInstance().Transactions_JSON(tt);
 		LinkedHashMap tras_json = (LinkedHashMap)((LinkedHashMap)json.get("transactions")).get(0);
-		
-			String out = "<font size='+1'> <b>"+Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>"+ tras_json.get("type");
-			out += "       ("  + Lang.getInstance().translate_from_langObj("Block", langObj) +": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" +  tras_json.get("block") + "</a>"; 
-			out += " - " +  tras_json.get("seq")  +") </font><br>";
-			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Confirmations", langObj)       + ": </b>" +  tras_json.get("confirmations"); 
-			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Date", langObj)       + ": </b>" + tras_json.get("date");
-			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Size", langObj)        + ": </b>" + tras_json.get("size"); 
-			out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Publick Key", langObj)   + ": </b>" + tras_json.get("pub_key");
-			out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Signature", langObj)   + ": </b>" + tras_json.get("signature");
-			out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" +  tras_json.get("reference");
-			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
-			out += "<br> ";
-			if ( tras_json.get("creator_key") != "-")
-			{
-				if ( tras_json.get("creator_key") == "+"){
-					out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) +": </b><a href=?addr="+  tras_json.get("creator_addr") +  get_Lang(langObj)+ ">" + tras_json.get("creator") + "</a>";
-				}
-				else{
-					out += "<b>" +  Lang.getInstance().translate_from_langObj("Creator", langObj) +": </b><a href=?person="+  tras_json.get("creator_key") + get_Lang(langObj)+ ">" + tras_json.get("creator") + "</a>";
-				}
+
+		String out = "<font size='+1'> <b>"+Lang.getInstance().translate_from_langObj("Transaction", langObj) + ": </b>"+ tras_json.get("type");
+		out += "       ("  + Lang.getInstance().translate_from_langObj("Block", langObj) +": </b><a href=?block=" + tras_json.get("block") + get_Lang(langObj) + ">" +  tras_json.get("block") + "</a>";
+		out += " - " +  tras_json.get("seq")  +") </font><br>";
+		out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Confirmations", langObj)       + ": </b>" +  tras_json.get("confirmations");
+		out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Date", langObj)       + ": </b>" + tras_json.get("date");
+		out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Size", langObj)        + ": </b>" + tras_json.get("size");
+		out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Publick Key", langObj)   + ": </b>" + tras_json.get("pub_key");
+		out += "<br><b>" +  Lang.getInstance().translate_from_langObj("Signature", langObj)   + ": </b>" + tras_json.get("signature");
+		out += "<br><b>"  +  Lang.getInstance().translate_from_langObj("Reference", langObj) + ": </b>" +  tras_json.get("reference");
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
+		out += "<br> ";
+		if ( tras_json.get("creator_key") != "-")
+		{
+			if ( tras_json.get("creator_key") == "+"){
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Creator", langObj) +": </b><a href=?addr="+  tras_json.get("creator_addr") +  get_Lang(langObj)+ ">" + tras_json.get("creator") + "</a>";
 			}
-			//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient; 
-			out += "<br>";	
+			else{
+				out += "<b>" +  Lang.getInstance().translate_from_langObj("Creator", langObj) +": </b><a href=?person="+  tras_json.get("creator_key") + get_Lang(langObj)+ ">" + tras_json.get("creator") + "</a>";
+			}
+		}
+		//output += '<br>'  +  data.transaction_Header.label_recipient       + ': ' + data.transaction_Header.transactions[0].recipient;
+		out += "<br>";
 		int type = transaction.getType();
 		switch (type) {
 		case Transaction.SEND_ASSET_TRANSACTION:
@@ -165,34 +168,34 @@ public class WEB_Transactions_HTML {
 		String out = "";
 		GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction)transaction;
 		boolean isCredit = false;
-			if (assetTransfer.getOwner() != null) {
-				if (assetTransfer.getOwner().getPerson() != null) {
-					out += "<b>" + Lang.getInstance().translate_from_langObj("Creditor", langObj) + ":</b> <a href=?person="
-							+ assetTransfer.getOwner().getPerson().b.getKey() + get_Lang(langObj) + ">"
-							+ assetTransfer.getOwner().viewPerson() + "</a><br>";
-				} else {
-					out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
-							+ assetTransfer.getOwner().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getOwner().getAddress()
-							+ "</a><br>";
-				}
-			}
-			
-			if (assetTransfer.getRecipient().getPerson() != null) {
-				out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?person="
-						+ assetTransfer.getRecipient().getPerson().b.getKey() + get_Lang(langObj) + ">"
-						+ assetTransfer.getRecipient().viewPerson() + "</a><br>";
-
+		if (assetTransfer.getOwner() != null) {
+			if (assetTransfer.getOwner().getPerson() != null) {
+				out += "<b>" + Lang.getInstance().translate_from_langObj("Creditor", langObj) + ":</b> <a href=?person="
+						+ assetTransfer.getOwner().getPerson().b.getKey() + get_Lang(langObj) + ">"
+						+ assetTransfer.getOwner().viewPerson() + "</a><br>";
 			} else {
-
 				out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
-						+ assetTransfer.getRecipient().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getRecipient().getAddress()
+						+ assetTransfer.getOwner().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getOwner().getAddress()
 						+ "</a><br>";
 			}
-			
-			
-			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Asset", langObj) + ": </b>" +String.valueOf(Controller.getInstance()
-					.getAsset(assetTransfer.getAbsKey()).toString());
-			out += "<BR><b>" + Lang.getInstance().translate_from_langObj(isCredit?"Credit":"Amount", langObj) + ": </b>" +assetTransfer.getAmount().toPlainString();
+		}
+
+		if (assetTransfer.getRecipient().getPerson() != null) {
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?person="
+					+ assetTransfer.getRecipient().getPerson().b.getKey() + get_Lang(langObj) + ">"
+					+ assetTransfer.getRecipient().viewPerson() + "</a><br>";
+
+		} else {
+
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Recipient", langObj) + ":</b> <a href=?addr="
+					+ assetTransfer.getRecipient().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getRecipient().getAddress()
+					+ "</a><br>";
+		}
+
+
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Asset", langObj) + ": </b>" +String.valueOf(Controller.getInstance()
+				.getAsset(assetTransfer.getAbsKey()).toString());
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj(isCredit?"Credit":"Amount", langObj) + ": </b>" +assetTransfer.getAmount().toPlainString();
 		return out;
 	}
 
@@ -213,7 +216,7 @@ public class WEB_Transactions_HTML {
 		AssetCls asset = (AssetCls)assetIssue.getItem();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +asset.getName();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" +asset.getDescription();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" +asset.getQuantity(DCSet.getInstance()).toString();
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" +asset.getQuantity().toString();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isDivisible()+"", langObj) ;
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isMovable()+"", langObj) ;
 		return out;
@@ -234,9 +237,9 @@ public class WEB_Transactions_HTML {
 					+ record.getRecipient().getAddress() + get_Lang(langObj) + ">" + record.getRecipient().getAddress()
 					+ "</a><br>";
 		}
-		
-		
-		
+
+
+
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Person", langObj) + ": </b>" +String.valueOf(Controller.getInstance().getPerson(record.getKey()).toString());
 		return out;
 	}
@@ -255,24 +258,24 @@ public class WEB_Transactions_HTML {
 		String out = "";
 		CreatePollTransaction pollCreation = (CreatePollTransaction)transaction;
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> "
-					+ pollCreation.getPoll().getName() + "<br>";
+				+ pollCreation.getPoll().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-					+ pollCreation.getPoll().getDescription() + "<br>";
+				+ pollCreation.getPoll().getDescription() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Options", langObj) + ":</b><br>";
-			
-			//OPTIONS
 
-			PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(),
-					Controller.getInstance().getAsset(AssetCls.FEE_KEY));
-			JTable table = Gui.createSortableTable(pollOptionsTableModel, 0);
-			
-			TableRowSorter<PollOptionsTableModel> sorter =  (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
-			sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
-			out += "<Table><tr><td>" + table.getColumnName(0) + "<td>" + table.getColumnName(1) + "<td>" + table.getColumnName(2) + "</tr> ";
-			int row_Count = table.getRowCount();
-			for (int i = 0; i<row_Count; i++){
-				out += "<Table><tr><td>" + table.getValueAt(i, 0) + "<td>" + table.getValueAt(i, 1) + "<td>" + table.getValueAt(i, 2) + "</tr> ";
-			}			
+		//OPTIONS
+
+		PollOptionsTableModel pollOptionsTableModel = new PollOptionsTableModel(pollCreation.getPoll(),
+				Controller.getInstance().getAsset(AssetCls.FEE_KEY));
+		JTable table = Gui.createSortableTable(pollOptionsTableModel, 0);
+
+		TableRowSorter<PollOptionsTableModel> sorter =  (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
+		sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
+		out += "<Table><tr><td>" + table.getColumnName(0) + "<td>" + table.getColumnName(1) + "<td>" + table.getColumnName(2) + "</tr> ";
+		int row_Count = table.getRowCount();
+		for (int i = 0; i<row_Count; i++){
+			out += "<Table><tr><td>" + table.getValueAt(i, 0) + "<td>" + table.getValueAt(i, 1) + "<td>" + table.getValueAt(i, 2) + "</tr> ";
+		}
 
 		return out;
 	}
@@ -291,13 +294,13 @@ public class WEB_Transactions_HTML {
 		CreateOrderTransaction orderCreation = (CreateOrderTransaction)transaction;
 		Order order = orderCreation.getOrder();
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Have", langObj) + ":</b> "
-					+ order.getAmountHave().toPlainString() + " x "
-					+ String.valueOf(order.getHaveAsset().toString()) + "<br>";
+				+ order.getAmountHave().toPlainString() + " x "
+				+ String.valueOf(order.getHaveAsset().toString()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Want", langObj) + ":</b> "
-					+ order.getAmountWant().toPlainString() + " x "
-					+ String.valueOf(order.getWantAsset().toString()) + "<br>";
+				+ order.getAmountWant().toPlainString() + " x "
+				+ String.valueOf(order.getWantAsset().toString()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Price", langObj) + ":</b> "
-					+ order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString() + "<br>";
+				+ order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString() + "<br>";
 		return out;
 	}
 
@@ -306,11 +309,11 @@ public class WEB_Transactions_HTML {
 		String out = "";
 		R_Hashes r_Hashes = (R_Hashes)transaction;
 		out += "<b>" + Lang.getInstance().translate_from_langObj("URL", langObj) + ":</b> "
-					+ new String(r_Hashes.getURL(), Charset.forName("UTF-8")) + "<br>";
+				+ new String(r_Hashes.getURL(), Charset.forName("UTF-8")) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-					+ new String(r_Hashes.getData(), Charset.forName("UTF-8")) + "<br>";
+				+ new String(r_Hashes.getData(), Charset.forName("UTF-8")) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("HASHES", langObj) + ":</b> "
-					+  String.join("<br />", r_Hashes.getHashesB58()) + "<br>";
+				+  String.join("<br />", r_Hashes.getHashesB58()) + "<br>";
 		return out;
 	}
 
@@ -322,60 +325,60 @@ public class WEB_Transactions_HTML {
 		long status_key = setStatusToItem.getKey();
 		StatusCls status = Controller.getInstance().getItemStatus(status_key);
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Name", langObj) + ":</b> "
-					+ status.getName()+ "<br>";
+				+ status.getName()+ "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Status Description", langObj) + ":</b> " + status.getDescription()+ "<br>";
 		long beginDate = setStatusToItem.getBeginDate();
 		long endDate = setStatusToItem.getEndDate();
 		out += "<b>" + Lang.getInstance().translate_from_langObj("From - To", langObj) + ":</b> "
-					+ (beginDate == Long.MIN_VALUE?"?":DateTimeFormat.timestamptoString(beginDate))
-					+ " - " + (endDate == Long.MAX_VALUE? "?":DateTimeFormat.timestamptoString(endDate)) + "<br>";
+				+ (beginDate == Long.MIN_VALUE?"?":DateTimeFormat.timestamptoString(beginDate))
+				+ " - " + (endDate == Long.MAX_VALUE? "?":DateTimeFormat.timestamptoString(endDate)) + "<br>";
 		if (setStatusToItem.getValue1() != 0) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("Value", langObj) + " 1:</b> "
-						+ setStatusToItem.getValue1() + "<br>";
+					+ setStatusToItem.getValue1() + "<br>";
 		}
 		if (setStatusToItem.getValue2() != 0) {
-				out += "<b>" + Lang.getInstance().translate_from_langObj("Value", langObj) + " 2:</b> "
-						+ setStatusToItem.getValue2() + "<br>";
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Value", langObj) + " 2:</b> "
+					+ setStatusToItem.getValue2() + "<br>";
 		}
 		if (setStatusToItem.getData1() != null) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 1:</b> "
-						+ new String(setStatusToItem.getData1(), Charset.forName("UTF-8")) + "<br>";
+					+ new String(setStatusToItem.getData1(), Charset.forName("UTF-8")) + "<br>";
 		}
 		if (setStatusToItem.getData2() != null) {
 			out += "<b>" + Lang.getInstance().translate_from_langObj("DATA", langObj) + " 2:</b> "
-						+ new String(setStatusToItem.getData2(), Charset.forName("UTF-8")) + "<br>";
+					+ new String(setStatusToItem.getData2(), Charset.forName("UTF-8")) + "<br>";
 		}
 		if (setStatusToItem.getRefParent() != 0l) {
-				out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
-						+ setStatusToItem.viewRefParent() + "<br>";
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Parent", langObj) + ":</b> "
+					+ setStatusToItem.viewRefParent() + "<br>";
 		}
 		if (setStatusToItem.getDescription() != null) {
-				out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-						+  new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")) + "<br>";
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
+					+  new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")) + "<br>";
 		}
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Name", langObj) + ":</b> "
-					+ item.getItemTypeStr() + " - " + item.getItemSubType()
-					+ ": " + item.getName() + "<br>";
+				+ item.getItemTypeStr() + " - " + item.getItemSubType()
+				+ ": " + item.getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Item Description", langObj) + ":</b> "
-					+  item.getDescription() + "<br>";
+				+  item.getDescription() + "<br>";
 		return out;
 	}
 
 	private String serttify_Pub_Key_HTML(Transaction transaction, JSONObject langObj) {
 		// TODO Auto-generated method stub
 		String out = "";
-		 R_SertifyPubKeys record = (R_SertifyPubKeys) transaction;
+		R_SertifyPubKeys record = (R_SertifyPubKeys) transaction;
 		PersonCls person;
 		person = Controller.getInstance().getPerson( record.getKey());
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?person="
-					+ person.getKey() + get_Lang(langObj) + ">" + person.getName() + "</a><br>";
+				+ person.getKey() + get_Lang(langObj) + ">" + person.getName() + "</a><br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("End Days", langObj) + ":</b> "
-					+ record.getAddDay() + "<br>";
-			int i = 0;
-			for (String address: record.getSertifiedPublicKeysB58())
-			{
-				out += "<b>   " + Lang.getInstance().translate_from_langObj("Account", langObj)  + " " + ++i + ":</b> "	+ address + "<br>";
-			}
+				+ record.getAddDay() + "<br>";
+		int i = 0;
+		for (String address: record.getSertifiedPublicKeysB58())
+		{
+			out += "<b>   " + Lang.getInstance().translate_from_langObj("Account", langObj)  + " " + ++i + ":</b> "	+ address + "<br>";
+		}
 		return out;
 	}
 
@@ -383,16 +386,16 @@ public class WEB_Transactions_HTML {
 		// TODO Auto-generated method stub
 		String out = "";
 		R_SignNote r_Statement = (R_SignNote)transaction;
-			if (r_Statement.getKey() > 0) {
-				out += "<b>" + Lang.getInstance().translate_from_langObj("Key", langObj) + ":</b> "
-						+ Controller.getInstance().getTemplate( r_Statement.getKey()).toString() + "<br>";
-			}
-			if (r_Statement.getData() != null) {
-				String ss = (( r_Statement.isText() ) ? new String(r_Statement.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Statement.getData()));
-				ss = "<div  style='word-wrap: break-word;'>" +ss;
-				out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
-						+ ss + "<br>";
-			}	
+		if (r_Statement.getKey() > 0) {
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Key", langObj) + ":</b> "
+					+ Controller.getInstance().getTemplate( r_Statement.getKey()).toString() + "<br>";
+		}
+		if (r_Statement.getData() != null) {
+			String ss = (( r_Statement.isText() ) ? new String(r_Statement.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Statement.getData()));
+			ss = "<div  style='word-wrap: break-word;'>" +ss;
+			out += "<b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
+					+ ss + "<br>";
+		}
 		return out;
 	}
 
@@ -406,7 +409,7 @@ public class WEB_Transactions_HTML {
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
 				+ vouchRecord.getVouchSeq() + "</a><br>"; */
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> ";
-		
+
 		out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td><td>";
 		out += "<td>"+ get_HTML(record, langObj) + "</table><br>";
 		// LABEL DESCRIPTION
@@ -462,7 +465,7 @@ public class WEB_Transactions_HTML {
 				+ imprintIssue.getItem().getName() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ imprintIssue.getItem().getDescription() + "<br>";
-		
+
 		return out;
 	}
 
@@ -508,14 +511,14 @@ public class WEB_Transactions_HTML {
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ tr.getItem().getDescription() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
-				+ ((AssetCls) tr.getItem()).getQuantity(DCSet.getInstance()).toString() + "<br>";
+				+ ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ":</b> "
 				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isDivisible() + "", langObj)
 				+ "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ":</b> "
 				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isMovable() + "", langObj)
 				+ "<br>";
-		
+
 
 		return out;
 	}
@@ -541,15 +544,15 @@ public class WEB_Transactions_HTML {
 					+ tr.getAmount().toPlainString() + " ("
 					+ Controller.getInstance().getAsset(tr.getAbsKey()).getName() + ")";
 		}
-		
+
 		if (!tr.getHead().equals(""))
 			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Title", langObj) + ":</b> " + tr.getHead();
-		
-		if (!tr.viewData().equals(""))	
+
+		if (!tr.viewData().equals(""))
 			out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Message", langObj) + ":</b> "
 					+ tr.viewData();
 
-		
+
 		return out;
 
 	}
@@ -559,37 +562,37 @@ public class WEB_Transactions_HTML {
 			return "&lang=en";
 		return "&lang=" + langObj.get("_lang_ISO_");
 
-	} 
+	}
 
 	private String get_Vouches(Transaction transaction ){
-		
-		
+
+
 		Statements_Vouch_Table_Model model = new Statements_Vouch_Table_Model(transaction);
 		int row_count = model.getRowCount();
 		if(row_count == 0) return "";
-	String out = "<b>" + Lang.getInstance().translate_from_langObj("Certified", langObj) + ":</b> ";	
-	//langObj
-	
-	out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>"+ Lang.getInstance().translate_from_langObj("Transaction", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Date", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Creator", langObj)+"</tr>";
-	for (int i = 0; i<row_count; i++){
-	out += "<tr>";
-	out += "<td><a href=?tx="+  Base58.encode(model.getTrancaction(i).getSignature())+ get_Lang(langObj) +  ">" + model.getTrancaction(i).getBlockHeight(DCSet.getInstance())+ "-" + model.getTrancaction(i).getSeqNo(DCSet.getInstance()) + "</a>";
-	out +="<td>" + model.getValueAt(i, 0);
-	out +="<td>";
-	Transaction tr = model.getTrancaction(i);
-	if (tr.getCreator().getPerson() != null) {
-		out += "<a href=?person="	+ tr.getCreator().getPerson().b.getKey() + get_Lang(langObj) + ">"
-				+ tr.getCreator().viewPerson() + "</a><br>";
-	} else {
-		out += "<a href=?addr="	+ tr.getCreator().getAddress() + get_Lang(langObj) + ">" + tr.getCreator().getAddress()
-				+ "</a><br>";
+		String out = "<b>" + Lang.getInstance().translate_from_langObj("Certified", langObj) + ":</b> ";
+		//langObj
+
+		out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td>"+ Lang.getInstance().translate_from_langObj("Transaction", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Date", langObj)+"<td>"+ Lang.getInstance().translate_from_langObj("Creator", langObj)+"</tr>";
+		for (int i = 0; i<row_count; i++){
+			out += "<tr>";
+			out += "<td><a href=?tx="+  Base58.encode(model.getTrancaction(i).getSignature())+ get_Lang(langObj) +  ">" + model.getTrancaction(i).getBlockHeight(DCSet.getInstance())+ "-" + model.getTrancaction(i).getSeqNo(DCSet.getInstance()) + "</a>";
+			out +="<td>" + model.getValueAt(i, 0);
+			out +="<td>";
+			Transaction tr = model.getTrancaction(i);
+			if (tr.getCreator().getPerson() != null) {
+				out += "<a href=?person="	+ tr.getCreator().getPerson().b.getKey() + get_Lang(langObj) + ">"
+						+ tr.getCreator().viewPerson() + "</a><br>";
+			} else {
+				out += "<a href=?addr="	+ tr.getCreator().getAddress() + get_Lang(langObj) + ">" + tr.getCreator().getAddress()
+						+ "</a><br>";
+			}
+
+
+		}
+		out += "</table>";
+		return out;
 	}
-	
-	
-	}
-	out += "</table>";
-	return out;	
-	}
-	
-	
+
+
 }

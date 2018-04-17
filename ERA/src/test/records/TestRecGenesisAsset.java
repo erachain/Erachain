@@ -107,7 +107,7 @@ public class TestRecGenesisAsset {
 			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
 
 			//CHECK QUANTITY
-			assertEquals(asset.getQuantity(db), asset1.getQuantity(db));
+			assertEquals(asset.getQuantity(), asset1.getQuantity());
 
 			//DIVISIBLE
 			assertEquals(asset.isDivisible(), asset1.isDivisible());
@@ -169,7 +169,7 @@ public class TestRecGenesisAsset {
 			//CHECK QUANTITY
 			AssetCls asset = (AssetCls)genesisIssueAssetTransaction.getItem();
 			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
-			assertEquals(asset.getQuantity(db), asset1.getQuantity(db));
+			assertEquals(asset.getQuantity(), asset1.getQuantity());
 
 			//DIVISIBLE
 			assertEquals(asset.isDivisible(), asset1.isDivisible());
@@ -382,7 +382,7 @@ public class TestRecGenesisAsset {
 
 		initIssue(true);
 
-		BigDecimal total = BigDecimal.valueOf(asset.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		//assertEquals(total, amoSend);
 
@@ -420,7 +420,7 @@ public class TestRecGenesisAsset {
 
 		initIssue(true);
 
-		BigDecimal total = BigDecimal.valueOf(asset.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		//CREATE SIGNATURE
@@ -453,7 +453,7 @@ public class TestRecGenesisAsset {
 
 		initIssue(true);
 
-		BigDecimal total = BigDecimal.valueOf(asset.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal total = BigDecimal.valueOf(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		BigDecimal amoSend = BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		//assertEquals(total, amoSend);
 

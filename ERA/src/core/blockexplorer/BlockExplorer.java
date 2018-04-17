@@ -1542,7 +1542,7 @@ public class BlockExplorer
 		assetJSON.put("name", asset.getName());
 		assetJSON.put("description", asset.getDescription());
 		assetJSON.put("owner", asset.getOwner().getAddress());
-		assetJSON.put("quantity", asset.getQuantity(dcSet));
+		assetJSON.put("quantity", asset.getQuantity());
 		String divis = Lang.getInstance().translate_from_langObj("False", langObj);
 		if (asset.isDivisible()) divis = Lang.getInstance().translate_from_langObj("True", langObj);
 		assetJSON.put("isDivisible",divis );

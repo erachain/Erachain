@@ -63,7 +63,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 	@Override
 	public BigDecimal getAmount() {
-		return new BigDecimal(((AssetCls)this.getItem()).getQuantity(dcSet));
+		return new BigDecimal(((AssetCls)this.getItem()).getQuantity());
 	}
 
 	@Override
@@ -111,7 +111,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		AssetCls asset = (AssetCls)this.getItem();
 		//long maxQuantity = asset.isDivisible() ? 10000000000L : 1000000000000000000L;
 		long maxQuantity = Long.MAX_VALUE;
-		long quantity = asset.getQuantity(dcSet);
+		long quantity = asset.getQuantity();
 		//if(quantity > maxQuantity || quantity < 0 && quantity != -1 && quantity != -2 )
 		if(quantity > maxQuantity || quantity < -1 )
 		{
@@ -131,7 +131,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		JSONObject transaction = super.toJson();
 		AssetCls asset = (AssetCls)this.getItem();
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-		transaction.put("quantity", asset.getQuantity(DCSet.getInstance()));
+		transaction.put("quantity", asset.getQuantity());
 		transaction.put("scale", asset.getScale());
 		transaction.put("divisible", asset.isDivisible());
 
@@ -240,7 +240,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		//ADD ASSETS TO OWNER
 		//this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
-		this.creator.changeBalance(this.dcSet, false, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(this.dcSet)).setScale(8-), false);
+		AssetCls asset = (AssetCls)this.getItem();
+		this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+				new BigDecimal(asset.getQuantity()).setScale(0), false);
 
 	}
 
@@ -252,8 +254,10 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		super.orphan(asPack);
 
 		//REMOVE ASSETS FROM OWNER
+		AssetCls asset = (AssetCls)this.getItem();
 		//this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
-		this.creator.changeBalance(this.dcSet, true, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(this.dcSet)).setScale(8-), true);
+		this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+				new BigDecimal(asset.getQuantity()).setScale(0), true);
 	}
 
 	/*
@@ -294,7 +298,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		AssetCls asset = (AssetCls)this.getItem();
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(this.dcSet),
-				new BigDecimal(asset.getQuantity(this.dcSet)).setScale(8-));
+				new BigDecimal(asset.getQuantity()).setScale(0));
 
 		return assetAmount;
 	}

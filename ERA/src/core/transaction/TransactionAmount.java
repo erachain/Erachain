@@ -509,7 +509,7 @@ public abstract class TransactionAmount extends Transaction {
 							// if asset is unlimited and me is creator of this asset
 							boolean unLimited =
 									absKey > AssetCls.REAL_KEY // not genesis assets!
-									&& asset.getQuantity(dcSet).equals(0l)
+									&& asset.getQuantity().equals(0l)
 									&& asset.getOwner().getAddress().equals(this.creator.getAddress());
 
 									//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE

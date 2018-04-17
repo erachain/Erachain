@@ -300,7 +300,7 @@ public class CreateOrderTransaction extends Transaction {
 			}
 
 			// if asset is unlimited and me is creator of this asset
-			boolean unLimited = haveAsset.getQuantity(db).equals(0l)
+			boolean unLimited = haveAsset.getQuantity().equals(0l)
 					&& haveAsset.getOwner().getAddress().equals(this.creator.getAddress());
 
 			if (!unLimited) {
@@ -334,7 +334,7 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		//
-		Long maxWant = wantAsset.getQuantity(db);
+		Long maxWant = wantAsset.getQuantity();
 		if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
 			return INVALID_QUANTITY;
 
