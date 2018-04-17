@@ -1,9 +1,9 @@
 package utils;
 
 import java.util.List;
- import org.apache.log4j.Logger;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
@@ -96,7 +96,7 @@ public class UpdateUtil {
 
 	public static void repopulateTransactionFinalMap() {
 		DCSet.getInstance().getTransactionFinalMap().reset();
-		
+
 		Block b = new GenesisBlock();
 		DCSet.getInstance().flush(b.getDataLength(true)>>7, false);
 		do
@@ -117,10 +117,10 @@ public class UpdateUtil {
 		}while ( b != null );
 
 	}
-	
+
 	public static void repopulateCommentPostMap() {
 		DCSet.getInstance().getPostCommentMap().reset();
-		
+
 		Block b = new GenesisBlock();
 		DCSet.getInstance().flush(b.getDataLength(true)>>7, false);
 		do
@@ -128,12 +128,14 @@ public class UpdateUtil {
 			List<Transaction> txs = b.getTransactions();
 			for (Transaction tx : txs)
 			{
+				tx.setDC(DCSet.getInstance(), false);
+
 				if(tx instanceof ArbitraryTransaction)
 				{
 					int service = ((ArbitraryTransaction) tx).getService();
 					if(service == BlogUtils.COMMENT_SERVICE_ID)
 					{
-						((ArbitraryTransaction) tx).addToCommentMapOnDemand(DCSet.getInstance());
+						((ArbitraryTransaction) tx).addToCommentMapOnDemand();
 					}
 				}
 			}
@@ -144,7 +146,7 @@ public class UpdateUtil {
 			}
 			b = b.getChild(DCSet.getInstance());
 		}while ( b != null );
-		
+
 	}
 }
 

@@ -226,7 +226,7 @@ public class RegisterNameTransaction extends Transaction
 		//this.creator.setLastReference(this.timestamp, db);
 
 		//INSERT INTO DATABASE
-		db.getNameMap().add(this.name);
+		this.dcSet.getNameMap().add(this.name);
 	}
 
 
@@ -241,7 +241,7 @@ public class RegisterNameTransaction extends Transaction
 		//this.creator.setLastReference(this.reference, db);
 
 		//INSERT INTO DATABASE
-		db.getNameMap().delete(this.name);
+		this.dcSet.getNameMap().delete(this.name);
 	}
 
 

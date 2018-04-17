@@ -271,7 +271,7 @@ public class CreatePollTransaction extends Transaction
 		super.process(block, asPack);
 
 		//INSERT INTO DATABASE
-		db.getPollMap().add(this.poll);
+		this.dcSet.getPollMap().add(this.poll);
 	}
 
 
@@ -283,7 +283,7 @@ public class CreatePollTransaction extends Transaction
 		super.orphan(asPack);
 
 		//DELETE FROM DATABASE
-		db.getPollMap().delete(this.poll);
+		this.dcSet.getPollMap().delete(this.poll);
 	}
 
 

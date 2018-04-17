@@ -289,12 +289,12 @@ public class MultiPaymentTransaction extends Transaction {
 		//PROCESS PAYMENTS
 		for(Payment payment: this.payments)
 		{
-			payment.process(this.creator, db);
+			payment.process(this.creator, this.dcSet);
 
 			//UPDATE REFERENCE OF RECIPIENT
-			if(false && payment.getRecipient().getLastTimestamp(db) == null)
+			if(false && payment.getRecipient().getLastTimestamp(this.dcSet) == null)
 			{
-				payment.getRecipient().setLastTimestamp(this.timestamp, db);
+				payment.getRecipient().setLastTimestamp(this.timestamp, this.dcSet);
 			}
 		}
 	}
@@ -309,12 +309,12 @@ public class MultiPaymentTransaction extends Transaction {
 		//ORPHAN PAYMENTS
 		for(Payment payment: this.payments)
 		{
-			payment.orphan(this.creator, db);
+			payment.orphan(this.creator, this.dcSet);
 
 			//UPDATE REFERENCE OF RECIPIENT
-			if(false && payment.getRecipient().getLastTimestamp(db).equals(this.timestamp))
+			if(false && payment.getRecipient().getLastTimestamp(this.dcSet).equals(this.timestamp))
 			{
-				payment.getRecipient().setLastTimestamp(this.reference, db);
+				payment.getRecipient().setLastTimestamp(this.reference, this.dcSet);
 			}
 		}
 	}

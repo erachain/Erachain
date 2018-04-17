@@ -1679,7 +1679,7 @@ public class BlockExplorer
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
-			BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
+			BigDecimal increment = order.calculateBuyIncrement();
 			BigDecimal amount = order.getAmountHaveLeft();
 			amount = amount.subtract(amount.remainder(increment));
 
@@ -1727,7 +1727,7 @@ public class BlockExplorer
 
 			buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
-			BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
+			BigDecimal increment = order.calculateBuyIncrement();
 			BigDecimal amount = order.getAmountHaveLeft();
 			amount = amount.subtract(amount.remainder(increment));
 

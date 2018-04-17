@@ -240,7 +240,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		//ADD ASSETS TO OWNER
 		//this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
-		this.creator.changeBalance(dc, false, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(dc)).setScale(8-), false);
+		this.creator.changeBalance(this.dcSet, false, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(this.dcSet)).setScale(8-), false);
 
 	}
 
@@ -253,7 +253,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		//REMOVE ASSETS FROM OWNER
 		//this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
-		this.creator.changeBalance(dc, true, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(dc)).setScale(8-), true);
+		this.creator.changeBalance(this.dcSet, true, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(this.dcSet)).setScale(8-), true);
 	}
 
 	/*
@@ -293,8 +293,8 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
 		AssetCls asset = (AssetCls)this.getItem();
-		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(dcSet),
-				new BigDecimal(asset.getQuantity(dcSet)).setScale(8-));
+		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(this.dcSet),
+				new BigDecimal(asset.getQuantity(this.dcSet)).setScale(8-));
 
 		return assetAmount;
 	}

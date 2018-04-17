@@ -1,14 +1,10 @@
 package core.transaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -18,23 +14,15 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.block.GenesisBlock;
-import core.crypto.Base58;
-import core.crypto.Crypto;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
-import lang.Lang;
-import utils.Converter;
 
 
 // TODO
 // ver =1 - vouching incommed transfers - assets etc.
-//   ++ FEE = 0, no TIMESTAMP??, max importance for including in block 
+//   ++ FEE = 0, no TIMESTAMP??, max importance for including in block
 public class R_Vouch extends Transaction {
 
 	private static final byte TYPE_ID = (byte)Transaction.VOUCH_TRANSACTION;
@@ -42,7 +30,7 @@ public class R_Vouch extends Transaction {
 
 	protected int height;
 	protected int seq;
-	
+
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + HEIGHT_LENGTH + SEQ_LENGTH;
 
 	static Logger LOGGER = Logger.getLogger(R_Vouch.class.getName());
@@ -74,42 +62,43 @@ public class R_Vouch extends Transaction {
 		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte)0, height, seq, 0l, reference);
 	}
 
-	
+
 	//GETTERS/SETTERS
 
 	//public static String getName() { return "Send"; }
 
-	public int getVouchHeight() 
+	public int getVouchHeight()
 	{
 		return this.height;
 	}
-	
-	public int getVouchSeq() 
+
+	public int getVouchSeq()
 	{
 		return this.seq;
 	}
-	
-	
 
+
+
+	@Override
 	public boolean hasPublicText() {
 		return false;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public JSONObject toJson() 
+	public JSONObject toJson()
 	{
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
 
 		transaction.put("height", this.height);
 		transaction.put("seq", this.seq);
-		
-		return transaction;	
+
+		return transaction;
 	}
 
 	//PARSE/CONVERT
-	
+
 	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception{
 
 		boolean asPack = releaserReference != null;
@@ -120,7 +109,7 @@ public class R_Vouch extends Transaction {
 		{
 			throw new Exception("Data does not match block length " + data.length);
 		}
-		
+
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
@@ -129,7 +118,7 @@ public class R_Vouch extends Transaction {
 		if (!asPack) {
 			//READ TIMESTAMP
 			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-			timestamp = Longs.fromByteArray(timestampBytes);	
+			timestamp = Longs.fromByteArray(timestampBytes);
 			position += TIMESTAMP_LENGTH;
 		}
 
@@ -137,17 +126,17 @@ public class R_Vouch extends Transaction {
 		if (!asPack) {
 			//READ REFERENCE
 			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-			reference = Longs.fromByteArray(referenceBytes);	
+			reference = Longs.fromByteArray(referenceBytes);
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
 		}
-		
+
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
-		
+
 		byte feePow = 0;
 		if (!asPack) {
 			//READ FEE POWER
@@ -155,21 +144,21 @@ public class R_Vouch extends Transaction {
 			feePow = feePowBytes[0];
 			position += 1;
 		}
-		
+
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		position += SIGNATURE_LENGTH;
 
 		//READ HEIGHT
 		byte[] heightBytes = Arrays.copyOfRange(data, position, position + HEIGHT_LENGTH);
-		int height = Ints.fromByteArray(heightBytes);	
+		int height = Ints.fromByteArray(heightBytes);
 		position += HEIGHT_LENGTH;
-				
+
 		//READ SEQ
 		byte[] seqBytes = Arrays.copyOfRange(data, position, position + SEQ_LENGTH);
-		int seq = Ints.fromByteArray(seqBytes);	
+		int seq = Ints.fromByteArray(seqBytes);
 		position += SEQ_LENGTH;
-		
+
 		if (asPack) {
 			return new R_Vouch(typeBytes, creator, height, seq, reference, signatureBytes);
 		} else {
@@ -193,7 +182,7 @@ public class R_Vouch extends Transaction {
 		seqBytes = Bytes.ensureCapacity(seqBytes, SEQ_LENGTH, 0);
 		data = Bytes.concat(data, seqBytes);
 
-		return data;	
+		return data;
 	}
 
 	@Override
@@ -207,8 +196,9 @@ public class R_Vouch extends Transaction {
 	}
 
 	//@Override
+	@Override
 	public int isValid(DCSet db, Long releaserReference) {
-		
+
 		if (this.height < 2 ) {
 			//CHECK HEIGHT - not 0 and NOT GENESIS
 			return INVALID_BLOCK_HEIGHT;
@@ -218,7 +208,7 @@ public class R_Vouch extends Transaction {
 			//CHECK DATA SIZE
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
-			
+
 		int result = super.isValid(db, releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result;
 
@@ -230,11 +220,11 @@ public class R_Vouch extends Transaction {
 
 		Block block = db.getBlockMap().get(b);
 		if (block == null)
-			return INVALID_BLOCK_HEIGHT_ERROR;		
+			return INVALID_BLOCK_HEIGHT_ERROR;
 		Transaction tx = block.getTransaction(seq);
 		if (tx == null )
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
-			*/
+		 */
 		Transaction tx = db.getTransactionFinalMap().getTransaction(height, seq);
 		if (tx == null ) {
 			if (height == 104841 && seq == 1) {
@@ -245,26 +235,27 @@ public class R_Vouch extends Transaction {
 		}
 
 		return Transaction.VALIDATE_OK;
-		
+
 	}
 
-	
-	
+
+
+	@Override
 	public void process(Block block, boolean asPack) {
 
 		super.process(block, asPack);
-		
+
 		if (block == null)
 			return;
-		
+
 		// make key for vouching record
 		Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);
 		// find value
-		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value =  db.getVouchRecordMap().get(recordKey);
+		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value =  this.dcSet.getVouchRecordMap().get(recordKey);
 
 		// update value
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> valueNew;
-		BigDecimal amount = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db);
+		BigDecimal amount = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet);
 		List<Tuple2<Integer, Integer>> listNew;
 		if (value == null) {
 			listNew = new ArrayList<Tuple2<Integer, Integer>>();
@@ -272,45 +263,46 @@ public class R_Vouch extends Transaction {
 			listNew = value.b;
 			amount = amount.add(value.a);
 		}
-		
-		listNew.add(new Tuple2<Integer, Integer>(this.getBlockHeightByParent(db), this.getSeqNo(db)));
+
+		listNew.add(new Tuple2<Integer, Integer>(this.getBlockHeightByParent(this.dcSet), this.getSeqNo(this.dcSet)));
 		// for test only!!
 		//listNew.add(new Tuple2<Integer, Integer>(2, 2));
-		
+
 		valueNew =
 				new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
-					amount,
-					listNew
-					);			
-		db.getVouchRecordMap().set(recordKey, valueNew);
-		
+						amount,
+						listNew
+						);
+		this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+
 	}
 
+	@Override
 	public void orphan(boolean asPack) {
 
 		super.orphan(asPack);
-		
+
 		// make key for vouching record
 		Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);
 		// find value
-		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value =  db.getVouchRecordMap().get(recordKey);
+		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value =  this.dcSet.getVouchRecordMap().get(recordKey);
 		// update value
 		List<Tuple2<Integer, Integer>> listNew = value.b;
-		
-		listNew.remove(new Tuple2<Integer, Integer>(this.getBlockHeight(db), this.getSeqNo(db)));
+
+		listNew.remove(new Tuple2<Integer, Integer>(this.getBlockHeight(this.dcSet), this.getSeqNo(this.dcSet)));
 		// for test ONLY !!!
 		//listNew.remove(new Tuple2<Integer, Integer>(2, 2));
-		
+
 		Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> valueNew =
 				new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
-					value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, db)),
-					listNew
-					);
-		db.getVouchRecordMap().set(recordKey, valueNew);
+						value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet)),
+						listNew
+						);
+		this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
 
 	}
 
-	
+
 	@Override
 	public HashSet<Account> getInvolvedAccounts()
 	{
@@ -331,20 +323,20 @@ public class R_Vouch extends Transaction {
 			return accounts;
 		}
 		accounts.addAll(record.getInvolvedAccounts());
-				
+
 		return accounts;
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
 		if(address.equals(creator.getAddress())) return true;
-		
+
 		for (Account recipient: this.getRecipientAccounts())
 		{
 			if (address.equals(recipient.getAddress()))
-					return true;
+				return true;
 		}
 
 		return false;

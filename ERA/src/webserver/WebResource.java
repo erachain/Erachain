@@ -1,5 +1,4 @@
 package webserver;
-import java.awt.image.BufferedImage;
 // 30/03
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -28,7 +27,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -64,6 +62,7 @@ import api.ApiErrorFactory;
 import api.BlogPostResource;
 import api.NameStorageResource;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.blockexplorer.BlockExplorer;
@@ -91,30 +90,27 @@ import datachain.ItemAssetMap;
 import datachain.ItemPersonMap;
 import datachain.NameMap;
 import lang.Lang;
-import ntp.NTP;
 import settings.Settings;
-import utils.APIUtils;
 import utils.AccountBalanceComparator;
 import utils.BlogUtils;
+import utils.Corekeys;
 import utils.DiffHelper;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
-import webserver.wrapper.WebAccount;
 import utils.Pair;
 import utils.PebbleHelper;
-import utils.Corekeys;
 import utils.StorageUtils;
 import utils.StrJSonFine;
 import utils.UpdateUtil;
 
 @Path("/")
 public class WebResource {
-	
+
 	@Context
 	HttpServletRequest request;
-	
+
 	private static final Logger LOGGER = Logger.getLogger(WebResource.class);
-	
+
 	@GET
 	public Response Default() {
 
@@ -135,14 +131,14 @@ public class WebResource {
 
 				return Response.ok(
 						PebbleHelper.getPebbleHelper("web/main.html", request)
-								.evaluate(), "text/html; charset=utf-8")
+						.evaluate(), "text/html; charset=utf-8")
 						.build();
 			}
 
 			if (StringUtils.isBlank(searchValue)) {
 				return Response.ok(
 
-				pebbleHelper.evaluate(), "text/html; charset=utf-8").build();
+						pebbleHelper.evaluate(), "text/html; charset=utf-8").build();
 			}
 
 			List<Pair<String, String>> searchResults;
@@ -162,7 +158,7 @@ public class WebResource {
 
 	public List<HTMLSearchResult> generateHTMLSearchresults(
 			List<Pair<String, String>> searchResults) throws IOException,
-			PebbleException {
+	PebbleException {
 		List<HTMLSearchResult> results = new ArrayList<>();
 		for (Pair<String, String> result : searchResults) {
 			String name = result.getA();
@@ -194,7 +190,7 @@ public class WebResource {
 			for ( StackTraceElement item: e.getStackTrace() ) {
 				ss += item.toString() + "<br>";
 			}
-					
+
 			return Response.status(501)
 					.header("Content-Type", "text/html; charset=utf-8")
 					.entity(ss + "<br>" + e.getMessage())
@@ -206,7 +202,7 @@ public class WebResource {
 			for ( StackTraceElement item: ee.getStackTrace() ) {
 				ss += item.toString() + "<br>";
 			}
-					
+
 			return Response.status(501)
 					//.header("Content-Type", "application/json; charset=utf-8")
 					.header("Content-Type", "text/html; charset=utf-8")
@@ -225,10 +221,10 @@ public class WebResource {
 	public Response blockexplorer() {
 		return blockexplorerhtml();
 	}
-	
 
-	
-	
+
+
+
 	@Path("index/blockexplorer.html")
 	@GET
 	public Response blockexplorerhtml() {
@@ -238,38 +234,38 @@ public class WebResource {
 		try {
 			content = readFile("web/blockexplorer.html",
 					StandardCharsets.UTF_8);
-			
-			
+
+
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(),e);
 			return error404(request, null);
 		}
-		
+
 		Document doc = null;
-		
+
 		doc = Jsoup.parse(content);
-		
-	//	Element element = doc.getElementById("menu_top_100_");
-	//	if (element != null)	element.text("werwfyrtyryrtyrtyrtyrtyrtyrtyrtytyrerwer");
-		
-//		
-		
+
+		//	Element element = doc.getElementById("menu_top_100_");
+		//	if (element != null)	element.text("werwfyrtyryrtyrtyrtyrtyrtyrtyrtytyrerwer");
+
+		//
+
 		if (lang !=null){
-			
-			LOGGER.error("try lang file: " + lang+".json");	
+
+			LOGGER.error("try lang file: " + lang+".json");
 			langObj = Lang.openLangFile(lang+".json");
-			
-		
+
+
 			Elements el = doc.select("translate");
 			for (Element e:el){
 				e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
 			}
 		}
-		
+
 		return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
-		
+
 	}
-	
+
 	@Path("index/blogsearch.html")
 	@GET
 	public Response doBlogSearch() {
@@ -295,7 +291,7 @@ public class WebResource {
 		}
 
 	}
-	
+
 	@Path("index/test.html")
 	@GET
 	public Response test() {
@@ -305,68 +301,68 @@ public class WebResource {
 		try {
 			content = readFile("web/test.html",
 					StandardCharsets.UTF_8);
-			
-			
+
+
 		} catch (IOException e) {
 			LOGGER.error(e.getMessage(),e);
 			return error404(request, null);
 		}
-		
+
 		Document doc = null;
-		
+
 		doc = Jsoup.parse(content);
-		
-	//	Element element = doc.getElementById("menu_top_100_");
-	//	if (element != null)	element.text("werwfyrtyryrtyrtyrtyrtyrtyrtyrtytyrerwer");
-		
-//		
-		
+
+		//	Element element = doc.getElementById("menu_top_100_");
+		//	if (element != null)	element.text("werwfyrtyryrtyrtyrtyrtyrtyrtyrtytyrerwer");
+
+		//
+
 		if (lang !=null){
-			
-			LOGGER.error("try lang file: " + lang+".json");	
+
+			LOGGER.error("try lang file: " + lang+".json");
 			langObj = Lang.openLangFile(lang+".json");
-			
-		
+
+
 			Elements el = doc.select("translate");
 			for (Element e:el){
 				e.text(Lang.getInstance().translate_from_langObj(e.text(),langObj));
 			}
 		}
-		
+
 		return Response.ok(doc.toString(), "text/html; charset=utf-8").build();
-		
+
 	}
-	
-	
-	
+
+
+
 	@Path("index/nsrepopulate.html")
 	@GET
 	public Response doNsRepopulate() {
-		
-			UpdateUtil.repopulateNameStorage(70000);
-			return error404(request, "Namestorage repopulated!");
-		
+
+		UpdateUtil.repopulateNameStorage(70000);
+		return error404(request, "Namestorage repopulated!");
+
 	}
 	@Path("index/deleteunconfirmed.html")
 	@GET
 	public Response doDeleteUnconfirmedTxs() {
-		
+
 		DCSet dcSet = DCSet.getInstance();
 		Collection<Transaction> values = dcSet.getTransactionMap().getValuesAll();
-		
-		 List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
-		 
-		 for (Transaction transaction : values) {
-			 if(privateKeyAccounts.contains(transaction.getCreator()))
-			 {
-				 dcSet.getTransactionMap().delete(transaction);
-			 }
+
+		List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
+
+		for (Transaction transaction : values) {
+			if(privateKeyAccounts.contains(transaction.getCreator()))
+			{
+				dcSet.getTransactionMap().delete(transaction);
+			}
 		}
-		 
+
 		return error404(request, "Unconfirmed transactions removed.");
-		
+
 	}
-	
+
 
 	@Path("index/namestorage.html")
 	@GET
@@ -422,9 +418,9 @@ public class WebResource {
 
 			} else {
 				pebbleHelper
-						.getContextMap()
-						.put("result",
-								"<div class=\"alert alert-danger\" role=\"alert\">You need to register a name to create a website.<br></div>");
+				.getContextMap()
+				.put("result",
+						"<div class=\"alert alert-danger\" role=\"alert\">You need to register a name to create a website.<br></div>");
 			}
 			return Response.ok(pebbleHelper.evaluate(),
 					"text/html; charset=utf-8").build();
@@ -556,11 +552,11 @@ public class WebResource {
 
 		String jsonContent = form.getFirst("json");
 		JSONObject jsonanswer = new JSONObject();
-		
+
 		if (StringUtils.isBlank(type)
 				|| (!type.equalsIgnoreCase("get")
 						&& !type.equalsIgnoreCase("post") && !type
-							.equalsIgnoreCase("delete"))) {
+						.equalsIgnoreCase("delete"))) {
 
 			jsonanswer.put("type", "apicallerror");
 			jsonanswer.put("errordetail",
@@ -674,18 +670,18 @@ public class WebResource {
 	}
 
 	public boolean checkPlainTypes(MediaType mediaType) {
-		
+
 		List<Pair<String,String>> pairsToCheck = new ArrayList<Pair<String,String>>();
 		pairsToCheck.add(new Pair<String, String>("text", "html"));
 		pairsToCheck.add(new Pair<String, String>("text", "plain"));
-		
+
 		for (Pair<String, String> pair : pairsToCheck) {
 			if(pair.getA().equalsIgnoreCase(mediaType.getType()) && pair.getB().equalsIgnoreCase(mediaType.getSubtype()))
 			{
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -956,9 +952,9 @@ public class WebResource {
 
 		} else {
 			pebbleHelper
-					.getContextMap()
-					.put("result",
-							"<div class=\"alert alert-danger translate\" role=\"alert\">" 
+			.getContextMap()
+			.put("result",
+					"<div class=\"alert alert-danger translate\" role=\"alert\">"
 							+ "You need to register a name to create a profile.<br>"
 							+ "</div>");
 		}
@@ -992,7 +988,7 @@ public class WebResource {
 		}
 
 	}
-	
+
 	@Path("index/status.html")
 	@GET
 	public Response getStatus() {
@@ -1010,11 +1006,11 @@ public class WebResource {
 			pebbleHelper.getContextMap().put(
 					"version",
 					"Erachain.org " + Controller.getInstance().getVersion());
-			
+
 			int status = Controller.getInstance().getStatus();
 			String statustext = "";
 			//TODO this needs to be moved to another place
-			
+
 			Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
 			if(Controller.getInstance().getWalletSyncHeight() > 0) {
 				statustext = "<span class=\"translate\">Wallet Synchronizing</span> ";
@@ -1032,12 +1028,12 @@ public class WebResource {
 				statustext = "<span class=\"translate\">Synchronizing</span> ";
 				statustext += 100 * HWeight.a/Controller.getInstance().getMaxPeerHWeight(0).a + "%<br>";
 				statustext += "<span class=\"translate\">Height</span>: " + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0).a;
-			} 
-						
+			}
+
 			pebbleHelper.getContextMap().put(
 					"status",
 					statustext);
-			
+
 			return Response.ok(pebbleHelper.evaluate(),
 					"text/html; charset=utf-8").build();
 		} catch (PebbleException e) {
@@ -1167,7 +1163,7 @@ public class WebResource {
 			type = "image/jpeg";
 			break;
 		case "svg":
-			type = "image/svg+xml";	
+			type = "image/svg+xml";
 		}
 
 		if (file.exists()) {
@@ -1181,73 +1177,73 @@ public class WebResource {
 		int dotPos = filename.lastIndexOf(".") + 1;
 		return filename.substring(dotPos);
 	}
-	
+
 	@Path("index/personimage")
 	@GET
 	@Produces({"image/png", "image/jpg"})
 	public Response getFullImage() {
-		
+
 		long key = new Long(request.getParameter("key"));
-	 if (key <=0) {
-		  return error404(request, null);
-	 }
-		
-	 ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
+		if (key <=0) {
+			return error404(request, null);
+		}
+
+		ItemPersonMap map = DCSet.getInstance().getItemPersonMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					Transaction.ITEM_PERSON_NOT_EXIST);
 		}
-		
+
 		PersonCls person = (PersonCls)map.get(key);
 		JSONObject jj = new JSONObject();
 		byte[] b = person.getImage();
-		if (b.length<=0){	
+		if (b.length<=0){
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					"Invalid Image");
-			
-		
+
+
 		}
-		
-	return Response.ok(new ByteArrayInputStream(b)).build();
-	//	return Response.ok(file, "image/png").build();
-		
+
+		return Response.ok(new ByteArrayInputStream(b)).build();
+		//	return Response.ok(file, "image/png").build();
+
 	}
 
 	@Path("index/assetimage")
 	@GET
 	@Produces({"image/png", "image/jpg"})
 	public Response getAssetImage() {
-		
+
 		long key = new Long(request.getParameter("key"));
-	 if (key <=0) {
-		  return error404(request, null);
-	 }
-		
-	 ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+		if (key <=0) {
+			return error404(request, null);
+		}
+
+		ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 		// DOES EXIST
 		if (!map.contains(key)) {
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
-		
+
 		AssetCls person = (AssetCls)map.get(key);
 		JSONObject jj = new JSONObject();
 		byte[] b = person.getImage();
-		if (b.length<=0){	
+		if (b.length<=0){
 			throw ApiErrorFactory.getInstance().createError(
 					//ApiErrorFactory.ERROR_INVALID_ASSET_ID);
 					"Invalid Image");
-			
-		
+
+
 		}
-		
-	return Response.ok(new ByteArrayInputStream(b)).build();
-	//	return Response.ok(file, "image/png").build();
-		
+
+		return Response.ok(new ByteArrayInputStream(b)).build();
+		//	return Response.ok(file, "image/png").build();
+
 	}
 
 	@Path("index/libs/css/style.css")
@@ -1298,7 +1294,7 @@ public class WebResource {
 		}
 	}
 
-	
+
 	@Path("index/libs/js/utils.js")
 	@GET
 	public Response utilsjs() {
@@ -1310,7 +1306,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/marked.js")
 	@GET
 	public Response markedjs() {
@@ -1322,7 +1318,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/third-party/highlight.pack.js")
 	@GET
 	public Response highlightpackjs() {
@@ -1358,8 +1354,8 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
-	
+
+
 	@Path("index/libs/js/explorerStatements.js")
 	@GET
 	public Response explorerStatements() {
@@ -1371,7 +1367,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/explorerTemplates.js")
 	@GET
 	public Response explorerTemplates() {
@@ -1383,7 +1379,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/explorerStatuses.js")
 	@GET
 	public Response explorerStatuses() {
@@ -1395,7 +1391,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/explorerTransactionsTable.js")
 	@GET
 	public Response explorerTransactionsTable() {
@@ -1419,7 +1415,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/third-party/ZeroClipboard.swf")
 	@GET
 	public Response ZeroClipboard() {
@@ -1504,10 +1500,10 @@ public class WebResource {
 		String creator = form.getFirst("creator");
 		String contentparam = form.getFirst("content");
 		String preview = form.getFirst("preview");
-		
-		
-		
-		
+
+
+
+
 		String blogname = form.getFirst(BlogPostResource.BLOGNAME_KEY);
 		String postid = form.getFirst(BlogPostResource.COMMENT_POSTID_KEY);
 
@@ -1530,7 +1526,7 @@ public class WebResource {
 
 			jsonBlogPost.put("title", title);
 			jsonBlogPost.put("body", contentparam);
-			
+
 
 			if (StringUtils.isNotBlank(preview) && preview.equals("true")) {
 				json.put("type", "preview");
@@ -1557,8 +1553,8 @@ public class WebResource {
 								.calcRecommendedFeeForArbitraryTransaction(
 										jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null)
 								.getA().toPlainString()
-								*/
-								0);
+						 */
+						0);
 
 				String result;
 				//COMMENT OR REAL BLOGPOST?
@@ -1600,8 +1596,8 @@ public class WebResource {
 				.header("Content-Type", "application/json; charset=utf-8")
 				.entity(json.toJSONString()).build();
 	}
-	
-	
+
+
 	@Path("index/postcomment.html")
 	@GET
 	public Response postComment() {
@@ -1623,7 +1619,7 @@ public class WebResource {
 
 			List<Account> resultingAccounts;
 
-			
+
 			/**
 			 * Currently we allow all names and accounts, that needs to be restricted later
 			 */
@@ -1635,7 +1631,7 @@ public class WebResource {
 			}
 			List<Name> resultingNames = new ArrayList<Name>(Controller.getInstance()
 					.getNamesAsList());
-			
+
 			for (Name name : resultingNames) {
 				// No balance account not shown
 				if (name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a.compareTo(BigDecimal.ZERO) <= 0) {
@@ -1649,10 +1645,10 @@ public class WebResource {
 				}
 			}
 
-//		 Pair<List<Account>, List<Name>> accountdAndNames = new Pair<List<Account>, List<Name>>(resultingAccounts,
-//				resultingNames);
+			//		 Pair<List<Account>, List<Name>> accountdAndNames = new Pair<List<Account>, List<Name>>(resultingAccounts,
+			//				resultingNames);
 
-			
+
 
 			Collections.sort(resultingAccounts, new AccountBalanceComparator());
 			Collections.reverse(resultingAccounts);
@@ -1673,9 +1669,9 @@ public class WebResource {
 			if (resultingNames.isEmpty() && resultingAccounts.isEmpty()) {
 
 				pebbleHelper
-						.getContextMap()
-						.put("errormessage",
-								"<div id=\"result\"><div class=\"alert alert-dismissible alert-danger\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>You can't post to this blog! None of your accounts has balance or the blog owner did not allow your accounts to post!<br></div></div>");
+				.getContextMap()
+				.put("errormessage",
+						"<div id=\"result\"><div class=\"alert alert-dismissible alert-danger\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>You can't post to this blog! None of your accounts has balance or the blog owner did not allow your accounts to post!<br></div></div>");
 
 			}
 
@@ -1750,9 +1746,9 @@ public class WebResource {
 			if (resultingNames.isEmpty() && resultingAccounts.isEmpty()) {
 
 				pebbleHelper
-						.getContextMap()
-						.put("errormessage",
-								"<div id=\"result\"><div class=\"alert alert-dismissible alert-danger\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>You can't post to this blog! None of your accounts has balance or the blog owner did not allow your accounts to post!<br></div></div>");
+				.getContextMap()
+				.put("errormessage",
+						"<div id=\"result\"><div class=\"alert alert-dismissible alert-danger\" role=\"alert\"><button type=\"button\" class=\"close\" data-dismiss=\"alert\">x</button>You can't post to this blog! None of your accounts has balance or the blog owner did not allow your accounts to post!<br></div></div>");
 
 			}
 
@@ -1935,7 +1931,7 @@ public class WebResource {
 		}
 
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@POST
 	@Path("index/deletecomment.html")
@@ -1956,8 +1952,8 @@ public class WebResource {
 					// TODO put this snippet in method
 					jsonanswer.put("type", "deleteError");
 					jsonanswer
-							.put("errordetail",
-									"The comment you are trying to delete does not exist!");
+					.put("errordetail",
+							"The comment you are trying to delete does not exist!");
 
 					return Response
 							.status(200)
@@ -1978,12 +1974,12 @@ public class WebResource {
 				}
 
 				String creator = BlogUtils.getCreatorOrBlogOwnerOpt(blogEntryOpt);
-				
+
 				if (creator == null) {
 					jsonanswer.put("type", "deleteError");
 					jsonanswer
-							.put("errordetail",
-									"You are not allowed to delete this comment! You need to be the owner of the blog or author of the comment!");
+					.put("errordetail",
+							"You are not allowed to delete this comment! You need to be the owner of the blog or author of the comment!");
 
 					return Response
 							.status(200)
@@ -2062,8 +2058,8 @@ public class WebResource {
 					// TODO put this snippet in method
 					jsonanswer.put("type", "deleteError");
 					jsonanswer
-							.put("errordetail",
-									"The blog entry you are trying to delete does not exist!");
+					.put("errordetail",
+							"The blog entry you are trying to delete does not exist!");
 
 					return Response
 							.status(200)
@@ -2102,12 +2098,12 @@ public class WebResource {
 									jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null
 									);
 					jsonBlogPost.put("fee", fee.getA().toPlainString());
-					*/
+					 */
 					jsonBlogPost.put("fee", 0);
 					// I am not author, but am I the owner of the blog?
 				} else if (blognameOpt != null
 						&& Controller.getInstance().getNamesAsListAsString()
-								.contains(blognameOpt)) {
+						.contains(blognameOpt)) {
 					Name name = DCSet.getInstance().getNameMap()
 							.get(blognameOpt);
 					jsonBlogPost.put("creator", name.getOwner().getAddress());
@@ -2115,8 +2111,8 @@ public class WebResource {
 				} else {
 					jsonanswer.put("type", "deleteError");
 					jsonanswer
-							.put("errordetail",
-									"You are not allowed to delete this post! You need to be owner of the blog or author of the blogpost!");
+					.put("errordetail",
+							"You are not allowed to delete this post! You need to be owner of the blog or author of the blogpost!");
 
 					return Response
 							.status(200)
@@ -2243,7 +2239,7 @@ public class WebResource {
 							.calcRecommendedFeeForArbitraryTransaction(
 									jsonBlogPost.toJSONString().getBytes(StandardCharsets.UTF_8), null);
 					jsonBlogPost.put("fee", fee.getA().toPlainString());
-					*/
+					 */
 					jsonBlogPost.put("fee", "0.0");
 
 					try {
@@ -2650,7 +2646,7 @@ public class WebResource {
 					return Response.ok(
 							PebbleHelper.getPebbleHelper(
 									"web/profiledisabled.html", request)
-									.evaluate(), "text/html; charset=utf-8")
+							.evaluate(), "text/html; charset=utf-8")
 							.build();
 				}
 
@@ -2695,14 +2691,14 @@ public class WebResource {
 			pebbleHelper.getContextMap().put(
 					"isFollowing",
 					activeProfileOpt != null
-							&& activeProfileOpt.getFollowedBlogs().contains(
-									blogname));
+					&& activeProfileOpt.getFollowedBlogs().contains(
+							blogname));
 
 			pebbleHelper.getContextMap().put(
 					"isLikeing",
 					activeProfileOpt != null
-							&& activeProfileOpt.getLikedPosts().contains(
-									blogname));
+					&& activeProfileOpt.getLikedPosts().contains(
+							blogname));
 
 			List<BlogEntry> blogPosts = BlogUtils.getBlogPosts(blogname);
 
@@ -2924,392 +2920,392 @@ public class WebResource {
 
 		String[] files =
 			{
-				"adapters/jquery.js",
-				"README.md",
-				"CHANGES.md",
-				"styles.js",
-				"lang/sk.js",
-				"lang/fi.js",
-				"lang/it.js",
-				"lang/he.js",
-				"lang/uk.js",
-				"lang/sv.js",
-				"lang/en-ca.js",
-				"lang/sr-latn.js",
-				"lang/ru.js",
-				"lang/zh-cn.js",
-				"lang/no.js",
-				"lang/fr.js",
-				"lang/fa.js",
-				"lang/da.js",
-				"lang/mk.js",
-				"lang/ko.js",
-				"lang/ro.js",
-				"lang/mn.js",
-				"lang/tr.js",
-				"lang/bg.js",
-				"lang/ka.js",
-				"lang/de.js",
-				"lang/el.js",
-				"lang/pt.js",
-				"lang/af.js",
-				"lang/eu.js",
-				"lang/cy.js",
-				"lang/en-au.js",
-				"lang/hi.js",
-				"lang/en.js",
-				"lang/fr-ca.js",
-				"lang/nb.js",
-				"lang/sr.js",
-				"lang/en-gb.js",
-				"lang/ms.js",
-				"lang/pl.js",
-				"lang/is.js",
-				"lang/lv.js",
-				"lang/km.js",
-				"lang/tt.js",
-				"lang/th.js",
-				"lang/hu.js",
-				"lang/bn.js",
-				"lang/zh.js",
-				"lang/ja.js",
-				"lang/et.js",
-				"lang/nl.js",
-				"lang/ar.js",
-				"lang/eo.js",
-				"lang/lt.js",
-				"lang/gl.js",
-				"lang/ku.js",
-				"lang/cs.js",
-				"lang/vi.js",
-				"lang/ca.js",
-				"lang/ug.js",
-				"lang/fo.js",
-				"lang/id.js",
-				"lang/si.js",
-				"lang/sl.js",
-				"lang/pt-br.js",
-				"lang/es.js",
-				"lang/hr.js",
-				"lang/sq.js",
-				"lang/bs.js",
-				"lang/gu.js",
-				"skins/moono/dialog_ie7.css",
-				"skins/moono/dialog_ie.css",
-				"skins/moono/editor_iequirks.css",
-				"skins/moono/icons_hidpi.png",
-				"skins/moono/editor.css",
-				"skins/moono/readme.md",
-				"skins/moono/dialog_ie8.css",
-				"skins/moono/editor_ie.css",
-				"skins/moono/dialog.css",
-				"skins/moono/icons.png",
-				"skins/moono/dialog_iequirks.css",
-				"skins/moono/editor_ie7.css",
-				"skins/moono/editor_gecko.css",
-				"skins/moono/editor_ie8.css",
-				"skins/moono/images/spinner.gif",
-				"skins/moono/images/arrow.png",
-				"skins/moono/images/lock-open.png",
-				"skins/moono/images/lock.png",
-				"skins/moono/images/close.png",
-				"skins/moono/images/refresh.png",
-				"skins/moono/images/hidpi/lock-open.png",
-				"skins/moono/images/hidpi/lock.png",
-				"skins/moono/images/hidpi/close.png",
-				"skins/moono/images/hidpi/refresh.png",
-				"build-config.js",
-				"config.js",
-				"ckeditor.js",
-				"LICENSE.md",
-				"plugins/preview/preview.html",
-				"plugins/templates/templates/default.js",
-				"plugins/templates/templates/images/template3.gif",
-				"plugins/templates/templates/images/template1.gif",
-				"plugins/templates/templates/images/template2.gif",
-				"plugins/templates/dialogs/templates.css",
-				"plugins/templates/dialogs/templates.js",
-				"plugins/tabletools/dialogs/tableCell.js",
-				"plugins/icons_hidpi.png",
-				"plugins/dialog/dialogDefinition.js",
-				"plugins/iframe/dialogs/iframe.js",
-				"plugins/iframe/images/placeholder.png",
-				"plugins/liststyle/dialogs/liststyle.js",
-				"plugins/magicline/images/icon-rtl.png",
-				"plugins/magicline/images/icon.png",
-				"plugins/magicline/images/hidpi/icon-rtl.png",
-				"plugins/magicline/images/hidpi/icon.png",
-				"plugins/image/dialogs/image.js",
-				"plugins/image/images/noimage.png",
-				"plugins/link/dialogs/link.js",
-				"plugins/link/dialogs/anchor.js",
-				"plugins/link/images/anchor.png",
-				"plugins/link/images/hidpi/anchor.png",
-				"plugins/flash/dialogs/flash.js",
-				"plugins/flash/images/placeholder.png",
-				"plugins/about/dialogs/logo_ckeditor.png",
-				"plugins/about/dialogs/about.js",
-				"plugins/about/dialogs/hidpi/logo_ckeditor.png",
-				"plugins/icons.png",
-				"plugins/div/dialogs/div.js",
-				"plugins/specialchar/dialogs/lang/sk.js",
-				"plugins/specialchar/dialogs/lang/fi.js",
-				"plugins/specialchar/dialogs/lang/it.js",
-				"plugins/specialchar/dialogs/lang/he.js",
-				"plugins/specialchar/dialogs/lang/uk.js",
-				"plugins/specialchar/dialogs/lang/_translationstatus.txt",
-				"plugins/specialchar/dialogs/lang/sv.js",
-				"plugins/specialchar/dialogs/lang/ru.js",
-				"plugins/specialchar/dialogs/lang/zh-cn.js",
-				"plugins/specialchar/dialogs/lang/no.js",
-				"plugins/specialchar/dialogs/lang/fr.js",
-				"plugins/specialchar/dialogs/lang/fa.js",
-				"plugins/specialchar/dialogs/lang/da.js",
-				"plugins/specialchar/dialogs/lang/ko.js",
-				"plugins/specialchar/dialogs/lang/tr.js",
-				"plugins/specialchar/dialogs/lang/bg.js",
-				"plugins/specialchar/dialogs/lang/de.js",
-				"plugins/specialchar/dialogs/lang/el.js",
-				"plugins/specialchar/dialogs/lang/pt.js",
-				"plugins/specialchar/dialogs/lang/af.js",
-				"plugins/specialchar/dialogs/lang/eu.js",
-				"plugins/specialchar/dialogs/lang/cy.js",
-				"plugins/specialchar/dialogs/lang/en.js",
-				"plugins/specialchar/dialogs/lang/fr-ca.js",
-				"plugins/specialchar/dialogs/lang/nb.js",
-				"plugins/specialchar/dialogs/lang/en-gb.js",
-				"plugins/specialchar/dialogs/lang/pl.js",
-				"plugins/specialchar/dialogs/lang/lv.js",
-				"plugins/specialchar/dialogs/lang/km.js",
-				"plugins/specialchar/dialogs/lang/tt.js",
-				"plugins/specialchar/dialogs/lang/th.js",
-				"plugins/specialchar/dialogs/lang/hu.js",
-				"plugins/specialchar/dialogs/lang/zh.js",
-				"plugins/specialchar/dialogs/lang/ja.js",
-				"plugins/specialchar/dialogs/lang/et.js",
-				"plugins/specialchar/dialogs/lang/nl.js",
-				"plugins/specialchar/dialogs/lang/ar.js",
-				"plugins/specialchar/dialogs/lang/eo.js",
-				"plugins/specialchar/dialogs/lang/lt.js",
-				"plugins/specialchar/dialogs/lang/gl.js",
-				"plugins/specialchar/dialogs/lang/ku.js",
-				"plugins/specialchar/dialogs/lang/cs.js",
-				"plugins/specialchar/dialogs/lang/vi.js",
-				"plugins/specialchar/dialogs/lang/ca.js",
-				"plugins/specialchar/dialogs/lang/ug.js",
-				"plugins/specialchar/dialogs/lang/id.js",
-				"plugins/specialchar/dialogs/lang/si.js",
-				"plugins/specialchar/dialogs/lang/sl.js",
-				"plugins/specialchar/dialogs/lang/pt-br.js",
-				"plugins/specialchar/dialogs/lang/es.js",
-				"plugins/specialchar/dialogs/lang/hr.js",
-				"plugins/specialchar/dialogs/lang/sq.js",
-				"plugins/specialchar/dialogs/specialchar.js",
-				"plugins/table/dialogs/table.js",
-				"plugins/showblocks/images/block_address.png",
-				"plugins/showblocks/images/block_blockquote.png",
-				"plugins/showblocks/images/block_pre.png",
-				"plugins/showblocks/images/block_h2.png",
-				"plugins/showblocks/images/block_h3.png",
-				"plugins/showblocks/images/block_h1.png",
-				"plugins/showblocks/images/block_h4.png",
-				"plugins/showblocks/images/block_h6.png",
-				"plugins/showblocks/images/block_div.png",
-				"plugins/showblocks/images/block_p.png",
-				"plugins/showblocks/images/block_h5.png",
-				"plugins/find/dialogs/find.js",
-				"plugins/smiley/dialogs/smiley.js",
-				"plugins/smiley/images/lightbulb.gif",
-				"plugins/smiley/images/cry_smile.png",
-				"plugins/smiley/images/heart.gif",
-				"plugins/smiley/images/thumbs_up.png",
-				"plugins/smiley/images/wink_smile.png",
-				"plugins/smiley/images/teeth_smile.gif",
-				"plugins/smiley/images/teeth_smile.png",
-				"plugins/smiley/images/heart.png",
-				"plugins/smiley/images/regular_smile.gif",
-				"plugins/smiley/images/cry_smile.gif",
-				"plugins/smiley/images/shades_smile.gif",
-				"plugins/smiley/images/embarrassed_smile.png",
-				"plugins/smiley/images/broken_heart.gif",
-				"plugins/smiley/images/shades_smile.png",
-				"plugins/smiley/images/sad_smile.gif",
-				"plugins/smiley/images/omg_smile.gif",
-				"plugins/smiley/images/regular_smile.png",
-				"plugins/smiley/images/angel_smile.png",
-				"plugins/smiley/images/devil_smile.png",
-				"plugins/smiley/images/kiss.gif",
-				"plugins/smiley/images/whatchutalkingabout_smile.gif",
-				"plugins/smiley/images/omg_smile.png",
-				"plugins/smiley/images/envelope.gif",
-				"plugins/smiley/images/confused_smile.png",
-				"plugins/smiley/images/envelope.png",
-				"plugins/smiley/images/tongue_smile.gif",
-				"plugins/smiley/images/embarrassed_smile.gif",
-				"plugins/smiley/images/confused_smile.gif",
-				"plugins/smiley/images/angel_smile.gif",
-				"plugins/smiley/images/tounge_smile.gif",
-				"plugins/smiley/images/thumbs_down.png",
-				"plugins/smiley/images/thumbs_up.gif",
-				"plugins/smiley/images/lightbulb.png",
-				"plugins/smiley/images/tongue_smile.png",
-				"plugins/smiley/images/sad_smile.png",
-				"plugins/smiley/images/angry_smile.gif",
-				"plugins/smiley/images/angry_smile.png",
-				"plugins/smiley/images/devil_smile.gif",
-				"plugins/smiley/images/thumbs_down.gif",
-				"plugins/smiley/images/kiss.png",
-				"plugins/smiley/images/whatchutalkingabout_smile.png",
-				"plugins/smiley/images/wink_smile.gif",
-				"plugins/smiley/images/broken_heart.png",
-				"plugins/smiley/images/embaressed_smile.gif",
-				"plugins/forms/dialogs/textfield.js",
-				"plugins/forms/dialogs/select.js",
-				"plugins/forms/dialogs/hiddenfield.js",
-				"plugins/forms/dialogs/button.js",
-				"plugins/forms/dialogs/checkbox.js",
-				"plugins/forms/dialogs/textarea.js",
-				"plugins/forms/dialogs/form.js",
-				"plugins/forms/dialogs/radio.js",
-				"plugins/forms/images/hiddenfield.gif",
-				"plugins/pastefromword/filter/default.js",
-				"plugins/pagebreak/images/pagebreak.gif",
-				"plugins/wsc/README.md",
-				"plugins/wsc/dialogs/ciframe.html",
-				"plugins/wsc/dialogs/wsc.css",
-				"plugins/wsc/dialogs/wsc_ie.js",
-				"plugins/wsc/dialogs/wsc.js",
-				"plugins/wsc/dialogs/tmpFrameset.html",
-				"plugins/wsc/LICENSE.md",
-				"plugins/scayt/README.md",
-				"plugins/scayt/dialogs/toolbar.css",
-				"plugins/scayt/dialogs/options.js",
-				"plugins/scayt/CHANGELOG.md",
-				"plugins/scayt/LICENSE.md",
-				"plugins/colordialog/dialogs/colordialog.js",
-				"plugins/clipboard/dialogs/paste.js",
-				"plugins/a11yhelp/dialogs/a11yhelp.js",
-				"plugins/a11yhelp/dialogs/lang/sk.js",
-				"plugins/a11yhelp/dialogs/lang/fi.js",
-				"plugins/a11yhelp/dialogs/lang/it.js",
-				"plugins/a11yhelp/dialogs/lang/he.js",
-				"plugins/a11yhelp/dialogs/lang/uk.js",
-				"plugins/a11yhelp/dialogs/lang/_translationstatus.txt",
-				"plugins/a11yhelp/dialogs/lang/sv.js",
-				"plugins/a11yhelp/dialogs/lang/sr-latn.js",
-				"plugins/a11yhelp/dialogs/lang/ru.js",
-				"plugins/a11yhelp/dialogs/lang/zh-cn.js",
-				"plugins/a11yhelp/dialogs/lang/no.js",
-				"plugins/a11yhelp/dialogs/lang/fr.js",
-				"plugins/a11yhelp/dialogs/lang/fa.js",
-				"plugins/a11yhelp/dialogs/lang/da.js",
-				"plugins/a11yhelp/dialogs/lang/mk.js",
-				"plugins/a11yhelp/dialogs/lang/ko.js",
-				"plugins/a11yhelp/dialogs/lang/ro.js",
-				"plugins/a11yhelp/dialogs/lang/mn.js",
-				"plugins/a11yhelp/dialogs/lang/tr.js",
-				"plugins/a11yhelp/dialogs/lang/bg.js",
-				"plugins/a11yhelp/dialogs/lang/de.js",
-				"plugins/a11yhelp/dialogs/lang/el.js",
-				"plugins/a11yhelp/dialogs/lang/pt.js",
-				"plugins/a11yhelp/dialogs/lang/af.js",
-				"plugins/a11yhelp/dialogs/lang/eu.js",
-				"plugins/a11yhelp/dialogs/lang/cy.js",
-				"plugins/a11yhelp/dialogs/lang/hi.js",
-				"plugins/a11yhelp/dialogs/lang/en.js",
-				"plugins/a11yhelp/dialogs/lang/fr-ca.js",
-				"plugins/a11yhelp/dialogs/lang/nb.js",
-				"plugins/a11yhelp/dialogs/lang/sr.js",
-				"plugins/a11yhelp/dialogs/lang/en-gb.js",
-				"plugins/a11yhelp/dialogs/lang/pl.js",
-				"plugins/a11yhelp/dialogs/lang/lv.js",
-				"plugins/a11yhelp/dialogs/lang/km.js",
-				"plugins/a11yhelp/dialogs/lang/tt.js",
-				"plugins/a11yhelp/dialogs/lang/th.js",
-				"plugins/a11yhelp/dialogs/lang/hu.js",
-				"plugins/a11yhelp/dialogs/lang/zh.js",
-				"plugins/a11yhelp/dialogs/lang/ja.js",
-				"plugins/a11yhelp/dialogs/lang/et.js",
-				"plugins/a11yhelp/dialogs/lang/nl.js",
-				"plugins/a11yhelp/dialogs/lang/ar.js",
-				"plugins/a11yhelp/dialogs/lang/eo.js",
-				"plugins/a11yhelp/dialogs/lang/lt.js",
-				"plugins/a11yhelp/dialogs/lang/gl.js",
-				"plugins/a11yhelp/dialogs/lang/ku.js",
-				"plugins/a11yhelp/dialogs/lang/cs.js",
-				"plugins/a11yhelp/dialogs/lang/vi.js",
-				"plugins/a11yhelp/dialogs/lang/ca.js",
-				"plugins/a11yhelp/dialogs/lang/ug.js",
-				"plugins/a11yhelp/dialogs/lang/fo.js",
-				"plugins/a11yhelp/dialogs/lang/id.js",
-				"plugins/a11yhelp/dialogs/lang/si.js",
-				"plugins/a11yhelp/dialogs/lang/sl.js",
-				"plugins/a11yhelp/dialogs/lang/pt-br.js",
-				"plugins/a11yhelp/dialogs/lang/es.js",
-				"plugins/a11yhelp/dialogs/lang/hr.js",
-				"plugins/a11yhelp/dialogs/lang/sq.js",
-				"plugins/a11yhelp/dialogs/lang/gu.js",
-				"contents.css"
+					"adapters/jquery.js",
+					"README.md",
+					"CHANGES.md",
+					"styles.js",
+					"lang/sk.js",
+					"lang/fi.js",
+					"lang/it.js",
+					"lang/he.js",
+					"lang/uk.js",
+					"lang/sv.js",
+					"lang/en-ca.js",
+					"lang/sr-latn.js",
+					"lang/ru.js",
+					"lang/zh-cn.js",
+					"lang/no.js",
+					"lang/fr.js",
+					"lang/fa.js",
+					"lang/da.js",
+					"lang/mk.js",
+					"lang/ko.js",
+					"lang/ro.js",
+					"lang/mn.js",
+					"lang/tr.js",
+					"lang/bg.js",
+					"lang/ka.js",
+					"lang/de.js",
+					"lang/el.js",
+					"lang/pt.js",
+					"lang/af.js",
+					"lang/eu.js",
+					"lang/cy.js",
+					"lang/en-au.js",
+					"lang/hi.js",
+					"lang/en.js",
+					"lang/fr-ca.js",
+					"lang/nb.js",
+					"lang/sr.js",
+					"lang/en-gb.js",
+					"lang/ms.js",
+					"lang/pl.js",
+					"lang/is.js",
+					"lang/lv.js",
+					"lang/km.js",
+					"lang/tt.js",
+					"lang/th.js",
+					"lang/hu.js",
+					"lang/bn.js",
+					"lang/zh.js",
+					"lang/ja.js",
+					"lang/et.js",
+					"lang/nl.js",
+					"lang/ar.js",
+					"lang/eo.js",
+					"lang/lt.js",
+					"lang/gl.js",
+					"lang/ku.js",
+					"lang/cs.js",
+					"lang/vi.js",
+					"lang/ca.js",
+					"lang/ug.js",
+					"lang/fo.js",
+					"lang/id.js",
+					"lang/si.js",
+					"lang/sl.js",
+					"lang/pt-br.js",
+					"lang/es.js",
+					"lang/hr.js",
+					"lang/sq.js",
+					"lang/bs.js",
+					"lang/gu.js",
+					"skins/moono/dialog_ie7.css",
+					"skins/moono/dialog_ie.css",
+					"skins/moono/editor_iequirks.css",
+					"skins/moono/icons_hidpi.png",
+					"skins/moono/editor.css",
+					"skins/moono/readme.md",
+					"skins/moono/dialog_ie8.css",
+					"skins/moono/editor_ie.css",
+					"skins/moono/dialog.css",
+					"skins/moono/icons.png",
+					"skins/moono/dialog_iequirks.css",
+					"skins/moono/editor_ie7.css",
+					"skins/moono/editor_gecko.css",
+					"skins/moono/editor_ie8.css",
+					"skins/moono/images/spinner.gif",
+					"skins/moono/images/arrow.png",
+					"skins/moono/images/lock-open.png",
+					"skins/moono/images/lock.png",
+					"skins/moono/images/close.png",
+					"skins/moono/images/refresh.png",
+					"skins/moono/images/hidpi/lock-open.png",
+					"skins/moono/images/hidpi/lock.png",
+					"skins/moono/images/hidpi/close.png",
+					"skins/moono/images/hidpi/refresh.png",
+					"build-config.js",
+					"config.js",
+					"ckeditor.js",
+					"LICENSE.md",
+					"plugins/preview/preview.html",
+					"plugins/templates/templates/default.js",
+					"plugins/templates/templates/images/template3.gif",
+					"plugins/templates/templates/images/template1.gif",
+					"plugins/templates/templates/images/template2.gif",
+					"plugins/templates/dialogs/templates.css",
+					"plugins/templates/dialogs/templates.js",
+					"plugins/tabletools/dialogs/tableCell.js",
+					"plugins/icons_hidpi.png",
+					"plugins/dialog/dialogDefinition.js",
+					"plugins/iframe/dialogs/iframe.js",
+					"plugins/iframe/images/placeholder.png",
+					"plugins/liststyle/dialogs/liststyle.js",
+					"plugins/magicline/images/icon-rtl.png",
+					"plugins/magicline/images/icon.png",
+					"plugins/magicline/images/hidpi/icon-rtl.png",
+					"plugins/magicline/images/hidpi/icon.png",
+					"plugins/image/dialogs/image.js",
+					"plugins/image/images/noimage.png",
+					"plugins/link/dialogs/link.js",
+					"plugins/link/dialogs/anchor.js",
+					"plugins/link/images/anchor.png",
+					"plugins/link/images/hidpi/anchor.png",
+					"plugins/flash/dialogs/flash.js",
+					"plugins/flash/images/placeholder.png",
+					"plugins/about/dialogs/logo_ckeditor.png",
+					"plugins/about/dialogs/about.js",
+					"plugins/about/dialogs/hidpi/logo_ckeditor.png",
+					"plugins/icons.png",
+					"plugins/div/dialogs/div.js",
+					"plugins/specialchar/dialogs/lang/sk.js",
+					"plugins/specialchar/dialogs/lang/fi.js",
+					"plugins/specialchar/dialogs/lang/it.js",
+					"plugins/specialchar/dialogs/lang/he.js",
+					"plugins/specialchar/dialogs/lang/uk.js",
+					"plugins/specialchar/dialogs/lang/_translationstatus.txt",
+					"plugins/specialchar/dialogs/lang/sv.js",
+					"plugins/specialchar/dialogs/lang/ru.js",
+					"plugins/specialchar/dialogs/lang/zh-cn.js",
+					"plugins/specialchar/dialogs/lang/no.js",
+					"plugins/specialchar/dialogs/lang/fr.js",
+					"plugins/specialchar/dialogs/lang/fa.js",
+					"plugins/specialchar/dialogs/lang/da.js",
+					"plugins/specialchar/dialogs/lang/ko.js",
+					"plugins/specialchar/dialogs/lang/tr.js",
+					"plugins/specialchar/dialogs/lang/bg.js",
+					"plugins/specialchar/dialogs/lang/de.js",
+					"plugins/specialchar/dialogs/lang/el.js",
+					"plugins/specialchar/dialogs/lang/pt.js",
+					"plugins/specialchar/dialogs/lang/af.js",
+					"plugins/specialchar/dialogs/lang/eu.js",
+					"plugins/specialchar/dialogs/lang/cy.js",
+					"plugins/specialchar/dialogs/lang/en.js",
+					"plugins/specialchar/dialogs/lang/fr-ca.js",
+					"plugins/specialchar/dialogs/lang/nb.js",
+					"plugins/specialchar/dialogs/lang/en-gb.js",
+					"plugins/specialchar/dialogs/lang/pl.js",
+					"plugins/specialchar/dialogs/lang/lv.js",
+					"plugins/specialchar/dialogs/lang/km.js",
+					"plugins/specialchar/dialogs/lang/tt.js",
+					"plugins/specialchar/dialogs/lang/th.js",
+					"plugins/specialchar/dialogs/lang/hu.js",
+					"plugins/specialchar/dialogs/lang/zh.js",
+					"plugins/specialchar/dialogs/lang/ja.js",
+					"plugins/specialchar/dialogs/lang/et.js",
+					"plugins/specialchar/dialogs/lang/nl.js",
+					"plugins/specialchar/dialogs/lang/ar.js",
+					"plugins/specialchar/dialogs/lang/eo.js",
+					"plugins/specialchar/dialogs/lang/lt.js",
+					"plugins/specialchar/dialogs/lang/gl.js",
+					"plugins/specialchar/dialogs/lang/ku.js",
+					"plugins/specialchar/dialogs/lang/cs.js",
+					"plugins/specialchar/dialogs/lang/vi.js",
+					"plugins/specialchar/dialogs/lang/ca.js",
+					"plugins/specialchar/dialogs/lang/ug.js",
+					"plugins/specialchar/dialogs/lang/id.js",
+					"plugins/specialchar/dialogs/lang/si.js",
+					"plugins/specialchar/dialogs/lang/sl.js",
+					"plugins/specialchar/dialogs/lang/pt-br.js",
+					"plugins/specialchar/dialogs/lang/es.js",
+					"plugins/specialchar/dialogs/lang/hr.js",
+					"plugins/specialchar/dialogs/lang/sq.js",
+					"plugins/specialchar/dialogs/specialchar.js",
+					"plugins/table/dialogs/table.js",
+					"plugins/showblocks/images/block_address.png",
+					"plugins/showblocks/images/block_blockquote.png",
+					"plugins/showblocks/images/block_pre.png",
+					"plugins/showblocks/images/block_h2.png",
+					"plugins/showblocks/images/block_h3.png",
+					"plugins/showblocks/images/block_h1.png",
+					"plugins/showblocks/images/block_h4.png",
+					"plugins/showblocks/images/block_h6.png",
+					"plugins/showblocks/images/block_div.png",
+					"plugins/showblocks/images/block_p.png",
+					"plugins/showblocks/images/block_h5.png",
+					"plugins/find/dialogs/find.js",
+					"plugins/smiley/dialogs/smiley.js",
+					"plugins/smiley/images/lightbulb.gif",
+					"plugins/smiley/images/cry_smile.png",
+					"plugins/smiley/images/heart.gif",
+					"plugins/smiley/images/thumbs_up.png",
+					"plugins/smiley/images/wink_smile.png",
+					"plugins/smiley/images/teeth_smile.gif",
+					"plugins/smiley/images/teeth_smile.png",
+					"plugins/smiley/images/heart.png",
+					"plugins/smiley/images/regular_smile.gif",
+					"plugins/smiley/images/cry_smile.gif",
+					"plugins/smiley/images/shades_smile.gif",
+					"plugins/smiley/images/embarrassed_smile.png",
+					"plugins/smiley/images/broken_heart.gif",
+					"plugins/smiley/images/shades_smile.png",
+					"plugins/smiley/images/sad_smile.gif",
+					"plugins/smiley/images/omg_smile.gif",
+					"plugins/smiley/images/regular_smile.png",
+					"plugins/smiley/images/angel_smile.png",
+					"plugins/smiley/images/devil_smile.png",
+					"plugins/smiley/images/kiss.gif",
+					"plugins/smiley/images/whatchutalkingabout_smile.gif",
+					"plugins/smiley/images/omg_smile.png",
+					"plugins/smiley/images/envelope.gif",
+					"plugins/smiley/images/confused_smile.png",
+					"plugins/smiley/images/envelope.png",
+					"plugins/smiley/images/tongue_smile.gif",
+					"plugins/smiley/images/embarrassed_smile.gif",
+					"plugins/smiley/images/confused_smile.gif",
+					"plugins/smiley/images/angel_smile.gif",
+					"plugins/smiley/images/tounge_smile.gif",
+					"plugins/smiley/images/thumbs_down.png",
+					"plugins/smiley/images/thumbs_up.gif",
+					"plugins/smiley/images/lightbulb.png",
+					"plugins/smiley/images/tongue_smile.png",
+					"plugins/smiley/images/sad_smile.png",
+					"plugins/smiley/images/angry_smile.gif",
+					"plugins/smiley/images/angry_smile.png",
+					"plugins/smiley/images/devil_smile.gif",
+					"plugins/smiley/images/thumbs_down.gif",
+					"plugins/smiley/images/kiss.png",
+					"plugins/smiley/images/whatchutalkingabout_smile.png",
+					"plugins/smiley/images/wink_smile.gif",
+					"plugins/smiley/images/broken_heart.png",
+					"plugins/smiley/images/embaressed_smile.gif",
+					"plugins/forms/dialogs/textfield.js",
+					"plugins/forms/dialogs/select.js",
+					"plugins/forms/dialogs/hiddenfield.js",
+					"plugins/forms/dialogs/button.js",
+					"plugins/forms/dialogs/checkbox.js",
+					"plugins/forms/dialogs/textarea.js",
+					"plugins/forms/dialogs/form.js",
+					"plugins/forms/dialogs/radio.js",
+					"plugins/forms/images/hiddenfield.gif",
+					"plugins/pastefromword/filter/default.js",
+					"plugins/pagebreak/images/pagebreak.gif",
+					"plugins/wsc/README.md",
+					"plugins/wsc/dialogs/ciframe.html",
+					"plugins/wsc/dialogs/wsc.css",
+					"plugins/wsc/dialogs/wsc_ie.js",
+					"plugins/wsc/dialogs/wsc.js",
+					"plugins/wsc/dialogs/tmpFrameset.html",
+					"plugins/wsc/LICENSE.md",
+					"plugins/scayt/README.md",
+					"plugins/scayt/dialogs/toolbar.css",
+					"plugins/scayt/dialogs/options.js",
+					"plugins/scayt/CHANGELOG.md",
+					"plugins/scayt/LICENSE.md",
+					"plugins/colordialog/dialogs/colordialog.js",
+					"plugins/clipboard/dialogs/paste.js",
+					"plugins/a11yhelp/dialogs/a11yhelp.js",
+					"plugins/a11yhelp/dialogs/lang/sk.js",
+					"plugins/a11yhelp/dialogs/lang/fi.js",
+					"plugins/a11yhelp/dialogs/lang/it.js",
+					"plugins/a11yhelp/dialogs/lang/he.js",
+					"plugins/a11yhelp/dialogs/lang/uk.js",
+					"plugins/a11yhelp/dialogs/lang/_translationstatus.txt",
+					"plugins/a11yhelp/dialogs/lang/sv.js",
+					"plugins/a11yhelp/dialogs/lang/sr-latn.js",
+					"plugins/a11yhelp/dialogs/lang/ru.js",
+					"plugins/a11yhelp/dialogs/lang/zh-cn.js",
+					"plugins/a11yhelp/dialogs/lang/no.js",
+					"plugins/a11yhelp/dialogs/lang/fr.js",
+					"plugins/a11yhelp/dialogs/lang/fa.js",
+					"plugins/a11yhelp/dialogs/lang/da.js",
+					"plugins/a11yhelp/dialogs/lang/mk.js",
+					"plugins/a11yhelp/dialogs/lang/ko.js",
+					"plugins/a11yhelp/dialogs/lang/ro.js",
+					"plugins/a11yhelp/dialogs/lang/mn.js",
+					"plugins/a11yhelp/dialogs/lang/tr.js",
+					"plugins/a11yhelp/dialogs/lang/bg.js",
+					"plugins/a11yhelp/dialogs/lang/de.js",
+					"plugins/a11yhelp/dialogs/lang/el.js",
+					"plugins/a11yhelp/dialogs/lang/pt.js",
+					"plugins/a11yhelp/dialogs/lang/af.js",
+					"plugins/a11yhelp/dialogs/lang/eu.js",
+					"plugins/a11yhelp/dialogs/lang/cy.js",
+					"plugins/a11yhelp/dialogs/lang/hi.js",
+					"plugins/a11yhelp/dialogs/lang/en.js",
+					"plugins/a11yhelp/dialogs/lang/fr-ca.js",
+					"plugins/a11yhelp/dialogs/lang/nb.js",
+					"plugins/a11yhelp/dialogs/lang/sr.js",
+					"plugins/a11yhelp/dialogs/lang/en-gb.js",
+					"plugins/a11yhelp/dialogs/lang/pl.js",
+					"plugins/a11yhelp/dialogs/lang/lv.js",
+					"plugins/a11yhelp/dialogs/lang/km.js",
+					"plugins/a11yhelp/dialogs/lang/tt.js",
+					"plugins/a11yhelp/dialogs/lang/th.js",
+					"plugins/a11yhelp/dialogs/lang/hu.js",
+					"plugins/a11yhelp/dialogs/lang/zh.js",
+					"plugins/a11yhelp/dialogs/lang/ja.js",
+					"plugins/a11yhelp/dialogs/lang/et.js",
+					"plugins/a11yhelp/dialogs/lang/nl.js",
+					"plugins/a11yhelp/dialogs/lang/ar.js",
+					"plugins/a11yhelp/dialogs/lang/eo.js",
+					"plugins/a11yhelp/dialogs/lang/lt.js",
+					"plugins/a11yhelp/dialogs/lang/gl.js",
+					"plugins/a11yhelp/dialogs/lang/ku.js",
+					"plugins/a11yhelp/dialogs/lang/cs.js",
+					"plugins/a11yhelp/dialogs/lang/vi.js",
+					"plugins/a11yhelp/dialogs/lang/ca.js",
+					"plugins/a11yhelp/dialogs/lang/ug.js",
+					"plugins/a11yhelp/dialogs/lang/fo.js",
+					"plugins/a11yhelp/dialogs/lang/id.js",
+					"plugins/a11yhelp/dialogs/lang/si.js",
+					"plugins/a11yhelp/dialogs/lang/sl.js",
+					"plugins/a11yhelp/dialogs/lang/pt-br.js",
+					"plugins/a11yhelp/dialogs/lang/es.js",
+					"plugins/a11yhelp/dialogs/lang/hr.js",
+					"plugins/a11yhelp/dialogs/lang/sq.js",
+					"plugins/a11yhelp/dialogs/lang/gu.js",
+					"contents.css"
 			};
 
-		
+
 		String fullname = "";
 		String type = "text/plain";
 		File file;
-		
+
 		for (String filename : files) {
 			if(filename.equals(folder))
 			{
 				fullname = "web/libs/ckeditor/"+filename;
-				
-			    switch (filename.substring(filename.lastIndexOf(".") + 1)) {
-			    	case "js":
-			    		type = "text/javascript";
-			    		break;
-			    	case "css":
-			    		type = "text/css";
-			    		break;
-			    	case "html":
-			    		type = "text/html";
-			    		break;
-			    	case "txt":
-			    	case "md":
-			    		type = "text/plain";
-			    		break;
-			    	case "png":
-			    		type = "image/png";
-			    		break;
-			    	case "gif":
-			    		type = "image/gif";
-			    		break;	
-			    	case "svg":
-						type = "image/svg+xml";
-			    }
-			}	
+
+				switch (filename.substring(filename.lastIndexOf(".") + 1)) {
+				case "js":
+					type = "text/javascript";
+					break;
+				case "css":
+					type = "text/css";
+					break;
+				case "html":
+					type = "text/html";
+					break;
+				case "txt":
+				case "md":
+					type = "text/plain";
+					break;
+				case "png":
+					type = "image/png";
+					break;
+				case "gif":
+					type = "image/gif";
+					break;
+				case "svg":
+					type = "image/svg+xml";
+				}
+			}
 		}
-		
+
 		file = new File(fullname);
-		
+
 		if (file.exists()) {
 			return Response.ok(file, type).build();
 		} else {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/translation.json")
 	@GET
 	public Response translationjson() {
-		
+
 		File file = new File("languages/" + Settings.getInstance().getLang());
-		
+
 		if (file.exists()) {
 			return Response.ok(file, "application/json").build();
 		} else {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/translation.js")
 	@GET
 	public Response translationjs() {
@@ -3321,7 +3317,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	@Path("index/libs/js/third-party/qrcode.min.js")
 	@GET
 	public Response qrcodejs() {
@@ -3333,7 +3329,7 @@ public class WebResource {
 			return error404(request, null);
 		}
 	}
-	
+
 	public Response error404(HttpServletRequest request, String titleOpt) {
 
 		try {
@@ -3479,7 +3475,7 @@ public class WebResource {
 	}
 
 	private Response enhanceAndShowWebsite(String website) throws IOException,
-			PebbleException {
+	PebbleException {
 		website = injectValues(website);
 
 		File tmpFile = File.createTempFile("web", ".site");

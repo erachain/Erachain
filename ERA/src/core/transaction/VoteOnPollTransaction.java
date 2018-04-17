@@ -266,15 +266,15 @@ public class VoteOnPollTransaction extends Transaction
 		super.process(block, asPack);
 
 		//ADD VOTE TO POLL
-		Poll poll = db.getPollMap().get(this.poll).copy();
+		Poll poll = this.dcSet.getPollMap().get(this.poll).copy();
 		int previousOption = poll.addVoter(this.creator, this.option);
-		db.getPollMap().add(poll);
+		this.dcSet.getPollMap().add(poll);
 
 		//CHECK IF WE HAD PREVIOUSLY VOTED
 		if(previousOption != -1)
 		{
 			//ADD TO ORPHAN DATABASE
-			db.getVoteOnPollDatabase().set(this, previousOption);
+			this.dcSet.getVoteOnPollDatabase().set(this, previousOption);
 		}
 	}
 
@@ -287,17 +287,17 @@ public class VoteOnPollTransaction extends Transaction
 		super.orphan(asPack);
 
 		//DELETE VOTE FROM POLL
-		Poll poll = db.getPollMap().get(this.poll).copy();
+		Poll poll = this.dcSet.getPollMap().get(this.poll).copy();
 		poll.deleteVoter(this.creator, this.option);
 
 		//RESTORE PREVIOUS VOTE
-		int previousOption = db.getVoteOnPollDatabase().get(this);
+		int previousOption = this.dcSet.getVoteOnPollDatabase().get(this);
 		if(previousOption != -1)
 		{
 			poll.addVoter(this.creator, previousOption);
 		}
 
-		db.getPollMap().add(poll);
+		this.dcSet.getPollMap().add(poll);
 	}
 
 

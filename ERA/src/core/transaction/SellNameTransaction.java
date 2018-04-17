@@ -234,7 +234,7 @@ public class SellNameTransaction extends Transaction
 		//this.creator.setLastReference(this.signature, db);
 
 		//INSERT INTO DATABASE
-		db.getNameExchangeMap().add(this.nameSale);
+		this.dcSet.getNameExchangeMap().add(this.nameSale);
 	}
 
 	//@Override
@@ -248,7 +248,7 @@ public class SellNameTransaction extends Transaction
 		//this.creator.setLastReference(this.reference, db);
 
 		//DELETE FORM DATABASE
-		db.getNameExchangeMap().delete(this.nameSale);
+		this.dcSet.getNameExchangeMap().delete(this.nameSale);
 
 	}
 

@@ -1,29 +1,19 @@
 package test.records;
 
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple3;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 //import java.math.BigInteger;
 //import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Stack;
 
-//import java.util.List;
- import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
 
-import ntp.NTP;
-
-
+import core.BlockChain;
 import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -32,6 +22,7 @@ import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import datachain.HashesSignsMap;
+import ntp.NTP;
 
 public class TestRecHash {
 
@@ -42,7 +33,7 @@ public class TestRecHash {
 	long VOTE_KEY = AssetCls.ERA_KEY;
 	byte FEE_POWER = (byte)1;
 	long timestamp = NTP.getTime();
-	
+
 	byte[] url = "http://sdsdf.com/dfgr/1".getBytes();
 	byte[] data = "test123!".getBytes();
 
@@ -51,7 +42,7 @@ public class TestRecHash {
 	//CREATE EMPTY MEMORY DATABASE
 	private DCSet db;
 	private GenesisBlock gb;
-	
+
 	//CREATE KNOWN ACCOUNT
 	byte[] seed = Crypto.getInstance().digest("test".getBytes());
 	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -60,9 +51,9 @@ public class TestRecHash {
 
 	// INIT
 	private void init() {
-		
+
 		db = DCSet.createEmptyDatabaseSet();
-		
+
 		gb = new GenesisBlock();
 		try {
 			gb.process(db);
@@ -70,59 +61,59 @@ public class TestRecHash {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
-	
+
 	//
-	
+
 	@Test
-	public void validateSignature() 
+	public void validateSignature()
 	{
-		
+
 		init();
-		
+
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 		hashesRecord.sign(maker, asPack);
-		
+
 		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
 		assertEquals(true, hashesRecord.isSignatureValid(db));
-		
+
 		//INVALID SIGNATURE
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
-		
+
 		//CHECK IF ISSUE PLATE IS INVALID
 		assertEquals(false, hashesRecord.isSignatureValid(db));
 	}
-		
 
-	
+
+
 	@Test
-	public void parse() 
+	public void parse()
 	{
-		
+
 		init();
-		
-		
+
+
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 		hashesRecord.sign(maker, asPack);
-		
+
 		//CONVERT TO BYTES
 		byte[] rawHashesRecord = hashesRecord.toBytes(true, null);
-		
+
 		//CHECK DATA LENGTH
 		assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(false));
-		
+
 		R_Hashes parsed = null;
-		try 
-		{	
+		try
+		{
 			//PARSE FROM BYTES
 			parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawHashesRecord, releaserReference);
 		}
-		catch (Exception e) 
+		catch (Exception e)
 		{
 			fail("Exception while parsing transaction. " + e);
 		}
@@ -131,20 +122,20 @@ public class TestRecHash {
 		assertEquals(true, parsed instanceof R_Hashes);
 
 		//CHECK TIMESTAMP
-		assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());				
+		assertEquals(hashesRecord.getTimestamp(), parsed.getTimestamp());
 
 		//CHECK REFERENCE
-		//assertEquals(hashesRecord.getReference(), parsed.getReference());	
-		
+		//assertEquals(hashesRecord.getReference(), parsed.getReference());
+
 		//CHECK ISSUER
 		assertEquals(hashesRecord.getCreator().getAddress(), parsed.getCreator().getAddress());
 
 		//CHECK FEE
-		assertEquals(hashesRecord.getFeePow(), parsed.getFeePow());			
+		assertEquals(hashesRecord.getFeePow(), parsed.getFeePow());
 
 		//CHECK SIGNATURE
 		assertEquals(true, Arrays.equals(hashesRecord.getSignature(), parsed.getSignature()));
-		
+
 
 		/////////////////////////////////
 		//CHECK URL
@@ -152,39 +143,39 @@ public class TestRecHash {
 
 		//CHECK NAME
 		assertEquals(true, Arrays.equals(hashesRecord.getData(), parsed.getData()));
-										
+
 		//CHECK HASHES
 		assertEquals(true, Arrays.equals(hashesRecord.getHashesB58(), parsed.getHashesB58()));
 
 	}
 
-	
+
 	@Test
 	public void process()
 	{
-		
+
 		init();
-		
+
 		byte[] hash0 = maker.getPublicKey();
 		hashes[0] = hash0;
-		
+
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
-		
+
 		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(db, releaserReference));
-		
+
 		hashesRecord.sign(maker, false);
 		hashesRecord.process(gb, false);
-							
+
 		//CHECK REFERENCE SENDER
 		assertEquals(hashesRecord.getTimestamp(), maker.getLastTimestamp(db));
-		
+
 		HashesSignsMap map = db.getHashesSignsMap();
 		Stack<Tuple3<Long, Integer, Integer>> result = map.get(hash0);
 		assertEquals(result.size(), 1);
-			
+
 		///// ORPHAN
 		hashesRecord.orphan(false);
-										
+
 		//CHECK REFERENCE SENDER
 		//assertEquals(hashesRecord.getReference(), maker.getLastReference(db));
 

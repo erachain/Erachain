@@ -463,11 +463,13 @@ public class Order implements Comparable<Order>
 
 	//PROCESS/ORPHAN
 
-	public void process(DCSet db, Transaction transaction)
+	public void process(Transaction transaction)
 	{
+
+		DCSet db = this.dcSet;
 		//REMOVE HAVE
 		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-		this.creator.changeBalance(db, true, this.have, this.amountHave, false);
+		this.creator.changeBalance(this.dcSet, true, this.have, this.amountHave, false);
 
 		//ADD ORDER TO DATABASE
 		db.getOrderMap().add(this.copy());
@@ -617,7 +619,9 @@ public class Order implements Comparable<Order>
 		}
 	}
 
-	public void orphan(DCSet db) {
+	public void orphan() {
+
+		DCSet db = this.dcSet;
 
 		//ORPHAN TRADES
 		for(Trade trade: this.getInitiatedTrades(db))
@@ -634,24 +638,25 @@ public class Order implements Comparable<Order>
 	}
 
 	// TODO delete this
-	public BigDecimal calculate-BuyIncrement(Order order, DCSet db)
+	// SCALE - different for ASSETS
+	public BigDecimal calculateBuyIncrement()
 	{
 		BigInteger multiplier = BigInteger.valueOf(100000000l);
 
 		//CALCULATE THE MINIMUM INCREMENT AT WHICH I CAN BUY USING GCD
 		BigInteger haveAmount = BigInteger.ONE.multiply(multiplier);
-		BigInteger priceAmount = order.getPriceCalc().multiply(new BigDecimal(multiplier), rounding)
-				.setScale(order.getScaleForPrice(), RoundingMode.HALF_DOWN).toBigInteger();
+		BigInteger priceAmount = this.getPriceCalc().multiply(new BigDecimal(multiplier), rounding)
+				.setScale(this.getScaleForPrice(), RoundingMode.HALF_DOWN).toBigInteger();
 		BigInteger gcd = haveAmount.gcd(priceAmount);
 		haveAmount = haveAmount.divide(gcd);
 		priceAmount = priceAmount.divide(gcd);
 
 		//CALCULATE GCD IN COMBINATION WITH DIVISIBILITY
-		if(this.getWantAsset(db).isDivisible())
+		if(this.getWantAsset(this.dcSet).isDivisible())
 		{
 			haveAmount = haveAmount.multiply(multiplier);
 		}
-		if(this.getHaveAsset(db).isDivisible())
+		if(this.getHaveAsset(this.dcSet).isDivisible())
 		{
 			priceAmount = priceAmount.multiply(multiplier);
 		}
@@ -659,7 +664,7 @@ public class Order implements Comparable<Order>
 
 		//CALCULATE THE INCREMENT AT WHICH WE HAVE TO BUY
 		BigDecimal increment = new BigDecimal(haveAmount.divide(gcd));
-		if(this.getWantAsset(db).isDivisible())
+		if(this.getWantAsset(this.dcSet).isDivisible())
 		{
 			increment = increment.divide(new BigDecimal(multiplier));
 		}

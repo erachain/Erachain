@@ -223,11 +223,11 @@ public class UpdateNameTransaction extends Transaction
 		super.process(block, asPack);
 
 		//SET ORPHAN DATA
-		Name oldName = db.getNameMap().get(this.name.getName());
-		db.getUpdateNameMap().set(this, oldName);
+		Name oldName = this.dcSet.getNameMap().get(this.name.getName());
+		this.dcSet.getUpdateNameMap().set(this, oldName);
 
 		//INSERT INTO DATABASE
-		db.getNameMap().add(this.name);
+		this.dcSet.getNameMap().add(this.name);
 	}
 
 	//@Override
@@ -238,11 +238,11 @@ public class UpdateNameTransaction extends Transaction
 		super.orphan(asPack);
 
 		//RESTORE ORPHAN DATA
-		Name oldName = db.getUpdateNameMap().get(this);
-		db.getNameMap().add(oldName);
+		Name oldName = this.dcSet.getUpdateNameMap().get(this);
+		this.dcSet.getNameMap().add(oldName);
 
 		//DELETE ORPHAN DATA
-		db.getUpdateNameMap().delete(this);
+		this.dcSet.getUpdateNameMap().delete(this);
 	}
 
 

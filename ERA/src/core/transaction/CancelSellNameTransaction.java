@@ -225,11 +225,11 @@ public class CancelSellNameTransaction extends Transaction
 		super.process(block, asPack);
 
 		//SET ORPHAN DATA
-		NameSale nameSale = db.getNameExchangeMap().getNameSale(this.name);
-		db.getCancelSellNameMap().set(this, nameSale.getAmount());
+		NameSale nameSale = this.dcSet.getNameExchangeMap().getNameSale(this.name);
+		this.dcSet.getCancelSellNameMap().set(this, nameSale.getAmount());
 
 		//DELETE FROM DATABASE
-		db.getNameExchangeMap().delete(this.name);
+		this.dcSet.getNameExchangeMap().delete(this.name);
 
 	}
 
@@ -241,12 +241,12 @@ public class CancelSellNameTransaction extends Transaction
 		super.orphan(asPack);
 
 		//ADD TO DATABASE
-		BigDecimal amount = db.getCancelSellNameMap().get(this);
+		BigDecimal amount = this.dcSet.getCancelSellNameMap().get(this);
 		NameSale nameSale = new NameSale(this.name, amount);
-		db.getNameExchangeMap().add(nameSale);
+		this.dcSet.getNameExchangeMap().add(nameSale);
 
 		//DELETE ORPHAN DATA
-		db.getCancelSellNameMap().delete(this);
+		this.dcSet.getCancelSellNameMap().delete(this);
 	}
 
 

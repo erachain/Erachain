@@ -1,23 +1,14 @@
 package core.transaction;
 
-import static org.junit.Assert.assertEquals;
-
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
-import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -32,9 +23,8 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import datachain.DCSet;
 import core.item.ItemCls;
-import core.item.persons.PersonHuman;
+import datachain.DCSet;
 
 
 // if person has not ALIVE status - add it
@@ -48,7 +38,7 @@ public class R_SertifyPubKeys extends Transaction {
 	private static final String NAME_ID = "Sertify Person";
 	private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
 	private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
-	
+
 	public static final int DEFAULT_DURATION = 2 * 356;
 
 	protected Long key; // PERSON KEY
@@ -57,14 +47,14 @@ public class R_SertifyPubKeys extends Transaction {
 	protected List<byte[]> sertifiedSignatures;
 
 	private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH;
-	
+
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
 
 	public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
 			List<PublicKeyAccount> sertifiedPublicKeys,
 			int add_day, long timestamp, Long reference) {
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);		
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
 		this.key = key;
 		this.sertifiedPublicKeys = sertifiedPublicKeys;
@@ -129,30 +119,31 @@ public class R_SertifyPubKeys extends Transaction {
 				sertifiedPublicKeys,
 				add_day, 0l, null);
 	}
-	
+
 	//GETTERS/SETTERS
 
 	//public static String getName() { return "Send"; }
 
 	// PERSON KEY
+	@Override
 	public long getKey()
 	{
 		return this.key;
 	}
 
 	@Override
-	public List<PublicKeyAccount> getPublicKeys() 
+	public List<PublicKeyAccount> getPublicKeys()
 	{
 		return this.sertifiedPublicKeys;
 	}
 
-	public List<PublicKeyAccount> getSertifiedPublicKeys() 
+	public List<PublicKeyAccount> getSertifiedPublicKeys()
 	{
 		return this.sertifiedPublicKeys;
 	}
 
-	
-	public List<String> getSertifiedPublicKeysB58() 
+
+	public List<String> getSertifiedPublicKeysB58()
 	{
 		List<String> pbKeys = new ArrayList<String>();
 		for (PublicKeyAccount key: this.sertifiedPublicKeys)
@@ -162,11 +153,11 @@ public class R_SertifyPubKeys extends Transaction {
 		return pbKeys;
 	}
 
-	public List<byte[]> getSertifiedSignatures() 
+	public List<byte[]> getSertifiedSignatures()
 	{
 		return this.sertifiedSignatures;
 	}
-	public List<String> getSertifiedSignaturesB58() 
+	public List<String> getSertifiedSignaturesB58()
 	{
 		List<String> items = new ArrayList<String>();
 		for (byte[] item: this.sertifiedSignatures)
@@ -181,11 +172,11 @@ public class R_SertifyPubKeys extends Transaction {
 		return sertifiedSignatures;
 	}
 
-	public int getAddDay() 
+	public int getAddDay()
 	{
 		return this.add_day;
 	}
-	
+
 	public int getPublicKeysSize()
 	{
 		return this.typeBytes[2];
@@ -194,13 +185,14 @@ public class R_SertifyPubKeys extends Transaction {
 	{
 		return typeBytes[2];
 	}
-	
+
 	// IT is only PERSONALITY record
+	@Override
 	public boolean hasPublicText() {
 		return true;
 	}
 
-			
+
 	//////// VIEWS
 	@Override
 	public String viewAmount(String address) {
@@ -215,7 +207,7 @@ public class R_SertifyPubKeys extends Transaction {
 	//////////////
 	@SuppressWarnings("unchecked")
 	@Override
-	public JSONObject toJson() 
+	public JSONObject toJson()
 	{
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
@@ -226,10 +218,10 @@ public class R_SertifyPubKeys extends Transaction {
 		transaction.put("sertified_public_keys", this.getSertifiedPublicKeysB58());
 		transaction.put("sertified_signatures", this.getSertifiedSignaturesB58());
 		transaction.put("add_day", this.add_day);
-		
-		return transaction;	
+
+		return transaction;
 	}
-	
+
 	public void signUserAccounts(List<PrivateKeyAccount> userPrivateAccounts)
 	{
 		byte[] data;
@@ -243,7 +235,7 @@ public class R_SertifyPubKeys extends Transaction {
 		data = Bytes.concat(data, Ints.toByteArray(port));
 
 		if (this.sertifiedSignatures == null) this.sertifiedSignatures = new ArrayList<byte[]>();
-		
+
 		byte[] publicKey;
 		for ( PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
@@ -264,14 +256,14 @@ public class R_SertifyPubKeys extends Transaction {
 	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
-		
+
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if (data.length < BASE_LENGTH_AS_PACK
 				| !asPack & data.length < BASE_LENGTH)
 		{
 			throw new Exception("Data does not match block length " + data.length);
 		}
-		
+
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
@@ -280,7 +272,7 @@ public class R_SertifyPubKeys extends Transaction {
 		if (!asPack) {
 			//READ TIMESTAMP
 			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-			timestamp = Longs.fromByteArray(timestampBytes);	
+			timestamp = Longs.fromByteArray(timestampBytes);
 			position += TIMESTAMP_LENGTH;
 		}
 
@@ -288,17 +280,17 @@ public class R_SertifyPubKeys extends Transaction {
 		if (!asPack) {
 			//READ REFERENCE
 			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-			reference = Longs.fromByteArray(referenceBytes);	
+			reference = Longs.fromByteArray(referenceBytes);
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
 		}
-		
+
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
-		
+
 		byte feePow = 0;
 		if (!asPack) {
 			//READ FEE POWER
@@ -306,14 +298,14 @@ public class R_SertifyPubKeys extends Transaction {
 			feePow = feePowBytes[0];
 			position += 1;
 		}
-		
+
 		//READ SIGNATURE
 		byte[] signature = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		position += SIGNATURE_LENGTH;
 
 		//READ PERSON KEY
 		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-		long key = Longs.fromByteArray(keyBytes);	
+		long key = Longs.fromByteArray(keyBytes);
 		position += KEY_LENGTH;
 
 		//byte[] item;
@@ -323,7 +315,7 @@ public class R_SertifyPubKeys extends Transaction {
 		{
 			//READ USER ACCOUNT
 			sertifiedPublicKeys.add(new PublicKeyAccount(Arrays.copyOfRange(data, position, position + USER_ADDRESS_LENGTH)));
-			position += USER_ADDRESS_LENGTH;			
+			position += USER_ADDRESS_LENGTH;
 
 			if (getVersion(typeBytes)==1)
 			{
@@ -352,6 +344,7 @@ public class R_SertifyPubKeys extends Transaction {
 	}
 
 	//@Override
+	@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -360,23 +353,23 @@ public class R_SertifyPubKeys extends Transaction {
 		byte[] keyBytes = Longs.toByteArray(this.key);
 		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
-		
+
 		//WRITE USER PUBLIC KEYS
 		int i = 0;
 		for ( PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
 			data = Bytes.concat(data, publicAccount.getPublicKey());
-			
+
 			if (withSign & this.getVersion()==1)
 			{
 				data = Bytes.concat(data, this.sertifiedSignatures.get(i++));
 			}
 		}
-		
+
 		//WRITE DURATION
 		data = Bytes.concat(data, Ints.toByteArray(this.add_day));
 
-		return data;	
+		return data;
 	}
 
 	@Override
@@ -384,7 +377,7 @@ public class R_SertifyPubKeys extends Transaction {
 	{
 		// not include reference
 		int len = asPack? BASE_LENGTH_AS_PACK : BASE_LENGTH;
-		int accountsSize = this.sertifiedPublicKeys.size(); 
+		int accountsSize = this.sertifiedPublicKeys.size();
 		len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;
 		return this.typeBytes[1] == 1? len + Transaction.SIGNATURE_LENGTH * accountsSize: len;
 	}
@@ -404,7 +397,7 @@ public class R_SertifyPubKeys extends Transaction {
 			pAccountsSize = this.sertifiedPublicKeys.size();
 			if (pAccountsSize > this.sertifiedSignatures.size())
 				return false;
-			
+
 			byte[] singItem;
 			for (int i = 0; i < pAccountsSize; i++)
 			{
@@ -417,7 +410,7 @@ public class R_SertifyPubKeys extends Transaction {
 				}
 			}
 		}
-		
+
 		byte[] data = this.toBytes( false, null );
 		if ( data == null ) return false;
 
@@ -428,7 +421,7 @@ public class R_SertifyPubKeys extends Transaction {
 
 		Crypto crypto = Crypto.getInstance();
 		if (!crypto.verify(creator.getPublicKey(), signature, data))
-				return false;
+			return false;
 
 		// if use signs from person
 		if (this.getVersion() == 1)
@@ -444,10 +437,11 @@ public class R_SertifyPubKeys extends Transaction {
 	}
 
 	//
+	@Override
 	public int isValid(DCSet dcSet, Long releaserReference) {
-		
+
 		boolean creator_admin = false;
-		
+
 		int result = super.isValid(dcSet, releaserReference);
 		if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
 			long personsCount = dcSet.getItemPersonMap().getLastKey();
@@ -486,21 +480,24 @@ public class R_SertifyPubKeys extends Transaction {
 
 		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, dcSet);
 		if ( balERA.compareTo(
-						//BlockChain.MINOR_ERA_BALANCE_BD
-						BlockChain.MIN_GENERATING_BALANCE_BD
-					)<0
+				//BlockChain.MINOR_ERA_BALANCE_BD
+				BlockChain.MIN_GENERATING_BALANCE_BD
+				)<0
 				)
 			return Transaction.NOT_ENOUGH_RIGHTS;
-		
+
 		return Transaction.VALIDATE_OK;
 	}
 
 	//PROCESS/ORPHAN
-	
+
+	@Override
 	public void process(Block block, boolean asPack) {
 
 		//UPDATE SENDER
 		super.process(block, asPack);
+
+		DCSet db = this.dcSet;
 
 		int transactionIndex = -1;
 		int blockIndex = -1;
@@ -517,7 +514,7 @@ public class R_SertifyPubKeys extends Transaction {
 			transactionIndex = block.getTransactionSeq(signature);
 		}
 
-		
+
 		boolean personalized = false;
 		for (Account pkAccount: this.sertifiedPublicKeys) {
 			Tuple4<Long, Integer, Integer, Integer> info = pkAccount.getPersonDuration(db);
@@ -538,14 +535,14 @@ public class R_SertifyPubKeys extends Transaction {
 
 			// GET FEE from that record
 			transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
-			
+
 			// ISSUE NEW COMPU in chain
 			BigDecimal issued_FEE_BD = transPersonIssue.getFee();
 
 			// BACK FEE FOR ISSUER without gift for this.CREATOR
 			transPersonIssue.getCreator().changeBalance(db, false, FEE_KEY, issued_FEE_BD
 					.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
-		
+
 			// GIVE GIFTs
 			this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
 			pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
@@ -555,18 +552,18 @@ public class R_SertifyPubKeys extends Transaction {
 					.add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), false);
 
 		}
-		
+
 		int add_day = this.add_day;
 		// set to time stamp of record
-		int start_day = (int)(this.timestamp / 86400000); 
+		int start_day = (int)(this.timestamp / 86400000);
 		int end_day = start_day + add_day;
-		
+
 		Tuple3<Integer, Integer, Integer> itemP = new Tuple3<Integer, Integer, Integer>(end_day,
 				//Controller.getInstance().getHeight(), this.signature);
 				blockIndex, transactionIndex);
 		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, end_day,
 				blockIndex, transactionIndex);
-		
+
 		/*
 		Tuple5<Long, Long, byte[], Integer, Integer> psItem = db.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
 		if (psItem == null) {
@@ -578,7 +575,7 @@ public class R_SertifyPubKeys extends Transaction {
 							new byte[0],
 							blockIndex, transactionIndex));
 		}
-		*/
+		 */
 
 		// SET PERSON ADDRESS
 		String address;
@@ -587,7 +584,7 @@ public class R_SertifyPubKeys extends Transaction {
 			address = publicAccount.getAddress();
 			db.getAddressPersonMap().addItem(address, itemA);
 			db.getPersonAddressMap().addItem(this.key, address, itemP);
-			
+
 			if (!db.getAddressTime_SignatureMap().contains(address)) {
 				db.getAddressTime_SignatureMap().set(address, this.signature);
 			}
@@ -596,11 +593,13 @@ public class R_SertifyPubKeys extends Transaction {
 
 	}
 
+	@Override
 	public void orphan(boolean asPack) {
 
 		//UPDATE SENDER
 		super.orphan(asPack);
-								
+
+		DCSet db = this.dcSet;
 		//UPDATE RECIPIENT
 		String address;
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
@@ -609,7 +608,7 @@ public class R_SertifyPubKeys extends Transaction {
 			db.getAddressPersonMap().removeItem(address);
 			db.getPersonAddressMap().removeItem(this.key, address);
 		}
-		
+
 		boolean personalized = false;
 		for (Account pkAccount: this.sertifiedPublicKeys) {
 			if (pkAccount.getPersonDuration(db) != null) {
@@ -637,7 +636,7 @@ public class R_SertifyPubKeys extends Transaction {
 			// BACK FEE FOR ISSUER without gift for this.CREATOR
 			transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY, issued_FEE_BD
 					.subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), true);
-		
+
 			// GIVE GIFTs
 			this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, true);
 			pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, true);
@@ -663,22 +662,22 @@ public class R_SertifyPubKeys extends Transaction {
 	public HashSet<Account> getRecipientAccounts() {
 		HashSet<Account> accounts = new HashSet<Account>();
 		accounts.addAll(this.sertifiedPublicKeys);
-		
+
 		return accounts;
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
 		if(address.equals(creator.getAddress())) return true;
-		
+
 		for (PublicKeyAccount publicAccount: this.sertifiedPublicKeys)
 		{
 			if (address.equals(publicAccount.getAddress()))
-					return true;
+				return true;
 		}
-				
+
 		return false;
 	}
 

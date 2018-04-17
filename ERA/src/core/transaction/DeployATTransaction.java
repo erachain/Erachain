@@ -405,28 +405,28 @@ public class DeployATTransaction extends Transaction
 		//UPDATE ISSUER
 		super.process(block, asPack);
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
-		this.creator.changeBalance(db, true, Transaction.FEE_KEY, this.amount, false);
+		this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false);
 
 		//CREATE AT ID = ADDRESS
-		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
+		String atId = Crypto.getInstance().getATAddress( getBytesForAddress(this.dcSet) );
 
 		Account atAccount = new Account(atId);
 
 		//atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
-		atAccount.changeBalance(db, false, Transaction.FEE_KEY, this.amount, false);
+		atAccount.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false);
 
 		//UPDATE REFERENCE OF RECIPIENT
-		if( true || atAccount.getLastTimestamp(db) == null)
+		if( true || atAccount.getLastTimestamp(this.dcSet) == null)
 		{
-			atAccount.setLastTimestamp(this.timestamp, db);
+			atAccount.setLastTimestamp(this.timestamp, this.dcSet);
 		}
 
 		//CREATE AT - public key or address? Is that the correct height?
-		AT at = new AT( Base58.decode( atId ), Base58.decode(this.creator.getAddress()) , this.name , this.description, this.type, this.tags , this.creationBytes , db.getBlockMap().last().getHeight(db) + 1 );
+		AT at = new AT( Base58.decode( atId ), Base58.decode(this.creator.getAddress()) , this.name , this.description, this.type, this.tags , this.creationBytes , this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1 );
 
 		//INSERT INTO DATABASE
-		db.getATMap().add(at);
-		db.getATStateMap().addOrUpdate(at.getCreationBlockHeight(), at.getId(), at.getState());
+		this.dcSet.getATMap().add(at);
+		this.dcSet.getATStateMap().addOrUpdate(at.getCreationBlockHeight(), at.getId(), at.getState());
 
 	}
 
@@ -471,18 +471,18 @@ public class DeployATTransaction extends Transaction
 		//UPDATE ISSUER
 		super.orphan(asPack);
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
-		this.creator.changeBalance(db, false, Transaction.FEE_KEY, this.amount, true);
+		this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, true);
 
-		String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
+		String atId = Crypto.getInstance().getATAddress( getBytesForAddress(this.dcSet) );
 
 		Account atAccount = new Account(atId);
 
 		//UPDATE RECIPIENT
 		//atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
-		atAccount.changeBalance(db, true, Transaction.FEE_KEY, this.amount, true);
+		atAccount.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, true);
 
 		//UPDATE REFERENCE OF SENDER
-		this.creator.setLastTimestamp(this.reference, db);
+		this.creator.setLastTimestamp(this.reference, this.dcSet);
 
 	}
 

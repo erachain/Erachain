@@ -242,8 +242,9 @@ public class CancelOrderTransaction extends Transaction
 		super.orphan(asPack);
 
 		//ADD TO DATABASE
-		Order order = db.getCompletedOrderMap().get(this.order);
-		orphan_it(db, order);
+		Order order = this.dcSet.getCompletedOrderMap().get(this.order);
+		order.setDC(this.dcSet);
+		orphan_it(this.dcSet, order);
 	}
 
 	@Override

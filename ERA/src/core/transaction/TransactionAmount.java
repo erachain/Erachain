@@ -627,6 +627,8 @@ public abstract class TransactionAmount extends Transaction {
 
 		super.process(block, asPack);
 
+		DCSet db = this.dcSet;
+
 		if (this.amount == null)
 			return;
 
@@ -705,6 +707,8 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (this.amount == null)
 			return;
+
+		DCSet db = this.dcSet;
 
 		int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
 		if (amount_sign == 0)

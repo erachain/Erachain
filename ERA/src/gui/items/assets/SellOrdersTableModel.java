@@ -9,7 +9,6 @@ import controller.Controller;
 import core.BlockChain;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
-import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
@@ -125,7 +124,7 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 
 
 			// It shows unacceptably small amount of red.
-			BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
+			BigDecimal increment = order.calculateBuyIncrement();
 			BigDecimal amount = order.getAmountHaveLeft();
 			String amountStr = NumberAsString.getInstance().numberAsString(order.getAmountHaveLeft());
 			amount = amount.subtract(amount.remainder(increment));

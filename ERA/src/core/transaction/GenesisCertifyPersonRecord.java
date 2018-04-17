@@ -1,32 +1,21 @@
 package core.transaction;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.mapdb.Fun.Tuple2;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
-import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 import core.account.Account;
-import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.statuses.StatusCls;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
 
 public class GenesisCertifyPersonRecord extends Genesis_Record {
 
@@ -37,15 +26,15 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 
 	private Account recipient;
 	private long key;
-	
-	public GenesisCertifyPersonRecord(Account recipient, long key) 
+
+	public GenesisCertifyPersonRecord(Account recipient, long key)
 	{
 		super(TYPE_ID, NAME_ID);
 		this.recipient = recipient;
 		this.key = key;
 		this.generateSignature();
 	}
-	
+
 	//GETTERS/SETTERS
 	//public static String getName() { return NAME; }
 
@@ -53,71 +42,73 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	{
 		return this.recipient;
 	}
-		
+
+	@Override
 	public long getKey()
 	{
 		return this.key;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
-	public JSONObject toJson() 
+	public JSONObject toJson()
 	{
 		//GET BASE
 		JSONObject transaction = super.toJson();
-				
+
 		//ADD CREATOR/RECIPIENT/AMOUNT/ASSET
 		transaction.put("recipient", this.recipient.getAddress());
 		transaction.put("person", this.key);
-				
-		return transaction;	
+
+		return transaction;
 	}
 
 	//PARSE/CONVERT
-	
+
 	public static Transaction Parse(byte[] data) throws Exception{
-		
+
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if(data.length < BASE_LENGTH)
 		{
 			throw new Exception("Data does not match block length: " + data.length + " in " + NAME_ID);
 		}
-		
+
 		// READ TYPE
 		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
 		int position = SIMPLE_TYPE_LENGTH;
-					
+
 		//READ RECIPIENT
 		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
 		Account recipient = new Account(Base58.encode(recipientBytes));
 		position += RECIPIENT_LENGTH;
-		
+
 		//READ KEY
 		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-		long key = Longs.fromByteArray(keyBytes);	
+		long key = Longs.fromByteArray(keyBytes);
 		position += KEY_LENGTH;
-						
-		return new GenesisCertifyPersonRecord(recipient, key);	
-	}	
-	
+
+		return new GenesisCertifyPersonRecord(recipient, key);
+	}
+
 	//@Override
+	@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference)
 	{
 		byte[] data = super.toBytes(withSign, releaserReference);
-				
+
 		//WRITE RECIPIENT
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
-		
+
 		//WRITE KEY
 		byte[] keyBytes = Longs.toByteArray(this.key);
 		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
 		data = Bytes.concat(data, keyBytes);
-						
+
 		return data;
 	}
 
 	@Override
-	public int getDataLength(boolean asPack) 
+	public int getDataLength(boolean asPack)
 	{
 		return BASE_LENGTH;
 	}
@@ -126,9 +117,9 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference) 
+	public int isValid(DCSet db, Long releaserReference)
 	{
-		
+
 		//CHECK IF RECIPIENT IS VALID ADDRESS
 		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
 		{
@@ -139,14 +130,14 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 		}
-				
+
 		return VALIDATE_OK;
 	}
 
 	//PROCESS/ORPHAN
-	
+
 	@Override
-	public void process(Block block, boolean asPack) 
+	public void process(Block block, boolean asPack)
 	{
 
 		//Block block = new GenesisBlock();
@@ -154,21 +145,21 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		int blockIndex = -1;
 		//Block block = this.getBlock(db);// == null (((
 		if (block == null) {
-			blockIndex = db.getBlockMap().last().getHeight(db);
+			blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet);
 		} else {
-			blockIndex = block.getHeight(db);
+			blockIndex = block.getHeight(this.dcSet);
 			if (blockIndex < 1 ) {
 				// if block not is confirmed - get last block + 1
-				blockIndex = db.getBlockMap().last().getHeight(db) + 1;
+				blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1;
 			}
 			//transactionIndex = this.getSeqNo(db);
 			transactionIndex = block.getTransactionSeq(signature);
 		}
-		
+
 		//UPDATE RECIPIENT
-		Tuple5<Long, Long, byte[], Integer, Integer> itemP = 
+		Tuple5<Long, Long, byte[], Integer, Integer> itemP =
 				new Tuple5<Long, Long, byte[], Integer, Integer>
-					(timestamp, Long.MAX_VALUE, null, blockIndex, transactionIndex);
+		(timestamp, Long.MAX_VALUE, null, blockIndex, transactionIndex);
 
 		// SET ALIVE PERSON for DURATION permanent
 		///db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
@@ -176,32 +167,32 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		// SET PERSON ADDRESS - end date as timestamp
 		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
 		Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
-		db.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
-		db.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
-		
+		this.dcSet.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
+		this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
+
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastTimestamp(this.timestamp, db);
+		this.recipient.setLastTimestamp(this.timestamp, this.dcSet);
 	}
 
 	@Override
-	public void orphan(boolean asPack) 
+	public void orphan(boolean asPack)
 	{
-								
+
 		// UNDO ALIVE PERSON for DURATION
 		//db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
 		//UPDATE RECIPIENT
-		db.getAddressPersonMap().removeItem(this.recipient.getAddress());
-		db.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
+		this.dcSet.getAddressPersonMap().removeItem(this.recipient.getAddress());
+		this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
 		//UPDATE REFERENCE OF CREATOR
-		// not needthis.creator.setLastReference(this.reference, db);		
+		// not needthis.creator.setLastReference(this.reference, db);
 		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.removeLastTimestamp(db);
+		this.recipient.removeLastTimestamp(this.dcSet);
 	}
 
 	//REST
-	
+
 	@Override
 	public HashSet<Account> getRecipientAccounts()
 	{
@@ -209,17 +200,17 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 		accounts.add(this.recipient);
 		return accounts;
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
-		
+
 		if(address.equals(recipient.getAddress()))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 

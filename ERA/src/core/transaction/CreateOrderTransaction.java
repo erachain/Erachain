@@ -378,7 +378,9 @@ public class CreateOrderTransaction extends Transaction {
 		// PROCESS ORDER
 		// NEED COPY for check block.isValid() and not modify ORDER for
 		// block.process
-		this.order.copy().process(db, this);
+		Order orderThis = this.order.copy();
+		orderThis.setDC(this.dcSet);
+		orderThis.process(this);
 	}
 
 	// @Override
@@ -388,7 +390,9 @@ public class CreateOrderTransaction extends Transaction {
 		super.orphan(asPack);
 
 		// ORPHAN ORDER
-		this.order.copy().orphan(db);
+		Order orderThis = this.order.copy();
+		orderThis.setDC(this.dcSet);
+		orderThis.orphan();
 	}
 
 	@Override
