@@ -15,17 +15,17 @@ public class AssetUnique extends AssetCls {
 
 	private static final int TYPE_ID = AssetCls.UNIQUE;
 
-	public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
 	{
-		super(typeBytes, owner, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description, scale, asset_type);
 	}
-	public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description);
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, scale, asset_type);
 	}
-	public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
+	public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)0}, owner, name, icon, image, description);
+		this(new byte[]{(byte)TYPE_ID, (byte)0}, owner, name, icon, image, description, scale, asset_type);
 	}
 
 	//GETTERS/SETTERS
@@ -114,8 +114,19 @@ public class AssetUnique extends AssetCls {
 		String description = new String(descriptionBytes, StandardCharsets.UTF_8);
 		position += descriptionLength;
 
+		//READ SCALE
+		byte[] scaleBytes = Arrays.copyOfRange(data, position, position + SCALE_LENGTH);
+		byte scale = scaleBytes[0];
+		position += SCALE_LENGTH;
+
+		//READ ASSET TYPE
+		byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
+		//boolean divisable = divisibleBytes[0] == 1;
+		position += ASSET_TYPE_LENGTH;
+
+
 		//RETURN
-		AssetUnique statement = new AssetUnique(typeBytes, owner, name, icon, image, description);
+		AssetUnique statement = new AssetUnique(typeBytes, owner, name, icon, image, description, scale, assetTypeBytes[0]);
 
 		if (includeReference)
 		{

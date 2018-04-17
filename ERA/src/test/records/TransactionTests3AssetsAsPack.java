@@ -70,7 +70,7 @@ public class TransactionTests3AssetsAsPack {
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
-		asset = new AssetVenture(maker, "a", icon, image, "a", false, 50000l, (byte) 2, true);
+		asset = new AssetVenture(maker, "a", icon, image, "a", false, (byte) 2, 50000l, true);
 		//key = asset.getKey();
 
 		releaserReference = maker.getLastTimestamp(db);
@@ -87,7 +87,7 @@ public class TransactionTests3AssetsAsPack {
 		init();
 
 		//CREATE ASSET
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje");
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
@@ -114,7 +114,7 @@ public class TransactionTests3AssetsAsPack {
 		init();
 
 		//CREATE SIGNATURE
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje");
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
 		LOGGER.info("asset: " + asset.getType()[0] + ", " + asset.getType()[1]);
 		boolean includeReference = false;
 		byte [] raw = asset.toBytes(includeReference, false);
@@ -202,7 +202,7 @@ public class TransactionTests3AssetsAsPack {
 
 		init();
 
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje");
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
@@ -238,7 +238,7 @@ public class TransactionTests3AssetsAsPack {
 
 		init();
 
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje");
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
@@ -272,7 +272,7 @@ public class TransactionTests3AssetsAsPack {
 
 		init();
 
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje");
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);

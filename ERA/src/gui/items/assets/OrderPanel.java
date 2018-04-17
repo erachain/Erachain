@@ -442,17 +442,9 @@ public class OrderPanel extends JPanel
 			BigDecimal price = new BigDecimal(txtPrice.getText());
 
 			if (buying) {
-				if (this.have.isDivisible()) {
-					target.setText(price.multiply(amount).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_UP).toPlainString());
-				} else {
-					target.setText(price.multiply(amount).setScale(3, RoundingMode.HALF_UP).toPlainString());
-				}
+				target.setText(price.multiply(amount).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_UP).toPlainString());
 			} else {
-				if (this.want.isDivisible()) {
-					target.setText(price.multiply(amount).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_UP).toPlainString());
-				} else {
-					target.setText(price.multiply(amount).setScale(3, RoundingMode.HALF_UP).toPlainString());
-				}
+				target.setText(price.multiply(amount).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_UP).toPlainString());
 			}
 			BigDecimal r = new BigDecimal(target.getText());
 			if (!r.equals(new BigDecimal("0.00000000"))) sellButton.setEnabled(true);

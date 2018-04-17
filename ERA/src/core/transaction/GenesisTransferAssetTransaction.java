@@ -230,16 +230,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 			}
 		}
 
-		//CHECK IF AMOUNT IS DIVISIBLE
-		// genesis assets not in DB yet and need take it from genesis maker
-		if(!GenesisBlock.makeAsset((int)this.getAbsKey()).isDivisible())
-		{
-			//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if(this.getAmount().stripTrailingZeros().scale() > 0)
-			{
-				//AMOUNT HAS DECIMALS
-				return INVALID_AMOUNT;
-			}
+		// CHECK IF AMOUNT wrong SCALE
+		if (this.getAmount().scale() != GenesisBlock.makeAsset((int)this.getAbsKey()).getScale()) {
+			return AMOUNT_SCALE_WRONG;
 		}
 
 		//CHECK IF AMOUNT IS POSITIVE

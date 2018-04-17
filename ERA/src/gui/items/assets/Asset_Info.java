@@ -130,7 +130,7 @@ public class Asset_Info extends JTextPane {
 		text += "<div><b>"+ Lang.getInstance().translate("Name") + ": </b>" + asset.getName() + "</div>";
 		text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
 		text += "<div><b>" + Lang.getInstance().translate("Owner") + ": </b><a href = '!!Owner'>" + hl_Owner.get_Text() + "</a></div>";
-		text += "<div><b>" + Lang.getInstance().translate("Divisible") + ": </b>" + Lang.getInstance().translate(asset.isDivisible()+"") +"</div>";
+		text += "<div><b>" + Lang.getInstance().translate("TYPE") + ": </b>" + Lang.getInstance().translate(asset.viewAssetType()+"") +"</div>";
 		text += "<div></b>" + Lang.getInstance().translate("Quantity") + ": </b>" + asset.getQuantity() +"</div><<BR></td></tr></table>";
 		text +="<div>";
 

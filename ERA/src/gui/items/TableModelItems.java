@@ -14,7 +14,7 @@ public class TableModelItems extends TableModelCls<Long, ItemCls>
 	//public static final int COLUMN_NAME = 1;
 	//public static final int COLUMN_ADDRESS = 2;
 	//public static final int COLUMN_AMOUNT = 3;
-	//public static final int COLUMN_DIVISIBLE = 4;
+	//public static final int COLUMN_ASSET_TYPE = 4;
 
 	protected ArrayList<ItemCls> list;
 	protected Item_Map db;

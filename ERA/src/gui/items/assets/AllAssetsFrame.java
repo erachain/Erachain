@@ -101,7 +101,7 @@ public class AllAssetsFrame extends JFrame{
 		movableColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
 		//CHECKBOX FOR DIVISIBLE
-		TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_DIVISIBLE);
+		TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_ASSET_TYPE);
 		divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 		
 		//CHECKBOX FOR FAVORITE

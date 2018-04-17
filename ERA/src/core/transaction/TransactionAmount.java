@@ -409,16 +409,6 @@ public abstract class TransactionAmount extends Transaction {
 
 					if (amount_sign != 0) {
 
-						if(!asset.isDivisible())
-						{
-							//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-							if(this.amount.stripTrailingZeros().scale() > 0)
-							{
-								//AMOUNT HAS DECIMALS
-								return AMOUNT_DIVISIBLE;
-							}
-						}
-
 						int actionType = Account.actionType(key, amount);
 
 						if (actionType == 3) {

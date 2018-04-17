@@ -224,14 +224,7 @@ public class PayDividendFrame extends JFrame
 				BigDecimal accountAmount = amount.multiply(percentage);
 
 				//ROUND AMOUNT
-				if(assetToPay.isDivisible())
-				{
-					accountAmount = accountAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
-				}
-				else
-				{
-					accountAmount = accountAmount.setScale(0, RoundingMode.DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-				}
+				accountAmount = accountAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
 
 				//CHECK IF AMOUNT NOT ZERO
 				if(accountAmount.compareTo(BigDecimal.ZERO) > 0)

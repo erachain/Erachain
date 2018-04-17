@@ -27,7 +27,7 @@ public class Model_Hashes_info extends AbstractTableModel {
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	// public static final int COLUMN_AMOUNT = 3;
-	// public static final int COLUMN_DIVISIBLE = 4;
+	// public static final int COLUMN_ASSET_TYPE = 4;
 	Stack<Tuple3<Long, Integer, Integer>> hashs = null;
 	DCSet db;
 	HashesSignsMap map;

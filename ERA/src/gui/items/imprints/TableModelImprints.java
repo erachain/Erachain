@@ -20,7 +20,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 	public static final int COLUMN_NAME = 1;
 	public static final int COLUMN_ADDRESS = 2;
 	//public static final int COLUMN_AMOUNT = 3;
-	//public static final int COLUMN_DIVISIBLE = 4;
+	//public static final int COLUMN_ASSET_TYPE = 4;
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true};
 	private SortableList<Long, ImprintCls> imprints;
 	

@@ -258,16 +258,10 @@ public class MultiPaymentTransaction extends Transaction {
 				return NO_BALANCE;
 			}
 
-			//CHECK IF AMOUNT IS DIVISIBLE
-			AssetCls aa = (AssetCls)db.getItemAssetMap().get(payment.getAsset());
-			if(!aa.isDivisible())
-			{
-				//CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-				if(payment.getAmount().stripTrailingZeros().scale() > 0)
-				{
-					//AMOUNT HAS DECIMALS
-					return INVALID_AMOUNT;
-				}
+			// CHECK IF AMOUNT wrong SCALE
+			AssetCls asset = (AssetCls) db.getItemAssetMap().get(payment.getAsset());
+			if (payment.getAmount().scale() != asset.getScale()) {
+				return AMOUNT_SCALE_WRONG;
 			}
 
 			//PROCESS PAYMENT IN FORK

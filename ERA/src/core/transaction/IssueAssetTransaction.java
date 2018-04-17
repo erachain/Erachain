@@ -131,9 +131,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		JSONObject transaction = super.toJson();
 		AssetCls asset = (AssetCls)this.getItem();
 		//ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-		transaction.put("quantity", asset.getQuantity());
-		transaction.put("scale", asset.getScale());
-		transaction.put("divisible", asset.isDivisible());
+		transaction.put("asset", asset.toJson());
 
 		return transaction;
 	}

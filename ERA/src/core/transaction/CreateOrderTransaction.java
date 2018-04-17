@@ -317,15 +317,6 @@ public class CreateOrderTransaction extends Transaction {
 
 		}
 
-		// CHECK IF HAVE IS NOT DIVISBLE
-		if (!haveAsset.isDivisible()) {
-			// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if (amountHave.stripTrailingZeros().scale() > 0) {
-				// AMOUNT HAS DECIMALS
-				return INVALID_AMOUNT;
-			}
-		}
-
 		// CHECK IF WANT EXISTS
 		AssetCls wantAsset = this.order.getWantAsset(db);
 		if (wantAsset == null) {
@@ -337,15 +328,6 @@ public class CreateOrderTransaction extends Transaction {
 		Long maxWant = wantAsset.getQuantity();
 		if (maxWant > 0 && new BigDecimal(maxWant).compareTo(amountWant) < 0)
 			return INVALID_QUANTITY;
-
-		// CHECK IF WANT IS NOT DIVISIBLE
-		if (!wantAsset.isDivisible()) {
-			// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-			if (amountWant.stripTrailingZeros().scale() > 0) {
-				// AMOUNT HAS DECIMALS
-				return INVALID_RETURN;
-			}
-		}
 
 		// for PARSE and toBYTES need only AMOUNT_LENGTH bytes
 		// and SCALE

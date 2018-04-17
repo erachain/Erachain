@@ -61,6 +61,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		this(new byte[]{ArbitraryTransaction.TYPE_ID, 0, 0, 0}, creator, payments, service, data, feePow, timestamp, reference);
 	}
 
+	@Override
 	public boolean hasPublicText() {
 		return true;
 	}
@@ -198,17 +199,17 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 	}
 
 	@Override
-	public int getDataLength(boolean asPack) 
+	public int getDataLength(boolean asPack)
 	{
 		int paymentsLength = 0;
 		for(Payment payment: this.getPayments())
 		{
 			paymentsLength += payment.getDataLength();
 		}
-		
+
 		return BASE_LENGTH + this.data.length +  paymentsLength;
 	}
-	
+
 	// VALIDATE
 
 	/*
@@ -221,9 +222,10 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		return Crypto.getInstance().verify(this.creator.getPublicKey(),
 				this.signature, data);
 	}
-	*/
+	 */
 
 	//@Override
+	@Override
 	public int isValid(DCSet db, Long releaserReference) {
 
 		// CHECK PAYMENTS SIZE
@@ -239,7 +241,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		// REMOVE FEE
 		DCSet fork = db.fork();
 		super.process(this.block, false);
-		
+
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {
 			// CHECK IF RECIPIENT IS VALID ADDRESS
@@ -259,14 +261,10 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 				return NO_BALANCE;
 			}
 
-			// CHECK IF AMOUNT IS DIVISIBLE
-			AssetCls aa = (AssetCls) db.getItemAssetMap().get(payment.getAsset());
-			if (!aa.isDivisible()) {
-				// CHECK IF AMOUNT DOES NOT HAVE ANY DECIMALS
-				if (payment.getAmount().stripTrailingZeros().scale() > 0) {
-					// AMOUNT HAS DECIMALS
-					return INVALID_AMOUNT;
-				}
+			// CHECK IF AMOUNT wrong SCALE
+			AssetCls asset = (AssetCls) db.getItemAssetMap().get(payment.getAsset());
+			if (payment.getAmount().scale() != asset.getScale()) {
+				return AMOUNT_SCALE_WRONG;
 			}
 
 			// PROCESS PAYMENT IN FORK
@@ -276,6 +274,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		return super.isValid(fork, releaserReference);
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return calcCommonFee();
 	}

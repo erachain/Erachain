@@ -303,7 +303,7 @@ public class TransactionCreator
 		//TIME
 		long time = NTP.getTime();
 								
-		AssetCls asset = new AssetVenture(creator, name, icon, image, description, movable, quantity, scale, divisible);
+		AssetCls asset = new AssetVenture(creator, name, icon, image, description, movable, scale, quantity, divisible);
 							
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, 0l);										

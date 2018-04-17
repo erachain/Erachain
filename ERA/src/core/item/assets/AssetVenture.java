@@ -21,27 +21,24 @@ import datachain.DCSet;
 public class AssetVenture extends AssetCls {
 
 	protected static final int QUANTITY_LENGTH = 8;
-	protected static final int SCALE_LENGTH = 1;
-	protected static final int DIVISIBLE_LENGTH = 1;
 
 	private static final int TYPE_ID = AssetCls.VENTURE;
 
 	protected long quantity = 0;
 
-	public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, long quantity, byte scale, boolean divisible)
+	public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
 	{
-		super(typeBytes, owner, name, icon, image, description);
+		super(typeBytes, owner, name, icon, image, description, scale, asset_type);
 		this.quantity = quantity;
-		this.divisible = divisible;
-		this.scale = scale;
 	}
-	public AssetVenture(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, long quantity, byte scale, boolean divisible)
+	public AssetVenture(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, quantity, scale, divisible);
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, scale, asset_type, quantity);
 	}
-	public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, boolean movable, long quantity, byte scale, boolean divisible)
+	public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
 	{
-		this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, icon, image, description, quantity, scale, divisible);
+		//this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, asset_type, icon, image, description, quantity, scale);
+		this(new byte[]{(byte)TYPE_ID}, owner, name, icon, image, description, scale, asset_type, quantity);
 	}
 
 	//GETTERS/SETTERS
@@ -73,10 +70,6 @@ public class AssetVenture extends AssetCls {
 		}
 	}
 
-	@Override
-	public boolean isDivisible() {
-		return this.divisible;
-	}
 
 	//PARSE
 	// includeReference - TRUE only for store in local DB
@@ -166,13 +159,13 @@ public class AssetVenture extends AssetCls {
 		byte scale = scaleBytes[0];
 		position += SCALE_LENGTH;
 
-		//READ DIVISABLE
-		byte[] divisibleBytes = Arrays.copyOfRange(data, position, position + DIVISIBLE_LENGTH);
-		boolean divisable = divisibleBytes[0] == 1;
-		position += DIVISIBLE_LENGTH;
+		//READ ASSET TYPE
+		byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
+		//boolean divisable = divisibleBytes[0] == 1;
+		position += ASSET_TYPE_LENGTH;
 
 		//RETURN
-		AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, quantity, scale, divisable);
+		AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, scale, assetTypeBytes[0], quantity);
 		if (includeReference)
 		{
 			venture.setReference(reference);
@@ -192,14 +185,15 @@ public class AssetVenture extends AssetCls {
 		//WRITE SCALE_LENGTH
 		//byte[] scaleBytes = new byte[this.scale];
 		byte[] scaleBytes = new byte[1];
-		scaleBytes[0] = this.scale;
+		scaleBytes[0] = (byte)this.scale;
 		data = Bytes.concat(data, scaleBytes);
 
 
-		//WRITE DIVISIBLE
-		byte[] divisibleBytes = new byte[1];
-		divisibleBytes[0] = (byte) (this.divisible == true ? 1 : 0);
-		data = Bytes.concat(data, divisibleBytes);
+		//WRITE ASSET TYPE
+		byte[] assetTypeBytes = new byte[1];
+		//assetTypeBytes[0] = (byte) (this.divisible == true ? 1 : 0);
+		assetTypeBytes[0] = (byte)this.asset_type;
+		data = Bytes.concat(data, assetTypeBytes);
 
 		return data;
 	}
@@ -208,7 +202,7 @@ public class AssetVenture extends AssetCls {
 	public int getDataLength(boolean includeReference)
 	{
 		return super.getDataLength(includeReference)
-				+ SCALE_LENGTH + QUANTITY_LENGTH + DIVISIBLE_LENGTH;
+				+ QUANTITY_LENGTH;
 	}
 
 	//OTHER
@@ -220,9 +214,6 @@ public class AssetVenture extends AssetCls {
 
 		// ADD DATA
 		assetJSON.put("quantity", this.getQuantity());
-		assetJSON.put("scale", this.getScale());
-		assetJSON.put("divisible", this.isDivisible());
-		assetJSON.put("movable", this.isMovable());
 
 		return assetJSON;
 	}
