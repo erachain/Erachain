@@ -825,9 +825,9 @@ function assets(data)
 	
 		table += '<td>' + fformat(data.assets[key].description).substr(0, 100);
 		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
-		table += '<td>' + htmlFilter(data.assets[key].isMovable);
+		table += '<td>' + htmlFilter(data.assets[key].assetType);
 		table += '<td>' +data.assets[key].quantity;
-		table += '<td>' + htmlFilter(data.assets[key].isDivisible);
+		table += '<td>' + htmlFilter(data.assets[key].scale);
 	}
 		table += '<tr><td colspan=4>';
 //	if(data.maxHeight != data.lastBlock.height)
@@ -900,8 +900,12 @@ function asset(data)
 	
 	output += '<br><br>';
 	
-	output += '<b>'   + data.asset.label_Divisible + ':</b> ' + data.asset.this.isDivisible;
+	output += '<b>'   + data.asset.label_Scale + ':</b> ' + data.asset.this.scale;
 		
+	output += '<br><br>';
+
+	output += '<b>'   + data.asset.label_AssetType + ':</b> ' + data.asset.this.assetType;
+	
 	output += '<br><br>';
 	
 	output += '<b> ' +data.asset.label_Quantity + ':</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);	

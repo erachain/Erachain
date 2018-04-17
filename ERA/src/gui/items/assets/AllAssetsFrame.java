@@ -15,18 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import gui.CoreRowSorter;
-import gui.library.MTable;
-import gui.models.WalletItemAssetsTableModel;
-import lang.Lang;
-
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -34,16 +28,19 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 
 import core.item.assets.AssetCls;
+import gui.CoreRowSorter;
+import gui.library.MTable;
+import lang.Lang;
 
 @SuppressWarnings("serial")
 public class AllAssetsFrame extends JFrame{
-	
+
 	private TableModelItemAssets tableModelItemAssets;
 
 	public AllAssetsFrame() {
-		
+
 		super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("All Assets"));
-		
+
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
@@ -51,59 +48,55 @@ public class AllAssetsFrame extends JFrame{
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 		this.setIconImages(icons);
-		
+
 		//CLOSE
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		
+
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
-		
+
 		//PADDING
 		((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5, 5, 5));
-		
+
 		//SEACH LABEL GBC
 		GridBagConstraints searchLabelGBC = new GridBagConstraints();
 		searchLabelGBC.insets = new Insets(0, 5, 5, 0);
-		searchLabelGBC.fill = GridBagConstraints.HORIZONTAL;   
+		searchLabelGBC.fill = GridBagConstraints.HORIZONTAL;
 		searchLabelGBC.anchor = GridBagConstraints.NORTHWEST;
-		searchLabelGBC.weightx = 0;	
+		searchLabelGBC.weightx = 0;
 		searchLabelGBC.gridwidth = 1;
 		searchLabelGBC.gridx = 0;
 		searchLabelGBC.gridy = 0;
-		
+
 		//SEACH GBC
 		GridBagConstraints searchGBC = new GridBagConstraints();
 		searchGBC.insets = new Insets(0, 5, 5, 0);
-		searchGBC.fill = GridBagConstraints.HORIZONTAL;   
+		searchGBC.fill = GridBagConstraints.HORIZONTAL;
 		searchGBC.anchor = GridBagConstraints.NORTHWEST;
-		searchGBC.weightx = 1;	
+		searchGBC.weightx = 1;
 		searchGBC.gridwidth = 1;
 		searchGBC.gridx = 1;
 		searchGBC.gridy = 0;
-		
+
 		//TABLE GBC
 		GridBagConstraints tableGBC = new GridBagConstraints();
 		tableGBC.insets = new Insets(0, 5, 5, 0);
-		tableGBC.fill = GridBagConstraints.BOTH;  
+		tableGBC.fill = GridBagConstraints.BOTH;
 		tableGBC.anchor = GridBagConstraints.NORTHWEST;
-		tableGBC.weightx = 1;	
-		tableGBC.weighty = 1;	
+		tableGBC.weightx = 1;
+		tableGBC.weighty = 1;
 		tableGBC.gridwidth = 2;
-		tableGBC.gridx = 0;	
-		tableGBC.gridy = 1;	
-		
+		tableGBC.gridx = 0;
+		tableGBC.gridy = 1;
+
 		//CREATE TABLE
 		this.tableModelItemAssets = new TableModelItemAssets();
 		final MTable assetsTable = new MTable(this.tableModelItemAssets);
-		
-		//CHECKBOX FOR MOVABLE
-		TableColumn movableColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_MOVABLE);
-		movableColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
 
-		//CHECKBOX FOR DIVISIBLE
+		//CHECKBOX FOR ASSET TYPE
 		TableColumn divisibleColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_ASSET_TYPE);
 		divisibleColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
-		
+
 		//CHECKBOX FOR FAVORITE
 		TableColumn favoriteColumn = assetsTable.getColumnModel().getColumn(TableModelItemAssets.COLUMN_FAVORITE);
 		favoriteColumn.setCellRenderer(assetsTable.getDefaultRenderer(Boolean.class));
@@ -112,20 +105,23 @@ public class AllAssetsFrame extends JFrame{
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 		CoreRowSorter sorter = new CoreRowSorter(this.tableModelItemAssets, indexes);
 		assetsTable.setRowSorter(sorter);
-		
+
 		//CREATE SEARCH FIELD
 		final JTextField txtSearch = new JTextField();
 
 		// UPDATE FILTER ON TEXT CHANGE
 		txtSearch.getDocument().addDocumentListener(new DocumentListener() {
+			@Override
 			public void changedUpdate(DocumentEvent e) {
 				onChange();
 			}
 
+			@Override
 			public void removeUpdate(DocumentEvent e) {
 				onChange();
 			}
 
+			@Override
 			public void insertUpdate(DocumentEvent e) {
 				onChange();
 			}
@@ -135,7 +131,7 @@ public class AllAssetsFrame extends JFrame{
 				// GET VALUE
 				String search = txtSearch.getText();
 
-			 	// SET FILTER
+				// SET FILTER
 				tableModelItemAssets.getSortableList().setFilter(search);
 				tableModelItemAssets.fireTableDataChanged();
 			}
@@ -145,6 +141,7 @@ public class AllAssetsFrame extends JFrame{
 		JPopupMenu nameSalesMenu = new JPopupMenu();
 		JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
 		details.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				int row = assetsTable.getSelectedRow();
 				row = assetsTable.convertRowIndexToModel(row);
@@ -162,7 +159,7 @@ public class AllAssetsFrame extends JFrame{
 				Point p = e.getPoint();
 				int row = assetsTable.rowAtPoint(p);
 				assetsTable.setRowSelectionInterval(row, row);
-				
+
 				if(e.getClickCount() == 2)
 				{
 					row = assetsTable.convertRowIndexToModel(row);
@@ -175,7 +172,7 @@ public class AllAssetsFrame extends JFrame{
 		this.add(new JLabel(Lang.getInstance().translate("search") + ":"), searchLabelGBC);
 		this.add(txtSearch, searchGBC);
 		this.add(new JScrollPane(assetsTable), tableGBC);
-		
+
 		//PACK
 		this.pack();
 		//this.setSize(500, this.getHeight());
@@ -184,5 +181,5 @@ public class AllAssetsFrame extends JFrame{
 		this.setVisible(true);
 	}
 
-	
+
 }

@@ -1010,12 +1010,14 @@ public class BlockExplorer
 			//assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(DCSet.getInstance())));
-			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
-			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
-			assetJSON.put("isDivisible", a);
-			a =  Lang.getInstance().translate_from_langObj("False",langObj);
-			if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
-			assetJSON.put("isMovable", a);
+			assetJSON.put("scale", asset.getScale());
+			//String a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			//if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			//assetJSON.put("isDivisible", a);
+			assetJSON.put("assetType", asset.viewAssetType());
+			//a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			//if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			//assetJSON.put("isMovable", a);
 
 			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
 			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
@@ -1065,12 +1067,14 @@ public class BlockExplorer
 			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(dcSet)));
-			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
-			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
-			assetJSON.put("isDivisible", a);
-			a =  Lang.getInstance().translate_from_langObj("False",langObj);
-			if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
-			assetJSON.put("isMovable", a);
+			assetJSON.put("scale", asset.getScale());
+			//String a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			//if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			//assetJSON.put("isDivisible", a);
+			assetJSON.put("assetType", asset.viewAssetType());
+			//a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			//if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			//assetJSON.put("isMovable", a);
 
 			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
 			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
@@ -1147,12 +1151,14 @@ public class BlockExplorer
 			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
 			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString( asset.getTotalQuantity(dcSet)));
-			String a =  Lang.getInstance().translate_from_langObj("False",langObj);
-			if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
-			assetJSON.put("isDivisible", a);
-			a =  Lang.getInstance().translate_from_langObj("False",langObj);
-			if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
-			assetJSON.put("isMovable", a);
+			assetJSON.put("scale", asset.getScale());
+			//String a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			//if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			//assetJSON.put("isDivisible", a);
+			assetJSON.put("assetType", asset.viewAssetType());
+			//a =  Lang.getInstance().translate_from_langObj("False",langObj);
+			//if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+			//assetJSON.put("isMovable", a);
 
 			assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
 			assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
@@ -1543,9 +1549,14 @@ public class BlockExplorer
 		assetJSON.put("description", asset.getDescription());
 		assetJSON.put("owner", asset.getOwner().getAddress());
 		assetJSON.put("quantity", asset.getQuantity());
-		String divis = Lang.getInstance().translate_from_langObj("False", langObj);
-		if (asset.isDivisible()) divis = Lang.getInstance().translate_from_langObj("True", langObj);
-		assetJSON.put("isDivisible",divis );
+		assetJSON.put("scale", asset.getScale());
+		//String a =  Lang.getInstance().translate_from_langObj("False",langObj);
+		//if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+		//assetJSON.put("isDivisible", a);
+		assetJSON.put("assetType", asset.viewAssetType());
+		//a =  Lang.getInstance().translate_from_langObj("False",langObj);
+		//if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
+		//assetJSON.put("isMovable", a);
 		assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
 		assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 

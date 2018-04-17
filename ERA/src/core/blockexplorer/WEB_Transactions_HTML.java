@@ -217,8 +217,8 @@ public class WEB_Transactions_HTML {
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" +asset.getName();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" +asset.getDescription();
 		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" +asset.getQuantity().toString();
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isDivisible()+"", langObj) ;
-		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.isMovable()+"", langObj) ;
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Scale", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.getScale()+"", langObj) ;
+		out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Asset Type", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.viewAssetType()+"", langObj) ;
 		return out;
 	}
 
@@ -512,11 +512,11 @@ public class WEB_Transactions_HTML {
 				+ tr.getItem().getDescription() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
 				+ ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
-		out += "<b>" + Lang.getInstance().translate_from_langObj("Divisible", langObj) + ":</b> "
-				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isDivisible() + "", langObj)
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Scale", langObj) + ":</b> "
+				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).getScale() + "", langObj)
 				+ "<br>";
-		out += "<b>" + Lang.getInstance().translate_from_langObj("Movable", langObj) + ":</b> "
-				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).isMovable() + "", langObj)
+		out += "<b>" + Lang.getInstance().translate_from_langObj("Asset Type", langObj) + ":</b> "
+				+ Lang.getInstance().translate_from_langObj(((AssetCls) tr.getItem()).viewAssetType() + "", langObj)
 				+ "<br>";
 
 

@@ -156,6 +156,7 @@ public class Order implements Comparable<Order>
 		return (AssetCls)db.getItemAssetMap().get(this.want);
 	}
 
+	/*
 	//////////// DIVISIBLE
 	public boolean isHaveDivisible(DCSet db)
 	{
@@ -188,6 +189,7 @@ public class Order implements Comparable<Order>
 
 		return amount.stripTrailingZeros().scale() == 0;
 	}
+	 */
 
 	///////////////////////// AMOUNTS
 	public BigDecimal getAmountHave()
@@ -253,8 +255,10 @@ public class Order implements Comparable<Order>
 			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), this.amountHave.scale(), RoundingMode.HALF_DOWN);
 		}
 
+		/*
 		if ( !this.isWantDivisible(db) )
 			temp = temp.setScale(0,  RoundingMode.HALF_DOWN);
+		 */
 
 		return this.amountWant.subtract(temp);
 	}
@@ -495,8 +499,8 @@ public class Order implements Comparable<Order>
 		List<Order> orders = db.getOrderMap().getOrders(this.want, this.have, true);
 		//Collections.sort(orders);
 
-		boolean isDivisibleHave = this.isHaveDivisible(db);
-		boolean isDivisibleWant = this.isWantDivisible(db);
+		boolean isDivisibleHave = true; //this.isHaveDivisible(db);
+		boolean isDivisibleWant = true; //this.isWantDivisible(db);
 		BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
 
 		while( !completedOrder && ++i < orders.size())
@@ -652,11 +656,11 @@ public class Order implements Comparable<Order>
 		priceAmount = priceAmount.divide(gcd);
 
 		//CALCULATE GCD IN COMBINATION WITH DIVISIBILITY
-		if(this.getWantAsset(this.dcSet).isDivisible())
+		if(true) //this.getWantAsset(this.dcSet).isDivisible())
 		{
 			haveAmount = haveAmount.multiply(multiplier);
 		}
-		if(this.getHaveAsset(this.dcSet).isDivisible())
+		if(true) //this.getHaveAsset(this.dcSet).isDivisible())
 		{
 			priceAmount = priceAmount.multiply(multiplier);
 		}
@@ -664,7 +668,7 @@ public class Order implements Comparable<Order>
 
 		//CALCULATE THE INCREMENT AT WHICH WE HAVE TO BUY
 		BigDecimal increment = new BigDecimal(haveAmount.divide(gcd));
-		if(this.getWantAsset(this.dcSet).isDivisible())
+		if(true) // this.getWantAsset(this.dcSet).isDivisible())
 		{
 			increment = increment.divide(new BigDecimal(multiplier));
 		}

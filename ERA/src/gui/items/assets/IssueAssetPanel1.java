@@ -480,7 +480,12 @@ public class IssueAssetPanel1 extends JPanel
 			//CREATE ASSET
 			parsestep++;
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), null, null, this.chkMovable.isSelected(), quantity, scale, this.chkDivisible.isSelected(),
+			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(creator, this.txtName.getText(), this.txtareaDescription.getText(), null, null,
+					//this.chkMovable.isSelected(),
+					scale,
+					asset_type,
+					quantity,
+					//this.chkDivisible.isSelected(),
 					feePow);
 
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
