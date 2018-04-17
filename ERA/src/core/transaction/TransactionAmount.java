@@ -623,9 +623,9 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 
 		if (this.amount == null)
 			return;
@@ -699,9 +699,9 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 
 		if (this.amount == null)
 			return;

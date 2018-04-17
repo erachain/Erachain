@@ -809,7 +809,7 @@ public class BlockGenerator extends Thread implements Observer
 						//orderedTransactions.remove(transaction);
 
 						//PROCESS IN NEWBLOCKDB
-						transaction.process(newBlockDb, null, false);
+						transaction.process(null, false);
 
 						//TRANSACTION PROCESSES
 						//transactionProcessed = true;

@@ -36,9 +36,9 @@ public class txWindowTest {
 		Account recipient3 = new Account("QcJCST3wT8t22jKM2FFDhL8zKiH8cuBjEB");		
 
 		List<Payment> payments = new ArrayList<Payment>();
-		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
-		payments.add(new Payment(recipient2, 61l, BigDecimal.valueOf(120).setScale(8)));
-		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(8)));
+		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+		payments.add(new Payment(recipient2, 61l, BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
 		
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
 

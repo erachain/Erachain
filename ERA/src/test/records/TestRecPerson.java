@@ -48,7 +48,7 @@ public class TestRecPerson {
 
 	Long releaserReference = null;
 
-	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
+	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
@@ -128,16 +128,16 @@ public class TestRecPerson {
 		//personGeneral.setKey(genesisPersonKey);
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-		genesis_issue_person.process(db, gb, false);
+		genesis_issue_person.process(gb, false);
 		//genesisPersonKey = db.getIssuePersonMap().size();
 		genesisPersonKey = genesis_issue_person.getAssetKey(db); 
 
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
-		genesis_certify.process(db, gb, false);
+		genesis_certify.process(gb, false);
 		
 		certifier.setLastTimestamp(last_ref, db);
-		certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(8), false);
-		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		
 		person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
@@ -165,7 +165,7 @@ public class TestRecPerson {
 
 		issuePersonTransaction.sign(certifier, false);
 		
-		issuePersonTransaction.process(db, gb, false);
+		issuePersonTransaction.process(gb, false);
 		personKey = person.getKey(db);
 
 		// issue 1 genesis person in init() here
@@ -216,7 +216,7 @@ public class TestRecPerson {
 		issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
 
 	}
@@ -356,13 +356,13 @@ public class TestRecPerson {
 
 		issuePersonTransaction.sign(certifier, false);
 		
-		issuePersonTransaction.process(db, gb, false);
+		issuePersonTransaction.process(gb, false);
 		
 		LOGGER.info("person KEY: " + person.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getBalanceUSE(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).subtract(issuePersonTransaction.getFee()).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(issuePersonTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK PERSON EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssuePersonMap().get(issuePersonTransaction);
@@ -376,11 +376,11 @@ public class TestRecPerson {
 		assertEquals(issuePersonTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
 		//////// ORPHAN /////////
-		issuePersonTransaction.orphan(db, false);
+		issuePersonTransaction.orphan(false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), certifier.getBalanceUSE(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK PERSON EXISTS ISSUER
 		assertEquals(false, db.getItemPersonMap().contains(personKey));
@@ -427,11 +427,11 @@ public class TestRecPerson {
 		personalizeRecord_0.setDC(db, false);
 		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 		// ADD RIGHTS
-		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8), false);
+		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
@@ -617,7 +617,7 @@ public class TestRecPerson {
 		//// PROCESS /////
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
-		r_SertifyPubKeys.process(db, gb, false);
+		r_SertifyPubKeys.process(gb, false);
 		int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 		
 		//CHECK BALANCE SENDER
@@ -688,7 +688,7 @@ public class TestRecPerson {
 		assertEquals(true, userAccount3.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
 		
 		////////// ORPHAN //////////////////
-		r_SertifyPubKeys.orphan(db, false);
+		r_SertifyPubKeys.orphan(false);
 
 		//CHECK BALANCE SENDER
 		assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, db));
@@ -739,7 +739,7 @@ public class TestRecPerson {
 				end_date, timestamp, certifier.getLastTimestamp(db));
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
-		r_SertifyPubKeys.process(db, gb, false);
+		r_SertifyPubKeys.process(gb, false);
 
 		int abs_end_date = end_date + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 		
@@ -756,14 +756,14 @@ public class TestRecPerson {
 				end_date2, timestamp, certifier.getLastTimestamp(db));
 		r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
 		r_SertifyPubKeys.sign(certifier, false);
-		r_SertifyPubKeys.process(db, gb, false);
+		r_SertifyPubKeys.process(gb, false);
 
 		int abs_end_date2 = end_date2 + (int)(r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
 		assertEquals(abs_end_date2, (int)userAccount2.getPersonDuration(db).b);
 		assertEquals(false, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
 
-		r_SertifyPubKeys.orphan(db, false);
+		r_SertifyPubKeys.orphan(false);
 
 		assertEquals(abs_end_date, (int)userAccount2.getPersonDuration(db).b);
 		assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
@@ -830,7 +830,7 @@ public class TestRecPerson {
 		KKPersonStatusMap dbPS_fork = fork.getPersonStatusMap();
 
 		
-		r_SertifyPubKeys.process(fork, gb, false);
+		r_SertifyPubKeys.process(gb, false);
 		int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 		
 		//assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
@@ -924,7 +924,7 @@ public class TestRecPerson {
 
 		
 		////////// ORPHAN //////////////////
-		r_SertifyPubKeys.orphan(fork, false);
+		r_SertifyPubKeys.orphan(false);
 
 		//CHECK BALANCE SENDER
 		assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, fork));

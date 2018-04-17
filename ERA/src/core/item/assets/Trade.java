@@ -30,8 +30,8 @@ public class Trade {
 	{
 		this.initiator = initiator;
 		this.target = target;
-		this.amountHave = amountHave.setScale(8);
-		this.amountWant = amountWant.setScale(8);
+		this.amountHave = amountHave;
+		this.amountWant = amountWant;
 		this.timestamp = timestamp;
 	}
 

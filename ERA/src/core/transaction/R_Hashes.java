@@ -381,10 +381,10 @@ public class R_Hashes extends Transaction {
 	
 	//PROCESS/ORPHAN
 	
-	public void process(DCSet dcSet, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(dcSet, block, asPack);
+		super.process(block, asPack);
 		
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 		
@@ -417,10 +417,10 @@ public class R_Hashes extends Transaction {
 		}
 	}
 
-	public void orphan(DCSet dcSet, boolean asPack) {
+	public void orphan(boolean asPack) {
 
 		//UPDATE SENDER
-		super.orphan(dcSet, asPack);
+		super.orphan(asPack);
 						
 		HashesSignsMap map = dcSet.getHashesSignsMap();
 		for (byte[] hash: hashes) {

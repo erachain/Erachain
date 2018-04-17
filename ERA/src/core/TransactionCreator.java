@@ -139,7 +139,7 @@ public class TransactionCreator
 				transactionAccount.setDC(this.fork, false);
 				if(transactionAccount.isValid(this.fork, null) == Transaction.VALIDATE_OK)
 				{
-					transactionAccount.process(this.fork, null, false);
+					transactionAccount.process(null, false);
 				} else {
 					//THE TRANSACTION BECAME INVALID LET 
 					this.fork.getTransactionMap().delete(transactionAccount);
@@ -842,7 +842,7 @@ public class TransactionCreator
 
 			if (!asPack) {
 				//PROCESS IN FORK
-				transaction.process(this.fork, null, asPack);
+				transaction.process(null, asPack);
 				
 				// if it ISSUE - reset key
 				if (transaction instanceof Issue_ItemRecord) {

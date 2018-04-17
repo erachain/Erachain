@@ -75,7 +75,7 @@ public class TestRecImprint {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 		imprint = new Imprint(maker, name_total, icon, image, "");
 
@@ -188,7 +188,7 @@ public class TestRecImprint {
 		
 		assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(db, releaserReference));
 		
-		issueImprintRecord.process(db, gb, false);
+		issueImprintRecord.process(gb, false);
 		
 		LOGGER.info("imprint KEY: " + imprint.getKey(db));
 				
@@ -201,9 +201,9 @@ public class TestRecImprint {
 		ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");				
 		IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp+10);
 		issueImprintTransaction_2.sign(maker, false);
-		issueImprintTransaction_2.process(db, gb, false);
+		issueImprintTransaction_2.process(gb, false);
 		LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
-		issueImprintTransaction_2.orphan(db, false);
+		issueImprintTransaction_2.orphan(false);
 		ItemImprintMap imprintMap = db.getItemImprintMap();
 		int mapSize = imprintMap.size();
 		assertEquals(0, mapSize - 1);
@@ -225,11 +225,11 @@ public class TestRecImprint {
 		//CREATE ISSUE IMPRINT TRANSACTION
 		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
 		issueImprintRecord.sign(maker, false);
-		issueImprintRecord.process(db, gb, false);
+		issueImprintRecord.process(gb, false);
 		long key = db.getIssueImprintMap().get(issueImprintRecord);
 //		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));
 		
-		issueImprintRecord.orphan(db, false);
+		issueImprintRecord.orphan(false);
 				
 		//CHECK IMPRINT EXISTS SENDER
 		assertEquals(false, db.getItemImprintMap().contains(key));

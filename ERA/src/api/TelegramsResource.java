@@ -4,16 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-// 30/03
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,34 +16,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
-import core.block.Block;
-import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
-import datachain.DCSet;
-import gui.PasswordPane;
-import gui.library.Issue_Confirm_Dialog;
-import gui.transaction.OnDealClick;
-import gui.transaction.Send_RecordDetailsFrame;
-import lang.Lang;
 import network.message.TelegramMessage;
-import settings.Settings;
 import utils.APIUtils;
-import utils.Converter;
-import utils.Pair;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -168,7 +146,7 @@ public class TelegramsResource {
 
 		JSONObject out = new JSONObject();
 		Controller cntr = Controller.getInstance();
-		
+
 		// READ SENDER
 		Account sender;
 		try {
@@ -198,8 +176,8 @@ public class TelegramsResource {
 		BigDecimal amount;
 		// READ AMOUNT
 		try {
-			amount = new BigDecimal(amount1).setScale(8);
-			if (amount.equals(new BigDecimal("0.0").setScale(8)))
+			amount = new BigDecimal(amount1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			if (amount.equals(new BigDecimal("0.0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)))
 				throw new Exception("");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -212,10 +190,10 @@ public class TelegramsResource {
 		try {
 			message = message1;
 			if (message != null){
-			if (message.length() > BlockChain.MAX_REC_DATA_BYTES)
-				throw new Exception("");
+				if (message.length() > BlockChain.MAX_REC_DATA_BYTES)
+					throw new Exception("");
 			}else{
-				message = "";	
+				message = "";
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -249,15 +227,15 @@ public class TelegramsResource {
 		Transaction transaction;
 		PrivateKeyAccount account = cntr.getPrivateKeyAccountByAddress(sender.getAddress());
 		if (account == null) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);	
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
 		}
-		
+
 		try {
-		transaction = cntr.r_Send(
-				account, 0, recip, asset1, amount,
-				head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
-		if (transaction == null) 
-			throw new Exception("transaction == null");
+			transaction = cntr.r_Send(
+					account, 0, recip, asset1, amount,
+					head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
+			if (transaction == null)
+				throw new Exception("transaction == null");
 		} catch (Exception e) {
 			out.put("status_code", Transaction.INVALID_TRANSACTION_TYPE);
 			out.put("status", "Invalid Transaction");
@@ -270,13 +248,13 @@ public class TelegramsResource {
 		return out.toJSONString();
 	}
 
-// "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
-// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
+	// "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+	// POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
 	@SuppressWarnings("unchecked")
 	@POST
 	@Path("send")
 	public String sendPost(String x) {
-		
+
 		JSONObject jsonObject;
 		try {
 			// READ JSON
@@ -291,8 +269,8 @@ public class TelegramsResource {
 			@QueryParam("amount") String amount1, @QueryParam("message") String message1,
 			@QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
 			) {
-		*/
-		
+		 */
+
 		return send((String)jsonObject.get("sender"), (String)jsonObject.get("recipient"),
 				(long)jsonObject.get("asset"), (String)jsonObject.get("amount"),
 				(String)jsonObject.get("title"), (String)jsonObject.get("message"),
@@ -320,29 +298,29 @@ public class TelegramsResource {
 			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
 		}
 
-		
+
 		R_Send r_Send = (R_Send) telegram.getTransaction();
 		byte[] r_data = r_Send.getData();
 		if (r_data == null || r_data.length == 0)
 			return null;
 
 		APIUtils.askAPICallAllowed(password, "POST decrypt telegram data\n " + signature, request);
-		
+
 		byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
 		if (ddd == null) {
 			return "wrong decryption";
 		}
-		
+
 		if (r_Send.isText()) {
 			try {
-    		String str = (new String(ddd, "UTF-8"));
-    		return str;    			
+				String str = (new String(ddd, "UTF-8"));
+				return str;
 			} catch (UnsupportedEncodingException e) {
 				return "error UTF-8";
 			}
 		} else {
-    		String str = Base58.encode(ddd);
-    		return str;			
+			String str = Base58.encode(ddd);
+			return str;
 		}
 	}
 }

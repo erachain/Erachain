@@ -238,7 +238,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 		// REMOVE FEE
 		DCSet fork = db.fork();
-		super.process(fork, this.block, false);
+		super.process(this.block, false);
 		
 		// CHECK PAYMENTS
 		for (Payment payment : this.payments) {

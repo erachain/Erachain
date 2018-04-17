@@ -19,6 +19,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -30,14 +31,14 @@ import utils.Pair;
 
 @Path("multipayment")
 @Produces(MediaType.APPLICATION_JSON)
-public class MultiPaymentResource 
+public class MultiPaymentResource
 {
-	
+
 	private static final Logger LOGGER = Logger
 			.getLogger(MultiPaymentResource.class);
 	@Context
 	HttpServletRequest request;
-	
+
 	@POST
 	@Consumes(MediaType.WILDCARD)
 	public String createMultiPayment(String x)
@@ -55,23 +56,23 @@ public class MultiPaymentResource
 				lgAsset = ((Long) jsonObject.get("asset")).intValue();
 			}
 			String feePowStr = (String) jsonObject.get("feePow");
-			
+
 			AssetCls defaultAsset;
 			try {
 				defaultAsset = Controller.getInstance().getAsset(new Long(lgAsset));
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
-					Transaction.ITEM_ASSET_NOT_EXIST);
+						Transaction.ITEM_ASSET_NOT_EXIST);
 			}
 
 			List<Payment> payments = jsonPaymentParser((JSONArray)jsonObject.get("payments"), defaultAsset);
-			
+
 			// CHECK ADDRESS
 			if (!Crypto.getInstance().isValidAddress(sender)) {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_ADDRESS);
 			}
-			
+
 			// CHECK IF WALLET EXISTS
 			if (!Controller.getInstance().doesWalletExists()) {
 				throw ApiErrorFactory.getInstance().createError(
@@ -83,7 +84,7 @@ public class MultiPaymentResource
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_WALLET_LOCKED);
 			}
-			
+
 			// GET ACCOUNT
 			PrivateKeyAccount account = Controller.getInstance()
 					.getPrivateKeyAccountByAddress(sender);
@@ -91,7 +92,7 @@ public class MultiPaymentResource
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_ADDRESS);
 			}
-			
+
 			int feePow=0;
 			if(feePowStr != null) {
 				try
@@ -100,12 +101,12 @@ public class MultiPaymentResource
 				}
 				catch(Exception e)
 				{
-				}	
+				}
 			} else {
 			}
-			
+
 			Pair<Transaction, Integer> result = Controller.getInstance().sendMultiPayment(account, payments, feePow);
-			
+
 			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
 			else
@@ -124,26 +125,26 @@ public class MultiPaymentResource
 	{
 		return jsonPaymentParser(jsonArray, Controller.getInstance().getAsset(0L));
 	}
-	
+
 	public static List<Payment> jsonPaymentParser(JSONArray jsonArray, AssetCls defaultAsset)
 	{
 		List<Payment> payments = new ArrayList<Payment>();
-		
+
 		if(jsonArray == null) {
 			return payments;
 		}
-		
+
 		for(int i=0; i<jsonArray.size(); i++)
 		{
 			JSONObject jsonPayment = (JSONObject) jsonArray.get(i);
-			
+
 			String recipient = jsonPayment.get("recipient").toString();
 			if (!Crypto.getInstance().isValidAddress(recipient)) {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_ADDRESS);
 			}
 			Account paymentRecipient = new Account(jsonPayment.get("recipient").toString());
-			
+
 			AssetCls paymentAsset = defaultAsset;
 			if(jsonPayment.containsKey("asset")) {
 				try {
@@ -153,22 +154,22 @@ public class MultiPaymentResource
 							Transaction.INVALID_ITEM_VALUE);
 				}
 			}
-			
+
 			BigDecimal bdAmount;
-			try 
+			try
 			{
 				bdAmount = new BigDecimal(jsonPayment.get("amount").toString());
-				bdAmount = bdAmount.setScale(8);
+				bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_AMOUNT);
 			}
-			
+
 			Payment payment = new Payment(paymentRecipient, paymentAsset.getKey(), bdAmount);
-			
+
 			payments.add(payment);
-		}	
-		
+		}
+
 		return payments;
 	}
 }

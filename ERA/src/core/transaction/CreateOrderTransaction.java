@@ -81,30 +81,7 @@ public class CreateOrderTransaction extends Transaction {
 	public void setDC(DCSet dcSet, boolean asPack) {
 		super.setDC(dcSet, asPack);
 
-		AssetCls asset = this.order.getHaveAsset(dcSet);
-		int scaleHave;
-		if (this.order.getHave() < BlockChain.AMOUNT_SCALE_FROM) {
-			scaleHave = 8;
-		} else {
-			scaleHave = asset.getScale();
-		}
-
-		asset = this.order.getWantAsset(dcSet);
-		int scaleWant;
-		if (this.order.getWant() < BlockChain.AMOUNT_SCALE_FROM) {
-			scaleWant = 8;
-		} else {
-			scaleWant = asset.getScale();
-		}
-
-		if (scaleHave != BlockChain.AMOUNT_DEDAULT_SCALE
-				|| scaleWant != BlockChain.AMOUNT_DEDAULT_SCALE) {
-			// RESCALE AMOUNTs
-			BigDecimal amountHave = new BigDecimal(this.order.getAmountHave().unscaledValue(), scaleHave);
-			BigDecimal amountWant = new BigDecimal(this.order.getAmountWant().unscaledValue(), scaleWant);
-			this.order = new Order(new BigInteger(signature), creator, this.order.getHave(), this.order.getWant(),
-					amountHave, amountWant, timestamp);
-		}
+		this.order.setDC(dcSet);
 
 	}
 
@@ -394,9 +371,9 @@ public class CreateOrderTransaction extends Transaction {
 
 	// @Override
 	@Override
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 		// UPDATE CREATOR
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 
 		// PROCESS ORDER
 		// NEED COPY for check block.isValid() and not modify ORDER for
@@ -406,9 +383,9 @@ public class CreateOrderTransaction extends Transaction {
 
 	// @Override
 	@Override
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 		// UPDATE CREATOR
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 
 		// ORPHAN ORDER
 		this.order.copy().orphan(db);
@@ -443,7 +420,7 @@ public class CreateOrderTransaction extends Transaction {
 			return this.order.getAmountHave();
 		}
 
-		return BigDecimal.ZERO.setScale(8);
+		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 	}
 
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() {

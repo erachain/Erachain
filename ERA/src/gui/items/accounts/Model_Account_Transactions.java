@@ -6,27 +6,24 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
-import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import database.wallet.TransactionMap;
-import datachain.DCMap;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
+import utils.ObserverMessage;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer
@@ -34,11 +31,11 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	private static final int COLUMN_ADDRESS = 0;
 	public static final int COLUMN_AMOUNT = 1;
 	public static final int COLUMN_TRANSACTION = 2;
-//	public static final int COLUMN_CONFIRMED_BALANCE = 1;
-//	public static final int COLUMN_WAINTING_BALANCE = 2;
+	//	public static final int COLUMN_CONFIRMED_BALANCE = 1;
+	//	public static final int COLUMN_WAINTING_BALANCE = 2;
 	//public static final int COLUMN_GENERATING_BALANCE = 3;
-//	public static final int COLUMN_FEE_BALANCE = 3;
-	
+	//	public static final int COLUMN_FEE_BALANCE = 3;
+
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","Amount","Type"}); //, "Confirmed Balance", "Waiting", AssetCls.FEE_NAME});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
@@ -49,7 +46,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 	private SortableList<Tuple2<String, String>, Transaction> transactions;
 	private List<Transaction> transactions_Asset;
 	//private  Account_Cls account;
-	
+
 	@SuppressWarnings("unchecked")
 	public Model_Account_Transactions()
 	{
@@ -57,42 +54,43 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 		cred = new ArrayList<Tuple2<Tuple3<String, Long, String>, BigDecimal>>();
 		account = new Account("");
-		
+
 		Controller.getInstance().addWalletListener(this);
-	//	Controller.getInstance().addObserver(this);
-		
+		//	Controller.getInstance().addObserver(this);
+
 	}
-	
+
 	@Override
 	public SortableList<Tuple2<String, String>, Transaction> getSortableList() {
 		return this.transactions;
 	}
-	
+
+	@Override
 	public Class<? extends Object> getColumnClass(int c) {     // set column type
 		Object o = getValueAt(0, c);
 		return o==null?Null.class:o.getClass();
-	   }
-// читаем колонки которые изменяем высоту	   
+	}
+	// читаем колонки которые изменяем высоту
 	public Boolean[] get_Column_AutoHeight(){
-		
+
 		return this.column_AutuHeight;
 	}
-// устанавливаем колонки которым изменить высоту	
+	// устанавливаем колонки которым изменить высоту
 	public void set_get_Column_AutoHeight( Boolean[] arg0){
-		this.column_AutuHeight = arg0;	
+		this.column_AutuHeight = arg0;
 	}
-	
-	
+
+
 	public Account getAccount(int row)
 	{
-		return (Account)publicKeyAccounts.get(row);
+		return publicKeyAccounts.get(row);
 	}
 	public PublicKeyAccount getPublicKeyAccount(int row)
 	{
 		return publicKeyAccounts.get(row);
 	}
-	
-	public void setParam(AssetCls asset, Account account) 
+
+	public void setParam(AssetCls asset, Account account)
 	{
 		if (account != null) this.account = account;
 		if (asset !=null) {
@@ -101,71 +99,71 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		}
 
 		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress( this.account.getAddress());
-			
-			
+
+
 		this.transactions_Asset.clear();;
 		for (Transaction trans1:transactions){
-		long a = trans1.getAssetKey();
-			if ((a == asset_Key ||  a == -asset_Key)){	
-				
-				this.transactions_Asset.add(trans1);		
-				
-				
+			long a = trans1.getAssetKey();
+			if ((a == asset_Key ||  a == -asset_Key)){
+
+				this.transactions_Asset.add(trans1);
+
+
 			}
-		
-			
+
+
 		}
-		
-		
+
+
 		this.fireTableDataChanged();
 	}
-	
+
 	@Override
-	public int getColumnCount() 
+	public int getColumnCount()
 	{
 		return columnNames.length;
 	}
-	
+
 	@Override
-	public String getColumnName(int index) 
+	public String getColumnName(int index)
 	{
 		return columnNames[index];
 	}
 
 	@Override
-	public int getRowCount() 
+	public int getRowCount()
 	{
-		
+
 		return transactions_Asset.size();
 	}
 
 	@Override
-	public Object getValueAt(int row, int column) 
+	public Object getValueAt(int row, int column)
 	{
-		
+
 		if (transactions_Asset.isEmpty()) return null;
-		
-	/*	if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
+
+		/*	if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
 		{
 			return null;
 		}
-		
-		
+
+
 		account = this.publicKeyAccounts.get(row);
-		
+
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> balance;
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
 		String str;
-	*/	
+		 */
 		switch(column)
 		{
-		case COLUMN_ADDRESS:			
+		case COLUMN_ADDRESS:
 			return transactions_Asset.get(row).getKey();
 		case COLUMN_AMOUNT:
 			return transactions_Asset.get(row).getAmount().toPlainString();
 		case COLUMN_TRANSACTION:
 			return Lang.getInstance().translate(transactions_Asset.get(row).viewTypeName());
-	/*
+			/*
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
@@ -182,29 +180,29 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 		case COLUMN_FEE_BALANCE:
 			if (this.asset == null) return "-";
 			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(Transaction.FEE_KEY));
-		*/	
-			
-		/*	
-			
+			 */
+
+			/*
+
 		case COLUMN_GENERATING_BALANCE:
-			
+
 			if(this.asset == null || this.asset.getKey() == AssetCls.FEE_KEY)
 			{
-				return  NumberAsString.getInstance().numberAsString(account.getGeneratingBalance());	
+				return  NumberAsString.getInstance().numberAsString(account.getGeneratingBalance());
 			}
 			else
 			{
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(8));
+				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 			}
-			*/
-			
+			 */
+
 		}
-		
+
 		return null;
 	}
 
 	@Override
-	public void update(Observable o, Object arg) 
+	public void update(Observable o, Object arg)
 	{
 		try
 		{
@@ -215,84 +213,84 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 			//GUI ERROR
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
-		
+
+
 		//CHECK IF NEW LIST
-				if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
-				{
-					if(this.transactions == null)
-					{
-						this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
-						this.transactions.registerObserver();
-						this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
-						
-						this.transactions_Asset.clear();;
-						for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
-						long a = trans.getB().getAssetKey();
-						Transaction trans1 = trans.getB();
-						Tuple2<Tuple2<String, String>, Transaction> ss = null;
-							
-								if ((a == asset_Key ||  a == -asset_Key)&& (account.getAddress() == trans1.viewCreator() || account.getAddress() == trans1.viewRecipient())){
-								this.transactions_Asset.add(trans.getB());		
-								
-								
-							}
-						
-							
-						}
-						
-						
-						
-						
-					}
-					
-					this.fireTableDataChanged();
-				}
-		
-		
-		
-		
-		
-	
-			
-			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
-					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE)
+		{
+			if(this.transactions == null)
 			{
-				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-				cred.clear();
-				for (PublicKeyAccount account:this.publicKeyAccounts){
-					cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
-					//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));	
+				this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+				this.transactions.registerObserver();
+				this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
+
+				this.transactions_Asset.clear();;
+				for (Pair<Tuple2<String, String>, Transaction> trans:this.transactions){
+					long a = trans.getB().getAssetKey();
+					Transaction trans1 = trans.getB();
+					Tuple2<Tuple2<String, String>, Transaction> ss = null;
+
+					if ((a == asset_Key ||  a == -asset_Key)&& (account.getAddress() == trans1.viewCreator() || account.getAddress() == trans1.viewRecipient())){
+						this.transactions_Asset.add(trans.getB());
+
+
 					}
-				
-				
-				this.fireTableDataChanged();
-				
-			//	this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
+
+
+				}
+
+
+
+
 			}
-			/*
+
+			this.fireTableDataChanged();
+		}
+
+
+
+
+
+
+
+		if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
+		{
+			this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+			cred.clear();
+			for (PublicKeyAccount account:this.publicKeyAccounts){
+				cred.addAll(DCSet.getInstance().getCredit_AddressesMap().getList(account.getAddress(), -asset_Key));
+				//cred.addAll(DBSet.getInstance().getCredit_AddressesMap().getList(Base58.decode(account.getAddress()), asset_Key));
+			}
+
+
+			this.fireTableDataChanged();
+
+			//	this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
+		}
+		/*
 			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE)
 			{
 	// обновляем данные
 				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 				this.fireTableDataChanged();
 			}
-			*/
-		
-	
-		
-	
+		 */
+
+
+
+
 	}
 
-	public BigDecimal getTotalBalance() 
+	public BigDecimal getTotalBalance()
 	{
-		BigDecimal totalBalance = BigDecimal.ZERO.setScale(8);
-		
+		BigDecimal totalBalance = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
 		for(Account account: this.publicKeyAccounts)
 		{
 			if(this.asset == null)
@@ -304,7 +302,7 @@ public class Model_Account_Transactions  extends TableModelCls<Tuple2<String, St
 				totalBalance = totalBalance.add(account.getBalanceUSE(this.asset.getKey(DCSet.getInstance())));
 			}
 		}
-		
+
 		return totalBalance;
 	}
 

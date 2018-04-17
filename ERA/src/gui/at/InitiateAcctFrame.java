@@ -1,9 +1,5 @@
 package gui.at;
 
-import gui.PasswordPane;
-import gui.models.AccountsComboBoxModel;
-import lang.Lang;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -36,22 +32,25 @@ import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
-import utils.Converter;
-import utils.Pair;
-import at.AT_Constants;
-import at.AT_Error;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import at.AT_Constants;
+import at.AT_Error;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import gui.PasswordPane;
+import gui.models.AccountsComboBoxModel;
+import lang.Lang;
+import utils.Converter;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class InitiateAcctFrame extends JFrame {
@@ -95,35 +94,35 @@ public class InitiateAcctFrame extends JFrame {
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(5,5,5,5);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelGBC.fill = GridBagConstraints.HORIZONTAL;
 		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
+		labelGBC.weightx = 0;
 		labelGBC.gridx = 0;
 
 		//COMBOBOX GBC
 		GridBagConstraints cbxGBC = new GridBagConstraints();
 		cbxGBC.insets = new Insets(5,5,5,5);
-		cbxGBC.fill = GridBagConstraints.NONE;  
+		cbxGBC.fill = GridBagConstraints.NONE;
 		cbxGBC.anchor = GridBagConstraints.NORTHWEST;
 		cbxGBC.weightx = 0;
 		cbxGBC.gridwidth = 4;
-		cbxGBC.gridx = 1;	
+		cbxGBC.gridx = 1;
 
 		//TEXTFIELD GBC
 		GridBagConstraints txtGBC = new GridBagConstraints();
 		txtGBC.insets = new Insets(5,5,5,5);
-		txtGBC.fill = GridBagConstraints.HORIZONTAL;  
+		txtGBC.fill = GridBagConstraints.HORIZONTAL;
 		txtGBC.anchor = GridBagConstraints.NORTHWEST;
-		txtGBC.weightx = 1;	
-		txtGBC.gridx = 1;		
+		txtGBC.weightx = 1;
+		txtGBC.gridx = 1;
 
 		//BUTTON GBC
 		GridBagConstraints buttonGBC = new GridBagConstraints();
 		buttonGBC.insets = new Insets(5,5,5,5);
-		buttonGBC.fill = GridBagConstraints.NONE;  
+		buttonGBC.fill = GridBagConstraints.NONE;
 		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
 		buttonGBC.gridwidth = 2;
-		buttonGBC.gridx = 0;		
+		buttonGBC.gridx = 0;
 
 		//LABEL FROM
 		labelGBC.gridy = 0;
@@ -139,7 +138,7 @@ public class InitiateAcctFrame extends JFrame {
 		labelGBC.gridy = 1;
 		JLabel swapLabel = new JLabel(Lang.getInstance().translate("Trade") + ":");
 		this.add(swapLabel, labelGBC);
-		
+
 		//TXT AMOUNT
 		txtGBC.gridy = 1;
 		this.txtAmount = new JTextField();
@@ -150,7 +149,7 @@ public class InitiateAcctFrame extends JFrame {
 		labelGBC.gridx = 2;
 		JLabel coreLabel = new JLabel(Lang.getInstance().translate("Erachain.org for"));
 		this.add(coreLabel, labelGBC);
-		
+
 		//TXT AMOUNT
 		txtGBC.gridy = 1;
 		txtGBC.gridx = 3;
@@ -162,7 +161,7 @@ public class InitiateAcctFrame extends JFrame {
 		labelGBC.gridx = 4;
 		JLabel otherLabel = new JLabel(Lang.getInstance().translate("BURST"));
 		this.add(otherLabel, labelGBC);
-		
+
 		//LABEL NAME
 		labelGBC.gridy = 2;
 		labelGBC.gridx = 0;
@@ -176,13 +175,13 @@ public class InitiateAcctFrame extends JFrame {
 		this.txtRecipient = new JTextField();
 		this.add(this.txtRecipient, txtGBC);
 		txtGBC.gridwidth = 1;
-		
+
 		//LABEL BURST ADDRESS
 		labelGBC.gridy = 3;
 		labelGBC.gridx = 0;
 		JLabel burstAddressLabel = new JLabel(Lang.getInstance().translate("My BURST address") + ":");
 		this.add(burstAddressLabel, labelGBC);
-		
+
 		//TXT LABEL ADDRESS
 		txtGBC.gridy = 3;
 		txtGBC.gridx = 1;
@@ -191,7 +190,7 @@ public class InitiateAcctFrame extends JFrame {
 		this.add(this.txtBurstAddress, txtGBC);
 		txtGBC.gridwidth = 1;
 
-		
+
 		//LABEL DATA
 		labelGBC.gridy = 4;
 		labelGBC.gridx = 0;
@@ -217,14 +216,14 @@ public class InitiateAcctFrame extends JFrame {
 		this.txtRetypePass = new JPasswordField();
 		this.txtRetypePass.setBorder(this.txtRetypePass.getBorder());
 		this.add(this.txtRetypePass, txtGBC);
-		
+
 		//PASSWORD ALERT
 		labelGBC.gridy = 5;
 		labelGBC.gridx = 0;
 		labelGBC.gridwidth = 4;
 		JLabel passAlert = new JLabel(Lang.getInstance().translate("( DO NOT USE your wallet's password. )"));
 		this.add(passAlert, labelGBC);
-		
+
 		//LABEL FEE
 		labelGBC.gridy = 6;
 		labelGBC.gridx = 0;
@@ -237,13 +236,13 @@ public class InitiateAcctFrame extends JFrame {
 		this.txtFeePow = new JTextField();
 		this.txtFeePow.setText("0");
 		this.add(this.txtFeePow, txtGBC);
-		
+
 		//LABEL FEES ALERT
 		labelGBC.gridx = 2;
 		labelGBC.gridwidth = 3;
 		JLabel feesAlertLabel = new JLabel(Lang.getInstance().translate("( fees should be at // )"));
 		this.add(feesAlertLabel, labelGBC);
-		
+
 		//LABEL NAME
 		labelGBC.gridy = 7;
 		labelGBC.gridx = 0;
@@ -255,7 +254,7 @@ public class InitiateAcctFrame extends JFrame {
 		txtGBC.gridx = 1;
 		this.txtExpirationBlocks = new JTextField("200");
 		this.add(this.txtExpirationBlocks, txtGBC);
-		
+
 		//LABEL BLOCKS
 		labelGBC.gridx = 2;
 		labelGBC.gridwidth = 3;
@@ -274,20 +273,21 @@ public class InitiateAcctFrame extends JFrame {
 		this.txtMinActivationAmount = new JTextField("20.00000000");
 		this.add(this.txtMinActivationAmount, txtGBC);
 
-		
+
 		//BUTTON Register
 		buttonGBC.gridy = 9;
 		this.deployButton = new JButton(Lang.getInstance().translate("Initiate"));
 		this.deployButton.setPreferredSize(new Dimension(80, 25));
 		this.deployButton.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				onDeployClick();
 			}
 		});
 		this.add(this.deployButton, buttonGBC);
-		
+
 
 		//PACK
 		this.pack();
@@ -317,7 +317,7 @@ public class InitiateAcctFrame extends JFrame {
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(this); 
+			String password = PasswordPane.showUnlockWalletDialog(this);
 			if(!Controller.getInstance().unlockWallet(password))
 			{
 				//WRONG PASSWORD
@@ -341,10 +341,10 @@ public class InitiateAcctFrame extends JFrame {
 
 			//READ QUANTITY
 			parse = 1;
-			BigDecimal quantity = new BigDecimal(this.txtAmount.getText()).setScale(8);
-			
-			BigDecimal burstQuantity = new BigDecimal(this.txtAmountOther.getText()).setScale(8);
-			
+			BigDecimal quantity = new BigDecimal(this.txtAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
+			BigDecimal burstQuantity = new BigDecimal(this.txtAmountOther.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
 
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -393,14 +393,14 @@ public class InitiateAcctFrame extends JFrame {
 				this.deployButton.setEnabled(true);
 				return;
 			}
-			
+
 			if ( blocksToEnd < 20 )
 			{
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Expiration should be at least 20"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
 				return;
 			}
-			
+
 			byte[] address = new byte[32];
 			byte[] empty = new byte[7];
 			address= Base58.decode(addr);
@@ -425,10 +425,10 @@ public class InitiateAcctFrame extends JFrame {
 			//}
 			shab.clear();
 			shab.put( sha256.digest( has ) );
-			
+
 			byte[] finalHash = new byte[32];
 			finalHash = shab.array().clone();
-			
+
 			b.put(finalHash);
 
 			b.putInt(0);
@@ -475,7 +475,7 @@ public class InitiateAcctFrame extends JFrame {
 				return;
 			}
 
-			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText()).setScale(8);
+			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			byte[] minActivationAmountBytes = minActivationAmountB.unscaledValue().toByteArray();
 			byte[] fillActivation = new byte[8 - minActivationAmountBytes.length];
@@ -522,7 +522,7 @@ public class InitiateAcctFrame extends JFrame {
 				creation.put(dataBytes);
 			byte[] creationBytes = null;
 			creationBytes = creation.array();
-			
+
 			String name = "Erachain.orgBURST @ " + quantity.divide(burstQuantity, 2, RoundingMode.HALF_UP);
 			String desc = Lang.getInstance().translate("Initiators BURST address: ") + this.txtBurstAddress.getText();
 			String type = "acct";
@@ -541,20 +541,20 @@ public class InitiateAcctFrame extends JFrame {
 			switch(result.getB())
 			{
 			case Transaction.VALIDATE_OK:
-				
+
 				JPanel successPanel = new JPanel();
 				successPanel.setLayout(new GridLayout(2,2));
 
-				//Labels for the textfield components        
+				//Labels for the textfield components
 				JLabel successLabel = new JLabel(Lang.getInstance().translate("***IMPORTANT*** Use the following key to unlock the counterparty funds") + ":");
 				JTextField txtField = new JTextField(Converter.toHex(has));
 
-				//Add the components to the JPanel        
+				//Add the components to the JPanel
 				successPanel.add(successLabel);
 				successPanel.add(txtField);
 				JOptionPane.showMessageDialog(null, new JScrollPane(successPanel) , Lang.getInstance().translate("AT has been deployed"), JOptionPane.INFORMATION_MESSAGE);
 				this.dispose();
-				break;	
+				break;
 			case Transaction.NOT_YET_RELEASED:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT will be enabled at !"),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
@@ -562,7 +562,7 @@ public class InitiateAcctFrame extends JFrame {
 			case Transaction.NOT_ENOUGH_FEE:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
-				break;	
+				break;
 			case Transaction.NEGATIVE_AMOUNT:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Quantity must be at least 0!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
@@ -590,7 +590,7 @@ public class InitiateAcctFrame extends JFrame {
 			default:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
-				break;	
+				break;
 			}
 		}
 		catch(Exception e)

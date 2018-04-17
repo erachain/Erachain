@@ -127,7 +127,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//PROCESS/ORPHAN
 
 	@Override
-	public void process(DCSet db, Block block, boolean asPack)
+	public void process(Block block, boolean asPack)
 	{
 		
 		//INSERT INTO DATABASE
@@ -137,7 +137,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 
 
 	@Override
-	public void orphan(DCSet db, boolean asPack) 
+	public void orphan(boolean asPack) 
 	{
 																		
 		//DELETE FROM DATABASE

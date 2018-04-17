@@ -182,10 +182,10 @@ public abstract class Issue_ItemRecord extends Transaction
 	
 	//PROCESS/ORPHAN
 	//@Override
-	public void process(DCSet db, Block block, boolean asPack)
+	public void process(Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 		
 		// SET REFERENCE if not setted before (in Imprint it setted)
 		if (this.item.getReference() == null)
@@ -197,10 +197,10 @@ public abstract class Issue_ItemRecord extends Transaction
 	}
 
 	//@Override
-	public void orphan(DCSet db, boolean asPack) 
+	public void orphan(boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 
 		//LOGGER.debug("<<<<< core.transaction.Issue_ItemRecord.orphan 1");
 		//DELETE FROM DATABASE		

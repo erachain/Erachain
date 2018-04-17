@@ -34,6 +34,7 @@ public class Order implements Comparable<Order>
 	private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
 			+ 2*AMOUNT_LENGTH + 2*FULFILLED_LENGTH + TIMESTAMP_LENGTH + EXECUTABLE_LENGTH;
 
+	protected DCSet dcSet;
 	private BigInteger id;
 	private Account creator;
 	private long have;
@@ -53,11 +54,11 @@ public class Order implements Comparable<Order>
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
-		this.amountHave = amountHave.setScale(8);
-		this.amountWant = amountWant.setScale(8);
+		this.amountHave = amountHave;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.amountWant = amountWant;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.fulfilledHave = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.fulfilledWant = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.timestamp = timestamp;
-		this.fulfilledHave = BigDecimal.ZERO.setScale(8);
-		this.fulfilledWant = BigDecimal.ZERO.setScale(8);
 	}
 
 	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave,
@@ -68,10 +69,10 @@ public class Order implements Comparable<Order>
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
-		this.amountHave = amountHave;//.setScale(8);
-		this.amountWant = amountWant;//.setScale(8);
-		this.fulfilledHave = fulfilledHave;//.setScale(8);
-		this.fulfilledWant = fulfilledWant;//.setScale(8);
+		this.amountHave = amountHave;
+		this.amountWant = amountWant;
+		this.fulfilledHave = fulfilledHave;
+		this.fulfilledWant = fulfilledWant;
 		this.isExecutable = isExecutable == 1? true: false;
 		this.timestamp = timestamp;
 	}
@@ -85,6 +86,33 @@ public class Order implements Comparable<Order>
 	public void setId(byte[] id)
 	{
 		this.id = new BigInteger(id);
+	}
+
+	public void setDC(DCSet dcSet) {
+		this.dcSet = dcSet;
+
+		AssetCls asset = this.getHaveAsset(dcSet);
+		int scaleHave;
+		if (this.getHave() < BlockChain.AMOUNT_SCALE_FROM) {
+			scaleHave = 8;
+		} else {
+			scaleHave = asset.getScale();
+		}
+
+		asset = this.getWantAsset(dcSet);
+		int scaleWant;
+		if (this.getWant() < BlockChain.AMOUNT_SCALE_FROM) {
+			scaleWant = 8;
+		} else {
+			scaleWant = asset.getScale();
+		}
+
+		if (scaleHave != BlockChain.AMOUNT_DEDAULT_SCALE
+				|| scaleWant != BlockChain.AMOUNT_DEDAULT_SCALE) {
+			// RESCALE AMOUNTs
+			this.amountHave = new BigDecimal(this.getAmountHave().unscaledValue(), scaleHave);
+			this.amountWant = new BigDecimal(this.getAmountWant().unscaledValue(), scaleWant);
+		}
 	}
 
 	public Account getCreator()
@@ -184,14 +212,14 @@ public class Order implements Comparable<Order>
 	public BigDecimal getAmountHaveLeft(DBSet db, BigDecimal newPrice)
 	{
 		if (this.isHaveDivisible(db))
-			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
+			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN);
 		return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
 	}
 
 	public BigDecimal getAmountWantLeft(DBSet db, BigDecimal newPrice)
 	{
 		if (this.isWantDivisible(db))
-			return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(8, RoundingMode.HALF_DOWN);
+			return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN);
 		return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
 	}
 	 */
@@ -220,9 +248,9 @@ public class Order implements Comparable<Order>
 	{
 		BigDecimal temp;
 		if (this.amountHave.compareTo(this.amountWant) > 0){
-			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(8);
+			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(this.amountHave.scale());
 		} else {
-			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), 8, RoundingMode.HALF_DOWN);
+			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), this.amountHave.scale(), RoundingMode.HALF_DOWN);
 		}
 
 		if ( !this.isWantDivisible(db) )
@@ -237,20 +265,31 @@ public class Order implements Comparable<Order>
 	}
 
 	///////// PRICE
+	public int getScaleForPrice()
+	{
+		return this.amountWant.scale();
+	}
+
+	public int getScaleForPriceReverse()
+	{
+		return this.amountHave.scale();
+	}
+
+	///////// PRICE
 	public BigDecimal getPriceCalc()
 	{
-		return this.amountWant.divide(amountHave, 10, RoundingMode.HALF_DOWN);
+		return this.amountWant.divide(amountHave, getScaleForPrice(), RoundingMode.HALF_DOWN);
 	}
 	public BigDecimal getPriceCalcReverse()
 	{
-		return this.amountHave.divide(amountWant, 10, RoundingMode.HALF_UP);
+		return this.amountHave.divide(amountWant, getScaleForPriceReverse(), RoundingMode.HALF_UP);
 	}
 	public String viewPrice()
 	{
 		if(this.amountHave.compareTo(this.amountWant) > 0)
-			return ":" + this.amountHave.divide(amountWant, 8, RoundingMode.HALF_UP).toPlainString();
+			return ":" + this.amountHave.divide(amountWant, getScaleForPrice(), RoundingMode.HALF_UP).toPlainString();
 
-		return "*" + this.amountWant.divide(amountHave, 8, RoundingMode.HALF_DOWN).toPlainString();
+		return "*" + this.amountWant.divide(amountHave, getScaleForPriceReverse(), RoundingMode.HALF_DOWN).toPlainString();
 
 	}
 
@@ -505,7 +544,7 @@ public class Order implements Comparable<Order>
 
 					tradeAmount = isReversePrice?
 							thisAmountHaveLeft.divide(orderPrice, 8, RoundingMode.HALF_DOWN):
-								thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale1(8, RoundingMode.HALF_DOWN);
+								thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale(thisAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
 
 							//tradeAmount.
 							if ( !isDivisibleWant && tradeAmount.stripTrailingZeros().scale() > 0) {
@@ -518,8 +557,8 @@ public class Order implements Comparable<Order>
 
 								// recalc
 								tradeAmountGet = isReversePrice?
-										tradeAmount.multiply(orderPrice, rounding).setScale(8, RoundingMode.HALF_DOWN):
-											tradeAmount.divide(orderReversePrice, 8, RoundingMode.HALF_DOWN);
+										tradeAmount.multiply(orderPrice, rounding).setScale(tradeAmount.scale(), RoundingMode.HALF_DOWN):
+											tradeAmount.divide(orderReversePrice, tradeAmount.scale(), RoundingMode.HALF_DOWN);
 										if ( !isDivisibleHave && tradeAmountGet.stripTrailingZeros().scale() > 0) {
 											// wrong trade by non Divisible items
 											continue;
@@ -595,14 +634,14 @@ public class Order implements Comparable<Order>
 	}
 
 	// TODO delete this
-	public BigDecimal calculateBuyIncrement(Order order, DCSet db)
+	public BigDecimal calculate-BuyIncrement(Order order, DCSet db)
 	{
 		BigInteger multiplier = BigInteger.valueOf(100000000l);
 
 		//CALCULATE THE MINIMUM INCREMENT AT WHICH I CAN BUY USING GCD
 		BigInteger haveAmount = BigInteger.ONE.multiply(multiplier);
 		BigInteger priceAmount = order.getPriceCalc().multiply(new BigDecimal(multiplier), rounding)
-				.setScale(8, RoundingMode.HALF_DOWN).toBigInteger();
+				.setScale(order.getScaleForPrice(), RoundingMode.HALF_DOWN).toBigInteger();
 		BigInteger gcd = haveAmount.gcd(priceAmount);
 		haveAmount = haveAmount.divide(gcd);
 		priceAmount = priceAmount.divide(gcd);

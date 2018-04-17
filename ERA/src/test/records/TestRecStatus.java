@@ -67,8 +67,8 @@ public class TestRecStatus {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8), false);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		statusMap = db.getItemStatusMap();
 		mapSize = statusMap.size();
 
@@ -121,7 +121,7 @@ public class TestRecStatus {
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueStatusRecord.sign(maker, false);
-		issueStatusRecord.process(db, gb, false);
+		issueStatusRecord.process(gb, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueStatusTransaction = issueStatusRecord.toBytes(true, null);
@@ -184,7 +184,7 @@ public class TestRecStatus {
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
 		
 		issueStatusRecord.sign(maker, false);
-		issueStatusRecord.process(db, gb, false);
+		issueStatusRecord.process(gb, false);
 		
 		LOGGER.info("status KEY: " + status.getKey(db));
 				
@@ -195,9 +195,9 @@ public class TestRecStatus {
 		StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje", true);				
 		IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
 		issueStatusTransaction_2.sign(maker, false);
-		issueStatusTransaction_2.process(db, gb, false);
+		issueStatusTransaction_2.process(gb, false);
 		LOGGER.info("status_2 KEY: " + status_2.getKey(db));
-		issueStatusTransaction_2.orphan(db, false);
+		issueStatusTransaction_2.orphan(false);
 		assertEquals(mapSize + 1, statusMap.size());
 		
 		//CHECK STATUS IS CORRECT
@@ -208,7 +208,7 @@ public class TestRecStatus {
 
 		////// ORPHAN ///////
 		
-		issueStatusRecord.orphan(db, false);
+		issueStatusRecord.orphan(false);
 				
 		assertEquals(mapSize, statusMap.size());
 

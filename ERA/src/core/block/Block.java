@@ -365,13 +365,13 @@ public class Block {
 		if (height < inDay30<<1)
 			;
 		else if (height < inDay30<<2)
-			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(8);
+			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		else if (height < inDay30<<3) // < 72000
-			minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(8);
+			minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		else if (height < 87000) //87000)
-			minFee = minFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(8);
+			minFee = minFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		else
-			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(8);
+			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		if ( fee.compareTo(minFee) < 0)
 			fee = minFee;
@@ -1318,7 +1318,7 @@ public class Block {
 
 					timerStart = System.currentTimeMillis();
 					try{
-						transaction.process(validatingDC, this, false);
+						transaction.process(this, false);
 					} catch (Exception e) {
 						if (cnt.isOnStopping())
 							return false;
@@ -1511,7 +1511,7 @@ public class Block {
 			if (!transaction.isWiped()) {
 				transaction.setDC(dcSet, false);
 				timerStart = System.currentTimeMillis();
-				transaction.process(dcSet, this, false);
+				transaction.process(this, false);
 				timerProcess += System.currentTimeMillis() - timerStart;
 			} else {
 				//UPDATE REFERENCE OF SENDER
@@ -1665,7 +1665,7 @@ public class Block {
 			transaction.setDC(dcSet, false);
 
 			if (!transaction.isWiped()) {
-				transaction.orphan(dcSet, false);
+				transaction.orphan(false);
 			} else {
 				// IT IS REFERENCED RECORD?
 				if (transaction.isReferenced() ) {

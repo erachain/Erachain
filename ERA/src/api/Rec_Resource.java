@@ -1,15 +1,10 @@
 package api;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -18,79 +13,38 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import controller.Controller;
-import core.TransactionCreator;
+import core.BlockChain;
 import core.account.Account;
-import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
-import core.crypto.AEScrypto;
 import core.crypto.Base58;
-import core.crypto.Crypto;
-import core.naming.Name;
-import core.transaction.ArbitraryTransaction;
-import core.transaction.BuyNameTransaction;
-import core.transaction.CancelOrderTransaction;
-import core.transaction.CancelSellNameTransaction;
-import core.transaction.CreateOrderTransaction;
-import core.transaction.CreatePollTransaction;
-import core.transaction.DeployATTransaction;
-import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueTemplateRecord;
-import core.transaction.GenesisIssuePersonRecord;
-import core.transaction.GenesisIssueStatusRecord;
-import core.transaction.GenesisTransferAssetTransaction;
-import core.transaction.IssueAssetTransaction;
-import core.transaction.IssueImprintRecord;
-import core.transaction.IssueTemplateRecord;
-import core.transaction.IssuePersonRecord;
-import core.transaction.IssueStatusRecord;
-import core.transaction.IssueUnionRecord;
-import core.transaction.MultiPaymentTransaction;
-import core.transaction.R_Hashes;
 import core.transaction.R_Send;
-import core.transaction.R_SertifyPubKeys;
-import core.transaction.R_SetStatusToItem;
-import core.transaction.R_SetUnionToItem;
-import core.transaction.R_SignNote;
-import core.transaction.R_Vouch;
-import core.transaction.RegisterNameTransaction;
-import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import core.transaction.UpdateNameTransaction;
-import core.transaction.VoteOnPollTransaction;
-import datachain.DCSet;
-import lang.Lang;
-import network.Peer;
 import ntp.NTP;
 import utils.APIUtils;
-import utils.Converter;
 import utils.Pair;
 
 @Path("record")
 @Produces(MediaType.APPLICATION_JSON)
 public class Rec_Resource {
-	
-    @Context
-    private UriInfo uriInfo;
-    
+
+	@Context
+	private UriInfo uriInfo;
+
 	private static final Logger LOGGER = Logger
 			.getLogger(Rec_Resource.class);
-	
+
 	@Context
 	HttpServletRequest request;
 
@@ -102,7 +56,7 @@ public class Rec_Resource {
 		String text = "";
 		JSONArray help = new JSONArray();
 		JSONObject item;
-		
+
 		text = "SEND_ASSET_TRANSACTION: ";
 		text += "type: " + Transaction.SEND_ASSET_TRANSACTION;
 		text += ", recipient: Account in Base58";
@@ -114,10 +68,10 @@ public class Rec_Resource {
 		text += ", encryptMessage: =0 - not encrypt";
 		item = new JSONObject();
 		item.put(Transaction.SEND_ASSET_TRANSACTION, text);
-		
-		
+
+
 		help.add(item);
-		
+
 		return help.toJSONString();
 	}
 
@@ -134,16 +88,16 @@ public class Rec_Resource {
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
 		}
-		
+
 		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
 		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-		
+
 		//CREATE TRANSACTION FROM RAW
 		Transaction transaction;
 		try {
 			if (!queryParameters.containsKey("data"))
 				return APIUtils.errorMess(-1, "Parameter [data] not found");
-			
+
 			String dataStr = queryParameters.get("data").get(0);
 			byte[] data = Base58.decode(dataStr);
 			int cut = 53;
@@ -170,16 +124,16 @@ public class Rec_Resource {
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
 		}
-		
+
 		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
 		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-		
+
 		//CREATE TRANSACTION FROM RAW
 		Transaction transaction;
 		try {
 			if (!queryParameters.containsKey("data"))
 				return APIUtils.errorMess(-1, "Parameter [data] not found");
-			
+
 			String dataStr = queryParameters.get("data").get(0);
 			transaction = TransactionFactory.getInstance().parse(Base58.decode(dataStr), null);
 		} catch (Exception e) {
@@ -204,12 +158,12 @@ public class Rec_Resource {
 			//		ApiErrorFactory.ERROR_JSON)).build();
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
-		} 
+		}
 
 		PublicKeyAccount creatorPK;
 		if (!PublicKeyAccount.isValidPublicKey(creator)) {
 			return APIUtils.errorMess(Transaction.INVALID_CREATOR,
-					ApiErrorFactory.getInstance().createErrorJSON(Transaction.INVALID_CREATOR).toJSONString());				
+					ApiErrorFactory.getInstance().createErrorJSON(Transaction.INVALID_CREATOR).toJSONString());
 		}
 		creatorPK = new PublicKeyAccount(Base58.decode(creator));
 
@@ -219,91 +173,91 @@ public class Rec_Resource {
 			reference = Controller.getInstance().getTransactionCreator().getReference(creatorPK);
 		}
 
-		
+
 		try {
-			
+
 			Transaction record = null;
-			
+
 			switch(record_type)
 			{
 			case Transaction.SIGN_NOTE_TRANSACTION:
-				
+
 				//PARSE PAYMENT TRANSACTION
 				//return R_SignNote.Parse(data, releaserReference);
 				break;
-			
+
 			case Transaction.REGISTER_NAME_TRANSACTION:
-				
+
 				//PARSE REGISTER NAME TRANSACTION
 				//return RegisterNameTransaction.Parse(data);
 				break;
-				
+
 			case Transaction.UPDATE_NAME_TRANSACTION:
-				
+
 				//PARSE UPDATE NAME TRANSACTION
 				//return UpdateNameTransaction.Parse(data);
 				break;
-				
+
 			case Transaction.SELL_NAME_TRANSACTION:
-				
+
 				//PARSE SELL NAME TRANSACTION
 				//return SellNameTransaction.Parse(data);
 				break;
-				
+
 			case Transaction.CANCEL_SELL_NAME_TRANSACTION:
-				
+
 				//PARSE CANCEL SELL NAME TRANSACTION
 				//return CancelSellNameTransaction.Parse(data);
 				break;
-				
+
 			case Transaction.BUY_NAME_TRANSACTION:
-				
+
 				//PARSE CANCEL SELL NAME TRANSACTION
-				//return BuyNameTransaction.Parse(data);	
+				//return BuyNameTransaction.Parse(data);
 				break;
-				
+
 			case Transaction.CREATE_POLL_TRANSACTION:
-				
+
 				//PARSE CREATE POLL TRANSACTION
-				//return CreatePollTransaction.Parse(data);	
+				//return CreatePollTransaction.Parse(data);
 				break;
-				
+
 			case Transaction.VOTE_ON_POLL_TRANSACTION:
-				
+
 				//PARSE CREATE POLL VOTE
-				//return VoteOnPollTransaction.Parse(data, releaserReference);		
+				//return VoteOnPollTransaction.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.ARBITRARY_TRANSACTION:
-				
+
 				//PARSE ARBITRARY TRANSACTION
-				//return ArbitraryTransaction.Parse(data);			
+				//return ArbitraryTransaction.Parse(data);
 				break;
-						
+
 			case Transaction.CREATE_ORDER_TRANSACTION:
-				
+
 				//PARSE ORDER CREATION TRANSACTION
-				//return CreateOrderTransaction.Parse(data, releaserReference);	
+				//return CreateOrderTransaction.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.CANCEL_ORDER_TRANSACTION:
-				
+
 				//PARSE ORDER CANCEL
-				//return CancelOrderTransaction.Parse(data, releaserReference);	
+				//return CancelOrderTransaction.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.MULTI_PAYMENT_TRANSACTION:
-				
+
 				//PARSE MULTI PAYMENT
-				//return MultiPaymentTransaction.Parse(data, releaserReference);		
+				//return MultiPaymentTransaction.Parse(data, releaserReference);
 				break;
-			
+
 			case Transaction.DEPLOY_AT_TRANSACTION:
 				//return DeployATTransaction.Parse(data);
 				break;
-	
+
 			case Transaction.SEND_ASSET_TRANSACTION:
-	
+
 				Account recipient = null;
 				long key = 0;
 				BigDecimal amount = null;
@@ -319,143 +273,143 @@ public class Rec_Resource {
 					Tuple2<Account, String> recipientRes = Account.tryMakeAccount(recipientStr);
 					if (recipientRes.b != null) {
 						return APIUtils.errorMess(Transaction.INVALID_ADDRESS,
-								ApiErrorFactory.getInstance().createErrorJSON(recipientRes.b).toJSONString());					
+								ApiErrorFactory.getInstance().createErrorJSON(recipientRes.b).toJSONString());
 					}
 					recipient = recipientRes.a;
-					
+
 					step++;
 					if (jsonObject.containsKey("key"))
 						key = Long.parseLong(((List<String>)jsonObject.get("key")).get(0));
-					
+
 					step++;
 					if (jsonObject.containsKey("amount"))
-						amount = new BigDecimal(((List<String>)jsonObject.get("amount")).get(0)).setScale(8);
-					
+						amount = new BigDecimal(((List<String>)jsonObject.get("amount")).get(0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
 					step++;
 					if (jsonObject.containsKey("head"))
 						head = ((List<String>)jsonObject.get("head")).get(0);
-					
+
 					step++;
 					if (jsonObject.containsKey("data"))
 						data = Base58.decode(((List<String>)jsonObject.get("data")).get(0));
-					
+
 					step++;
 					if (jsonObject.containsKey("isText")
 							&& Integer.parseInt(((List<String>)jsonObject.get("isText")).get(0))==0)
 						isText = new byte[]{0};
 					else
 						isText = new byte[]{1};
-	
+
 					step++;
 					if (jsonObject.containsKey("encryptMessage")
 							&& Integer.parseInt(((List<String>)jsonObject.get("encryptMessage")).get(0)) == 0)
 						encryptMessage = new byte[]{0};
 					else
 						encryptMessage = new byte[]{1};
-					
+
 				} catch (Exception e1) {
 					//LOGGER.info(e1);
 					return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
-				} 
+				}
 				record = new R_Send((byte)version, (byte)property1, (byte)property2,
 						creatorPK,
 						(byte)feePow, recipient, key, amount, head,
 						data, isText, encryptMessage, timestamp, reference);
-					
+
 				break;
-				
+
 			case Transaction.HASHES_RECORD:
-	
+
 				// PARSE ACCOUNTING TRANSACTION V3
 				//return R_Hashes.Parse(data, releaserReference);
 				break;
-					
+
 			case Transaction.VOUCH_TRANSACTION:
-				
+
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_Vouch.Parse(data, releaserReference);
 				break;
-	
+
 			case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
-				
+
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_SetStatusToItem.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.SET_UNION_TO_ITEM_TRANSACTION:
-				
+
 				//PARSE CERTIFY PERSON TRANSACTION
 				//return R_SetUnionToItem.Parse(data, releaserReference);
 				break;
-	
+
 			case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
-				
+
 				//PARSE CERTIFY PERSON TRANSACTION
-				//return R_SertifyPubKeys.Parse(data, releaserReference);			
+				//return R_SertifyPubKeys.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.ISSUE_ASSET_TRANSACTION:
-				
+
 				//PARSE ISSUE ASSET TRANSACTION
 				//return IssueAssetTransaction.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.ISSUE_IMPRINT_TRANSACTION:
-				
+
 				//PARSE ISSUE IMPRINT TRANSACTION
 				//return IssueImprintRecord.Parse(data, releaserReference);
 				break;
-	
+
 			case Transaction.ISSUE_TEMPLATE_TRANSACTION:
-				
+
 				//PARSE ISSUE PLATE TRANSACTION
 				//return IssueTemplateRecord.Parse(data, releaserReference);
 				break;
-	
+
 			case Transaction.ISSUE_PERSON_TRANSACTION:
-				
+
 				//PARSE ISSUE PERSON TRANSACTION
 				//return IssuePersonRecord.Parse(data, releaserReference);
 				break;
-	
+
 			case Transaction.ISSUE_STATUS_TRANSACTION:
-				
+
 				//PARSE ISSUE PLATE TRANSACTION
 				//return IssueStatusRecord.Parse(data, releaserReference);
 				break;
-	
+
 			case Transaction.ISSUE_UNION_TRANSACTION:
-				
+
 				//PARSE ISSUE PLATE TRANSACTION
 				//return IssueUnionRecord.Parse(data, releaserReference);
 				break;
-				
+
 			case Transaction.GENESIS_SEND_ASSET_TRANSACTION:
-				
+
 				//PARSE TRANSFER ASSET TRANSACTION
-				//return GenesisTransferAssetTransaction.Parse(data);	
+				//return GenesisTransferAssetTransaction.Parse(data);
 				break;
-			
+
 			case Transaction.GENESIS_ISSUE_PERSON_TRANSACTION:
-				
+
 				//PARSE ISSUE PERSON TRANSACTION
 				//return GenesisIssuePersonRecord.Parse(data);
 				break;
-	
+
 			case Transaction.GENESIS_ISSUE_TEMPLATE_TRANSACTION:
-				
+
 				//PARSE ISSUE PLATE TRANSACTION
 				//return GenesisIssueTemplateRecord.Parse(data);
 				break;
-	
+
 			case Transaction.GENESIS_ISSUE_STATUS_TRANSACTION:
-				
+
 				//PARSE ISSUE STATUS TRANSACTION
 				//return GenesisIssueStatusRecord.Parse(data);
 				break;
-	
+
 			case Transaction.GENESIS_ISSUE_ASSET_TRANSACTION:
-				
+
 				//PARSE GENESIS TRANSACTION
 				//return GenesisIssueAssetTransaction.Parse(data);
 				break;
@@ -463,22 +417,22 @@ public class Rec_Resource {
 			default:
 				return APIUtils.errorMess(Transaction.INVALID_TRANSACTION_TYPE, "Invalid transaction type: " + record_type);
 
-			}  
+			}
 
 			// all test a not valid for main test
 			// all other network must be invalid here!
 			int port = Controller.getInstance().getNetworkPort();
 			return Base58.encode(Bytes.concat(record.toBytes(false, null), Ints.toByteArray(port)));
-			
+
 		} catch (Exception e) {
 			//LOGGER.info(e);
 			return APIUtils.errorMess(-step, e.toString() + " on step: " + step);
-		} 
-			
-	}
-	
+		}
 
-	
+	}
+
+
+
 	@GET
 	@Path("/getraw/{type}/{creator}")
 	//@Consumes(MediaType.APPLICATION_JSON)
@@ -495,10 +449,10 @@ public class Rec_Resource {
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
 		}
-		
+
 		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
 		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-		
+
 		JSONObject jsonObject = null;
 		try {
 			jsonObject = new JSONObject(queryParameters);
@@ -507,30 +461,30 @@ public class Rec_Resource {
 			//LOGGER.info(e);
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
-		} 
+		}
 
 		int feePow;
 		int version;
 		long timestamp;
 		long reference;
-		
+
 		int step = 0;
-		try {			
+		try {
 			feePow = jsonObject.containsKey("feePow")?Integer.parseInt(((List<String>)jsonObject.get("feePow")).get(0)):0;
-			
+
 			step++;
 			version = jsonObject.containsKey("version")?Integer.parseInt(((List<String>)jsonObject.get("version")).get(0)):0;
-			
+
 			step++;
 			timestamp = jsonObject.containsKey("timestamp")?Long.parseLong(((List<String>)jsonObject.get("timestamp")).get(0)):NTP.getTime();
-			
+
 			step++;
 			reference = jsonObject.containsKey("reference")?Long.parseLong(((List<String>)jsonObject.get("reference")).get(0)):0l;
 		} catch (Exception e1) {
 			//LOGGER.info(e1);
 			return APIUtils.errorMess(-step, e1.toString() + " on step: " + step);
-		} 
-		
+		}
+
 
 		return toBytes(record_type, version, 0, 0, feePow, timestamp, creator, reference, queryParameters);
 
@@ -551,10 +505,10 @@ public class Rec_Resource {
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
 		}
-		
+
 		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
 		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-		
+
 		return toBytes(record_type, version, 0, 0, feePow, timestamp, creator, reference, queryParameters);
 
 	}
@@ -576,10 +530,10 @@ public class Rec_Resource {
 			return APIUtils.errorMess(ApiErrorFactory.ERROR_JSON, ApiErrorFactory.getInstance().createError(
 					ApiErrorFactory.ERROR_JSON).toString());
 		}
-		
+
 		// see http://ru.tmsoftstudio.com/file/page/web-services-java/javax_ws_rs_core.html
 		MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-		
+
 		return toBytes(record_type, version, property1, property2, feePow, timestamp, creator, reference, queryParameters);
 
 	}
@@ -592,7 +546,7 @@ public class Rec_Resource {
 
 		try {
 			byte[] transactionBytes = Base58.decode(rawDataBase58);
-	
+
 			step++;
 			Pair<Transaction, Integer> result = Controller.getInstance().lightCreateTransactionFromRaw(transactionBytes);
 			if(result.getB() == Transaction.VALIDATE_OK) {

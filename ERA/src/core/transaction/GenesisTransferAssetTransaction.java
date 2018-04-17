@@ -84,7 +84,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 	@Override
 	public BigDecimal getAmount(String address) {
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
+		BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		if(address.equals(this.recipient.getAddress()))
 		{
@@ -254,7 +254,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//PROCESS/ORPHAN
 
 	@Override
-	public void process(DCSet db, Block block, boolean asPack)
+	public void process(Block block, boolean asPack)
 	{
 
 		long key = this.key;
@@ -288,7 +288,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	}
 
 	@Override
-	public void orphan(DCSet db, boolean asPack)
+	public void orphan(boolean asPack)
 	{
 		// RISE ERROR
 		DCSet err = null;

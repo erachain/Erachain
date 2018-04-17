@@ -88,7 +88,7 @@ public class TestRecTemplate {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
 	private void initTemplate(boolean process) {
@@ -99,7 +99,7 @@ public class TestRecTemplate {
 		issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueTemplateRecord.sign(maker, false);
 		if (process) {
-			issueTemplateRecord.process(db, gb, false);
+			issueTemplateRecord.process(gb, false);
 			templateKey = template.getKey(db);
 		}
 	}
@@ -146,7 +146,7 @@ public class TestRecTemplate {
 		//CREATE ISSUE PLATE TRANSACTION
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueTemplateRecord.sign(maker, false);
-		issueTemplateRecord.process(db, gb, false);
+		issueTemplateRecord.process(gb, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(true, null);
@@ -209,7 +209,7 @@ public class TestRecTemplate {
 		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(db, releaserReference));
 		
 		issueTemplateRecord.sign(maker, false);
-		issueTemplateRecord.process(db, gb, false);
+		issueTemplateRecord.process(gb, false);
 		int mapSize = templateMap.size();
 		
 		LOGGER.info("template KEY: " + template.getKey(db));
@@ -221,9 +221,9 @@ public class TestRecTemplate {
 		TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
 		issueTemplateTransaction_2.sign(maker, false);
-		issueTemplateTransaction_2.process(db, gb, false);
+		issueTemplateTransaction_2.process(gb, false);
 		LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-		issueTemplateTransaction_2.orphan(db, false);
+		issueTemplateTransaction_2.orphan(false);
 		assertEquals(mapSize, templateMap.size());
 		
 		//CHECK PLATE IS CORRECT
@@ -245,11 +245,11 @@ public class TestRecTemplate {
 		//CREATE ISSUE PLATE TRANSACTION
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 		issueTemplateRecord.sign(maker, false);
-		issueTemplateRecord.process(db, gb, false);
+		issueTemplateRecord.process(gb, false);
 		long key = db.getIssueTemplateMap().get(issueTemplateRecord);
 		assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 		
-		issueTemplateRecord.orphan(db, false);
+		issueTemplateRecord.orphan(false);
 				
 		//CHECK PLATE EXISTS SENDER
 		assertEquals(false, templateMap.contains(key));
@@ -506,13 +506,13 @@ public class TestRecTemplate {
 		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(db, releaserReference));
 		
 		signNoteRecord.sign(maker, false);
-		signNoteRecord.process(db, gb, false);
+		signNoteRecord.process(gb, false);
 							
 		//CHECK REFERENCE SENDER
 		assertEquals(signNoteRecord.getTimestamp(), maker.getLastTimestamp(db));	
 			
 		///// ORPHAN
-		signNoteRecord.orphan(db, false);
+		signNoteRecord.orphan(false);
 										
 		//CHECK REFERENCE SENDER
 		//assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));

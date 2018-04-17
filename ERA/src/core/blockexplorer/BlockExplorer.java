@@ -1348,8 +1348,8 @@ public class BlockExplorer
 		Map<Long, BigDecimal> volumeAmountOrders = new TreeMap<Long, BigDecimal>();
 
 		int count;
-		BigDecimal volumePrice =  BigDecimal.ZERO.setScale(8);
-		BigDecimal volumeAmount =  BigDecimal.ZERO.setScale(8);
+		BigDecimal volumePrice =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal volumeAmount =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		for (Order order : orders)
 		{
@@ -1364,7 +1364,7 @@ public class BlockExplorer
 
 			if(!volumeAmountOrders.containsKey(order.getWant()))
 			{
-				volumeAmount =  BigDecimal.ZERO.setScale(8);
+				volumeAmount =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			else
 			{
@@ -1373,7 +1373,7 @@ public class BlockExplorer
 
 			if(!volumePriceOrders.containsKey(order.getWant()))
 			{
-				volumePrice =  BigDecimal.ZERO.setScale(8);
+				volumePrice =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			else
 			{
@@ -1400,7 +1400,7 @@ public class BlockExplorer
 
 			if(!volumePriceOrders.containsKey(order.getHave()))
 			{
-				volumePrice =  BigDecimal.ZERO.setScale(8);
+				volumePrice =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			else
 			{
@@ -1409,7 +1409,7 @@ public class BlockExplorer
 
 			if(!volumeAmountOrders.containsKey(order.getHave()))
 			{
-				volumeAmount =  BigDecimal.ZERO.setScale(8);
+				volumeAmount =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			else
 			{
@@ -1435,8 +1435,8 @@ public class BlockExplorer
 			if(!pairsTrades.containsKey(trade.getInitiatorOrder(DCSet.getInstance()).getWant()) )
 			{
 				count = 0;
-				volumePrice =  BigDecimal.ZERO.setScale(8);
-				volumeAmount =  BigDecimal.ZERO.setScale(8);
+				volumePrice =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				volumeAmount =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			else
 			{
@@ -1457,8 +1457,8 @@ public class BlockExplorer
 			if(!pairsTrades.containsKey(trade.getTargetOrder(DCSet.getInstance()).getWant()))
 			{
 				count = 0;
-				volumePrice =  BigDecimal.ZERO.setScale(8);
-				volumeAmount =  BigDecimal.ZERO.setScale(8);
+				volumePrice =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				volumeAmount =  BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			else
 			{
@@ -1487,7 +1487,7 @@ public class BlockExplorer
 							pair.getValue(),
 							0,
 							volumePriceOrders.get(pair.getKey()), volumeAmountOrders.get(pair.getKey()),
-							BigDecimal.ZERO.setScale(8), BigDecimal.ZERO.setScale(8)
+							BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)
 							)
 					);
 		}
@@ -1514,8 +1514,8 @@ public class BlockExplorer
 						pair.getKey(), Fun.t6(
 								0,
 								pair.getValue(),
-								BigDecimal.ZERO.setScale(8),
-								BigDecimal.ZERO.setScale(8),
+								BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+								BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
 								volumePriceTrades.get(pair.getKey()),
 								volumeAmountTrades.get(pair.getKey())
 								)
@@ -1575,7 +1575,7 @@ public class BlockExplorer
 		}
 		else
 		{
-			output.put("totalOrdersVolume", BigDecimal.ZERO.setScale(8).toPlainString());
+			output.put("totalOrdersVolume", BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
 		}
 
 		if(all.containsKey(key))
@@ -1584,7 +1584,7 @@ public class BlockExplorer
 		}
 		else
 		{
-			output.put("totalTradesVolume", BigDecimal.ZERO.setScale(8).toPlainString());
+			output.put("totalTradesVolume", BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
 		}
 
 		Map pairsJSON=new LinkedHashMap();
@@ -1659,11 +1659,11 @@ public class BlockExplorer
 		Map buysJSON = new LinkedHashMap();
 
 
-		BigDecimal sumAmount = BigDecimal.ZERO.setScale(8);
-		BigDecimal sumAmountGood = BigDecimal.ZERO.setScale(8);
+		BigDecimal sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal sumAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
-		BigDecimal sumSellingAmount = BigDecimal.ZERO.setScale(8);
-		BigDecimal sumSellingAmountGood = BigDecimal.ZERO.setScale(8);
+		BigDecimal sumSellingAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal sumSellingAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		for (Order order : ordersHave)
 		{
@@ -1673,9 +1673,9 @@ public class BlockExplorer
 			sellJSON.put("amount", order.getAmountHaveLeft().toPlainString());
 			sumAmount = sumAmount.add(order.getAmountHaveLeft());
 
-			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
+			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal sellingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(8, RoundingMode.DOWN);
+			BigDecimal sellingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
@@ -1706,11 +1706,11 @@ public class BlockExplorer
 		output.put("sellsSumTotal", sumSellingAmount.toPlainString());
 		output.put("sellsSumTotalGood", sumSellingAmountGood.toPlainString());
 
-		sumAmount = BigDecimal.ZERO.setScale(8);
-		sumAmountGood = BigDecimal.ZERO.setScale(8);
+		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		sumAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
-		BigDecimal sumBuyingAmount = BigDecimal.ZERO.setScale(8);
-		BigDecimal sumBuyingAmountGood = BigDecimal.ZERO.setScale(8);
+		BigDecimal sumBuyingAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal sumBuyingAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		for (Order order : ordersWant)
 		{
@@ -1721,9 +1721,9 @@ public class BlockExplorer
 
 			sumAmount = sumAmount.add(order.getAmountHaveLeft());
 
-			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(8).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
+			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal buyingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(8, RoundingMode.DOWN);
+			BigDecimal buyingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
 
 			buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
@@ -1756,8 +1756,8 @@ public class BlockExplorer
 
 		output.put("tradesCount", trades.size());
 
-		BigDecimal tradeWantAmount = BigDecimal.ZERO.setScale(8);
-		BigDecimal tradeHaveAmount = BigDecimal.ZERO.setScale(8);
+		BigDecimal tradeWantAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal tradeHaveAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		int i = 0;
 		for (Trade trade : trades)
@@ -1902,7 +1902,7 @@ public class BlockExplorer
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
 
-			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
+			BigDecimal totalAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			for (Transaction transaction : block.getTransactions()) {
 				for (Account account : transaction.getInvolvedAccounts()) {
 					BigDecimal amount = transaction.getAmount(account);
@@ -1917,7 +1917,7 @@ public class BlockExplorer
 
 			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DCSet.getInstance().getATTransactionMap().getATTransactions(counter);
 
-			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
+			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e : aTtxs.entrySet())
 			{
@@ -2218,7 +2218,7 @@ public class BlockExplorer
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
-			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
+			BigDecimal totalAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			for (Transaction transaction : block.getTransactions()) {
 				for (Account account : transaction.getInvolvedAccounts()) {
 					BigDecimal amount = transaction.getAmount(account);
@@ -2233,7 +2233,7 @@ public class BlockExplorer
 
 			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DBSet.getInstance().getATTransactionMap().getATTransactions(counter);
 
-			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
+			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e : aTtxs.entrySet())
 			{
@@ -2365,7 +2365,7 @@ public class BlockExplorer
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(DBSet.getInstance())));
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
-			BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
+			BigDecimal totalAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			for (Transaction transaction : block.getTransactions()) {
 				for (Account account : transaction.getInvolvedAccounts()) {
 					BigDecimal amount = transaction.getAmount(account);
@@ -2380,7 +2380,7 @@ public class BlockExplorer
 
 			LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs = DBSet.getInstance().getATTransactionMap().getATTransactions(counter);
 
-			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
+			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e : aTtxs.entrySet())
 			{
@@ -2443,8 +2443,8 @@ public class BlockExplorer
 	{
 		Map output=new LinkedHashMap();
 		Map balances=new LinkedHashMap();
-		BigDecimal all = BigDecimal.ZERO.setScale(8);
-		BigDecimal alloreders = BigDecimal.ZERO.setScale(8);
+		BigDecimal all = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal alloreders = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
@@ -2900,7 +2900,7 @@ public class BlockExplorer
 				Map<Long, BigDecimal> totalAmountOfAssets = new TreeMap<Long, BigDecimal>();
 
 				for (Payment payment : ((MultiPaymentTransaction)transaction).getPayments()) {
-					BigDecimal amount = BigDecimal.ZERO.setScale(8);
+					BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 					if(totalAmountOfAssets.containsKey(payment.getAsset())) {
 						amount = totalAmountOfAssets.get(payment.getAsset());
 					}
@@ -2927,7 +2927,7 @@ public class BlockExplorer
 				Map<Long, BigDecimal> totalAmountOfAssets = new TreeMap<Long, BigDecimal>();
 
 				for (Payment payment : ((ArbitraryTransaction)transaction).getPayments()) {
-					BigDecimal amount = BigDecimal.ZERO.setScale(8);
+					BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 					if(totalAmountOfAssets.containsKey(payment.getAsset())) {
 						amount = totalAmountOfAssets.get(payment.getAsset());
 					}
@@ -3287,7 +3287,7 @@ public class BlockExplorer
 			AT at = DCSet.getInstance().getATMap().getAT(address);
 			Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
 			long aTtimestamp = block.getTimestamp(DCSet.getInstance());
-			BigDecimal aTbalanceCreation = BigDecimal.ZERO.setScale(8);
+			BigDecimal aTbalanceCreation = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			for (Transaction transaction : block.getTransactions()) {
 				if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION )
 				{
@@ -3375,11 +3375,11 @@ public class BlockExplorer
 		int aTTxsCount = 0;
 		int txsCount = 0;
 		int totalBlocksGeneratedCount = 0;
-		BigDecimal totalBlocksGeneratedFee = BigDecimal.ZERO.setScale(8);
+		BigDecimal totalBlocksGeneratedFee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		int[] txsTypeCount = new int[256];
 		List<Map<String, Map<Long, BigDecimal>>> tXincomes = new ArrayList<>();
 		List<Map<Long, BigDecimal>> totalBalances = new ArrayList<>();
-		BigDecimal spentFee = BigDecimal.ZERO.setScale(8);
+		BigDecimal spentFee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		Map<Long, BigDecimal> receivedCoins = new LinkedHashMap<>();
 		Map<Long, BigDecimal> sentCoins = new LinkedHashMap<>();
 		Map<String, BigDecimal> generatedFee = new LinkedHashMap<>();
@@ -3414,7 +3414,7 @@ public class BlockExplorer
 
 				generatedFee.put(
 						generator,
-						generatedFee.getOrDefault(generator, BigDecimal.ZERO.setScale(8)).add(fee)
+						generatedFee.getOrDefault(generator, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)).add(fee)
 						);
 
 				totalBlocksGeneratedFee = totalBlocksGeneratedFee.add(fee);
@@ -3502,7 +3502,7 @@ public class BlockExplorer
 					{
 						sentCoins.put(
 								assetAmount.getKey(),
-								sentCoins.getOrDefault(assetAmount.getKey(), BigDecimal.ZERO.setScale(8))
+								sentCoins.getOrDefault(assetAmount.getKey(), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
 								.subtract(assetAmount.getValue())
 								);
 					}
@@ -3511,13 +3511,13 @@ public class BlockExplorer
 					{
 						receivedCoins.put(
 								assetAmount.getKey(),
-								receivedCoins.getOrDefault(assetAmount.getKey(), BigDecimal.ZERO.setScale(8))
+								receivedCoins.getOrDefault(assetAmount.getKey(), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
 								.add(assetAmount.getValue())
 								);
 					}
 
 					newTotalBalance.put(assetAmount.getKey(),
-							newTotalBalance.getOrDefault(assetAmount.getKey(), BigDecimal.ZERO.setScale(8))
+							newTotalBalance.getOrDefault(assetAmount.getKey(), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
 							.add(assetAmount.getValue())
 							);
 				}
@@ -4685,7 +4685,7 @@ public class BlockExplorer
 
 		output.put("countTx", txCountJSON);
 
-		BigDecimal totalAmount = BigDecimal.ZERO.setScale(8);
+		BigDecimal totalAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		for (Transaction transaction : block.getTransactions()) {
 			for (Account account : transaction.getInvolvedAccounts()) {
 				BigDecimal amount = transaction.getAmount(account);
@@ -4698,7 +4698,7 @@ public class BlockExplorer
 
 		output.put("totalAmount", totalAmount.toPlainString());
 
-		BigDecimal totalATAmount = BigDecimal.ZERO.setScale(8);
+		BigDecimal totalATAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e : atTxs.entrySet())
 		{
@@ -4888,7 +4888,7 @@ public class BlockExplorer
 			}
 			else
 			{
-				return BigDecimal.ZERO.setScale(8);
+				return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 		}
 
@@ -4900,7 +4900,7 @@ public class BlockExplorer
 			}
 			else
 			{
-				return BigDecimal.ZERO.setScale(8);
+				return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 		}
 

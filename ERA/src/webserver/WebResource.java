@@ -2354,7 +2354,7 @@ public class WebResource {
 							if(creator != null)
 							{
 								BigDecimal amount = BigDecimal.TEN;
-								amount = amount.setScale(8);
+								amount = amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 								payments.add(new Payment(new Account(creator), AssetCls.FEE_KEY,amount ));
 							}
 							result = activeProfileOpt.saveProfile(payments);

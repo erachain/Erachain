@@ -64,7 +64,7 @@ public class TestTemplateAsPack {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
 	
@@ -109,7 +109,7 @@ public class TestTemplateAsPack {
 		//CREATE ISSUE PLATE TRANSACTION
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
 		issueTemplateRecord.sign(maker, asPack);
-		issueTemplateRecord.process(db, gb, asPack);
+		issueTemplateRecord.process(gb, asPack);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(true, null);
@@ -164,7 +164,7 @@ public class TestTemplateAsPack {
 		
 		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(db, releaserReference));
 		Long makerReference = maker.getLastTimestamp(db);
-		issueTemplateRecord.process(db, gb, asPack);
+		issueTemplateRecord.process(gb, asPack);
 		
 		LOGGER.info("template KEY: " + template.getKey(db));
 				
@@ -175,9 +175,9 @@ public class TestTemplateAsPack {
 		TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");				
 		IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2);
 		issueTemplateTransaction_2.sign(maker, asPack);
-		issueTemplateTransaction_2.process(db, gb, asPack);
+		issueTemplateTransaction_2.process(gb, asPack);
 		LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-		issueTemplateTransaction_2.orphan(db, asPack);
+		issueTemplateTransaction_2.orphan(asPack);
 		ItemTemplateMap templateMap = db.getItemTemplateMap();
 		int mapSize = templateMap.size();
 		assertEquals(0, mapSize - 4);
@@ -202,11 +202,11 @@ public class TestTemplateAsPack {
 		//CREATE ISSUE PLATE TRANSACTION
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
 		issueTemplateRecord.sign(maker, asPack);
-		issueTemplateRecord.process(db, gb, asPack);
+		issueTemplateRecord.process(gb, asPack);
 		long key = db.getIssueTemplateMap().get(issueTemplateRecord);
 		assertEquals((long)makerReference, (long)maker.getLastTimestamp(db));
 		
-		issueTemplateRecord.orphan(db, asPack);
+		issueTemplateRecord.orphan(asPack);
 				
 		//CHECK PLATE EXISTS SENDER
 		assertEquals(false, db.getItemTemplateMap().contains(key));

@@ -18,23 +18,24 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import utils.APIUtils;
-import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.transaction.Transaction;
+import utils.APIUtils;
+import utils.Pair;
 
 @Path("namesales")
 @Produces(MediaType.APPLICATION_JSON)
-public class NameSalesResource 
+public class NameSalesResource
 {
 	@Context
 	HttpServletRequest request;
-	
+
 	@SuppressWarnings("unchecked")
 	@GET
 	public String getNameSales()
@@ -47,21 +48,21 @@ public class NameSalesResource
 		{
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
-		
+
 		List<Pair<Account, NameSale>> nameSales = Controller.getInstance().getNameSales();
 		JSONArray array = new JSONArray();
-		
+
 		for(Pair<Account, NameSale> nameSale: nameSales)
 		{
 			array.add(nameSale.getB().toJson());
 		}
-		
+
 		return array.toJSONString();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("/address/{address}")	
+	@Path("/address/{address}")
 	public String getNameSales(@PathParam("address") String address)
 	{
 		String password = null;
@@ -72,60 +73,60 @@ public class NameSalesResource
 		{
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
-				
+
 		//CHECK ADDRESS
 		if(!Crypto.getInstance().isValidAddress(address))
 		{
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 		}
-				
+
 		//CHECK ACCOUNT IN WALLET
-		Account account = Controller.getInstance().getAccountByAddress(address);	
+		Account account = Controller.getInstance().getAccountByAddress(address);
 		if(account == null)
 		{
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
 		}
-		
+
 		JSONArray array = new JSONArray();
 		for(NameSale nameSale: Controller.getInstance().getNameSales(account))
 		{
 			array.add(nameSale.toJson());
 		}
-		
+
 		return array.toJSONString();
 	}
-	
+
 	@GET
-	@Path("/{name}")	
+	@Path("/{name}")
 	public static String getNameSale(@PathParam("name") String nameName)
-	{	
+	{
 		NameSale nameSale = Controller.getInstance().getNameSale(nameName);
-				
+
 		//CHECK IF NAME SALE EXISTS
 		if(nameSale == null)
 		{
 			throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 		}
-		
+
 		return nameSale.toJson().toJSONString();
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	@Path("/network")	
+	@Path("/network")
 	@GET
 	public String getAllNameSales()
 	{
 		List<NameSale> nameSales = Controller.getInstance().getAllNameSales();
 		JSONArray array = new JSONArray();
-		
+
 		for(NameSale nameSale: nameSales)
 		{
 			array.add(nameSale.getKey());
 		}
-		
+
 		return array.toJSONString();
 	}
-	
+
 	@POST
 	@Path("/{name}")
 	@Consumes(MediaType.WILDCARD)
@@ -134,23 +135,23 @@ public class NameSalesResource
 		try
 		{
 			//READ JSON
-			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);		
+			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String amount = (String) jsonObject.get("amount");
 			String feePowStr = (String) jsonObject.get("feePow");
-			
+
 			//PARSE AMOUNT
 			BigDecimal bdAmount;
 			try
 			{
 				bdAmount = new BigDecimal(amount);
-				bdAmount = bdAmount.setScale(8);
+				bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			}
 			catch(Exception e)
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_AMOUNT);
 			}
-				
-			
+
+
 			//PARSE FEE
 			int feePow=0;
 			try
@@ -169,7 +170,7 @@ public class NameSalesResource
 			{
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 			}
-						
+
 			//CHECK WALLET UNLOCKED
 			if(!Controller.getInstance().isWalletUnlocked())
 			{
@@ -182,17 +183,17 @@ public class NameSalesResource
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 			}
-			
+
 			//GET OWNER
-			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(name.getOwner().getAddress());				
+			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(name.getOwner().getAddress());
 			if(account == null)
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
-				
+
 			//CREATE NAME SALE
 			Pair<Transaction, Integer> result = Controller.getInstance().sellName(account, nameName, bdAmount, feePow);
-				
+
 			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
 			else
@@ -210,7 +211,7 @@ public class NameSalesResource
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
 	}
-	
+
 	@DELETE
 	@Path("/{name}/{fee}")
 	@Consumes(MediaType.WILDCARD)
@@ -227,8 +228,8 @@ public class NameSalesResource
 			catch(Exception e)
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
-			}	
-			
+			}
+
 			NameSale nameSale = Controller.getInstance().getNameSale(nameName);
 
 			String password = null;
@@ -239,7 +240,7 @@ public class NameSalesResource
 			{
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 			}
-						
+
 			//CHECK WALLET UNLOCKED
 			if(!Controller.getInstance().isWalletUnlocked())
 			{
@@ -251,17 +252,17 @@ public class NameSalesResource
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 			}
-			
+
 			//GET OWNER
-			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(nameSale.getName().getOwner().getAddress());				
+			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(nameSale.getName().getOwner().getAddress());
 			if(account == null)
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
-			
+
 			//CREATE NAME SALE
 			Pair<Transaction, Integer> result = Controller.getInstance().cancelSellName(account, nameSale, feePow);
-				
+
 			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
 			else
@@ -279,7 +280,7 @@ public class NameSalesResource
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 		}
 	}
-	
+
 	@POST
 	@Path("/buy/{name}")
 	@Consumes(MediaType.WILDCARD)
@@ -288,10 +289,10 @@ public class NameSalesResource
 		try
 		{
 			//READ JSON
-			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);		
+			JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
 			String buyer = (String) jsonObject.get("buyer");
 			String feePowStr = (String) jsonObject.get("feePow");
-			
+
 			//PARSE FEE
 			int feePow;
 			try
@@ -311,7 +312,7 @@ public class NameSalesResource
 			{
 				throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 			}
-						
+
 			//CHECK WALLET UNLOCKED
 			if(!Controller.getInstance().isWalletUnlocked())
 			{
@@ -319,29 +320,29 @@ public class NameSalesResource
 			}
 
 			NameSale nameSale = Controller.getInstance().getNameSale(nameName);
-			
+
 			//CHECK IF NAME SALE EXISTS
 			if(nameSale == null)
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.NAME_DOES_NOT_EXIST);
 			}
-			
+
 			//CHECK ADDRESS
 			if(!Crypto.getInstance().isValidAddress(buyer))
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
 			}
-			
+
 			//GET BUYER
-			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(buyer);				
+			PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(buyer);
 			if(account == null)
 			{
 				throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 			}
-			
+
 			//CREATE NAME SALE
 			Pair<Transaction, Integer> result = Controller.getInstance().BuyName(account, nameSale, feePow);
-				
+
 			if (result.getB() == Transaction.VALIDATE_OK)
 				return result.getA().toJson().toJSONString();
 			else

@@ -2,21 +2,20 @@ package gui.items.assets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
 import controller.Controller;
+import core.BlockChain;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
+import lang.Lang;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-import lang.Lang;
 
 @SuppressWarnings("serial")
 public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> implements Observer
@@ -26,79 +25,79 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 	public static final int COLUMN_TOTAL = 2;
 
 	public SortableList<BigInteger, Order> orders;
-	
+
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Price", "Amount", "Buying Amount"});
-	
+
 	BigDecimal sumAmount;
 	BigDecimal sumTotal;
 	private AssetCls have;
 	private AssetCls want;
-	 
+
 	public SellOrdersTableModel(AssetCls have, AssetCls want)
 	{
 		this.have = have;
 		this.want= want;
 		this.orders = Controller.getInstance().getOrders(have, want, true);
-				
+
 		columnNames[COLUMN_PRICE] += " " + want.getShort();
 		columnNames[COLUMN_AMOUNT] += " " + have.getShort();
 		columnNames[COLUMN_TOTAL] += " " + want.getShort();
-		
+
 		totalCalc();
 
 		Controller.getInstance().addObserver(this);
 		//this.orders.registerObserver();
 
 	}
-	
+
 	private void totalCalc()
 	{
-		sumAmount = BigDecimal.ZERO.setScale(8);
-		sumTotal = BigDecimal.ZERO.setScale(8);
-		for (Pair<BigInteger, Order> orderPair : this.orders) 	
+		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		sumTotal = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		for (Pair<BigInteger, Order> orderPair : this.orders)
 		{
 			sumAmount = sumAmount.add(orderPair.getB().getAmountHaveLeft());
 			sumTotal = sumTotal.add(orderPair.getB().getAmountWantLeft());
 		}
 	}
-	
+
 	@Override
-	public SortableList<BigInteger, Order> getSortableList() 
+	public SortableList<BigInteger, Order> getSortableList()
 	{
 		return this.orders;
 	}
-	
+
 	public Order getOrder(int row)
 	{
 		return this.orders.get(row).getB();
 	}
-	
+
 	@Override
-	public int getColumnCount() 
+	public int getColumnCount()
 	{
 		return this.columnNames.length;
 	}
-	
+
 	@Override
-	public String getColumnName(int index) 
+	public String getColumnName(int index)
 	{
 		return this.columnNames[index];
 	}
 
 	@Override
-	public int getRowCount() 
+	public int getRowCount()
 	{
 		return this.orders.size() + 1;
 	}
 
 	@Override
-	public Object getValueAt(int row, int column) 
+	public Object getValueAt(int row, int column)
 	{
 		if(this.orders == null || row > this.orders.size() )
 		{
 			return null;
 		}
-		
+
 		Order order = null;
 		boolean isMine = false;
 		if(row < this.orders.size())
@@ -109,56 +108,56 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 				isMine = true;
 			}
 		}
-		
+
 		switch(column)
 		{
-			case COLUMN_PRICE:
-				
-				if(row == this.orders.size())
-					return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
-				
-				return NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
-			
-			case COLUMN_AMOUNT:
-				
-				if(row == this.orders.size())
-					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
-				
-				
-				// It shows unacceptably small amount of red.
-				BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
-				BigDecimal amount = order.getAmountHaveLeft();
-				String amountStr = NumberAsString.getInstance().numberAsString(order.getAmountHaveLeft());
-				amount = amount.subtract(amount.remainder(increment));
-				
-				if (amount.compareTo(BigDecimal.ZERO) <= 0)
-					amountStr = "<font color=#808080>" + amountStr + "</font>";
+		case COLUMN_PRICE:
 
-				if (isMine)
-					amountStr = "<b>" + amountStr + "</b>";
-				
-				return "<html>" + amountStr + "</html>";
-			
-			case COLUMN_TOTAL:
-	
-				if(row == this.orders.size())
-					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
-	
-				amountStr = NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
+			if(row == this.orders.size())
+				return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
 
-				if (isMine)
-					amountStr = "<b>" + amountStr + "</b>";
+			return NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
 
-				return "<html>" + amountStr + "</html>";
-					
+		case COLUMN_AMOUNT:
+
+			if(row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
+
+
+			// It shows unacceptably small amount of red.
+			BigDecimal increment = order.calculateBuyIncrement(order, DCSet.getInstance());
+			BigDecimal amount = order.getAmountHaveLeft();
+			String amountStr = NumberAsString.getInstance().numberAsString(order.getAmountHaveLeft());
+			amount = amount.subtract(amount.remainder(increment));
+
+			if (amount.compareTo(BigDecimal.ZERO) <= 0)
+				amountStr = "<font color=#808080>" + amountStr + "</font>";
+
+			if (isMine)
+				amountStr = "<b>" + amountStr + "</b>";
+
+			return "<html>" + amountStr + "</html>";
+
+		case COLUMN_TOTAL:
+
+			if(row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
+
+			amountStr = NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
+
+			if (isMine)
+				amountStr = "<b>" + amountStr + "</b>";
+
+			return "<html>" + amountStr + "</html>";
+
 		}
-		
+
 		return null;
 	}
 
 	@Override
-	public void update(Observable o, Object arg) 
-	{	
+	public void update(Observable o, Object arg)
+	{
 		try
 		{
 			this.syncUpdate(o, arg);
@@ -168,11 +167,11 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 			//GUI ERROR
 		}
 	}
-	
+
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
+
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
 				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
@@ -183,8 +182,8 @@ public class SellOrdersTableModel extends TableModelCls<BigInteger, Order> imple
 			this.fireTableDataChanged();
 		}
 	}
-	
-	public void removeObservers() 
+
+	public void removeObservers()
 	{
 		this.orders.removeObserver();
 		Controller.getInstance().deleteObserver(this);

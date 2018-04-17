@@ -4,11 +4,14 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.TrayIcon.MessageType;
 import java.math.BigDecimal;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
 import com.github.rjeschke.txtmark.Processor;
+
 import controller.Controller;
 import core.account.Account;
 import core.transaction.R_Send;
@@ -20,7 +23,7 @@ import de.muntjak.tinylookandfeel.Theme;
 import org.jvnet.substance.SubstanceLookAndFeel;
 import org.jvnet.substance.api.skin.*;
 import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
-*/
+ */
 
 import lang.Lang;
 import settings.Settings;
@@ -36,14 +39,14 @@ public class library {
 		Account account = Controller.getInstance().getAccountByAddress(r_Send.getRecipient().getAddress());
 		if (account != null) {
 			if (Settings.getInstance().isSoundReceiveMessageEnabled()) {
-				PlaySound.getInstance().playSound("receivemessage.wav", ((Transaction) record).getSignature());
+				PlaySound.getInstance().playSound("receivemessage.wav", record.getSignature());
 			}
 
 			SysTray.getInstance().sendMessage("Payment received",
 					"From: " + r_Send.getCreator().getPersonAsString() + "\nTo: " + account.getPersonAsString() + "\n"
 							+ "Asset Key" + ": " + r_Send.getAbsKey() + ", " + "Amount" + ": "
 							+ r_Send.getAmount().toPlainString(),
-					MessageType.INFO);
+							MessageType.INFO);
 		} else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
 			PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
 		}
@@ -111,10 +114,10 @@ public class library {
 		 * ;// // com.sun.java.swing.plaf.gtk.GTKLookAndFeel //
 		 * com.sun.java.swing.plaf.motif.MotifLookAndFeel //
 		 * com.sun.java.swing.plaf.windows.WindowsLookAndFeel
-		 * 
-		 * 
-		 * 
-		 * 
+		 *
+		 *
+		 *
+		 *
 		 */
 
 		Toolkit.getDefaultToolkit().setDynamicLayout(true);
@@ -272,7 +275,7 @@ public class library {
 	 * Boolean.TRUE); JFrame.setDefaultLookAndFeelDecorated(true);
 	 * JDialog.setDefaultLookAndFeelDecorated(true);
 	 * Runtime.getRuntime().addShutdownHook(new Thread() {
-	 * 
+	 *
 	 * @Override public void run() { try { String skinClassName =
 	 * SubstanceLookAndFeel.getCurrentSkin().getClass().getCanonicalName();
 	 * properties.setProperty("skinClassName", skinClassName);

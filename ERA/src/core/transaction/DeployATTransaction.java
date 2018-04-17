@@ -400,10 +400,10 @@ public class DeployATTransaction extends Transaction
 
 	//@Override
 	@Override
-	public void process(DCSet db, Block block, boolean asPack)
+	public void process(Block block, boolean asPack)
 	{
 		//UPDATE ISSUER
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
 		this.creator.changeBalance(db, true, Transaction.FEE_KEY, this.amount, false);
 
@@ -466,10 +466,10 @@ public class DeployATTransaction extends Transaction
 
 	//@Override
 	@Override
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 
 		//UPDATE ISSUER
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 		//this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
 		this.creator.changeBalance(db, false, Transaction.FEE_KEY, this.amount, true);
 
@@ -535,7 +535,7 @@ public class DeployATTransaction extends Transaction
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(8).subtract(this.amount.add(this.fee));
+			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).subtract(this.amount.add(this.fee));
 		}
 
 		return BigDecimal.ZERO;

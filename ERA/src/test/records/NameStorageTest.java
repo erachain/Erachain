@@ -1,18 +1,17 @@
 package test.records;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 
-import ntp.NTP;
-
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import controller.Controller;
+import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
 import core.naming.Name;
@@ -22,8 +21,9 @@ import core.transaction.ArbitraryTransactionV3;
 import core.transaction.RegisterNameTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import utils.Pair;
+import ntp.NTP;
 import utils.Corekeys;
+import utils.Pair;
 import utils.StorageUtils;
 
 @SuppressWarnings("unchecked")
@@ -58,17 +58,17 @@ public class NameStorageTest {
 
 		// PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(sender, BigDecimal
-		//		.valueOf(1000).setScale(8), NTP.getTime());
+		//		.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		//sender.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 
 		// PROCESS GENESIS TRANSACTION TO MAKE SURE BUYER HAS FUNDS
 		//transaction = new GenesisTransaction(buyer, BigDecimal.valueOf(1000)
-		//		.setScale(8), NTP.getTime());
+		//		.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 		// CREATE SIGNATURE
 		long timestamp = NTP.getTime();
@@ -79,12 +79,12 @@ public class NameStorageTest {
 				sender, name, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		//nameRegistration.sign(sender);
-		
+
 
 		// CHECK IF NAME REGISTRATION IS VALID
 		assertEquals(Transaction.VALIDATE_OK,
 				nameRegistration.isValid(databaseSet, releaserReference));
-		nameRegistration.process(databaseSet, null, false);
+		nameRegistration.process(null, false);
 	}
 
 	@Test
@@ -108,44 +108,44 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		
-		arbitraryTransaction.process(databaseSet, null, false);
+
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertEquals(
 				"yes",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
 						Corekeys.PROFILEENABLE.toString()));
-		
-		
+
+
 		byte[] seed = Crypto.getInstance().digest("test2".getBytes());
 		byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-		 PrivateKeyAccount badSender = new PrivateKeyAccount(privateKey);
-		 
-		 
-		  storageJsonObject = StorageUtils.getStorageJsonObject(
-					null, Arrays.asList(
-							Corekeys.PROFILEENABLE.toString()),null,
-					null, null, null);
-			storageJsonObject.put("name", "drizzt");
-			 data = storageJsonObject.toString().getBytes();
+		PrivateKeyAccount badSender = new PrivateKeyAccount(privateKey);
 
-			// ADDING KEY COMPLETE WITH YES
-			arbitraryTransaction = new ArbitraryTransactionV3(
-					null, badSender, null, 10, data, (byte)0,
-					timestamp, badSender.getLastTimestamp(databaseSet));
-			
-			
-			arbitraryTransaction.process(databaseSet, null, false);
 
-			// KEY IS STILL THERE!
-			assertEquals(
-					"yes",
-					databaseSet.getNameStorageMap().getOpt("drizzt",
-							Corekeys.PROFILEENABLE.toString()));
-		
-		
-		
+		storageJsonObject = StorageUtils.getStorageJsonObject(
+				null, Arrays.asList(
+						Corekeys.PROFILEENABLE.toString()),null,
+				null, null, null);
+		storageJsonObject.put("name", "drizzt");
+		data = storageJsonObject.toString().getBytes();
+
+		// ADDING KEY COMPLETE WITH YES
+		arbitraryTransaction = new ArbitraryTransactionV3(
+				null, badSender, null, 10, data, (byte)0,
+				timestamp, badSender.getLastTimestamp(databaseSet));
+
+
+		arbitraryTransaction.process(null, false);
+
+		// KEY IS STILL THERE!
+		assertEquals(
+				"yes",
+				databaseSet.getNameStorageMap().getOpt("drizzt",
+						Corekeys.PROFILEENABLE.toString()));
+
+
+
 	}
 
 	@Test
@@ -170,7 +170,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -190,7 +190,7 @@ public class NameStorageTest {
 				data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		// NEW KEY IS THERE!
 		assertEquals(
@@ -209,8 +209,8 @@ public class NameStorageTest {
 		arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
 				data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
-		
-		arbitraryTransaction.process(databaseSet, null, false);
+
+		arbitraryTransaction.process(null, false);
 		arbitraryTransaction.sign(sender, false);
 
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -240,7 +240,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		assertEquals(
 				"skerberus",
@@ -259,8 +259,8 @@ public class NameStorageTest {
 				data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		
-		arbitraryTransaction.process(databaseSet, null, false);
+
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
@@ -281,7 +281,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -307,7 +307,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -332,7 +332,7 @@ public class NameStorageTest {
 				data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -352,7 +352,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		assertEquals(
 				"a;b;c",
@@ -373,7 +373,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		// KEY IS THERE!
 		assertEquals(
@@ -390,8 +390,8 @@ public class NameStorageTest {
 
 		JSONObject storageJsonObject = StorageUtils.getStorageJsonObject(null,
 				null, null, null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "first")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "first")), null);
 		storageJsonObject.put("name", "drizzt");
 		byte[] data = storageJsonObject.toString().getBytes();
 
@@ -400,7 +400,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
 
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -420,7 +420,7 @@ public class NameStorageTest {
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
 
-		arbitraryTransaction2.process(databaseSet, null, false);
+		arbitraryTransaction2.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -430,7 +430,7 @@ public class NameStorageTest {
 						Corekeys.WEBSITE.toString()));
 
 		// ORPHANING FIRST TX!
-		arbitraryTransaction.orphan(databaseSet, false);
+		arbitraryTransaction.orphan(false);
 
 		assertEquals(
 				" second",
@@ -438,7 +438,7 @@ public class NameStorageTest {
 						Corekeys.WEBSITE.toString()));
 
 		// ORPHANING second TX!
-		arbitraryTransaction2.orphan(databaseSet, false);
+		arbitraryTransaction2.orphan(false);
 
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
 				Corekeys.WEBSITE.toString()));
@@ -463,7 +463,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -475,8 +475,8 @@ public class NameStorageTest {
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "vrontis")), null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "second")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -484,7 +484,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
-		arbitraryTransaction2.process(databaseSet, null, false);
+		arbitraryTransaction2.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -496,8 +496,8 @@ public class NameStorageTest {
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>("asdf",
 						"asdf")), null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "third")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "third")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -505,7 +505,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction3.sign(sender, false);
-		arbitraryTransaction3.process(databaseSet, null, false);
+		arbitraryTransaction3.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
@@ -532,7 +532,7 @@ public class NameStorageTest {
 		// Website: firstthird
 		// random : skerberus
 		// asdf : asdf
-		arbitraryTransaction2.orphan(databaseSet, false);
+		arbitraryTransaction2.orphan(false);
 
 		assertEquals(
 				"firstthird",
@@ -569,7 +569,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -581,8 +581,8 @@ public class NameStorageTest {
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "vrontis")), null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "second")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -590,7 +590,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
-		arbitraryTransaction2.process(databaseSet, null, false);
+		arbitraryTransaction2.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -602,8 +602,8 @@ public class NameStorageTest {
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>("asdf",
 						"asdf")), null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "third")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "third")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -611,7 +611,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction3.sign(sender, false);
-		arbitraryTransaction3.process(databaseSet, null, false);
+		arbitraryTransaction3.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
@@ -637,7 +637,7 @@ public class NameStorageTest {
 		// Website: secondthird
 		// random : vrontis
 		// asdf : asdf
-		arbitraryTransaction.orphan(databaseSet, false);
+		arbitraryTransaction.orphan(false);
 
 		assertEquals(
 				"secondthird",
@@ -645,8 +645,8 @@ public class NameStorageTest {
 						Corekeys.WEBSITE.toString()));
 		assertNull(
 
-		databaseSet.getNameStorageMap().getOpt("drizzt",
-				Corekeys.PROFILEENABLE.toString()));
+				databaseSet.getNameStorageMap().getOpt("drizzt",
+						Corekeys.PROFILEENABLE.toString()));
 		assertEquals(
 				"vrontis",
 				databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -657,7 +657,7 @@ public class NameStorageTest {
 		// removing new first
 		// Website: third
 		// asdf : asdf
-		arbitraryTransaction2.orphan(databaseSet, false);
+		arbitraryTransaction2.orphan(false);
 
 		assertEquals(
 				"third",
@@ -665,8 +665,8 @@ public class NameStorageTest {
 						Corekeys.WEBSITE.toString()));
 		assertNull(
 
-		databaseSet.getNameStorageMap().getOpt("drizzt",
-				Corekeys.PROFILEENABLE.toString()));
+				databaseSet.getNameStorageMap().getOpt("drizzt",
+						Corekeys.PROFILEENABLE.toString()));
 		assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
 				random_linking_example));
 		assertEquals("asdf",
@@ -692,7 +692,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction.sign(sender, false);
-		arbitraryTransaction.process(databaseSet, null, false);
+		arbitraryTransaction.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -704,8 +704,8 @@ public class NameStorageTest {
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>(
 						random_linking_example, "vrontis")), null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "second")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "second")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -713,7 +713,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction2.sign(sender, false);
-		arbitraryTransaction2.process(databaseSet, null, false);
+		arbitraryTransaction2.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -725,8 +725,8 @@ public class NameStorageTest {
 		storageJsonObject = StorageUtils.getStorageJsonObject(null, null,
 				Collections.singletonList(new Pair<String, String>("asdf",
 						"asdf")), null, Collections
-						.singletonList(new Pair<String, String>(
-								Corekeys.WEBSITE.toString(), "third")), null);
+				.singletonList(new Pair<String, String>(
+						Corekeys.WEBSITE.toString(), "third")), null);
 		storageJsonObject.put("name", "drizzt");
 		data = storageJsonObject.toString().getBytes();
 
@@ -734,7 +734,7 @@ public class NameStorageTest {
 				null, sender, null, 10, data, (byte)0,
 				timestamp, sender.getLastTimestamp(databaseSet));
 		arbitraryTransaction3.sign(sender, false);
-		arbitraryTransaction3.process(databaseSet, null, false);
+		arbitraryTransaction3.process(null, false);
 
 		DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
@@ -759,7 +759,7 @@ public class NameStorageTest {
 		// Profenable:yes
 		// Website: firstsecond
 		// random : skerberus;vrontis
-		arbitraryTransaction3.orphan(databaseSet, false);
+		arbitraryTransaction3.orphan(false);
 
 		assertEquals(
 				"firstsecond",

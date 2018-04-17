@@ -2,24 +2,24 @@ package gui.items.assets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.Observable;
 import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 
-import gui.models.TableModelCls;
-import utils.DateTimeFormat;
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
+import core.BlockChain;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import datachain.DCSet;
 import datachain.SortableList;
+import gui.models.TableModelCls;
 import lang.Lang;
+import utils.DateTimeFormat;
+import utils.NumberAsString;
+import utils.ObserverMessage;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigInteger>, Trade> implements Observer
@@ -32,18 +32,18 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
 	private SortableList<Tuple2<BigInteger, BigInteger>, Trade> trades;
 	private AssetCls have;
-	
+
 	BigDecimal sumAsset1;
 	BigDecimal sumAsset2;
-	
+
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
-	
+
 	private void totalCalc()
 	{
-		sumAsset1 = BigDecimal.ZERO.setScale(8);
-		sumAsset2 = BigDecimal.ZERO.setScale(8);
-		
-		for (Pair<Tuple2<BigInteger, BigInteger>, Trade> tradePair : this.trades) 	
+		sumAsset1 = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		sumAsset2 = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
+		for (Pair<Tuple2<BigInteger, BigInteger>, Trade> tradePair : this.trades)
 		{
 			String type = tradePair.getB().getInitiatorOrder(DCSet.getInstance()).getHave() == this.have.getKey() ? "Sell" : "Buy";
 
@@ -57,81 +57,81 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				sumAsset1 = sumAsset1.add(tradePair.getB().getAmountWant());
 				sumAsset2 = sumAsset2.add(tradePair.getB().getAmountHave());
 			}
-			
+
 		}
 	}
-	
+
 	public TradesTableModel(AssetCls have, AssetCls want)
 	{
 		Controller.getInstance().addObserver(this);
-		
+
 		this.have = have;
 		this.trades = Controller.getInstance().getTrades(have, want);
 		this.trades.registerObserver();
-		
+
 		this.columnNames[2] = have.getShort();
-		
+
 		this.columnNames[4] = want.getShort();
-		
+
 		this.columnNames[3] = "Price: " + this.columnNames[4];
-		
+
 		totalCalc();
 	}
-	
+
 	@Override
-	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getSortableList() 
+	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getSortableList()
 	{
 		return this.trades;
 	}
-	
+
 	public Trade getTrade(int row)
 	{
 		Pair<Tuple2<BigInteger, BigInteger>, Trade> rec = this.trades.get(row);
 		if (rec == null)
 			return null;
-		
+
 		return this.trades.get(row).getB();
 	}
-	
+
 	@Override
-	public int getColumnCount() 
+	public int getColumnCount()
 	{
 		return this.columnNames.length;
 	}
-	
+
 	@Override
-	public String getColumnName(int index) 
+	public String getColumnName(int index)
 	{
 		return this.columnNames[index];
 	}
 
 	@Override
-	public int getRowCount() 
+	public int getRowCount()
 	{
 		return this.trades.size() + 1;
 	}
 
 	@Override
-	public Object getValueAt(int row, int column) 
+	public Object getValueAt(int row, int column)
 	{
 		if(this.trades == null || row > this.trades.size() )
 		{
 			return null;
 		}
-		
+
 		Trade trade = null;
 		int type = 0;
 		Order initatorOrder = null;
 		Order targetOrder = null;
-		
+
 		if(row < this.trades.size())
 		{
 			trade = this.trades.get(row).getB();
 			if(trade != null) {
 				DCSet db = DCSet.getInstance();
-				
-				initatorOrder = trade.getInitiatorOrder(db); 				
-				targetOrder = trade.getTargetOrder(db); 
+
+				initatorOrder = trade.getInitiatorOrder(db);
+				targetOrder = trade.getTargetOrder(db);
 
 				type = initatorOrder.getHave()
 						== this.have.getKey()?
@@ -139,72 +139,72 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
 			}
 		}
-		
+
 		switch(column)
 		{
-			case COLUMN_TIMESTAMP:
-				
-				if(row == this.trades.size())
-					return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
-				
-				return DateTimeFormat.timestamptoString(trade.getTimestamp());
-				
-			case COLUMN_TYPE:
-				
-				return type == 0? "": type > 0? "Sell" : "Buy";
-	
-			case COLUMN_ASSET_1:
-				
-				if(row == this.trades.size())
-					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset1) + "</i></html>";
+		case COLUMN_TIMESTAMP:
 
-				String result = "";
-				if(type > 0)
-					result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
-				else
-					result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
-				
-				if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
-					result = "<html><b>" + result + "</b></html>";
-				}
-				
-				return result;
+			if(row == this.trades.size())
+				return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
 
-				
-			case COLUMN_PRICE:
-				
-				if(row == this.trades.size())
-					return null;
-				
-				if(type > 0)
-					return NumberAsString.getInstance().numberAsString12(trade.getPriceCalc());
-				else
-					return NumberAsString.getInstance().numberAsString12(trade.getPriceCalcBack());
-			
-			case COLUMN_ASSET_2:
+			return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
-				if(row == this.trades.size())
-					return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
+		case COLUMN_TYPE:
 
-				if(type > 0)
-					result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
-				else
-					result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+			return type == 0? "": type > 0? "Sell" : "Buy";
 
-				if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
-					result = "<html><b>" + result + "</b></html>";
-				}
-				
-				return result;
+		case COLUMN_ASSET_1:
+
+			if(row == this.trades.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset1) + "</i></html>";
+
+			String result = "";
+			if(type > 0)
+				result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+			else
+				result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+
+			if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
+				result = "<html><b>" + result + "</b></html>";
+			}
+
+			return result;
+
+
+		case COLUMN_PRICE:
+
+			if(row == this.trades.size())
+				return null;
+
+			if(type > 0)
+				return NumberAsString.getInstance().numberAsString12(trade.getPriceCalc());
+			else
+				return NumberAsString.getInstance().numberAsString12(trade.getPriceCalcBack());
+
+		case COLUMN_ASSET_2:
+
+			if(row == this.trades.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
+
+			if(type > 0)
+				result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+			else
+				result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+
+			if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+				result = "<html><b>" + result + "</b></html>";
+			}
+
+			return result;
 
 		}
-		
+
 		return null;
 	}
 
 	@Override
-	public void update(Observable o, Object arg) 
-	{	
+	public void update(Observable o, Object arg)
+	{
 		try
 		{
 			this.syncUpdate(o, arg);
@@ -214,11 +214,11 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			//GUI ERROR
 		}
 	}
-	
+
 	public synchronized void syncUpdate(Observable o, Object arg)
 	{
 		ObserverMessage message = (ObserverMessage) arg;
-		
+
 		//CHECK IF LIST UPDATED
 		if(message.getType() == ObserverMessage.ADD_TRADE_TYPE || message.getType() == ObserverMessage.REMOVE_TRADE_TYPE)
 		{
@@ -226,8 +226,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			this.fireTableDataChanged();
 		}
 	}
-	
-	public void removeObservers() 
+
+	public void removeObservers()
 	{
 		this.trades.removeObserver();
 		Controller.getInstance().deleteObserver(this);
@@ -239,7 +239,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		Pair<Tuple2<BigInteger, BigInteger>, Trade> rec = this.trades.get(k);
 		if (rec == null)
 			return null;
-		
+
 		return this.trades.get(k).getB();
 	}
 }

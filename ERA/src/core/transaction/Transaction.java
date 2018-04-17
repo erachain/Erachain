@@ -335,9 +335,9 @@ public abstract class Transaction {
 	protected Block block; // parent block
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
 	protected Long reference = 0l;
-	protected BigDecimal fee = BigDecimal.ZERO.setScale(8); // - for genesis
+	protected BigDecimal fee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE); // - for genesis
 	// transactions
-	// protected BigDecimal fee = new BigDecimal.valueOf(999000).setScale(8);
+	// protected BigDecimal fee = new BigDecimal.valueOf(999000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 	protected byte feePow = 0;
 	protected byte[] signature;
 	protected long timestamp;
@@ -526,11 +526,10 @@ public abstract class Transaction {
 	// calc FEE by recommended and feePOW
 	public void calcFee() {
 
-		BigDecimal fee = new BigDecimal(calcBaseFee()).multiply(BlockChain.FEE_RATE).setScale(8, BigDecimal.ROUND_UP);
+		BigDecimal fee = new BigDecimal(calcBaseFee()).multiply(BlockChain.FEE_RATE).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_UP);
 
 		if (this.feePow > 0) {
-			this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(8,
-					BigDecimal.ROUND_UP);
+			this.fee = fee.multiply(new BigDecimal(BlockChain.FEE_POW_BASE).pow(this.feePow)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE,	BigDecimal.ROUND_UP);
 		} else {
 			this.fee = fee;
 		}
@@ -547,10 +546,7 @@ public abstract class Transaction {
 	}
 
 	// GET only INVITED FEE
-	public int getInvitedFee(DCSet db) {
-		if (this.dcSet == null)
-			this.setDC(db, false);
-
+	public int getInvitedFee() {
 		int fee = this.fee.unscaledValue().intValue();
 		return fee >> BlockChain.FEE_INVITED_SHIFT;
 	}
@@ -1053,7 +1049,7 @@ public abstract class Transaction {
 	}
 
 	// public abstract void process(DBSet db);
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 
 		this.block = block;
 
@@ -1063,14 +1059,14 @@ public abstract class Transaction {
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
 				// this.creator.setBalance(FEE_KEY, this.creator.getBalance(db,
 				// FEE_KEY).subtract(this.fee), db);
-				this.creator.changeBalance(db, true, FEE_KEY, this.fee, false);
+				this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, false);
 
 			}
 
-			process_gifts(0, getInvitedFee(db), this.creator, false);
+			process_gifts(0, getInvitedFee(), this.creator, false);
 
 			String creatorAddress = this.creator.getAddress();
-			AddressTime_SignatureMap dbASmap = db.getAddressTime_SignatureMap();
+			AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
 			if (!dbASmap.contains(creatorAddress)) {
 				dbASmap.set(creatorAddress, signature); // for quick search
 				// public keys
@@ -1082,32 +1078,32 @@ public abstract class Transaction {
 			// UPDATE REFERENCE OF SENDER
 			if (this.isReferenced())
 				// IT IS REFERENCED RECORD?
-				this.creator.setLastTimestamp(this.timestamp, db);
+				this.creator.setLastTimestamp(this.timestamp, this.dcSet);
 		}
 
 	}
 
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 
 		if (!asPack) {
 			if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
 				// this.creator.setBalance(FEE_KEY, this.creator.getBalance(db,
 				// FEE_KEY).add(this.fee), db);
-				this.creator.changeBalance(db, false, FEE_KEY, this.fee, true);
+				this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true);
 
 			}
 
 			// calc INVITED FEE
-			process_gifts(0, getInvitedFee(db), this.creator, true);
+			process_gifts(0, getInvitedFee(), this.creator, true);
 
 			// UPDATE REFERENCE OF SENDER
 			if (this.isReferenced()) {
 				// IT IS REFERENCED RECORD?
 				// set last transaction signature for this ACCOUNT
-				this.creator.removeLastTimestamp(db);
+				this.creator.removeLastTimestamp(this.dcSet);
 			}
 
-			db.getAddressTime_SignatureMap().delete(creator, timestamp);
+			this.dcSet.getAddressTime_SignatureMap().delete(creator, timestamp);
 
 		}
 	}
@@ -1191,7 +1187,7 @@ public abstract class Transaction {
 
 	public static Map<String, Map<Long, BigDecimal>> subAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount,
 			String address, Long assetKey, BigDecimal amount) {
-		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.setScale(8).subtract(amount));
+		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).subtract(amount));
 	}
 
 	public static Map<String, Map<Long, BigDecimal>> addAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount,

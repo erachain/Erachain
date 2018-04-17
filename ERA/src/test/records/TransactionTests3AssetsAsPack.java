@@ -69,7 +69,7 @@ public class TransactionTests3AssetsAsPack {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		
 		asset = new AssetVenture(maker, "a", icon, image, "a", false, 50000l, (byte) 2, true);
 		//key = asset.getKey();
@@ -128,7 +128,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(true, releaserReference);
@@ -211,12 +211,12 @@ public class TransactionTests3AssetsAsPack {
 		
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
 		
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		
 		LOGGER.info("asset KEY: " + asset.getKey(db));
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.valueOf(1).setScale(8), maker.getBalanceUSE(asset.getKey(db), db));
+		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(asset.getKey(db), db));
 		
 		//CHECK ASSET EXISTS SENDER
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
@@ -244,15 +244,15 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
-		assertEquals(new BigDecimal(1).setScale(8), maker.getBalanceUSE(key,db));
+		assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key,db));
 		assertEquals(issueAssetTransaction.getSignature(), releaserReference);
 		
-		issueAssetTransaction.orphan(db, asPack);
+		issueAssetTransaction.orphan(asPack);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(key,db));
+		assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key,db));
 		
 		//CHECK ASSET EXISTS SENDER
 		assertEquals(false, db.getItemAssetMap().contains(key));
@@ -278,23 +278,23 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		long key = db.getIssueAssetMap().get(issueAssetTransaction);
 
 		//CREATE SIGNATURE
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		
 		//CREATE ASSET TRANSFER
-		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS VALID
 		assertEquals(true, assetTransfer.isSignatureValid(db));
 		
 		//INVALID SIGNATURE
-		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
-		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(101).setScale(8), -123L);
+		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(101).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), -123L);
 		
 		//CHECK IF ASSET TRANSFER SIGNATURE IS INVALID
 		assertEquals(false, assetTransfer.isSignatureValid(db));
@@ -311,46 +311,46 @@ public class TransactionTests3AssetsAsPack {
 		issueAssetTransaction.sign(maker, asPack);
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
 		
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		long key = asset.getKey(db);
 		//assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-		assertEquals(new BigDecimal(asset.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(new BigDecimal(asset.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 		
 		//CREATE SIGNATURE
 		Account recipient = new Account("QgcphUTiVHHfHg8e1LVgg5jujVES7ZDUTr");
 				
 		//CREATE VALID ASSET TRANSFER
-		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
 		
-		assetTransfer.process(db, gb, asPack);
+		assetTransfer.process(gb, asPack);
 		
 		//CREATE VALID ASSET TRANSFER
-		//maker.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(8), db);
-		assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		//maker.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), db);
+		assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 
 		//CHECK IF ASSET TRANSFER IS VALID
 		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));			
 		
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
-		assetTransfer = new R_Send(maker, new Account("test"), key, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		assetTransfer = new R_Send(maker, new Account("test"), key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 	
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
 		
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
-		assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(-100).setScale(8), releaserReference);
+		assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));	
 		
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
-		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
-		assetTransfer.process(db, gb, asPack);
+		assetTransfer.process(gb, asPack);
 		
 		//CHECK IF ASSET TRANSFER IS INVALID
 		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));	
@@ -367,7 +367,7 @@ public class TransactionTests3AssetsAsPack {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 					
 		//CREATE VALID ASSET TRANSFER
-		R_Send assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		R_Send assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
 
 		//CONVERT TO BYTES
@@ -438,18 +438,18 @@ public class TransactionTests3AssetsAsPack {
 			
 		//CREATE ASSET TRANSFER
 		long key = 221;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(8), false);
-		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
-		assetTransfer.process(db, gb, asPack);
+		assetTransfer.process(gb, asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), recipient.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(maker_LastReference, releaserReference);
@@ -471,19 +471,19 @@ public class TransactionTests3AssetsAsPack {
 			
 		//CREATE ASSET TRANSFER
 		long key = 1l;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8), false);
-		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(8), releaserReference);
+		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		Transaction assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 		assetTransfer.sign(maker, asPack);
-		assetTransfer.process(db, gb, asPack);
-		assetTransfer.orphan(db, asPack);
+		assetTransfer.process(gb, asPack);
+		assetTransfer.orphan(asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.ZERO.setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(100).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 				
 		//CHECK BALANCE RECIPIENT
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.ZERO.setScale(8), recipient.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
 		
 		//CHECK REFERENCE SENDER
 		assertEquals(maker_LastReference, releaserReference);
@@ -524,14 +524,14 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[64]);
 		issueAssetTransaction.sign(maker, asPack);
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		//LOGGER.info("IssueAssetTransaction .creator.getBalance(1, db): " + account.getBalance(1, dcSet));
 		key = asset.getKey(db);
 
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(8), BigDecimal.valueOf(0.1).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
 		createOrderTransaction.sign(maker, asPack);
-		createOrderTransaction.process(db, gb, asPack);
+		createOrderTransaction.process(gb, asPack);
 		
 		//this.creator.getBalance(1, db).compareTo(this.fee) == -1)
 		//LOGGER.info("createOrderTransaction.creator.getBalance(1, db): " + createOrderTransaction.getCreator().getBalance(1, dcSet));
@@ -654,21 +654,21 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[64]);
 		issueAssetTransaction.sign(maker, asPack);
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 		key = asset.getKey(db);
 		
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(100).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
 		createOrderTransaction.sign(maker, asPack);
-		createOrderTransaction.process(db, gb, asPack);
+		createOrderTransaction.process(gb, asPack);
 		
 		//CREATE CANCEL ORDER
 		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1,2});
 		cancelOrderTransaction.sign(maker, asPack);
-		cancelOrderTransaction.process(db, gb, asPack);
+		cancelOrderTransaction.process(gb, asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(asset.getQuantity(db)).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.valueOf(asset.getQuantity(db)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(cancelOrderTransaction.getSignature(), releaserReference);
@@ -686,33 +686,33 @@ public class TransactionTests3AssetsAsPack {
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
-		issueAssetTransaction.process(db, gb, asPack);
+		issueAssetTransaction.process(gb, asPack);
 
 		long key = asset.getKey(db);
 		LOGGER.info("asset.getReg(): " + asset.getReference());
 		LOGGER.info("asset.getKey(): " + key);
 
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.valueOf(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 		
 		//CREATE ORDER
-		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(8), BigDecimal.valueOf(1).setScale(8), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
+		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(maker, key, FEE_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{5,6});
 		createOrderTransaction.sign(maker, asPack);
-		createOrderTransaction.process(db, gb, asPack);
+		createOrderTransaction.process(gb, asPack);
 
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(49000).setScale(8), maker.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.valueOf(49000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 		
 		//CREATE CANCEL ORDER
 		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1,2});
 		cancelOrderTransaction.sign(maker, asPack);
-		cancelOrderTransaction.process(db, gb, asPack);
+		cancelOrderTransaction.process(gb, asPack);
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(50000).setScale(8), maker.getBalanceUSE( key, db));
-		cancelOrderTransaction.orphan(db, asPack);
+		assertEquals(BigDecimal.valueOf(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE( key, db));
+		cancelOrderTransaction.orphan(asPack);
 		
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(49000).setScale(8), maker.getBalanceUSE( key, db));
+		assertEquals(BigDecimal.valueOf(49000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE( key, db));
 						
 		//CHECK REFERENCE SENDER
 		assertEquals(createOrderTransaction.getSignature(), releaserReference);
@@ -738,13 +738,13 @@ public class TransactionTests3AssetsAsPack {
 
 		long key = 2l;
 		
-		creator.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(8), false);
+		creator.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 				
 		R_Send r_Send = new R_Send(
 				creator, 
 				recipient, 
 				key, 
-				BigDecimal.valueOf(10).setScale(8), 
+				BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), 
 				"headdd", data,
 				new byte[] { 1 },
 				new byte[] { 0 },
@@ -754,11 +754,11 @@ public class TransactionTests3AssetsAsPack {
 		
 		assertEquals(r_Send.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		r_Send.process(db, gb, asPack);
+		r_Send.process(gb, asPack);
 		
-		assertEquals(BigDecimal.valueOf(1).setScale(8), creator.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), creator.getBalanceUSE(key, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), creator.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), creator.getBalanceUSE(key, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
 		
 		byte[] rawMessageTransaction = r_Send.toBytes(true, releaserReference);
 		

@@ -1,10 +1,5 @@
 package gui.at;
 
-import gui.PasswordPane;
-import gui.items.assets.OrderPanel;
-import gui.models.AccountsComboBoxModel;
-import lang.Lang;
-
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -38,11 +33,15 @@ import com.google.common.primitives.Longs;
 import at.AT_Constants;
 import at.AT_Error;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import gui.PasswordPane;
+import gui.models.AccountsComboBoxModel;
+import lang.Lang;
 //import settings.Settings;
 import utils.Converter;
 import utils.Pair;
@@ -93,35 +92,35 @@ public class DeployATFrame extends JFrame {
 		//LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(5,5,5,5);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelGBC.fill = GridBagConstraints.HORIZONTAL;
 		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
+		labelGBC.weightx = 0;
 		labelGBC.gridx = 0;
 
 		//COMBOBOX GBC
 		GridBagConstraints cbxGBC = new GridBagConstraints();
 		cbxGBC.insets = new Insets(5,5,5,5);
-		cbxGBC.fill = GridBagConstraints.NONE;  
+		cbxGBC.fill = GridBagConstraints.NONE;
 		cbxGBC.anchor = GridBagConstraints.NORTHWEST;
-		cbxGBC.weightx = 0;	
-		cbxGBC.gridx = 1;	
+		cbxGBC.weightx = 0;
+		cbxGBC.gridx = 1;
 
 		//TEXTFIELD GBC
 		GridBagConstraints txtGBC = new GridBagConstraints();
 		txtGBC.insets = new Insets(5,5,5,5);
-		txtGBC.fill = GridBagConstraints.HORIZONTAL;  
+		txtGBC.fill = GridBagConstraints.HORIZONTAL;
 		txtGBC.anchor = GridBagConstraints.NORTHWEST;
-		txtGBC.weightx = 1;	
+		txtGBC.weightx = 1;
 		txtGBC.gridwidth = 2;
-		txtGBC.gridx = 1;		
+		txtGBC.gridx = 1;
 
 		//BUTTON GBC
 		GridBagConstraints buttonGBC = new GridBagConstraints();
 		buttonGBC.insets = new Insets(5,5,5,5);
-		buttonGBC.fill = GridBagConstraints.NONE;  
+		buttonGBC.fill = GridBagConstraints.NONE;
 		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
 		buttonGBC.gridwidth = 2;
-		buttonGBC.gridx = 0;		
+		buttonGBC.gridx = 0;
 
 		//LABEL FROM
 		labelGBC.gridy = 0;
@@ -268,6 +267,7 @@ public class DeployATFrame extends JFrame {
 		this.deployButton.setPreferredSize(new Dimension(80, 25));
 		this.deployButton.addActionListener(new ActionListener()
 		{
+			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				onDeployClick();
@@ -303,7 +303,7 @@ public class DeployATFrame extends JFrame {
 		if(!Controller.getInstance().isWalletUnlocked())
 		{
 			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(this); 
+			String password = PasswordPane.showUnlockWalletDialog(this);
 			if(!Controller.getInstance().unlockWallet(password))
 			{
 				//WRONG PASSWORD
@@ -327,7 +327,7 @@ public class DeployATFrame extends JFrame {
 
 			//READ QUANTITY
 			parse = 1;
-			BigDecimal quantity = new BigDecimal(this.txtQuantity.getText()).setScale(8);
+			BigDecimal quantity = new BigDecimal(this.txtQuantity.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			//
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -365,29 +365,29 @@ public class DeployATFrame extends JFrame {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Error in data or cs or us pages!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
+
 			byte[] balanceBytes = Ints.toByteArray(feePow);
 			byte[] fill = new byte[8 - balanceBytes.length];
 			balanceBytes = Bytes.concat(fill, balanceBytes);
 
 			long lFee = Longs.fromByteArray(balanceBytes);
 			DCSet dcSet = DCSet.getInstance();
-			
+
 			if ( (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( dcSet.getBlockMap().last().getHeight(dcSet)) > lFee )
 			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fees should be at least ") + (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE( 
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Fees should be at least ") + (cpages + dpages + cspages + uspages) * AT_Constants.getInstance().COST_PER_PAGE(
 						dcSet.getBlockMap().last().getHeight(dcSet)) + " !", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 
-			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText()).setScale(8);
+			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			byte[] minActivationAmountBytes = minActivationAmountB.unscaledValue().toByteArray();
 			byte[] fillActivation = new byte[8 - minActivationAmountBytes.length];
 			minActivationAmountBytes = Bytes.concat(fillActivation, minActivationAmountBytes);
 
 			long minActivationAmount = Longs.fromByteArray(minActivationAmountBytes);
-			
+
 			int creationLength = 4;
 			creationLength += 8; //pages
 			creationLength += 8; //minActivationAmount
@@ -396,10 +396,10 @@ public class DeployATFrame extends JFrame {
 
 			creationLength += dpages * 256 <= 256 ? 1 : (dpages * 256 <= 32767 ? 2 : 4); // data size
 			creationLength += data.length() / 2;
-			
+
 			ByteBuffer creation = ByteBuffer.allocate(creationLength);
 			creation.order(ByteOrder.LITTLE_ENDIAN);
-			
+
 			creation.putShort(AT_Constants.getInstance().AT_VERSION( dcSet.getBlockMap().last().getHeight(dcSet) ));
 			creation.putShort((short)0);
 			creation.putShort((short)cpages);
@@ -422,13 +422,13 @@ public class DeployATFrame extends JFrame {
 				creation.putShort((short)(data.length()/2));
 			else
 				creation.putInt(data.length()/2);
-		
+
 			byte[] dataBytes = Converter.parseHexString(data);
 			if(dataBytes != null)
 				creation.put(dataBytes);
 			byte[] creationBytes = null;
-			creationBytes = creation.array();			
-			
+			creationBytes = creation.array();
+
 			Pair<Transaction, Integer> result = Controller.getInstance().deployAT(creator, this.txtName.getText(), this.txtareaDescription.getText() , this.txtType.getText(), this.txtTags.getText() , creationBytes, quantity, feePow);
 
 			//CHECK VALIDATE MESSAGE
@@ -437,7 +437,7 @@ public class DeployATFrame extends JFrame {
 				JOptionPane.showMessageDialog(new JFrame(), AT_Error.getATError( result.getB() - Transaction.AT_ERROR) , "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
-			
+
 			switch(result.getB())
 			{
 			case Transaction.VALIDATE_OK:
@@ -448,11 +448,11 @@ public class DeployATFrame extends JFrame {
 			case Transaction.NOT_YET_RELEASED:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("AT will be enabled after %block% block!").replace("%block%", String.valueOf(Transaction.getAT_BLOCK_HEIGHT_RELEASE())),  Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
-				*/
+				 */
 			case Transaction.NOT_ENOUGH_FEE:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Not enough %fee% balance!").replace("%fee%", AssetCls.FEE_NAME), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
-				break;	
+				break;
 			case Transaction.NEGATIVE_AMOUNT:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Quantity must be at least 0!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
@@ -480,7 +480,7 @@ public class DeployATFrame extends JFrame {
 			default:
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				this.deployButton.setEnabled(true);
-				break;	
+				break;
 			}
 		}
 		catch(Exception e)

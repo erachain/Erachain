@@ -2,7 +2,6 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,16 +17,15 @@ import com.google.common.base.Charsets;
 //import com.google.common.primitives.Longs;
 
 import api.BlogPostResource;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
-import core.crypto.Crypto;
 import core.naming.Name;
 import core.payment.Payment;
 import core.web.blog.BlogEntry;
 import datachain.DCSet;
-import datachain.ItemAssetBalanceMap;
 import utils.BlogUtils;
 import utils.StorageUtils;
 
@@ -39,21 +37,21 @@ public abstract class ArbitraryTransaction extends Transaction {
 	protected byte[] data;
 
 	protected List<Payment> payments;
-	
+
 	static Logger LOGGER = Logger.getLogger(ArbitraryTransaction.class.getName());
-	
+
 	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference) {
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);	
+		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 	}
 	public ArbitraryTransaction(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long timestamp, Long reference, byte[] signature) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference, signature);
 	}
 	/*
 	public ArbitraryTransaction(PublicKeyAccount creator, byte feePow, long timestamp, byte[] reference) {
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, timestamp, reference);	
+		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, timestamp, reference);
 	}
-	*/
-		
+	 */
+
 	// GETTERS/SETTERS
 	//public static String getName() { return "OLD: Arbitrary"; }
 
@@ -72,7 +70,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 			return new ArrayList<Payment>();
 		}
 	}
-	
+
 	// PARSE CONVERT
 
 	@SuppressWarnings("unchecked")
@@ -90,23 +88,23 @@ public abstract class ArbitraryTransaction extends Transaction {
 		for (Payment payment : this.payments) {
 			payments.add(payment.toJson());
 		}
-		
+
 		if(!payments.isEmpty()) {
 			transaction.put("payments", payments);
 		}
-		
+
 		return transaction;
 	}
-	
+
 	public static Transaction Parse(byte[] data) throws Exception
 	{
 		// READ TIMESTAMP
 		//byte[] timestampBytes = Arrays.copyOfRange(data, 0, TIMESTAMP_LENGTH);
 		//long timestamp = Longs.fromByteArray(timestampBytes);
-	
+
 		return ArbitraryTransactionV3.Parse(data);
 	}
-	
+
 	@Override
 	public PublicKeyAccount getCreator() {
 		return this.creator;
@@ -115,14 +113,14 @@ public abstract class ArbitraryTransaction extends Transaction {
 	@Override
 	public HashSet<Account> getInvolvedAccounts() {
 		HashSet<Account> accounts = new HashSet<>();
-		
+
 		accounts.add(this.creator);
 		accounts.addAll(this.getRecipientAccounts());
-		
+
 		return accounts;
 	}
 
-	
+
 	@Override
 	public HashSet<Account> getRecipientAccounts()
 	{
@@ -134,12 +132,12 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 		return accounts;
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
-		
+
 		for(Account involved: this.getInvolvedAccounts())
 		{
 			if(address.equals(involved.getAddress()))
@@ -147,13 +145,14 @@ public abstract class ArbitraryTransaction extends Transaction {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
 	//@Override
+	@Override
 	public BigDecimal getAmount(Account account) {
-		BigDecimal amount = BigDecimal.ZERO.setScale(8);
+		BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		String address = account.getAddress();
 
 		// IF SENDER
@@ -179,57 +178,59 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 		return amount;
 	}
-	
+
 	//@Override
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount() 
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
 	{
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-		
+
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		
+
 		for(Payment payment: this.payments)
 		{
 			assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), payment.getAsset(), payment.getAmount());
 			assetAmount = addAssetAmount(assetAmount, payment.getRecipient().getAddress(), payment.getAsset(), payment.getAmount());
 		}
-		
+
 		return assetAmount;
 	}
 
 	// PROCESS/ORPHAN
 	//@Override
-	public void process(DCSet db, Block block, boolean asPack) {
+	@Override
+	public void process(Block block, boolean asPack) {
 
-		
+
 		try {
 			// NAME STORAGE UPDATE
 			if (this.getService() == 10) {
-				StorageUtils.processUpdate(getData(), signature, this.getCreator(), db);
+				StorageUtils.processUpdate(getData(), signature, this.getCreator(), this.dcSet);
 			} else if (this.getService() == 777) {
-				addToBlogMapOnDemand(db);
+				addToBlogMapOnDemand();
 			} else if (this.getService() == BlogUtils.COMMENT_SERVICE_ID) {
-				addToCommentMapOnDemand(db);
+				addToCommentMapOnDemand();
 			}
 		} catch (Throwable e) {
 			LOGGER.error(e.getMessage(),e);
 		}
 
 		// UPDATE CREATOR
-		super.process(db, block, asPack);
-		
+		super.process(block, asPack);
+
 		// PROCESS PAYMENTS
 		for (Payment payment : this.getPayments()) {
-			payment.process(this.getCreator(), db);
+			payment.process(this.getCreator(), this.dcSet);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (false && payment.getRecipient().getLastTimestamp(db) == null) {
-				payment.getRecipient().setLastTimestamp(this.timestamp, db);
+			if (false && payment.getRecipient().getLastTimestamp(this.dcSet) == null) {
+				payment.getRecipient().setLastTimestamp(this.timestamp, this.dcSet);
 			}
 		}
 	}
 
 	//@Override
-	public void orphan(DCSet db, boolean asPack) {
+	@Override
+	public void orphan(boolean asPack) {
 
 		// NAME STORAGE UPDATE ORPHAN
 		// if (service == 10) {
@@ -240,20 +241,20 @@ public abstract class ArbitraryTransaction extends Transaction {
 		// }
 
 		// UPDATE CREATOR
-		super.orphan(db, asPack);
-		
+		super.orphan(asPack);
+
 		// ORPHAN PAYMENTS
 		for (Payment payment : this.getPayments()) {
-			payment.orphan(this.getCreator(), db);
+			payment.orphan(this.getCreator(), this.dcSet);
 
 			// UPDATE REFERENCE OF RECIPIENT
-			if (false && payment.getRecipient().getLastTimestamp(db).equals(this.timestamp)) {
-				payment.getRecipient().removeLastTimestamp(db);
+			if (false && payment.getRecipient().getLastTimestamp(this.dcSet).equals(this.timestamp)) {
+				payment.getRecipient().removeLastTimestamp(this.dcSet);
 			}
 		}
 	}
-	
-	public void addToCommentMapOnDemand(DCSet db) {
+
+	public void addToCommentMapOnDemand() {
 
 		if (getService() == BlogUtils.COMMENT_SERVICE_ID) {
 			byte[] data = getData();
@@ -277,16 +278,16 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 						// OWNER IS DELETING OWN POST?
 						if (creatorOfDeleteTX.equals(creatorOfEntryToDelete)) {
-							deleteCommentInternal(db, commentEntryOpt);
+							deleteCommentInternal(this.dcSet, commentEntryOpt);
 							// BLOGOWNER IS DELETING POST
 						} else if (
 								commentEntryOpt.getBlognameOpt() != null) {
-							Name name = db.getNameMap().get(
+							Name name = this.dcSet.getNameMap().get(
 									commentEntryOpt.getBlognameOpt());
 							if (name != null
 									&& name.getOwner().getAddress()
-											.equals(creatorOfDeleteTX)) {
-								deleteCommentInternal(db, commentEntryOpt);
+									.equals(creatorOfDeleteTX)) {
+								deleteCommentInternal(this.dcSet, commentEntryOpt);
 
 							}
 						}
@@ -303,9 +304,9 @@ public abstract class ArbitraryTransaction extends Transaction {
 					if (StringUtils.isNotBlank(post)
 							&& StringUtils.isNotBlank(postid)) {
 
-						db.getPostCommentMap().add(Base58.decode(postid),
+						this.dcSet.getPostCommentMap().add(Base58.decode(postid),
 								getSignature());
-						db.getCommentPostMap().add(getSignature(),
+						this.dcSet.getCommentPostMap().add(getSignature(),
 								Base58.decode(postid));
 					}
 				}
@@ -315,8 +316,8 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 
 	}
-	
-	private void addToBlogMapOnDemand(DCSet db) {
+
+	private void addToBlogMapOnDemand() {
 
 		if (getService() == 777) {
 			byte[] data = this.getData();
@@ -344,7 +345,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 					isShare = true;
 					byte[] sharedSignature = Base58.decode(share);
 					if (sharedSignature != null) {
-						db.getSharedPostsMap().add(sharedSignature, author);
+						this.dcSet.getSharedPostsMap().add(sharedSignature, author);
 					}
 				}
 
@@ -360,16 +361,16 @@ public abstract class ArbitraryTransaction extends Transaction {
 							// OWNER IS DELETING OWN POST?
 							if (creatorOfDeleteTX
 									.equals(creatorOfEntryToDelete)) {
-								deleteInternal(db, isShare, blogEntryOpt);
+								deleteInternal(isShare, blogEntryOpt);
 								// BLOGOWNER IS DELETING POST
 							} else if (author != null
 									&& blogEntryOpt.getBlognameOpt() != null) {
-								Name name = db.getNameMap().get(
+								Name name = this.dcSet.getNameMap().get(
 										blogEntryOpt.getBlognameOpt());
 								if (name != null
 										&& name.getOwner().getAddress()
-												.equals(creatorOfDeleteTX)) {
-									deleteInternal(db, isShare, blogEntryOpt);
+										.equals(creatorOfDeleteTX)) {
+									deleteInternal(isShare, blogEntryOpt);
 								}
 							}
 
@@ -385,40 +386,40 @@ public abstract class ArbitraryTransaction extends Transaction {
 						if (!isShare) {
 							List<String> hashTags = BlogUtils.getHashTags(post);
 							for (String hashTag : hashTags) {
-								db.getHashtagPostMap().add(hashTag,
+								this.dcSet.getHashtagPostMap().add(hashTag,
 										getSignature());
 							}
 						}
 
-						db.getBlogPostMap().add(blognameOpt, getSignature());
+						this.dcSet.getBlogPostMap().add(blognameOpt, getSignature());
 					}
 				}
 
 			}
 		}
 	}
-	
-	public void deleteInternal(DCSet db, boolean isShare, BlogEntry blogEntryOpt) {
+
+	public void deleteInternal(boolean isShare, BlogEntry blogEntryOpt) {
 		if (isShare) {
 			byte[] sharesignature = Base58.decode(blogEntryOpt
 					.getShareSignatureOpt());
-			db.getBlogPostMap().remove(blogEntryOpt.getBlognameOpt(),
+			this.dcSet.getBlogPostMap().remove(blogEntryOpt.getBlognameOpt(),
 					sharesignature);
-			db.getSharedPostsMap().remove(sharesignature,
+			this.dcSet.getSharedPostsMap().remove(sharesignature,
 					blogEntryOpt.getNameOpt());
 		} else {
 			// removing from hashtagmap
 			List<String> hashTags = BlogUtils.getHashTags(blogEntryOpt
 					.getDescription());
 			for (String hashTag : hashTags) {
-				db.getHashtagPostMap().remove(hashTag,
+				this.dcSet.getHashtagPostMap().remove(hashTag,
 						Base58.decode(blogEntryOpt.getSignature()));
 			}
-			db.getBlogPostMap().remove(blogEntryOpt.getBlognameOpt(),
+			this.dcSet.getBlogPostMap().remove(blogEntryOpt.getBlognameOpt(),
 					Base58.decode(blogEntryOpt.getSignature()));
 		}
 	}
-	
+
 	public void deleteCommentInternal(DCSet db, BlogEntry commentEntry) {
 
 		byte[] signatureOfComment = Base58.decode(commentEntry.getSignature());
@@ -433,7 +434,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
 		}
 	}
-	
+
 	// TODO implement readd delete if orphaned!
 	@SuppressWarnings("unused")
 	private void removeFromBlogMapOnDemand(DCSet db) {
@@ -465,6 +466,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 		}
 	}
 
+	@Override
 	public int calcBaseFee() {
 		return calcCommonFee();
 	}

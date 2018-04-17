@@ -233,27 +233,27 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 	//@Override
 	@Override
-	public void process(DCSet dc, Block block, boolean asPack)
+	public void process(Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(dc, block, asPack);
+		super.process(block, asPack);
 
 		//ADD ASSETS TO OWNER
-		//this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(8), db);
-		this.creator.changeBalance(dc, false, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(dc)).setScale(8), false);
+		//this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
+		this.creator.changeBalance(dc, false, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(dc)).setScale(8-), false);
 
 	}
 
 	//@Override
 	@Override
-	public void orphan(DCSet dc, boolean asPack)
+	public void orphan(boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.orphan(dc, asPack);
+		super.orphan(asPack);
 
 		//REMOVE ASSETS FROM OWNER
-		//this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(8), db);
-		this.creator.changeBalance(dc, true, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(dc)).setScale(8), true);
+		//this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
+		this.creator.changeBalance(dc, true, this.getItem().getKey(dc), new BigDecimal(((AssetCls)this.getItem()).getQuantity(dc)).setScale(8-), true);
 	}
 
 	/*
@@ -294,7 +294,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 		AssetCls asset = (AssetCls)this.getItem();
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), asset.getKey(dcSet),
-				new BigDecimal(asset.getQuantity(dcSet)).setScale(8));
+				new BigDecimal(asset.getQuantity(dcSet)).setScale(8-));
 
 		return assetAmount;
 	}

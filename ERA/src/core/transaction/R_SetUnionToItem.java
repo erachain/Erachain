@@ -311,10 +311,10 @@ public class R_SetUnionToItem extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 		
 		// pack additional data
 		byte[] a_data = new byte[0];//this.value1;
@@ -340,10 +340,10 @@ public class R_SetUnionToItem extends Transaction {
 
 	}
 
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 
 		//UPDATE SENDER
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 						
 		// UNDO ALIVE PERSON for DURATION
 		if (this.itemType == ItemCls.PERSON_TYPE)

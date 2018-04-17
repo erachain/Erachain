@@ -21,15 +21,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import utils.APIUtils;
-import utils.GZIP;
-import utils.Pair;
-import utils.StorageUtils;
-
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -38,6 +34,10 @@ import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import utils.APIUtils;
+import utils.GZIP;
+import utils.Pair;
+import utils.StorageUtils;
 
 @Path("namestorage")
 @Produces(MediaType.APPLICATION_JSON)
@@ -79,7 +79,7 @@ public class NameStorageResource {
 
 		return json.toJSONString();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("/{name}/keys")
@@ -115,8 +115,8 @@ public class NameStorageResource {
 
 		Map<String, String> map = DCSet.getInstance().getNameStorageMap()
 				.get(name);
-		
-		
+
+
 		if (map == null) {
 			throw ApiErrorFactory.getInstance().createError(
 					Transaction.NAME_DOES_NOT_EXIST);
@@ -134,7 +134,7 @@ public class NameStorageResource {
 	@POST
 	@Path("/update/{name}")
 	public String updateEntry(String x, @PathParam("name") String name) {
-		
+
 		DCSet dcSet = DCSet.getInstance();
 
 		try {
@@ -160,14 +160,14 @@ public class NameStorageResource {
 			}
 
 			Name nameObj = DCSet.getInstance().getNameMap().get(name);
-//			Controller.getInstance().getAccountByAddress(name)
+			//			Controller.getInstance().getAccountByAddress(name)
 
 			String creator;
 			if (nameObj == null) {
-				
+
 				//check if addressstorage
 				Account accountByAddress = Controller.getInstance().getAccountByAddress(name);
-				
+
 				if(accountByAddress == null)
 				{
 					throw ApiErrorFactory.getInstance().createError(
@@ -175,7 +175,7 @@ public class NameStorageResource {
 				}
 
 				creator = name;
-				
+
 			} else {
 				creator = nameObj.getOwner().getAddress();
 			}
@@ -193,42 +193,42 @@ public class NameStorageResource {
 			}
 
 			jsonObject.put("name", name);
-			
+
 			String paymentsOpt = (String) jsonObject.get(PAYMENTS_JSON_KEY);
-			
+
 			List<Payment> resultPayments = new ArrayList<>();
 			if(paymentsOpt != null)
 			{
 				// READ JSON
 				JSONObject paymentsJson = (JSONObject) JSONValue.parse(paymentsOpt);
 				Set<String> addresses = paymentsJson.keySet();
-				
-				
+
+
 				for (String address : addresses) {
-					
+
 					if (!Crypto.getInstance().isValidAddress(address)) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.INVALID_ADDRESS);
 					}
-					
+
 					String amountAssetJson = (String) paymentsJson.get(address);
-					
+
 					JSONObject amountAssetJsonObject = (JSONObject) JSONValue.parse(amountAssetJson);
-					
+
 					String amount = (String) amountAssetJsonObject.get(AMOUNT_JSON_KEY);
-					
+
 					BigDecimal bdAmount;
-					try 
+					try
 					{
 						bdAmount = new BigDecimal(amount);
-						bdAmount = bdAmount.setScale(8);
+						bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 					} catch (Exception e) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.INVALID_AMOUNT);
 					}
-					
+
 					AssetCls paymentAsset = Controller.getInstance().getAsset(new Long(0L));
-					
+
 					if(amountAssetJsonObject.containsKey(ASSET_JSON_KEY)) {
 						try {
 							paymentAsset = Controller.getInstance().getAsset(new Long(amountAssetJsonObject.get(ASSET_JSON_KEY).toString()));
@@ -237,19 +237,19 @@ public class NameStorageResource {
 									Transaction.ITEM_ASSET_NOT_EXIST);
 						}
 					}
-					
+
 					Payment payment = new Payment(new Account(address), paymentAsset.getKey(), bdAmount);
 					resultPayments.add(payment);
-					
+
 				}
-				
-				
-				
-//				remove payments from json
+
+
+
+				//				remove payments from json
 				jsonObject.remove(PAYMENTS_JSON_KEY);
-				
+
 			}
-			
+
 			List<Payment> paymentsForCalculation = new ArrayList<>(resultPayments);
 
 			String jsonString = jsonObject.toJSONString();
@@ -260,7 +260,7 @@ public class NameStorageResource {
 			}
 
 			byte[] bytes = jsonString.getBytes(StandardCharsets.UTF_8);
-			List<String> askApicalls = new ArrayList<String>();	
+			List<String> askApicalls = new ArrayList<String>();
 			List<String> decompressedValue = new ArrayList<String>();
 			JSONObject jsonObjectForCheck = (JSONObject) JSONValue.parse(x);
 			// TODO IN CASE OF MULTIPAYMENT 4000 CAN BE A PROBLEM, THE FIRST TX CAN CONTAIN MULTIPAYMENTS WHICH NEED EXTRA SPACE
@@ -321,7 +321,7 @@ public class NameStorageResource {
 								.getInstance()
 								.calcRecommendedFeeForArbitraryTransaction(
 										resultbyteArray, paymentsForCalculation).getA();
-										*/
+						 */
 						//multipayment only for first tx
 						BigDecimal currentFee = BigDecimal.ZERO;
 						paymentsForCalculation = null;
@@ -337,13 +337,13 @@ public class NameStorageResource {
 								+ "\nfee: " + currentFee.toPlainString());
 						decompressedValue.add(decompressed);
 					}
-					
+
 					if(allTxPairs.size() > ApiErrorFactory.BATCH_TX_AMOUNT)
 					{
 						throw ApiErrorFactory.getInstance().createError(
 								ApiErrorFactory.ERROR_TX_AMOUNT);
 					}
-					
+
 					//recalculating FEE amount
 					BigDecimal newCompleteFee = BigDecimal.ZERO;
 					BigDecimal oldAmount = BigDecimal.ZERO;
@@ -356,17 +356,17 @@ public class NameStorageResource {
 							newPairs.add(pair);
 							continue;
 						}
-						
+
 						BigDecimal newAmount = oldAmount.multiply(new BigDecimal(1.15));
-						newAmount = newAmount.setScale(0, BigDecimal.ROUND_UP).setScale(8); 
+						newAmount = newAmount.setScale(0, BigDecimal.ROUND_UP).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 						pair.setB(newAmount);
 						newPairs.add(pair);
-						
+
 						oldAmount = newAmount;
-						
+
 						newCompleteFee= newCompleteFee.add(newAmount);
 					}
-					
+
 					String apicalls = "";
 					for (int i = 0; i < newPairs.size(); i++) {
 						apicalls +=	"POST namestorage/update/" + name
@@ -374,7 +374,7 @@ public class NameStorageResource {
 								+ decompressedValue.get(i)
 								+ "\nfee: " + newPairs.get(i).getB().toPlainString()+"\n";
 					}
-					
+
 					String basicInfo = getMultiPaymentsWarning(resultPayments);
 
 					basicInfo = "Because of the size of the data this call will create "
@@ -382,7 +382,7 @@ public class NameStorageResource {
 							+ " transactions.\nAll Arbitrary Transactions will cost: "
 							+ newCompleteFee.toPlainString() + " " + AssetCls.FEE_NAME + ".\nDetails:\n\n";
 
-//					basicInfo += StringUtils.join(askApicalls, "\n");
+					//					basicInfo += StringUtils.join(askApicalls, "\n");
 					basicInfo += apicalls;
 
 					//String password = null;
@@ -393,7 +393,7 @@ public class NameStorageResource {
 						throw ApiErrorFactory.getInstance().createError(
 								ApiErrorFactory.ERROR_WALLET_LOCKED);
 					}
-					
+
 					// GET ACCOUNT
 					PrivateKeyAccount account = Controller.getInstance()
 							.getPrivateKeyAccountByAddress(creator);
@@ -401,13 +401,13 @@ public class NameStorageResource {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.CREATOR_NOT_OWNER);
 					}
-					
+
 					if (account.getBalance(dcSet, Transaction.FEE_KEY).a.b.compareTo(
 							completeFee) == -1) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.NO_BALANCE);
 					}
-					
+
 					Pair<Transaction, Integer> result;
 					String results = "";
 					for (Pair<byte[], BigDecimal> pair : newPairs) {
@@ -426,31 +426,31 @@ public class NameStorageResource {
 
 				}
 			}
-			
-			
+
+
 			int feePow = 0;
-			
+
 			String basicInfo = getMultiPaymentsWarning(resultPayments);
-			
-			
+
+
 			/*
 			BigDecimal fee = Controller.getInstance()
 					.calcRecommendedFeeForArbitraryTransaction(bytes, resultPayments).getA();
-			*/
-			
-			
+			 */
+
+
 			//String password = null;
 			APIUtils.askAPICallAllowed(password, basicInfo +
-									"POST namestorage/update/" + name + "\n"
-											+ GZIP.webDecompress(jsonString) + "\nfee: "
-											+ feePow, request);
+					"POST namestorage/update/" + name + "\n"
+					+ GZIP.webDecompress(jsonString) + "\nfee: "
+					+ feePow, request);
 
 			//CHECK WALLET UNLOCKED
 			if (!Controller.getInstance().isWalletUnlocked()) {
 				throw ApiErrorFactory.getInstance().createError(
 						ApiErrorFactory.ERROR_WALLET_LOCKED);
 			}
-			
+
 			// GET ACCOUNT
 			PrivateKeyAccount account = Controller.getInstance()
 					.getPrivateKeyAccountByAddress(creator);
@@ -458,7 +458,7 @@ public class NameStorageResource {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.CREATOR_NOT_OWNER);
 			}
-			
+
 			// SEND PAYMENT
 			Pair<Transaction, Integer> result = Controller.getInstance()
 					.createArbitraryTransaction(account,resultPayments , 10, bytes, feePow);
@@ -479,7 +479,7 @@ public class NameStorageResource {
 	}
 
 	public String getMultiPaymentsWarning(List<Payment> resultPayments) {
-		
+
 		if(resultPayments.isEmpty())
 		{
 			return "";

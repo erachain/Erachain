@@ -243,7 +243,7 @@ public class Account {
 				BigDecimal freeze = BigDecimal.ZERO;
 				for (int[] point: item) {
 					if (height < point[0]) {
-						freeze = new BigDecimal(point[1]).setScale(8);
+						freeze = new BigDecimal(point[1]).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 						break;
 					}
 				}
@@ -586,7 +586,7 @@ public class Account {
 		//DO NOT GO BELOW 0
 		if(balance.compareTo(BigDecimal.ZERO) == -1)
 		{
-			balance = BigDecimal.ZERO.setScale(8);
+			balance = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		}
 
 		// use penalty

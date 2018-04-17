@@ -146,7 +146,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//PROCESS/ORPHAN
 	
 	@Override
-	public void process(DCSet db, Block block, boolean asPack) 
+	public void process(Block block, boolean asPack) 
 	{
 
 		//Block block = new GenesisBlock();
@@ -184,7 +184,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	}
 
 	@Override
-	public void orphan(DCSet db, boolean asPack) 
+	public void orphan(boolean asPack) 
 	{
 								
 		// UNDO ALIVE PERSON for DURATION

@@ -432,7 +432,7 @@ public class Wallet extends Observable implements Observer
 
 		// SOME
 		//Account initAccount = this.getAccounts().get(0);
-		//initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY, BigDecimal.valueOf(0.00001).setScale(8));
+		//initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY, BigDecimal.valueOf(0.00001).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 
 		return true;

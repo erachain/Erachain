@@ -233,7 +233,7 @@ public class RecordReleasePack extends Transaction {
 				// transaction counter x100
 				return result + counter * 100;
 			//PROCESS PAYMENT IN FORK AS PACK
-			transaction.process(fork, this.block, true);
+			transaction.process(this.block, true);
 			counter++;
 		}
 		
@@ -245,29 +245,29 @@ public class RecordReleasePack extends Transaction {
 	//PROCESS/ORPHAN
 	
 	//@Override
-	public void process(DCSet db, Block block, boolean asPack) 
+	public void process(Block block, boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 		
 		//PROCESS PAYMENTS
 		for(Transaction transaction: this.transactions)
 		{
-			transaction.process(db, block, true); // as Pack in body			
+			transaction.process(block, true); // as Pack in body			
 		}
 	}
 
 	//@Override
-	public void orphan(DCSet db, boolean asPack) 
+	public void orphan(boolean asPack) 
 	{
 		//UPDATE CREATOR
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 								
 		//ORPHAN PAYMENTS
 		for(Transaction transaction: this.transactions)
 		{
 			transaction.setDC(db, true);
-			transaction.orphan(db, true); // as Pack in body
+			transaction.orphan(true); // as Pack in body
 		}
 	}
 

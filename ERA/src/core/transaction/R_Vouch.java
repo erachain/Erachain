@@ -250,9 +250,9 @@ public class R_Vouch extends Transaction {
 
 	
 	
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 		
 		if (block == null)
 			return;
@@ -286,9 +286,9 @@ public class R_Vouch extends Transaction {
 		
 	}
 
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 		
 		// make key for vouching record
 		Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);

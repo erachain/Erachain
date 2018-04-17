@@ -1,10 +1,6 @@
 package core.block;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 // import org.apache.log4j.Logger;
 
@@ -14,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -22,43 +17,40 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
-import core.BlockChain;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 //import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.persons.PersonCls;
-import core.item.persons.PersonHuman;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
 import core.item.templates.Template;
 import core.item.templates.TemplateCls;
-import core.transaction.Transaction;
 import core.transaction.GenesisCertifyPersonRecord;
 import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisIssueTemplateRecord;
-import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.GenesisIssueStatusRecord;
+import core.transaction.GenesisIssueTemplateRecord;
 import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import settings.Settings;
 import utils.Pair;
 
 public class GenesisBlock extends Block{
-	
+
 	private static int genesisVersion = 0;
 	private static byte[] genesisReference = Bytes.ensureCapacity(new byte[]{19,66,8,21,0,0,0,0}, Crypto.SIGNATURE_LENGTH, 0);
 
 	private static byte[] icon = new byte[0];
 	private static byte[] image = new byte[0];
 
-	private String testnetInfo; 
+	private String testnetInfo;
 	private long genesisTimestamp;
-	
+
 	//AssetVenture asset0;
 	//AssetVenture asset1;
 	public static final PublicKeyAccount CREATOR = new PublicKeyAccount(new byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]);
@@ -67,36 +59,36 @@ public class GenesisBlock extends Block{
 	{
 		//SET HEADER
 		super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
-		
+
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
 		this.generatingBalance = BlockChain.GENERAL_ERA_BALANCE;
-		
+
 		Account recipient;
 		BigDecimal bdAmount0;
 		BigDecimal bdAmount1;
 		//PublicKeyAccount issuer = new PublicKeyAccount(new byte[Crypto.HASH_LENGTH]);
 		//PersonCls user;
-		
+
 
 		// ISSUE ITEMS
 		this.initItems();
-		
+
 		if(genesisTimestamp != BlockChain.DEFAULT_MAINNET_STAMP) {
-			this.testnetInfo = ""; 
-			
+			this.testnetInfo = "";
+
 			//ADD TESTNET GENESIS TRANSACTIONS
-			this.testnetInfo += "\ngenesisStamp: " + String.valueOf(genesisTimestamp);	
+			this.testnetInfo += "\ngenesisStamp: " + String.valueOf(genesisTimestamp);
 
 			byte[] seed = Crypto.getInstance().digest(Longs.toByteArray(genesisTimestamp));
 
 			this.testnetInfo += "\ngenesisSeed: " + Base58.encode(seed);
-			
-			bdAmount0 = new BigDecimal(BlockChain.GENESIS_ERA_TOTAL>>2).setScale(8);
-			bdAmount1 = new BigDecimal(100).setScale(8);
+
+			bdAmount0 = new BigDecimal(BlockChain.GENESIS_ERA_TOTAL>>2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			bdAmount1 = new BigDecimal(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			for(int nonce=0; nonce<3; nonce++)
-		    {
+			{
 				byte[] accountSeed = generateAccountSeed(seed, nonce);
-				
+
 				Pair<byte[], byte[]> keyPair = Crypto.getInstance().createKeyPair(accountSeed);
 				byte[] publicKey = keyPair.getB();
 				//String address = Crypto.getInstance().getAddress(publicKey);
@@ -107,8 +99,8 @@ public class GenesisBlock extends Block{
 				user = new PersonHuman(recipient,
 						"UNKNOWN", "1966-08-21 0:10:10.0", null, (byte)1, "-", (float)0.0, (float)0.0,
 						"-", "-", "-", (int) 188, icon, image, "-", null);
-						*/
-				
+				 */
+
 
 				//CREATE ISSUE PERSON TRANSACTION
 				//this.addTransaction(new GenesisIssuePersonRecord(user));
@@ -121,14 +113,14 @@ public class GenesisBlock extends Block{
 				// SEND GENESIS ASSETS
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
-		    }
+			}
 			this.testnetInfo += "\nStart the other nodes with command" + ":";
 			this.testnetInfo += "\njava -Xms512m -Xmx1024m -jar ERA.jar -testnet=" + genesisTimestamp;
-			
+
 		} else {
 
 			List<Tuple2<Account, BigDecimal>> sends_toUsers = new ArrayList<Tuple2<Account, BigDecimal>>();
-			
+
 			/*
 			 */
 			///////// GENEGAL
@@ -150,8 +142,8 @@ public class GenesisBlock extends Block{
 							"Симанков, Дмитрий", "1966-08-21", null,
 							(byte)1, "европеец-славянин", (float)43.1330, (float)131.9224,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
-							*/
-				);
+					 */
+					);
 			////////// MINOR
 			List<List<Object>> minorGenesisUsers = Arrays.asList(
 					/*
@@ -159,7 +151,7 @@ public class GenesisBlock extends Block{
 							"неизвестный участник", "1966-08-21",  null,
 							(byte)1, "европеец-славянин", (float)0.0, (float)0.0,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 188, icon, image, "-")),
-							*/
+					 */
 					);
 			List<PersonCls> personGenesisUsers = Arrays.asList(
 					/*
@@ -167,19 +159,19 @@ public class GenesisBlock extends Block{
 							"Менделеев, Дмитрий Иванович", "1834-02-08", "1907-02-02",
 							(byte)1, "европеец-славянин", (float)58.195278, (float)68.258056,
 							"белый", "серо-зеленый", "серо-коричневый", (int) 180, icon, image, "русский учёный-энциклопедист: химик, физикохимик, физик, метролог, экономист, технолог, геолог, метеоролог, нефтяник, педагог, воздухоплаватель, приборостроитель. Профессор Санкт-Петербургского университета; член-корреспондент по разряду «физический» Императорской Санкт-Петербургской Академии наук. Среди наиболее известных открытий — периодический закон химических элементов, один из фундаментальных законов мироздания, неотъемлемый для всего естествознания. Автор классического труда «Основы химии».")
-							*/
+					 */
 					);
 
 			////////// INVESTORS ICO 10%
 			List<List<Object>> genesisInvestors = Arrays.asList(
-					////					
+					////
 					Arrays.asList("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y", "333000"),
 					Arrays.asList("7PnyFvPSVxczqueXfmjtwZNXN54vU9Zxsw", "300000"),
 					Arrays.asList("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y", "300000"),
 					Arrays.asList("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap", "300000"),
 					Arrays.asList("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV", "100000"),
 					Arrays.asList("7QuuSeJqTsuNBUsTfrfqHgRZTZ6ymKxYoJ", "100000"),
-					
+
 					////
 					Arrays.asList("7Mr6qTY2vN1int3Byo6NmZQDRmH7zuLEZ7", "1800"),
 					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
@@ -217,8 +209,8 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7MRWHqXZRmNYL7TUHkVht9CQcime3K4Cm3", "253.451"),
 					Arrays.asList("7677tDJSjTSHnjDe3msjVmJYhWMZZED2jj", "2000"),
 					Arrays.asList("75R3LayKe3orQrtZnMWR1VdadBdypj2NWW", "1001"),
-					Arrays.asList("7JwZCVyg4gZiwpV5Qa9nWGvmvT7ESD83Rk", "150")				
-					
+					Arrays.asList("7JwZCVyg4gZiwpV5Qa9nWGvmvT7ESD83Rk", "150")
+
 					);
 
 			////////// ACTIVISTS
@@ -290,7 +282,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7QqeSR442vstwcf5Hzm3t2pWgqupQNxRTv", 2), //
 					Arrays.asList("736RAxF1dwRE1FqKCyBVztvGSmDYj9Z8VD", 4), //
 					Arrays.asList("73UxSPEhB9R5deSxL62c8ckCKvQdCALBcu", 4), //
-					
+
 					Arrays.asList("7LPhKZXmd6miLE9XxWZciabydoC8vf4f64", 3), //
 					Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", 1),
 					Arrays.asList("7MdXzNcKgWXvy7unJ7WPLmp3LQvUdiNEAz", 1),
@@ -354,7 +346,7 @@ public class GenesisBlock extends Block{
 					Arrays.asList("7MJyC8L6AQGtckhJaF4BS1MiMQHBeuk5ss", 1),
 					Arrays.asList("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3", 1), //// 11111
 					Arrays.asList("7D9mKfdvXwgTpogHN1KTGmF78PjteidPA6", 1),
-					
+
 					Arrays.asList("7RVngd4icw21J1ePCg8977sBetgQFARBUL", 1),
 					Arrays.asList("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r", 3),
 					Arrays.asList("7DWxrA51FMESx73rJ7xQcgZ3vJBye3oKdt", 1),
@@ -370,42 +362,42 @@ public class GenesisBlock extends Block{
 					));
 
 			// TRANSFERS
-			// 
+			//
 
 			BigDecimal totalSended = BigDecimal.ZERO;
-			
+
 			for(List<Object> item: generalGenesisUsers)
 			{
-				
+
 				recipient = new Account((String)item.get(0));
-				
-				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
+
+				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
-				
+
 				// buffer for CREDIT sends
 				sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
 
-				bdAmount1 = BigDecimal.ONE.setScale(8);
+				bdAmount1 = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.FEE_KEY, bdAmount1));
 
 			}
 
 			int pickDebt = 27000;
-			BigDecimal limitOwned = new BigDecimal( pickDebt * 6 ).setScale(8);
+			BigDecimal limitOwned = new BigDecimal( pickDebt * 6 ).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			// NOT PERSONALIZE INVESTORS - ICO 10%
 			for(List<Object> item: genesisInvestors)
 			{
-				
+
 				//recipient = new Account((String)item.get(0));
 				if (((String)item.get(0)).length() > 36 ) {
-					recipient = new PublicKeyAccount((String)item.get(0));					
+					recipient = new PublicKeyAccount((String)item.get(0));
 				} else {
 					recipient = new Account((String)item.get(0));
 				}
-				
-				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(8);
+
+				bdAmount0 = new BigDecimal((String)item.get(1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
 				totalSended = totalSended.add(bdAmount0);
 
@@ -416,70 +408,70 @@ public class GenesisBlock extends Block{
 					// buffer for CREDIT sends
 					sends_toUsers.add(new Tuple2<Account, BigDecimal>(recipient, bdAmount0));
 				}
-			}			
+			}
 
 			// ACTIVITES
 			int nonce = genesisActivists.size()>>1;
-			for(List<Object> item: genesisActivists)
-			{
-				
-				recipient = new Account((String)item.get(0));
-				
-				bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(8);
-				transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
-				totalSended = totalSended.add(bdAmount0);
+				for(List<Object> item: genesisActivists)
+				{
 
-				addDebt(recipient.getAddress(), 1, genesisDebtors);
-
-			}			
-
-			// ADJUST end
-			transactions.add(new GenesisTransferAssetTransaction(
-					new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERA_KEY,
-					new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(8)));
-
-
-			// FOR DEBROTS
-			nonce = genesisDebtors.size()>>1;
-
-			int i = 0;
-			Account bufferCreditor = sends_toUsers.get(i).a;
-			BigDecimal bufferAmount = sends_toUsers.get(i).b;
-			
-			for(List<Object> item: genesisDebtors)
-			{
-				
-				if (((String)item.get(0)).length() > 36 ) {
-					recipient = new PublicKeyAccount((String)item.get(0));					
-				} else {
 					recipient = new Account((String)item.get(0));
-				}
-				
-				bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce--).setScale(8);
 
-				do {
-					if (bufferAmount.subtract(bdAmount0).compareTo(limitOwned) < 0) {
-						// use  MIN BALANCE investor!
-						BigDecimal diffLimit = bufferAmount.subtract(limitOwned);
-						bdAmount0 = bdAmount0.subtract(diffLimit);
-						
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
-								diffLimit, bufferCreditor));
-						i++;
-						limitOwned = limitOwned.subtract(BigDecimal.ONE);
-						bufferCreditor = sends_toUsers.get(i).a;
-						bufferAmount = sends_toUsers.get(i).b;
-						continue;
+					bdAmount0 = new BigDecimal((String)item.get(1)).add(new BigDecimal(nonce--)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+					transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
+					totalSended = totalSended.add(bdAmount0);
+
+					addDebt(recipient.getAddress(), 1, genesisDebtors);
+
+				}
+
+				// ADJUST end
+				transactions.add(new GenesisTransferAssetTransaction(
+						new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe"), AssetCls.ERA_KEY,
+						new BigDecimal(BlockChain.GENESIS_ERA_TOTAL).subtract(totalSended).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+
+
+				// FOR DEBROTS
+				nonce = genesisDebtors.size()>>1;
+
+				int i = 0;
+				Account bufferCreditor = sends_toUsers.get(i).a;
+				BigDecimal bufferAmount = sends_toUsers.get(i).b;
+
+				for(List<Object> item: genesisDebtors)
+				{
+
+					if (((String)item.get(0)).length() > 36 ) {
+						recipient = new PublicKeyAccount((String)item.get(0));
 					} else {
-						transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
-								bdAmount0, bufferCreditor));
-						bufferAmount = bufferAmount.subtract(bdAmount0);
-						break;
+						recipient = new Account((String)item.get(0));
 					}
-				} while (true);
-			}			
+
+					bdAmount0 = new BigDecimal((int)item.get(1) * pickDebt + nonce--).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
+					do {
+						if (bufferAmount.subtract(bdAmount0).compareTo(limitOwned) < 0) {
+							// use  MIN BALANCE investor!
+							BigDecimal diffLimit = bufferAmount.subtract(limitOwned);
+							bdAmount0 = bdAmount0.subtract(diffLimit);
+
+							transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
+									diffLimit, bufferCreditor));
+							i++;
+							limitOwned = limitOwned.subtract(BigDecimal.ONE);
+							bufferCreditor = sends_toUsers.get(i).a;
+							bufferAmount = sends_toUsers.get(i).b;
+							continue;
+						} else {
+							transactions.add(new GenesisTransferAssetTransaction(recipient, -AssetCls.ERA_KEY,
+									bdAmount0, bufferCreditor));
+							bufferAmount = bufferAmount.subtract(bdAmount0);
+							break;
+						}
+					} while (true);
+				}
 		}
-		
+
 		//GENERATE AND VALIDATE TRANSACTIONS
 		this.transactionCount = transactions.size();
 		this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
@@ -487,10 +479,10 @@ public class GenesisBlock extends Block{
 		// SIGN simple as HASH
 		this.signature = generateHeadHash();
 	}
-	
+
 	private void initItems()
 	{
-		
+
 		transactions = new ArrayList<Transaction>();
 		///// ASSETS
 		//CREATE ERA ASSET
@@ -500,20 +492,20 @@ public class GenesisBlock extends Block{
 		//asset1 = makeAsset(AssetCls.FEE_KEY);
 		//transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
-		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++) 
+		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++)
 			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
 
 		///// TEMPLATES
-		for (int i = 1; i <= TemplateCls.UNHIRING_KEY; i++) 
+		for (int i = 1; i <= TemplateCls.UNHIRING_KEY; i++)
 			transactions.add(new GenesisIssueTemplateRecord(makeTemplate(i)));
 
 		///// STATUSES
 		for (int i = 1; i <= StatusCls.MEMBER_KEY; i++)
-			transactions.add(new GenesisIssueStatusRecord(makeStatus(i)));		
+			transactions.add(new GenesisIssueStatusRecord(makeStatus(i)));
 	}
-	
+
 	// make assets
-	public static AssetVenture makeAsset(long key) 
+	public static AssetVenture makeAsset(long key)
 	{
 		switch((int)key)
 		{
@@ -553,33 +545,33 @@ public class GenesisBlock extends Block{
 		return null;
 	}
 	// make templates
-	public static Template makeTemplate(int key) 
+	public static Template makeTemplate(int key)
 	{
 		switch(key)
 		{
 		case (int)TemplateCls.LICENSE_KEY:
 			String license = "";
-			try {
-				//FileInputStream fis = new FileInputStream("Aronicle License ERA.txt");
-				//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-				//Reader in = new BufferedReader(isr);
-				File file = new File("License Erachain.txt");
-				//READ SETTINS JSON FILE
-				List<String> lines = Files.readLines(file, Charsets.UTF_8);
-				
-				for(String line : lines){			
-					license += line + "\n";
-				}
-				//file.close();
-			} catch ( Exception e ) {
-				return null;
+		try {
+			//FileInputStream fis = new FileInputStream("Aronicle License ERA.txt");
+			//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
+			//Reader in = new BufferedReader(isr);
+			File file = new File("License Erachain.txt");
+			//READ SETTINS JSON FILE
+			List<String> lines = Files.readLines(file, Charsets.UTF_8);
+
+			for(String line : lines){
+				license += line + "\n";
 			}
-		
-			return new Template(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
-					//+ " \"" + Controller.APP_NAME + "\"", icon, image,
-					+ " \"ERM4\"", icon, image,
-					license
-					);
+			//file.close();
+		} catch ( Exception e ) {
+			return null;
+		}
+
+		return new Template(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
+				//+ " \"" + Controller.APP_NAME + "\"", icon, image,
+				+ " \"ERM4\"", icon, image,
+				license
+				);
 		case (int)TemplateCls.MARRIAGE_KEY:
 			return new Template(CREATOR, "Заявление о бракосочетании", icon, image, "Мы, %person1% и %person2%, женимся!");
 		case (int)TemplateCls.UNMARRIAGE_KEY:
@@ -591,7 +583,7 @@ public class GenesisBlock extends Block{
 		}
 		return new Template(CREATOR, "empty", icon, image, "empty");
 	}
-	
+
 	// make statuses
 	public static Status makeStatus(int key)
 	{
@@ -607,32 +599,32 @@ public class GenesisBlock extends Block{
 
 		return new Status(CREATOR, "Право %1 ур. в объед. %2", icon, image, "Уровень %1 прав (власти) в объединении %2", false);
 	}
-	
-	
+
+
 	private void addDebt(String address, int val, List<List<Object>> genesisDebtors)
 	{
-		
+
 		Account recipient;
 		if (address.equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
-			|| address.equals("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap")
-			//|| address.equals("7GWr8njMyjkDs1gdRAgQ6MaEp2DMkK26h7") Матюхин
-			// Бобылева Оксана
-			)
+				|| address.equals("74MxuwvW8EhtJKZqF7McbcAMzu5V5bnQap")
+				//|| address.equals("7GWr8njMyjkDs1gdRAgQ6MaEp2DMkK26h7") Матюхин
+				// Бобылева Оксана
+				)
 			return;
-				
+
 		//int i = 0;
 		for(int i=0; i < genesisDebtors.size(); i++)
 		{
-			
+
 			List<Object> item = genesisDebtors.get(i);
 			String address_deb = (String)item.get(0);
-			
+
 			if (address_deb.length() > 36 ) {
-				recipient = new PublicKeyAccount(address_deb);					
+				recipient = new PublicKeyAccount(address_deb);
 			} else {
 				recipient = new Account(address_deb);
 			}
-			
+
 			if (recipient.equals(address)) {
 				val += (int)item.get(1);
 				genesisDebtors.set(i, Arrays.asList(address_deb, val));
@@ -655,12 +647,12 @@ public class GenesisBlock extends Block{
 	{
 		return this.genesisTimestamp;
 	}
-	
-	public String getTestNetInfo() 
+
+	public String getTestNetInfo()
 	{
 		return this.testnetInfo;
 	}
-	
+
 	@Override
 	public Block getParent(DCSet db)
 	{
@@ -673,75 +665,75 @@ public class GenesisBlock extends Block{
 	{
 		return 0;
 	}
-	*/
+	 */
 
-	
+
 	public byte[] generateHeadHash()
 	{
 		byte[] data = new byte[0];
-		
+
 		//WRITE VERSION
 		byte[] versionBytes = Longs.toByteArray(genesisVersion);
 		versionBytes = Bytes.ensureCapacity(versionBytes, 4, 0);
 		data = Bytes.concat(data, versionBytes);
-		
+
 		//WRITE REFERENCE
 		byte[] referenceBytes = Bytes.ensureCapacity(genesisReference, Crypto.SIGNATURE_LENGTH, 0);
 		data = Bytes.concat(data, referenceBytes);
-		
-		
+
+
 		//WRITE TIMESTAMP
 		byte[] genesisTimestampBytes = Longs.toByteArray(this.genesisTimestamp);
 		genesisTimestampBytes = Bytes.ensureCapacity(genesisTimestampBytes, 8, 0);
 		data = Bytes.concat(data, genesisTimestampBytes);
-		
+
 		/*
 		//WRITE GENERATING BALANCE
 		byte[] generatingBalanceBytes = Longs.toByteArray(GENESIS_GENERATING_BALANCE);
 		generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, 8, 0);
 		data = Bytes.concat(data, generatingBalanceBytes);
-		*/
-	
+		 */
+
 		/*
 		//WRITE GENERATOR
 		byte[] generatorBytes = Bytes.ensureCapacity(genesisGenerator.getPublicKey(), Crypto.HASH_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
-		*/
-		
+		 */
+
 		//DIGEST [32]
 		byte[] digest = Crypto.getInstance().digest(data);
-		
+
 		//DIGEST + transactionsHash
 		// = byte[64]
 		digest = Bytes.concat(digest, transactionsHash);
-		
+
 		return digest;
 	}
-	
+
 	//VALIDATE
-	
+
 	@Override
 	public boolean isSignatureValid()
 	{
-		
+
 		//VALIDATE BLOCK SIGNATURE
-		byte[] digest = generateHeadHash();				
+		byte[] digest = generateHeadHash();
 		if(!Arrays.equals(digest, this.signature))
 		{
 			return false;
 		}
-				
+
 		return true;
 	}
-	
+
 	/*
 	@Override
 	public BigDecimal getTotalFee()
 	{
-		return BigDecimal.ZERO.setScale(8);
+		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 	}
-	*/
-	
+	 */
+
 	@Override
 	public boolean isValid(DCSet db, boolean andProcess)
 	{
@@ -750,7 +742,7 @@ public class GenesisBlock extends Block{
 		{
 			return false;
 		}
-		
+
 		//VALIDATE TRANSACTIONS
 		byte[] transactionsSignatures = new byte[0];
 		for(Transaction transaction: this.getTransactions())
@@ -767,14 +759,14 @@ public class GenesisBlock extends Block{
 			LOGGER.error("*** GenesisBlock.digest(transactionsSignatures) invalid");
 			return false;
 		}
-		
+
 		return true;
 	}
-	
-	private static byte[] generateAccountSeed(byte[] seed, int nonce) 
-	{		
+
+	private static byte[] generateAccountSeed(byte[] seed, int nonce)
+	{
 		byte[] nonceBytes = Ints.toByteArray(nonce);
 		byte[] accountSeed = Bytes.concat(nonceBytes, seed, nonceBytes);
-		return Crypto.getInstance().doubleDigest(accountSeed);		
-	}	
+		return Crypto.getInstance().doubleDigest(accountSeed);
+	}
 }

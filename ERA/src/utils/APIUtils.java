@@ -71,7 +71,7 @@ public class APIUtils {
 		BigDecimal bdAmount;
 		try {
 			bdAmount = new BigDecimal(amount);
-			bdAmount = bdAmount.setScale(8);
+			bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		} catch (Exception e) {
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_AMOUNT);
 		}

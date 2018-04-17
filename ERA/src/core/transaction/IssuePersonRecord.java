@@ -261,10 +261,10 @@ public class IssuePersonRecord extends Issue_ItemRecord
 	
 	//PROCESS/ORPHAN
 
-	public void process(DCSet db, Block block, boolean asPack)
+	public void process(Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 		
 		// for quick search public keys
 		PersonHuman person = (PersonHuman)this.item;

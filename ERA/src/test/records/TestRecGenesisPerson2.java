@@ -85,7 +85,7 @@ public class TestRecGenesisPerson2 {
 		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
 		if (toProcess)
 		{ 
-			genesisIssuePersonTransaction.process(db, gb, false);
+			genesisIssuePersonTransaction.process(gb, false);
 			keyPerson = person.getKey(db);
 		}
 		
@@ -229,7 +229,7 @@ public class TestRecGenesisPerson2 {
 		//CHECK REFERENCE RECIPIENT
 		//assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
 
-		genesisIssuePersonTransaction.process(db, gb, false);
+		genesisIssuePersonTransaction.process(gb, false);
 		keyPerson = person.getKey(db);
 
 		//CHECK PERSON EXISTS SENDER
@@ -242,7 +242,7 @@ public class TestRecGenesisPerson2 {
 		
 		/////////////////
 		///// ORPHAN ////
-		genesisIssuePersonTransaction.orphan(db, false);
+		genesisIssuePersonTransaction.orphan(false);
 		
 		assertEquals(false, db.getItemPersonMap().contains(keyPerson));
 	

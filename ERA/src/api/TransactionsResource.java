@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,32 +22,21 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
-import core.account.PrivateKeyAccount;
 import core.block.Block;
-import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import gui.PasswordPane;
-import gui.library.Issue_Confirm_Dialog;
-import gui.transaction.OnDealClick;
-import gui.transaction.Send_RecordDetailsFrame;
-import lang.Lang;
-import settings.Settings;
 import utils.APIUtils;
-import utils.Converter;
 import utils.Pair;
 
 @Path("transactions")
@@ -72,7 +59,7 @@ public class TransactionsResource {
 	public String getTransactions(@PathParam("address") String address) {
 		return this.getTransactionsLimited(address, 50);
 	}
-	*/
+	 */
 
 	@GET
 	@Path("address/{address}")
@@ -213,7 +200,7 @@ public class TransactionsResource {
 	public String getNetworkIncomesTransactions(@PathParam("address") String address) {
 		List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
 		JSONArray array = new JSONArray();
-		
+
 		DCSet dcSet = DCSet.getInstance();
 
 		for (Transaction record: dcSet.getTransactionMap().getIncomedTransactions(address)) {
@@ -257,7 +244,7 @@ public class TransactionsResource {
 				blockLimit = ((Long) jsonObject.get("blocklimit")).intValue();
 
 				if (blockLimit > 360) // 360 ensures at least six hours of
-										// blocks can be queried at once
+					// blocks can be queried at once
 				{
 					APIUtils.disallowRemote(request);
 				}
@@ -606,7 +593,7 @@ public class TransactionsResource {
 	public String incomingRecipientDecrypt(@PathParam("height") int height, @PathParam("address") String address,
 			@PathParam("password") String password) {
 
-		boolean needPass = true; 
+		boolean needPass = true;
 
 		// CHECK IF WALLET EXISTS
 		if (!Controller.getInstance().doesWalletExists()) {
@@ -632,35 +619,35 @@ public class TransactionsResource {
 			HashSet<Account> recipients = transaction.getRecipientAccounts();
 			for (Account recipient: recipients) {
 				if (recipient.equals(address)) {
-					
+
 					JSONObject json = transaction.toJson();
-										
+
 					if (json.containsKey("encrypted")) {
-						
+
 						byte[] r_data = null;
-						
+
 						if (transaction instanceof R_Send) {
 							R_Send r_Send = (R_Send) transaction;
 							r_data = r_Send.getData();
-						
+
 							if (r_data != null && r_data.length > 0) {
-	
+
 								if (needPass) {
 									APIUtils.askAPICallAllowed(password, "GET incoming for [" + height + "] DECRYPT data - password: " + password + "\n", request);
 									needPass = false;
 								}
 								r_data = cntr.decrypt(transaction.getCreator(), recipient, r_data);
 								if (r_data == null) {
-						    		json.put("data", "error decryption");
+									json.put("data", "error decryption");
 								} else {
 									if (r_Send.isText()) {
 										try {
-								    		json.put("data", new String(r_data, "UTF-8"));
+											json.put("data", new String(r_data, "UTF-8"));
 										} catch (UnsupportedEncodingException e) {
-								    		json.put("data", "error UTF-8");
+											json.put("data", "error UTF-8");
 										}
 									} else {
-							    		json.put("data", Base58.encode(r_data));
+										json.put("data", Base58.encode(r_data));
 									}
 								}
 							}
@@ -725,8 +712,8 @@ public class TransactionsResource {
 		BigDecimal amount;
 		// READ AMOUNT
 		try {
-			amount = new BigDecimal(amount1).setScale(8);
-			if (amount.equals(new BigDecimal("0.0").setScale(8)))
+			amount = new BigDecimal(amount1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			if (amount.equals(new BigDecimal("0.0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)))
 				throw new Exception("");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -739,10 +726,10 @@ public class TransactionsResource {
 		try {
 			message = message1;
 			if (message != null){
-			if (message.length() > BlockChain.MAX_REC_DATA_BYTES)
-				throw new Exception("");
+				if (message.length() > BlockChain.MAX_REC_DATA_BYTES)
+					throw new Exception("");
 			}else{
-				message = "";	
+				message = "";
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -786,13 +773,13 @@ public class TransactionsResource {
 		// CREATE TX MESSAGE
 		Transaction transaction;
 		try {
-		transaction = Controller.getInstance().r_Send(
-				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
-				head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
-		// test result = new Pair<Transaction, Integer>(null,
-		// Transaction.VALIDATE_OK);
-		if (transaction == null) 
-			throw new Exception("");
+			transaction = Controller.getInstance().r_Send(
+					Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
+					head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
+			// test result = new Pair<Transaction, Integer>(null,
+			// Transaction.VALIDATE_OK);
+			if (transaction == null)
+				throw new Exception("");
 		} catch (Exception e) {
 			out.put("status_code", Transaction.INVALID_TRANSACTION_TYPE);
 			out.put("status", "Invalid Transaction");
@@ -822,7 +809,7 @@ public class TransactionsResource {
 		return out.toJSONString();
 	}
 
-	
+
 	// GET transactions/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
 	@GET
 	//@Produces("text/plain")
@@ -845,7 +832,7 @@ public class TransactionsResource {
 		}
 
 		JSONObject out = new JSONObject();
-		
+
 		R_Send r_Send = (R_Send) transaction;
 		Account account = Controller.getInstance().getAccountByAddress(r_Send.getCreator().getAddress());
 		byte[] r_data = r_Send.getData();
@@ -853,22 +840,22 @@ public class TransactionsResource {
 			return null;
 
 		APIUtils.askAPICallAllowed(password, "POST decrypt data\n " + signature, request);
-		
+
 		byte[] ddd = Controller.getInstance().decrypt(r_Send.getCreator(), r_Send.getRecipient(), r_data);
 		if (ddd == null) {
 			return "wrong decryption";
 		}
-		
+
 		if (r_Send.isText()) {
 			try {
-    		String str = (new String(ddd, "UTF-8"));
-    		return str;    			
+				String str = (new String(ddd, "UTF-8"));
+				return str;
 			} catch (UnsupportedEncodingException e) {
 				return "error UTF-8";
 			}
 		} else {
-    		String str = Base58.encode(ddd);
-    		return str;			
+			String str = Base58.encode(ddd);
+			return str;
 		}
 	}
 }

@@ -73,7 +73,7 @@ public class TestRecHash {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
 	
@@ -173,7 +173,7 @@ public class TestRecHash {
 		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(db, releaserReference));
 		
 		hashesRecord.sign(maker, false);
-		hashesRecord.process(db, gb, false);
+		hashesRecord.process(gb, false);
 							
 		//CHECK REFERENCE SENDER
 		assertEquals(hashesRecord.getTimestamp(), maker.getLastTimestamp(db));
@@ -183,7 +183,7 @@ public class TestRecHash {
 		assertEquals(result.size(), 1);
 			
 		///// ORPHAN
-		hashesRecord.orphan(db, false);
+		hashesRecord.orphan(false);
 										
 		//CHECK REFERENCE SENDER
 		//assertEquals(hashesRecord.getReference(), maker.getLastReference(db));

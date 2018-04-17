@@ -84,8 +84,8 @@ public class TestRecSetStatusToItem {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(8), false);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		//statusMap = db.getItemStatusMap();
 		//mapSize = statusMap.size();
 
@@ -96,7 +96,7 @@ public class TestRecSetStatusToItem {
 
 		//CREATE ISSUE PERSON TRANSACTION
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issuePersonTransaction.process(db, gb, false);
+		issuePersonTransaction.process(gb, false);
 		person = (PersonCls)issuePersonTransaction.getItem();
 		personkey = person.getKey(db);
 
@@ -226,7 +226,7 @@ public class TestRecSetStatusToItem {
 
 		
 		setStatusTransaction.sign(maker, false);
-		setStatusTransaction.process(db, gb, false);
+		setStatusTransaction.process(gb, false);
 				
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		// TEST TIME and EXPIRE TIME for ALIVE person
@@ -244,7 +244,7 @@ public class TestRecSetStatusToItem {
 				"tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
 				timestamp+10, maker.getLastTimestamp(db));
 		setStatusTransaction_2.sign(maker, false);
-		setStatusTransaction_2.process(db, gb, false);
+		setStatusTransaction_2.process(gb, false);
 
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		endDate = statusDuration.a;
@@ -252,7 +252,7 @@ public class TestRecSetStatusToItem {
 		
 		
 		////// ORPHAN 2 ///////
-		setStatusTransaction_2.orphan(db, false);
+		setStatusTransaction_2.orphan(false);
 		
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		endDate = statusDuration.a;
@@ -262,7 +262,7 @@ public class TestRecSetStatusToItem {
 		assertEquals(setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
 		////// ORPHAN ///////
-		setStatusTransaction.orphan(db, false);
+		setStatusTransaction.orphan(false);
 										
 		statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
 		assertEquals(statusDuration, null);

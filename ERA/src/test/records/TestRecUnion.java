@@ -42,7 +42,7 @@ public class TestRecUnion {
 
 	Long releaserReference = null;
 
-	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
+	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
@@ -118,7 +118,7 @@ public class TestRecUnion {
 		
 		certifier.setLastTimestamp(gb.getTimestamp(db), db);
 		certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		
 		union = new Union(certifier, "РСФСР", timestamp - 1234567,
 				parent + 1, icon, image, "Россия");
@@ -143,7 +143,7 @@ public class TestRecUnion {
 
 		issueUnionTransaction.sign(certifier, false);
 		
-		issueUnionTransaction.process(db, gb, false);
+		issueUnionTransaction.process(gb, false);
 		unionKey = union.getKey(db);
 
 		assertEquals( 1, unionKey);
@@ -187,7 +187,7 @@ public class TestRecUnion {
 		issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(db, releaserReference));
 		// ADD FEE
-		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
 
 		//CHECK IF ISSUE UNION IS VALID
@@ -239,7 +239,7 @@ public class TestRecUnion {
 		
 		// PARSE ISSEU UNION RECORD
 		issueUnionTransaction.sign(certifier, false);
-		issueUnionTransaction.process(db, gb, false);
+		issueUnionTransaction.process(gb, false);
 		
 		//CONVERT TO BYTES
 		byte[] rawIssueUnionRecord = issueUnionTransaction.toBytes(true, null);
@@ -317,13 +317,13 @@ public class TestRecUnion {
 
 		issueUnionTransaction.sign(certifier, false);
 		
-		issueUnionTransaction.process(db, gb, false);
+		issueUnionTransaction.process(gb, false);
 		
 		LOGGER.info("union KEY: " + union.getKey(db));
 		
 		//CHECK BALANCE ISSUER
 		assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).subtract(issueUnionTransaction.getFee()).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(issueUnionTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK UNION EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssueUnionMap().get(issueUnionTransaction);
@@ -337,11 +337,11 @@ public class TestRecUnion {
 		assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
 		//////// ORPHAN /////////
-		issueUnionTransaction.orphan(db, false);
+		issueUnionTransaction.orphan(false);
 		
 		//CHECK BALANCE ISSUER
 		assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(1).setScale(8), certifier.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK UNION EXISTS ISSUER
 		assertEquals(false, db.getItemUnionMap().contains(unionKey));

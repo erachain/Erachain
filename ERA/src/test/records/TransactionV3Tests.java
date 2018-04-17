@@ -51,7 +51,7 @@ public class TransactionV3Tests {
 	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
 
 	Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");		
-	BigDecimal amount = BigDecimal.valueOf(10).setScale(8); 
+	BigDecimal amount = BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE); 
 
 	byte[] data = "test123!".getBytes();
 	byte[] isText = new byte[] { 1 };
@@ -72,8 +72,8 @@ public class TransactionV3Tests {
 		
 		// FEE FUND
 		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(8), false);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
 	}
 
@@ -98,11 +98,11 @@ public class TransactionV3Tests {
 		
 		assertEquals(messageTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		
-		messageTransactionV3.process(db, gb, false);
+		messageTransactionV3.process(gb, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(90).setScale(8), maker.getBalanceUSE(ERM_KEY, db));
-		assertEquals(BigDecimal.valueOf(10).setScale(8), recipient.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERM_KEY, db));
+		assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERM_KEY, db));
 		
 		byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(true, null);
 		int dd = messageTransactionV3.getDataLength(false);
@@ -160,12 +160,12 @@ public class TransactionV3Tests {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8), false);
+		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		
 		List<Payment> payments = new ArrayList<Payment>();
-		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(8)));
-		payments.add(new Payment(recipient2, 61l, BigDecimal.valueOf(120).setScale(8)));
-		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(8)));
+		payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+		payments.add(new Payment(recipient2, 61l, BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+		payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
 				
 		ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
 				maker, payments, 111,
@@ -185,13 +185,13 @@ public class TransactionV3Tests {
 			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		}
 		
-		arbitraryTransactionV3.process(db, gb, false);
+		arbitraryTransactionV3.process(gb, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(8), maker.getBalanceUSE(61l, db));
-		assertEquals(BigDecimal.valueOf(110).setScale(8), recipient1.getBalanceUSE(61l, db));
-		assertEquals(BigDecimal.valueOf(120).setScale(8), recipient2.getBalanceUSE(61l, db));
-		assertEquals(BigDecimal.valueOf(201).setScale(8), recipient3.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000-110-120-201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient1.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient2.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient3.getBalanceUSE(61l, db));
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
 		
@@ -238,7 +238,7 @@ public class TransactionV3Tests {
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		
-		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(8), false);
+		maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		
 		List<Payment> payments = new ArrayList<Payment>();
 				
@@ -260,10 +260,10 @@ public class TransactionV3Tests {
 			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
 		}
 		
-		arbitraryTransactionV3.process(db, gb, false);
+		arbitraryTransactionV3.process(gb, false);
 		
-		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(8), maker.getBalanceUSE(FEE_KEY, db));
-		assertEquals(BigDecimal.valueOf(1000).setScale(8), maker.getBalanceUSE(61l, db));
+		assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
+		assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
 
 		
 		byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);

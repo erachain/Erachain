@@ -47,7 +47,7 @@ public class DatabaseTests {
 
 	Long releaserReference = null;
 
-	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(8);
+	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	//long ALIVE_KEY = StatusCls.ALIVE_KEY;
@@ -102,13 +102,13 @@ public class DatabaseTests {
 				"white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 				
 		GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-		genesis_issue_person.process(dcSet, gb, false);
+		genesis_issue_person.process(gb, false);
 		GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(maker, 0L);
-		genesis_certify.process(dcSet, gb, false);
+		genesis_certify.process(gb, false);
 		
 		maker.setLastTimestamp(last_ref, dcSet);
-		maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(8), false);
-		maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(8), false);
+		maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		
 		person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
 				gender, "Slav", (float)28.12345, (float)133.7777,
@@ -126,15 +126,15 @@ public class DatabaseTests {
 		init();
 		
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dcSet, gb, asPack);
+		issuePersonTransaction.process(gb, asPack);
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dcSet, gb, asPack);
+		issuePersonTransaction.process(gb, asPack);
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(dcSet, gb, asPack);
+		issuePersonTransaction.process(gb, asPack);
 		
 
 		//assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
@@ -144,11 +144,11 @@ public class DatabaseTests {
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(fork, gb, asPack);
+		issuePersonTransaction.process(gb, asPack);
 
 		issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
 		issuePersonTransaction.sign(maker, asPack);
-		issuePersonTransaction.process(fork, gb, asPack);
+		issuePersonTransaction.process(gb, asPack);
 
 		//assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 		
@@ -255,7 +255,7 @@ public class DatabaseTests {
 		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, 50000l, (byte) 2, false);
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
 		issueAssetTransaction.sign(maker, false);
-		issueAssetTransaction.process(dcSet, gb, false);
+		issueAssetTransaction.process(gb, false);
 		//LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 		
 		long key = asset.getKey(dcSet);

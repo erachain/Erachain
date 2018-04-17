@@ -497,10 +497,10 @@ public class R_SertifyPubKeys extends Transaction {
 
 	//PROCESS/ORPHAN
 	
-	public void process(DCSet db, Block block, boolean asPack) {
+	public void process(Block block, boolean asPack) {
 
 		//UPDATE SENDER
-		super.process(db, block, asPack);
+		super.process(block, asPack);
 
 		int transactionIndex = -1;
 		int blockIndex = -1;
@@ -596,10 +596,10 @@ public class R_SertifyPubKeys extends Transaction {
 
 	}
 
-	public void orphan(DCSet db, boolean asPack) {
+	public void orphan(boolean asPack) {
 
 		//UPDATE SENDER
-		super.orphan(db, asPack);
+		super.orphan(asPack);
 								
 		//UPDATE RECIPIENT
 		String address;
