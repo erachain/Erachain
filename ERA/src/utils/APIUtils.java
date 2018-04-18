@@ -2,12 +2,10 @@ package utils;
 
 import java.awt.GraphicsEnvironment;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.charset.Charset;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.ws.rs.WebApplicationException;
 
 import org.apache.log4j.Logger;
@@ -27,16 +25,11 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.web.ServletUtils;
 import datachain.DCSet;
-import gui.DebugTabPane;
-import gui.Gui;
 import gui.MainFrame;
 import gui.PasswordPane;
-import gui.items.mails.Mail_Info;
 import gui.library.Issue_Confirm_Dialog;
 import gui.transaction.Send_RecordDetailsFrame;
-import gui2.Main_Panel;
 import lang.Lang;
-import network.Peer;
 import settings.Settings;
 //import test.records.TestRecTemplate;
 
@@ -49,7 +42,7 @@ public class APIUtils {
 	}
 
 	public static String processPayment(String password, String sender, String feePowStr, String recipient,
-			String assetKeyString, String amount, String x, HttpServletRequest request) {
+			String assetKeyString, String amount, String x, HttpServletRequest request, JSONObject jsonObject) {
 
 		// PARSE AMOUNT
 		AssetCls asset;
@@ -94,6 +87,42 @@ public class APIUtils {
 			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
 		}
 
+		String title = null;
+		byte[] message = null;
+		boolean istextmessage = true;
+		boolean encrypt = false;
+		if (jsonObject != null) {
+			if (jsonObject.containsKey("title")) {
+				title = (String)jsonObject.get("title");
+			}
+
+			if (jsonObject.containsKey("message")) {
+				String message_in = (String)jsonObject.get("message");
+				message = message_in.getBytes(Charset.forName("UTF-8"));
+				if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
+					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DESCRIPTION_LENGTH);
+				}
+			}
+
+			if (jsonObject.containsKey("istextmessage")) {
+				try {
+					istextmessage = (boolean)jsonObject.get("istextmessage");
+				} catch (Exception e) {
+					throw ApiErrorFactory.getInstance().createError(api.ApiErrorFactory.ERROR_JSON);
+				}
+			}
+			if (jsonObject.containsKey("encrypt")) {
+				try {
+					encrypt = (boolean)jsonObject.get("encrypt");
+				} catch (Exception e) {
+					throw ApiErrorFactory.getInstance().createError(api.ApiErrorFactory.ERROR_JSON);
+				}
+			}
+		}
+
+		byte[] isText = istextmessage? new byte[] { 1 } : new byte[] { 0 };
+		byte[] isEncrypted = encrypt? new byte[] { 1 } : new byte[] { 0 };
+
 		// TRU UNLOCK
 		askAPICallAllowed(password, "POST payment\n" + x, request);
 
@@ -112,20 +141,20 @@ public class APIUtils {
 		Integer result;
 		// SEND ASSET PAYMENT
 		Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
-				asset.getKey(DCSet.getInstance()), bdAmount);
+				asset.getKey(DCSet.getInstance()), bdAmount, title, message, isText, isEncrypted);
 
 		boolean confirmed = true;
 		if (gui.Gui.isGuiStarted()) {
 			String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(true)
-					+ " Bytes, ";
+			+ " Bytes, ";
 			Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
 					+ " COMPU</b><br></body></HTML>";
-	
+
 			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
-					Lang.getInstance().translate("Send Mail"), (int) (600), (int) (450), Status_text,
+					Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
 					Lang.getInstance().translate("Confirmation Transaction"));
 			Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
-	
+
 			// ww.jTabbedPane1.setVisible(false);
 			dd.jScrollPane1.setViewportView(ww);
 			dd.setLocationRelativeTo(null);
@@ -138,7 +167,7 @@ public class APIUtils {
 
 		if (confirmed) {
 
-			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);				
+			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
 
 			if (result == Transaction.VALIDATE_OK)
 				return transaction.toJson().toJSONString();
@@ -180,7 +209,7 @@ public class APIUtils {
 				}
 
 				throw ApiErrorFactory.getInstance()
-						.createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+				.createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
 
 			}
 
@@ -188,16 +217,16 @@ public class APIUtils {
 
 			if (answer == JOptionPane.NO_OPTION) {
 				throw ApiErrorFactory.getInstance()
-						.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
-				
+				.createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+
 			} else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
 				if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL || !Controller.getInstance().isWalletUnlocked()) {
-				//if (true) {
+					//if (true) {
 					password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(Gui.getInstance());
 					//password = PasswordPane.showUnlockWalletDialog(new DebugTabPane());
-					
+
 					if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
 						return;
 					} else {
@@ -208,7 +237,7 @@ public class APIUtils {
 					return;
 				}
 			}
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);				
+			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
 
 		} catch (Exception e) {
 			if (e instanceof WebApplicationException) {
