@@ -24,11 +24,11 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
 
 	@Override
 	protected Map<byte[], Map<String, String>> getMap(DB database) {
-		
+
 		return database.createTreeMap("OrphanNameStorageMap")
-		            .comparator(SignedBytes.lexicographicalComparator())
-		            .makeOrGet();
-		
+				.comparator(SignedBytes.lexicographicalComparator())
+				.makeOrGet();
+
 	}
 
 	@Override
@@ -49,25 +49,19 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
 
 	@Override
 	protected void createIndexes(DB database) {}
-	
-	
+
+
 	public void add(byte[] txAndName, String key, String value)
 	{
 		Map<String, String> keyValueMap = this.get(txAndName);
 		if (keyValueMap == null) {
 			keyValueMap = new HashMap<String, String>();
 		}
-		
+
 		keyValueMap.put(key, value);
-		
+
 		this.set(txAndName, keyValueMap);
-		
+
 	}
-	
-	public void remove(byte[] txAndName)
-	{
-		this.remove(txAndName);
-	}
-	
 
 }

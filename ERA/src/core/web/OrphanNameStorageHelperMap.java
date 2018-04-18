@@ -26,11 +26,11 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
 	@Override
 	protected Map<String, List<byte[]>> getMap(DB database) {
-		
-		
+
+
 		return   database.createTreeMap("OrphanNameStorageHelperMap")
-		            .makeOrGet();
-		
+				.makeOrGet();
+
 	}
 
 	@Override
@@ -45,8 +45,8 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
 	@Override
 	protected void createIndexes(DB database) {}
-	
-	
+
+
 	public void add(String name, byte[] signatureOfTx)
 	{
 		List<byte[]> list = this.get(name);
@@ -54,18 +54,18 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 		{
 			list = new ArrayList<>();
 		}
-		
+
 		if(!ByteArrayUtils.contains(list, signatureOfTx))
 		{
 			list.add(signatureOfTx);
 		}
-		
-		
+
+
 		set(name, list);
-		
-		
+
+
 	}
-	
+
 	public void remove(String name, byte[] signatureOfTx)
 	{
 		List<byte[]> list = this.get(name);
@@ -73,18 +73,11 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 		{
 			return;
 		}
-		
+
 		ByteArrayUtils.remove(list, signatureOfTx);
-		
+
 		set(name, list);
-		
-	}
-	
-	
-	
-	public void remove(byte[] txAndName)
-	{
-		this.remove(txAndName);
+
 	}
 
 	@Override
