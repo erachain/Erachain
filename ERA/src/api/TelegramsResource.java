@@ -137,8 +137,8 @@ public class TelegramsResource {
 	@GET
 	@Path("send/{sender}/{recipient}/{asset}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
 	public String send(@PathParam("sender") String sender1, @PathParam("recipient") String recipient1,
-			@PathParam("asset") long asset1, @PathParam("amount") String amount1,
-			@PathParam("title") String title1, @PathParam("message") String message1,
+			@PathParam("asset") long asset_in, @PathParam("amount") String amount_in,
+			@PathParam("title") String title_in, @PathParam("message") String message_in,
 			@PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
 			@PathParam("password") String password) {
 
@@ -176,8 +176,8 @@ public class TelegramsResource {
 		BigDecimal amount;
 		// READ AMOUNT
 		try {
-			amount = new BigDecimal(amount1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-			if (amount.equals(new BigDecimal("0.0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)))
+			amount = new BigDecimal(amount_in).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			if (amount.equals(new BigDecimal("0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)))
 				throw new Exception("");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -186,38 +186,21 @@ public class TelegramsResource {
 			out.put("status", "Invalid Amount");
 			return out.toJSONString();
 		}
-		String message;
-		try {
-			message = message1;
-			if (message != null){
-				if (message.length() > BlockChain.MAX_REC_DATA_BYTES)
-					throw new Exception("");
-			}else{
-				message = "";
+		byte[] message = null;
+		if (message_in != null) {
+			message = message_in.getBytes(Charset.forName("UTF-8"));
+			if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
+				out.put("status_code", Transaction.INVALID_DESCRIPTION_LENGTH);
+				out.put("status", "Invalid message");
+				return out.toJSONString();
 			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			// e.printStackTrace();
-			out.put("status_code", Transaction.INVALID_DESCRIPTION_LENGTH);
-			out.put("status", "Invalid message");
-			return out.toJSONString();
 		}
-		byte[] encrypted = new byte[] { 0 };
-		byte[] isTextByte = new byte[] { 1 };
 
+		byte[] encrypted = encrypt?new byte[] { 1 } : new byte[] { 0 };
+		byte[] isTextByte = istextmessage?new byte[] { 1 } : new byte[] { 0 };
 
 		// title
-		String head;
-		try {
-			head = title1;
-			if (head == null)
-				head = "";
-			if (head.getBytes(StandardCharsets.UTF_8).length > 256)
-				throw new Exception("");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
+		if (title_in != null  && title_in.getBytes(StandardCharsets.UTF_8).length > 256) {
 			out.put("status_code", Transaction.INVALID_HEAD_LENGTH);
 			out.put("status", "Invalid Title");
 			return out.toJSONString();
@@ -232,8 +215,8 @@ public class TelegramsResource {
 
 		try {
 			transaction = cntr.r_Send(
-					account, 0, recip, asset1, amount,
-					head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
+					account, 0, recip, asset_in, amount,
+					title_in, message, isTextByte, encrypted);
 			if (transaction == null)
 				throw new Exception("transaction == null");
 		} catch (Exception e) {
@@ -277,6 +260,7 @@ public class TelegramsResource {
 				(boolean)jsonObject.get("istextmessage"), (boolean)jsonObject.get("encrypt"),
 				(String)jsonObject.get("password"));
 	}
+
 	// GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1
 	@GET
 	//@Produces("text/plain")
@@ -297,7 +281,6 @@ public class TelegramsResource {
 		if (telegram == null) {
 			throw ApiErrorFactory.getInstance().createError(Transaction.TRANSACTION_DOES_NOT_EXIST);
 		}
-
 
 		R_Send r_Send = (R_Send) telegram.getTransaction();
 		byte[] r_data = r_Send.getData();

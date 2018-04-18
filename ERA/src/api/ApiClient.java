@@ -435,26 +435,18 @@ public class ApiClient {
 					"Unlocks the wallet using the given password. Returns true/false depending on the fact if the password is correct.\n201 - Wallet does not exist.",
 					"Errors: 201 - Wallet does not exist."
 				},
+
 				{
-					"POST rec_payment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipient>\"}",
+					"GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}?password={password}",
 					"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
 					"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 				},
 				{
-					"GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}",
-					"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
+					"POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+					"Send a payment with message using the given data. \"istextmessage\" and \"encrypt\" are optional and default true. Sender and recipient can also be a name.",
 					"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
 				},
-				{
-					"POST rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}",
-					"Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
-					"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
-				},
-				{
-					"GET rec_payment/telegram/{feePow}/{sender}/{assetKey}/{amount}/{recipient}",
-					"Send TELEGRAM as a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
-					"Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
-				},
+
 				{
 					"POST namepayment {\"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"fee\":\"<fee>\", \"sender\":\"<senderAddress>\", \"recipient\":\"<recipientName>\"}",
 					"Send a new neme-payment using the given data. If \"asset\" is omitted, 2 is provided (default commission asset).",
@@ -648,11 +640,6 @@ public class ApiClient {
 				{
 					"GET namestorage/<name>/key/<key>",
 					"Returns an value of namekey-pair from namestorage.",
-					""
-				},
-				{
-					"POST rec_message {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"message\": \"<message>\", \"amount\": \"<amount>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>}",
-					"Send a message using the given data. \"istextmessage\" and \"encrypt\" are optional and default true. Sender and recipient can also be a name.",
 					""
 				},
 				{
