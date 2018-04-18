@@ -2,7 +2,7 @@ package utils;
 
 import java.awt.GraphicsEnvironment;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
@@ -64,7 +64,7 @@ public class APIUtils {
 		BigDecimal bdAmount;
 		try {
 			bdAmount = new BigDecimal(amount);
-			bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			bdAmount = bdAmount.setScale(asset.getScale());
 		} catch (Exception e) {
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_AMOUNT);
 		}
@@ -94,11 +94,14 @@ public class APIUtils {
 		if (jsonObject != null) {
 			if (jsonObject.containsKey("title")) {
 				title = (String)jsonObject.get("title");
+				if (title.getBytes(StandardCharsets.UTF_8).length > 256) {
+					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_HEAD_LENGTH);
+				}
 			}
 
 			if (jsonObject.containsKey("message")) {
 				String message_in = (String)jsonObject.get("message");
-				message = message_in.getBytes(Charset.forName("UTF-8"));
+				message = message_in.getBytes(StandardCharsets.UTF_8);
 				if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
 					throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DESCRIPTION_LENGTH);
 				}
