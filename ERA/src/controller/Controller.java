@@ -231,12 +231,12 @@ public class Controller extends Observable {
 			Path p = null;
 			BasicFileAttributes attr = null;
 			try {
-				f = new File(Controller.APP_NAME + ".jar");
+				f = new File(Controller.APP_NAME.toLowerCase() + ".jar");
 				p = f.toPath();
 				attr = Files.readAttributes(p, BasicFileAttributes.class);
 			} catch (Exception e1) {
 				try {
-					f = new File(Controller.APP_NAME + ".exe");
+					f = new File(Controller.APP_NAME.toLowerCase() + ".exe");
 					p = f.toPath();
 					attr = Files.readAttributes(p, BasicFileAttributes.class);
 				} catch (Exception e2) {
