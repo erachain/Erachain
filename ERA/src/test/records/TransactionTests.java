@@ -2268,7 +2268,7 @@ public class TransactionTests {
 		init();
 
 		//CREATE ASSET
-		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, (byte) 2, 50000l, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 0, 50000l);
 		//byte[] data = asset.toBytes(false);
 		//Asset asset2 = Asset.parse(data);
 
@@ -2301,7 +2301,7 @@ public class TransactionTests {
 
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
-		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, (byte) 2, 50000l, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
@@ -2340,8 +2340,11 @@ public class TransactionTests {
 			//CHECK QUANTITY
 			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
 
-			//DIVISIBLE
-			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
+			//SCALE
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getScale(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getScale());
+
+			//ASSET TYPE
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getAssetType(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getAssetType());
 
 			//CHECK FEE
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());
@@ -2383,7 +2386,7 @@ public class TransactionTests {
 
 		//CREATE SIGNATURE
 		long timestamp = NTP.getTime();
-		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, (byte) 2, 50000l, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
 
 		//CREATE ISSUE ASSET TRANSACTION
@@ -2422,7 +2425,7 @@ public class TransactionTests {
 
 
 		long timestamp = NTP.getTime();
-		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", false, (byte) 2, 50000l, false);
+		AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));

@@ -109,8 +109,11 @@ public class TestRecGenesisAsset {
 			//CHECK QUANTITY
 			assertEquals(asset.getQuantity(), asset1.getQuantity());
 
-			//DIVISIBLE
-			assertEquals(asset.isDivisible(), asset1.isDivisible());
+			//SCALE
+			assertEquals(asset.getScale(), asset1.getScale());
+
+			//ASSET TYPE
+			assertEquals(asset.getAssetType(), asset1.getAssetType());
 
 
 		}
@@ -171,8 +174,11 @@ public class TestRecGenesisAsset {
 			AssetCls asset1 = (AssetCls)parsedGenesisIssueAssetTransaction.getItem();
 			assertEquals(asset.getQuantity(), asset1.getQuantity());
 
-			//DIVISIBLE
-			assertEquals(asset.isDivisible(), asset1.isDivisible());
+			//SCALE
+			assertEquals(asset.getScale(), asset1.getScale());
+
+			//ASSET TYPE
+			assertEquals(asset.getAssetType(), asset1.getAssetType());
 
 		}
 		catch (Exception e)

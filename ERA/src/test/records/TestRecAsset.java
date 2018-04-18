@@ -80,10 +80,10 @@ public class TestRecAsset {
 
 		maker_1.setLastTimestamp(gb.getTimestamp(db), db);
 
-		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", false, (byte) 2, 50000l, true);
+		asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 8, 0, 50000l);
 		//key = asset.getKey();
 
-		assetMovable = new AssetVenture(maker, "movable", icon, image, "...", true, (byte) 2, 50000l, true);
+		assetMovable = new AssetVenture(maker, "movable", icon, image, "...", 8, 0, 50000l);
 
 	}
 
@@ -97,7 +97,7 @@ public class TestRecAsset {
 		init();
 
 		//CREATE ASSET
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
@@ -122,7 +122,7 @@ public class TestRecAsset {
 		init();
 
 		//CREATE SIGNATURE
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
 		LOGGER.info("asset: " + asset.getType()[0] + ", " + asset.getType()[1]);
 		byte [] raw = asset.toBytes(false, false);
 		assertEquals(raw.length, asset.getDataLength(false));
@@ -167,8 +167,11 @@ public class TestRecAsset {
 			//CHECK QUANTITY
 			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getQuantity(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getQuantity());
 
-			//DIVISIBLE
-			assertEquals(((AssetCls)issueAssetTransaction.getItem()).isDivisible(), ((AssetCls)parsedIssueAssetTransaction.getItem()).isDivisible());
+			//SCALE
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getScale(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getScale());
+
+			//ASSET TYPE
+			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getAssetType(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getAssetType());
 
 			//CHECK FEE
 			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());
@@ -208,7 +211,7 @@ public class TestRecAsset {
 
 		init();
 
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
@@ -244,7 +247,7 @@ public class TestRecAsset {
 
 		init();
 
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
@@ -278,7 +281,7 @@ public class TestRecAsset {
 
 		init();
 
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", scale, asset_type);
+		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
@@ -633,7 +636,7 @@ public class TestRecAsset {
 		assertEquals(Transaction.INVALID_REFERENCE, messageTransaction.isValid(db, releaserReference));
 
 		// NOT DIVISIBLE
-		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", false, (byte) 0, 0l, false);
+		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", 8, 0, 0l);
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp++, maker.getLastTimestamp(db));
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
 		issueAssetTransaction.sign(maker, false);
@@ -909,7 +912,7 @@ public class TestRecAsset {
 		assertEquals(Transaction.INVALID_REFERENCE, rsend.isValid(db, releaserReference));
 
 		// NOT DIVISIBLE
-		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", false, (byte) 0, 0l, false);
+		asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", 8, 0, 0l);
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp++, maker.getLastTimestamp(db));
 		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
 		issueAssetTransaction.sign(maker, false);
