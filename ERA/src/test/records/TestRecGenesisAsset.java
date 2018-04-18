@@ -76,7 +76,7 @@ public class TestRecGenesisAsset {
 		//genesisIssueAssetTransaction.sign(creator);
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
 		assertEquals(true, genesisIssueAssetTransaction.isSignatureValid());
-		assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(releaserReference));
 
 		//CONVERT TO BYTES
 		//LOGGER.info("CREATOR: " + genesisIssueAssetTransaction.getCreator().getPublicKey());
@@ -288,7 +288,7 @@ public class TestRecGenesisAsset {
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 		//CHECK IF ASSET TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		assetTransfer.process(gb, false);
 
@@ -297,19 +297,19 @@ public class TestRecGenesisAsset {
 		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 		//CHECK IF ASSET TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
 		assetTransfer = new GenesisTransferAssetTransaction(new Account("test"), key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
 		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
@@ -400,7 +400,7 @@ public class TestRecGenesisAsset {
 
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(null));
 
 		// assetTransfer.sign(sender); // not  NEED
 		assetTransfer.process(gb, false);
@@ -471,7 +471,7 @@ public class TestRecGenesisAsset {
 
 		//CREATE ASSET TRANSFER
 		Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, -key, amoSend, owner);
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, null));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(null));
 
 		/// PARSE
 		byte[] rawGenesisTransferAsset = assetTransfer.toBytes(true, null);

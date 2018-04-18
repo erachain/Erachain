@@ -1,18 +1,10 @@
 package core.transaction;
 
-import java.math.BigDecimal;
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-//import java.util.List;
-//import java.util.LinkedHashMap;
-//import java.util.List;
-//import java.util.Map;
-//import org.apache.log4j.Logger;
-import java.util.List;
 
 import org.json.simple.JSONObject;
 
@@ -24,8 +16,6 @@ import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import core.item.ItemCls;
-import datachain.DCSet;
 
 
 // issue statement
@@ -38,20 +28,20 @@ public class IssueStatementRecord extends Transaction {
 	/*
 	PROPERTIES:
 	[0] - type
-	[1] - version 
-	[2] bits[0] - =1 - has Template 
-	[2] bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3 
+	[1] - version
+	[2] bits[0] - =1 - has Template
+	[2] bits [6,7] - signers: 0 - none; 1..3 = 1..3; 4 = LIST -> 1 byte for LIST.len + 3
 	[3] - < 0 - has DATA
-		*/
+	 */
 	protected long key; // key for Template
 	protected byte[] data;
 	protected byte[] encrypted;
 	protected byte[] isText;
 	protected PublicKeyAccount[] signers; // for all it need ecnrypt
 	protected byte[][] signatures; // - multi sign
-	
+
 	public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-		
+
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
 		this.key = templateKey;
@@ -106,11 +96,11 @@ public class IssueStatementRecord extends Transaction {
 	public void setSidnerSignature(int index, byte[] signature) {
 		if (signatures == null)
 			signatures = new byte[signers.length][];
-		
+
 		signatures[index] = signature;
-		
+
 	}
-	
+
 	public static boolean hasTemplate(byte[] typeBytes) {
 		if (typeBytes[2] < 0 ) return true;
 		return false;
@@ -122,14 +112,14 @@ public class IssueStatementRecord extends Transaction {
 		byte mask = ~HAS_TEMPLATE_MASK;
 		return typeBytes[2] & mask;
 	}
-	
+
 	protected void setTypeBytes() {
 
 		byte vers = 0;
-		
+
 		byte prop1 = 0;
 		if (this.signers != null && this.signers.length > 0) {
-			int len = this.signers.length; 
+			int len = this.signers.length;
 			if (len < 4) {
 				prop1 = (byte)len;
 			} else {
@@ -138,7 +128,7 @@ public class IssueStatementRecord extends Transaction {
 		}
 		// set has PLATE byte
 		if (this.key > 0) prop1 = (byte) (HAS_TEMPLATE_MASK | prop1);
-			
+
 		byte prop2 = 0;
 		if (data != null && data.length > 0) {
 			prop2 = (byte)(prop2 | (byte)-128);
@@ -154,33 +144,34 @@ public class IssueStatementRecord extends Transaction {
 
 	//public static String getName() { return "Statement"; }
 
-	public long getKey() 
+	@Override
+	public long getKey()
 	{
 		return this.key;
 	}
-	
-	public byte[] getData() 
+
+	public byte[] getData()
 	{
 		return this.data;
 	}
-	
+
 	public boolean isText()
 	{
 		if (data == null || data.length == 0) return false;
 		return (Arrays.equals(this.isText,new byte[1]))?false:true;
 	}
-	
+
 	public boolean isEncrypted()
 	{
 		if (data == null || data.length == 0) return false;
 		return (Arrays.equals(this.encrypted, new byte[1]))?false:true;
 	}
 
-	public PublicKeyAccount[] getSigners() 
+	public PublicKeyAccount[] getSigners()
 	{
 		return this.signers;
 	}
-	public String[] getSignersB58() 
+	public String[] getSignersB58()
 	{
 		String[] pbKeys = new String[0];
 		int i = 0;
@@ -191,11 +182,11 @@ public class IssueStatementRecord extends Transaction {
 		return pbKeys;
 	}
 
-	public byte[][] getSignersSignatures() 
+	public byte[][] getSignersSignatures()
 	{
 		return this.signatures;
 	}
-	public String[] getSignersSignaturesB58() 
+	public String[] getSignersSignaturesB58()
 	{
 		String[] items = new String[0];
 		int i = 0;
@@ -206,18 +197,19 @@ public class IssueStatementRecord extends Transaction {
 		return items;
 	}
 
+	@Override
 	public boolean hasPublicText() {
 		if (data == null || data.length == 0)
 			return false;
 		if (!Arrays.equals(this.encrypted,new byte[1]))
 			return false;
-		
+
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public JSONObject toJson() 
+	public JSONObject toJson()
 	{
 		//GET BASE
 		JSONObject transaction = this.getJsonBase();
@@ -245,22 +237,22 @@ public class IssueStatementRecord extends Transaction {
 			transaction.put("singers", this.getSignersB58());
 			transaction.put("signatures", this.getSignersSignaturesB58());
 		}
-		return transaction;	
+		return transaction;
 	}
-	
+
 	// releaserReference = null - not a pack
 	// releaserReference = reference for releaser account - it is as pack
 	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception
 	{
 		boolean asPack = releaserReference != null;
-		
+
 		//CHECK IF WE MATCH BLOCK LENGTH
 		if (data.length < BASE_LENGTH_AS_PACK
 				| !asPack & data.length < BASE_LENGTH)
 		{
 			throw new Exception("Data does not match block length " + data.length);
 		}
-		
+
 		// READ TYPE
 		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
 		int position = TYPE_LENGTH;
@@ -269,7 +261,7 @@ public class IssueStatementRecord extends Transaction {
 		if (!asPack) {
 			//READ TIMESTAMP
 			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-			timestamp = Longs.fromByteArray(timestampBytes);	
+			timestamp = Longs.fromByteArray(timestampBytes);
 			position += TIMESTAMP_LENGTH;
 		}
 
@@ -277,17 +269,17 @@ public class IssueStatementRecord extends Transaction {
 		if (!asPack) {
 			//READ REFERENCE
 			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-			reference = Longs.fromByteArray(referenceBytes);	
+			reference = Longs.fromByteArray(referenceBytes);
 			position += REFERENCE_LENGTH;
 		} else {
 			reference = releaserReference;
 		}
-		
+
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
 		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
 		position += CREATOR_LENGTH;
-		
+
 		byte feePow = 0;
 		if (!asPack) {
 			//READ FEE POWER
@@ -295,19 +287,19 @@ public class IssueStatementRecord extends Transaction {
 			feePow = feePowBytes[0];
 			position += 1;
 		}
-		
+
 		//READ SIGNATURE
 		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 		position += SIGNATURE_LENGTH;
 
 		//////// local parameters
-		
+
 		long key = 0l;
-		if (hasTemplate(typeBytes)) 
+		if (hasTemplate(typeBytes))
 		{
 			//READ KEY
 			byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-			key = Longs.fromByteArray(keyBytes);	
+			key = Longs.fromByteArray(keyBytes);
 			position += KEY_LENGTH;
 		}
 
@@ -320,16 +312,16 @@ public class IssueStatementRecord extends Transaction {
 
 			//READ DATA SIZE
 			byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
-			int dataSize = Ints.fromByteArray(dataSizeBytes);	
+			int dataSize = Ints.fromByteArray(dataSizeBytes);
 			position += DATA_SIZE_LENGTH;
-	
+
 			//READ DATA
 			arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
 			position += dataSize;
-			
+
 			encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
 			position += ENCRYPTED_LENGTH;
-			
+
 			isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
 			position += IS_TEXT_LENGTH;
 		}
@@ -353,7 +345,7 @@ public class IssueStatementRecord extends Transaction {
 				position += SIGNATURE_LENGTH;
 			}
 		}
-		
+
 		if (signersLen == 0) {
 			if (!asPack) {
 				return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
@@ -366,12 +358,13 @@ public class IssueStatementRecord extends Transaction {
 			} else {
 				return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
 			}
-			
+
 		}
 
 	}
 
 	//@Override
+	@Override
 	public byte[] toBytes(boolean withSign, Long releaserReference) {
 
 		byte[] data = super.toBytes(withSign, releaserReference);
@@ -381,25 +374,25 @@ public class IssueStatementRecord extends Transaction {
 			byte[] keyBytes = Longs.toByteArray(this.key);
 			keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
 			data = Bytes.concat(data, keyBytes);
-			
+
 		}
 		if (this.data != null ) {
-			
+
 			//WRITE DATA SIZE
 			byte[] dataSizeBytes = Ints.toByteArray(this.data.length);
 			data = Bytes.concat(data, dataSizeBytes);
-	
+
 			//WRITE DATA
 			data = Bytes.concat(data, this.data);
-			
+
 			//WRITE ENCRYPTED
 			data = Bytes.concat(data, this.encrypted);
-			
+
 			//WRITE ISTEXT
 			data = Bytes.concat(data, this.isText);
 		}
 
-		return data;	
+		return data;
 	}
 
 	@Override
@@ -409,7 +402,7 @@ public class IssueStatementRecord extends Transaction {
 			add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
 		if (this.key > 0)
 			add_len += KEY_LENGTH;
-		
+
 		if (asPack) {
 			return BASE_LENGTH_AS_PACK + add_len;
 		} else {
@@ -418,26 +411,27 @@ public class IssueStatementRecord extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DCSet db, Long releaserReference) {
-		
+	@Override
+	public int isValid(Long releaserReference) {
+
 		//CHECK DATA SIZE
 		if(data.length > BlockChain.MAX_REC_DATA_BYTES || data.length < 1)
 		{
 			return INVALID_DATA_LENGTH;
 		}
-	
 
-		int result = super.isValid(db, releaserReference);
-		if (result != Transaction.VALIDATE_OK) return result; 
-		
+
+		int result = super.isValid(releaserReference);
+		if (result != Transaction.VALIDATE_OK) return result;
+
 		// ITEM EXIST? - for assets transfer not need - amount expect instead
-		if (!db.getItemTemplateMap().contains(this.key))
+		if (!this.dcSet.getItemTemplateMap().contains(this.key))
 			return Transaction.ITEM_DOES_NOT_EXIST;
 
 		return Transaction.VALIDATE_OK;
 
 	}
-	
+
 	@Override
 	public HashSet<Account> getInvolvedAccounts()
 	{
@@ -445,23 +439,23 @@ public class IssueStatementRecord extends Transaction {
 		accounts.add(this.creator);
 		return accounts;
 	}
-	
+
 	@Override
 	public HashSet<Account> getRecipientAccounts()
 	{
 		return new HashSet<>();
 	}
-	
+
 	@Override
-	public boolean isInvolved(Account account) 
+	public boolean isInvolved(Account account)
 	{
 		String address = account.getAddress();
-		
+
 		if(address.equals(this.creator.getAddress()))
 		{
 			return true;
 		}
-		
+
 		return false;
 	}
 

@@ -135,7 +135,7 @@ public class TransactionCreator
 				this.fork.getTransactionMap().delete(transactionAccount);
 			} else {
 				transactionAccount.setDC(this.fork, false);
-				if(transactionAccount.isValid(this.fork, null) == Transaction.VALIDATE_OK)
+				if(transactionAccount.isValid(null) == Transaction.VALIDATE_OK)
 				{
 					transactionAccount.process(null, false);
 				} else {
@@ -406,7 +406,7 @@ public class TransactionCreator
 			return new Pair<Transaction, Integer>(issuePersonRecord, 1);//this.afterCreate(issuePersonRecord, asPack));
 		} else {
 			// for COPY -
-			int valid = issuePersonRecord.isValid(this.fork, lastReference);
+			int valid = issuePersonRecord.isValid(lastReference);
 			if (valid == Transaction.NOT_ENOUGH_FEE
 					|| valid == Transaction.CREATOR_NOT_PERSONALIZED) {
 				valid = Transaction.VALIDATE_OK;
@@ -833,7 +833,7 @@ public class TransactionCreator
 	{
 		//CHECK IF PAYMENT VALID
 		transaction.setDC(this.fork, asPack);
-		int valid = transaction.isValid(this.fork, null);
+		int valid = transaction.isValid(null);
 
 		if(valid == Transaction.VALIDATE_OK)
 		{

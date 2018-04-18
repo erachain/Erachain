@@ -16,7 +16,6 @@ import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
-import datachain.DCSet;
 
 /*
 
@@ -49,7 +48,7 @@ public class R_Send extends TransactionAmount {
 
 	private static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Send";
-	private static int position;
+	//private static int position;
 
 	protected String head;
 	protected byte[] data;
@@ -410,7 +409,7 @@ public class R_Send extends TransactionAmount {
 
 	// @Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		if (head.getBytes(StandardCharsets.UTF_8).length > 256)
 			return INVALID_HEAD_LENGTH;
@@ -422,7 +421,7 @@ public class R_Send extends TransactionAmount {
 			}
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 }

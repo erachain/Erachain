@@ -18,7 +18,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.naming.Name;
-import datachain.DCSet;
 
 public class UpdateNameTransaction extends Transaction
 {
@@ -170,7 +169,7 @@ public class UpdateNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -193,24 +192,24 @@ public class UpdateNameTransaction extends Transaction
 		}
 
 		//CHECK IF NAME EXISTS
-		if(!db.getNameMap().contains(this.name))
+		if(!this.dcSet.getNameMap().contains(this.name))
 		{
 			return NAME_DOES_NOT_EXIST;
 		}
 
 		//CHECK IF NAMESALE EXISTS
-		if(db.getNameExchangeMap().contains(this.name.getName()))
+		if(this.dcSet.getNameExchangeMap().contains(this.name.getName()))
 		{
 			return NAME_ALREADY_ON_SALE;
 		}
 
 		//CHECK IF CREATOR IS CREATOR
-		if(!db.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.creator.getAddress()))
+		if(!this.dcSet.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.creator.getAddress()))
 		{
 			return INVALID_CREATOR;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//PROCESS/ORPHAN

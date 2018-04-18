@@ -101,7 +101,7 @@ public class TestRecGenesisPerson2 {
 		//genesisIssuePersonTransaction.sign(creator);
 		//CHECK IF ISSUE PERSON TRANSACTION IS VALID
 		assertEquals(true, genesisIssuePersonTransaction.isSignatureValid());
-		assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(releaserReference));
 				
 		//CONVERT TO BYTES
 		//LOGGER.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
@@ -155,7 +155,7 @@ public class TestRecGenesisPerson2 {
 				(byte)1, "Slav", (float)111.1, (float)1.1,
 				"white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
 		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);	
-		assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(releaserReference));
 
 	}
 

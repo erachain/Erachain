@@ -2,7 +2,6 @@ package datachain;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,25 +21,23 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple4;
 
 import core.item.assets.Order;
-import core.item.assets.OrderReverse;
-import utils.ObserverMessage;
 import database.DBMap;
 import database.serializer.OrderSerializer;
-import datachain.DCSet;
+import utils.ObserverMessage;
 
-public class OrderMap extends DCMap<BigInteger, Order> 
+public class OrderMap extends DCMap<BigInteger, Order>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
+
 	@SuppressWarnings("rawtypes")
 	private BTreeMap haveWantKeyMap;
 	@SuppressWarnings("rawtypes")
 	private BTreeMap wantHaveKeyMap;
-	
+
 	public OrderMap(DCSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		
+
 		if (databaseSet.isWithObserver()) {
 			this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ORDER_TYPE);
 			if (databaseSet.isDynamicGUI()) {
@@ -51,30 +48,31 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		}
 	}
 
-	public OrderMap(OrderMap parent, DCSet dcSet) 
+	public OrderMap(OrderMap parent, DCSet dcSet)
 	{
 		super(parent, dcSet);
 
 	}
 
+	@Override
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<BigInteger, Order> getMap(DB database) 
+	protected Map<BigInteger, Order> getMap(DB database)
 	{
 		//OPEN MAP
 		return this.openMap(database);
 	}
 
 	@Override
-	protected Map<BigInteger, Order> getMemoryMap() 
+	protected Map<BigInteger, Order> getMemoryMap()
 	{
 		DB database = DBMaker.newMemoryDB().make();
-		
+
 		//OPEN MAP
 		return this.openMap(database);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private Map<BigInteger, Order> openMap(DB database)
 	{
@@ -82,79 +80,79 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		BTreeMap<BigInteger, Order> map = database.createTreeMap("orders")
 				.valueSerializer(new OrderSerializer())
 				.makeOrGet();
-		
+
 		//HAVE/WANT KEY
 		this.haveWantKeyMap = database.createTreeMap("orders_key_have_want")
 				.comparator(Fun.COMPARATOR)
 				.makeOrGet();
-		
+
 		//BIND HAVE/WANT KEY
 		Bind.secondaryKey(map, this.haveWantKeyMap,
 				new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger, Order>() {
 			@Override
 			public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key, Order value) {
 				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getHave(), value.getWant(), value.getPriceCalc(), key);
-			}	
+			}
 		});
-		
+
 		// WANT/HAVE KEY
 		this.wantHaveKeyMap = database.createTreeMap("orders_key_want_have")
 				.comparator(Fun.COMPARATOR)
 				.makeOrGet();
-		
+
 		//BIND HAVE/WANT KEY
 		Bind.secondaryKey(map, this.wantHaveKeyMap, new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger, Order>() {
 			@Override
 			public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key, Order value) {
 				return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.getWant(), value.getHave(), value.getPriceCalc(), key);
-			}	
+			}
 		});
-		
-				
+
+
 		//RETURN
 		return map;
 	}
 
 	@Override
-	protected Order getDefaultValue() 
+	protected Order getDefaultValue()
 	{
 		return null;
 	}
-	
+
 	@Override
-	protected Map<Integer, Integer> getObservableData() 
+	protected Map<Integer, Integer> getObservableData()
 	{
 		return this.observableData;
 	}
 
 	public void add(Order order) {
-		
+
 		// this order is NOT executable
 		order.setExecutable(true);
-		
+
 		this.set(order.getId(), order);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected Collection<BigInteger> getSubKeysWithParent(long have, long want) {
-		
+
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
 				//Fun.t4(have, want, null, null),
 				Fun.t4(have, want, null, null),
 				Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-		
+
 		//IF THIS IS A FORK
 		if(this.parent != null)
 		{
 			if (false) { ///////////// OLD VERSION /////////
 				//GET ALL KEYS FOR FORK
 				Collection<BigInteger> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
-				
+
 				//COMBINE LISTS
 				Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
 				combinedKeys.addAll(parentKeys);
-				
+
 				if (this.deleted != null) {
 					//DELETE DELETED
 					for(BigInteger deleted: this.deleted)
@@ -162,14 +160,14 @@ public class OrderMap extends DCMap<BigInteger, Order>
 						combinedKeys.remove(deleted);
 					}
 				}
-				
+
 				//CONVERT SET BACK TO COLLECTION
 				keys = combinedKeys;
 			} else {
-				
+
 				//GET ALL KEYS FOR FORK
 				Collection<BigInteger> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
-				
+
 				// REMOVE those who DELETED here
 				if (this.deleted != null) {
 					//DELETE DELETED
@@ -178,23 +176,23 @@ public class OrderMap extends DCMap<BigInteger, Order>
 						parentKeys.remove(deleted);
 					}
 				}
-				
+
 				//COMBINE LISTS
 				Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
 				combinedKeys.addAll(parentKeys);
 
 				//CONVERT SET BACK TO COLLECTION
 				keys = combinedKeys;
-				
+
 			}
 		}
-		
+
 		return keys;
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Collection<BigInteger> getKeysHave(long have) {
-		
+
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
 				Fun.t4(have, null, null, null),
@@ -205,37 +203,37 @@ public class OrderMap extends DCMap<BigInteger, Order>
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private Collection<BigInteger> getKeysWant(long want) {
-		
+
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
 				Fun.t4(want, null, null, null),
 				Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
-		
+
 		return keys;
 	}
-	
-	public List<Order> getOrders(long haveWant) 
+
+	public List<Order> getOrders(long haveWant)
 	{
 		return getOrders(haveWant, false);
 	}
-	
-	public List<Order> getOrders(long haveWant, boolean filter) 
+
+	public List<Order> getOrders(long haveWant, boolean filter)
 	{
 		Map<BigInteger, Boolean> orderKeys = new TreeMap<BigInteger, Boolean>();
-		
+
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = this.getKeysHave(haveWant);
-		
+
 		for (BigInteger key : keys) {
 			orderKeys.put(key, true);
 		}
-		
+
 		keys = this.getKeysWant(haveWant);
-		
+
 		for (BigInteger key : keys) {
 			orderKeys.put(key, true);
 		}
-		
+
 		//GET ALL ORDERS FOR KEYS
 		List<Order> orders = new ArrayList<Order>();
 
@@ -263,47 +261,45 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		return orders;
 	}
 
-	public boolean isExecutable(DCSet db, BigInteger key) 
+	public boolean isExecutable(DCSet db, BigInteger key)
 	{
 
 		/* OLD
 		Order order = this.get(key);
-		
+
 		BigDecimal increment = order.calculateBuyIncrement(order, db);
 		BigDecimal amount = order.getAmountHaveLeft();
 		amount = amount.subtract(amount.remainder(increment));
 		return  (amount.compareTo(BigDecimal.ZERO) > 0);
 		} else {
-			
+
 		}
-		*/
+		 */
 
 
 		Order order = this.get(key);
 		if (order.getAmountHaveLeft().compareTo(BigDecimal.ZERO) <= 0)
 			return false;
 		BigDecimal price = order.getPriceCalcReverse();
-		if ( !order.isWantDivisible(db)
-				&&
-				order.getAmountHaveLeft().compareTo(price) < 0)
+		if (order.getAmountHaveLeft().compareTo(price) < 0)
 			return false;
-		
+
 		/*
 		BigDecimal thisPrice = order.getPriceCalc();
 		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 		//if (isReversePrice)
 			//return order.getAmountHaveLeft().compareTo(order.getPriceCalc()) >= 0;
-		
-			
+
+
 		//return BigDecimal.ONE.divide(order.getAmountHaveLeft(), 12,  RoundingMode.HALF_UP )
 		//		.compareTo(order.getPriceCalcReverse()) >= 0;
 		 */
-		
+
 		return order.isExecutable();
-		
+
 	}
-	
-	public List<Order> getOrders(long have, long want, boolean orderReverse) 
+
+	public List<Order> getOrders(long have, long want, boolean orderReverse)
 	{
 		//FILTER ALL KEYS
 		Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
@@ -314,32 +310,32 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		if (false && orderReverse) {
 			for(BigInteger key: keys)
 			{
-				orders.add((OrderReverse)this.get(key));
-			}			
+				orders.add(this.get(key));
+			}
 		} else {
 			for(BigInteger key: keys)
 			{
 				orders.add(this.get(key));
 			}
 		}
-		
+
 		//IF THIS IS A FORK
 		if(false && this.parent != null)
 		{
 			//RESORT ORDERS
 			Collections.sort(orders);
 		}
-		
+
 		//RETURN
 		return orders;
 	}
-	
+
 	public SortableList<BigInteger, Order> getOrdersSortableList(long have, long want)
 	{
 		//RETURN
 		return getOrdersSortableList(have, want, false);
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SortableList<BigInteger, Order> getOrdersSortableList(long have, long want, boolean filter)
 	{
@@ -347,16 +343,16 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		Collection<BigInteger> keys;
 		if (false) {
 			keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-				Fun.t4(have, want, null, null),
-				Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
+					Fun.t4(have, want, null, null),
+					Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
 		} else if (false) {
 			keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
-				Fun.t4(have, want, null, null),
-				Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-		} else if (false) {			
+					Fun.t4(have, want, null, null),
+					Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
+		} else if (false) {
 			keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-				Fun.t4(want, have, null, null),
-				Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
+					Fun.t4(want, have, null, null),
+					Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
 		} else {
 			// CORRECT! - haveWantKeyMap LOSES some orders!
 			// https://github.com/icreator/Erachain/issues/178
@@ -369,7 +365,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		//Filters orders with unacceptably small amount. These orders have not worked
 		if(filter) {
 			List<BigInteger> keys2 = new ArrayList<BigInteger>();
-			
+
 			DCSet db = getDCSet();
 			Iterator<BigInteger> iter = keys.iterator();
 			while (iter.hasNext()) {
@@ -379,7 +375,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 			}
 			keys = keys2;
 		}
-		
+
 		//RETURN
 		return new SortableList<BigInteger, Order>(this, keys);
 	}
@@ -391,7 +387,7 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
 				Fun.t4(have, null, null, null),
 				Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values();
-		
+
 		//RETURN
 		return new SortableList<BigInteger, Order>(this, keys);
 	}
@@ -403,10 +399,11 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
 				Fun.t4(null, want, null, null),
 				Fun.t4(Fun.HI(), want, Fun.HI(), Fun.HI())).values();
-		
+
 		//RETURN
 		return new SortableList<BigInteger, Order>(this, keys);
 	}
+	@Override
 	public Order get(BigInteger key)
 	{
 		Order order = super.get(key);
@@ -415,12 +412,12 @@ public class OrderMap extends DCMap<BigInteger, Order>
 		else
 			LOGGER.error("*** database.OrderMap.get(BigInteger) - key[" + key + "] not found!");
 
-		
+
 		return order;
 	}
 
 
-	public void delete(Order order) 
+	public void delete(Order order)
 	{
 		this.delete(order.getId());
 	}

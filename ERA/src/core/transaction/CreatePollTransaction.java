@@ -21,7 +21,6 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.voting.Poll;
 import core.voting.PollOption;
-import datachain.DCSet;
 
 public class CreatePollTransaction extends Transaction
 {
@@ -190,7 +189,7 @@ public class CreatePollTransaction extends Transaction
 	 */
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK POLL NAME LENGTH
@@ -214,7 +213,7 @@ public class CreatePollTransaction extends Transaction
 		}
 
 		//CHECK POLL DOES NOT EXIST ALREADY
-		if(db.getPollMap().contains(this.poll))
+		if(this.dcSet.getPollMap().contains(this.poll))
 		{
 			return POLL_ALREADY_CREATED;
 		}
@@ -258,7 +257,7 @@ public class CreatePollTransaction extends Transaction
 			options.add(option.getName());
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//PROCESS/ORPHAN

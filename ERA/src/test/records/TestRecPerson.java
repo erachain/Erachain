@@ -161,7 +161,7 @@ public class TestRecPerson {
 
 
 		//assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
-		assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(releaserReference));
 
 		issuePersonTransaction.sign(certifier, false);
 		
@@ -210,14 +210,14 @@ public class TestRecPerson {
 		//issuePersonTransaction.sign(certifier, false);
 
 		//CHECK IF ISSUE PERSON IS VALID
-		assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(releaserReference));
 
 		//CREATE INVALID ISSUE PERSON - INVALID PERSONALIZE
 		issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
-		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePersonTransaction.isValid(releaserReference));
 
 	}
 
@@ -352,7 +352,7 @@ public class TestRecPerson {
 		init();				
 		
 		//assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
-		assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(releaserReference));
 
 		issuePersonTransaction.sign(certifier, false);
 		
@@ -402,7 +402,7 @@ public class TestRecPerson {
 						
 		initPersonalize();
 
-		assertEquals(Transaction.VALIDATE_OK, r_SertifyPubKeys.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, r_SertifyPubKeys.isValid(releaserReference));
 		
 		//r_SertifyPerson.sign(maker, false);
 		//r_SertifyPerson.process(db, false);
@@ -411,13 +411,13 @@ public class TestRecPerson {
 		R_SertifyPubKeys personalizeRecord_0 = new R_SertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
 				sertifiedPublicKeys,
 				356, timestamp, userAccount1.getLastTimestamp(db));
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));	
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(releaserReference));	
 
 		//CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
 		personalizeRecord_0 = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
 				sertifiedPublicKeys,
 				356, timestamp, certifier.getLastTimestamp(db));
-		assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(db, releaserReference));	
+		assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(releaserReference));	
 
 		//CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
 		personalizeRecord_0 = new R_SertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
@@ -425,14 +425,14 @@ public class TestRecPerson {
 				356, timestamp, userAccount1.getLastTimestamp(db));
 		//CREATE INVALID ISSUE PERSON - NOT FEE
 		personalizeRecord_0.setDC(db, false);
-		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		//assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(db, releaserReference));
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(releaserReference));
 		// ADD RIGHTS
 		userAccount1.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(releaserReference));
 
 	    List<PublicKeyAccount> sertifiedPublicKeys011 = new ArrayList<PublicKeyAccount>();
 	    sertifiedPublicKeys011.add( new PublicKeyAccount(new byte[60]));
@@ -441,7 +441,7 @@ public class TestRecPerson {
 		personalizeRecord_0 = new R_SertifyPubKeys(0, certifier, FEE_POWER, personKey,
 				sertifiedPublicKeys011,
 				356, timestamp, certifier.getLastTimestamp(db));
-		assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(releaserReference));
 
 	}
 	

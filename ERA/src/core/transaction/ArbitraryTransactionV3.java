@@ -226,7 +226,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		// CHECK PAYMENTS SIZE
 		if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -239,7 +239,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 		}
 
 		// REMOVE FEE
-		DCSet fork = db.fork();
+		DCSet fork = this.dcSet.fork();
 		super.process(this.block, false);
 
 		// CHECK PAYMENTS
@@ -262,7 +262,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			}
 
 			// CHECK IF AMOUNT wrong SCALE
-			AssetCls asset = (AssetCls) db.getItemAssetMap().get(payment.getAsset());
+			AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(payment.getAsset());
 			if (payment.getAmount().scale() != asset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
@@ -271,7 +271,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			payment.process(this.creator, fork);
 		}
 
-		return super.isValid(fork, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	@Override

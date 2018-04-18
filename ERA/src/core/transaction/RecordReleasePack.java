@@ -210,7 +210,7 @@ public class RecordReleasePack extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK PAYMENTS SIZE
@@ -219,7 +219,7 @@ public class RecordReleasePack extends Transaction {
 			return INVALID_PAYMENTS_LENGTH;
 		}
 
-		DCSet fork = db.fork();
+		DCSet fork = this.dcSet.fork();
 
 		int counter = 0;
 		int result = 0;
@@ -227,7 +227,7 @@ public class RecordReleasePack extends Transaction {
 		for(Transaction transaction: this.transactions)
 		{
 
-			result = transaction.isValid(fork, releaserReference);
+			result = transaction.isValid(releaserReference);
 			if (result != Transaction.VALIDATE_OK)
 				// transaction counter x100
 				return result + counter * 100;
@@ -237,7 +237,7 @@ public class RecordReleasePack extends Transaction {
 		}
 
 		// IN FORK
-		return super.isValid(fork, releaserReference);
+		return super.isValid(releaserReference);
 
 	}
 

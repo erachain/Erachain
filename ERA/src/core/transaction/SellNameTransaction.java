@@ -17,7 +17,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.naming.NameSale;
-import datachain.DCSet;
 
 public class SellNameTransaction extends Transaction
 {
@@ -173,7 +172,7 @@ public class SellNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -183,25 +182,25 @@ public class SellNameTransaction extends Transaction
 		}
 
 		//CHECK IF NAME EXISTS
-		if(!db.getNameMap().contains(this.nameSale.getName(db)))
+		if(!this.dcSet.getNameMap().contains(this.nameSale.getName(this.dcSet)))
 		{
 			return NAME_DOES_NOT_EXIST;
 		}
 
 		//CHECK CREATOR
-		if(!Crypto.getInstance().isValidAddress(this.nameSale.getName(db).getOwner().getAddress()))
+		if(!Crypto.getInstance().isValidAddress(this.nameSale.getName(this.dcSet).getOwner().getAddress()))
 		{
 			return INVALID_ADDRESS;
 		}
 
 		//CHECK IF CREATOR IS CREATOR
-		if(!db.getNameMap().get(this.nameSale.getKey()).getOwner().getAddress().equals(this.creator.getAddress()))
+		if(!this.dcSet.getNameMap().get(this.nameSale.getKey()).getOwner().getAddress().equals(this.creator.getAddress()))
 		{
 			return INVALID_MAKER_ADDRESS;
 		}
 
 		//CHECK IF NOT FOR SALE ALREADY
-		if(db.getNameExchangeMap().contains(this.nameSale))
+		if(this.dcSet.getNameExchangeMap().contains(this.nameSale))
 		{
 			return NAME_ALREADY_ON_SALE;
 		}
@@ -218,7 +217,7 @@ public class SellNameTransaction extends Transaction
 			return INVALID_AMOUNT;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//PROCESS/ORPHAN

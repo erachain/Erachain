@@ -44,8 +44,8 @@ public class Order implements Comparable<Order>
 	private BigDecimal amountWant;
 	private BigDecimal fulfilledWant;
 	protected long timestamp;
-	private int haveDivisible;
-	private int wantDivisible;
+	//private int haveDivisible;
+	//private int wantDivisible;
 	private boolean isExecutable = true;
 
 	public Order(BigInteger id, Account creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, long timestamp)

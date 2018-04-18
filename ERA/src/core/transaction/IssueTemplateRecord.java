@@ -23,7 +23,6 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.templates.TemplateCls;
 import core.item.templates.TemplateFactory;
-import datachain.DCSet;
 
 public class IssueTemplateRecord extends Issue_ItemRecord 
 {
@@ -68,9 +67,9 @@ public class IssueTemplateRecord extends Issue_ItemRecord
 	}
 
 	//@Override
-	public int isValid(DCSet db, Long releaserReference) {	
+	public int isValid(Long releaserReference) {	
 
-		int result = super.isValid(db, releaserReference);
+		int result = super.isValid(releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		/*

@@ -438,11 +438,11 @@ public class R_SertifyPubKeys extends Transaction {
 
 	//
 	@Override
-	public int isValid(DCSet dcSet, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		boolean creator_admin = false;
 
-		int result = super.isValid(dcSet, releaserReference);
+		int result = super.isValid(releaserReference);
 		if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
 			long personsCount = dcSet.getItemPersonMap().getLastKey();
 			if (personsCount < 20) {

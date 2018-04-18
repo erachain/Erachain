@@ -15,7 +15,6 @@ import core.account.Account;
 import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
-import datachain.DCSet;
 
 public class GenesisCertifyPersonRecord extends Genesis_Record {
 
@@ -117,7 +116,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS
@@ -126,7 +125,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 			return INVALID_ADDRESS;
 		}
 
-		if ( !db.getItemPersonMap().contains(this.key) )
+		if ( !this.dcSet.getItemPersonMap().contains(this.key) )
 		{
 			return Transaction.ITEM_PERSON_NOT_EXIST;
 		}

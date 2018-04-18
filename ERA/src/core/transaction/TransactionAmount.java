@@ -83,6 +83,11 @@ public abstract class TransactionAmount extends Transaction {
 			// set version to 1
 			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
 		} else {
+			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+			if (different_scale != 0) {
+				amount = amount.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+			}
+			amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 			this.amount = amount;
 		}
 
@@ -99,6 +104,11 @@ public abstract class TransactionAmount extends Transaction {
 			// set version to 1
 			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
 		} else {
+			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+			if (different_scale != 0) {
+				amount = amount.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+				amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			}
 			this.amount = amount;
 		}
 
@@ -172,8 +182,7 @@ public abstract class TransactionAmount extends Transaction {
 			{
 				//IF SENDER
 				amount = amount.subtract(this.amount);
-			} else if(address.equals(this.recipient.getAddress()))
-			{
+			} else if(address.equals(this.recipient.getAddress())) {
 				//IF RECIPIENT
 				amount = amount.add(this.amount);
 			}
@@ -347,7 +356,7 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override // - fee + balance - calculate here
-	public int isValid(DCSet dcSet, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 		boolean wrong = true;

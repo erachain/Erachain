@@ -17,7 +17,6 @@ import com.google.common.primitives.Longs;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import datachain.DCSet;
 
 
 // TODO
@@ -197,7 +196,7 @@ public class R_Vouch extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		if (this.height < 2 ) {
 			//CHECK HEIGHT - not 0 and NOT GENESIS
@@ -209,7 +208,7 @@ public class R_Vouch extends Transaction {
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
 
-		int result = super.isValid(db, releaserReference);
+		int result = super.isValid(releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result;
 
 		/*
@@ -225,7 +224,7 @@ public class R_Vouch extends Transaction {
 		if (tx == null )
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		 */
-		Transaction tx = db.getTransactionFinalMap().getTransaction(height, seq);
+		Transaction tx = this.dcSet.getTransactionFinalMap().getTransaction(height, seq);
 		if (tx == null ) {
 			if (height == 104841 && seq == 1) {
 				// "32tebyLDxbucXod4N4TAZZGCMqLJdXtDQuY4o1P4gxDBcBKkdCi41LdAxVD9Xzy3rmPQ41yHXtFJvhD6SPkrfaa3

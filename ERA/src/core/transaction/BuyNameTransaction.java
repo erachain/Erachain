@@ -20,7 +20,6 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.naming.Name;
 import core.naming.NameSale;
-import datachain.DCSet;
 
 public class BuyNameTransaction extends Transaction
 {
@@ -190,7 +189,7 @@ public class BuyNameTransaction extends Transaction
 	//VALIDATE
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -200,7 +199,7 @@ public class BuyNameTransaction extends Transaction
 		}
 
 		//CHECK IF NAME EXISTS
-		Name name = this.nameSale.getName(db);
+		Name name = this.nameSale.getName(this.dcSet);
 		if(name == null)
 		{
 			return NAME_DOES_NOT_EXIST;
@@ -213,7 +212,7 @@ public class BuyNameTransaction extends Transaction
 		}
 
 		//CHECK IF NAME FOR SALE ALREADY
-		if(!db.getNameExchangeMap().contains(this.nameSale.getKey()))
+		if(!this.dcSet.getNameExchangeMap().contains(this.nameSale.getKey()))
 		{
 			return NAME_NOT_FOR_SALE;
 		}
@@ -225,19 +224,19 @@ public class BuyNameTransaction extends Transaction
 		}
 
 		//CHECK IF CREATOR HAS ENOUGH MONEY
-		if(this.creator.getBalance(db, Transaction.FEE_KEY).a.b.compareTo(this.nameSale.getAmount()) == -1)
+		if(this.creator.getBalance(this.dcSet, Transaction.FEE_KEY).a.b.compareTo(this.nameSale.getAmount()) == -1)
 		{
 			return NO_BALANCE;
 		}
 
 		//CHECK IF PRICE MATCHES
-		NameSale nameSale = db.getNameExchangeMap().getNameSale(this.nameSale.getKey());
+		NameSale nameSale = this.dcSet.getNameExchangeMap().getNameSale(this.nameSale.getKey());
 		if(!this.nameSale.getAmount().equals(nameSale.getAmount()))
 		{
 			return INVALID_AMOUNT;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//@Override

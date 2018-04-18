@@ -91,7 +91,7 @@ public class TransactionTests3AssetsAsPack {
 
 		//CREATE ISSUE ASSET TRANSACTION
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
-		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(releaserReference));
 
 		issueAssetTransaction.sign(maker, asPack);
 
@@ -211,7 +211,7 @@ public class TransactionTests3AssetsAsPack {
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
 
-		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(releaserReference));
 
 		issueAssetTransaction.process(gb, asPack);
 
@@ -311,7 +311,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
-		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(releaserReference));
 
 		issueAssetTransaction.process(gb, asPack);
 		long key = asset.getKey(db);
@@ -326,7 +326,7 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer.sign(maker, asPack);
 
 		//CHECK IF ASSET TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		assetTransfer.process(gb, asPack);
 
@@ -335,19 +335,19 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 
 		//CHECK IF ASSET TRANSFER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		//CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
 		assetTransfer = new R_Send(maker, new Account("test"), key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		//CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
 		assetTransfer = new R_Send(maker, recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
 
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 		//CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
 		assetTransfer = new R_Send(maker, recipient, 0, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), releaserReference);
@@ -355,7 +355,7 @@ public class TransactionTests3AssetsAsPack {
 		assetTransfer.process(gb, asPack);
 
 		//CHECK IF ASSET TRANSFER IS INVALID
-		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(db, releaserReference));
+		assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference));
 
 	}
 
@@ -544,13 +544,13 @@ public class TransactionTests3AssetsAsPack {
 		//CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(account, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), account.getLastReference(dcSet));
 		//cancelOrderTransaction.sign(account);
 		//CHECK IF CANCEL ORDER IS VALID
-		assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(releaserReference));
 
 		//CREATE INVALID CANCEL ORDER ORDER DOES NOT EXIST
 		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,7}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1,2});
 
 		//CHECK IF CANCEL ORDER IS INVALID
-		assertEquals(Transaction.ORDER_DOES_NOT_EXIST, cancelOrderTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.ORDER_DOES_NOT_EXIST, cancelOrderTransaction.isValid(releaserReference));
 
 		//CREATE INVALID CANCEL ORDER INCORRECT CREATOR
 		seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -559,7 +559,7 @@ public class TransactionTests3AssetsAsPack {
 		cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1,2});
 
 		//CHECK IF CANCEL ORDER IS INVALID
-		assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(releaserReference));
 
 		//CREATE INVALID CANCEL ORDER NO BALANCE
 		DCSet fork = db.fork();
@@ -567,13 +567,13 @@ public class TransactionTests3AssetsAsPack {
 		maker.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false);
 
 		//CHECK IF CANCEL ORDER IS INVALID
-		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(fork, releaserReference));
+		assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(releaserReference));
 
 		//CREATE CANCEL ORDER INVALID REFERENCE
 		cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), -123L, new byte[]{1,2});
 
 		//CHECK IF NAME REGISTRATION IS INVALID
-		assertEquals(Transaction.INVALID_REFERENCE, cancelOrderTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.INVALID_REFERENCE, cancelOrderTransaction.isValid(releaserReference));
 
 	}
 
@@ -687,7 +687,7 @@ public class TransactionTests3AssetsAsPack {
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, System.currentTimeMillis(), releaserReference);
 		issueAssetTransaction.sign(maker, asPack);
-		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(releaserReference));
 		issueAssetTransaction.process(gb, asPack);
 
 		long key = asset.getKey(db);
@@ -754,7 +754,7 @@ public class TransactionTests3AssetsAsPack {
 				);
 		r_Send.sign(creator, asPack);
 
-		assertEquals(r_Send.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_Send.isValid(releaserReference), Transaction.VALIDATE_OK);
 
 		r_Send.process(gb, asPack);
 

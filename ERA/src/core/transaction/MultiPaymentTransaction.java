@@ -217,7 +217,7 @@ public class MultiPaymentTransaction extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK PAYMENTS SIZE
@@ -227,7 +227,8 @@ public class MultiPaymentTransaction extends Transaction {
 		}
 
 		//REMOVE FEE
-		DCSet fork = db.fork();
+		// TODO REMOVE FORK!!!! - use calculate instead
+		DCSet fork = this.dcSet.fork();
 		//this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
 		this.creator.changeBalance(fork, true, FEE_KEY, this.fee, false);
 
@@ -259,7 +260,7 @@ public class MultiPaymentTransaction extends Transaction {
 			}
 
 			// CHECK IF AMOUNT wrong SCALE
-			AssetCls asset = (AssetCls) db.getItemAssetMap().get(payment.getAsset());
+			AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(payment.getAsset());
 			if (payment.getAmount().scale() != asset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
@@ -268,7 +269,7 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.process(this.creator, fork);
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//PROCESS/ORPHAN

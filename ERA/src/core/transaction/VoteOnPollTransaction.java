@@ -18,7 +18,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.voting.Poll;
 import core.voting.PollOption;
-import datachain.DCSet;
 
 public class VoteOnPollTransaction extends Transaction
 {
@@ -216,7 +215,7 @@ public class VoteOnPollTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK POLL LENGTH
@@ -233,13 +232,13 @@ public class VoteOnPollTransaction extends Transaction
 		}
 
 		//CHECK POLL EXISTS
-		if(!db.getPollMap().contains(this.poll))
+		if(!this.dcSet.getPollMap().contains(this.poll))
 		{
 			return POLL_NOT_EXISTS;
 		}
 
 		//CHECK OPTION EXISTS
-		Poll poll = db.getPollMap().get(this.poll);
+		Poll poll = this.dcSet.getPollMap().get(this.poll);
 		if(poll.getOptions().size()-1 < this.option || this.option < 0)
 		{
 			return POLL_OPTION_NOT_EXISTS;
@@ -252,7 +251,7 @@ public class VoteOnPollTransaction extends Transaction
 			return ALREADY_VOTED_FOR_THAT_OPTION;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 
 	}
 

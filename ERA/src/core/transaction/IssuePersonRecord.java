@@ -17,7 +17,6 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import datachain.AddressTime_SignatureMap;
-import datachain.DCSet;
 
 public class IssuePersonRecord extends Issue_ItemRecord
 {
@@ -100,7 +99,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		PersonCls person = (PersonCls) this.getItem();
@@ -129,7 +128,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 			// IF PERSON is LIVE
 			if (person.getImage().length < (MAX_IMAGE_LENGTH>>1)
 					|| person.getImage().length > MAX_IMAGE_LENGTH) {
-				int height = this.getBlockHeightByParent(db);
+				int height = this.getBlockHeightByParent(this.dcSet);
 				if (height != 2998) {
 					// early blocks has wrong ISSUE_PERSON with 0 image length - in block 2998
 					return Transaction.INVALID_IMAGE_LENGTH;
@@ -147,16 +146,16 @@ public class IssuePersonRecord extends Issue_ItemRecord
 				if (human.getOwnerSignature() == null) {
 					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
 				}
-				if (!human.isSignatureValid(db)) {
+				if (!human.isSignatureValid(this.dcSet)) {
 					return Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID;
 				}
 			}
 		}
 
 		boolean creator_admin = false;
-		int res = super.isValid(db, releaserReference);
+		int res = super.isValid(releaserReference);
 		if ( res == Transaction.CREATOR_NOT_PERSONALIZED) {
-			long count = db.getItemPersonMap().getLastKey();
+			long count = this.dcSet.getItemPersonMap().getLastKey();
 			if (count < 20) {
 				// FIRST Persons only by ME
 				// FIRST Persons only by ADMINS
@@ -171,7 +170,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 				return res;
 		} else if (res == Transaction.NOT_ENOUGH_FEE) {
 			// IF balance of FEE < 0 - ERROR
-			if(this.creator.getBalance(db, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0)
+			if(this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0)
 				return res;
 		} else if (res != Transaction.VALIDATE_OK) {
 			return res;

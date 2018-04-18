@@ -13,7 +13,6 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.ItemCls;
-import datachain.DCSet;
 
 public abstract class AddressItem_Refs extends Transaction
 {
@@ -108,7 +107,7 @@ public abstract class AddressItem_Refs extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK NAME LENGTH
@@ -125,7 +124,7 @@ public abstract class AddressItem_Refs extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 
 	}
 

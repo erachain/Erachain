@@ -14,7 +14,6 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.ItemCls;
-import datachain.DCSet;
 import utils.Pair;
 
 public abstract class Issue_ItemRecord extends Transaction
@@ -118,7 +117,7 @@ public abstract class Issue_ItemRecord extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK NAME LENGTH
@@ -127,13 +126,13 @@ public abstract class Issue_ItemRecord extends Transaction
 		int nameLen = name.length();
 		if(nameLen < item.getMinNameLen()
 				//&& !BlockChain.DEVELOP_USE
-				&& this.getBlockHeightByParentOrLast(db) > 114000
+				&& this.getBlockHeightByParentOrLast(this.dcSet) > 114000
 				)
 		{
 			// IF already in DB
 			Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(name);
 			if (pair == null
-					|| this.item.getKey(db) > 0
+					|| this.item.getKey(this.dcSet) > 0
 					|| !this.getCreator().equals(pair.getB())) {
 				return INVALID_NAME_LENGTH;
 			}
@@ -166,7 +165,7 @@ public abstract class Issue_ItemRecord extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 
 	}
 

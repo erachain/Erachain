@@ -184,7 +184,7 @@ public class TestRecImprint {
 		assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
 		issueImprintRecord.sign(maker, false);
 
-		assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(releaserReference));
 
 		issueImprintRecord.process(gb, false);
 

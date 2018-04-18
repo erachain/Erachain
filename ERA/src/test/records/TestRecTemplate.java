@@ -202,7 +202,7 @@ public class TestRecTemplate {
 		//CREATE ISSUE PLATE TRANSACTION
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference));
 
 		issueTemplateRecord.sign(maker, false);
 		issueTemplateRecord.process(gb, false);
@@ -499,7 +499,7 @@ public class TestRecTemplate {
 
 		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(releaserReference));
 
 		signNoteRecord.sign(maker, false);
 		signNoteRecord.process(gb, false);

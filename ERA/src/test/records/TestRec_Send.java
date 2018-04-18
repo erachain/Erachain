@@ -106,7 +106,7 @@ public class TestRec_Send {
 				);
 		r_SendV3.sign(maker, false);
 
-		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
 		assertEquals((long)maker.getLastTimestamp(db), gb.getTimestamp(db));
 		r_SendV3.process(gb, false);
@@ -154,7 +154,7 @@ public class TestRec_Send {
 				);
 		r_SendV3.sign(maker, false);
 
-		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 		assertEquals((long)maker.getLastTimestamp(db), timestamp);
@@ -202,7 +202,7 @@ public class TestRec_Send {
 				);
 		r_SendV3.sign(maker, false);
 
-		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -246,7 +246,7 @@ public class TestRec_Send {
 				);
 		r_SendV3.sign(maker, false);
 
-		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -291,7 +291,7 @@ public class TestRec_Send {
 				);
 		r_SendV3.sign(maker, false);
 
-		assertEquals(r_SendV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -373,11 +373,11 @@ public class TestRec_Send {
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
 		{
-			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.NOT_YET_RELEASED);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.NOT_YET_RELEASED);
 		}
 		else
 		{
-			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 		}
 
 		arbitraryTransactionV3.process(gb, false);
@@ -449,11 +449,11 @@ public class TestRec_Send {
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
 		{
-			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.NOT_YET_RELEASED);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.NOT_YET_RELEASED);
 		}
 		else
 		{
-			assertEquals(arbitraryTransactionV3.isValid(db, releaserReference), Transaction.VALIDATE_OK);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 		}
 
 		arbitraryTransactionV3.process(gb, false);

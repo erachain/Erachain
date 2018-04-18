@@ -161,7 +161,7 @@ public class CancelOrderTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		for ( byte[] valid_item: VALID_REC) {
@@ -172,8 +172,8 @@ public class CancelOrderTransaction extends Transaction
 
 		//CHECK IF ORDER EXISTS
 		Order order = null;
-		if(db.getOrderMap().contains(this.order))
-			order = db.getOrderMap().get(this.order);
+		if(this.dcSet.getOrderMap().contains(this.order))
+			order = this.dcSet.getOrderMap().get(this.order);
 
 		if (order== null)
 			return ORDER_DOES_NOT_EXIST;
@@ -185,7 +185,7 @@ public class CancelOrderTransaction extends Transaction
 			return INVALID_ORDER_CREATOR;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//PROCESS/ORPHAN

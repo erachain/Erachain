@@ -101,10 +101,10 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
-		int result = super.isValid(db, releaserReference);
+		int result = super.isValid(releaserReference);
 		if(result != Transaction.VALIDATE_OK) return result;
 
 		//CHECK QUANTITY

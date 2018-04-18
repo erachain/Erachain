@@ -218,7 +218,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS

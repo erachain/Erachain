@@ -19,7 +19,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.ItemCls;
 import core.item.statuses.StatusCls;
-import datachain.DCSet;
 import utils.DateTimeFormat;
 
 public class R_SetStatusToItem extends Transaction {
@@ -600,9 +599,9 @@ public class R_SetStatusToItem extends Transaction {
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
-		int result = super.isValid(db, releaserReference);
+		int result = super.isValid(releaserReference);
 		if (result != Transaction.VALIDATE_OK) {
 			return result;
 		}
@@ -631,7 +630,7 @@ public class R_SetStatusToItem extends Transaction {
 			}
 		}
 
-		if ( !db.getItemStatusMap().contains(this.key) )
+		if ( !this.dcSet.getItemStatusMap().contains(this.key) )
 		{
 			return Transaction.ITEM_STATUS_NOT_EXIST;
 		}
@@ -641,7 +640,7 @@ public class R_SetStatusToItem extends Transaction {
 				&& this.itemType != ItemCls.UNION_TYPE)
 			return ITEM_DOES_NOT_STATUSED;
 
-		ItemCls item = db.getItem_Map(this.itemType).get(this.itemKey);
+		ItemCls item = this.dcSet.getItem_Map(this.itemType).get(this.itemKey);
 		if ( item == null )
 		{
 			return Transaction.ITEM_DOES_NOT_EXIST;
@@ -652,7 +651,7 @@ public class R_SetStatusToItem extends Transaction {
 			byte[] bytes = Longs.toByteArray(this.ref_to_parent);
 			int height = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
 			int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
-			Transaction tx = db.getTransactionFinalMap().getTransaction(height, seqNo);
+			Transaction tx = this.dcSet.getTransactionFinalMap().getTransaction(height, seqNo);
 			if (tx == null )
 				return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}

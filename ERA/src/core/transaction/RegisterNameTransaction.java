@@ -19,7 +19,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.naming.Name;
-import datachain.DCSet;
 
 public class RegisterNameTransaction extends Transaction
 {
@@ -174,7 +173,7 @@ public class RegisterNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -203,13 +202,13 @@ public class RegisterNameTransaction extends Transaction
 		}
 
 		//CHECK NAME NOT REGISTRED ALREADY
-		if(db.getNameMap().contains(this.name))
+		if(this.dcSet.getNameMap().contains(this.name))
 		{
 			return NAME_ALREADY_REGISTRED;
 		}
 
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 
 	}
 

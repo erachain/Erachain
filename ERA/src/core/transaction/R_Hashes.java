@@ -344,7 +344,7 @@ public class R_Hashes extends Transaction {
 	}
 
 	//@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 		
 		//CHECK DATA SIZE
 		if(url.length > MAX_URL_LENGTH)
@@ -362,7 +362,7 @@ public class R_Hashes extends Transaction {
 			return INVALID_PARAMS_LENGTH;
 		}
 
-		int result = super.isValid(db, releaserReference);
+		int result = super.isValid(releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result; 
 		
 		/** double singns is available

@@ -83,7 +83,7 @@ public class NameStorageTest {
 
 		// CHECK IF NAME REGISTRATION IS VALID
 		assertEquals(Transaction.VALIDATE_OK,
-				nameRegistration.isValid(databaseSet, releaserReference));
+				nameRegistration.isValid(releaserReference));
 		nameRegistration.process(null, false);
 	}
 

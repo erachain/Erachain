@@ -1294,12 +1294,12 @@ public class Block {
 					transaction.setDC(validatingDC, false);
 
 					//CHECK IF VALID
-					if(transaction.isValid(validatingDC, null) != Transaction.VALIDATE_OK)
+					if(transaction.isValid(null) != Transaction.VALIDATE_OK)
 					{
 						LOGGER.debug("*** Block[" + height
 								+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 								+ transaction.viewFullTypeName() + "]"
-								+ "invalid code: " + transaction.isValid(validatingDC, null)
+								+ "invalid code: " + transaction.isValid(null)
 								+ " " + Base58.encode(transaction.getSignature()));
 						return false;
 					}

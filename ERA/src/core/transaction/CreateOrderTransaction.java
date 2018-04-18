@@ -244,7 +244,7 @@ public class CreateOrderTransaction extends Transaction {
 	// VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		for (byte[] valid_item : VALID_REC) {
 			if (Arrays.equals(this.signature, valid_item)) {
@@ -252,7 +252,7 @@ public class CreateOrderTransaction extends Transaction {
 			}
 		}
 
-		int height = this.getBlockHeightByParentOrLast(db);
+		int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
 		// CHECK IF ASSETS NOT THE SAME
 		long have = this.order.getHave();
@@ -281,7 +281,7 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		// CHECK IF WANT EXISTS
-		AssetCls haveAsset = this.order.getHaveAsset(db);
+		AssetCls haveAsset = this.order.getHaveAsset(this.dcSet);
 		if (haveAsset == null) {
 			// WANT DOES NOT EXIST
 			return ITEM_ASSET_NOT_EXIST;
@@ -289,13 +289,13 @@ public class CreateOrderTransaction extends Transaction {
 
 		// CHECK IF SENDER HAS ENOUGH ASSET BALANCE
 		if (FEE_KEY == have) {
-			if (this.creator.getBalance(db, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
+			if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
 				return NO_BALANCE;
 			}
 		} else {
 
 			// CHECK IF SENDER HAS ENOUGH FEE BALANCE
-			if (this.creator.getBalance(db, FEE_KEY).a.b.compareTo(this.fee) == -1) {
+			if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.fee) == -1) {
 				return NOT_ENOUGH_FEE;
 			}
 
@@ -305,7 +305,7 @@ public class CreateOrderTransaction extends Transaction {
 
 			if (!unLimited) {
 
-				BigDecimal forSale = this.creator.getForSale(db, have, height);
+				BigDecimal forSale = this.creator.getForSale(this.dcSet, have, height);
 
 				if (forSale.compareTo(amountHave) < 0) {
 					return NO_BALANCE;
@@ -318,7 +318,7 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		// CHECK IF WANT EXISTS
-		AssetCls wantAsset = this.order.getWantAsset(db);
+		AssetCls wantAsset = this.order.getWantAsset(this.dcSet);
 		if (wantAsset == null) {
 			// WANT DOES NOT EXIST
 			return ITEM_ASSET_NOT_EXIST;
@@ -346,7 +346,7 @@ public class CreateOrderTransaction extends Transaction {
 			return AMOUNT_SCALE_WRONG;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	// PROCESS/ORPHAN

@@ -139,7 +139,7 @@ public class TestRecUnion {
 	public void initUnionalize() {
 
 
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
 
 		issueUnionTransaction.sign(certifier, false);
 		
@@ -181,22 +181,22 @@ public class TestRecUnion {
 		issueUnionTransaction.sign(certifier, false);
 
 		//CHECK IF ISSUE UNION IS VALID
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
 
 		//CREATE INVALID ISSUE UNION - INVALID UNIONALIZE
 		issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
-		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(releaserReference));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference));
 
 		//CHECK IF ISSUE UNION IS VALID
 		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference));
 
 		//CHECK 
 		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
 
 	}
 
@@ -313,7 +313,7 @@ public class TestRecUnion {
 		
 		init();				
 		
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
 
 		issueUnionTransaction.sign(certifier, false);
 		

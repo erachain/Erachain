@@ -18,7 +18,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.naming.Name;
 import core.naming.NameSale;
-import datachain.DCSet;
 
 public class CancelSellNameTransaction extends Transaction
 {
@@ -184,7 +183,7 @@ public class CancelSellNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
@@ -194,7 +193,7 @@ public class CancelSellNameTransaction extends Transaction
 		}
 
 		//CHECK IF NAME EXISTS
-		Name name = db.getNameMap().get(this.name);
+		Name name = this.dcSet.getNameMap().get(this.name);
 		if(name == null)
 		{
 			return NAME_DOES_NOT_EXIST;
@@ -207,12 +206,12 @@ public class CancelSellNameTransaction extends Transaction
 		}
 
 		//CHECK IF NAME FOR SALE ALREADY
-		if(!db.getNameExchangeMap().contains(this.name))
+		if(!this.dcSet.getNameExchangeMap().contains(this.name))
 		{
 			return NAME_NOT_FOR_SALE;
 		}
 
-		return super.isValid(db, releaserReference);
+		return super.isValid(releaserReference);
 	}
 
 	//PROCESS/ORPHAN

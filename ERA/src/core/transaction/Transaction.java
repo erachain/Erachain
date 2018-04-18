@@ -962,7 +962,7 @@ public abstract class Transaction {
 		return true;
 	}
 
-	public int isValid(DCSet dcSet, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
 		// CHECK IF REFERENCE IS OK
 		Long reference = releaserReference == null ? this.creator.getLastTimestamp(dcSet) : releaserReference;

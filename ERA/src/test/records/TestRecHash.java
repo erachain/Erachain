@@ -161,7 +161,7 @@ public class TestRecHash {
 
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(releaserReference));
 
 		hashesRecord.sign(maker, false);
 		hashesRecord.process(gb, false);

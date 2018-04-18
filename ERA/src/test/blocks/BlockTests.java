@@ -316,7 +316,7 @@ public class BlockTests
 		long timestamp = newBlock.getTimestamp(db);
 		payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, generator.getLastTimestamp(db));
 		payment.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment.isValid(db, null));
+		assertEquals(Transaction.VALIDATE_OK, payment.isValid(null));
 		transactions = new ArrayList<Transaction>();
 		transactions.add(payment);
 
@@ -467,7 +467,7 @@ public class BlockTests
 		long timestamp = block.getTimestamp(db);
 		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, generator.getLastTimestamp(db));
 		payment1.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
+		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(null));
 
 		//payment1.process(fork);
 		transactions = new ArrayList<Transaction>();
@@ -478,7 +478,7 @@ public class BlockTests
 		Account recipient2 = new Account("7AfGz1FJ6tUnxxKSAHfcjroFEm8jSyVm7r");
 		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, generator.getLastTimestamp(fork));
 		payment2.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(fork, null));
+		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(null));
 
 		transactions.add(payment2);
 
@@ -572,7 +572,7 @@ public class BlockTests
 		long timestamp = block.getTimestamp(db) - 1000;
 		Transaction payment1 = new R_Send(generator, FEE_POWER, recipient1, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp++, generator.getLastTimestamp(fork));
 		payment1.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(fork, null));
+		assertEquals(Transaction.VALIDATE_OK, payment1.isValid(null));
 
 		payment1.process(block, false);
 
@@ -583,7 +583,7 @@ public class BlockTests
 		Transaction payment2 = new R_Send(generator, FEE_POWER, recipient2, ERM_KEY,
 				BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp++, generator.getLastTimestamp(fork));
 		payment2.sign(generator, false);
-		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(fork, null));
+		assertEquals(Transaction.VALIDATE_OK, payment2.isValid(null));
 
 		transactions.add(payment2);
 

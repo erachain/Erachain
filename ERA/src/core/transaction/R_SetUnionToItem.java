@@ -15,7 +15,6 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.ItemCls;
-import datachain.DCSet;
 
 public class R_SetUnionToItem extends Transaction {
 
@@ -263,9 +262,9 @@ public class R_SetUnionToItem extends Transaction {
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference) {
+	public int isValid(Long releaserReference) {
 
-		int result = super.isValid(db, releaserReference);
+		int result = super.isValid(releaserReference);
 		if (result != Transaction.VALIDATE_OK) return result;
 
 		//CHECK END_DAY
@@ -274,7 +273,7 @@ public class R_SetUnionToItem extends Transaction {
 			return INVALID_DATE;
 		}
 
-		if ( !db.getItemStatusMap().contains(this.key) )
+		if ( !this.dcSet.getItemStatusMap().contains(this.key) )
 		{
 			return Transaction.ITEM_STATUS_NOT_EXIST;
 		}
@@ -284,11 +283,11 @@ public class R_SetUnionToItem extends Transaction {
 				&& this.itemType != ItemCls.STATUS_TYPE)
 			return ITEM_DOES_NOT_UNITED;
 
-		ItemCls item = db.getItem_Map(this.itemType).get(this.itemKey);
+		ItemCls item = this.dcSet.getItem_Map(this.itemType).get(this.itemKey);
 		if ( item == null )
 			return Transaction.ITEM_DOES_NOT_EXIST;
 
-		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
+		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, this.dcSet);
 		if (false && balERA.compareTo(BlockChain.MINOR_ERA_BALANCE_BD)<0 )
 			return Transaction.NOT_ENOUGH_RIGHTS;
 

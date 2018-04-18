@@ -182,7 +182,7 @@ public class TestRecStatus {
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(db, releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(releaserReference));
 
 		issueStatusRecord.sign(maker, false);
 		issueStatusRecord.process(gb, false);

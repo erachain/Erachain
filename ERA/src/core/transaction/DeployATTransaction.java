@@ -316,13 +316,13 @@ public class DeployATTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(DCSet db, Long releaserReference)
+	public int isValid(Long releaserReference)
 	{
-		return isValid(db, 0);
+		return isValid(0);
 	}
 
 	//
-	public int isValid(DCSet db, Integer forkHeight)
+	public int isValid(Integer forkHeight)
 	{
 		/*
 		//CHECK IF RELEASED
@@ -367,20 +367,20 @@ public class DeployATTransaction extends Transaction
 		//CHECK IF CREATIONBYTES VALID
 		try
 		{
-			int height = db.getBlockMap().last().getHeight(db) + 1;
+			int height = this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1;
 			byte[] balanceBytes = this.getFee().unscaledValue().toByteArray();
 			byte[] fill = new byte[8 - balanceBytes.length];
 			balanceBytes = Bytes.concat(fill, balanceBytes);
 
 			long lFee = Longs.fromByteArray(balanceBytes);
-			int returnCode = AT_Controller.checkCreationBytes(this.creationBytes, this.type, lFee , height, forkHeight, db);
+			int returnCode = AT_Controller.checkCreationBytes(this.creationBytes, this.type, lFee , height, forkHeight, this.dcSet);
 			if ( returnCode != 0 )
 			{
 				return returnCode + AT_ERROR;
 			}
 
-			String atId = Crypto.getInstance().getATAddress( getBytesForAddress( db ) );
-			if ( db.getATMap().getAT(atId)!=null)
+			String atId = Crypto.getInstance().getATAddress( getBytesForAddress( this.dcSet ) );
+			if ( this.dcSet.getATMap().getAT(atId)!=null)
 			{
 				return 12 + AT_ERROR;
 			}
@@ -392,7 +392,7 @@ public class DeployATTransaction extends Transaction
 			return INVALID_CREATION_BYTES;
 		}
 
-		return super.isValid(db, null);
+		return super.isValid(null);
 
 	}
 
