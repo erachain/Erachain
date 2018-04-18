@@ -2,7 +2,6 @@ package api;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletRequest;
@@ -176,9 +175,8 @@ public class TelegramsResource {
 		BigDecimal amount;
 		// READ AMOUNT
 		try {
-			amount = new BigDecimal(amount_in).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-			if (amount.equals(new BigDecimal("0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)))
-				throw new Exception("");
+			// USE max DEEP SCALE!
+			amount = new BigDecimal(amount_in).setScale(8); //BlockChain.AMOUNT_DEDAULT_SCALE);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
@@ -188,7 +186,7 @@ public class TelegramsResource {
 		}
 		byte[] message = null;
 		if (message_in != null) {
-			message = message_in.getBytes(Charset.forName("UTF-8"));
+			message = message_in.getBytes(StandardCharsets.UTF_8);
 			if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
 				out.put("status_code", Transaction.INVALID_DESCRIPTION_LENGTH);
 				out.put("status", "Invalid message");
