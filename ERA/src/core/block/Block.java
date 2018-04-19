@@ -1105,18 +1105,20 @@ public class Block {
 
 		if (height < BlockChain.REPEAT_WIN) {
 			repeatsMin = height - 1;
+		} else if (height < 90000) {
+			repeatsMin = 7;
 		} else {
 			repeatsMin = BlockChain.GENESIS_ERA_TOTAL/usedBalance;
 			repeatsMin  = repeatsMin>>2;
 
-		if (height < 110000 && repeatsMin > 40)
+		if (height < 110000 && repeatsMin > 40) {
 			repeatsMin = 40;
-		else if (height < 150000 && repeatsMin > 50)
+		} else if (height < 150000 && repeatsMin > 50) {
 			repeatsMin = 50;
-		else if (repeatsMin < 10)
+		} else if (repeatsMin < 10) {
 			repeatsMin = 10;
 		}
-
+		}
 
 		int def = repeatsMin - (height - previousForgingHeight);
 		if (def > 0) {

@@ -129,9 +129,10 @@ public class Asset_Info extends JTextPane {
 		text += "<td><div  style='float:left'><div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DCSet.getInstance()) +"</div>";
 		text += "<div><b>"+ Lang.getInstance().translate("Name") + ": </b>" + asset.getName() + "</div>";
 		text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
-		text += "<div><b>" + Lang.getInstance().translate("Owner") + ": </b><a href = '!!Owner'>" + hl_Owner.get_Text() + "</a></div>";
-		text += "<div><b>" + Lang.getInstance().translate("TYPE") + ": </b>" + Lang.getInstance().translate(asset.viewAssetType()+"") +"</div>";
-		text += "<div></b>" + Lang.getInstance().translate("Quantity") + ": </b>" + asset.getQuantity() +"</div><<BR></td></tr></table>";
+		text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
+		text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetType()+"</b>,");
+		text += " " + Lang.getInstance().translate("Scale") + ": <b>" + Lang.getInstance().translate(asset.getScale()+"") +"</b>,";
+		text += " " + Lang.getInstance().translate("Quantity") + ": <b>" + asset.getQuantity() +"</b></div><<BR></td></tr></table>";
 		text +="<div>";
 
 
