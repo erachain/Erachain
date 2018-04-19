@@ -404,7 +404,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator() +"<br>";
 			text += Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.getItem().getName() +"<br>";
 			text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
-			text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
+		//	text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
 			text += Lang.getInstance().translate("Asset Type") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).viewAssetType()+"")+ "<br>";
 			text += Lang.getInstance().translate("Scale") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
 			text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
