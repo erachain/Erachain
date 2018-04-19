@@ -28,14 +28,14 @@ public class CancelOrderTransaction extends Transaction
 	private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
 	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
 
-	private BigInteger order;
+	private BigInteger orderID;
 	public static final byte[][] VALID_REC = new byte[][]{
 	};
 
 
 	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
-		this.order = order;
+		this.orderID = order;
 	}
 	public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
 		this(typeBytes, creator, order, feePow, timestamp, reference);
@@ -54,7 +54,7 @@ public class CancelOrderTransaction extends Transaction
 
 	public BigInteger getOrder()
 	{
-		return this.order;
+		return this.orderID;
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class CancelOrderTransaction extends Transaction
 
 		//ADD CREATOR/ORDER
 		transaction.put("creator", this.creator.getAddress());
-		transaction.put("order", Base58.encode(this.order.toByteArray()));
+		transaction.put("orderID", Base58.encode(this.orderID.toByteArray()));
 
 		return transaction;
 	}
@@ -143,7 +143,7 @@ public class CancelOrderTransaction extends Transaction
 		byte[] data = super.toBytes(withSign, releaserReference);
 
 		//WRITE ORDER
-		byte[] orderBytes = this.order.toByteArray();
+		byte[] orderBytes = this.orderID.toByteArray();
 		byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
 		orderBytes = Bytes.concat(fill, orderBytes);
 		data = Bytes.concat(data, orderBytes);
@@ -172,8 +172,8 @@ public class CancelOrderTransaction extends Transaction
 
 		//CHECK IF ORDER EXISTS
 		Order order = null;
-		if(this.dcSet.getOrderMap().contains(this.order))
-			order = this.dcSet.getOrderMap().get(this.order);
+		if(this.dcSet.getOrderMap().contains(this.orderID))
+			order = this.dcSet.getOrderMap().get(this.orderID);
 
 		if (order== null)
 			return ORDER_DOES_NOT_EXIST;
@@ -203,7 +203,7 @@ public class CancelOrderTransaction extends Transaction
 
 		//UPDATE BALANCE OF CREATOR
 		Account creator = order.getCreator();
-		//creator.setBalance(order.getHave(), creator.getBalance(db, order.getHave()).add(order.getAmountHaveLeft()), db);
+		//creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).add(orderID.getAmountHaveLeft()), db);
 		creator.changeBalance(db, false, order.getHave(), order.getAmountHaveLeft(), false);
 
 		//DELETE FROM DATABASE
@@ -217,7 +217,7 @@ public class CancelOrderTransaction extends Transaction
 		//UPDATE CREATOR
 		super.process(block, asPack);
 
-		Order order = this.dcSet.getOrderMap().get(this.order);
+		Order order = this.dcSet.getOrderMap().get(this.orderID);
 		order.setDC(this.dcSet);
 		process_it(this.dcSet, order);
 	}
@@ -228,7 +228,7 @@ public class CancelOrderTransaction extends Transaction
 
 		//REMOVE BALANCE OF CREATOR
 		Account creator = order.getCreator();
-		//creator.setBalance(order.getHave(), creator.getBalance(db, order.getHave()).subtract(order.getAmountHaveLeft()), db);
+		//creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).subtract(orderID.getAmountHaveLeft()), db);
 		creator.changeBalance(db, true, order.getHave(), order.getAmountHaveLeft(), true);
 
 		//DELETE ORPHAN DATA
@@ -242,7 +242,7 @@ public class CancelOrderTransaction extends Transaction
 		super.orphan(asPack);
 
 		//ADD TO DATABASE
-		Order order = this.dcSet.getCompletedOrderMap().get(this.order);
+		Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 		order.setDC(this.dcSet);
 		orphan_it(this.dcSet, order);
 	}
@@ -298,13 +298,13 @@ public class CancelOrderTransaction extends Transaction
 
 		Order order;
 
-		if(this.dcSet.getCompletedOrderMap().contains(this.order))
+		if(this.dcSet.getCompletedOrderMap().contains(this.orderID))
 		{
-			order =  this.dcSet.getCompletedOrderMap().get(this.order);
+			order =  this.dcSet.getCompletedOrderMap().get(this.orderID);
 		}
 		else
 		{
-			order =  this.dcSet.getOrderMap().get(this.order);
+			order =  this.dcSet.getOrderMap().get(this.orderID);
 		}
 
 		assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHaveLeft());
