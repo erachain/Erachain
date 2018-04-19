@@ -373,12 +373,6 @@ public abstract class TransactionAmount extends Transaction {
 		//CHECK IF AMOUNT AND ASSET
 		if (this.amount != null) {
 
-			// for PARSE and toBYTES need only AMOUNT_LENGTH bytes
-			byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-			if (amountBytes.length > AMOUNT_LENGTH) {
-				return AMOUNT_LENGHT_SO_LONG;
-			}
-
 			long absKey = this.key;
 			if (absKey < 0)
 				absKey = -absKey;
@@ -388,9 +382,16 @@ public abstract class TransactionAmount extends Transaction {
 				return ITEM_ASSET_NOT_EXIST;
 			}
 
-			// SCALE wrong
-			if (this.amount.scale() != asset.getScale()) {
-				return AMOUNT_SCALE_WRONG;
+			// for PARSE and toBYTES need only AMOUNT_LENGTH bytes
+			if (this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
+				byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+				if (amountBytes.length > AMOUNT_LENGTH) {
+					return AMOUNT_LENGHT_SO_LONG;
+				}
+				// SCALE wrong
+				if (this.amount.scale() != asset.getScale()) {
+					return AMOUNT_SCALE_WRONG;
+				}
 			}
 
 			//CHECK IF AMOUNT IS DIVISIBLE
