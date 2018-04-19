@@ -116,19 +116,23 @@ public class Order implements Comparable<Order>
 
 	public void setDC(DCSet dcSet) {
 		this.dcSet = dcSet;
-
+		int different_scale;
 		AssetCls asset = this.getHaveAsset(dcSet);
-		int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
-		if (different_scale != 0 && asset.getKey(this.dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
-			// RESCALE AMOUNT
-			this.amountHave = this.amountHave.scaleByPowerOfTen(different_scale);
+		if (asset != null) {
+			different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+			if (different_scale != 0 && asset.getKey(this.dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
+				// RESCALE AMOUNT
+				this.amountHave = this.amountHave.scaleByPowerOfTen(different_scale);
+			}
 		}
 
 		asset = this.getWantAsset(dcSet);
-		different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
-		if (different_scale != 0 && asset.getKey(this.dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
-			// RESCALE AMOUNT
-			this.amountWant = this.amountWant.scaleByPowerOfTen(different_scale);
+		if (asset != null) {
+			different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+			if (different_scale != 0 && asset.getKey(this.dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
+				// RESCALE AMOUNT
+				this.amountWant = this.amountWant.scaleByPowerOfTen(different_scale);
+			}
 		}
 	}
 
