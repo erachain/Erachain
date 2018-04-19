@@ -1,7 +1,7 @@
 {
 	"_lang_ISO_":"ru",
 	"_lang_name_":"Русский",
-	"_timestamp_of_translation_": "1496804561001",
+	"_timestamp_of_translation_": "1496804761002",
 	" ( * optional field )":" ( * дополнительное поле )",
 	" and start the application again.":" и запустите приложение снова.",
 	"( DO NOT USE your wallet's password. )":"( Не используйте Ваш пароль кошелька! )",
@@ -81,6 +81,7 @@
 	"Attention!":"Внимание!",
 	"Available pairs": "Доступные пары",
 	"Automated Transaction": "Автоматическая Транзакция",
+	"Author": "Создатель",
 	"Back":"Назад",
 	"Bad Json value":"Ошибка Json значения",
 	"Balance":"Баланс",
@@ -257,6 +258,10 @@
 	"Favorite Assets":"Избранные Активы",
 	"Favorite Documents":"Избранные Документы",
 	"Favorite Persons":"Избранные Персоны",
+	"Favorite Statuses":"Избранные Статусы",
+	"Favorite Templates":"Избранные Шаблоны",
+	"Favorite Unique Hashes":"Избранные Единичные Хэши",
+	
 	"Fee":"Сбор",
 	"Fee below the minimum for this size of a transaction!":"Сбор ниже минимального для такого размера сделки!",
 	"fee less required":"Сбор меньше чем требуется",
@@ -386,6 +391,9 @@
 	"Issue Statement":"Создать Заявление",
 	"Issue Template":"Создать Шаблон",
 	"Issue Union":"Создать Объединение",
+	"Issue Unique Hash":"Создать Единичный Хэш",
+	"Issue Linked Hash":"Создать Привязанный Хэш",
+	
 	"Imprint issue has been sent!":"Выпуск Отпечатка заявлен!",
 	"I Owner":"Я Собственник",
 	
@@ -444,6 +452,7 @@
 	"My Transactions":"Мои Транзакции",
 	"My Votes":"Мои Голоса",
 	"My Unions":"Мои Объединения",
+	"My Unique Hashes":"Мои Единичные Хэши",
 	"name already exists":"Имя уже существует",
 	"name already for sale":"имя уже для продажи",
 	"Name Details":"Детали Имени",
@@ -607,7 +616,9 @@
 	"Search Statements":"Поиск Заявления",
 	"Search Statuses":"Поиск Статуса",
 	"Search Templates":"Поиск шаблона",
-	"Search Unions":"Поиск Объединения",
+	"Search Unions":"Найти Объединения",
+	"Search Unique Hashes":"Найти Единичные Хэши",
+	"Search Linked Hash":"Найти Привязанный Хэш",
 	"Select pair":"Выбрать пару",
 	"Select Template":"Выберите Шаблон",
 	"Select Account":"Выберите Счет",
@@ -958,8 +969,10 @@
 	"Search Votings":"Поиск Опросов",
 	"Issue Voting":"Создать Опрос",
 	"Work with Votings":"Работа с Опросами",
-	"DashBoard":"Обзор"	
-	"Network DashBoard":"Обзор Среды"	
+	"DashBoard":"Обзор",
+	"Network DashBoard":"Обзор Среды",
 	"Network Port":"Порт Сети",
+	"Unique Hashes":"Единичные Хэши",
+	"Linked Hashes":"Привязанные Хэши",
 	"":""
 }
