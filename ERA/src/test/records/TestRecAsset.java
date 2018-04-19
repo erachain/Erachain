@@ -101,7 +101,7 @@ public class TestRecAsset {
 		// TO BASE SCALE
 		BigDecimal amount_tx = amount_asset.scaleByPowerOfTen(amount_asset.scale() - scale_default);
 		// FROM BASE SCALE to ASSET SCALE
-		BigDecimal amount_asset_out = amount_tx.scaleByPowerOfTen(-scalse_asset);
+		BigDecimal amount_asset_out = amount_tx.scaleByPowerOfTen(amount_tx.scale() - scalse_asset);
 
 
 		//CREATE ASSET
@@ -111,6 +111,7 @@ public class TestRecAsset {
 		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
 		issueAssetTransaction.setDC(db, false);
 		issueAssetTransaction.process(gb, false);
+		asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
 		long assetKey = asset.getKey(db);
 
@@ -119,7 +120,7 @@ public class TestRecAsset {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
 		//CREATE VALID ASSET TRANSFER
-		R_Send assetTransfer = new R_Send(maker, FEE_POWER, recipient, assetKey, amount_in, timestamp, 0l);
+		R_Send assetTransfer = new R_Send(maker, FEE_POWER, recipient, assetKey, amount_asset, timestamp, 0l);
 		assetTransfer.sign(maker, false);
 
 		//CONVERT TO BYTES
@@ -136,8 +137,13 @@ public class TestRecAsset {
 			//CHECK INSTANCE
 			assertEquals(true, parsedAssetTransfer instanceof R_Send);
 
-			assertEquals(amount_in, issueAssetTransaction.getAmount());
-			assertEquals(amount_in.compareTo(issueAssetTransaction.getAmount()), 0);
+			BigDecimal ammountParsed = parsedAssetTransfer.getAmount();
+			parsedAssetTransfer.setDC(db, false);
+			BigDecimal ammountParsed_inDC = parsedAssetTransfer.getAmount();
+
+			assertEquals(ammountParsed_inDC, amount_asset);
+
+
 		}
 		catch (Exception e)
 		{

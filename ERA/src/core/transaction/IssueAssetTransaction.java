@@ -14,6 +14,7 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
+import core.item.assets.AssetVenture;
 import datachain.DCSet;
 
 public class IssueAssetTransaction extends Issue_ItemRecord
@@ -82,6 +83,22 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 	@Override
 	protected long getStartKey() {
 		return 1000l;
+	}
+
+	@Override
+	public void setDC(DCSet dcSet, boolean asPack) {
+		super.setDC(dcSet, asPack);
+
+		AssetCls asset = (AssetCls) this.item;
+
+		if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
+			// MAKE OLD STYLE ASSET with DEVISIBLE:
+			// PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
+			asset = new AssetVenture((byte)0, asset.getOwner(), asset.getName(),
+					asset.getIcon(), asset.getImage(), asset.getDescription(), asset.getScale(), 1, asset.getQuantity());
+			this.item = asset;
+		}
+
 	}
 
 	/*

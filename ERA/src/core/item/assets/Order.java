@@ -54,19 +54,19 @@ public class Order implements Comparable<Order>
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
+
+		// SCALE to BASE
 		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 		if (different_scale != 0) {
-			amountHave = amountHave.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+			amountHave = amountHave.scaleByPowerOfTen(different_scale);
 		}
-		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.amountHave = amountHave;
 
 		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 		if (different_scale != 0) {
-			amountWant = amountWant.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+			amountWant = amountWant.scaleByPowerOfTen(different_scale);
 		}
-		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		this.amountWant = amountWant;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.amountWant = amountWant;
 
 		this.fulfilledHave = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.fulfilledWant = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -82,19 +82,19 @@ public class Order implements Comparable<Order>
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
+
+		// SCALE to BASE
 		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 		if (different_scale != 0) {
-			amountHave = amountHave.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+			amountHave = amountHave.scaleByPowerOfTen(different_scale);
 		}
-		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.amountHave = amountHave;
 
 		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 		if (different_scale != 0) {
-			amountWant = amountWant.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+			amountWant = amountWant.scaleByPowerOfTen(different_scale);
 		}
-		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		this.amountWant = amountWant;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.amountWant = amountWant;
 
 		this.fulfilledHave = fulfilledHave;
 		this.fulfilledWant = fulfilledWant;
@@ -118,26 +118,17 @@ public class Order implements Comparable<Order>
 		this.dcSet = dcSet;
 
 		AssetCls asset = this.getHaveAsset(dcSet);
-		int scaleHave;
-		if (this.getHave() < BlockChain.AMOUNT_SCALE_FROM) {
-			scaleHave = 8;
-		} else {
-			scaleHave = asset.getScale();
+		int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+		if (different_scale != 0 && asset.getKey(this.dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
+			// RESCALE AMOUNT
+			this.amountHave = this.amountHave.scaleByPowerOfTen(different_scale);
 		}
 
 		asset = this.getWantAsset(dcSet);
-		int scaleWant;
-		if (this.getWant() < BlockChain.AMOUNT_SCALE_FROM) {
-			scaleWant = 8;
-		} else {
-			scaleWant = asset.getScale();
-		}
-
-		if (scaleHave != BlockChain.AMOUNT_DEDAULT_SCALE
-				|| scaleWant != BlockChain.AMOUNT_DEDAULT_SCALE) {
-			// RESCALE AMOUNTs
-			this.amountHave = new BigDecimal(this.getAmountHave().unscaledValue(), scaleHave);
-			this.amountWant = new BigDecimal(this.getAmountWant().unscaledValue(), scaleWant);
+		different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+		if (different_scale != 0 && asset.getKey(this.dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
+			// RESCALE AMOUNT
+			this.amountWant = this.amountWant.scaleByPowerOfTen(different_scale);
 		}
 	}
 
@@ -275,7 +266,7 @@ public class Order implements Comparable<Order>
 	public BigDecimal calcAmountWantLeft(DCSet db)
 	{
 		BigDecimal temp;
-		if (this.amountHave.compareTo(this.amountWant) > 0){
+		if (this.amountHave.compareTo(this.amountWant) > 0) {
 			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(this.amountHave.scale());
 		} else {
 			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), this.amountHave.scale(), RoundingMode.HALF_DOWN);

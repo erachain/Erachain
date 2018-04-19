@@ -19,6 +19,7 @@ import core.account.Account;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
+import core.item.assets.AssetCls;
 import datachain.DCSet;
 import utils.NumberAsString;
 
@@ -40,6 +41,10 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	{
 		super(TYPE_ID, NAME_ID);
 		this.recipient = recipient;
+		int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amount = amount.scaleByPowerOfTen(different_scale);
+		}
 		this.amount = amount;
 		this.key = key;
 		if (key >= 0)
@@ -80,6 +85,23 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 	public long getAssetKey()
 	{
 		return this.key;
+	}
+
+	@Override
+	public void setDC(DCSet dcSet, boolean asPack) {
+		super.setDC(dcSet, asPack);
+
+		if (this.amount != null) {
+			long assetKey = this.getAbsKey();
+			AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
+			if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
+				int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+				if (different_scale != 0) {
+					// RESCALE AMOUNT
+					this.amount = this.amount.scaleByPowerOfTen(different_scale);
+				}
+			}
+		}
 	}
 
 	@Override

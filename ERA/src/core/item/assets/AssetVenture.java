@@ -24,7 +24,7 @@ public class AssetVenture extends AssetCls {
 
 	private static final int TYPE_ID = AssetCls.VENTURE;
 
-	protected long quantity = 0;
+	protected long quantity;
 
 	public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
 	{

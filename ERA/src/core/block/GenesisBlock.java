@@ -492,8 +492,14 @@ public class GenesisBlock extends Block{
 		//asset1 = makeAsset(AssetCls.FEE_KEY);
 		//transactions.add(new GenesisIssueAssetTransaction(asset1));
 		// ASSET OTHER
-		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++)
-			transactions.add(new GenesisIssueAssetTransaction(makeAsset(i)));
+		for (int i = 1; i <= AssetCls.REAL_KEY + 5; i++) {
+			AssetVenture asset = makeAsset(i);
+			// MAKE OLD STYLE ASSET with DEVISIBLE:
+			// PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
+			asset = new AssetVenture((byte)0, asset.getOwner(), asset.getName(),
+					asset.getIcon(), asset.getImage(), asset.getDescription(), 8, 1, 0l);
+			transactions.add(new GenesisIssueAssetTransaction(asset));
+		}
 
 		///// TEMPLATES
 		for (int i = 1; i <= TemplateCls.UNHIRING_KEY; i++)

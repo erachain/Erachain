@@ -73,28 +73,6 @@ public abstract class TransactionAmount extends Transaction {
 
 	public static final byte BACKWARD_MASK = 64;
 
-	// need for calculate fee
-	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
-	{
-		super(typeBytes, name, creator, feePow, timestamp, reference, signature);
-		this.recipient = recipient;
-
-		if (amount == null || amount.equals(BigDecimal.ZERO)) {
-			// set version to 1
-			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
-		} else {
-			typeBytes[2] = (byte)(typeBytes[2] | (byte)127);
-			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
-			if (different_scale != 0) {
-				amount = amount.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
-			}
-			amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-			this.amount = amount;
-		}
-
-		this.key = key;
-	}
-
 	// need for calculate fee by feePow into GUI
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference)
 	{
@@ -109,13 +87,19 @@ public abstract class TransactionAmount extends Transaction {
 			typeBytes[2] = (byte)(typeBytes[2] & (byte)127);
 			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 			if (different_scale != 0) {
-				amount = amount.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
-				amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				amount = amount.scaleByPowerOfTen(different_scale);
 			}
 			this.amount = amount;
 		}
 
 		this.key = key;
+	}
+
+	// need for calculate fee
+	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference, byte[] signature)
+	{
+		this(typeBytes, name, creator, feePow, recipient, amount, key, timestamp, reference);
+		this.signature = signature;
 	}
 
 	//GETTERS/SETTERS
@@ -127,15 +111,12 @@ public abstract class TransactionAmount extends Transaction {
 		if (this.amount != null) {
 			long assetKey = this.getAbsKey();
 			AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
-			int scale;
-			if (asset == null || assetKey < BlockChain.AMOUNT_SCALE_FROM) {
-				scale = BlockChain.AMOUNT_DEDAULT_SCALE;
-			} else {
-				scale = asset.getScale();
-			}
-			if (scale != BlockChain.AMOUNT_DEDAULT_SCALE) {
-				// RESCALE AMOUNT
-				this.amount = new BigDecimal(this.amount.unscaledValue(), scale);
+			if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
+				int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+				if (different_scale != 0) {
+					// RESCALE AMOUNT
+					this.amount = this.amount.scaleByPowerOfTen(different_scale);
+				}
 			}
 		}
 	}

@@ -1087,7 +1087,8 @@ public class Block {
 	}
 
 	public static int isSoRapidly(DCSet dcSet, int height, Account accountCreator,
-			int previousForgingHeight) {
+			int previousForgingHeight)
+	{
 
 		// NEED CHECK ONLY ON START
 
@@ -1102,19 +1103,19 @@ public class Block {
 
 		int repeatsMin;
 
-		if (height < BlockChain.REPEAT_WIN<<1)
-			repeatsMin = BlockChain.REPEAT_WIN;
-		else {
+		if (height < BlockChain.REPEAT_WIN) {
+			repeatsMin = height - 1;
+		} else {
 			repeatsMin = BlockChain.GENESIS_ERA_TOTAL/usedBalance;
 			repeatsMin  = repeatsMin>>2;
-		}
 
 		if (height < 110000 && repeatsMin > 40)
 			repeatsMin = 40;
-		if (height < 150000 && repeatsMin > 50)
+		else if (height < 150000 && repeatsMin > 50)
 			repeatsMin = 50;
 		else if (repeatsMin < 10)
 			repeatsMin = 10;
+		}
 
 
 		int def = repeatsMin - (height - previousForgingHeight);
