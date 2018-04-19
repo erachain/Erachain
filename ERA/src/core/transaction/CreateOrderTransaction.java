@@ -256,10 +256,10 @@ public class CreateOrderTransaction extends Transaction {
 		int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
 		// CHECK IF ASSETS NOT THE SAME
-		long have = this.order.getHave();
-		long want = this.order.getWant();
+		long haveKey = this.order.getHave();
+		long wantKey = this.order.getWant();
 
-		if (have == RIGHTS_KEY && !BlockChain.DEVELOP_USE
+		if (haveKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
 				// && want != FEE_KEY
 				) {
 			// have ERA
@@ -270,7 +270,7 @@ public class CreateOrderTransaction extends Transaction {
 			}
 		}
 
-		if (have == want) {
+		if (haveKey == wantKey) {
 			return HAVE_EQUALS_WANT;
 		}
 
@@ -289,7 +289,7 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		// CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-		if (FEE_KEY == have) {
+		if (FEE_KEY == haveKey) {
 			if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
 				return NO_BALANCE;
 			}
@@ -306,7 +306,7 @@ public class CreateOrderTransaction extends Transaction {
 
 			if (!unLimited) {
 
-				BigDecimal forSale = this.creator.getForSale(this.dcSet, have, height);
+				BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height);
 
 				if (forSale.compareTo(amountHave) < 0) {
 					return NO_BALANCE;
@@ -332,19 +332,24 @@ public class CreateOrderTransaction extends Transaction {
 
 		// for PARSE and toBYTES need only AMOUNT_LENGTH bytes
 		// and SCALE
-		byte[] amountBytes = amountHave.unscaledValue().toByteArray();
-		if (amountBytes.length > AMOUNT_LENGTH) {
-			return AMOUNT_LENGHT_SO_LONG;
+		byte[] amountBytes;
+		if (BlockChain.AMOUNT_SCALE_FROM < haveKey) {
+			amountBytes = amountHave.unscaledValue().toByteArray();
+			if (amountBytes.length > AMOUNT_LENGTH) {
+				return AMOUNT_LENGHT_SO_LONG;
+			}
+			if (amountHave.scale() != haveAsset.getScale()) {
+				return AMOUNT_SCALE_WRONG;
+			}
 		}
-		if (amountHave.scale() != haveAsset.getScale()) {
-			return AMOUNT_SCALE_WRONG;
-		}
-		amountBytes = amountWant.unscaledValue().toByteArray();
-		if (amountBytes.length > AMOUNT_LENGTH) {
-			return AMOUNT_LENGHT_SO_LONG;
-		}
-		if (amountWant.scale() != wantAsset.getScale()) {
-			return AMOUNT_SCALE_WRONG;
+		if (BlockChain.AMOUNT_SCALE_FROM < wantKey) {
+			amountBytes = amountWant.unscaledValue().toByteArray();
+			if (amountBytes.length > AMOUNT_LENGTH) {
+				return AMOUNT_LENGHT_SO_LONG;
+			}
+			if (amountWant.scale() != wantAsset.getScale()) {
+				return AMOUNT_SCALE_WRONG;
+			}
 		}
 
 		return super.isValid(releaserReference);
