@@ -827,7 +827,7 @@ function assets(data)
 		table += '<td><a href =?addr='+ data.assets[key].owner +get_lang() + '> ' + htmlFilter(data.assets[key].owner) + '</a>';
 		table += '<td>' + htmlFilter(data.assets[key].assetType);
 		table += '<td>' +data.assets[key].quantity;
-		table += '<td>' + htmlFilter(data.assets[key].scale);
+		table += '<td>' + data.assets[key].scale;
 	}
 		table += '<tr><td colspan=4>';
 //	if(data.maxHeight != data.lastBlock.height)

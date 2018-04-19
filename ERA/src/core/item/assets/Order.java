@@ -267,9 +267,9 @@ public class Order implements Comparable<Order>
 	{
 		BigDecimal temp;
 		if (this.amountHave.compareTo(this.amountWant) > 0) {
-			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(this.amountHave.scale());
+			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
 		} else {
-			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), this.amountHave.scale(), RoundingMode.HALF_DOWN);
+			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), this.amountWant.scale(), RoundingMode.HALF_DOWN);
 		}
 
 		/*
@@ -299,18 +299,20 @@ public class Order implements Comparable<Order>
 	///////// PRICE
 	public BigDecimal getPriceCalc()
 	{
-		return this.amountWant.divide(amountHave, getScaleForPrice(), RoundingMode.HALF_DOWN);
+		//return this.amountWant.divide(amountHave, getScaleForPrice(), RoundingMode.HALF_DOWN);
+		return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
 	}
 	public BigDecimal getPriceCalcReverse()
 	{
-		return this.amountHave.divide(amountWant, getScaleForPriceReverse(), RoundingMode.HALF_UP);
+		//return this.amountHave.divide(amountWant, getScaleForPriceReverse(), RoundingMode.HALF_UP);
+		return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
 	}
 	public String viewPrice()
 	{
 		if(this.amountHave.compareTo(this.amountWant) > 0)
-			return ":" + this.amountHave.divide(amountWant, getScaleForPrice(), RoundingMode.HALF_UP).toPlainString();
+			return ":" + getPriceCalcReverse().toPlainString();
 
-		return "*" + this.amountWant.divide(amountHave, getScaleForPriceReverse(), RoundingMode.HALF_DOWN).toPlainString();
+		return "*" + getPriceCalc().toPlainString();
 
 	}
 

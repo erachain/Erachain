@@ -1014,7 +1014,7 @@ public class BlockExplorer
 			//String a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			//if (asset.isDivisible()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
 			//assetJSON.put("isDivisible", a);
-			assetJSON.put("assetType", asset.viewAssetType());
+			assetJSON.put("assetType", Lang.getInstance().translate_from_langObj(asset.viewAssetType(), langObj));
 			//a =  Lang.getInstance().translate_from_langObj("False",langObj);
 			//if (asset.isMovable()) a =  Lang.getInstance().translate_from_langObj("True",langObj);
 			//assetJSON.put("isMovable", a);

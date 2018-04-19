@@ -1105,16 +1105,16 @@ public class Block {
 
 		if (height < BlockChain.REPEAT_WIN) {
 			repeatsMin = height - 1;
-		} else if (height < 90000) {
-			repeatsMin = 3;
+		} else if (height < 100000) {
+			return 0;
 		} else {
 			repeatsMin = BlockChain.GENESIS_ERA_TOTAL/usedBalance;
 			repeatsMin  = repeatsMin>>2;
 
-		if (height < 100000 && repeatsMin > 40) {
+		if (height < 120000 && repeatsMin > 20) {
+			repeatsMin = 20;
+		} else if (height < 150000 && repeatsMin > 40) {
 			repeatsMin = 40;
-		} else if (height < 150000 && repeatsMin > 50) {
-			repeatsMin = 50;
 		} else if (repeatsMin < 10) {
 			repeatsMin = 10;
 		}
