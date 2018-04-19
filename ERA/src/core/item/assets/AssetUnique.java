@@ -16,17 +16,17 @@ public class AssetUnique extends AssetCls {
 
 	private static final int TYPE_ID = AssetCls.UNIQUE;
 
-	public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
+	public AssetUnique(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale)
 	{
-		super(typeBytes, owner, name, icon, image, description, scale, asset_type);
+		super(typeBytes, owner, name, icon, image, description, asset_type, scale);
 	}
-	public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
+	public AssetUnique(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, scale, asset_type);
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, asset_type, scale);
 	}
-	public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
+	public AssetUnique(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)0}, owner, name, icon, image, description, scale, asset_type);
+		this(new byte[]{(byte)TYPE_ID, (byte)0}, owner, name, icon, image, description, asset_type, scale);
 	}
 
 	//GETTERS/SETTERS
@@ -127,7 +127,7 @@ public class AssetUnique extends AssetCls {
 
 
 		//RETURN
-		AssetUnique statement = new AssetUnique(typeBytes, owner, name, icon, image, description, scale, assetTypeBytes[0]);
+		AssetUnique statement = new AssetUnique(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale);
 
 		if (includeReference)
 		{

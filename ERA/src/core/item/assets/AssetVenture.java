@@ -26,19 +26,19 @@ public class AssetVenture extends AssetCls {
 
 	protected long quantity;
 
-	public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
+	public AssetVenture(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity)
 	{
-		super(typeBytes, owner, name, icon, image, description, scale, asset_type);
+		super(typeBytes, owner, name, icon, image, description, asset_type, scale);
 		this.quantity = quantity;
 	}
-	public AssetVenture(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
+	public AssetVenture(int props, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity)
 	{
-		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, scale, asset_type, quantity);
+		this(new byte[]{(byte)TYPE_ID, (byte)props}, owner, name, icon, image, description, asset_type, scale, quantity);
 	}
-	public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
+	public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale, long quantity)
 	{
 		//this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, asset_type, icon, image, description, quantity, scale);
-		this(new byte[]{(byte)TYPE_ID, (byte) 0}, owner, name, icon, image, description, scale, asset_type, quantity);
+		this(new byte[]{(byte)TYPE_ID, (byte) 0}, owner, name, icon, image, description, asset_type, scale, quantity);
 	}
 
 	//GETTERS/SETTERS
@@ -165,7 +165,7 @@ public class AssetVenture extends AssetCls {
 		position += ASSET_TYPE_LENGTH;
 
 		//RETURN
-		AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, scale, assetTypeBytes[0], quantity);
+		AssetVenture venture = new AssetVenture(typeBytes, owner, name, icon, image, description, assetTypeBytes[0], scale, quantity);
 		if (includeReference)
 		{
 			venture.setReference(reference);

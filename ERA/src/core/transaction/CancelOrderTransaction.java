@@ -218,7 +218,6 @@ public class CancelOrderTransaction extends Transaction
 		super.process(block, asPack);
 
 		Order order = this.dcSet.getOrderMap().get(this.orderID);
-		order.setDC(this.dcSet);
 		process_it(this.dcSet, order);
 	}
 
@@ -243,7 +242,6 @@ public class CancelOrderTransaction extends Transaction
 
 		//ADD TO DATABASE
 		Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
-		order.setDC(this.dcSet);
 		orphan_it(this.dcSet, order);
 	}
 

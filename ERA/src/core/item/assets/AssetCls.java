@@ -76,16 +76,16 @@ public abstract class AssetCls extends ItemCls {
 	// 2 - claim or right or obligation
 	protected int asset_type;
 
-	protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
+	protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale)
 	{
 		super(typeBytes, owner, name, icon, image, description);
 		this.asset_type = asset_type;
 		this.scale = (byte)scale;
 
 	}
-	public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type)
+	public AssetCls(int type, byte pars, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale)
 	{
-		this(new byte[TYPE_LENGTH], owner, name, icon, image, description, scale, asset_type);
+		this(new byte[TYPE_LENGTH], owner, name, icon, image, description, asset_type, scale);
 		this.typeBytes[0] = (byte)type;
 		this.typeBytes[1] = pars;
 	}

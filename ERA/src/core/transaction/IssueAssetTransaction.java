@@ -95,7 +95,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 			// MAKE OLD STYLE ASSET with DEVISIBLE:
 			// PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
 			asset = new AssetVenture((byte)0, asset.getOwner(), asset.getName(),
-					asset.getIcon(), asset.getImage(), asset.getDescription(), asset.getScale(), 1, asset.getQuantity());
+					asset.getIcon(), asset.getImage(), asset.getDescription(), 1, asset.getScale(), asset.getQuantity());
 			this.item = asset;
 		}
 

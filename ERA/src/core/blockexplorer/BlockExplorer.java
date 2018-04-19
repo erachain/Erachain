@@ -1628,8 +1628,8 @@ public class BlockExplorer
 		output.put("label_Key", Lang.getInstance().translate_from_langObj("Key", langObj));
 		output.put("label_Creator", Lang.getInstance().translate_from_langObj("Creator", langObj));
 		output.put("label_Description", Lang.getInstance().translate_from_langObj("Description", langObj));
-		output.put("label_Scale", Lang.getInstance().translate_from_langObj("Scale", langObj));
-		output.put("label_AssetType", Lang.getInstance().translate_from_langObj("Asset Type", langObj));
+		output.put("label_Scale", Lang.getInstance().translate_from_langObj("Accuracy", langObj));
+		output.put("label_AssetType", Lang.getInstance().translate_from_langObj("TYPE", langObj));
 		output.put("label_Quantity", Lang.getInstance().translate_from_langObj("Quantity", langObj));
 		output.put("label_Holders", Lang.getInstance().translate_from_langObj("Holders", langObj));
 		output.put("label_Available_pairs", Lang.getInstance().translate_from_langObj("Available pairs", langObj));

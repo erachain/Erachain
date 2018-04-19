@@ -80,7 +80,7 @@ public class BlockExplorerTest {
 
 		//ADD ERM ASSET
 		AssetVenture ermAsset = new AssetVenture(block.getCreator(), "ERM", icon, image, ".",
-				8, 0, 100000000l);
+				0, 8, 100000000l);
 		databaseSet.getIssueAssetMap().set(block.getSignature(), 0l);
 		databaseSet.getItemAssetMap().set(0l, ermAsset);
 
