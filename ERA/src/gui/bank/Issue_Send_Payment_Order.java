@@ -307,12 +307,12 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
 	private String packMessage() {
 		// TODO Auto-generated method stub
 		 JSONObject jSON_Message = new JSONObject();
-		jSON_Message.put("OKYD", "0401060"); // setd payment order
+		jSON_Message.put("OKYD", "0401060"); // set payment order
 		jSON_Message.put("24", issue_Panel.jTextArea_Description.getText()); // description
 		jSON_Message.put("9", issue_Panel.jTextField_Account_in_Bank.getText());
-		jSON_Message.put("7", issue_Panel.jTextField_Ammount.getText()); // setd ammount
+		jSON_Message.put("7", issue_Panel.jTextField_Ammount.getText()); // set amount
 		jSON_Message.put("11", issue_Panel.jTextField_BIK.getText()); // sender bik
-		jSON_Message.put("60", issue_Panel.jTextField_INN.getText()); // setder inn
+		jSON_Message.put("60", issue_Panel.jTextField_INN.getText()); // sender inn
 		jSON_Message.put("14", issue_Panel.jTextField_Reciever_BIK.getText()); // reciever bik
 		jSON_Message.put("61", issue_Panel.jTextField_Reciever_INN.getText()); // reciever inn
 		jSON_Message.put("15", issue_Panel.jTextField_Recivier_Account_in_Bank1.getText()); // reciever chet
