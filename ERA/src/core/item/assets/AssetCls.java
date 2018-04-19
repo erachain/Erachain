@@ -195,11 +195,20 @@ public abstract class AssetCls extends ItemCls {
 	 */
 
 	/*
-	public byte[] toBytes(boolean includeReference)
+	@Override
+	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
 	{
-		return super.toBytes(includeReference);
+
+		byte[] data = super.toBytes(includeReference, forOwnerSign);
+
+		//WRITE SCALE
+		data = Bytes.concat(data, new byte[]{(byte)this.getScale()});
+
+		//WRITE ASSET TYPE
+		data = Bytes.concat(data, new byte[]{(byte)this.getAssetType()});
+
+		return data;
 	}
-	 */
 
 	@Override
 	public int getDataLength(boolean includeReference)
@@ -207,6 +216,7 @@ public abstract class AssetCls extends ItemCls {
 		return super.getDataLength(includeReference)
 				+ SCALE_LENGTH + ASSET_TYPE_LENGTH;
 	}
+	 */
 
 	//OTHER
 	@Override

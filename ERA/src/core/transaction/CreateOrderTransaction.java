@@ -79,6 +79,7 @@ public class CreateOrderTransaction extends Transaction {
 
 	@Override
 	public void setDC(DCSet dcSet, boolean asPack) {
+
 		super.setDC(dcSet, asPack);
 
 		this.order.setDC(dcSet);

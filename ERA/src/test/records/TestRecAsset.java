@@ -87,6 +87,64 @@ public class TestRecAsset {
 
 	}
 
+	@Test
+	public void testScale()
+	{
+
+		init();
+
+		int scalse_in = 5;
+		int scalse_asset = 1;
+		int scale_default = 8;
+		BigDecimal amount_in = BigDecimal.valueOf(12345.123).setScale(scalse_in, BigDecimal.ROUND_HALF_DOWN);
+		BigDecimal amount_asset = amount_in.setScale(scalse_asset, BigDecimal.ROUND_HALF_DOWN);
+		// TO BASE SCALE
+		BigDecimal amount_tx = amount_asset.scaleByPowerOfTen(amount_asset.scale() - scale_default);
+		// FROM BASE SCALE to ASSET SCALE
+		BigDecimal amount_asset_out = amount_tx.scaleByPowerOfTen(-scalse_asset);
+
+
+		//CREATE ASSET
+		AssetVenture asset = new AssetVenture(maker, "test", icon, image, "strontje", scalse_asset, 0, 10000l);
+
+		//CREATE ISSUE ASSET TRANSACTION
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
+		issueAssetTransaction.setDC(db, false);
+		issueAssetTransaction.process(gb, false);
+
+		long assetKey = asset.getKey(db);
+
+		long timestamp = NTP.getTime();
+
+		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+
+		//CREATE VALID ASSET TRANSFER
+		R_Send assetTransfer = new R_Send(maker, FEE_POWER, recipient, assetKey, amount_in, timestamp, 0l);
+		assetTransfer.sign(maker, false);
+
+		//CONVERT TO BYTES
+		byte[] rawAssetTransfer = assetTransfer.toBytes(true, null);
+
+		//CHECK DATALENGTH
+		assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(false));
+
+		try
+		{
+			//PARSE FROM BYTES
+			R_Send parsedAssetTransfer = (R_Send) TransactionFactory.getInstance().parse(rawAssetTransfer, releaserReference);
+
+			//CHECK INSTANCE
+			assertEquals(true, parsedAssetTransfer instanceof R_Send);
+
+			assertEquals(amount_in, issueAssetTransaction.getAmount());
+			assertEquals(amount_in.compareTo(issueAssetTransaction.getAmount()), 0);
+		}
+		catch (Exception e)
+		{
+			fail("Exception while parsing transaction.");
+		}
+
+	}
 
 	//ISSUE ASSET TRANSACTION
 
@@ -100,7 +158,7 @@ public class TestRecAsset {
 		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
 
 		//CREATE ISSUE ASSET TRANSACTION
-		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+		Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
 		issueAssetTransaction.sign(maker, false);
 
 		//CHECK IF ISSUE ASSET TRANSACTION IS VALID
@@ -113,8 +171,6 @@ public class TestRecAsset {
 		assertEquals(false, issueAssetTransaction.isSignatureValid(db));
 	}
 
-
-
 	@Test
 	public void parseIssueAssetTransaction()
 	{
@@ -122,7 +178,16 @@ public class TestRecAsset {
 		init();
 
 		//CREATE SIGNATURE
-		AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
+		AssetUnique assetUni = new AssetUnique(maker, "test", icon, image, "strontje", 8, 0);
+		LOGGER.info("asset: " + assetUni.getType()[0] + ", " + assetUni.getType()[1]);
+		byte [] rawUni = assetUni.toBytes(false, false);
+		assertEquals(rawUni.length, assetUni.getDataLength(false));
+		assetUni.setReference(new byte[64]);
+		rawUni = assetUni.toBytes(true, false);
+		assertEquals(rawUni.length, assetUni.getDataLength(true));
+
+		//CREATE SIGNATURE
+		AssetVenture asset = new AssetVenture(maker, "test", icon, image, "strontje", 8, 0, 1000l);
 		LOGGER.info("asset: " + asset.getType()[0] + ", " + asset.getType()[1]);
 		byte [] raw = asset.toBytes(false, false);
 		assertEquals(raw.length, asset.getDataLength(false));
@@ -131,8 +196,9 @@ public class TestRecAsset {
 		assertEquals(raw.length, asset.getDataLength(true));
 
 		//CREATE ISSUE ASSET TRANSACTION
-		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
 		issueAssetTransaction.sign(maker, false);
+		issueAssetTransaction.setDC(db, false);
 		issueAssetTransaction.process(gb, false);
 
 		//CONVERT TO BYTES
@@ -172,9 +238,6 @@ public class TestRecAsset {
 
 			//ASSET TYPE
 			assertEquals(((AssetCls)issueAssetTransaction.getItem()).getAssetType(), ((AssetCls)parsedIssueAssetTransaction.getItem()).getAssetType());
-
-			//CHECK FEE
-			assertEquals(issueAssetTransaction.getFee(), parsedIssueAssetTransaction.getFee());
 
 			//CHECK REFERENCE
 			//assertEquals((long)issueAssetTransaction.getReference(), (long)parsedIssueAssetTransaction.getReference());

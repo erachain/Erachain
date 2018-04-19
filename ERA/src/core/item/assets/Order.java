@@ -54,10 +54,23 @@ public class Order implements Comparable<Order>
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
-		this.amountHave = amountHave;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountHave = amountHave.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+		}
+		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.amountHave = amountHave;
+
+		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountWant = amountWant.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+		}
+		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.amountWant = amountWant;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
 		this.fulfilledHave = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.fulfilledWant = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
 		this.timestamp = timestamp;
 	}
 
@@ -69,10 +82,23 @@ public class Order implements Comparable<Order>
 		this.creator = creator;
 		this.have = have;
 		this.want = want;
+		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountHave = amountHave.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+		}
+		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		this.amountHave = amountHave;
-		this.amountWant = amountWant;
+
+		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountWant = amountWant.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
+		}
+		amountHave.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		this.amountWant = amountWant;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+
 		this.fulfilledHave = fulfilledHave;
 		this.fulfilledWant = fulfilledWant;
+
 		this.isExecutable = isExecutable == 1? true: false;
 		this.timestamp = timestamp;
 	}

@@ -143,18 +143,18 @@ public class R_Send extends TransactionAmount {
 
 	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp,
 			Long reference) {
-		this(new byte[] { TYPE_ID, 0, -128, 0 }, creator, feePow, recipient, key, amount, timestamp, reference);
+		this(new byte[] { TYPE_ID, 0, 0, 0 }, creator, feePow, recipient, key, amount, timestamp, reference);
 	}
 
 	public R_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp,
 			Long reference, byte[] signature) {
-		this(new byte[] { TYPE_ID, 0, -128, 0 }, creator, feePow, recipient, key, amount, timestamp, reference,
+		this(new byte[] { TYPE_ID, 0, 0, 0 }, creator, feePow, recipient, key, amount, timestamp, reference,
 				signature);
 	}
 
 	// as pack
 	public R_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, Long reference) {
-		this(new byte[] { TYPE_ID, 0, -128, 0 }, creator, (byte) 0, recipient, key, amount, 0l, reference);
+		this(new byte[] { TYPE_ID, 0, 0, 0 }, creator, (byte) 0, recipient, key, amount, 0l, reference);
 	}
 
 	// GETTERS/SETTERS

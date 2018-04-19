@@ -83,6 +83,7 @@ public abstract class TransactionAmount extends Transaction {
 			// set version to 1
 			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
 		} else {
+			typeBytes[2] = (byte)(typeBytes[2] | (byte)127);
 			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 			if (different_scale != 0) {
 				amount = amount.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -104,6 +105,8 @@ public abstract class TransactionAmount extends Transaction {
 			// set version to 1
 			typeBytes[2] = (byte)(typeBytes[2] | (byte)-128);
 		} else {
+			// RESET 0 bit
+			typeBytes[2] = (byte)(typeBytes[2] & (byte)127);
 			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 			if (different_scale != 0) {
 				amount = amount.scaleByPowerOfTen(BlockChain.AMOUNT_DEDAULT_SCALE);

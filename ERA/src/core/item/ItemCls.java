@@ -3,37 +3,24 @@ package core.item;
 import java.nio.charset.Charset;
 //import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-//import java.util.Arrays;
-// import org.apache.log4j.Logger;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple6;
 
-import com.github.rjeschke.txtmark.Processor;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
 
 import controller.Controller;
 import core.BlockChain;
-import core.account.Account;
-import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
-import core.crypto.Crypto;
-import core.transaction.Issue_ItemRecord;
 import core.transaction.Transaction;
-import database.wallet.FavoriteItem;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
-import lang.Lang;
-import utils.NumberAsString;
 import utils.Pair;
 
 public abstract class ItemCls {
@@ -58,12 +45,12 @@ public abstract class ItemCls {
 	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
 	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
 	protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
-		
+
 	protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
 	//protected DCMap dbMap;
 	//protected DCMap dbIssueMap;
-	
+
 	protected String TYPE_NAME = "unknown";
 	protected byte[] typeBytes;
 	protected PublicKeyAccount owner;
@@ -73,7 +60,7 @@ public abstract class ItemCls {
 	protected byte[] reference = null; // this is signature of issued record
 	protected byte[] icon;
 	protected byte[] image;
-	
+
 	static Logger LOGGER = Logger.getLogger(ItemCls.class.getName());
 
 	public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
@@ -84,7 +71,7 @@ public abstract class ItemCls {
 		this.description = description;
 		this.icon = icon == null? new byte[0]: icon;
 		this.image = image == null? new byte[0]: image;
-		
+
 	}
 	public ItemCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
 	{
@@ -120,13 +107,13 @@ public abstract class ItemCls {
 				Long date = Long.parseLong(str);
 				return new Pair<Integer, Long>(0, date);
 			}
-			catch(Exception e)			
+			catch(Exception e)
 			{
-				return new Pair<Integer, Long>(-1, 0l);				
+				return new Pair<Integer, Long>(-1, 0l);
 			}
 		}
 	}
-	
+
 	public static Pair<Integer, Integer> resolveEndDayFromStr(String str, Integer defaultVol)
 	{
 		if (str.length() == 0) return new Pair<Integer, Integer>(0, defaultVol);
@@ -144,9 +131,9 @@ public abstract class ItemCls {
 				Integer date = Integer.parseInt(str);
 				return new Pair<Integer, Integer>(0, date);
 			}
-			catch(Exception e)			
+			catch(Exception e)
 			{
-				return new Pair<Integer, Integer>(-1, 0);				
+				return new Pair<Integer, Integer>(-1, 0);
 			}
 		}
 	}
@@ -168,7 +155,7 @@ public abstract class ItemCls {
 	public PublicKeyAccount getOwner() {
 		return this.owner;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
@@ -178,8 +165,8 @@ public abstract class ItemCls {
 	public byte[] getImage() {
 		return this.image;
 	}
-	
-	
+
+
 	public long getKey() {
 		return getKey(DCSet.getInstance());
 	}
@@ -188,14 +175,14 @@ public abstract class ItemCls {
 		resolveKey(db);
 		return this.key;
 	}
-	
+
 	public long getHeight(DCSet db)
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
 		long key = dbMap.getLastKey();
 		return key;
-		
+
 	}
 
 	public long resolveKey(DCSet db) {
@@ -213,16 +200,16 @@ public abstract class ItemCls {
 	public void resetKey() {
 		this.key = 0;
 	}
-	
+
 	public static ItemCls getItem(DCSet db, int type, long key) {
 		//return Controller.getInstance().getItem(db, type, key);
 		return db.getItem_Map(type).get(key);
 	}
-	
+
 	public String getDescription() {
 		return this.description;
 	}
-		
+
 	public byte[] getReference() {
 		return this.reference;
 	}
@@ -231,14 +218,14 @@ public abstract class ItemCls {
 		this.reference = reference;
 
 	}
-		
+
 	public boolean isConfirmed() {
 		return isConfirmed(DCSet.getInstance());
 	}
-	
+
 	public boolean isConfirmed(DCSet db) {
 		return this.getDBIssueMap(db).contains(this.reference);
-	}	
+	}
 
 	public boolean isFavorite() {
 		return Controller.getInstance().isItemFavorite(this);
@@ -250,7 +237,7 @@ public abstract class ItemCls {
 
 		byte[] data = new byte[0];
 		boolean useAll = !forOwnerSign;
-		
+
 		if (useAll) {
 			//WRITE TYPE
 			data = Bytes.concat(data, this.typeBytes);
@@ -273,7 +260,7 @@ public abstract class ItemCls {
 			//WRITE NAME SIZE
 			data = Bytes.concat(data, new byte[]{(byte)nameBytes.length});
 		}
-		
+
 		//WRITE NAME
 		data = Bytes.concat(data, nameBytes);
 
@@ -282,7 +269,7 @@ public abstract class ItemCls {
 			int iconLength = this.icon.length;
 			byte[] iconLengthBytes = Ints.toByteArray(iconLength);
 			data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
-					
+
 			//WRITE ICON
 			data = Bytes.concat(data, this.icon);
 		}
@@ -293,10 +280,10 @@ public abstract class ItemCls {
 			byte[] imageLengthBytes = Ints.toByteArray(imageLength);
 			data = Bytes.concat(data, imageLengthBytes);
 		}
-				
+
 		//WRITE IMAGE
 		data = Bytes.concat(data, this.image);
-		
+
 		byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
 		if (useAll) {
 			//WRITE DESCRIPTION SIZE
@@ -304,19 +291,19 @@ public abstract class ItemCls {
 			byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
 			data = Bytes.concat(data, descriptionLengthBytes);
 		}
-				
+
 		//WRITE DESCRIPTION
 		data = Bytes.concat(data, descriptionBytes);
-		
+
 		if(useAll && includeReference)
 		{
 			//WRITE REFERENCE
 			data = Bytes.concat(data, this.reference);
 		}
-		
+
 		return data;
 	}
-	
+
 	/*
 	@SuppressWarnings("unchecked")
 	protected JSONObject getJsonBase()
@@ -327,14 +314,14 @@ public abstract class ItemCls {
 		out.put("name", this.getName());
 		out.put("description", this.getDescription());
 		out.put("owner", this.getOwner().getAddress());
-		
+
 		return out;
 	}
 
 	public abstract JSONObject toJson();
-	*/
+	 */
 
-	public int getDataLength(boolean includeReference) 
+	public int getDataLength(boolean includeReference)
 	{
 		return BASE_LENGTH
 				+ this.name.getBytes(StandardCharsets.UTF_8).length
@@ -345,23 +332,23 @@ public abstract class ItemCls {
 	}
 
 	//OTHER
-	
+
 	public String toString(DCSet db)
-	{		
+	{
 		long key = this.getKey(db);
 		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
 		return (key==0?"?:":key
 				//+ "." + this.typeBytes[0]
-				+ " ") + this.getName()  
+				+ " ") + this.getName()
 				+ (creator.length()==0?"": " (" +creator + ")");
 	}
-	
-	
+
+
 	public String toString(DCSet db, byte[] data) {
 		String str = this.toString(db);
-		
+
 		Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = core.transaction.R_SetStatusToItem.unpackData(data);
-		
+
 		if (str.contains("%1") && tuple.a != null)
 			str = str.replace("%1", tuple.a.toString());
 		if (str.contains("%2") && tuple.b != null)
@@ -372,30 +359,31 @@ public abstract class ItemCls {
 			str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
 		if (str.contains("%D") && tuple.f != null)
 			str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
-		
+
 		return str;
 	}
 
+	@Override
 	public String toString()
 	{
 		return toString(DCSet.getInstance());
 	}
-	
+
 	public String getShort(DCSet db)
 	{
 		long key = this.getKey(db);
 		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
 		return (key<1?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 30))
-				+ (creator.length()==0?"": " (" +creator + ")");
+		+ (creator.length()==0?"": " (" +creator + ")");
 	}
 	public String getShort()
 	{
 		return getShort(DCSet.getInstance());
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public JSONObject toJson() {
-		
+
 		JSONObject itemJSON = new JSONObject();
 
 		// ADD DATA
@@ -409,24 +397,24 @@ public abstract class ItemCls {
 		itemJSON.put("creator", this.owner.getAddress());
 		itemJSON.put("isConfirmed", this.isConfirmed());
 		itemJSON.put("reference", Base58.encode(this.reference));
-		
+
 		Transaction txReference = Controller.getInstance().getTransaction(this.reference);
 		if(txReference != null)
 		{
 			itemJSON.put("timestamp", txReference.getTimestamp());
 		}
-		
+
 		return itemJSON;
 	}
 	@SuppressWarnings("unchecked")
 	public JSONObject toJsonData() {
-		
+
 		JSONObject itemJSON = new JSONObject();
 
 		// ADD DATA
 		itemJSON.put("icon", Base58.encode(this.icon));
 		itemJSON.put("image", Base58.encode(this.image));
-		
+
 		return itemJSON;
 	}
 
@@ -435,11 +423,11 @@ public abstract class ItemCls {
 	{
 		//INSERT INTO DATABASE
 		Item_Map dbMap = this.getDBMap(db);
-		
+
 		long newKey;
 		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
 		if (pair == null) {
-		
+
 			newKey = dbMap.getLastKey();
 			if (newKey < startKey) {
 				// IF this not GENESIS issue - start from startKey
@@ -457,9 +445,9 @@ public abstract class ItemCls {
 		this.key = newKey;
 		//SET ORPHAN DATA
 		this.getDBIssueMap(db).set(this.reference, newKey);
-		
+
 	}
-	
+
 	public long removeFromMap(DCSet db)
 	{
 		//DELETE FROM DATABASE
@@ -470,13 +458,13 @@ public abstract class ItemCls {
 		if (pair == null) {
 			this.getDBMap(db).remove();
 		} else {
-			this.getDBMap(db).delete(thisKey);			
+			this.getDBMap(db).delete(thisKey);
 		}
-				
+
 		//DELETE ORPHAN DATA
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
 		this.getDBIssueMap(db).delete(this.reference);
-		
+
 		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 
 		return thisKey;

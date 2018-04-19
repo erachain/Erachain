@@ -4,6 +4,7 @@ package core.item.assets;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import com.google.common.primitives.Bytes;
 //import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
@@ -138,5 +139,26 @@ public class AssetUnique extends AssetCls {
 	}
 
 	//OTHER
+	@Override
+	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
+	{
+
+		byte[] data = super.toBytes(includeReference, forOwnerSign);
+
+		//WRITE SCALE
+		data = Bytes.concat(data, new byte[]{(byte)this.getScale()});
+
+		//WRITE ASSET TYPE
+		data = Bytes.concat(data, new byte[]{(byte)this.getAssetType()});
+
+		return data;
+	}
+
+	@Override
+	public int getDataLength(boolean includeReference)
+	{
+		return super.getDataLength(includeReference)
+				+ SCALE_LENGTH + ASSET_TYPE_LENGTH;
+	}
 
 }

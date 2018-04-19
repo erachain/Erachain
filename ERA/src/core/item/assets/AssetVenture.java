@@ -38,7 +38,7 @@ public class AssetVenture extends AssetCls {
 	public AssetVenture(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int scale, int asset_type, long quantity)
 	{
 		//this(new byte[]{(byte)TYPE_ID, movable?(byte)1:(byte)0}, owner, name, asset_type, icon, image, description, quantity, scale);
-		this(new byte[]{(byte)TYPE_ID}, owner, name, icon, image, description, scale, asset_type, quantity);
+		this(new byte[]{(byte)TYPE_ID, (byte) 0}, owner, name, icon, image, description, scale, asset_type, quantity);
 	}
 
 	//GETTERS/SETTERS
@@ -202,7 +202,7 @@ public class AssetVenture extends AssetCls {
 	public int getDataLength(boolean includeReference)
 	{
 		return super.getDataLength(includeReference)
-				+ QUANTITY_LENGTH;
+				+ SCALE_LENGTH + ASSET_TYPE_LENGTH + QUANTITY_LENGTH;
 	}
 
 	//OTHER
