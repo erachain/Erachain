@@ -103,7 +103,7 @@ public class MImprintEDIT_Pane extends JTextPane {
 	}
 	public String to_HTML(String str){
 	String out= null;
-	out = str.replaceAll(" ", "&ensp").replaceAll("\t", "&ensp&ensp&ensp&ensp&ensp&ensp&ensp&ensp").replaceAll("\n","<br>");
+	out = str.replaceAll(" ", "&ensp;").replaceAll("\t", "&ensp&ensp&ensp&ensp&ensp&ensp&ensp&ensp").replaceAll("\n","<br>");
 	
 	return out;
 	}
