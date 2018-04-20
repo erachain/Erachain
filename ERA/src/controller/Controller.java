@@ -2729,6 +2729,14 @@ public class Controller extends Observable {
 					feePow);
 		}
 	}
+	public Transaction issueImprint1(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssueImprintTransaction1(creator, name, description, icon, image,
+					feePow);
+		}
+	}
 
 	public Transaction issueTemplate(PrivateKeyAccount creator, String name, String description, byte[] icon, byte[] image,
 			int feePow) {

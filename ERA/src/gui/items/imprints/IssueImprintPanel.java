@@ -1,6 +1,9 @@
 package gui.items.imprints;
 
+import gui.MainFrame;
 import gui.PasswordPane;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
@@ -43,6 +46,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.imprints.Imprint;
+import core.transaction.IssueImprintRecord;
 import core.transaction.Transaction;
 
 @SuppressWarnings("serial")
@@ -56,6 +60,7 @@ public class IssueImprintPanel extends JPanel
 	private JTextField txtCreditor;
 	private JTextField txtAmount;
 	private JButton issueButton;
+	private IssueImprintPanel th;
 
 	public IssueImprintPanel()
 	{
@@ -71,7 +76,7 @@ public class IssueImprintPanel extends JPanel
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 //		this.setIconImages(icons);
-		
+		th = this;
 		//LAYOUT
 		this.setLayout(new GridBagLayout());
 		
@@ -323,17 +328,52 @@ public class IssueImprintPanel extends JPanel
 
 			// CUT BYTES LEN
 			name_total = Imprint.hashNameToBase58(name_total);
-			String description = ""; //this.txtareaDescription.getText();
+			String description = Lang.getInstance().translate("Number") + ": "+ this.txtNumber.getText() + " \n";
+			description += Lang.getInstance().translate("Date") + ": "+ this.txtDate.getText() + " \n";
+			description += Lang.getInstance().translate("Debitor INN") + ": "+ this.txtDebitor.getText()+ " \n";
+			description += Lang.getInstance().translate("Creditor INN")  +": "+ this.txtCreditor.getText() + " \n";
+			description += Lang.getInstance().translate("Amount") + ": "+ this.txtAmount.getText();
 
 			byte[] icon = null;
 			byte[] image = null;
 			//CREATE IMPRINT
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			Pair<Transaction, Integer> result = Controller.getInstance().issueImprint(creator, name_total, description,
+			IssueImprintRecord result = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, name_total, description,
 					icon, image, feePow);
 			
+			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
+			String text = "<HTML><body>";
+			text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
+			text += Lang.getInstance().translate("Creator") +":&nbsp;"  + result.getCreator() +"<br>";
+			text +=  library.to_HTML(result.getItem().getDescription()) +"<br>";
+			String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ result.viewSize(false)+" Bytes, ";
+			Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ result.getFee().toString()+" COMPU</b><br></body></HTML>";
+
+			//	  System.out.print("\n"+ text +"\n");
+			//	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
+			//	    UIManager.put("OptionPane.okButtonText", "Готово");
+
+			//	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
+
+			Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,text, (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+			dd.setLocationRelativeTo(th);
+			dd.setVisible(true);
+
+			//	JOptionPane.OK_OPTION
+			if (!dd.isConfirm){ //s!= JOptionPane.OK_OPTION)	{
+
+				issueButton.setEnabled(true);
+
+				return;
+			}
+			
+			
+			int result1 = Controller.getInstance().getTransactionCreator().afterCreate(result, false);
+			
+			
+			
 			//CHECK VALIDATE MESSAGE
-			if (result.getB() == Transaction.VALIDATE_OK) {
+			if (result1 == Transaction.VALIDATE_OK) {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Imprint issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 	//			this.dispose();
 			
@@ -354,7 +394,7 @@ public class IssueImprintPanel extends JPanel
 			}
 			else {
 				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Unknown error")
-						+ "[" + result.getB() + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+						+ "[" + result1 + "]!" , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 
 		}

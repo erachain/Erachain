@@ -331,6 +331,28 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
 	}
+	
+	public Transaction createIssueImprintTransaction1(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image,
+			int feePow)
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+
+		//TIME
+		long time = NTP.getTime();
+
+		ImprintCls imprint = new Imprint(creator, name, icon, image, description);
+
+		//CREATE ISSUE IMPRINT TRANSACTION
+		IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte)feePow, time);
+		issueImprintRecord.sign(creator, false);
+		issueImprintRecord.setDC(this.fork, false);
+
+		//VALIDATE AND PROCESS
+		return issueImprintRecord;
+	}
+	
 
 	public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, String name, String description,
 			byte[] icon, byte[] image,
