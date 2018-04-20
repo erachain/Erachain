@@ -157,15 +157,16 @@ public class AssetDetailsPanel extends JPanel {
 		JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divis-ible") + ":");
 		this.add(divisibleLabel, labelGBC);
 
-		//DIVISIBLE
+		//TYPE
 		detailGBC.gridy = gridy;
-		JCheckBox chkDivisible = new JCheckBox();
+		 JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetType()));
 
-		chkDivisible.setSelected(asset.isDivisible()); // SELECT - OPION = asset.getAssetType();
-		int option = asset.getAssetType();
+	//	textType.setSelected(asset.isDivisible()); // SELECT - OPION = asset.getAssetType();
+	//	asset.viewAssetType()
+	//	int option = asset.getAssetType();
 
-		chkDivisible.setEnabled(false);
-		this.add(chkDivisible, detailGBC);
+		textType.setEnabled(false);
+		this.add(textType, detailGBC);
 
 		//IF ASSET CONFIRMED
 		if(this.asset.getKey() >= 0)

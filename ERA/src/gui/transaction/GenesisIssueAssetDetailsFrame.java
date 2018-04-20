@@ -78,11 +78,12 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame
 
 		//DIVISIBLE
 		++detailGBC.gridy;
-		JCheckBox divisible = new JCheckBox();
-		= asset.viewAssetType();
-		divisible.setSelected(asset.isDivisible()); //
-		divisible.setEnabled(false);
-		this.add(divisible, detailGBC);
+	//	JCheckBox divisible = new JCheckBox();
+		 JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetType()));
+	//	= asset.viewAssetType();
+	//	divisible.setSelected(asset.isDivisible()); //
+		 textType.setEnabled(false);
+		this.add(textType, detailGBC);
 
 		//PACK
 		//	this.pack();
