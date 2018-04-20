@@ -126,7 +126,7 @@ public class TableModelItemAssets extends TableModelItems
 
 		case COLUMN_ASSET_TYPE:
 
-			return asset.viewAssetType();
+			return Lang.getInstance().translate(asset.viewAssetType());
 
 		case COLUMN_ADDRESS:
 

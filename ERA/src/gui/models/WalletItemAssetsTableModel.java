@@ -108,7 +108,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
 			case COLUMN_ASSET_TYPE:
 
-				return asset.viewAssetType();
+				return Lang.getInstance().translate(asset.viewAssetType());
 
 			case COLUMN_AMOUNT:
 

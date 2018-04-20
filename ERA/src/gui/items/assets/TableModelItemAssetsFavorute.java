@@ -112,7 +112,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
 		case COLUMN_ASSET_TYPE:
 
-			return asset.viewAssetType();
+			return Lang.getInstance().translate(asset.viewAssetType());
 
 		case COLUMN_AMOUNT:
 
