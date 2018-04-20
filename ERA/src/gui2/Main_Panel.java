@@ -431,17 +431,19 @@ public class Main_Panel extends javax.swing.JPanel {
 			insertTab(Lang.getInstance().translate("Search Statuses"), new Search_Statuses_Tab());
 			return;
 		}
-		if (str.equals(Lang.getInstance().translate("My Unions")) || str.equals("My_Unions_Tab")) {
-			insertTab(Lang.getInstance().translate("My Unions"), new My_Unions_Tab());
-			return;
-		}
-		if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("Search_Union_Tab")) {
-			insertTab(Lang.getInstance().translate("Search Unions"), new Search_Union_Tab());
-			return;
-		}
-		if (str.equals(Lang.getInstance().translate("Issue Union")) || str.equals("IssueUnionPanel")) {
-			insertTab(Lang.getInstance().translate("Issue Union"), new IssueUnionPanel());
-			return;
+		if (BlockChain.DEVELOP_USE) {
+			if (str.equals(Lang.getInstance().translate("My Unions")) || str.equals("My_Unions_Tab")) {
+				insertTab(Lang.getInstance().translate("My Unions"), new My_Unions_Tab());
+				return;
+			}
+			if (str.equals(Lang.getInstance().translate("Search Unions")) || str.equals("Search_Union_Tab")) {
+				insertTab(Lang.getInstance().translate("Search Unions"), new Search_Union_Tab());
+				return;
+			}
+			if (str.equals(Lang.getInstance().translate("Issue Union")) || str.equals("IssueUnionPanel")) {
+				insertTab(Lang.getInstance().translate("Issue Union"), new IssueUnionPanel());
+				return;
+			}
 		}
 		if (str.equals(Lang.getInstance().translate("My Votings")) || str.equals("Votings_My_SplitPanel")) {
 			insertTab(Lang.getInstance().translate("My Votings"), new Votings_My_SplitPanel());

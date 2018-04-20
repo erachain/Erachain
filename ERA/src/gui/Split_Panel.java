@@ -6,6 +6,8 @@
 package gui;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -182,28 +184,27 @@ public class Split_Panel extends javax.swing.JPanel {
 
         jToolBar_RightPanel.setFloatable(false);
         jToolBar_RightPanel.setRollover(true);
-
+      
+    	GridBagConstraints gridConstr = new GridBagConstraints();
+    	gridConstr.gridx = 0;
+    	gridConstr.gridy = 0;
+    	gridConstr.insets = new java.awt.Insets(1, 8, 8, 8);
         jButton1_jToolBar_RightPanel.setText("jButton1");
         jButton1_jToolBar_RightPanel.setFocusable(false);
         jButton1_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton1_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar_RightPanel.add(jButton1_jToolBar_RightPanel);
+        rightPanel1.add(jButton1_jToolBar_RightPanel,gridConstr);
 
-        jButton2_jToolBar_RightPanel.setText("jButton2");
-        jButton2_jToolBar_RightPanel.setToolTipText("");
-        jButton2_jToolBar_RightPanel.setFocusable(false);
-        jButton2_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar_RightPanel.add(jButton2_jToolBar_RightPanel);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 9, 0, 8);
-        rightPanel1.add(jToolBar_RightPanel, gridBagConstraints);
+		 gridConstr = new GridBagConstraints();
+		 gridConstr.gridx = 1;
+		 gridConstr.gridy = 0;
+			gridConstr.insets = new java.awt.Insets(1, 8, 8, 8);
+		jButton2_jToolBar_RightPanel.setText("jButton2");
+		jButton2_jToolBar_RightPanel.setToolTipText("");
+		jButton2_jToolBar_RightPanel.setFocusable(false);
+		jButton2_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+		jButton2_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+		rightPanel1.add(jButton2_jToolBar_RightPanel, gridConstr);
 
         jPanel_RightPanel.setAlignmentX(1.0F);
         jPanel_RightPanel.setAlignmentY(1.0F);

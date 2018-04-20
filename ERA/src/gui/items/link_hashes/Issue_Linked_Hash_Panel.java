@@ -3,6 +3,7 @@ package gui.items.link_hashes;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -88,8 +89,8 @@ public class Issue_Linked_Hash_Panel extends Split_Panel {
 		jButton3_jToolBar_RightPanel = new JButton();
 		jButton3_jToolBar_RightPanel.setText(Lang.getInstance().translate("Create Hash"));
 		// jButton3_jToolBar_RightPanel.setFocusable(false);
-		jButton3_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-		jButton3_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+		jButton3_jToolBar_RightPanel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+	//	jButton3_jToolBar_RightPanel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
 		jButton3_jToolBar_RightPanel.addActionListener(new ActionListener() {
 			// create Hashs
 			@Override
@@ -98,8 +99,11 @@ public class Issue_Linked_Hash_Panel extends Split_Panel {
 
 			}
 		});
-
-		jToolBar_RightPanel.add(jButton3_jToolBar_RightPanel);
+		GridBagConstraints gridConstr = new GridBagConstraints();
+		gridConstr.gridx = 2;
+		gridConstr.gridy = 0;
+		gridConstr.insets = new java.awt.Insets(1, 8, 8, 8);
+		rightPanel1.add(jButton3_jToolBar_RightPanel,gridConstr);
 
 		jButton1_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
 		jButton2_jToolBar_RightPanel.setFont(new Font("Tahoma", 0, 14));
