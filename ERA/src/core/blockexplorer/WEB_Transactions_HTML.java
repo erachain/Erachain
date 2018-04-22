@@ -14,7 +14,6 @@ import controller.Controller;
 import core.crypto.Base58;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.item.templates.TemplateCls;
@@ -292,15 +291,16 @@ public class WEB_Transactions_HTML {
 		// TODO Auto-generated method stub
 		String out = "";
 		CreateOrderTransaction orderCreation = (CreateOrderTransaction)transaction;
-		Order order = orderCreation.getOrder();
+		//tradeMap.getTradesByOrderID(new BigInteger(transaction.getSignature());
+		//Order order = orderCreation.getOrder();
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Have", langObj) + ":</b> "
-				+ order.getAmountHave().toPlainString() + " x "
-				+ String.valueOf(order.getHaveAsset().toString()) + "<br>";
+				+ orderCreation.getAmountHave().toPlainString() + " x "
+				+ String.valueOf(orderCreation.getHaveAsset().toString()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Want", langObj) + ":</b> "
-				+ order.getAmountWant().toPlainString() + " x "
-				+ String.valueOf(order.getWantAsset().toString()) + "<br>";
+				+ orderCreation.getAmountWant().toPlainString() + " x "
+				+ String.valueOf(orderCreation.getWantAsset().toString()) + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Price", langObj) + ":</b> "
-				+ order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString() + "<br>";
+				+ orderCreation.getPriceCalc().toPlainString() + " / " + orderCreation.getPriceCalcReverse().toPlainString() + "<br>";
 		return out;
 	}
 

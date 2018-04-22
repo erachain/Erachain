@@ -1,25 +1,27 @@
 package datachain;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import com.google.common.primitives.UnsignedBytes;
 
-import core.item.assets.Order;
 import core.transaction.CancelOrderTransaction;
 import database.DBMap;
-import database.serializer.OrderSerializer;
-import datachain.DCSet;
 import utils.ObserverMessage;
 
-public class CancelOrderMap extends DCMap<byte[], Order> 
+public class CancelOrderMap extends DCMap<byte[], Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
+
 	public CancelOrderMap(DCSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
@@ -35,38 +37,43 @@ public class CancelOrderMap extends DCMap<byte[], Order>
 
 	}
 
-	public CancelOrderMap(CancelOrderMap parent) 
+	public CancelOrderMap(CancelOrderMap parent)
 	{
 		super(parent, null);
 	}
-	
+
+	@Override
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<byte[], Order> getMap(DB database) 
+	protected Map<byte[], Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getMap(DB database)
 	{
 		//OPEN MAP
 		return database.createTreeMap("cancelOrderOrphanData")
 				.keySerializer(BTreeKeySerializer.BASIC)
-				.valueSerializer(new OrderSerializer())
 				.comparator(UnsignedBytes.lexicographicalComparator())
+				//.valueSerializer(new OrderSerializer())
 				.makeOrGet();
 	}
 
 	@Override
-	protected Map<byte[], Order> getMemoryMap() 
+	protected Map<byte[], Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getMemoryMap()
 	{
-		return new TreeMap<byte[], Order>(UnsignedBytes.lexicographicalComparator());
+		return new TreeMap<byte[], Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override
-	protected Order getDefaultValue() 
+	protected Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> getDefaultValue()
 	{
 		return null;
 	}
-	
+
 	@Override
-	protected Map<Integer, Integer> getObservableData() 
+	protected Map<Integer, Integer> getObservableData()
 	{
 		return this.observableData;
 	}
@@ -74,13 +81,15 @@ public class CancelOrderMap extends DCMap<byte[], Order>
 	public void delete(CancelOrderTransaction transaction) {
 		this.delete(transaction.getSignature());
 	}
-	
-	public Order get(CancelOrderTransaction transaction)
+
+	public Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> get(CancelOrderTransaction transaction)
 	{
 		return this.get(transaction.getSignature());
 	}
-	
-	public void set(CancelOrderTransaction transaction, Order value)
+
+	public void set(CancelOrderTransaction transaction, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> value)
 	{
 		this.set(transaction.getSignature(), value);
 	}

@@ -5,6 +5,9 @@ import java.math.BigInteger;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+
 import controller.Controller;
 import core.BlockChain;
 import core.item.assets.AssetCls;
@@ -17,14 +20,16 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implements Observer
+public class BuyOrdersTableModel extends TableModelCls<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> implements Observer
 {
 	public static final int COLUMN_BUYING_PRICE = 0;
 	public static final int COLUMN_BUYING_AMOUNT = 1;
 	public static final int COLUMN_PRICE = 2;
 	public static final int COLUMN_AMOUNT = 3;
 
-	public SortableList<BigInteger, Order> orders;
+	public SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> orders;
 
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
 
@@ -56,22 +61,28 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 	{
 		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		sumTotal = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		for (Pair<BigInteger, Order> orderPair : this.orders)
+		for (Pair<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> orderPair : this.orders)
 		{
-			sumAmount = sumAmount.add(orderPair.getB().getAmountWantLeft());
-			sumTotal = sumTotal.add(orderPair.getB().getAmountHaveLeft());
+			Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
+			BigDecimal amount = haveItem.b.subtract(haveItem.c);
+			sumAmount = sumAmount.add(amount);
+			sumTotal = sumTotal.add(amount);
 		}
 	}
 
 	@Override
-	public SortableList<BigInteger, Order> getSortableList()
+	public SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getSortableList()
 	{
 		return this.orders;
 	}
 
-	public Order getOrder(int row)
+	public Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> getOrder(int row)
 	{
-		Pair<BigInteger, Order> rec = this.orders.get(row);
+		Pair<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> rec = this.orders.get(row);
 		if (rec == null)
 			return null;
 
@@ -105,14 +116,15 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 			return null;
 		}
 
-		Order order = null;
+		Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> order = null;
 		boolean isMine = false;
 		if(row < this.orders.size())
 		{
 			order = this.orders.get(row).getB();
 			if (order != null) {
 				Controller cntr = Controller.getInstance();
-				if(cntr.isAddressIsMine(order.getCreator().getAddress())) {
+				if(cntr.isAddressIsMine(order.a.b)) {
 					isMine = true;
 				}
 			}
@@ -126,7 +138,7 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				return "<html>Total:</html>";
 
 
-			return NumberAsString.getInstance().numberAsString12(order.getPriceCalcReverse());
+			return NumberAsString.getInstance().numberAsString12(Order.getPriceCalcReverse2(order.b.b, order.c.b));
 
 		case COLUMN_BUYING_AMOUNT:
 
@@ -134,9 +146,9 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
 
 			if (isMine)
-				return "<html><b>" + NumberAsString.getInstance().numberAsString(order.getAmountWantLeft()) + "</b></html>";
+				return "<html><b>" + NumberAsString.getInstance().numberAsString(order.c.c) + "</b></html>";
 
-			return NumberAsString.getInstance().numberAsString(order.getAmountWantLeft());
+			return NumberAsString.getInstance().numberAsString(order.c.c);
 
 		case COLUMN_PRICE:
 
@@ -144,8 +156,8 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				return "";
 
 			if (isMine)
-				return "<html><b>" + NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
-			return NumberAsString.getInstance().numberAsString12(order.getPriceCalc());
+				return "<html><b>" + NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
+			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
 
 		case COLUMN_AMOUNT:
 
@@ -153,12 +165,13 @@ public class BuyOrdersTableModel extends TableModelCls<BigInteger, Order> implem
 				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
 
 			// It shows unacceptably small amount of red.
-			BigDecimal increment = order.calculateBuyIncrement();
-			BigDecimal amount = order.getAmountHaveLeft();
+			//BigDecimal increment = order.calculateBuyIncrement();
+			BigDecimal amount = order.b.c;
 			String amountStr = NumberAsString.getInstance().numberAsString(amount);
-			amount = amount.subtract(amount.remainder(increment));
+			//amount = amount.subtract(amount.remainder(increment));
 
-			if (amount.compareTo(BigDecimal.ZERO) <= 0)
+			//if (amount.compareTo(BigDecimal.ZERO) <= 0)
+			if (order.a.d)
 				return "<html><font color=#808080>" + amountStr + "</font></html>";
 			else
 				return "<html>" + amountStr + "</html>";

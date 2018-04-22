@@ -3,14 +3,16 @@ package core.item.assets;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Longs;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
-import core.BlockChain;
 import core.crypto.Crypto;
 import datachain.DCSet;
+import datachain.OrderMap;
 
 public class Trade {
 
@@ -40,9 +42,10 @@ public class Trade {
 		return this.initiator;
 	}
 
-	public Order getInitiatorOrder(DCSet db)
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getInitiatorOrder(DCSet db)
 	{
-		return this.getOrder(this.initiator, db);
+		return getOrder(db, this.initiator);
 	}
 
 	public BigInteger getTarget()
@@ -50,12 +53,14 @@ public class Trade {
 		return this.target;
 	}
 
-	public Order getTargetOrder(DCSet db)
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getTargetOrder(DCSet db)
 	{
-		return this.getOrder(this.target, db);
+		return getOrder(db, this.target);
 	}
 
-	public static Order getOrder(BigInteger key, DCSet db)
+	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, BigInteger key)
 	{
 		if(db.getOrderMap().contains(key))
 		{
@@ -64,9 +69,9 @@ public class Trade {
 
 		if(db.getCompletedOrderMap().contains(key))
 		{
-			Order order = db.getCompletedOrderMap().get(key);
-			order.setExecutable(false);
-			return order;
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
+			return OrderMap.setExecutable(order, false);
 		}
 
 		return null;
@@ -82,13 +87,13 @@ public class Trade {
 		return this.amountWant;
 	}
 
-	public BigDecimal getPriceCalc()
+	public BigDecimal getPriceCalc11()
 	{
-		return this.amountWant.divide(amountHave, 12, RoundingMode.HALF_DOWN);
+		return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
 	}
-	public BigDecimal getPriceCalcBack()
+	public BigDecimal getPriceCalcBack11()
 	{
-		return this.amountHave.divide(amountWant, 12, RoundingMode.HALF_UP);
+		return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
 	}
 
 	public long getTimestamp()
@@ -97,7 +102,28 @@ public class Trade {
 	}
 
 	//PARSE/CONVERT
+	public static Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> toDBrec(Trade trade) {
+		return new Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>(
+				trade.initiator, trade.target, trade.amountHave, trade.amountWant, trade.timestamp);
 
+	}
+
+	public static Trade fromDBrec(Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade) {
+		return new Trade(trade.a, trade.b, trade.c, trade.d, trade.e);
+	}
+
+	public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
+		List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
+
+		List<Trade>trades = new ArrayList<Trade>();
+		for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> item: list) {
+			trades.add(Trade.fromDBrec(item));
+		}
+
+		return trades;
+	}
+
+	/*
 	public static Trade parse(byte[] data) throws Exception
 	{
 		//CHECK IF CORRECT LENGTH
@@ -175,24 +201,21 @@ public class Trade {
 	{
 		return BASE_LENGTH;
 	}
+	 */
 
 	//PROCESS/ORPHAN
 
 	public void process(DCSet db)
 	{
-		Order initiator = this.getInitiatorOrder(db).copy();
-		Order target = this.getTargetOrder(db).copy();
+		Order initiator = Order.fromDBrec(this.getInitiatorOrder(db));
+		Order target = Order.fromDBrec(this.getTargetOrder(db));
 
 		//ADD TRADE TO DATABASE
-		db.getTradeMap().add(this);
+		db.getTradeMap().add(toDBrec(this));
 
 		//UPDATE FULFILLED HAVE
 		initiator.setFulfilledHave(initiator.getFulfilledHave().add(this.amountWant));
 		target.setFulfilledHave(target.getFulfilledHave().add(this.amountHave));
-
-		//UPDATE FULFILLED WANT
-		initiator.setFulfilledWant(initiator.getFulfilledWant().add(this.amountHave));
-		target.setFulfilledWant(target.getFulfilledWant().add(this.amountWant));
 
 		//CHECK IF FULFILLED
 		if(initiator.isFulfilled())
@@ -201,13 +224,17 @@ public class Trade {
 			db.getOrderMap().delete(initiator);
 
 			//ADD TO COMPLETED ORDERS
-			db.getCompletedOrderMap().add(initiator);
+			//initiator.setFulfilledWant(initiator.getAmountWant());
+			db.getCompletedOrderMap().add(Order.toDBrec(initiator));
 		}
 		else
 		{
 			//UPDATE ORDER
 			// in any case because .copy
-			db.getOrderMap().add(initiator);
+			//initiator.setFulfilledWant(initiator.getFulfilledHave().multiply(initiator.getPriceCalc())
+			//		.setScale(initiator.getAmountWant().scale(), RoundingMode.HALF_DOWN));
+
+			db.getOrderMap().add(Order.toDBrec(initiator));
 		}
 
 		if(target.isFulfilled())
@@ -216,12 +243,14 @@ public class Trade {
 			db.getOrderMap().delete(target);
 
 			//ADD TO COMPLETED ORDERS
-			db.getCompletedOrderMap().add(target);
+			//target.setFulfilledWant(target.getAmountWant());
+			db.getCompletedOrderMap().add(Order.toDBrec(target));
 		}
 		else
 		{
 			//UPDATE ORDER
-			db.getOrderMap().add(target);
+			//target.setFulfilledWant(target.getFulfilledWant().add(amountWant));
+			db.getOrderMap().add(Order.toDBrec(target));
 		}
 
 		//TRANSFER FUNDS
@@ -233,8 +262,8 @@ public class Trade {
 
 	public void orphan(DCSet db)
 	{
-		Order initiator = this.getInitiatorOrder(db).copy();
-		Order target = this.getTargetOrder(db).copy();
+		Order initiator = Order.fromDBrec(this.getInitiatorOrder(db));
+		Order target = Order.fromDBrec(this.getTargetOrder(db));
 
 		//REVERSE FUNDS
 		//initiator.getCreator().setBalance(initiator.getWant(), initiator.getCreator().getBalance(db, initiator.getWant()).subtract(this.amountHave), db);
@@ -259,8 +288,8 @@ public class Trade {
 		target.setFulfilledHave(target.getFulfilledHave().subtract(this.amountHave));
 
 		//UPDATE ORDERS
-		db.getOrderMap().add(initiator);
-		db.getOrderMap().add(target);
+		db.getOrderMap().add(Order.toDBrec(initiator));
+		db.getOrderMap().add(Order.toDBrec(target));
 
 		//REMOVE FROM DATABASE
 		db.getTradeMap().delete(this);

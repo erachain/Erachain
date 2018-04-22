@@ -2,6 +2,7 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -14,7 +15,6 @@ import com.google.common.primitives.Longs;
 
 import core.BlockChain;
 import core.account.Account;
-import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
@@ -31,6 +31,10 @@ public class CreateOrderTransaction extends Transaction {
 	// private static final int PRICE_LENGTH = 12;
 	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2 * AMOUNT_LENGTH;
 
+	private long haveKey;
+	private long wantKey;
+	private	BigDecimal amountHave;
+	private BigDecimal amountWant;
 	private Order order;
 
 	public static final byte[][] VALID_REC = new byte[][] {
@@ -39,26 +43,28 @@ public class CreateOrderTransaction extends Transaction {
 				"4fWbpHBsEzyG9paXH5oJswn3YMhvxw6fRssk6qZmB7jxQ72sRXJunEQhi9bnTwg2cUjwGCZy54u4ZseLRM7xh2x6")
 	};
 
-	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want,
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
 			BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference) {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
-		this.order = new Order(null, creator, have, want, amountHave, amountWant, timestamp);
+		this.haveKey = haveKey;
+		this.wantKey = wantKey;
+		this.amountHave = amountHave;
+		this.amountWant = amountWant;
 
 	}
 
-	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long have, long want,
+	public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
 			BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
 			byte[] signature) {
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+		this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
 		this.signature = signature;
-		this.order = new Order(new BigInteger(signature), creator, have, want, amountHave, amountWant, timestamp);
-		// this.calcFee();
+		//this.order = new Order(new BigInteger(signature), creator, haveKey, wantKey, amountHave, amountWant, timestamp);
 
 	}
 
-	public CreateOrderTransaction(PublicKeyAccount creator, long have, long want, BigDecimal amountHave,
+	public CreateOrderTransaction(PublicKeyAccount creator, long haveKey, long wantKey, BigDecimal amountHave,
 			BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) {
-		this(new byte[] { TYPE_ID, 0, 0, 0 }, creator, have, want, amountHave, amountWant, feePow, timestamp, reference,
+		this(new byte[] { TYPE_ID, 0, 0, 0 }, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference,
 				signature);
 	}
 
@@ -82,18 +88,77 @@ public class CreateOrderTransaction extends Transaction {
 
 		super.setDC(dcSet, asPack);
 
+		int different_scale;
+		AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(this.haveKey);
+		if (asset != null) {
+			different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+			if (different_scale != 0 && asset.getKey(dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
+				// RESCALE AMOUNT
+				this.amountHave = this.amountHave.scaleByPowerOfTen(different_scale);
+			}
+		}
+
+		asset = (AssetCls)dcSet.getItemAssetMap().get(this.wantKey);
+		if (asset != null) {
+			different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+			if (different_scale != 0 && asset.getKey(dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
+				// RESCALE AMOUNT
+				this.amountWant = this.amountWant.scaleByPowerOfTen(different_scale);
+			}
+		}
+
+		this.order = new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey, this.amountHave, this.amountWant, this.timestamp);
 		this.order.setDC(dcSet);
 
 	}
 
 	@Override
 	public BigDecimal getAmount() {
-		return this.order.getAmountHave();
+		return this.amountHave;
 	}
 
 	@Override
 	public long getKey() {
-		return this.order.getHave();
+		return this.haveKey;
+	}
+
+	public long getHaveKey()
+	{
+		return this.haveKey;
+	}
+
+	public AssetCls getHaveAsset()
+	{
+		return (AssetCls)this.dcSet.getItemAssetMap().get(this.haveKey);
+	}
+
+	public BigDecimal getAmountHave()
+	{
+		return this.amountHave;
+	}
+
+	public long getWantKey()
+	{
+		return this.wantKey;
+	}
+
+	public AssetCls getWantAsset()
+	{
+		return (AssetCls)this.dcSet.getItemAssetMap().get(this.wantKey);
+	}
+
+	public BigDecimal getAmountWant()
+	{
+		return this.amountWant;
+	}
+
+	public BigDecimal getPriceCalc()
+	{
+		return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
+	}
+	public BigDecimal getPriceCalcReverse()
+	{
+		return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
 	}
 
 	public Order getOrder() {
@@ -105,13 +170,15 @@ public class CreateOrderTransaction extends Transaction {
 		return false;
 	}
 
+	/*
 	// @Override
 	@Override
 	public void sign(PrivateKeyAccount creator, boolean asPack) {
 		super.sign(creator, asPack);
 		// in IMPRINT reference already setted before sign
-		this.order.setId(this.signature);
+		//this.order.setId(this.signature);
 	}
+	 */
 
 	// PARSE CONVERT
 
@@ -192,17 +259,14 @@ public class CreateOrderTransaction extends Transaction {
 		// GET BASE
 		JSONObject transaction = this.getJsonBase();
 
-		// ADD CREATOR/ORDER
-		transaction.put("creator", this.creator.getAddress());
+		transaction.put("haveKey", this.haveKey);
+		transaction.put("wantKey", this.wantKey);
+		transaction.put("amountHave", this.amountHave.toPlainString());
+		transaction.put("amountWant", this.amountWant.toPlainString());
 
-		JSONObject order = new JSONObject();
-		order.put("have", this.order.getHave());
-		order.put("want", this.order.getWant());
-		order.put("amountHave", this.order.getAmountHave().toPlainString());
-		order.put("amountWant", this.order.getAmountWant().toPlainString());
-		order.put("price", this.order.getPriceCalc().toPlainString());
-
-		transaction.put("order", order);
+		if (this.order != null) {
+			transaction.put("order", this.order.toJson());
+		}
 
 		return transaction;
 	}
@@ -213,23 +277,23 @@ public class CreateOrderTransaction extends Transaction {
 		byte[] data = super.toBytes(withSign, releaserReference);
 
 		// WRITE HAVE
-		byte[] haveBytes = Longs.toByteArray(this.order.getHave());
+		byte[] haveBytes = Longs.toByteArray(this.haveKey);
 		haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
 		data = Bytes.concat(data, haveBytes);
 
 		// WRITE WANT
-		byte[] wantBytes = Longs.toByteArray(this.order.getWant());
+		byte[] wantBytes = Longs.toByteArray(this.wantKey);
 		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
 		data = Bytes.concat(data, wantBytes);
 
 		// WRITE AMOUNT HAVE
-		byte[] amountHaveBytes = this.order.getAmountHave().unscaledValue().toByteArray();
+		byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
 		byte[] fill_H = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
 		amountHaveBytes = Bytes.concat(fill_H, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
 
 		// WRITE AMOUNT WANT
-		byte[] amountWantBytes = this.order.getAmountWant().unscaledValue().toByteArray();
+		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
 		byte[] fill_W = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill_W, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
@@ -256,13 +320,13 @@ public class CreateOrderTransaction extends Transaction {
 		int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
 		// CHECK IF ASSETS NOT THE SAME
-		long haveKey = this.order.getHave();
-		long wantKey = this.order.getWant();
+		long haveKey = this.haveKey;
+		long wantKey = this.wantKey;
 
 		if (haveKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
-				// && want != FEE_KEY
+				// && wantKey != FEE_KEY
 				) {
-			// have ERA
+			// haveKey ERA
 			if (height > BlockChain.FREEZE_FROM
 					&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
 				// LOCK ERA sell
@@ -275,14 +339,14 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		// CHECK IF AMOUNT POSITIVE
-		BigDecimal amountHave = this.order.getAmountHave();
-		BigDecimal amountWant = this.order.getAmountWant();
+		BigDecimal amountHave = this.amountHave;
+		BigDecimal amountWant = this.amountWant;
 		if (amountHave.compareTo(BigDecimal.ZERO) <= 0 || amountWant.compareTo(BigDecimal.ZERO) <= 0) {
 			return NEGATIVE_AMOUNT;
 		}
 
 		// CHECK IF WANT EXISTS
-		AssetCls haveAsset = this.order.getHaveAsset(this.dcSet);
+		AssetCls haveAsset = this.getHaveAsset();
 		if (haveAsset == null) {
 			// WANT DOES NOT EXIST
 			return ITEM_ASSET_NOT_EXIST;
@@ -319,7 +383,7 @@ public class CreateOrderTransaction extends Transaction {
 		}
 
 		// CHECK IF WANT EXISTS
-		AssetCls wantAsset = this.order.getWantAsset(this.dcSet);
+		AssetCls wantAsset = this.getWantAsset();
 		if (wantAsset == null) {
 			// WANT DOES NOT EXIST
 			return ITEM_ASSET_NOT_EXIST;
@@ -364,11 +428,8 @@ public class CreateOrderTransaction extends Transaction {
 		super.process(block, asPack);
 
 		// PROCESS ORDER
-		// NEED COPY for check block.isValid() and not modify ORDER for
-		// block.process
-		Order orderThis = this.order.copy();
-		orderThis.setDC(this.dcSet);
-		orderThis.process(this);
+		//this.order.copy().process(this);
+		this.order.process(this);
 	}
 
 	// @Override
@@ -378,9 +439,7 @@ public class CreateOrderTransaction extends Transaction {
 		super.orphan(asPack);
 
 		// ORPHAN ORDER
-		Order orderThis = this.order.copy();
-		orderThis.setDC(this.dcSet);
-		orderThis.orphan();
+		this.order.copy().orphan();
 	}
 
 	@Override
@@ -409,7 +468,7 @@ public class CreateOrderTransaction extends Transaction {
 	@Override
 	public BigDecimal getAmount(Account account) {
 		if (account.getAddress().equals(this.creator.getAddress())) {
-			return this.order.getAmountHave();
+			return this.amountHave;
 		}
 
 		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -419,8 +478,8 @@ public class CreateOrderTransaction extends Transaction {
 		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
 		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.order.getHave(),
-				this.order.getAmountHave());
+		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.haveKey,
+				this.amountHave);
 
 		return assetAmount;
 	}

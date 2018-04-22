@@ -80,6 +80,7 @@ import core.voting.Poll;
 import core.voting.PollOption;
 import datachain.DCSet;
 import datachain.SortableList;
+import datachain.TradeMap;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import lang.Lang;
@@ -1681,13 +1682,13 @@ public class BlockExplorer
 		{
 			Map sellJSON = new LinkedHashMap();
 
-			sellJSON.put("price", order.getPriceCalc().toPlainString());
+			sellJSON.put("price", order.getPrice().toPlainString());
 			sellJSON.put("amount", order.getAmountHaveLeft().toPlainString());
 			sumAmount = sumAmount.add(order.getAmountHaveLeft());
 
-			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
+			sellJSON.put("sellingPrice", BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).divide(order.getPrice(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal sellingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
+			BigDecimal sellingAmount = order.getPrice().multiply(order.getAmountHaveLeft()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
@@ -1728,14 +1729,14 @@ public class BlockExplorer
 		{
 			Map buyJSON = new LinkedHashMap();
 
-			buyJSON.put("price", order.getPriceCalc().toPlainString());
+			buyJSON.put("price", order.getPrice().toPlainString());
 			buyJSON.put("amount", order.getAmountHaveLeft().toPlainString());
 
 			sumAmount = sumAmount.add(order.getAmountHaveLeft());
 
-			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).divide(order.getPriceCalc(), 8, RoundingMode.DOWN).toPlainString());
+			buyJSON.put("buyingPrice", BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).divide(order.getPrice(), 8, RoundingMode.DOWN).toPlainString());
 
-			BigDecimal buyingAmount = order.getPriceCalc().multiply(order.getAmountHaveLeft()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
+			BigDecimal buyingAmount = order.getPrice().multiply(order.getAmountHaveLeft()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
 
 			buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
@@ -2877,7 +2878,7 @@ public class BlockExplorer
 				orderJSON.put("amount", order.getAmountHave().toPlainString());
 				orderJSON.put("amountLeft", order.getAmountHaveLeft().toPlainString());
 				orderJSON.put("amountWant", order.getAmountWant().toPlainString());
-				orderJSON.put("price", order.getPriceCalc().toPlainString());
+				orderJSON.put("price", order.getPrice().toPlainString());
 
 				transactionDataJSON.put("orderSource", orderJSON);
 
@@ -2970,8 +2971,8 @@ public class BlockExplorer
 			} else if(transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION)
 			{
 				if (assetNames != null) {
-					assetNames.setKey(((CreateOrderTransaction)transaction).getOrder().getHave());
-					assetNames.setKey(((CreateOrderTransaction)transaction).getOrder().getWant());
+					assetNames.setKey(((CreateOrderTransaction)transaction).getHaveKey());
+					assetNames.setKey(((CreateOrderTransaction)transaction).getWantKey());
 				}
 
 			} else if(transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION)
@@ -3351,11 +3352,10 @@ public class BlockExplorer
 		for (String address : addresses) {
 			Map<Tuple2<BigInteger, BigInteger>, Trade> trades = new TreeMap<Tuple2<BigInteger, BigInteger>, Trade>();
 			List<Transaction> orders = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, Transaction.CREATE_ORDER_TRANSACTION, 0);
+			TradeMap tradeMap = DCSet.getInstance().getTradeMap();
 			for (Transaction transaction : orders)
 			{
-				Order order =  ((CreateOrderTransaction)transaction).getOrder();
-
-				SortableList<Tuple2<BigInteger, BigInteger>, Trade> tradesBuf = Controller.getInstance().getTrades(order);
+				SortableList<Tuple2<BigInteger, BigInteger>, Trade> tradesBuf = tradeMap.getTradesByOrderID(new BigInteger(transaction.getSignature()));
 				for (Pair<Tuple2<BigInteger, BigInteger>, Trade> pair : tradesBuf) {
 					trades.put(pair.getA(), pair.getB());
 				}

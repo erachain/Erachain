@@ -9,6 +9,7 @@ import java.util.List;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import core.BlockChain;
@@ -18,7 +19,7 @@ import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
 
-public class Order implements Comparable<Order>
+public class Order_old_ReversePrice implements Comparable<Order_old_ReversePrice>
 {
 
 	private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
@@ -37,50 +38,65 @@ public class Order implements Comparable<Order>
 	protected DCSet dcSet;
 	private BigInteger id;
 	private Account creator;
-	private long haveKey;
-	private long wantKey;
+	private long have;
+	private long want;
 	private BigDecimal amountHave;
 	private BigDecimal fulfilledHave;
 	private BigDecimal amountWant;
-	private BigDecimal price;
+	//private BigDecimal fulfilledWant;
 	protected long timestamp;
 	private boolean isExecutable = true;
 
-	public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp)
+	public Order_old_ReversePrice(BigInteger id, Account creator, long have, long want, BigDecimal amountHave, BigDecimal amountWant, long timestamp)
 	{
 		this.id = id;
 		this.creator = creator;
-		this.haveKey = haveKey;
-		this.wantKey = wantKey;
+		this.have = have;
+		this.want = want;
 
+		// SCALE to BASE
+		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountHave = amountHave.scaleByPowerOfTen(different_scale);
+		}
 		this.amountHave = amountHave;
+
+		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountWant = amountWant.scaleByPowerOfTen(different_scale);
+		}
 		this.amountWant = amountWant;
 
-		this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
-
-		this.price = calcPrice(amountHave, amountWant);
+		this.fulfilledHave = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		//this.fulfilledWant = BigDecimal.ZERO;//.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 		this.timestamp = timestamp;
 	}
 
-	public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
+	public Order_old_ReversePrice(BigInteger id, Account creator, long have, long want, BigDecimal amountHave,
 			BigDecimal amountWant, BigDecimal fulfilledHave,
 			byte isExecutable, long timestamp)
 	{
 		this.id = id;
 		this.creator = creator;
-		this.haveKey = haveKey;
-		this.wantKey = wantKey;
+		this.have = have;
+		this.want = want;
 
+		// SCALE to BASE
+		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountHave = amountHave.scaleByPowerOfTen(different_scale);
+		}
 		this.amountHave = amountHave;
+
+		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountWant = amountWant.scaleByPowerOfTen(different_scale);
+		}
 		this.amountWant = amountWant;
 
 		this.fulfilledHave = fulfilledHave;
-
-		this.price = this.amountWant.divide(this.amountHave,
-				this.amountWant.scale() + BlockChain.AMOUNT_DEDAULT_SCALE
-				+ this.amountHave.precision(),
-				RoundingMode.HALF_DOWN);
+		//this.fulfilledWant = fulfilledWant;
 
 		this.isExecutable = isExecutable == 1? true: false;
 		this.timestamp = timestamp;
@@ -108,7 +124,7 @@ public class Order implements Comparable<Order>
 
 	public long getHave()
 	{
-		return this.haveKey;
+		return this.have;
 	}
 
 	public AssetCls getHaveAsset()
@@ -118,12 +134,12 @@ public class Order implements Comparable<Order>
 
 	public AssetCls getHaveAsset(DCSet db)
 	{
-		return (AssetCls)db.getItemAssetMap().get(this.haveKey);
+		return (AssetCls)db.getItemAssetMap().get(this.have);
 	}
 
 	public long getWant()
 	{
-		return this.wantKey;
+		return this.want;
 	}
 	public boolean isExecutable() {
 		return this.isExecutable;
@@ -139,8 +155,43 @@ public class Order implements Comparable<Order>
 
 	public AssetCls getWantAsset(DCSet db)
 	{
-		return (AssetCls)db.getItemAssetMap().get(this.wantKey);
+		return (AssetCls)db.getItemAssetMap().get(this.want);
 	}
+
+	/*
+	//////////// DIVISIBLE
+	public boolean isHaveDivisible(DCSet db)
+	{
+		if (this.haveDivisible == 0)
+			this.haveDivisible = this.getHaveAsset(db).isDivisible()? 1:-1;
+
+		return this.haveDivisible == 1;
+	}
+
+	public boolean isHaveDivisibleGood(DCSet db, BigDecimal amount)
+	{
+		if(this.isHaveDivisible(db))
+			return true;
+
+		return amount.stripTrailingZeros().scale() == 0;
+	}
+
+	public boolean isWantDivisible(DCSet db)
+	{
+		if (this.wantDivisible == 0)
+			this.wantDivisible = this.getWantAsset(db).isDivisible()? 1:-1;
+
+		return this.wantDivisible == 1;
+	}
+
+	public boolean isWantDivisibleGood(DCSet db, BigDecimal amount)
+	{
+		if(this.isWantDivisible(db))
+			return true;
+
+		return amount.stripTrailingZeros().scale() == 0;
+	}
+	 */
 
 	///////////////////////// AMOUNTS
 	public BigDecimal getAmountHave()
@@ -158,13 +209,25 @@ public class Order implements Comparable<Order>
 	}
 	public BigDecimal getAmountWantLeft()
 	{
-		return this.getAmountHaveLeft().multiply(getPrice(), rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
+		return this.getAmountHaveLeft().multiply(getPriceCalc(), rounding);
 	}
 
-	public static BigDecimal getAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	/*
+	public BigDecimal getAmountHaveLeft(DBSet db, BigDecimal newPrice)
+	{
+		if (this.isHaveDivisible(db))
+			return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN);
+		return this.amountHave.subtract(this.fulfilledHave).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
+	}
+
+	 */
+
+	public static BigDecimal getAmountWantLeft(Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
 			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderREC)
 	{
-		return orderREC.b.c.multiply(calcPrice(orderREC.b.b, orderREC.b.c)).setScale(orderREC.c.b.scale(), RoundingMode.HALF_DOWN);
+		//		if (true) //this.isWantDivisible(db))
+		return orderREC.b.c.multiply(getPriceCalc2(orderREC.b.b, orderREC.b.c)).setScale(orderREC.c.b.scale(), RoundingMode.HALF_DOWN);
+		//return this.amountWant.subtract(this.amountWant).multiply(newPrice, rounding).setScale(0, RoundingMode.HALF_DOWN);
 	}
 
 	//////// FULFILLED
@@ -172,10 +235,40 @@ public class Order implements Comparable<Order>
 	{
 		return this.fulfilledHave;
 	}
+	/*
+	public BigDecimal getFulfilledWant()
+	{
+		return this.fulfilledWant;
+	}
+	 */
 
 	public void setFulfilledHave(BigDecimal fulfilled)
 	{
 		this.fulfilledHave = fulfilled;
+	}
+	/*
+	public void setFulfilledWant(BigDecimal fulfilled)
+	{
+		this.fulfilledWant = fulfilled;
+	}
+	 */
+
+	// need for process
+	public BigDecimal calcAmountWantLeft(DCSet db)
+	{
+		BigDecimal temp;
+		if (this.amountHave.compareTo(this.amountWant) > 0) {
+			temp = this.fulfilledHave.multiply(this.getPriceCalc(), rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
+		} else {
+			temp = this.fulfilledHave.divide(this.getPriceCalcReverse(), this.amountWant.scale(), RoundingMode.HALF_DOWN);
+		}
+
+		/*
+		if ( !this.isWantDivisible(db) )
+			temp = temp.setScale(0,  RoundingMode.HALF_DOWN);
+		 */
+
+		return this.amountWant.subtract(temp);
 	}
 
 	public boolean isFulfilled()
@@ -184,24 +277,53 @@ public class Order implements Comparable<Order>
 	}
 
 	///////// PRICE
-	public BigDecimal getPrice()
+	/*
+	public int getScaleForPrice()
 	{
-		return this.price;
+		return this.amountWant.scale();
 	}
 
-	public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant)
+	public int getScaleForPriceReverse()
 	{
-		return amountWant.divide(amountHave,
-				amountWant.scale()
-				+ amountHave.precision() - amountHave.scale()
-				//+ BlockChain.AMOUNT_DEDAULT_SCALE
-				+ 3,
-				RoundingMode.HALF_DOWN).stripTrailingZeros();
+		return this.amountHave.scale();
+	}
+	 */
+
+	///////// PRICE
+	public BigDecimal getPriceCalc()
+	{
+		//return this.amountWant.divide(amountHave, getScaleForPrice(), RoundingMode.HALF_DOWN);
+		// PRICE all > 1
+		return this.amountWant.divide(this.amountHave,
+				this.amountWant.scale() + BlockChain.AMOUNT_DEDAULT_SCALE
+				+ this.amountHave.precision(), RoundingMode.HALF_DOWN);
+	}
+
+	public static BigDecimal getPriceCalc2(BigDecimal amountHave, BigDecimal amountWant)
+	{
+		//return this.amountWant.divide(amountHave, getScaleForPrice(), RoundingMode.HALF_DOWN);
+		// PRICE all > 1
+		return amountWant.divide(amountHave, 6, RoundingMode.HALF_DOWN);
+	}
+
+	public BigDecimal getPriceCalcReverse()
+	{
+		//return this.amountHave.divide(amountWant, getScaleForPriceReverse(), RoundingMode.HALF_UP);
+		return this.amountHave.divide(this.amountWant, 6, RoundingMode.HALF_UP);
+	}
+	public static BigDecimal getPriceCalcReverse2(BigDecimal amountHave, BigDecimal amountWant)
+	{
+		//return this.amountHave.divide(amountWant, getScaleForPriceReverse(), RoundingMode.HALF_UP);
+		return amountHave.divide(amountWant, 6, RoundingMode.HALF_UP);
 	}
 
 	public String viewPrice()
 	{
-		return getPrice().toPlainString();
+		if(this.amountHave.compareTo(this.amountWant) > 0)
+			return ":" + getPriceCalcReverse().toPlainString();
+
+		return "*" + getPriceCalc().toPlainString();
+
 	}
 
 	public long getTimestamp()
@@ -216,12 +338,13 @@ public class Order implements Comparable<Order>
 
 	public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades(DCSet db)
 	{
-		return db.getTradeMap().getInitiatedTrades(this);
+		return db.getTradeMap().getInitiatedTrades(null);
 	}
 
 	public boolean isConfirmed()
 	{
-		return isConfirmed(DCSet.getInstance());
+		return DCSet.getInstance().getOrderMap().contains(this.id)
+				|| DCSet.getInstance().getCompletedOrderMap().contains(this.id);
 	}
 
 	public boolean isConfirmed(DCSet dc)
@@ -377,30 +500,30 @@ public class Order implements Comparable<Order>
 	public JSONObject toJson() {
 
 		JSONObject order = new JSONObject();
-		order.put("haveKey", this.haveKey);
-		order.put("wantKey", this.wantKey);
+		order.put("haveKey", this.have);
+		order.put("wantKey", this.want);
 		order.put("amountHave", this.amountHave.toPlainString());
 		order.put("amountWant", this.amountWant.toPlainString());
 		order.put("fulfilledHave", this.fulfilledHave.toPlainString());
-		order.put("price", this.price.toPlainString());
+		//order.put("fulfilledWant", this.fulfilledWant.toPlainString());
 
 		return order;
 
 	}
 
-	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> toDBrec(Order order) {
-		return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	public static Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> toDBrec(Order_old_ReversePrice order) {
+		return new Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
 				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-						new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
+						new Tuple4<BigInteger, String, Long, Boolean>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable()),
 						new Tuple3<Long, BigDecimal, BigDecimal>(order.getHave(), order.getAmountHave(), order.getFulfilledHave()),
 						new Tuple2<Long, BigDecimal>(order.getWant(), order.getAmountWant()));
 
 	}
 
-	public static Order fromDBrec(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	public static Order_old_ReversePrice fromDBrec(Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
 			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
-		return new Order(order.a.a, new Account(order.a.b), order.b.a, order.c.a, order.b.b,
+		return new Order_old_ReversePrice(order.a.a, new Account(order.a.b), order.b.a, order.c.a, order.b.b,
 				order.c.b, order.b.c,
 				(byte)(order.a.d?1:0), order.a.c);
 
@@ -414,21 +537,21 @@ public class Order implements Comparable<Order>
 		DCSet db = this.dcSet;
 		//REMOVE HAVE
 		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-		this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, false);
+		this.creator.changeBalance(this.dcSet, true, this.have, this.amountHave, false);
 
 		//ADD ORDER TO DATABASE
-		db.getOrderMap().add(Order.toDBrec(this));
+		db.getOrderMap().add(Order_old_ReversePrice.toDBrec(this));
 
 		//GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
 		//TRY AND COMPLETE ORDERS
 		boolean completedOrder = false;
 		int i = -1;
-		BigDecimal thisPrice = this.getPrice();
-		//BigDecimal thisReversePrice = this.getPriceCalcReverse();
-		//boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+		BigDecimal thisPrice = this.getPriceCalc();
+		BigDecimal thisReversePrice = this.getPriceCalcReverse();
+		boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
-		List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, true);
+		List<Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.want, this.have, true);
 		//Collections.sort(orders);
 
 		boolean isDivisibleHave = true; //this.isHaveDivisible(db);
@@ -438,13 +561,13 @@ public class Order implements Comparable<Order>
 		while( !completedOrder && ++i < orders.size())
 		{
 			//GET ORDER
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
 			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
 
 			BigDecimal orderAmountHaveLeft;
 			BigDecimal orderAmountWantLeft;
-			BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-			BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
+			BigDecimal orderReversePrice = Order_old_ReversePrice.getPriceCalcReverse2(order.b.b, order.c.b);
+			BigDecimal orderPrice = Order_old_ReversePrice.getPriceCalc2(order.b.b, order.c.b);
 
 			Trade trade;
 			BigDecimal tradeAmount;
@@ -452,9 +575,9 @@ public class Order implements Comparable<Order>
 
 			///////////////
 			//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-			if( //isReversePrice?
-					//	thisReversePrice.compareTo(orderPrice) < 0:
-					thisPrice.compareTo(orderReversePrice) > 0
+			if( isReversePrice?
+					thisReversePrice.compareTo(orderPrice) < 0:
+						thisPrice.compareTo(orderReversePrice) > 0
 					)
 				//continue;
 				break;
@@ -464,7 +587,13 @@ public class Order implements Comparable<Order>
 			//break;
 
 			orderAmountHaveLeft = order.b.b.subtract(order.b.c); //.getAmountHaveLeft();
-			orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
+
+			// calculate WANT amount left for ORDER
+			if (order.b.c.compareTo(BigDecimal.ZERO) == 0)
+				orderAmountWantLeft = order.c.b; //getAmountWant();
+			else
+				// recalv Want
+				orderAmountWantLeft = Order.fromDBrec(order).calcAmountWantLeft_old(db); // .getAmountWantLeft();
 
 			int compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
 			if ( compare >= 0) {
@@ -475,10 +604,29 @@ public class Order implements Comparable<Order>
 				else
 				{
 
-					tradeAmount = tradeAmountGet.multiply(orderReversePrice).setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
+					tradeAmount = isReversePrice?
+							thisAmountHaveLeft.divide(orderPrice, 8, RoundingMode.HALF_DOWN):
+								///thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale(thisAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
+								tradeAmountGet.multiply(orderReversePrice, rounding).setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
 
-					//// recalc
-					///tradeAmountGet = tradeAmount.divide(orderReversePrice, tradeAmount.scale(), RoundingMode.HALF_DOWN);
+							//tradeAmount.
+							if ( !isDivisibleWant && tradeAmount.stripTrailingZeros().scale() > 0) {
+								// rounding only DOWN !
+								tradeAmount = tradeAmount.setScale(0, RoundingMode.DOWN);
+
+								if (tradeAmount.compareTo(BigDecimal.ZERO) == 0)
+									// not completed yet by this order price
+									continue;
+
+								// recalc
+								tradeAmountGet = isReversePrice?
+										tradeAmount.multiply(orderPrice, rounding).setScale(tradeAmount.scale(), RoundingMode.HALF_DOWN):
+											tradeAmount.divide(orderReversePrice, tradeAmount.scale(), RoundingMode.HALF_DOWN);
+										if ( !isDivisibleHave && tradeAmountGet.stripTrailingZeros().scale() > 0) {
+											// wrong trade by non Divisible items
+											continue;
+										}
+							}
 				}
 
 				//THIS is COMPLETED
@@ -504,6 +652,7 @@ public class Order implements Comparable<Order>
 
 				// need to update from DB -.copy() not update automative
 				this.fulfilledHave = this.fulfilledHave.add(tradeAmountGet);
+				//this.fulfilledWant = this.fulfilledWant.add(tradeAmount);
 
 				// update new values
 				thisAmountHaveLeft = this.getAmountHaveLeft();
@@ -542,11 +691,11 @@ public class Order implements Comparable<Order>
 		}
 
 		//REMOVE ORDER FROM DATABASE
-		db.getOrderMap().delete(this);
+		db.getOrderMap().delete(this.getId());
 
 		//REMOVE HAVE
 		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).add(this.amountHave), db);
-		this.creator.changeBalance(db, false, this.haveKey, this.amountHave, true);
+		this.creator.changeBalance(db, false, this.have, this.amountHave, true);
 	}
 
 	/*
@@ -591,10 +740,10 @@ public class Order implements Comparable<Order>
 
 	//@Override
 	@Override
-	public int compareTo(Order order)
+	public int compareTo(Order_old_ReversePrice order)
 	{
 		//COMPARE ONLY BY PRICE
-		int result = this.getPrice().compareTo(order.getPrice());
+		int result = this.getPriceCalc().compareTo(order.getPriceCalc());
 		if (result != 0)
 			return result;
 
@@ -614,7 +763,7 @@ public class Order implements Comparable<Order>
 
 	//COPY
 
-	public Order copy()
+	public Order_old_ReversePrice copy()
 	{
 		return fromDBrec(toDBrec(this));
 		/*

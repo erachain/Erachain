@@ -41,7 +41,7 @@ public class OrderReverse extends Order {
 	public int compareTo(OrderReverse order) 
 	{	
 		//COMPARE ONLY BY PRICE
-		int result = this.getPriceCalc().compareTo(order.getPriceCalc());
+		int result = this.getPrice().compareTo(order.getPrice());
 		if (result != 0)
 			return result;
 

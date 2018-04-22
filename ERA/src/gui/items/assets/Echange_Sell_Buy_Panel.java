@@ -238,7 +238,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane{
 					if(row < sellOrdersTableModel.orders.size())
 					{
 						buyOrderPanel.txtAmount.setText(order.getAmountHaveLeft().toPlainString());
-						buyOrderPanel.txtPrice.setText(order.getPriceCalc().toPlainString());
+						buyOrderPanel.txtPrice.setText(order.getPrice().toPlainString());
 					}
 				}
 			}

@@ -141,7 +141,7 @@ public class CancelOrderFrame extends JDialog
       		
       	//TXT PRICE
       	txtGBC.gridy = 5;
-      	JTextField txtPrice = new JTextField(order.getPriceCalc().toPlainString());
+      	JTextField txtPrice = new JTextField(order.getPrice().toPlainString());
       	txtPrice.setEditable(false);
       	this.add(txtPrice, txtGBC);
       	

@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Longs;
@@ -2502,24 +2503,23 @@ public class Controller extends Observable {
 		return (TemplateCls) this.dcSet.getItemTemplateMap().get(key);
 	}
 
+	/*
 	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want) {
 		return this.getOrders(have, want, true);
 	}
+	 */
 
-	public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls want, boolean filter) {
+	public SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getOrders(AssetCls have, AssetCls want, boolean filter) {
 		return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
 	}
 
-	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(AssetCls have, AssetCls want) {
+	public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(AssetCls have, AssetCls want) {
 		return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
 	}
 
-	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getTrades(Order order) {
-		return this.dcSet.getTradeMap().getTrades(order);
-	}
-
 	public List<Trade> getTradeByTimestmp(long have, long want, long timestamp) {
-		return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
+		return Trade.getTradeByTimestmp(this.dcSet, have, want, timestamp);
 	}
 
 	// IMPRINTS

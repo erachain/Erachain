@@ -6,11 +6,13 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.BlockChain;
 import core.item.assets.AssetCls;
-import core.item.assets.Order;
 import core.item.assets.Trade;
 import datachain.DCSet;
 import datachain.SortableList;
@@ -22,7 +24,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigInteger>, Trade> implements Observer
+public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> implements Observer
 {
 	public static final int COLUMN_TIMESTAMP = 0;
 	public static final int COLUMN_TYPE = 1;
@@ -30,7 +32,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 	public static final int COLUMN_PRICE = 3;
 	public static final int COLUMN_ASSET_2 = 4;
 
-	private SortableList<Tuple2<BigInteger, BigInteger>, Trade> trades;
+	private SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades;
 	private AssetCls have;
 
 	BigDecimal sumAsset1;
@@ -43,19 +45,21 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		sumAsset1 = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		sumAsset2 = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
-		for (Pair<Tuple2<BigInteger, BigInteger>, Trade> tradePair : this.trades)
+		for (Pair<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> tradePair : this.trades)
 		{
-			String type = tradePair.getB().getInitiatorOrder(DCSet.getInstance()).getHave() == this.have.getKey() ? "Sell" : "Buy";
+
+			Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade = tradePair.getB();
+			String type = Trade.getOrder(DCSet.getInstance(), trade.a).b.a == this.have.getKey() ? "Sell" : "Buy";
 
 			if(type.equals("Buy"))
 			{
-				sumAsset1 = sumAsset1.add(tradePair.getB().getAmountHave());
-				sumAsset2 = sumAsset2.add(tradePair.getB().getAmountWant());
+				sumAsset1 = sumAsset1.add(trade.c);// getAmountHave());
+				sumAsset2 = sumAsset2.add(trade.d); //getAmountWant());
 			}
 			else
 			{
-				sumAsset1 = sumAsset1.add(tradePair.getB().getAmountWant());
-				sumAsset2 = sumAsset2.add(tradePair.getB().getAmountHave());
+				sumAsset1 = sumAsset1.add(trade.d); //getAmountWant());
+				sumAsset2 = sumAsset2.add(trade.c); //getAmountHave());
 			}
 
 		}
@@ -121,8 +125,10 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
 		Trade trade = null;
 		int type = 0;
-		Order initatorOrder = null;
-		Order targetOrder = null;
+		Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> initatorOrder = null;
+		Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> targetOrder = null;
 
 		if(row < this.trades.size())
 		{
@@ -133,7 +139,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				initatorOrder = trade.getInitiatorOrder(db);
 				targetOrder = trade.getTargetOrder(db);
 
-				type = initatorOrder.getHave()
+				type = initatorOrder.b.a
 						== this.have.getKey()?
 								-1:1;
 
@@ -164,7 +170,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			else
 				result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
 
-			if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
+			if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";
 			}
 
@@ -177,7 +183,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				return null;
 
 			if(type > 0)
-				return NumberAsString.getInstance().numberAsString12(trade.getPriceCalc());
+				return NumberAsString.getInstance().numberAsString12(trade.getPrice());
 			else
 				return NumberAsString.getInstance().numberAsString12(trade.getPriceCalcBack());
 
@@ -191,7 +197,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			else
 				result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
 
-			if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+			if (Controller.getInstance().isAddressIsMine(targetOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";
 			}
 

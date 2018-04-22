@@ -62,7 +62,7 @@ public class Order_Info_Panel extends JPanel {
 		// PRICE
 		++detailGBC.gridy;
 		JTextField price = new JTextField(
-				order.getPriceCalc().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString());
+				order.getPrice().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString());
 		price.setEditable(false);
 		MenuPopupUtil.installContextMenu(price);
 		this.add(price, detailGBC);

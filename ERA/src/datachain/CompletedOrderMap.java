@@ -1,5 +1,6 @@
 package datachain;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,21 +8,23 @@ import java.util.Map;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import core.item.assets.Order;
-import utils.ObserverMessage;
 import database.DBMap;
-import database.serializer.OrderSerializer;
-import datachain.DCSet;
+import utils.ObserverMessage;
 
-public class CompletedOrderMap extends DCMap<BigInteger, Order> 
+public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
+
 	public CompletedOrderMap(DCSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
-		
+
 		if (databaseSet.isWithObserver()) {
 			this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ORDER_TYPE);
 			if (databaseSet.isDynamicGUI()) {
@@ -32,68 +35,77 @@ public class CompletedOrderMap extends DCMap<BigInteger, Order>
 		}
 	}
 
-	public CompletedOrderMap(CompletedOrderMap parent) 
+	public CompletedOrderMap(CompletedOrderMap parent)
 	{
 		super(parent, null);
 	}
 
+	@Override
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<BigInteger, Order> getMap(DB database) 
+	protected Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMap(DB database)
 	{
 		//OPEN MAP
 		return this.openMap(database);
 	}
 
 	@Override
-	protected Map<BigInteger, Order> getMemoryMap() 
+	protected Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMemoryMap()
 	{
 		DB database = DBMaker.newMemoryDB().make();
-		
+
 		//OPEN MAP
 		return this.openMap(database);
 	}
-	
-	private Map<BigInteger, Order> openMap(DB database)
+
+	private Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> openMap(DB database)
 	{
 		//OPEN MAP
-		BTreeMap<BigInteger, Order> map = database.createTreeMap("completedorders")
-				.valueSerializer(new OrderSerializer())
-				.makeOrGet();
-		
+		BTreeMap<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> map = database.createTreeMap("completedorders")
+		//.valueSerializer(new OrderSerializer())
+		.makeOrGet();
+
 		//RETURN
 		return map;
 	}
 
 	@Override
-	protected Order getDefaultValue() 
+	protected Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getDefaultValue()
 	{
 		return null;
 	}
-	
+
 	@Override
-	protected Map<Integer, Integer> getObservableData() 
+	protected Map<Integer, Integer> getObservableData()
 	{
 		return this.observableData;
 	}
 
-	public void add(Order order)
+	public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order)
 	{
 		// this order is NOT executable
-		order.setExecutable(false);
+		order = datachain.OrderMap.setExecutable(order, false);
 
-		this.set(order.getId(), order);
+		this.set(order.a.a, order);
 	}
 
-	public Order get(BigInteger key)
+	@Override
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(BigInteger key)
 	{
-		Order order = super.get(key);
-		order.setExecutable(false);
-		return order;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
+		return datachain.OrderMap.setExecutable(order, false);
 	}
 
-	public void delete(Order order) 
+	public void delete(Order order)
 	{
 		this.delete(order.getId());
 	}
