@@ -11,7 +11,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import core.BlockChain;
 import core.account.Account;
 import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
@@ -77,10 +76,7 @@ public class Order implements Comparable<Order>
 
 		this.fulfilledHave = fulfilledHave;
 
-		this.price = this.amountWant.divide(this.amountHave,
-				this.amountWant.scale() + BlockChain.AMOUNT_DEDAULT_SCALE
-				+ this.amountHave.precision(),
-				RoundingMode.HALF_DOWN);
+		this.price = calcPrice(amountHave, amountWant);
 
 		this.isExecutable = isExecutable == 1? true: false;
 		this.timestamp = timestamp;
@@ -183,6 +179,11 @@ public class Order implements Comparable<Order>
 		return this.fulfilledHave.compareTo(this.amountHave) == 0;
 	}
 
+	public BigDecimal getFulfilledWant()
+	{
+		return this.fulfilledHave.multiply(price).setScale(amountWant.scale(), RoundingMode.HALF_DOWN);
+	}
+
 	///////// PRICE
 	public BigDecimal getPrice()
 	{
@@ -191,12 +192,19 @@ public class Order implements Comparable<Order>
 
 	public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant)
 	{
-		return amountWant.divide(amountHave,
+		//int precH = amountHave.precision();
+		//int scaleH = amountHave.scale();
+		//int scaleW = amountWant.scale();
+		BigDecimal result = amountWant.divide(amountHave,
 				amountWant.scale()
 				+ amountHave.precision() - amountHave.scale()
-				//+ BlockChain.AMOUNT_DEDAULT_SCALE
 				+ 3,
 				RoundingMode.HALF_DOWN).stripTrailingZeros();
+
+		// IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
+		if (result.scale() < 1)
+			return result.setScale(1);
+		return result;
 	}
 
 	public String viewPrice()

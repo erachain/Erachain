@@ -15,7 +15,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import core.BlockChain;
 import core.account.Account;
 import database.DBMap;
 import utils.ObserverMessage;
@@ -142,11 +141,12 @@ Tuple2<BigDecimal, BigDecimal>  // on HOLD
 		return new Tuple5<
 				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
 				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>
-		(new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+		/// .setScale(BlockChain.AMOUNT_DEDAULT_SCALE)
+		(new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
 	}
 
 	@Override

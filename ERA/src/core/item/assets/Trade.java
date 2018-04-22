@@ -2,7 +2,6 @@ package core.item.assets;
 // 16/03
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,15 +84,6 @@ public class Trade {
 	public BigDecimal getAmountWant()
 	{
 		return this.amountWant;
-	}
-
-	public BigDecimal getPriceCalc11()
-	{
-		return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
-	}
-	public BigDecimal getPriceCalcBack11()
-	{
-		return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
 	}
 
 	public long getTimestamp()
@@ -230,10 +220,6 @@ public class Trade {
 		else
 		{
 			//UPDATE ORDER
-			// in any case because .copy
-			//initiator.setFulfilledWant(initiator.getFulfilledHave().multiply(initiator.getPriceCalc())
-			//		.setScale(initiator.getAmountWant().scale(), RoundingMode.HALF_DOWN));
-
 			db.getOrderMap().add(Order.toDBrec(initiator));
 		}
 

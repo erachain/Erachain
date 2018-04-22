@@ -257,7 +257,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		//this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
 		AssetCls asset = (AssetCls)this.getItem();
 		this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
-				new BigDecimal(asset.getQuantity()).setScale(0), false);
+				new BigDecimal(asset.getQuantity()).setScale(asset.getScale()), false);
 
 	}
 

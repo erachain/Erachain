@@ -48,6 +48,16 @@ public class CreateOrderTransaction extends Transaction {
 		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 		this.haveKey = haveKey;
 		this.wantKey = wantKey;
+
+		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountHave = amountHave.scaleByPowerOfTen(different_scale);
+		}
+		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			amountWant = amountWant.scaleByPowerOfTen(different_scale);
+		}
+
 		this.amountHave = amountHave;
 		this.amountWant = amountWant;
 
@@ -111,6 +121,11 @@ public class CreateOrderTransaction extends Transaction {
 		this.order.setDC(dcSet);
 
 	}
+
+	static public BigDecimal unScaleAmountToDefault(BigDecimal amount, AssetCls asset) {
+		return amount;
+	}
+
 
 	@Override
 	public BigDecimal getAmount() {
