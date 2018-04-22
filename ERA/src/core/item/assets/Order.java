@@ -432,14 +432,15 @@ public class Order implements Comparable<Order>
 		int i = -1;
 		BigDecimal thisPrice = this.getPrice();
 		BigDecimal tempPrice;
+		BigDecimal thisIncrement;
 		//boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
 		List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, true);
 		//Collections.sort(orders);
 
-		boolean isDivisibleHave = true; //this.isHaveDivisible(db);
-		boolean isDivisibleWant = true; //this.isWantDivisible(db);
+		//boolean isDivisibleHave = true; //this.isHaveDivisible(db);
+		//boolean isDivisibleWant = true; //this.isWantDivisible(db);
 		BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
 
 		while( !completedOrder && ++i < orders.size())
@@ -462,16 +463,13 @@ public class Order implements Comparable<Order>
 
 			///////////////
 			//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-			if( //isReversePrice?
-					//	thisReversePrice.compareTo(orderPrice) < 0:
-					thisPrice.compareTo(orderReversePrice) > 0
-					)
-				//continue;
+			if(thisPrice.compareTo(orderReversePrice) > 0)
 				break;
-			if ( ! isDivisibleWant && thisAmountHaveLeft.compareTo(orderPrice) < 0)
+
+			thisIncrement = orderPrice.scaleByPowerOfTen(-this.amountWant.scale());
+			if (thisAmountHaveLeft.compareTo(thisIncrement) < 0)
 				// if left not enough for 1 buy by price this order
-				continue;
-			//break;
+				break;
 
 			orderAmountHaveLeft = order.b.b.subtract(order.b.c); //.getAmountHaveLeft();
 			orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
@@ -543,12 +541,10 @@ public class Order implements Comparable<Order>
 				// update new values
 				thisAmountHaveLeft = this.getAmountHaveLeft();
 
-				// recalc new LEFTS
-				// if amountWant id not Divisible
 				if ( !completedOrder
 						&&
 						// if can't trade by more good price than self - by orderOrice - then  auto cancel!
-						!isDivisibleWant && thisAmountHaveLeft.compareTo(orderPrice) < 0)
+						thisAmountHaveLeft.compareTo(thisIncrement) < 0)
 				{
 					// cancel order if it not fulfiled isDivisible
 					// or HAVE not enough to one WANT  = price
