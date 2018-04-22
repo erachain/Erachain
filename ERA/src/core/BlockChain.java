@@ -101,6 +101,7 @@ public class BlockChain
 
 		public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1022 : 1033;
 		public static final int AMOUNT_DEDAULT_SCALE = 8;
+		public static final int TRADE_PRECISION = 6;
 		public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 123100;
 		public static final String[] TRUE_ADDRESSES = new String[] {
 				"7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"

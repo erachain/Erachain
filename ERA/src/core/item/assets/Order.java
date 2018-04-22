@@ -11,6 +11,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
@@ -21,6 +22,8 @@ public class Order implements Comparable<Order>
 {
 
 	private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
+
+	final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
 
 	private static final int ID_LENGTH = Crypto.SIGNATURE_LENGTH;
 	private static final int CREATOR_LENGTH = 25;
@@ -192,14 +195,10 @@ public class Order implements Comparable<Order>
 
 	public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant)
 	{
-		//int precH = amountHave.precision();
-		//int scaleH = amountHave.scale();
-		//int scaleW = amountWant.scale();
-		BigDecimal result = amountWant.divide(amountHave,
-				amountWant.scale()
-				+ amountHave.precision() - amountHave.scale()
-				+ 3,
-				RoundingMode.HALF_DOWN).stripTrailingZeros();
+		int scale = amountHave.precision() - amountHave.scale() + amountWant.scale();
+		if (scale < 10)
+			scale = 10;
+		BigDecimal result = amountWant.divide(amountHave, scale, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
 		// IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
 		if (result.scale() < 1)
@@ -432,7 +431,7 @@ public class Order implements Comparable<Order>
 		boolean completedOrder = false;
 		int i = -1;
 		BigDecimal thisPrice = this.getPrice();
-		//BigDecimal thisReversePrice = this.getPriceCalcReverse();
+		BigDecimal tempPrice;
 		//boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
 		List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
@@ -453,10 +452,13 @@ public class Order implements Comparable<Order>
 			BigDecimal orderAmountWantLeft;
 			BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
 			BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
+			BigDecimal orderPriceTemp;
 
 			Trade trade;
 			BigDecimal tradeAmount;
 			BigDecimal tradeAmountGet;
+			BigDecimal tradeAmountAccurate;
+			BigDecimal differenceTrade;
 
 			///////////////
 			//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
@@ -483,10 +485,38 @@ public class Order implements Comparable<Order>
 				else
 				{
 
-					tradeAmount = tradeAmountGet.multiply(orderReversePrice).setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
+					// RESOLVE amount with SCALE
+					tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(tradeAmountGet.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+					tradeAmount = tradeAmountAccurate.setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
+					if (tradeAmount.precision() < BlockChain.TRADE_PRECISION) {
+						differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
+						differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
+						if (differenceTrade.compareTo(precisionUnit) > 0) {
 
-					//// recalc
-					///tradeAmountGet = tradeAmount.divide(orderReversePrice, tradeAmount.scale(), RoundingMode.HALF_DOWN);
+							// USE price of THIS
+							tradeAmountAccurate = tradeAmountGet.multiply(thisPrice).setScale(tradeAmountGet.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+							tradeAmount = tradeAmountAccurate.setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
+							if (tradeAmount.precision() < BlockChain.TRADE_PRECISION) {
+								differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
+								differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
+								if (differenceTrade.compareTo(precisionUnit) > 0) {
+									continue;
+								} else {
+									// PRICE for ORDER is SAME + ACCURACY
+									orderPriceTemp = tradeAmountGet.divide(tradeAmount, 8, RoundingMode.HALF_DOWN);
+									differenceTrade = orderPriceTemp.divide(orderPrice, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
+									differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
+									// calculated price is OVER order price ?
+									if (orderPriceTemp.compareTo(orderPrice) < 0
+											&& differenceTrade.compareTo(precisionUnit) > 0
+											) {
+										continue;
+									}
+								}
+							}
+						} else {
+						}
+					}
 				}
 
 				//THIS is COMPLETED
@@ -494,12 +524,9 @@ public class Order implements Comparable<Order>
 
 			} else {
 
-				if ( !isDivisibleWant && thisAmountHaveLeft.compareTo(orderPrice) < 0)
-					// if left not enough for 1 buy by price this order
-					break;
-
 				tradeAmount = orderAmountHaveLeft;
 				tradeAmountGet = orderAmountWantLeft;
+
 			}
 
 			//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
