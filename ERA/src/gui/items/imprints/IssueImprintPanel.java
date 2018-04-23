@@ -169,7 +169,7 @@ public class IssueImprintPanel extends JPanel
 
         //LABEL DATE
       	labelGBC.gridy = gridy;
-      	JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + "(YY-MM-DD HH:MM");
+      	JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + "(YY-MM-DD HH:MM):");
       	this.add(dateLabel, labelGBC);
       		
       	//TXT DEBITOR
