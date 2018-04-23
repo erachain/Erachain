@@ -1256,17 +1256,17 @@ public class API {
 					Transaction.ITEM_ASSET_NOT_EXIST);
 		}
 
-		SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> ordersA = this.dcSet.getOrderMap().getOrdersSortableList(have, want, true);
+		SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersA = this.dcSet.getOrderMap().getOrdersSortableList(have, want, true);
 
 		JSONArray arrayA = new JSONArray();
 
 		if (!ordersA.isEmpty()) {
-			for(Pair<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-					Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> pair: ordersA)
+			for(Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> pair: ordersA)
 			{
-				Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> order = pair.getB();
+				Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = pair.getB();
 				JSONArray itemJson = new JSONArray();
 				itemJson.add(order.b.b.subtract(order.b.c)); // getAmountHaveLeft());
 				itemJson.add(Order.calcPrice(order.b.b, order.c.b));
@@ -1275,17 +1275,17 @@ public class API {
 			}
 		}
 
-		SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> ordersB = this.dcSet.getOrderMap().getOrdersSortableList(want, have, true);
+		SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersB = this.dcSet.getOrderMap().getOrdersSortableList(want, have, true);
 
 		JSONArray arrayB = new JSONArray();
 
 		if (!ordersA.isEmpty()) {
-			for(Pair<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-					Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> pair: ordersB)
+			for(Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> pair: ordersB)
 			{
-				Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> order = pair.getB();
+				Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = pair.getB();
 				JSONArray itemJson = new JSONArray();
 				itemJson.add(order.b.b.subtract(order.b.c)); // getAmountHaveLeft());
 				itemJson.add(Order.calcPrice(order.b.b, order.c.b));

@@ -3,9 +3,17 @@ package gui.items.assets;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import core.item.assets.Order;
 import lang.Lang;
 import utils.MenuPopupUtil;
@@ -16,10 +24,13 @@ public class Order_Info_Panel extends JPanel {
 	public GridBagConstraints labelGBC = new GridBagConstraints();
 	public GridBagConstraints detailGBC = new GridBagConstraints();
 
-	public Order_Info_Panel(Order order) {
+	public Order_Info_Panel(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderREC) {
 
 		// LAYOUT
 		this.setLayout(new GridBagLayout());
+
+		Order order = Order.fromDBrec(orderREC);
 
 		// LABEL GBC
 		labelGBC = new GridBagConstraints();
@@ -61,8 +72,8 @@ public class Order_Info_Panel extends JPanel {
 
 		// PRICE
 		++detailGBC.gridy;
-		JTextField price = new JTextField(
-				order.getPrice().toPlainString() + " / " + order.getPriceCalcReverse().toPlainString());
+		JTextField price = new JTextField(order.getPrice().toPlainString());
+		//+ " / " + order.getPriceCalcReverse().toPlainString());
 		price.setEditable(false);
 		MenuPopupUtil.installContextMenu(price);
 		this.add(price, detailGBC);

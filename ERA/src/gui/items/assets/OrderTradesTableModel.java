@@ -11,7 +11,6 @@ import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.item.assets.Order;
-import core.item.assets.Trade;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
@@ -30,14 +29,16 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 	public static final int COLUMN_AMOUNT_WANT = 4;
 
 	private SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades;
-	private Order order;
+	private Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
 
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
 
-	public OrderTradesTableModel(Order order)
+	public OrderTradesTableModel(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order)
 	{
 		this.order = order;
-		this.trades = DCSet.getInstance().getTradeMap().getTrades(order);
+		this.trades = DCSet.getInstance().getTradeMap().getTrades(order.a.a);
 		this.trades.registerObserver();
 	}
 
@@ -89,8 +90,8 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 		if(trade != null) {
 			DCSet db = DCSet.getInstance();
 
-			initatorOrder = Trade.getOrder(db, trade.a);
-			targetOrder = Trade.getOrder(db, trade.b);
+			initatorOrder = Order.getOrder(db, trade.a);
+			targetOrder = Order.getOrder(db, trade.b);
 		}
 
 		switch(column)
@@ -101,7 +102,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 
 		case COLUMN_TYPE:
 
-			return initatorOrder.b.a == this.order.getHave() ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
+			return initatorOrder.b.a == this.order.b.a ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
 
 		case COLUMN_AMOUNT:
 

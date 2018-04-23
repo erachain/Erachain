@@ -11,7 +11,6 @@ import org.mapdb.Fun.Tuple5;
 
 import core.crypto.Crypto;
 import datachain.DCSet;
-import datachain.OrderMap;
 
 public class Trade {
 
@@ -44,7 +43,7 @@ public class Trade {
 	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getInitiatorOrder(DCSet db)
 	{
-		return getOrder(db, this.initiator);
+		return Order.getOrder(db, this.initiator);
 	}
 
 	public BigInteger getTarget()
@@ -55,26 +54,7 @@ public class Trade {
 	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getTargetOrder(DCSet db)
 	{
-		return getOrder(db, this.target);
-	}
-
-	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, BigInteger key)
-	{
-		if(db.getOrderMap().contains(key))
-		{
-			return db.getOrderMap().get(key);
-		}
-
-		if(db.getCompletedOrderMap().contains(key))
-		{
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
-			return OrderMap.setExecutable(order, false);
-		}
-
-		return null;
-
+		return Order.getOrder(db, this.target);
 	}
 
 	public BigDecimal getAmountHave()

@@ -7,13 +7,12 @@ import java.util.Observer;
 
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.BlockChain;
 import core.item.assets.AssetCls;
-import core.item.assets.Trade;
+import core.item.assets.Order;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
@@ -49,7 +48,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		{
 
 			Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade = tradePair.getB();
-			String type = Trade.getOrder(DCSet.getInstance(), trade.a).b.a == this.have.getKey() ? "Sell" : "Buy";
+			String type = Order.getOrder(DCSet.getInstance(), trade.a).b.a == this.have.getKey() ? "Sell" : "Buy";
 
 			if(type.equals("Buy"))
 			{
@@ -83,14 +82,14 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 	}
 
 	@Override
-	public SortableList<Tuple2<BigInteger, BigInteger>, Trade> getSortableList()
+	public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getSortableList()
 	{
 		return this.trades;
 	}
 
-	public Trade getTrade(int row)
+	public Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> getTrade(int row)
 	{
-		Pair<Tuple2<BigInteger, BigInteger>, Trade> rec = this.trades.get(row);
+		Pair<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> rec = this.trades.get(row);
 		if (rec == null)
 			return null;
 
@@ -123,12 +122,12 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			return null;
 		}
 
-		Trade trade = null;
+		Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade = null;
 		int type = 0;
-		Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> initatorOrder = null;
-		Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> targetOrder = null;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initatorOrder = null;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> targetOrder = null;
 
 		if(row < this.trades.size())
 		{
@@ -136,8 +135,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			if(trade != null) {
 				DCSet db = DCSet.getInstance();
 
-				initatorOrder = trade.getInitiatorOrder(db);
-				targetOrder = trade.getTargetOrder(db);
+				initatorOrder = Order.getOrder(db, trade.a);
+				targetOrder = Order.getOrder(db, trade.b);
 
 				type = initatorOrder.b.a
 						== this.have.getKey()?
@@ -153,7 +152,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 			if(row == this.trades.size())
 				return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
 
-			return DateTimeFormat.timestamptoString(trade.getTimestamp());
+			return DateTimeFormat.timestamptoString(trade.e);
 
 		case COLUMN_TYPE:
 
@@ -166,9 +165,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
 			String result = "";
 			if(type > 0)
-				result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+				result = NumberAsString.getInstance().numberAsString(trade.c);
 			else
-				result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+				result = NumberAsString.getInstance().numberAsString(trade.d);
 
 			if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";
@@ -183,9 +182,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				return null;
 
 			if(type > 0)
-				return NumberAsString.getInstance().numberAsString12(trade.getPrice());
+				return NumberAsString.getInstance().numberAsString12(Order.calcPrice(trade.c, trade.d));
 			else
-				return NumberAsString.getInstance().numberAsString12(trade.getPriceCalcBack());
+				return NumberAsString.getInstance().numberAsString12(Order.calcPrice(trade.d, trade.c));
 
 		case COLUMN_ASSET_2:
 
@@ -193,9 +192,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
 
 			if(type > 0)
-				result = NumberAsString.getInstance().numberAsString(trade.getAmountWant());
+				result = NumberAsString.getInstance().numberAsString(trade.d);
 			else
-				result = NumberAsString.getInstance().numberAsString(trade.getAmountHave());
+				result = NumberAsString.getInstance().numberAsString(trade.c);
 
 			if (Controller.getInstance().isAddressIsMine(targetOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";
@@ -242,7 +241,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 	@Override
 	public Object getItem(int k) {
 		// TODO Auto-generated method stub
-		Pair<Tuple2<BigInteger, BigInteger>, Trade> rec = this.trades.get(k);
+		Pair<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> rec = this.trades.get(k);
 		if (rec == null)
 			return null;
 

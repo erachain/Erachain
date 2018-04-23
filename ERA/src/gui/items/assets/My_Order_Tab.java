@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -19,7 +21,10 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 
-import core.item.assets.Order;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.WalletItemAssetsTableModel;
@@ -295,7 +300,8 @@ public class My_Order_Tab extends Split_Panel {
 	class search_listener implements ListSelectionListener  {
 		@Override
 		public void valueChanged(ListSelectionEvent arg0) {
-			Order order = null;
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
 			if (table.getSelectedRow() >= 0 ) order = ordersModel.getOrder(table.convertRowIndexToModel(table.getSelectedRow()));
 			if (order == null) return;
 			jScrollPane_jPanel_RightPanel.setViewportView(new Order_Info_Panel(order));

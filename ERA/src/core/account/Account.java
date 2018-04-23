@@ -23,7 +23,6 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
-import core.item.assets.Order;
 import core.item.persons.PersonCls;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
@@ -987,13 +986,14 @@ public class Account {
 
 		OrderMap map = dcSet.getOrderMap();
 		Iterator<BigInteger> iterator = map.getIterator(0, true);
-		Order order;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
 		while (iterator.hasNext()) {
 			order =  map.get(iterator.next());
-			if(order.getHave() == key)
+			if(order.b.a == key)
 			{
-				String address = order.getCreator().address;
-				values.put(address, values.get(address).add(order.getAmountHave()));
+				String address = order.a.b;
+				values.put(address, values.get(address).add(order.b.b));
 			}
 		}
 

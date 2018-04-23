@@ -1,6 +1,7 @@
 package core;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 //import java.math.BigInteger;
 import java.util.ArrayList;
@@ -331,7 +332,7 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS
 		return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, false));
 	}
-	
+
 	public Transaction createIssueImprintTransaction1(PrivateKeyAccount creator, String name, String description,
 			byte[] icon, byte[] image,
 			int feePow)
@@ -352,7 +353,7 @@ public class TransactionCreator
 		//VALIDATE AND PROCESS
 		return issueImprintRecord;
 	}
-	
+
 
 	public Transaction createIssueTemplateTransaction(PrivateKeyAccount creator, String name, String description,
 			byte[] icon, byte[] image,
@@ -541,6 +542,11 @@ public class TransactionCreator
 
 	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow)
 	{
+		return createCancelOrderTransaction(creator, order.getId(), feePow);
+	}
+
+	public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, BigInteger orderID, int feePow)
+	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
 
@@ -548,7 +554,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 
 		//CREATE PRDER TRANSACTION
-		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, order.getId(), (byte)feePow, time, 0l);
+		CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte)feePow, time, 0l);
 		cancelOrderTransaction.sign(creator, false);
 		cancelOrderTransaction.setDC(this.fork, false);
 

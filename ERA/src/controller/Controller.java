@@ -43,7 +43,6 @@ import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Longs;
@@ -2509,8 +2508,8 @@ public class Controller extends Observable {
 	}
 	 */
 
-	public SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getOrders(AssetCls have, AssetCls want, boolean filter) {
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(AssetCls have, AssetCls want, boolean filter) {
 		return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
 	}
 
@@ -2792,9 +2791,13 @@ public class Controller extends Observable {
 	}
 
 	public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
+		return cancelOrder(creator, order.getId(), feePow);
+	}
+
+	public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
-			return this.transactionCreator.createCancelOrderTransaction(creator, order, feePow);
+			return this.transactionCreator.createCancelOrderTransaction(creator, orderID, feePow);
 		}
 	}
 

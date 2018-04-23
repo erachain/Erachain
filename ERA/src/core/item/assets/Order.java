@@ -17,6 +17,7 @@ import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import datachain.OrderMap;
 
 public class Order implements Comparable<Order>
 {
@@ -89,6 +90,25 @@ public class Order implements Comparable<Order>
 
 	public void setDC(DCSet dcSet) {
 		this.dcSet = dcSet;
+	}
+
+	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, BigInteger key)
+	{
+		if(db.getOrderMap().contains(key))
+		{
+			return db.getOrderMap().get(key);
+		}
+
+		if(db.getCompletedOrderMap().contains(key))
+		{
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
+			return OrderMap.setExecutable(order, false);
+		}
+
+		return null;
+
 	}
 
 	public BigInteger getId()
@@ -206,6 +226,12 @@ public class Order implements Comparable<Order>
 		return result;
 	}
 
+	public static BigDecimal calcAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order)
+	{
+		return 	order.b.c.multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
+	}
+
 	public String viewPrice()
 	{
 		return getPrice().toPlainString();
@@ -235,6 +261,14 @@ public class Order implements Comparable<Order>
 	{
 		return dc.getOrderMap().contains(this.id)
 				|| dc.getCompletedOrderMap().contains(this.id);
+	}
+
+	public static boolean isGoodIncrement(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order,
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target)
+	{
+		return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
 	}
 
 	//PARSE/CONVERT

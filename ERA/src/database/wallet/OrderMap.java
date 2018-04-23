@@ -12,7 +12,7 @@ import org.mapdb.DBMaker;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import core.account.Account;
 import core.item.assets.Order;
@@ -40,8 +40,8 @@ Tuple3
 
  */
 public class OrderMap extends DCMap<Tuple2<String, BigInteger>,
-Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>
+Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -65,16 +65,16 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Tuple2<String, BigInteger>, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getMap(DB database)
+	protected Map<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMap(DB database)
 	{
 		//OPEN MAP
 		return this.openMap(database);
 	}
 
 	@Override
-	protected Map<Tuple2<String, BigInteger>, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getMemoryMap()
+	protected Map<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMemoryMap()
 	{
 		DB database = DBMaker.newMemoryDB().make();
 
@@ -82,12 +82,12 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>
 		return this.openMap(database);
 	}
 
-	private Map<Tuple2<String, BigInteger>, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> openMap(DB database)
+	private Map<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> openMap(DB database)
 	{
 		//OPEN MAP
-		BTreeMap<Tuple2<String, BigInteger>, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> map = database.createTreeMap("orders")
+		BTreeMap<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> map = database.createTreeMap("orders")
 		//.keySerializer(BTreeKeySerializer.TUPLE2)
 		//.valueSerializer(new OrderSerializer())
 		.makeOrGet();
@@ -97,8 +97,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>
 	}
 
 	@Override
-	protected Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> getDefaultValue()
+	protected Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getDefaultValue()
 	{
 		return null;
 	}
@@ -112,20 +112,26 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>>
 	public void add(Order order) {
 
 		this.set(new Tuple2<String, BigInteger>(order.getCreator().getAddress(), order.getId()),
-				new Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>(
-						new Tuple4<BigInteger, String, Long, Boolean>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable()),
+				new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
+						new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
 						new Tuple3<Long, BigDecimal, BigDecimal>(order.getHave(), order.getAmountHave(), order.getFulfilledHave()),
-						new Tuple3<Long, BigDecimal, BigDecimal>(order.getWant(), order.getAmountWant(), order.getFulfilledWant())
+						new Tuple2<Long, BigDecimal>(order.getWant(), order.getAmountWant())
 						));
+	}
+
+	public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+
+		this.set(new Tuple2<String, BigInteger>(order.a.b, order.a.a), order);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void delete(Account account)
 	{
 		//GET ALL ORDERS THAT BELONG TO THAT ADDRESS
-		Map<Tuple2<String, BigInteger>, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> accountOrders = ((BTreeMap) this.map).subMap(
+		Map<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> accountOrders = ((BTreeMap) this.map).subMap(
 				Fun.t2(account.getAddress(), null),
 				Fun.t2(account.getAddress(), Fun.HI()));
 

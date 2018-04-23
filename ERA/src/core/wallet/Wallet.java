@@ -14,7 +14,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -30,7 +30,6 @@ import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.assets.Order;
-import core.item.assets.Trade;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.transaction.BuyNameTransaction;
@@ -1773,7 +1772,7 @@ public class Wallet extends Observable implements Observer
 		{
 			//ADD ORDER
 			// reload order
-			Order orderReloaded = Trade.getOrder(DCSet.getInstance(), order.getId());
+			Order orderReloaded = Order.fromDBrec(Order.getOrder(DCSet.getInstance(), order.getId()));
 			this.database.getOrderMap().add(orderReloaded == null?
 					order:
 						orderReloaded);
@@ -1824,9 +1823,9 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(orderCancel.getCreator().getAddress()))
 		{
 			//DELETE ORDER
-			Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrder());
-			this.database.getOrderMap().add(Order.fromDBrec(order));
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrder());
+			this.database.getOrderMap().add(order);
 		}
 	}
 

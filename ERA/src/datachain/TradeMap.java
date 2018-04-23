@@ -106,7 +106,7 @@ Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>
 				public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value)
 				{
 					Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Trade.getOrder(getDCSet(), value.a);
+					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
 					long have = order.b.a;
 					long want = order.c.a;
 					String pairKey;
@@ -135,7 +135,7 @@ Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>
 				public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value)
 				{
 					Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Trade.getOrder(getDCSet(), value.a);
+					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
 					long want = order.c.a;
 
 					String wantKey;
@@ -157,7 +157,7 @@ Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>
 				public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value)
 				{
 					Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Trade.getOrder(getDCSet(), value.a);
+					Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
 					long have = order.b.a;
 
 					String haveKey;
@@ -266,12 +266,12 @@ Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>
 	}
 
 	@SuppressWarnings( "unchecked" )
-	public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(Order order)
+	public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(BigInteger orderID)
 	{
 		//ADD REVERSE KEYS
 		Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple2, Tuple2<BigInteger, BigInteger>>) this.reverseKeyMap).subMap(
-				Fun.t2(order.getId(), null),
-				Fun.t2(order.getId(), Fun.HI())).values();
+				Fun.t2(orderID, null),
+				Fun.t2(orderID, Fun.HI())).values();
 
 		//RETURN
 		return new SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>(this, keys);

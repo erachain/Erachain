@@ -5,8 +5,9 @@ import java.math.BigInteger;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.BlockChain;
@@ -20,15 +21,15 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class SellOrdersTableModel extends TableModelCls<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> implements Observer
+public class SellOrdersTableModel extends TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Observer
 {
 	public static final int COLUMN_PRICE = 0;
 	public static final int COLUMN_AMOUNT = 1;
 	public static final int COLUMN_TOTAL = 2;
 
-	public SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> orders;
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Price", "Amount", "Buying Amount"});
 
@@ -58,8 +59,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> imp
 	{
 		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		sumTotal = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		for (Pair<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> orderPair : this.orders)
+		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders)
 		{
 
 			Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
@@ -70,14 +71,14 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> imp
 	}
 
 	@Override
-	public SortableList<BigInteger, Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> getSortableList()
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList()
 	{
 		return this.orders;
 	}
 
-	public Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> getOrder(int row)
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(int row)
 	{
 		return this.orders.get(row).getB();
 	}
@@ -108,8 +109,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> imp
 			return null;
 		}
 
-		Tuple3<Tuple4<BigInteger, String, Long, Boolean>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> order = null;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
 		boolean isMine = false;
 		if(row < this.orders.size())
 		{
@@ -127,7 +128,7 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> imp
 			if(row == this.orders.size())
 				return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
 
-			return NumberAsString.getInstance().numberAsString12(Order.getPriceCalcReverse2(order.b.b, order.c.b));
+			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
 
 		case COLUMN_AMOUNT:
 
@@ -155,7 +156,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>>> imp
 			if(row == this.orders.size())
 				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
 
-			amountStr = NumberAsString.getInstance().numberAsString(order.c.b.subtract(order.c.c)); // getAmountWantLeft());
+			//amountStr = NumberAsString.getInstance().numberAsString(order.c.b.subtract(order.c.c)); // getAmountWantLeft());
+			amountStr = NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order)); // getAmountWantLeft());
 
 			if (isMine)
 				amountStr = "<b>" + amountStr + "</b>";
