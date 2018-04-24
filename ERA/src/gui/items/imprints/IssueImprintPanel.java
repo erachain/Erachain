@@ -243,7 +243,7 @@ public class IssueImprintPanel extends JPanel
         //BUTTON Register
         buttonGBC.gridy = gridy;
         this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
+        this.issueButton.setPreferredSize(new Dimension(130, 25));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)
