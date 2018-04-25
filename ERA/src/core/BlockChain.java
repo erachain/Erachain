@@ -527,9 +527,11 @@ public class BlockChain
 					return 3;
 				}
 
-				Block lastBlock = dcSet.getBlockMap().last();
-				if(Arrays.equals(lastBlock.getReference(), block.getReference())) {
+				int height01 = dcSet.getBlockHeightsMap().size() - 1;
+				lastSignature = dcSet.getBlockHeightsMap().get(height01);
+				if(Arrays.equals(lastSignature, block.getReference())) {
 					// CONCURENT for LAST BLOCK
+					Block lastBlock = dcSet.getBlockMap().last();
 					if (block.calcWinValue(dcSet) > lastBlock.calcWinValue(dcSet)) {
 						LOGGER.debug("isNewBlockValid -> reference to PARENT last block >>> TRY WIN");
 						return 4;

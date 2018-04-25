@@ -1396,8 +1396,7 @@ public class Controller extends Observable {
 				}
 
 				int isNewWinBlockValid = this.blockChain.isNewBlockValid(dcSet, newBlock, message.getSender());
-				if (isNewWinBlockValid != 0) { // TODO not solve 4 5
-					/// NOT BAN - WATCH it
+				if (isNewWinBlockValid < 0) {
 					if (isNewWinBlockValid < -10) {
 						info = "newBlock (" + newBlock.toString(dcSet) + ") is Invalid";
 						banPeerOnError(message.getSender(), info);
@@ -1406,25 +1405,25 @@ public class Controller extends Observable {
 						// reference to PARENT last block >>> weak...
 						// already - BROADCASTED to him
 						return;
-					} else if (isNewWinBlockValid < 0) {
+					} else {
+						/// NOT BAN - WATCH it
 						if (this.network.getActivePeersCounter(false) > Settings.getInstance().getMaxConnections() - 3) {
 							this.network.tryDisconnect(message.getSender(), 0, "");
 						}
 						return;
-					} else if (isNewWinBlockValid == 3 || isNewWinBlockValid == 41) {
+					}
+				}
+
+				if (isNewWinBlockValid == 3) {
+					return;
+				} else if (isNewWinBlockValid == 0) {
+					// CHECK IF VALID
+					if (!newBlock.isValid(dcSet, false)) {
+						info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
+						banPeerOnError(message.getSender(), info);
 						return;
 					}
-					return;
-				}
 
-				if (!newBlock.isValid(dcSet, false)) {
-					info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
-					banPeerOnError(message.getSender(), info);
-					return;
-				}
-
-				// CHECK IF VALID
-				if (isNewWinBlockValid == 0) {
 					if (blockChain.setWaitWinBuffer(dcSet, newBlock)) {
 						// IF IT WIN
 						/*
@@ -1437,7 +1436,6 @@ public class Controller extends Observable {
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
 						this.network.asyncBroadcast(message, excludes, false);
-						return;
 					} else {
 						// SEND IF my WIN BLOCK as RESPONCE
 						if (blockChain.compareNewWin(dcSet, newBlock) < 0) {
@@ -1445,8 +1443,10 @@ public class Controller extends Observable {
 									.createWinBlockMessage(blockChain.getWaitWinBuffer());
 							message.getSender().sendMessage(messageBestWin);
 						}
-						return;
 					}
+					return;
+
+
 				} else if (isNewWinBlockValid == 4) {
 					// NEW BLOCK is CONURENT for last BLOCK - try WIN it
 					// STOP FORGING
@@ -1457,6 +1457,12 @@ public class Controller extends Observable {
 						Block lastBlock = this.getLastBlock();
 						this.blockChain.clearWaitWinBuffer();
 						this.synchronizer.pipeProcessOrOrphan(this.dcSet, lastBlock, true, false);
+						if (!newBlock.isValid(dcSet, false)) {
+							info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
+							banPeerOnError(message.getSender(), info);
+							this.blockGenerator.setForgingStatus(tempStatus);
+							return;
+						}
 						this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, false);
 						List<Peer> excludes = new ArrayList<Peer>();
 						excludes.add(message.getSender());
@@ -1478,6 +1484,12 @@ public class Controller extends Observable {
 					this.blockGenerator.setForgingStatus(ForgingStatus.FORGING_WAIT);
 					try {
 						if (this.flushNewBlockGenerated()) {
+							if (!newBlock.isValid(dcSet, false)) {
+								info = "Block (" + newBlock.toString(dcSet) + ") is Invalid";
+								banPeerOnError(message.getSender(), info);
+								this.blockGenerator.setForgingStatus(tempStatus);
+								return;
+							}
 							this.blockChain.setWaitWinBuffer(dcSet, newBlock);
 							List<Peer> excludes = new ArrayList<Peer>();
 							excludes.add(message.getSender());
