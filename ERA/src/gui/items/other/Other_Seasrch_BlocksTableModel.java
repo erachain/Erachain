@@ -2,21 +2,19 @@ package gui.items.other;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
-import utils.DateTimeFormat;
-import utils.NumberAsString;
-import utils.ObserverMessage;
+
 import controller.Controller;
 import core.BlockChain;
 import core.block.Block;
 import datachain.DCSet;
 import lang.Lang;
+import utils.DateTimeFormat;
+import utils.NumberAsString;
 
 @SuppressWarnings("serial")
 public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
@@ -31,7 +29,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 	private List<Block> blocks;
 	private String[] columnNames = Lang.getInstance()
 			.translate(new String[] { "Height", "Timestamp", "Generator", "GB pH VW tVW", // "Generating
-																							// Balance",
+					// Balance",
 					"Transactions", "Fee" });
 	private Boolean[] column_AutuHeight = new Boolean[] { false, true, true, false, true, false };
 
@@ -39,14 +37,15 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
 	public Other_Seasrch_BlocksTableModel() {
 		//
-	//	searchBlock(1,1);
-	}
-	
-	public Block getBlock(Integer row){
-		return blocks.get(row);
-		
+		//	searchBlock(1,1);
 	}
 
+	public Block getBlock(Integer row){
+		return blocks.get(row);
+
+	}
+
+	@Override
 	public Class<? extends Object> getColumnClass(int c) { // set column type
 		Object o = getValueAt(0, c);
 		return o == null ? Null.class : o.getClass();
@@ -138,11 +137,11 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				}
 
 				return DateTimeFormat.timestamptoString(block.getTimestamp(dcSet));// +
-																					// "
-																					// "
-																					// +
-																					// block.getTimestamp(DBSet.getInstance())/
-																					// 1000;
+				// "
+				// "
+				// +
+				// block.getTimestamp(DBSet.getInstance())/
+				// 1000;
 
 			case COLUMN_GENERATOR:
 
@@ -162,8 +161,8 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				}
 
 				return block.getGeneratingBalance(dcSet) + " "
-						+ Block.getPreviousForgingHeightForCalcWin(dcSet, block.getCreator(), block.getHeight(dcSet))
-						+ " " + block.calcWinValue(dcSet) + " " + block.calcWinValueTargeted(dcSet);
+				+ BlockChain.getPreviousForgingHeightForCalcWin(dcSet, block.getCreator(), block.getHeight(dcSet))
+				+ " " + block.calcWinValue(dcSet) + " " + block.calcWinValueTargeted(dcSet);
 
 			case COLUMN_TRANSACTIONS:
 				if (block == null) {
@@ -193,7 +192,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 		}
 	}
 
-	
+
 	public void searchBlock(Integer start, Integer end){
 		clear();
 		if (start <= end) {
@@ -204,7 +203,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				}
 			}
 		}
-		
+
 	}
 
 }

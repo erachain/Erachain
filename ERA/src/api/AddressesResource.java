@@ -23,10 +23,10 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
-import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -329,7 +329,7 @@ public class AddressesResource {
 
 		}
 
-		return "" + Block.calcGeneratingBalance(DCSet.getInstance(),
+		return "" + BlockChain.calcGeneratingBalance(DCSet.getInstance(),
 				new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) );
 	}
 

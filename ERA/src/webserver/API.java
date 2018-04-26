@@ -40,6 +40,7 @@ import org.mapdb.Fun.Tuple5;
 
 import api.ApiErrorFactory;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -936,7 +937,7 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity("" + Block.calcGeneratingBalance(DCSet.getInstance(),
+				.entity("" + BlockChain.calcGeneratingBalance(DCSet.getInstance(),
 						new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) ))
 				.build();
 	}

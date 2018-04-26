@@ -366,7 +366,7 @@ public class BlockGenerator extends Thread implements Observer
 									{
 
 										//winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
-										winned_value = account.calcWinValue(dcSet, height, target);
+										winned_value = BlockChain.calcWinValue(dcSet, account, height, target);
 										if(winned_value < 1l)
 											continue;
 
@@ -537,6 +537,9 @@ public class BlockGenerator extends Thread implements Observer
 										LOGGER.error("NEW BLOCK not FLUSHED");
 									}
 
+									if (forgingStatus == ForgingStatus.FORGING_WAIT)
+										setForgingStatus(ForgingStatus.FORGING);
+
 									if (ctrl.isOnStopping()) {
 										status = -1;
 										return;
@@ -655,6 +658,9 @@ public class BlockGenerator extends Thread implements Observer
 								status = -1;
 								return;
 							}
+
+							setForgingStatus(ForgingStatus.FORGING_WAIT);
+
 						}
 
 					} catch (Exception e) {

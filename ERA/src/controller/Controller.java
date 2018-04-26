@@ -1424,6 +1424,8 @@ public class Controller extends Observable {
 						return;
 					}
 
+					newBlock.calcWinValue(dcSet);
+
 					if (blockChain.setWaitWinBuffer(dcSet, newBlock)) {
 						// IF IT WIN
 						/*
@@ -1447,7 +1449,8 @@ public class Controller extends Observable {
 					return;
 
 
-				} else if (isNewWinBlockValid == 4) {
+				} else if (false // при больших нагрузках увеличивает развал сети
+						&& isNewWinBlockValid == 4) {
 					// NEW BLOCK is CONURENT for last BLOCK - try WIN it
 					// STOP FORGING
 					LOGGER.debug("   ++ block CONCURENT to LAST BLOCK in CHAIN ++");
@@ -1477,7 +1480,8 @@ public class Controller extends Observable {
 					// FORGING RESTORE
 					this.blockGenerator.setForgingStatus(tempStatus);
 					return;
-				} else if (isNewWinBlockValid == 5) {
+				} else if (false // при больших нагрузках увеличивает развал сети
+						&& isNewWinBlockValid == 5) {
 					// STOP FORGING
 					LOGGER.debug("   ++ block to FUTURE ++");
 					ForgingStatus tempStatus = this.blockGenerator.getForgingStatus();

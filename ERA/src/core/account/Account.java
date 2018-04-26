@@ -923,39 +923,6 @@ public class Account {
 	}
 	 */
 
-	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public long calcWinValue(DCSet dcSet, int height, long target) {
-
-		int generatingBalance = Block.calcGeneratingBalance(dcSet, this, height);
-
-		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
-			return 0l;
-
-		// TEST STRONG of win Value
-		int previousForgingHeight = Block.getPreviousForgingHeightForCalcWin(dcSet, this, height);
-		if (previousForgingHeight < 1)
-			return 0l;
-
-		// test repeated win account
-		if (!Controller.getInstance().isTestNet()) {
-			int repeated = Block.isSoRapidly(dcSet, height, this, previousForgingHeight);
-			if (repeated > 0) {
-				return -repeated;
-			}
-		}
-
-		long winned_value = Block.calcWinValue(previousForgingHeight, height, generatingBalance);
-
-		int base = BlockChain.getMinTarget(height);
-		int targetedWinValue = Block.calcWinValueTargeted2(winned_value, target);
-		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
-			return -targetedWinValue;
-		}
-
-		return winned_value;
-
-	}
-
 	public static Map<String, BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
 		ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
 		Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
