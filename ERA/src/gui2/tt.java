@@ -1,22 +1,15 @@
 package gui2;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.UIManager;
+import core.BlockChain;
+import lang.Lang;
+
+import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import core.BlockChain;
-import javassist.bytecode.analysis.ControlFlow.Block;
-import lang.Lang;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author DarkRaha
@@ -58,23 +51,25 @@ public tt() {
    
 
    // ���������� �� �������� �����
-   
-		if (BlockChain.DEVELOP_USE)
-			root.add(bank_Tree);
-		root.add(account_Node);
-		root.add(person_Node);
-		root.add(document_Node);
-		root.add(mails_Node);
-		root.add(assets_Node);
-		root.add(templates_Node);
-		root.add(statuses_Node);
-		if (BlockChain.DEVELOP_USE)
-			root.add(unions_Node);
-		root.add(votings_Node);
-		root.add(hashes_Node);
-		root.add(linked_hashes_Node);
-		root.add(records_Node);
-		root.add(other_Node);
+
+    if (BlockChain.DEVELOP_USE)
+        root.add(bank_Tree);
+    root.add(account_Node);
+    root.add(person_Node);
+    root.add(document_Node);
+    root.add(mails_Node);
+    root.add(assets_Node);
+    root.add(templates_Node);
+    root.add(statuses_Node);
+    if (BlockChain.DEVELOP_USE)
+        root.add(unions_Node);
+    root.add(votings_Node);
+    if (BlockChain.DEVELOP_USE)
+        root.add(hashes_Node);
+   if (BlockChain.DEVELOP_USE)
+    root.add(linked_hashes_Node);
+    root.add(records_Node);
+    root.add(other_Node);
 
   
    bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Payment Order")));
