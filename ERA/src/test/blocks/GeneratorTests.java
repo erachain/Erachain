@@ -35,6 +35,8 @@ public class GeneratorTests {
 	long timestamp = NTP.getTime();
 	Controller cntrlr = Controller.getInstance();
 
+	PrivateKeyAccount generator1;
+
 	List<Transaction> transactions =  new ArrayList<Transaction>();
 	byte[] transactionsHash =  new byte[Crypto.HASH_LENGTH];
 
@@ -776,11 +778,11 @@ public class GeneratorTests {
 
 		int height = newBlock.getHeight(dcSet);
 		//CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
-		Integer forgingData = userAccount1.getForgingData(dcSet, height);
-		assertEquals((int)forgingData, 2);
+		Tuple2<Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
+		assertEquals((int)forgingData.a, 2);
 
 		forgingData = recipient.getForgingData(dcSet, height);
-		assertEquals((int)forgingData, 2);
+		assertEquals((int)forgingData.a, 2);
 
 	}
 
@@ -791,7 +793,7 @@ public class GeneratorTests {
 		int target = 100000;
 		int generatingBalance = target;
 		int previousForgingHeight = 0;
-		long winned_value = 0l;
+		int winned_value = 0;
 		int base = 0;
 		int targetedWinValue = 0;
 		for (int height=2; height < 1000; height++) {
@@ -804,9 +806,9 @@ public class GeneratorTests {
 				previousForgingHeight = BlockChain.REPEAT_WIN + (BlockChain.BASE_TARGET>>1) + (height>>2);
 
 			previousForgingHeight = height;
-			winned_value = BlockChain.calcWinValue(previousForgingHeight, height, generatingBalance);
+			winned_value = BlockChain.calcWinValue(dcSet, generator1, height);
 			base = BlockChain.getMinTarget(height);
-			targetedWinValue = BlockChain.calcWinValueTargeted(winned_value, target);
+			targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, winned_value, height, target);
 
 			assertEquals(true, targetedWinValue > 0);
 

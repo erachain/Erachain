@@ -161,7 +161,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				}
 
 				return block.getGeneratingBalance(dcSet) + " "
-				+ BlockChain.getPreviousForgingHeightForCalcWin(dcSet, block.getCreator(), block.getHeight(dcSet))
+				+ block.getCreator().getForgingData(dcSet, block.getHeight(dcSet))
 				+ " " + block.calcWinValue(dcSet) + " " + block.calcWinValueTargeted(dcSet);
 
 			case COLUMN_TRANSACTIONS:

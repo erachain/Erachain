@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
@@ -233,11 +234,11 @@ public class BlockTests
 		assertEquals(0, recipient2.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0.0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
 
 		int height = genesisBlock.getHeight(db) + 1;
-		Integer forgingData = recipient1.getForgingData(db, height);
-		assertEquals(-1, (int)forgingData);
+		Tuple2<Integer, Integer> forgingData = recipient1.getForgingData(db, height);
+		assertEquals(-1, (int)forgingData.a);
 
 		forgingData = recipient2.getForgingData(db, height);
-		assertEquals(-1, (int)forgingData);
+		assertEquals(-1, (int)forgingData.a);
 
 		//ORPHAN BLOCK
 		try {
@@ -591,7 +592,7 @@ public class BlockTests
 		block.setTransactions(transactions);
 
 		////generator.setLastForgingData(db, block.getHeightByParent(db));
-		generator.setForgingData(db, block.getHeightByParent(db));
+		generator.setForgingData(db, block.getHeightByParent(db), payment2.getAmount().intValue());
 		block.setCalcGeneratingBalance(db);
 		block.sign(generator);
 

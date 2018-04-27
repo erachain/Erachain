@@ -1,15 +1,14 @@
 package datachain;
 
-import java.util.Arrays;
 // 30/03
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableSet;
 import java.util.TreeMap;
 
+//import com.sun.media.jfxmedia.logging.Logger;
+import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.Atomic.Var;
 import org.mapdb.BTreeKeySerializer;
@@ -17,27 +16,18 @@ import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple2Comparator;
-import org.mapdb.HTreeMap;
 
-import com.google.common.primitives.UnsignedBytes;
-//import com.sun.media.jfxmedia.logging.Logger;
-import org.apache.log4j.Logger;
-
-import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import database.serializer.BlockSerializer;
-import settings.Settings;
 import utils.Converter;
 import utils.ObserverMessage;
 
 public class BlockMap extends DCMap<Integer, Block> {
-	
+
 	public static final int HEIGHT_INDEX = 1; // for GUI
 
 	private static final Logger LOGGER = Logger.getLogger(BlockMap.class);
@@ -107,10 +97,11 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void createIndexes(DB database) {
 		generatorMap = database.createTreeMap("generators_index").makeOrGet();
-		
+
 		Bind.secondaryKey((BTreeMap)this.map, generatorMap, new Fun.Function2<Tuple2<String, String>, Integer, Block>() {
 			@Override
 			public Tuple2<String, String> run(Integer b, Block block) {
@@ -124,7 +115,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		 * database.createHashMap("block_signs_map_Value").makeOrGet();
 		 * Bind.secondaryValue((BTreeMap)this.map, blockSignsMap, new
 		 * Fun.Function2<Tuple2<Integer,Integer>, byte[], Block>() {
-		 * 
+		 *
 		 * @Override public Tuple2<Integer, Integer> run(byte[] a, Block b) { //
 		 * TODO Auto-generated method stub return new Tuple2(b.getHeight(db),
 		 * b.getSignature(); } });
@@ -134,10 +125,10 @@ public class BlockMap extends DCMap<Integer, Block> {
 		 * database.createTreeSet("Set1").makeOrGet();
 		 * Bind.secondaryKeys((BTreeMap)this.map, Set1, new
 		 * Fun.Function2<Integer[], byte[], Block>() {
-		 * 
+		 *
 		 * @Override public Integer[] run(byte[] b, Block block) { return new
 		 * Integer[]{1};
-		 * 
+		 *
 		 * } });
 		 */
 		/*
@@ -145,10 +136,10 @@ public class BlockMap extends DCMap<Integer, Block> {
 		 * database.createTreeSet("Set2").makeOrGet();
 		 * Bind.secondaryValues((BTreeMap)this.map, Set2, new
 		 * Fun.Function2<Integer[],byte[], Block>(){
-		 * 
+		 *
 		 * @Override public Integer[] run(byte[] b, Block block) { return new
 		 * Integer[]{1};
-		 * 
+		 *
 		 * } });
 		 */
 
@@ -262,11 +253,11 @@ public class BlockMap extends DCMap<Integer, Block> {
 				if (((Account)pk).equals("7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")) {
 					LOGGER.error(key + " - 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y : " + Base58.encode(pkb));
 				}
-				
+
 			}
 		}
-		*/
-		
+		 */
+
 		byte[] signature = block.getSignature();
 		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(signature);
 		if (item != null && item.a > 0) {
@@ -281,7 +272,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 
 		// INCREMENT KEY
-		this.key++;		
+		this.key++;
 		int height = this.key;
 
 		// calc before insert record
@@ -296,7 +287,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 			PublicKeyAccount creator = block.getCreator();
 			dcSet.getBlockCreatorMap().add(creator.getPublicKey());
 			// PROCESS FORGING DATA
-			creator.setForgingData(dcSet, height);
+			int forgingBalance = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+			creator.setForgingData(dcSet, height, forgingBalance);
 
 		}
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
@@ -314,19 +306,19 @@ public class BlockMap extends DCMap<Integer, Block> {
 		return sss;
 
 	}
-	
+
 	/*
 	public boolean set(int height, Block block) {
 		return false;
 	}
-	*/
-	
+	 */
+
 	// TODO make CHAIN deletes - only for LAST block!
 	public void remove(byte[] signature, byte[] reference) {
 		DCSet dcSet = getDCSet();
 
 		int height = this.key;
-		
+
 		this.setLastBlockSignature(reference);
 		dcSet.getBlockSignsMap().delete(signature);
 
@@ -347,7 +339,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 		// use SUPER.class only!
 		super.delete(height);
-		
+
 		if (this.atomicKey != null) {
 			this.atomicKey.decrementAndGet();
 		}
@@ -361,14 +353,14 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public void delete(int height) {
 		//return ;
 	}
-	*/
+	 */
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Collection<Integer> getGeneratorBlocks(String address)
 	{
 		Collection<Integer> headers = ((BTreeMap)(this.generatorMap))
 				.subMap(Fun.t2(address, null), Fun.t2(address,Fun.HI())).values();
-		
+
 		return headers;
 	}
 

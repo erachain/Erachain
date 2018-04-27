@@ -58,7 +58,7 @@ public class ForgingStatus extends JLabel implements Observer {
 				DCSet dcSet = DCSet.getInstance();
 				for(Account account: Controller.getInstance().getAccounts())
 				{
-					long win_value = BlockChain.calcWinValue(dcSet, account, newHeight, target);
+					int win_value = BlockChain.calcWinValue(dcSet, account, newHeight);
 					if (Math.abs(win_value) > winBalance) {
 						winBalance = Math.abs(win_value);
 						winAccount = account;

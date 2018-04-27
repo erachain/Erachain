@@ -163,7 +163,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 				}
 
 				return block.getGeneratingBalance(dcSet) + " "
-				+ BlockChain.getPreviousForgingHeightForCalcWin(dcSet, block.getCreator(), block.getHeight(dcSet)) + " "
+				+ block.getCreator().getForgingData(dcSet, block.getHeight(dcSet)) + " "
 				+ block.calcWinValue(dcSet) + " "
 				+ block.calcWinValueTargeted(dcSet);
 

@@ -234,7 +234,7 @@ public class Block {
 	// CALCULATE and SET
 	public void setCalcGeneratingBalance(DCSet dcSet)
 	{
-		this.generatingBalance = BlockChain.calcGeneratingBalance(dcSet, this.creator, this.getHeightByParent(dcSet));
+		this.generatingBalance = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 	}
 
 	public byte[] getReference()
@@ -829,11 +829,12 @@ public class Block {
 			return this.winValue;
 		}
 
-		if (this.generatingBalance <= 0) {
+		/*if (this.generatingBalance <= 0) {
 			this.setCalcGeneratingBalance(dcSet);
 		}
+		 */
 
-		this.winValue = BlockChain.calcWinValue(dcSet, this.getHeightByParent(dcSet), this.creator, this.generatingBalance);
+		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.getHeightByParent(dcSet));
 		return this.winValue;
 	}
 
@@ -845,8 +846,8 @@ public class Block {
 			return BlockChain.BASE_TARGET;
 		}
 
-		long win_value = this.calcWinValue(dcSet);
-		long target = BlockChain.getTarget(dcSet, this);
+		int win_value = this.calcWinValue(dcSet);
+		int target = BlockChain.getTarget(dcSet, this);
 		return BlockChain.calcWinValueTargeted(win_value, target);
 	}
 
@@ -917,8 +918,9 @@ public class Block {
 		//int base = BlockChain.getMinTarget(height);
 		///int targetedWinValue = this.calcWinValueTargeted(dcSet);
 
-		long target = BlockChain.getTarget(dcSet, this);
-		long win_value = BlockChain.calcWinValue(dcSet, this.creator, height, target);
+		int target = BlockChain.getTarget(dcSet, this);
+		int win_value = BlockChain.calcWinValue(dcSet, this.creator, height);
+		win_value = BlockChain.calcWinValueTargetedBase(dcSet, win_value, height, target);
 		if (!cnt.isTestNet() && win_value < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + win_value + " < " + target);
