@@ -900,7 +900,7 @@ public class Account {
 	}
 
 	// previous forging block
-	public Integer getForgingData(DCSet db, int height) {
+	public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
 		return db.getAddressForging().get(this.address, height);
 	}
 	/*
@@ -908,13 +908,13 @@ public class Account {
 		db.getAddressForging().set(this.address, height, prevHeight);
 	}
 	 */
-	public void setForgingData(DCSet db, int height) {
-		db.getAddressForging().set(this.address, height);
+	public void setForgingData(DCSet db, int height, int forgingBalance) {
+		db.getAddressForging().set(this.address, height, forgingBalance);
 	}
 	public void delForgingData(DCSet db, int height) {
 		db.getAddressForging().delete(this.address, height);
 	}
-	public Integer getLastForgingData(DCSet db) {
+	public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {
 		return db.getAddressForging().getLast(this.address);
 	}
 	/*

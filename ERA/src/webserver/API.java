@@ -937,7 +937,7 @@ public class API {
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
-				.entity("" + BlockChain.calcGeneratingBalance(DCSet.getInstance(),
+				.entity("" + BlockChain.calcWinValue(DCSet.getInstance(),
 						new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) ))
 				.build();
 	}

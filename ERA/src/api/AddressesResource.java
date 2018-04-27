@@ -329,7 +329,7 @@ public class AddressesResource {
 
 		}
 
-		return "" + BlockChain.calcGeneratingBalance(DCSet.getInstance(),
+		return "" + BlockChain.calcWinValue(DCSet.getInstance(),
 				new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) );
 	}
 

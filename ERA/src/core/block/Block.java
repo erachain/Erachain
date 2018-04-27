@@ -62,7 +62,7 @@ public class Block {
 	Block parentBlock;
 	//protected long timestamp;
 	protected int generatingBalance; // only for DB MAP
-	protected long winValue; // only for DB MAP
+	protected int winValue; // only for DB MAP
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
 
@@ -813,7 +813,7 @@ public class Block {
 		 */
 	}
 
-	public long calcWinValue(DCSet dcSet) {
+	public int calcWinValue(DCSet dcSet) {
 
 		if (this.winValue != 0)
 			return this.winValue;
@@ -847,7 +847,7 @@ public class Block {
 
 		long win_value = this.calcWinValue(dcSet);
 		long target = BlockChain.getTarget(dcSet, this);
-		return BlockChain.calcWinValueTargeted2(win_value, target);
+		return BlockChain.calcWinValueTargeted(win_value, target);
 	}
 
 	public boolean isValid(DCSet dcSet, boolean andProcess)

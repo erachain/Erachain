@@ -398,180 +398,178 @@ public abstract class TransactionAmount extends Transaction {
 			int amount_sign = this.amount.signum();
 
 			// BACKWARD - CONFISCATE
-			boolean confiscate_credit = typeBytes[1] == 1
-					|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+			boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
-					if (amount_sign != 0) {
+			if (amount_sign != 0) {
 
-						int actionType = Account.actionType(key, amount);
+				int actionType = Account.actionType(key, amount);
 
-						if (actionType == 3) {
-							// HOLD GOODS
-							if (!asset.isMovable()) {
-								return NOT_MOVABLE_ASSET;
-							}
-							BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
-							if (amount.compareTo(balance1) > 0) {
-								return NO_HOLD_BALANCE;
-							}
+				if (actionType == 3) {
+					// HOLD GOODS
+					if (!asset.isMovable()) {
+						return NOT_MOVABLE_ASSET;
+					}
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
+					if (amount.compareTo(balance1) > 0) {
+						return NO_HOLD_BALANCE;
+					}
 
-						} else if (actionType == 2) {
-							// CREDIT - BORROW
-							if (absKey == FEE_KEY) {
-								return NOT_DEBT_ASSET;
-							}
+				} else if (actionType == 2) {
+					// CREDIT - BORROW
+					if (absKey == FEE_KEY) {
+						return NOT_DEBT_ASSET;
+					}
 
-							// 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 -> 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
-							if (confiscate_credit) {
-								// BACKWARD - BORROW - CONFISCATE CREDIT
-								Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-										this.creator.getAddress(), absKey,
-										this.recipient.getAddress());
-								BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-								if (creditAmount.compareTo(amount) < 0) {
-									// NOT ENOUGHT DEBT from recipient to creator
-									return NO_DEBT_BALANCE;
-								}
+					// 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 -> 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
+					if (confiscate_credit) {
+						// BACKWARD - BORROW - CONFISCATE CREDIT
+						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+								this.creator.getAddress(), absKey,
+								this.recipient.getAddress());
+						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+						if (creditAmount.compareTo(amount) < 0) {
+							// NOT ENOUGHT DEBT from recipient to creator
+							return NO_DEBT_BALANCE;
+						}
 
-								/*
+						/*
 						BigDecimal balance1 = this.creator.getBalanceUSE(absKey, db);
 						if (balance1.compareTo(amount) < 0) {
 							// OWN + (-CREDIT)) = max amount that can be used for new credit
 							return NO_BALANCE;
 						}
-								 */
-							} else {
-								// CREDIT - GIVE CREDIT
-								// OR RETURN CREDIT
-								Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-										this.recipient.getAddress(), absKey,
-										this.creator.getAddress());
-								// TRY RETURN
-								BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-								if (creditAmount.compareTo(amount) < 0) {
-									BigDecimal leftAmount = amount.subtract(creditAmount);
-									BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN balance
-									// NOT ENOUGHT DEBT from recipient to creator
-									// TRY CREDITN OWN
-									if (balanceOwn.compareTo(leftAmount) < 0) {
-										// NOT ENOUGHT DEBT from recipient to creator
-										return NO_BALANCE;
-									}
-								}
-							}
-
-						} else if (actionType == 1) {
-
-							// SPEND ASSET
-
-							if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE) {
-
-								//byte[] ss = this.creator.getAddress();
-								if (height > BlockChain.FREEZE_FROM
-										&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
-									// LOCK PAYMENTS
-									wrong = true;
-									for ( String address: BlockChain.TRUE_ADDRESSES) {
-										if (this.recipient.equals(address)
-												// || this.creator.equals(address)
-												) {
-											wrong = false;
-											break;
-										}
-									}
-
-									if (wrong) {
-										//int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();
-										//if (balance > 3000)
-										return INVALID_CREATOR;
-									}
-
-								}
-
-							}
-
-							// if asset is unlimited and me is creator of this asset
-							boolean unLimited =
-									absKey > AssetCls.REAL_KEY // not genesis assets!
-									&& asset.getQuantity().equals(0l)
-									&& asset.getOwner().getAddress().equals(this.creator.getAddress());
-
-									//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-									if (unLimited) {
-										// not make RETURN - check validate next
-										//
-									} else if (absKey == FEE_KEY) {
-										if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
-											if (height > 120000 || BlockChain.DEVELOP_USE)
-												return NO_BALANCE;
-
-											wrong = true;
-											for ( byte[] valid_item: BlockChain.VALID_BAL) {
-												if (Arrays.equals(this.signature, valid_item)) {
-													wrong = false;
-													break;
-												}
-											}
-
-											if (wrong)
-												return NO_BALANCE;
-										}
-
-									} else {
-										if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
-											return NOT_ENOUGH_FEE;
-										}
-										BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
-
-										if (amount.compareTo(forSale) > 0) {
-											if (height > 120000 || BlockChain.DEVELOP_USE)
-												return NO_BALANCE;
-
-											// TODO: delete wrong check in new CHAIN
-											// SOME PAYMENTs is WRONG
-											wrong = true;
-											for ( byte[] valid_item: BlockChain.VALID_BAL) {
-												if (Arrays.equals(this.signature, valid_item)) {
-													wrong = false;
-													break;
-												}
-											}
-
-											if (wrong)
-												return NO_BALANCE;
-										}
-
-										if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
-											String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
-											if ( unlock != null && !this.recipient.equals(unlock))
-												return INVALID_CREATOR;
-										}
-
-									}
-						} else {
-							// PRODUCE - SPEND
-							// TRY FEE
-							if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
-								return NOT_ENOUGH_FEE;
-							}
-							BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
-							if (amount.compareTo(balance1) > 0) {
+						 */
+					} else {
+						// CREDIT - GIVE CREDIT
+						// OR RETURN CREDIT
+						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+								this.recipient.getAddress(), absKey,
+								this.creator.getAddress());
+						// TRY RETURN
+						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+						if (creditAmount.compareTo(amount) < 0) {
+							BigDecimal leftAmount = amount.subtract(creditAmount);
+							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN balance
+							// NOT ENOUGHT DEBT from recipient to creator
+							// TRY CREDITN OWN
+							if (balanceOwn.compareTo(leftAmount) < 0) {
+								// NOT ENOUGHT DEBT from recipient to creator
 								return NO_BALANCE;
 							}
 						}
+					}
 
-						// IF send from PERSON to ANONIMOUSE
-						// TODO: PERSON RULE 1
-						if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY) {
-							HashSet<Account> recipients = this.getRecipientAccounts();
-							for (Account recipient: recipients) {
-								if (!recipient.isPerson(dcSet, height)
-										&& !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
-									return RECEIVER_NOT_PERSONALIZED;
+				} else if (actionType == 1) {
+
+					// SPEND ASSET
+
+					if (absKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE) {
+
+						//byte[] ss = this.creator.getAddress();
+						if (height > BlockChain.FREEZE_FROM
+								&& BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
+							// LOCK PAYMENTS
+							wrong = true;
+							for ( String address: BlockChain.TRUE_ADDRESSES) {
+								if (this.recipient.equals(address)
+										// || this.creator.equals(address)
+										) {
+									wrong = false;
+									break;
 								}
 							}
+
+							if (wrong) {
+								//int balance = this.creator.getBalance(dcSet, absKey, 1).b.intValue();
+								//if (balance > 3000)
+								return INVALID_CREATOR;
+							}
+
+						}
+
+					}
+
+					// if asset is unlimited and me is creator of this asset
+					boolean unLimited = absKey > AssetCls.REAL_KEY // not genesis assets!
+							&& asset.getQuantity().equals(0l)
+							&& asset.getOwner().getAddress().equals(this.creator.getAddress());
+
+					//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+					if (unLimited) {
+						// not make RETURN - check validate next
+						//
+					} else if (absKey == FEE_KEY) {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
+							if (height > 120000 || BlockChain.DEVELOP_USE)
+								return NO_BALANCE;
+
+							wrong = true;
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
+								}
+							}
+
+							if (wrong)
+								return NO_BALANCE;
+						}
+
+					} else {
+						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
+							return NOT_ENOUGH_FEE;
+						}
+						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
+
+						if (amount.compareTo(forSale) > 0) {
+							if (height > 120000 || BlockChain.DEVELOP_USE)
+								return NO_BALANCE;
+
+							// TODO: delete wrong check in new CHAIN
+							// SOME PAYMENTs is WRONG
+							wrong = true;
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
+								}
+							}
+
+							if (wrong)
+								return NO_BALANCE;
+						}
+
+						if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
+							String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+							if ( unlock != null && !this.recipient.equals(unlock))
+								return INVALID_CREATOR;
+						}
+
+					}
+				} else {
+					// PRODUCE - SPEND
+					// TRY FEE
+					if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
+						return NOT_ENOUGH_FEE;
+					}
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
+					if (amount.compareTo(balance1) > 0) {
+						return NO_BALANCE;
+					}
+				}
+
+				// IF send from PERSON to ANONIMOUSE
+				// TODO: PERSON RULE 1
+				if (BlockChain.PERSON_SEND_PROTECT && actionType != 2 && isPerson && absKey != FEE_KEY) {
+					HashSet<Account> recipients = this.getRecipientAccounts();
+					for (Account recipient: recipients) {
+						if (!recipient.isPerson(dcSet, height)
+								&& !BlockChain.ANONYMASERS.contains(recipient.getAddress())) {
+							return RECEIVER_NOT_PERSONALIZED;
 						}
 					}
+				}
+			}
 
 		} else {
 			// TODO first records is BAD already ((
@@ -623,65 +621,64 @@ public abstract class TransactionAmount extends Transaction {
 		long absKey = getAbsKey();
 
 		// BACKWARD - CONFISCATE
-		boolean confiscate_credit = typeBytes[1] == 1
-				|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+		boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
-				//UPDATE SENDER
-				this.creator.changeBalance(db, !confiscate_credit, key, this.amount, false);
-				//UPDATE RECIPIENT
-				this.recipient.changeBalance(db, confiscate_credit, key, this.amount, false);
+		//UPDATE SENDER
+		this.creator.changeBalance(db, !confiscate_credit, key, this.amount, false);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, confiscate_credit, key, this.amount, false);
 
-				int actionType = Account.actionType(key, amount);
-				if (actionType == 2) {
-					if (confiscate_credit) {
-						// BORROW
-						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-								this.creator.getAddress(), absKey,
-								this.recipient.getAddress());
-						db.getCredit_AddressesMap().sub(creditKey, this.amount);
-					} else {
-						// CREDIR or RETURN CREDIT
-						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-								this.recipient.getAddress(), absKey,
-								this.creator.getAddress());
-						BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
-						if (creditAmount.compareTo(amount) >= 0) {
-							// ALL CREDIT RETURN
-							db.getCredit_AddressesMap().sub(creditKey, this.amount);
-						} else {
-							// GET CREDIT for left AMOUNT
-							BigDecimal leftAmount = amount.subtract(creditAmount);
-							Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
-									this.creator.getAddress(), absKey,
-									this.recipient.getAddress()); // REVERSE
-							db.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
-						}
-					}
+		int actionType = Account.actionType(key, amount);
+		if (actionType == 2) {
+			if (confiscate_credit) {
+				// BORROW
+				Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+						this.creator.getAddress(), absKey,
+						this.recipient.getAddress());
+				db.getCredit_AddressesMap().sub(creditKey, this.amount);
+			} else {
+				// CREDIR or RETURN CREDIT
+				Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+						this.recipient.getAddress(), absKey,
+						this.creator.getAddress());
+				BigDecimal creditAmount = db.getCredit_AddressesMap().get(creditKey);
+				if (creditAmount.compareTo(amount) >= 0) {
+					// ALL CREDIT RETURN
+					db.getCredit_AddressesMap().sub(creditKey, this.amount);
+				} else {
+					// GET CREDIT for left AMOUNT
+					BigDecimal leftAmount = amount.subtract(creditAmount);
+					Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
+							this.creator.getAddress(), absKey,
+							this.recipient.getAddress()); // REVERSE
+					db.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
 				}
+			}
+		}
 
-				if (absKey == Transaction.RIGHTS_KEY
-						&& this.recipient.getLastForgingData(db) == -1
-						&& this.amount.compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) >= 0) {
-					// TODO - если сначала прислать 12 а потом дослать 200000
-					// то будет все время выдавать недостаточное чило моне для форжинга
-					// так как все доначисления буду вычиаться из самого первого
-					// так как ттут нет добавки
+		if (absKey == Transaction.RIGHTS_KEY
+				&& this.recipient.getLastForgingData(db) == null
+				&& this.amount.compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) >= 0) {
+			// TODO - если сначала прислать 12 а потом дослать 200000
+			// то будет все время выдавать недостаточное чило моне для форжинга
+			// так как все доначисления буду вычиаться из самого первого
+			// так как ттут нет добавки
 
 
-					// update last forging block if it not exist
-					// if exist - it not need - incomes will be negate from forging balance
+			// update last forging block if it not exist
+			// if exist - it not need - incomes will be negate from forging balance
 
-					// it is stil unconfirmed!!!  Block block = this.getParent(db);
+			// it is stil unconfirmed!!!  Block block = this.getParent(db);
 
-					// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
-					int blockHeight;
-					if (block == null) {
-						blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 1;
-					} else {
-						blockHeight = block.getHeightByParent(db);
-					}
-					this.recipient.setForgingData(db, blockHeight);
-				}
+			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
+			int blockHeight;
+			if (block == null) {
+				blockHeight = Controller.getInstance().getBlockChain().getHeight(db) + 1;
+			} else {
+				blockHeight = block.getHeightByParent(db);
+			}
+			this.recipient.setForgingData(db, blockHeight, this.amount.intValue());
+		}
 	}
 
 	@Override
@@ -701,52 +698,52 @@ public abstract class TransactionAmount extends Transaction {
 		long absKey = getAbsKey();
 
 		// BACKWARD - CONFISCATE
-		boolean confiscate_credit = typeBytes[1] == 1
-				|| typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+		boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
-				//UPDATE SENDER
-				this.creator.changeBalance(db, confiscate_credit, key, this.amount, true);
-				//UPDATE RECIPIENT
-				this.recipient.changeBalance(db, !confiscate_credit, key, this.amount, true);
+		//UPDATE SENDER
+		this.creator.changeBalance(db, confiscate_credit, key, this.amount, true);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, !confiscate_credit, key, this.amount, true);
 
-				int actionType = Account.actionType(key, amount);
-				if (actionType == 2) {
-					if (confiscate_credit) {
-						// BORROW
-						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-								this.creator.getAddress(), absKey,
-								this.recipient.getAddress());
-						db.getCredit_AddressesMap().add(creditKey, this.amount);
-					} else {
-						// in BACK order - RETURN CREDIT << CREDIT
-						// GET CREDIT for left AMOUNT
-						Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
-								this.creator.getAddress(), absKey,
-								this.recipient.getAddress()); // REVERSE
-						BigDecimal leftAmount = db.getCredit_AddressesMap().get(leftCreditKey);
-						if (leftAmount.compareTo(amount) < 0) {
-							db.getCredit_AddressesMap().sub(leftCreditKey, leftAmount);
-							// CREDIR or RETURN CREDIT
-							Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-									this.recipient.getAddress(), absKey,
-									this.creator.getAddress());
-							db.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
-						} else {
-							// ONLY RETURN CREDIT
-							db.getCredit_AddressesMap().add(leftCreditKey, amount);
-						}
-
-					}
+		int actionType = Account.actionType(key, amount);
+		if (actionType == 2) {
+			if (confiscate_credit) {
+				// BORROW
+				Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+						this.creator.getAddress(), absKey,
+						this.recipient.getAddress());
+				db.getCredit_AddressesMap().add(creditKey, this.amount);
+			} else {
+				// in BACK order - RETURN CREDIT << CREDIT
+				// GET CREDIT for left AMOUNT
+				Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
+						this.creator.getAddress(), absKey,
+						this.recipient.getAddress()); // REVERSE
+				BigDecimal leftAmount = db.getCredit_AddressesMap().get(leftCreditKey);
+				if (leftAmount.compareTo(amount) < 0) {
+					db.getCredit_AddressesMap().sub(leftCreditKey, leftAmount);
+					// CREDIR or RETURN CREDIT
+					Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+							this.recipient.getAddress(), absKey,
+							this.creator.getAddress());
+					db.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
+				} else {
+					// ONLY RETURN CREDIT
+					db.getCredit_AddressesMap().add(leftCreditKey, amount);
 				}
 
-				if (absKey == Transaction.RIGHTS_KEY) {
-					// Parent BLOCK is still in MAP!
-					int blockHeight;
-					if (block == null) {
-						blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
-					} else {
-						blockHeight = block.getHeightByParent(db);
-					}
+			}
+		}
+
+		if (absKey == Transaction.RIGHTS_KEY) {
+			// Parent BLOCK is still in MAP!
+			int blockHeight;
+			if (block == null) {
+				blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
+			} else {
+				blockHeight = block.getHeightByParent(db);
+			}
+			/*
 					int lastForgingHeight = this.recipient.getLastForgingData(db);
 					if (lastForgingHeight != -1 && lastForgingHeight == blockHeight) {
 						int prevForgingHeight = this.recipient.getForgingData(db, blockHeight);
@@ -755,7 +752,16 @@ public abstract class TransactionAmount extends Transaction {
 							this.recipient.delForgingData(db, blockHeight);
 						}
 					}
+			 */
+			int lastForgingHeight = this.recipient.getLastForgingData(db);
+			if (lastForgingHeight != -1 && lastForgingHeight == blockHeight) {
+				int prevForgingHeight = this.recipient.getForgingData(db, blockHeight);
+				if (prevForgingHeight == -1 ) {
+					// if it is first payment ERM - reset last forging BLOCK
+					this.recipient.delForgingData(db, blockHeight);
 				}
+			}
+		}
 	}
 
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount()

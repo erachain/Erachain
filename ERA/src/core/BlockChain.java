@@ -17,9 +17,7 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.transaction.ArbitraryTransaction;
-import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
-import core.transaction.TransactionAmount;
 import datachain.BlockHeightsMap;
 import datachain.BlockSignsMap;
 import datachain.DCSet;
@@ -681,11 +679,11 @@ public class BlockChain
 	}
 
 	// ignore BIG win_values
-	public static long getTarget(DCSet dcSet, Block block)
+	public static int getTarget(DCSet dcSet, Block block)
 	{
 
 		if (block == null)
-			return 1000l;
+			return 1000;
 		/*
 		int height = block.getParentHeight(dcSet);
 		if (block.getTargetValue() > 0)
@@ -733,13 +731,11 @@ public class BlockChain
 			parent = parent.getParent(dcSet);
 		}
 
-		long target = win_value / i;
-
-		return target;
+		return (int)(win_value / i);
 	}
 
 	// calc Target by last blocks in chain
-	public long getTarget(DCSet dcSet)
+	public int getTarget(DCSet dcSet)
 	{
 		return getTarget(dcSet, this.getLastBlock(dcSet));
 	}
@@ -770,9 +766,17 @@ public class BlockChain
 
 	}
 
-	public static int getPreviousForgingHeightForCalcWin(DCSet dcSet, Account creator, int height) {
 
-		// IF BLOCK in the MAP
+	/*
+	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
+	// MABE used only in isValid and in Block Generator
+	public static int calcGeneratingBalance(DCSet dcSet, Account creator, int height)
+	{
+
+		long incomed_amount = 0l;
+		//long amount;
+
+		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, creator, height);
 		int previousForgingHeight = creator.getForgingData(dcSet, height);
 		if (previousForgingHeight == -1) {
 			// IF BLOCK not inserted in MAP
@@ -788,22 +792,6 @@ public class BlockChain
 		if (previousForgingHeight > height) {
 			return height;
 		}
-
-		return previousForgingHeight;
-
-	}
-
-	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
-	// MABE used only in isValid and in Block Generator
-	public static int calcGeneratingBalance(DCSet dcSet, Account creator, int height)
-	{
-
-		long incomed_amount = 0l;
-		//long amount;
-
-		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, creator, height);
-		if (previousForgingHeight == -1)
-			return 0;
 
 		previousForgingHeight++;
 		if (previousForgingHeight < height) {
@@ -896,55 +884,13 @@ public class BlockChain
 			return (int)(used_amount - incomed_amount);
 		}
 	}
+	OLD
+	 */
 
-	// may be calculated only for new BLOCK or last created BLOCK for this CREATOR
-	// because: creator.getLastForgingData(dcSet);
-	// see core.BlockChain.getMinTarget(int)
-	public static long calcWinValue(int previousForgingHeight, int height, int generatingBalance)
+	public static int calcWinValueTargeted(int win_value, int target)
 	{
 
-		long win_value;
-		int diff = height - previousForgingHeight;
-		if (diff > 1)
-			win_value = (long)generatingBalance * diff;
-		else
-			win_value = generatingBalance;
-
-		if (height < BlockChain.REPEAT_WIN)
-			win_value >>= 4;
-		else if (BlockChain.DEVELOP_USE)
-			win_value >>= 4;
-			else if (height < BlockChain.TARGET_COUNT)
-				win_value = (win_value >>4) - (win_value >>6);
-			else if (height < BlockChain.TARGET_COUNT<<2)
-				win_value >>= 5;
-			else if (height < BlockChain.TARGET_COUNT<<6)
-				win_value = (win_value >>5) - (win_value >>7);
-			else if (height < BlockChain.TARGET_COUNT<<10)
-				win_value >>= 6;
-			else
-				win_value = (win_value >>7) - (win_value >>9);
-
-			return win_value;
-
-	}
-
-	public static long calcWinValue(DCSet dcSet, int height, Account creator, int generatingBalance)
-	{
-
-		int previousForgingHeight = BlockChain.getPreviousForgingHeightForCalcWin(dcSet, creator, height);
-		if (previousForgingHeight == -1) {
-			return -1l;
-		}
-
-		return calcWinValue(previousForgingHeight, height, generatingBalance);
-	}
-
-
-	public static int calcWinValueTargeted2(long win_value, long target)
-	{
-
-		if (target == 0l) {
+		if (target == 0) {
 			// in forked chain in may be = 0
 			return -1;
 		}
@@ -958,7 +904,7 @@ public class BlockChain
 		target <<=1;
 		}
 
-		result += (int)(koeff * win_value / target);
+		result += (int)((long)koeff * win_value / target);
 		if (result > max_targ)
 			result = max_targ;
 
@@ -966,95 +912,100 @@ public class BlockChain
 
 	}
 
-	public static int calcWinValueTargeted(DCSet dcSet, Block block)
-	{
-
-		if (block.getVersion() == 0) {
-			// GENESIS - getBlockChain = null
-			return BlockChain.BASE_TARGET;
-		}
-
-		long win_value = block.calcWinValue(dcSet);
-		long target = BlockChain.getTarget(dcSet, block);
-		return calcWinValueTargeted2(win_value, target);
-	}
-
-	public static int isSoRapidly(DCSet dcSet, int height, Account accountCreator,
-			int previousForgingHeight)
-	{
-
-		// NEED CHECK ONLY ON START
-
-		int usedBalance = accountCreator.getBalanceUSE(1, dcSet).intValue();
-		if (usedBalance < BlockChain.MIN_GENERATING_BALANCE) {
-			return 1;
-		}
-
-		if (BlockChain.DEVELOP_USE // || height < 104000
-				)
-			return 0;
-
-		int repeatsMin;
-
-		if (height < BlockChain.REPEAT_WIN) {
-			repeatsMin = height - 1;
-		} else if (height < 100000) {
-			return 0;
-		} else {
-			repeatsMin = BlockChain.GENESIS_ERA_TOTAL/usedBalance;
-			repeatsMin  = repeatsMin>>2;
-
-		if (height < 120000 && repeatsMin > 20) {
-			repeatsMin = 20;
-		} else if (height < 150000 && repeatsMin > 40) {
-			repeatsMin = 40;
-		} else if (repeatsMin < 10) {
-			repeatsMin = 10;
-		}
-		}
-
-		int def = repeatsMin - (height - previousForgingHeight);
-		if (def > 0) {
-			return def;
-		}
-
-		return 0;
-
-	}
-
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public static long calcWinValue(DCSet dcSet, Account creator, int height, long target) {
+	public static int calcWinValue(DCSet dcSet, Account creator, int height) {
 
-		int generatingBalance = calcGeneratingBalance(dcSet, creator, height);
+		Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
-		if(!Controller.getInstance().isTestNet() && generatingBalance < BlockChain.MIN_GENERATING_BALANCE)
-			return 0l;
+		if (previousForgingPoint == null) {
+			// IF BLOCK not inserted in MAP
+			previousForgingPoint = creator.getLastForgingData(dcSet);
+		}
 
-		// TEST STRONG of win Value
-		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, creator, height);
-		if (previousForgingHeight < 1)
-			return 0l;
+		int previousForgingHeight = previousForgingPoint.a;
 
-		// test repeated win account
-		if (!Controller.getInstance().isTestNet()) {
-			int repeated = isSoRapidly(dcSet, height, creator, previousForgingHeight);
-			if (repeated > 0) {
-				return -repeated;
+		// OWN + RENT balance - in USE
+		int forgingBalance = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+		if (forgingBalance > previousForgingPoint.b) {
+			forgingBalance = previousForgingPoint.b;
+		}
+
+		if (!Controller.getInstance().isTestNet() && forgingBalance < BlockChain.MIN_GENERATING_BALANCE)
+			return 0;
+
+		int difference = height - previousForgingHeight;
+		if (Controller.getInstance().isTestNet()) {
+			;
+		} else if (BlockChain.DEVELOP_USE) {
+			difference -= REPEAT_WIN;
+			if (difference < 1)
+				return difference;
+		} else {
+
+			int repeatsMin;
+
+			if (height < BlockChain.REPEAT_WIN) {
+				repeatsMin = height - 1;
+			} else {
+				repeatsMin = BlockChain.GENESIS_ERA_TOTAL/forgingBalance;
+				repeatsMin  = repeatsMin>>2;
+			}
+
+			if (height < 120000 && repeatsMin > 20) {
+				repeatsMin = 20;
+			} else if (height < 150000 && repeatsMin > 40) {
+				repeatsMin = 40;
+			} else if (repeatsMin < 10) {
+				repeatsMin = 10;
+			}
+
+			difference -= repeatsMin;
+			if (difference < 1) {
+				return difference;
 			}
 		}
 
-		long winned_value = calcWinValue(previousForgingHeight, height, generatingBalance);
+		long win_value;
+
+		if (difference > 1)
+			win_value = (long)forgingBalance * (long)difference;
+		else
+			win_value = forgingBalance;
+
+		if (height < BlockChain.REPEAT_WIN)
+			win_value >>= 4;
+		else if (BlockChain.DEVELOP_USE)
+			win_value >>= 4;
+		else if (height < BlockChain.TARGET_COUNT)
+			win_value = (win_value >>4) - (win_value >>6);
+		else if (height < BlockChain.TARGET_COUNT<<2)
+			win_value >>= 5;
+		else if (height < BlockChain.TARGET_COUNT<<6)
+			win_value = (win_value >>5) - (win_value >>7);
+		else if (height < BlockChain.TARGET_COUNT<<10)
+			win_value >>= 6;
+		else
+			win_value = (win_value >>7) - (win_value >>9);
+
+
+		return (int)win_value;
+
+	}
+
+	public static int calcWinValueTargetedBase(DCSet dcSet, int win_value, int height, int target) {
+
+		if (win_value < 1)
+			return win_value;
 
 		int base = BlockChain.getMinTarget(height);
-		int targetedWinValue = calcWinValueTargeted2(winned_value, target);
+		int targetedWinValue = calcWinValueTargeted(win_value, target);
 		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
 			return -targetedWinValue;
 		}
 
-		return winned_value;
+		return targetedWinValue;
 
 	}
-
 	// CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
 	public void clearUnconfirmedRecords(Controller ctrl, DCSet dcSetOriginal) {
 

@@ -213,12 +213,12 @@ public class BlockGenerator extends Thread implements Observer
 				long timeUpdate = 0;
 				int shift_height = 0;
 				//byte[] unconfirmedTransactionsHash;
-				long max_winned_value;
-				long winned_value;
+				int max_winned_value;
+				int winned_value;
 				//long winned_value_account;
 				//long max_winned_value_account;
 				int height = BlockChain.getHeight(dcSet) + 1;
-				long target = bchain.getTarget(dcSet);
+				int target = bchain.getTarget(dcSet);
 				Block generatedBlock;
 				Block solvingBlock;
 
@@ -366,8 +366,12 @@ public class BlockGenerator extends Thread implements Observer
 									{
 
 										//winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
-										winned_value = BlockChain.calcWinValue(dcSet, account, height, target);
-										if(winned_value < 1l)
+										winned_value = BlockChain.calcWinValue(dcSet, account, height);
+										if(winned_value < 1)
+											continue;
+
+										winned_value = BlockChain.calcWinValueTargetedBase(dcSet, winned_value, height, target);
+										if(winned_value < 1)
 											continue;
 
 										if (winned_value > max_winned_value) {
@@ -387,7 +391,7 @@ public class BlockGenerator extends Thread implements Observer
 										return;
 									}
 
-									wait_new_block_broadcast = (int)((WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (target - max_winned_value) / target);
+									wait_new_block_broadcast = (WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (target - max_winned_value) / target;
 
 									newWinner = false;
 									if (wait_new_block_broadcast > 0) {
