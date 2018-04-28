@@ -259,7 +259,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		 */
 
 		byte[] signature = block.getSignature();
-		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(signature);
+		Tuple2<Integer, Integer> item = dcSet.getBlockSignsMap().get(signature);
 		if (item != null && item.a > 0) {
 			LOGGER.error("already EXIST : " + this.key
 					+ " SIGN: " + Base58.encode(signature));
@@ -276,7 +276,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		int height = this.key;
 
 		// calc before insert record
-		int win_value = block.calcWinValueTargeted(dcSet);
+		int win_value = block.calcWinValue(dcSet);
 
 		if (block.getVersion() == 0) {
 			// GENESIS block

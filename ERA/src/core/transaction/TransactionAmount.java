@@ -13,7 +13,6 @@ import org.mapdb.Fun.Tuple3;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
-import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -658,124 +657,105 @@ public abstract class TransactionAmount extends Transaction {
 		}
 
 		if (absKey == Transaction.RIGHTS_KEY) {
+			// update last forging block if it not exist
+			// if exist - it not need - incomes will be negate from forging balance
+			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
+
 			Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(db);
-			if (privousForgingPoint == null
-					|| privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE_BD) {
-				// TODO - если сначала прислать 12 а потом дослать 200000
-				// то будет все время выдавать недостаточное чило моне для форжинга
-				// так как все доначисления буду вычиаться из самого первого
-				// так как ттут нет добавки
-
-
-				// update last forging block if it not exist
-				// if exist - it not need - incomes will be negate from forging balance
-
-				// it is stil unconfirmed!!!  Block block = this.getParent(db);
-
-				// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
-				int	blockHeight = this.getBlockHeightByParentOrLast(db);
-				this.recipient.setForgingData(db, blockHeight, this.amount.intValue());
-			}
-		}
-
-		@Override
-		public void orphan(boolean asPack) {
-
-			super.orphan(asPack);
-
-			if (this.amount == null)
-				return;
-
-			DCSet db = this.dcSet;
-
-			int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
-			if (amount_sign == 0)
-				return;
-
-			long absKey = getAbsKey();
-
-			// BACKWARD - CONFISCATE
-			boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-
-			//UPDATE SENDER
-			this.creator.changeBalance(db, confiscate_credit, key, this.amount, true);
-			//UPDATE RECIPIENT
-			this.recipient.changeBalance(db, !confiscate_credit, key, this.amount, true);
-
-			int actionType = Account.actionType(key, amount);
-			if (actionType == 2) {
-				if (confiscate_credit) {
-					// BORROW
-					Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-							this.creator.getAddress(), absKey,
-							this.recipient.getAddress());
-					db.getCredit_AddressesMap().add(creditKey, this.amount);
-				} else {
-					// in BACK order - RETURN CREDIT << CREDIT
-					// GET CREDIT for left AMOUNT
-					Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
-							this.creator.getAddress(), absKey,
-							this.recipient.getAddress()); // REVERSE
-					BigDecimal leftAmount = db.getCredit_AddressesMap().get(leftCreditKey);
-					if (leftAmount.compareTo(amount) < 0) {
-						db.getCredit_AddressesMap().sub(leftCreditKey, leftAmount);
-						// CREDIR or RETURN CREDIT
-						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-								this.recipient.getAddress(), absKey,
-								this.creator.getAddress());
-						db.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
-					} else {
-						// ONLY RETURN CREDIT
-						db.getCredit_AddressesMap().add(leftCreditKey, amount);
-					}
-
+			int currentForgingBalance = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+			if (privousForgingPoint == null) {
+				if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
+					int	blockHeight = this.getBlockHeightByParentOrLast(db);
+					this.recipient.setForgingData(db, blockHeight, currentForgingBalance);
 				}
-			}
-
-			if (absKey == Transaction.RIGHTS_KEY) {
-				// Parent BLOCK is still in MAP!
-				int blockHeight;
-				if (block == null) {
-					blockHeight = Controller.getInstance().getBlockChain().getHeight(db);
-				} else {
-					blockHeight = block.getHeightByParent(db);
-				}
-				/*
-					int lastForgingHeight = this.recipient.getLastForgingData(db);
-					if (lastForgingHeight != -1 && lastForgingHeight == blockHeight) {
-						int prevForgingHeight = this.recipient.getForgingData(db, blockHeight);
-						if (prevForgingHeight == -1 ) {
-							// if it is first payment ERM - reset last forging BLOCK
-							this.recipient.delForgingData(db, blockHeight);
-						}
-					}
-				 */
-				int lastForgingHeight = this.recipient.getLastForgingData(db);
-				if (lastForgingHeight != -1 && lastForgingHeight == blockHeight) {
-					int prevForgingHeight = this.recipient.getForgingData(db, blockHeight);
-					if (prevForgingHeight == -1 ) {
-						// if it is first payment ERM - reset last forging BLOCK
-						this.recipient.delForgingData(db, blockHeight);
-					}
+			} else {
+				if (privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE
+						&& currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
+					int	blockHeight = this.getBlockHeightByParentOrLast(db);
+					this.recipient.setForgingData(db, blockHeight, this.amount.intValue());
 				}
 			}
 		}
-
-		public Map<String, Map<Long, BigDecimal>> getAssetAmount()
-		{
-			Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-
-			if (this.amount != null) {
-
-				assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
-
-				assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
-				assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
-			}
-
-			return assetAmount;
-		}
-
-		//public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
-
 	}
+
+	@Override
+	public void orphan(boolean asPack) {
+
+		super.orphan(asPack);
+
+		if (this.amount == null)
+			return;
+
+		DCSet db = this.dcSet;
+
+		int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
+		if (amount_sign == 0)
+			return;
+
+		long absKey = getAbsKey();
+
+		// BACKWARD - CONFISCATE
+		boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+
+		//UPDATE SENDER
+		this.creator.changeBalance(db, confiscate_credit, key, this.amount, true);
+		//UPDATE RECIPIENT
+		this.recipient.changeBalance(db, !confiscate_credit, key, this.amount, true);
+
+		int actionType = Account.actionType(key, amount);
+		if (actionType == 2) {
+			if (confiscate_credit) {
+				// BORROW
+				Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+						this.creator.getAddress(), absKey,
+						this.recipient.getAddress());
+				db.getCredit_AddressesMap().add(creditKey, this.amount);
+			} else {
+				// in BACK order - RETURN CREDIT << CREDIT
+				// GET CREDIT for left AMOUNT
+				Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
+						this.creator.getAddress(), absKey,
+						this.recipient.getAddress()); // REVERSE
+				BigDecimal leftAmount = db.getCredit_AddressesMap().get(leftCreditKey);
+				if (leftAmount.compareTo(amount) < 0) {
+					db.getCredit_AddressesMap().sub(leftCreditKey, leftAmount);
+					// CREDIR or RETURN CREDIT
+					Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+							this.recipient.getAddress(), absKey,
+							this.creator.getAddress());
+					db.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
+				} else {
+					// ONLY RETURN CREDIT
+					db.getCredit_AddressesMap().add(leftCreditKey, amount);
+				}
+
+			}
+		}
+
+		if (absKey == Transaction.RIGHTS_KEY) {
+			int	blockHeight = this.getBlockHeightByParentOrLast(db);
+			Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(db);
+			if (lastForgingPoint != null && lastForgingPoint.a == blockHeight) {
+				this.recipient.delForgingData(db, blockHeight);
+			}
+		}
+	}
+
+	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
+	{
+		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+
+		if (this.amount != null) {
+
+			assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
+
+			assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), this.key, this.amount);
+			assetAmount = addAssetAmount(assetAmount, this.recipient.getAddress(), this.key, this.amount);
+		}
+
+		return assetAmount;
+	}
+
+	//public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
+
+}

@@ -32,7 +32,7 @@ public class BlockChain
 {
 
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = true;
+	public static final boolean DEVELOP_USE = false;
 	public static final boolean HARD_WORK = false;
 	public static final boolean PERSON_SEND_PROTECT = true;
 	//public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -406,7 +406,7 @@ public class BlockChain
 	 */
 
 	public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
-		Tuple2<Integer, Long> hWeight = dcSet.getBlockSignsMap().get(this.getLastBlockSignature(dcSet));
+		Tuple2<Integer, Integer> hWeight = dcSet.getBlockSignsMap().get(this.getLastBlockSignature(dcSet));
 		if (hWeight == null || hWeight.a == -1) return new Tuple2<Integer, Long>(-1, -1L);
 
 		/*
@@ -424,7 +424,7 @@ public class BlockChain
 
 	public static int getCheckPoint(DCSet dcSet) {
 
-		Tuple2<Integer, Long> item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
+		Tuple2<Integer, Integer> item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
 		if (item == null || item.a == -1)
 			return 2;
 
@@ -459,7 +459,7 @@ public class BlockChain
 		List<byte[]> headers = new ArrayList<byte[]>();
 
 		//CHECK IF BLOCK EXISTS
-		Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(parentSignature);
+		Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(parentSignature);
 		if(heightWT != null && heightWT.a > 0)
 		{
 
@@ -938,30 +938,31 @@ public class BlockChain
 			;
 		} else if (BlockChain.DEVELOP_USE) {
 			difference -= REPEAT_WIN;
-			if (difference < 1)
-				return difference;
+			if (difference < REPEAT_WIN)
+				return difference - REPEAT_WIN;
 		} else {
 
 			int repeatsMin;
 
 			if (height < BlockChain.REPEAT_WIN) {
-				repeatsMin = height - 1;
+				repeatsMin = height - 2;
 			} else {
 				repeatsMin = BlockChain.GENESIS_ERA_TOTAL/forgingBalance;
-				repeatsMin  = repeatsMin>>2;
+				repeatsMin  = (repeatsMin>>2);
+
+				if (height < 100000 && repeatsMin > 6) {
+					repeatsMin = 6;
+				} else if (height < 120000 && repeatsMin > 20) {
+					repeatsMin = 20;
+				} else if (height < 150000 && repeatsMin > 40) {
+					repeatsMin = 40;
+				} else if (repeatsMin < 10) {
+					repeatsMin = 10;
+				}
 			}
 
-			if (height < 120000 && repeatsMin > 20) {
-				repeatsMin = 20;
-			} else if (height < 150000 && repeatsMin > 40) {
-				repeatsMin = 40;
-			} else if (repeatsMin < 10) {
-				repeatsMin = 10;
-			}
-
-			difference -= repeatsMin;
-			if (difference < 1) {
-				return difference;
+			if (difference < repeatsMin) {
+				return difference - repeatsMin;
 			}
 		}
 

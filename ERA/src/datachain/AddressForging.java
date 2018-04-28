@@ -66,7 +66,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 	private void set(String address, int height, int forgingBalance,  Tuple2<Integer, Integer> previousPoint)
 	{
 
-		if (height > previousPoint.a) {
+		if (previousPoint != null && height > previousPoint.a) {
 			this.set(new Tuple2<String, Integer>(address, height), previousPoint);
 		}
 

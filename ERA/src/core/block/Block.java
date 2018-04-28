@@ -135,7 +135,7 @@ public class Block {
 			return 1;
 
 		if (heightBlock < 1) {
-			Tuple2<Integer, Long> item = db.getBlockSignsMap().get(this.signature);
+			Tuple2<Integer, Integer> item = db.getBlockSignsMap().get(this.signature);
 			if (item == null) {
 				heightBlock = -1;
 			} else {
@@ -166,9 +166,9 @@ public class Block {
 		return parentBlock;
 	}
 
-	public Tuple2<Integer, Long> getParentKey(DCSet db)
+	public Tuple2<Integer, Integer> getParentKey(DCSet db)
 	{
-		Tuple2<Integer, Long> key = db.getBlockSignsMap().get(this.reference);
+		Tuple2<Integer, Integer> key = db.getBlockSignsMap().get(this.reference);
 		if (key == null || key.a < 1)
 			return null;
 		return key;
@@ -918,9 +918,9 @@ public class Block {
 		//int base = BlockChain.getMinTarget(height);
 		///int targetedWinValue = this.calcWinValueTargeted(dcSet);
 
+		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, height);
 		int target = BlockChain.getTarget(dcSet, this);
-		int win_value = BlockChain.calcWinValue(dcSet, this.creator, height);
-		win_value = BlockChain.calcWinValueTargetedBase(dcSet, win_value, height, target);
+		int win_value = BlockChain.calcWinValueTargetedBase(dcSet, this.winValue, height, target);
 		if (!cnt.isTestNet() && win_value < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + win_value + " < " + target);

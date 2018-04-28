@@ -283,7 +283,9 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 		if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
 			// PROCESS FORGING DATA
 			//// SKIP Genesis Block
-			this.recipient.setForgingData(this.dcSet, 1, this.amount.intValue());
+			///this.recipient.setForgingData(this.dcSet, 1, this.amount.intValue());
+			int currentForgingBalance = this.recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+			this.recipient.setForgingData(this.dcSet, 1, currentForgingBalance);
 		}
 
 		if (key < 0) {
@@ -296,6 +298,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 							this.recipient.getAddress()),
 					//new Tuple3<String, Long, String>(this.owner.getAddress(), -key, this.recipient.getAddress()),
 					this.amount);
+
 		} else {
 			// CREATOR update
 			GenesisBlock.CREATOR.changeBalance(this.dcSet, true, key, this.amount, false);

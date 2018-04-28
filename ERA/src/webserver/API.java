@@ -214,7 +214,7 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++step;
-			Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
 			if (heightWT != null && heightWT.a > 0) {
 				byte[] childSign = dcSet.getBlockHeightsMap().get(heightWT.a + 1);
 				out.put("child", Base58.encode(childSign));
@@ -254,7 +254,7 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++step;
-			Tuple2<Integer, Long> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
 			if (heightWT != null && heightWT.a > 0) {
 				out = dcSet.getBlockMap().get(heightWT.a + 1).toJson();
 			} else {
