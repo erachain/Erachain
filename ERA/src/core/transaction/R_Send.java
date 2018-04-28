@@ -260,6 +260,7 @@ public class R_Send extends TransactionAmount {
 
 		boolean asPack = releaserReference != null;
 
+		//
 		// CHECK IF WE MATCH BLOCK LENGTH
 		if (data.length < BASE_LENGTH_AS_PACK | !asPack & data.length < BASE_LENGTH) {
 			throw new Exception("Data does not match block length " + data.length);
