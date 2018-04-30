@@ -53,7 +53,7 @@ import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import datachain.BlockHeightsMap;
+import datachain.BlocksHeadsMap;
 import datachain.BlockMap;
 import datachain.DCSet;
 import datachain.ItemAssetMap;
@@ -216,7 +216,7 @@ public class API {
 			++step;
 			Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
 			if (heightWT != null && heightWT.a > 0) {
-				byte[] childSign = dcSet.getBlockHeightsMap().get(heightWT.a + 1);
+				byte[] childSign = dcSet.getBlocksHeadsMap().get(heightWT.a + 1);
 				out.put("child", Base58.encode(childSign));
 			} else {
 				out.put("message", "signature not found");
@@ -296,7 +296,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
+			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -334,7 +334,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
+			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -383,7 +383,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlockHeightsMap().get(block.getHeight(dcSet) + 1);
+			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1);
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -465,14 +465,14 @@ public class API {
 		try {
 
 			JSONArray array = new JSONArray();
-			BlockHeightsMap blockHeightsMap = dcSet.getBlockHeightsMap();
+			BlocksHeadsMap blocksHeadsMap = dcSet.getBlocksHeadsMap();
 			int max = dcSet.getBlockMap().size();
 			for (int i = height; i < height + limit + 1; ++i) {
 				if (height >= max) {
 					out.put("end", 1);
 					break;
 				}
-				array.add(Base58.encode(blockHeightsMap.get(i)));
+				array.add(Base58.encode(blocksHeadsMap.get(i)));
 			}
 			out.put("signatures", array);
 

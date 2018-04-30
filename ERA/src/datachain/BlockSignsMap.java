@@ -14,7 +14,7 @@ import com.google.common.primitives.UnsignedBytes;
 
 import core.block.Block;
 
-// block.signature -> Height, Weight
+// block.signature -> Height, Weight(Win Value)
 public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();

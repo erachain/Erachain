@@ -370,7 +370,7 @@ public class BlockGenerator extends Thread implements Observer
 										if(winned_value < 1)
 											continue;
 
-										winned_value = BlockChain.calcWinValueTargetedBase(dcSet, winned_value, height, target);
+										winned_value = BlockChain.calcWinValueTargetedBase(dcSet, height, winned_value, target);
 										if(winned_value < 1)
 											continue;
 
@@ -597,7 +597,7 @@ public class BlockGenerator extends Thread implements Observer
 											{
 											}
 
-											byte[] prevSignature = dcSet.getBlockHeightsMap().get(myHW.a - 1);
+											byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1);
 											response = (SignaturesMessage) peer.getResponse(
 													MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
 													Synchronizer.GET_BLOCK_TIMEOUT);

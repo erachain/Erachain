@@ -192,7 +192,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	public byte[] getLastBlockSignature() {
 		if (this.lastBlockSignature == null) {
-			this.lastBlockSignature = getDCSet().getBlockHeightsMap().get(this.key);
+			this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.key);
 		}
 		return this.lastBlockSignature;
 	}
@@ -276,7 +276,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 		int height = this.key;
 
 		// calc before insert record
-		int win_value = block.calcWinValue(dcSet);
+		long win_value = block.calcWinValue(dcSet);
+		long target = block.calcWinValue(dcSet);
 
 		if (block.getVersion() == 0) {
 			// GENESIS block
@@ -293,7 +294,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
 		// (System.currentTimeMillis() - start)*0.001);
-		dcSet.getBlockHeightsMap().add(signature);
+		dcSet.getBlocksHeadsMap().add(signature);
 		this.setLastBlockSignature(signature);
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
 		// (System.currentTimeMillis() - start)*0.001);
@@ -332,7 +333,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 			// 		db.getAddressForging().delete(this.address, height);
 
 
-			dcSet.getBlockHeightsMap().remove();
+			dcSet.getBlocksHeadsMap().remove();
 			dcSet.getBlockCreatorMap().remove();
 
 		}

@@ -18,8 +18,8 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.Transaction;
-import datachain.BlockHeightsMap;
 import datachain.BlockSignsMap;
+import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import network.Peer;
@@ -470,14 +470,15 @@ public class BlockChain
 			} else {
 				packet = SYNCHRONIZE_PACKET;
 			}
-			//BlockHeightsMap childsMap = dcSet.getBlockHeightsMap();
-			BlockHeightsMap map = dcSet.getBlockHeightsMap();
+			//BlocksHeadsMap childsMap = dcSet.getBlockHeightsMap();
+			//BlocksHeadsMap map = dcSet.getBlockHeightsMap();
+			BlocksHeadsMap map = dcSet.getBlocksHeadsMap();
 			int counter = 0;
 			int height = heightWT.a;
 			while(parentSignature != null && counter++ < packet)
 			{
 				headers.add(parentSignature);
-				parentSignature = map.get(++height);
+				parentSignature = map.get(++height).a;
 			}
 			//LOGGER.debug("get size " + counter);
 		} else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
@@ -533,8 +534,8 @@ public class BlockChain
 				return 3;
 			}
 
-			int height01 = dcSet.getBlockHeightsMap().size() - 1;
-			lastSignature = dcSet.getBlockHeightsMap().get(height01);
+			int height01 = dcSet.getBlocksHeadsMap().size() - 1;
+			lastSignature = dcSet.getBlocksHeadsMap().get(height01);
 			if(Arrays.equals(lastSignature, block.getReference())) {
 				// CONCURENT for LAST BLOCK
 				Block lastBlock = dcSet.getBlockMap().last();
@@ -679,11 +680,11 @@ public class BlockChain
 	}
 
 	// ignore BIG win_values
-	public static int getTarget(DCSet dcSet, Block block)
+	public static long getTarget(DCSet dcSet, Block block)
 	{
 
 		if (block == null)
-			return 1000;
+			return 1000l;
 		/*
 		int height = block.getParentHeight(dcSet);
 		if (block.getTargetValue() > 0)
@@ -731,11 +732,11 @@ public class BlockChain
 			parent = parent.getParent(dcSet);
 		}
 
-		return (int)(win_value / i);
+		return win_value / i;
 	}
 
 	// calc Target by last blocks in chain
-	public int getTarget(DCSet dcSet)
+	public long getTarget(DCSet dcSet)
 	{
 		return getTarget(dcSet, this.getLastBlock(dcSet));
 	}
@@ -743,7 +744,7 @@ public class BlockChain
 	// GET MIN TARGET
 	// TODO GENESIS_CHAIN
 	// SEE core.block.Block.calcWinValue(DBSet, Account, int, int)
-	public static int getMinTarget(int height) {
+	public static int getTargetedMin(int height) {
 		int base;
 		if ( height < BlockChain.REPEAT_WIN)
 			// FOR not repeated WINS - not need check BASE_TARGET
@@ -887,7 +888,7 @@ public class BlockChain
 	OLD
 	 */
 
-	public static int calcWinValueTargeted(int win_value, int target)
+	public static int calcWinValueTargeted(long win_value, long target)
 	{
 
 		if (target == 0) {
@@ -904,7 +905,7 @@ public class BlockChain
 		target <<=1;
 		}
 
-		result += (int)((long)koeff * win_value / target);
+		result += (int)(koeff * win_value / target);
 		if (result > max_targ)
 			result = max_targ;
 
@@ -913,7 +914,7 @@ public class BlockChain
 	}
 
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public static int calcWinValue(DCSet dcSet, Account creator, int height) {
+	public static long calcWinValue(DCSet dcSet, Account creator, int height) {
 
 		Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
@@ -993,12 +994,12 @@ public class BlockChain
 
 	}
 
-	public static int calcWinValueTargetedBase(DCSet dcSet, int win_value, int height, int target) {
+	public static int calcWinValueTargetedBase(DCSet dcSet, int height, long win_value, long target) {
 
 		if (win_value < 1)
-			return win_value;
+			return (int)win_value;
 
-		int base = BlockChain.getMinTarget(height);
+		int base = BlockChain.getTargetedMin(height);
 		int targetedWinValue = calcWinValueTargeted(win_value, target);
 		if (!Controller.getInstance().isTestNet() && base > targetedWinValue) {
 			return -targetedWinValue;

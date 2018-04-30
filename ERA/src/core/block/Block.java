@@ -62,7 +62,7 @@ public class Block {
 	Block parentBlock;
 	//protected long timestamp;
 	protected int generatingBalance; // only for DB MAP
-	protected int winValue; // only for DB MAP
+	protected long winValue; // only for DB MAP
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
 
@@ -813,7 +813,7 @@ public class Block {
 		 */
 	}
 
-	public int calcWinValue(DCSet dcSet) {
+	public long calcWinValue(DCSet dcSet) {
 
 		if (this.winValue != 0)
 			return this.winValue;
@@ -846,8 +846,8 @@ public class Block {
 			return BlockChain.BASE_TARGET;
 		}
 
-		int win_value = this.calcWinValue(dcSet);
-		int target = BlockChain.getTarget(dcSet, this);
+		long win_value = this.calcWinValue(dcSet);
+		long target = BlockChain.getTarget(dcSet, this);
 		return BlockChain.calcWinValueTargeted(win_value, target);
 	}
 
@@ -919,8 +919,8 @@ public class Block {
 		///int targetedWinValue = this.calcWinValueTargeted(dcSet);
 
 		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, height);
-		int target = BlockChain.getTarget(dcSet, this);
-		int win_value = BlockChain.calcWinValueTargetedBase(dcSet, this.winValue, height, target);
+		long target = BlockChain.getTarget(dcSet, this);
+		long win_value = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, target);
 		if (!cnt.isTestNet() && win_value < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + win_value + " < " + target);

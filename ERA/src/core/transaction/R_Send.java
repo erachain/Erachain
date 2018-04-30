@@ -324,6 +324,18 @@ public class R_Send extends TransactionAmount {
 			byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 			amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 			position += AMOUNT_LENGTH;
+
+			// CHECK ACCURACY of AMOUNT
+			int accuracy = typeBytes[3] & SCALE_MASK;
+			if (accuracy > 0) {
+				if (accuracy >= SCALE_MASK_HALF) {
+					accuracy -= SCALE_MASK;
+				}
+
+				// RESCALE AMOUNT
+				amount = amount.scaleByPowerOfTen(accuracy);
+			}
+
 		}
 
 		// HEAD LEN

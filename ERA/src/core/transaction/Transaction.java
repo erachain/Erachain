@@ -472,6 +472,10 @@ public abstract class Transaction {
 		return 0l;
 	}
 
+	public AssetCls getAsset() {
+		return null;
+	}
+
 	public byte[] getSignature() {
 		return this.signature;
 	}
@@ -922,7 +926,7 @@ public abstract class Transaction {
 		if (data == null)
 			return false;
 
-		int height = dcSet.getBlockHeightsMap().size();
+		int height = dcSet.getBlocksHeadsMap().size();
 		if (height < 100000) {
 			// for skip NOT VALID SIGNs
 			for (byte[] valid_item : VALID_SIGN) {

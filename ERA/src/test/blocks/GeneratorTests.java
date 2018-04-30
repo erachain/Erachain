@@ -807,8 +807,8 @@ public class GeneratorTests {
 
 			previousForgingHeight = height;
 			winned_value = BlockChain.calcWinValue(dcSet, generator1, height);
-			base = BlockChain.getMinTarget(height);
-			targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, winned_value, height, target);
+			base = BlockChain.getTargetedMin(height);
+			targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winned_value, target);
 
 			assertEquals(true, targetedWinValue > 0);
 

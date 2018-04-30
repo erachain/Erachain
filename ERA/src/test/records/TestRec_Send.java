@@ -27,6 +27,7 @@ import core.payment.Payment;
 import core.transaction.ArbitraryTransactionV3;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import datachain.DCSet;
 import ntp.NTP;
 
@@ -82,6 +83,54 @@ public class TestRec_Send {
 		maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
+	}
+
+	@Test
+	public void scaleTest()
+	{
+
+		Integer bbb = 31;
+		assertEquals("11111", Integer.toBinaryString(bbb));
+
+		BigDecimal amountBase = new BigDecimal("1234567812345678");
+		BigDecimal amountTemp;
+		BigDecimal amount1;
+		BigDecimal amount2;
+
+		//int shift = 64;
+		int scale;
+		int scaleBase;
+
+		for (int i = 0; i < TransactionAmount.SCALE_MASK; i++) {
+
+			amount1 = amountBase.scaleByPowerOfTen(-TransactionAmount.SCALE_MASK_HALF - BlockChain.AMOUNT_DEDAULT_SCALE + i);
+
+			scale = amount1.scale();
+
+			// TO BASE
+			scaleBase = -scale + BlockChain.AMOUNT_DEDAULT_SCALE;
+
+			amountTemp = amount1.scaleByPowerOfTen(scale + TransactionAmount.SCALE_MASK_HALF);
+
+			// CHECK ACCURACY of AMOUNT
+			int accuracy = scale & TransactionAmount.SCALE_MASK;
+			String sss = Integer.toBinaryString(accuracy);
+
+
+			if (accuracy > 0) {
+				if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
+					accuracy -= TransactionAmount.SCALE_MASK;
+				}
+				// RESCALE AMOUNT
+				amount2 = amountTemp.scaleByPowerOfTen(accuracy);
+			} else {
+				amount2 = amountTemp;
+			}
+
+
+			assertEquals(amount1.setScale(accuracy), amount2.setScale(accuracy));
+
+		}
 	}
 
 	@Test

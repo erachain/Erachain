@@ -47,6 +47,16 @@ typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
 #### PROPERTY 2
 typeBytes[3].0 = -128 if NO DATA - check sign
 
+## version 3
+
+#### PROPERTY 1
+typeBytes[2].0 = -128 if NO AMOUNT - check sign
+typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
+
+#### PROPERTY 2
+typeBytes[3].0 = -128 if NO DATA - check sign
+typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
+
  */
 
 public abstract class TransactionAmount extends Transaction {
@@ -56,9 +66,15 @@ public abstract class TransactionAmount extends Transaction {
 	protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 	protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
+	public static final int SCALE_MASK = 31;
+	public static final int SCALE_MASK_HALF = (SCALE_MASK + 1)>>1;
+	public static final byte BACKWARD_MASK = 64;
+
 	protected Account recipient;
 	protected BigDecimal amount;
 	protected long key = Transaction.FEE_KEY;
+	protected AssetCls asset;
+
 	/*
 	public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY = "backward PROPERTY";
 	public static final String NAME_ACTION_TYPE_BACKWARD_HOLD = "backward HOLD";
@@ -69,9 +85,6 @@ public abstract class TransactionAmount extends Transaction {
 	public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
 	public static final String NAME_CREDIT= "CREDIT";
 	public static final String NAME_SPEND = "SPEND";
-
-
-	public static final byte BACKWARD_MASK = 64;
 
 	// need for calculate fee by feePow into GUI
 	protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient, BigDecimal amount, long key, long timestamp, Long reference)
@@ -85,11 +98,14 @@ public abstract class TransactionAmount extends Transaction {
 		} else {
 			// RESET 0 bit
 			typeBytes[2] = (byte)(typeBytes[2] & (byte)127);
+
+			/*
 			int different_scale = amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 			if (different_scale != 0) {
 				amount = amount.scaleByPowerOfTen(different_scale);
 			}
 			this.amount = amount;
+			 */
 		}
 
 		this.key = key;
@@ -109,8 +125,8 @@ public abstract class TransactionAmount extends Transaction {
 		super.setDC(dcSet, asPack);
 
 		if (this.amount != null) {
-			long assetKey = this.getAbsKey();
-			AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
+			this.asset = (AssetCls) this.dcSet.getItemAssetMap().get(this.getAbsKey());
+			/*
 			if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
 				int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
 				if (different_scale != 0) {
@@ -118,6 +134,7 @@ public abstract class TransactionAmount extends Transaction {
 					this.amount = this.amount.scaleByPowerOfTen(different_scale);
 				}
 			}
+			 */
 		}
 	}
 
@@ -137,6 +154,12 @@ public abstract class TransactionAmount extends Transaction {
 	public long getAssetKey()
 	{
 		return this.key;
+	}
+
+	@Override
+	public AssetCls getAsset()
+	{
+		return this.asset;
 	}
 
 	@Override
@@ -272,13 +295,25 @@ public abstract class TransactionAmount extends Transaction {
 		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
 
 		if ( this.amount != null ) {
+
 			//WRITE KEY
 			byte[] keyBytes = Longs.toByteArray(this.key);
 			keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
 			data = Bytes.concat(data, keyBytes);
 
+			// WRITE ACCURACY of AMMOUNT
+			int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - this.amount.scale();
+			BigDecimal amountBase;
+			if (different_scale != 0) {
+				// RESCALE AMOUNT
+				amountBase = this.amount.scaleByPowerOfTen(different_scale);
+				data[3] = (byte)(data[3] & different_scale + (SCALE_MASK_HALF));
+			} else {
+				amountBase = this.amount;
+			}
+
 			//WRITE AMOUNT
-			byte[] amountBytes = Longs.toByteArray(this.amount.unscaledValue().longValue());
+			byte[] amountBytes = Longs.toByteArray(amountBase.unscaledValue().longValue());
 			amountBytes = Bytes.ensureCapacity(amountBytes, AMOUNT_LENGTH, 0);
 			data = Bytes.concat(data, amountBytes);
 		}
@@ -377,19 +412,19 @@ public abstract class TransactionAmount extends Transaction {
 			if (absKey < 0)
 				absKey = -absKey;
 
-			AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
+			//AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
 			if (asset == null) {
 				return ITEM_ASSET_NOT_EXIST;
 			}
 
 			// for PARSE and toBYTES need only AMOUNT_LENGTH bytes
-			if (this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
+			if (true || this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
 				byte[] amountBytes = this.amount.unscaledValue().toByteArray();
 				if (amountBytes.length > AMOUNT_LENGTH) {
 					return AMOUNT_LENGHT_SO_LONG;
 				}
 				// SCALE wrong
-				if (this.amount.scale() != asset.getScale()) {
+				if (this.amount.scale() > asset.getScale()) {
 					return AMOUNT_SCALE_WRONG;
 				}
 			}
