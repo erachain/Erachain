@@ -53,8 +53,8 @@ import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import datachain.BlocksHeadsMap;
 import datachain.BlockMap;
+import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import datachain.ItemAssetMap;
 import datachain.ItemPersonMap;
@@ -214,9 +214,9 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++step;
-			Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
-			if (heightWT != null && heightWT.a > 0) {
-				byte[] childSign = dcSet.getBlocksHeadsMap().get(heightWT.a + 1);
+			Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			if (heightWT != null && heightWT > 0) {
+				byte[] childSign = dcSet.getBlocksHeadsMap().get(heightWT + 1).a.c;
 				out.put("child", Base58.encode(childSign));
 			} else {
 				out.put("message", "signature not found");
@@ -254,9 +254,9 @@ public class API {
 			signatureBytes = Base58.decode(signature);
 
 			++step;
-			Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
-			if (heightWT != null && heightWT.a > 0) {
-				out = dcSet.getBlockMap().get(heightWT.a + 1).toJson();
+			Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
+			if (heightWT != null && heightWT > 0) {
+				out = dcSet.getBlockMap().get(heightWT + 1).toJson();
 			} else {
 				out.put("message", "signature not found");
 			}
@@ -296,7 +296,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1);
+			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).a.c;
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -334,7 +334,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1);
+			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).a.c;
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -383,7 +383,7 @@ public class API {
 			out.put("block", block.toJson());
 
 			++step;
-			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1);
+			byte[] childSign = dcSet.getBlocksHeadsMap().get(block.getHeight(dcSet) + 1).a.c;
 			if (childSign != null)
 				out.put("next", Base58.encode(childSign));
 
@@ -472,7 +472,7 @@ public class API {
 					out.put("end", 1);
 					break;
 				}
-				array.add(Base58.encode(blocksHeadsMap.get(i)));
+				array.add(Base58.encode(blocksHeadsMap.get(i).a.c));
 			}
 			out.put("signatures", array);
 
@@ -933,12 +933,15 @@ public class API {
 					Transaction.INVALID_ADDRESS);
 
 		}
+		
+		Account account = new Account(address);
 
 		return Response.status(200)
 				.header("Content-Type", "application/json; charset=utf-8")
 				.header("Access-Control-Allow-Origin", "*")
 				.entity("" + BlockChain.calcWinValue(DCSet.getInstance(),
-						new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) ))
+						account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
+						account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue()))
 				.build();
 	}
 

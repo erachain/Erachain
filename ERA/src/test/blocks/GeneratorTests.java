@@ -793,7 +793,7 @@ public class GeneratorTests {
 		int target = 100000;
 		int generatingBalance = target;
 		int previousForgingHeight = 0;
-		int winned_value = 0;
+		long winned_value = 0;
 		int base = 0;
 		int targetedWinValue = 0;
 		for (int height=2; height < 1000; height++) {
@@ -806,7 +806,7 @@ public class GeneratorTests {
 				previousForgingHeight = BlockChain.REPEAT_WIN + (BlockChain.BASE_TARGET>>1) + (height>>2);
 
 			previousForgingHeight = height;
-			winned_value = BlockChain.calcWinValue(dcSet, generator1, height);
+			winned_value = BlockChain.calcWinValue(dcSet, generator1, height, generator1.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue());
 			base = BlockChain.getTargetedMin(height);
 			targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winned_value, target);
 

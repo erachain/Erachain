@@ -219,17 +219,27 @@ public class Block {
 	// NEED CALCULATE BEFORE add in BlockMap
 	public void calcHeadMind(DCSet dcSet)
 	{
-		this.parentBlock = this.getParent(dcSet);
-		this.heightBlock = this.parentBlock.getHeight(dcSet);
-		Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
-		//this.creatorPreviousHeightBlock = forgingPoint.a;
-		this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-		this.winValue = calcWinValue(dcSet);
-		this.target = BlockChain.calcTarget(heightBlock, parentBlock.getTarget(), this.winValue);
+		
+		if (this.version == 0) {
+			this.heightBlock = 1;
+			this.forgingValue = BlockChain.GENESIS_WIN_VALUE;
+			this.winValue = BlockChain.GENESIS_WIN_VALUE;
+			this.target = BlockChain.GENESIS_WIN_VALUE;
+
+		} else { 
+			this.parentBlock = this.getParent(dcSet);
+			this.heightBlock = this.parentBlock.getHeight(dcSet);
+			//Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
+			//this.creatorPreviousHeightBlock = forgingPoint.a;
+			this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+			this.winValue = calcWinValue(dcSet);
+			this.target = BlockChain.calcTarget(heightBlock, parentBlock.getTarget(), this.winValue);
+		}
 	}
 
-	public void loadHeadMind(DCSet dcSet)
+	public void loadHeadMind(DCSet dcSet, int height)
 	{
+		this.heightBlock = height;
 		Tuple3<Integer, Long, Long> headMind = dcSet.getBlocksHeadsMap().get(this.getHeight(dcSet)).c;
 		this.forgingValue = headMind.a;
 		this.winValue = headMind.b;
@@ -978,12 +988,11 @@ public class Block {
 			return false;
 		}
 
-
-		this.target = BlockChain.calcTarget(dcSet, this.parentBlock.target, this.winValue);
-		int tardetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, this.target);
-		if (!cnt.isTestNet() && win_value < 1) {
+		this.target = BlockChain.calcTarget(this.heightBlock, this.parentBlock.getTarget(), this.winValue);
+		int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, this.target);
+		if (!cnt.isTestNet() && targetedWinValue < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
-			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + win_value + " < " + target);
+			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + this.target);
 			return false;
 		}
 

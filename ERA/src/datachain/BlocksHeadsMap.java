@@ -153,7 +153,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		return this.get(this.size());
 	}
 
-	public void remove() {
+	public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> remove() {
 
 		int key = this.size();
 		if (this.contains(key)) {
@@ -165,8 +165,10 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 			{
 				this.fullWeightVar.set(fullWeight);
 			}
-			super.delete(key);
+			return super.delete(key);
 		}
+
+		return null;
 	}
 
 

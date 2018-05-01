@@ -153,7 +153,7 @@ public class Synchronizer {
 				// runedBlock = block;
 				/// already in Validate block.process(fork);
 				if (checkFullWeight && myHeight == height) {
-					if (myWeight >= fork.getBlockSignsMap().getFullWeight()) {
+					if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
 						// INVALID BLOCK THROW EXCEPTION
 						String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
 						if (cnt.getActivePeersCounter() + 4 > Settings.getInstance().getMaxConnections())
@@ -504,7 +504,7 @@ public class Synchronizer {
 
 		int headersSize = headers.size();
 		if (headersSize == 0) {
-			byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight);
+			byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).a.c;
 
 			List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
 			if (headersCheck.isEmpty()) {
@@ -541,7 +541,7 @@ public class Synchronizer {
 		// TODO fix it error
 		byte[] checkPointHeightSignature;
 		Block checkPointHeightCommonBlock = null;
-		checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight);
+		checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).a.c;
 
 		try {
 			// try get common block from PEER
@@ -575,7 +575,7 @@ public class Synchronizer {
 				maxChainHeight = checkPointHeight;
 				lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
 			} else {
-				lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight);
+				lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).a.c;
 			}
 
 			LOGGER.debug(

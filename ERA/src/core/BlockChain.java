@@ -681,17 +681,13 @@ public class BlockChain
 		return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
 	}
 
+	/*
 	// ignore BIG win_values
 	public static long getTarget_old(DCSet dcSet, Block block)
 	{
 
 		if (block == null)
 			return 1000l;
-		/*
-		int height = block.getParentHeight(dcSet);
-		if (block.getTargetValue() > 0)
-			return block.getTargetValue();
-		 */
 
 		long min_value = 0;
 		long win_value = 0;
@@ -736,11 +732,12 @@ public class BlockChain
 
 		return win_value / i;
 	}
+	 */
 
-	// calc Target by last blocks in chain
+	// get Target by last blocks in chain
 	public long getTarget(DCSet dcSet)
 	{
-		return getTarget(dcSet, this.getLastBlock(dcSet));
+		return this.getLastBlock(dcSet).getTarget();
 	}
 
 	// GET MIN TARGET
@@ -754,18 +751,18 @@ public class BlockChain
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if (DEVELOP_USE)
 			base = BlockChain.BASE_TARGET >>1;
-		else if ( height < BlockChain.TARGET_COUNT)
-			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
-		else if ( height < BlockChain.TARGET_COUNT <<5)
-			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
-		else if ( height < 32100)
-			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
-		else if ( height < 105000)
-			base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
-		else
-			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
+	else if ( height < BlockChain.TARGET_COUNT)
+		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
+	else if ( height < BlockChain.TARGET_COUNT <<5)
+		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
+	else if ( height < 32100)
+		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
+	else if ( height < 105000)
+		base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
+	else
+		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
 
-		return base;
+	return base;
 
 	}
 

@@ -9,7 +9,6 @@ import javax.validation.constraints.Null;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import core.BlockChain;
 import core.block.Block;
 import datachain.DCSet;
 import lang.Lang;
@@ -104,15 +103,17 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				return null;
 			}
 
+			DCSet dcSet = DCSet.getInstance();
 			Block block = this.blocks.get(row);
 			// Block block = data.getB();
 			if (block == null) {
 				// this.blocks.rescan();
 				// data = this.blocks.get(row);
 				// return -1;
+			} else {
+				block.calcHeadMind(dcSet);				
 			}
 
-			DCSet dcSet = DCSet.getInstance();
 
 			switch (column) {
 			case COLUMN_HEIGHT:
@@ -127,7 +128,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
 				}
 
-				return block.getHeight(dcSet) + " " + BlockChain.getTarget(dcSet, block);
+				return block.getHeight(dcSet) + " " + block.getTarget();
 
 			case COLUMN_TIMESTAMP:
 				if (block == null) {

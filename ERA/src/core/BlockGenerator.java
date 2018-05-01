@@ -213,12 +213,13 @@ public class BlockGenerator extends Thread implements Observer
 				long timeUpdate = 0;
 				int shift_height = 0;
 				//byte[] unconfirmedTransactionsHash;
-				int max_winned_value;
-				int winned_value;
+				long max_winned_value;
+				long winned_value;
 				//long winned_value_account;
 				//long max_winned_value_account;
 				int height = BlockChain.getHeight(dcSet) + 1;
-				int target = bchain.getTarget(dcSet);
+				int forgingValue;
+				long target = bchain.getTarget(dcSet);
 				Block generatedBlock;
 				Block solvingBlock;
 
@@ -365,8 +366,8 @@ public class BlockGenerator extends Thread implements Observer
 									for(PrivateKeyAccount account: knownAccounts)
 									{
 
-										//winned_value_account = Block.calcGeneratingBalance(dcSet, account, height);
-										winned_value = BlockChain.calcWinValue(dcSet, account, height);
+										forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+										winned_value = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
 										if(winned_value < 1)
 											continue;
 
@@ -391,7 +392,7 @@ public class BlockGenerator extends Thread implements Observer
 										return;
 									}
 
-									wait_new_block_broadcast = (WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (target - max_winned_value) / target;
+									wait_new_block_broadcast = (WIN_TIMEPOINT>>1) + WIN_TIMEPOINT * 4 * (int)((target - max_winned_value) / target);
 
 									newWinner = false;
 									if (wait_new_block_broadcast > 0) {
@@ -597,7 +598,7 @@ public class BlockGenerator extends Thread implements Observer
 											{
 											}
 
-											byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1);
+											byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).b;
 											response = (SignaturesMessage) peer.getResponse(
 													MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
 													Synchronizer.GET_BLOCK_TIMEOUT);

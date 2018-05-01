@@ -2367,13 +2367,7 @@ public class Controller extends Observable {
 		if (this.isOnStopping())
 			return -1;
 
-		/// return this.blockChain != null?
-		/// this.blockChain.getHWeightFull(dcSet).a: -1;
-		Tuple2<Integer, Integer> hWeight = dcSet.getBlockSignsMap().get(blockChain.getLastBlockSignature(dcSet));
-		if (hWeight == null || hWeight.a == -1)
-			return -1;
-
-		return hWeight.a;
+		return dcSet.getBlocksHeadsMap().size();
 	}
 
 	public Block getLastBlock() {

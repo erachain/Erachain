@@ -1,8 +1,6 @@
 package datachain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,14 +10,10 @@ import java.util.NavigableSet;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.TreeMap;
-import java.util.WeakHashMap;
-
-import ntp.NTP;
 
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Atomic.Var;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 
@@ -27,13 +21,11 @@ import com.google.common.primitives.UnsignedBytes;
 
 import controller.Controller;
 import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.block.Block;
 import core.transaction.Transaction;
+import database.DBMap;
+import database.serializer.TransactionSerializer;
 import utils.ObserverMessage;
 import utils.ReverseComparator;
-import database.serializer.TransactionSerializer;
-import database.DBMap;
 
 // memory pool for unconfirmed transaction
 // tx.signature -> <<broadcasted peers>, transaction>
@@ -72,6 +64,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	}
 
+	@Override
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected void createIndexes(DB database) {
 		// TIMESTAMP INDEX
@@ -86,11 +79,11 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 		createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
 				new Fun.Function2<Long, byte[], Transaction>() {
-					@Override
-					public Long run(byte[] key, Transaction value) {
-						return value.getTimestamp();
-					}
-				});
+			@Override
+			public Long run(byte[] key, Transaction value) {
+				return value.getTimestamp();
+			}
+		});
 	}
 
 	public Integer deleteObservableData(int index) {
@@ -170,10 +163,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	@Override
 	public void update(Observable o, Object arg) {
-		
+
 		if(true)
 			return;
-		
+
 		ObserverMessage message = (ObserverMessage) arg;
 
 		// ON NEW BLOCK
@@ -209,6 +202,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		}
 	}
 
+	@Override
 	public boolean set(byte[] signature, Transaction transaction) {
 
 		if (this.size() > MAX_MAP_SIZE) {
@@ -227,10 +221,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		if (this.map.containsKey(signature)) {
 			return true;
 		}
-		
+
 		this.getDCSet().updateUncTxCounter(1);
-		
-		return super.set(signature, transaction);		
+
+		return super.set(signature, transaction);
 
 	}
 
@@ -280,13 +274,13 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		ArrayList<Transaction> values = new ArrayList<Transaction>();
 		Iterator<byte[]> iterator = this.getIterator(0, false);
 		Account account = new Account(address);
-		
+
 		while(iterator.hasNext()) {
 			Transaction transaction = map.get(iterator.next());
 			HashSet<Account> recipients = transaction.getRecipientAccounts();
 			if (recipients == null || recipients.isEmpty())
 				continue;
-			
+
 			if (recipients.contains(account)) {
 				values.add(transaction);
 			}
@@ -314,7 +308,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		List<byte[]> peers = this.peersBroadcasted.get(signature);
 		if (peers == null || peers.isEmpty())
 			return 0;
-		
+
 		return peers.size();
 
 	}
@@ -343,7 +337,8 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 
 	}
 
-	public void delete(byte[] signature) {
+	@Override
+	public Transaction delete(byte[] signature) {
 
 		// delete BROADCASTS
 		this.peersBroadcasted.remove(signature);
@@ -351,7 +346,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
 		if (this.contains(signature))
 			this.getDCSet().updateUncTxCounter(-1);
 
-		super.delete(signature);
+		return super.delete(signature);
 	}
 
 	public void delete(Transaction transaction) {

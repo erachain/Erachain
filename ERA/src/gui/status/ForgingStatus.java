@@ -16,6 +16,7 @@ import controller.Controller;
 import core.BlockChain;
 import core.BlockGenerator;
 import core.account.Account;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
 import utils.GUIUtils;
@@ -58,7 +59,7 @@ public class ForgingStatus extends JLabel implements Observer {
 				DCSet dcSet = DCSet.getInstance();
 				for(Account account: Controller.getInstance().getAccounts())
 				{
-					int win_value = BlockChain.calcWinValue(dcSet, account, newHeight);
+					long win_value = BlockChain.calcWinValue(dcSet, account, newHeight, account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue());
 					if (Math.abs(win_value) > winBalance) {
 						winBalance = Math.abs(win_value);
 						winAccount = account;

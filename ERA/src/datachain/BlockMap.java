@@ -18,7 +18,6 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import core.account.PublicKeyAccount;
@@ -244,7 +243,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public Block get(int height) {
 
 		Block block = super.get(height);
-		block.loadHeadMind(this.getDCSet());
+		block.loadHeadMind(this.getDCSet(), height);
 		return block;
 
 	}
@@ -269,61 +268,39 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 		 */
 
-		int key = this.size();
-
 		byte[] signature = block.getSignature();
-		Integer item = dcSet.getBlockSignsMap().get(signature);
-		if (item != null && item > 0) {
-			LOGGER.error("already EXIST : " + key
-					+ " SIGN: " + Base58.encode(signature));
+		if (dcSet.getBlockSignsMap().contains(signature)) {
+			LOGGER.error("already EXIST : " + this.size()
+			+ " SIGN: " + Base58.encode(signature));
 			return true;
 		}
 
-		// INCREMENT ATOMIC KEY IF EXISTS
-		//if (this.atomicKey != null) {
-		//	this.atomicKey.incrementAndGet();
-		//}
-
-		// INCREMENT KEY
-		//this.key++;
-		int height = key++;
+		int height = this.size() + 1;
 
 		// calc before insert record
 		long winValue;
-		Tuple3<byte[], byte[], byte[]> head;
-		Tuple4<Integer, Integer, Long, Long> fotgingPoint;
+		Tuple3 head;
+		Tuple3<Integer, Long, Long> fotgingPoint;
 
 		if (block.getVersion() == 0) {
 			// GENESIS block
 			///winValue = core.BlockChain.GENESIS_WIN_VALUE;
-			dcSet.getBlockSignsMap().set(signature, 1);
+			dcSet.getBlockSignsMap().set(signature, height);
 			head = new Tuple3<byte[], byte[], byte[]>(
 					null, block.getReference(), block.getTransactionsHash());
 			fotgingPoint = null;
 		} else {
 			dcSet.getBlockSignsMap().set(signature, height);
 
+			// PROCESS FORGING DATA
 			PublicKeyAccount creator = block.getCreator();
-			// PROCESS FORGING DATA
-			head = new Tuple3<byte[], byte[], byte[]>(
-					creator.getBytes(), block.getReference(), block.getTransactionsHash());
-			fotgingPoint = new Tuple3<Integer, Long, Long>(
-					block.forgingBalance, winValue, target);
-			//creator.setForgingData(dcSet, height, forgingBalance);
-
-			fotgingPoint = block.getHeadMind();
-			// PROCESS FORGING DATA
-			head = new Tuple3<byte[], byte[], byte[]>(
-					creator.getBytes(), block.getReference(), block.getTransactionsHash());
-			fotgingPoint = new Tuple4<Integer, Integer, Long, Long>(
-					height, forgingBalance, winValue, target);
-			//creator.setForgingData(dcSet, height, forgingBalance);
+			creator.setForgingData(dcSet, height, block.getForgingValue());
 		}
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
 		// (System.currentTimeMillis() - start)*0.001);
 		//dcSet.getBlocksHeadsMap().add(signature);
 		//this.setLastBlockSignature(signature);
-		dcSet.getBlocksHeadsMap().set(height, new Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>>(
+		dcSet.getBlocksHeadsMap().set(height, new Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>(
 				block.getHeadFace(), signature, block.getHeadMind()));
 
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
@@ -356,16 +333,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 		// ORPHAN FORGING DATA
 		if (height > 1) {
 
-			Tuple3<byte[], Tuple3<byte[], byte[], byte[]>, Tuple4<Integer, Integer, Long, Long>> point = dcSet.getBlocksHeadsMap().last();
-			byte[] creatorByte = point.b.a;
+			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> head = dcSet.getBlocksHeadsMap().remove();
+
+			byte[] creatorByte = head.a.b;
 			PublicKeyAccount creator = new PublicKeyAccount(creatorByte);
 			// INITIAL forging DATA no need remove!
 			creator.delForgingData(dcSet, height);
-			// 		db.getAddressForging().delete(this.address, height);
-
-
-			dcSet.getBlocksHeadsMap().remove();
-			//dcSet.getBlockCreatorMap().remove();
 
 		}
 

@@ -132,7 +132,7 @@ public abstract class DCMap<T, U> extends Observable {
 		if (this.parent != null) {
 			if (this.deleted != null)
 				u -= this.deleted.size();
-			
+
 			u -= this.shiftSize;
 			u += this.parent.size();
 		}
@@ -258,7 +258,7 @@ public abstract class DCMap<T, U> extends Observable {
 					this.setChanged();
 					if (this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_AT_TX_TYPE)
 							|| this.getObservableData().get(DBMap.NOTIFY_ADD)
-									.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)) {
+							.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)) {
 						this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD),
 								new Pair<T, U>(key, value)));
 					} else {
@@ -284,10 +284,10 @@ public abstract class DCMap<T, U> extends Observable {
 		return false;
 	}
 
-	public void delete(T key) {
+	public U delete(T key) {
 
 		if (DCSet.isStoped()) {
-			return;
+			return null;
 		}
 
 		this.addUses();
@@ -299,10 +299,13 @@ public abstract class DCMap<T, U> extends Observable {
 				if (this.deleted == null) {
 					this.deleted = new ArrayList<T>();
 				}
-				this.deleted.add(key);
+				if (this.parent.contains(key)) {
+					this.deleted.add(key);
+					value = this.parent.get(key);
+				}
 			}
 			this.outUses();
-			return;
+			return value;
 
 		} else if (this.parent == null) {
 
@@ -325,6 +328,7 @@ public abstract class DCMap<T, U> extends Observable {
 
 		}
 		this.outUses();
+		return value;
 
 	}
 

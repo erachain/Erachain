@@ -329,8 +329,10 @@ public class AddressesResource {
 
 		}
 
+		Account account = new Account(address);
 		return "" + BlockChain.calcWinValue(DCSet.getInstance(),
-				new Account(address), Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()) );
+				account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
+				account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue());
 	}
 
 	@GET

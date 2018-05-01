@@ -20,7 +20,7 @@ import core.item.persons.PersonCls;
 import core.transaction.IssuePersonRecord;
 import core.transaction.R_SertifyPubKeys;
 import core.transaction.Transaction;
-import datachain.BlockSignsMap;
+import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import ntp.NTP;
 
@@ -141,7 +141,7 @@ public class TestChain {
 		Controller.getInstance().initBlockChain(dcSet);
 		gb = Controller.getInstance().getBlockChain().getGenesisBlock();
 		blockChain = Controller.getInstance().getBlockChain();
-		BlockSignsMap dbHeight = dcSet.getBlockSignsMap();
+		BlocksHeadsMap dbHeight = dcSet.getBlocksHeadsMap();
 
 		int lastH = 0;
 
@@ -151,7 +151,7 @@ public class TestChain {
 		while (i <= blockChain.getHeight(dcSet)) {
 			block = blockChain.getBlock(dcSet, i);
 			int win_value = block.calcWinValueTargeted(dcSet);
-			long www = dbHeight.getWeight(block);
+			long www = block.calcWinValue(dcSet);
 			if (www != win_value) {
 				//assertEquals(www, win_value);
 				long diff = www - win_value;
