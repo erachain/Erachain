@@ -8,14 +8,16 @@ import java.util.Map;
 
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple4;
 //import org.mapdb.Fun.Tuple3;
 
-//
+/*
+ - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
+ */
+
 // account.address + current block.Height ->
-//   -> previous making blockHeight + this ForgingH balance + this Target + this Win Value
+//   -> previous making blockHeight + this ForgingH balance
 // last forged block for ADDRESS -> by height = 0
-public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple4<Integer, Integer, Long, Long>>
+public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -35,20 +37,20 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple4<Intege
 
 	@Override
 
-	protected Map<Tuple2<String, Integer>, Tuple4<Integer, Integer, Long, Long>> getMap(DB database)
+	protected Map<Tuple2<String, Integer>, Tuple2<Integer, Integer>> getMap(DB database)
 	{
 		//OPEN MAP
 		return database.getTreeMap("address_forging");
 	}
 
 	@Override
-	protected Map<Tuple2<String, Integer>, Tuple4<Integer, Integer, Long, Long>> getMemoryMap()
+	protected Map<Tuple2<String, Integer>, Tuple2<Integer, Integer>> getMemoryMap()
 	{
-		return new HashMap<Tuple2<String, Integer>, Tuple4<Integer, Integer, Long, Long>>();
+		return new HashMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>>();
 	}
 
 	@Override
-	protected Tuple4<Integer, Integer, Long, Long> getDefaultValue()
+	protected Tuple2<Integer, Integer> getDefaultValue()
 	{
 		return null; //new Tuple2<Integer, Integer>(-1, 0);
 	}
@@ -59,9 +61,9 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple4<Intege
 		return this.observableData;
 	}
 
-	public Tuple4<Integer, Integer, Long, Long> get(String address, int height)
+	public Tuple2<Integer, Integer> get(String address, int height)
 	{
-		Tuple4<Integer, Integer, Long, Long> point = this.get(new Tuple2<String, Integer>(address, height));
+		Tuple2<Integer, Integer> point = this.get(new Tuple2<String, Integer>(address, height));
 		if (point == null)
 			this.get(new Tuple2<String, Integer>(address, 0));
 
@@ -71,16 +73,15 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple4<Intege
 
 
 	// height
-	public void set(String address, Tuple4<Integer, Integer, Long, Long> currentPoint)
+	public void set(String address, Integer currentHeight, Integer currentForgingVolume)
 	{
 
-		int height = currentPoint.a;
-		Tuple4<Integer, Integer, Long, Long> previousPoint = this.getLast(address);
-		if (previousPoint != null && height > previousPoint.a) {
-			this.set(new Tuple2<String, Integer>(address, height), previousPoint);
+		Tuple2<Integer, Integer> previousPoint = this.getLast(address);
+		if (previousPoint != null && currentHeight > previousPoint.a) {
+			this.set(new Tuple2<String, Integer>(address, currentHeight), previousPoint);
 		}
 
-		this.setLast(address, currentPoint);
+		this.setLast(address, new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
 
 	}
 
@@ -92,16 +93,16 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple4<Intege
 			return;
 		}
 		Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
-		Tuple4<Integer, Integer, Long, Long> previous = this.get(key);
+		Tuple2<Integer, Integer> previous = this.get(key);
 		this.delete(key);
 		this.setLast(address, previous);
 
 	}
-	public Tuple4<Integer, Integer, Long, Long> getLast(String address)
+	public Tuple2<Integer, Integer> getLast(String address)
 	{
 		return this.get(new Tuple2<String, Integer>(address, 0));
 	}
-	private void setLast(String address, Tuple4<Integer, Integer, Long, Long> point)
+	private void setLast(String address, Tuple2<Integer, Integer> point)
 	{
 		this.set(new Tuple2<String, Integer>(address, 0), point);
 	}

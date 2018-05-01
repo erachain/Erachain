@@ -61,7 +61,7 @@ public class GenesisBlock extends Block{
 		super(genesisVersion, genesisReference, CREATOR, new byte[0], new byte[0]);
 
 		this.genesisTimestamp = Settings.getInstance().getGenesisStamp();
-		this.generatingBalance = BlockChain.GENERAL_ERA_BALANCE;
+		this.forgingBalance = BlockChain.GENERAL_ERA_BALANCE;
 
 		Account recipient;
 		BigDecimal bdAmount0;

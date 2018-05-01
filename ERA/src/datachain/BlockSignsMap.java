@@ -1,37 +1,34 @@
 package datachain;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple2;
 
 import com.google.common.primitives.UnsignedBytes;
 
 import core.block.Block;
 
 // block.signature -> Height, Weight(Win Value)
-public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
+public class BlockSignsMap extends DCMap<byte[], Integer>
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
 	// for saving in DB
-	private Atomic.Long fullWeightVar;
-	private Long fullWeight = 0L;
-	private int startedInForkHeight = 0;
+	//private Atomic.Long fullWeightVar;
+	//private Long fullWeight = 0L;
+	//private int startedInForkHeight = 0;
 
 	public BlockSignsMap(DCSet databaseSet, DB database)
 	{
 		super(databaseSet, database);
 
-		this.fullWeightVar = database.getAtomicLong("fullWeight");
-		this.fullWeight = this.fullWeightVar.get();
-		if (this.fullWeight == null)
-			this.fullWeight = 0L;
+		//this.fullWeightVar = database.getAtomicLong("fullWeight");
+		//this.fullWeight = this.fullWeightVar.get();
+		//if (this.fullWeight == null)
+		//	this.fullWeight = 0L;
 
 		//startedInForkHeight = 0;
 	}
@@ -39,7 +36,7 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 	public BlockSignsMap(BlockSignsMap parent, DCSet dcSet)
 	{
 		super(parent, dcSet);
-		this.fullWeight = parent.getFullWeight();
+		//this.fullWeight = parent.getFullWeight();
 		//startedInForkHeight
 	}
 
@@ -47,7 +44,7 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<byte[], Tuple2<Integer, Integer>> getMap(DB database)
+	protected Map<byte[], Integer> getMap(DB database)
 	{
 		//OPEN MAP
 		return database.createTreeMap("height")
@@ -58,21 +55,23 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 	}
 
 	@Override
-	protected Map<byte[], Tuple2<Integer, Integer>> getMemoryMap()
+	protected Map<byte[], Integer> getMemoryMap()
 	{
-		return new TreeMap<byte[], Tuple2<Integer, Integer>>(UnsignedBytes.lexicographicalComparator());
+		return new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
 	}
 
 	@Override
-	protected Tuple2<Integer, Integer> getDefaultValue()
+	protected Integer getDefaultValue()
 	{
 		//return new Tuple2<Integer, Long>(-1,-1L);
 		return null;
 	}
 
-	public Long getFullWeight() {
+	/*
+	private Long getFullWeight() {
 		return this.fullWeight;
 	}
+	 */
 
 	/*
 	public void setFullWeight(long value) {
@@ -85,9 +84,11 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 	}
 	 */
 
-	public int getStartedInForkHeight() {
+	/*
+	private int getStartedInForkHeight() {
 		return this.startedInForkHeight;
 	}
+	 */
 
 
 	@Override
@@ -96,16 +97,16 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 		return this.observableData;
 	}
 
-	public Tuple2<Integer, Integer> get(Block block)
+	public Integer get(Block block)
 	{
 		return this.get(block.getSignature());
 	}
 
 	public Block getBlock(byte[] signature)
 	{
-		Tuple2<Integer, Integer> key = this.get(signature);
-		if (key != null && key.a > 0)
-			return this.getDCSet().getBlockMap().get(key.a);
+		Integer key = this.get(signature);
+		if (key != null && key > 0)
+			return this.getDCSet().getBlockMap().get(key);
 
 		return null;
 	}
@@ -113,26 +114,30 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 	public Integer getHeight(Block block)
 	{
 		if (this.contains(block.getSignature()))
-			return this.get(block.getSignature()).a;
+			return this.get(block.getSignature());
 		return -1;
 	}
 	public Integer getHeight(byte[] signature)
 	{
 		if (this.contains(signature)) {
-			Tuple2<Integer, Integer> o = this.get(signature);
+			Integer o = this.get(signature);
 			if (o != null)
-				return this.get(signature).a;
+				return this.get(signature);
 		}
 		return -1;
 	}
-	public int getWeight(Block block)
+
+	/*
+	private int getWeight(Block block)
 	{
 		if (this.contains(block.getSignature()))
 			return this.get(block.getSignature()).b;
 		return 0;
 	}
+	 */
 
-	public void recalcWeightFull(DCSet dcSet) {
+	/*
+	private void recalcWeightFull(DCSet dcSet) {
 
 		long weightFull = 0l;
 		Iterator<byte[]> iterator = this.getIterator(0, true);
@@ -146,8 +151,10 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 		this.fullWeightVar.set(fullWeight);
 
 	}
+	 */
 
-	public boolean set(byte[] key, int height, int weight)
+	/*
+	public boolean set(byte[] key, int height)//, int weight)
 	{
 		if (this.contains(key)) {
 			// sub old value from FULL
@@ -159,16 +166,18 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 			startedInForkHeight = height;
 		}
 
-		fullWeight += weight;
+		fullWeight += 1; //weight;
 
 		if(this.fullWeightVar != null)
 		{
 			this.fullWeightVar.set(fullWeight);
 		}
 
-		return super.set(key, new Tuple2<Integer, Integer>(height, weight));
+		return super.set(key, new Tuple2<Integer, Integer>(height, 1)); //weight));
 	}
+	 */
 
+	/*
 	@Override
 	public void delete(byte[] key)
 	{
@@ -186,4 +195,6 @@ public class BlockSignsMap extends DCMap<byte[], Tuple2<Integer, Integer>>
 		}
 
 	}
+	 */
+
 }

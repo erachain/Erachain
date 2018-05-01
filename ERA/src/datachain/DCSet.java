@@ -55,7 +55,7 @@ public class DCSet implements Observer, IDB {
 
 	private AddressTime_SignatureMap addressTime_SignatureMap;
 	private BlockMap blockMap;
-	private BlockCreatorMap blockCreatorMap;
+	//private BlockCreatorMap blockCreatorMap;
 	private BlockSignsMap blockSignsMap;
 	private BlocksHeadsMap blocksHeadsMap;
 	private ReferenceMap referenceMap;
@@ -287,7 +287,7 @@ public class DCSet implements Observer, IDB {
 			this.actions = 0l;
 
 			this.blockMap = new BlockMap(this, database);
-			this.blockCreatorMap = new BlockCreatorMap(this, database);
+			//this.blockCreatorMap = new BlockCreatorMap(this, database);
 			this.blockSignsMap = new BlockSignsMap(this, database);
 			this.blocksHeadsMap = new BlocksHeadsMap(this, database);
 			this.referenceMap = new ReferenceMap(this, database);
@@ -359,10 +359,10 @@ public class DCSet implements Observer, IDB {
 			throw e;
 		}
 
-		if (this.blockMap.size() != this.blockSignsMap.size()
-				|| this.blocksHeadsMap.size() != this.blockSignsMap.size()) {
+		if (this.blockMap.size() != this.blocksHeadsMap.size()
+				|| this.blockSignsMap.size() != this.blocksHeadsMap.size()) {
 			LOGGER.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
-					+ this.blockMap.size() + " == " + this.blockSignsMap.size() + " == " + this.blocksHeadsMap.size());
+					+ this.blockMap.size() + " == " + this.blocksHeadsMap.size());
 
 			this.close();
 			this.actions = -1;
@@ -409,7 +409,7 @@ public class DCSet implements Observer, IDB {
 
 		this.addressTime_SignatureMap = new AddressTime_SignatureMap(parent.addressTime_SignatureMap);
 		this.blockMap = new BlockMap(parent.blockMap, this);
-		this.blockCreatorMap = new BlockCreatorMap(parent.blockCreatorMap);
+		//this.blockCreatorMap = new BlockCreatorMap(parent.blockCreatorMap);
 		this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
 		this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
 		this.referenceMap = new ReferenceMap(parent.referenceMap);
@@ -524,7 +524,7 @@ public class DCSet implements Observer, IDB {
 		this.atMap.reset();
 		this.atStateMap.reset();
 		this.atTransactionMap.reset();
-		this.blockCreatorMap.reset();
+		//this.blockCreatorMap.reset();
 
 		this.outUses();
 	}
@@ -638,10 +638,12 @@ public class DCSet implements Observer, IDB {
 		return this.blockMap;
 	}
 
+	/*
 	public BlockCreatorMap getBlockCreatorMap()
 	{
 		return this.blockCreatorMap;
 	}
+	 */
 
 	public BlockSignsMap getBlockSignsMap()
 	{

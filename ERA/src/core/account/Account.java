@@ -899,15 +899,18 @@ public class Account {
 		return getPerson(DCSet.getInstance(), Controller.getInstance().getMyHeight());
 	}
 
-	// previous forging block
+	// previous forging block or changed ERA volume
 	public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
+		//return db.getAddressForging().get(this.address, height);
 		return db.getAddressForging().get(this.address, height);
 	}
+
 	/*
 	public void setForgingData(DBSet db, int height, int prevHeight) {
 		db.getAddressForging().set(this.address, height, prevHeight);
 	}
 	 */
+
 	public void setForgingData(DCSet db, int height, int forgingBalance) {
 		db.getAddressForging().set(this.address, height, forgingBalance);
 	}
@@ -918,8 +921,9 @@ public class Account {
 		return db.getAddressForging().getLast(this.address);
 	}
 	/*
-	public void setLastForgingData(DBSet db, int prevHeight) {
-		db.getAddressForging().setLast(this.address, prevHeight);
+	public void setLastForgingData(DCSet db, int height) {
+		getAddressForging = this.getBal USE
+		db.getAddressForging().setLast(this.address, height, forgingBalance);
 	}
 	 */
 

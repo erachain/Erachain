@@ -12,6 +12,9 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -56,24 +59,34 @@ public class Block {
 	private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
 	public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
 
+	/// HEAD of BLOCK ///
+	// FACE
 	protected int version;
-	protected byte[] reference;
-	int heightBlock;
-	Block parentBlock;
-	//protected long timestamp;
-	protected int generatingBalance; // only for DB MAP
-	protected long winValue; // only for DB MAP
 	protected PublicKeyAccount creator;
 	protected byte[] signature;
-
-	protected List<Transaction> transactions;
 	protected int transactionCount;
-	protected byte[] rawTransactions = null;
-
 	protected byte[] transactionsHash;
+	//protected long timestamp;
+
+	// LINK
+	protected byte[] reference;
+	Block parentBlock;
+
+	// MIND - that calculated on DB
+	int heightBlock;
+	int creatorPreviousHeightBlock;
+	protected int forgingBalance;
+	protected long winValue;
+	protected long target;
+	/// END of HEAD ///
+
+	// BODY
+	protected List<Transaction> transactions;
+	protected byte[] rawTransactions = null;
 
 	protected byte[] atBytes;
 	//protected Long atFees;
+
 
 	static Logger LOGGER = Logger.getLogger(Block.class.getName());
 
@@ -135,11 +148,11 @@ public class Block {
 			return 1;
 
 		if (heightBlock < 1) {
-			Tuple2<Integer, Integer> item = db.getBlockSignsMap().get(this.signature);
+			Integer item = db.getBlockSignsMap().get(this.signature);
 			if (item == null) {
 				heightBlock = -1;
 			} else {
-				heightBlock = item.a;
+				heightBlock = item;
 			}
 		}
 
@@ -161,17 +174,53 @@ public class Block {
 	public Block getParent(DCSet db)
 	{
 		if (parentBlock == null) {
+			//this.parentBlock = db.getBlockSignsMap().getBlock(this.reference);
 			this.parentBlock = db.getBlockSignsMap().getBlock(this.reference);
 		}
 		return parentBlock;
 	}
 
-	public Tuple2<Integer, Integer> getParentKey(DCSet db)
+	public Tuple3 getHead()
 	{
-		Tuple2<Integer, Integer> key = db.getBlockSignsMap().get(this.reference);
-		if (key == null || key.a < 1)
-			return null;
-		return key;
+		// FACE
+		int version;
+		byte[] creator;
+		byte[] signature;
+		int transactionCount;
+		byte[] transactionsHash;
+
+		// LINK
+		byte[] reference;
+		Block parent;
+
+		// MIND
+		int heightBlock;
+		int creatorPreviousHeightBlock;
+		int forgingBalance;
+		long winValue;
+		long target;
+
+		Tuple5<Integer, byte[], byte[], Integer, byte[]> face = new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
+				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
+		Tuple2<Block, byte[]> link = new Tuple2<Block, byte[]>(this.parentBlock, this.reference);
+
+		Tuple5<Integer, Integer, Integer, Long, Long> mind = new Tuple5<Integer, Integer, Integer, Long, Long>(
+				this.heightBlock, this.creatorPreviousHeightBlock, this.forgingBalance, this.winValue, this.target);
+
+		return new Tuple3(face, link, mind);
+	}
+
+	public Tuple5<Integer, byte[], byte[], Integer, byte[]> getHeadFace()
+	{
+
+		return new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
+				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
+	}
+
+	public Tuple4<Integer, Integer, Long, Long> getHeadMind()
+	{
+		return new Tuple4<Integer, Integer, Long, Long>(
+				this.creatorPreviousHeightBlock, this.forgingBalance, this.winValue, this.target);
 	}
 
 	public Block getChild(DCSet db)
@@ -223,18 +272,18 @@ public class Block {
 	// balance on creator account when making this block
 	public int getGeneratingBalance(DCSet dcSet)
 	{
-		return this.generatingBalance;
+		return this.forgingBalance;
 	}
 	private void setGeneratingBalance(int generatingBalance)
 	{
-		this.generatingBalance = generatingBalance;
+		this.forgingBalance = generatingBalance;
 	}
 
 
 	// CALCULATE and SET
 	public void setCalcGeneratingBalance(DCSet dcSet)
 	{
-		this.generatingBalance = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+		this.forgingBalance = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 	}
 
 	public byte[] getReference()
@@ -433,12 +482,10 @@ public class Block {
 		return this.atBytes;
 	}
 
-	/*
-	public void setTransactionsHash(byte[] transactionsHash)
+	public byte[] getTransactionsHash()
 	{
-		this.transactionsHash = transactionsHash;
+		return this.transactionsHash;
 	}
-	 */
 
 	public static byte[] makeTransactionsHash(byte[] creator, List<Transaction> transactions, byte[] atBytes)
 	{
@@ -581,7 +628,7 @@ public class Block {
 		block.put("version", this.version);
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.getTimestamp(DCSet.getInstance()));
-		block.put("generatingBalance", this.generatingBalance);
+		block.put("generatingBalance", this.forgingBalance);
 		block.put("winValue", this.calcWinValue(DCSet.getInstance()));
 		block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
@@ -632,7 +679,7 @@ public class Block {
 
 		if (forDB) {
 			//WRITE GENERATING BALANCE
-			byte[] generatingBalanceBytes = Ints.toByteArray(this.generatingBalance);
+			byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingBalance);
 			generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
 			data = Bytes.concat(data, generatingBalanceBytes);
 		}
@@ -1193,7 +1240,7 @@ public class Block {
 
 		long start = System.currentTimeMillis();
 
-		if (this.generatingBalance <= 0) {
+		if (this.forgingBalance <= 0) {
 			this.setCalcGeneratingBalance(dcSet);
 			long tickets = System.currentTimeMillis() - start;
 			LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );

@@ -17,7 +17,11 @@ import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 
+import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
@@ -34,8 +38,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	protected Atomic.Integer atomicKey;
-	protected int key;
+	//	protected Atomic.Integer atomicKey;
+	//	protected int key;
 
 	// private Var<byte[]> lastBlockVar;
 	private byte[] lastBlockSignature;
@@ -54,8 +58,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public BlockMap(DCSet databaseSet, DB database) {
 		super(databaseSet, database);
 
-		this.atomicKey = database.getAtomicInteger("block_map" + "_key");
-		this.key = this.atomicKey.get();
+		//this.atomicKey = database.getAtomicInteger("block_map" + "_key");
+		//this.key = this.atomicKey.get();
 
 		if (databaseSet.isWithObserver()) {
 			// this.observableData.put(DBMap.NOTIFY_RESET,
@@ -89,7 +93,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public BlockMap(BlockMap parent, DCSet dcSet) {
 		super(parent, dcSet);
 
-		this.key = parent.size();
+		//this.key = parent.size();
 
 		this.lastBlockSignature = parent.getLastBlockSignature();
 		this.feePool = parent.getFeePool();
@@ -151,7 +155,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		return database.createTreeMap("blocks").keySerializer(BTreeKeySerializer.BASIC)
 				// .comparator(UnsignedBytes.lexicographicalComparator())
 				.valueSerializer(new BlockSerializer()).valuesOutsideNodesEnable()
-				//.counterEnable() - auto increment atomicKey
+				.counterEnable() // - auto increment atomicKey
 				.makeOrGet();
 	}
 
@@ -187,12 +191,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	public Block last() {
 		// return this.get(this.getLastBlockSignature());
-		return this.get(this.key);
+		return this.get(this.size());
 	}
 
 	public byte[] getLastBlockSignature() {
 		if (this.lastBlockSignature == null) {
-			this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.key);
+			this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).a;
 		}
 		return this.lastBlockSignature;
 	}
@@ -218,6 +222,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		return false;
 	}
 
+	/*
 	@Override
 	public int size() {
 		// size from Map as .size() - .deleted() + parent.size() for numbered key is WRONG
@@ -225,6 +230,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		// so use this KEY
 		return this.key;
 	}
+	 */
 
 	public void setProcessing(boolean processing) {
 		if (this.processingVar != null) {
@@ -258,44 +264,60 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 		 */
 
+		int key = this.size();
+
 		byte[] signature = block.getSignature();
-		Tuple2<Integer, Integer> item = dcSet.getBlockSignsMap().get(signature);
-		if (item != null && item.a > 0) {
-			LOGGER.error("already EXIST : " + this.key
+		Integer item = dcSet.getBlockSignsMap().get(signature);
+		if (item != null && item > 0) {
+			LOGGER.error("already EXIST : " + key
 					+ " SIGN: " + Base58.encode(signature));
 			return true;
 		}
 
 		// INCREMENT ATOMIC KEY IF EXISTS
-		if (this.atomicKey != null) {
-			this.atomicKey.incrementAndGet();
-		}
+		//if (this.atomicKey != null) {
+		//	this.atomicKey.incrementAndGet();
+		//}
 
 		// INCREMENT KEY
-		this.key++;
-		int height = this.key;
+		//this.key++;
+		int height = key++;
 
 		// calc before insert record
-		long win_value = block.calcWinValue(dcSet);
-		long target = block.calcWinValue(dcSet);
+		long winValue;
+		Tuple3<byte[], byte[], byte[]> head;
+		Tuple4<Integer, Integer, Long, Long> fotgingPoint;
 
 		if (block.getVersion() == 0) {
 			// GENESIS block
-			dcSet.getBlockSignsMap().set(signature, 1, core.BlockChain.GENESIS_WIN_VALUE);
+			///winValue = core.BlockChain.GENESIS_WIN_VALUE;
+			dcSet.getBlockSignsMap().set(signature, 1);
+			head = new Tuple3<byte[], byte[], byte[]>(
+					null, block.getReference(), block.getTransactionsHash());
+			fotgingPoint = null;
 		} else {
-			dcSet.getBlockSignsMap().set(signature, height, win_value);
+			dcSet.getBlockSignsMap().set(signature, height);
+
+			//block.mindDC(dcSet);
+
+			fotgingPoint = block.getHeadMind();
+			getHeadFace
 
 			PublicKeyAccount creator = block.getCreator();
-			dcSet.getBlockCreatorMap().add(creator.getPublicKey());
 			// PROCESS FORGING DATA
-			int forgingBalance = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-			creator.setForgingData(dcSet, height, forgingBalance);
-
+			head = new Tuple3<byte[], byte[], byte[]>(
+					creator.getBytes(), block.getReference(), block.getTransactionsHash());
+			fotgingPoint = new Tuple4<Integer, Integer, Long, Long>(
+					height, forgingBalance, winValue, target);
+			//creator.setForgingData(dcSet, height, forgingBalance);
 		}
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
 		// (System.currentTimeMillis() - start)*0.001);
-		dcSet.getBlocksHeadsMap().add(signature);
-		this.setLastBlockSignature(signature);
+		//dcSet.getBlocksHeadsMap().add(signature);
+		//this.setLastBlockSignature(signature);
+		dcSet.getBlocksHeadsMap().set(height, new Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>>(
+				block.getHeadFace(), signature, block.getHeadMind()));
+
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
 		// (System.currentTimeMillis() - start)*0.001);
 
@@ -318,7 +340,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public void remove(byte[] signature, byte[] reference) {
 		DCSet dcSet = getDCSet();
 
-		int height = this.key;
+		int height = this.size();
 
 		this.setLastBlockSignature(reference);
 		dcSet.getBlockSignsMap().delete(signature);
@@ -326,7 +348,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 		// ORPHAN FORGING DATA
 		if (height > 1) {
 
-			byte[] creatorByte = dcSet.getBlockCreatorMap().last();
+			Tuple3<byte[], Tuple3<byte[], byte[], byte[]>, Tuple4<Integer, Integer, Long, Long>> point = dcSet.getBlocksHeadsMap().last();
+			byte[] creatorByte = point.b.a;
 			PublicKeyAccount creator = new PublicKeyAccount(creatorByte);
 			// INITIAL forging DATA no need remove!
 			creator.delForgingData(dcSet, height);
@@ -334,19 +357,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 
 			dcSet.getBlocksHeadsMap().remove();
-			dcSet.getBlockCreatorMap().remove();
+			//dcSet.getBlockCreatorMap().remove();
 
 		}
 
 		// use SUPER.class only!
 		super.delete(height);
-
-		if (this.atomicKey != null) {
-			this.atomicKey.decrementAndGet();
-		}
-
-		// DECREMENT KEY
-		--this.key;
 
 	}
 

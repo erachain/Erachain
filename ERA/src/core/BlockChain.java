@@ -406,29 +406,22 @@ public class BlockChain
 	 */
 
 	public Tuple2<Integer, Long> getHWeightFull(DCSet dcSet) {
-		Tuple2<Integer, Integer> hWeight = dcSet.getBlockSignsMap().get(this.getLastBlockSignature(dcSet));
-		if (hWeight == null || hWeight.a == -1) return new Tuple2<Integer, Long>(-1, -1L);
-
-		/*
-		if (hWeight.b < hWeight.a * 2000) {
-			dcSet.getBlockSignsMap().recalcWeightFull(dcSet);
-		}
-		 */
-		return new Tuple2<Integer, Long>(hWeight.a, dcSet.getBlockSignsMap().getFullWeight());
+		return new Tuple2<Integer, Long>(dcSet.getBlocksHeadsMap().size(),
+				dcSet.getBlocksHeadsMap().getFullWeight());
 	}
 
 	public long getFullWeight(DCSet dcSet) {
 
-		return dcSet.getBlockSignsMap().getFullWeight();
+		return dcSet.getBlocksHeadsMap().getFullWeight();
 	}
 
 	public static int getCheckPoint(DCSet dcSet) {
 
-		Tuple2<Integer, Integer> item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
-		if (item == null || item.a == -1)
+		Integer item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
+		if (item == null || item == -1)
 			return 2;
 
-		int heightCheckPoint = item.a;
+		int heightCheckPoint = item;
 		int dynamicCheckPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
 
 		if (dynamicCheckPoint > heightCheckPoint)
@@ -459,8 +452,8 @@ public class BlockChain
 		List<byte[]> headers = new ArrayList<byte[]>();
 
 		//CHECK IF BLOCK EXISTS
-		Tuple2<Integer, Integer> heightWT = dcSet.getBlockSignsMap().get(parentSignature);
-		if(heightWT != null && heightWT.a > 0)
+		Integer height = dcSet.getBlockSignsMap().get(parentSignature);
+		if(height != null && height > 0)
 		{
 
 			int packet;
@@ -474,11 +467,10 @@ public class BlockChain
 			//BlocksHeadsMap map = dcSet.getBlockHeightsMap();
 			BlocksHeadsMap map = dcSet.getBlocksHeadsMap();
 			int counter = 0;
-			int height = heightWT.a;
 			while(parentSignature != null && counter++ < packet)
 			{
 				headers.add(parentSignature);
-				parentSignature = map.get(++height).a;
+				parentSignature = map.get(++height).b;
 			}
 			//LOGGER.debug("get size " + counter);
 		} else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
@@ -535,7 +527,7 @@ public class BlockChain
 			}
 
 			int height01 = dcSet.getBlocksHeadsMap().size() - 1;
-			lastSignature = dcSet.getBlocksHeadsMap().get(height01);
+			lastSignature = dcSet.getBlocksHeadsMap().get(height01).b;
 			if(Arrays.equals(lastSignature, block.getReference())) {
 				// CONCURENT for LAST BLOCK
 				Block lastBlock = dcSet.getBlockMap().last();
