@@ -21,11 +21,9 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
-import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Base58;
-import core.transaction.Transaction;
 import database.serializer.BlockSerializer;
 import utils.Converter;
 import utils.ObserverMessage;
@@ -196,7 +194,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 	public byte[] getLastBlockSignature() {
 		if (this.lastBlockSignature == null) {
-			this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).a;
+			this.lastBlockSignature = getDCSet().getBlocksHeadsMap().get(this.size()).a.c;
 		}
 		return this.lastBlockSignature;
 	}
@@ -243,6 +241,13 @@ public class BlockMap extends DCMap<Integer, Block> {
 		this.processing = processing;
 	}
 
+	public Block get(int height) {
+
+		Block block = super.get(height);
+		block.loadHeadMind(this.getDCSet());
+		return block;
+
+	}
 	static boolean init1 = true;
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();
@@ -298,12 +303,15 @@ public class BlockMap extends DCMap<Integer, Block> {
 		} else {
 			dcSet.getBlockSignsMap().set(signature, height);
 
-			//block.mindDC(dcSet);
+			PublicKeyAccount creator = block.getCreator();
+			// PROCESS FORGING DATA
+			head = new Tuple3<byte[], byte[], byte[]>(
+					creator.getBytes(), block.getReference(), block.getTransactionsHash());
+			fotgingPoint = new Tuple3<Integer, Long, Long>(
+					block.forgingBalance, winValue, target);
+			//creator.setForgingData(dcSet, height, forgingBalance);
 
 			fotgingPoint = block.getHeadMind();
-			getHeadFace
-
-			PublicKeyAccount creator = block.getCreator();
 			// PROCESS FORGING DATA
 			head = new Tuple3<byte[], byte[], byte[]>(
 					creator.getBytes(), block.getReference(), block.getTransactionsHash());

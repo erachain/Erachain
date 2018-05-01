@@ -698,7 +698,7 @@ public class BlockGenerator extends Thread implements Observer
 				Block newBlock = BlockFactory.getInstance().create(version, parentBlock.getSignature(), account,
 						transactionsHash, atBytes);
 				// SET GENERATING BALANCE here
-				newBlock.setCalcGeneratingBalance(dcSet);
+				///newBlock.setCalcGeneratingBalance(dcSet);
 				newBlock.sign(account);
 
 				return newBlock;
@@ -722,7 +722,7 @@ public class BlockGenerator extends Thread implements Observer
 				Block newBlock = new Block(version, parentBlock.getSignature(), account, transactionsItem, atBytes);
 				//	//BlockFactory.getInstance().create(version, parentBlock.getSignature(), account, trans, atBytes);
 				// SET GENERATING BALANCE here
-				newBlock.setCalcGeneratingBalance(dcSet);
+				////newBlock.setCalcGeneratingBalance(dcSet);
 				newBlock.sign(account);
 
 				return newBlock;

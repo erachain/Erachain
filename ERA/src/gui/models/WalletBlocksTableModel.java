@@ -125,7 +125,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			case COLUMN_BASETARGET:
 
 				long iii = block.calcWinValueTargeted(DCSet.getInstance());
-				return block.getGeneratingBalance(DCSet.getInstance()) + " "
+				return block.getForgingValue() + " "
 					+ iii;
 				
 			case COLUMN_TRANSACTIONS:

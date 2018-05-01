@@ -160,7 +160,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 					return "-1";
 				}
 
-				return block.getGeneratingBalance(dcSet) + " "
+				return block.getForgingValue() + " "
 				+ block.getCreator().getForgingData(dcSet, block.getHeight(dcSet))
 				+ " " + block.calcWinValue(dcSet) + " " + block.calcWinValueTargeted(dcSet);
 

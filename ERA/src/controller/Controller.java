@@ -2399,7 +2399,7 @@ public class Controller extends Observable {
 
 	public long getNextBlockGeneratingBalance() {
 		Block block = this.dcSet.getBlockMap().last();
-		return block.getGeneratingBalance(dcSet);
+		return block.getForgingValue();
 	}
 
 	// FORGE

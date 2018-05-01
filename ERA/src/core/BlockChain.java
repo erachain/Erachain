@@ -50,7 +50,8 @@ public class BlockChain
 
 	public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
 	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
-	public static final int TARGET_COUNT = 100;
+	public static final int TARGET_COUNT_SHIFT = 9;
+	public static final int TARGET_COUNT = 2<<TARGET_COUNT_SHIFT;
 	public static final int BASE_TARGET = 1024 * 3;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
 
@@ -671,8 +672,17 @@ public class BlockChain
 		return list;
 	}
 
+	public static long calcTarget(int height, long targetPrevios, long winValue)
+	{
+
+		if (height < TARGET_COUNT) {
+			return targetPrevios - (targetPrevios/height) + (winValue/height);
+		}
+		return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
+	}
+
 	// ignore BIG win_values
-	public static long getTarget(DCSet dcSet, Block block)
+	public static long getTarget_old(DCSet dcSet, Block block)
 	{
 
 		if (block == null)
@@ -906,7 +916,7 @@ public class BlockChain
 	}
 
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
-	public static long calcWinValue(DCSet dcSet, Account creator, int height) {
+	public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
 		Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
@@ -918,7 +928,6 @@ public class BlockChain
 		int previousForgingHeight = previousForgingPoint.a;
 
 		// OWN + RENT balance - in USE
-		int forgingBalance = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 		if (forgingBalance > previousForgingPoint.b) {
 			forgingBalance = previousForgingPoint.b;
 		}

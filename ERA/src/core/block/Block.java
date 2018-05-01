@@ -13,7 +13,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
@@ -70,12 +69,12 @@ public class Block {
 
 	// LINK
 	protected byte[] reference;
-	Block parentBlock;
+	protected Block parentBlock;
 
 	// MIND - that calculated on DB
-	int heightBlock;
-	int creatorPreviousHeightBlock;
-	protected int forgingBalance;
+	protected int heightBlock;
+	//protected int creatorPreviousHeightBlock;
+	protected int forgingValue;
 	protected long winValue;
 	protected long target;
 	/// END of HEAD ///
@@ -160,16 +159,10 @@ public class Block {
 
 	}
 
-	/*
-	protected long targetValue;
-	public long getTargetValue() {
-		return targetValue;
+	public long getTarget() {
+		return this.target;
 	}
-	public void setTargetValue(long target) {
-		if (targetValue == 0)
-			targetValue = target;
-	}
-	 */
+
 
 	public Block getParent(DCSet db)
 	{
@@ -195,7 +188,7 @@ public class Block {
 
 		// MIND
 		int heightBlock;
-		int creatorPreviousHeightBlock;
+		////int creatorPreviousHeightBlock;
 		int forgingBalance;
 		long winValue;
 		long target;
@@ -204,8 +197,8 @@ public class Block {
 				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
 		Tuple2<Block, byte[]> link = new Tuple2<Block, byte[]>(this.parentBlock, this.reference);
 
-		Tuple5<Integer, Integer, Integer, Long, Long> mind = new Tuple5<Integer, Integer, Integer, Long, Long>(
-				this.heightBlock, this.creatorPreviousHeightBlock, this.forgingBalance, this.winValue, this.target);
+		Tuple3<Integer, Long, Long> mind = new Tuple3<Integer, Long, Long>(
+				this.forgingValue, this.winValue, this.target);
 
 		return new Tuple3(face, link, mind);
 	}
@@ -217,11 +210,33 @@ public class Block {
 				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
 	}
 
-	public Tuple4<Integer, Integer, Long, Long> getHeadMind()
+	public Tuple3<Integer, Long, Long> getHeadMind()
 	{
-		return new Tuple4<Integer, Integer, Long, Long>(
-				this.creatorPreviousHeightBlock, this.forgingBalance, this.winValue, this.target);
+		return new Tuple3<Integer, Long, Long>(
+				this.forgingValue, this.winValue, this.target);
 	}
+
+	// NEED CALCULATE BEFORE add in BlockMap
+	public void calcHeadMind(DCSet dcSet)
+	{
+		this.parentBlock = this.getParent(dcSet);
+		this.heightBlock = this.parentBlock.getHeight(dcSet);
+		Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
+		//this.creatorPreviousHeightBlock = forgingPoint.a;
+		this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+		this.winValue = calcWinValue(dcSet);
+		this.target = BlockChain.calcTarget(heightBlock, parentBlock.getTarget(), this.winValue);
+	}
+
+	public void loadHeadMind(DCSet dcSet)
+	{
+		Tuple3<Integer, Long, Long> headMind = dcSet.getBlocksHeadsMap().get(this.getHeight(dcSet)).c;
+		this.forgingValue = headMind.a;
+		this.winValue = headMind.b;
+		this.target = headMind.c;
+
+	}
+
 
 	public Block getChild(DCSet db)
 	{
@@ -250,12 +265,13 @@ public class Block {
 						Controller.getInstance().getBlockChain().getGenesisBlock().getSignature()))
 			return 1;
 
-		Block parent = this.getParent(db);
-		if (parent == null)
+
+		this.getParent(db);
+		if (this.parentBlock == null)
 			return -1;
 
-		int height = parent.getHeight(db) + 1;
-		return height;
+		this.heightBlock = this.parentBlock.getHeight(db) + 1;
+		return this.heightBlock;
 
 	}
 
@@ -270,20 +286,23 @@ public class Block {
 	}
 
 	// balance on creator account when making this block
-	public int getGeneratingBalance(DCSet dcSet)
+	public int getForgingValue()
 	{
-		return this.forgingBalance;
+		return this.forgingValue;
 	}
+
+	/*
 	private void setGeneratingBalance(int generatingBalance)
 	{
-		this.forgingBalance = generatingBalance;
+		this.forgingValue = generatingBalance;
 	}
+	 */
 
 
 	// CALCULATE and SET
 	public void setCalcGeneratingBalance(DCSet dcSet)
 	{
-		this.forgingBalance = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+		this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 	}
 
 	public byte[] getReference()
@@ -558,7 +577,7 @@ public class Block {
 		position += CREATOR_LENGTH;
 
 		int generatingBalance = 0;
-		if (forDB) {
+		if (false && forDB) {
 			//READ GENERATING BALANCE
 			byte[] generatingBalanceBytes = Arrays.copyOfRange(data, position, position + GENERATING_BALANCE_LENGTH);
 			generatingBalance = Ints.fromByteArray(generatingBalanceBytes);
@@ -601,8 +620,8 @@ public class Block {
 			block = new Block(version, reference, generator, transactionsHash, new byte[0], signature);
 		}
 
-		if (forDB)
-			block.setGeneratingBalance(generatingBalance);
+		//if (forDB)
+		//	block.setGeneratingBalance(generatingBalance);
 
 		//READ TRANSACTIONS COUNT
 		byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
@@ -628,7 +647,7 @@ public class Block {
 		block.put("version", this.version);
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.getTimestamp(DCSet.getInstance()));
-		block.put("generatingBalance", this.forgingBalance);
+		block.put("generatingBalance", this.forgingValue);
 		block.put("winValue", this.calcWinValue(DCSet.getInstance()));
 		block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
@@ -677,9 +696,9 @@ public class Block {
 		byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
 		data = Bytes.concat(data, generatorBytes);
 
-		if (forDB) {
+		if (false && forDB) {
 			//WRITE GENERATING BALANCE
-			byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingBalance);
+			byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingValue);
 			generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
 			data = Bytes.concat(data, generatingBalanceBytes);
 		}
@@ -765,7 +784,7 @@ public class Block {
 	public int getDataLength(boolean forDB)
 	{
 
-		int length = BASE_LENGTH + (forDB?GENERATING_BALANCE_LENGTH:0);
+		int length = BASE_LENGTH; // + (forDB?GENERATING_BALANCE_LENGTH:0);
 
 		if(this.version > 1)
 		{
@@ -862,40 +881,25 @@ public class Block {
 
 	public long calcWinValue(DCSet dcSet) {
 
-		if (this.winValue != 0)
-			return this.winValue;
-
-		if (this.version == 0) {
+		if (this.version == 0 || this.creator == null) {
 			// GENESIS
 			this.winValue = BlockChain.GENESIS_WIN_VALUE;
 			return this.winValue;
 		}
 
-		if (this.creator == null) {
-			this.winValue = BlockChain.BASE_TARGET;
-			return this.winValue;
-		}
-
-		/*if (this.generatingBalance <= 0) {
-			this.setCalcGeneratingBalance(dcSet);
-		}
-		 */
-
-		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.getHeightByParent(dcSet));
+		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 		return this.winValue;
 	}
 
 	public int calcWinValueTargeted(DCSet dcSet)
 	{
 
-		if (this.version == 0) {
+		if (this.version == 0 || this.creator == null) {
 			// GENESIS - getBlockChain = null
 			return BlockChain.BASE_TARGET;
 		}
 
-		long win_value = this.calcWinValue(dcSet);
-		long target = BlockChain.getTarget(dcSet, this);
-		return BlockChain.calcWinValueTargeted(win_value, target);
+		return BlockChain.calcWinValueTargeted(this.winValue, this.target);
 	}
 
 	public boolean isValid(DCSet dcSet, boolean andProcess)
@@ -965,9 +969,18 @@ public class Block {
 		//int base = BlockChain.getMinTarget(height);
 		///int targetedWinValue = this.calcWinValueTargeted(dcSet);
 
-		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, height);
-		long target = BlockChain.getTarget(dcSet, this);
-		long win_value = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, target);
+		this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+		this.heightBlock = height;
+
+		this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+		if (!cnt.isTestNet() && this.winValue < 1) {
+			LOGGER.debug("*** Block[" + height + "] WIN_VALUE not in BASE RULES " + this.winValue);
+			return false;
+		}
+
+
+		this.target = BlockChain.calcTarget(dcSet, this.parentBlock.target, this.winValue);
+		int tardetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, this.target);
 		if (!cnt.isTestNet() && win_value < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + win_value + " < " + target);
@@ -1239,12 +1252,6 @@ public class Block {
 			throw new Exception("on stoping");
 
 		long start = System.currentTimeMillis();
-
-		if (this.forgingBalance <= 0) {
-			this.setCalcGeneratingBalance(dcSet);
-			long tickets = System.currentTimeMillis() - start;
-			LOGGER.error("[" + this.heightBlock + "] setCalcGeneratingBalance time: " +  tickets*0.001 );
-		}
 
 		//ADD TO DB
 		long timerStart = System.currentTimeMillis();

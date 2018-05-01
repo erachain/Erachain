@@ -1912,7 +1912,7 @@ public class BlockExplorer
 			blockJSON.put("height", counter);
 			blockJSON.put("signature", Base58.encode(block.getSignature()));
 			blockJSON.put("generator", block.getCreator().getAddress());
-			blockJSON.put("generatingBalance", block.getGeneratingBalance(dcSet));
+			blockJSON.put("generatingBalance", block.getForgingValue());
 			//blockJSON.put("winValue", block.calcWinValue(dcSet.getInstance()));
 			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(dcSet));
 			blockJSON.put("transactionCount", block.getTransactionCount());
@@ -4764,7 +4764,7 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order =  ((Creat
 			transactionDataJSON.put("generator", block.getCreator().getAddress());
 			transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
 
-			transactionDataJSON.put("generatingBalance", block.getGeneratingBalance(dcSet));
+			transactionDataJSON.put("generatingBalance", block.getForgingValue());
 			//transactionDataJSON.put("atFees", block.getATfee().toPlainString());
 			transactionDataJSON.put("reference", Base58.encode(block.getReference()));
 			transactionDataJSON.put("generatorSignature", Base58.encode(block.getSignature()));

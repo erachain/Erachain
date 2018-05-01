@@ -11,17 +11,17 @@ import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 /*
  *  Block Height ->
- *  + signature
- *  + Block HEAD - creator, parentSignature, transactions Signature
- *  + Forging Data - previous height, this Forging Value, Win Value, Target Value
+ *  BLOCK HEAD:
+ *  + FACE - version, creator, signature, transactionCount, transactionsHash
+ *  + parentSignature
+ *  + Forging Data - Forging Value, Win Value, Target Value
  *
  */
-public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>>>
+public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>>
 {
 
 	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -56,7 +56,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 	}
 
 	@Override
-	protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>>> getMap(DB database)
+	protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMap(DB database)
 	{
 		//OPEN MAP
 		return database.createTreeMap(NAME)
@@ -79,12 +79,12 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 	}
 
 	@Override
-	protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>>> getMemoryMap() {
-		return new HashMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>>>();
+	protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMemoryMap() {
+		return new HashMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>>();
 	}
 
 	@Override
-	protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>> getDefaultValue() {
+	protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> getDefaultValue() {
 		return null;
 	}
 
@@ -107,7 +107,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		Iterator<Integer> iterator = this.getIterator(0, true);
 		while (iterator.hasNext()) {
 			Integer key = iterator.next();
-			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>> item = this.get(key);
+			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item = this.get(key);
 			weightFull += item.c.c;
 		}
 
@@ -116,7 +116,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 
 	}
 
-	public boolean set(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>> item) {
+	public boolean set(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
 
 		int key = this.size() + 1;
 		int height = item.c.a;
@@ -138,7 +138,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 
 	}
 
-	public int add(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>> item) {
+	public int add(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
 
 		int key = this.size() + 1;
 
@@ -149,7 +149,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		return key;
 	}
 
-	public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>> last() {
+	public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> last() {
 		return this.get(this.size());
 	}
 
@@ -158,7 +158,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		int key = this.size();
 		if (this.contains(key)) {
 			// sub old value from FULL
-			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple4<Integer, Integer, Long, Long>> value_old = this.get(key);
+			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> value_old = this.get(key);
 			fullWeight -= value_old.c.c;
 
 			if(this.fullWeightVar != null)
