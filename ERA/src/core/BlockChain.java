@@ -972,6 +972,7 @@ public class BlockChain
 		else
 			win_value = forgingBalance;
 
+		if (false) {
 		if (height < BlockChain.REPEAT_WIN)
 			win_value >>= 4;
 		else if (BlockChain.DEVELOP_USE)
@@ -986,6 +987,7 @@ public class BlockChain
 			win_value >>= 6;
 		else
 			win_value = (win_value >>7) - (win_value >>9);
+		}
 
 
 		return (int)win_value;

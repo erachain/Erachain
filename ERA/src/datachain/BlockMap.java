@@ -247,6 +247,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 		return block;
 
 	}
+	
 	static boolean init1 = true;
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();
@@ -277,20 +278,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 
 		int height = this.size() + 1;
 
-		// calc before insert record
-		long winValue;
-		Tuple3 head;
-		Tuple3<Integer, Long, Long> fotgingPoint;
-
 		if (block.getVersion() == 0) {
 			// GENESIS block
-			///winValue = core.BlockChain.GENESIS_WIN_VALUE;
-			dcSet.getBlockSignsMap().set(signature, height);
-			head = new Tuple3<byte[], byte[], byte[]>(
-					null, block.getReference(), block.getTransactionsHash());
-			fotgingPoint = null;
 		} else {
-			dcSet.getBlockSignsMap().set(signature, height);
 
 			// PROCESS FORGING DATA
 			PublicKeyAccount creator = block.getCreator();
@@ -298,10 +288,11 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
 		// (System.currentTimeMillis() - start)*0.001);
-		//dcSet.getBlocksHeadsMap().add(signature);
-		//this.setLastBlockSignature(signature);
+
+		dcSet.getBlockSignsMap().set(signature, height);
 		dcSet.getBlocksHeadsMap().set(height, new Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>(
 				block.getHeadFace(), signature, block.getHeadMind()));
+		this.setLastBlockSignature(signature);
 
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
 		// (System.currentTimeMillis() - start)*0.001);
@@ -322,7 +313,7 @@ public class BlockMap extends DCMap<Integer, Block> {
 	 */
 
 	// TODO make CHAIN deletes - only for LAST block!
-	public void remove(byte[] signature, byte[] reference) {
+	public Block remove(byte[] signature, byte[] reference) {
 		DCSet dcSet = getDCSet();
 
 		int height = this.size();
@@ -343,15 +334,9 @@ public class BlockMap extends DCMap<Integer, Block> {
 		}
 
 		// use SUPER.class only!
-		super.delete(height);
+		return super.delete(height);
 
 	}
-
-	/*
-	public void delete(int height) {
-		//return ;
-	}
-	 */
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Collection<Integer> getGeneratorBlocks(String address)
