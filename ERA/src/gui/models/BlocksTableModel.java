@@ -233,7 +233,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 		{
 			//CHECK IF LIST UPDATED
 			Block block = (Block)message.getValue();
-			block.loadHeadMind(DCSet.getInstance(), 0);
+			block.loadHeadMind(DCSet.getInstance());
 			this.blocks.add(0, block);
 			this.fireTableRowsInserted(0, 0);
 			if (this.blocks.size() > 100) {
@@ -266,7 +266,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 		DCSet dcSet = DCSet.getInstance();
 		Block block = cntr.getLastBlock();
 		for (int i=0; i<100; i++) {
-			block.loadHeadMind(dcSet, 0);
+			block.loadHeadMind(dcSet);
 			this.blocks.add(block);
 			block = cntr.getBlock(block.getReference());
 			if (block == null)

@@ -206,7 +206,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 			for (Integer i = start; i <= end; i++) {
 				Block block = DCSet.getInstance().getBlockMap().get(i);
 				if (block != null) {
-					block.loadHeadMind(dcSet, 0);
+					block.loadHeadMind(dcSet);
 					blocks.add(block);
 				}
 			}

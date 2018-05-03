@@ -458,7 +458,8 @@ public class CreateOrderTransaction extends Transaction {
 		super.orphan(asPack);
 
 		// ORPHAN ORDER
-		this.order.copy().orphan();
+		//this.order.copy().orphan();
+		this.order.orphan();
 	}
 
 	@Override

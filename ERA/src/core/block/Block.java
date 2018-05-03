@@ -69,7 +69,7 @@ public class Block {
 
 	// LINK
 	protected byte[] reference;
-	protected Block parentBlock;
+	protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> parentBlockHead;
 
 	// MIND - that calculated on DB
 	protected int heightBlock;
@@ -138,6 +138,11 @@ public class Block {
 		return this.signature;
 	}
 
+	public void setHeight(int height)
+	{
+		this.heightBlock = height;
+	}
+	
 	public int getHeight(DCSet db)
 	{
 
@@ -164,16 +169,42 @@ public class Block {
 	}
 
 
-	public Block getParent(DCSet db)
+	public void loadParentHead(DCSet db)
 	{
-		if (parentBlock == null) {
-			//this.parentBlock = db.getBlockSignsMap().getBlock(this.reference);
-			this.parentBlock = db.getBlockSignsMap().getBlock(this.reference);
+		if (parentBlockHead == null) {
+			Integer heightParentBlock = db.getBlockSignsMap().get(this.reference);
+			if (heightParentBlock == null) {
+				this.heightBlock = -1;
+				this.parentBlockHead = null;
+			} else {
+				this.heightBlock = heightParentBlock + 1;
+				this.parentBlockHead = db.getBlocksHeadsMap().get(heightParentBlock);
+			}
 		}
-		return parentBlock;
 	}
 
-	public Tuple3 getHead()
+	public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> getParentHead()
+	{
+		return this.parentBlockHead;
+	}
+
+	public Block getParent(DCSet dcSet)
+	{
+		int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
+		//assert (parentHeight, this.heightBlock - 1);
+		return dcSet.getBlockMap().get(parentHeight);
+	}
+
+	public void loadHeadMind(DCSet dcSet)
+	{
+		Tuple3<Integer, Long, Long> headMind = dcSet.getBlocksHeadsMap().get(this.heightBlock).c;
+		this.forgingValue = headMind.a;
+		this.winValue = headMind.b;
+		this.target = headMind.c;
+
+	}
+
+	public Tuple3 getHead1()
 	{
 		// FACE
 		int version;
@@ -184,7 +215,7 @@ public class Block {
 
 		// LINK
 		byte[] reference;
-		Block parent;
+		//Block parent;
 
 		// MIND
 		int heightBlock;
@@ -195,12 +226,13 @@ public class Block {
 
 		Tuple5<Integer, byte[], byte[], Integer, byte[]> face = new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
 				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
-		Tuple2<Block, byte[]> link = new Tuple2<Block, byte[]>(this.parentBlock, this.reference);
+		//Tuple2<Block, byte[]> link = new Tuple2<Block, byte[]>(this.parentBlockHead, this.reference);
 
 		Tuple3<Integer, Long, Long> mind = new Tuple3<Integer, Long, Long>(
 				this.forgingValue, this.winValue, this.target);
 
-		return new Tuple3(face, link, mind);
+		
+		return new Tuple3(face, this.reference, mind);
 	}
 
 	public Tuple5<Integer, byte[], byte[], Integer, byte[]> getHeadFace()
@@ -216,6 +248,7 @@ public class Block {
 				this.forgingValue, this.winValue, this.target);
 	}
 
+	/*
 	// NEED CALCULATE BEFORE add in BlockMap
 	public void calcHeadMind(DCSet dcSet)
 	{
@@ -227,29 +260,16 @@ public class Block {
 			this.target = BlockChain.GENESIS_WIN_VALUE;
 
 		} else { 
-			this.parentBlock = this.getParent(dcSet);
-			this.heightBlock = this.parentBlock.getHeight(dcSet) + 1;
+			this.parentBlockHead = this.getParent(dcSet);
+			this.heightBlock = this.parentBlockHead.getHeight(dcSet) + 1;
 			//Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
 			//this.creatorPreviousHeightBlock = forgingPoint.a;
 			this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 			this.winValue = calcWinValue(dcSet);
-			this.target = BlockChain.calcTarget(heightBlock, parentBlock.getTarget(), this.winValue);
+			this.target = BlockChain.calcTarget(heightBlock, parentBlockHead.getTarget(), this.winValue);
 		}
 	}
-
-	public void loadHeadMind(DCSet dcSet, int height)
-	{
-		if (height < 1)
-			this.getHeight(dcSet);
-		else
-			this.heightBlock = height;
-		Tuple3<Integer, Long, Long> headMind = dcSet.getBlocksHeadsMap().get(this.getHeight(dcSet)).c;
-		this.forgingValue = headMind.a;
-		this.winValue = headMind.b;
-		this.target = headMind.c;
-
-	}
-
+	*/
 
 	public Block getChild(DCSet db)
 	{
@@ -279,11 +299,7 @@ public class Block {
 			return 1;
 
 
-		this.getParent(db);
-		if (this.parentBlock == null)
-			return -1;
-
-		this.heightBlock = this.parentBlock.getHeight(db) + 1;
+		this.loadParentHead(db);
 		return this.heightBlock;
 
 	}
@@ -962,7 +978,7 @@ public class Block {
 		}
 
 		//CHECK IF VERSION IS CORRECT
-		if(this.version != this.getParent(dcSet).getNextBlockVersion(dcSet))
+		if(this.version != 1) //this.getParent(dcSet).getNextBlockVersion(dcSet))
 		{
 			LOGGER.debug("*** Block[" + height + "].version invalid");
 			return false;
@@ -998,7 +1014,7 @@ public class Block {
 			return false;
 		}
 
-		long currentTarget = this.parentBlock.getTarget();
+		long currentTarget = this.parentBlockHead.c.c;
 		int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, currentTarget);
 		if (!cnt.isTestNet() && targetedWinValue < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
@@ -1054,7 +1070,7 @@ public class Block {
 
 			long timestampEnd = this.getTimestamp(dcSet);
 			// because time filter used by parent block timestamp on core.BlockGenerator.run()
-			long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
+			//long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 
 			DCSet validatingDC;
 

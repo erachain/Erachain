@@ -31,6 +31,9 @@ import utils.Pair;
 public class BlockChain
 {
 
+	// 1825 - 13189664557 - 2718
+	// 1824 - 7635471
+	
 	//public static final int START_LEVEL = 1;
 	public static final boolean DEVELOP_USE = false;
 	public static final boolean HARD_WORK = false;
@@ -738,7 +741,7 @@ public class BlockChain
 	public long getTarget(DCSet dcSet)
 	{
 		Block block = this.getLastBlock(dcSet);
-		block.loadHeadMind(dcSet, 0);
+		block.loadHeadMind(dcSet);
 		return block.getTarget();
 	}
 

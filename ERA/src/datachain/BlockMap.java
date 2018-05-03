@@ -243,10 +243,20 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public Block getWithMind(int height) {
 
 		Block block = super.get(height);
-		block.loadHeadMind(this.getDCSet(), height);
+		block.setHeight(height);
+		block.loadHeadMind(this.getDCSet());
 		return block;
 
 	}
+	
+	public Block get(Integer height) {
+
+		Block block = super.get(height);
+		block.setHeight(height);
+		return block;
+
+	}
+
 
 	static boolean init1 = true;
 	public boolean add(Block block) {
