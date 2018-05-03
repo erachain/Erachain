@@ -92,8 +92,8 @@ public class TestRec_Send {
 		Integer bbb = 31;
 		assertEquals("11111", Integer.toBinaryString(bbb));
 
-		BigDecimal amountBase = new BigDecimal("1234567812345678");
-		BigDecimal amountTemp;
+		BigDecimal amountTest = new BigDecimal("1234567812345678");
+		BigDecimal amountBase;
 		BigDecimal amount1;
 		BigDecimal amount2;
 
@@ -103,32 +103,37 @@ public class TestRec_Send {
 
 		for (int i = 0; i < TransactionAmount.SCALE_MASK; i++) {
 
-			amount1 = amountBase.scaleByPowerOfTen(-TransactionAmount.SCALE_MASK_HALF - BlockChain.AMOUNT_DEDAULT_SCALE + i);
+			amount1 = amountTest.scaleByPowerOfTen(-TransactionAmount.SCALE_MASK_HALF - BlockChain.AMOUNT_DEDAULT_SCALE + i);
 
 			scale = amount1.scale();
 
 			// TO BASE
-			scaleBase = -scale + BlockChain.AMOUNT_DEDAULT_SCALE;
+			scaleBase = scale - BlockChain.AMOUNT_DEDAULT_SCALE;
 
-			amountTemp = amount1.scaleByPowerOfTen(scale + TransactionAmount.SCALE_MASK_HALF);
+			// to DEFAUTL base 8 decimals
+			amountBase = amount1.scaleByPowerOfTen(scaleBase);
+
+			if (scaleBase < 0)
+				scaleBase += TransactionAmount.SCALE_MASK + 1;
+
 
 			// CHECK ACCURACY of AMOUNT
-			int accuracy = scale & TransactionAmount.SCALE_MASK;
+			int accuracy = scaleBase & TransactionAmount.SCALE_MASK;
 			String sss = Integer.toBinaryString(accuracy);
 
 
 			if (accuracy > 0) {
-				if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
-					accuracy -= TransactionAmount.SCALE_MASK;
+				if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+					accuracy -= TransactionAmount.SCALE_MASK + 1;
 				}
 				// RESCALE AMOUNT
-				amount2 = amountTemp.scaleByPowerOfTen(accuracy);
+				amount2 = amountBase.scaleByPowerOfTen(-accuracy);
 			} else {
-				amount2 = amountTemp;
+				amount2 = amountBase;
 			}
 
 
-			assertEquals(amount1.setScale(accuracy), amount2.setScale(accuracy));
+			assertEquals(amount1, amount2);
 
 		}
 	}

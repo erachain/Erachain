@@ -328,12 +328,12 @@ public class R_Send extends TransactionAmount {
 			// CHECK ACCURACY of AMOUNT
 			int accuracy = typeBytes[3] & SCALE_MASK;
 			if (accuracy > 0) {
-				if (accuracy >= SCALE_MASK_HALF) {
-					accuracy -= SCALE_MASK;
+				if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+					accuracy -= TransactionAmount.SCALE_MASK + 1;
 				}
 
 				// RESCALE AMOUNT
-				amount = amount.scaleByPowerOfTen(accuracy);
+				amount = amount.scaleByPowerOfTen(-accuracy);
 			}
 
 		}

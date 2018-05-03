@@ -302,12 +302,15 @@ public abstract class TransactionAmount extends Transaction {
 			data = Bytes.concat(data, keyBytes);
 
 			// WRITE ACCURACY of AMMOUNT
-			int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - this.amount.scale();
+			int different_scale = this.amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 			BigDecimal amountBase;
 			if (different_scale != 0) {
 				// RESCALE AMOUNT
 				amountBase = this.amount.scaleByPowerOfTen(different_scale);
-				data[3] = (byte)(data[3] & different_scale + (SCALE_MASK_HALF));
+				if (different_scale < 0)
+					different_scale += TransactionAmount.SCALE_MASK + 1;
+
+				data[3] = (byte)(data[3] | different_scale);
 			} else {
 				amountBase = this.amount;
 			}
