@@ -240,14 +240,14 @@ public class BlockMap extends DCMap<Integer, Block> {
 		this.processing = processing;
 	}
 
-	public Block get(int height) {
+	public Block getWithMind(int height) {
 
 		Block block = super.get(height);
 		block.loadHeadMind(this.getDCSet(), height);
 		return block;
 
 	}
-	
+
 	static boolean init1 = true;
 	public boolean add(Block block) {
 		DCSet dcSet = getDCSet();

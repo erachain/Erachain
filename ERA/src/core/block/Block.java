@@ -228,7 +228,7 @@ public class Block {
 
 		} else { 
 			this.parentBlock = this.getParent(dcSet);
-			this.heightBlock = this.parentBlock.getHeight(dcSet);
+			this.heightBlock = this.parentBlock.getHeight(dcSet) + 1;
 			//Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
 			//this.creatorPreviousHeightBlock = forgingPoint.a;
 			this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
@@ -239,7 +239,10 @@ public class Block {
 
 	public void loadHeadMind(DCSet dcSet, int height)
 	{
-		this.heightBlock = height;
+		if (height < 1)
+			this.getHeight(dcSet);
+		else
+			this.heightBlock = height;
 		Tuple3<Integer, Long, Long> headMind = dcSet.getBlocksHeadsMap().get(this.getHeight(dcSet)).c;
 		this.forgingValue = headMind.a;
 		this.winValue = headMind.b;
@@ -301,6 +304,11 @@ public class Block {
 		return this.forgingValue;
 	}
 
+	public long getWinValue()
+	{
+		return this.winValue;
+	}
+
 	/*
 	private void setGeneratingBalance(int generatingBalance)
 	{
@@ -309,11 +317,13 @@ public class Block {
 	 */
 
 
+	/*
 	// CALCULATE and SET
 	public void setCalcGeneratingBalance(DCSet dcSet)
 	{
 		this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 	}
+	*/
 
 	public byte[] getReference()
 	{

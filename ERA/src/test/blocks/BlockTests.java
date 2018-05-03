@@ -593,7 +593,7 @@ public class BlockTests
 
 		////generator.setLastForgingData(db, block.getHeightByParent(db));
 		generator.setForgingData(db, block.getHeightByParent(db), payment2.getAmount().intValue());
-		block.setCalcGeneratingBalance(db);
+		//block.setCalcGeneratingBalance(db);
 		block.sign(generator);
 
 		//CHECK VALID

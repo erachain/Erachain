@@ -7,6 +7,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.block.Block;
@@ -111,7 +112,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				// data = this.blocks.get(row);
 				// return -1;
 			} else {
-				block.calcHeadMind(dcSet);				
+				//block.calcHeadMind(dcSet);				
 			}
 
 
@@ -161,9 +162,11 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 					return "-1";
 				}
 
+				Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, block.getHeight(dcSet));
+				
 				return block.getForgingValue() + " "
-				+ block.getCreator().getForgingData(dcSet, block.getHeight(dcSet))
-				+ " " + block.calcWinValue(dcSet) + " " + block.calcWinValueTargeted(dcSet);
+				+ forgingPoint.a + " " + forgingPoint.b
+				+ " " + block.getWinValue() + " " + block.calcWinValueTargeted(dcSet);
 
 			case COLUMN_TRANSACTIONS:
 				if (block == null) {
@@ -197,9 +200,11 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 	public void searchBlock(Integer start, Integer end){
 		clear();
 		if (start <= end) {
+			DCSet dcSet = DCSet.getInstance();
 			for (Integer i = start; i <= end; i++) {
 				Block block = DCSet.getInstance().getBlockMap().get(i);
 				if (block != null) {
+					block.loadHeadMind(dcSet, 0);
 					blocks.add(block);
 				}
 			}

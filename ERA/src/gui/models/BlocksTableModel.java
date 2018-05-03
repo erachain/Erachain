@@ -8,6 +8,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.block.Block;
@@ -113,7 +114,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 				//data = this.blocks.get(row);
 				//	return -1;
 			} else {
-				block.calcHeadMind(dcSet);
+				//block.calcHeadMind(dcSet);
 			}
 
 			switch(column)
@@ -162,9 +163,11 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 					return "-1";
 				}
 
+				Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, block.getHeight(dcSet));
+
 				return block.getForgingValue() + " "
-				+ block.getCreator().getForgingData(dcSet, block.getHeight(dcSet)) + " "
-				+ block.calcWinValue(dcSet) + " "
+				+ forgingPoint.a + " " + forgingPoint.b
+				+ block.getWinValue() + " "
 				+ block.calcWinValueTargeted(dcSet);
 
 			case COLUMN_TRANSACTIONS:
@@ -228,7 +231,9 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 		} else if(type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE)
 		{
 			//CHECK IF LIST UPDATED
-			this.blocks.add(0, (Block)message.getValue());
+			Block block = (Block)message.getValue();
+			block.loadHeadMind(DCSet.getInstance(), 0);
+			this.blocks.add(0, block);
 			this.fireTableRowsInserted(0, 0);
 			if (this.blocks.size() > 100) {
 				this.blocks.remove(100);
@@ -256,10 +261,13 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 
 	public void resetRows() {
 		this.blocks = new ArrayList<Block>();
-		Block block = Controller.getInstance().getLastBlock();
+		Controller cntr = Controller.getInstance();
+		DCSet dcSet = DCSet.getInstance();
+		Block block = cntr.getLastBlock();
 		for (int i=0; i<100; i++) {
+			block.loadHeadMind(dcSet, 0);
 			this.blocks.add(block);
-			block = Controller.getInstance().getBlock(block.getReference());
+			block = cntr.getBlock(block.getReference());
 			if (block == null)
 				return;
 		}
