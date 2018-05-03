@@ -164,9 +164,10 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
 				Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, block.getHeight(dcSet));
 				
-				return block.getForgingValue() + " "
-				+ forgingPoint.a + " " + forgingPoint.b
-				+ " " + block.getWinValue() + " " + block.calcWinValueTargeted(dcSet);
+				return  forgingPoint.b + " "
+				+ forgingPoint.a + " "
+				+ block.getWinValue() + " "
+				+ block.calcWinValueTargeted(dcSet);
 
 			case COLUMN_TRANSACTIONS:
 				if (block == null) {
