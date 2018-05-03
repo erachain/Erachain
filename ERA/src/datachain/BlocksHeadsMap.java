@@ -160,7 +160,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		if (this.contains(key)) {
 			// sub old value from FULL
 			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> value_old = this.get(key);
-			fullWeight -= value_old.c.c;
+			fullWeight -= value_old.c.b;
 
 			if(this.fullWeightVar != null)
 			{

@@ -901,7 +901,6 @@ public class Account {
 
 	// previous forging block or changed ERA volume
 	public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
-		//return db.getAddressForging().get(this.address, height);
 		return db.getAddressForging().get(this.address, height);
 	}
 

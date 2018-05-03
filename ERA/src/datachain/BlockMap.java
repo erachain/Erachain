@@ -293,9 +293,11 @@ public class BlockMap extends DCMap<Integer, Block> {
 		} else {
 
 			// PROCESS FORGING DATA
-			PublicKeyAccount creator = block.getCreator();
-			creator.setForgingData(dcSet, height, block.getForgingValue());
 		}
+
+		PublicKeyAccount creator = block.getCreator();
+		creator.setForgingData(dcSet, height, block.getForgingValue());
+		
 		// LOGGER.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
 		// (System.currentTimeMillis() - start)*0.001);
 
