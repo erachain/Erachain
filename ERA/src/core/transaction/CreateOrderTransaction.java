@@ -22,6 +22,15 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.DCSet;
 
+/*
+
+#### PROPERTY 1
+typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
+
+#### PROPERTY 2
+typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
+
+ */
 public class CreateOrderTransaction extends Transaction {
 	private static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
 	private static final String NAME_ID = "Create Order";
@@ -262,11 +271,31 @@ public class CreateOrderTransaction extends Transaction {
 		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
+		// CHECK ACCURACY of AMOUNT
+		int accuracy = typeBytes[2] & TransactionAmount.SCALE_MASK;
+		if (accuracy > 0) {
+			if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+				accuracy -= TransactionAmount.SCALE_MASK + 1;
+			}
+
+			// RESCALE AMOUNT
+			amountHave = amountHave.scaleByPowerOfTen(-accuracy);
+		}
 
 		// READ AMOUNT WANT
 		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
+		// CHECK ACCURACY of AMOUNT
+		accuracy = typeBytes[3] & TransactionAmount.SCALE_MASK;
+		if (accuracy > 0) {
+			if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+				accuracy -= TransactionAmount.SCALE_MASK + 1;
+			}
+
+			// RESCALE AMOUNT
+			amountWant = amountWant.scaleByPowerOfTen(-accuracy);
+		}
 
 		return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
 				reference, signatureBytes);
@@ -305,14 +334,39 @@ public class CreateOrderTransaction extends Transaction {
 		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
 		data = Bytes.concat(data, wantBytes);
 
+		// WRITE ACCURACY of AMMOUNT
+		int different_scale = this.amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		BigDecimal amountBase;
+		if (different_scale != 0) {
+			// RESCALE AMOUNT
+			amountBase = this.amountHave.scaleByPowerOfTen(different_scale);
+			if (different_scale < 0)
+				different_scale += TransactionAmount.SCALE_MASK + 1;
+
+			data[2] = (byte)(data[2] | different_scale);
+		} else {
+			amountBase = this.amountHave;
+		}
 		// WRITE AMOUNT HAVE
-		byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
+		byte[] amountHaveBytes = amountBase.unscaledValue().toByteArray();
 		byte[] fill_H = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
 		amountHaveBytes = Bytes.concat(fill_H, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
 
+		// WRITE ACCURACY of AMMOUNT
+		different_scale = this.amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
+		if (different_scale != 0) {
+			// RESCALE AMOUNT
+			amountBase = this.amountWant.scaleByPowerOfTen(different_scale);
+			if (different_scale < 0)
+				different_scale += TransactionAmount.SCALE_MASK + 1;
+
+			data[3] = (byte)(data[3] | different_scale);
+		} else {
+			amountBase = this.amountWant;
+		}
 		// WRITE AMOUNT WANT
-		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
+		byte[] amountWantBytes = amountBase.unscaledValue().toByteArray();
 		byte[] fill_W = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill_W, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
