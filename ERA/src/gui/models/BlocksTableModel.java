@@ -163,10 +163,11 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 					return "-1";
 				}
 
-				Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, block.getHeight(dcSet));
+				int height =  block.getHeight(dcSet);
+				Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
 
 				return  forgingPoint.b + " "
-				+ forgingPoint.a + " "
+				+ (height - forgingPoint.a) + " "
 				+ block.getWinValue() + " "
 				+ block.calcWinValueTargeted(dcSet);
 
