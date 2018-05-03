@@ -104,8 +104,8 @@ public abstract class TransactionAmount extends Transaction {
 			if (different_scale != 0) {
 				amount = amount.scaleByPowerOfTen(different_scale);
 			}
-			this.amount = amount;
 			 */
+			this.amount = amount;
 		}
 
 		this.key = key;

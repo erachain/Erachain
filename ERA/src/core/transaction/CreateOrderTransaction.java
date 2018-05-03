@@ -49,6 +49,7 @@ public class CreateOrderTransaction extends Transaction {
 		this.haveKey = haveKey;
 		this.wantKey = wantKey;
 
+		/*
 		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
 		if (different_scale != 0) {
 			amountHave = amountHave.scaleByPowerOfTen(different_scale);
@@ -57,6 +58,7 @@ public class CreateOrderTransaction extends Transaction {
 		if (different_scale != 0) {
 			amountWant = amountWant.scaleByPowerOfTen(different_scale);
 		}
+		*/
 
 		this.amountHave = amountHave;
 		this.amountWant = amountWant;
@@ -98,6 +100,7 @@ public class CreateOrderTransaction extends Transaction {
 
 		super.setDC(dcSet, asPack);
 
+		/*
 		int different_scale;
 		AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(this.haveKey);
 		if (asset != null) {
@@ -116,6 +119,7 @@ public class CreateOrderTransaction extends Transaction {
 				this.amountWant = this.amountWant.scaleByPowerOfTen(different_scale);
 			}
 		}
+		*/
 
 		this.order = new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey, this.amountHave, this.amountWant, this.timestamp);
 		this.order.setDC(dcSet);
@@ -417,7 +421,7 @@ public class CreateOrderTransaction extends Transaction {
 			if (amountBytes.length > AMOUNT_LENGTH) {
 				return AMOUNT_LENGHT_SO_LONG;
 			}
-			if (amountHave.scale() != haveAsset.getScale()) {
+			if (amountHave.scale() > haveAsset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
 		}
@@ -426,7 +430,7 @@ public class CreateOrderTransaction extends Transaction {
 			if (amountBytes.length > AMOUNT_LENGTH) {
 				return AMOUNT_LENGHT_SO_LONG;
 			}
-			if (amountWant.scale() != wantAsset.getScale()) {
+			if (amountWant.scale() > wantAsset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
 		}
