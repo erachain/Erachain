@@ -998,13 +998,14 @@ public class Block {
 			return false;
 		}
 
-		this.target = BlockChain.calcTarget(this.heightBlock, this.parentBlock.getTarget(), this.winValue);
-		int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, this.target);
+		long currentTarget = this.parentBlock.getTarget();
+		int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, currentTarget);
 		if (!cnt.isTestNet() && targetedWinValue < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
 			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + this.target);
 			return false;
 		}
+		this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
 
 		if ( this.atBytes != null && this.atBytes.length > 0 )
 		{

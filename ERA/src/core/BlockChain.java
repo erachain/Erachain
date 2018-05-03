@@ -737,7 +737,9 @@ public class BlockChain
 	// get Target by last blocks in chain
 	public long getTarget(DCSet dcSet)
 	{
-		return this.getLastBlock(dcSet).getTarget();
+		Block block = this.getLastBlock(dcSet);
+		block.loadHeadMind(dcSet, 0);
+		return block.getTarget();
 	}
 
 	// GET MIN TARGET
@@ -751,20 +753,16 @@ public class BlockChain
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if (DEVELOP_USE)
 			base = BlockChain.BASE_TARGET >>1;
-	else if ( height < BlockChain.TARGET_COUNT)
-		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>2);
-	else if ( height < BlockChain.TARGET_COUNT <<5)
-		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>3);
-	else if ( height < 32100)
-		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
-	else if ( height < 105000)
-		base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
-	else
-		base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
-
-	return base;
-
-	}
+		else if ( height < 32100)
+			base = (BlockChain.BASE_TARGET>>2); // + (BlockChain.BASE_TARGET>>4);
+		else if ( height < 105000)
+			base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
+		else
+			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
+	
+		return base;
+	
+		}
 
 
 	/*

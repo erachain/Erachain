@@ -115,12 +115,13 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		this.fullWeightVar.set(fullWeight);
 
 	}
+	
+	public boolean set(int height, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
 
-	public boolean set(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
+		//int key = this.size() + 1;
 
-		int key = this.size() + 1;
-		int height = item.c.a;
-		long weight = item.c.c;
+		// get Win Value of block
+		long weight = item.c.b;
 
 		if (startedInForkHeight == 0 && this.parent != null) {
 			startedInForkHeight = height;
@@ -134,7 +135,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 		}
 
 		// INSERT WITH NEW KEY
-		return super.set(key, item);
+		return super.set(height, item);
 
 	}
 
