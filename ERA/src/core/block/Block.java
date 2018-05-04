@@ -684,7 +684,8 @@ public class Block {
 		block.put("reference", Base58.encode(this.reference));
 		block.put("timestamp", this.getTimestamp(DCSet.getInstance()));
 		block.put("generatingBalance", this.forgingValue);
-		block.put("winValue", this.calcWinValue(DCSet.getInstance()));
+		block.put("winValue", this.getWinValue());
+		block.put("target", this.getTarget());
 		block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
 		block.put("fee", this.getTotalFee().toPlainString());
@@ -1523,7 +1524,7 @@ public class Block {
 		return " WT: " + this.calcWinValueTargeted(dcSet)
 		+ " recs: " + this.transactionCount
 		+ " H: " + this.getHeightByParent(dcSet)
-		+ " W: " + this.calcWinValue(dcSet)
+		//+ " W: " + this.getWinValue()
 		+ " C: " + this.getCreator().getPersonAsString();
 	}
 

@@ -1424,7 +1424,7 @@ public class Controller extends Observable {
 						return;
 					}
 
-					newBlock.calcWinValue(dcSet);
+					/////newBlock.calcWinValue(dcSet);
 
 					if (blockChain.setWaitWinBuffer(dcSet, newBlock)) {
 						// IF IT WIN

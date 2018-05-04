@@ -23,8 +23,6 @@ import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import network.Peer;
-import network.message.MessageFactory;
-import ntp.NTP;
 import settings.Settings;
 import utils.Pair;
 
@@ -522,7 +520,8 @@ public class BlockChain
 			// при больших нагрузках увеличивает развал сети
 			if (true)
 				return -111;
-
+			
+			/*
 			//CHECK IF WE KNOW THIS BLOCK
 			if(dbMap.contains(block.getSignature()))
 			{
@@ -566,6 +565,7 @@ public class BlockChain
 
 			LOGGER.debug("isNewBlockValid ERROR -> reference NOT to last block -9");
 			return -7;
+			*/
 		}
 
 		return 0;

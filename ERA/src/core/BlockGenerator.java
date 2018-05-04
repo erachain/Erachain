@@ -725,6 +725,7 @@ public class BlockGenerator extends Thread implements Observer
 				// SET GENERATING BALANCE here
 				////newBlock.setCalcGeneratingBalance(dcSet);
 				newBlock.sign(account);
+				newBlock.isValid(dcSet, false); // set win VALUE
 
 				return newBlock;
 
@@ -777,7 +778,7 @@ public class BlockGenerator extends Thread implements Observer
 
 					if (bchain != null ) {
 						waitWin = bchain.getWaitWinBuffer();
-						if (waitWin != null && waitWin.calcWinValue(dcSet) > max_winned_value) {
+						if (waitWin != null && waitWin.getWinValue() > max_winned_value) {
 							return null;
 						}
 					}
