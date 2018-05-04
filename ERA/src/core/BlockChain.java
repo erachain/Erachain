@@ -681,6 +681,13 @@ public class BlockChain
 		if (height < TARGET_COUNT) {
 			return targetPrevios - (targetPrevios/height) + (winValue/height);
 		}
+		
+		// CUT GROWTH
+		long cut1 = (targetPrevios<<1) + (targetPrevios>>1);
+		if (height > 50000 && winValue > cut1) {
+			winValue = cut1;
+		}
+		
 		return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
 	}
 

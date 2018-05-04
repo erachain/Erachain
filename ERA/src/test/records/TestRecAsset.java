@@ -861,10 +861,14 @@ public class TestRecAsset {
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 		long timestamp = NTP.getTime();
 
+		
 		//CREATE ASSET TRANSFER
 		long key = 2l;
-		maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		BigDecimal amountSend = BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal bal = maker.getBalanceUSE(key, db);
+		
+		maker.changeBalance(db, false, key, amountSend, false);
+		Transaction messageTransaction = new R_Send(maker, FEE_POWER, recipient, key, amountSend,
 				"headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
 				timestamp, maker.getLastTimestamp(db));
 		messageTransaction.sign(maker, false);

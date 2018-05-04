@@ -143,6 +143,16 @@ public class Block {
 		this.heightBlock = height;
 	}
 	
+	public void setHeadMind(int height, int forgingValue, long winValue, long previousTarget)
+	{
+		this.heightBlock = height;
+		this.forgingValue = forgingValue;
+		this.winValue = winValue;
+		this.target = BlockChain.calcTarget(this.heightBlock, previousTarget, this.winValue);
+
+	}
+
+	
 	public int getHeight(DCSet db)
 	{
 
@@ -202,37 +212,6 @@ public class Block {
 		this.winValue = headMind.b;
 		this.target = headMind.c;
 
-	}
-
-	public Tuple3 getHead1()
-	{
-		// FACE
-		int version;
-		byte[] creator;
-		byte[] signature;
-		int transactionCount;
-		byte[] transactionsHash;
-
-		// LINK
-		byte[] reference;
-		//Block parent;
-
-		// MIND
-		int heightBlock;
-		////int creatorPreviousHeightBlock;
-		int forgingBalance;
-		long winValue;
-		long target;
-
-		Tuple5<Integer, byte[], byte[], Integer, byte[]> face = new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
-				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
-		//Tuple2<Block, byte[]> link = new Tuple2<Block, byte[]>(this.parentBlockHead, this.reference);
-
-		Tuple3<Integer, Long, Long> mind = new Tuple3<Integer, Long, Long>(
-				this.forgingValue, this.winValue, this.target);
-
-		
-		return new Tuple3(face, this.reference, mind);
 	}
 
 	public Tuple5<Integer, byte[], byte[], Integer, byte[]> getHeadFace()

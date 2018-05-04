@@ -159,8 +159,9 @@ public class TestRec_Send {
 				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
+		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), 25); //Transaction.VALIDATE_OK);
 
 		assertEquals((long)maker.getLastTimestamp(db), gb.getTimestamp(db));
 		r_SendV3.process(gb, false);
@@ -207,8 +208,9 @@ public class TestRec_Send {
 				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
+		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), 25); //Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 		assertEquals((long)maker.getLastTimestamp(db), timestamp);
@@ -255,6 +257,7 @@ public class TestRec_Send {
 				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
+		r_SendV3.setDC(db, false);
 
 		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
@@ -299,6 +302,7 @@ public class TestRec_Send {
 				timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
+		r_SendV3.setDC(db, false);
 
 		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
 
@@ -344,8 +348,9 @@ public class TestRec_Send {
 				++timestamp, maker.getLastTimestamp(db)
 				);
 		r_SendV3.sign(maker, false);
+		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference), 25); //ransaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -388,13 +393,15 @@ public class TestRec_Send {
 		aTFundingAsset.setReference(assetReference);
 		db.getItemAssetMap().set(61l, aTFundingAsset);
 
-		GenesisBlock genesisBlock = new GenesisBlock();
+		GenesisBlock genesisBlock = gb; //new GenesisBlock();
+		/*
 		try {
 			genesisBlock.process(db);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		*/
 
 		//CREATE KNOWN ACCOUNT
 		byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -423,6 +430,7 @@ public class TestRec_Send {
 				++timestamp, maker.getLastTimestamp(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
+		arbitraryTransactionV3.setDC(db, false);
 
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
@@ -499,6 +507,7 @@ public class TestRec_Send {
 				timestamp, maker.getLastTimestamp(db)
 				);
 		arbitraryTransactionV3.sign(maker, false);
+		arbitraryTransactionV3.setDC(db, false);
 
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)

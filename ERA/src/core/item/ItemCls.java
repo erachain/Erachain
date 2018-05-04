@@ -15,7 +15,6 @@ import com.google.common.primitives.Ints;
 import controller.Controller;
 import core.BlockChain;
 import core.account.PublicKeyAccount;
-import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import datachain.DCSet;
@@ -336,11 +335,11 @@ public abstract class ItemCls {
 	public String toString(DCSet db)
 	{
 		long key = this.getKey(db);
-		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
+		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
 		return (key==0?"?:":key
 				//+ "." + this.typeBytes[0]
-				+ " ") + this.getName()
-				+ (creator.length()==0?"": " (" +creator + ")");
+				+ " ") + this.getName();
+				//+ (creator.length()==0?"": " (" +creator + ")");
 	}
 
 
@@ -372,9 +371,9 @@ public abstract class ItemCls {
 	public String getShort(DCSet db)
 	{
 		long key = this.getKey(db);
-		String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
-		return (key<1?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 30))
-		+ (creator.length()==0?"": " (" +creator + ")");
+		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
+		return (key<1?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 30));
+		//+ (creator.length()==0?"": " (" +creator + ")");
 	}
 	public String getShort()
 	{
