@@ -722,12 +722,9 @@ public class BlockGenerator extends Thread implements Observer
 		atBytes = new byte[0];
 
 		//CREATE NEW BLOCK
-
 		Block newBlock = new Block(version, parentBlock.getSignature(), account, transactionsItem, atBytes);
-		//	//BlockFactory.getInstance().create(version, parentBlock.getSignature(), account, trans, atBytes);
-		// SET GENERATING BALANCE here
-		////newBlock.setCalcGeneratingBalance(dcSet);
 		newBlock.sign(account);
+		// SET HEAD MIND before saving in DB if WIN
 		newBlock.setHeadMind(height, forgingValue, winValue, previousTarget);
 		return newBlock;
 

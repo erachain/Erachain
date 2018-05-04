@@ -520,6 +520,7 @@ public class Order implements Comparable<Order>
 					// RESOLVE amount with SCALE
 					tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(tradeAmountGet.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
 					tradeAmount = tradeAmountAccurate.setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
+					int tradeAmountPrecision = tradeAmount.precision(); 
 					if (tradeAmount.precision() < BlockChain.TRADE_PRECISION) {
 						differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
 						differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
@@ -528,6 +529,7 @@ public class Order implements Comparable<Order>
 							// USE price of THIS
 							tradeAmountAccurate = tradeAmountGet.multiply(thisPrice).setScale(tradeAmountGet.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
 							tradeAmount = tradeAmountAccurate.setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
+							tradeAmountPrecision = tradeAmount.precision(); 
 							if (tradeAmount.precision() < BlockChain.TRADE_PRECISION) {
 								differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
 								differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();

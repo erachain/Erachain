@@ -354,6 +354,13 @@ public class Account {
 			absKey = -key;
 		}
 
+		if (this.equals("78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg")
+				&& absKey == 2
+				&& !db.isFork()
+				&& (type == 1 || type == 2)) {
+			;
+		}
+		
 		Tuple5<
 		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
 		Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>> balance = db.getAssetBalanceMap().get(getAddress(), absKey);

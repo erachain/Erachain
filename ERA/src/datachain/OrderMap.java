@@ -28,11 +28,12 @@ import database.DBMap;
 import utils.ObserverMessage;
 
 /*
- * Tuple4
+ * Tuple5
  * 	private BigInteger id;
 	private Account creator;
 	protected long timestamp;
 	private boolean isExecutable = true;
+	private BigDecimal Price;
 
 Tuple3
 	private long have;
