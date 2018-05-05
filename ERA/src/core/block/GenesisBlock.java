@@ -754,7 +754,7 @@ public class GenesisBlock extends Block{
 		byte[] transactionsSignatures = new byte[0];
 		for(Transaction transaction: this.getTransactions())
 		{
-			if(transaction.isValid(null) != Transaction.VALIDATE_OK)
+			if(transaction.isValid(null, 0l) != Transaction.VALIDATE_OK)
 			{
 				return false;
 			}

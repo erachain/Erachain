@@ -1,40 +1,32 @@
 package test.records;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Stack;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
-import ntp.NTP;
-
 import org.junit.Test;
 
 import core.BlockChain;
-import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.item.ItemFactory;
-import core.item.unions.UnionCls;
 import core.item.unions.Union;
-import core.item.statuses.StatusCls;
+import core.item.unions.UnionCls;
 import core.transaction.IssueUnionRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.wallet.Wallet;
 import datachain.DCSet;
 import datachain.KKUnionStatusMap;
+import ntp.NTP;
 
 public class TestRecUnion {
 
@@ -50,6 +42,8 @@ public class TestRecUnion {
 	byte[] unionReference = new byte[64];
 	long timestamp = NTP.getTime();
 	
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
@@ -139,7 +133,7 @@ public class TestRecUnion {
 	public void initUnionalize() {
 
 
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
 
 		issueUnionTransaction.sign(certifier, false);
 		
@@ -181,22 +175,22 @@ public class TestRecUnion {
 		issueUnionTransaction.sign(certifier, false);
 
 		//CHECK IF ISSUE UNION IS VALID
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
 
 		//CREATE INVALID ISSUE UNION - INVALID UNIONALIZE
 		issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
-		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(releaserReference, flags));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference, flags));
 
 		//CHECK IF ISSUE UNION IS VALID
 		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference, flags));
 
 		//CHECK 
 		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
 
 	}
 
@@ -313,7 +307,7 @@ public class TestRecUnion {
 		
 		init();				
 		
-		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
 
 		issueUnionTransaction.sign(certifier, false);
 		

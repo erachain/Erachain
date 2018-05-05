@@ -217,7 +217,7 @@ public class MultiPaymentTransaction extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK PAYMENTS SIZE
@@ -269,7 +269,7 @@ public class MultiPaymentTransaction extends Transaction {
 			payment.process(this.creator, fork);
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	//PROCESS/ORPHAN

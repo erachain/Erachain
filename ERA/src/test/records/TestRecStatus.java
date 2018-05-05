@@ -40,6 +40,8 @@ public class TestRecStatus {
 	byte[] statusReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
@@ -182,7 +184,7 @@ public class TestRecStatus {
 		//CREATE ISSUE STATUS TRANSACTION
 		IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(releaserReference, flags));
 
 		issueStatusRecord.sign(maker, false);
 		issueStatusRecord.process(gb, false);

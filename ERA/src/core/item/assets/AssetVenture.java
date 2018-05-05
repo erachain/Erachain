@@ -161,7 +161,7 @@ public class AssetVenture extends AssetCls {
 
 		//READ ASSET TYPE
 		byte[] assetTypeBytes = Arrays.copyOfRange(data, position, position + ASSET_TYPE_LENGTH);
-		//boolean divisable = divisibleBytes[0] == 1;
+		//boolean divisible = divisibleBytes[0] == 1;
 		position += ASSET_TYPE_LENGTH;
 
 		//RETURN

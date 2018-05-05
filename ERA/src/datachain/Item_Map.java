@@ -12,8 +12,6 @@ import org.mapdb.DB;
 
 import core.item.ItemCls;
 import database.DBMap;
-import datachain.DCSet;
-import utils.ObserverMessage;
 import utils.Pair;
 
 public abstract class Item_Map extends DCMap<Long, ItemCls> {
@@ -88,6 +86,15 @@ public abstract class Item_Map extends DCMap<Long, ItemCls> {
 	@Override
 	protected Map<Integer, Integer> getObservableData() {
 		return this.observableData;
+	}
+
+	public ItemCls get(Long key) {
+		ItemCls item = super.get(key);
+		if (item == null)
+			return  null;
+		
+		item.setKey(key);
+		return item;
 	}
 
 	public long add(ItemCls item) {

@@ -226,7 +226,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference) {
+	public int isValid(Long releaserReference, long flags) {
 
 		// CHECK PAYMENTS SIZE
 		if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -271,7 +271,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 			payment.process(this.creator, fork);
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	@Override

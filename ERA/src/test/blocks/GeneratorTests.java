@@ -35,6 +35,8 @@ public class GeneratorTests {
 	long timestamp = NTP.getTime();
 	Controller cntrlr = Controller.getInstance();
 
+	long flags = 0l;
+
 	PrivateKeyAccount generator1;
 
 	List<Transaction> transactions =  new ArrayList<Transaction>();
@@ -682,7 +684,7 @@ public class GeneratorTests {
 					"sss", new byte[3000], new byte[]{1}, new byte[]{0},
 					timestamp++, generator.getLastTimestamp(snapshot));
 			payment.sign(generator, false);
-			assertEquals(payment.isValid(null), Transaction.VALIDATE_OK);
+			assertEquals(payment.isValid(null, flags), Transaction.VALIDATE_OK);
 
 			//PROCESS IN DB
 			payment.process(genesisBlock, false);
@@ -755,7 +757,7 @@ public class GeneratorTests {
 		Transaction payment = new R_Send(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
 				timestamp++, userAccount1.getLastTimestamp(dcSet));
 		payment.sign(userAccount1, false);
-		assertEquals(payment.isValid(null), Transaction.VALIDATE_OK);
+		assertEquals(payment.isValid(null, flags), Transaction.VALIDATE_OK);
 
 		//ADD TO UNCONFIRMED TRANSACTIONS
 		dcSet.getTransactionMap().add(payment);

@@ -99,7 +99,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 
 
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		PersonCls person = (PersonCls) this.getItem();
@@ -153,7 +153,7 @@ public class IssuePersonRecord extends Issue_ItemRecord
 		}
 
 		boolean creator_admin = false;
-		int res = super.isValid(releaserReference);
+		int res = super.isValid(releaserReference, flags);
 		if ( res == Transaction.CREATOR_NOT_PERSONALIZED) {
 			long count = this.dcSet.getItemPersonMap().getLastKey();
 			if (count < 20) {

@@ -45,6 +45,8 @@ public class TestRecSetStatusToItem {
 	Long to_date = null;
 	long personkey;
 
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
@@ -211,7 +213,7 @@ public class TestRecSetStatusToItem {
 
 		init();
 
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(releaserReference));
+		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(releaserReference, flags));
 		assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(),	0);
 
 		Tuple5<Long, Long, byte[], Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);

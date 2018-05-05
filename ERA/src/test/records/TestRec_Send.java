@@ -45,6 +45,8 @@ public class TestRec_Send {
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
@@ -161,7 +163,7 @@ public class TestRec_Send {
 		r_SendV3.sign(maker, false);
 		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), 25); //Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference, flags), 25); //Transaction.VALIDATE_OK);
 
 		assertEquals((long)maker.getLastTimestamp(db), gb.getTimestamp(db));
 		r_SendV3.process(gb, false);
@@ -210,7 +212,7 @@ public class TestRec_Send {
 		r_SendV3.sign(maker, false);
 		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), 25); //Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference, flags), 25); //Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 		assertEquals((long)maker.getLastTimestamp(db), timestamp);
@@ -259,7 +261,7 @@ public class TestRec_Send {
 		r_SendV3.sign(maker, false);
 		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -304,7 +306,7 @@ public class TestRec_Send {
 		r_SendV3.sign(maker, false);
 		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -350,7 +352,7 @@ public class TestRec_Send {
 		r_SendV3.sign(maker, false);
 		r_SendV3.setDC(db, false);
 
-		assertEquals(r_SendV3.isValid(releaserReference), 25); //ransaction.VALIDATE_OK);
+		assertEquals(r_SendV3.isValid(releaserReference, flags), 25); //ransaction.VALIDATE_OK);
 
 		r_SendV3.process(gb, false);
 
@@ -435,11 +437,11 @@ public class TestRec_Send {
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
 		{
-			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.NOT_YET_RELEASED);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.NOT_YET_RELEASED);
 		}
 		else
 		{
-			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
 		}
 
 		arbitraryTransactionV3.process(gb, false);
@@ -512,11 +514,11 @@ public class TestRec_Send {
 		//if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
 		if (false)
 		{
-			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.NOT_YET_RELEASED);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.NOT_YET_RELEASED);
 		}
 		else
 		{
-			assertEquals(arbitraryTransactionV3.isValid(releaserReference), Transaction.VALIDATE_OK);
+			assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
 		}
 
 		arbitraryTransactionV3.process(gb, false);

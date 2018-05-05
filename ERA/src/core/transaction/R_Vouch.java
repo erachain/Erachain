@@ -196,7 +196,7 @@ public class R_Vouch extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference) {
+	public int isValid(Long releaserReference, long flags) {
 
 		if (this.height < 2 ) {
 			//CHECK HEIGHT - not 0 and NOT GENESIS
@@ -208,7 +208,7 @@ public class R_Vouch extends Transaction {
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		}
 
-		int result = super.isValid(releaserReference);
+		int result = super.isValid(releaserReference, flags);
 		if (result != Transaction.VALIDATE_OK) return result;
 
 		/*

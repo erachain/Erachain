@@ -34,6 +34,8 @@ public class TestRecHash {
 	byte FEE_POWER = (byte)1;
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
+
 	byte[] url = "http://sdsdf.com/dfgr/1".getBytes();
 	byte[] data = "test123!".getBytes();
 
@@ -161,7 +163,7 @@ public class TestRecHash {
 
 		hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp+10, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(releaserReference, flags));
 
 		hashesRecord.sign(maker, false);
 		hashesRecord.process(gb, false);

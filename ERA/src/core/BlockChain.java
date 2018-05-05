@@ -51,9 +51,9 @@ public class BlockChain
 
 	public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
 	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
-	public static final int TARGET_COUNT_SHIFT = 9;
-	public static final int TARGET_COUNT = 2<<TARGET_COUNT_SHIFT;
-	public static final int BASE_TARGET = 1024 * 3;
+	public static final int TARGET_COUNT_SHIFT = 10;
+	public static final int TARGET_COUNT = 1<<TARGET_COUNT_SHIFT;
+	public static final int BASE_TARGET = 1 << 15;
 	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
 
 	// RIGHTs
@@ -100,6 +100,7 @@ public class BlockChain
 		Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
 		Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
 		Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
+		///Base58.decode("2Gr6C2Nu22TYRHAxxus1XTskWBZ1CEajACdP29SMUanbaDKjPvepmhT4X7MFT5cog15CLf8DQP4GX6nLdZzwF84v"),		
 	};
 
 
@@ -683,12 +684,14 @@ public class BlockChain
 		}
 		
 		// CUT GROWTH
-		long cut1 = (targetPrevios<<1) + (targetPrevios>>1);
-		if (height > 50000 && winValue > cut1) {
+		long cut1 = targetPrevios + (targetPrevios>>1);
+		if (height > TARGET_COUNT && winValue > cut1) {
 			winValue = cut1;
 		}
 		
-		return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
+		//return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
+		// better accuracy
+		return (targetPrevios * (TARGET_COUNT - 1) + winValue) >> TARGET_COUNT_SHIFT;
 	}
 
 	/*
@@ -763,7 +766,7 @@ public class BlockChain
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if (DEVELOP_USE)
 			base = BlockChain.BASE_TARGET >>1;
-		else if ( height < 32100)
+		else if ( height < 90000)
 			base = (BlockChain.BASE_TARGET>>2); // + (BlockChain.BASE_TARGET>>4);
 		else if ( height < 105000)
 			base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
@@ -903,20 +906,24 @@ public class BlockChain
 			return -1;
 		}
 
-		int max_targ = BlockChain.BASE_TARGET * 15;
-		int koeff = BlockChain.BASE_TARGET;
-		int result = 0;
-		while (koeff > 0 && result < max_targ && win_value > target<<1) {
-			result += BlockChain.BASE_TARGET;
-			koeff >>=1;
-		target <<=1;
+		if (false) {
+			int max_targ = BlockChain.BASE_TARGET * 15;
+			int koeff = BlockChain.BASE_TARGET;
+			int result = 0;
+			while (koeff > 0 && result < max_targ && win_value > target<<1) {
+				result += BlockChain.BASE_TARGET;
+				koeff >>=1;
+			target <<=1;
+			}
+	
+			result += (int)(koeff * win_value / target);
+			if (result > max_targ)
+				result = max_targ;
+			return result;
+		} else {
+			int result = (int)(BlockChain.BASE_TARGET * win_value / target);			
+			return result;
 		}
-
-		result += (int)(koeff * win_value / target);
-		if (result > max_targ)
-			result = max_targ;
-
-		return result;
 
 	}
 
@@ -938,7 +945,7 @@ public class BlockChain
 		}
 
 		if (!Controller.getInstance().isTestNet() && forgingBalance < BlockChain.MIN_GENERATING_BALANCE)
-			return 0;
+			return 0l;
 
 		int difference = height - previousForgingHeight;
 		if (Controller.getInstance().isTestNet()) {
@@ -957,12 +964,19 @@ public class BlockChain
 				repeatsMin = BlockChain.GENESIS_ERA_TOTAL/forgingBalance;
 				repeatsMin  = (repeatsMin>>2);
 
-				if (height < 100000 && repeatsMin > 6) {
-					repeatsMin = 6;
-				} else if (height < 120000 && repeatsMin > 20) {
-					repeatsMin = 20;
-				} else if (height < 150000 && repeatsMin > 40) {
-					repeatsMin = 40;
+				if (height < 40000) {
+					if (repeatsMin > 4)
+						repeatsMin = 4;
+				} else if (height < 100000) {
+					if (repeatsMin > 6)
+						repeatsMin = 6;
+				} else if (height < 110000) {
+					if (repeatsMin > 12) {
+						repeatsMin = 12;
+					}
+				} else if (height < 120000) {
+					if (repeatsMin > 40)
+						repeatsMin = 40;
 				} else if (repeatsMin < 10) {
 					repeatsMin = 10;
 				}
@@ -995,10 +1009,17 @@ public class BlockChain
 			win_value >>= 6;
 		else
 			win_value = (win_value >>7) - (win_value >>9);
+		} else {
+			if (height < BlockChain.REPEAT_WIN)
+				win_value >>= 6;
+			//else if (height < 110000)
+			//	win_value = (win_value >>6) + (win_value >>9);
+			else
+				win_value >>=7;
 		}
 
 
-		return (int)win_value;
+		return win_value;
 
 	}
 

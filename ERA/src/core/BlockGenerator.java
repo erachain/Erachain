@@ -796,7 +796,7 @@ public class BlockGenerator extends Thread implements Observer
 
 				transaction.setDC(newBlockDb, false);
 
-				if (transaction.isValid(null) != Transaction.VALIDATE_OK) {
+				if (transaction.isValid(null, 0l) != Transaction.VALIDATE_OK) {
 					// INVALID TRANSACTION
 					// REMOVE FROM LIST
 					//transactionProcessed = true;

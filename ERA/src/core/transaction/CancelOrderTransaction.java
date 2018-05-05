@@ -163,7 +163,7 @@ public class CancelOrderTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		for ( byte[] valid_item: VALID_REC) {
@@ -188,7 +188,7 @@ public class CancelOrderTransaction extends Transaction
 			return INVALID_ORDER_CREATOR;
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	//PROCESS/ORPHAN

@@ -422,7 +422,7 @@ public class R_Send extends TransactionAmount {
 
 	// @Override
 	@Override
-	public int isValid(Long releaserReference) {
+	public int isValid(Long releaserReference, long flags) {
 
 		if (head.getBytes(StandardCharsets.UTF_8).length > 256)
 			return INVALID_HEAD_LENGTH;
@@ -434,7 +434,7 @@ public class R_Send extends TransactionAmount {
 			}
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 }

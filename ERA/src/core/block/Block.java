@@ -334,19 +334,27 @@ public class Block {
 	{
 		BigDecimal fee = this.getTotalFeeForProcess(db);
 
+		// NOT GIFT for MISSed forger 
+		long cut1 = this.target<<1;
+		// TODO - off START POINT 
+		if (this.heightBlock > 140000
+				&& this.winValue >= cut1) {
+			return fee;
+		}
+
 		// TODO calculate AT FEE
 		// fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
 		int inDay30 = BlockChain.BLOCKS_PER_DAY*30;
-
+		
 		BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
-		int height = this.getHeightByParent(db);
-		if (height < inDay30<<1)
+		//int height = this.getHeightByParent(db);
+		if (this.heightBlock < inDay30<<1)
 			;
-		else if (height < inDay30<<2)
+		else if (this.heightBlock < inDay30<<2)
 			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		else if (height < inDay30<<3) // < 72000
+		else if (this.heightBlock < inDay30<<3) // < 72000
 			minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		else if (height < 87000) //87000)
+		else if (this.heightBlock < 87000) //87000)
 			minFee = minFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 		else
 			minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
@@ -998,7 +1006,7 @@ public class Block {
 		int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, this.winValue, currentTarget);
 		if (!cnt.isTestNet() && targetedWinValue < 1) {
 			//targetedWinValue = this.calcWinValueTargeted(dcSet);
-			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + this.target);
+			LOGGER.debug("*** Block[" + height + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
 			return false;
 		}
 		this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
@@ -1096,12 +1104,12 @@ public class Block {
 					transaction.setDC(validatingDC, false);
 
 					//CHECK IF VALID
-					if(transaction.isValid(null) != Transaction.VALIDATE_OK)
+					if(transaction.isValid(null, 0l) != Transaction.VALIDATE_OK)
 					{
 						LOGGER.debug("*** Block[" + height
 								+ "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
 								+ transaction.viewFullTypeName() + "]"
-								+ "invalid code: " + transaction.isValid(null)
+								+ "invalid code: " + transaction.isValid(null, 0l)
 								+ " " + Base58.encode(transaction.getSignature()));
 						return false;
 					}
@@ -1210,7 +1218,7 @@ public class Block {
 
 		//PROCESS FEE
 		BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
-		BigDecimal blockTotalFee = getTotalFee(dcSet);
+		BigDecimal blockTotalFee = this.getTotalFee(dcSet);
 
 
 		if (blockFee.compareTo(blockTotalFee) < 0) {

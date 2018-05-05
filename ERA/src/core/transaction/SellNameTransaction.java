@@ -172,7 +172,7 @@ public class SellNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
@@ -217,7 +217,7 @@ public class SellNameTransaction extends Transaction
 			return INVALID_AMOUNT;
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	//PROCESS/ORPHAN

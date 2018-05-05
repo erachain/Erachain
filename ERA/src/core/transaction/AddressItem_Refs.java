@@ -107,7 +107,7 @@ public abstract class AddressItem_Refs extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK NAME LENGTH
@@ -124,7 +124,7 @@ public abstract class AddressItem_Refs extends Transaction
 			return INVALID_DESCRIPTION_LENGTH;
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 
 	}
 

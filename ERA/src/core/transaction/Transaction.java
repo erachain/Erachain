@@ -966,7 +966,14 @@ public abstract class Transaction {
 		return true;
 	}
 
-	public int isValid(Long releaserReference) {
+	
+	/*
+	 *  flags
+	 *   = 1 - not check fee
+	 *   = 2 - not check person
+	 *   = 4 - not check PublicText
+	 */
+	public int isValid(Long releaserReference, long flags) {
 
 		// CHECK IF REFERENCE IS OK
 		Long reference = releaserReference == null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
@@ -981,7 +988,7 @@ public abstract class Transaction {
 
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 
-		if (this.hasPublicText()
+		if (this.hasPublicText() && (flags & 4l) == 0
 				&& (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
 						|| BlockChain.NOVA_ASSETS.get(this.creator.getAddress()) == null)
 				&& !this.creator.isPerson(dcSet, height)) {
@@ -1002,7 +1009,8 @@ public abstract class Transaction {
 
 		// CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
 		// CHECK IF CREATOR HAS ENOUGH FEE MONEY
-		if (this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+		if ((flags & 1l) == 0
+				&& this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
 			return NOT_ENOUGH_FEE;
 		}
 

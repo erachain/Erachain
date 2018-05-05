@@ -39,6 +39,7 @@ public class NameStorageTest {
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
 
 	@Before
 	public void setup() {
@@ -83,7 +84,7 @@ public class NameStorageTest {
 
 		// CHECK IF NAME REGISTRATION IS VALID
 		assertEquals(Transaction.VALIDATE_OK,
-				nameRegistration.isValid(releaserReference));
+				nameRegistration.isValid(releaserReference, flags));
 		nameRegistration.process(null, false);
 	}
 

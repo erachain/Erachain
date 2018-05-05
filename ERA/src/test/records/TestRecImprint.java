@@ -39,6 +39,8 @@ public class TestRecImprint {
 	byte[] imprintReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
@@ -184,7 +186,7 @@ public class TestRecImprint {
 		assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
 		issueImprintRecord.sign(maker, false);
 
-		assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(releaserReference, flags));
 
 		issueImprintRecord.process(gb, false);
 

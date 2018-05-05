@@ -1,30 +1,18 @@
 package test.records;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
- import org.apache.log4j.Logger;
 
-import ntp.NTP;
-
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-
-import core.account.Account;
 import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
-import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
-import core.item.statuses.StatusCls;
 import core.transaction.GenesisIssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
@@ -44,6 +32,8 @@ public class TestRecGenesisPerson2 {
 	byte FEE_POWER = (byte)1;
 	byte[] packedReference = new byte[64];
 	
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 	private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
@@ -101,7 +91,7 @@ public class TestRecGenesisPerson2 {
 		//genesisIssuePersonTransaction.sign(creator);
 		//CHECK IF ISSUE PERSON TRANSACTION IS VALID
 		assertEquals(true, genesisIssuePersonTransaction.isSignatureValid());
-		assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(releaserReference, flags));
 				
 		//CONVERT TO BYTES
 		//LOGGER.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
@@ -155,7 +145,7 @@ public class TestRecGenesisPerson2 {
 				(byte)1, "Slav", (float)111.1, (float)1.1,
 				"white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
 		genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);	
-		assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(releaserReference));
+		assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(releaserReference, flags));
 
 	}
 

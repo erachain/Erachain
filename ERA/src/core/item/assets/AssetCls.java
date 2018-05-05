@@ -11,6 +11,7 @@ import datachain.Issue_ItemMap;
 import datachain.Item_Map;
 
 
+// 1019 - Movable = true; Divisible = NO; Quantity = 1
 public abstract class AssetCls extends ItemCls {
 
 	// CORE KEY
@@ -149,7 +150,14 @@ public abstract class AssetCls extends ItemCls {
 
 	public int getScale() {
 		if (this.key < BlockChain.AMOUNT_SCALE_FROM) {
-			return this.asset_type == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
+			if (this.key == 0) {
+				Long error = null;
+				error ++;
+			}
+					
+			//return this.asset_type == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
+			// IN ANY CASE
+			return BlockChain.AMOUNT_DEDAULT_SCALE;
 		}
 
 		return this.scale;

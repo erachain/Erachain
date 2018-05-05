@@ -426,7 +426,7 @@ public class R_SignNote extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference) {
+	public int isValid(Long releaserReference, long flags) {
 
 		//CHECK DATA SIZE
 		if (data == null && key <= 0)
@@ -438,7 +438,7 @@ public class R_SignNote extends Transaction {
 		}
 
 
-		int result = super.isValid(releaserReference);
+		int result = super.isValid(releaserReference, flags);
 		if (result != Transaction.VALIDATE_OK) return result;
 
 		// ITEM EXIST? - for assets transfer not need - amount expect instead

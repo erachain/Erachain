@@ -189,7 +189,7 @@ public class CreatePollTransaction extends Transaction
 	 */
 
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK POLL NAME LENGTH
@@ -257,7 +257,7 @@ public class CreatePollTransaction extends Transaction
 			options.add(option.getName());
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	//PROCESS/ORPHAN

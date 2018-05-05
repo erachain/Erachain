@@ -35,6 +35,8 @@ public class TestRec_Vouch {
 	byte[] assetReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
+
 	int height = 1;
 	int seq = 3;
 	//CREATE EMPTY MEMORY DATABASE
@@ -96,20 +98,20 @@ public class TestRec_Vouch {
 
 		//CREATE VOUCH RECORD
 		Transaction vouchRecord = new R_Vouch(maker, FEE_POWER,  height, seq, timestamp, maker.getLastTimestamp(db));
-		assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(releaserReference, flags));
 
 		vouchRecord = new R_Vouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);
-		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(releaserReference));
+		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(releaserReference, flags));
 
 		// SET <2 in isValid()
 		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastTimestamp(db), new byte[64]);
-		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(releaserReference));
+		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(releaserReference, flags));
 
 		vouchRecord = new R_Vouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastTimestamp(db), new byte[64]);
-		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(releaserReference));
+		assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(releaserReference, flags));
 
 		vouchRecord = new R_Vouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastTimestamp(db), new byte[64]);
-		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(releaserReference));
+		assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(releaserReference, flags));
 	}
 
 

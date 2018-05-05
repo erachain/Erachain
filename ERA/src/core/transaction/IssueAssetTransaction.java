@@ -118,10 +118,10 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
-		int result = super.isValid(releaserReference);
+		int result = super.isValid(releaserReference, flags);
 		if(result != Transaction.VALIDATE_OK) return result;
 
 		//CHECK QUANTITY

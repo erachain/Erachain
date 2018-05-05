@@ -169,7 +169,7 @@ public class UpdateNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -209,7 +209,7 @@ public class UpdateNameTransaction extends Transaction
 			return INVALID_CREATOR;
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	//PROCESS/ORPHAN

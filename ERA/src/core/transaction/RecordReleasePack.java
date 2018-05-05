@@ -210,7 +210,7 @@ public class RecordReleasePack extends Transaction {
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK PAYMENTS SIZE
@@ -227,7 +227,7 @@ public class RecordReleasePack extends Transaction {
 		for(Transaction transaction: this.transactions)
 		{
 
-			result = transaction.isValid(releaserReference);
+			result = transaction.isValid(releaserReference, flags);
 			if (result != Transaction.VALIDATE_OK)
 				// transaction counter x100
 				return result + counter * 100;
@@ -237,7 +237,7 @@ public class RecordReleasePack extends Transaction {
 		}
 
 		// IN FORK
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 
 	}
 

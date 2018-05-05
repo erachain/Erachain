@@ -378,7 +378,7 @@ public abstract class TransactionAmount extends Transaction {
 	}
 
 	@Override // - fee + balance - calculate here
-	public int isValid(Long releaserReference) {
+	public int isValid(Long releaserReference, long flags) {
 
 		int height = this.getBlockHeightByParentOrLast(dcSet);
 		boolean wrong = true;
@@ -555,7 +555,21 @@ public abstract class TransactionAmount extends Transaction {
 
 					} else {
 						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
-							return NOT_ENOUGH_FEE;
+							if (height > 41100 || BlockChain.DEVELOP_USE)
+								return NOT_ENOUGH_FEE;
+
+							// TODO: delete wrong check in new CHAIN
+							// SOME PAYMENTs is WRONG
+							wrong = true;
+							for ( byte[] valid_item: BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
+								}
+							}
+
+							if (wrong)
+								return NOT_ENOUGH_FEE;
 						}
 						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 
@@ -700,16 +714,15 @@ public abstract class TransactionAmount extends Transaction {
 			// get height by LAST block in CHAIN + 2 - skip incoming BLOCK
 
 			Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(db);
-			int currentForgingBalance = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-			if (privousForgingPoint == null) {
+			int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+			int	blockHeight = this.getBlockHeightByParentOrLast(db);
+			if (privousForgingPoint == null || privousForgingPoint.a == blockHeight) {
 				if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-					int	blockHeight = this.getBlockHeightByParentOrLast(db);
 					this.recipient.setForgingData(db, blockHeight, currentForgingBalance);
 				}
 			} else {
 				if (privousForgingPoint.b < BlockChain.MIN_GENERATING_BALANCE
 						&& currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-					int	blockHeight = this.getBlockHeightByParentOrLast(db);
 					this.recipient.setForgingData(db, blockHeight, this.amount.intValue());
 				}
 			}

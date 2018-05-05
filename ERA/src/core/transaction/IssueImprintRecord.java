@@ -142,7 +142,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 	//VALIDATE
 	//
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK NAME LENGTH
@@ -153,7 +153,7 @@ public class IssueImprintRecord extends Issue_ItemRecord
 			return INVALID_NAME_LENGTH;
 		}
 
-		int result = super.isValid(releaserReference);
+		int result = super.isValid(releaserReference, flags);
 		if (result != Transaction.VALIDATE_OK) return result;
 
 		// CHECK reference in DB

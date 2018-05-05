@@ -41,6 +41,8 @@ public class TestTemplateAsPack {
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
+	long flags = 0l;
+
 	//CREATE EMPTY MEMORY DATABASE
 	private DCSet db;
 	private GenesisBlock gb;
@@ -163,7 +165,7 @@ public class TestTemplateAsPack {
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
 		issueTemplateRecord.sign(maker, asPack);
 
-		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference, flags));
 		Long makerReference = maker.getLastTimestamp(db);
 		issueTemplateRecord.process(gb, asPack);
 

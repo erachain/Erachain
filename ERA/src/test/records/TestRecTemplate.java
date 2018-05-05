@@ -45,6 +45,8 @@ public class TestRecTemplate {
 	byte[] templateReference = new byte[64];
 	long timestamp = NTP.getTime();
 
+	long flags = 0l;
+
 	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
 	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
 
@@ -202,7 +204,7 @@ public class TestRecTemplate {
 		//CREATE ISSUE PLATE TRANSACTION
 		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference, flags));
 
 		issueTemplateRecord.sign(maker, false);
 		issueTemplateRecord.process(gb, false);
@@ -499,7 +501,7 @@ public class TestRecTemplate {
 
 		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(releaserReference));
+		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(releaserReference, flags));
 
 		signNoteRecord.sign(maker, false);
 		signNoteRecord.process(gb, false);

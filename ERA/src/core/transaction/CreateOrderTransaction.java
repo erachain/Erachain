@@ -382,7 +382,7 @@ public class CreateOrderTransaction extends Transaction {
 	// VALIDATE
 
 	@Override
-	public int isValid(Long releaserReference) {
+	public int isValid(Long releaserReference, long flags) {
 
 		for (byte[] valid_item : VALID_REC) {
 			if (Arrays.equals(this.signature, valid_item)) {
@@ -489,7 +489,13 @@ public class CreateOrderTransaction extends Transaction {
 			}
 		}
 
-		return super.isValid(releaserReference);
+		// VALID if want to BY COMPU by ERA
+		if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
+				&& amountHave.compareTo(BigDecimal.ONE) >= 0) {
+			flags = flags | 1l;
+		}
+		
+		return super.isValid(releaserReference, flags);
 	}
 
 	// PROCESS/ORPHAN

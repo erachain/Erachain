@@ -316,7 +316,7 @@ public class DeployATTransaction extends Transaction
 	//VALIDATE
 
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 		return isValid(0);
 	}
@@ -392,7 +392,7 @@ public class DeployATTransaction extends Transaction
 			return INVALID_CREATION_BYTES;
 		}
 
-		return super.isValid(null);
+		return super.isValid(null, 0l);
 
 	}
 

@@ -215,7 +215,7 @@ public class VoteOnPollTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK POLL LENGTH
@@ -251,7 +251,7 @@ public class VoteOnPollTransaction extends Transaction
 			return ALREADY_VOTED_FOR_THAT_OPTION;
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 
 	}
 

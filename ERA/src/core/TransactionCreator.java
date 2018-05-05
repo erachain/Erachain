@@ -136,7 +136,7 @@ public class TransactionCreator
 				this.fork.getTransactionMap().delete(transactionAccount);
 			} else {
 				transactionAccount.setDC(this.fork, false);
-				if(transactionAccount.isValid(null) == Transaction.VALIDATE_OK)
+				if(transactionAccount.isValid(null, 0l) == Transaction.VALIDATE_OK)
 				{
 					transactionAccount.process(null, false);
 				} else {
@@ -429,7 +429,7 @@ public class TransactionCreator
 			return new Pair<Transaction, Integer>(issuePersonRecord, 1);//this.afterCreate(issuePersonRecord, asPack));
 		} else {
 			// for COPY -
-			int valid = issuePersonRecord.isValid(lastReference);
+			int valid = issuePersonRecord.isValid(lastReference, 0l);
 			if (valid == Transaction.NOT_ENOUGH_FEE
 					|| valid == Transaction.CREATOR_NOT_PERSONALIZED) {
 				valid = Transaction.VALIDATE_OK;
@@ -861,7 +861,7 @@ public class TransactionCreator
 	{
 		//CHECK IF PAYMENT VALID
 		transaction.setDC(this.fork, asPack);
-		int valid = transaction.isValid(null);
+		int valid = transaction.isValid(null, 0l);
 
 		if(valid == Transaction.VALIDATE_OK)
 		{
@@ -885,7 +885,7 @@ public class TransactionCreator
 		return valid;
 	}
 
-	public Integer afterCreateRaw(Transaction transaction, boolean asPack)
+	public Integer afterCreateRaw(Transaction transaction, boolean asPack, long flags)
 	{
 		this.checkUpdate();
 		return this.afterCreate(transaction, asPack);

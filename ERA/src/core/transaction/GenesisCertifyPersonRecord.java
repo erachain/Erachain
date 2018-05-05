@@ -116,7 +116,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 	//VALIDATE
 
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK IF RECIPIENT IS VALID ADDRESS

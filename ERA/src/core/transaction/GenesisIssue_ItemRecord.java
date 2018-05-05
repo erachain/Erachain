@@ -88,7 +88,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record
 	//VALIDATE
 
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 
 		//CHECK NAME LENGTH

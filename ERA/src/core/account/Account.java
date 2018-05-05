@@ -354,8 +354,8 @@ public class Account {
 			absKey = -key;
 		}
 
-		if (this.equals("78cK2QS34j8cPLWwHDqCBy36ZmikiCzLcg")
-				&& absKey == 2
+		if (this.equals("7JbpYi98CP5HwP5ca5uEFgHZc2y7MqGpZv")
+				&& absKey == 1
 				&& !db.isFork()
 				&& (type == 1 || type == 2)) {
 			;

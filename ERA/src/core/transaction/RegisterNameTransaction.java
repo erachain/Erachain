@@ -173,7 +173,7 @@ public class RegisterNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -208,7 +208,7 @@ public class RegisterNameTransaction extends Transaction
 		}
 
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 
 	}
 

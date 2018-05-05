@@ -183,7 +183,7 @@ public class CancelSellNameTransaction extends Transaction
 
 	//@Override
 	@Override
-	public int isValid(Long releaserReference)
+	public int isValid(Long releaserReference, long flags)
 	{
 		//CHECK NAME LENGTH
 		int nameLength = this.name.getBytes(StandardCharsets.UTF_8).length;
@@ -211,7 +211,7 @@ public class CancelSellNameTransaction extends Transaction
 			return NAME_NOT_FOR_SALE;
 		}
 
-		return super.isValid(releaserReference);
+		return super.isValid(releaserReference, flags);
 	}
 
 	//PROCESS/ORPHAN
