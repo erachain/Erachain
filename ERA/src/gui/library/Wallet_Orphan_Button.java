@@ -2,19 +2,14 @@ package gui.library;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 
 import controller.Controller;
 import core.BlockGenerator;
-import core.wallet.Wallet;
 import datachain.DCSet;
 import gui.PasswordPane;
 import lang.Lang;
@@ -57,20 +52,17 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 				new Thread() {
 					@Override
 					public void run() {
-						
+
 						String message = Lang.getInstance().translate("Insert Quantity") + ":";
 						String retVal = JOptionPane.showInputDialog(null, message, "10");
-						if (retVal != null){
-							
+						if (retVal != null) {
+
 							Integer retValint = Integer.valueOf(retVal);
 							int hh = DCSet.getInstance().getBlockMap().size() - retValint;
-							if (hh >1 )
-							Controller.getInstance().setOrphanTo(hh);
+							if (hh > 1)
+								Controller.getInstance().setOrphanTo(hh);
 						}
-						
-						
-						
-						
+
 					}
 				}.start();
 			}
@@ -79,45 +71,39 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 	}
 
 	@Override
-	public void update(Observable arg0, Object arg1) 
-	{
+	public void update(Observable arg0, Object arg1) {
 		ObserverMessage message = (ObserverMessage) arg1;
 		int type = message.getType();
 		if (type == ObserverMessage.WALLET_SYNC_STATUS) {
 			int currentHeight = (int) message.getValue();
-			if (currentHeight == 0 || currentHeight == DCSet.getInstance().getBlockMap().size())
-			{
+			if (currentHeight == 0 || currentHeight == DCSet.getInstance().getBlockMap().size()) {
 				th.setEnabled(true);
 				return;
 			}
 			th.setEnabled(false);
 		}
-		
-		else if(type == ObserverMessage.FORGING_STATUS)
-		{
+
+		else if (type == ObserverMessage.FORGING_STATUS) {
 			BlockGenerator.ForgingStatus status = (BlockGenerator.ForgingStatus) message.getValue();
-			
-						
-			if (status == BlockGenerator.ForgingStatus.FORGING_WAIT || status == BlockGenerator.ForgingStatus.FORGING_ENABLED)
+
+			if (status == BlockGenerator.ForgingStatus.FORGING_ENABLED
+					// || status == BlockGenerator.ForgingStatus.FORGING_WAIT
+					)
 				th.setEnabled(false);
-				else{
-				th.setEnabled(true);
-				}
-		}else if(type == ObserverMessage.NETWORK_STATUS)
-		{
-			int status = (int) message.getValue();
-			
-			
-			if(status == Controller.STATUS_SYNCHRONIZING)
-			{
-				
-				//this.setText(Lang.getInstance().translate("Synchronizing"));
-				th.setEnabled(false);
-			}	else{
+			else {
 				th.setEnabled(true);
 			}
-		}		
+		} else if (type == ObserverMessage.NETWORK_STATUS) {
+			int status = (int) message.getValue();
+
+			if (status == Controller.STATUS_SYNCHRONIZING) {
+
+				// this.setText(Lang.getInstance().translate("Synchronizing"));
+				th.setEnabled(false);
+			} else {
+				th.setEnabled(true);
+			}
+		}
 	}
 
-	
 }

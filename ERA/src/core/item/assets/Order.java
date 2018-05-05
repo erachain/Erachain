@@ -453,6 +453,15 @@ public class Order implements Comparable<Order>
 	{
 
 		DCSet db = this.dcSet;
+		
+		if (this.creator.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs")
+				&& this.haveKey == 2
+				&& this.wantKey == 1
+				&& !db.isFork()
+				&& true) {
+			;
+		}
+
 		//REMOVE HAVE
 		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
 		this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, false);
@@ -494,6 +503,14 @@ public class Order implements Comparable<Order>
 			BigDecimal tradeAmountGet;
 			BigDecimal tradeAmountAccurate;
 			BigDecimal differenceTrade;
+
+			if (order.a.b.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs")
+					&& order.b.a == 2
+					&& order.c.a == 1
+					&& !db.isFork()
+					&& true) {
+				;
+			}
 
 			///////////////
 			//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE

@@ -354,10 +354,11 @@ public class Account {
 			absKey = -key;
 		}
 
-		if (this.equals("7JbpYi98CP5HwP5ca5uEFgHZc2y7MqGpZv")
+		if (this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs")
 				&& absKey == 1
 				&& !db.isFork()
-				&& (type == 1 || type == 2)) {
+				&& (type == 1 || type == 2)
+				&& true) {
 			;
 		}
 		

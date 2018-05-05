@@ -100,7 +100,7 @@ public class BlockChain
 		Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
 		Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
 		Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
-		///Base58.decode("2Gr6C2Nu22TYRHAxxus1XTskWBZ1CEajACdP29SMUanbaDKjPvepmhT4X7MFT5cog15CLf8DQP4GX6nLdZzwF84v"),		
+		Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),		
 	};
 
 
@@ -766,9 +766,9 @@ public class BlockChain
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if (DEVELOP_USE)
 			base = BlockChain.BASE_TARGET >>1;
-		else if ( height < 90000)
-			base = (BlockChain.BASE_TARGET>>2); // + (BlockChain.BASE_TARGET>>4);
-		else if ( height < 105000)
+		else if ( height < 110000)
+			base = (BlockChain.BASE_TARGET>>3); // + (BlockChain.BASE_TARGET>>4);
+		else if ( height < 115000)
 			base = (BlockChain.BASE_TARGET>>1) - (BlockChain.BASE_TARGET>>4);
 		else
 			base = (BlockChain.BASE_TARGET>>1) + (BlockChain.BASE_TARGET>>4);
@@ -930,6 +930,9 @@ public class BlockChain
 	// calc WIN_VALUE for ACCOUNT in HEIGHT
 	public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
+		if (forgingBalance < MIN_GENERATING_BALANCE)
+			return 0l;
+		
 		Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
 		if (previousForgingPoint == null) {
@@ -971,8 +974,8 @@ public class BlockChain
 					if (repeatsMin > 6)
 						repeatsMin = 6;
 				} else if (height < 110000) {
-					if (repeatsMin > 12) {
-						repeatsMin = 12;
+					if (repeatsMin > 10) {
+						repeatsMin = 10;
 					}
 				} else if (height < 120000) {
 					if (repeatsMin > 40)

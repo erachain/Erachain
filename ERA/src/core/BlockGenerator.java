@@ -96,6 +96,11 @@ public class BlockGenerator extends Thread implements Observer
 		this.orphanto =  height;
 	}
 
+	public int getOrphanTo()
+	{
+		return this.orphanto;
+	}
+
 	public static String viewStatus()
 	{
 
@@ -245,7 +250,7 @@ public class BlockGenerator extends Thread implements Observer
 
 				if (this.orphanto > 0) {
 					status = 9;
-					ctrl.setForgingStatus(ForgingStatus.FORGING_WAIT);
+					ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
 					try
 					{
 						while (bchain.getHeight(dcSet) > this.orphanto) {
@@ -293,7 +298,7 @@ public class BlockGenerator extends Thread implements Observer
 					status = 41;
 
 					//CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-					syncForgingStatus();
+					////syncForgingStatus();
 
 					//Timestamp timestamp = new Timestamp(NTP.getTime());
 					//LOGGER.info("NTP.getTime() " + timestamp);
@@ -543,9 +548,7 @@ public class BlockGenerator extends Thread implements Observer
 							if (!ctrl.flushNewBlockGenerated()) {
 								// NEW BLOCK not FLUSHED
 								LOGGER.error("NEW BLOCK not FLUSHED");
-							}
-
-							if (forgingStatus == ForgingStatus.FORGING_WAIT)
+							} else if (forgingStatus == ForgingStatus.FORGING_WAIT)
 								setForgingStatus(ForgingStatus.FORGING);
 
 							if (ctrl.isOnStopping()) {
@@ -901,11 +904,15 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 		}
 
+		setForgingStatus(ForgingStatus.FORGING_WAIT);
+
+		/*
 		// NOT NEED to wait - TARGET_WIN will be small
 		if (ctrl.isReadyForging())
 			setForgingStatus(ForgingStatus.FORGING);
 		else
 			setForgingStatus(ForgingStatus.FORGING_WAIT);
+			*/
 	}
 
 }
