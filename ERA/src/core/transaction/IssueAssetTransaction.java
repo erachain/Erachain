@@ -90,6 +90,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord
 		super.setDC(dcSet, asPack);
 
 		AssetCls asset = (AssetCls) this.item;
+		///asset.getKey(dcSet);
 
 		if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
 			// MAKE OLD STYLE ASSET with DEVISIBLE:

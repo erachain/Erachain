@@ -149,7 +149,7 @@ public abstract class AssetCls extends ItemCls {
 	 */
 
 	public int getScale() {
-		if (this.key < BlockChain.AMOUNT_SCALE_FROM) {
+		if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
 			if (this.key == 0) {
 				Long error = null;
 				error ++;
@@ -168,13 +168,13 @@ public abstract class AssetCls extends ItemCls {
 	}
 
 	public boolean isMovable() {
-		if (this.key < BlockChain.AMOUNT_SCALE_FROM) {
+		if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
 			return (this.typeBytes[1] & (byte)1) > 0;
 		}
 		return this.asset_type == 0;
 	}
 	public boolean isImMovable() {
-		if (this.key < BlockChain.AMOUNT_SCALE_FROM) {
+		if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
 			return (this.typeBytes[1] & (byte)1) <= 0;
 		}
 		return this.asset_type == 1;

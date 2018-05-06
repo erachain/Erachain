@@ -396,18 +396,18 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 					quantity,
 					feePow);
 
-			
+			AssetCls asset = (AssetCls)issueAssetTransaction.getItem();
 			
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 			String text = "<HTML><body>";
 			text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
 			text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator() +"<br>";
-			text += Lang.getInstance().translate("Name") +":&nbsp;"+ issueAssetTransaction.getItem().getName() +"<br>";
-			text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
+			text += "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") +":&nbsp;"+ asset.getName() +"<br>";
+			text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ asset.getQuantity().toString()+"<br>";
 		//	text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
-			text += Lang.getInstance().translate("Asset Type") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).viewAssetType()+"")+ "<br>";
-			text += Lang.getInstance().translate("Scale") +":&nbsp;"+ ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
-			text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
+			text += Lang.getInstance().translate("Asset Type") +":&nbsp;"+ Lang.getInstance().translate(asset.viewAssetType()+"")+ "<br>";
+			text += Lang.getInstance().translate("Scale") +":&nbsp;"+ asset.getScale()+ "<br>";
+			text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(asset.getDescription())+"<br>";
 			String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueAssetTransaction.viewSize(false)+" Bytes, ";
 			Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueAssetTransaction.getFee().toString()+" COMPU</b><br></body></HTML>";
 

@@ -303,6 +303,7 @@ public class TransactionCreator
 		long time = NTP.getTime();
 
 		AssetCls asset = new AssetVenture(creator, name, icon, image, description, asset_type, scale, quantity);
+		asset.setKey(this.fork.getItemAssetMap().getLastKey() + 1l);
 
 		//CREATE ISSUE ASSET TRANSACTION
 		IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte)feePow, time, 0l);
