@@ -198,7 +198,7 @@ public class BlockChain
 
 			// TIKER = KEY + CREATOR
 			NOVA_ASSETS.put("BTC",
-					new Pair<Integer, byte[]>(21, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortBytes()));
+					new Pair<Integer, byte[]>(21, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
 			//NOVA_ASSETS.put("@@USD",
 			//		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
 			//NOVA_ASSETS.put("¤¤RUB",

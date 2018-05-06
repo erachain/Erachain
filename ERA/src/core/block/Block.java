@@ -218,7 +218,7 @@ public class Block {
 	{
 
 		return new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
-				this.version, this.creator.getBytes(), this.signature, this.transactionCount, this.transactionsHash);
+				this.version, this.creator.getPublicKey(), this.signature, this.transactionCount, this.transactionsHash);
 	}
 
 	public Tuple3<Integer, Long, Long> getHeadMind()

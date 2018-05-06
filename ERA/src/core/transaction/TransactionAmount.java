@@ -389,7 +389,7 @@ public abstract class TransactionAmount extends Transaction {
 			if (height < 120000) {
 				wrong = true;
 				for ( byte[] valid_address: BlockChain.VALID_ADDRESSES) {
-					if (Arrays.equals(this.recipient.getBytes(), valid_address)) {
+					if (Arrays.equals(this.recipient.getAddressBytes(), valid_address)) {
 						wrong = false;
 						break;
 					}

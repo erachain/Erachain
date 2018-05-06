@@ -98,9 +98,19 @@ public class Synchronizer {
 			if (cnt.isOnStopping())
 				throw new Exception("on stoping");
 
+			int height = lastBlock.getHeightByParent(fork);
+			int bbb = fork.getBlockMap().size();
+			int hhh = fork.getBlocksHeadsMap().size();
+			int sss = fork.getBlockSignsMap().size();
+
 			// runedBlock = lastBlock; // FOR quick STOPPING
 			countTransactionToOrphan += lastBlock.getTransactionCount();
 			lastBlock.orphan(fork);
+
+			int height2 = lastBlock.getHeightByParent(fork);
+			int bbb2 = fork.getBlockMap().size();
+			int hhh2 = fork.getBlocksHeadsMap().size();
+			int sss2 = fork.getBlockSignsMap().size();
 
 			LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
 			lastBlock = blockMap.last();
@@ -120,6 +130,9 @@ public class Synchronizer {
 
 		for (Block block : newBlocks) {
 			int height = block.getHeightByParent(fork);
+			int bbb = fork.getBlockMap().size();
+			int hhh = fork.getBlocksHeadsMap().size();
+			int sss = fork.getBlockSignsMap().size();
 
 			if (height == fork.getBlockMap().size()) {
 				if (Arrays.equals(block.getSignature(), fork.getBlockMap().getLastBlockSignature())) {
@@ -149,6 +162,12 @@ public class Synchronizer {
 
 			// CHECK IF VALID
 			if (block.isSignatureValid() && block.isValid(fork, true)) {
+
+				int height2 = block.getHeightByParent(fork);
+				int bbb2 = fork.getBlockMap().size();
+				int hhh2 = fork.getBlocksHeadsMap().size();
+				int sss2 = fork.getBlockSignsMap().size();
+
 				// PROCESS TO VALIDATE NEXT BLOCKS
 				// runedBlock = block;
 				/// already in Validate block.process(fork);
