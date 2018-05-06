@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -18,6 +19,7 @@ import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import database.wallet.AccountsPropertisMap;
+import gui.PasswordPane;
 import lang.Lang;
 import utils.StrJSonFine;
 
@@ -44,6 +46,29 @@ public class Account_Set_Name_Dialog extends javax.swing.JDialog {
         super();
         th = this;
         account = adr;
+        
+        if(!Controller.getInstance().isWalletUnlocked())
+		{
+			//ASK FOR PASSWORD
+			String password = PasswordPane.showUnlockWalletDialog(this);
+			if(password.equals(""))
+			{
+				this.jButton_OK.setEnabled(true);
+				return;
+			}
+			if(!Controller.getInstance().unlockWallet(password))
+			{
+				//WRONG PASSWORD
+				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+				//ENABLE
+				this.jButton_OK.setEnabled(true);
+				return;
+			}
+		}
+        
+        
+        
         List<Image> icons = new ArrayList<Image>();
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
 		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
