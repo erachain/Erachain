@@ -475,7 +475,7 @@ public class CreateOrderTransaction extends Transaction {
 			if (amountBytes.length > AMOUNT_LENGTH) {
 				return AMOUNT_LENGHT_SO_LONG;
 			}
-			if (amountHave.scale() > haveAsset.getScale()) {
+			if (amountHave.stripTrailingZeros().scale() > haveAsset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
 		}
@@ -484,7 +484,7 @@ public class CreateOrderTransaction extends Transaction {
 			if (amountBytes.length > AMOUNT_LENGTH) {
 				return AMOUNT_LENGHT_SO_LONG;
 			}
-			if (amountWant.scale() > wantAsset.getScale()) {
+			if (amountWant.stripTrailingZeros().scale() > wantAsset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
 		}

@@ -427,7 +427,7 @@ public abstract class TransactionAmount extends Transaction {
 					return AMOUNT_LENGHT_SO_LONG;
 				}
 				// SCALE wrong
-				if (this.amount.scale() > asset.getScale()) {
+				if (this.amount.stripTrailingZeros().scale() > asset.getScale()) {
 					return AMOUNT_SCALE_WRONG;
 				}
 			}
