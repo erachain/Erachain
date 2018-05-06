@@ -252,7 +252,8 @@ public class BlockMap extends DCMap<Integer, Block> {
 	public Block get(Integer height) {
 
 		Block block = super.get(height);
-		block.setHeight(height);
+		if (block != null)
+			block.setHeight(height);
 		return block;
 
 	}
