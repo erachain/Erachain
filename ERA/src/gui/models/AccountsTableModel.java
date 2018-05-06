@@ -28,14 +28,14 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 {
 	public final int COLUMN_NO = 0;
 	public static final int COLUMN_ADDRESS = 1;
-	//	public static final int COLUMN_BALANCE = 1;
-	public static final int COLUMN_CONFIRMED_BALANCE = 2;
+	public static final int COLUMN_NAME = 2;
+	public static final int COLUMN_CONFIRMED_BALANCE = 3;
 	//	public static final int COLUMN_WAINTING_BALANCE = 2;
 	//public static final int COLUMN_GENERATING_BALANCE = 3;
-	public static final int COLUMN_FEE_BALANCE = 3;
+	public static final int COLUMN_FEE_BALANCE = 4;
 
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Account", "Confirmed Balance", AssetCls.FEE_NAME}); // "Waiting"
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"No.","Account","Name", "Confirmed Balance", AssetCls.FEE_NAME}); // "Waiting"
 	private Boolean[] column_AutuHeight = new Boolean[]{true,false,false,false};
 	private List<PublicKeyAccount> publicKeyAccounts;
 	private AssetCls asset;
@@ -118,6 +118,10 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		{
 		case COLUMN_ADDRESS:
 			return account.getPersonAsString();
+		case COLUMN_NAME:
+			Tuple2<String, String> aa = account.getName();
+			if (aa == null) return "";
+			return aa.a;
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
@@ -179,7 +183,8 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		ObserverMessage message = (ObserverMessage) arg;
 
 
-
+		if(message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE || message.getType()==  ObserverMessage.RESET_ALL_ACCOUNT_TYPE) this.fireTableDataChanged();
+		
 		if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE)
 		{
 			this.publicKeyAccounts.add(((PublicKeyAccount)message.getValue()));

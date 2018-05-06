@@ -18,6 +18,8 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 
 import org.mapdb.Fun.Tuple3;
@@ -71,40 +73,34 @@ public class Person_Owner_Panel extends JPanel {
 		this.add(jScrollPane_Tab_My_Persons, gridBagConstraints);
 
 		JPopupMenu menu = new JPopupMenu();
-menu.addAncestorListener(new AncestorListener(){
 
-			
-
-			@Override
-			public void ancestorAdded(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				row = jTable_My_Persons.getSelectedRow();
-				if (row < 1 ) {
-				menu.disable();
-			}
-			
-			row = jTable_My_Persons.convertRowIndexToModel(row);
-				
-				
-			}
-
-			@Override
-			public void ancestorMoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void ancestorRemoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			
-			
-		});
 		
+menu.addPopupMenuListener(new PopupMenuListener(){
+
+	@Override
+	public void popupMenuCanceled(PopupMenuEvent arg0) {
+		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+		// TODO Auto-generated method stub
+		int row1 = jTable_My_Persons.getSelectedRow();
+		if (row1 < 0 ) return;
+	
+	row = jTable_My_Persons.convertRowIndexToModel(row1);
+	
+	
+	}
+	});		
+
 
 		JMenuItem copyKey = new JMenuItem(Lang.getInstance().translate("Copy Key"));
 		copyKey.addActionListener(new ActionListener() {

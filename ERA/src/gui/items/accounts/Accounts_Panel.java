@@ -49,6 +49,7 @@ import core.crypto.Base32;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import gui.Gui;
+import gui.MainFrame;
 import gui.PasswordPane;
 @SuppressWarnings("serial")
 public class Accounts_Panel extends JPanel // implements ItemListener
@@ -444,6 +445,17 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			}
 		});
 		menu.add(copyBankKey);
+		
+		JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Set Name"));
+		set_name.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e) 
+			{
+				 new Account_Set_Name_Dialog(pub_Key.getAddress()); 
+			//	 tableModel.fireTableDataChanged();
+			}
+		});
+		menu.add(set_name);
 		
 	/*	JMenuItem hiddenAccountKey = new JMenuItem(Lang.getInstance().translate("Hidden Account"));
 		hiddenAccountKey.addActionListener(new ActionListener()

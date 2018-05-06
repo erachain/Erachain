@@ -32,17 +32,17 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public  class PersonAccountsModel extends  AbstractTableModel implements Observer
 {
-	public static final int COLUMN_TO_DATE = 1;
-	public static final int COLUMN_CREATOR = 2;
+	public static final int COLUMN_TO_DATE = 2;
+	public static final int COLUMN_CREATOR = 3;
 	public static final int COLUMN_ADDRESS = 0;
 	public static final int COLUMN_CREATOR_NAME = 30;
-//	public static final int COLUMN_CONFIRMED = 3;
+	public static final int COLUMN_ACCOUNT_NAME = 1;
 	private static final HashSet<Account> Account = null;
 	
 	long key_person_table;
 	TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
 	
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account","To Date", "Verifier"}); //, "Data"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Name", "To Date", "Verifier"}); //, "Data"});
 	private Boolean[] column_AutuHeight = new Boolean[]{true,true};
 	SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 	
@@ -176,7 +176,7 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			
 			return trans.getCreator().getPersonAsString();
 			
-		case 3:
+		case 4:
 			if (trans == null)
 				return null;
 			
@@ -189,6 +189,11 @@ public  class PersonAccountsModel extends  AbstractTableModel implements Observe
 			
 			if (trans.getCreator().getPerson()== null) return null;
 			return trans.getCreator().getPerson().b.getName();
+		
+		case COLUMN_ACCOUNT_NAME:
+			Tuple2<String, String> aa = new Account(addrses_key_value).getName();
+			if (aa == null) return "";
+			return aa.a;
 		
 		}
 		
