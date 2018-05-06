@@ -1179,9 +1179,23 @@ public class Block {
 					}
 					timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 
-					seq++;
+				} else {
+					// for some TRANSACTIONs need add to FINAM MAP etc.
+					// R_SertifyPubKeys - in same BLOCK with IssuePersonRecord
 
+					Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(this.heightBlock, seq);
+
+					finalMap.set(key, transaction);
+					transFinalMapSinds.set(transactionSignature, key);
+					List<byte[]> signatures = transaction.getSignatures();
+					if (signatures != null) {
+						for (byte[] itemSignature: signatures) {
+							transFinalMapSinds.set(itemSignature, key);
+						}
+					}
 				}
+
+				seq++;
 
 				transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
 			}

@@ -42,6 +42,16 @@ typeBytes[2].1 = -64 if backward - CONFISCATE CREDIT
 #### PROPERTY 2
 typeBytes[3].0 = -128 if NO DATA
 
+## version 3
+
+#### PROPERTY 1
+typeBytes[2].0 = -128 if NO AMOUNT - check sign
+typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
+
+#### PROPERTY 2
+typeBytes[3].0 = -128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128) - assertEquals((byte)128, (byte)-128);
+typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
+
  */
 
 public class R_Send extends TransactionAmount {
@@ -49,6 +59,8 @@ public class R_Send extends TransactionAmount {
 	private static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
 	private static final String NAME_ID = "Send";
 	//private static int position;
+
+	public static final int NO_DATA_MASK = 128; // 0x10000000
 
 	protected String head;
 	protected byte[] data;
@@ -69,7 +81,7 @@ public class R_Send extends TransactionAmount {
 
 		if (data == null || data.length == 0) {
 			// set version byte
-			typeBytes[3] = (byte) (typeBytes[3] | (byte) -128);
+			typeBytes[3] = (byte) (typeBytes[3] | NO_DATA_MASK);
 		} else {
 			this.data = data;
 			this.encrypted = encrypted;
@@ -326,14 +338,17 @@ public class R_Send extends TransactionAmount {
 			position += AMOUNT_LENGTH;
 
 			// CHECK ACCURACY of AMOUNT
-			int accuracy = typeBytes[3] & SCALE_MASK;
-			if (accuracy > 0) {
-				if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
-					accuracy -= TransactionAmount.SCALE_MASK + 1;
+			if (typeBytes[3] != -1) {
+				// not use old FLAG from vers 2 
+				int accuracy = typeBytes[3] & SCALE_MASK;
+				if (accuracy > 0) {
+					if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+						accuracy -= TransactionAmount.SCALE_MASK + 1;
+					}
+	
+					// RESCALE AMOUNT
+					amount = amount.scaleByPowerOfTen(-accuracy);
 				}
-
-				// RESCALE AMOUNT
-				amount = amount.scaleByPowerOfTen(-accuracy);
 			}
 
 		}

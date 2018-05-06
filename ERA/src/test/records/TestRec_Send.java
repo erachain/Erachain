@@ -94,6 +94,13 @@ public class TestRec_Send {
 		Integer bbb = 31;
 		assertEquals("11111", Integer.toBinaryString(bbb));
 
+		assertEquals("10000000", Integer.toBinaryString(128));
+
+		byte noData = (byte)128;
+		//assertEquals((byte)-1, (byte)128);
+		assertEquals((byte)128, (byte)-128);
+		//assertEquals(core.transaction.R_Send.NO_DATA_MASK));
+		
 		BigDecimal amountTest = new BigDecimal("1234567812345678");
 		BigDecimal amountBase;
 		BigDecimal amount1;

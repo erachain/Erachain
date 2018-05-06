@@ -54,7 +54,7 @@ typeBytes[2].0 = -128 if NO AMOUNT - check sign
 typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
 
 #### PROPERTY 2
-typeBytes[3].0 = -128 if NO DATA - check sign
+typeBytes[3].0 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
 typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
 
  */

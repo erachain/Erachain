@@ -480,8 +480,8 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
 	}
 
-	public Transaction getTransaction(byte[] seg) {
-		return this.get(getDCSet().getTransactionFinalMapSigns().get(seg));
+	public Transaction getTransaction(byte[] signature) {
+		return this.get(getDCSet().getTransactionFinalMapSigns().get(signature));
 
 	}
 	

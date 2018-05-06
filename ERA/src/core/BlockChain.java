@@ -33,7 +33,7 @@ public class BlockChain
 	// 1824 - 7635471
 	
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = false;
+	public static final boolean DEVELOP_USE = true;
 	public static final boolean HARD_WORK = false;
 	public static final boolean PERSON_SEND_PROTECT = true;
 	//public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -54,7 +54,7 @@ public class BlockChain
 	public static final int TARGET_COUNT_SHIFT = 10;
 	public static final int TARGET_COUNT = 1<<TARGET_COUNT_SHIFT;
 	public static final int BASE_TARGET = 1 << 15;
-	public static final int REPEAT_WIN = DEVELOP_USE?5:40; // GENESIS START TOP ACCOUNTS
+	public static final int REPEAT_WIN = DEVELOP_USE?4:40; // GENESIS START TOP ACCOUNTS
 
 	// RIGHTs
 	public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -473,7 +473,10 @@ public class BlockChain
 			while(parentSignature != null && counter++ < packet)
 			{
 				headers.add(parentSignature);
-				parentSignature = map.get(++height).b;
+				if (map.contains(++height))
+					parentSignature = map.get(height).b;
+				else
+					parentSignature = null;
 			}
 			//LOGGER.debug("get size " + counter);
 		} else if (Arrays.equals(parentSignature, this.CHECKPOINT.b)) {
@@ -765,7 +768,7 @@ public class BlockChain
 			/////base = BlockChain.BASE_TARGET>>1;
 			base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET>>2); // ONLY UP
 		else if (DEVELOP_USE)
-			base = BlockChain.BASE_TARGET >>1;
+			base = 1; //BlockChain.BASE_TARGET >>5;
 		else if ( height < 110000)
 			base = (BlockChain.BASE_TARGET>>3); // + (BlockChain.BASE_TARGET>>4);
 		else if ( height < 115000)
@@ -938,6 +941,8 @@ public class BlockChain
 		if (previousForgingPoint == null) {
 			// IF BLOCK not inserted in MAP
 			previousForgingPoint = creator.getLastForgingData(dcSet);
+			if (previousForgingPoint == null)
+				return 0l;
 		}
 
 		int previousForgingHeight = previousForgingPoint.a;
@@ -954,9 +959,17 @@ public class BlockChain
 		if (Controller.getInstance().isTestNet()) {
 			;
 		} else if (BlockChain.DEVELOP_USE) {
-			difference -= REPEAT_WIN;
-			if (difference < REPEAT_WIN)
-				return difference - REPEAT_WIN;
+			if (height < BlockChain.REPEAT_WIN + 2) {
+				if (difference < height - 2)
+					return difference - height + 2;
+			} else if (height < 20) {
+				if (difference < 4)
+					return -999l;
+			} else {
+				//difference -= REPEAT_WIN;				
+				if (difference < REPEAT_WIN)
+					return difference - REPEAT_WIN;
+			}
 		} else {
 
 			int repeatsMin;
@@ -996,6 +1009,9 @@ public class BlockChain
 			win_value = (long)forgingBalance * (long)difference;
 		else
 			win_value = forgingBalance;
+		
+		if (DEVELOP_USE)
+			return win_value>>2;
 
 		if (false) {
 		if (height < BlockChain.REPEAT_WIN)
