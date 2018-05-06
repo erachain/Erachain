@@ -26,6 +26,7 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
+import database.wallet.AccountsPropertisMap;
 import datachain.DCSet;
 import datachain.ItemAssetBalanceMap;
 import datachain.OrderMap;
@@ -1010,5 +1011,10 @@ public class Account {
 
 	}
 
+	public  Tuple2<String, String> getName(){
+		
+		return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(this.getAddress());	
+		
+	}
 
 }

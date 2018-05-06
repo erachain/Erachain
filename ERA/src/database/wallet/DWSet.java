@@ -31,6 +31,7 @@ public class DWSet implements IDB
 	private int uses;
 
 	private AccountMap accountMap;
+	private AccountsPropertisMap accountsPropertisMap;
 	private TransactionMap transactionMap;
 	private BlockMap blockMap;
 	private NameMap nameMap;
@@ -80,6 +81,7 @@ public class DWSet implements IDB
 	    uses = 0;
 	    
 	    this.accountMap = new AccountMap(this, this.database);
+	    this.accountsPropertisMap = new AccountsPropertisMap(this, this.database);
 	    this.transactionMap = new TransactionMap(this, this.database);
 	    this.blockMap = new BlockMap(this, this.database);
 	    this.nameMap = new NameMap(this, this.database);
@@ -157,6 +159,13 @@ public class DWSet implements IDB
 	{
 		return this.accountMap;
 	}
+	
+	public AccountsPropertisMap getAccountsPropertisMap()
+	{
+		return this.accountsPropertisMap;
+	}
+	
+	
 	
 	public TransactionMap getTransactionMap()
 	{
@@ -327,6 +336,7 @@ public class DWSet implements IDB
 		this.personMap.delete(account);
 		this.statusMap.delete(account);
 		this.orderMap.delete(account);
+		this.accountsPropertisMap.delete(account.getAddress());
 		
 		this.uses--;
 
