@@ -15,14 +15,18 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
+import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.items.accounts.Account_Send_Dialog;
+import gui.items.accounts.Account_Set_Name_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
 import gui.models.PersonAccountsModel;
 import gui.models.Renderer_Left;
@@ -70,40 +74,33 @@ public class Accounts_Library_Panel extends JPanel {
 		this.add(jScrollPane_Tab_Accounts, gridBagConstraints);
 
 		JPopupMenu menu = new JPopupMenu();
-		menu.addAncestorListener(new AncestorListener(){
-
-			
-
-			@Override
-			public void ancestorAdded(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				row = jTable_Accounts.getSelectedRow();
-				if (row < 1 ) {
-				menu.disable();
-			}
-			
-			row = jTable_Accounts.convertRowIndexToModel(row);
-				
-				
-			}
-
-			@Override
-			public void ancestorMoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void ancestorRemoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			
-			
-		});
 		
-		
+		menu.addPopupMenuListener(new PopupMenuListener(){
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				int row1 = jTable_Accounts.getSelectedRow();
+				if (row1 < 0 ) return;
+			
+			row = jTable_Accounts.convertRowIndexToModel(row1);
+			
+			
+			}
+			});
+			
 
 		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
 		copyAddress.addActionListener(new ActionListener() {
@@ -199,6 +196,17 @@ public class Accounts_Library_Panel extends JPanel {
 			}
 		});
 		menu.add(Send_Mail_item_Menu);
+		
+		JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Set Name"));
+		setName.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Account account = person_Accounts_Model.getAccount(row);
+
+				new Account_Set_Name_Dialog(account.getAddress()); 
+
+			}
+		});
+		menu.add(setName);
 
 		////////////////////
 		TableMenuPopupUtil.installContextMenu(jTable_Accounts, menu); // SELECT

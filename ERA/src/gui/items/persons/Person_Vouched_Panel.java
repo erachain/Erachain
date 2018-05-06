@@ -17,6 +17,8 @@ import javax.swing.JTable;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.table.TableColumn;
@@ -118,38 +120,34 @@ public class Person_Vouched_Panel extends JPanel {
 		
 
 		JPopupMenu menu = new JPopupMenu();
-menu.addAncestorListener(new AncestorListener(){
 
-			
 
-			@Override
-			public void ancestorAdded(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				row = jTable_Vouches.getSelectedRow();
-				if (row < 1 ) {
-				menu.disable();
-			}
-			
-			row = jTable_Vouches.convertRowIndexToModel(row);
-				
-				
-			}
+menu.addPopupMenuListener(new PopupMenuListener(){
 
-			@Override
-			public void ancestorMoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
+@Override
+public void popupMenuCanceled(PopupMenuEvent arg0) {
+// TODO Auto-generated method stub
 
-			@Override
-			public void ancestorRemoved(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			
-			
-		});
+}
+
+@Override
+public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+// TODO Auto-generated method stub
+int row1 = jTable_Vouches.getSelectedRow();
+if (row1 < 0 ) return;
+
+row = jTable_Vouches.convertRowIndexToModel(row1);
+
+
+}
+});		
+
 		/*
 		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
 		menu_copyName.addActionListener(new ActionListener() {

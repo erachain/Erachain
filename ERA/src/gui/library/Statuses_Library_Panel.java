@@ -16,6 +16,8 @@ import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 
 import controller.Controller;
@@ -85,40 +87,34 @@ public Statuses_Library_Panel(PersonCls person){
     
    	JPopupMenu menu = new JPopupMenu();
    	
-   	menu.addAncestorListener(new AncestorListener(){
-
-		
-
-		@Override
-		public void ancestorAdded(AncestorEvent arg0) {
-			// TODO Auto-generated method stub
-			row = jTable_Statuses.getSelectedRow();
-			if (row < 1 ) {
-			menu.disable();
-		}
-		
-		row = jTable_Statuses.convertRowIndexToModel(row);
-			
-			
-		}
-
-		@Override
-		public void ancestorMoved(AncestorEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void ancestorRemoved(AncestorEvent arg0) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		
-		
-	});
+  
 	
-	
+   	menu.addPopupMenuListener(new PopupMenuListener(){
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			int row1 = jTable_Statuses.getSelectedRow();
+			if (row1 < 0 ) return;
+		
+		row = jTable_Statuses.convertRowIndexToModel(row1);
+		
+		
+		}
+		});
+		
 
    	JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
 	menu_copyName.addActionListener(new ActionListener() {

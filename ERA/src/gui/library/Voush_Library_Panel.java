@@ -19,6 +19,8 @@ import javax.swing.SortOrder;
 import javax.swing.UIManager;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
@@ -116,38 +118,32 @@ public class Voush_Library_Panel extends JPanel {
 		JPopupMenu menu = new JPopupMenu();
 		
 		
-		menu.addAncestorListener(new AncestorListener(){
-
 			
+		menu.addPopupMenuListener(new PopupMenuListener(){
 
 			@Override
-			public void ancestorAdded(AncestorEvent arg0) {
-				// TODO Auto-generated method stub
-				row = jTable_Vouches.getSelectedRow();
-				if (row < 1 ) {
-				menu.disable();
-			}
-			
-			row = jTable_Vouches.convertRowIndexToModel(row);
-				
-				
-			}
-
-			@Override
-			public void ancestorMoved(AncestorEvent arg0) {
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
 
 			@Override
-			public void ancestorRemoved(AncestorEvent arg0) {
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				int row1 = jTable_Vouches.getSelectedRow();
+				if (row1 < 0 ) return;
+			
+			row = jTable_Vouches.convertRowIndexToModel(row1);
 			
 			
-			
-		});
+			}
+			});
 		
 		JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Creator Name"));
 		menu_copyName.addActionListener(new ActionListener() {

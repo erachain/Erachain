@@ -183,7 +183,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		ObserverMessage message = (ObserverMessage) arg;
 
 
-		if(message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE) this.fireTableDataChanged();
+		if(message.getType() == ObserverMessage.LIST_ALL_ACCOUNT_TYPE || message.getType()==  ObserverMessage.RESET_ALL_ACCOUNT_TYPE) this.fireTableDataChanged();
 		
 		if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE)
 		{
