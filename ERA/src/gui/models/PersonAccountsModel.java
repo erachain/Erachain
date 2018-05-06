@@ -1,42 +1,33 @@
 package gui.models;
-import java.util.Map.Entry;
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
+////////
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Stack;
+import java.util.TreeMap;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.HashSet;
-import java.util.Map;
-////////
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
 import core.account.Account;
-import core.item.imprints.ImprintCls;
-import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import datachain.SortableList;
 import lang.Lang;
+import utils.ObserverMessage;
 
 @SuppressWarnings("serial")
 public  class PersonAccountsModel extends  AbstractTableModel implements Observer
 {
+	public static final int COLUMN_ADDRESS = 0;
+	public static final int COLUMN_ACCOUNT_NAME = 1;
 	public static final int COLUMN_TO_DATE = 2;
 	public static final int COLUMN_CREATOR = 3;
-	public static final int COLUMN_ADDRESS = 0;
 	public static final int COLUMN_CREATOR_NAME = 30;
-	public static final int COLUMN_ACCOUNT_NAME = 1;
 	private static final HashSet<Account> Account = null;
 	
 	long key_person_table;
