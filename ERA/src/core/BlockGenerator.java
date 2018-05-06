@@ -306,6 +306,11 @@ public class BlockGenerator extends Thread implements Observer
 					//waitWin = bchain.getWaitWinBuffer();
 
 					ctrl.checkStatusAndObserve(1);
+
+					if (forgingStatus == ForgingStatus.FORGING_WAIT
+							&& timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<2) < NTP.getTime())
+						setForgingStatus(ForgingStatus.FORGING);
+
 					if (//true ||
 							(forgingStatus == ForgingStatus.FORGING // FORGING enabled
 							&& !ctrl.needUpToDate()
