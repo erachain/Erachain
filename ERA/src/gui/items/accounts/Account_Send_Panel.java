@@ -665,7 +665,7 @@ public class Account_Send_Panel extends JPanel
 		{
 			//READ AMOUNT
 			parsing = 1;
-			amount = new BigDecimal(txtAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			amount = new BigDecimal(txtAmount.getText()); //.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
 			//READ FEE
 			parsing = 2;
@@ -691,7 +691,7 @@ public class Account_Send_Panel extends JPanel
 			return;
 		}
 
-		if (amount.equals(new BigDecimal("0.0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE))){
+		if (amount.signum() == 0){
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error")+":  "+Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
 
 			//ENABLE

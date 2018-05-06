@@ -1,14 +1,9 @@
 package gui.transaction;
 
-import java.sql.Timestamp;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import controller.Controller;
-import core.account.Account;
-import core.account.PrivateKeyAccount;
 
 //import javax.swing.JFrame;
 //import javax.swing.JOptionPane;
@@ -18,7 +13,6 @@ import gui.MainFrame;
 //import lang.Lang;
 import gui.PasswordPane;
 import lang.Lang;
-import utils.Pair;
 
 public class OnDealClick 
 {
@@ -333,6 +327,16 @@ public class OnDealClick
 			mess = "Account already personalizes";
 			break;
 			
+		case Transaction.AMOUNT_LENGHT_SO_LONG:
+			mess = "Amount accuracy so big";
+			break;			
+		case Transaction.AMOUNT_SCALE_SO_BIG:
+			mess = "Amount scale so big";
+			break;
+		case Transaction.AMOUNT_SCALE_WRONG:
+			mess = "Amount point scale wrong";
+			break;
+
 		case Transaction.INVALID_BLOCK_HEIGHT:
 			mess = "Invalid block height";
 			break;
