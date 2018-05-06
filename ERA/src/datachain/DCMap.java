@@ -238,9 +238,10 @@ public abstract class DCMap<T, U> extends Observable {
 			U old = this.map.put(key, value);
 
 			if (this.parent != null) {
+				//if (old != null)
+				//	++this.shiftSize;
 				if (this.deleted != null) {
-					this.deleted.remove(key);
-					if (old != null)
+					if (this.deleted.remove(key))
 						++this.shiftSize;
 				}
 			} else {

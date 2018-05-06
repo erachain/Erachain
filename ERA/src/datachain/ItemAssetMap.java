@@ -1,16 +1,11 @@
 package datachain;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.mapdb.Atomic;
 import org.mapdb.DB;
 
 import core.item.ItemCls;
-import core.item.assets.AssetCls;
 import database.serializer.ItemSerializer;
-import datachain.DCSet;
-import datachain.Item_Map;
 //import database.serializer.AssetSerializer;
 import utils.ObserverMessage;
 
@@ -48,6 +43,7 @@ public class ItemAssetMap extends Item_Map
 		return database.createTreeMap(NAME)
 				.valueSerializer(new ItemSerializer(TYPE))
 				//.valueSerializer(new AssetSerializer())
+				// key instead size - .counterEnable()
 				.makeOrGet();
 	}
 

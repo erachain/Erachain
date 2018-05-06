@@ -87,6 +87,7 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 			BlockGenerator.ForgingStatus status = (BlockGenerator.ForgingStatus) message.getValue();
 
 			if (status == BlockGenerator.ForgingStatus.FORGING_ENABLED
+					&& Controller.getInstance().isStatusOK()
 					// || status == BlockGenerator.ForgingStatus.FORGING_WAIT
 					)
 				th.setEnabled(false);
@@ -98,7 +99,6 @@ public class Wallet_Orphan_Button extends JButton implements Observer {
 
 			if (status == Controller.STATUS_SYNCHRONIZING) {
 
-				// this.setText(Lang.getInstance().translate("Synchronizing"));
 				th.setEnabled(false);
 			} else {
 				th.setEnabled(true);
