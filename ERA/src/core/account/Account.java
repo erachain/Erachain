@@ -1011,7 +1011,7 @@ public class Account {
 
 	}
 
-	public  Tuple2<String, String> getName(){
+public  Tuple2<String, String> getName(){
 		
 		return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(this.getAddress());	
 		
