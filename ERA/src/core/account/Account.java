@@ -110,12 +110,12 @@ public class Account {
 		return address;
 	}
 
-	public byte[] getBytes()
+	public byte[] getAddressBytes()
 	{
 		return bytes;
 	}
 
-	public byte[] getShortBytes()
+	public byte[] getShortAddressBytes()
 	{
 		return this.shortBytes;
 	}

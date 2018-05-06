@@ -120,6 +120,9 @@ public class Synchronizer {
 
 		for (Block block : newBlocks) {
 			int height = block.getHeightByParent(fork);
+			int kkk = fork.getBlockMap().size();
+			int ttt = fork.getBlocksHeadsMap().size();
+			int ppp = fork.getBlockSignsMap().size();
 
 			if (height == fork.getBlockMap().size()) {
 				if (Arrays.equals(block.getSignature(), fork.getBlockMap().getLastBlockSignature())) {
