@@ -203,6 +203,7 @@ public class Accounts_Library_Panel extends JPanel {
 				Account account = person_Accounts_Model.getAccount(row);
 
 				new Account_Set_Name_Dialog(account.getAddress()); 
+				jTable_Accounts.repaint();
 
 			}
 		});

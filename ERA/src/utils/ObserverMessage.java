@@ -267,8 +267,9 @@ public class ObserverMessage {
 	public static final int WALLET_LIST_UNION_TYPE = 2014;
 	public static final int LIST_UNION_FAVORITES_TYPE = 2016;
 	
-	
-	
+	public static final int WALLET_ACCOUNT_PROPERTIES_ADD = 2017;
+	public static final int WALLET_ACCOUNT_PROPERTIES_DELETE = 2018;
+	public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 2019;
 
 	private int type;
 	private Object value;
