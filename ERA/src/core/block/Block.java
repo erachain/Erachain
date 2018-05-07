@@ -673,7 +673,7 @@ public class Block {
 		block.put("generatingBalance", this.forgingValue);
 		block.put("winValue", this.getWinValue());
 		block.put("target", this.getTarget());
-		block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
+		///block.put("winValueTargeted", this.calcWinValueTargeted(DCSet.getInstance()));
 		block.put("creator", this.creator.getAddress());
 		block.put("fee", this.getTotalFee().toPlainString());
 		block.put("transactionsHash", Base58.encode(this.transactionsHash));

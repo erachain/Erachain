@@ -53,7 +53,7 @@ public class BlockChain
 	public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
 	public static final int TARGET_COUNT_SHIFT = 10;
 	public static final int TARGET_COUNT = 1<<TARGET_COUNT_SHIFT;
-	public static final int BASE_TARGET = 1 << 15;
+	public static final int BASE_TARGET = 100000;///1 << 15;
 	public static final int REPEAT_WIN = DEVELOP_USE?4:40; // GENESIS START TOP ACCOUNTS
 
 	// RIGHTs
@@ -694,7 +694,7 @@ public class BlockChain
 		
 		//return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
 		// better accuracy
-		return (targetPrevios * (TARGET_COUNT - 1) + winValue) >> TARGET_COUNT_SHIFT;
+		return (((targetPrevios<<TARGET_COUNT_SHIFT) - targetPrevios) + winValue) >> TARGET_COUNT_SHIFT;
 	}
 
 	/*
@@ -909,24 +909,8 @@ public class BlockChain
 			return -1;
 		}
 
-		if (false) {
-			int max_targ = BlockChain.BASE_TARGET * 15;
-			int koeff = BlockChain.BASE_TARGET;
-			int result = 0;
-			while (koeff > 0 && result < max_targ && win_value > target<<1) {
-				result += BlockChain.BASE_TARGET;
-				koeff >>=1;
-			target <<=1;
-			}
-	
-			result += (int)(koeff * win_value / target);
-			if (result > max_targ)
-				result = max_targ;
-			return result;
-		} else {
-			int result = (int)(BlockChain.BASE_TARGET * win_value / target);			
-			return result;
-		}
+		int result = (int)(BlockChain.BASE_TARGET * win_value / target);			
+		return result;
 
 	}
 
