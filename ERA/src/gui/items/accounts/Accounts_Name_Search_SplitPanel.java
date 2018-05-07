@@ -41,6 +41,8 @@ import com.google.common.io.Files;
 import controller.Controller;
 import database.wallet.AccountsPropertisMap;
 import datachain.SortableList;
+import gui.MainFrame;
+import gui.PasswordPane;
 import gui.Split_Panel;
 import gui.library.MTable;
 import gui.library.My_JFileChooser;
@@ -135,9 +137,14 @@ public Accounts_Name_Search_SplitPanel(){
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			int row = imprintsTable.getSelectedRow();
-			row = imprintsTable.convertRowIndexToModel(row);
-			Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
-			new Account_Set_Name_Dialog(ac.getA());
+			try {
+				row = imprintsTable.convertRowIndexToModel(row);
+				Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
+				new Account_Set_Name_Dialog(ac.getA());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 		}
 	});
@@ -146,10 +153,35 @@ public Accounts_Name_Search_SplitPanel(){
 	JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Delete"));
 	menuItemDelete.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
+			 if(!Controller.getInstance().isWalletUnlocked())
+				{
+					//ASK FOR PASSWORD
+					String password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
+					if(password.equals(""))
+					{
+						
+						return;
+					}
+					if(!Controller.getInstance().unlockWallet(password))
+					{
+						//WRONG PASSWORD
+						JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+						//ENABLE
+						
+						return;
+					}
+				}
+		        
 			int row = imprintsTable.getSelectedRow();
-			row = imprintsTable.convertRowIndexToModel(row);
-			Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
-			db.delete(ac.getA());
+			try {
+				row = imprintsTable.convertRowIndexToModel(row);
+				Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
+				db.delete(ac.getA());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			
 		}
 	});
