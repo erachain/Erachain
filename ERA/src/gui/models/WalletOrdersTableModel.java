@@ -13,6 +13,7 @@ import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.item.assets.Order;
+import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
 import utils.DateTimeFormat;
@@ -89,6 +90,7 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 		}
 
 		Order order = Order.fromDBrec(this.orders.get(row).getB());
+		order.setDC(DCSet.getInstance());
 
 
 		switch(column)

@@ -2920,7 +2920,7 @@ public class Controller extends Observable {
 	 */
 
 	public Block getBlockByHeight(DCSet db, int parseInt) {
-		return db.getBlockMap().get(parseInt);
+		return db.getBlockMap().getWithMind(parseInt);
 	}
 
 	public Block getBlockByHeight(int parseInt) {

@@ -209,67 +209,67 @@ public class GeneratorTests {
 
 			if (i == 0) {
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(1024, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(1024, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 1) {
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(1464, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(1464, newBlock.calcWinValueTargeted());
 				//assertEquals(15716, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 2) {
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(1464, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(1464, newBlock.calcWinValueTargeted());
 				//assertEquals(16784, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 9) {
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(1464, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(1464, newBlock.calcWinValueTargeted());
 				//assertEquals(25024, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 10) {
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(25024, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(25024, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 11) {
 				//assertEquals(1571, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(14648, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(14648, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 12) {
 				//assertEquals(1678, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(14648, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(14648, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 29) {
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
-				assertEquals(14648, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(14648, newBlock.calcWinValueTargeted());
 				//assertEquals(2124, generator3.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 30) {
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
-				assertEquals(2124, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(2124, newBlock.calcWinValueTargeted());
 				//assertEquals(439, generator3.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 31) {
 				//assertEquals(15716, generator2.calcWinValueTargeted(dcSet, height));
-				assertEquals(439, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(439, newBlock.calcWinValueTargeted());
 				//assertEquals(439, generator3.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 39) {
 				//assertEquals(439, generator3.calcWinValueTargeted(dcSet, height));
-				assertEquals(439, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(439, newBlock.calcWinValueTargeted());
 				//assertEquals(7080, generator1.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 40) {
 				//assertEquals(439, generator3.calcWinValueTargeted(dcSet, height));
-				assertEquals(7080, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(7080, newBlock.calcWinValueTargeted());
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 41) {
 				//assertEquals(471, generator3.calcWinValueTargeted(dcSet, height));
-				assertEquals(1464, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(1464, newBlock.calcWinValueTargeted());
 				//assertEquals(1464, generator1.calcWinValueTargeted(dcSet, height));
 			}
 
@@ -405,7 +405,7 @@ public class GeneratorTests {
 			//CHECK IF BLOCK SIGNATURE IS VALID
 			assertEquals(true, newBlock.isSignatureValid());
 
-			long weight_old = newBlock.calcWinValueTargeted(dcSet);
+			long weight_old = newBlock.calcWinValueTargeted();
 			//CHECK IF BLOCK IS VALID
 			if (!newBlock.isValid(dcSet, false))
 				assertEquals(false, newBlock.isValid(dcSet, false));
@@ -425,7 +425,7 @@ public class GeneratorTests {
 				e.printStackTrace();
 			}
 
-			long weight = newBlock.calcWinValueTargeted(dcSet);
+			long weight = newBlock.calcWinValueTargeted();
 			if (weight != weight_old) {
 				i_break++;
 			}
@@ -443,49 +443,49 @@ public class GeneratorTests {
 			buffer.put(height, hWeight);
 
 			if (i == 2) {
-				assertEquals(8192, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(8192, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargetedTargeted(dcSet, height));
 				assertEquals((long)hWeight.b, 9192); // GENESIS + new first block
 			}
 			else if (i == 3) {
-				assertEquals(7369, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(7369, newBlock.calcWinValueTargeted());
 				assertEquals((int)hWeight.a, height);
 				assertEquals((long)hWeight.b, 9192 + 7369);
 			}
 			else if (i == 4) {
-				assertEquals(15522, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(15522, newBlock.calcWinValueTargeted());
 				assertEquals((long)hWeight.b, 9192 + 7369 + 15522);
 			}
 			else if (i == 11) {
-				assertEquals(18873, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(18873, newBlock.calcWinValueTargeted());
 				assertEquals((long)hWeight.b, 130617);
 				//assertEquals(25024, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 12) {
-				assertEquals(15963, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(15963, newBlock.calcWinValueTargeted());
 				//assertEquals(26245, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 13) {
 				//assertEquals(1678, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(13226, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(13226, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 14) {
 				//assertEquals(1785, generator1.calcWinValueTargeted(dcSet, height));
-				assertEquals(12581, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(12581, newBlock.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, height));
 			}
 			else if (i == 30) {
 				//assertEquals(21240, generator3.calcWinValueTargeted(dcSet, height));
-				assertEquals(13911, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(13911, newBlock.calcWinValueTargeted());
 			}
 			else if (i == 31) {
 				//assertEquals(22338, generator3.calcWinValueTargeted(dcSet, height));
-				assertEquals(13578, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(13578, newBlock.calcWinValueTargeted());
 			}
 			else if (i == 32) {
 				//assertEquals(4394, generator3.calcWinValueTargeted(dcSet, height));
-				assertEquals(10218, newBlock.calcWinValueTargeted(dcSet));
+				assertEquals(10218, newBlock.calcWinValueTargeted());
 			}
 			else if (i == 13) {
 			}
@@ -511,7 +511,7 @@ public class GeneratorTests {
 			}
 
 			Tuple2<Integer, Long> hWeight_old = cntrlr.getBlockChain().getHWeightFull(dcSet);
-			long weight = block.calcWinValueTargeted(dcSet);
+			long weight = block.calcWinValueTargeted();
 
 			//PRPHAN BLOCK
 			try {
@@ -540,18 +540,18 @@ public class GeneratorTests {
 			assertEquals( buffer.get(parentHeight).b, hWeight.b);
 
 			if (i_height == 0) {
-				assertEquals(1464, block.calcWinValueTargeted(dcSet));
+				assertEquals(1464, block.calcWinValueTargeted());
 				//assertEquals(14648, generator2.calcWinValueTargeted(dcSet, i_height));
 				assertEquals((long)hWeight.b, 1464);
 			}
 			else if (i_height == 1) {
-				assertEquals(1464, block.calcWinValueTargeted(dcSet));
+				assertEquals(1464, block.calcWinValueTargeted());
 				//assertEquals(15716, generator2.calcWinValueTargeted(dcSet, i_height));
 				assertEquals((int)hWeight.a, i_height);
 				assertEquals((long)hWeight.b, 1464 + 1464);
 			}
 			else if (i_height == 2) {
-				assertEquals(1464, block.calcWinValueTargeted(dcSet));
+				assertEquals(1464, block.calcWinValueTargeted());
 				assertEquals((long)hWeight.b, (i_height-1) * 1464);
 			}
 			else if (i_height == 9) {
