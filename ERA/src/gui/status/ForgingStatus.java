@@ -4,6 +4,7 @@ package gui.status;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.TimeUnit;
@@ -72,7 +73,8 @@ public class ForgingStatus extends JLabel implements Observer {
 				if(winAccount != null)
 				{
 					//timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
-					timeForge = "" + (BlockChain.BASE_TARGET * winBalance / target);
+					timeForge = new BigDecimal(BlockChain.calcWinValueTargetedBase(dcSet, newHeight, winBalance, target)).movePointLeft(3).toPlainString();
+					//timeForge = "" + (BlockChain.BASE_TARGET * winBalance / target);
 					timeForge = winBalance2>0?timeForge:("("+winBalance2+")");
 					timeForge = timeForge + " " + winAccount.getAddress();
 					timeForge = Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
