@@ -85,6 +85,8 @@ public tt() {
    person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Insert Person")));
    account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Accounts")));
    account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Loans")));
+   account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Name Accounts")));
+   
    
   // account_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Accounts")));
    //account_Node.add(new DefaultMutableTreeNode("Issue Account"));

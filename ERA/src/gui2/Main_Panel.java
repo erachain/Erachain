@@ -18,6 +18,7 @@ import core.BlockChain;
 import gui.Wallets.Wallets_Manager_SplitPanel;
 import gui.bank.Issue_Send_Payment_Order;
 import gui.bank.My_Order_Pauments_SplitPanel;
+import gui.items.accounts.Accounts_Name_Search_SplitPanel;
 import gui.items.accounts.My_Accounts_SplitPanel;
 import gui.items.accounts.My_Loans_SplitPanel;
 import gui.items.assets.Assets_Favorite_SplitPanel;
@@ -342,6 +343,18 @@ public class Main_Panel extends javax.swing.JPanel {
 
 		}
 
+		
+		if (str.equals(Lang.getInstance().translate("Name Accounts")) || str.equals("Accounts_Name_Search_SplitPanel")) {
+			insertTab(Lang.getInstance().translate("Name Accounts"), new Accounts_Name_Search_SplitPanel());
+			return;
+
+		}
+		
+		
+		
+		
+		
+		
 		if (str.equals(Lang.getInstance().translate("Favorite Documents"))
 				|| str.equals("Statements_Favorite_SplitPanel")) {
 			insertTab(Lang.getInstance().translate("Favorite Documents"), new Statements_Favorite_SplitPanel());

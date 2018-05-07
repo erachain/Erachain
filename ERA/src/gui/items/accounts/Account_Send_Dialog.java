@@ -31,12 +31,13 @@ public class Account_Send_Dialog extends JDialog {
 		panel = new Account_Send_Panel(asset, account, account_To, person);
 		getContentPane().add(panel, BorderLayout.CENTER);
 		this.setTitle(Lang.getInstance().translate("Send"));
+		this.pack();
 		this.setResizable(true);
 		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
 		setModal(true);
-		this.pack();
+		
 		this.setLocationRelativeTo(null);
-		this.setVisible(false);
+		this.setVisible(true);
 
 	}
 	public void  sertParams(String ammount, String title, String message){

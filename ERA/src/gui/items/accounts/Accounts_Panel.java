@@ -452,7 +452,8 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 			public void actionPerformed(ActionEvent e) 
 			{
 				 new Account_Set_Name_Dialog(pub_Key.getAddress()); 
-			//	 tableModel.fireTableDataChanged();
+				 table.repaint();
+				// tableModel.fireTableDataChanged();
 			}
 		});
 		menu.add(set_name);

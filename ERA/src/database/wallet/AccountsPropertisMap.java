@@ -29,6 +29,7 @@ import utils.ReverseComparator;
 import database.DBMap;
 import database.serializer.NameSerializer;
 import datachain.DCMap;
+import datachain.SortableList;
 
 // <Account, Tuple2<Title,JSON_String>>
 public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> {
@@ -42,9 +43,9 @@ public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> 
 	public AccountsPropertisMap(DWSet dWSet, DB database) {
 		super(dWSet, database);
 
-		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ACCOUNT_TYPE);
-		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ACCOUNT_TYPE);
-		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
+		this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_ADD);
+		this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_DELETE);
+		this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_ACCOUNT_PROPERTIES_LIST);
 	}
 
 	public AccountsPropertisMap(AccountsPropertisMap parent) {
@@ -104,4 +105,7 @@ public class AccountsPropertisMap extends DCMap<String, Tuple2<String, String>> 
 		// TODO Auto-generated method stub
 
 	}
+	
+	
+	
 }

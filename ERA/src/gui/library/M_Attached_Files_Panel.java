@@ -97,8 +97,6 @@ public class M_Attached_Files_Panel extends JPanel{
   				
   				 try(FileOutputStream fos=new FileOutputStream(pp))
   		        {
-  		            // перевод строки в байты
-  					String ssst = model.getValueAt(row, 2).toString();
   		            byte[] buffer =(byte[]) model.getValueAt(row, 2);
   		            // if ZIP
   		           if ((boolean)model.getValueAt(row, 1)){
