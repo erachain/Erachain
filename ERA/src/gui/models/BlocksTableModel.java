@@ -30,7 +30,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 
 	private List<Block> blocks;
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
-			"GB pH VW tVW", //"Generating Balance",
+			"GB pH WV tWV", //"Generating Balance",
 			"Transactions", "Fee"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,true,false};
 

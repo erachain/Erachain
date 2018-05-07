@@ -7,16 +7,15 @@ import javax.validation.constraints.Null;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import utils.DateTimeFormat;
-import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
 import core.block.Block;
-import core.wallet.Wallet;
 import database.wallet.BlockMap;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
+import utils.DateTimeFormat;
+import utils.ObserverMessage;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>, Block> implements Observer{
@@ -31,7 +30,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	private SortableList<Tuple2<String, String>, Block> blocks;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
-			"GB pH VW tVW", //"Generating Balance",
+			"GB pH WV tWV", //"Generating Balance",
 			"Transactions", "Fee"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,true,false};
 	

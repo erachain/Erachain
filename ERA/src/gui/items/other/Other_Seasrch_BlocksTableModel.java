@@ -28,7 +28,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 
 	private List<Block> blocks;
 	private String[] columnNames = Lang.getInstance()
-			.translate(new String[] { "Height", "Timestamp", "Generator", "GB pH VW tVW", // "Generating
+			.translate(new String[] { "Height", "Timestamp", "Generator", "GB pH WV tWV", // "Generating
 					// Balance",
 					"Transactions", "Fee" });
 	private Boolean[] column_AutuHeight = new Boolean[] { false, true, true, false, true, false };
