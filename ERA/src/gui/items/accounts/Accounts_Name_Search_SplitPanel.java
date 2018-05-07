@@ -127,7 +127,16 @@ public Accounts_Name_Search_SplitPanel(){
 			});
 	
 	
-	
+	button3_ToolBar_LeftPanel.addActionListener(new ActionListener(){
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			new Account_Name_Add();
+		}
+		
+		
+	});
 	
 	
 	
