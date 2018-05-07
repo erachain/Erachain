@@ -17,7 +17,9 @@ import javax.swing.DefaultRowSorter;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
 import javax.swing.event.DocumentEvent;
@@ -60,10 +62,11 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel{
 private Accounts_Name_TableModel tableModelImprints;
 private JButton button3_ToolBar_LeftPanel;
 protected My_JFileChooser chooser;
+private AccountsPropertisMap db;
 
 public Accounts_Name_Search_SplitPanel(){
 	super("Accounts_Name_Search_SplitPanel");
-
+	db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
 	setName(Lang.getInstance().translate("Name Accounts"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	searthLabel_SearchToolBar_LeftPanel.setVisible(true);
@@ -125,35 +128,35 @@ public Accounts_Name_Search_SplitPanel(){
 	
 	
 	
-	/*
+	
 // MENU
 	JPopupMenu nameSalesMenu = new JPopupMenu();
-	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
+	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Edit"));
 	details.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			int row = imprintsTable.getSelectedRow();
 			row = imprintsTable.convertRowIndexToModel(row);
-			ImprintCls imprint = tableModelImprints.getImprint(row);
-			new ImprintFrame(imprint);
+			Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
+			new Account_Set_Name_Dialog(ac.getA());
+			
 		}
 	});
 	nameSalesMenu.add(details);
-	imprintsTable.setComponentPopupMenu(nameSalesMenu);
-	imprintsTable.addMouseListener(new MouseAdapter() {
-	@Override
-		public void mousePressed(MouseEvent e) {
-			Point p = e.getPoint();
-			int row = imprintsTable.rowAtPoint(p);
-			imprintsTable.setRowSelectionInterval(row, row);
-			if(e.getClickCount() == 2)
-			{
-				row = imprintsTable.convertRowIndexToModel(row);
-				ImprintCls imprint = tableModelImprints.getImprint(row);
-				new ImprintFrame(imprint);
-			}
+	
+	JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Delete"));
+	menuItemDelete.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			int row = imprintsTable.getSelectedRow();
+			row = imprintsTable.convertRowIndexToModel(row);
+			Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
+			db.delete(ac.getA());
+			
 		}
 	});
-	*/
+	nameSalesMenu.add(menuItemDelete);
+	imprintsTable.setComponentPopupMenu(nameSalesMenu);
+	
+	
 	button2_ToolBar_LeftPanel.addActionListener(new ActionListener(){
 
 		@SuppressWarnings("unchecked")
@@ -198,7 +201,7 @@ public Accounts_Name_Search_SplitPanel(){
   					// buffer
   					JSONObject output = new JSONObject();
   					
-  					SortableList<String, Tuple2<String, String>> lists = Controller.getInstance().wallet.database.getAccountsPropertisMap().getList();
+  					SortableList<String, Tuple2<String, String>> lists = db.getList();
   					
   					for(Pair<String, Tuple2<String, String>> list:lists){
   						JSONObject account = new JSONObject();
@@ -284,7 +287,7 @@ public Accounts_Name_Search_SplitPanel(){
 			JSONObject ss = (JSONObject) inJSON.get(a);
 			Object a1 = ss.get("name");
 			Object a2 = ss.get("json");
-			Controller.getInstance().wallet.database.getAccountsPropertisMap().set(a, new Tuple2(ss.get("name"), ss.get("json")));
+			db.set(a, new Tuple2(ss.get("name"), ss.get("json")));
 		}
 		
 		
