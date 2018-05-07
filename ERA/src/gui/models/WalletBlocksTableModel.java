@@ -1,4 +1,5 @@
 package gui.models;
+import java.math.BigDecimal;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -30,7 +31,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 	private SortableList<Tuple2<String, String>, Block> blocks;
 	
 	private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
-			"GB pH WV tWV", //"Generating Balance",
+			"GB tWV", //"Generating Balance",
 			"Transactions", "Fee"});
 	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,true,false};
 	
@@ -123,9 +124,8 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 				
 			case COLUMN_BASETARGET:
 
-				long iii = block.calcWinValueTargeted(DCSet.getInstance());
 				return block.getForgingValue() + " "
-					+ iii;
+				+ new BigDecimal(block.calcWinValueTargeted(DCSet.getInstance())).movePointLeft(3);
 				
 			case COLUMN_TRANSACTIONS:
 				

@@ -1,5 +1,6 @@
 package gui.items.other;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -168,7 +169,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				return  forgingPoint.b + " "
 				+ (height - forgingPoint.a) + " "
 				+ block.getWinValue() + " "
-				+ block.calcWinValueTargeted(dcSet);
+				+ new BigDecimal(block.calcWinValueTargeted(dcSet)).movePointLeft(3);
 
 			case COLUMN_TRANSACTIONS:
 				if (block == null) {
