@@ -380,7 +380,8 @@ public Accounts_Name_Search_SplitPanel(){
   			chooser.setAcceptAllFileFilterUsed(false);//only filter
   	        chooser.addChoosableFileFilter(xmlFilter);
   	        chooser.setFileFilter(xmlFilter);
-  	      if ( chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
+  	        
+  	      if ( chooser.showOpenDialog(getParent()) == JFileChooser.APPROVE_OPTION ) {
 			
 			File file = new File(chooser.getSelectedFile().getPath());
 			
