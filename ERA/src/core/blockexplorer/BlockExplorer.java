@@ -1225,13 +1225,13 @@ public class BlockExplorer {
 			if (!volumeAmountOrders.containsKey(order.c.a)) {
 				volumeAmount = BigDecimal.ZERO;
 			} else {
-				volumeAmount = volumeAmountOrders.get(order.c.b);
+				volumeAmount = volumeAmountOrders.get(order.c.a);
 			}
 
 			if (!volumePriceOrders.containsKey(order.b.a)) {
 				volumePrice = BigDecimal.ZERO;
 			} else {
-				volumePrice = volumePriceOrders.get(order.c.b);
+				volumePrice = volumePriceOrders.get(order.c.a);
 			}
 
 			count++;
