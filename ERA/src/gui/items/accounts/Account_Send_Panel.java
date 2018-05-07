@@ -225,6 +225,7 @@ public class Account_Send_Panel extends JPanel
 			}
 			this.add(txtTo, txtToGBC);
 		}
+		
 		txtTo.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
@@ -560,7 +561,7 @@ public class Account_Send_Panel extends JPanel
 		//this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
 		//this.setLocation(20, 20);
 		//	this.setIconImages(icons);
-
+		refreshReceiverDetails();
 
 
 	}

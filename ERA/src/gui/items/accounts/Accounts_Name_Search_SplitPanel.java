@@ -1,6 +1,9 @@
 package gui.items.accounts;
 
 import java.awt.Component;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -26,6 +29,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -39,11 +44,14 @@ import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import controller.Controller;
+import core.account.Account;
+import core.account.PublicKeyAccount;
 import database.wallet.AccountsPropertisMap;
 import datachain.SortableList;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.Split_Panel;
+import gui.items.mails.Mail_Send_Dialog;
 import gui.library.MTable;
 import gui.library.My_JFileChooser;
 import gui.models.WalletItemImprintsTableModel;
@@ -65,6 +73,7 @@ private Accounts_Name_TableModel tableModelImprints;
 private JButton button3_ToolBar_LeftPanel;
 protected My_JFileChooser chooser;
 private AccountsPropertisMap db;
+protected int row;
 
 public Accounts_Name_Search_SplitPanel(){
 	super("Accounts_Name_Search_SplitPanel");
@@ -138,26 +147,97 @@ public Accounts_Name_Search_SplitPanel(){
 		
 	});
 	
+// menu
 	
+	JPopupMenu menu = new JPopupMenu();
 	
-// MENU
-	JPopupMenu nameSalesMenu = new JPopupMenu();
-	JMenuItem details = new JMenuItem(Lang.getInstance().translate("Edit"));
-	details.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-			int row = imprintsTable.getSelectedRow();
-			try {
-				row = imprintsTable.convertRowIndexToModel(row);
-				Pair<String, Tuple2<String, String>> ac = tableModelImprints.getAccount(row);
-				new Account_Set_Name_Dialog(ac.getA());
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+	menu.addPopupMenuListener(new PopupMenuListener(){
+
+		@Override
+		public void popupMenuCanceled(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
 			
 		}
+
+		@Override
+		public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+			// TODO Auto-generated method stub
+			int row1 = imprintsTable.getSelectedRow();
+			if (row1 < 0 ) return;
+		
+		row = imprintsTable.convertRowIndexToModel(row1);
+		
+		
+		
+		}
+		});
+		
+
+	JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Copy Account"));
+	copyAddress.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			 Pair<String, Tuple2<String, String>> account = tableModelImprints.getAccount(row);
+			StringSelection value = new StringSelection(account.getA());
+			clipboard.setContents(value, null);
+		}
 	});
-	nameSalesMenu.add(details);
+	menu.add(copyAddress);
+
+	JMenuItem menu_copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
+	menu_copyPublicKey.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+
+			 Pair<String, Tuple2<String, String>> account = tableModelImprints.getAccount(row);
+			byte[] publick_Key = Controller.getInstance().getPublicKeyByAddress(account.getA());
+			PublicKeyAccount public_Account = new PublicKeyAccount(publick_Key);
+			StringSelection value = new StringSelection(public_Account.getBase58());
+			clipboard.setContents(value, null);
+		}
+	});
+	menu.add(menu_copyPublicKey);
+
+	JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+	Send_Coins_item_Menu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
+			Account account = new Account(account1.getA());
+			new Account_Send_Dialog(null, null, account, null);
+
+		}
+	});
+	menu.add(Send_Coins_item_Menu);
+
+	JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+	Send_Mail_item_Menu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
+			Account account = new Account(account1.getA());
+			new Mail_Send_Dialog(null, null, account, null);
+
+		}
+	});
+	menu.add(Send_Mail_item_Menu);
+	
+	JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Set Name"));
+	setName.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+			Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
+			
+			new Account_Set_Name_Dialog(account1.getA()); 
+			imprintsTable.repaint();
+
+		}
+	});
+	menu.add(setName);
 	
 	JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Delete"));
 	menuItemDelete.addActionListener(new ActionListener() {
@@ -194,8 +274,14 @@ public Accounts_Name_Search_SplitPanel(){
 			
 		}
 	});
-	nameSalesMenu.add(menuItemDelete);
-	imprintsTable.setComponentPopupMenu(nameSalesMenu);
+	menu.add(menuItemDelete);
+	
+	
+	
+
+	
+	
+	imprintsTable.setComponentPopupMenu(menu);
 	
 	
 	button2_ToolBar_LeftPanel.addActionListener(new ActionListener(){
