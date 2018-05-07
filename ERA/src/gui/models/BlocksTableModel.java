@@ -1,4 +1,5 @@
 package gui.models;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -169,7 +170,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 				return  forgingPoint.b + " "
 				+ (height - forgingPoint.a) + " "
 				+ block.getWinValue() + " "
-				+ block.calcWinValueTargeted(dcSet);
+				+ new BigDecimal(block.calcWinValueTargeted(dcSet)).movePointLeft(3);
 
 			case COLUMN_TRANSACTIONS:
 				if (block == null) {
