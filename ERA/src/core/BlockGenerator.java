@@ -223,6 +223,7 @@ public class BlockGenerator extends Thread implements Observer
 		int forgingValue;
 		int winned_forgingValue;
 		long winValue;
+		int targetedWinValue;
 		long winned_winValue;
 		long previousTarget = bchain.getTarget(dcSet);
 		Block generatedBlock;
@@ -383,8 +384,8 @@ public class BlockGenerator extends Thread implements Observer
 								if(winValue < 1)
 									continue;
 
-								winValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
-								if(winValue < 1)
+								targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+								if(targetedWinValue < 1)
 									continue;
 
 								if (winValue > winned_winValue) {
