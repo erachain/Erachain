@@ -1,9 +1,5 @@
 package gui.transaction;
 
-import gui.PasswordPane;
-import gui.library.M_Accoutn_Text_Field;
-import lang.Lang;
-
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -13,35 +9,22 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
-
-import utils.Converter;
-import utils.DateTimeFormat;
-import utils.MenuPopupUtil;
-import controller.Controller;
-import core.account.Account;
-import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
-import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import gui.library.M_Accoutn_Text_Field;
+import lang.Lang;
+import utils.DateTimeFormat;
+import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
 public class Rec_DetailsFrame extends JPanel //JFrame
@@ -56,7 +39,8 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 	{
 
 		this.record = record1;
-		DCSet db = DCSet.getInstance();
+		DCSet dcSet = DCSet.getInstance();
+		this.record.setDC(dcSet, false);
 
 		//ICON
 		List<Image> icons = new ArrayList<Image>();
@@ -118,10 +102,10 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 		//Height + Seq
 		detailGBC.gridy = componentLevel++;
 		JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
-				+ " [" + record.viewHeightSeq(db) + " "
+				+ " [" + record.viewHeightSeq(dcSet) + " "
 				+ String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
 				+ "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
-				+ ">>" + record.getConfirmations(db));
+				+ ">>" + record.getConfirmations(dcSet));
 		shorn_Info.setEditable(false);
 //		MenuPopupUtil.installContextMenu(shorn_Info);
 		this.add(shorn_Info, detailGBC);
@@ -214,7 +198,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 						
 						+ String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
 						+ "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
-						+ ">>" + record.getConfirmations(db));
+						+ ">>" + record.getConfirmations(dcSet));
 				
 				
 				
@@ -236,7 +220,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 					public void actionPerformed(ActionEvent e) {
 			
 						Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-						StringSelection value = new StringSelection(record.viewHeightSeq(db));
+						StringSelection value = new StringSelection(record.viewHeightSeq(dcSet));
 						clipboard.setContents(value, null);
 					}
 				});

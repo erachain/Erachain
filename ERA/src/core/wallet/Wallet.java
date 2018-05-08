@@ -1772,7 +1772,11 @@ public class Wallet extends Observable implements Observer
 		{
 			//ADD ORDER
 			// reload order
-			Order orderReloaded = Order.fromDBrec(Order.getOrder(DCSet.getInstance(), order.getId()));
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew = Order.getOrder(DCSet.getInstance(), order.getId());
+			if (orderNew == null)
+				return;
+			
+			Order orderReloaded = Order.fromDBrec(orderNew);
 			this.database.getOrderMap().add(orderReloaded == null?
 					order:
 						orderReloaded);

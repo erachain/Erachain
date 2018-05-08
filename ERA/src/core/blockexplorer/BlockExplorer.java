@@ -1203,6 +1203,7 @@ public class BlockExplorer {
 		return output;
 	}
 
+	// TODO: что-то тут напутано
 	public Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> calcForAsset(
 			List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders,
 			List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades) {
@@ -1231,7 +1232,7 @@ public class BlockExplorer {
 			if (!volumePriceOrders.containsKey(order.b.a)) {
 				volumePrice = BigDecimal.ZERO;
 			} else {
-				volumePrice = volumePriceOrders.get(order.c.a);
+				volumePrice = volumePriceOrders.get(order.b.a);
 			}
 
 			count++;
@@ -1250,7 +1251,7 @@ public class BlockExplorer {
 			}
 
 			if (!volumePriceOrders.containsKey(order.b.a)) {
-				volumePrice = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				volumePrice = BigDecimal.ZERO;
 			} else {
 				volumePrice = volumePriceOrders.get(order.b.a);
 			}
@@ -1264,7 +1265,8 @@ public class BlockExplorer {
 			count++;
 			pairsOpenOrders.put(order.b.a, count);
 
-			volumePrice = volumePrice.add(order.b.b);
+			if (order.b.b != null)
+				volumePrice = volumePrice.add(order.b.b);
 
 			volumePriceOrders.put(order.b.a, volumePrice);
 
