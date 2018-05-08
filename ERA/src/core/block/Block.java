@@ -915,7 +915,7 @@ public class Block {
 		return this.winValue;
 	}
 
-	public int calcWinValueTargeted(DCSet dcSet)
+	public int calcWinValueTargeted()
 	{
 
 		if (this.version == 0 || this.creator == null) {
@@ -1522,7 +1522,7 @@ public class Block {
 	}
 
 	public String toString(DCSet dcSet) {
-		return " WT: " + this.calcWinValueTargeted(dcSet)
+		return " WT: " + this.calcWinValueTargeted()
 		+ " recs: " + this.transactionCount
 		+ " H: " + this.getHeightByParent(dcSet)
 		//+ " W: " + this.getWinValue()

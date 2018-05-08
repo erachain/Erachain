@@ -1688,7 +1688,7 @@ public class BlockExplorer {
 		output.put("Label_Generator", Lang.getInstance().translate_from_langObj("Creator", langObj));
 		output.put("Label_Gen_balance", Lang.getInstance().translate_from_langObj("Gen.Balance", langObj));
 		output.put("Label_TXs", Lang.getInstance().translate_from_langObj("TXs", langObj));
-		output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Height", langObj));
+		output.put("Label_Fee", Lang.getInstance().translate_from_langObj("Fee", langObj));
 		output.put("Label_AT_Amount", Lang.getInstance().translate_from_langObj("AT Amount", langObj));
 		output.put("Label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
 		output.put("Label_Later", Lang.getInstance().translate_from_langObj("Later", langObj));
@@ -1702,9 +1702,8 @@ public class BlockExplorer {
 			blockJSON.put("signature", Base58.encode(block.getSignature()));
 			blockJSON.put("generator", block.getCreator().getAddress());
 			blockJSON.put("generatingBalance", block.getForgingValue());
-			// blockJSON.put("winValue",
-			// block.calcWinValue(dcSet.getInstance()));
-			blockJSON.put("winValueTargetted", block.calcWinValueTargeted(dcSet));
+			blockJSON.put("winValue", block.getWinValue());
+			blockJSON.put("winValueTargetted", block.calcWinValueTargeted());
 			blockJSON.put("transactionCount", block.getTransactionCount());
 			blockJSON.put("timestamp", block.getTimestamp(dcSet));
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
@@ -4193,6 +4192,8 @@ public class BlockExplorer {
 		} else {
 			block = Controller.getInstance().getBlock(Base58.decode(query));
 		}
+		
+		block.loadHeadMind(dcSet);
 
 		for (Transaction transaction : block.getTransactions()) {
 			all.add(transaction);
@@ -4276,6 +4277,12 @@ public class BlockExplorer {
 		output.put("totalFee", block.getTotalFee().toPlainString());
 		output.put("version", block.getVersion());
 
+
+		output.put("generatingBalance", block.getForgingValue());
+		output.put("winValue", block.getWinValue());
+		output.put("target", block.getTarget());
+		output.put("winValueTargeted", block.calcWinValueTargeted());
+
 		output.put("start", size + 1);
 		output.put("end", 1);
 
@@ -4304,8 +4311,6 @@ public class BlockExplorer {
 
 			transactionDataJSON.put("generator", block.getCreator().getAddress());
 			transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
-
-			transactionDataJSON.put("generatingBalance", block.getForgingValue());
 			// transactionDataJSON.put("atFees",
 			// block.getATfee().toPlainString());
 			transactionDataJSON.put("reference", Base58.encode(block.getReference()));
@@ -4333,6 +4338,12 @@ public class BlockExplorer {
 		output.put("label_Total_Amount", Lang.getInstance().translate_from_langObj("Total Amount", langObj));
 		output.put("label_Total_AT_Amount", Lang.getInstance().translate_from_langObj("Total AT Amount", langObj));
 		output.put("label_Total_Fee", Lang.getInstance().translate_from_langObj("Total Fee", langObj));
+
+		output.put("label_Win_Value", Lang.getInstance().translate_from_langObj("Win Value", langObj));
+		output.put("label_Generating_Balance", Lang.getInstance().translate_from_langObj("Generating Balance", langObj));
+		output.put("label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
+		output.put("label_Targeted_Win_Value", Lang.getInstance().translate_from_langObj("Targeted Win Value", langObj));
+
 		output.put("label_Parent_block", Lang.getInstance().translate_from_langObj("Parent block", langObj));
 		output.put("label_Current_block", Lang.getInstance().translate_from_langObj("Current block", langObj));
 		output.put("label_Child_block", Lang.getInstance().translate_from_langObj("Child block", langObj));

@@ -125,7 +125,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			case COLUMN_BASETARGET:
 
 				return block.getForgingValue() + " "
-				+ new BigDecimal(block.calcWinValueTargeted(DCSet.getInstance())).movePointLeft(3);
+				+ new BigDecimal(block.calcWinValueTargeted()).movePointLeft(3);
 				
 			case COLUMN_TRANSACTIONS:
 				

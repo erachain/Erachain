@@ -150,13 +150,13 @@ public class TestChain {
 		int i = 1;
 		while (i <= blockChain.getHeight(dcSet)) {
 			block = blockChain.getBlock(dcSet, i);
-			int win_value = block.calcWinValueTargeted(dcSet);
+			int win_value = block.calcWinValueTargeted();
 			long www = block.calcWinValue(dcSet);
 			if (www != win_value) {
 				//assertEquals(www, win_value);
 				long diff = www - win_value;
 				i = i + 1 - 1;
-				win_value = block.calcWinValueTargeted(dcSet);
+				win_value = block.calcWinValueTargeted();
 				lastH = block.getCreator().getForgingData(dcSet, i).a;
 				int h_i = lastH - 1;
 				do {

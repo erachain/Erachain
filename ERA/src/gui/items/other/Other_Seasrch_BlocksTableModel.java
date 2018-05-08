@@ -169,7 +169,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 				return  forgingPoint.b + " "
 				+ (height - forgingPoint.a) + " "
 				+ block.getWinValue() + " "
-				+ new BigDecimal(block.calcWinValueTargeted(dcSet)).movePointLeft(3);
+				+ new BigDecimal(block.calcWinValueTargeted()).movePointLeft(3);
 
 			case COLUMN_TRANSACTIONS:
 				if (block == null) {
