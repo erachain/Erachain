@@ -911,7 +911,9 @@ public class BlockGenerator extends Thread implements Observer
 			return;
 		}
 
-		setForgingStatus(ForgingStatus.FORGING_WAIT);
+		if(forgingStatus != ForgingStatus.FORGING) {
+			setForgingStatus(ForgingStatus.FORGING_WAIT);
+		}
 
 		/*
 		// NOT NEED to wait - TARGET_WIN will be small
