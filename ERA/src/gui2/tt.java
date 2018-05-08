@@ -1,21 +1,15 @@
 package gui2;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.UIManager;
+import core.BlockChain;
+import lang.Lang;
+
+import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import core.BlockChain;
-import lang.Lang;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author DarkRaha
@@ -57,21 +51,25 @@ public tt() {
    
 
    // ���������� �� �������� �����
-   
-  if(BlockChain.DEVELOP_USE) root.add(bank_Tree);
-   root.add(account_Node);
-   root.add(person_Node);
-   root.add(document_Node);
-   root.add(mails_Node);
-   root.add(assets_Node);
-   root.add(templates_Node);
-   root.add(statuses_Node);
-   root.add(unions_Node);
-   root.add(votings_Node);
-   root.add(hashes_Node);
-   root.add(linked_hashes_Node);
-   root.add(records_Node);
-   root.add(other_Node);
+
+    if (BlockChain.DEVELOP_USE)
+        root.add(bank_Tree);
+    root.add(account_Node);
+    root.add(person_Node);
+    root.add(document_Node);
+    root.add(mails_Node);
+    root.add(assets_Node);
+    root.add(templates_Node);
+    root.add(statuses_Node);
+    if (BlockChain.DEVELOP_USE)
+        root.add(unions_Node);
+    root.add(votings_Node);
+    if (BlockChain.DEVELOP_USE)
+        root.add(hashes_Node);
+   if (BlockChain.DEVELOP_USE)
+    root.add(linked_hashes_Node);
+    root.add(records_Node);
+    root.add(other_Node);
 
   
    bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Payment Order")));
@@ -120,11 +118,11 @@ public tt() {
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Statuses")));
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Statuses")));
    statuses_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Create Status")));
-   
+	
    unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Unions")));
    unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Unions")));
    unions_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Union")));
-   
+		
    votings_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Votings")));
    votings_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Votings")));
    votings_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Voting")));
@@ -134,7 +132,8 @@ public tt() {
    records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));
    
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
-   other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
+		if (BlockChain.DEVELOP_USE)
+			other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));
    other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Blocks")));
    
