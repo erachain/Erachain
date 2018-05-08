@@ -308,4 +308,3 @@ public class Split_Panel extends javax.swing.JPanel {
     public JCheckBox searth_Favorite_JCheckBox_LeftPanel;
     // End of variables declaration                   
 }
-

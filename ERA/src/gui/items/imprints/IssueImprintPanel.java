@@ -159,7 +159,7 @@ public class IssueImprintPanel extends JPanel
         
         //LABEL NUMBER
       	labelGBC.gridy = gridy;
-      	JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + "(0..9/-.):");
+      	JLabel numberLabel = new JLabel(Lang.getInstance().translate("Number") + " (0..9/-.):");
       	this.add(numberLabel, labelGBC);
       		
       	//TXT NUMBER
@@ -169,7 +169,7 @@ public class IssueImprintPanel extends JPanel
 
         //LABEL DATE
       	labelGBC.gridy = gridy;
-      	JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + "(YY-MM-DD HH:MM");
+      	JLabel dateLabel = new JLabel(Lang.getInstance().translate("Date") + " (YY-MM-DD HH:MM):");
       	this.add(dateLabel, labelGBC);
       		
       	//TXT DEBITOR
@@ -199,7 +199,7 @@ public class IssueImprintPanel extends JPanel
 
         //LABEL CREDITOR
       	labelGBC.gridy = gridy;
-      	JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + "(123.03):");
+      	JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + " (123.03):");
       	this.add(amountLabel, labelGBC);
       		
       	//TXT DEBITOR
@@ -243,7 +243,7 @@ public class IssueImprintPanel extends JPanel
         //BUTTON Register
         buttonGBC.gridy = gridy;
         this.issueButton = new JButton(Lang.getInstance().translate("Issue"));
-        this.issueButton.setPreferredSize(new Dimension(100, 25));
+        this.issueButton.setPreferredSize(new Dimension(170, 25));
         this.issueButton.addActionListener(new ActionListener()
 		{
 		    public void actionPerformed(ActionEvent e)

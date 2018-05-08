@@ -307,7 +307,7 @@ public class Controller extends Observable {
 
 	public void sendMyHWeightToPeer(Peer peer) {
 
-		// SEND HEIGTH MESSAGE
+		// SEND HEIGHT MESSAGE
 		peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(this.blockChain.getHWeightFull(dcSet)));
 	}
 
@@ -1147,7 +1147,7 @@ public class Controller extends Observable {
 		/*
 		// GET HEIGHT
 		Tuple2<Integer, Long> HWeight = this.blockChain.getHWeightFull(dcSet);
-		// SEND HEIGTH MESSAGE
+		// SEND HEIGHT MESSAGE
 		if (!peer.sendMessage(MessageFactory.getInstance().createHWeightMessage(HWeight)))
 			return;
 
