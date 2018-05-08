@@ -156,7 +156,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 
 		setLayout(new java.awt.GridBagLayout());
 		
-		add_Tamplate.setText(Lang.getInstance().translate("Insert Template?"));
+		add_Tamplate.setText(Lang.getInstance().translate("Insert Template") + "?");
 		add_Tamplate.addActionListener ( new ActionListener(){
 
 			@Override

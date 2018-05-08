@@ -1,13 +1,5 @@
 package gui.items.assets;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -22,6 +14,11 @@ import gui.library.My_Add_Image_Panel;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -132,7 +129,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 		txtFeePow = new javax.swing.JTextField();
 		issue_jButton = new javax.swing.JButton();
 		// size from widht
-		add_Image_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Image (max %1%kB)").replace("%1%", "1024"), 250 , 250);
+		add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
 		// size from height
 		add_Logo_Icon_Panel = new  My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50 , 50);
 
