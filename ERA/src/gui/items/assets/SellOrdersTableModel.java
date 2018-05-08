@@ -10,7 +10,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
-import core.BlockChain;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.SortableList;
@@ -31,7 +30,7 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Price", "Amount", "Buying Amount"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Price", "Amount", "Total"});
 
 	BigDecimal sumAmount;
 	BigDecimal sumTotal;
@@ -57,8 +56,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 
 	private void totalCalc()
 	{
-		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		sumTotal = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		sumAmount = BigDecimal.ZERO;
+		sumTotal = BigDecimal.ZERO;
 		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders)
 		{
@@ -126,8 +125,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 		case COLUMN_PRICE:
 
 			if(row == this.orders.size())
-				return "<html>"+Lang.getInstance().translate("Total") + ":</html>";
-
+				return "<html><b>"+Lang.getInstance().translate("Total") + ":</b></html>";
+			
 			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
 
 		case COLUMN_AMOUNT:
@@ -137,32 +136,24 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 
 
 			// It shows unacceptably small amount of red.
-			//BigDecimal increment = order.calculateBuyIncrement();
-			BigDecimal amount = order.b.c;
+			BigDecimal amount = order.b.b.subtract(order.b.c);
 			String amountStr = NumberAsString.getInstance().numberAsString(amount);
-			//amount = amount.subtract(amount.remainder(increment));
-
-			//if (amount.compareTo(BigDecimal.ZERO) <= 0)
 			if (order.a.d)
-				amountStr = "<font color=#808080>" + amountStr + "</font>";
-
-			if (isMine)
-				amountStr = "<b>" + amountStr + "</b>";
-
-			return "<html>" + amountStr + "</html>";
+				return amountStr;
+			else
+				return "<html><font color=#808080>" + amountStr + "</font></html>";
 
 		case COLUMN_TOTAL:
 
 			if(row == this.orders.size())
 				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
 
-			//amountStr = NumberAsString.getInstance().numberAsString(order.c.b.subtract(order.c.c)); // getAmountWantLeft());
 			amountStr = NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order)); // getAmountWantLeft());
 
 			if (isMine)
-				amountStr = "<b>" + amountStr + "</b>";
+				amountStr = "<html><b>" + amountStr + "</b></html>";
 
-			return "<html>" + amountStr + "</html>";
+			return amountStr;
 
 		}
 

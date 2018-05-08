@@ -10,7 +10,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
-import core.BlockChain;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.SortableList;
@@ -21,50 +20,47 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class BuyOrdersTableModel extends TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Observer
-{
-	public static final int COLUMN_BUYING_PRICE = 0;
-	public static final int COLUMN_BUYING_AMOUNT = 1;
-	public static final int COLUMN_PRICE = 2;
-	public static final int COLUMN_AMOUNT = 3;
+public class BuyOrdersTableModel extends
+		TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
+		implements Observer {
+	public static final int COLUMN_BUYING_PRICE = -1;
+	public static final int COLUMN_PRICE = 0;
+	public static final int COLUMN_AMOUNT = 1;
+	public static final int COLUMN_TOTAL = 2;
 
-	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
+	// private String[] columnNames = Lang.getInstance().translate(new
+	// String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Price", "Amount", "Total" });
 
 	BigDecimal sumAmount;
 	BigDecimal sumTotal;
 	private AssetCls have;
 	private AssetCls want;
 
-	public BuyOrdersTableModel(AssetCls have, AssetCls want)
-	{
+	public BuyOrdersTableModel(AssetCls have, AssetCls want) {
 		this.have = have;
-		this.want= want;
+		this.want = want;
 
 		this.orders = Controller.getInstance().getOrders(have, want, true);
 
-		columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
-		columnNames[COLUMN_BUYING_AMOUNT] += " " + want.getShort();
+		// columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
 		columnNames[COLUMN_PRICE] += " " + want.getShort();
 		columnNames[COLUMN_AMOUNT] += " " + have.getShort();
+		columnNames[COLUMN_TOTAL] += " " + want.getShort();
 
 		totalCalc();
 
 		Controller.getInstance().addObserver(this);
-		//this.orders.registerObserver();
+		// this.orders.registerObserver();
 
 	}
 
-	private void totalCalc()
-	{
-		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		sumTotal = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders)
-		{
+	private void totalCalc() {
+		sumAmount = BigDecimal.ZERO;
+		sumTotal = BigDecimal.ZERO;
+		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
 			Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
 			BigDecimal amount = haveItem.b.subtract(haveItem.c);
 			sumAmount = sumAmount.add(amount);
@@ -73,17 +69,14 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	}
 
 	@Override
-	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList()
-	{
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
 		return this.orders;
 	}
 
-	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(int row)
-	{
-		Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> rec = this.orders.get(row);
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(
+			int row) {
+		Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> rec = this.orders
+				.get(row);
 		if (rec == null)
 			return null;
 
@@ -91,92 +84,84 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	}
 
 	@Override
-	public int getColumnCount()
-	{
+	public int getColumnCount() {
 		return this.columnNames.length;
 	}
 
 	@Override
-	public String getColumnName(int index)
-	{
+	public String getColumnName(int index) {
 		return this.columnNames[index];
 	}
 
 	@Override
-	public int getRowCount()
-	{
+	public int getRowCount() {
 		return this.orders.size() + 1;
 
 	}
 
 	@Override
-	public Object getValueAt(int row, int column)
-	{
-		if(this.orders == null || row > this.orders.size() )
-		{
+	public Object getValueAt(int row, int column) {
+		if (this.orders == null || row > this.orders.size()) {
 			return null;
 		}
 
-		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
 		boolean isMine = false;
-		if(row < this.orders.size())
-		{
+		if (row < this.orders.size()) {
 			order = this.orders.get(row).getB();
 			if (order != null) {
 				Controller cntr = Controller.getInstance();
-				if(cntr.isAddressIsMine(order.a.b)) {
+				if (cntr.isAddressIsMine(order.a.b)) {
 					isMine = true;
 				}
 			}
 		}
 
-		switch(column)
-		{
-		case COLUMN_BUYING_PRICE:
+		switch (column) {
 
-			if(row == this.orders.size())
-				return "<html>Total:</html>";
-
-
-			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
-
-		case COLUMN_BUYING_AMOUNT:
-
-			if(row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
-
-			if (isMine)
-				return "<html><b>" + NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order)) + "</b></html>";
-
-			return NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order));
+		/*
+		 * case COLUMN_BUYING_PRICE:
+		 * 
+		 * if(row == this.orders.size()) return "<html>Total:</html>";
+		 * 
+		 * 
+		 * return
+		 * NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b
+		 * .b, order.c.b));
+		 */
 
 		case COLUMN_PRICE:
 
 			if(row == this.orders.size())
-				return "";
-
-			if (isMine)
-				return "<html><b>" + NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
+				return "<html><b>"+Lang.getInstance().translate("Total") + ":</b></html>";
+			
 			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
 
 		case COLUMN_AMOUNT:
 
 			if(row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
+
 
 			// It shows unacceptably small amount of red.
-			//BigDecimal increment = order.calculateBuyIncrement();
-			BigDecimal amount = order.b.c;
+			BigDecimal amount = order.b.b.subtract(order.b.c);
 			String amountStr = NumberAsString.getInstance().numberAsString(amount);
-			//amount = amount.subtract(amount.remainder(increment));
-
-			//if (amount.compareTo(BigDecimal.ZERO) <= 0)
 			if (order.a.d)
-				return "<html><font color=#808080>" + amountStr + "</font></html>";
+				return amountStr;
 			else
-				return "<html>" + amountStr + "</html>";
+				return "<html><font color=#808080>" + amountStr + "</font></html>";
 
+		case COLUMN_TOTAL:
+
+			if(row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
+
+			amountStr = NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order)); // getAmountWantLeft());
+
+			if (isMine)
+				amountStr = "<html><b>" + amountStr + "</b></html>";
+
+			return amountStr;
 
 		}
 
@@ -184,34 +169,29 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	}
 
 	@Override
-	public void update(Observable o, Object arg)
-	{
-		try
-		{
+	public void update(Observable o, Object arg) {
+		try {
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
+		} catch (Exception e) {
+			// GUI ERROR
 		}
 	}
 
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
+	public synchronized void syncUpdate(Observable o, Object arg) {
 		ObserverMessage message = (ObserverMessage) arg;
 
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
-				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-		{
+		// CHECK IF LIST UPDATED
+		if (message.getType() == ObserverMessage.ADD_ORDER_TYPE
+				|| message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
+				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
+				|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
 			this.orders = Controller.getInstance().getOrders(have, want, true);
 			totalCalc();
 			this.fireTableDataChanged();
 		}
 	}
 
-	public void removeObservers()
-	{
+	public void removeObservers() {
 		this.orders.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}
@@ -219,6 +199,6 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	@Override
 	public Object getItem(int k) {
 		// TODO Auto-generated method stub
-		return  this.orders.get(k).getB();
+		return this.orders.get(k).getB();
 	}
 }

@@ -108,6 +108,11 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			if (block == null)
 				return null;
 			
+			if (block.getWinValue() == 0l) {
+				block.getHeight(DCSet.getInstance());
+				block.loadHeadMind(DCSet.getInstance());
+			}
+			
 			switch(column)
 			{
 			case COLUMN_HEIGHT:

@@ -1229,16 +1229,16 @@ public class BlockExplorer {
 				volumeAmount = volumeAmountOrders.get(order.c.a);
 			}
 
-			if (!volumePriceOrders.containsKey(order.b.a)) {
+			if (!volumePriceOrders.containsKey(order.c.a)) {
 				volumePrice = BigDecimal.ZERO;
 			} else {
-				volumePrice = volumePriceOrders.get(order.b.a);
+				volumePrice = volumePriceOrders.get(order.c.a);
 			}
 
 			count++;
 			pairsOpenOrders.put(order.c.a, count);
 
-			volumeAmount = volumeAmount.add(order.b.c);
+			volumeAmount = volumeAmount.add(order.b.c.subtract(order.b.c)); // getAmountHaveLeft
 
 			volumeAmountOrders.put(order.c.a, volumeAmount);
 
@@ -1265,8 +1265,7 @@ public class BlockExplorer {
 			count++;
 			pairsOpenOrders.put(order.b.a, count);
 
-			if (order.b.b != null)
-				volumePrice = volumePrice.add(order.b.b);
+			volumePrice = volumePrice.add(order.b.c.subtract(order.b.c)); // getAmountHaveLeft
 
 			volumePriceOrders.put(order.b.a, volumePrice);
 
@@ -1283,8 +1282,8 @@ public class BlockExplorer {
 					.getOrder(dcSet, trade.a);
 			if (!pairsTrades.containsKey(initiator.c.a)) {
 				count = 0;
-				volumePrice = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-				volumeAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				volumePrice = BigDecimal.ZERO;
+				volumeAmount = BigDecimal.ZERO;
 			} else {
 				count = pairsTrades.get(initiator.c.a);
 				volumePrice = volumePriceTrades.get(initiator.c.a);
@@ -1326,8 +1325,8 @@ public class BlockExplorer {
 
 		for (Map.Entry<Long, Integer> pair : pairsOpenOrders.entrySet()) {
 			all.put(pair.getKey(), Fun.t6(pair.getValue(), 0, volumePriceOrders.get(pair.getKey()),
-					volumeAmountOrders.get(pair.getKey()), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-					BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+					volumeAmountOrders.get(pair.getKey()), BigDecimal.ZERO,
+					BigDecimal.ZERO));
 		}
 
 		for (Map.Entry<Long, Integer> pair : pairsTrades.entrySet()) {
@@ -1339,8 +1338,8 @@ public class BlockExplorer {
 								volumeAmountTrades.get(pair.getKey())));
 			} else {
 				all.put(pair.getKey(),
-						Fun.t6(0, pair.getValue(), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-								BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+						Fun.t6(0, pair.getValue(), BigDecimal.ZERO,
+								BigDecimal.ZERO,
 								volumePriceTrades.get(pair.getKey()), volumeAmountTrades.get(pair.getKey())));
 			}
 		}
@@ -1462,7 +1461,7 @@ public class BlockExplorer {
 		List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
 				.getOrderMap().getOrders(have, want, false);
 		List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
-				.getOrderMap().getOrders(want, have, true);
+				.getOrderMap().getOrders(want, have, false);
 
 		// Collections.reverse(ordersWant);
 
@@ -1483,22 +1482,24 @@ public class BlockExplorer {
 		Map sellsJSON = new LinkedHashMap();
 		Map buysJSON = new LinkedHashMap();
 
-		BigDecimal sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		BigDecimal sumAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal sumAmount = BigDecimal.ZERO;
+		BigDecimal sumAmountGood = BigDecimal.ZERO;
 
-		BigDecimal sumSellingAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		BigDecimal sumSellingAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal sumSellingAmount = BigDecimal.ZERO;
+		BigDecimal sumSellingAmountGood = BigDecimal.ZERO;
 
+		BigDecimal vol;
 		for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : ordersHave) {
 			Map sellJSON = new LinkedHashMap();
 
 			sellJSON.put("price", order.a.e.toPlainString());
-			sellJSON.put("amount", order.b.c.toPlainString());
-			sumAmount = sumAmount.add(order.b.c);
+			vol = order.b.b.subtract(order.b.c);
+			sellJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
+			sumAmount = sumAmount.add(vol);
 
 			sellJSON.put("sellingPrice", Order.calcPrice(order.c.b, order.b.b).toPlainString());
 
-			BigDecimal sellingAmount = Order.getAmountWantLeft(order);
+			BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
 
 			sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
@@ -1507,7 +1508,7 @@ public class BlockExplorer {
 			sellJSON.put("good", good);
 
 			if (good) {
-				sumAmountGood = sumAmountGood.add(order.b.b);
+				sumAmountGood = sumAmountGood.add(vol);
 
 				sumSellingAmountGood = sumSellingAmountGood.add(sellingAmount);
 			}
@@ -1524,19 +1525,20 @@ public class BlockExplorer {
 		output.put("sellsSumTotal", sumSellingAmount.toPlainString());
 		output.put("sellsSumTotalGood", sumSellingAmountGood.toPlainString());
 
-		sumAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		sumAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		sumAmount = BigDecimal.ZERO;
+		sumAmountGood = BigDecimal.ZERO;
 
-		BigDecimal sumBuyingAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		BigDecimal sumBuyingAmountGood = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal sumBuyingAmount = BigDecimal.ZERO;
+		BigDecimal sumBuyingAmountGood = BigDecimal.ZERO;
 
 		for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : ordersWant) {
 			Map buyJSON = new LinkedHashMap();
 
 			buyJSON.put("price", order.a.e.toPlainString());
-			buyJSON.put("amount", order.b.c.toPlainString());
+			vol = order.b.b.subtract(order.b.c);
+			buyJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
 
-			sumAmount = sumAmount.add(order.b.c);
+			sumAmount = sumAmount.add(vol);
 
 			buyJSON.put("buyingPrice", Order.calcPrice(order.c.b, order.b.b).toPlainString());
 
@@ -1550,7 +1552,7 @@ public class BlockExplorer {
 
 			if (good) {
 				sumBuyingAmountGood = sumBuyingAmountGood.add(buyingAmount);
-				sumAmountGood = sumAmountGood.add(order.b.c);
+				sumAmountGood = sumAmountGood.add(vol);
 			}
 
 			sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
@@ -1568,8 +1570,8 @@ public class BlockExplorer {
 
 		output.put("tradesCount", trades.size());
 
-		BigDecimal tradeWantAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		BigDecimal tradeHaveAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal tradeWantAmount = BigDecimal.ZERO;
+		BigDecimal tradeHaveAmount = BigDecimal.ZERO;
 
 		int i = 0;
 		for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade : trades) {
@@ -1599,7 +1601,6 @@ public class BlockExplorer {
 
 			} else {
 				tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Buy", langObj));
-
 				tradeHaveAmount = tradeHaveAmount.add(trade.c);
 				tradeWantAmount = tradeWantAmount.add(trade.d);
 			}

@@ -180,11 +180,13 @@ public class Order implements Comparable<Order>
 		return this.getAmountHaveLeft().multiply(getPrice(), rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
 	}
 
+	/*
 	public static BigDecimal getAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderREC)
 	{
-		return orderREC.b.c.multiply(calcPrice(orderREC.b.b, orderREC.b.c)).setScale(orderREC.c.b.scale(), RoundingMode.HALF_DOWN);
+		return orderREC.b.b.subtract(orderREC.b.c).multiply(calcPrice(orderREC.b.b, orderREC.c.b)).setScale(orderREC.c.b.scale(), RoundingMode.HALF_DOWN);
 	}
+	*/
 
 	//////// FULFILLED
 	public BigDecimal getFulfilledHave()
@@ -204,7 +206,7 @@ public class Order implements Comparable<Order>
 
 	public BigDecimal getFulfilledWant()
 	{
-		return this.fulfilledHave.multiply(price).setScale(amountWant.scale(), RoundingMode.HALF_DOWN);
+		return this.fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
 	}
 
 	///////// PRICE
@@ -229,7 +231,7 @@ public class Order implements Comparable<Order>
 	public static BigDecimal calcAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order)
 	{
-		return 	order.b.c.multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
+		return 	order.b.b.subtract(order.b.c).multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
 	}
 
 	public String viewPrice()
