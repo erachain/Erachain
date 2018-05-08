@@ -15,6 +15,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import core.item.assets.Order;
+import datachain.DCSet;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
@@ -31,6 +32,7 @@ public class Order_Info_Panel extends JPanel {
 		this.setLayout(new GridBagLayout());
 
 		Order order = Order.fromDBrec(orderREC);
+		order.setDC(DCSet.getInstance());
 
 		// LABEL GBC
 		labelGBC = new GridBagConstraints();
