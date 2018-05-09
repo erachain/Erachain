@@ -614,7 +614,7 @@ public class TransactionTests3AssetsAsPack {
 			assertEquals(cancelOrderTransaction.getCreator().getAddress(), parsedCancelOrder.getCreator().getAddress());
 
 			//CHECK ORDER
-			assertEquals(0, cancelOrderTransaction.getOrder().compareTo(parsedCancelOrder.getOrder()));
+			assertEquals(0, cancelOrderTransaction.getOrderID().compareTo(parsedCancelOrder.getOrderID()));
 
 			//CHECK FEE
 			assertEquals(cancelOrderTransaction.getFee(), parsedCancelOrder.getFee());

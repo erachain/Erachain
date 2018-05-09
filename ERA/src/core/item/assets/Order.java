@@ -273,6 +273,15 @@ public class Order implements Comparable<Order>
 		return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
 	}
 
+	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, BigInteger orderID) {
+
+		return dcSet.getCompletedOrderMap().contains(orderID)?
+				dcSet.getCompletedOrderMap().get(orderID):
+					dcSet.getOrderMap().get(orderID);
+
+	}
+
 	//PARSE/CONVERT
 
 	/*

@@ -1761,25 +1761,20 @@ public class Wallet extends Observable implements Observer
 		//ADD ORDER
 		//Order = orderCreation.getOrder();
 		//this.addOrder(Trade.getOrder(orderCreation.getOrder().getId(), DBSet.getInstance()));
-		this.addOrder(orderCreation.getOrder());
+		this.addOrder(orderCreation);
 
 	}
 
-	private void addOrder(Order order)
+	private void addOrder(CreateOrderTransaction orderCreation)
 	{
 		//CHECK IF WE ARE CREATOR
-		if(this.accountExists(order.getCreator().getAddress()))
+		if(this.accountExists(orderCreation.getCreator().getAddress()))
 		{
 			//ADD ORDER
 			// reload order
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew = Order.getOrder(DCSet.getInstance(), order.getId());
-			if (orderNew == null)
-				return;
-			
-			Order orderReloaded = Order.fromDBrec(orderNew);
-			this.database.getOrderMap().add(orderReloaded == null?
-					order:
-						orderReloaded);
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew = Order.reloadOrder(DCSet.getInstance(), new BigInteger(orderCreation.getSignature()));
+
+			this.database.getOrderMap().add(orderNew);
 		}
 	}
 
@@ -1792,10 +1787,10 @@ public class Wallet extends Observable implements Observer
 		}
 
 		//CHECK IF WE ARE CREATOR
-		if(this.accountExists(orderCreation.getOrder().getCreator().getAddress()))
+		if(this.accountExists(orderCreation.getCreator().getAddress()))
 		{
 			//DELETE ORDER
-			//this.database.getOrderMap().delete(orderCreation.getOrder());
+			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCreation.getCreator().getAddress(), new BigInteger(orderCreation.getSignature())));
 		}
 	}
 
@@ -1811,7 +1806,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(orderCancel.getCreator().getAddress()))
 		{
 			//DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCancel.getCreator().getAddress(), orderCancel.getOrder()));
+			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCancel.getCreator().getAddress(), new BigInteger(orderCancel.getSignature())));
 		}
 	}
 
@@ -1828,7 +1823,7 @@ public class Wallet extends Observable implements Observer
 		{
 			//DELETE ORDER
 			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrder());
+			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
 			this.database.getOrderMap().add(order);
 		}
 	}

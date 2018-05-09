@@ -2538,7 +2538,7 @@ public class BlockExplorer {
 					transactionDataJSON.put("compressed", false);
 				}
 			} else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
-				BigInteger key = ((CancelOrderTransaction) unit).getOrder();
+				BigInteger key = ((CancelOrderTransaction) unit).getOrderID();
 				Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
 				if (dcSet.getCompletedOrderMap().contains(key)) {
 					order = dcSet.getCompletedOrderMap().get(key);

@@ -42,9 +42,11 @@ public class CreateOrderTransaction extends Transaction {
 
 	private long haveKey;
 	private long wantKey;
+	private AssetCls haveAsset;
+	private AssetCls wantAsset;
 	private	BigDecimal amountHave;
 	private BigDecimal amountWant;
-	private Order order;
+	//private Order order;
 
 	public static final byte[][] VALID_REC = new byte[][] {
 		Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
@@ -101,37 +103,16 @@ public class CreateOrderTransaction extends Transaction {
 	/*
 	 * public void makeOrder() { if (this.order == null) this.order = new
 	 * Order(new BigInteger(this.signature), this.creator, this.have, this.want,
-	 * this.amount, this.price, this.timestamp); }
+	 * this.amount, this.amountWant, this.timestamp); }
 	 */
 
 	@Override
 	public void setDC(DCSet dcSet, boolean asPack) {
 
 		super.setDC(dcSet, asPack);
-
-		/*
-		int different_scale;
-		AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(this.haveKey);
-		if (asset != null) {
-			different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
-			if (different_scale != 0 && asset.getKey(dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
-				// RESCALE AMOUNT
-				this.amountHave = this.amountHave.scaleByPowerOfTen(different_scale);
-			}
-		}
-
-		asset = (AssetCls)dcSet.getItemAssetMap().get(this.wantKey);
-		if (asset != null) {
-			different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
-			if (different_scale != 0 && asset.getKey(dcSet) > BlockChain.AMOUNT_SCALE_FROM) {
-				// RESCALE AMOUNT
-				this.amountWant = this.amountWant.scaleByPowerOfTen(different_scale);
-			}
-		}
-		*/
-
-		this.order = new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey, this.amountHave, this.amountWant, this.timestamp);
-		this.order.setDC(dcSet);
+		
+		this.haveAsset = (AssetCls)this.dcSet.getItemAssetMap().get(this.haveKey);
+		this.wantAsset = (AssetCls)this.dcSet.getItemAssetMap().get(this.wantKey);
 
 	}
 
@@ -139,6 +120,10 @@ public class CreateOrderTransaction extends Transaction {
 		return amount;
 	}
 
+	public BigInteger getOrderId() {
+		return new BigInteger(this.signature);
+	}
+	
 
 	@Override
 	public BigDecimal getAmount() {
@@ -157,7 +142,7 @@ public class CreateOrderTransaction extends Transaction {
 
 	public AssetCls getHaveAsset()
 	{
-		return (AssetCls)this.dcSet.getItemAssetMap().get(this.haveKey);
+		return this.haveAsset;
 	}
 
 	public BigDecimal getAmountHave()
@@ -172,7 +157,7 @@ public class CreateOrderTransaction extends Transaction {
 
 	public AssetCls getWantAsset()
 	{
-		return (AssetCls)this.dcSet.getItemAssetMap().get(this.wantKey);
+		return this.wantAsset;
 	}
 
 	public BigDecimal getAmountWant()
@@ -182,16 +167,19 @@ public class CreateOrderTransaction extends Transaction {
 
 	public BigDecimal getPriceCalc()
 	{
-		return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
+		//return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
+		return this.amountWant.divide(this.amountHave, this.wantAsset.getScale(), RoundingMode.HALF_DOWN);
 	}
 	public BigDecimal getPriceCalcReverse()
 	{
-		return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
+		//return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
+		return this.amountHave.divide(this.amountWant, this.haveAsset.getScale(), RoundingMode.HALF_DOWN);
 	}
 
-	public Order getOrder() {
-		return this.order;
-	}
+	
+	//public Order getOrder() {
+	//	return this.order;
+	//}
 
 	@Override
 	public boolean hasPublicText() {
@@ -207,6 +195,15 @@ public class CreateOrderTransaction extends Transaction {
 		//this.order.setId(this.signature);
 	}
 	 */
+
+	public Order makeOrder() {
+		// set SCALE by ASSET
+		BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
+		BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
+		return new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey,
+				amountHave, amountWant, // new SCALE
+				this.timestamp);
+	}
 
 	// PARSE CONVERT
 
@@ -312,9 +309,9 @@ public class CreateOrderTransaction extends Transaction {
 		transaction.put("amountHave", this.amountHave.toPlainString());
 		transaction.put("amountWant", this.amountWant.toPlainString());
 
-		if (this.order != null) {
-			transaction.put("order", this.order.toJson());
-		}
+		//if (this.order != null) {
+		//	transaction.put("order", this.order.toJson());
+		//}
 
 		return transaction;
 	}
@@ -508,7 +505,10 @@ public class CreateOrderTransaction extends Transaction {
 
 		// PROCESS ORDER
 		//this.order.copy().process(this);
-		this.order.process(this);
+		//this.order.process(this);
+
+		makeOrder().process(this);
+
 	}
 
 	// @Override
@@ -519,7 +519,9 @@ public class CreateOrderTransaction extends Transaction {
 
 		// ORPHAN ORDER
 		//this.order.copy().orphan();
-		this.order.orphan();
+
+		makeOrder().orphan();
+
 	}
 
 	@Override

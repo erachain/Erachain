@@ -3,8 +3,8 @@ package gui.transaction;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
+import datachain.DCSet;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
@@ -15,7 +15,7 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 	{
 		super(orderCreation);
 
-		Order order = orderCreation.getOrder();
+		orderCreation.setDC(DCSet.getInstance(), false);;
 
 		//LABEL HAVE
 		++labelGBC.gridy;
@@ -25,8 +25,9 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 		//HAVE
 		++detailGBC.gridy;
 		JTextField have = new JTextField(
-				order.getAmountHave().toPlainString() + " x "
-						+ String.valueOf(order.getHaveAsset().toString()));
+				orderCreation.getAmountHave().toPlainString()
+				+ " x "
+				+ String.valueOf(orderCreation.getHaveAsset().toString()));
 		have.setEditable(false);
 		MenuPopupUtil.installContextMenu(have);
 		this.add(have, detailGBC);
@@ -39,8 +40,8 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 		//HAVE
 		++detailGBC.gridy;
 		JTextField want = new JTextField(
-				order.getAmountWant().toPlainString() + " x "
-						+ String.valueOf(order.getWantAsset().toString()));
+				orderCreation.getAmountWant().toPlainString() + " x "
+						+ String.valueOf(orderCreation.getWantAsset().toString()));
 		want.setEditable(false);
 		MenuPopupUtil.installContextMenu(want);
 		this.add(want, detailGBC);
@@ -52,7 +53,7 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame
 
 		//PRICE
 		++detailGBC.gridy;
-		JTextField price = new JTextField(order.getPrice().toPlainString()); // + " / " + order.getPriceCalcReverse().toPlainString());
+		JTextField price = new JTextField(orderCreation.getPriceCalc().toPlainString()); // + " / " + order.getPriceCalcReverse().toPlainString());
 		price.setEditable(false);
 		MenuPopupUtil.installContextMenu(price);
 		this.add(price, detailGBC);

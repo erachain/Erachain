@@ -54,7 +54,7 @@ public class CancelOrderTransaction extends Transaction
 	//GETTERS/SETTERS
 	//public static String getName() { return "OLD: Cancel Order"; }
 
-	public BigInteger getOrder()
+	public BigInteger getOrderID()
 	{
 		return this.orderID;
 	}
