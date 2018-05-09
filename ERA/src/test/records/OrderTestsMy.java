@@ -209,9 +209,26 @@ public class OrderTestsMy
 		int prec2 = big11.precision();
 		++prec2;
 
-
 	}
 
+	@Test
+	public void scalePrice()
+	{
+		//BigDecimal big01 = new BigDecimal("89.999999999999");
+		BigDecimal big01 = new BigDecimal("100.000");
+		BigDecimal big02 = new BigDecimal("1.800");
+		int scalePrice = big01.setScale(0, RoundingMode.UP).precision() + big02.scale();
+		BigDecimal price = big02.divide(big01, scalePrice, RoundingMode.HALF_DOWN);
+		int scalePriceReverse = big02.setScale(0, RoundingMode.UP).precision() + big01.scale();
+		BigDecimal priceReverse = big01.divide(big02, scalePriceReverse, RoundingMode.HALF_DOWN);
+		BigDecimal res02 = big01.multiply(price).setScale(big02.scale(), RoundingMode.HALF_DOWN);
+		BigDecimal res01 = big02.multiply(priceReverse).setScale(big01.scale(), RoundingMode.HALF_DOWN);
+
+		int iii = 1;
+		
+	}
+
+		
 	@Test
 	public void validateSignatureOrderTransaction()
 	{

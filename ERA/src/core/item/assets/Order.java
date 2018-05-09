@@ -177,16 +177,8 @@ public class Order implements Comparable<Order>
 	}
 	public BigDecimal getAmountWantLeft()
 	{
-		return this.getAmountHaveLeft().multiply(getPrice(), rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
+		return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
 	}
-
-	/*
-	public static BigDecimal getAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderREC)
-	{
-		return orderREC.b.b.subtract(orderREC.b.c).multiply(calcPrice(orderREC.b.b, orderREC.c.b)).setScale(orderREC.c.b.scale(), RoundingMode.HALF_DOWN);
-	}
-	*/
 
 	//////// FULFILLED
 	public BigDecimal getFulfilledHave()
@@ -217,14 +209,14 @@ public class Order implements Comparable<Order>
 
 	public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant)
 	{
-		int scale = amountHave.precision() - amountHave.scale() + amountWant.scale();
-		if (scale < 10)
-			scale = 10;
-		BigDecimal result = amountWant.divide(amountHave, scale, RoundingMode.HALF_DOWN).stripTrailingZeros();
+		//int scale = amountHave.precision() - amountHave.scale() + amountWant.scale();
+		int scalePrice = amountWant.scale();
+		scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
+		BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
 		// IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-		if (result.scale() < 1)
-			return result.setScale(1);
+		if (result.scale() < 0)
+			return result.setScale(0);
 		return result;
 	}
 
@@ -484,7 +476,7 @@ public class Order implements Comparable<Order>
 		//TRY AND COMPLETE ORDERS
 		boolean completedOrder = false;
 		int i = -1;
-		BigDecimal thisPrice = this.getPrice();
+		BigDecimal thisPrice = this.price;
 		BigDecimal tempPrice;
 		BigDecimal thisIncrement;
 		//boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;

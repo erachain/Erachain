@@ -168,12 +168,15 @@ public class CreateOrderTransaction extends Transaction {
 	public BigDecimal getPriceCalc()
 	{
 		//return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
-		return this.amountWant.divide(this.amountHave, this.wantAsset.getScale(), RoundingMode.HALF_DOWN);
+		int scalePrice = this.amountHave.setScale(0, RoundingMode.UP).precision() + this.amountWant.scale();
+		return this.amountWant.divide(this.amountHave, scalePrice, RoundingMode.HALF_DOWN);
 	}
 	public BigDecimal getPriceCalcReverse()
 	{
 		//return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
-		return this.amountHave.divide(this.amountWant, this.haveAsset.getScale(), RoundingMode.HALF_DOWN);
+		int scalePrice = this.amountHave.scale();
+		scalePrice = this.amountWant.setScale(0, RoundingMode.UP).precision() + scalePrice>0? scalePrice : 0;
+		return this.amountHave.divide(this.amountWant, scalePrice, RoundingMode.HALF_DOWN);
 	}
 
 	
@@ -197,7 +200,7 @@ public class CreateOrderTransaction extends Transaction {
 	 */
 
 	public Order makeOrder() {
-		// set SCALE by ASSET
+		// set SCALE by ASSETs
 		BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
 		BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
 		return new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey,
