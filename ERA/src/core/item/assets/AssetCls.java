@@ -149,7 +149,7 @@ public abstract class AssetCls extends ItemCls {
 	 */
 
 	public int getScale() {
-		if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
+		if (true && this.key < BlockChain.AMOUNT_SCALE_FROM) {
 			if (this.key == 0) {
 				Long error = null;
 				error ++;

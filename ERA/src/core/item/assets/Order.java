@@ -456,13 +456,14 @@ public class Order implements Comparable<Order>
 	{
 
 		DCSet db = this.dcSet;
+		int compare = 0;
 		
-		if (this.creator.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs")
-				&& this.haveKey == 2
-				&& this.wantKey == 1
+		if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+				(this.haveKey == 1010
+				|| this.wantKey == 1010)
 				&& !db.isFork()
-				&& true) {
-			;
+				) {
+			compare++;
 		}
 
 		//REMOVE HAVE
@@ -507,12 +508,12 @@ public class Order implements Comparable<Order>
 			BigDecimal tradeAmountAccurate;
 			BigDecimal differenceTrade;
 
-			if (order.a.b.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs")
-					&& order.b.a == 2
-					&& order.c.a == 1
+			if (order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+					(order.b.a == 1010
+					|| order.c.a == 1010)
 					&& !db.isFork()
-					&& true) {
-				;
+					) {
+				compare++;
 			}
 
 			///////////////
@@ -528,7 +529,7 @@ public class Order implements Comparable<Order>
 			orderAmountHaveLeft = order.b.b.subtract(order.b.c); //.getAmountHaveLeft();
 			orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
 
-			int compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
+			compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
 			if ( compare >= 0) {
 
 				tradeAmountGet = thisAmountHaveLeft;

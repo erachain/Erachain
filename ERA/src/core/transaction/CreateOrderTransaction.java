@@ -418,9 +418,13 @@ public class CreateOrderTransaction extends Transaction {
 			return NEGATIVE_AMOUNT;
 		}
 
+		// CHECK IF HAVE EXISTS
+		if (this.haveAsset == null) {
+			// HAVE DOES NOT EXIST
+			return ITEM_ASSET_NOT_EXIST;
+		}
 		// CHECK IF WANT EXISTS
-		AssetCls haveAsset = this.getHaveAsset();
-		if (haveAsset == null) {
+		if (this.wantAsset == null) {
 			// WANT DOES NOT EXIST
 			return ITEM_ASSET_NOT_EXIST;
 		}
@@ -446,20 +450,22 @@ public class CreateOrderTransaction extends Transaction {
 				BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height);
 
 				if (forSale.compareTo(amountHave) < 0) {
-					return NO_BALANCE;
+					boolean wrong = true;
+					for ( byte[] valid_item: BlockChain.VALID_BAL) {
+						if (Arrays.equals(this.signature, valid_item)) {
+							wrong = false;
+							break;
+						}
+					}
+
+					if (wrong)
+						return NO_BALANCE;
 				}
 			}
 
 			if (height > BlockChain.FREEZE_FROM && BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress()) != null)
 				return INVALID_CREATOR;
 
-		}
-
-		// CHECK IF WANT EXISTS
-		AssetCls wantAsset = this.getWantAsset();
-		if (wantAsset == null) {
-			// WANT DOES NOT EXIST
-			return ITEM_ASSET_NOT_EXIST;
 		}
 
 		//
@@ -510,7 +516,9 @@ public class CreateOrderTransaction extends Transaction {
 		//this.order.copy().process(this);
 		//this.order.process(this);
 
-		makeOrder().process(this);
+		Order order = makeOrder();
+		order.setDC(dcSet);
+		order.process(this);
 
 	}
 
@@ -523,7 +531,9 @@ public class CreateOrderTransaction extends Transaction {
 		// ORPHAN ORDER
 		//this.order.copy().orphan();
 
-		makeOrder().orphan();
+		Order order = makeOrder();
+		order.setDC(dcSet);
+		order.orphan();
 
 	}
 
