@@ -2,7 +2,6 @@ package core.transaction;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -167,37 +166,17 @@ public class CreateOrderTransaction extends Transaction {
 
 	public BigDecimal getPriceCalc()
 	{
-		//return this.amountWant.divide(this.amountHave, this.amountWant.scale() - this.amountHave.scale() + 1, RoundingMode.HALF_DOWN);
-		int scalePrice = this.amountHave.setScale(0, RoundingMode.UP).precision() + this.amountWant.scale();
-		return this.amountWant.divide(this.amountHave, scalePrice, RoundingMode.HALF_DOWN);
+		return Order.calcPrice(this.amountHave, this.amountWant);
 	}
 	public BigDecimal getPriceCalcReverse()
 	{
-		//return this.amountHave.divide(this.amountWant, this.amountHave.scale() - this.amountWant.scale() + 1, RoundingMode.HALF_UP);
-		int scalePrice = this.amountHave.scale();
-		scalePrice = this.amountWant.setScale(0, RoundingMode.UP).precision() + scalePrice>0? scalePrice : 0;
-		return this.amountHave.divide(this.amountWant, scalePrice, RoundingMode.HALF_DOWN);
+		return Order.calcPrice(this.amountWant, this.amountHave);
 	}
-
-	
-	//public Order getOrder() {
-	//	return this.order;
-	//}
 
 	@Override
 	public boolean hasPublicText() {
 		return false;
 	}
-
-	/*
-	// @Override
-	@Override
-	public void sign(PrivateKeyAccount creator, boolean asPack) {
-		super.sign(creator, asPack);
-		// in IMPRINT reference already setted before sign
-		//this.order.setId(this.signature);
-	}
-	 */
 
 	public Order makeOrder() {
 		// set SCALE by ASSETs

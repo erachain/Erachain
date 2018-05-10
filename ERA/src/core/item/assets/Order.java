@@ -207,11 +207,28 @@ public class Order implements Comparable<Order>
 		return this.price;
 	}
 
+	public static int powerTen(BigDecimal value)
+	{
+		BigDecimal t = value;
+		int i = 0;
+		while (t.compareTo(BigDecimal.ONE) > 0) {
+			t = t.movePointLeft(1);
+			i++;
+		}
+		return i;
+	}
+
+	// BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
+	public static int precision(BigDecimal value)
+	{
+		return powerTen(value) + value.scale();
+	}
+
 	public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant)
 	{
-		//int scale = amountHave.precision() - amountHave.scale() + amountWant.scale();
 		int scalePrice = amountWant.scale();
-		scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
+		// .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
+		scalePrice = Order.powerTen(amountHave) + (scalePrice>0?scalePrice : 0);
 		BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
 		// IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
@@ -507,6 +524,7 @@ public class Order implements Comparable<Order>
 			BigDecimal tradeAmountGet;
 			BigDecimal tradeAmountAccurate;
 			BigDecimal differenceTrade;
+			BigDecimal differenceTradeThis;
 
 			if (order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
 					(order.b.a == 1010
@@ -539,37 +557,17 @@ public class Order implements Comparable<Order>
 				{
 
 					// RESOLVE amount with SCALE
-					tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(tradeAmountGet.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-					tradeAmount = tradeAmountAccurate.setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
-					int tradeAmountPrecision = tradeAmount.precision(); 
-					if (tradeAmount.precision() < BlockChain.TRADE_PRECISION) {
+					tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(orderAmountHaveLeft.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+					tradeAmount = tradeAmountAccurate.setScale(orderAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
+					
+					// PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision(); 
+					int tradeAmountPrecision = Order.precision(tradeAmount);
+					if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
 						differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
 						differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
 						if (differenceTrade.compareTo(precisionUnit) > 0) {
-
-							// USE price of THIS
-							tradeAmountAccurate = tradeAmountGet.multiply(thisPrice).setScale(tradeAmountGet.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-							tradeAmount = tradeAmountAccurate.setScale(tradeAmountGet.scale(), RoundingMode.HALF_DOWN);
-							tradeAmountPrecision = tradeAmount.precision(); 
-							if (tradeAmount.precision() < BlockChain.TRADE_PRECISION) {
-								differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
-								differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
-								if (differenceTrade.compareTo(precisionUnit) > 0) {
-									continue;
-								} else {
-									// PRICE for ORDER is SAME + ACCURACY
-									orderPriceTemp = tradeAmountGet.divide(tradeAmount, 8, RoundingMode.HALF_DOWN);
-									differenceTrade = orderPriceTemp.divide(orderPrice, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
-									differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
-									// calculated price is OVER order price ?
-									if (orderPriceTemp.compareTo(orderPrice) < 0
-											&& differenceTrade.compareTo(precisionUnit) > 0
-											) {
-										continue;
-									}
-								}
-							}
-						} else {
+							// it is BAD ACCURACY							
+							continue;
 						}
 					}
 				}
