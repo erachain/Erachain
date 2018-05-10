@@ -1,43 +1,5 @@
 package webserver;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
-
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.BlockChain;
@@ -53,15 +15,32 @@ import core.item.assets.Order;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
-import datachain.BlockMap;
-import datachain.BlocksHeadsMap;
-import datachain.DCSet;
-import datachain.ItemAssetMap;
-import datachain.ItemPersonMap;
-import datachain.SortableList;
+import datachain.*;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
 import utils.APIUtils;
 import utils.Pair;
 import utils.StrJSonFine;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 
@@ -1728,5 +1707,25 @@ public class API {
 		}
 	}
 
+	/*
+	 * ************* TRANSACTIONS **************
+	 */
 
+	/**
+	 * web api. get transaction by address. in method set static limit transaction 50.
+	 * @param address address
+	 * @return list of transaction(JSON string)
+	 */
+	@GET
+	@Path("sendassetsfilter")
+	public Response getTransaction(@QueryParam("address") String address) {
+		Account account = Controller.getInstance().getAccountByAddress(address);
+		JSONArray array = new JSONArray();
+		for (Transaction transaction : Controller.getInstance().getLastTransactions(account, 50)) {
+			array.add(transaction.toJson());
+		}
+		return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+				.header("Access-Control-Allow-Origin", "*")
+				.entity(StrJSonFine.convert(array.toJSONString())).build();
+	}
 }
