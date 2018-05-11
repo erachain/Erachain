@@ -360,6 +360,7 @@ public class CreateOrderTransaction extends Transaction {
 
 	// VALIDATE
 
+	private final BigDecimal FEE_MIN_1 = new BigDecimal("-0.0001");
 	@Override
 	public int isValid(Long releaserReference, long flags) {
 
@@ -413,6 +414,11 @@ public class CreateOrderTransaction extends Transaction {
 			if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
 				return NO_BALANCE;
 			}
+			// VALID if want to BY COMPU by ERA
+		} else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
+					&& amountHave.compareTo(BigDecimal.ONE) >= 0
+					&& this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0 ) {
+				flags = flags | 1l;
 		} else {
 
 			// CHECK IF SENDER HAS ENOUGH FEE BALANCE
@@ -472,12 +478,6 @@ public class CreateOrderTransaction extends Transaction {
 			if (amountWant.stripTrailingZeros().scale() > wantAsset.getScale()) {
 				return AMOUNT_SCALE_WRONG;
 			}
-		}
-
-		// VALID if want to BY COMPU by ERA
-		if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
-				&& amountHave.compareTo(BigDecimal.ONE) >= 0) {
-			flags = flags | 1l;
 		}
 		
 		return super.isValid(releaserReference, flags);
