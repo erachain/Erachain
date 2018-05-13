@@ -24,15 +24,15 @@ public class BuyOrdersTableModel extends
 		TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
 		implements Observer {
 	//public static final int COLUMN_BUYING_PRICE = -1;
-	public static final int COLUMN_PRICE = 0;
-	public static final int COLUMN_AMOUNT_WANT = 1;
+	public static final int COLUMN_AMOUNT_WANT = 0;
+	public static final int COLUMN_PRICE = 1;
 	public static final int COLUMN_AMOUNT_HAVE = 2;
 
 	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
 	// private String[] columnNames = Lang.getInstance().translate(new
 	// String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Price", "Want", "Have" });
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Want", "Price", "Have" });
 
 	BigDecimal sumAmountWant;
 	BigDecimal sumAmountHave;
@@ -142,13 +142,6 @@ public class BuyOrdersTableModel extends
 		 * .b, order.c.b));
 		 */
 
-		case COLUMN_PRICE:
-
-			if (row == this.orders.size())
-				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
-
-			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.c.b, order.b.b));
-
 		case COLUMN_AMOUNT_WANT:
 
 			if (row == this.orders.size())
@@ -162,6 +155,13 @@ public class BuyOrdersTableModel extends
 				return amountStr;
 			else
 				return "<html><font color=#808080>" + amountStr + "</font></html>";
+
+		case COLUMN_PRICE:
+
+			if (row == this.orders.size())
+				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
+
+			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.c.b, order.b.b));
 
 		case COLUMN_AMOUNT_HAVE:
 

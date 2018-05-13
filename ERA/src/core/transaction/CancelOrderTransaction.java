@@ -15,6 +15,7 @@ import org.mapdb.Fun.Tuple5;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -320,7 +321,7 @@ public class CancelOrderTransaction extends Transaction
 	
 	@Override
 	public int calcBaseFee() {
-		if  (this.height < 130000)
+		if  (this.height < BlockChain.ORDER_FEE_DOWN)
 			return 2 * calcCommonFee();
 		
 		return calcCommonFee();

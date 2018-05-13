@@ -8,6 +8,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
@@ -185,6 +188,17 @@ public class CreateOrderTransaction extends Transaction {
 		return new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey,
 				amountHave, amountWant, // new SCALE
 				this.timestamp);
+	}
+
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> makeOrderDB() {
+		return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
+						new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(this.getOrderId(),
+								this.creator.getAddress(), this.timestamp, true, this.getPriceCalc()),
+						new Tuple3<Long, BigDecimal, BigDecimal>(this.haveKey, this.amountHave, BigDecimal.ZERO),
+						new Tuple2<Long, BigDecimal>(this.wantKey, this.amountWant));
+
 	}
 
 	// PARSE CONVERT
@@ -560,7 +574,7 @@ public class CreateOrderTransaction extends Transaction {
 
 	@Override
 	public int calcBaseFee() {
-		if  (this.height < 130000)
+		if  (this.height < BlockChain.ORDER_FEE_DOWN)
 			return 5 * calcCommonFee();
 		
 		return calcCommonFee();

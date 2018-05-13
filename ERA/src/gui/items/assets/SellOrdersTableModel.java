@@ -23,13 +23,13 @@ import utils.Pair;
 public class SellOrdersTableModel extends
 		TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
 		implements Observer {
-	public static final int COLUMN_PRICE = 0;
-	public static final int COLUMN_AMOUNT_HAVE = 1;
+	public static final int COLUMN_AMOUNT_HAVE = 0;
+	public static final int COLUMN_PRICE = 1;
 	public static final int COLUMN_AMOUNT_WANT = 2;
 
 	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Price", "Have", "Want" });
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Have", "Price", "Want" });
 
 	BigDecimal sumAmountHave;
 	BigDecimal sumAmountWant;
@@ -120,13 +120,6 @@ public class SellOrdersTableModel extends
 		}
 
 		switch (column) {
-		case COLUMN_PRICE:
-
-			if (row == this.orders.size())
-				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
-
-			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
-
 		case COLUMN_AMOUNT_HAVE:
 
 			if (row == this.orders.size())
@@ -139,6 +132,13 @@ public class SellOrdersTableModel extends
 				return amountStr;
 			else
 				return "<html><font color=#808080>" + amountStr + "</font></html>";
+
+		case COLUMN_PRICE:
+
+			if (row == this.orders.size())
+				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
+
+			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
 
 		case COLUMN_AMOUNT_WANT:
 

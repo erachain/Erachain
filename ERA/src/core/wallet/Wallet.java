@@ -29,7 +29,6 @@ import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.ItemCls;
-import core.item.assets.Order;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.transaction.BuyNameTransaction;
@@ -1771,8 +1770,7 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(orderCreation.getCreator().getAddress()))
 		{
 			//ADD ORDER
-			// reload order
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew = Order.reloadOrder(DCSet.getInstance(), new BigInteger(orderCreation.getSignature()));
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew = orderCreation.makeOrderDB();
 
 			this.database.getOrderMap().add(orderNew);
 		}

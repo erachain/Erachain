@@ -109,36 +109,35 @@ public class CreateOrderPanel extends JPanel {
 
 		// label buy
 		// DETAIL GBC
-		GridBagConstraints label_buy = new GridBagConstraints();
-		label_buy.insets = new Insets(0, 5, 5, 0);
-		label_buy.fill = GridBagConstraints.HORIZONTAL;
-		label_buy.anchor = GridBagConstraints.NORTHWEST;
-		label_buy.gridx = 0;
-		label_buy.gridwidth = 3;
+		GridBagConstraints label_sell_buy = new GridBagConstraints();
+		label_sell_buy.insets = new Insets(0, 5, 5, 0);
+		label_sell_buy.fill = GridBagConstraints.HORIZONTAL;
+		label_sell_buy.anchor = GridBagConstraints.NORTHWEST;
+		label_sell_buy.gridx = 0;
+		label_sell_buy.gridwidth = 3;
 
-		label_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		label_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-		label_buy.weightx = 1.0;
+		label_sell_buy.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		label_sell_buy.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+		label_sell_buy.weightx = 1.0;
 
-		label_buy.gridy = ++labelGBC.gridy;
+		label_sell_buy.gridy = ++labelGBC.gridy;
 		detailGBC.gridy = ++detailGBC.gridy;
-		JLabel lblBuy = new JLabel(Lang.getInstance().translate("To Buy %want%").replace("%have%", this.have.toString())
-				.replace("%want%", this.want.toString()));
-		JLabel lblTitle = new JLabel(Lang.getInstance().translate("To Sell %have%")
-				.replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
+		JLabel lblWish = new JLabel("<html>"
+				 + (buying? Lang.getInstance().translate("Buy") + ": " + "<b>" + this.want.toString()
+						: Lang.getInstance().translate("Sell") + ": " + "<b>" + this.have.toString())
+				 + "</b></html>");
 
-		if (buying)
-			this.add(lblBuy, label_buy);
-		else
-			this.add(lblTitle, label_buy);
+		this.add(lblWish, label_sell_buy);
+
+		JLabel lblResult = new JLabel("<html>"
+				+ (buying? Lang.getInstance().translate("for") + ": " + this.have.toString()
+						: Lang.getInstance().translate("for") + ": " + this.want.toString())
+				+ "</b></html>");
 
 		// Label sell
-		label_buy.gridy = ++labelGBC.gridy;
+		label_sell_buy.gridy = ++labelGBC.gridy;
 		detailGBC.gridy = ++detailGBC.gridy;
-		if (buying)
-			this.add(lblTitle, label_buy);
-		else
-			this.add(lblBuy, label_buy);
+		this.add(lblResult, label_sell_buy);
 
 		// LABEL FROM
 		labelGBC.gridy = ++labelGBC.gridy;
@@ -176,10 +175,10 @@ public class CreateOrderPanel extends JPanel {
 		// LABEL AMOUNT
 		labelGBC.gridy++;
 
-		String mes = buying ? Lang.getInstance().translate("Quantity want to Buy")
-				: Lang.getInstance().translate("Quantity want Sell");
+		String mes = buying ? Lang.getInstance().translate("Quantity to Buy")
+				: Lang.getInstance().translate("Quantity to Sell");
 
-		JLabel amountLabel = new JLabel(mes + "(1):");
+		JLabel amountLabel = new JLabel(mes + ":");
 		this.add(amountLabel, labelGBC);
 
 		// AMOUNT
@@ -190,14 +189,13 @@ public class CreateOrderPanel extends JPanel {
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
 		JLabel amountHintLabel = new JLabel(buying ? want.getName() : have.getName());
-
 		this.add(amountHintLabel, assetHintGBC);
 
 		// LABEL PRICE
 		labelGBC.gridy++;
 		JLabel priceLabel = new JLabel(
-				"<html><div style=\"width: 100px;\">" + Lang.getInstance().translate("Price per unit") + " "
-						+ (buying ? want.getName() : have.getName()) + "(2):</div></html>");
+				"<html><b>" + Lang.getInstance().translate("Price per unit") + " "
+						+ ":</b></html>");
 		this.add(priceLabel, labelGBC);
 		// PRICE
 		detailGBC.gridy++;
@@ -255,7 +253,8 @@ public class CreateOrderPanel extends JPanel {
 		// LABEL AMOUNT
 		labelGBC.gridy++;
 
-		mes = buying ? Lang.getInstance().translate("Total Sell") : Lang.getInstance().translate("Total Buy");
+		//mes = buying ? Lang.getInstance().translate("Result") : Lang.getInstance().translate("Total Buy (want)");
+		mes = Lang.getInstance().translate("Result");
 
 		JLabel buyingAmountLabel = new JLabel(mes + ":");
 		this.add(buyingAmountLabel, labelGBC);
@@ -519,7 +518,7 @@ public class CreateOrderPanel extends JPanel {
 				+ " COMPU</b><br></body></HTML>";
 
 		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
-				Lang.getInstance().translate("Send Mail"), (int) (MainFrame.getInstance().getWidth() / 1.2),
+				Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
 				(int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
 				Lang.getInstance().translate("Confirmation Transaction") + ": "
 						+ Lang.getInstance().translate("Order Creation"));
