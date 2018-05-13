@@ -560,6 +560,9 @@ public class CreateOrderTransaction extends Transaction {
 
 	@Override
 	public int calcBaseFee() {
-		return 5 * calcCommonFee();
+		if  (this.height < 130000)
+			return 5 * calcCommonFee();
+		
+		return calcCommonFee();
 	}
 }

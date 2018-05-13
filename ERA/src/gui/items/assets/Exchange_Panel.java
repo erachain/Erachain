@@ -39,7 +39,7 @@ public class Exchange_Panel extends JPanel
 	private AssetCls want;
 	Echange_Sell_Buy_Panel tt;
 	
-	public OrderPanel buyOrderPanel;
+	public CreateOrderPanel buyOrderPanel;
 	
 	
 	String action;

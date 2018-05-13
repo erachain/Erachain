@@ -20,120 +20,117 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 @SuppressWarnings("serial")
-public class SellOrdersTableModel extends TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Observer
-{
+public class SellOrdersTableModel extends
+		TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
+		implements Observer {
 	public static final int COLUMN_PRICE = 0;
-	public static final int COLUMN_AMOUNT = 1;
-	public static final int COLUMN_TOTAL = 2;
+	public static final int COLUMN_AMOUNT_HAVE = 1;
+	public static final int COLUMN_AMOUNT_WANT = 2;
 
-	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Price", "Amount", "Total"});
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Price", "Have", "Want" });
 
-	BigDecimal sumAmount;
-	BigDecimal sumTotal;
+	BigDecimal sumAmountHave;
+	BigDecimal sumAmountWant;
 	private AssetCls have;
 	private AssetCls want;
 
-	public SellOrdersTableModel(AssetCls have, AssetCls want)
-	{
+	public SellOrdersTableModel(AssetCls have, AssetCls want) {
 		this.have = have;
-		this.want= want;
+		this.want = want;
 		this.orders = Controller.getInstance().getOrders(have, want, true);
 
 		columnNames[COLUMN_PRICE] += " " + want.getShort();
-		columnNames[COLUMN_AMOUNT] += " " + have.getShort();
-		columnNames[COLUMN_TOTAL] += " " + want.getShort();
+		columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
+		columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
 
 		totalCalc();
 
 		Controller.getInstance().addObserver(this);
-		//this.orders.registerObserver();
+		// this.orders.registerObserver();
 
 	}
 
-	private void totalCalc()
-	{
-		sumAmount = BigDecimal.ZERO;
-		sumTotal = BigDecimal.ZERO;
-		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders)
-		{
+	private void totalCalc() {
+		sumAmountHave = BigDecimal.ZERO;
+		sumAmountWant = BigDecimal.ZERO;
+		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
 
 			Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
-			BigDecimal amount = haveItem.b.subtract(haveItem.c);
-			sumAmount = sumAmount.add(amount);
-			sumTotal = sumTotal.add(amount);
+			sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
+			
+			sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));
 		}
 	}
 
 	@Override
-	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList()
-	{
+	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
 		return this.orders;
 	}
 
-	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(int row)
-	{
+	public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(
+			int row) {
 		return this.orders.get(row).getB();
 	}
 
 	@Override
-	public int getColumnCount()
-	{
+	public int getColumnCount() {
 		return this.columnNames.length;
 	}
 
 	@Override
-	public String getColumnName(int index)
-	{
+	public String getColumnName(int index) {
 		return this.columnNames[index];
 	}
 
 	@Override
-	public int getRowCount()
-	{
+	public int getRowCount() {
 		return this.orders.size() + 1;
 	}
 
 	@Override
-	public Object getValueAt(int row, int column)
-	{
-		if(this.orders == null || row > this.orders.size() )
-		{
+	public Object getValueAt(int row, int column) {
+		if (this.orders == null || row > this.orders.size()) {
 			return null;
 		}
 
-		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
 		boolean isMine = false;
-		if(row < this.orders.size())
-		{
+		int size = this.orders.size();
+		if (row < size) {
 			order = this.orders.get(row).getB();
+			
+			if (order == null) {
+				totalCalc();
+				this.fireTableRowsDeleted(row, row);
+				return null;
+			}
+			
 			Controller cntr = Controller.getInstance();
-			if(cntr.isAddressIsMine(order.a.b)) {
+			if (cntr.isAddressIsMine(order.a.b)) {
 				isMine = true;
 			}
+
+		} else if (size > row ) {
+			this.orders = Controller.getInstance().getOrders(have, want, true);
+			totalCalc();
+			this.fireTableDataChanged();
+			return null;
 		}
 
-		switch(column)
-		{
+		switch (column) {
 		case COLUMN_PRICE:
 
-			if(row == this.orders.size())
-				return "<html><b>"+Lang.getInstance().translate("Total") + ":</b></html>";
-			
+			if (row == this.orders.size())
+				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
+
 			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
 
-		case COLUMN_AMOUNT:
+		case COLUMN_AMOUNT_HAVE:
 
-			if(row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
-
+			if (row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmountHave) + "</i></html>";
 
 			// It shows unacceptably small amount of red.
 			BigDecimal amount = order.b.b.subtract(order.b.c);
@@ -143,10 +140,10 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 			else
 				return "<html><font color=#808080>" + amountStr + "</font></html>";
 
-		case COLUMN_TOTAL:
+		case COLUMN_AMOUNT_WANT:
 
-			if(row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
+			if (row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmountWant) + "</i></html>";
 
 			amountStr = NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order)); // getAmountWantLeft());
 
@@ -161,35 +158,33 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	}
 
 	@Override
-	public void update(Observable o, Object arg)
-	{
-		try
-		{
+	public void update(Observable o, Object arg) {
+		try {
 			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
+		} catch (Exception e) {
+			// GUI ERROR
 		}
 	}
 
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
+	public synchronized void syncUpdate(Observable o, Object arg) {
 		ObserverMessage message = (ObserverMessage) arg;
 
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
-				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-		{
+		// CHECK IF LIST UPDATED
+		if (message.getType() == ObserverMessage.ADD_ORDER_TYPE
+				|| message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
+				//|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
+				//|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
+				) {
 			this.orders = Controller.getInstance().getOrders(this.have, want, true);
-			//List<Order> items = DCSet.getInstance().getOrderMap().getOrders(have.getKey(), want.getKey(), false);
+			// List<Order> items =
+			// DCSet.getInstance().getOrderMap().getOrders(have.getKey(),
+			// want.getKey(), false);
 			totalCalc();
 			this.fireTableDataChanged();
 		}
 	}
 
-	public void removeObservers()
-	{
+	public void removeObservers() {
 		this.orders.removeObserver();
 		Controller.getInstance().deleteObserver(this);
 	}

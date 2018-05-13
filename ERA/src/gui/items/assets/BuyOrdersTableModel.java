@@ -23,19 +23,19 @@ import utils.Pair;
 public class BuyOrdersTableModel extends
 		TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
 		implements Observer {
-	public static final int COLUMN_BUYING_PRICE = -1;
+	//public static final int COLUMN_BUYING_PRICE = -1;
 	public static final int COLUMN_PRICE = 0;
-	public static final int COLUMN_AMOUNT = 1;
-	public static final int COLUMN_TOTAL = 2;
+	public static final int COLUMN_AMOUNT_WANT = 1;
+	public static final int COLUMN_AMOUNT_HAVE = 2;
 
 	public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
 	// private String[] columnNames = Lang.getInstance().translate(new
 	// String[]{"Buying Price", "Buying Amount", "Price", "Amount"});
-	private String[] columnNames = Lang.getInstance().translate(new String[] { "Price", "Amount", "Total" });
+	private String[] columnNames = Lang.getInstance().translate(new String[] { "Price", "Want", "Have" });
 
-	BigDecimal sumAmount;
-	BigDecimal sumTotal;
+	BigDecimal sumAmountWant;
+	BigDecimal sumAmountHave;
 	private AssetCls have;
 	private AssetCls want;
 
@@ -46,9 +46,9 @@ public class BuyOrdersTableModel extends
 		this.orders = Controller.getInstance().getOrders(have, want, true);
 
 		// columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
-		columnNames[COLUMN_PRICE] += " " + want.getShort();
-		columnNames[COLUMN_AMOUNT] += " " + have.getShort();
-		columnNames[COLUMN_TOTAL] += " " + want.getShort();
+		columnNames[COLUMN_PRICE] += " " + have.getShort();
+		columnNames[COLUMN_AMOUNT_WANT] += " " + want.getShort();
+		columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
 
 		totalCalc();
 
@@ -58,13 +58,14 @@ public class BuyOrdersTableModel extends
 	}
 
 	private void totalCalc() {
-		sumAmount = BigDecimal.ZERO;
-		sumTotal = BigDecimal.ZERO;
+		sumAmountWant = BigDecimal.ZERO;
+		sumAmountHave = BigDecimal.ZERO;
 		for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
+			
 			Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
-			BigDecimal amount = haveItem.b.subtract(haveItem.c);
-			sumAmount = sumAmount.add(amount);
-			sumTotal = sumTotal.add(amount);
+			sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
+			
+			sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));
 		}
 	}
 
@@ -107,14 +108,25 @@ public class BuyOrdersTableModel extends
 
 		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
 		boolean isMine = false;
-		if (row < this.orders.size()) {
+		int size = this.orders.size();
+		if (row < size) {
 			order = this.orders.get(row).getB();
-			if (order != null) {
-				Controller cntr = Controller.getInstance();
-				if (cntr.isAddressIsMine(order.a.b)) {
-					isMine = true;
-				}
+			if (order == null) {
+				totalCalc();
+				this.fireTableRowsDeleted(row, row);
+				return null;
 			}
+
+			Controller cntr = Controller.getInstance();
+			if (cntr.isAddressIsMine(order.a.b)) {
+				isMine = true;
+			}			
+
+		} else if (size > row ) {
+			this.orders = Controller.getInstance().getOrders(have, want, true);
+			totalCalc();
+			this.fireTableDataChanged();
+			return null;
 		}
 
 		switch (column) {
@@ -132,31 +144,31 @@ public class BuyOrdersTableModel extends
 
 		case COLUMN_PRICE:
 
-			if(row == this.orders.size())
-				return "<html><b>"+Lang.getInstance().translate("Total") + ":</b></html>";
-			
-			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.b.b, order.c.b));
+			if (row == this.orders.size())
+				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
 
-		case COLUMN_AMOUNT:
+			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.c.b, order.b.b));
 
-			if(row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmount) + "</i></html>";
+		case COLUMN_AMOUNT_WANT:
 
+			if (row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmountWant) + "</i></html>";
 
 			// It shows unacceptably small amount of red.
-			BigDecimal amount = order.b.b.subtract(order.b.c);
+			BigDecimal amount = Order.calcAmountWantLeft(order);
+			
 			String amountStr = NumberAsString.getInstance().numberAsString(amount);
 			if (order.a.d)
 				return amountStr;
 			else
 				return "<html><font color=#808080>" + amountStr + "</font></html>";
 
-		case COLUMN_TOTAL:
+		case COLUMN_AMOUNT_HAVE:
 
-			if(row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumTotal) + "</i></html>";
+			if (row == this.orders.size())
+				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmountHave) + "</i></html>";
 
-			amountStr = NumberAsString.getInstance().numberAsString(Order.calcAmountWantLeft(order)); // getAmountWantLeft());
+			amountStr = NumberAsString.getInstance().numberAsString(order.b.b.subtract(order.b.c));
 
 			if (isMine)
 				amountStr = "<html><b>" + amountStr + "</b></html>";

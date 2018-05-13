@@ -333,6 +333,7 @@ public abstract class Transaction {
 	// protected int type;
 	protected byte[] typeBytes;
 	protected Block block; // parent block
+	protected int height;
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
 	protected Long reference = 0l;
 	protected BigDecimal fee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE); // - for genesis
@@ -373,6 +374,7 @@ public abstract class Transaction {
 	// GETTERS/SETTERS
 	public void setDC(DCSet dcSet, boolean asPack) {
 		this.dcSet = dcSet;
+		this.height = this.getBlockHeightByParentOrLast(dcSet);
 		if (!asPack)
 			this.calcFee();
 	}

@@ -41,23 +41,23 @@ import gui.transaction.OnDealClick;
 import lang.Lang;
 
 @SuppressWarnings("serial")
-public class OrderPanel extends JPanel {
-	static Logger LOGGER = Logger.getLogger(OrderPanel.class.getName());
+public class CreateOrderPanel extends JPanel {
+	static Logger LOGGER = Logger.getLogger(CreateOrderPanel.class.getName());
 
 	private AssetCls have;
 	private AssetCls want;
 	private JButton sellButton;
 	public JComboBox<Account> cbxAccount;
-	public JTextField txtAmount;
+	public JTextField txtAmountHave;
 	public JTextField txtPrice;
 	private JTextField txtFeePow;
 	private JTextField txtBuyingPrice;
 	private JTextField txtBuyingAmount;
 	private JTextPane superHintText;
 
-	private OrderPanel th;
+	private CreateOrderPanel th;
 
-	public OrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
+	public CreateOrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
 		this.setLayout(new GridBagLayout());
 		th = this;
 		this.have = have;
@@ -125,13 +125,7 @@ public class OrderPanel extends JPanel {
 		JLabel lblBuy = new JLabel(Lang.getInstance().translate("To Buy %want%").replace("%have%", this.have.toString())
 				.replace("%want%", this.want.toString()));
 		JLabel lblTitle = new JLabel(Lang.getInstance().translate("To Sell %have%")
-				.replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));// this.have.toString()
-																									// +
-																									// "
-																									// /
-																									// "
-																									// +
-																									// this.want.toString());
+				.replace("%have%", this.have.toString()).replace("%want%", this.want.toString()));
 
 		if (buying)
 			this.add(lblBuy, label_buy);
@@ -190,8 +184,8 @@ public class OrderPanel extends JPanel {
 
 		// AMOUNT
 		detailGBC.gridy++;
-		this.txtAmount = new JTextField();
-		this.add(this.txtAmount, detailGBC);
+		this.txtAmountHave = new JTextField();
+		this.add(this.txtAmountHave, detailGBC);
 
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
@@ -280,7 +274,7 @@ public class OrderPanel extends JPanel {
 		this.add(buyingAmountHintLabel, assetHintGBC);
 
 		// ON PRICE CHANGE
-		txtAmount.getDocument().addDocumentListener(new DocumentListener() {
+		txtAmountHave.getDocument().addDocumentListener(new DocumentListener() {
 			@Override
 			public void changedUpdate(DocumentEvent e) {
 				calculateBuyingAmount(txtBuyingAmount, buying);
@@ -357,7 +351,7 @@ public class OrderPanel extends JPanel {
 		if (!isDigit(this.txtPrice.getText()))
 			superHintText.setText("<html><body style='font-size: 100%'>&nbsp;<br>"
 					+ Lang.getInstance().translate("Enter correct price.") + "</body></html>");
-		else if (!isDigit(this.txtAmount.getText()))
+		else if (!isDigit(this.txtAmountHave.getText()))
 			superHintText.setText("<html><body style='font-size: 100%'>&nbsp;<br>"
 					+ Lang.getInstance().translate("Enter correct amount.") + "</body></html>");
 		else
@@ -365,7 +359,7 @@ public class OrderPanel extends JPanel {
 					.translate("Give <b>%amount% %have%</b>"
 							+ " at the price of <b>%price%&nbsp;%want%</b> per <b>1% %have%</b> that would get "
 							+ "<b>%buyingamount%&nbsp;%want%</b>.")
-					.replace("%amount%", this.txtAmount.getText()).replace("%have%", have.getShort())
+					.replace("%amount%", this.txtAmountHave.getText()).replace("%have%", have.getShort())
 					.replace("%price%", this.txtPrice.getText()).replace("%want%", want.getShort())
 					.replace("%buyingamount%", this.txtBuyingAmount.getText()) + "</body></html>");
 	}
@@ -393,7 +387,7 @@ public class OrderPanel extends JPanel {
 		int i = 1;
 		try {
 
-			BigDecimal amount = new BigDecimal(txtAmount.getText());
+			BigDecimal amount = new BigDecimal(txtAmountHave.getText());
 			i++;
 			BigDecimal price = new BigDecimal(txtPrice.getText());
 
@@ -451,7 +445,7 @@ public class OrderPanel extends JPanel {
 
 			// READ AMOUNT
 			parse = 1;
-			amountHave = new BigDecimal(this.txtAmount.getText());
+			amountHave = new BigDecimal(this.txtAmountHave.getText());
 
 			// READ PRICE
 			parse = 2;
@@ -547,7 +541,7 @@ public class OrderPanel extends JPanel {
 						Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 
 				// this.txtFeePow.setText("0");
-				this.txtAmount.setText("0");
+				this.txtAmountHave.setText("0");
 				// this.txtPrice.setText("0");
 
 			} else {

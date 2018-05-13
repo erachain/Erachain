@@ -317,8 +317,12 @@ public class CancelOrderTransaction extends Transaction
 
 		return assetAmount;
 	}
+	
 	@Override
 	public int calcBaseFee() {
-		return 2 * calcCommonFee();
+		if  (this.height < 130000)
+			return 2 * calcCommonFee();
+		
+		return calcCommonFee();
 	}
 }
