@@ -24,9 +24,9 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Observer
 {
 	public static final int COLUMN_TIMESTAMP = 0;
-	public static final int COLUMN_HAVE = 1;
-	public static final int COLUMN_WANT = 2;
-	public static final int COLUMN_AMOUNT = 3;
+	public static final int COLUMN_AMOUNT = 1;
+	public static final int COLUMN_HAVE = 2;
+	public static final int COLUMN_WANT = 3;
 	public static final int COLUMN_PRICE = 4;
 	public static final int COLUMN_FULFILLED = 5;
 	public static final int COLUMN_CREATOR = 6;
@@ -36,7 +36,7 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 	private SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Have", "Want", "Amount", "Price", "Fulfilled", "Creator", "Confirmed", "DONE"});
+	private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Confirmed", "DONE"});
 
 	public WalletOrdersTableModel()
 	{

@@ -1770,8 +1770,17 @@ public class Wallet extends Observable implements Observer
 		if(this.accountExists(orderCreation.getCreator().getAddress()))
 		{
 			//ADD ORDER
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew = orderCreation.makeOrderDB();
+			
+			// TODO : FULLFILL not work - нужно сделать запись заявок по записи заявок в основную базу а не по записи транзакций
+			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew;
 
+			orderNew = DCSet.getInstance().getOrderMap().get(orderCreation.getOrderId());
+			if (orderNew == null) {
+				orderNew = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getOrderId());
+				if (orderNew == null) {
+					orderNew = orderCreation.makeOrderDB();
+				}
+			}
 			this.database.getOrderMap().add(orderNew);
 		}
 	}
