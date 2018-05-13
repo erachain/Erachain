@@ -12,6 +12,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
+import core.account.Account;
 import core.item.assets.Order;
 import datachain.DCSet;
 import datachain.SortableList;
@@ -89,51 +90,51 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 			return null;
 		}
 
-		Order order = Order.fromDBrec(this.orders.get(row).getB());
-		order.setDC(DCSet.getInstance());
+		Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.reloadOrder(DCSet.getInstance(), this.orders.get(row).getB().a.a);
+		//order.setDC(DCSet.getInstance());
 
 
 		switch(column)
 		{
 		case COLUMN_TIMESTAMP:
 
-			return DateTimeFormat.timestamptoString(order.getTimestamp());
+			return DateTimeFormat.timestamptoString(order.a.c);
 
 		case COLUMN_HAVE:
 
-			return order.getHaveAsset().getShort();
+			return DCSet.getInstance().getItemAssetMap().get(order.b.a).getShort();
 
 		case COLUMN_WANT:
 
-			return order.getWantAsset().getShort();
+			return DCSet.getInstance().getItemAssetMap().get(order.c.a).getShort();
 
 		case COLUMN_AMOUNT:
 
-			return order.getAmountHave().toPlainString();
+			return order.b.b.toPlainString();
 
 		case COLUMN_PRICE:
 
-			return order.viewPrice();
+			return Order.calcPrice(order.b.b, order.c.b);
 
 		case COLUMN_FULFILLED:
 
-			return order.getFulfilledHave().toPlainString();
+			return order.b.c.toPlainString();
 			//return order.getFulfilledHave().toPlainString();
 
 		case COLUMN_CREATOR:
 
-			return order.getCreator().getPersonAsString();
+			return new Account(order.a.b).getPersonAsString();
 
 		case COLUMN_CONFIRMED:
 
-			return order.isConfirmed();
+			return DCSet.getInstance().getOrderMap().contains(order.a.a)
+					|| DCSet.getInstance().getCompletedOrderMap().contains(order.a.a);
 
 		case COLUMN_DONE:
 
-			if (order.isExecutable())
-				//if (DBSet.getInstance().getOrderMap().contains(order.getId()))
-				return "";
-			return "++";
+			if (order.b.b.compareTo(order.b.c) == 0)
+				return "++";
+			return "";
 
 		}
 
@@ -159,7 +160,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 		ObserverMessage message = (ObserverMessage) arg;
 
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE)
+		if(//message.getType() == ObserverMessage.LIST_ORDER_TYPE || 
+				message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE)
 		{
 			if(this.orders == null)
 			{
@@ -173,8 +175,8 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Obse
 		}
 
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
-				|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+		if(//message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE ||
+				message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
 		{
 			this.fireTableDataChanged();
 		}
