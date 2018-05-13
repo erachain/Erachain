@@ -122,17 +122,15 @@ public class CreateOrderPanel extends JPanel {
 
 		label_sell_buy.gridy = ++labelGBC.gridy;
 		detailGBC.gridy = ++detailGBC.gridy;
-		JLabel lblWish = new JLabel("<html>"
-				 + (buying? Lang.getInstance().translate("Buy") + ": " + "<b>" + this.want.toString()
-						: Lang.getInstance().translate("Sell") + ": " + "<b>" + this.have.toString())
-				 + "</b></html>");
+		JLabel lblWish = new JLabel(
+				"<html>" + (buying ? Lang.getInstance().translate("Buy") + ": " + "<b>" + this.want.toString()
+						: Lang.getInstance().translate("Sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
 
 		this.add(lblWish, label_sell_buy);
 
-		JLabel lblResult = new JLabel("<html>"
-				+ (buying? Lang.getInstance().translate("for") + ": " + this.have.toString()
-						: Lang.getInstance().translate("for") + ": " + this.want.toString())
-				+ "</b></html>");
+		JLabel lblResult = new JLabel(
+				"<html>" + (buying ? Lang.getInstance().translate("for") + ": " + this.have.toString()
+						: Lang.getInstance().translate("for") + ": " + this.want.toString()) + "</b></html>");
 
 		// Label sell
 		label_sell_buy.gridy = ++labelGBC.gridy;
@@ -194,8 +192,7 @@ public class CreateOrderPanel extends JPanel {
 		// LABEL PRICE
 		labelGBC.gridy++;
 		JLabel priceLabel = new JLabel(
-				"<html><b>" + Lang.getInstance().translate("Price per unit") + " "
-						+ ":</b></html>");
+				"<html><b>" + Lang.getInstance().translate("Price per unit") + " " + ":</b></html>");
 		this.add(priceLabel, labelGBC);
 		// PRICE
 		detailGBC.gridy++;
@@ -253,7 +250,8 @@ public class CreateOrderPanel extends JPanel {
 		// LABEL AMOUNT
 		labelGBC.gridy++;
 
-		//mes = buying ? Lang.getInstance().translate("Result") : Lang.getInstance().translate("Total Buy (want)");
+		// mes = buying ? Lang.getInstance().translate("Result") :
+		// Lang.getInstance().translate("Total Buy (want)");
 		mes = Lang.getInstance().translate("Result");
 
 		JLabel buyingAmountLabel = new JLabel(mes + ":");
@@ -392,7 +390,7 @@ public class CreateOrderPanel extends JPanel {
 
 			if (buying) {
 				target.setText(
-						price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+						price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 			} else {
 				target.setText(
 						price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN).toPlainString());
@@ -436,7 +434,7 @@ public class CreateOrderPanel extends JPanel {
 
 		int feePow;
 		BigDecimal amountHave;
-		BigDecimal price;
+		BigDecimal amountWant;
 		long parse = 0;
 		try {
 			// READ FEE
@@ -448,7 +446,8 @@ public class CreateOrderPanel extends JPanel {
 
 			// READ PRICE
 			parse = 2;
-			price = new BigDecimal(this.txtPrice.getText());
+			// price = new BigDecimal(this.txtPrice.getText());
+			amountWant = new BigDecimal(this.txtBuyingAmount.getText());
 
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
@@ -469,7 +468,7 @@ public class CreateOrderPanel extends JPanel {
 			return;
 		}
 
-		if (price.compareTo(new BigDecimal(0)) == 0 || amountHave.compareTo(new BigDecimal(0)) == 0) {
+		if (amountWant.compareTo(new BigDecimal(0)) == 0 || amountHave.compareTo(new BigDecimal(0)) == 0) {
 
 			// DISABLE
 			this.sellButton.setEnabled(true);
@@ -478,11 +477,11 @@ public class CreateOrderPanel extends JPanel {
 
 		// CREATE ORDER
 
-		BigDecimal amountWant = amountHave.multiply(price);
+		// BigDecimal amountWant = amountHave.multiply(price);
 		if (buying) {
-			price = amountWant;
+			BigDecimal amountTemp = amountWant;
 			amountWant = amountHave;
-			amountHave = price;
+			amountHave = amountTemp;
 		}
 
 		if (false) {
@@ -510,8 +509,9 @@ public class CreateOrderPanel extends JPanel {
 		}
 
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-		Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want, amountHave,
-				amountWant, feePow);
+		Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
+				amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
+				amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 		String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
 				+ " Bytes, ";
 		Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
