@@ -544,12 +544,27 @@ public class BlockExplorer {
 
 		if (info.getQueryParameters().containsKey("Seg_No")) {
 
-			output.put("lastBlock", jsonQueryLastBlock());
-			output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("block"),
-					info.getQueryParameters().getFirst("Seg_No")));
 
-			output.put("queryTimeMs", stopwatchAll.elapsedTime());
-			return output;
+			output.put("lastBlock", jsonQueryLastBlock());
+
+			if (info.getQueryParameters().containsKey("statement")) {
+
+				output.put("lastBlock", jsonQueryLastBlock());
+				
+				output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),
+						info.getQueryParameters().getFirst("Seg_No")));
+
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			} else {
+			
+				Transaction transaction = dcSet.getTransactionFinalMap().getTransaction(new Integer(info.getQueryParameters().getFirst("block")),
+						new Integer(info.getQueryParameters().getFirst("Seg_No")));
+				output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
+	
+				output.put("queryTimeMs", stopwatchAll.elapsedTime());
+				return output;
+			}
 		}
 
 		output.put("queryTimeMs", stopwatchAll.elapsedTime());
@@ -778,8 +793,15 @@ public class BlockExplorer {
 			if (dcSet.getTransactionFinalMap().contains(new Tuple2(blockNo, seqNo))) {
 				i++;
 				outputItem = new LinkedHashMap();
-				outputItem.put(1, "statement");
-				outputItem.put(2, Lang.getInstance().translate_from_langObj("Statement", langObj));
+				Transaction transaction = dcSet.getTransactionFinalMap().get(new Tuple2(blockNo, seqNo));
+				if (transaction instanceof R_SignNote) { 
+					outputItem.put(1, "statement");
+					outputItem.put(2, Lang.getInstance().translate_from_langObj("Statement", langObj));
+				} else {
+					outputItem.put(1, "block");
+					outputItem.put(2, Lang.getInstance().translate_from_langObj("Transaction Seq No", langObj));
+					
+				}
 				foundList.put(i, outputItem);
 			}
 		}
@@ -3794,7 +3816,6 @@ public class BlockExplorer {
 
 		R_SignNote trans = (R_SignNote) dcSet.getTransactionFinalMap().getTransaction(new Integer(block),
 				new Integer(seg_No));
-
 		// output.put("Label_title",
 		// Lang.getInstance().translate_from_langObj("Title",langObj));
 		output.put("Label_statement", Lang.getInstance().translate_from_langObj("Statement", langObj));
