@@ -78,7 +78,7 @@ protected int row;
 public Accounts_Name_Search_SplitPanel(){
 	super("Accounts_Name_Search_SplitPanel");
 	db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
-	setName(Lang.getInstance().translate("Name Accounts"));
+	setName(Lang.getInstance().translate("Favorite Accounts"));
 	searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") +":  ");
 	searthLabel_SearchToolBar_LeftPanel.setVisible(true);
 //	this.searchTextField_SearchToolBar_LeftPanel.setVisible(true);
@@ -227,7 +227,7 @@ public Accounts_Name_Search_SplitPanel(){
 	});
 	menu.add(Send_Mail_item_Menu);
 	
-	JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Set Name"));
+	JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit Name"));
 	setName.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
@@ -239,7 +239,7 @@ public Accounts_Name_Search_SplitPanel(){
 	});
 	menu.add(setName);
 	
-	JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Delete"));
+	JMenuItem menuItemDelete = new JMenuItem(Lang.getInstance().translate("Remove Favorite"));
 	menuItemDelete.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 			 if(!Controller.getInstance().isWalletUnlocked())

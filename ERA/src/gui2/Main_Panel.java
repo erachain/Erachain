@@ -344,8 +344,8 @@ public class Main_Panel extends javax.swing.JPanel {
 		}
 
 		
-		if (str.equals(Lang.getInstance().translate("Name Accounts")) || str.equals("Accounts_Name_Search_SplitPanel")) {
-			insertTab(Lang.getInstance().translate("Name Accounts"), new Accounts_Name_Search_SplitPanel());
+		if (str.equals(Lang.getInstance().translate("Favorite Accounts")) || str.equals("Accounts_Name_Search_SplitPanel")) {
+			insertTab(Lang.getInstance().translate("Favorite Accounts"), new Accounts_Name_Search_SplitPanel());
 			return;
 
 		}
