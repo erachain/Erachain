@@ -532,13 +532,13 @@ public class Account {
 
 		PersonCls person = personRes.b;
 		if (person.getDeathday() / 10 > person.getBirthday() / 10)
-			return "☻^"; // "☗"; ☻
+			return "☗"; // "☗"; ☻
 
 		int key = personRes.a;
 		if (key == -1)
-			return "☻-"; // "☺";
+			return "-"; // "☺";
 		else if (key == 1)
-			return "☻+"; // "♥"; //"☺"; //"☑"; 9829
+			return "♥"; // "♥"; //"☺"; //"☑"; 9829
 		else
 			return "";
 
