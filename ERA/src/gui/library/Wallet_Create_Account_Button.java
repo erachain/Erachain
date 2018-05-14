@@ -24,7 +24,7 @@ public class Wallet_Create_Account_Button extends JButton implements Observer {
 
 private Wallet_Create_Account_Button th;
 
-public Wallet_Create_Account_Button(){
+public Wallet_Create_Account_Button(MTable table){
 	
 	super(Lang.getInstance().translate("New Account"));
 	th = this;
@@ -63,7 +63,9 @@ public Wallet_Create_Account_Button(){
 				{
 					@Override
 					public void run() {
-						Controller.getInstance().generateNewAccountWithSynch();
+						Controller.getInstance().wallet.generateNewAccount();
+						//Controller.getInstance().generateNewAccountWithSynch();
+						//table.repaint();
 					}
 				}.start();
 			 }

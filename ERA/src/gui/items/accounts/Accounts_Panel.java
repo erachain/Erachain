@@ -120,7 +120,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		favoritesGBC.gridy = 0;	
 		
 		
-		newAccount_Button = new Wallet_Create_Account_Button();
+		newAccount_Button = new Wallet_Create_Account_Button(table);
 		this.add(newAccount_Button, favoritesGBC);
 		
 		
@@ -446,7 +446,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		});
 		menu.add(copyBankKey);
 		
-		JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Set Name"));
+		JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Edit Name"));
 		set_name.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e) 

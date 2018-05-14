@@ -12,6 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -50,12 +51,15 @@ import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
+import database.wallet.AccountsPropertisMap;
 import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 //import .BlockMap;
 import datachain.DCSet;
+import lang.Lang;
 import utils.ObserverMessage;
 import utils.Pair;
+import utils.StrJSonFine;
 
 public class Wallet extends Observable implements Observer
 {
@@ -437,6 +441,7 @@ public class Wallet extends Observable implements Observer
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	public String generateNewAccount()
 	{
 		//CHECK IF WALLET IS OPEN
@@ -454,13 +459,16 @@ public class Wallet extends Observable implements Observer
 		//GENERATE ACCOUNT SEED
 		byte[] accountSeed = generateAccountSeed(seed, nonce);
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
-
+		JSONObject ob = new JSONObject();
 		//CHECK IF ACCOUNT ALREADY EXISTS
 		if(!this.accountExists(account.getAddress()))
 		{
 			//ADD TO DATABASE
 			this.secureDatabase.getAccountSeedMap().add(account);
 			this.database.getAccountMap().add(account);
+			// set name
+			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + nonce);
+			this.database.getAccountsPropertisMap().set(account.getAddress(), new Tuple2<String, String>(Lang.getInstance().translate("My Account") + " " + nonce,  StrJSonFine.convert(ob)) );
 			LOGGER.info("Added account #" + nonce);
 
 			this.secureDatabase.commit();
