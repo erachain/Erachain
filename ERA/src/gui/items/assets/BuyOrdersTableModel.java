@@ -145,12 +145,12 @@ public class BuyOrdersTableModel extends
 		case COLUMN_AMOUNT_WANT:
 
 			if (row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmountWant) + "</i></html>";
+				return "<html><i>" + NumberAsString.formatAsString(want.getScale()).format(sumAmountWant) + "</i></html>";
 
 			// It shows unacceptably small amount of red.
 			BigDecimal amount = Order.calcAmountWantLeft(order);
 			
-			String amountStr = NumberAsString.getInstance().numberAsString(amount);
+			String amountStr = NumberAsString.formatAsString(want.getScale()).format(amount);
 			if (order.a.d)
 				return amountStr;
 			else
@@ -159,16 +159,17 @@ public class BuyOrdersTableModel extends
 		case COLUMN_PRICE:
 
 			if (row == this.orders.size())
-				return "<html><b>" + Lang.getInstance().translate("Total") + ":</b></html>";
-
-			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(order.c.b, order.b.b));
+				return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
+			
+			BigDecimal price = Order.calcPrice(order.c.b, order.b.b);
+			return NumberAsString.formatAsString(price.stripTrailingZeros().scale()).format(price);
 
 		case COLUMN_AMOUNT_HAVE:
 
 			if (row == this.orders.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAmountHave) + "</i></html>";
+				return "<html><i>" + NumberAsString.formatAsString(have.getScale()).format(sumAmountHave) + "</i></html>";
 
-			amountStr = NumberAsString.getInstance().numberAsString(order.b.b.subtract(order.b.c));
+			amountStr = NumberAsString.formatAsString(have.getScale()).format(order.b.b.subtract(order.b.c));
 
 			if (isMine)
 				amountStr = "<html><b>" + amountStr + "</b></html>";

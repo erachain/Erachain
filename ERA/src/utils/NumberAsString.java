@@ -4,8 +4,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.json.simple.parser.ParseException;
-
 public class NumberAsString {
 	private static NumberAsString instance;
 	private DecimalFormat decimalFormat;
@@ -43,4 +41,23 @@ public class NumberAsString {
 	public String numberAsString12(Object amount) {
 		return decimalFormat12.format(amount);
 	}
+	
+	public static DecimalFormat formatAsString(int scale)
+	{
+		Locale locale = new Locale("en", "US");
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+		symbols.setDecimalSeparator('.');
+		symbols.setGroupingSeparator(',');
+		
+		if (scale <= 0) {
+			return new DecimalFormat("###,##0", symbols);
+		}
+		
+		String ss = "";
+		for (int i=0; i< scale; i++) {
+			ss += "0";
+		}
+		return new DecimalFormat("###,##0." + ss, symbols);
+	}
+
 }
