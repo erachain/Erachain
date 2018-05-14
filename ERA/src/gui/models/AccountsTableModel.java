@@ -143,7 +143,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 
 
 		case	COLUMN_NO:
-			return row+1;
+			return account.getAccountNo();
 
 
 			/*

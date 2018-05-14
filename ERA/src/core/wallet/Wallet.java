@@ -440,6 +440,10 @@ public class Wallet extends Observable implements Observer
 
 		return true;
 	}
+	
+	public int getAccountNonce(){
+		return this.secureDatabase.getNonce();
+	}
 
 	@SuppressWarnings("unchecked")
 	public String generateNewAccount()
@@ -467,8 +471,8 @@ public class Wallet extends Observable implements Observer
 			this.secureDatabase.getAccountSeedMap().add(account);
 			this.database.getAccountMap().add(account);
 			// set name
-			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + nonce);
-			this.database.getAccountsPropertisMap().set(account.getAddress(), new Tuple2<String, String>(Lang.getInstance().translate("My Account") + " " + nonce,  StrJSonFine.convert(ob)) );
+			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce +1));
+			this.database.getAccountsPropertisMap().set(account.getAddress(), new Tuple2<String, String>(Lang.getInstance().translate("My Account") + " " + (nonce+1),  StrJSonFine.convert(ob)) );
 			LOGGER.info("Added account #" + nonce);
 
 			this.secureDatabase.commit();

@@ -18,6 +18,7 @@ import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.UnsignedBytes;
 
+import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -28,12 +29,15 @@ public class AccountMap extends Observable {
 
 	private static final String ADDRESS_ASSETS = "address_assets";
 	private static final String ADDRESSES = "addresses";
+	private static final String ADDRESSES_NO = "addresses_nomer";
 
 	private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
 	private Set<byte[]> publickKeys;
 
 	private Var<Long> licenseKeyVar;
 	private Long licenseKey;
+	// nom account from create. if <0 - not show
+	private Map<String, Integer> acountsNoMap;
 
 	//private List<Account> accounts;
 	//private List<PublicKeyAccount> publickKeys;
@@ -49,6 +53,7 @@ public class AccountMap extends Observable {
 				.makeOrGet();
 
 		this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
+		this.acountsNoMap = database.getTreeMap(ADDRESSES_NO);
 
 		// LICENCE SIGNED
 		this.licenseKeyVar = database.getAtomicVar("licenseKey");
@@ -325,11 +330,18 @@ public class AccountMap extends Observable {
 			if(!this.publickKeys.contains(account.getPublicKey()))
 			{
 				this.publickKeys.add(account.getPublicKey());
+				int n = Controller.getInstance().wallet.getAccountNonce();
+				acountsNoMap.put(account.getAddress(),n);
 				this.setChanged();
 				this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
 
 			}
 		}
+	}
+	
+	public int getAccountNo(String pubkey){
+		
+		return acountsNoMap.get(pubkey);
 	}
 
 	/*
