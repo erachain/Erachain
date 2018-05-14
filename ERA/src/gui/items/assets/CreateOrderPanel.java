@@ -55,6 +55,7 @@ public class CreateOrderPanel extends JPanel {
 	private JTextField txtBuyingAmount;
 	private JTextPane superHintText;
 
+	private boolean SHOW_HINTS = false;
 	private CreateOrderPanel th;
 
 	public CreateOrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
@@ -129,8 +130,8 @@ public class CreateOrderPanel extends JPanel {
 		this.add(lblWish, label_sell_buy);
 
 		JLabel lblResult = new JLabel(
-				"<html>" + (buying ? Lang.getInstance().translate("for") + ": " + this.have.toString()
-						: Lang.getInstance().translate("for") + ": " + this.want.toString()) + "</b></html>");
+				"<html>" + (buying ? Lang.getInstance().translate("for") + ": <b>" + this.have.toString()
+						: Lang.getInstance().translate("for") + ": <b>" + this.want.toString()) + "</b></html>");
 
 		// Label sell
 		label_sell_buy.gridy = ++labelGBC.gridy;
@@ -168,8 +169,11 @@ public class CreateOrderPanel extends JPanel {
 		detailGBC.gridwidth = 1;
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel accountHintLabel = new JLabel(have.getName());// .getShort() );
-		// this.add(accountHintLabel, assetHintGBC);
+		if (SHOW_HINTS) {
+			JLabel accountHintLabel = new JLabel(have.getShortName() );
+			this.add(accountHintLabel, assetHintGBC);
+		}
+		
 		// LABEL AMOUNT
 		labelGBC.gridy++;
 
@@ -186,8 +190,10 @@ public class CreateOrderPanel extends JPanel {
 
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel amountHintLabel = new JLabel(buying ? want.getName() : have.getName());
-		this.add(amountHintLabel, assetHintGBC);
+		if (SHOW_HINTS) {
+			JLabel amountHintLabel = new JLabel(buying ? want.getShortName() : have.getShortName());
+			this.add(amountHintLabel, assetHintGBC);
+		}
 
 		// LABEL PRICE
 		labelGBC.gridy++;
@@ -200,8 +206,10 @@ public class CreateOrderPanel extends JPanel {
 		this.add(txtPrice, detailGBC);
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel priceHintLabel = new JLabel(buying ? have.getName() : want.getName());
-		this.add(priceHintLabel, assetHintGBC);
+		if (SHOW_HINTS) {
+			JLabel priceHintLabel = new JLabel(buying ? have.getShortName() : want.getShortName());
+			this.add(priceHintLabel, assetHintGBC);
+		}
 
 		if (false & buying) {
 			/*
@@ -267,8 +275,10 @@ public class CreateOrderPanel extends JPanel {
 
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel buyingAmountHintLabel = new JLabel(buying ? have.getName() : want.getName());
-		this.add(buyingAmountHintLabel, assetHintGBC);
+		if (SHOW_HINTS) {
+			JLabel buyingAmountHintLabel = new JLabel(buying ? have.getShortName() : want.getShortName());
+			this.add(buyingAmountHintLabel, assetHintGBC);
+		}
 
 		// ON PRICE CHANGE
 		txtAmountHave.getDocument().addDocumentListener(new DocumentListener() {
@@ -300,8 +310,8 @@ public class CreateOrderPanel extends JPanel {
 
 		// ASSET HINT
 		assetHintGBC.gridy = detailGBC.gridy;
-		JLabel feeHintLabel = new JLabel(Controller.getInstance().getAsset(AssetCls.FEE_KEY).getName());
-		this.add(feeHintLabel, assetHintGBC);
+		/////JLabel feeHintLabel = new JLabel(Controller.getInstance().getAsset(AssetCls.FEE_KEY).getName());
+		////this.add(feeHintLabel, assetHintGBC);
 
 		// ADD SELL BUTTON
 		labelGBC.gridy++;

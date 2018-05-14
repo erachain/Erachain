@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 // import org.apache.log4j.Logger;
 
 import org.json.simple.JSONObject;
-import utils.ByteArrayUtils;
 
 import com.google.common.primitives.Bytes;
 //import com.google.common.primitives.Ints;
@@ -15,17 +14,12 @@ import com.google.common.primitives.Longs;
 
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-import core.naming.Name;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
-import datachain.ItemPersonMap;
 import datachain.Item_Map;
-import datachain.NameMap;
 import settings.Settings;
+import utils.ByteArrayUtils;
 import utils.DateTimeFormat;
-import utils.NameUtils;
-import utils.Pair;
-import utils.NameUtils.NameResult;
 
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
@@ -237,7 +231,8 @@ public abstract class PersonCls extends ItemCls {
 	public String toString(DCSet db)
 	{
 		long key = this.getKey(db);
-		return (key<0?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + " " + this.name + " "
+		return "[" + (key<1?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + "]"
+				+ this.name + "♥"
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	
@@ -245,8 +240,8 @@ public abstract class PersonCls extends ItemCls {
 	public String getShort(DCSet db)
 	{
 		long key = this.getKey(db);
-		return (key<1?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + " "
-				+ this.name.substring(0, Math.min(this.name.length(), 20)) + " "
+		return "[" + (key<1?"?":key) + (this.typeBytes[0]==HUMAN?"":("." + this.typeBytes[0])) + "]"
+				+ this.name.substring(0, Math.min(this.name.length(), 20)) + "♥"
 				+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY","") ;
 	}
 	

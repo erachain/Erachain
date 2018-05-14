@@ -158,6 +158,22 @@ public abstract class ItemCls {
 	public String getName() {
 		return this.name;
 	}
+	public String getShortName() {
+		String[] words = this.name.split(" ");
+		String result = "";
+		for (String word: words) {
+			if (word.length() > 6) {
+				result += word.substring(0, 5) + ".";
+			} else {
+				result += word + " ";
+			}
+			if (result.length() > 25)
+				break;
+		}
+		
+		return result.trim();
+		
+	}
 	public byte[] getIcon() {
 		return this.icon;
 	}
@@ -336,9 +352,8 @@ public abstract class ItemCls {
 	{
 		long key = this.getKey(db);
 		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
-		return (key==0?"?:":key
-				//+ "." + this.typeBytes[0]
-				+ " ") + this.getName();
+		return "[" + (key==0?"?:":key)
+				+ "] " + this.getName();
 				//+ (creator.length()==0?"": " (" +creator + ")");
 	}
 
