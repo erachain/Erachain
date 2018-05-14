@@ -8,10 +8,10 @@ import controller.Controller;
 import core.naming.NameSale;
 import datachain.DCSet;
 import datachain.SortableList;
+import lang.Lang;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-import lang.Lang;
 
 @SuppressWarnings("serial")
 public class NameSalesTableModel extends TableModelCls<String, BigDecimal> implements Observer
@@ -89,7 +89,7 @@ public class NameSalesTableModel extends TableModelCls<String, BigDecimal> imple
 			
 		case COLUMN_PRICE:
 			
-			return NumberAsString.getInstance().numberAsString(nameSale.getAmount());
+			return NumberAsString.formatAsString(nameSale.getAmount());
 			
 		}
 		

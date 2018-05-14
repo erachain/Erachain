@@ -9,7 +9,6 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
@@ -33,7 +32,7 @@ public class BalanceRenderer implements ListCellRenderer<Pair<Tuple2<String, Lon
 		if(value != null)
 		{
 			AssetCls asset = Controller.getInstance().getAsset(value.getA().b);		
-			renderer.setText("(" + asset.getKey() + ") " + asset.getName() + " - " + NumberAsString.getInstance().numberAsString(value.getB()));
+			renderer.setText("(" + asset.getKey() + ") " + asset.getName() + " - " + NumberAsString.formatAsString(value.getB().a.b, asset.getScale()));
 		}
 		
 		return renderer;

@@ -125,14 +125,14 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(balance.a.b) + "/" + balance.b.b.toPlainString() + "/" + balance.c.b.toPlainString();
+			str = NumberAsString.formatAsString(balance.a.b) + "/" + balance.b.b.toPlainString() + "/" + balance.c.b.toPlainString();
 			return str;
 			/*
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
 			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DBSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a))
+			str = NumberAsString.formatAsString(unconfBalance.a.subtract(balance.a))
 					+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 					+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
 			return str;
@@ -152,11 +152,11 @@ public class AccountsTableModel extends AbstractTableModel implements Observer
 
 			if(this.asset == null || this.asset.getKey() == AssetCls.FEE_KEY)
 			{
-				return  NumberAsString.getInstance().numberAsString(account.getGeneratingBalance());
+				return  NumberAsString.formatAsString(account.getGeneratingBalance());
 			}
 			else
 			{
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				return NumberAsString.formatAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 			}
 			 */
 

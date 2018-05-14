@@ -106,7 +106,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 
 		case COLUMN_AMOUNT:
 
-			String result = NumberAsString.getInstance().numberAsString(trade.c); //getAmountHave());
+			String result = NumberAsString.formatAsString(trade.c); //getAmountHave());
 
 			if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";
@@ -116,11 +116,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 
 		case COLUMN_PRICE:
 
-			return NumberAsString.getInstance().numberAsString12(Order.calcPrice(trade.c, trade.d));
+			return NumberAsString.formatAsString(Order.calcPrice(trade.c, trade.d));
 
 		case COLUMN_AMOUNT_WANT:
 
-			result = NumberAsString.getInstance().numberAsString(trade.d); //getAmountWant());
+			result = NumberAsString.formatAsString(trade.d); //getAmountWant());
 
 			if (Controller.getInstance().isAddressIsMine(targetOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";

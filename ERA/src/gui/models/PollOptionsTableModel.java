@@ -78,7 +78,7 @@ public class PollOptionsTableModel extends AbstractTableModel
 		
 		case COLUMN_VOTES:
 			
-			return NumberAsString.getInstance().numberAsString(option.getVotes(this.asset.getKey(DCSet.getInstance())));
+			return NumberAsString.formatAsString(option.getVotes(this.asset.getKey(DCSet.getInstance())));
 			
 		case COLUMN_PERCENTAGE:
 			

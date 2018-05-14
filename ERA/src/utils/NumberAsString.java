@@ -1,46 +1,56 @@
 package utils;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.json.simple.parser.ParseException;
-
 public class NumberAsString {
-	private static NumberAsString instance;
-	private DecimalFormat decimalFormat;
-	private DecimalFormat decimalFormat12;
-	
-	public static NumberAsString getInstance()
-	{
-		if(instance == null)
-		{
-			instance = new NumberAsString();
-		}
-		
-		return instance;
-	}
-	
-	public NumberAsString()
+
+	public static String formatAsString(Object amount)
 	{
 		Locale locale = new Locale("en", "US");
 		DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
 		symbols.setDecimalSeparator('.');
 		symbols.setGroupingSeparator(',');
 		
-		decimalFormat = new DecimalFormat("###,##0.00000000", symbols);
+		if (amount instanceof BigDecimal) {
+			int scale = ((BigDecimal)amount).scale();
+			if (scale <= 0) {
+				return new DecimalFormat("###,##0", symbols).format(amount);
+			}
+			
+			String ss = "";
+			for (int i=0; i< scale; i++) {
+				ss += "0";
+			}
+			return new DecimalFormat("###,##0." + ss, symbols).format(amount);
+			
+		} else if (amount instanceof Integer
+				|| amount instanceof Long) {
+			return new DecimalFormat("###,##0", symbols).format(amount);
+		} else {
+			return new DecimalFormat("###,##0.000", symbols).format(amount);
+		}
+	}
 
+	public static String formatAsString(BigDecimal amount, int scale)
+	{
+		Locale locale = new Locale("en", "US");
+		DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
+		symbols.setDecimalSeparator('.');
+		symbols.setGroupingSeparator(',');
+		
+		if (scale <= 0) {
+			return new DecimalFormat("###,##0", symbols).format(amount);
+		}
+		
 		String ss = "";
-		for (int i=0; i< 12; i++) {
+		for (int i=0; i< scale; i++) {
 			ss += "0";
 		}
-		decimalFormat12 = new DecimalFormat("###,##0." + ss, symbols);
+		return new DecimalFormat("###,##0." + ss, symbols).format(amount);
+			
 	}
-	
-	public String numberAsString(Object amount) {
-		return decimalFormat.format(amount);
-	}
-	public String numberAsString12(Object amount) {
-		return decimalFormat12.format(amount);
-	}
+
 }

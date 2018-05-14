@@ -11,10 +11,10 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import datachain.SortableList;
+import lang.Lang;
 import utils.Converter;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import lang.Lang;
 
 @SuppressWarnings("serial")
 public class AcctTableModel extends TableModelCls<String, AT> implements Observer
@@ -104,7 +104,7 @@ public class AcctTableModel extends TableModelCls<String, AT> implements Observe
 		
 		case COLUMN_AT_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(new Account(Base58.encode(at.getId())).getBalanceUSE(Transaction.FEE_KEY));
+			return NumberAsString.formatAsString(new Account(Base58.encode(at.getId())).getBalanceUSE(Transaction.FEE_KEY));
 		
 		case COLUMN_AT_SECRET:
 			

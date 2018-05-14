@@ -161,13 +161,13 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 		case COLUMN_ASSET_1:
 
 			if(row == this.trades.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset1) + "</i></html>";
+				return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
 
 			String result = "";
 			if(type > 0)
-				result = NumberAsString.getInstance().numberAsString(trade.c);
+				result = NumberAsString.formatAsString(trade.c);
 			else
-				result = NumberAsString.getInstance().numberAsString(trade.d);
+				result = NumberAsString.formatAsString(trade.d);
 
 			if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";
@@ -182,19 +182,19 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 				return null;
 
 			if(type > 0)
-				return NumberAsString.getInstance().numberAsString12(Order.calcPrice(trade.c, trade.d));
+				return NumberAsString.formatAsString(Order.calcPrice(trade.c, trade.d));
 			else
-				return NumberAsString.getInstance().numberAsString12(Order.calcPrice(trade.d, trade.c));
+				return NumberAsString.formatAsString(Order.calcPrice(trade.d, trade.c));
 
 		case COLUMN_ASSET_2:
 
 			if(row == this.trades.size())
-				return "<html><i>" + NumberAsString.getInstance().numberAsString(sumAsset2) + "</i></html>";
+				return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
 			if(type > 0)
-				result = NumberAsString.getInstance().numberAsString(trade.d);
+				result = NumberAsString.formatAsString(trade.d);
 			else
-				result = NumberAsString.getInstance().numberAsString(trade.c);
+				result = NumberAsString.formatAsString(trade.c);
 
 			if (Controller.getInstance().isAddressIsMine(targetOrder.a.b)) {
 				result = "<html><b>" + result + "</b></html>";

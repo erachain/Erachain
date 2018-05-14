@@ -11,19 +11,15 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
 
-import core.block.Block;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import datachain.SortableList;
 import datachain.TransactionMap;
+import lang.Lang;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-import controller.Controller;
-import lang.Lang;
 
 @SuppressWarnings("serial")
 public class Debug_Transactions_Table_Model extends AbstractTableModel implements Observer {
@@ -118,7 +114,7 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
 				
 			case COLUMN_FEE:
 				
-				return NumberAsString.getInstance().numberAsString(transaction.getFee());		
+				return NumberAsString.formatAsString(transaction.getFee());		
 			}
 			
 			return null;

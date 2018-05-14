@@ -5,8 +5,6 @@ import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
-import utils.NumberAsString;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
@@ -15,6 +13,7 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import datachain.DCSet;
+import utils.NumberAsString;
 
 public class Name {
 
@@ -190,6 +189,6 @@ public class Name {
 	
 	public String getNameBalanceString()
 	{
-		return NumberAsString.getInstance().numberAsString(this.getOwner().getBalance(AssetCls.FEE_KEY)) + " - " + this.getName();
+		return NumberAsString.formatAsString(this.getOwner().getBalance(AssetCls.FEE_KEY)) + " - " + this.getName();
 	}
 }

@@ -66,7 +66,7 @@ public class PaymentsTableModel extends AbstractTableModel
 			
 		case COLUMN_AMOUNT:
 			
-			return NumberAsString.getInstance().numberAsString(payment.getAmount());
+			return NumberAsString.formatAsString(payment.getAmount());
 			
 		}
 		

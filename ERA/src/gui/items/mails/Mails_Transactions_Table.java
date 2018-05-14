@@ -35,9 +35,6 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.mapdb.Fun.Tuple2;
-
-import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
 import core.account.Account;
@@ -895,7 +892,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 				}
 				amountStr = /*"<font" + fontSize + ">" +send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "
-						+  */ NumberAsString.getInstance().numberAsString(this.amount) /*+ "</font>"
+						+  */ NumberAsString.formatAsString(this.amount) /*+ "</font>"
 						+ "\n " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DBSet.getInstance())*/;
 			}
 			
@@ -910,7 +907,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 					+ "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
 					+ DateTimeFormat.timestamptoString(this.timestamp)
 					+ " " + Lang.getInstance().translate("Fee") + ": "
-					+ NumberAsString.getInstance().numberAsString(fee)
+					+ NumberAsString.formatAsString(fee)
 					+ "<br></font>\n ttttttttttttttt"
 					+ amountStr
 					+ "</td></tr></table>"
@@ -950,7 +947,7 @@ public class Mails_Transactions_Table extends JTable implements Observer{
 						+ "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
 						+ DateTimeFormat.timestamptoString(this.timestamp)
 						+ " " + Lang.getInstance().translate("Fee") + ": "
-						+ NumberAsString.getInstance().numberAsString(fee)
+						+ NumberAsString.formatAsString(fee)
 						+ "<br></font>\n"
 						+ amountStr
 						+ "</td></tr></table>"
