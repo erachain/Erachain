@@ -26,7 +26,6 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 //import core.item.assets.AssetCls;
 import core.transaction.Transaction;
-import database.wallet.AccountsPropertisMap;
 import datachain.DCSet;
 import datachain.ItemAssetBalanceMap;
 import datachain.OrderMap;
@@ -690,7 +689,7 @@ public class Account {
 			personStr = personChar(personRes) + personRes.b.getShort();
 			addressStr = this.getAddress().substring(0, 8);
 		}
-		return " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
+		return " {" + NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY)) + "}"
 		+ " " + addressStr + " " + personStr;
 	}
 
@@ -711,8 +710,8 @@ public class Account {
 		boolean statusBad = Controller.getInstance().getStatus() != Controller.STATUS_OK;
 
 		return (statusBad?"??? ":"")
-				+ NumberAsString.getInstance().numberAsString(this.getBalanceUSE(key))
-				+ " {" + NumberAsString.getInstance().numberAsString(this.getBalanceUSE(FEE_KEY)) + "}"
+				+ NumberAsString.formatAsString(this.getBalanceUSE(key))
+				+ " {" + NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY)) + "}"
 				+ " " + addressStr + " " + personStr;
 	}
 

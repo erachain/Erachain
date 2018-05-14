@@ -35,7 +35,6 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -803,7 +802,7 @@ public class Send_TableModel extends JTable implements Observer{
 				}
 				amountStr = "<font" + fontSize + ">" + send_type + " "
 						//+ Lang.getInstance().translate("Amount") + ": "
-						+ NumberAsString.getInstance().numberAsString(this.amount) + "</font>"
+						+ NumberAsString.formatAsString(this.amount) + "</font>"
 						+ " " + Controller.getInstance().getAsset(this.getAbsAssetKey()).getShort(DCSet.getInstance());
 			}
 			
@@ -818,7 +817,7 @@ public class Send_TableModel extends JTable implements Observer{
 					+ "<font size='2' color='" + colorTextHeader + "'>\n" + strconfirmations + " . "
 					+ DateTimeFormat.timestamptoString(this.timestamp)
 					+ " " + Lang.getInstance().translate("Fee") + ": "
-					+ NumberAsString.getInstance().numberAsString(fee)
+					+ NumberAsString.formatAsString(fee)
 					+ "<br></font>\n"
 					+ amountStr
 					+ "</td></tr></table>"
@@ -892,7 +891,7 @@ public class Send_TableModel extends JTable implements Observer{
 					+ send_type + "\n"
 					+ Lang.getInstance().translate("Sender") + ": " + this.sender + "\n"
 					+ Lang.getInstance().translate("Recipient") + ": " + this.recipient + "\n"
-					+ Lang.getInstance().translate("Amount") + ": " + NumberAsString.getInstance().numberAsString(this.amount) + " " + strAsset + " . "+Lang.getInstance().translate("Fee") + ": " + NumberAsString.getInstance().numberAsString(this.fee) + "\n"
+					+ Lang.getInstance().translate("Amount") + ": " + NumberAsString.formatAsString(this.amount) + " " + strAsset + " . "+Lang.getInstance().translate("Fee") + ": " + NumberAsString.formatAsString(this.fee) + "\n"
 					+ Lang.getInstance().translate("Type") + ": " + imginout + ". " + imgLock + "\n"
 					+ Lang.getInstance().translate("Confirmations") + ": " + strConfirmations + "\n"
 					+ Lang.getInstance().translate("[MESSAGE START]\n")

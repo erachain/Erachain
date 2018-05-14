@@ -187,7 +187,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
 					return "-1";
 				}
 
-				return NumberAsString.getInstance().numberAsString(block.getTotalFee());
+				return NumberAsString.formatAsString(block.getTotalFee());
 
 			}
 

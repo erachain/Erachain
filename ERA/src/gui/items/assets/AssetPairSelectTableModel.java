@@ -141,9 +141,9 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 		case COLUMN_ORDERS_VOLUME:
 			
 			
-			return item == null?"":("<html>" +(item.c==null?"0" : NumberAsString.getInstance().numberAsString(item.c))) 
+			return item == null?"":("<html>" +(item.c==null?"0" : NumberAsString.formatAsString(item.c))) 
 					+ " " + this.assets.get(row).getShort() + "&hArr;  "//"<br>" 
-					+ NumberAsString.getInstance().numberAsString(item.d) 
+					+ NumberAsString.formatAsString(item.d) 
 					+ " " + Controller.getInstance().getAsset(this.key).getShort()
 					+ "</html>";
 
@@ -159,9 +159,9 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 			
 			if (item == null) return "";
 			if(item.b > 0)
-				return "<html>" + NumberAsString.getInstance().numberAsString(item.e) 
+				return "<html>" + NumberAsString.formatAsString(item.e) 
 					+ " " + this.assets.get(row).getShort() + "&hArr; " //"<br>" 
-					+ NumberAsString.getInstance().numberAsString(item.f) 
+					+ NumberAsString.formatAsString(item.f) 
 					+ " " + Controller.getInstance().getAsset(this.key).getShort()
 					+ "</html>";
 			else

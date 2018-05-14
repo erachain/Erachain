@@ -8,16 +8,15 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import datachain.SortableList;
 import lang.Lang;
+import utils.NumberAsString;
+import utils.ObserverMessage;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class Balances_To_Account_TableModel extends AbstractTableModel implements Observer
@@ -93,7 +92,7 @@ public class Balances_To_Account_TableModel extends AbstractTableModel implement
 			
 		case COLUMN_BALANCE:
 			
-			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(this.key));
+			return NumberAsString.formatAsString(account.getBalanceUSE(this.key));
 		}
 		
 		return null;

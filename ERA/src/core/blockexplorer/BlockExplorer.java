@@ -886,7 +886,7 @@ public class BlockExplorer {
 			assetJSON.put("description", asset.getDescription());
 			// assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
-			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString(asset.getTotalQuantity(dcSet)));
+			assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
 			assetJSON.put("scale", asset.getScale());
 			// String a =
 			// Lang.getInstance().translate_from_langObj("False",langObj);
@@ -943,7 +943,7 @@ public class BlockExplorer {
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
-			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString(asset.getTotalQuantity(dcSet)));
+			assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
 			assetJSON.put("scale", asset.getScale());
 			// String a =
 			// Lang.getInstance().translate_from_langObj("False",langObj);
@@ -1017,7 +1017,7 @@ public class BlockExplorer {
 			assetJSON.put("name", asset.getName());
 			assetJSON.put("description", asset.getDescription());
 			assetJSON.put("owner", asset.getOwner().getAddress());
-			assetJSON.put("quantity", NumberAsString.getInstance().numberAsString(asset.getTotalQuantity(dcSet)));
+			assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
 			assetJSON.put("scale", asset.getScale());
 			// String a =
 			// Lang.getInstance().translate_from_langObj("False",langObj);
@@ -1885,11 +1885,11 @@ public class BlockExplorer {
 					}
 				}
 			}
-			output.put("era_balance_a", NumberAsString.getInstance().numberAsString(eraBalanceA));
-			output.put("era_balance_b", NumberAsString.getInstance().numberAsString(eraBalanceB));
-			output.put("era_balance_c", NumberAsString.getInstance().numberAsString(eraBalanceC));
-			output.put("era_balance_total", NumberAsString.getInstance().numberAsString(eraBalanceTotal));
-			output.put("compu_balance", NumberAsString.getInstance().numberAsString(compuBalance));
+			output.put("era_balance_a", NumberAsString.formatAsString(eraBalanceA));
+			output.put("era_balance_b", NumberAsString.formatAsString(eraBalanceB));
+			output.put("era_balance_c", NumberAsString.formatAsString(eraBalanceC));
+			output.put("era_balance_total", NumberAsString.formatAsString(eraBalanceTotal));
+			output.put("compu_balance", NumberAsString.formatAsString(compuBalance));
 		}
 		output.put("accounts", accountsJSON);
 

@@ -249,13 +249,13 @@ public abstract class TransactionAmount extends Transaction {
 		if (this.amount == null)
 			return "";
 		String address = account.getAddress();
-		return NumberAsString.getInstance().numberAsString(getAmount(address));
+		return NumberAsString.formatAsString(getAmount(address));
 	}
 	@Override
 	public String viewAmount(String address) {
 		if (this.amount == null)
 			return "";
-		return NumberAsString.getInstance().numberAsString(getAmount(address));
+		return NumberAsString.formatAsString(getAmount(address));
 	}
 
 	private String viewActionType() {

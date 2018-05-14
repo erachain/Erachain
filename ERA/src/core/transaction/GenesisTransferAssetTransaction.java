@@ -124,16 +124,16 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 	@Override
 	public String viewAmount() {
-		return NumberAsString.getInstance().numberAsString(this.amount);
+		return NumberAsString.formatAsString(this.amount);
 	}
 	@Override
 	public String viewAmount(Account account) {
 		String address = account.getAddress();
-		return NumberAsString.getInstance().numberAsString(getAmount(address));
+		return NumberAsString.formatAsString(getAmount(address));
 	}
 	@Override
 	public String viewAmount(String address) {
-		return NumberAsString.getInstance().numberAsString(getAmount(address));
+		return NumberAsString.formatAsString(getAmount(address));
 	}
 
 	@Override

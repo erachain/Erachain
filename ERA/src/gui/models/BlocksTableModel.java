@@ -188,7 +188,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer{
 					return "-1";
 				}
 
-				return NumberAsString.getInstance().numberAsString(block.getTotalFee());
+				return NumberAsString.formatAsString(block.getTotalFee());
 
 			}
 

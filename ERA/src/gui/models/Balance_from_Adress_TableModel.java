@@ -11,17 +11,16 @@ import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import utils.NumberAsString;
-import utils.ObserverMessage;
-import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import datachain.SortableList;
 import lang.Lang;
+import utils.NumberAsString;
+import utils.ObserverMessage;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class Balance_from_Adress_TableModel extends AbstractTableModel implements Observer {
@@ -155,19 +154,19 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 
 		case COLUMN_A:
 
-			return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().a.b);
+			return NumberAsString.formatAsString(table_balance.get(row).getB().getB().a.b);
 
 		case COLUMN_B:
 
-			return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().b.b);
+			return NumberAsString.formatAsString(table_balance.get(row).getB().getB().b.b);
 
 		case COLUMN_C:
 
-			return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().c.b);
+			return NumberAsString.formatAsString(table_balance.get(row).getB().getB().c.b);
 
 		//case COLUMN_D:
 
-			//return NumberAsString.getInstance().numberAsString(table_balance.get(row).getB().getB().d.b);
+			//return NumberAsString.formatAsString(table_balance.get(row).getB().getB().d.b);
 
 		case COLUMN_ASSET_NAME:
 

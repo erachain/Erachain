@@ -1,11 +1,5 @@
 package gui.items.accounts;
 
-import gui.items.assets.AssetsComboBoxModel;
-import gui.library.MTable;
-import gui.library.Wallet_Create_Account_Button;
-import gui.library.Wallet_Sync_Button;
-import gui.models.AccountsTableModel;
-import lang.Lang;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -19,20 +13,15 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JButton;
+
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-import javax.swing.event.MenuKeyEvent;
-import javax.swing.event.MenuKeyListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
@@ -40,17 +29,19 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import controller.Controller;
-import utils.NumberAsString;
-import utils.TableMenuPopupUtil;
-import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base32;
 import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import gui.Gui;
-import gui.MainFrame;
-import gui.PasswordPane;
+import gui.items.assets.AssetsComboBoxModel;
+import gui.library.MTable;
+import gui.library.Wallet_Create_Account_Button;
+import gui.library.Wallet_Sync_Button;
+import gui.models.AccountsTableModel;
+import lang.Lang;
+import utils.NumberAsString;
+import utils.TableMenuPopupUtil;
 @SuppressWarnings("serial")
 public class Accounts_Panel extends JPanel // implements ItemListener
 
@@ -500,7 +491,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 		table.getModel().addTableModelListener(new TableModelListener() {
 			@Override
 			public void tableChanged(TableModelEvent arg0) {
-				totalBalance.setText(Lang.getInstance().translate("Confirmed Balance") + ": " + NumberAsString.getInstance().numberAsString(tableModel.getTotalBalance()));				
+				totalBalance.setText(Lang.getInstance().translate("Confirmed Balance") + ": " + NumberAsString.formatAsString(tableModel.getTotalBalance()));				
 			}		
 		});
 		

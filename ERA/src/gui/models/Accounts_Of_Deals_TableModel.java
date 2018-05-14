@@ -70,7 +70,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
 		//	balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
 
-		return NumberAsString.getInstance().numberAsString(ss);
+		return NumberAsString.formatAsString(ss);
 	}
 
 	// Total waiting
@@ -89,7 +89,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
 		//	balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
 
-		return NumberAsString.getInstance().numberAsString(ss.subtract(sW));
+		return NumberAsString.formatAsString(ss.subtract(sW));
 	}
 
 
@@ -176,19 +176,19 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 		case COLUMN_CONFIRMED_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(balance.a); // + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
+			str = NumberAsString.formatAsString(balance.a); // + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
 			return str;
 		case COLUMN_WAINTING_BALANCE:
 			if (this.asset == null) return "-";
 			balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
 			unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance()));
-			str = NumberAsString.getInstance().numberAsString(unconfBalance.a.subtract(balance.a.b));
+			str = NumberAsString.formatAsString(unconfBalance.a.subtract(balance.a.b));
 			//	+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
 			//	+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
 			return str;
 		case COLUMN_FEE_BALANCE:
 			if (this.asset == null) return "-";
-			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(Transaction.FEE_KEY));
+			return NumberAsString.formatAsString(account.getBalanceUSE(Transaction.FEE_KEY));
 
 
 			/*
@@ -197,11 +197,11 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
 			if(this.asset == null || this.asset.getKey() == AssetCls.FEE_KEY)
 			{
-				return  NumberAsString.getInstance().numberAsString(account.getGeneratingBalance());
+				return  NumberAsString.formatAsString(account.getGeneratingBalance());
 			}
 			else
 			{
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				return NumberAsString.formatAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 			}
 			 */
 

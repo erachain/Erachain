@@ -29,12 +29,12 @@ public class GenesisIssueAssetTransaction extends GenesisIssue_ItemRecord
 	@Override
 	public String viewAmount(Account account) {
 		AssetCls asset = (AssetCls)this.getItem();
-		return NumberAsString.getInstance().numberAsString(asset.getQuantity());
+		return NumberAsString.formatAsString(asset.getQuantity());
 	}
 	@Override
 	public String viewAmount(String address) {
 		AssetCls asset = (AssetCls)this.getItem();
-		return NumberAsString.getInstance().numberAsString(asset.getQuantity());
+		return NumberAsString.formatAsString(asset.getQuantity());
 	}
 
 

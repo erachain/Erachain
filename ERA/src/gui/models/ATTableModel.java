@@ -9,9 +9,9 @@ import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
 import datachain.SortableList;
+import lang.Lang;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-import lang.Lang;
 
 @SuppressWarnings("serial")
 public class ATTableModel extends TableModelCls<Long, AT> implements Observer
@@ -91,7 +91,7 @@ public class ATTableModel extends TableModelCls<Long, AT> implements Observer
 		case COLUMN_AMOUNT:
 		{
 			Account account = new Account(Base58.encode(at.getId()));
-			return NumberAsString.getInstance().numberAsString(account.getBalanceUSE(Transaction.FEE_KEY));
+			return NumberAsString.formatAsString(account.getBalanceUSE(Transaction.FEE_KEY));
 		}	
 		case COLUMN_CREATOR:
 			
