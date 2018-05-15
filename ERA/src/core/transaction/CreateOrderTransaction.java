@@ -378,6 +378,10 @@ public class CreateOrderTransaction extends Transaction {
 	@Override
 	public int isValid(Long releaserReference, long flags) {
 
+		if (this.wantAsset.isAccounting() || this.haveAsset.isAccounting()) {
+			return ACCOUNTING_ASSET;
+		}
+		
 		for (byte[] valid_item : VALID_REC) {
 			if (Arrays.equals(this.signature, valid_item)) {
 				return VALIDATE_OK;

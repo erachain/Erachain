@@ -1,5 +1,13 @@
 package gui.items.assets;
 
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -14,11 +22,6 @@ import gui.library.My_Add_Image_Panel;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -376,9 +379,9 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			parsestep++;
 			// SCALE, ASSET_TYPE, QUANTITY
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			int asset_type =0;
-			if (currency_unmovabl_chk.isSelected()) asset_type=1;
-			if (claim_right_obligation_chk.isSelected()) asset_type=2;
+			int asset_type = 0;
+			if (currency_unmovabl_chk.isSelected()) asset_type = 1;
+			if (claim_right_obligation_chk.isSelected()) asset_type = 2;
 			
 			
 			IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction)Controller.getInstance().issueAsset(
@@ -389,7 +392,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 					add_Image_Panel.imgButes,
 					false,
 					scale,
-					asset_type ,
+					asset_type,
 					quantity,
 					feePow);
 

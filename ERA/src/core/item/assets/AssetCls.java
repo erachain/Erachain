@@ -114,14 +114,19 @@ public abstract class AssetCls extends ItemCls {
 	@Override
 	public String viewName() {
 		
+		if (this.key < 5) {
+			return "®" + this.name;
+		}
 		switch(this.asset_type)
 		{
 		case 1:
 			return "▼" + this.name;
 		case 2:
-			return "◄" + this.name; // ■ ± █
+			return "◄" + this.name; // ® ■ ± █
+		case 3:
+			return "±" + this.name;
 		default:
-			return "▲" + this.name;			
+			return "▲" + this.name;
 		}
 	}
 	
@@ -174,12 +179,13 @@ public abstract class AssetCls extends ItemCls {
 	 */
 
 	public int getScale() {
-		if (true && this.key < BlockChain.AMOUNT_SCALE_FROM) {
-			if (this.key == 0) {
-				Long error = null;
-				error ++;
-			}
-					
+		if (this.key == 0) {
+			Long error = null;
+			error ++;
+		} else if (this.key < 5 ||
+				this.key > 1000 &&
+				this.key < BlockChain.AMOUNT_SCALE_FROM
+				) {	
 			//return this.asset_type == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
 			// IN ANY CASE
 			return BlockChain.AMOUNT_DEDAULT_SCALE;
@@ -209,6 +215,10 @@ public abstract class AssetCls extends ItemCls {
 		return this.asset_type == 2;
 	}
 
+	public boolean isAccounting() {
+		return this.asset_type == 3;
+	}
+
 	public String viewAssetType() {
 		switch (this.asset_type) {
 		case 0:
@@ -217,6 +227,8 @@ public abstract class AssetCls extends ItemCls {
 			return "Immovable";
 		case 2:
 			return "Claim";
+		case 3:
+			return "Accounting";
 		}
 		return "unknown";
 	}

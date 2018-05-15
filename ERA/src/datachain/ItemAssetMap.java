@@ -5,6 +5,8 @@ import java.util.Map;
 import org.mapdb.DB;
 
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
+import core.item.assets.AssetVenture;
 import database.serializer.ItemSerializer;
 //import database.serializer.AssetSerializer;
 import utils.ObserverMessage;
@@ -45,6 +47,34 @@ public class ItemAssetMap extends Item_Map
 				//.valueSerializer(new AssetSerializer())
 				// key instead size - .counterEnable()
 				.makeOrGet();
+	}
+
+	public boolean contains(Long key) {
+		if (key > 100 && key < 1000) {
+			return true;
+		} else {
+			return super.contains(key);
+		}
+	}
+
+	public AssetCls get(Long key) {
+		
+		if (key > 100 && key < 1000) {
+			AssetCls item;
+			switch (key.intValue()) {
+				case 643:
+					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("RUB"),
+							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
+					break;
+				default:
+					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, "ISO." + key,
+							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
+			}
+			item.setKey(key);
+			return item;
+		} else {
+			return (AssetCls)super.get(key);			
+		}
 	}
 
 }

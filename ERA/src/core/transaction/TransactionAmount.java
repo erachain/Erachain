@@ -477,7 +477,7 @@ public abstract class TransactionAmount extends Transaction {
 							return NO_BALANCE;
 						}
 						 */
-					} else {
+					} else if (!asset.isAccounting()) {
 						// CREDIT - GIVE CREDIT
 						// OR RETURN CREDIT
 						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
@@ -527,76 +527,80 @@ public abstract class TransactionAmount extends Transaction {
 
 					}
 
-					// if asset is unlimited and me is creator of this asset
-					boolean unLimited = absKey > AssetCls.REAL_KEY // not genesis assets!
-							&& asset.getQuantity().equals(0l)
-							&& asset.getOwner().getAddress().equals(this.creator.getAddress());
-
-					//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-					if (unLimited) {
-						// not make RETURN - check validate next
-						//
-					} else if (absKey == FEE_KEY) {
-						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
-							if (height > 120000 || BlockChain.DEVELOP_USE)
-								return NO_BALANCE;
-
-							wrong = true;
-							for ( byte[] valid_item: BlockChain.VALID_BAL) {
-								if (Arrays.equals(this.signature, valid_item)) {
-									wrong = false;
-									break;
+					if (!asset.isAccounting()) {
+						// if asset is not ACCOUNTONG - check BALANCES
+						
+						// if asset is unlimited and me is creator of this asset
+						boolean unLimited = absKey > AssetCls.REAL_KEY // not genesis assets!
+								&& asset.getQuantity().equals(0l)
+								&& asset.getOwner().getAddress().equals(this.creator.getAddress());
+	
+						//CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+						if (unLimited) {
+							// not make RETURN - check validate next
+							//
+						} else if (absKey == FEE_KEY) {
+							if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.amount.add(this.fee) ) < 0) {
+								if (height > 120000 || BlockChain.DEVELOP_USE)
+									return NO_BALANCE;
+	
+								wrong = true;
+								for ( byte[] valid_item: BlockChain.VALID_BAL) {
+									if (Arrays.equals(this.signature, valid_item)) {
+										wrong = false;
+										break;
+									}
 								}
+	
+								if (wrong)
+									return NO_BALANCE;
 							}
-
-							if (wrong)
-								return NO_BALANCE;
-						}
-
-					} else {
-						if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
-							if (height > 41100 || BlockChain.DEVELOP_USE)
-								return NOT_ENOUGH_FEE;
-
-							// TODO: delete wrong check in new CHAIN
-							// SOME PAYMENTs is WRONG
-							wrong = true;
-							for ( byte[] valid_item: BlockChain.VALID_BAL) {
-								if (Arrays.equals(this.signature, valid_item)) {
-									wrong = false;
-									break;
+	
+						} else {
+							if(this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo( this.fee ) < 0) {
+								if (height > 41100 || BlockChain.DEVELOP_USE)
+									return NOT_ENOUGH_FEE;
+	
+								// TODO: delete wrong check in new CHAIN
+								// SOME PAYMENTs is WRONG
+								wrong = true;
+								for ( byte[] valid_item: BlockChain.VALID_BAL) {
+									if (Arrays.equals(this.signature, valid_item)) {
+										wrong = false;
+										break;
+									}
 								}
+	
+								if (wrong)
+									return NOT_ENOUGH_FEE;
 							}
-
-							if (wrong)
-								return NOT_ENOUGH_FEE;
-						}
-						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
-
-						if (amount.compareTo(forSale) > 0) {
-							if (height > 120000 || BlockChain.DEVELOP_USE)
-								return NO_BALANCE;
-
-							// TODO: delete wrong check in new CHAIN
-							// SOME PAYMENTs is WRONG
-							wrong = true;
-							for ( byte[] valid_item: BlockChain.VALID_BAL) {
-								if (Arrays.equals(this.signature, valid_item)) {
-									wrong = false;
-									break;
+							BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
+	
+							if (amount.compareTo(forSale) > 0) {
+								if (height > 120000 || BlockChain.DEVELOP_USE)
+									return NO_BALANCE;
+	
+								// TODO: delete wrong check in new CHAIN
+								// SOME PAYMENTs is WRONG
+								wrong = true;
+								for ( byte[] valid_item: BlockChain.VALID_BAL) {
+									if (Arrays.equals(this.signature, valid_item)) {
+										wrong = false;
+										break;
+									}
 								}
+	
+								if (wrong)
+									return NO_BALANCE;
 							}
-
-							if (wrong)
-								return NO_BALANCE;
+	
+							if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
+								String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+								if ( unlock != null && !this.recipient.equals(unlock))
+									return INVALID_CREATOR;
+							}
+	
 						}
-
-						if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
-							String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
-							if ( unlock != null && !this.recipient.equals(unlock))
-								return INVALID_CREATOR;
-						}
-
 					}
 				} else {
 					// PRODUCE - SPEND

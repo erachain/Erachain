@@ -198,9 +198,9 @@ public class OnDealClick
 		case Transaction.INVALID_QUANTITY:
 			mess = "Invalid quantity";
 			break;
-//		case Transaction.ITEM_ASSET_NOT_EXIST:
-//			mess = "asset does not exist";
-//			break;
+		case Transaction.ACCOUNTING_ASSET:
+			mess = "It is Accounting Asset";
+			break;
 		case Transaction.INVALID_RETURN:
 			mess = "Invalid return";
 			break;
