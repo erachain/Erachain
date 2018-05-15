@@ -124,8 +124,8 @@ public class CreateOrderPanel extends JPanel {
 		label_sell_buy.gridy = ++labelGBC.gridy;
 		detailGBC.gridy = ++detailGBC.gridy;
 		JLabel lblWish = new JLabel(
-				"<html>" + (buying ? Lang.getInstance().translate("Buy") + ": " + "<b>" + this.want.toString()
-						: Lang.getInstance().translate("Sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
+				"<html>" + (buying ? Lang.getInstance().translate("To Buy") + ": " + "<b>" + this.want.toString()
+						: Lang.getInstance().translate("To Sell") + ": " + "<b>" + this.have.toString()) + "</b></html>");
 
 		this.add(lblWish, label_sell_buy);
 
@@ -260,7 +260,7 @@ public class CreateOrderPanel extends JPanel {
 
 		// mes = buying ? Lang.getInstance().translate("Result") :
 		// Lang.getInstance().translate("Total Buy (want)");
-		mes = Lang.getInstance().translate("Result");
+		mes = Lang.getInstance().translate("Total");
 
 		JLabel buyingAmountLabel = new JLabel(mes + ":");
 		this.add(buyingAmountLabel, labelGBC);
