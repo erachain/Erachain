@@ -152,13 +152,13 @@ public class Statement_Info extends javax.swing.JPanel {
 					}
 				}
 
-				jTextArea_Body.setText(template.getName() + "\n\n" + description + "\n\n"
+				jTextArea_Body.setText(template.viewName() + "\n\n" + description + "\n\n"
 						+ new String(statement.getData(), Charset.forName("UTF-8")));
 
 			}
 
 		} else {
-			jTextArea_Body.setText(template.getName() + "\n" + Lang.getInstance().translate("Encrypted"));
+			jTextArea_Body.setText(template.viewName() + "\n" + Lang.getInstance().translate("Encrypted"));
 		}
 
 		jSplitPane1.setDividerLocation(350);// .setDividerLocation((int)(jSplitPane1.getSize().getHeight()/0.5));//.setLastDividerLocation(0);

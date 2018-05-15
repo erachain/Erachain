@@ -198,7 +198,7 @@ public class IssueUnionPanel extends JPanel
 		 String text = "<HTML><body>";
 		 	text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Union") + "<br><br><br>";
 		    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issue_Union.getCreator() +"<br>";
-		    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issue_Union.getItem().getName() +"<br>";
+		    text += Lang.getInstance().translate("Name") +":&nbsp;"+ issue_Union.getItem().viewName() +"<br>";
 		   text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issue_Union.getItem().getDescription())+"<br>";
 		   text += Lang.getInstance().translate("Date") +":&nbsp;"+ ((UnionCls)issue_Union.getItem()).getBirthday() +"<br>";
 		   text += Lang.getInstance().translate("Parent") +":&nbsp;"+ ((UnionCls)issue_Union.getItem()).getParent() +"<br>";

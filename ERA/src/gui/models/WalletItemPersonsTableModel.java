@@ -104,7 +104,7 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
 		
 		case COLUMN_NAME:
 			
-			return person.getName();
+			return person.viewName();
 		
 		case COLUMN_ADDRESS:
 			

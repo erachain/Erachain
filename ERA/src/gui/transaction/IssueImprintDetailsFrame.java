@@ -37,7 +37,7 @@ public class IssueImprintDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(imprintIssue.getItem().getName());
+		JTextField name = new JTextField(imprintIssue.getItem().viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

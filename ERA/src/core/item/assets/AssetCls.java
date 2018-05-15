@@ -101,6 +101,31 @@ public abstract class AssetCls extends ItemCls {
 
 		return this.name;
 	}
+		
+	@Override
+	public int getMinNameLen() {
+		
+		if (this.asset_type == 2)
+			return 4;
+		
+		return BlockChain.DEVELOP_USE?10:12;
+	}
+
+	@Override
+	public String viewName() {
+		
+		switch(this.asset_type)
+		{
+		case 1:
+			return "▼" + this.name;
+		case 2:
+			return "◄" + this.name; // ■ ± █
+		default:
+			return "▲" + this.name;			
+		}
+	}
+	
+	
 	@Override
 	public String getDescription() {
 		/*

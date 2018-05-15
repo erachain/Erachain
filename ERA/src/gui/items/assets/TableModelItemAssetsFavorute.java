@@ -104,7 +104,7 @@ public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> 
 
 		case COLUMN_NAME:
 
-			return asset.getName();
+			return asset.viewName();
 
 		case COLUMN_ADDRESS:
 

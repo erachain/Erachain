@@ -159,7 +159,7 @@ public abstract class ItemCls {
 		return this.name;
 	}
 	public String getShortName() {
-		String[] words = this.name.split(" ");
+		String[] words = this.viewName().split(" ");
 		String result = "";
 		for (String word: words) {
 			if (word.length() > 6) {
@@ -214,6 +214,10 @@ public abstract class ItemCls {
 	}
 	public void resetKey() {
 		this.key = 0;
+	}
+
+	public String viewName() {
+		return this.name;			
 	}
 
 	public static ItemCls getItem(DCSet db, int type, long key) {
@@ -353,7 +357,7 @@ public abstract class ItemCls {
 		long key = this.getKey(db);
 		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
 		return "[" + (key==0?"?:":key)
-				+ "] " + this.getName();
+				+ "] " + this.viewName();
 				//+ (creator.length()==0?"": " (" +creator + ")");
 	}
 
@@ -387,7 +391,7 @@ public abstract class ItemCls {
 	{
 		long key = this.getKey(db);
 		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
-		return (key<1?"? ":key + ": ") + this.name.substring(0, Math.min(this.name.length(), 30));
+		return (key<1?"? ":key + ": ") + this.viewName().substring(0, Math.min(this.viewName().length(), 30));
 		//+ (creator.length()==0?"": " (" +creator + ")");
 	}
 	public String getShort()

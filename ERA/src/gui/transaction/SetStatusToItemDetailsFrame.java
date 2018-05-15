@@ -50,7 +50,7 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 
 		////// STATUS
 		++detailGBC.gridy;
-		JTextField statusName = new JTextField(status.getName());
+		JTextField statusName = new JTextField(status.viewName());
 		statusName.setEditable(false);
 		MenuPopupUtil.installContextMenu(statusName);
 		this.add(statusName, detailGBC);		
@@ -169,7 +169,7 @@ public class SetStatusToItemDetailsFrame extends Rec_DetailsFrame
 		//NAME
 		++detailGBC.gridy;
 		JTextField itemName = new JTextField(item.getItemTypeStr() + " - " + item.getItemSubType()
-		+ ": " + item.getName());
+		+ ": " + item.viewName());
 		itemName.setEditable(false);
 		MenuPopupUtil.installContextMenu(itemName);
 		this.add(itemName, detailGBC);		

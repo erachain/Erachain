@@ -102,7 +102,7 @@ public class WalletItemStatusesTableModel extends TableModelCls<Tuple2<String, S
 		
 		case COLUMN_NAME:
 			
-			return status.getName();
+			return status.viewName();
 		
 		case COLUMN_ADDRESS:
 			

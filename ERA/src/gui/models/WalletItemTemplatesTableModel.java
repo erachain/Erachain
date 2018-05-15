@@ -76,7 +76,7 @@ public class WalletItemTemplatesTableModel extends TableModelCls<Tuple2<String, 
 		
 		case COLUMN_NAME:
 			
-			return template.getName();
+			return template.viewName();
 		
 		case COLUMN_ADDRESS:
 			

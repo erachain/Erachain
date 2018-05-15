@@ -6,7 +6,6 @@ import java.util.Observer;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 
-import utils.ObserverMessage;
 import controller.Controller;
 import core.item.ItemCls;
 import datachain.DCSet;
@@ -86,7 +85,7 @@ public abstract class WalletItem_TableModel extends TableModelCls<Tuple2<String,
 		
 		case COLUMN_NAME:
 			
-			return item.getName();
+			return item.viewName();
 		
 		case COLUMN_ADDRESS:
 			

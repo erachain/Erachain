@@ -35,7 +35,7 @@ public class WalletNameSalesTableModel extends TableModelCls<Tuple2<String, Stri
 		return this.nameSales;
 	}
 	
-	public NameSale getNameSale(int row)
+	public NameSale viewNameSale(int row)
 	{
 		Pair<Tuple2<String, String>, BigDecimal> data = this.nameSales.get(row);
 		return new NameSale(data.getA().b, data.getB());

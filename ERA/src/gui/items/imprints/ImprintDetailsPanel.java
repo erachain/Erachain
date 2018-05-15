@@ -72,7 +72,7 @@ public class ImprintDetailsPanel extends JPanel {
 		
 		//NAME
 		detailGBC.gridy = 2;
-		JTextField txtName = new JTextField(imprint.getName());
+		JTextField txtName = new JTextField(imprint.viewName());
 		txtName.setEditable(false);
 		this.add(txtName, detailGBC);		
 		

@@ -45,7 +45,7 @@ public class Account_Repay_Debt_Panel extends  Class_Account_Transaction_Panel
 	{
 		String a;
 		if (asset == null) a = "";
-		else a = asset.getName();
+		else a = asset.viewName();
 
 		jTextArea_Title.setText(Lang.getInstance().translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", a));
 

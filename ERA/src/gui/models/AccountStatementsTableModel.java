@@ -96,7 +96,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 			return this.template.getKey(DCSet.getInstance());
 		case COLUMN_TEMPLATE_NAME:
 			if (this.template == null) return "-";
-			return this.template.getName();
+			return this.template.viewName();
 		case COLUMN_TEXT:
 			if (this.template == null) return "-";
 			return "+";

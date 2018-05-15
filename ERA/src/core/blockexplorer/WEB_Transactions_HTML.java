@@ -507,7 +507,7 @@ public class WEB_Transactions_HTML {
 		IssueAssetTransaction tr = (IssueAssetTransaction) transaction;
 		String out = "";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?asset="
-				+ tr.getAssetKey() + get_Lang(langObj) + ">" + tr.getItem().getName() + "</a><br>";
+				+ tr.getAssetKey() + get_Lang(langObj) + ">" + tr.getItem().viewName() + "</a><br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
 				+ tr.getItem().getDescription() + "<br>";
 		out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "

@@ -141,7 +141,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
 	//			System.out.print("\n key:"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +" value:" + params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
 				
 				 jTextPane_Message_Public.pars.replace("{{"+ params_Template_Model.getValueAt(arg0.getFirstRow(),  0) +"}}",(String) params_Template_Model.getValueAt(arg0.getFirstRow(),  arg0.getColumn()));
-	//			 System.out.print("\n" + get_TemplateCls().getName() + "\n");
+	//			 System.out.print("\n" + get_TemplateCls().viewName() + "\n");
 	//				System.out.print(get_Params());
 				 jTextPane_Message_Public.setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
 				arg0=arg0;

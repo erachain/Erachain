@@ -34,9 +34,6 @@ public class AssetUnique extends AssetCls {
 	public String getItemSubType() { return "unique"; }
 
 	@Override
-	public int getMinNameLen() { return 12; }
-
-	@Override
 	public Long getQuantity() {
 		return 1L;
 	}

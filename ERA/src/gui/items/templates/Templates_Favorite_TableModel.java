@@ -103,7 +103,7 @@ public class Templates_Favorite_TableModel extends TableModelCls<Tuple2<String, 
 		
 		case COLUMN_NAME:
 			
-			return status.getName();
+			return status.viewName();
 		
 		case COLUMN_ADDRESS:
 			

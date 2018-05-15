@@ -40,7 +40,7 @@ public class IssueTemplateDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(templateIssue.getItem().getName());
+		JTextField name = new JTextField(templateIssue.getItem().viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

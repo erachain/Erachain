@@ -131,7 +131,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
 			
 		case COLUMN_NAME:
 			
-			return this.assets.get(row).getName();
+			return this.assets.get(row).viewName();
 			
 		case COLUMN_ORDERS_COUNT:
 			 

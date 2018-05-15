@@ -43,7 +43,7 @@ public class Status_Info extends MTextPane {
 		} else {
 			message = "" + status.getKey();
 		}
-		message = "<div><b>" + message + "</b> : " + status.getName().toString() + "</div>";
+		message = "<div><b>" + message + "</b> : " + status.viewName().toString() + "</div>";
 		
 		message += "<div>" + status.getDescription() + "</div>";
 		message += "<div>" + (status.isUnique()?"UNIQUE":"multi") + "</div>";

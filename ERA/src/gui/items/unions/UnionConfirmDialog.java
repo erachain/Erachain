@@ -191,7 +191,7 @@ public class UnionConfirmDialog extends JDialog  {
 	        info.setFocusable(false);
 	        jLabel_UnionInfo.setViewportView( info);
 	       // jLabel_UnionInfo.set
-	     //   jLabel_UnionInfo.setText(Lang.getInstance().translate("Public Keys of") + " " + union.getName() +":");
+	     //   jLabel_UnionInfo.setText(Lang.getInstance().translate("Public Keys of") + " " + union.viewName() +":");
 	   //     jLabel_UnionInfo.setText(new Union_Info().Get_HTML_Union_Info_001(union) );
 	        gridBagConstraints = new java.awt.GridBagConstraints();
 	        gridBagConstraints.gridx = 0;

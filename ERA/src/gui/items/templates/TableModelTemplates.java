@@ -84,7 +84,7 @@ public class TableModelTemplates extends TableModelItems {
 
 		case COLUMN_NAME:
 
-			return template.getName();
+			return template.viewName();
 
 		case COLUMN_ADDRESS:
 

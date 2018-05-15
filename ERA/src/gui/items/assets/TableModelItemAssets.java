@@ -122,7 +122,7 @@ public class TableModelItemAssets extends TableModelItems
 
 		case COLUMN_NAME:
 
-			return asset.getName();
+			return asset.viewName();
 
 		case COLUMN_ASSET_TYPE:
 

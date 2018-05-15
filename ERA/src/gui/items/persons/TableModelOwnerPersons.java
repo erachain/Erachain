@@ -110,7 +110,7 @@ public class TableModelOwnerPersons<U, T> extends AbstractTableModel implements 
 		
 		case COLUMN_NAME:
 			
-			return person.getName();
+			return person.viewName();
 		
 	//	case COLUMN_ADDRESS:
 			

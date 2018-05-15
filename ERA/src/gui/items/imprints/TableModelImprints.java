@@ -96,7 +96,7 @@ public class TableModelImprints extends TableModelCls<Long, ImprintCls> implemen
 		
 		case COLUMN_NAME:
 			
-			return imprint.getName();
+			return imprint.viewName();
 		
 		case COLUMN_ADDRESS:
 			

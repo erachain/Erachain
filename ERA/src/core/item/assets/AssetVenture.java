@@ -47,9 +47,6 @@ public class AssetVenture extends AssetCls {
 	public String getItemSubType() { return "venture"; }
 
 	@Override
-	public int getMinNameLen() { return BlockChain.DEVELOP_USE?10:12; }
-
-	@Override
 	public Long getQuantity() {
 		return this.quantity;
 	}

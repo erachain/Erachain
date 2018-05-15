@@ -245,7 +245,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 				+ Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
 		text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueDoc.getCreator() + "<br>";
 		// text += Lang.getInstance().translate("Name") +":&nbsp;"+
-		// issueDoc.getItem().getName() +"<br>";
+		// issueDoc.getItem().viewName() +"<br>";
 		// text += Lang.getInstance().translate("Quantity") +":&nbsp;"+
 		// ((AssetCls)issueAssetTransaction.getItem()).getQuantity().toString()+"<br>";
 		// text += Lang.getInstance().translate("Movable") +":&nbsp;"+

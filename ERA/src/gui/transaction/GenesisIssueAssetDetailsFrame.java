@@ -40,7 +40,7 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame
 
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(asset.getName());
+		JTextField name = new JTextField(asset.viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);

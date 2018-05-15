@@ -49,7 +49,7 @@ public class IssueAssetDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(assetIssue.getItem().getName());
+		JTextField name = new JTextField(assetIssue.getItem().viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

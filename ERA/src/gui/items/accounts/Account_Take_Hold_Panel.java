@@ -50,7 +50,7 @@ public class Account_Take_Hold_Panel extends  Class_Account_Transaction_Panel
 		String a;
 		th = this;
 		if (asset == null) a = "";
-		else a = asset.getName();
+		else a = asset.viewName();
 
 		jTextArea_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
 

@@ -32,7 +32,7 @@ public class BalanceRenderer implements ListCellRenderer<Pair<Tuple2<String, Lon
 		if(value != null)
 		{
 			AssetCls asset = Controller.getInstance().getAsset(value.getA().b);		
-			renderer.setText("(" + asset.getKey() + ") " + asset.getName() + " - " + NumberAsString.formatAsString(value.getB().a.b, asset.getScale()));
+			renderer.setText("(" + asset.getKey() + ") " + asset.viewName() + " - " + NumberAsString.formatAsString(value.getB().a.b, asset.getScale()));
 		}
 		
 		return renderer;

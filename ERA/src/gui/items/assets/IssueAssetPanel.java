@@ -399,7 +399,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 			String text = "<HTML><body>";
 			text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Asset") + "<br><br><br>";
 			text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueAssetTransaction.getCreator() +"<br>";
-			text += "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") +":&nbsp;"+ asset.getName() +"<br>";
+			text += "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") +":&nbsp;"+ asset.viewName() +"<br>";
 			text += Lang.getInstance().translate("Quantity") +":&nbsp;"+ asset.getQuantity().toString()+"<br>";
 		//	text += Lang.getInstance().translate("Movable") +":&nbsp;"+ Lang.getInstance().translate(((AssetCls)issueAssetTransaction.getItem()).isMovable()+"")+ "<br>";
 			text += Lang.getInstance().translate("Asset Type") +":&nbsp;"+ Lang.getInstance().translate(asset.viewAssetType()+"")+ "<br>";

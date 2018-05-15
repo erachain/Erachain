@@ -130,7 +130,7 @@ public class Balance_from_Assets extends AbstractTableModel implements Observer
 		
 		case COLUMN_ASSET_NAME:
 			
-			return asset.getName(); 
+			return asset.viewName(); 
 			
 		case COLUMN_ACCOUNT:
 			return table_balance.get(row).getA().getAddress();

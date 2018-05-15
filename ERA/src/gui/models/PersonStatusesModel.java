@@ -213,7 +213,7 @@ public Account get_Creator_Account(int row){
 			block = value.b.d;
 			recNo = value.b.e;
 			record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
-			return record==null?"":((Account)record.getCreator()).getPerson().b.getName();
+			return record==null?"":((Account)record.getCreator()).getPerson().b.viewName();
 
 		
 

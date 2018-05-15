@@ -170,7 +170,7 @@ public class Balance_from_Adress_TableModel extends AbstractTableModel implement
 
 		case COLUMN_ASSET_NAME:
 
-			return asset.getName();
+			return asset.viewName();
 
 		}
 

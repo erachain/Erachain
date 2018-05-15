@@ -347,7 +347,7 @@ public class AssetPairSelect extends JDialog{
 					if(row < assetPairSelectTableModel.assets.size())
 					{
 						// Container ss = getParent();
-						//if (getParent().getClass().getName() == "11")
+						//if (getParent().getClass().viewName() == "11")
 					/*	new ExchangeFrame(
 								(AssetCls)Controller.getInstance().getItem(ItemCls.ASSET_TYPE, assetPairSelectTableModel.key), 
 								(AssetCls) assetPairSelectTableModel.assets.get(row), action, account);

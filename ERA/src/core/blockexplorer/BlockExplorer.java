@@ -886,7 +886,7 @@ public class BlockExplorer {
 		Collection<ItemCls> items = Controller.getInstance().getAllItems(ItemCls.ASSET_TYPE);
 
 		for (ItemCls item : items) {
-			output.put(item.getKey(), item.getName());
+			output.put(item.getKey(), item.viewName());
 		}
 
 		return output;
@@ -1404,7 +1404,7 @@ public class BlockExplorer {
 				.getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
-			if (issueAssetTransaction.getItem().getName().equals(asset.getName())) {
+			if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
 				assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
 				assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
 				break;

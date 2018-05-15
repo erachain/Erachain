@@ -49,7 +49,7 @@ public class Person_Info extends JTextPane {
 			message = "" + person.getKey();
 		}
 	
-		message = "<b>" + message + "</b> : " + person.getName();
+		message = "<b>" + message + "</b> : " + person.viewName();
 		//date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
 		date_birthday =  person.getBirthdayStr();
 		message += " (" + date_birthday;

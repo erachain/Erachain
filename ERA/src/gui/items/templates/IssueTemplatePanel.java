@@ -257,7 +257,7 @@ public class IssueTemplatePanel extends JPanel
 		String text = "<HTML><body>";
 		text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"  + Lang.getInstance().translate("Issue Template") + "<br><br><br>";
 	    text += Lang.getInstance().translate("Creator") +":&nbsp;"  + issueTemplate.getCreator() +"<br>";
-	    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueTemplate.getItem().getName() +"<br>";
+	    text += Lang.getInstance().translate("Title") +":&nbsp;"+ issueTemplate.getItem().viewName() +"<br>";
 	    text += Lang.getInstance().translate("Description")+":<br>"+ library.to_HTML(issueTemplate.getItem().getDescription())+"<br>";
 	    String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ issueTemplate.viewSize(false)+" Bytes, ";
 	    Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ issueTemplate.getFee().toString()+" COMPU</b><br></body></HTML>";

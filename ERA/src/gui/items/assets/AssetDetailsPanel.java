@@ -92,7 +92,7 @@ public class AssetDetailsPanel extends JPanel {
 
 		//NAME
 		detailGBC.gridy = gridy;
-		JTextField txtName = new JTextField(asset.getName());
+		JTextField txtName = new JTextField(asset.viewName());
 		txtName.setEditable(false);
 		this.add(txtName, detailGBC);
 

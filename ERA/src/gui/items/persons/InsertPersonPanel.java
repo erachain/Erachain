@@ -251,7 +251,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 					return;
 				}
 
-				txtName.setText(person.getName());
+				txtName.setText(person.viewName());
 				// jLabel2.setText("jLabel2");
 				ImageIcon image = new ImageIcon(person.getImage());
 				// if (image.le)

@@ -100,7 +100,7 @@ public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, Str
 
 			case COLUMN_NAME:
 
-				return asset.getName();
+				return asset.viewName();
 
 			case COLUMN_ADDRESS:
 

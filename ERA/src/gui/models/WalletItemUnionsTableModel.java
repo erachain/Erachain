@@ -97,7 +97,7 @@ public class WalletItemUnionsTableModel extends TableModelCls<Tuple2<String, Str
 		
 		case COLUMN_NAME:
 			
-			return union.getName();
+			return union.viewName();
 		
 		case COLUMN_ADDRESS:
 			

@@ -38,7 +38,7 @@ public class IssueUnionDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(unionIssue.getItem().getName());
+		JTextField name = new JTextField(unionIssue.getItem().viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

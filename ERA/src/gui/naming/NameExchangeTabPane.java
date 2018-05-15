@@ -59,7 +59,7 @@ public class NameExchangeTabPane extends JTabbedPane{
 				int row = walletNameSalesTable.getSelectedRow();
 				row = walletNameSalesTable.convertRowIndexToModel(row);
 									
-				NameSale nameSale = walletNameSalesTableModel.getNameSale(row);
+				NameSale nameSale = walletNameSalesTableModel.viewNameSale(row);
 				new CancelSellNameFrame(nameSale);
 			}
 		});
@@ -78,7 +78,7 @@ public class NameExchangeTabPane extends JTabbedPane{
 				if(e.getClickCount() == 2)
 				{
 					row = walletNameSalesTable.convertRowIndexToModel(row);
-					NameSale nameSale = walletNameSalesTableModel.getNameSale(row);
+					NameSale nameSale = walletNameSalesTableModel.viewNameSale(row);
 					new CancelSellNameFrame(nameSale);
 				}
 		     }

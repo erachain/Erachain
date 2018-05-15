@@ -287,7 +287,7 @@ public class PersonConfirmDialog extends JDialog {
 		jLabel_PersonInfo.setViewportView(info);
 		// jLabel_PersonInfo.set
 		// jLabel_PersonInfo.setText(Lang.getInstance().translate("Public Keys
-		// of") + " " + person.getName() +":");
+		// of") + " " + person.viewName() +":");
 		// jLabel_PersonInfo.setText(new
 		// Person_Info().Get_HTML_Person_Info_001(person) );
 		gridBagConstraints = new java.awt.GridBagConstraints();

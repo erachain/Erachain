@@ -24,7 +24,7 @@ public class Info_Templates extends javax.swing.JPanel {
 		this.template = template;
 		initComponents();
 
-		jTextField_Title.setText(template.getName());
+		jTextField_Title.setText(template.viewName());
 		jTextArea_Content.setText(template.getDescription());
 
 	}

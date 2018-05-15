@@ -99,7 +99,7 @@ public class TableModelItemStatuses extends TableModelItems
 		
 		case COLUMN_NAME:
 			
-			return status.getName();
+			return status.viewName();
 		
 		case COLUMN_ADDRESS:
 			

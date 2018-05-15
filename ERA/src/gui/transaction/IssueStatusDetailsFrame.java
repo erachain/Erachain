@@ -37,7 +37,7 @@ public class IssueStatusDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(statusIssue.getItem().getName());
+		JTextField name = new JTextField(statusIssue.getItem().viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

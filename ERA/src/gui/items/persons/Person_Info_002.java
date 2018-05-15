@@ -129,7 +129,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	        javax.swing.JTextField  jTextField1N;
  	        jTextField1N = new JTextField ();
 	        jTextField1N.setEditable(false);
-	        jTextField1N.setText(person.getName());
+	        jTextField1N.setText(person.viewName());
 			MenuPopupUtil.installContextMenu(jTextField1N);
 			jTextField1N.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -256,7 +256,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 	//	add(jLabel_Name, gridBagConstraints);
 
 		jTextField_Name.setEditable(false);
-		jTextField_Name.setText(person.getName());
+		jTextField_Name.setText(person.viewName());
 		MenuPopupUtil.installContextMenu(jTextField_Name);
 		jTextField_Name.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {

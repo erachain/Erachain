@@ -72,7 +72,7 @@ public class UnionDetailsPanel extends JPanel {
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField txtName = new JTextField(union.getName());
+		JTextField txtName = new JTextField(union.viewName());
 		txtName.setEditable(false);
 		this.add(txtName, detailGBC);		
 		

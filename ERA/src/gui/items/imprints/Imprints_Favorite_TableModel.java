@@ -97,7 +97,7 @@ public class Imprints_Favorite_TableModel extends TableModelCls<Tuple2<String, S
 		
 		case COLUMN_NAME:
 			
-			return person.getName();
+			return person.viewName();
 		
 		case COLUMN_ADDRESS:
 			

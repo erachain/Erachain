@@ -47,7 +47,7 @@ public class Account_Confiscate_Debt_Panel extends  Class_Account_Transaction_Pa
 	{
 		String a;
 		if (asset == null) a = "";
-		else a = asset.getName();
+		else a = asset.viewName();
 
 		sendButton.setText(Lang.getInstance().translate("Confiscate Debt"));
 		jTextArea_Title.setText(Lang.getInstance().translate("If You want to confiscate in debt issued asset %asset%, fill in this form").replace("%asset%", a));

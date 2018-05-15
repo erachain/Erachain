@@ -52,7 +52,7 @@ public class TableModelUnions extends TableModelItems
 		
 		case COLUMN_NAME:
 			
-			return union.getName();
+			return union.viewName();
 		
 		case COLUMN_ADDRESS:
 			

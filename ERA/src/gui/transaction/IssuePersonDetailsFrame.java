@@ -24,7 +24,7 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame
 		
 		//NAME
 		++detailGBC.gridy;
-		JTextField name = new JTextField(personIssue.getItem().getName());
+		JTextField name = new JTextField(personIssue.getItem().viewName());
 		name.setEditable(false);
 		MenuPopupUtil.installContextMenu(name);
 		this.add(name, detailGBC);		

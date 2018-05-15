@@ -573,7 +573,7 @@ public class Mail_Send_Panel extends JPanel
 		}
 
 		if (txtTo.getText().equals("has no Addresses")){
-			txtRecDetails.setText(person.getName() + " " + Lang.getInstance().translate("has no Accounts"));
+			txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
 			return;
 		}
 
