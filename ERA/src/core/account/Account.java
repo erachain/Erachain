@@ -888,5 +888,8 @@ public class Account {
 		return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(this.getAddress());
 
 	}
+	public int getAccountNo(){
+		return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(this.address);
+	}
 
 }
