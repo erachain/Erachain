@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.mapdb.DB;
 
+import core.BlockChain;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
@@ -50,7 +51,7 @@ public class ItemAssetMap extends Item_Map
 	}
 
 	public boolean contains(Long key) {
-		if (key > 100 && key < 1000) {
+		if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
 			return true;
 		} else {
 			return super.contains(key);
@@ -59,11 +60,23 @@ public class ItemAssetMap extends Item_Map
 
 	public AssetCls get(Long key) {
 		
-		if (key > 100 && key < 1000) {
+		if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
 			AssetCls item;
 			switch (key.intValue()) {
 				case 643:
 					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("RUB"),
+							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
+					break;
+				case 840:
+					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("USD"),
+							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
+					break;
+				case 978:
+					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("EUR"),
+							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
+					break;
+				case 959:
+					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("XAU"),
 							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
 					break;
 				default:
