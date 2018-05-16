@@ -85,9 +85,7 @@ public class Account_Send_Panel extends JPanel {
 		this.person = person;
 		sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
 		y = 0;
-		if (asset == null) {
-			asset = Controller.getInstance().getAsset(1l);
-		}
+		
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[] { 0, 112, 140, 0, 0 };
 		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -108,6 +106,10 @@ public class Account_Send_Panel extends JPanel {
 		favoritesGBC.gridx = 0;
 		favoritesGBC.gridy = y;
 
+		if (asset == null) {
+			asset = Controller.getInstance().getAsset(2l);
+		}
+
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		// this.add(cbxFavorites, favoritesGBC);
 		/// if (asset != null) cbxFavorites.setSelectedItem(asset);
@@ -119,12 +121,12 @@ public class Account_Send_Panel extends JPanel {
 				if (item.getKey() == asset.getKey()) {
 					// not worked cbxFavorites.setSelectedItem(asset);
 					cbxFavorites.setSelectedIndex(i);
-					cbxFavorites.setEnabled(false);// .setEditable(false);
+					cbxFavorites.setEnabled(true);// .setEditable(false);
 					break;
-				} else {
-					cbxFavorites.setEnabled(true);
 				}
 			}
+		} else {
+			cbxFavorites.setEnabled(true);
 		}
 
 		this.accountsModel = new AccountsComboBoxModel();

@@ -74,7 +74,6 @@ public class Mail_Send_Panel extends JPanel {
 	private JCheckBox isText;
 	private MButton sendButton;
 	private AccountsComboBoxModel accountsModel;
-	private JComboBox<AssetCls> cbxFavorites;
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	public JTextField txt_Title;
@@ -112,11 +111,6 @@ public class Mail_Send_Panel extends JPanel {
 
 		txtRecDetails = new JTextField();
 
-		// cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
-
-		// this.add(cbxFavorites, favoritesGBC);
-		// if (asset != null) cbxFavorites.setSelectedItem(asset);
-
 		this.accountsModel = new AccountsComboBoxModel();
 
 		// LABEL FROM
@@ -147,23 +141,6 @@ public class Mail_Send_Panel extends JPanel {
 		this.add(this.cbxFrom, cbxFromGBC);
 		if (account != null)
 			cbxFrom.setSelectedItem(account);
-
-		// ON FAVORITES CHANGE
-
-		cbxFavorites.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
-
-				if (asset != null) {
-					((AccountRenderer) cbxFrom.getRenderer()).setAsset(asset.getKey());
-					cbxFrom.repaint();
-					refreshReceiverDetails();
-				}
-
-			}
-		});
 
 		// LABEL TO
 		GridBagConstraints labelToGBC = new GridBagConstraints();
@@ -536,7 +513,8 @@ public class Mail_Send_Panel extends JPanel {
 
 	private void refreshReceiverDetails() {
 		String toValue = txtTo.getText();
-		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
+
+		AssetCls asset = Controller.getInstance().getAsset(Transaction.FEE_KEY);
 
 		if (toValue.isEmpty()) {
 			txtRecDetails.setText("");
@@ -707,11 +685,6 @@ public class Mail_Send_Panel extends JPanel {
 
 		AssetCls asset;
 		long key = 0l;
-		if (amount != null) {
-			// CHECK IF PAYMENT OR ASSET TRANSFER
-			asset = (AssetCls) this.cbxFavorites.getSelectedItem();
-			key = asset.getKey();
-		}
 
 		Integer result;
 
