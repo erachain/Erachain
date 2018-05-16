@@ -117,8 +117,9 @@ public abstract class AssetCls extends ItemCls {
 	public String viewName() {
 		
 		if (this.key < 5) {
-			return "®" + this.name;
+			return "" + this.name; // ®
 		}
+		
 		switch(this.asset_type)
 		{
 		case 1:

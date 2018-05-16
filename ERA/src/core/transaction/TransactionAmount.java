@@ -424,10 +424,10 @@ public abstract class TransactionAmount extends Transaction {
 			// CHECK IF AMOUNT IS DIVISIBLE
 			int amount_sign = this.amount.signum();
 
-			// BACKWARD - CONFISCATE
-			boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-
 			if (amount_sign != 0) {
+
+				// BACKWARD - CONFISCATE
+				boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
 				int actionType = Account.actionType(key, amount);
 
@@ -469,22 +469,32 @@ public abstract class TransactionAmount extends Transaction {
 						 * (-CREDIT)) = max amount that can be used for new
 						 * credit return NO_BALANCE; }
 						 */
-					} else if (!asset.isAccounting()) {
-						// CREDIT - GIVE CREDIT
-						// OR RETURN CREDIT
-						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-								this.recipient.getAddress(), absKey, this.creator.getAddress());
-						// TRY RETURN
-						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-						if (creditAmount.compareTo(amount) < 0) {
-							BigDecimal leftAmount = amount.subtract(creditAmount);
-							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
-																									// balance
-							// NOT ENOUGHT DEBT from recipient to creator
+					} else {
+						// CREDIT - GIVE CREDIT OR RETURN CREDIT
+
+						if (asset.isAccounting()) {
+							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b;
 							// TRY CREDITN OWN
-							if (balanceOwn.compareTo(leftAmount) < 0) {
-								// NOT ENOUGHT DEBT from recipient to creator
+							if (balanceOwn.compareTo(amount) < 0) {
 								return NO_BALANCE;
+							}
+
+						} else {
+							Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+									this.recipient.getAddress(), absKey, this.creator.getAddress());
+							// TRY RETURN
+							BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+							if (creditAmount.compareTo(amount) < 0) {
+								BigDecimal leftAmount = amount.subtract(creditAmount);
+								BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
+																										// balance
+								// NOT ENOUGHT DEBT from recipient to creator
+								// TRY CREDITN OWN
+								if (balanceOwn.compareTo(leftAmount) < 0) {
+									// NOT ENOUGHT DEBT from recipient to
+									// creator
+									return NO_BALANCE;
+								}
 							}
 						}
 					}
@@ -618,8 +628,7 @@ public abstract class TransactionAmount extends Transaction {
 
 				// IF send from PERSON to ANONIMOUSE
 				// TODO: PERSON RULE 1
-				if (!asset.isAccounting() && BlockChain.PERSON_SEND_PROTECT
-						&& actionType != 2 && actionType != 3
+				if (!asset.isAccounting() && BlockChain.PERSON_SEND_PROTECT && actionType != 2 && actionType != 3
 						&& isPerson && absKey != FEE_KEY) {
 					HashSet<Account> recipients = this.getRecipientAccounts();
 					for (Account recipient : recipients) {
