@@ -434,12 +434,14 @@ public abstract class TransactionAmount extends Transaction {
 				switch (actionType) {
 				case 3: // HOLD GOODS
 
-					if (!asset.isMovable()) {
-						return NOT_MOVABLE_ASSET;
-					}
-					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
-					if (amount.compareTo(balance1) > 0) {
-						return NO_HOLD_BALANCE;
+					if (!asset.isAccounting()) {
+						if (!asset.isMovable()) {
+							return NOT_MOVABLE_ASSET;
+						}
+						BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
+						if (amount.compareTo(balance1) > 0) {
+							return NO_HOLD_BALANCE;
+						}
 					}
 
 					break;
@@ -472,14 +474,7 @@ public abstract class TransactionAmount extends Transaction {
 					} else {
 						// CREDIT - GIVE CREDIT OR RETURN CREDIT
 
-						if (asset.isAccounting()) {
-							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b;
-							// TRY CREDITN OWN
-							if (balanceOwn.compareTo(amount) < 0) {
-								return NO_BALANCE;
-							}
-
-						} else {
+						if (!asset.isAccounting()) {
 							Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
 									this.recipient.getAddress(), absKey, this.creator.getAddress());
 							// TRY RETURN
@@ -615,7 +610,7 @@ public abstract class TransactionAmount extends Transaction {
 						return NOT_ENOUGH_FEE;
 					}
 
-					balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
 					if (amount.compareTo(balance1) > 0) {
 						return NO_BALANCE;
 					}
