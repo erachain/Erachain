@@ -106,7 +106,9 @@ public abstract class AssetCls extends ItemCls {
 	public int getMinNameLen() {
 		
 		if (this.asset_type == 2)
-			return 4;
+			return 6;
+		if (this.asset_type == 3)
+			return 6;
 		
 		return BlockChain.DEVELOP_USE?10:12;
 	}

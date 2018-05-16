@@ -198,8 +198,8 @@ public class OnDealClick
 		case Transaction.INVALID_QUANTITY:
 			mess = "Invalid quantity";
 			break;
-		case Transaction.ACCOUNTING_ASSET:
-			mess = "It is Accounting Asset";
+		case Transaction.INVALID_ACCOUNTING_PAIR:
+			mess = "Invalid Accounting Pair";
 			break;
 		case Transaction.INVALID_RETURN:
 			mess = "Invalid return";
@@ -282,7 +282,10 @@ public class OnDealClick
 		case Transaction.INVALID_CREATOR:
 			mess = "Invalid creator";
 			break;
-			
+		case Transaction.INVALID_TRANSFER_TYPE:
+			mess = "Invalid transfer type";
+			break;
+						
 		case Transaction.ITEM_ASSET_NOT_EXIST:
 			mess = "Item asset does not exist";
 			break;
