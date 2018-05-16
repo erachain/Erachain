@@ -47,9 +47,7 @@ public class FavoriteItemAsset extends FavoriteItem {
 		this.setChanged();
 		this.notifyObservers(new ObserverMessage(ObserverMessage.DELETE_ASSET_FAVORITES_TYPE, key));
 	}
-	
-	
-	
+		
 	@Override
 	public void addObserver(Observer o) 
 	{
