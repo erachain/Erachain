@@ -10,9 +10,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.DefaultComboBoxModel;
 
-import utils.ObserverMessage;
 import controller.Controller;
 import core.item.assets.AssetCls;
+import utils.ObserverMessage;
 
 @SuppressWarnings("serial")
 public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implements Observer {
@@ -59,13 +59,15 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
 		{
 			//GET SELECTED ITEM
 			AssetCls selected = (AssetCls) this.getSelectedItem();
+			int selectedIndex = -1;
 						
 			//EMPTY LIST
 			this.removeAllElements();
 				
-			//INSERT ALL ACCOUNTS
+			//INSERT ALL ITEMS
 			Set<Long> keys = (Set<Long>) message.getValue();
 			List<AssetCls> assets = new ArrayList<AssetCls>();
+			int i = 0;
 			for(Long key: keys)
 			{				
 				if(key==0) continue;
@@ -77,6 +79,13 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
 				//ADD
 				
 				this.addElement(asset);
+
+				if (selected != null && asset.getKey() == selected.getKey()) {
+					selectedIndex = i;
+					selected = asset; // need for SELECT as OBJECT
+				}
+
+				i++;
 			}
 				
 			//RESET SELECTED ITEM
