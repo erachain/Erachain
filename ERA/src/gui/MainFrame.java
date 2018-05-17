@@ -357,13 +357,13 @@ public class MainFrame extends JFrame implements Observer {
 			Iterator<?> it = aa.values().iterator();
 			TreeSet s1 = new TreeSet();
 			while (it.hasNext()) {
-				long d2 = (long) it.next();
+				long d2 = Long.parseLong(it.next().toString());
 				s1.add(d2);
 
 			}
 			Iterator<?> s1_It = s1.iterator();
 			while (s1_It.hasNext()) {
-				long sa = (long) s1_It.next();
+				long sa = Long.parseLong(s1_It.next().toString());
 				mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
 
 			}
