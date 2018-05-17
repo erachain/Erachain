@@ -424,7 +424,7 @@ public abstract class TransactionAmount extends Transaction {
 			// CHECK IF AMOUNT IS DIVISIBLE
 			int amount_sign = this.amount.signum();
 
-			if (amount_sign != 0) {
+			if (!asset.isAccounting() && amount_sign != 0) {
 
 				// BACKWARD - CONFISCATE
 				boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
@@ -434,14 +434,12 @@ public abstract class TransactionAmount extends Transaction {
 				switch (actionType) {
 				case 3: // HOLD GOODS
 
-					if (!asset.isAccounting()) {
-						if (!asset.isMovable()) {
-							return NOT_MOVABLE_ASSET;
-						}
-						BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
-						if (amount.compareTo(balance1) > 0) {
-							return NO_HOLD_BALANCE;
-						}
+					if (!asset.isMovable()) {
+						return NOT_MOVABLE_ASSET;
+					}
+					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
+					if (amount.compareTo(balance1) > 0) {
+						return NO_HOLD_BALANCE;
 					}
 
 					break;
@@ -474,22 +472,20 @@ public abstract class TransactionAmount extends Transaction {
 					} else {
 						// CREDIT - GIVE CREDIT OR RETURN CREDIT
 
-						if (!asset.isAccounting()) {
-							Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
-									this.recipient.getAddress(), absKey, this.creator.getAddress());
-							// TRY RETURN
-							BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
-							if (creditAmount.compareTo(amount) < 0) {
-								BigDecimal leftAmount = amount.subtract(creditAmount);
-								BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
-																										// balance
-								// NOT ENOUGHT DEBT from recipient to creator
-								// TRY CREDITN OWN
-								if (balanceOwn.compareTo(leftAmount) < 0) {
-									// NOT ENOUGHT DEBT from recipient to
-									// creator
-									return NO_BALANCE;
-								}
+						Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
+								this.recipient.getAddress(), absKey, this.creator.getAddress());
+						// TRY RETURN
+						BigDecimal creditAmount = dcSet.getCredit_AddressesMap().get(creditKey);
+						if (creditAmount.compareTo(amount) < 0) {
+							BigDecimal leftAmount = amount.subtract(creditAmount);
+							BigDecimal balanceOwn = this.creator.getBalance(dcSet, absKey, 1).b; // OWN
+																									// balance
+							// NOT ENOUGHT DEBT from recipient to creator
+							// TRY CREDITN OWN
+							if (balanceOwn.compareTo(leftAmount) < 0) {
+								// NOT ENOUGHT DEBT from recipient to
+								// creator
+								return NO_BALANCE;
 							}
 						}
 					}
@@ -524,81 +520,76 @@ public abstract class TransactionAmount extends Transaction {
 
 					}
 
-					if (!asset.isAccounting()) {
-						// if asset is not ACCOUNTONG - check BALANCES
+					// if asset is unlimited and me is creator of this asset
+					boolean unLimited = absKey > AssetCls.REAL_KEY // not
+																	// genesis
+																	// assets!
+							&& asset.getQuantity().equals(0l)
+							&& asset.getOwner().getAddress().equals(this.creator.getAddress());
 
-						// if asset is unlimited and me is creator of this asset
-						boolean unLimited = absKey > AssetCls.REAL_KEY // not
-																		// genesis
-																		// assets!
-								&& asset.getQuantity().equals(0l)
-								&& asset.getOwner().getAddress().equals(this.creator.getAddress());
+					// CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+					if (unLimited) {
+						// not make RETURN - check validate next
+						//
+					} else if (absKey == FEE_KEY) {
+						if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.amount.add(this.fee)) < 0) {
+							if (height > 120000 || BlockChain.DEVELOP_USE)
+								return NO_BALANCE;
 
-						// CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-						if (unLimited) {
-							// not make RETURN - check validate next
-							//
-						} else if (absKey == FEE_KEY) {
-							if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.amount.add(this.fee)) < 0) {
-								if (height > 120000 || BlockChain.DEVELOP_USE)
-									return NO_BALANCE;
-
-								wrong = true;
-								for (byte[] valid_item : BlockChain.VALID_BAL) {
-									if (Arrays.equals(this.signature, valid_item)) {
-										wrong = false;
-										break;
-									}
+							wrong = true;
+							for (byte[] valid_item : BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
 								}
-
-								if (wrong)
-									return NO_BALANCE;
 							}
 
-						} else {
-							if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
-								if (height > 41100 || BlockChain.DEVELOP_USE)
-									return NOT_ENOUGH_FEE;
+							if (wrong)
+								return NO_BALANCE;
+						}
 
-								// TODO: delete wrong check in new CHAIN
-								// SOME PAYMENTs is WRONG
-								wrong = true;
-								for (byte[] valid_item : BlockChain.VALID_BAL) {
-									if (Arrays.equals(this.signature, valid_item)) {
-										wrong = false;
-										break;
-									}
+					} else {
+						if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
+							if (height > 41100 || BlockChain.DEVELOP_USE)
+								return NOT_ENOUGH_FEE;
+
+							// TODO: delete wrong check in new CHAIN
+							// SOME PAYMENTs is WRONG
+							wrong = true;
+							for (byte[] valid_item : BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
 								}
-
-								if (wrong)
-									return NOT_ENOUGH_FEE;
 							}
-							BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 
-							if (amount.compareTo(forSale) > 0) {
-								if (height > 120000 || BlockChain.DEVELOP_USE)
-									return NO_BALANCE;
+							if (wrong)
+								return NOT_ENOUGH_FEE;
+						}
+						BigDecimal forSale = this.creator.getForSale(dcSet, absKey, height);
 
-								// TODO: delete wrong check in new CHAIN
-								// SOME PAYMENTs is WRONG
-								wrong = true;
-								for (byte[] valid_item : BlockChain.VALID_BAL) {
-									if (Arrays.equals(this.signature, valid_item)) {
-										wrong = false;
-										break;
-									}
+						if (amount.compareTo(forSale) > 0) {
+							if (height > 120000 || BlockChain.DEVELOP_USE)
+								return NO_BALANCE;
+
+							// TODO: delete wrong check in new CHAIN
+							// SOME PAYMENTs is WRONG
+							wrong = true;
+							for (byte[] valid_item : BlockChain.VALID_BAL) {
+								if (Arrays.equals(this.signature, valid_item)) {
+									wrong = false;
+									break;
 								}
-
-								if (wrong)
-									return NO_BALANCE;
 							}
 
-							if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
-								String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
-								if (unlock != null && !this.recipient.equals(unlock))
-									return INVALID_CREATOR;
-							}
+							if (wrong)
+								return NO_BALANCE;
+						}
 
+						if (!BlockChain.DEVELOP_USE && height > BlockChain.FREEZE_FROM) {
+							String unlock = BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress());
+							if (unlock != null && !this.recipient.equals(unlock))
+								return INVALID_CREATOR;
 						}
 					}
 
@@ -610,7 +601,7 @@ public abstract class TransactionAmount extends Transaction {
 						return NOT_ENOUGH_FEE;
 					}
 
-					BigDecimal balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
+					balance1 = this.creator.getBalance(dcSet, absKey, actionType).b;
 					if (amount.compareTo(balance1) > 0) {
 						return NO_BALANCE;
 					}
