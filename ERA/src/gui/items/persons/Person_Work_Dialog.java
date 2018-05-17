@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 
 import org.mapdb.Fun.Tuple3;
 
-import controller.Controller;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
@@ -107,7 +105,7 @@ public class Person_Work_Dialog extends JDialog {
   				if (addresses.isEmpty()) {
   					
   				} else {
-  					new Account_Send_Dialog(null,null,null, person).show();;				
+  					new Account_Send_Dialog(null,null,null, person).show();			
   				}
   				dispose();	
     		}});
