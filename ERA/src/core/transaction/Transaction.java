@@ -952,7 +952,7 @@ public abstract class Transaction {
 			boolean wrong = true;
 			for (byte[] item: DISCREDIR_ADDRESSES) {
 				if (Arrays.equals(this.creator.getPublicKey(), item)
-						&& height < 120000) {
+						&& height < 200000) {
 					byte[] digest = Crypto.getInstance().digest(data);
 					digest = Bytes.concat(digest, digest);
 					if (Arrays.equals(this.signature, digest)) {
