@@ -107,7 +107,21 @@ public class Send_Panel extends JPanel
 
 		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 		this.add(cbxFavorites, favoritesGBC);
-		if (asset != null) cbxFavorites.setSelectedItem(asset);
+		////if (asset != null) cbxFavorites.setSelectedItem(asset);
+		if (asset != null) {
+			for (int i = 0; i < cbxFavorites.getItemCount(); i++) {
+				AssetCls item = cbxFavorites.getItemAt(i);
+				if (item.getKey() == asset.getKey()) {
+					// not worked cbxFavorites.setSelectedItem(asset);
+					cbxFavorites.setSelectedIndex(i);
+					cbxFavorites.setEnabled(false);// .setEditable(false);
+					break;
+				} else {
+					cbxFavorites.setEnabled(true);
+				}
+			}
+		}
+
 
 		this.accountsModel = new AccountsComboBoxModel();
 

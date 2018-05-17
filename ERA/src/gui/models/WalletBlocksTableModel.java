@@ -105,8 +105,10 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
 			}
 
 			Block block = data.getB();
-			if (block == null)
+			if (block == null) {
+				this.fireTableDataChanged();
 				return null;
+			}
 			
 			if (block.getWinValue() == 0l) {
 				block.getHeight(DCSet.getInstance());

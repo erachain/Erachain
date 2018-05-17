@@ -46,7 +46,6 @@ import gui.AccountRenderer;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.items.accounts.Accounts_ComboBox_Model;
-import gui.items.assets.AssetsComboBoxModel;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MButton;
 import gui.models.AccountsComboBoxModel;
@@ -59,9 +58,8 @@ import utils.MenuPopupUtil;
 
 @SuppressWarnings("serial")
 
-public class Mail_Send_Panel extends JPanel
-{
-	//private final MessagesTableModel messagesTableModel;
+public class Mail_Send_Panel extends JPanel {
+	// private final MessagesTableModel messagesTableModel;
 	private final JTable table;
 	// TODO - "A" - &
 	final static String wrongFirstCharOfAddress = "A";
@@ -76,7 +74,6 @@ public class Mail_Send_Panel extends JPanel
 	private JCheckBox isText;
 	private MButton sendButton;
 	private AccountsComboBoxModel accountsModel;
-	private JComboBox<AssetCls> cbxFavorites;
 	private JTextField txtRecDetails;
 	private JLabel messageLabel;
 	public JTextField txt_Title;
@@ -84,31 +81,29 @@ public class Mail_Send_Panel extends JPanel
 	PersonCls person;
 	private Mail_Send_Panel th;
 
-	public Mail_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person)
-	{
+	public Mail_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
 
 		th = this;
-		this.person =person;
-		sendButton = new MButton(Lang.getInstance().translate("Send"),2);
-		y=0;
+		this.person = person;
+		sendButton = new MButton(Lang.getInstance().translate("Send"), 2);
+		y = 0;
 		this.setName(Lang.getInstance().translate("Send Mail"));
-		if (asset == null)
-		{
+		if (asset == null) {
 			asset = Controller.getInstance().getAsset(1l);
 		}
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		//	gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
-		//	gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
+		// gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
+		// gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0};
 		this.setLayout(gridBagLayout);
 
-		//PADDING
+		// PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
 		this.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-		//ASSET FAVORITES
+		// ASSET FAVORITES
 		GridBagConstraints favoritesGBC = new GridBagConstraints();
 		favoritesGBC.insets = new Insets(5, 5, 5, 0);
 		favoritesGBC.fill = GridBagConstraints.BOTH;
-		favoritesGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		favoritesGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		favoritesGBC.weightx = 1.0;
 		favoritesGBC.gridwidth = 5;
 		favoritesGBC.gridx = 0;
@@ -116,31 +111,22 @@ public class Mail_Send_Panel extends JPanel
 
 		txtRecDetails = new JTextField();
 
-		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
-
-		//this.add(cbxFavorites, favoritesGBC);
-		if (asset != null) cbxFavorites.setSelectedItem(asset);
-
-
-
-
-
-
 		this.accountsModel = new AccountsComboBoxModel();
 
-		//LABEL FROM
+		// LABEL FROM
 		GridBagConstraints labelFromGBC = new GridBagConstraints();
-		labelFromGBC.insets = new Insets(5,10, 5, 5);
+		labelFromGBC.insets = new Insets(5, 10, 5, 5);
 		labelFromGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelFromGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelFromGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		labelFromGBC.weightx = 0;
 		labelFromGBC.gridx = 0;
 		labelFromGBC.gridy = ++y;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select Account") + ":");
 		this.add(fromLabel, labelFromGBC);
-		//fontHeight = fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
+		// fontHeight =
+		// fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
 
-		//COMBOBOX FROM
+		// COMBOBOX FROM
 		GridBagConstraints cbxFromGBC = new GridBagConstraints();
 		cbxFromGBC.gridwidth = 4;
 		cbxFromGBC.insets = new Insets(5, 5, 5, 10);
@@ -153,81 +139,60 @@ public class Mail_Send_Panel extends JPanel
 		this.cbxFrom = new JComboBox<Account>(accountsModel);
 		this.cbxFrom.setRenderer(new AccountRenderer(0));
 		this.add(this.cbxFrom, cbxFromGBC);
-		if (account != null) cbxFrom.setSelectedItem(account);
+		if (account != null)
+			cbxFrom.setSelectedItem(account);
 
-		//ON FAVORITES CHANGE
-
-		cbxFavorites.addActionListener (new ActionListener () {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-
-				AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
-
-				if(asset != null)
-				{
-					((AccountRenderer)cbxFrom.getRenderer()).setAsset(asset.getKey());
-					cbxFrom.repaint();
-					refreshReceiverDetails();
-				}
-
-			}
-		});
-
-		//LABEL TO
+		// LABEL TO
 		GridBagConstraints labelToGBC = new GridBagConstraints();
 		labelToGBC.gridy = ++y;
-		labelToGBC.insets = new Insets(5,10,5,10);
+		labelToGBC.insets = new Insets(5, 10, 5, 10);
 		labelToGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelToGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelToGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		labelToGBC.weightx = 0;
 		labelToGBC.gridx = 0;
 		JLabel toLabel = new JLabel(Lang.getInstance().translate("To: (address or name)"));
 		this.add(toLabel, labelToGBC);
 
-		//TXT TO
+		// TXT TO
 		GridBagConstraints txtToGBC = new GridBagConstraints();
 		txtToGBC.gridwidth = 4;
 		txtToGBC.insets = new Insets(5, 5, 5, 10);
 		txtToGBC.fill = GridBagConstraints.HORIZONTAL;
-		txtToGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		txtToGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		txtToGBC.weightx = 0.1;
 		txtToGBC.gridx = 1;
 		txtToGBC.gridy = y;
 
-
-
 		txtTo = new JTextField();
 		// if person show selectbox with all adresses for person
-		if (person !=null){
+		if (person != null) {
 
 			Accounts_ComboBox_Model accounts_To_Model = new Accounts_ComboBox_Model(person.getKey());
 			this.cbx_To = new JComboBox(accounts_To_Model);
-			if (accounts_To_Model.getSize() !=0) {
+			if (accounts_To_Model.getSize() != 0) {
 				this.add(this.cbx_To, txtToGBC);
 				txtTo.setText(cbx_To.getSelectedItem().toString());
 				Account account1 = new Account(txtTo.getText());
 				txtRecDetails.setText(account1.toString());
 				toLabel.setText(Lang.getInstance().translate("Select Account To") + ": ");
-				cbx_To.addActionListener (new ActionListener () {
+				cbx_To.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						String str = (String) cbx_To.getSelectedItem();
-						if(str != null)
-						{
+						if (str != null) {
 							txtTo.setText(cbx_To.getSelectedItem().toString());
 							refreshReceiverDetails();
 						}
 
 					}
 				});
-			}else {
+			} else {
 
 				this.txtTo.setText("has no Accounts");
 				sendButton.setEnabled(false);
 
 			}
-		}
-		else {
+		} else {
 
 			if (account_To != null) {
 				txtTo.setText(account_To.getAddress());
@@ -235,55 +200,50 @@ public class Mail_Send_Panel extends JPanel
 			this.add(txtTo, txtToGBC);
 		}
 
-
-
-
 		txtTo.getDocument().addDocumentListener(new DocumentListener() {
 
 			@Override
 			public void changedUpdate(DocumentEvent arg0) {
 			}
+
 			@Override
 			public void insertUpdate(DocumentEvent arg0) {
 				refreshReceiverDetails();
 			}
+
 			@Override
 			public void removeUpdate(DocumentEvent arg0) {
 				refreshReceiverDetails();
 			}
 		});
 
-		//LABEL RECEIVER
+		// LABEL RECEIVER
 		GridBagConstraints labelDetailsGBC = new GridBagConstraints();
 		labelDetailsGBC.gridy = ++y;
-		labelDetailsGBC.insets = new Insets(5,10,5,5);
+		labelDetailsGBC.insets = new Insets(5, 10, 5, 5);
 		labelDetailsGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelDetailsGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		labelDetailsGBC.weightx = 0;
 		labelDetailsGBC.gridx = 0;
 		JLabel recDetailsLabel = new JLabel(Lang.getInstance().translate("Receiver details") + ":");
 		this.add(recDetailsLabel, labelDetailsGBC);
 
-
-
-
-		//RECEIVER DETAILS
+		// RECEIVER DETAILS
 		GridBagConstraints txtReceiverGBC = new GridBagConstraints();
 		txtReceiverGBC.gridwidth = 4;
 		txtReceiverGBC.insets = new Insets(5, 5, 5, 10);
 		txtReceiverGBC.fill = GridBagConstraints.HORIZONTAL;
-		txtReceiverGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		txtReceiverGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		txtReceiverGBC.weightx = 0;
 		txtReceiverGBC.gridx = 1;
 		txtReceiverGBC.gridy = y;
 
-
 		txtRecDetails.setEditable(false);
 		this.add(txtRecDetails, txtReceiverGBC);
 
-		//LABEL TITLE
+		// LABEL TITLE
 		GridBagConstraints labelMessageGBC = new GridBagConstraints();
-		labelMessageGBC.insets = new Insets(5,5,5,5);
+		labelMessageGBC.insets = new Insets(5, 5, 5, 5);
 		labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;
 		labelMessageGBC.anchor = GridBagConstraints.NORTHWEST;
 		labelMessageGBC.weightx = 0;
@@ -293,7 +253,7 @@ public class Mail_Send_Panel extends JPanel
 		JLabel title_Label = new JLabel(Lang.getInstance().translate("Title") + ":");
 		this.add(title_Label, labelMessageGBC);
 
-		//TXT TITLE
+		// TXT TITLE
 		GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
 		txtMessageGBC.insets = new Insets(5, 5, 5, 10);
@@ -307,26 +267,24 @@ public class Mail_Send_Panel extends JPanel
 
 		this.add(txt_Title, txtMessageGBC);
 
-
-
-		//LABEL MESSAGE
-		//     	GridBagConstraints labelMessageGBC = new GridBagConstraints();
-		labelMessageGBC.insets = new Insets(5,10,5,5);
+		// LABEL MESSAGE
+		// GridBagConstraints labelMessageGBC = new GridBagConstraints();
+		labelMessageGBC.insets = new Insets(5, 10, 5, 5);
 		labelMessageGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		labelMessageGBC.weightx = 0;
 		labelMessageGBC.gridx = 0;
 		labelMessageGBC.gridy = ++y;
 
 		messageLabel = new JLabel(Lang.getInstance().translate("Message") + ":");
 
-		//TXT MESSAGE
-		//	GridBagConstraints txtMessageGBC = new GridBagConstraints();
+		// TXT MESSAGE
+		// GridBagConstraints txtMessageGBC = new GridBagConstraints();
 		txtMessageGBC.gridwidth = 4;
 		txtMessageGBC.insets = new Insets(5, 5, 5, 10);
-		//txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;
+		// txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;
 		txtMessageGBC.fill = java.awt.GridBagConstraints.BOTH;
-		txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		txtMessageGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		txtMessageGBC.weightx = 0;
 		txtMessageGBC.gridx = 1;
 		txtMessageGBC.gridy = y;
@@ -335,23 +293,23 @@ public class Mail_Send_Panel extends JPanel
 		this.txtMessage = new JTextArea();
 		this.txtMessage.setRows(4);
 		this.txtMessage.setColumns(25);
-		//     this.txtMessage.setMinimumSize(new Dimension(200,150));
+		// this.txtMessage.setMinimumSize(new Dimension(200,150));
 
 		this.txtMessage.setBorder(this.txtTo.getBorder());
 
 		JScrollPane messageScroll = new JScrollPane(this.txtMessage);
-		//messageScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-		//messageScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		// messageScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		// messageScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		this.add(messageScroll, txtMessageGBC);
 
 		this.add(messageLabel, labelMessageGBC);
 
-		//LABEL ISTEXT
+		// LABEL ISTEXT
 		GridBagConstraints labelIsTextGBC = new GridBagConstraints();
 		labelIsTextGBC.gridy = ++y;
-		labelIsTextGBC.insets = new Insets(5,5,5,5);
+		labelIsTextGBC.insets = new Insets(5, 5, 5, 5);
 		labelIsTextGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelIsTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelIsTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		labelIsTextGBC.weightx = 0;
 		labelIsTextGBC.gridx = 0;
 
@@ -359,11 +317,11 @@ public class Mail_Send_Panel extends JPanel
 		isTextLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.add(isTextLabel, labelIsTextGBC);
 
-		//TEXT ISTEXT
+		// TEXT ISTEXT
 		GridBagConstraints isChkTextGBC = new GridBagConstraints();
-		isChkTextGBC.insets = new Insets(5,5,5,5);
+		isChkTextGBC.insets = new Insets(5, 5, 5, 5);
 		isChkTextGBC.fill = GridBagConstraints.HORIZONTAL;
-		isChkTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		isChkTextGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		isChkTextGBC.weightx = 0;
 		isChkTextGBC.gridx = 1;
 		isChkTextGBC.gridy = y;
@@ -372,11 +330,11 @@ public class Mail_Send_Panel extends JPanel
 		isText.setSelected(true);
 		this.add(isText, isChkTextGBC);
 
-		//LABEL ENCRYPTED
+		// LABEL ENCRYPTED
 		GridBagConstraints labelEncGBC = new GridBagConstraints();
-		labelEncGBC.insets = new Insets(5,5,5,5);
+		labelEncGBC.insets = new Insets(5, 5, 5, 5);
 		labelEncGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		labelEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		labelEncGBC.weightx = 0;
 		labelEncGBC.gridx = 2;
 		labelEncGBC.gridy = y;
@@ -385,11 +343,11 @@ public class Mail_Send_Panel extends JPanel
 		encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.add(encLabel, labelEncGBC);
 
-		//ENCRYPTED CHECKBOX
+		// ENCRYPTED CHECKBOX
 		GridBagConstraints ChkEncGBC = new GridBagConstraints();
-		ChkEncGBC.insets = new Insets(5,5,5,5);
+		ChkEncGBC.insets = new Insets(5, 5, 5, 5);
 		ChkEncGBC.fill = GridBagConstraints.HORIZONTAL;
-		ChkEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		ChkEncGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		ChkEncGBC.weightx = 0;
 		ChkEncGBC.gridx = 3;
 		ChkEncGBC.gridy = y;
@@ -398,39 +356,37 @@ public class Mail_Send_Panel extends JPanel
 		encrypted.setSelected(true);
 		this.add(encrypted, ChkEncGBC);
 
-		//LABEL AMOUNT
+		// LABEL AMOUNT
 		GridBagConstraints amountlabelGBC = new GridBagConstraints();
-		amountlabelGBC.insets = new Insets(5,5,5,5);
+		amountlabelGBC.insets = new Insets(5, 5, 5, 5);
 		amountlabelGBC.fill = GridBagConstraints.HORIZONTAL;
-		amountlabelGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		amountlabelGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		amountlabelGBC.weightx = 0;
 		amountlabelGBC.gridx = 0;
 		amountlabelGBC.gridy = ++y;
 
 		final JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount") + ":");
 		amountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		//	this.add(amountLabel, amountlabelGBC);
+		// this.add(amountLabel, amountlabelGBC);
 
-		//TXT AMOUNT
+		// TXT AMOUNT
 		GridBagConstraints txtAmountGBC = new GridBagConstraints();
-		txtAmountGBC.insets = new Insets(5,5,5,5);
+		txtAmountGBC.insets = new Insets(5, 5, 5, 5);
 		txtAmountGBC.fill = GridBagConstraints.HORIZONTAL;
-		txtAmountGBC.anchor = GridBagConstraints.FIRST_LINE_START;//.NORTHWEST;
+		txtAmountGBC.anchor = GridBagConstraints.FIRST_LINE_START;// .NORTHWEST;
 		txtAmountGBC.weightx = 0;
 		txtAmountGBC.gridx = 1;
 		txtAmountGBC.gridy = y;
 
 		txtAmount = new JTextField("0.00000000");
-		txtAmount.setPreferredSize(new Dimension(130,22));
-		//		this.add(txtAmount, txtAmountGBC);
+		txtAmount.setPreferredSize(new Dimension(130, 22));
+		// this.add(txtAmount, txtAmountGBC);
 
-
-
-		//LABEL GBC
+		// LABEL GBC
 		GridBagConstraints feelabelGBC = new GridBagConstraints();
 		feelabelGBC.anchor = GridBagConstraints.EAST;
 		feelabelGBC.gridy = y;
-		feelabelGBC.insets = new Insets(5,5,5,5);
+		feelabelGBC.insets = new Insets(5, 5, 5, 5);
 		feelabelGBC.fill = GridBagConstraints.BOTH;
 		feelabelGBC.weightx = 0;
 		feelabelGBC.gridx = 2;
@@ -439,7 +395,7 @@ public class Mail_Send_Panel extends JPanel
 		feeLabel.setVerticalAlignment(SwingConstants.TOP);
 		this.add(feeLabel, feelabelGBC);
 
-		//FEE TXT
+		// FEE TXT
 		GridBagConstraints feetxtGBC = new GridBagConstraints();
 		feetxtGBC.fill = GridBagConstraints.BOTH;
 		feetxtGBC.insets = new Insets(5, 5, 5, 5);
@@ -449,41 +405,38 @@ public class Mail_Send_Panel extends JPanel
 
 		txtFeePow = new JTextField();
 		txtFeePow.setText("0");
-		txtFeePow.setPreferredSize(new Dimension(130,22));
+		txtFeePow.setPreferredSize(new Dimension(130, 22));
 		this.add(txtFeePow, feetxtGBC);
 
-		//BUTTON DECRYPTALL
+		// BUTTON DECRYPTALL
 		GridBagConstraints decryptAllGBC = new GridBagConstraints();
-		decryptAllGBC.insets = new Insets(5,5,5,5);
+		decryptAllGBC.insets = new Insets(5, 5, 5, 5);
 		decryptAllGBC.fill = GridBagConstraints.HORIZONTAL;
 		decryptAllGBC.anchor = GridBagConstraints.NORTHWEST;
 		decryptAllGBC.gridwidth = 1;
 		decryptAllGBC.gridx = 3;
 		decryptAllGBC.gridy = ++y;
 		JButton decryptButton = new JButton(Lang.getInstance().translate("Decrypt All"));
-		//	this.add(decryptButton, decryptAllGBC);
+		// this.add(decryptButton, decryptAllGBC);
 
-		//BUTTON SEND
+		// BUTTON SEND
 		GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5,25,5,5);
+		buttonGBC.insets = new Insets(5, 25, 5, 5);
 		buttonGBC.fill = GridBagConstraints.BOTH;
 		buttonGBC.anchor = GridBagConstraints.PAGE_START;
-		buttonGBC.gridx =2;
+		buttonGBC.gridx = 2;
 		buttonGBC.gridy = y;
 
-
-		//      sendButton.setPreferredSize(new Dimension(80, 25));
-		sendButton.addActionListener(new ActionListener()
-		{
+		// sendButton.setPreferredSize(new Dimension(80, 25));
+		sendButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				onSendClick();
 			}
 		});
 		this.add(sendButton, buttonGBC);
 
-		//MESSAGES HISTORY TABLE
+		// MESSAGES HISTORY TABLE
 
 		table = new Send_TableModel();
 
@@ -494,32 +447,30 @@ public class Mail_Send_Panel extends JPanel
 		scrollPane.setPreferredSize(new Dimension(100, 100));
 		scrollPane.setWheelScrollingEnabled(true);
 
-		//BOTTOM GBC
+		// BOTTOM GBC
 		GridBagConstraints messagesGBC = new GridBagConstraints();
-		messagesGBC.insets = new Insets(5,5,5,5);
+		messagesGBC.insets = new Insets(5, 5, 5, 5);
 		messagesGBC.fill = GridBagConstraints.BOTH;
 		messagesGBC.anchor = GridBagConstraints.NORTHWEST;
 		messagesGBC.weightx = 0;
 		messagesGBC.gridx = 0;
 
-		//ADD BOTTOM SO IT PUSHES TO TOP
+		// ADD BOTTOM SO IT PUSHES TO TOP
 		messagesGBC.gridy = ++y;
 		messagesGBC.weighty = 4;
 		messagesGBC.gridwidth = 5;
 
-		//     add(scrollPane, messagesGBC);
+		// add(scrollPane, messagesGBC);
 
-		//BUTTON DECRYPTALL
-		decryptButton.addActionListener(new ActionListener()
-		{
+		// BUTTON DECRYPTALL
+		decryptButton.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e)
-			{
+			public void actionPerformed(ActionEvent e) {
 				((Send_TableModel) table).CryptoOpenBoxAll();
 			}
 		});
 
-		//CONTEXT MENU
+		// CONTEXT MENU
 		MenuPopupUtil.installContextMenu(txtTo);
 		MenuPopupUtil.installContextMenu(txtFeePow);
 		MenuPopupUtil.installContextMenu(txtAmount);
@@ -527,149 +478,136 @@ public class Mail_Send_Panel extends JPanel
 		MenuPopupUtil.installContextMenu(txtRecDetails);
 
 		ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-		service.scheduleWithFixedDelay(	new Runnable() {
+		service.scheduleWithFixedDelay(new Runnable() {
 			@Override
 			public void run() {
 
-				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("+ txtMessage.getText().length()+")</html>");
+				messageLabel.setText("<html>" + Lang.getInstance().translate("Message") + ":<br>("
+						+ txtMessage.getText().length() + ")</html>");
 
-			}}, 0, 500, TimeUnit.MILLISECONDS);
-
+			}
+		}, 0, 500, TimeUnit.MILLISECONDS);
 
 		/*
-        this.pack();
-		this.setLocationRelativeTo(null);
-		this.setMaximizable(true);
-		this.setTitle(Lang.getInstance().translate("Persons"));
-		this.setClosable(true);
-		this.setResizable(true);
+		 * this.pack(); this.setLocationRelativeTo(null);
+		 * this.setMaximizable(true);
+		 * this.setTitle(Lang.getInstance().translate("Persons"));
+		 * this.setClosable(true); this.setResizable(true);
 		 */
 
+		// Container parent = this.getParent();
+		// this.setSize(new Dimension(
+		// (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
+		// this.setLocation(20, 20);
+		// this.setIconImages(icons);
 
-		//Container parent = this.getParent();
-		//this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
-		//this.setLocation(20, 20);
-		//	this.setIconImages(icons);
-
-		//CLOSE
-		//setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-		//this.setResizable(true);
-		//splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
-		//this.setVisible(true);
+		// CLOSE
+		// setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+		// this.setResizable(true);
+		// splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
+		// this.setVisible(true);
 		refreshReceiverDetails();
-		this.setMinimumSize(new Dimension(0,0));
+		this.setMinimumSize(new Dimension(0, 0));
 
 	}
 
-	private void refreshReceiverDetails()
-	{
+	private void refreshReceiverDetails() {
 		String toValue = txtTo.getText();
-		AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
 
-		if(toValue.isEmpty())
-		{
+		AssetCls asset = Controller.getInstance().getAsset(Transaction.FEE_KEY);
+
+		if (toValue.isEmpty()) {
 			txtRecDetails.setText("");
 			return;
 		}
 
-		if (txtTo.getText().equals("has no Addresses")){
+		if (txtTo.getText().equals("has no Addresses")) {
 			txtRecDetails.setText(person.viewName() + " " + Lang.getInstance().translate("has no Accounts"));
 			return;
 		}
 
-		if(false && Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
+		if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
 			txtRecDetails.setText(Lang.getInstance().translate("Status must be OK to show receiver details."));
 			return;
 		}
 
-
-
-
 		Account account = null;
 		Tuple2<Account, String> accountRes = Account.tryMakeAccount(toValue);
 
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(accountRes.a == null) {
+		// CHECK IF RECIPIENT IS VALID ADDRESS
+		if (accountRes.a == null) {
 			txtRecDetails.setText(accountRes.b);
 		} else {
 			account = accountRes.a;
 
 			txtRecDetails.setText(account.toString(asset.getKey()));
 
-			if(account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
-					&& account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0)
-			{
+			if (account.getBalanceUSE(asset.getKey()).compareTo(BigDecimal.ZERO) == 0
+					&& account.getBalanceUSE(Transaction.FEE_KEY).compareTo(BigDecimal.ZERO) == 0) {
 				txtRecDetails.setText(Lang.getInstance().translate("Warning!") + " " + txtRecDetails.getText());
 			}
 		}
 
-		if(false && account!=null && account.getAddress().startsWith(wrongFirstCharOfAddress))
-		{
+		if (false && account != null && account.getAddress().startsWith(wrongFirstCharOfAddress)) {
 			encrypted.setEnabled(false);
 			encrypted.setSelected(false);
 			isText.setSelected(false);
-		}
-		else
-		{
+		} else {
 			encrypted.setEnabled(true);
 		}
 
 	}
 
-	public void onSendClick()
-	{
-		//DISABLE
+	public void onSendClick() {
+		// DISABLE
 		this.sendButton.setEnabled(false);
 
-		//TODO TEST
-		//CHECK IF NETWORK OK
-		/*if(Controller.getInstance().getStatus() != Controller.STATUS_OKE)
-		{
-			//NETWORK NOT OK
-			JOptionPane.showMessageDialog(null, "You are unable to send a transaction while synchronizing or while having no connections!", "Error", JOptionPane.ERROR_MESSAGE);
+		// TODO TEST
+		// CHECK IF NETWORK OK
+		/*
+		 * if(Controller.getInstance().getStatus() != Controller.STATUS_OKE) {
+		 * //NETWORK NOT OK JOptionPane.showMessageDialog(null,
+		 * "You are unable to send a transaction while synchronizing or while having no connections!"
+		 * , "Error", JOptionPane.ERROR_MESSAGE);
+		 * 
+		 * //ENABLE this.sendButton.setEnabled(true);
+		 * 
+		 * return; }
+		 */
 
-			//ENABLE
-			this.sendButton.setEnabled(true);
-
-			return;
-		}*/
-
-		//CHECK IF WALLET UNLOCKED
-		if(!Controller.getInstance().isWalletUnlocked())
-		{
-			//ASK FOR PASSWORD
+		// CHECK IF WALLET UNLOCKED
+		if (!Controller.getInstance().isWalletUnlocked()) {
+			// ASK FOR PASSWORD
 			String password = PasswordPane.showUnlockWalletDialog(this);
-			if(password.equals(""))
-			{
+			if (password.equals("")) {
 				this.sendButton.setEnabled(true);
 				return;
 			}
-			if(!Controller.getInstance().unlockWallet(password))
-			{
-				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+			if (!Controller.getInstance().unlockWallet(password)) {
+				// WRONG PASSWORD
+				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"),
+						Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
-				//ENABLE
+				// ENABLE
 				this.sendButton.setEnabled(true);
 				return;
 			}
 		}
 
-		//READ SENDER
+		// READ SENDER
 		Account sender = (Account) cbxFrom.getSelectedItem();
 
-		//READ RECIPIENT
+		// READ RECIPIENT
 		String recipientAddress = txtTo.getText();
 
-
-		//ORDINARY RECIPIENT
+		// ORDINARY RECIPIENT
 		Tuple2<Account, String> accountRes = Account.tryMakeAccount(recipientAddress);
 		Account recipient = accountRes.a;
-		if (recipient == null)	{
-			JOptionPane.showMessageDialog(null, accountRes.b , Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		if (recipient == null) {
+			JOptionPane.showMessageDialog(null, accountRes.b, Lang.getInstance().translate("Error"),
+					JOptionPane.ERROR_MESSAGE);
 
-			//ENABLE
+			// ENABLE
 			this.sendButton.setEnabled(true);
 			return;
 		}
@@ -677,32 +615,30 @@ public class Mail_Send_Panel extends JPanel
 		int parsing = 0;
 		int feePow = 0;
 		BigDecimal amount = null;
-		try
-		{
-			//READ AMOUNT
+		try {
+			// READ AMOUNT
 			parsing = 1;
 			amount = new BigDecimal(txtAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
-			//READ FEE
+			// READ FEE
 			parsing = 2;
 			feePow = Integer.parseInt(txtFeePow.getText());
-		}
-		catch(Exception e)
-		{
-			//CHECK WHERE PARSING ERROR HAPPENED
-			switch(parsing)
-			{
+		} catch (Exception e) {
+			// CHECK WHERE PARSING ERROR HAPPENED
+			switch (parsing) {
 			case 1:
 
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"),
+						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 
 			case 2:
 
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"),
+						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 				break;
 			}
-			//ENABLE
+			// ENABLE
 			this.sendButton.setEnabled(true);
 			return;
 		}
@@ -713,29 +649,21 @@ public class Mail_Send_Panel extends JPanel
 
 		byte[] messageBytes = null;
 
-		if (message != null && message.length() > 0)
-		{
-			if ( isTextB )
-			{
-				messageBytes = message.getBytes( Charset.forName("UTF-8") );
-			}
-			else
-			{
-				try
-				{
-					messageBytes = Converter.parseHexString( message );
-				}
-				catch (Exception g)
-				{
-					try
-					{
+		if (message != null && message.length() > 0) {
+			if (isTextB) {
+				messageBytes = message.getBytes(Charset.forName("UTF-8"));
+			} else {
+				try {
+					messageBytes = Converter.parseHexString(message);
+				} catch (Exception g) {
+					try {
 						messageBytes = Base58.decode(message);
-					}
-					catch (Exception e)
-					{
-						JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+					} catch (Exception e) {
+						JOptionPane.showMessageDialog(new JFrame(),
+								Lang.getInstance().translate("Message format is not base58 or hex!"),
+								Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
-						//ENABLE
+						// ENABLE
 						this.sendButton.setEnabled(true);
 						return;
 					}
@@ -744,49 +672,48 @@ public class Mail_Send_Panel extends JPanel
 		}
 
 		// if no TEXT - set null
-		if (messageBytes != null && messageBytes.length == 0) messageBytes = null;
+		if (messageBytes != null && messageBytes.length == 0)
+			messageBytes = null;
 		// if amount = 0 - set null
-		if (amount.compareTo(BigDecimal.ZERO) == 0) amount = null;
+		if (amount.compareTo(BigDecimal.ZERO) == 0)
+			amount = null;
 
 		boolean encryptMessage = encrypted.isSelected();
 
-		byte[] encrypted = (encryptMessage)?new byte[]{1}:new byte[]{0};
-		byte[] isTextByte = (isTextB)? new byte[] {1}:new byte[]{0};
+		byte[] encrypted = (encryptMessage) ? new byte[] { 1 } : new byte[] { 0 };
+		byte[] isTextByte = (isTextB) ? new byte[] { 1 } : new byte[] { 0 };
 
 		AssetCls asset;
 		long key = 0l;
-		if (amount != null) {
-			//CHECK IF PAYMENT OR ASSET TRANSFER
-			asset = (AssetCls) this.cbxFavorites.getSelectedItem();
-			key = asset.getKey();
-		}
 
 		Integer result;
 
-		if(messageBytes != null)
-		{
-			if ( messageBytes.length > BlockChain.MAX_REC_DATA_BYTES )
-			{
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+		if (messageBytes != null) {
+			if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+				JOptionPane.showMessageDialog(new JFrame(),
+						Lang.getInstance().translate("Message size exceeded!") + " <= MAX",
+						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
-				//ENABLE
+				// ENABLE
 				this.sendButton.setEnabled(true);
 				return;
 			}
 
-			if(encryptMessage)
-			{
-				//sender
-				PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
+			if (encryptMessage) {
+				// sender
+				PrivateKeyAccount account = Controller.getInstance()
+						.getPrivateKeyAccountByAddress(sender.getAddress().toString());
 				byte[] privateKey = account.getPrivateKey();
 
-				//recipient
+				// recipient
 				byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
-				if(publicKey == null)
-				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				if (publicKey == null) {
+					JOptionPane.showMessageDialog(new JFrame(),
+							Lang.getInstance().translate(
+									"The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."),
+							Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 
-					//ENABLE
+					// ENABLE
 					this.sendButton.setEnabled(true);
 
 					return;
@@ -799,26 +726,31 @@ public class Mail_Send_Panel extends JPanel
 		String head = this.txt_Title.getText();
 		if (head == null)
 			head = "";
-		if (head.getBytes(StandardCharsets.UTF_8).length>256){
+		if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
 
-			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(new JFrame(),
+					Lang.getInstance().translate("Title size exceeded!") + " <= 256",
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			return;
 
 		}
 
+		// CREATE TX MESSAGE
+		Transaction transaction = Controller.getInstance().r_Send(
+				Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
+				amount, head, messageBytes, isTextByte, encrypted);
+		// test result = new Pair<Transaction, Integer>(null,
+		// Transaction.VALIDATE_OK);
 
+		String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
+				+ " Bytes, ";
+		Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
+				+ " COMPU</b><br></body></HTML>";
 
-
-
-		//CREATE TX MESSAGE
-		Transaction transaction = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key, amount, head, messageBytes, isTextByte, encrypted);
-		// test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
-
-		String Status_text = "<HTML>"+ Lang.getInstance().translate("Size")+":&nbsp;"+ transaction.viewSize(false)+" Bytes, ";
-		Status_text += "<b>" +Lang.getInstance().translate("Fee")+":&nbsp;"+ transaction.getFee().toString()+" COMPU</b><br></body></HTML>";
-
-
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (th.getWidth()/1.2), (int) (th.getHeight()/1.2),Status_text, Lang.getInstance().translate("Confirmation Transaction") + " " + Lang.getInstance().translate("Send Mail"));
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+				Lang.getInstance().translate("Send Mail"), (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2),
+				Status_text, Lang.getInstance().translate("Confirmation Transaction") + " "
+						+ Lang.getInstance().translate("Send Mail"));
 
 		Mail_Info ww = new Mail_Info((R_Send) transaction);
 		ww.jTabbedPane1.setVisible(false);
@@ -826,46 +758,44 @@ public class Mail_Send_Panel extends JPanel
 		dd.setLocationRelativeTo(th);
 		dd.setVisible(true);
 
-		//	JOptionPane.OK_OPTION
-		if (dd.isConfirm){
-
-
-
+		// JOptionPane.OK_OPTION
+		if (dd.isConfirm) {
 
 			result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
 
-			//CHECK VALIDATE MESSAGE
-			if (result ==  transaction.VALIDATE_OK)
-			{
-				//RESET FIELDS
+			// CHECK VALIDATE MESSAGE
+			if (result == transaction.VALIDATE_OK) {
+				// RESET FIELDS
 
-				if(amount != null && amount.compareTo(BigDecimal.ZERO) == 1) //IF MORE THAN ZERO
+				if (amount != null && amount.compareTo(BigDecimal.ZERO) == 1) // IF
+																				// MORE
+																				// THAN
+																				// ZERO
 				{
 					this.txtAmount.setText("0");
 				}
 
 				// TODO "A" ??
-				if(false && this.txtTo.getText().startsWith(wrongFirstCharOfAddress))
-				{
+				if (false && this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
 					this.txtTo.setText("");
 				}
 
 				this.txtMessage.setText("");
 
 				// TODO "A" ??
-				if(true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress))
-				{
-					JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+				if (true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
+					JOptionPane.showMessageDialog(new JFrame(),
+							Lang.getInstance().translate("Message and/or payment has been sent!"),
+							Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
 				}
 			} else {
-				JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(new JFrame(),
+						Lang.getInstance().translate(OnDealClick.resultMess(result)),
+						Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			}
 		}
-		//ENABLE
+		// ENABLE
 		this.sendButton.setEnabled(true);
 	}
 
-
 }
-
-

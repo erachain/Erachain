@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
 
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
+
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.transaction.R_Vouch;
@@ -36,8 +38,10 @@ public class Statements_Vouch_Table_Model extends AbstractTableModel implements 
 	private int recNo;
 
 	public Statements_Vouch_Table_Model(Transaction transaction) {
-		blockNo = transaction.getBlockHeight(DCSet.getInstance());
-		recNo = transaction.getSeqNo(DCSet.getInstance());
+		if (transaction != null) {
+			blockNo = transaction.getBlockHeight(DCSet.getInstance());
+			recNo = transaction.getSeqNo(DCSet.getInstance());
+		}
 		transactions = new ArrayList<R_Vouch>();
 		addObservers();
 		

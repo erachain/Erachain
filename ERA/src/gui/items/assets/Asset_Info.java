@@ -124,9 +124,10 @@ public class Asset_Info extends JTextPane {
 
 		text +="<table><tr valign='top' align = 'left'><td>";
 		text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key")+ ": </b>" + asset.getKey() + "</DIV>";
-		Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
 		if (image1 !=null) text +="<div><a href ='!!img'  style='color: "+ color  +"' ><img src=\""+img_Local_URL +"\"></a></div>";
-		text += "<td><div  style='float:left'><div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DCSet.getInstance()) +"</div>";
+		Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
+		if (record != null)
+			text += "<td><div  style='float:left'><div><b>"+ Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq(DCSet.getInstance()) +"</div>";
 		text += "<div><b>"+ Lang.getInstance().translate("Name") + ": </b>" + asset.viewName() + "</div>";
 		text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
 		text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";

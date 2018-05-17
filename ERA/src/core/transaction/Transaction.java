@@ -89,6 +89,7 @@ public abstract class Transaction {
 	public static final int INVALID_SIGNATURE = 16;
 	public static final int NO_DEBT_BALANCE = 17;
 	public static final int NO_HOLD_BALANCE = 18;
+	public static final int INVALID_TRANSFER_TYPE = 19;
 
 	public static final int NOT_ENOUGH_RIGHTS = 20;
 	public static final int OWNER_NOT_PERSONALIZED = 21;
@@ -114,6 +115,7 @@ public abstract class Transaction {
 	public static final int INVALID_TYPE_LENGTH = 43;
 	public static final int NOT_MOVABLE_ASSET = 44;
 	public static final int NOT_DEBT_ASSET = 45;
+	public static final int INVALID_ACCOUNTING_PAIR = 46;
 
 	public static final int INVALID_NAME_LENGTH = 50;
 	public static final int INVALID_ICON_LENGTH = 51;

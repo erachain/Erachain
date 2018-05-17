@@ -59,9 +59,19 @@ public class Account_Lend_Panel extends  Class_Account_Transaction_Panel
 		// favorite combo box
 		cbxFavorites.setModel(new AssetsComboBoxModel());
 		if (asset != null) {
-			cbxFavorites.setEnabled(false);//.
-			cbxFavorites.setSelectedItem(asset);
+			for (int i = 0; i < cbxFavorites.getItemCount(); i++) {
+				AssetCls item = cbxFavorites.getItemAt(i);
+				if (item.getKey() == asset.getKey()) {
+					// not worked cbxFavorites.setSelectedItem(asset);
+					cbxFavorites.setSelectedIndex(i);
+					cbxFavorites.setEnabled(false);// .setEditable(false);
+					break;
+				} else {
+					cbxFavorites.setEnabled(true);
+				}
+			}
 		}
+
 		// accoutn ComboBox
 		this.accountsModel = new AccountsComboBoxModel();
 		this.cbxFrom.setModel(accountsModel);
