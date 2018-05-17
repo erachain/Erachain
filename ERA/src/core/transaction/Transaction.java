@@ -338,9 +338,9 @@ public abstract class Transaction {
 	protected int height;
 	// TODO REMOVE REFERENCE - use TIMESTAMP as reference
 	protected Long reference = 0l;
-	protected BigDecimal fee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE); // - for genesis
+	protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
 	// transactions
-	// protected BigDecimal fee = new BigDecimal.valueOf(999000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+	// protected BigDecimal fee = new BigDecimal.valueOf(999000);
 	protected byte feePow = 0;
 	protected byte[] signature;
 	protected long timestamp;
@@ -1203,7 +1203,7 @@ public abstract class Transaction {
 
 	public static Map<String, Map<Long, BigDecimal>> subAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount,
 			String address, Long assetKey, BigDecimal amount) {
-		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).subtract(amount));
+		return addAssetAmount(allAssetAmount, address, assetKey, BigDecimal.ZERO.subtract(amount));
 	}
 
 	public static Map<String, Map<Long, BigDecimal>> addAssetAmount(Map<String, Map<Long, BigDecimal>> allAssetAmount,

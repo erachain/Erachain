@@ -383,7 +383,7 @@ public class CreateOrderPanel extends JPanel {
 	/*
 	 * public void calculateBuyingPrice(JTextField target, boolean buying) { try
 	 * { BigDecimal price = new BigDecimal(txtPrice.getText());
-	 * target.setText(BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).
+	 * target.setText(BigDecimal.ONE.
 	 * divide(price, RoundingMode.DOWN).toPlainString()); } catch(Exception e) {
 	 * target.setText("0"); }
 	 * 

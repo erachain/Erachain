@@ -611,7 +611,7 @@ public class Send_Panel extends JPanel
 		{
 			//READ AMOUNT
 			parsing = 1;
-			amount = new BigDecimal(txtAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			amount = new BigDecimal(txtAmount.getText());
 
 			//READ FEE
 			parsing = 2;

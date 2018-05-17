@@ -17,7 +17,6 @@ import java.util.TreeSet;
 
 import org.json.simple.JSONObject;
 
-import core.BlockChain;
 import utils.Converter;
 
 
@@ -332,8 +331,8 @@ public class AT_Machine_State
 		JSONObject json = new JSONObject();
 		json.put("machineCode", Converter.toHex(ap_code.array()) );
 		json.put("machineData", Converter.toHex(ap_data.array()) );
-		json.put("currentBalance", BigDecimal.valueOf(getG_balance(), BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString() );
-		json.put("prevBalance", BigDecimal.valueOf(getP_balance(), BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString() );
+		json.put("currentBalance", BigDecimal.valueOf(getG_balance()).toPlainString() );
+		json.put("prevBalance", BigDecimal.valueOf(getP_balance()).toPlainString() );
 		json.put("frozen", freezeOnSameBalance());
 		json.put("running", getMachineState().isRunning());
 		json.put("stopped", getMachineState().isStopped());

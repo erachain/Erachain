@@ -193,7 +193,7 @@ public class Account {
 				BigDecimal freeze = BigDecimal.ZERO;
 				for (int[] point : item) {
 					if (height < point[0]) {
-						freeze = new BigDecimal(point[1]).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+						freeze = new BigDecimal(point[1]);
 						break;
 					}
 				}
@@ -456,8 +456,7 @@ public class Account {
 	 * Iterator<AT_Transaction> iter = atTxs.values().iterator(); while (
 	 * iter.hasNext() ) { AT_Transaction key = iter.next(); if (
 	 * key.getRecipient().equals( this.getAddress() ) ) { balance =
-	 * balance.subtract( BigDecimal.valueOf(key.getAmount(),
-	 * BlockChain.AMOUNT_DEDAULT_SCALE) ); } }
+	 * balance.subtract( BigDecimal.valueOf(key.getAmount()) ); } }
 	 * 
 	 * // icreator X 0.9 for each block generated if (balance_penalty > 0.1 *
 	 * penalty_koeff && block.getCreator().getAddress().equals(this.address)) {
@@ -466,7 +465,7 @@ public class Account {
 	 * }
 	 * 
 	 * //DO NOT GO BELOW 0 if(balance.compareTo(BigDecimal.ZERO) == -1) {
-	 * balance = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE); }
+	 * balance = BigDecimal.ZERO; }
 	 * 
 	 * // use penalty this.generatingBalance = balance.multiply(new
 	 * BigDecimal(balance_penalty / penalty_koeff));

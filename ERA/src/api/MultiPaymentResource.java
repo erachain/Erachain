@@ -19,7 +19,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -159,7 +158,7 @@ public class MultiPaymentResource
 			try
 			{
 				bdAmount = new BigDecimal(jsonPayment.get("amount").toString());
-				bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				bdAmount = bdAmount;
 			} catch (Exception e) {
 				throw ApiErrorFactory.getInstance().createError(
 						Transaction.INVALID_AMOUNT);

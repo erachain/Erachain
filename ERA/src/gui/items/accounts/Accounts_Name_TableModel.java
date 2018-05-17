@@ -1,7 +1,6 @@
 package gui.items.accounts;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -15,17 +14,10 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.block.Block;
-import core.item.assets.AssetCls;
-import core.transaction.Transaction;
 import database.wallet.AccountsPropertisMap;
-import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
-import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -166,7 +158,7 @@ public class Accounts_Name_TableModel extends AbstractTableModel implements Obse
 			}
 			else
 			{
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO);
 			}
 			 */
 

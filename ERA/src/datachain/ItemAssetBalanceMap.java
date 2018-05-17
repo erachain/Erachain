@@ -141,7 +141,6 @@ Tuple2<BigDecimal, BigDecimal>  // on HOLD
 		return new Tuple5<
 				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>,
 				Tuple2<BigDecimal, BigDecimal>,	Tuple2<BigDecimal, BigDecimal>>
-		/// .setScale(BlockChain.AMOUNT_DEDAULT_SCALE)
 		(new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
 				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
 				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -195,10 +194,10 @@ Tuple2<BigDecimal, BigDecimal>  // on HOLD
 		// TODO for TEST
 		// FOR TEST NET
 		if (key == Transaction.FEE_KEY &&
-				value.a.compareTo(BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)) < 0) {
+				value.a.compareTo(BigDecimal.ONE) < 0) {
 
 			return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+					BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO);
 
 		}
 		 */

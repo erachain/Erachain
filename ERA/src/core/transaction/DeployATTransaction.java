@@ -535,7 +535,7 @@ public class DeployATTransaction extends Transaction
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).subtract(this.amount.add(this.fee));
+			return BigDecimal.ZERO.subtract(this.amount.add(this.fee));
 		}
 
 		return BigDecimal.ZERO;

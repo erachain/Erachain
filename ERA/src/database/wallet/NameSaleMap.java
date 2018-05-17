@@ -16,7 +16,6 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import core.BlockChain;
 import core.account.Account;
 import core.naming.NameSale;
 import database.DBMap;
@@ -122,7 +121,7 @@ public class NameSaleMap extends DCMap<Tuple2<String, String>, BigDecimal>
 	@Override
 	protected BigDecimal getDefaultValue()
 	{
-		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		return BigDecimal.ZERO;
 	}
 
 	@Override

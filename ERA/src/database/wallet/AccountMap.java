@@ -18,7 +18,6 @@ import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.UnsignedBytes;
 
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import utils.ObserverMessage;
@@ -201,7 +200,7 @@ public class AccountMap extends Observable {
 	}
 
 	private Tuple3<BigDecimal, BigDecimal, BigDecimal> getBalanceNull() {
-		return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
 	}
 
 	// change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
@@ -267,7 +266,7 @@ public class AccountMap extends Observable {
 		Tuple2<String, Long> k = new Tuple2<String, Long>(address, key);
 
 		if(!this.assetsBalanceMap.containsKey(k))
-			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			return BigDecimal.ZERO;
 
 		Tuple3<BigDecimal, BigDecimal, BigDecimal> value = this.assetsBalanceMap.get(k);
 		if (type == 1)
@@ -352,7 +351,7 @@ public class AccountMap extends Observable {
 
 		Tuple2<String, Long> k = new Tuple2<String, Long>(account.getAddress(), key);
 		if(!this.assetsBalanceMap.containsKey(k)) {
-			value =	new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+			value =	new Tuple3<BigDecimal, BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO), BigDecimal.ZERO);
 		} else {
 			value = this.assetsBalanceMap.get(k);
 		}

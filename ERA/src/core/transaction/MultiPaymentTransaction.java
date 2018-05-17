@@ -15,7 +15,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -358,7 +357,7 @@ public class MultiPaymentTransaction extends Transaction {
 	@Override
 	public BigDecimal getAmount(Account account)
 	{
-		BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amount = BigDecimal.ZERO;
 		String address = account.getAddress();
 
 		//IF CREATOR

@@ -140,12 +140,12 @@ public class OrderTestsMy
 
 		// FEE FUND
 		accountA.setLastTimestamp(gb.getTimestamp(db), db);
-		accountA.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		accountA.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		accountA.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
+		accountA.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
 		accountB.setLastTimestamp(gb.getTimestamp(db), db);
-		accountB.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		accountB.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
+		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
 		assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
@@ -167,7 +167,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER TRANSACTION
 		orderCreation = new CreateOrderTransaction(accountA, keyA, 3l,
-				BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp, 0l);
+				BigDecimal.valueOf(10), BigDecimal.valueOf(100), (byte)0, timestamp, 0l);
 
 
 	}
@@ -245,7 +245,7 @@ public class OrderTestsMy
 		assertEquals(true, orderCreation.isSignatureValid(db));
 
 		//INVALID SIGNATURE
-		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 3l, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp, 0l, new byte[64]);
+		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 3l, BigDecimal.valueOf(100), BigDecimal.valueOf(1), (byte)0, timestamp, 0l, new byte[64]);
 
 		//CHECK IF ORDER CREATION SIGNATURE IS INVALID
 		assertEquals(false, orderCreation.isSignatureValid(db));
@@ -259,14 +259,14 @@ public class OrderTestsMy
 
 		//CHECK VALID
 		long timeStamp = timestamp++;
-		CreateOrderTransaction orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l);
+		CreateOrderTransaction orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(100), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
 
 		//CREATE INVALID ORDER CREATION HAVE EQUALS WANT
-		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l);
+		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.FEE_KEY, BigDecimal.valueOf(100), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
@@ -274,7 +274,7 @@ public class OrderTestsMy
 		assertEquals(Transaction.HAVE_EQUALS_WANT, orderCreation.isValid(releaserReference, flags));
 
 		//CREATE INVALID ORDER CREATION NOT ENOUGH BALANCE
-		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY, BigDecimal.valueOf(50001).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l);
+		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY, BigDecimal.valueOf(50001), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
@@ -282,7 +282,7 @@ public class OrderTestsMy
 		assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(releaserReference, flags));
 
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
-		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(-50.0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l);
+		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(-50.0), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
@@ -297,7 +297,7 @@ public class OrderTestsMy
 		keyA = assetA.getKey(db);
 
 		//CREATE INVALID ORDER CREATION INVALID AMOUNT
-		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(50.01).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l);
+		orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(50.01), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
@@ -307,7 +307,7 @@ public class OrderTestsMy
 		if (false) {
 			//CREATE INVALID ORDER CREATION INVALID AMOUNT
 			orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, keyA,
-					BigDecimal.valueOf(0.01).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l, new byte[64]);
+					BigDecimal.valueOf(0.01), BigDecimal.valueOf(1.1), (byte)0, ++timeStamp, 0l, new byte[64]);
 			orderCreation.setDC(db, false);
 			//orderCreation.process(null, false);
 
@@ -316,7 +316,7 @@ public class OrderTestsMy
 		}
 
 		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-		orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l, new byte[64]);
+		orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
@@ -324,7 +324,7 @@ public class OrderTestsMy
 		assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(releaserReference, flags));
 
 		//CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 114l, BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, 0l, new byte[64]);
+		orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 114l, BigDecimal.valueOf(0.1), BigDecimal.valueOf(1), (byte)0, ++timeStamp, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 
@@ -333,7 +333,7 @@ public class OrderTestsMy
 
 		if (false) {
 			//CREATE ORDER CREATION INVALID REFERENCE
-			orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, ++timeStamp, -12345L, new byte[64]);
+			orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1), BigDecimal.valueOf(1), (byte)0, ++timeStamp, -12345L, new byte[64]);
 			orderCreation.setDC(db, false);
 
 			//CHECK IF  ORDER CREATION IS INVALID
@@ -444,7 +444,7 @@ public class OrderTestsMy
 		// calc - https://docs.google.com/spreadsheets/d/14OjXtMM36XHqtercQZCytusK7KKD0dSY_uno0lWMsCs/edit#gid=0
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[64]);
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(100), (byte)0, timestamp++, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -452,7 +452,7 @@ public class OrderTestsMy
 		order_AB_1_ID = orderCreation.getOrderId();
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(300).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[64]);
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(300), (byte)0, timestamp++, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -460,7 +460,7 @@ public class OrderTestsMy
 		order_AB_4_ID = order_AB_4.getId();
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1400).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[64]);
+				BigDecimal.valueOf(1400),BigDecimal.valueOf(200), (byte)0, timestamp++, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -468,7 +468,7 @@ public class OrderTestsMy
 		order_AB_3_ID = order_AB_3.getId();
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(130).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[64]);
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(130), (byte)0, timestamp++, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -487,7 +487,7 @@ public class OrderTestsMy
 		// CREATE ORDER SELLING 120 B FOR A AT A PRICE OF 595)
 		// должно иницировать 2 торговли на Приказ АБ_1 и Приказ АБ_2
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(595).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[]{5, 6});
+				BigDecimal.valueOf(120),BigDecimal.valueOf(595), (byte)0, timestamp++, 0l, new byte[]{5, 6});
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -498,12 +498,12 @@ public class OrderTestsMy
 		order_AB_2 = Order.fromDBrec(reloadOrder(order_AB_2));
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(45600).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(49880).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(45600)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(49880)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(120)); //BALANCE B FOR ACCOUNT A
 		Assert.assertEquals(accountB.getBalanceUSE(keyA, db),
 				order_AB_1.getAmountHave().add(BigDecimal.valueOf(120).subtract(order_AB_1.getAmountWant())
-						//.multiply(order_B.getPriceCalcReverse()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
+						//.multiply(order_B.getPriceCalcReverse()))
 						.divide(order_AB_2.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_HALF_UP))
 				); //BALANCE A FOR ACCOUNT B
 
@@ -514,7 +514,7 @@ public class OrderTestsMy
 		Assert.assertEquals(false, db.getOrderMap().contains(order_BA_1_ID));
 		Assert.assertEquals(0, order_AB_1_tmp.getFulfilledHave().compareTo(order_AB_1.getAmountHave()));
 		order_BA_1 = Order.fromDBrec(Order.reloadOrder(db, order_BA_1.getId()));
-		assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(120));
 		Assert.assertEquals(true, order_AB_1_tmp.isFulfilled());
 		Assert.assertEquals(true, order_BA_1.isFulfilled());
 
@@ -542,17 +542,17 @@ public class OrderTestsMy
 			// 2
 			trade = Trade.fromDBrec(order_BA_1.getInitiatedTrades(db).get(1));
 			Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(20)
-					//.multiply(orderB.getPriceCalcReverse()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+					//.multiply(orderB.getPriceCalcReverse()));
 					.divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_HALF_UP));
-			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20));
 			Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_2_ID));
 		} else {
 			// 2
 			Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_2_ID));
 			Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(20)
-					//.multiply(orderB.getPriceCalcReverse()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+					//.multiply(orderB.getPriceCalcReverse()));
 					.divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_HALF_UP));
-			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20));
 			// 1
 			trade = Trade.fromDBrec(order_BA_1.getInitiatedTrades(db).get(1));
 			Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
@@ -562,10 +562,10 @@ public class OrderTestsMy
 		}
 
 		////////////////////////////
-		bal_A_keyA = accountA.getBalanceUSE(keyA, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_A_keyB = accountA.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_B_keyB = accountB.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_B_keyA = accountB.getBalanceUSE(keyA, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		bal_A_keyA = accountA.getBalanceUSE(keyA, db);
+		bal_A_keyB = accountA.getBalanceUSE(keyB, db);
+		bal_B_keyB = accountB.getBalanceUSE(keyB, db);
+		bal_B_keyA = accountB.getBalanceUSE(keyA, db);
 
 		BigDecimal order_AB_2_haveLeft = order_AB_2.getAmountHaveLeft();
 
@@ -573,7 +573,7 @@ public class OrderTestsMy
 
 		// new trade add - duplicate
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(260).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(1900).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[]{5, 6});
+				BigDecimal.valueOf(260),BigDecimal.valueOf(1900), (byte)0, timestamp++, 0l, new byte[]{5, 6});
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -586,7 +586,7 @@ public class OrderTestsMy
 		Assert.assertEquals(accountA.getBalanceUSE(keyA, db),
 				bal_A_keyA); //BALANCE A FOR ACCOUNT A
 		Assert.assertEquals(accountB.getBalanceUSE(keyB, db),
-				bal_B_keyB.subtract(order_BA_2.getAmountHave()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
+				bal_B_keyB.subtract(order_BA_2.getAmountHave())); //BALANCE B FOR ACCOUNT B
 		Assert.assertEquals(accountA.getBalanceUSE(keyB, db),
 				bal_A_keyB.add(order_BA_2.getFulfilledHave())); //BALANCE B FOR ACCOUNT A
 		Assert.assertEquals(accountB.getBalanceUSE(keyA, db),
@@ -600,10 +600,10 @@ public class OrderTestsMy
 		BigDecimal trade_amo_5 = amoHave.divide(order_BA_2.getPrice(), 8, RoundingMode.HALF_DOWN);
 		BigDecimal trade_amo_6 = amoHave;
 
-		bal_A_keyA = accountA.getBalanceUSE(keyA, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_A_keyB = accountA.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_B_keyB = accountB.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_B_keyA = accountB.getBalanceUSE(keyA, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		bal_A_keyA = accountA.getBalanceUSE(keyA, db);
+		bal_A_keyB = accountA.getBalanceUSE(keyB, db);
+		bal_B_keyB = accountB.getBalanceUSE(keyB, db);
+		bal_B_keyA = accountB.getBalanceUSE(keyA, db);
 
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
 				amoHave, amoWant,
@@ -620,13 +620,13 @@ public class OrderTestsMy
 		trade_1_amoB = order_BA_2.getAmountHaveLeft();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal(45600).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal(45600)
 				.subtract(amoHave)); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(49620).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(49620)); //BALANCE B FOR ACCOUNT B
 		assertEquals(accountA.getBalanceUSE(keyB, db),
-				bal_A_keyB.add(trade_amo_5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
+				bal_A_keyB.add(trade_amo_5)); //BALANCE B FOR ACCOUNT A
 		assertEquals(accountB.getBalanceUSE(keyA, db),
-				bal_B_keyA.add(trade_amo_6).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+				bal_B_keyA.add(trade_amo_6)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		Assert.assertEquals(false, db.getOrderMap().contains(order_AB_8.getId()));
@@ -638,7 +638,7 @@ public class OrderTestsMy
 		Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_BA_2.getId()));
 		//Assert.assertEquals(order_E.getFulfilledHave(),
 		//		//trade_B_fill.add(amoHave.multiply(order_E.getPriceCalcReverse()).setScale(8, RoundingMode.HALF_DOWN)));
-		//		trade_amo_2.add(tradedAmoB).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		//		trade_amo_2.add(tradedAmoB));
 
 		Assert.assertEquals(false, order_BA_2.isFulfilled());
 
@@ -665,7 +665,7 @@ public class OrderTestsMy
 		//CREATE ORDER ONE (SELLING 100 A FOR B AT A PRICE OF 10)
 		// amountHAVE 100 - amountWant 1000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[64]);
+				BigDecimal.valueOf(100),BigDecimal.valueOf(1000), (byte)0, timestamp++, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
@@ -675,30 +675,30 @@ public class OrderTestsMy
 		//CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
 		//GENERATES TRADE 100 B FOR 1000 A
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(4995).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(249.75).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[]{5, 6});
+				BigDecimal.valueOf(4995),BigDecimal.valueOf(249.75), (byte)0, timestamp++, 0l, new byte[]{5, 6});
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
 		BigInteger order_BA_1_ID = orderCreation.makeOrder().getId();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49900).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(45005).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49900)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(45005)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(100)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		Order order_AB_1 = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
 		Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1.getId()));
-		Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
 		Assert.assertEquals(true, order_AB_1.isFulfilled());
 
 		Order order_BA_1 = Order.fromDBrec(db.getOrderMap().get(order_BA_1_ID));
 		Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_BA_1.getId()));
-		Assert.assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(1000));
 		// if order is not fulfiller - recalc getFulfilledWant by own price:
-		Assert.assertEquals(BigDecimal.valueOf(50).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-				order_BA_1.getFulfilledHave().multiply(order_BA_1.getPrice()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(BigDecimal.valueOf(50),
+				order_BA_1.getFulfilledHave().multiply(order_BA_1.getPrice()));
 		Assert.assertEquals(false, order_BA_1.isFulfilled());
 
 		//CHECK TRADES
@@ -708,12 +708,12 @@ public class OrderTestsMy
 		Assert.assertEquals(0, trade.getInitiator().compareTo(order_BA_1_ID));
 		Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
 		Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(100)));
-		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(1000));
 
-		bal_A_keyA = accountA.getBalanceUSE(keyA, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_A_keyB = accountA.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_B_keyB = accountB.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		bal_B_keyA = accountB.getBalanceUSE(keyA, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		bal_A_keyA = accountA.getBalanceUSE(keyA, db);
+		bal_A_keyB = accountA.getBalanceUSE(keyB, db);
+		bal_B_keyB = accountB.getBalanceUSE(keyB, db);
+		bal_B_keyA = accountB.getBalanceUSE(keyA, db);
 
 		//CREATE ORDER THREE (SELLING 19.99999999 A FOR B AT A PRICE OF 20)
 		BigDecimal amoHave = BigDecimal.valueOf(1.99999999);
@@ -735,15 +735,15 @@ public class OrderTestsMy
 
 		//CHECK BALANCES
 		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal("49898.00000001")); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(45005).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		assertEquals(accountA.getBalanceUSE(keyB, db).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(45005)); //BALANCE B FOR ACCOUNT B
+		assertEquals(accountA.getBalanceUSE(keyB, db),
 				bal_A_keyB.add(order_BA_2_wantTaked)); //BALANCE B FOR ACCOUNT A
-		assertEquals(accountB.getBalanceUSE(keyA, db), new BigDecimal("101.99999999").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		assertEquals(accountB.getBalanceUSE(keyA, db), new BigDecimal("101.99999999")); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		order_AB_1 = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
 		Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1.getId()));
-		Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
 		Assert.assertEquals(true, order_AB_1.isFulfilled());
 
 		order_BA_1 = Order.fromDBrec(db.getOrderMap().get(order_BA_1_ID));
@@ -795,7 +795,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[64]);
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(100), (byte)0, timestamp++, 0l, new byte[64]);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -805,7 +805,7 @@ public class OrderTestsMy
 		//CREATE ORDER TWO (SELLING 99.9 B FOR A AT A PRICE OF 5)
 		//GENERATES TRADE 99,9 B FOR 495 A
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(99.9).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(495).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(99.9),BigDecimal.valueOf(495), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -815,8 +815,8 @@ public class OrderTestsMy
 		//CHECK BALANCES
 		Assert.assertEquals(0, accountA.getBalanceUSE(keyA, db).compareTo(BigDecimal.valueOf(49000))); //BALANCE A FOR ACCOUNT A
 		Assert.assertEquals(0, accountB.getBalanceUSE(keyB, db).compareTo(BigDecimal.valueOf(49900.1))); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(99.9).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(999).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(99.9)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(999)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		Order orderA = Order.fromDBrec(db.getOrderMap().get(orderID_A));
@@ -841,7 +841,7 @@ public class OrderTestsMy
 		//CREATE ORDER THREE (SELLING 99 A FOR B AT A PRICE OF 0.2)
 		//GENERATED TRADE 99 A FOR 9.9 B
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(99).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(19.8).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(99),BigDecimal.valueOf(19.8), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -902,7 +902,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(1000), BigDecimal.valueOf(100), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -912,7 +912,7 @@ public class OrderTestsMy
 		//CREATE ORDER TWO (SELLING 200 B FOR PRICE OF 5)
 		//GENERATES TRADE 100 B FOR 1000 A
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(200),BigDecimal.valueOf(1000), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -948,7 +948,7 @@ public class OrderTestsMy
 		//CREATE ORDER THREE (SELLING 99 A FOR B AT A PRICE OF 0.2) (I CAN BUY AT INCREMENTS OF 1)
 		//GENERATED TRADE 95 A for 19 B
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(95.9).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(19).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(95.9),BigDecimal.valueOf(19), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -956,10 +956,10 @@ public class OrderTestsMy
 		BigInteger orderID_C = orderCreation.makeOrder().getId();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(48904.1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(48904.1)); //BALANCE A FOR ACCOUNT A
 		Assert.assertEquals(0, accountB.getBalanceUSE(keyB, db).compareTo(BigDecimal.valueOf(49800))); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(119.18).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(1095.9).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(119.18)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(1095.9)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
@@ -974,7 +974,7 @@ public class OrderTestsMy
 
 		Order orderC = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_C));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderC.getId()));
-		Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(95.9).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(95.9));
 		Assert.assertEquals(true, orderC.isFulfilled());
 
 		//CHECK TRADES
@@ -1016,7 +1016,7 @@ public class OrderTestsMy
 		// CHECK SORTING for orders
 		//CREATE ORDER _B  SELL 2A x 20000 = 40000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(40000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(2), BigDecimal.valueOf(40000), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1025,7 +1025,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _A  SELL 1A for 15000 = 15000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(15000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(1), BigDecimal.valueOf(15000), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1034,7 +1034,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _C SELL 4A x 25000 = 100000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(4).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(4), BigDecimal.valueOf(100000), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1043,7 +1043,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _D (BUY) 30000 x 2 = 60000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(60000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(60000),BigDecimal.valueOf(2), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1051,11 +1051,11 @@ public class OrderTestsMy
 		BigInteger orderID_D = orderCreation.makeOrder().getId();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); //BALANCE A FOR ACCOUNT A
 		// 60000 - 5000 returned by auto cancel
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000000 - 60000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(60000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3.2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000000 - 60000)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(60000)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3.2)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
@@ -1067,20 +1067,20 @@ public class OrderTestsMy
 
 		Order orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
-		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
+		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
 		Assert.assertEquals(true, orderB.isFulfilled());
 
 		Order orderC = Order.fromDBrec(db.getOrderMap().get(orderID_C));
 		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
-		Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2));
 		Assert.assertEquals(false, orderC.isFulfilled());
 
 		// buy order
 		Order orderD = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_D));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderD.getId()));
-		Assert.assertEquals(orderD.getFulfilledHave(), BigDecimal.valueOf(60000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		/// calc wrong Assert.assertEquals(orderD.getFulfilledWant(), BigDecimal.valueOf(3).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderD.getFulfilledHave(), BigDecimal.valueOf(60000));
+		/// calc wrong Assert.assertEquals(orderD.getFulfilledWant(), BigDecimal.valueOf(3));
 		// its auto-canceled
 		Assert.assertEquals(true, orderD.isFulfilled());
 
@@ -1094,22 +1094,22 @@ public class OrderTestsMy
 		// rundon sorting - 3 orders -тут нет сортровки и выдает ордер один из 3-х
 		if (trade.getTarget().compareTo(orderID_A) == 0) {
 			Assert.assertEquals(0, trade.getTarget().compareTo(orderID_A));
-			Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(15000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+			Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
+			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(15000));
 
 			if (false) {
 				trade = Trade.fromDBrec(orderD.getInitiatedTrades(db).get(1));
 				Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_D));
 				Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
-				Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-				Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(40000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2));
+				Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(40000));
 			}
 		}
 
 
 		//CREATE ORDER _E - buy 23000 x 2 = 46000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(56000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(56000),BigDecimal.valueOf(2), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountB, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1117,18 +1117,18 @@ public class OrderTestsMy
 		BigInteger orderID_E = orderCreation.makeOrder().getId();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); //BALANCE A FOR ACCOUNT A
 		// 6000 - returned by non Divisible change - auto canceled order
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000000 - 60000 - 56000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(60000 + 56000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3.2 + 2.24).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000000 - 60000 - 56000)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(60000 + 56000)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3.2 + 2.24)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		/// order auto canceled
 		Order orderE = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_E));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderE.getId()));
 		// 6000 returned by auto-cancel
-		Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(56000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(56000));
 		//Assert.assertEquals(orderE.getFulfilledWant(), BigDecimal.valueOf(2));
 		// but auto-canceled
 		Assert.assertEquals(true, orderE.isFulfilled());
@@ -1136,8 +1136,8 @@ public class OrderTestsMy
 		Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
 		// reload order_B
 		orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderB.getId()));
-		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
+		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
 		Assert.assertEquals(true, orderB.isFulfilled());
 
 		//CHECK TRADES
@@ -1146,14 +1146,14 @@ public class OrderTestsMy
 		trade = Trade.fromDBrec(orderE.getInitiatedTrades(db).get(0));
 		Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_E));
 		Assert.assertEquals(0, trade.getTarget().compareTo(orderID_C));
-		Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2.24).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(56000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2.24));
+		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(56000));
 
 		assertEquals(0, db.getOrderMap().getOrders(keyB, keyA, false).size());
 		/*
-		assertEquals(BigDecimal.valueOf(23000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), db.getOrderMap().getOrders(keyB, keyA).get(0).getPriceCalcReverse());
-		assertEquals(BigDecimal.valueOf(26000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountHaveLeft());
-		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountWantLeft());
+		assertEquals(BigDecimal.valueOf(23000), db.getOrderMap().getOrders(keyB, keyA).get(0).getPriceCalcReverse());
+		assertEquals(BigDecimal.valueOf(26000), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountHaveLeft());
+		assertEquals(BigDecimal.valueOf(1), db.getOrderMap().getOrders(keyB, keyA).get(0).getAmountWantLeft());
 		 */
 
 	}
@@ -1186,7 +1186,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _A  SELL 1A for 15000 = 15000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(15000.88).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(1), BigDecimal.valueOf(15000.88), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1195,7 +1195,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _B  SELL 2A x 20000 = 40000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(40000.33).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(2), BigDecimal.valueOf(40000.33), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1204,7 +1204,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _C SELL 4A x 25000 = 100000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(4).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100007).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(4), BigDecimal.valueOf(100007), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1213,7 +1213,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _D (BUY) 30000 x 2 = 60000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(60003).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(60003),BigDecimal.valueOf(2), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1221,35 +1221,35 @@ public class OrderTestsMy
 		BigInteger orderID_D = orderCreation.makeOrder().getId();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000000 - 60003).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(60003).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3.2000576).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(1000000 - 60003)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(60003)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3.2000576)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
-		Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.88).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(1));
+		Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.88));
 		Assert.assertEquals(true, orderA.isFulfilled());
 		Assert.assertEquals(true, orderA.isFulfilled());
 
 		Order orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
-		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
+		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
 		Assert.assertEquals(true, orderB.isFulfilled());
 
 		Order orderC = Order.fromDBrec(db.getOrderMap().get(orderID_C));
 		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
-		Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2000576).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2000576));
 		Assert.assertEquals(false, orderC.isFulfilled());
 
 		// buy order
 		Order orderD = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_D));
 		Assert.assertEquals(false, db.getOrderMap().contains(orderD.getId()));
-		Assert.assertEquals(orderD.getFulfilledHave(), BigDecimal.valueOf(60003).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		//Assert.assertEquals(orderD.getFulfilledWant(), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderD.getFulfilledHave(), BigDecimal.valueOf(60003));
+		//Assert.assertEquals(orderD.getFulfilledWant(), BigDecimal.valueOf(2));
 		Assert.assertEquals(true, orderD.isFulfilled());
 
 		//CHECK TRADES
@@ -1261,21 +1261,21 @@ public class OrderTestsMy
 		// this may be WRONG in some case - reRUN task!
 		if (trade.getTarget().compareTo(orderID_A) == 0) {
 			Assert.assertEquals(0, trade.getTarget().compareTo(orderID_A));
-			Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(15000.88).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+			Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
+			Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(15000.88));
 
 			trade = Trade.fromDBrec(orderD.getInitiatedTrades(db).get(1));
 			if (trade.getTarget().compareTo(orderID_B) == 0) {
 				Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_D));
 				Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
-				Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-				Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
+				Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165));
 			}
 		}
 
 		//CREATE ORDER _E - buy 23000 x 2 = 46000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(46000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(46000),BigDecimal.valueOf(2), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountB, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1283,16 +1283,16 @@ public class OrderTestsMy
 		BigInteger orderID_E = orderCreation.makeOrder().getId();
 
 		//CHECK BALANCES
-		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(918998.955).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT B
-		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(55001.21).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE B FOR ACCOUNT A
-		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)); //BALANCE A FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); //BALANCE A FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyB, db), BigDecimal.valueOf(918998.955)); //BALANCE B FOR ACCOUNT B
+		Assert.assertEquals(accountA.getBalanceUSE(keyB, db), BigDecimal.valueOf(55001.21)); //BALANCE B FOR ACCOUNT A
+		Assert.assertEquals(accountB.getBalanceUSE(keyA, db), BigDecimal.valueOf(3)); //BALANCE A FOR ACCOUNT B
 
 		//CHECK ORDERS
 		/// order in memory !!!
 		Order orderE = Order.fromDBrec(db.getOrderMap().get(orderID_E));
 		Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderE.getId()));
-		Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(20000.165).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(20000.165));
 		Assert.assertEquals(0, orderE.getFulfilledWant().compareTo(BigDecimal.valueOf(1)));
 		Assert.assertEquals(false, orderE.isFulfilled());
 		Assert.assertEquals(false, orderE.isFulfilled());
@@ -1300,8 +1300,8 @@ public class OrderTestsMy
 		Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
 		// reload order_B
 		orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderB.getId()));
-		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
+		Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
 		Assert.assertEquals(true, orderB.isFulfilled());
 
 		//CHECK TRADES
@@ -1310,16 +1310,16 @@ public class OrderTestsMy
 		trade = Trade.fromDBrec(orderE.getInitiatedTrades(db).get(0));
 		Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_E));
 		Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
-		Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
+		Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165));
 
 		Order order_123 = Order.fromDBrec(db.getOrderMap().getOrders(keyB, keyA, false).get(0));
 		assertEquals(1, db.getOrderMap().getOrders(keyB, keyA, false).size());
-		assertEquals(BigDecimal.valueOf(23000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		assertEquals(BigDecimal.valueOf(23000),
 				order_123.getPrice());
-		assertEquals(BigDecimal.valueOf(25999.835).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		assertEquals(BigDecimal.valueOf(25999.835),
 				order_123.getAmountHaveLeft());
-		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		assertEquals(BigDecimal.valueOf(1),
 				order_123.getAmountWantLeft());
 
 	}
@@ -1351,7 +1351,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _A  SELL 2A for 15000 = 30000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(30000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(30000), BigDecimal.valueOf(2), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1360,7 +1360,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _B  SELL 2A x 20000 = 40000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(40000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(2).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(40000), BigDecimal.valueOf(2), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1369,7 +1369,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _C SELL 4A x 25000 = 100000
 		orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(4).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountB.getLastTimestamp(db));
+				BigDecimal.valueOf(100000), BigDecimal.valueOf(4), (byte)0, timestamp++, accountB.getLastTimestamp(db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1420,7 +1420,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER _I  SELL 3A for 24000 = 48000
 		orderCreation = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(3).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l);
+				BigDecimal.valueOf(3), BigDecimal.valueOf(100000), (byte)0, timestamp++, 0l);
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
@@ -1884,7 +1884,7 @@ public class OrderTestsMy
 
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
 		createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(150).setScale(assetA.getScale()),BigDecimal.valueOf(750).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, 0l, new byte[]{3, 4});
+				BigDecimal.valueOf(150).setScale(assetA.getScale()),BigDecimal.valueOf(750), (byte)0, timestamp++, 0l, new byte[]{3, 4});
 		createOrderTransaction.sign(accountA, false);
 		createOrderTransaction.setDC(db, false);
 		createOrderTransaction.process(null, false);
@@ -1946,9 +1946,9 @@ public class OrderTestsMy
 		issueAssetTransaction.setDC(db, false);
 		issueAssetTransaction.process(null, false);
 
-		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//transaction = new GenesisTransaction(accountB, BigDecimal.valueOf(1000), NTP.getTime());
 		//transaction.process(dcSet, false);
-		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
 		//CREATE ASSET
 		AssetCls assetB = new AssetVenture(accountB, "b", icon, image, "b", 0, 8, 50000l);
@@ -1964,7 +1964,7 @@ public class OrderTestsMy
 		//CREATE ORDER ONE (SELLING 1000 A FOR B AT A PRICE OF 0.10)
 		DCSet fork1 = db.fork();
 		CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountA.getLastTimestamp(fork1), new byte[]{5,6});
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(100), (byte)0, timestamp++, accountA.getLastTimestamp(fork1), new byte[]{5,6});
 		createOrderTransaction.sign(accountA, false);
 		createOrderTransaction.setDC(db, false);
 		createOrderTransaction.process(null, false);
@@ -1973,7 +1973,7 @@ public class OrderTestsMy
 		//CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
 		DCSet fork2 = fork1.fork();
 		createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountA.getLastTimestamp(fork2), new byte[]{1, 2});
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(200), (byte)0, timestamp++, accountA.getLastTimestamp(fork2), new byte[]{1, 2});
 		createOrderTransaction.sign(accountA, false);
 		createOrderTransaction.setDC(db, false);
 		createOrderTransaction.process(null, false);
@@ -1982,7 +1982,7 @@ public class OrderTestsMy
 		//CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
 		DCSet fork3 = fork2.fork();
 		createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA,
-				BigDecimal.valueOf(150).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(750).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountA.getLastTimestamp(fork3), new byte[]{3, 4});
+				BigDecimal.valueOf(150),BigDecimal.valueOf(750), (byte)0, timestamp++, accountA.getLastTimestamp(fork3), new byte[]{3, 4});
 		createOrderTransaction.sign(accountB, false);
 		createOrderTransaction.setDC(db, false);
 		createOrderTransaction.process(null, false);
@@ -2005,7 +2005,7 @@ public class OrderTestsMy
 
 		Order orderB = Order.fromDBrec(fork3.getOrderMap().get(orderID_B));
 		Assert.assertEquals(false, fork3.getCompletedOrderMap().contains(orderB.getId()));
-		assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(0));
 		Assert.assertEquals(false, orderB.isFulfilled());
 
 		//CHECK TRADES
@@ -2013,7 +2013,7 @@ public class OrderTestsMy
 
 		//ORPHAN ORDER TWO
 		createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
-				BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), (byte)0, timestamp++, accountA.getLastTimestamp(fork2), new byte[]{1, 2});
+				BigDecimal.valueOf(1000),BigDecimal.valueOf(200), (byte)0, timestamp++, accountA.getLastTimestamp(fork2), new byte[]{1, 2});
 		createOrderTransaction.setDC(db, false);
 		createOrderTransaction.orphan(false);
 
@@ -2185,14 +2185,14 @@ public class OrderTestsMy
 		init();
 
 		//CREATE ORDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), accountA.getBalanceUSE( keyA, db));
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity()), accountA.getBalanceUSE( keyA, db));
 		orderCreation.sign(accountA, false);
 		orderCreation.setDC(db, false);
 		orderCreation.process(null, false);
 		BigInteger orderID = orderCreation.makeOrder().getId();
 
 		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
-				.subtract(orderCreation.makeOrder().getAmountHave()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+				.subtract(orderCreation.makeOrder().getAmountHave()),
 				accountA.getBalanceUSE( keyA, db));
 
 
@@ -2204,7 +2204,7 @@ public class OrderTestsMy
 		cancelOrderTransaction.process(null, false);
 
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity()),
 				accountA.getBalanceUSE(keyA, db));
 
 		//CHECK REFERENCE SENDER
@@ -2215,12 +2215,12 @@ public class OrderTestsMy
 
 		////////// OPHRAN ////////////////
 		//CHECK BALANCE SENDER
-		assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), accountA.getBalanceUSE( keyA, db));
+		assertEquals(BigDecimal.valueOf(assetA.getQuantity()), accountA.getBalanceUSE( keyA, db));
 		cancelOrderTransaction.orphan(false);
 
 		//CHECK BALANCE SENDER
 		assertEquals(BigDecimal.valueOf(assetA.getQuantity())
-				.subtract(orderCreation.makeOrder().getAmountHave()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+				.subtract(orderCreation.makeOrder().getAmountHave()),
 				accountA.getBalanceUSE( keyA, db));
 
 		//CHECK REFERENCE SENDER

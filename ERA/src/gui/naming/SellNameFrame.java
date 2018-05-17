@@ -26,7 +26,6 @@ import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.naming.Name;
 import core.transaction.Transaction;
@@ -228,7 +227,7 @@ public class SellNameFrame extends JFrame
 		{
 			//READ PRICE
 			parsing = 1;
-			BigDecimal price= new BigDecimal(txtPrice.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal price= new BigDecimal(txtPrice.getText());
 
 			//READ FEE
 			parsing = 2;

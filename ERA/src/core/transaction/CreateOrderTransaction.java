@@ -62,17 +62,6 @@ public class CreateOrderTransaction extends Transaction {
 		this.haveKey = haveKey;
 		this.wantKey = wantKey;
 
-		/*
-		int different_scale = amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
-		if (different_scale != 0) {
-			amountHave = amountHave.scaleByPowerOfTen(different_scale);
-		}
-		different_scale = amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
-		if (different_scale != 0) {
-			amountWant = amountWant.scaleByPowerOfTen(different_scale);
-		}
-		*/
-
 		this.amountHave = amountHave;
 		this.amountWant = amountWant;
 
@@ -563,7 +552,7 @@ public class CreateOrderTransaction extends Transaction {
 			return this.amountHave;
 		}
 
-		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		return BigDecimal.ZERO;
 	}
 
 	public Map<String, Map<Long, BigDecimal>> getAssetAmount() {

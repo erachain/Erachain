@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import at.AT;
-import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
@@ -181,7 +180,7 @@ public class ATDetailsFrame extends JFrame {
 		JLabel minActivationLabel = new JLabel(Lang.getInstance().translate("Min Activation Amount") + ":");
 		this.add(minActivationLabel, labelGBC);
 		detailGBC.gridy = 9;
-		JTextField txtMinActiv = new JTextField( BigDecimal.valueOf(at.minActivationAmount() , BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
+		JTextField txtMinActiv = new JTextField( BigDecimal.valueOf(at.minActivationAmount()).toPlainString());
 		txtMinActiv.setEditable(false);
 		this.add(txtMinActiv, detailGBC);
 

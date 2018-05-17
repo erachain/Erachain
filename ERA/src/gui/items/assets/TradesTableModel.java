@@ -10,7 +10,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
-import core.BlockChain;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.DCSet;
@@ -41,8 +40,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
 	private void totalCalc()
 	{
-		sumAsset1 = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		sumAsset2 = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		sumAsset1 = BigDecimal.ZERO;
+		sumAsset2 = BigDecimal.ZERO;
 
 		for (Pair<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> tradePair : this.trades)
 		{

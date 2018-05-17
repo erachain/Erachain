@@ -12,7 +12,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -333,7 +332,7 @@ public class VoteOnPollTransaction extends Transaction
 	{
 		if(account.getAddress().equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).subtract(this.fee);
+			return BigDecimal.ZERO.subtract(this.fee);
 		}
 
 		return BigDecimal.ZERO;

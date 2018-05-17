@@ -101,11 +101,6 @@ public abstract class TransactionAmount extends Transaction {
 			// RESET 0 bit
 			typeBytes[2] = (byte) (typeBytes[2] & (byte) 127);
 
-			/*
-			 * int different_scale = amount.scale() -
-			 * BlockChain.AMOUNT_DEDAULT_SCALE; if (different_scale != 0) {
-			 * amount = amount.scaleByPowerOfTen(different_scale); }
-			 */
 			this.amount = amount;
 		}
 
@@ -127,12 +122,6 @@ public abstract class TransactionAmount extends Transaction {
 
 		if (this.amount != null) {
 			this.asset = (AssetCls) this.dcSet.getItemAssetMap().get(this.getAbsKey());
-			/*
-			 * if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
-			 * int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE -
-			 * asset.getScale(); if (different_scale != 0) { // RESCALE AMOUNT
-			 * this.amount = this.amount.scaleByPowerOfTen(different_scale); } }
-			 */
 		}
 	}
 

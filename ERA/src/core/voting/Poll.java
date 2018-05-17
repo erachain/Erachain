@@ -81,7 +81,7 @@ public class Poll
 
 	public BigDecimal getTotalVotes(long assetKey)
 	{
-		BigDecimal votes = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal votes = BigDecimal.ZERO;
 
 		for(PollOption option: this.options)
 		{

@@ -112,7 +112,7 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 			}
 			else
 			{
-				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				return NumberAsString.getInstance().numberAsString(BigDecimal.ZERO);
 			}
 			 */
 
