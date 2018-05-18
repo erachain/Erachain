@@ -1,6 +1,13 @@
 *.class
 /data*
+/*backup*
 /backup*
 /wallet*
 ERA/settings.json
 ERA/*.jar
+/build/
+.gradle
+log*.txt
+settings.json
+/.classpath
+/.project
