@@ -24,7 +24,6 @@ import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
-import core.crypto.Crypto;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import network.message.TelegramMessage;
@@ -46,21 +45,16 @@ public class TelegramsResource {
 
 	@GET
 	@Path("address/{address}")
-	public String getTelegramsTwo(@PathParam("address") String address) {
-		return this.getTelegramsTimestamp(address, 0,"");
+	public String getTelegramsTwo(@PathParam("address") String address,
+			@QueryParam("filter") String filter) {
+		return this.getTelegramsTimestamp(address, 0, filter);
 	}
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("timestamp/{timestamp}/filter/{filter}")
-	public String getTelegramsLimited(@PathParam("timestamp") int timestamp, @PathParam("filter") String filter) {
-		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET telegrams/timestamp/" + timestamp + "filter/"+ filter, request);
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
+	@Path("timestamp/{timestamp}")
+	public String getTelegramsLimited(@PathParam("timestamp") long timestamp,
+		@QueryParam("filter") String filter) {
 
 		// CREATE JSON OBJECT
 		JSONArray array = new JSONArray();
@@ -74,29 +68,12 @@ public class TelegramsResource {
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("address/{address}/timestamp/{timestamp}/filter/{filter}")
-	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") int timestamp, @PathParam("filter") String filter) {
-		String password = null;
-		APIUtils.askAPICallAllowed(password, "GET telegrams/address/" + address + "/timestamp/" + timestamp, request);
-
-		// CHECK IF WALLET EXISTS
-		if (!Controller.getInstance().doesWalletExists()) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-		}
-
-		// CHECK ADDRESS
-		if (!Crypto.getInstance().isValidAddress(address)) {
-			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
-		}
-
-		// CHECK ACCOUNT IN WALLET
-		Account account = Controller.getInstance().getAccountByAddress(address);
-		if (account == null) {
-			throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
-		}
-
+	@Path("address/{address}/timestamp/{timestamp}")
+	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp,
+			@QueryParam("filter") String filter) {
+		
 		JSONArray array = new JSONArray();
-		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account, timestamp, filter)) {
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(new Account(address), timestamp, filter)) {
 			array.add(telegram.toJson());
 		}
 
@@ -134,12 +111,12 @@ public class TelegramsResource {
 	// GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122
 	@SuppressWarnings("unchecked")
 	@GET
-	@Path("send/{sender}/{recipient}/{asset}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
+	@Path("send/{sender}/{recipient}/{asset}/{amount}/{title}/{message}/{istextmessage}/{encrypt}")
 	public String send(@PathParam("sender") String sender1, @PathParam("recipient") String recipient1,
 			@PathParam("asset") long asset_in, @PathParam("amount") String amount_in,
 			@PathParam("title") String title_in, @PathParam("message") String message_in,
 			@PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
-			@PathParam("password") String password) {
+			@QueryParam("password") String password) {
 
 		APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
 

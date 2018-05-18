@@ -127,6 +127,9 @@ public abstract class AssetCls extends ItemCls {
 		case 2:
 			return "◄" + this.name; // ® ■ ± █
 		case 3:
+			if (this.key == 555l || this.key == 666l || this.key == 777l)
+				return this.name;
+			
 			return "±" + this.name;
 		default:
 			return "▲" + this.name;

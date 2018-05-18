@@ -435,14 +435,26 @@ public abstract class TransactionAmount extends Transaction {
 					case 555:
 						if (actionType != 1) 
 							return INVALID_TRANSFER_TYPE;
+						
+						if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
+							return NO_BALANCE;
+
 						break;
 					case 666:
 						if (actionType != 1) 
 							return INVALID_TRANSFER_TYPE;
+
+						if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
+							return NO_BALANCE;
+						
 						break;
 					case 777:
 						if (actionType != 1) 
 							return INVALID_TRANSFER_TYPE;
+
+						if (amount.compareTo(BigDecimal.ZERO.subtract(BigDecimal.ONE)) < 0)
+							return NO_BALANCE;
+						
 						break;
 					case 888:
 						return ITEM_ASSET_NOT_EXIST;
@@ -700,20 +712,20 @@ public abstract class TransactionAmount extends Transaction {
 		long absKey = getAbsKey();
 
 		// BACKWARD - CONFISCATE
-		boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+		boolean confiscate = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
 		// UPDATE SENDER
 		if (absKey == 666l) {
-			this.creator.changeBalance(db, confiscate_credit, key, this.amount, false);			
+			this.creator.changeBalance(db, confiscate, key, this.amount, false);			
 		} else {
-			this.creator.changeBalance(db, !confiscate_credit, key, this.amount, false);			
+			this.creator.changeBalance(db, !confiscate, key, this.amount, false);			
 		}
 		// UPDATE RECIPIENT
-		this.recipient.changeBalance(db, confiscate_credit, key, this.amount, false);
+		this.recipient.changeBalance(db, confiscate, key, this.amount, false);
 
 		int actionType = Account.actionType(key, amount);
 		if (actionType == 2) {
-			if (confiscate_credit) {
+			if (confiscate) {
 				// BORROW
 				Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
 						absKey, this.recipient.getAddress());
@@ -775,20 +787,20 @@ public abstract class TransactionAmount extends Transaction {
 		long absKey = getAbsKey();
 
 		// BACKWARD - CONFISCATE
-		boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+		boolean confiscate = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
 		// UPDATE SENDER
 		if (absKey == 666l) {
-			this.creator.changeBalance(db, !confiscate_credit, key, this.amount, false);			
+			this.creator.changeBalance(db, !confiscate, key, this.amount, false);			
 		} else {
-			this.creator.changeBalance(db, confiscate_credit, key, this.amount, false);			
+			this.creator.changeBalance(db, confiscate, key, this.amount, false);			
 		}
 		// UPDATE RECIPIENT
-		this.recipient.changeBalance(db, !confiscate_credit, key, this.amount, true);
+		this.recipient.changeBalance(db, !confiscate, key, this.amount, true);
 
 		int actionType = Account.actionType(key, amount);
 		if (actionType == 2) {
-			if (confiscate_credit) {
+			if (confiscate) {
 				// BORROW
 				Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
 						absKey, this.recipient.getAddress());
