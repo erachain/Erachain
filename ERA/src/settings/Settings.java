@@ -2,37 +2,30 @@ package settings;
 // 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
 // 30/03 ++
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.URL;
-import java.util.ArrayList;
-//import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-// import org.apache.log4j.Logger;
-import org.apache.log4j.Logger;
-
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
-
 import controller.Controller;
 import core.BlockChain;
 import lang.Lang;
 import network.Peer;
 import ntp.NTP;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
+//import java.util.Arrays;
+// import org.apache.log4j.Logger;
 
 public class Settings {
 
@@ -44,7 +37,7 @@ public class Settings {
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2; // 10000 
+	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2; // 10000
 	private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
@@ -55,84 +48,85 @@ public class Settings {
 	//public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
 
 	private long genesisStamp = -1;
-	
+
 	//RPC
 	private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_RPC_ENABLED = false;
-	
+
 	private static final boolean DEFAULT_BACUP_ENABLED = true;
 	private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
 	public static final int DEFAULT_ACCOUNTS = 1;
-	
+
 	//WEB
 	private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_WEB_ENABLED = true;
-	
-	// 19 03	
+
+	// 19 03
 	//GUI
 	private static final boolean DEFAULT_GUI_ENABLED = true;
 	private static final boolean DEFAULT_GUI_DYNAMIC = true;
-	
+
 	//DATA
 	public static final String DEFAULT_DATA_DIR = "datachain";
 	public static final String DEFAULT_LOCAL_DIR = "datalocal";
 	public static final String DEFAULT_WALLET_DIR = "wallet";
 	public static final String DEFAULT_BACKUP_DIR = "backup";
-	
+
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
 
 	private static final boolean DEFAULT_SOUND_RECEIVE_COIN = true;
 	private static final boolean DEFAULT_SOUND_MESSAGE = true;
 	private static final boolean DEFAULT_SOUND_NEW_TRANSACTION = true;
-	
+
 	//private static final int DEFAULT_MAX_BYTE_PER_FEE = 512;
 	private static final boolean ALLOW_FEE_LESS_REQUIRED = false;
-	
+
 	//private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);
 
 	//DATE FORMAT
 	private static final String DEFAULT_TIME_ZONE = ""; //"GMT+3";
 	private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 	private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
-	
+
 	private static final boolean DEFAULT_NS_UPDATE = false;
 	private static final boolean DEFAULT_FORGING_ENABLED = true;
-	
+
 	public static String DEFAULT_LANGUAGE = "en.json";
 
 	private static final String NOTEFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
 	private static final int NOTEFY_INCOMING_CONFIRMATIONS = 0;
 
 	private static Settings instance;
-	
+
 	private JSONObject settingsJSON;
 	private JSONObject peersJSON;
 
 	private String userPath = "";
+    private String walletPath = "";
 
 	private InetAddress localAddress;
-	
+
 	List<Peer> cacheInternetPeers;
 	long timeLoadInternetPeers;
-	
+
 	private String[] defaultPeers = { };
 
 	private String getBackUpPath;
+	private String getWalletPath;
 
-	
 	public static Settings getInstance()
 	{
 		if(instance == null)
 		{
 			instance = new Settings();
 		}
-		
+
 		return instance;
 	}
-	
+
 	public static void FreeInstance()
 	{
 		if(instance != null)
@@ -140,37 +134,37 @@ public class Settings {
 			instance = null;
 		}
 	}
-	
+
 	private Settings()
 	{
 		this.localAddress = this.getCurrentIp();
 		settingsJSON = read_setting_JSON();
-				
-				
+
+
 		File file = new File("");
 		//TRY READ PEERS.JSON
 		try
 		{
 			//OPEN FILE
 			file = new File(this.getPeersPath());
-			
+
 			//CREATE FILE IF IT DOESNT EXIST
 			if(file.exists())
 			{
 				//READ PEERS FILE
 				List<String> lines = Files.readLines(file, Charsets.UTF_8);
-				
+
 				String jsonString = "";
 				for(String line : lines){
 					jsonString += line;
 				}
-				
+
 				//CREATE JSON OBJECT
 				this.peersJSON = (JSONObject) JSONValue.parse(jsonString);
 			} else {
 				this.peersJSON = new JSONObject();
 			}
-			
+
 		}
 		catch(Exception e)
 		{
@@ -179,43 +173,44 @@ public class Settings {
 			this.peersJSON = new JSONObject();
 		}
 	}
-	
+
 	public JSONObject Dump()
 	{
 		return (JSONObject) settingsJSON.clone();
 	}
-	
+
 	public void setDefaultPeers(String[] peers)
 	{
 		this.defaultPeers = peers;
 	}
-	
+
 	public String getSettingsPath()
 	{
 		return this.userPath + "settings.json";
 	}
-	
+
 	public String getGuiSettingPath(){
-		
+
 		return this.userPath + "gui_settings.json";
-		
+
 	}
-	
+
 	public String getPeersPath()
 	{
 		return this.userPath + (core.BlockChain.DEVELOP_USE?"peers-dev.json":"peers.json");
 	}
-	
+
 	public String getWalletDir()
 	{
-		return this.getUserPath() + DEFAULT_WALLET_DIR;
+		return this.getWalletPath + DEFAULT_WALLET_DIR;
 	}
-	
+
 	public String getBackUpDir()
 	{
 		return this.getBackUpPath + DEFAULT_BACKUP_DIR;
 	}
-	
+
+
 	public String getDataDir()
 	{
 		return this.getUserPath() + DEFAULT_DATA_DIR;
@@ -224,17 +219,20 @@ public class Settings {
 	{
 		return this.getUserPath() + DEFAULT_LOCAL_DIR;
 	}
-	
+
 	public String getLangDir()
 	{
 		return this.getUserPath() + "languages";
 	}
-	
+
 	public String getUserPath()
 	{
 		return this.userPath;
 	}
-
+    public String getWalletPath()
+    {
+        return this.walletPath;
+    }
 	// http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
 	public String getNotifyIncomingURL()
 	{
@@ -251,7 +249,7 @@ public class Settings {
 		{
 			return (int) (long)this.settingsJSON.get("notify_incoming_confirmations");
 		}
-		
+
 		return NOTEFY_INCOMING_CONFIRMATIONS;
 	}
 
@@ -262,25 +260,25 @@ public class Settings {
 		} else {
 			return new JSONArray();
 		}
-		
+
 	}
-		
+
 	@SuppressWarnings("unchecked")
 	public List<Peer> getKnownPeers()
 	{
 		try {
 			boolean loadPeersFromInternet =	(
-				Controller.getInstance().getToOfflineTime() != 0L 
-				&& 
+				Controller.getInstance().getToOfflineTime() != 0L
+				&&
 				NTP.getTime() - Controller.getInstance().getToOfflineTime() > 5*60*1000
 				);
-			
+
 			List<Peer> knownPeers = new ArrayList<>();
 			JSONArray peersArray = new JSONArray();
-	
+
 			try {
 				JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
-	
+
 				if(peersArraySettings != null)
 				{
 					for (Object peer : peersArraySettings) {
@@ -293,10 +291,10 @@ public class Settings {
 				LOGGER.error(e.getMessage(),e);
 				LOGGER.info("Error with loading knownpeers from settings.json.");
 			}
-			
+
 			try {
 				JSONArray peersArrayPeers = (JSONArray) this.peersJSON.get("knownpeers");
-				
+
 				if(peersArrayPeers != null)
 				{
 					for (Object peer : peersArrayPeers) {
@@ -305,39 +303,39 @@ public class Settings {
 						}
 					}
 				}
-				
+
 			} catch (Exception e) {
 				LOGGER.debug(e.getMessage(),e);
 				LOGGER.info("Error with loading knownpeers from peers.json.");
 			}
-			
+
 			knownPeers.addAll(this.getPeersFromDefault());
-			
+
 			knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
-			
+
 			if(!core.BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet))
 			{
 				knownPeers.addAll(getKnownPeersFromInternet());
 			}
-			
+
 			return knownPeers;
-		
+
 		} catch (Exception e) {
 			LOGGER.debug(e.getMessage(),e);
 			LOGGER.info("Error in getKnownPeers().");
 			return new ArrayList<Peer>();
 		}
 	}
-	
-	public List<Peer> getKnownPeersFromInternet() 
+
+	public List<Peer> getKnownPeersFromInternet()
 	{
 		try {
-			
+
 			if(this.cacheInternetPeers == null) {
-				
+
 				this.cacheInternetPeers = new ArrayList<Peer>();
 			}
-				
+
 			if(this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24*60*60*1000 )
 			{
 				this.timeLoadInternetPeers = NTP.getTime();
@@ -350,21 +348,21 @@ public class Settings {
 					this.cacheInternetPeers = getKnownPeersFromJSONArray(peersArray);
 				}
 			}
-		
+
 			//LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet : ") + this.cacheInternetPeers.size());
 
 			return this.cacheInternetPeers;
-			
+
 		} catch (Exception e) {
 			//RETURN EMPTY LIST
 
 			//LOGGER.debug(e.getMessage(), e);
 			LOGGER.info(Lang.getInstance().translate("Peers loaded from Internet with errors : ") + this.cacheInternetPeers.size());
-						
+
 			return this.cacheInternetPeers;
 		}
 	}
-	
+
 	public List<Peer> getPeersFromDefault()
 	{
 		List<Peer> peers = new ArrayList<Peer>();
@@ -373,12 +371,12 @@ public class Settings {
 			try
 			{
 				InetAddress address = InetAddress.getByName(this.defaultPeers[i]);
-				
+
 				if(!this.isLocalAddress(address))
 				{
 					//CREATE PEER
 					Peer peer = new Peer(address);
-								
+
 					//ADD TO LIST
 					peers.add(peer);
 				}
@@ -390,25 +388,25 @@ public class Settings {
 		}
 		return peers;
 	}
-	
+
 	public List<Peer> getKnownPeersFromJSONArray(JSONArray peersArray)
 	{
 		try
 		{
 			//CREATE LIST WITH PEERS
 			List<Peer> peers = new ArrayList<>();
-			
+
 			for(int i=0; i<peersArray.size(); i++)
 			{
 				try
 				{
 					InetAddress address = InetAddress.getByName((String) peersArray.get(i));
-					
+
 					if(!this.isLocalAddress(address))
 					{
 						//CREATE PEER
 						Peer peer = new Peer(address);
-									
+
 						//ADD TO LIST
 						peers.add(peer);
 					}
@@ -418,7 +416,7 @@ public class Settings {
 					LOGGER.info((String) peersArray.get(i) + " - invalid peer address!");
 				}
 			}
-			
+
 			//RETURN
 			return peers;
 		}
@@ -428,22 +426,22 @@ public class Settings {
 			return new ArrayList<Peer>();
 		}
 	}
-	
+
 	public void setGenesisStamp(long testNetStamp) {
 		this.genesisStamp = testNetStamp;
 	}
-	
+
 	public boolean isTestnet () {
 		return this.getGenesisStamp() != BlockChain.DEFAULT_MAINNET_STAMP;
 	}
-	
+
 	public long getGenesisStamp() {
 		if(this.genesisStamp == -1) {
 			if(this.settingsJSON.containsKey("testnetstamp"))
 			{
 				if(this.settingsJSON.get("testnetstamp").toString().equals("now") ||
 						((Long) this.settingsJSON.get("testnetstamp")).longValue() == 0) {
-					this.genesisStamp = System.currentTimeMillis();				
+					this.genesisStamp = System.currentTimeMillis();
 				} else {
 					this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
 				}
@@ -451,80 +449,80 @@ public class Settings {
 				this.genesisStamp = BlockChain.DEFAULT_MAINNET_STAMP;
 			}
 		}
-		
+
 		return this.genesisStamp;
 	}
-	
+
 	public int getMaxConnections()
 	{
 		if(this.settingsJSON.containsKey("maxconnections"))
 		{
 			return ((Long) this.settingsJSON.get("maxconnections")).intValue();
 		}
-		
+
 		return DEFAULT_MAX_CONNECTIONS;
 	}
-	
+
 	public int getMaxReceivePeers()
 	{
 		if(this.settingsJSON.containsKey("maxreceivepeers"))
 		{
 			return ((Long) this.settingsJSON.get("maxreceivepeers")).intValue();
 		}
-		
+
 		return DEFAULT_MAX_RECEIVE_PEERS;
 	}
-	
+
 	public int getMaxSentPeers()
 	{
 		if(this.settingsJSON.containsKey("maxsentpeers"))
 		{
 			return ((Long) this.settingsJSON.get("maxsentpeers")).intValue();
 		}
-		
+
 		return DEFAULT_MAX_SENT_PEERS;
 	}
-	
+
 	public int getMinConnections()
 	{
 		if(this.settingsJSON.containsKey("minconnections"))
 		{
 			return ((Long) this.settingsJSON.get("minconnections")).intValue();
 		}
-		
+
 		return DEFAULT_MIN_CONNECTIONS;
 	}
-	
+
 	public int getConnectionTimeout()
 	{
 		if(this.settingsJSON.containsKey("connectiontimeout"))
 		{
 			return ((Long) this.settingsJSON.get("connectiontimeout")).intValue();
 		}
-		
+
 		return DEFAULT_CONNECTION_TIMEOUT;
 	}
-	
+
 	public boolean isTryingConnectToBadPeers()
 	{
 		if(this.settingsJSON.containsKey("tryingconnecttobadpeers"))
 		{
 			return ((Boolean) this.settingsJSON.get("tryingconnecttobadpeers")).booleanValue();
 		}
-		
+
 		return DEFAULT_TRYING_CONNECT_TO_BAD_PEERS;
 	}
-		
+
 	public int getRpcPort()
 	{
 		if(this.settingsJSON.containsKey("rpcport"))
 		{
 			return ((Long) this.settingsJSON.get("rpcport")).intValue();
 		}
-		
+
 		return BlockChain.DEFAULT_RPC_PORT;
 	}
-	
+
 	public String[] getRpcAllowed()
 	{
 		try
@@ -533,18 +531,18 @@ public class Settings {
 			{
 				//GET PEERS FROM JSON
 				JSONArray allowedArray = (JSONArray) this.settingsJSON.get("rpcallowed");
-				
+
 				//CREATE LIST WITH PEERS
 				String[] allowed = new String[allowedArray.size()];
 				for(int i=0; i<allowedArray.size(); i++)
 				{
 					allowed[i] = (String) allowedArray.get(i);
 				}
-				
+
 				//RETURN
-				return allowed;	
+				return allowed;
 			}
-			
+
 			//RETURN
 			return DEFAULT_RPC_ALLOWED.split(";");
 		}
@@ -555,56 +553,56 @@ public class Settings {
 		}
 	}
 
-	public boolean isRpcEnabled() 
+	public boolean isRpcEnabled()
 	{
 		if(this.settingsJSON.containsKey("rpcenabled"))
 		{
 			return ((Boolean) this.settingsJSON.get("rpcenabled")).booleanValue();
 		}
-		
+
 		return DEFAULT_RPC_ENABLED;
 	}
-	
-	public boolean getbacUpEnabled() 
+
+	public boolean getbacUpEnabled()
 	{
 		if(this.settingsJSON.containsKey("backupenabled"))
 		{
 			return ((Boolean) this.settingsJSON.get("backupenabled")).booleanValue();
 		}
-		
+
 		return DEFAULT_BACUP_ENABLED;
 	}
-	
-	public boolean getbacUpAskToStart() 
+
+	public boolean getbacUpAskToStart()
 	{
 		if(this.settingsJSON.containsKey("backupasktostart"))
 		{
 			return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();
 		}
-		
+
 		return DEFAULT_BACKUP_ASK_ENABLED;
 	}
-	
+
 	public int getWebPort()
 	{
 		if(this.settingsJSON.containsKey("webport"))
 		{
 			return ((Long) this.settingsJSON.get("webport")).intValue();
 		}
-		
+
 		return BlockChain.DEFAULT_WEB_PORT;
 	}
-	
-	public boolean isGuiConsoleEnabled() 
+
+	public boolean isGuiConsoleEnabled()
 	{
 		if(this.settingsJSON.containsKey("guiconsoleenabled"))
 		{
 			return ((Boolean) this.settingsJSON.get("guiconsoleenabled")).booleanValue();
 		}
-		
+
 		return DEFAULT_GUI_CONSOLE_ENABLED;
 	}
-	
+
 	public String[] getWebAllowed()
 	{
 		try
@@ -613,18 +611,18 @@ public class Settings {
 			{
 				//GET PEERS FROM JSON
 				JSONArray allowedArray = (JSONArray) this.settingsJSON.get("weballowed");
-				
+
 				//CREATE LIST WITH PEERS
 				String[] allowed = new String[allowedArray.size()];
 				for(int i=0; i<allowedArray.size(); i++)
 				{
 					allowed[i] = (String) allowedArray.get(i);
 				}
-				
+
 				//RETURN
-				return allowed;	
+				return allowed;
 			}
-			
+
 			//RETURN
 			return DEFAULT_WEB_ALLOWED.split(";");
 		}
@@ -635,27 +633,27 @@ public class Settings {
 		}
 	}
 
-	public boolean isWebEnabled() 
+	public boolean isWebEnabled()
 	{
 		if(this.settingsJSON.containsKey("webenabled"))
 		{
 			return ((Boolean) this.settingsJSON.get("webenabled")).booleanValue();
 		}
-		
+
 		return DEFAULT_WEB_ENABLED;
 	}
-	
-	public boolean updateNameStorage() 
+
+	public boolean updateNameStorage()
 	{
 		if(this.settingsJSON.containsKey("nsupdate"))
 		{
 			return ((Boolean) this.settingsJSON.get("nsupdate")).booleanValue();
 		}
-		
+
 		return DEFAULT_NS_UPDATE;
 	}
-	
-	public boolean isForgingEnabled() 
+
+	public boolean isForgingEnabled()
 	{
 		try {
 			if(this.settingsJSON.containsKey("forging"))
@@ -665,67 +663,67 @@ public class Settings {
 		} catch (Exception e) {
 			LOGGER.error("Bad Settings.json content for parameter forging " + ExceptionUtils.getStackTrace(e));
 		}
-		
+
 		return DEFAULT_FORGING_ENABLED;
 	}
-	
+
 	public int getPingInterval()
 	{
 		if(this.settingsJSON.containsKey("pinginterval"))
 		{
 			return ((Long) this.settingsJSON.get("pinginterval")).intValue();
 		}
-		
+
 		return DEFAULT_PING_INTERVAL;
 	}
 
-	public boolean isGeneratorKeyCachingEnabled() 
+	public boolean isGeneratorKeyCachingEnabled()
 	{
 		if(this.settingsJSON.containsKey("generatorkeycaching"))
 		{
 			return ((Boolean) this.settingsJSON.get("generatorkeycaching")).booleanValue();
 		}
-		
+
 		return DEFAULT_GENERATOR_KEY_CACHING;
 	}
-	
-	public boolean isCheckpointingEnabled() 
+
+	public boolean isCheckpointingEnabled()
 	{
 		if(this.settingsJSON.containsKey("checkpoint"))
 		{
 			return ((Boolean) this.settingsJSON.get("checkpoint")).booleanValue();
 		}
-		
+
 		return DEFAULT_CHECKPOINTING;
 	}
-	
-	public boolean isSoundReceivePaymentEnabled() 
+
+	public boolean isSoundReceivePaymentEnabled()
 	{
 		if(this.settingsJSON.containsKey("soundreceivepayment"))
 		{
 			return ((Boolean) this.settingsJSON.get("soundreceivepayment")).booleanValue();
 		}
-		
+
 		return DEFAULT_SOUND_RECEIVE_COIN;
 	}
-	
-	public boolean isSoundReceiveMessageEnabled() 
+
+	public boolean isSoundReceiveMessageEnabled()
 	{
 		if(this.settingsJSON.containsKey("soundreceivemessage"))
 		{
 			return ((Boolean) this.settingsJSON.get("soundreceivemessage")).booleanValue();
 		}
-		
+
 		return DEFAULT_SOUND_MESSAGE;
 	}
-	
-	public boolean isSoundNewTransactionEnabled() 
+
+	public boolean isSoundNewTransactionEnabled()
 	{
 		if(this.settingsJSON.containsKey("soundnewtransaction"))
 		{
 			return ((Boolean) this.settingsJSON.get("soundnewtransaction")).booleanValue();
 		}
-		
+
 		return DEFAULT_SOUND_NEW_TRANSACTION;
 	}
 	
@@ -740,14 +738,14 @@ public class Settings {
 		return DEFAULT_MAX_BYTE_PER_FEE;
 	}
 	*/
-	
-	public boolean isAllowFeeLessRequired() 
+
+	public boolean isAllowFeeLessRequired()
 	{
 		if(this.settingsJSON.containsKey("allowfeelessrequired"))
 		{
 			return ((Boolean) this.settingsJSON.get("allowfeelessrequired")).booleanValue();
 		}
-		
+
 		return ALLOW_FEE_LESS_REQUIRED;
 	}
 
@@ -757,15 +755,15 @@ public class Settings {
 		return DEFAULT_BIG_FEE;
 	}
 	*/
-	
-	public boolean isGuiEnabled() 
+
+	public boolean isGuiEnabled()
 	{
-		
+
 		if(!Controller.getInstance().doesWalletDatabaseExists())
 		{
 			return true;
 		}
-		
+
 		if(System.getProperty("nogui") != null)
 		{
 			return false;
@@ -774,35 +772,35 @@ public class Settings {
 		{
 			return ((Boolean) this.settingsJSON.get("guienabled")).booleanValue();
 		}
-		
+
 		return DEFAULT_GUI_ENABLED;
 	}
-	
-	public boolean isGuiDynamic() 
+
+	public boolean isGuiDynamic()
 	{
 	if(this.settingsJSON.containsKey("guidynamic"))
 		{
 			return ((Boolean) this.settingsJSON.get("guidynamic")).booleanValue();
 		}
-		
+
 		return DEFAULT_GUI_DYNAMIC;
 	}
-	
+
 	public String getTimeZone()
 	{
 		if(this.settingsJSON.containsKey("timezone")) {
 			return (String) this.settingsJSON.get("timezone");
 		}
-		
+
 		return DEFAULT_TIME_ZONE;
 	}
-	
+
 	public String getTimeFormat()
 	{
 		if(this.settingsJSON.containsKey("timeformat")) {
 			return (String) this.settingsJSON.get("timeformat");
 		}
-		
+
 		return DEFAULT_TIME_FORMAT;
 	}
 
@@ -812,10 +810,10 @@ public class Settings {
 		if(this.settingsJSON.containsKey("birthTimeformat")) {
 			return (String) this.settingsJSON.get("birthTimeformat");
 		}
-		
+
 		return DEFAULT_BIRTH_TIME_FORMAT;
 	}
-	
+
 
 	public boolean isSysTrayEnabled() {
 		if(this.settingsJSON.containsKey("systray"))
@@ -836,7 +834,7 @@ public class Settings {
             return false;
         }
 	}
-	
+
 	public InetAddress getCurrentIp() {
         try {
             Enumeration<NetworkInterface> networkInterfaces = NetworkInterface
@@ -847,7 +845,7 @@ public class Settings {
                 Enumeration<InetAddress> nias = ni.getInetAddresses();
                 while(nias.hasMoreElements()) {
                     InetAddress ia= (InetAddress) nias.nextElement();
-                    if (!ia.isLinkLocalAddress() 
+                    if (!ia.isLinkLocalAddress()
                      && !ia.isLoopbackAddress()
                      && ia instanceof Inet4Address) {
                         return ia;
@@ -866,7 +864,7 @@ public class Settings {
 		{
 			return ((String) this.settingsJSON.get("lang").toString());
 		}
-		
+
 		return DEFAULT_LANGUAGE;
 	}
 	public String get_Font(){
@@ -874,72 +872,72 @@ public class Settings {
 		{
 			return ((String) this.settingsJSON.get("font_size").toString());
 		}
-		
-		return DEFAULT_FONT_SIZE.toString();		
-		
+
+		return DEFAULT_FONT_SIZE.toString();
+
 	}
-	
+
 	public String get_File_Chooser_Paht(){
 		if(this.settingsJSON.containsKey("FileChooser_Path"))
 		{
 			return ((String) this.settingsJSON.get("FileChooser_Path").toString());
 		}
-		
+
 		return getUserPath();
-		
+
 	}
-	
+
 	public int get_File_Chooser_Wight(){
 		if(this.settingsJSON.containsKey("FileChooser_Wight"))
 		{
 			return new Integer( this.settingsJSON.get("FileChooser_Wight").toString());
 		}
-		
+
 		return 0;
-		
+
 	}
-	
+
 	public int get_File_Chooser_Height(){
 		if(this.settingsJSON.containsKey("FileChooser_Height"))
 		{
 			return new Integer(this.settingsJSON.get("FileChooser_Height").toString());
 		}
-		
+
 		return 0;
-		
+
 	}
-	
+
 	public String get_Font_Name(){
 		if(this.settingsJSON.containsKey("font_name"))
 		{
 			return ((String) this.settingsJSON.get("font_name").toString());
 		}
-		
+
 		return DEFAULT_FONT_NAME;
 	}
-		
+
 	public String get_Theme(){
-		
+
 		if(this.settingsJSON.containsKey("theme"))
 		{
 			return ((String) this.settingsJSON.get("theme").toString());
 		}
-		
+
 		return DEFAULT_THEME;
 	}
-	
+
 	public String get_LookAndFell(){
-		
+
 		if(this.settingsJSON.containsKey("LookAndFell"))
 		{
 			return ((String) this.settingsJSON.get("LookAndFell").toString());
 		}
-		
+
 		return DEFAULT_THEME;
-		
-		
+
+
 	}
-		
+
 	public JSONObject  read_setting_JSON() {
 		int alreadyPassed = 0;
 		File file = new File(this.userPath + "settings.json");
@@ -962,83 +960,92 @@ public class Settings {
 				//OPEN FILE
 		//READ SETTINS JSON FILE
 		List<String> lines = Files.readLines(file, Charsets.UTF_8);
-		
+
 		String jsonString = "";
 		for(String line : lines){
-			
+
 			//correcting single backslash bug
 			if(line.contains("userpath"))
 			{
 				line = line.replace("\\", File.separator);
 			}
-			
+
 			jsonString += line;
 		}
-		
+
 		//CREATE JSON OBJECT
 		this.settingsJSON = (JSONObject) JSONValue.parse(jsonString);
 		settingsJSON =	settingsJSON == null ? new JSONObject() : settingsJSON;
-		
-		
+
+
 		alreadyPassed++;
-		
+
 		if(this.settingsJSON.containsKey("userpath"))
 		{
 			this.userPath = (String) this.settingsJSON.get("userpath");
-			
+
 			if (!(this.userPath.endsWith("\\") || this.userPath.endsWith("/") || this.getBackUpPath.endsWith(File.separator)))
 			{
-				this.userPath += File.separator; 
+				this.userPath += File.separator;
 			}
 		}
 		else
 		{
 			alreadyPassed ++;
-		}	
-		
+		}
+
 // read BackUb Path		
 		if(this.settingsJSON.containsKey("backuppath"))
 		{
 			this.getBackUpPath = (String) this.settingsJSON.get("backuppath");
-			
-		
+
+
 			try {
 				if (!(this.getBackUpPath.endsWith("\\") || this.getBackUpPath.endsWith("/")|| this.getBackUpPath.endsWith(File.separator)))
 				{
-					this.getBackUpPath += File.separator; 
+					this.getBackUpPath += File.separator;
 				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				this.getBackUpPath = ""; 
+				this.getBackUpPath = "";
 			}
-			
+
 		}
 		else{
-			this.getBackUpPath = ""; 
-			
+			this.getBackUpPath = "";
+
 		}
-		
-		
-	
+
+		if(this.settingsJSON.containsKey("walletdir"))
+		{
+			this.getWalletPath = (String) this.settingsJSON.get("walletdir");
+
+			try {
+				if (!(this.getWalletPath.endsWith("\\") || this.getWalletPath.endsWith("/")|| this.getWalletPath.endsWith(File.separator)))
+				{
+					this.getWalletPath += File.separator;
+				}
+			} catch (Exception e) {
+			
+				this.getWalletPath = "";
+			}
+		}
+		else {
+			this.getWalletPath="";
+		}
+
 		//CREATE FILE IF IT DOESNT EXIST
 		if(!file.exists())
 		{
 			file.createNewFile();
 		}
 	}
-		
-}
-catch(Exception e)
-{
-	LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
-	LOGGER.error(e.getMessage(),e);
-	settingsJSON =	new JSONObject();
-}
 
-	return settingsJSON;
-	
+} catch (Exception e) {
+			LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
+			LOGGER.error(e.getMessage(), e);
+			settingsJSON = new JSONObject();
+		}
+		return settingsJSON;
 	}
-	
-	
-	
 }
