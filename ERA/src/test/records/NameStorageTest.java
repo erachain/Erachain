@@ -11,7 +11,6 @@ import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
 import core.naming.Name;
@@ -59,17 +58,17 @@ public class NameStorageTest {
 
 		// PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 		//Transaction transaction = new GenesisTransaction(sender, BigDecimal
-		//		.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//		.valueOf(1000), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		//sender.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-		sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
 
 		// PROCESS GENESIS TRANSACTION TO MAKE SURE BUYER HAS FUNDS
 		//transaction = new GenesisTransaction(buyer, BigDecimal.valueOf(1000)
-		//		.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//		, NTP.getTime());
 		//transaction.process(databaseSet, false);
-		buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
 		// CREATE SIGNATURE
 		long timestamp = NTP.getTime();

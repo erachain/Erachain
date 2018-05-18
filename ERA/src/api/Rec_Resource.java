@@ -24,7 +24,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
@@ -283,7 +282,7 @@ public class Rec_Resource {
 
 					step++;
 					if (jsonObject.containsKey("amount"))
-						amount = new BigDecimal(((List<String>)jsonObject.get("amount")).get(0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+						amount = new BigDecimal(((List<String>)jsonObject.get("amount")).get(0));
 
 					step++;
 					if (jsonObject.containsKey("head"))

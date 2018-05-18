@@ -13,7 +13,6 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -344,7 +343,7 @@ public class BuyNameTransaction extends Transaction
 
 		if(address.equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).subtract(this.nameSale.getAmount());
+			return BigDecimal.ZERO.subtract(this.nameSale.getAmount());
 		}
 
 		if(address.equals(this.getSeller().getAddress()))
@@ -352,7 +351,7 @@ public class BuyNameTransaction extends Transaction
 			return this.nameSale.getAmount();
 		}
 
-		return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		return BigDecimal.ZERO;
 	}
 	@Override
 	public int calcBaseFee() {

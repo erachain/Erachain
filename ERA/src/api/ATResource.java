@@ -27,7 +27,6 @@ import com.google.common.primitives.Longs;
 import at.AT_Constants;
 import at.AT_Transaction;
 import controller.Controller;
-import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
@@ -224,7 +223,7 @@ public class ATResource
 		try
 		{
 			String quantityString = ( String ) jsonObject.get("quantity");
-			quantity = new BigDecimal(quantityString).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			quantity = new BigDecimal(quantityString);
 		}
 		catch (Exception e)
 		{
@@ -281,7 +280,7 @@ public class ATResource
 		{
 			throw ApiErrorFactory.getInstance().createError( Transaction.INVALID_FEE_POWER );
 		}
-		BigDecimal minActivationAmountB = new BigDecimal((String) jsonObject.get("minActivationAmount")).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal minActivationAmountB = new BigDecimal((String) jsonObject.get("minActivationAmount"));
 
 		byte[] minActivationAmountBytes = minActivationAmountB.unscaledValue().toByteArray();
 		byte[] fillActivation = new byte[8 - minActivationAmountBytes.length];

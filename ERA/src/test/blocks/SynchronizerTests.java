@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import controller.Controller;
-import core.BlockChain;
 import core.BlockGenerator;
 import core.Synchronizer;
 import core.account.PrivateKeyAccount;
@@ -56,9 +55,9 @@ public class SynchronizerTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000), false);
 
 		//GENERATE 5 NEXT BLOCKS
 		Block lastBlock = genesisBlock;
@@ -94,9 +93,9 @@ public class SynchronizerTests {
 		generator = new PrivateKeyAccount(privateKey);
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
 		//transaction.process(databaseSet, false);
-		generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000), false);
 
 		//FORK
 		DCSet fork = databaseSet.fork();
@@ -197,13 +196,13 @@ public class SynchronizerTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
-		generator.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		generator.changeBalance(databaseSet1, false, FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		generator.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		generator.changeBalance(databaseSet2, false, FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		generator.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000), false);
+		generator.changeBalance(databaseSet1, false, FEE_KEY, BigDecimal.valueOf(10), false);
+		generator.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000), false);
+		generator.changeBalance(databaseSet2, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
 
 		//CREATE KNOWN ACCOUNT 2
@@ -212,12 +211,12 @@ public class SynchronizerTests {
 		PrivateKeyAccount generator2 = new PrivateKeyAccount(privateKey2);
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR2 HAS FUNDS
-		//transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
-		//GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		//transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000), NTP.getTime());
+		//GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000));
 		//transaction.process(databaseSet, false);
 		//transaction.process(databaseSet2, false);
-		generator2.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		generator2.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		generator2.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000), false);
+		generator2.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000), false);
 
 
 		//GENERATE 5 NEXT BLOCKS

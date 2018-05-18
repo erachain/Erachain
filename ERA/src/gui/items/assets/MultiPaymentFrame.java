@@ -137,7 +137,7 @@ public class MultiPaymentFrame extends JFrame
 		txtGBC.gridy = 2;
 		txtFeePow = new JTextField();
 
-		//BigDecimal fee = BigDecimal.ONE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		//BigDecimal fee = BigDecimal.ONE;
 		//fee = fee.add(BigDecimal.valueOf(this.payments.size()).divide(BigDecimal.valueOf(5)));
 		txtFeePow.setText("0");
 

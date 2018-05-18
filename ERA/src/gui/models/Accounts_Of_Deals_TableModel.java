@@ -13,7 +13,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
@@ -201,7 +200,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 			}
 			else
 			{
-				return NumberAsString.formatAsString(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+				return NumberAsString.formatAsString(BigDecimal.ZERO);
 			}
 			 */
 
@@ -253,7 +252,7 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
 
 	public BigDecimal getTotalBalance()
 	{
-		BigDecimal totalBalance = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal totalBalance = BigDecimal.ZERO;
 
 		for(Account account: this.publicKeyAccounts)
 		{

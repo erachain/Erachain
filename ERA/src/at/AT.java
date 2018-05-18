@@ -8,7 +8,6 @@ import java.util.Iterator;
 
 import org.json.simple.JSONObject;
 
-import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.Transaction;
@@ -176,7 +175,7 @@ public class AT extends AT_Machine_State {
 		atJSON.put("type", type);
 		atJSON.put("tags", tags);
 		atJSON.put("version", getVersion());
-		atJSON.put("minActivation", BigDecimal.valueOf( minActivationAmount() , BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString() );
+		atJSON.put("minActivation", BigDecimal.valueOf( minActivationAmount()).toPlainString() );
 		atJSON.put("creationBlock", getCreationBlockHeight());
 		atJSON.put("state", getStateJSON());
 		atJSON.put("creator", new Account(Base58.encode(getCreator())).getAddress());

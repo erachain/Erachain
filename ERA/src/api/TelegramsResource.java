@@ -176,7 +176,7 @@ public class TelegramsResource {
 		// READ AMOUNT
 		try {
 			// USE max DEEP SCALE!
-			amount = new BigDecimal(amount_in).setScale(8); //BlockChain.AMOUNT_DEDAULT_SCALE);
+			amount = new BigDecimal(amount_in);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();

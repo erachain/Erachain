@@ -44,7 +44,6 @@ import org.mapdb.Fun.Tuple6;
 import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.block.Block;
 import core.block.GenesisBlock;
@@ -1326,7 +1325,7 @@ public class BlockExplorer {
 			if (!pairsTrades.containsKey(target.c.a)) {
 				count = 0;
 				volumePrice = BigDecimal.ZERO;
-				volumeAmount = BigDecimal.ZERO; // .setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				volumeAmount = BigDecimal.ZERO; // ;
 			} else {
 				count = pairsTrades.get(target.c.a);
 				volumePrice = volumePriceTrades.get(target.c.a);
@@ -1422,13 +1421,13 @@ public class BlockExplorer {
 		if (all.containsKey(key)) {
 			output.put("totalOrdersVolume", all.get(key).c.toPlainString());
 		} else {
-			output.put("totalOrdersVolume", BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
+			output.put("totalOrdersVolume", BigDecimal.ZERO.toPlainString());
 		}
 
 		if (all.containsKey(key)) {
 			output.put("totalTradesVolume", all.get(key).f.toPlainString());
 		} else {
-			output.put("totalTradesVolume", BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
+			output.put("totalTradesVolume", BigDecimal.ZERO.toPlainString());
 		}
 
 		Map pairsJSON = new LinkedHashMap();
@@ -1734,7 +1733,7 @@ public class BlockExplorer {
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
 			blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 
-			BigDecimal totalAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal totalAmount = BigDecimal.ZERO;
 			for (Transaction transaction : block.getTransactions()) {
 				for (Account account : transaction.getInvolvedAccounts()) {
 					BigDecimal amount = transaction.getAmount(account);
@@ -1749,11 +1748,11 @@ public class BlockExplorer {
 			LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> aTtxs = dcSet.getATTransactionMap()
 					.getATTransactions(counter);
 
-			BigDecimal totalATAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal totalATAmount = BigDecimal.ZERO;
 
 			for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : aTtxs.entrySet()) {
 				totalATAmount = totalATAmount
-						.add(BigDecimal.valueOf(e.getValue().getAmount(), BlockChain.AMOUNT_DEDAULT_SCALE));
+						.add(BigDecimal.valueOf(e.getValue().getAmount()));
 			}
 
 			blockJSON.put("totalATAmount", totalATAmount.toPlainString());
@@ -2018,7 +2017,7 @@ public class BlockExplorer {
 				 * block.getTotalFee().toPlainString());
 				 * 
 				 * BigDecimal totalAmount =
-				 * BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				 * BigDecimal.ZERO;
 				 * for (Transaction transaction : block.getTransactions()) { for
 				 * (Account account : transaction.getInvolvedAccounts()) {
 				 * BigDecimal amount = transaction.getAmount(account);
@@ -2032,12 +2031,12 @@ public class BlockExplorer {
 				 * dcSet.getATTransactionMap().getATTransactions(counter);
 				 * 
 				 * BigDecimal totalATAmount =
-				 * BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				 * BigDecimal.ZERO;
 				 * 
 				 * for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e :
 				 * aTtxs.entrySet()) { totalATAmount =
 				 * totalATAmount.add(BigDecimal.valueOf(
-				 * e.getValue().getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE));
+				 * e.getValue().getAmount() ));
 				 * }
 				 * 
 				 * blockJSON.put("totalATAmount",
@@ -2143,7 +2142,7 @@ public class BlockExplorer {
 			 * blockJSON.put("totalFee", block.getTotalFee().toPlainString());
 			 * 
 			 * BigDecimal totalAmount =
-			 * BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE); for
+			 * BigDecimal.ZERO; for
 			 * (Transaction transaction : block.getTransactions()) { for
 			 * (Account account : transaction.getInvolvedAccounts()) {
 			 * BigDecimal amount = transaction.getAmount(account);
@@ -2156,12 +2155,11 @@ public class BlockExplorer {
 			 * dcSet.getATTransactionMap().getATTransactions(counter);
 			 * 
 			 * BigDecimal totalATAmount =
-			 * BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			 * BigDecimal.ZERO;
 			 * 
 			 * for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e :
 			 * aTtxs.entrySet()) { totalATAmount =
-			 * totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount() ,
-			 * BlockChain.AMOUNT_DEDAULT_SCALE)); }
+			 * totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount())); }
 			 * 
 			 * blockJSON.put("totalATAmount", totalATAmount.toPlainString());
 			 * //blockJSON.put("aTfee", block.getATfee().toPlainString());
@@ -2208,8 +2206,8 @@ public class BlockExplorer {
 	public Map jsonQueryTopRichest(int limit, long key) {
 		Map output = new LinkedHashMap();
 		Map balances = new LinkedHashMap();
-		BigDecimal all = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-		BigDecimal alloreders = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal all = BigDecimal.ZERO;
+		BigDecimal alloreders = BigDecimal.ZERO;
 
 		List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
@@ -2613,7 +2611,7 @@ public class BlockExplorer {
 				Map<Long, BigDecimal> totalAmountOfAssets = new TreeMap<Long, BigDecimal>();
 
 				for (Payment payment : ((MultiPaymentTransaction) transaction).getPayments()) {
-					BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+					BigDecimal amount = BigDecimal.ZERO;
 					if (totalAmountOfAssets.containsKey(payment.getAsset())) {
 						amount = totalAmountOfAssets.get(payment.getAsset());
 					}
@@ -2638,7 +2636,7 @@ public class BlockExplorer {
 				Map<Long, BigDecimal> totalAmountOfAssets = new TreeMap<Long, BigDecimal>();
 
 				for (Payment payment : ((ArbitraryTransaction) transaction).getPayments()) {
-					BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+					BigDecimal amount = BigDecimal.ZERO;
 					if (totalAmountOfAssets.containsKey(payment.getAsset())) {
 						amount = totalAmountOfAssets.get(payment.getAsset());
 					}
@@ -2971,7 +2969,7 @@ public class BlockExplorer {
 			AT at = dcSet.getATMap().getAT(address);
 			Block block = Controller.getInstance().getBlockByHeight(at.getCreationBlockHeight());
 			long aTtimestamp = block.getTimestamp(dcSet);
-			BigDecimal aTbalanceCreation = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal aTbalanceCreation = BigDecimal.ZERO;
 			for (Transaction transaction : block.getTransactions()) {
 				if (transaction.getType() == Transaction.DEPLOY_AT_TRANSACTION) {
 					Account atAccount = ((DeployATTransaction) transaction).getATaccount(dcSet);
@@ -3055,11 +3053,11 @@ public class BlockExplorer {
 		int aTTxsCount = 0;
 		int txsCount = 0;
 		int totalBlocksGeneratedCount = 0;
-		BigDecimal totalBlocksGeneratedFee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal totalBlocksGeneratedFee = BigDecimal.ZERO;
 		int[] txsTypeCount = new int[256];
 		List<Map<String, Map<Long, BigDecimal>>> tXincomes = new ArrayList<>();
 		List<Map<Long, BigDecimal>> totalBalances = new ArrayList<>();
-		BigDecimal spentFee = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal spentFee = BigDecimal.ZERO;
 		Map<Long, BigDecimal> receivedCoins = new LinkedHashMap<>();
 		Map<Long, BigDecimal> sentCoins = new LinkedHashMap<>();
 		Map<String, BigDecimal> generatedFee = new LinkedHashMap<>();
@@ -3096,7 +3094,7 @@ public class BlockExplorer {
 				tXincome = Transaction.addAssetAmount(tXincome, generator, FEE_KEY, fee);
 
 				generatedFee.put(generator, generatedFee
-						.getOrDefault(generator, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)).add(fee));
+						.getOrDefault(generator, BigDecimal.ZERO).add(fee));
 
 				totalBlocksGeneratedFee = totalBlocksGeneratedFee.add(fee);
 
@@ -3140,12 +3138,12 @@ public class BlockExplorer {
 
 				if (addresses.contains(atTransaction.getSender())) {
 					tXincome = Transaction.subAssetAmount(tXincome, atTransaction.getSender(), FEE_KEY,
-							BigDecimal.valueOf(atTransaction.getAmount(), BlockChain.AMOUNT_DEDAULT_SCALE));
+							BigDecimal.valueOf(atTransaction.getAmount()));
 				}
 
 				if (addresses.contains(atTransaction.getRecipient())) {
 					tXincome = Transaction.addAssetAmount(tXincome, atTransaction.getRecipient(), FEE_KEY,
-							BigDecimal.valueOf(atTransaction.getAmount(), BlockChain.AMOUNT_DEDAULT_SCALE));
+							BigDecimal.valueOf(atTransaction.getAmount()));
 				}
 
 				aTTxsCount++;
@@ -3166,7 +3164,7 @@ public class BlockExplorer {
 						sentCoins.put(assetAmount.getKey(),
 								sentCoins
 										.getOrDefault(assetAmount.getKey(),
-												BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
+												BigDecimal.ZERO)
 										.subtract(assetAmount.getValue()));
 					}
 
@@ -3174,14 +3172,14 @@ public class BlockExplorer {
 						receivedCoins.put(assetAmount.getKey(),
 								receivedCoins
 										.getOrDefault(assetAmount.getKey(),
-												BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
+												BigDecimal.ZERO)
 										.add(assetAmount.getValue()));
 					}
 
 					newTotalBalance.put(assetAmount.getKey(),
 							newTotalBalance
 									.getOrDefault(assetAmount.getKey(),
-											BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
+											BigDecimal.ZERO)
 									.add(assetAmount.getValue()));
 				}
 
@@ -4277,7 +4275,7 @@ public class BlockExplorer {
 
 		output.put("countTx", txCountJSON);
 
-		BigDecimal totalAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal totalAmount = BigDecimal.ZERO;
 		for (Transaction transaction : block.getTransactions()) {
 			for (Account account : transaction.getInvolvedAccounts()) {
 				BigDecimal amount = transaction.getAmount(account);
@@ -4289,11 +4287,11 @@ public class BlockExplorer {
 
 		output.put("totalAmount", totalAmount.toPlainString());
 
-		BigDecimal totalATAmount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal totalATAmount = BigDecimal.ZERO;
 
 		for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
 			totalATAmount = totalATAmount
-					.add(BigDecimal.valueOf(e.getValue().getAmount(), BlockChain.AMOUNT_DEDAULT_SCALE));
+					.add(BigDecimal.valueOf(e.getValue().getAmount()));
 		}
 
 		output.put("totalATAmount", totalATAmount.toPlainString());
@@ -4462,7 +4460,7 @@ public class BlockExplorer {
 			if (transactionBalance.containsKey(key)) {
 				return transactionBalance.get(key);
 			} else {
-				return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				return BigDecimal.ZERO;
 			}
 		}
 
@@ -4470,7 +4468,7 @@ public class BlockExplorer {
 			if (totalBalance.containsKey(key)) {
 				return totalBalance.get(key);
 			} else {
-				return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				return BigDecimal.ZERO;
 			}
 		}
 

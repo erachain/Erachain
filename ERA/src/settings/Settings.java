@@ -37,7 +37,7 @@ public class Settings {
 	// EACH known PEER may send that whit peers to me - not white peer may be white peer for me
 	private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
 	private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
-	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2; // 10000
+	private static final int DEFAULT_CONNECTION_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>2; // 10000 
 	private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 	private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
 	private static final Integer DEFAULT_FONT_SIZE = 11;
@@ -48,70 +48,69 @@ public class Settings {
 	//public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
 
 	private long genesisStamp = -1;
-
+	
 	//RPC
 	private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_RPC_ENABLED = false;
-
+	
 	private static final boolean DEFAULT_BACUP_ENABLED = true;
 	private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
 	//GUI CONSOLE
 	private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
 	public static final int DEFAULT_ACCOUNTS = 1;
-
+	
 	//WEB
 	private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
 	private static final boolean DEFAULT_WEB_ENABLED = true;
-
-	// 19 03
+	
+	// 19 03	
 	//GUI
 	private static final boolean DEFAULT_GUI_ENABLED = true;
 	private static final boolean DEFAULT_GUI_DYNAMIC = true;
-
+	
 	//DATA
 	public static final String DEFAULT_DATA_DIR = "datachain";
 	public static final String DEFAULT_LOCAL_DIR = "datalocal";
 	public static final String DEFAULT_WALLET_DIR = "wallet";
 	public static final String DEFAULT_BACKUP_DIR = "backup";
-
+	
 	private static final boolean DEFAULT_GENERATOR_KEY_CACHING = true;
 	private static final boolean DEFAULT_CHECKPOINTING = true;
 
 	private static final boolean DEFAULT_SOUND_RECEIVE_COIN = true;
 	private static final boolean DEFAULT_SOUND_MESSAGE = true;
 	private static final boolean DEFAULT_SOUND_NEW_TRANSACTION = true;
-
+	
 	//private static final int DEFAULT_MAX_BYTE_PER_FEE = 512;
 	private static final boolean ALLOW_FEE_LESS_REQUIRED = false;
-
+	
 	//private static final BigDecimal DEFAULT_BIG_FEE = new BigDecimal(1000);
 
 	//DATE FORMAT
 	private static final String DEFAULT_TIME_ZONE = ""; //"GMT+3";
 	private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
 	private static final String DEFAULT_BIRTH_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
-
+	
 	private static final boolean DEFAULT_NS_UPDATE = false;
 	private static final boolean DEFAULT_FORGING_ENABLED = true;
-
+	
 	public static String DEFAULT_LANGUAGE = "en.json";
 
 	private static final String NOTEFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
 	private static final int NOTEFY_INCOMING_CONFIRMATIONS = 0;
 
 	private static Settings instance;
-
+	
 	private JSONObject settingsJSON;
 	private JSONObject peersJSON;
 
 	private String userPath = "";
-    private String walletPath = "";
 
 	private InetAddress localAddress;
-
+	
 	List<Peer> cacheInternetPeers;
 	long timeLoadInternetPeers;
-
+	
 	private String[] defaultPeers = { };
 
 	private String getBackUpPath;
@@ -123,10 +122,10 @@ public class Settings {
 		{
 			instance = new Settings();
 		}
-
+		
 		return instance;
 	}
-
+	
 	public static void FreeInstance()
 	{
 		if(instance != null)
@@ -134,37 +133,37 @@ public class Settings {
 			instance = null;
 		}
 	}
-
+	
 	private Settings()
 	{
 		this.localAddress = this.getCurrentIp();
 		settingsJSON = read_setting_JSON();
-
-
+				
+				
 		File file = new File("");
 		//TRY READ PEERS.JSON
 		try
 		{
 			//OPEN FILE
 			file = new File(this.getPeersPath());
-
+			
 			//CREATE FILE IF IT DOESNT EXIST
 			if(file.exists())
 			{
 				//READ PEERS FILE
 				List<String> lines = Files.readLines(file, Charsets.UTF_8);
-
+				
 				String jsonString = "";
 				for(String line : lines){
 					jsonString += line;
 				}
-
+				
 				//CREATE JSON OBJECT
 				this.peersJSON = (JSONObject) JSONValue.parse(jsonString);
 			} else {
 				this.peersJSON = new JSONObject();
 			}
-
+			
 		}
 		catch(Exception e)
 		{
@@ -173,17 +172,17 @@ public class Settings {
 			this.peersJSON = new JSONObject();
 		}
 	}
-
+	
 	public JSONObject Dump()
 	{
 		return (JSONObject) settingsJSON.clone();
 	}
-
+	
 	public void setDefaultPeers(String[] peers)
 	{
 		this.defaultPeers = peers;
 	}
-
+	
 	public String getSettingsPath()
 	{
 		return this.userPath + "settings.json";
@@ -229,10 +228,7 @@ public class Settings {
 	{
 		return this.userPath;
 	}
-    public String getWalletPath()
-    {
-        return this.walletPath;
-    }
+
 	// http://127.0.0.1:8000/ipay3_free/tools/block_proc/ERA
 	public String getNotifyIncomingURL()
 	{
@@ -1026,7 +1022,7 @@ public class Settings {
 					this.getWalletPath += File.separator;
 				}
 			} catch (Exception e) {
-			
+				// TODO Auto-generated catch block
 				this.getWalletPath = "";
 			}
 		}
@@ -1040,12 +1036,19 @@ public class Settings {
 			file.createNewFile();
 		}
 	}
+		
+}
+catch(Exception e)
+{
+	LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
+	LOGGER.error(e.getMessage(),e);
+	settingsJSON =	new JSONObject();
+}
 
-} catch (Exception e) {
-			LOGGER.info("Error while reading/creating settings.json " + file.getAbsolutePath() + " using default!");
-			LOGGER.error(e.getMessage(), e);
-			settingsJSON = new JSONObject();
-		}
-		return settingsJSON;
+	return settingsJSON;
+	
 	}
+	
+	
+	
 }

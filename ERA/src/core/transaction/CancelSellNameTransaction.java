@@ -12,7 +12,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -284,7 +283,7 @@ public class CancelSellNameTransaction extends Transaction
 
 		if(address.equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			return BigDecimal.ZERO;
 		}
 
 		return BigDecimal.ZERO;

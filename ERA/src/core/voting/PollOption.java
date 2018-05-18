@@ -12,7 +12,6 @@ import org.json.simple.JSONObject;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
-import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 
@@ -91,7 +90,7 @@ public class PollOption {
 
 	public BigDecimal getVotes(long assetKey)
 	{
-		BigDecimal votes = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal votes = BigDecimal.ZERO;
 
 		for(Account voter: this.voters)
 		{

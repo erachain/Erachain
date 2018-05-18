@@ -712,8 +712,8 @@ public class TransactionsResource {
 		BigDecimal amount;
 		// READ AMOUNT
 		try {
-			amount = new BigDecimal(amount1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-			if (amount.equals(new BigDecimal("0.0").setScale(BlockChain.AMOUNT_DEDAULT_SCALE)))
+			amount = new BigDecimal(amount1);
+			if (amount.equals(new BigDecimal(0)))
 				throw new Exception("");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

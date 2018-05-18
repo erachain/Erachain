@@ -16,7 +16,6 @@ import com.google.common.collect.Lists;
 import at.AT;
 import at.AT_API_Helper;
 import at.AT_Transaction;
-import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.transaction.R_Send;
@@ -185,7 +184,7 @@ public class ATWebResource {
 	public String getBalance(String atId)
 	{
 		AT at = getAT(atId);
-		return BigDecimal.valueOf(at.getG_balance(), BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString();
+		return BigDecimal.valueOf(at.getG_balance()).toPlainString();
 	}
 
 	public String getABalance(String atId)

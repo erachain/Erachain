@@ -19,7 +19,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -144,7 +143,7 @@ public class NameSalesResource
 			try
 			{
 				bdAmount = new BigDecimal(amount);
-				bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+				bdAmount = bdAmount;
 			}
 			catch(Exception e)
 			{

@@ -20,7 +20,6 @@ import org.mapdb.Fun.Tuple2;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 
-import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.crypto.Crypto;
@@ -548,14 +547,14 @@ public abstract class AT_Controller {
 					{
 						recipient.setLastTimestamp(-1L, dcSet);
 					}
-					//recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dcSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE) ) , dcSet );
+					//recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dcSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount()) ) , dcSet );
 				}
 				else
 				{
 					totalFees += tx.getAmount();
 				}
-				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE) ) , dcSet );
-				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount() , BlockChain.AMOUNT_DEDAULT_SCALE), false );
+				//sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() ) ) , dcSet );
+				sender.changeBalance( dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf( tx.getAmount()), false );
 				LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dcSet, Transaction.FEE_KEY));
 			}
 

@@ -35,7 +35,7 @@ public class TestChain {
 
 	Long releaserReference = null;
 
-	BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+	BigDecimal BG_ZERO = BigDecimal.ZERO;
 	long ERM_KEY = Transaction.RIGHTS_KEY;
 	long FEE_KEY = Transaction.FEE_KEY;
 	//long ALIVE_KEY = StatusCls.ALIVE_KEY;

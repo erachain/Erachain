@@ -76,23 +76,23 @@ public class GeneratorTests {
 		// AND LAST REFERENCE
 		// AND WIN_DATA
 		Transaction transaction;
-		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(1000000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(1000000));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(10000000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(10000000));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(300000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(300000));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(3000000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(3000000));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
@@ -310,48 +310,48 @@ public class GeneratorTests {
 		// AND LAST REFERENCE
 		// AND WIN_DATA
 		Transaction transaction;
-		transaction = new GenesisTransferAssetTransaction(generator0, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator0, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 10));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator1, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 10));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 20).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL / 20));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.045).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator3, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.045));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.045).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator4, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.045));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator5, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.03).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator5, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.03));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator6, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.02).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator6, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.02));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator7, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.02).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator7, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.02));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator8, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.03).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator8, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.03));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
-		transaction = new GenesisTransferAssetTransaction(generator9, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.033).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator9, ERM_KEY, BigDecimal.valueOf(BlockChain.GENESIS_ERA_TOTAL * 0.033));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
 		///////////////
-		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(generator1, FEE_KEY, BigDecimal.valueOf(10));
 		transaction.process(genesisBlock, false);
 		dcSet.getTransactionFinalMap().add( height, seq++, transaction);
 
@@ -590,11 +590,11 @@ public class GeneratorTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastTimestamp(genesisBlock.getTimestamp(dcSet), dcSet);
-		generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
+		generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000), false);
 
 		//GENERATE NEXT BLOCK
 		BlockGenerator blockGenerator = new BlockGenerator(false);
@@ -610,7 +610,7 @@ public class GeneratorTests {
 		{
 
 			//CREATE VALID PAYMENT
-			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp++, generator.getLastTimestamp(snapshot));
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot));
 			payment.sign(generator, false);
 
 			//PROCESS IN DB
@@ -657,11 +657,11 @@ public class GeneratorTests {
 		PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), NTP.getTime());
+		//Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
 		//transaction.process(databaseSet, false);
 		generator.setLastTimestamp(genesisBlock.getTimestamp(dcSet), dcSet);
-		generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+		generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
+		generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(100000), false);
 
 
 		//GENERATE NEXT BLOCK
@@ -680,7 +680,7 @@ public class GeneratorTests {
 		{
 
 			//CREATE VALID PAYMENT
-			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+			Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
 					"sss", new byte[3000], new byte[]{1}, new byte[]{0},
 					timestamp++, generator.getLastTimestamp(snapshot));
 			payment.sign(generator, false);
@@ -735,13 +735,13 @@ public class GeneratorTests {
 		PrivateKeyAccount userAccount2 = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce++));
 
 		//PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-		Transaction transaction = new GenesisTransferAssetTransaction(userAccount1, ERM_KEY, BigDecimal.valueOf(100000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		Transaction transaction = new GenesisTransferAssetTransaction(userAccount1, ERM_KEY, BigDecimal.valueOf(100000));
 		transaction.process(genesisBlock, false);
-		transaction = new GenesisTransferAssetTransaction(userAccount1, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(userAccount1, FEE_KEY, BigDecimal.valueOf(1));
 		transaction.process(genesisBlock, false);
-		transaction = new GenesisTransferAssetTransaction(userAccount2, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(userAccount2, ERM_KEY, BigDecimal.valueOf(10000));
 		transaction.process(genesisBlock, false);
-		transaction = new GenesisTransferAssetTransaction(userAccount2, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		transaction = new GenesisTransferAssetTransaction(userAccount2, FEE_KEY, BigDecimal.valueOf(1));
 		transaction.process(genesisBlock, false);
 
 
@@ -754,7 +754,7 @@ public class GeneratorTests {
 		long timestamp = timestampStart;
 
 		Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
-		Transaction payment = new R_Send(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+		Transaction payment = new R_Send(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000),
 				timestamp++, userAccount1.getLastTimestamp(dcSet));
 		payment.sign(userAccount1, false);
 		assertEquals(payment.isValid(null, flags), Transaction.VALIDATE_OK);

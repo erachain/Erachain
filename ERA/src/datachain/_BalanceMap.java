@@ -15,7 +15,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
-import core.BlockChain;
 import database.DBMap;
 
 // balances for Essence + Asset ->
@@ -126,10 +125,10 @@ Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
 		return new Tuple4<Tuple2<BigDecimal, BigDecimal>,
 				Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
 		(
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+				new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO)
 				);
 	}
 

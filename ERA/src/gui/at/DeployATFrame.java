@@ -33,7 +33,6 @@ import com.google.common.primitives.Longs;
 import at.AT_Constants;
 import at.AT_Error;
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
@@ -327,7 +326,7 @@ public class DeployATFrame extends JFrame {
 
 			//READ QUANTITY
 			parse = 1;
-			BigDecimal quantity = new BigDecimal(this.txtQuantity.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal quantity = new BigDecimal(this.txtQuantity.getText());
 
 			//
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
@@ -380,7 +379,7 @@ public class DeployATFrame extends JFrame {
 				return;
 			}
 
-			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText());
 
 			byte[] minActivationAmountBytes = minActivationAmountB.unscaledValue().toByteArray();
 			byte[] fillActivation = new byte[8 - minActivationAmountBytes.length];

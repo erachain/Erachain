@@ -25,7 +25,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -221,7 +220,7 @@ public class NameStorageResource {
 					try
 					{
 						bdAmount = new BigDecimal(amount);
-						bdAmount = bdAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+						bdAmount = bdAmount;
 					} catch (Exception e) {
 						throw ApiErrorFactory.getInstance().createError(
 								Transaction.INVALID_AMOUNT);
@@ -358,7 +357,7 @@ public class NameStorageResource {
 						}
 
 						BigDecimal newAmount = oldAmount.multiply(new BigDecimal(1.15));
-						newAmount = newAmount.setScale(0, BigDecimal.ROUND_UP).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+						newAmount = newAmount.setScale(0, BigDecimal.ROUND_UP);
 						pair.setB(newAmount);
 						newPairs.add(pair);
 

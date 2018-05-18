@@ -106,7 +106,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
 	@Override
 	public BigDecimal getAmount(String address) {
-		BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amount = BigDecimal.ZERO;
 
 		if(address.equals(this.recipient.getAddress()))
 		{

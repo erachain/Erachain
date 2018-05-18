@@ -62,7 +62,6 @@ import api.ApiErrorFactory;
 import api.BlogPostResource;
 import api.NameStorageResource;
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.blockexplorer.BlockExplorer;
@@ -2350,7 +2349,7 @@ public class WebResource {
 							if(creator != null)
 							{
 								BigDecimal amount = BigDecimal.TEN;
-								amount = amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+								amount = amount;
 								payments.add(new Payment(new Account(creator), AssetCls.FEE_KEY,amount ));
 							}
 							result = activeProfileOpt.saveProfile(payments);

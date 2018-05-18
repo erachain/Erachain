@@ -17,7 +17,6 @@ import com.google.common.base.Charsets;
 //import com.google.common.primitives.Longs;
 
 import api.BlogPostResource;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -152,7 +151,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 	//@Override
 	@Override
 	public BigDecimal getAmount(Account account) {
-		BigDecimal amount = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amount = BigDecimal.ZERO;
 		String address = account.getAddress();
 
 		// IF SENDER

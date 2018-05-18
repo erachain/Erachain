@@ -15,7 +15,6 @@ import java.util.Arrays;
 
 import org.json.simple.JSONObject;
 
-import core.BlockChain;
 import core.crypto.Base58;
 import utils.Converter;
 
@@ -163,7 +162,7 @@ public class AT_Transaction{
 		ob.put("sender", getSender());
 		ob.put("recipient", getRecipient());
 		ob.put("key", key);
-		ob.put("amount", BigDecimal.valueOf( amount , BlockChain.AMOUNT_DEDAULT_SCALE).toPlainString());
+		ob.put("amount", BigDecimal.valueOf(amount).toPlainString());
 		ob.put("message", ( message != null ) ? Converter.toHex(message) : "");
 		return ob;
 	}

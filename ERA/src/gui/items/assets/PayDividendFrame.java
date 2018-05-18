@@ -27,7 +27,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import core.payment.Payment;
@@ -193,7 +192,7 @@ public class PayDividendFrame extends JFrame
 
 			//AMOUNT TO PAY
 			parsing = 2;
-			BigDecimal amount = new BigDecimal(txtAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal amount = new BigDecimal(txtAmount.getText());
 
 			//ASSET TO PAY
 			long assetKey = ((Pair<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>>) this.cbxAssetToPay.getSelectedItem()).getA().b;
@@ -204,7 +203,7 @@ public class PayDividendFrame extends JFrame
 
 			//GET ACCOUNTS AND THEIR TOTAL BALANCE
 			List<Account> accounts = new ArrayList<Account>();
-			BigDecimal total = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal total = BigDecimal.ZERO;
 			for(int i=0; i<holders && i<balances.size(); i++)
 			{
 				Account account = new Account(balances.get(i).getA().a);
@@ -224,7 +223,7 @@ public class PayDividendFrame extends JFrame
 				BigDecimal accountAmount = amount.multiply(percentage);
 
 				//ROUND AMOUNT
-				accountAmount = accountAmount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.DOWN);
+				accountAmount = accountAmount.setScale(assetToPay.getScale(), RoundingMode.DOWN);
 
 				//CHECK IF AMOUNT NOT ZERO
 				if(accountAmount.compareTo(BigDecimal.ZERO) > 0)

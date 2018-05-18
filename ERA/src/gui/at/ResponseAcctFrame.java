@@ -32,7 +32,6 @@ import com.google.common.primitives.Longs;
 import at.AT_Constants;
 import at.AT_Error;
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
@@ -328,8 +327,8 @@ public class ResponseAcctFrame extends JFrame {
 
 			//READ QUANTITY
 			parse = 1;
-			BigDecimal quantity = new BigDecimal(this.txtAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-			BigDecimal burstQuantity = new BigDecimal(this.txtAmountOther.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal quantity = new BigDecimal(this.txtAmount.getText());
+			BigDecimal burstQuantity = new BigDecimal(this.txtAmountOther.getText());
 
 
 			//CREATE POLL
@@ -423,7 +422,7 @@ public class ResponseAcctFrame extends JFrame {
 				return;
 			}
 
-			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			BigDecimal minActivationAmountB = new BigDecimal(this.txtMinActivationAmount.getText());
 
 			byte[] minActivationAmountBytes = minActivationAmountB.unscaledValue().toByteArray();
 			byte[] fillActivation = new byte[8 - minActivationAmountBytes.length];

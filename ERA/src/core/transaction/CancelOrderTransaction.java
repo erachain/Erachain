@@ -288,7 +288,7 @@ public class CancelOrderTransaction extends Transaction
 
 		if(address.equals(this.creator.getAddress()))
 		{
-			return BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+			return BigDecimal.ZERO;
 		}
 
 		return BigDecimal.ZERO;

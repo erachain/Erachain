@@ -51,7 +51,6 @@ import core.transaction.Transaction;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
-import database.wallet.AccountsPropertisMap;
 import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 //import .BlockMap;
@@ -435,7 +434,7 @@ public class Wallet extends Observable implements Observer
 
 		// SOME
 		//Account initAccount = this.getAccounts().get(0);
-		//initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY, BigDecimal.valueOf(0.00001).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
+		//initAccount.setConfirmedBalance(Transaction.AssetCls.DILE_KEY, BigDecimal.valueOf(0.00001));
 
 
 		return true;
@@ -983,7 +982,7 @@ public class Wallet extends Observable implements Observer
 				if(atTx.b.getRecipient() == account.getAddress() )
 				{
 					this.database.getAccountMap().changeBalance(
-							account.getAddress(), false, atTx.b.getKey(), BigDecimal.valueOf(atTx.b.getAmount(), BlockChain.AMOUNT_DEDAULT_SCALE));
+							account.getAddress(), false, atTx.b.getKey(), BigDecimal.valueOf(atTx.b.getAmount()));
 
 				}
 			}
@@ -1038,7 +1037,7 @@ public class Wallet extends Observable implements Observer
 				if(atTx.b.getRecipient().equalsIgnoreCase( account.getAddress() ))
 				{
 					this.database.getAccountMap().changeBalance(
-							account.getAddress(), true, atTx.b.getKey(), BigDecimal.valueOf(atTx.b.getAmount(), BlockChain.AMOUNT_DEDAULT_SCALE));
+							account.getAddress(), true, atTx.b.getKey(), BigDecimal.valueOf(atTx.b.getAmount()));
 				}
 			}
 		}
