@@ -12,40 +12,32 @@ import database.serializer.ItemSerializer;
 //import database.serializer.AssetSerializer;
 import utils.ObserverMessage;
 
-public class ItemAssetMap extends Item_Map 
-{
-	//private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
-	//private Atomic.Long atomicKey;
-	//private long key;
+public class ItemAssetMap extends Item_Map {
+	// private Map<Integer, Integer> observableData = new HashMap<Integer,
+	// Integer>();
+
+	// private Atomic.Long atomicKey;
+	// private long key;
 	static final String NAME = "item_assets";
 	static final int TYPE = ItemCls.ASSET_TYPE;
-	
-	public ItemAssetMap(DCSet databaseSet, DB database)
-	{
+
+	public ItemAssetMap(DCSet databaseSet, DB database) {
 		super(databaseSet, database,
-				//TYPE,
-				NAME,
-				ObserverMessage.RESET_ASSET_TYPE,
-				ObserverMessage.ADD_ASSET_TYPE,
-				ObserverMessage.REMOVE_ASSET_TYPE,
-				ObserverMessage.LIST_ASSET_TYPE
-				);
+				// TYPE,
+				NAME, ObserverMessage.RESET_ASSET_TYPE, ObserverMessage.ADD_ASSET_TYPE,
+				ObserverMessage.REMOVE_ASSET_TYPE, ObserverMessage.LIST_ASSET_TYPE);
 	}
 
-	public ItemAssetMap(ItemAssetMap parent) 
-	{
+	public ItemAssetMap(ItemAssetMap parent) {
 		super(parent);
 	}
 
 	// type+name not initialized yet! - it call as Super in New
-	protected Map<Long, ItemCls> getMap(DB database) 
-	{
-		
-		//OPEN MAP
-		return database.createTreeMap(NAME)
-				.valueSerializer(new ItemSerializer(TYPE))
-				//.valueSerializer(new AssetSerializer())
+	protected Map<Long, ItemCls> getMap(DB database) {
+
+		// OPEN MAP
+		return database.createTreeMap(NAME).valueSerializer(new ItemSerializer(TYPE))
+				// .valueSerializer(new AssetSerializer())
 				// key instead size - .counterEnable()
 				.makeOrGet();
 	}
@@ -59,34 +51,47 @@ public class ItemAssetMap extends Item_Map
 	}
 
 	public AssetCls get(Long key) {
-		
+
 		if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
 			AssetCls item;
 			switch (key.intValue()) {
-				case 643:
-					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("RUB"),
-							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
-					break;
-				case 840:
-					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("USD"),
-							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
-					break;
-				case 978:
-					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("EUR"),
-							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
-					break;
-				case 959:
-					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, new String("XAU"),
-							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
-					break;
-				default:
-					item = new AssetVenture((byte)0, core.block.GenesisBlock.CREATOR, "ISO." + key,
-							null, null, "Accounting currency by ISO 4217 standard", 3, 2, 0l);
+			// http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
+			case 555:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("¤¤¤"), null, null,
+						"Businessman", 3, 8, 0l);
+				break;
+			case 666:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("♠♠♠"), null, null, // ♠♠♠
+						"bad, angry", 3, 8, 0l);
+				break;
+			case 777:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("♥♥♥"), null, null,
+						"Good Shine", 3, 8, 0l);
+				break;
+			case 643:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("RUB"), null, null,
+						"Accounting currency by ISO 4217 standard", 3, 2, 0l);
+				break;
+			case 840:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("USD"), null, null,
+						"Accounting currency by ISO 4217 standard", 3, 2, 0l);
+				break;
+			case 978:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("EUR"), null, null,
+						"Accounting currency by ISO 4217 standard", 3, 2, 0l);
+				break;
+			case 959:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("XAU"), null, null,
+						"Accounting currency by ISO 4217 standard", 3, 2, 0l);
+				break;
+			default:
+				item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, "ISO." + key, null, null,
+						"Accounting currency by ISO 4217 standard", 3, 2, 0l);
 			}
 			item.setKey(key);
 			return item;
 		} else {
-			return (AssetCls)super.get(key);			
+			return (AssetCls) super.get(key);
 		}
 	}
 
