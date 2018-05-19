@@ -183,15 +183,16 @@ public class TestRecPoll {
 		assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
 
 		//CREATE INVALID ISSUE POLL - INVALID POLLALIZE
-		issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);		
+		issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);
+		issuePollTransaction.setDC(db, false);
 		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(releaserReference, flags));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePollTransaction.isValid(releaserReference, flags));
+		assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
 
 		//CHECK IF ISSUE POLL IS VALID
 		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
-		assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePollTransaction.isValid(releaserReference, flags));
+		assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
 
 		//CHECK 
 		userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
@@ -326,7 +327,7 @@ public class TestRecPoll {
 		
 		//CHECK POLL EXISTS DB AS CONFIRMED:  key > -1
 		long key = db.getIssuePollMap().get(issuePollTransaction);
-		assertEquals(10001, key);
+		assertEquals(1l, key);
 		assertEquals(true, db.getItemPollMap().contains(key));
 		
 		//CHECK POLL IS CORRECT
