@@ -47,24 +47,7 @@ public class IssuePollRecord extends Issue_ItemRecord
 	
 	// NOT GENESIS ISSUE STRT FRON NUM
 	protected long getStartKey() {
-		return 10000l;
-	}
-
-	//@Override
-	public int isValid(Long releaserReference, long flags) {	
-
-		int result = super.isValid(releaserReference, flags);
-		if (result != Transaction.VALIDATE_OK) return result; 
-		
-		/*
-		BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, db);
-		if ( balERA.compareTo(BlockChain.MAJOR_ERA_BALANCE_BD)<0 )
-		{
-			return Transaction.NOT_ENOUGH_RIGHTS;
-		}
-		*/
-
-		return Transaction.VALIDATE_OK;
+		return 0l;
 	}
 
 	//PARSE CONVERT
