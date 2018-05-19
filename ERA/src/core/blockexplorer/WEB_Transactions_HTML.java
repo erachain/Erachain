@@ -101,6 +101,9 @@ public class WEB_Transactions_HTML {
 		case Transaction.ISSUE_PERSON_TRANSACTION:
 			out= out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
 			break;
+		case Transaction.ISSUE_POLL_TRANSACTION:
+			//out= out+ issue_Person_HTML(transaction, langObj) + get_Vouches(transaction);
+			break;
 		case Transaction.ISSUE_IMPRINT_TRANSACTION:
 			out= out+ issue_Imprint_HTML(transaction, langObj) + get_Vouches(transaction);
 			break;

@@ -117,159 +117,165 @@ public class ObserverMessage {
 	public static final int REMOVE_UNION_TYPE = 143;
 	public static final int LIST_UNION_TYPE = 144;
 
-	public static final int RESET_ASSET_STATUS_TYPE = 151;
-	public static final int ADD_ASSET_STATUS_TYPE = 152;
-	public static final int REMOVE_ASSET_STATUS_TYPE = 153;
-	public static final int LIST_ASSET_STATUS_TYPE = 154;
-	public static final int LIST_ASSET_STATUS_FAVORITES_TYPE = 156;
+	public static final int RESET_ASSET_STATUS_TYPE = 1151;
+	public static final int ADD_ASSET_STATUS_TYPE = 1152;
+	public static final int REMOVE_ASSET_STATUS_TYPE = 1153;
+	public static final int LIST_ASSET_STATUS_TYPE = 1154;
+	public static final int LIST_ASSET_STATUS_FAVORITES_TYPE = 1156;
 	
-	public static final int RESET_PERSON_STATUS_TYPE = 161;
-	public static final int ADD_PERSON_STATUS_TYPE = 162;
-	public static final int REMOVE_PERSON_STATUS_TYPE = 163;
-	public static final int LIST_PERSON_STATUS_TYPE = 164;
-	public static final int LIST_PERSON_STATUS_FAVORITES_TYPE = 166;
+	public static final int RESET_PERSON_STATUS_TYPE = 1161;
+	public static final int ADD_PERSON_STATUS_TYPE = 1162;
+	public static final int REMOVE_PERSON_STATUS_TYPE = 1163;
+	public static final int LIST_PERSON_STATUS_TYPE = 1164;
+	public static final int LIST_PERSON_STATUS_FAVORITES_TYPE = 1166;
 
-	public static final int RESET_UNION_STATUS_TYPE = 171;
-	public static final int ADD_UNION_STATUS_TYPE = 172;
-	public static final int REMOVE_UNION_STATUS_TYPE = 7173;
-	public static final int LIST_UNION_STATUS_TYPE = 174;
-	public static final int LIST_UNION_STATUS_FAVORITES_TYPE = 176;
+	public static final int RESET_UNION_STATUS_TYPE = 1171;
+	public static final int ADD_UNION_STATUS_TYPE = 1172;
+	public static final int REMOVE_UNION_STATUS_TYPE = 1173;
+	public static final int LIST_UNION_STATUS_TYPE = 1174;
+	public static final int LIST_UNION_STATUS_FAVORITES_TYPE = 1176;
 
-	public static final int RESET_ASSET_UNION_TYPE = 181;
-	public static final int ADD_ASSET_UNION_TYPE = 182;
-	public static final int REMOVE_ASSET_UNION_TYPE = 183;
-	public static final int LIST_ASSET_UNION_TYPE = 184;
-	public static final int LIST_ASSET_UNION_FAVORITES_TYPE = 186;
+	public static final int RESET_ASSET_UNION_TYPE = 1181;
+	public static final int ADD_ASSET_UNION_TYPE = 1182;
+	public static final int REMOVE_ASSET_UNION_TYPE = 1183;
+	public static final int LIST_ASSET_UNION_TYPE = 1184;
+	public static final int LIST_ASSET_UNION_FAVORITES_TYPE = 1186;
 
-	public static final int RESET_PERSON_UNION_TYPE = 191;
-	public static final int ADD_PERSON_UNION_TYPE = 192;
-	public static final int REMOVE_PERSON_UNION_TYPE = 193;
-	public static final int LIST_PERSON_UNION_TYPE = 194;
-	public static final int LIST_PERSON_UNION_FAVORITES_TYPE = 186;
+	public static final int RESET_PERSON_UNION_TYPE = 1191;
+	public static final int ADD_PERSON_UNION_TYPE = 1192;
+	public static final int REMOVE_PERSON_UNION_TYPE = 1193;
+	public static final int LIST_PERSON_UNION_TYPE = 1194;
+	public static final int LIST_PERSON_UNION_FAVORITES_TYPE = 1186;
 
-	public static final int RESET_STATUS_UNION_TYPE = 191;
-	public static final int ADD_STATUS_UNION_TYPE = 192;
-	public static final int REMOVE_STATUS_UNION_TYPE = 193;
-	public static final int LIST_STATUS_UNION_TYPE = 194;
-	public static final int LIST_STATUS_UNION_FAVORITES_TYPE = 196;
+	public static final int RESET_STATUS_UNION_TYPE = 1191;
+	public static final int ADD_STATUS_UNION_TYPE = 1192;
+	public static final int REMOVE_STATUS_UNION_TYPE = 1193;
+	public static final int LIST_STATUS_UNION_TYPE = 1194;
+	public static final int LIST_STATUS_UNION_FAVORITES_TYPE = 1196;
 
-	public static final int RESET_UNION_UNION_TYPE = 201;
-	public static final int ADD_UNION_UNION_TYPE = 202;
-	public static final int REMOVE_UNION_UNION_TYPE = 203;
-	public static final int LIST_UNION_UNION_TYPE = 204;
-	public static final int LIST_UNION_UNION_FAVORITES_TYPE = 206;
+	public static final int RESET_UNION_UNION_TYPE = 1201;
+	public static final int ADD_UNION_UNION_TYPE = 1202;
+	public static final int REMOVE_UNION_UNION_TYPE = 1203;
+	public static final int LIST_UNION_UNION_TYPE = 1204;
+	public static final int LIST_UNION_UNION_FAVORITES_TYPE = 1206;
 
-	public static final int RESET_PERSON_STATUS_UNION_TYPE = 211;
-	public static final int ADD_PERSON_STATUS_UNION_TYPE = 212;
-	public static final int REMOVE_PERSON_STATUS_UNION_TYPE = 213;
-	public static final int LIST_PERSON_STATUS_UNION_TYPE = 214;
-	public static final int LIST_PERSON_STATUS_UNION_FAVORITES_TYPE = 216;
+	public static final int RESET_PERSON_STATUS_UNION_TYPE = 1211;
+	public static final int ADD_PERSON_STATUS_UNION_TYPE = 1212;
+	public static final int REMOVE_PERSON_STATUS_UNION_TYPE = 1213;
+	public static final int LIST_PERSON_STATUS_UNION_TYPE = 1214;
+	public static final int LIST_PERSON_STATUS_UNION_FAVORITES_TYPE = 1216;
 
-	public static final int RESET_STATEMENT_TYPE = 221;
-	public static final int ADD_STATEMENT_TYPE = 222;
-	public static final int REMOVE_STATEMENT_TYPE = 223;
-	public static final int LIST_STATEMENT_TYPE = 224;
-	public static final int RESET_STATEMENT_FAVORITES_TYPE = 226;
-	public static final int ADD_STATEMENT_FAVORITES_TYPE = 227;
-	public static final int DELETE_STATEMENT_FAVORITES_TYPE = 228;
-	public static final int LIST_STATEMENT_FAVORITES_TYPE = 229;
+	public static final int RESET_STATEMENT_TYPE = 1221;
+	public static final int ADD_STATEMENT_TYPE = 1222;
+	public static final int REMOVE_STATEMENT_TYPE = 1223;
+	public static final int LIST_STATEMENT_TYPE = 1224;
+	public static final int RESET_STATEMENT_FAVORITES_TYPE = 1226;
+	public static final int ADD_STATEMENT_FAVORITES_TYPE = 1227;
+	public static final int DELETE_STATEMENT_FAVORITES_TYPE = 1228;
+	public static final int LIST_STATEMENT_FAVORITES_TYPE = 1229;
 	
-	public static final int RESET_VOUCH_TYPE = 231;
-	public static final int ADD_VOUCH_TYPE = 232;
-	public static final int REMOVE_VOUCH_TYPE = 233;
-	public static final int LIST_VOUCH_TYPE = 234;
-	public static final int LIST_VOUCH_FAVORITES_TYPE = 236;
+	public static final int RESET_VOUCH_TYPE = 1231;
+	public static final int ADD_VOUCH_TYPE = 1232;
+	public static final int REMOVE_VOUCH_TYPE = 1233;
+	public static final int LIST_VOUCH_TYPE = 1234;
+	public static final int LIST_VOUCH_FAVORITES_TYPE = 1236;
 
-	public static final int RESET_CANCEL_ORDER_TYPE = 241;
-	public static final int ADD_CANCEL_ORDER_TYPE = 242;
-	public static final int REMOVE_CANCEL_ORDER_TYPE = 243;
-	public static final int LIST_CANCEL_ORDER_TYPE = 244;
+	public static final int RESET_CANCEL_ORDER_TYPE = 1241;
+	public static final int ADD_CANCEL_ORDER_TYPE = 1242;
+	public static final int REMOVE_CANCEL_ORDER_TYPE = 1243;
+	public static final int LIST_CANCEL_ORDER_TYPE = 1244;
+
+	public static final int RESET_POLL_UNION_TYPE = 1251;
+	public static final int ADD_POLL_UNION_TYPE = 1252;
+	public static final int REMOVE_POLL_UNION_TYPE = 1253;
+	public static final int LIST_POLL_UNION_TYPE = 1254;
+	public static final int LIST_POLL_UNION_FAVORITES_TYPE = 1256;
 
 	///////////////////////// CHAIN //////////////////////
-	public static final int CHAIN_RESET_BLOCK_TYPE = 501;
-	public static final int CHAIN_ADD_BLOCK_TYPE = 502;
-	public static final int CHAIN_REMOVE_BLOCK_TYPE = 503;
-	public static final int CHAIN_LIST_BLOCK_TYPE = 504;
+	public static final int CHAIN_RESET_BLOCK_TYPE = 5501;
+	public static final int CHAIN_ADD_BLOCK_TYPE = 5502;
+	public static final int CHAIN_REMOVE_BLOCK_TYPE = 5503;
+	public static final int CHAIN_LIST_BLOCK_TYPE = 5504;
 
 	///////////////////////// WALLET /////////////////////
-	public static final int WALLET_RESET_BLOCK_TYPE = 1001;
-	public static final int WALLET_ADD_BLOCK_TYPE = 1002;
-	public static final int WALLET_REMOVE_BLOCK_TYPE = 1003;
-	public static final int WALLET_LIST_BLOCK_TYPE = 1004;
+	public static final int WALLET_RESET_BLOCK_TYPE = 10001;
+	public static final int WALLET_ADD_BLOCK_TYPE = 10002;
+	public static final int WALLET_REMOVE_BLOCK_TYPE = 10003;
+	public static final int WALLET_LIST_BLOCK_TYPE = 10004;
 	
-	public static final int WALLET_RESET_TRANSACTION_TYPE = 1011;
-	public static final int WALLET_ADD_TRANSACTION_TYPE = 1012;
-	public static final int WALLET_REMOVE_TRANSACTION_TYPE = 1013;
-	public static final int WALLET_LIST_TRANSACTION_TYPE = 1014;
-	public static final int WALLET_COUNT_TRANSACTION_TYPE = 1015;
+	public static final int WALLET_RESET_TRANSACTION_TYPE = 10011;
+	public static final int WALLET_ADD_TRANSACTION_TYPE = 10012;
+	public static final int WALLET_REMOVE_TRANSACTION_TYPE = 10013;
+	public static final int WALLET_LIST_TRANSACTION_TYPE = 10014;
+	public static final int WALLET_COUNT_TRANSACTION_TYPE = 10015;
 	
-	public static final int WALLET_RESET_ORDER_TYPE = 1021;
-	public static final int WALLET_ADD_ORDER_TYPE = 1022;
-	public static final int WALLET_REMOVE_ORDER_TYPE = 1023;
-	public static final int WALLET_LIST_ORDER_TYPE = 1024;
+	public static final int WALLET_RESET_ORDER_TYPE = 10021;
+	public static final int WALLET_ADD_ORDER_TYPE = 10022;
+	public static final int WALLET_REMOVE_ORDER_TYPE = 10023;
+	public static final int WALLET_LIST_ORDER_TYPE = 10024;
 	
-	public static final int WALLET_RESET_NAME_TYPE = 1031;
-	public static final int WALLET_ADD_NAME_TYPE = 1032;
-	public static final int WALLET_REMOVE_NAME_TYPE = 1033;
-	public static final int WALLET_LIST_NAME_TYPE = 1034;
+	public static final int WALLET_RESET_NAME_TYPE = 10031;
+	public static final int WALLET_ADD_NAME_TYPE = 10032;
+	public static final int WALLET_REMOVE_NAME_TYPE = 10033;
+	public static final int WALLET_LIST_NAME_TYPE = 10034;
 
-	public static final int WALLET_RESET_NAME_SALE_TYPE = 1041;
-	public static final int WALLET_ADD_NAME_SALE_TYPE = 1042;
-	public static final int WALLET_REMOVE_NAME_SALE_TYPE = 1043;
-	public static final int WALLET_LIST_NAME_SALE_TYPE = 1044;
+	public static final int WALLET_RESET_NAME_SALE_TYPE = 10041;
+	public static final int WALLET_ADD_NAME_SALE_TYPE = 10042;
+	public static final int WALLET_REMOVE_NAME_SALE_TYPE = 10043;
+	public static final int WALLET_LIST_NAME_SALE_TYPE = 10044;
 
-	public static final int WALLET_RESET_POLL_TYPE = 1051;
-	public static final int WALLET_ADD_POLL_TYPE = 1052;
-	public static final int WALLET_REMOVE_POLL_TYPE = 1053;
-	public static final int WALLET_LIST_POLL_TYPE = 1054;
+	public static final int WALLET_RESET_POLL_TYPE = 10051;
+	public static final int WALLET_ADD_POLL_TYPE = 10052;
+	public static final int WALLET_REMOVE_POLL_TYPE = 10053;
+	public static final int WALLET_LIST_POLL_TYPE = 10054;
 
-	public static final int WALLET_RESET_ASSET_TYPE = 1061;
-	public static final int WALLET_ADD_ASSET_TYPE = 1062;
-	public static final int WALLET_REMOVE_ASSET_TYPE = 1063;
-	public static final int WALLET_LIST_ASSET_TYPE = 1064;
+	public static final int WALLET_RESET_ASSET_TYPE = 10061;
+	public static final int WALLET_ADD_ASSET_TYPE = 10062;
+	public static final int WALLET_REMOVE_ASSET_TYPE = 10063;
+	public static final int WALLET_LIST_ASSET_TYPE = 10064;
 
-	public static final int WALLET_RESET_IMPRINT_TYPE = 1071;
-	public static final int WALLET_ADD_IMPRINT_TYPE = 1072;
-	public static final int WALLET_REMOVE_IMPRINT_TYPE = 1073;
-	public static final int WALLET_LIST_IMPRINT_TYPE = 1074;
-	public static final int LIST_IMPRINT_FAVORITES_TYPE = 1075;
-	public static final int ADD_IMPRINT_TYPE_FAVORITES_TYPE = 1077;
-	public static final int DELETE_IMPRINT_FAVORITES_TYPE = 1078;
+	public static final int WALLET_RESET_IMPRINT_TYPE = 10071;
+	public static final int WALLET_ADD_IMPRINT_TYPE = 10072;
+	public static final int WALLET_REMOVE_IMPRINT_TYPE = 10073;
+	public static final int WALLET_LIST_IMPRINT_TYPE = 10074;
+	public static final int LIST_IMPRINT_FAVORITES_TYPE = 10075;
+	public static final int ADD_IMPRINT_TYPE_FAVORITES_TYPE = 10077;
+	public static final int DELETE_IMPRINT_FAVORITES_TYPE = 10078;
 
-	public static final int WALLET_RESET_TEMPLATE_TYPE = 1081;
-	public static final int WALLET_ADD_TEMPLATE_TYPE = 1082;
-	public static final int WALLET_REMOVE_TEMPLATE_TYPE = 1083;
-	public static final int WALLET_LIST_TEMPLATE_TYPE = 1084;
-	public static final int LIST_TEMPLATE_FAVORITES_TYPE = 1086;
-	public static final int ADD_TEMPLATE_TYPE_FAVORITES_TYPE = 1087;
-	public static final int DELETE_TEMPLATE_FAVORITES_TYPE = 1088;
+	public static final int WALLET_RESET_TEMPLATE_TYPE = 10081;
+	public static final int WALLET_ADD_TEMPLATE_TYPE = 10082;
+	public static final int WALLET_REMOVE_TEMPLATE_TYPE = 10083;
+	public static final int WALLET_LIST_TEMPLATE_TYPE = 10084;
+	public static final int LIST_TEMPLATE_FAVORITES_TYPE = 10086;
+	public static final int ADD_TEMPLATE_TYPE_FAVORITES_TYPE = 10087;
+	public static final int DELETE_TEMPLATE_FAVORITES_TYPE = 10088;
 
-	public static final int WALLET_RESET_PERSON_TYPE = 1091;
-	public static final int WALLET_ADD_PERSON_TYPE = 1092;
-	public static final int WALLET_REMOVE_PERSON_TYPE = 1093;
-	public static final int WALLET_LIST_PERSON_TYPE = 1094;
-	public static final int RESET_PERSON_FAVORITES_TYPE = 1096;
-	public static final int ADD_PERSON_FAVORITES_TYPE = 1097;
-	public static final int DELETE_PERSON_FAVORITES_TYPE = 1098;
-	public static final int LIST_PERSON_FAVORITES_TYPE = 1099;
+	public static final int WALLET_RESET_PERSON_TYPE = 10091;
+	public static final int WALLET_ADD_PERSON_TYPE = 10092;
+	public static final int WALLET_REMOVE_PERSON_TYPE = 10093;
+	public static final int WALLET_LIST_PERSON_TYPE = 10094;
+	public static final int RESET_PERSON_FAVORITES_TYPE = 10096;
+	public static final int ADD_PERSON_FAVORITES_TYPE = 10097;
+	public static final int DELETE_PERSON_FAVORITES_TYPE = 10098;
+	public static final int LIST_PERSON_FAVORITES_TYPE = 10099;
 
-	public static final int WALLET_RESET_STATUS_TYPE = 2001;
-	public static final int WALLET_ADD_STATUS_TYPE = 2002;
-	public static final int WALLET_REMOVE_STATUS_TYPE = 2003;
-	public static final int WALLET_LIST_STATUS_TYPE = 2004;
-	public static final int LIST_STATUS_FAVORITES_TYPE = 2006;
-	public static final int ADD_STATUS_TYPE_FAVORITES_TYPE = 2007;
-	public static final int DELETE_STATUS_FAVORITES_TYPE = 2008;
+	public static final int WALLET_RESET_STATUS_TYPE = 12001;
+	public static final int WALLET_ADD_STATUS_TYPE = 12002;
+	public static final int WALLET_REMOVE_STATUS_TYPE = 12003;
+	public static final int WALLET_LIST_STATUS_TYPE = 12004;
+	public static final int LIST_STATUS_FAVORITES_TYPE = 12006;
+	public static final int ADD_STATUS_TYPE_FAVORITES_TYPE = 12007;
+	public static final int DELETE_STATUS_FAVORITES_TYPE = 12008;
 	
-	public static final int WALLET_RESET_UNION_TYPE = 2011;
-	public static final int WALLET_ADD_UNION_TYPE = 2012;
-	public static final int WALLET_REMOVE_UNION_TYPE = 2013;
-	public static final int WALLET_LIST_UNION_TYPE = 2014;
-	public static final int LIST_UNION_FAVORITES_TYPE = 2016;
+	public static final int WALLET_RESET_UNION_TYPE = 12011;
+	public static final int WALLET_ADD_UNION_TYPE = 12012;
+	public static final int WALLET_REMOVE_UNION_TYPE = 12013;
+	public static final int WALLET_LIST_UNION_TYPE = 12014;
+	public static final int LIST_UNION_FAVORITES_TYPE = 12016;
 	
-	public static final int WALLET_ACCOUNT_PROPERTIES_ADD = 2017;
-	public static final int WALLET_ACCOUNT_PROPERTIES_DELETE = 2018;
-	public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 2019;
+	public static final int WALLET_ACCOUNT_PROPERTIES_ADD = 12017;
+	public static final int WALLET_ACCOUNT_PROPERTIES_DELETE = 12018;
+	public static final int WALLET_ACCOUNT_PROPERTIES_LIST = 12019;
 
 	private int type;
 	private Object value;

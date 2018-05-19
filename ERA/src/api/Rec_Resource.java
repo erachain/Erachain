@@ -371,6 +371,12 @@ public class Rec_Resource {
 				//return IssuePersonRecord.Parse(data, releaserReference);
 				break;
 
+			case Transaction.ISSUE_POLL_TRANSACTION:
+
+				//PARSE ISSUE POLL TRANSACTION
+				//return IssuePollRecord.Parse(data, releaserReference);
+				break;
+
 			case Transaction.ISSUE_STATUS_TRANSACTION:
 
 				//PARSE ISSUE PLATE TRANSACTION

@@ -42,9 +42,11 @@ public class DCSet implements Observer, IDB {
 	private ItemAssetBalanceMap assetBalanceAccountingMap;
 	private KKAssetStatusMap kKAssetStatusMap;
 	private KKPersonStatusMap kKPersonStatusMap;
+	//private KKPollStatusMap kKPollStatusMap;
 	private KKUnionStatusMap kKUnionStatusMap;
 	private KKAssetUnionMap kKAssetUnionMap;
 	private KKPersonUnionMap kKPersonUnionMap;
+	private KKPollUnionMap kKPollUnionMap;
 	private KKStatusUnionMap kKStatusUnionMap;
 	private AddressPersonMap addressPersonMap;
 	private PersonAddressMap personAddressMap;
@@ -81,8 +83,10 @@ public class DCSet implements Observer, IDB {
 	private TradeMap tradeMap;
 	private ItemStatusMap itemStatusMap;
 	private IssueStatusMap issueStatusMap;
-	private ItemImprintMap imprintMap;
+	private ItemImprintMap itemImprintMap;
 	private IssueImprintMap issueImprintMap;
+	private ItemPollMap itemPollMap;
+	private IssuePollMap issuePollMap;
 	private ItemTemplateMap itemTemplateMap;
 	private IssueTemplateMap issueTemplateMap;
 	private ItemStatementMap itemStatementMap;
@@ -299,9 +303,11 @@ public class DCSet implements Observer, IDB {
 
 			this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
 			this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
+			//this.kKPollStatusMap = new KKPollStatusMap(this, database);
 			this.kKUnionStatusMap = new KKUnionStatusMap(this, database);
 			this.kKAssetUnionMap = new KKAssetUnionMap(this, database);
 			this.kKPersonUnionMap = new KKPersonUnionMap(this, database);
+			this.kKPollUnionMap = new KKPollUnionMap(this, database);
 			this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
 			this.addressPersonMap = new AddressPersonMap(this, database);
 			this.personAddressMap = new PersonAddressMap(this, database);
@@ -329,26 +335,35 @@ public class DCSet implements Observer, IDB {
 			this.updateNameMap = new UpdateNameMap(this, database);
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
 			this.pollMap = new PollMap(this, database);
-
 			this.voteOnPollMap = new VoteOnPollMap(this, database);
+			
+			this.itemAssetMap = new ItemAssetMap(this, database);
 			this.issueAssetMap = new IssueAssetMap(this, database);
 			this.orderMap = new OrderMap(this, database);
 			this.completedOrderMap = new CompletedOrderMap(this, database);
 			this.tradeMap = new TradeMap(this, database);
-			this.imprintMap = new ItemImprintMap(this, database);
+
+			this.itemImprintMap = new ItemImprintMap(this, database);
 			this.issueImprintMap = new IssueImprintMap(this, database);
+			
 			this.itemTemplateMap = new ItemTemplateMap(this, database);
 			this.issueTemplateMap = new IssueTemplateMap(this, database);
-			this.itemStatementMap = new ItemStatementMap(this, database);
 
-			this.issueStatementMap = new IssueStatementMap(this, database);
 			this.itemPersonMap = new ItemPersonMap(this, database);
 			this.issuePersonMap = new IssuePersonMap(this, database);
-			this.itemAssetMap = new ItemAssetMap(this, database);
+
+			this.itemPollMap = new ItemPollMap(this, database);
+			this.issuePollMap = new IssuePollMap(this, database);
+			
+			this.itemStatementMap = new ItemStatementMap(this, database);
+			this.issueStatementMap = new IssueStatementMap(this, database);
+			
 			this.itemStatusMap = new ItemStatusMap(this, database);
 			this.issueStatusMap = new IssueStatusMap(this, database);
+			
 			this.itemUnionMap = new ItemUnionMap(this, database);
 			this.issueUnionMap = new IssueUnionMap(this, database);
+			
 			this.atMap = new ATMap(this,database);
 			this.atStateMap = new ATStateMap(this,database);
 
@@ -392,9 +407,11 @@ public class DCSet implements Observer, IDB {
 		this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
 		this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
 		this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
+		//this.kKPollStatusMap = new KKUnionPollMap(parent.kKUnionStatusMap);
 		this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap);
 		this.kKAssetUnionMap = new KKAssetUnionMap(parent.kKAssetUnionMap);
 		this.kKPersonUnionMap = new KKPersonUnionMap(parent.kKPersonUnionMap);
+		this.kKPollUnionMap = new KKPollUnionMap(parent.kKPollUnionMap);
 
 		this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap);
 		this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
@@ -427,27 +444,37 @@ public class DCSet implements Observer, IDB {
 		this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
 		this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
 		this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
+		
 		this.pollMap = new PollMap(parent.pollMap);
-
 		this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
+		
 		this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap);
 		this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap());
 		this.orderMap = new OrderMap(parent.orderMap, this);
 		this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap);
 		this.tradeMap = new TradeMap(parent.tradeMap, this);
-		this.imprintMap = new ItemImprintMap(parent.imprintMap);
+		
+		this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap);
 		this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap);
+
 		this.itemTemplateMap = new ItemTemplateMap(parent.itemTemplateMap);
 		this.issueTemplateMap = new IssueTemplateMap(parent.getIssueTemplateMap());
 
 		this.itemStatementMap = new ItemStatementMap(parent.itemStatementMap);
 		this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap);
+
 		this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap());
 		this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap());
+
+		this.itemPollMap = new ItemPollMap(parent.itemPollMap);
+		this.issuePollMap = new IssuePollMap(parent.issuePollMap);
+
 		this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap);
 		this.issueStatusMap = new IssueStatusMap(parent.issueStatusMap);
+
 		this.itemUnionMap = new ItemUnionMap(parent.itemUnionMap);
 		this.issueUnionMap = new IssueUnionMap(parent.issueUnionMap);
+
 		this.atMap = new ATMap(parent.atMap);
 		this.atStateMap = new ATStateMap(parent.atStateMap);
 
@@ -470,6 +497,7 @@ public class DCSet implements Observer, IDB {
 		this.kKUnionStatusMap.reset();
 		this.kKAssetUnionMap.reset();
 		this.kKPersonUnionMap.reset();
+		this.kKPollUnionMap.reset();
 
 		this.kKStatusUnionMap.reset();
 		this.addressPersonMap.reset();
@@ -502,6 +530,7 @@ public class DCSet implements Observer, IDB {
 		this.cancelSellNameMap.reset();
 		this.pollMap.reset();
 		this.voteOnPollMap.reset();
+		
 		this.tradeMap.reset();
 
 		this.orderMap.reset();
@@ -509,7 +538,7 @@ public class DCSet implements Observer, IDB {
 		this.issueAssetMap.reset();
 		this.itemAssetMap.reset();
 		this.issueImprintMap.reset();
-		this.imprintMap.reset();
+		this.itemImprintMap.reset();
 		this.issueTemplateMap.reset();
 		this.itemStatementMap.reset();
 		this.issueStatementMap.reset();
@@ -517,6 +546,8 @@ public class DCSet implements Observer, IDB {
 
 		this.issuePersonMap.reset();
 		this.itemPersonMap.reset();
+		this.issuePollMap.reset();
+		this.itemPollMap.reset();
 		this.issueStatusMap.reset();
 		this.itemStatusMap.reset();
 		this.issueUnionMap.reset();
@@ -597,6 +628,10 @@ public class DCSet implements Observer, IDB {
 	public KKPersonUnionMap getPersonUnionMap()
 	{
 		return this.kKPersonUnionMap;
+	}
+	public KKPollUnionMap getPollUnionMap()
+	{
+		return this.kKPollUnionMap;
 	}
 	public KKStatusUnionMap getStatusUnionMap()
 	{
@@ -775,7 +810,7 @@ public class DCSet implements Observer, IDB {
 	}
 	public ItemImprintMap getItemImprintMap()
 	{
-		return this.imprintMap;
+		return this.itemImprintMap;
 	}
 	public IssueImprintMap getIssueImprintMap()
 	{
@@ -806,6 +841,14 @@ public class DCSet implements Observer, IDB {
 	public IssuePersonMap getIssuePersonMap()
 	{
 		return this.issuePersonMap;
+	}
+	public ItemPollMap getItemPollMap()
+	{
+		return this.itemPollMap;
+	}
+	public IssuePollMap getIssuePollMap()
+	{
+		return this.issuePollMap;
 	}
 	public ItemStatusMap getItemStatusMap()
 	{
@@ -839,6 +882,9 @@ public class DCSet implements Observer, IDB {
 		}
 		case ItemCls.PERSON_TYPE: {
 			return this.getItemPersonMap();
+		}
+		case ItemCls.POLL_TYPE: {
+			return this.getItemPollMap();
 		}
 		case ItemCls.STATUS_TYPE: {
 			return this.getItemStatusMap();

@@ -1,9 +1,5 @@
 package core.transaction;
 
-import java.util.Arrays;
- import org.apache.log4j.Logger;
-
-import com.google.common.primitives.Ints;
 //import com.google.common.primitives.Longs;
 
 public class TransactionFactory {
@@ -155,6 +151,11 @@ public class TransactionFactory {
 			
 			//PARSE ISSUE PERSON TRANSACTION
 			return IssuePersonRecord.Parse(data, releaserReference);
+
+		case Transaction.ISSUE_POLL_TRANSACTION:
+			
+			//PARSE ISSUE POLL TRANSACTION
+			return IssuePollRecord.Parse(data, releaserReference);
 
 		case Transaction.ISSUE_STATUS_TRANSACTION:
 			

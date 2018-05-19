@@ -2666,6 +2666,17 @@ public class Controller extends Observable {
 		}
 	}
 
+	public Transaction createItemPollVote(PrivateKeyAccount creator, long pollKey, int optionIndex,
+			int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			// GET OPTION INDEX
+			//int optionIndex = poll.getOptions().indexOf(option);
+
+			return this.transactionCreator.createItemPollVote(creator, pollKey, optionIndex, feePow);
+		}
+	}
+
 	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator, Poll poll, PollOption option,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
@@ -2771,6 +2782,15 @@ public class Controller extends Observable {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
 			return this.transactionCreator.createIssuePersonHumanTransaction(creator, feePow, human);
+		}
+	}
+
+	public Transaction issuePoll(PrivateKeyAccount creator, String name, String description, List<PollOption> options,
+			byte[] icon, byte[] image, int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			return this.transactionCreator.createIssuePollTransaction(creator, name, description, icon, image, options,
+					feePow);
 		}
 	}
 

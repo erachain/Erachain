@@ -216,6 +216,7 @@ public abstract class Transaction {
 	public static final int ISSUE_STATUS_TRANSACTION = 25;
 	public static final int ISSUE_UNION_TRANSACTION = 26;
 	public static final int ISSUE_STATEMENT_TRANSACTION = 27; // not in gui
+	public static final int ISSUE_POLL_TRANSACTION = 28;
 
 	// SEND ASSET
 	public static final int SEND_ASSET_TRANSACTION = 31;
@@ -245,6 +246,7 @@ public abstract class Transaction {
 	// voting
 	public static final int CREATE_POLL_TRANSACTION = 61;
 	public static final int VOTE_ON_POLL_TRANSACTION = 62;
+	public static final int VOTE_ON_ITEM_POLL_TRANSACTION = 63;
 
 	public static final int RELEASE_PACK = 70;
 

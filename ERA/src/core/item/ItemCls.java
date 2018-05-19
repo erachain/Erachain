@@ -31,6 +31,7 @@ public abstract class ItemCls {
 	public static final int STATUS_TYPE = 5;
 	public static final int UNION_TYPE = 6;
 	public static final int STATEMENT_TYPE = 7;
+	public static final int POLL_TYPE = 8;
 
 	protected static final int TYPE_LENGTH = 2;
 	protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;

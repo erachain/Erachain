@@ -26,6 +26,8 @@ import core.item.imprints.Imprint;
 import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
+import core.item.polls.Poll;
+import core.item.polls.PollCls;
 import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
 import core.item.templates.Template;
@@ -45,6 +47,7 @@ import core.transaction.DeployATTransaction;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.IssueImprintRecord;
 import core.transaction.IssuePersonRecord;
+import core.transaction.IssuePollRecord;
 import core.transaction.IssueStatusRecord;
 import core.transaction.IssueTemplateRecord;
 import core.transaction.IssueUnionRecord;
@@ -61,8 +64,9 @@ import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnItemPollTransaction;
 import core.transaction.VoteOnPollTransaction;
-import core.voting.Poll;
+import core.voting.PollOption;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import ntp.NTP;
@@ -236,7 +240,7 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, false));
 	}
 
-	public Transaction createPollCreation(PrivateKeyAccount creator, Poll poll, int feePow)
+	public Transaction createPollCreation(PrivateKeyAccount creator, core.voting.Poll poll, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();
@@ -253,6 +257,22 @@ public class TransactionCreator
 
 	}
 
+	public Transaction createItemPollVote(PrivateKeyAccount creator, long pollKey, int optionIndex, int feePow)
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+
+		//TIME
+		long time = NTP.getTime();
+
+		//CREATE POLL VOTE
+		VoteOnItemPollTransaction pollVote = new VoteOnItemPollTransaction(creator, pollKey, optionIndex, (byte)feePow, time, 0l);
+		pollVote.sign(creator, false);
+		pollVote.setDC(this.fork, false);
+
+		//VALIDATE AND PROCESS
+		return pollVote;
+	}
 
 	public Pair<Transaction, Integer> createPollVote(PrivateKeyAccount creator, String poll, int optionIndex, int feePow)
 	{
@@ -496,6 +516,26 @@ public class TransactionCreator
 		boolean asPack = false;
 		return new Pair<Transaction, Integer>(issuePersonRecord, 1);
 
+	}
+
+	public Transaction createIssuePollTransaction(PrivateKeyAccount creator, String name, String description,
+			byte[] icon, byte[] image,
+			List<PollOption> options, int feePow)
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+
+		//TIME
+		long time = NTP.getTime();
+
+		PollCls status = new Poll(creator, name, icon, image, description, options);
+
+		//CREATE ISSUE PLATE TRANSACTION
+		IssuePollRecord issueStatusRecord = new IssuePollRecord(creator, status, (byte)feePow, time, 0l);
+		issueStatusRecord.sign(creator, false);
+		issueStatusRecord.setDC(this.fork, false);
+
+		return issueStatusRecord;
 	}
 
 	public Transaction createIssueStatusTransaction(PrivateKeyAccount creator, String name, String description,

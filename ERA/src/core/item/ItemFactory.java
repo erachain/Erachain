@@ -1,9 +1,9 @@
 package core.item;
 
-import core.item.ItemCls;
 import core.item.assets.AssetFactory;
 import core.item.imprints.Imprint;
 import core.item.persons.PersonFactory;
+import core.item.polls.PollFactory;
 import core.item.statuses.StatusFactory;
 import core.item.templates.TemplateFactory;
 import core.item.unions.UnionFactory;
@@ -44,6 +44,8 @@ public class ItemFactory {
 			return StatusFactory.getInstance().parse(data, includeReference);
 		case ItemCls.UNION_TYPE:
 			return UnionFactory.getInstance().parse(data, includeReference);
+		case ItemCls.POLL_TYPE:
+			return PollFactory.getInstance().parse(data, includeReference);
 		}
 
 		throw new Exception("Invalid ITEM type: " + type);
