@@ -14,7 +14,6 @@ import org.junit.Test;
 import controller.Controller;
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
-import core.account.PublicKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -70,9 +69,6 @@ public class TestRecPoll {
     byte[] accountSeed3 = Wallet.generateAccountSeed(seed, nonce++);
     PrivateKeyAccount userAccount3 = new PrivateKeyAccount(accountSeed3);
     String userAddress3 = userAccount3.getAddress();
-
-    List<PrivateKeyAccount> sertifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
-    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
     	
 	PollCls pollGeneral;
 	PollCls poll;
@@ -125,13 +121,6 @@ public class TestRecPoll {
 		issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
 		issuePollTransaction.setDC(db, false);
 		
-		sertifiedPrivateKeys.add(userAccount1);
-		sertifiedPrivateKeys.add(userAccount2);
-		sertifiedPrivateKeys.add(userAccount3);
-		
-	    sertifiedPublicKeys.add( new PublicKeyAccount(userAccount1.getPublicKey()));
-	    sertifiedPublicKeys.add( new PublicKeyAccount(userAccount2.getPublicKey()));
-	    sertifiedPublicKeys.add( new PublicKeyAccount(userAccount3.getPublicKey()));
 
 	}
 	
@@ -182,10 +171,12 @@ public class TestRecPoll {
 		//CHECK IF ISSUE POLL IS VALID
 		assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
 
+		
 		//CREATE INVALID ISSUE POLL - INVALID POLLALIZE
-		issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);
+		issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, 0l, new byte[64]);
 		issuePollTransaction.setDC(db, false);
-		assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(releaserReference, flags));
+		if (!BlockChain.DEVELOP_USE)
+			assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(releaserReference, flags));
 		// ADD FEE
 		userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 		assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
@@ -340,7 +331,8 @@ public class TestRecPoll {
 		issuePollTransaction.orphan(false);
 		
 		//CHECK BALANCE ISSUER
-		assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
+		if (!BlockChain.DEVELOP_USE)
+			assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
 		assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 		
 		//CHECK POLL EXISTS ISSUER
