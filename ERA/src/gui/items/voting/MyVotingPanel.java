@@ -2,7 +2,7 @@ package gui.items.voting;
 
 import gui.CoreRowSorter;
 import gui.library.MTable;
-import gui.models.WalletPollsTableModel;
+import gui.models.WalletVotesTableModel;
 import gui.voting.PollFrame;
 import lang.Lang;
 
@@ -60,13 +60,13 @@ public class MyVotingPanel extends JPanel
 		buttonGBC.gridy = 1;	
 		
 		//TABLE
-		final WalletPollsTableModel pollsModel = new WalletPollsTableModel();
+		final WalletVotesTableModel pollsModel = new WalletVotesTableModel();
 		final MTable table = new MTable(pollsModel);
 		
 		//POLLS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-		indexes.put(WalletPollsTableModel.COLUMN_NAME, PollMap.NAME_INDEX);
-		indexes.put(WalletPollsTableModel.COLUMN_ADDRESS, PollMap.CREATOR_INDEX);
+		indexes.put(WalletVotesTableModel.COLUMN_NAME, PollMap.NAME_INDEX);
+		indexes.put(WalletVotesTableModel.COLUMN_ADDRESS, PollMap.CREATOR_INDEX);
 		CoreRowSorter sorter = new CoreRowSorter(pollsModel, indexes);
 		table.setRowSorter(sorter);
 				

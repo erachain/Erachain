@@ -559,9 +559,6 @@ public class GenesisBlock extends Block{
 		case (int)TemplateCls.LICENSE_KEY:
 			String license = "";
 		try {
-			//FileInputStream fis = new FileInputStream("Aronicle License ERA.txt");
-			//InputStreamReader isr = new InputStreamReader(fis, "UTF-8");
-			//Reader in = new BufferedReader(isr);
 			File file = new File("License Erachain.txt");
 			//READ SETTINS JSON FILE
 			List<String> lines = Files.readLines(file, Charsets.UTF_8);

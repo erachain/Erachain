@@ -16,7 +16,7 @@ import core.voting.Poll;
 import gui.Split_Panel;
 import gui.library.MTable;
 	import gui.models.WalletItemPersonsTableModel;
-import gui.models.WalletPollsTableModel;
+import gui.models.WalletVotesTableModel;
 import lang.Lang;
 
 
@@ -24,7 +24,7 @@ import lang.Lang;
 		private static final long serialVersionUID = 2717571093561259483L;
 
 		
-		private WalletPollsTableModel my_Voting_Model;
+		private WalletVotesTableModel my_Voting_Model;
 		private MTable my_Voting_table;
 		private TableRowSorter my_Sorter;
 		// для прозрачности
@@ -44,7 +44,7 @@ import lang.Lang;
 			// not show My filter
 			this.searth_My_JCheckBox_LeftPanel.setVisible(false);
 			//TABLE
-			my_Voting_Model = new WalletPollsTableModel();
+			my_Voting_Model = new WalletVotesTableModel();
 			my_Voting_table = new MTable(my_Voting_Model);
 			my_Sorter = new TableRowSorter(my_Voting_Model);
 			my_Voting_table.setRowSorter(my_Sorter);

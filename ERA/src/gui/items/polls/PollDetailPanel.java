@@ -1,4 +1,4 @@
-package gui.voting;
+package gui.items.polls;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -19,158 +19,152 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableRowSorter;
 
 import core.item.assets.AssetCls;
+import core.item.polls.PollCls;
 import core.transaction.CreatePollTransaction;
 import core.transaction.Transaction;
-import core.voting.Poll;
 import datachain.DCSet;
 import gui.Gui;
+import gui.models.ItemPollOptionsTableModel;
 import gui.models.PollOptionsTableModel;
 import lang.Lang;
 import utils.BigDecimalStringComparator;
 import utils.DateTimeFormat;
 
 @SuppressWarnings("serial")
-public class PollDetailsPanel extends JPanel
-{
-	private Poll poll;
+public class PollDetailPanel extends JPanel {
+	private PollCls poll;
 	private JTable table;
-	private PollOptionsTableModel pollOptionsTableModel;
+	private ItemPollOptionsTableModel pollOptionsTableModel;
 	private AssetCls asset;
-	
+
 	@SuppressWarnings("unchecked")
-	public PollDetailsPanel(Poll poll, AssetCls asset)
-	{
+	public PollDetailPanel(PollCls poll, AssetCls asset) {
 		this.poll = poll;
 		this.asset = asset;
-		
-		//LAYOUT
+
+		// LAYOUT
 		this.setLayout(new GridBagLayout());
-		
-		//PADDING
+
+		// PADDING
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
-		
-		//LABEL GBC
+
+		// LABEL GBC
 		GridBagConstraints labelGBC = new GridBagConstraints();
 		labelGBC.insets = new Insets(0, 5, 5, 0);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;   
+		labelGBC.fill = GridBagConstraints.HORIZONTAL;
 		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;	
+		labelGBC.weightx = 0;
 		labelGBC.gridx = 0;
-		
-		//DETAIL GBC
+
+		// DETAIL GBC
 		GridBagConstraints detailGBC = new GridBagConstraints();
 		detailGBC.insets = new Insets(0, 5, 5, 0);
-		detailGBC.fill = GridBagConstraints.HORIZONTAL;  
+		detailGBC.fill = GridBagConstraints.HORIZONTAL;
 		detailGBC.anchor = GridBagConstraints.NORTHWEST;
-		detailGBC.weightx = 1;	
+		detailGBC.weightx = 1;
 		detailGBC.gridwidth = 2;
-		detailGBC.gridx = 1;		
-		
-		//LABEL CREATOR
+		detailGBC.gridx = 1;
+
+		// LABEL CREATOR
 		labelGBC.gridy = 1;
 		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
 		this.add(creatorLabel, labelGBC);
-		
-		//CREATOR
+
+		// CREATOR
 		detailGBC.gridy = 1;
-		JTextField creator = new JTextField(poll.getCreator().getAddress());
+		JTextField creator = new JTextField(poll.getOwner().getAddress());
 		creator.setEditable(false);
 		this.add(creator, detailGBC);
-		
-		//LABEL NAME
+
+		// LABEL NAME
 		labelGBC.gridy = 2;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
-		
-		//NAME
+
+		// NAME
 		detailGBC.gridy = 2;
 		JTextField name = new JTextField(poll.getName());
 		name.setEditable(false);
-		this.add(name, detailGBC);		
-		
-		//LABEL DATE
+		this.add(name, detailGBC);
+
+		// LABEL DATE
 		labelGBC.gridy = 3;
 		JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date") + ":");
 		this.add(dateLabel, labelGBC);
-		
+
 		String dateTime = "";
-		
-		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
+
+		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(
+				poll.getOwner().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
-			CreatePollTransaction createPollTransaction = ((CreatePollTransaction)transaction);
-			if(createPollTransaction.getPoll().getName().equals(poll.getName()))
-			{
+			CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
+			if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
 				dateTime = DateTimeFormat.timestamptoString(createPollTransaction.getTimestamp());
 				break;
 			}
 		}
-		
-		//DATE
+
+		// DATE
 		detailGBC.gridy = 3;
 		JTextField date = new JTextField(dateTime);
 		date.setEditable(false);
-		this.add(date, detailGBC);		
+		this.add(date, detailGBC);
 
-		//LABEL DESCRIPTION
+		// LABEL DESCRIPTION
 		labelGBC.gridy = 4;
 		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
 		this.add(descriptionLabel, labelGBC);
-				
-		//DESCRIPTION
+
+		// DESCRIPTION
 		detailGBC.gridy = 4;
 		JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setBorder(name.getBorder());
 		txtAreaDescription.setEditable(false);
-		this.add(txtAreaDescription, detailGBC);		
-		
-		//LABEL OPTIONS
+		this.add(txtAreaDescription, detailGBC);
+
+		// LABEL OPTIONS
 		labelGBC.gridy = 5;
 		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
 		this.add(optionsLabel, labelGBC);
-		
-		//OPTIONS
+
+		// OPTIONS
 		detailGBC.gridy = 5;
-		pollOptionsTableModel = new PollOptionsTableModel(poll, asset);
+		pollOptionsTableModel = new ItemPollOptionsTableModel(poll, asset);
 		table = Gui.createSortableTable(pollOptionsTableModel, 0);
-		
-		TableRowSorter<PollOptionsTableModel> sorter =  (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
+
+		TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
 		sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
-		
+
 		this.add(new JScrollPane(table), detailGBC);
-		
-		//ADD EXCHANGE BUTTON
+
+		// ADD EXCHANGE BUTTON
 		detailGBC.gridy = 6;
 		JButton allButton = new JButton(Lang.getInstance().translate("Vote"));
 		allButton.setPreferredSize(new Dimension(100, 25));
-		allButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		allButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				onVoteClick();
 			}
-		});	
-		this.add(allButton, detailGBC);
-		
-		//PACK
+		});
+		// this.add(allButton, detailGBC);
+
+		// PACK
 		this.setVisible(true);
 	}
-	
-	public void onVoteClick()
-	{
-		//GET SELECTED OPTION
+
+	public void onVoteClick() {
+		// GET SELECTED OPTION
 		int row = this.table.getSelectedRow();
-		if(row == -1)
-		{
+		if (row == -1) {
 			row = 0;
 		}
 		row = this.table.convertRowIndexToModel(row);
-		
-		new VoteFrame(this.poll, row, asset);
+
+		new Polls_Dialog(this.poll, row, asset);
 	}
-	
-	public void setAsset(AssetCls asset)
-	{
+
+	public void setAsset(AssetCls asset) {
 		this.asset = asset;
 		pollOptionsTableModel.setAsset(asset);
 	}

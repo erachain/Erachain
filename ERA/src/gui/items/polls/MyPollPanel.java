@@ -1,8 +1,9 @@
-package gui.voting;
+package gui.items.polls;
 
 import gui.CoreRowSorter;
 import gui.library.MTable;
 import gui.models.WalletVotesTableModel;
+import gui.voting.PollFrame;
 import lang.Lang;
 
 import java.awt.Dimension;
@@ -30,11 +31,12 @@ import core.voting.Poll;
 import database.wallet.PollMap;
 
 @SuppressWarnings("serial")
-public class VotingPanel extends JPanel
+public class MyPollPanel extends JPanel
 {
-	public VotingPanel()
+	public MyPollPanel()
 	{
 		this.setLayout(new GridBagLayout());
+		setName(Lang.getInstance().translate("My Votings"));
 		
 		//PADDING
 		this.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -59,7 +61,7 @@ public class VotingPanel extends JPanel
 		
 		//TABLE
 		final WalletVotesTableModel pollsModel = new WalletVotesTableModel();
-		final JTable table = new MTable(pollsModel);
+		final MTable table = new MTable(pollsModel);
 		
 		//POLLS SORTER
 		Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
@@ -104,39 +106,16 @@ public class VotingPanel extends JPanel
 		//ADD NAMING SERVICE TABLE
 		this.add(new JScrollPane(table), tableGBC);
 		
-		//ADD REGISTER BUTTON
-		JButton createButton = new JButton(Lang.getInstance().translate("Create Poll"));
-		createButton.setPreferredSize(new Dimension(100, 25));
-		createButton.addActionListener(new ActionListener()
-		{
-		    public void actionPerformed(ActionEvent e)
-		    {
-		        onCreateClick();
-		    }
-		});	
-		this.add(createButton, buttonGBC);
 		
-		//ADD EXCHANGE BUTTON
-		buttonGBC.gridx = 1;
-		JButton allButton = new JButton(Lang.getInstance().translate("All Polls"));
-		allButton.setPreferredSize(new Dimension(100, 25));
-		allButton.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				onAllClick();
-			}
-		});	
-		this.add(allButton, buttonGBC);
 	}
 	
 	public void onCreateClick()
 	{
-		new CreatePollFrame();
+//		new CreatePollFrame();
 	}
 	
 	public void onAllClick()
 	{
-		new AllPollsFrame();
+//		new AllPollsFrame();
 	}
 }

@@ -87,6 +87,26 @@ public abstract class PollCls extends ItemCls{
 		return votes;
 	}
 
+	public BigDecimal getTotalVotes(DCSet dcSet, long assetKey, int option)
+	{
+		BigDecimal votes = BigDecimal.ZERO;
+		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		Account voter;
+		
+		optionVoteKeys = map.getVotes(this.key);
+		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+			if (option != key.b)
+				continue;
+			
+			voter = Account.makeAccountFromShort(key.c);
+			votes.add(voter.getBalanceUSE(assetKey));
+		}
+
+		return votes;
+	}
+
+
 	public List<Pair<Account, Integer>> getVotes(DCSet dcSet)
 	{
 		List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
@@ -106,6 +126,29 @@ public abstract class PollCls extends ItemCls{
 		return votes;
 	}
 
+	public List<Pair<Account, Integer>> getVotes(DCSet dcSet, List<Account> accounts)
+	{
+		List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
+
+		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		Pair<Account, Integer> vote;
+		Account voter;
+		
+		optionVoteKeys = map.getVotes(this.key);
+		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+			for (Account account: accounts) {
+				if (account.equals(key.c)) {
+					vote = new Pair<Account, Integer>(account, key.b);
+					votes.add(vote);
+				}
+			}
+		}
+
+		return votes;
+	}
+
+	
 	public int getOption(String option)
 	{
 		

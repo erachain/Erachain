@@ -172,9 +172,9 @@ public class OnDealClick
 		case Transaction.POLL_OPTION_NOT_EXISTS:
 			mess = "Option not exists";
 			break;
-		case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:
-			mess = "Already voted for that option";
-			break;
+		//case Transaction.ALREADY_VOTED_FOR_THAT_OPTION:
+		//	mess = "Already voted for that option";
+		//	break;
 		case Transaction.INVALID_DATA_LENGTH:
 			mess = "Invalid data length";
 			break;

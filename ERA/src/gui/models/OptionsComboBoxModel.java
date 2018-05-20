@@ -4,14 +4,12 @@ import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 
-import core.voting.PollOption;
-
 @SuppressWarnings("serial")
-public class OptionsComboBoxModel extends DefaultComboBoxModel<PollOption> {
+public class OptionsComboBoxModel extends DefaultComboBoxModel<String> {
 
-	public OptionsComboBoxModel(List<PollOption> options)
+	public OptionsComboBoxModel(List<String> options)
 	{
-		for(PollOption option: options)
+		for(String option: options)
 		{
 			this.addElement(option);
 		}

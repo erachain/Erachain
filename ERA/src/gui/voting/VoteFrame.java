@@ -4,7 +4,7 @@ import gui.AccountRenderer;
 import gui.PasswordPane;
 import gui.items.ComboBoxModelItemsAll;
 import gui.models.AccountsComboBoxModel;
-import gui.models.OptionsComboBoxModel;
+import gui.models.OptionsComboBoxModel_old;
 import lang.Lang;
 
 import java.awt.Component;
@@ -179,7 +179,7 @@ public class VoteFrame extends JFrame
       		
       	//CBX ACCOUNT
       	detailGBC.gridy = 5;
-      	this.cbxOptions = new JComboBox<PollOption>(new OptionsComboBoxModel(poll.getOptions()));
+      	this.cbxOptions = new JComboBox<PollOption>(new OptionsComboBoxModel_old(poll.getOptions()));
       	this.cbxOptions.setSelectedIndex(option);
       	this.cbxOptions.setRenderer(new DefaultListCellRenderer() {
       	    @SuppressWarnings("rawtypes")

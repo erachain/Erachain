@@ -1,12 +1,5 @@
 package gui.items.voting;
 
-import gui.AccountRenderer;
-import gui.PasswordPane;
-import gui.items.ComboBoxModelItemsAll;
-import gui.models.AccountsComboBoxModel;
-import gui.models.OptionsComboBoxModel;
-import lang.Lang;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -34,8 +27,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import utils.DateTimeFormat;
-import utils.Pair;
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -45,6 +36,13 @@ import core.transaction.Transaction;
 import core.voting.Poll;
 import core.voting.PollOption;
 import datachain.DCSet;
+import gui.AccountRenderer;
+import gui.PasswordPane;
+import gui.items.ComboBoxModelItemsAll;
+import gui.models.AccountsComboBoxModel;
+import gui.models.OptionsComboBoxModel_old;
+import lang.Lang;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class Voting_Dialog extends JDialog
@@ -190,7 +188,7 @@ public class Voting_Dialog extends JDialog
       		
       	//CBX ACCOUNT
       	detailGBC.gridy = 5;
-      	this.cbxOptions = new JComboBox<PollOption>(new OptionsComboBoxModel(poll.getOptions()));
+      	this.cbxOptions = new JComboBox<PollOption>(new OptionsComboBoxModel_old(poll.getOptions()));
       	this.cbxOptions.setSelectedIndex(option);
       	this.cbxOptions.setRenderer(new DefaultListCellRenderer() {
       	    @SuppressWarnings("rawtypes")
