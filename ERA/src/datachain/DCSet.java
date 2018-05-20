@@ -76,6 +76,7 @@ public class DCSet implements Observer, IDB {
 	private CancelSellNameMap cancelSellNameMap;
 	private PollMap pollMap;
 	private VoteOnPollMap voteOnPollMap;
+	private VoteOnItemPollMap voteOnItemPollMap;
 	private ItemAssetMap itemAssetMap;
 	private IssueAssetMap issueAssetMap;
 	private OrderMap orderMap;
@@ -336,6 +337,7 @@ public class DCSet implements Observer, IDB {
 			this.cancelSellNameMap = new CancelSellNameMap(this, database);
 			this.pollMap = new PollMap(this, database);
 			this.voteOnPollMap = new VoteOnPollMap(this, database);
+			this.voteOnItemPollMap = new VoteOnItemPollMap(this, database);
 			
 			this.itemAssetMap = new ItemAssetMap(this, database);
 			this.issueAssetMap = new IssueAssetMap(this, database);
@@ -447,6 +449,7 @@ public class DCSet implements Observer, IDB {
 		
 		this.pollMap = new PollMap(parent.pollMap);
 		this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
+		this.voteOnItemPollMap = new VoteOnItemPollMap(parent.voteOnItemPollMap);
 		
 		this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap);
 		this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap());
@@ -530,6 +533,7 @@ public class DCSet implements Observer, IDB {
 		this.cancelSellNameMap.reset();
 		this.pollMap.reset();
 		this.voteOnPollMap.reset();
+		this.voteOnItemPollMap.reset();
 		
 		this.tradeMap.reset();
 
@@ -779,9 +783,14 @@ public class DCSet implements Observer, IDB {
 		return this.pollMap;
 	}
 
-	public VoteOnPollMap getVoteOnPollDatabase()
+	public VoteOnPollMap getVoteOnPollMap()
 	{
 		return this.voteOnPollMap;
+	}
+
+	public VoteOnItemPollMap getVoteOnItemPollMap()
+	{
+		return this.voteOnItemPollMap;
 	}
 
 	public ItemAssetMap getItemAssetMap()

@@ -2785,7 +2785,7 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Transaction issuePoll(PrivateKeyAccount creator, String name, String description, List<PollOption> options,
+	public Transaction issuePoll(PrivateKeyAccount creator, String name, String description, List<String> options,
 			byte[] icon, byte[] image, int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {

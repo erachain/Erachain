@@ -8,12 +8,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import utils.Pair;
-
 import com.google.common.primitives.Bytes;
 
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import utils.Pair;
 
 public class Crypto {
 
@@ -75,15 +74,9 @@ public class Crypto {
 			return null;
 		}
 	}
-	
-	public String getAddress(byte[] publicKey)
+
+	public String getAddressFromShort(byte[] publicKeyHash)
 	{
-		//SHA256 PUBLICKEY FOR PROTECTION
-		byte[] publicKeyHash = this.digest(publicKey);
-		
-		//RIPEMD160 TO CREATE A SHORTER ADDRESS
-		RIPEMD160 ripEmd160 = new RIPEMD160();
-		publicKeyHash = ripEmd160.digest(publicKeyHash);
 		
 		//CONVERT TO LIST
 		List<Byte> addressList = new ArrayList<Byte>();
@@ -107,6 +100,19 @@ public class Crypto {
 		String address = Base58.encode(Bytes.toArray(addressList));
 		
 		return address;
+	}
+
+	public String getAddress(byte[] publicKey)
+	{
+		//SHA256 PUBLICKEY FOR PROTECTION
+		byte[] publicKeyHash = this.digest(publicKey);
+		
+		//RIPEMD160 TO CREATE A SHORTER ADDRESS
+		RIPEMD160 ripEmd160 = new RIPEMD160();
+		publicKeyHash = ripEmd160.digest(publicKeyHash);
+		
+		return this.getAddressFromShort(publicKeyHash);
+		
 	}
 	
 	public String getATAddress(byte[] signature)

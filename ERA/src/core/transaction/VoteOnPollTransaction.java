@@ -272,7 +272,7 @@ public class VoteOnPollTransaction extends Transaction
 		if(previousOption != -1)
 		{
 			//ADD TO ORPHAN DATABASE
-			this.dcSet.getVoteOnPollDatabase().set(this, previousOption);
+			this.dcSet.getVoteOnPollMap().set(this, previousOption);
 		}
 	}
 
@@ -289,7 +289,7 @@ public class VoteOnPollTransaction extends Transaction
 		poll.deleteVoter(this.creator, this.option);
 
 		//RESTORE PREVIOUS VOTE
-		int previousOption = this.dcSet.getVoteOnPollDatabase().get(this);
+		int previousOption = this.dcSet.getVoteOnPollMap().get(this);
 		if(previousOption != -1)
 		{
 			poll.addVoter(this.creator, previousOption);

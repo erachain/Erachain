@@ -66,7 +66,6 @@ import core.transaction.TransactionFactory;
 import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnItemPollTransaction;
 import core.transaction.VoteOnPollTransaction;
-import core.voting.PollOption;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import ntp.NTP;
@@ -520,7 +519,7 @@ public class TransactionCreator
 
 	public Transaction createIssuePollTransaction(PrivateKeyAccount creator, String name, String description,
 			byte[] icon, byte[] image,
-			List<PollOption> options, int feePow)
+			List<String> options, int feePow)
 	{
 		//CHECK FOR UPDATES
 		this.checkUpdate();

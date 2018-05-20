@@ -670,7 +670,7 @@ public class R_SetStatusToItem extends Transaction {
 		// pack additional data
 		byte[] add_data = packData();
 
-		Tuple2<Integer, Integer> heightSeqNo = this.getHeightSeqNo(this.dcSet);
+		Tuple2<Integer, Integer> heightSeqNo = this.getHeightSeqNo();
 
 		Tuple5<Long, Long, byte[], Integer, Integer> itemP =
 				new Tuple5<Long, Long, byte[], Integer, Integer>

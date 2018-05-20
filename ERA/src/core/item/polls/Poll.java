@@ -10,17 +10,16 @@ import com.google.common.primitives.Ints;
 
 import core.BlockChain;
 import core.account.PublicKeyAccount;
-import core.voting.PollOption;
 
 public class Poll extends PollCls {
 	
 	private static final int TYPE_ID = PollCls.POLL;
 
-	public Poll(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<PollOption> options)
+	public Poll(PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<String> options)
 	{
 		super(TYPE_ID, owner, name, icon, image, description, options);
 	}
-	public Poll(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<PollOption> options)
+	public Poll(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<String> options)
 	{
 		super(typeBytes, owner, name, icon, image, description, options);
 	}
@@ -113,17 +112,18 @@ public class Poll extends PollCls {
 		int optionsLength = Ints.fromByteArray(optionsLengthBytes);
 		position += OPTIONS_SIZE_LENGTH;
 
-		if(optionsLength < 1 || optionsLength > 100)
-		{
-			throw new Exception("Invalid options length");
-		}
-
 		//READ OPTIONS
-		List<PollOption> options = new ArrayList<PollOption>();
+		List<String> options = new ArrayList<String>();
 		for(int i=0; i<optionsLength; i++)
 		{
-			PollOption option = PollOption.parse(Arrays.copyOfRange(data, position, data.length));
-			position += option.getDataLength();
+
+			nameLength = Byte.toUnsignedInt(data[position]);
+			position ++;
+
+			byte[] optionBytes = Arrays.copyOfRange(data, position, position + nameLength);
+			String option = new String(optionBytes, StandardCharsets.UTF_8);
+			position += nameLength;
+
 			options.add(option);
 		}
 

@@ -1,11 +1,14 @@
 package core.item.polls;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NavigableSet;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
@@ -13,10 +16,10 @@ import com.google.common.primitives.Ints;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
-import core.voting.PollOption;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
+import datachain.VoteOnItemPollMap;
 import utils.Pair;
 
 public abstract class PollCls extends ItemCls{
@@ -26,15 +29,15 @@ public abstract class PollCls extends ItemCls{
 	protected static final int OPTIONS_SIZE_LENGTH = 4;
 	protected static final int BASE_LENGTH = OPTIONS_SIZE_LENGTH;
 
-	private List<PollOption> options;
+	private List<String> options;
 
-	public PollCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<PollOption> options)
+	public PollCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<String> options)
 	{
 		super(typeBytes, owner, name, icon, image, description);
 		this.options = options;
 
 	}
-	public PollCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<PollOption> options)
+	public PollCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, List<String> options)
 	{
 		this(new byte[TYPE_LENGTH], owner, name, icon, image, description, options);
 		this.typeBytes[0] = (byte)type;
@@ -44,96 +47,80 @@ public abstract class PollCls extends ItemCls{
 	public int getItemTypeInt() { return ItemCls.POLL_TYPE; }
 	public String getItemTypeStr() { return "poll"; }
 	
-	public List<PollOption> getOptions() {
+	public List<String> getOptions() {
 		return this.options;
 	}
 
 	// DB
-	public Item_Map getDBMap(DCSet db)
+	public Item_Map getDBMap(DCSet dc)
 	{
-		return db.getItemPollMap();
+		return dc.getItemPollMap();
 	}
-	public Issue_ItemMap getDBIssueMap(DCSet db)
+	public Issue_ItemMap getDBIssueMap(DCSet dc)
 	{
-		return db.getIssuePollMap();
-	}
-
-	public boolean hasVotes()
-	{
-		for(PollOption option: this.options)
-		{
-			if(!option.getVoters().isEmpty())
-			{
-				return true;
-			}
-		}
-
-		return false;
+		return dc.getIssuePollMap();
 	}
 
-	public BigDecimal getTotalVotes()
+	public boolean hasVotes(DCSet dc)
 	{
-		return getTotalVotes(0);
+		return dc.getVoteOnItemPollMap().hasVotes(this.key);
 	}
 
-	public BigDecimal getTotalVotes(long assetKey)
+	public BigDecimal getTotalVotes(DCSet dcSet)
+	{
+		return getTotalVotes(dcSet, 2);
+	}
+
+	public BigDecimal getTotalVotes(DCSet dcSet, long assetKey)
 	{
 		BigDecimal votes = BigDecimal.ZERO;
-
-		for(PollOption option: this.options)
-		{
-			votes = votes.add(option.getVotes(assetKey));
+		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		Account voter;
+		
+		optionVoteKeys = map.getVotes(this.key);
+		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+			voter = Account.makeAccountFromShort(key.c);
+			votes.add(voter.getBalanceUSE(assetKey));
 		}
 
 		return votes;
 	}
 
-	public List<Pair<Account, PollOption>> getVotes()
+	public List<Pair<Account, Integer>> getVotes(DCSet dcSet)
 	{
-		List<Pair<Account, PollOption>> votes = new ArrayList<Pair<Account, PollOption>>();
+		List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
 
-		for(PollOption option: this.options)
-		{
-			for(Account voter: option.getVoters())
-			{
-				Pair<Account, PollOption> vote = new Pair<Account, PollOption>(voter, option);
-				votes.add(vote);
-			}
+		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		Pair<Account, Integer> vote;
+		Account voter;
+		
+		optionVoteKeys = map.getVotes(this.key);
+		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+			voter = Account.makeAccountFromShort(key.c);
+			vote = new Pair<Account, Integer>(voter, key.b);
+			votes.add(vote);
 		}
 
 		return votes;
 	}
 
-	public List<Pair<Account, PollOption>> getVotes(List<Account> accounts)
+	public int getOption(String option)
 	{
-		List<Pair<Account, PollOption>> votes = new ArrayList<Pair<Account, PollOption>>();
-
-		for(PollOption option: this.options)
+		
+		int i = 0;
+		for(String pollOption: this.options)
 		{
-			for(Account voter: option.getVoters())
+			if(pollOption.equals(option))
 			{
-				if(accounts.contains(voter))
-				{
-					Pair<Account, PollOption> vote = new Pair<Account, PollOption>(voter, option);
-					votes.add(vote);
-				}
+				return i;
 			}
+			
+			i++;
 		}
 
-		return votes;
-	}
-
-	public PollOption getOption(String option)
-	{
-		for(PollOption pollOption: this.options)
-		{
-			if(pollOption.getName().equals(option))
-			{
-				return pollOption;
-			}
-		}
-
-		return null;
+		return -1;
 	}
 
 	
@@ -148,9 +135,15 @@ public abstract class PollCls extends ItemCls{
 		data = Bytes.concat(data, optionsLengthBytes);
 
 		//WRITE OPTIONS
-		for(PollOption option: this.options)
+		for(String option: this.options)
 		{
-			data = Bytes.concat(data, option.toBytes());
+			
+			//WRITE NAME SIZE
+			byte[] optionBytes = option.getBytes(StandardCharsets.UTF_8);
+			data = Bytes.concat(data, new byte[]{(byte)optionBytes.length});
+
+			//WRITE NAME
+			data = Bytes.concat(data, optionBytes);
 		}
 		
 		return data;
@@ -161,9 +154,9 @@ public abstract class PollCls extends ItemCls{
 	{
 		int length = super.getDataLength(includeReference) + BASE_LENGTH;
 
-		for(PollOption option: this.options)
+		for(String option: this.options)
 		{
-			length += option.getDataLength();
+			length += 1 + option.getBytes(StandardCharsets.UTF_8).length;
 		}
 		
 		return length;
@@ -172,60 +165,16 @@ public abstract class PollCls extends ItemCls{
 	
 	
 	//OTHER
-	
-	public int addVoter(Account voter, int optionIndex)
-	{
-		//CHECK IF WE HAD A PREVIOUS VOTE IN THIS POLL
-		int previousOption = -1;
-		for(PollOption option: this.options)
-		{
-			if(option.hasVoter(voter))
-			{
-				previousOption = this.options.indexOf(option);
-			}
-		}
-
-		if(previousOption != -1)
-		{
-			//REMOVE VOTE
-			this.options.get(previousOption).removeVoter(voter);
-		}
-
-		//ADD NEW VOTE
-		this.options.get(optionIndex).addVoter(voter);
-
-		return previousOption;
-	}
-
-	public void deleteVoter(Account voter, int optionIndex)
-	{
-		this.options.get(optionIndex).removeVoter(voter);
-	}
-
-	//COPY
-
-	public PollCls copy()
-	{
-		try
-		{
-			byte[] bytes = this.toBytes(false, false);
-			return PollFactory.getInstance().parse(bytes, false);
-		}
-		catch(Exception e)
-		{
-			return null;
-		}
-	}
-	
+		
 	@SuppressWarnings("unchecked")
 	public JSONObject toJson() {
 		
 		JSONObject pollJSON = super.toJson();
 
 		JSONArray jsonOptions = new JSONArray();
-		for(PollOption option: this.options)
+		for(String option: this.options)
 		{
-			jsonOptions.add(option.toJson());
+			jsonOptions.add(option);
 		}
 		pollJSON.put("options", jsonOptions);
 				

@@ -117,6 +117,11 @@ public class ObserverMessage {
 	public static final int REMOVE_UNION_TYPE = 143;
 	public static final int LIST_UNION_TYPE = 144;
 
+	public static final int RESET_VOTEPOLL_TYPE = 151;
+	public static final int ADD_VOTEPOLL_TYPE = 152;
+	public static final int REMOVE_VOTEPOLL_TYPE = 153;
+	public static final int LIST_VOTEPOLL_TYPE = 154;
+
 	public static final int RESET_ASSET_STATUS_TYPE = 1151;
 	public static final int ADD_ASSET_STATUS_TYPE = 1152;
 	public static final int REMOVE_ASSET_STATUS_TYPE = 1153;

@@ -78,7 +78,7 @@ public class TestRecPoll {
 	PollCls poll;
 	long pollKey = -1;
 	PollOption pollOption;
-	List<PollOption> options = new ArrayList<PollOption>();;
+	List<String> options = new ArrayList<String>();;
 	IssuePollRecord issuePollTransaction;
 
 	//PollAddressMap dbPA;
@@ -104,9 +104,9 @@ public class TestRecPoll {
 		//dbAP = db.getAddressPollMap();
 		
 		
-		options.add(new PollOption("first ORTION"));
-		options.add(new PollOption("second ORTION"));
-		options.add(new PollOption("probe probe"));
+		options.add("first ORTION");
+		options.add("second ORTION");
+		options.add("probe probe");
 
 		// GET RIGHTS TO CERTIFIER
 		pollGeneral = new Poll(certifier, "СССР", icon, image, "wqeqwe", options);
@@ -287,7 +287,7 @@ public class TestRecPoll {
 		assertEquals(poll.getItemTypeStr(), parsedPoll.getItemTypeStr());
 
 		assertEquals(poll.getOptions().size(), parsedPoll.getOptions().size());
-		assertEquals(poll.getOptions().get(2).getName(), parsedPoll.getOptions().get(2).getName());
+		assertEquals(poll.getOptions().get(2), parsedPoll.getOptions().get(2));
 
 		//PARSE TRANSACTION FROM WRONG BYTES
 		rawIssuePollRecord = new byte[issuePollTransaction.getDataLength(false)];

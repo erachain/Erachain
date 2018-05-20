@@ -13,7 +13,6 @@ import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.polls.PollCls;
-import core.voting.PollOption;
 import datachain.DCSet;
 
 public class VoteOnItemPollTransaction extends Transaction
@@ -216,36 +215,21 @@ public class VoteOnItemPollTransaction extends Transaction
 			return POLL_OPTION_NOT_EXISTS;
 		}
 
-		//CHECK IF NOT VOTED ALREADY
-		PollOption option = poll.getOptions().get(this.option);
-		if(option.hasVoter(this.creator))
-		{
-			return ALREADY_VOTED_FOR_THAT_OPTION;
-		}
-
 		return super.isValid(releaserReference, flags);
 
 	}
 
 	//PROCESS/ORPHAN
 
-	//@Override
-	@Override
 	public void process(Block block, boolean asPack)
 	{
 		//UPDATE CREATOR
 		super.process(block, asPack);
 
-		//ADD VOTE TO POLL
-		int previousOption = poll.addVoter(this.creator, this.option);
-		this.dcSet.getItemPollMap().set(this.key, poll);
+		//ADD VOTE TO POLL		
+		this.dcSet.getVoteOnItemPollMap().addItem(this.key, this.option, this.creator.getShortAddressBytes(),
+				this.getHeightSeqNo());
 
-		//CHECK IF WE HAD PREVIOUSLY VOTED
-		if(previousOption != -1)
-		{
-			//ADD TO ORPHAN DATABASE
-			this.dcSet.getVoteOnPollDatabase().set(this, previousOption);
-		}
 	}
 
 
@@ -257,16 +241,7 @@ public class VoteOnItemPollTransaction extends Transaction
 		super.orphan(asPack);
 
 		//DELETE VOTE FROM POLL
-		poll.deleteVoter(this.creator, this.option);
-
-		//RESTORE PREVIOUS VOTE
-		int previousOption = this.dcSet.getVoteOnPollDatabase().get(this);
-		if(previousOption != -1)
-		{
-			poll.addVoter(this.creator, previousOption);
-		}
-
-		this.dcSet.getItemPollMap().set(this.key, poll);
+		this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, this.creator.getShortAddressBytes());
 	}
 
 	@Override
@@ -297,6 +272,7 @@ public class VoteOnItemPollTransaction extends Transaction
 	}
 
 	public int calcBaseFee() {
+		// TODO: умножать комиссию на размер списка переголосваний (СТЕК)
 		return calcCommonFee();
 	}
 }

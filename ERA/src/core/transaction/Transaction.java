@@ -585,14 +585,14 @@ public abstract class Transaction {
 		return block;
 	}
 
-	public Tuple2<Integer, Integer> getHeightSeqNo(DCSet db) {
+	public Tuple2<Integer, Integer> getHeightSeqNo() {
 		int transactionIndex = -1;
 		int blockIndex;
 		if (block == null) {
 			// blockIndex = db.getBlockMap().getLastBlock().getHeight(db);
 			blockIndex = -1;
 		} else {
-			blockIndex = block.getHeightByParent(db);
+			blockIndex = block.getHeightByParent(this.dcSet);
 			transactionIndex = block.getTransactionSeq(signature);
 		}
 
