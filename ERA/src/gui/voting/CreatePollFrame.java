@@ -251,7 +251,7 @@ public class CreatePollFrame extends JFrame
 			
 			//CREATE POLL
 			PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-			CreatePollTransaction issue_voiting = (CreatePollTransaction) Controller.getInstance().createPoll(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions(), feePow);
+			CreatePollTransaction issue_voiting = (CreatePollTransaction) Controller.getInstance().createPoll_old(creator, this.txtName.getText(), this.txtareaDescription.getText(), this.optionsTableModel.getOptions(), feePow);
 			Poll poll = issue_voiting.getPoll();
 
 			//Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);

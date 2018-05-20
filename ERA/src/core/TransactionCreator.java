@@ -239,6 +239,23 @@ public class TransactionCreator
 		return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, false));
 	}
 
+	public Transaction createIssuePollRecord(PrivateKeyAccount creator, PollCls poll, int feePow)
+	{
+		//CHECK FOR UPDATES
+		this.checkUpdate();
+
+		//TIME
+		long time = NTP.getTime();
+
+		//CREATE POLL CREATION
+		IssuePollRecord pollCreation = new IssuePollRecord(creator, poll, (byte)feePow, time, 0l);
+		pollCreation.sign(creator, false);
+		pollCreation.setDC(this.fork, false);
+
+		return pollCreation;
+
+	}
+
 	public Transaction createPollCreation(PrivateKeyAccount creator, core.voting.Poll poll, int feePow)
 	{
 		//CHECK FOR UPDATES

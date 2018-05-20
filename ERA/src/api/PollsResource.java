@@ -118,7 +118,7 @@ public class PollsResource
 			}
 				
 			//CREATE POLL
-			CreatePollTransaction issue_voiting = (CreatePollTransaction) Controller.getInstance().createPoll(account, name, description, options, feePow);
+			CreatePollTransaction issue_voiting = (CreatePollTransaction) Controller.getInstance().createPoll_old(account, name, description, options, feePow);
 				
 			Poll poll = issue_voiting.getPoll();
 

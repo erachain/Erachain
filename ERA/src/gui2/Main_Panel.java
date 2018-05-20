@@ -47,6 +47,9 @@ import gui.items.persons.IssuePersonPanel;
 import gui.items.persons.Persons_Favorite_SplitPanel;
 import gui.items.persons.Persons_My_SplitPanel;
 import gui.items.persons.Persons_Search_SplitPanel;
+import gui.items.polls.IssuePollPanel;
+import gui.items.polls.Polls_My_SplitPanel;
+import gui.items.polls.Polls_Search_SplitPanel;
 import gui.items.records.Records_My_SplitPanel;
 import gui.items.records.Records_Search_SplitPanel;
 import gui.items.records.Records_UnConfirmed_Panel;
@@ -63,9 +66,6 @@ import gui.items.templates.Templates_Favorite_SplitPanel;
 import gui.items.unions.IssueUnionPanel;
 import gui.items.unions.My_Unions_Tab;
 import gui.items.unions.Search_Union_Tab;
-import gui.items.voting.Create_Voting_Panel;
-import gui.items.voting.Votings_My_SplitPanel;
-import gui.items.voting.Votings_Search_SplitPanel;
 import gui.library.MSplitPane;
 import lang.Lang;
 
@@ -456,29 +456,17 @@ public class Main_Panel extends javax.swing.JPanel {
 			}
 		}
 		
+		
 		if (str.equals(Lang.getInstance().translate("My Polls")) || str.equals("Polls_My_SplitPanel")) {
-			insertTab(Lang.getInstance().translate("My Polls"), new Votings_My_SplitPanel());
+			insertTab(Lang.getInstance().translate("My Polls"), new Polls_My_SplitPanel());
 			return;
 		}
 		if (str.equals(Lang.getInstance().translate("Search Polls")) || str.equals("Polls_Search_SplitPanel")) {
-			insertTab(Lang.getInstance().translate("Search Polls"), new Votings_Search_SplitPanel());
+			insertTab(Lang.getInstance().translate("Search Polls"), new Polls_Search_SplitPanel());
 			return;
 		}
 		if (str.equals(Lang.getInstance().translate("Issue Poll")) || str.equals("Create_Poll_Panel")) {
-			insertTab(Lang.getInstance().translate("Issue Poll"), new Create_Voting_Panel());
-			return;
-		}
-
-		if (str.equals(Lang.getInstance().translate("My Votings")) || str.equals("Votings_My_SplitPanel")) {
-			insertTab(Lang.getInstance().translate("My Votings"), new Votings_My_SplitPanel());
-			return;
-		}
-		if (str.equals(Lang.getInstance().translate("Search Votings")) || str.equals("Votings_Search_SplitPanel")) {
-			insertTab(Lang.getInstance().translate("Search Votings"), new Votings_Search_SplitPanel());
-			return;
-		}
-		if (str.equals(Lang.getInstance().translate("Issue Voting")) || str.equals("Create_Voting_Panel")) {
-			insertTab(Lang.getInstance().translate("Issue Voting"), new Create_Voting_Panel());
+			insertTab(Lang.getInstance().translate("Issue Poll"), new IssuePollPanel());
 			return;
 		}
 

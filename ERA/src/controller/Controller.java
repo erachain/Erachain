@@ -69,6 +69,7 @@ import core.item.assets.Trade;
 import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
+import core.item.polls.PollCls;
 import core.item.statuses.StatusCls;
 import core.item.templates.TemplateCls;
 import core.item.unions.UnionCls;
@@ -2649,7 +2650,19 @@ public class Controller extends Observable {
 		}
 	}
 
-	public Transaction createPoll(PrivateKeyAccount creator, String name, String description, List<String> options,
+	public Transaction issuePoll(PrivateKeyAccount creator, String name, byte[] icon, byte[] image,
+			String description, List<String> options,
+			int feePow) {
+		// CREATE ONLY ONE TRANSACTION AT A TIME
+		synchronized (this.transactionCreator) {
+			// CREATE POLL
+			PollCls poll = new core.item.polls.Poll(creator, name, icon, image, description, options);
+
+			return this.transactionCreator.createIssuePollRecord(creator, poll, feePow);
+		}
+	}
+	
+	public Transaction createPoll_old(PrivateKeyAccount creator, String name, String description, List<String> options,
 			int feePow) {
 		// CREATE ONLY ONE TRANSACTION AT A TIME
 		synchronized (this.transactionCreator) {
