@@ -33,7 +33,7 @@ public class BlockChain
 	// 1824 - 7635471
 	
 	//public static final int START_LEVEL = 1;
-	public static final boolean DEVELOP_USE = true;
+	public static final boolean DEVELOP_USE = false;
 	public static final boolean HARD_WORK = false;
 	public static final boolean PERSON_SEND_PROTECT = true;
 	//public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
