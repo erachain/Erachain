@@ -1,7 +1,7 @@
 {
 	"_lang_ISO_":"ru",
 	"_lang_name_":"Русский",
-	"_timestamp_of_translation_": "1496804885105",
+	"_timestamp_of_translation_": "1496804893105",
 	" ( * optional field )":" ( * дополнительное поле )",
 	" and start the application again.":" и запустите приложение снова.",
 	"( DO NOT USE your wallet's password. )":"( Не используйте Ваш пароль кошелька! )",
@@ -848,6 +848,7 @@
 	"Write Document Hash in BlockChain":"Записать Хэш документа в Блокчейн",
 	"Write in BlockChain":"Записать в Блокчейн",
 	"Write Hashs to BlockChain":"Запись Хэш в Блокчейн",
+	"Write Transaction":"Записать транзакцию",
 	"Write & Sign":"Подписать и Записать",
 	"year":"год",
 	"Yes":"Да",
