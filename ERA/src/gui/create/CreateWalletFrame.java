@@ -1,6 +1,5 @@
 package gui.create;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -15,7 +14,7 @@ import java.awt.event.WindowEvent;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+//import java.util.Random;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -36,7 +35,7 @@ public class CreateWalletFrame extends JFrame {
 	
 	private byte[] seed;
 	private NoWalletFrame parent;
-	private Random random;
+	private SecureRandom random;
 	
 	public CreateWalletFrame(NoWalletFrame parent)
 	{

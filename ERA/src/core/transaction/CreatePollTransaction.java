@@ -192,6 +192,9 @@ public class CreatePollTransaction extends Transaction
 	public int isValid(Long releaserReference, long flags)
 	{
 
+		if (this.height > BlockChain.ITEM_POLL_FROM) 
+			return INVALID_TRANSACTION_TYPE;
+		
 		//CHECK POLL NAME LENGTH
 		int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
 		if(nameLength > 400 || nameLength < 1)

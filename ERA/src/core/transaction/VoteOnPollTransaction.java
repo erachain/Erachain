@@ -12,6 +12,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -216,6 +217,9 @@ public class VoteOnPollTransaction extends Transaction
 	@Override
 	public int isValid(Long releaserReference, long flags)
 	{
+
+		if (this.height > BlockChain.ITEM_POLL_FROM) 
+			return INVALID_TRANSACTION_TYPE;
 
 		//CHECK POLL LENGTH
 		int pollLength = this.poll.getBytes(StandardCharsets.UTF_8).length;

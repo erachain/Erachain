@@ -1,7 +1,7 @@
 package api;
 
 import java.security.SecureRandom;
-import java.util.Random;
+//import java.util.Random;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,7 +17,7 @@ import core.crypto.Base58;
 @Produces(MediaType.APPLICATION_JSON)
 public class SeedResource 
 {
-	private Random random = new SecureRandom();
+	private SecureRandom random = new SecureRandom();
 	
 	@GET
 	public String getSeed()
