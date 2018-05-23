@@ -69,8 +69,21 @@ public class TelegramsResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("address/{address}/timestamp/{timestamp}")
+	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp) {
+		
+		JSONArray array = new JSONArray();
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(new Account(address), timestamp, null)) {
+			array.add(telegram.toJson());
+		}
+
+		return array.toJSONString();
+	}
+
+	@SuppressWarnings("unchecked")
+	@GET
+	@Path("address/{address}/timestamp/{timestamp}/filter/{filter}")
 	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp,
-			@QueryParam("filter") String filter) {
+			@PathParam("filter") String filter) {
 		
 		JSONArray array = new JSONArray();
 		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(new Account(address), timestamp, filter)) {
