@@ -1078,8 +1078,10 @@ public class Controller extends Observable {
 		int checkPoint = BlockChain.getCheckPoint(dcSet);
 		if (checkPoint < 10) {
 			hardCheckBlockSign = this.blockChain.getGenesisBlock().getSignature();
-		} else {
+		} else if (!BlockChain.DEVELOP_USE) {
 			hardCheckBlockSign = this.blockChain.CHECKPOINT.b;
+		} else {
+			hardCheckBlockSign = this.dcSet.getBlocksHeadsMap().get(checkPoint).a.c;
 		}
 		// CHECK CHECKPOINT BLOCK on CONNECT
 		Message mess = MessageFactory.getInstance().createGetHeadersMessage(hardCheckBlockSign);
@@ -1088,7 +1090,7 @@ public class Controller extends Observable {
 			; // MAY BE IT HARD BUSY
 		else if (response.getSignatures().isEmpty()) {
 			// NO
-			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES <<3, "wrong GENESIS BLOCK");
+			this.network.tryDisconnect(peer, Synchronizer.BAN_BLOCK_TIMES <<2, "wrong GENESIS BLOCK");
 			return;
 		}
 
