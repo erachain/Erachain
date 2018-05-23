@@ -783,27 +783,23 @@ public abstract class Transaction {
 			height = 1;
 		} else {
 			height = this.getBlockHeight(localDCSet);
-			// transaction.put("reference", this.reference==null?"null":"" +
-			// this.reference);
+			transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
+			transaction.put("creator", this.creator.getAddress());
 			transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
 			if (this.fee.signum() == 0) {
 				this.setDC(localDCSet, false);
 			}
 			transaction.put("fee", this.fee.toPlainString());
 			transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
-			transaction.put("creator", this.creator.getAddress());
 			transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
 			transaction.put("property1", Byte.toUnsignedInt(this.typeBytes[2]));
 			transaction.put("property2", Byte.toUnsignedInt(this.typeBytes[3]));
 			if (this.block != null) {
-				transaction.put("height", this.block.getHeightByParent(localDCSet));
-				transaction.put("height", this.getSeqNo(localDCSet));
+				transaction.put("height", height); //this.block.getHeightByParent(localDCSet));
+				transaction.put("sequence", this.getSeqNo(localDCSet));
 			}
 		}
-
-		transaction.put("height", height);
-		if (height > 0)
-			transaction.put("sequence", this.getSeqNo(localDCSet));
+		
 		transaction.put("size", this.viewSize(false));
 		return transaction;
 	}

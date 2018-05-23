@@ -108,7 +108,7 @@ public class TelegramsResource {
 	}
 
 
-	// GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122
+	// GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false?password=1
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("send/{sender}/{recipient}/{asset}/{amount}/{title}/{message}/{istextmessage}/{encrypt}")
@@ -118,7 +118,7 @@ public class TelegramsResource {
 			@PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
 			@QueryParam("password") String password) {
 
-		APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
+		//APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
 
 		JSONObject out = new JSONObject();
 		Controller cntr = Controller.getInstance();
