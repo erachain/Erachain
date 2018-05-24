@@ -78,7 +78,7 @@ public class TelegramsResource {
 			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);			
 		}
 		JSONArray array = new JSONArray();
-		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account.b, timestamp, filter)) {
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account.a, timestamp, filter)) {
 			array.add(telegram.toJson());
 		}
 
