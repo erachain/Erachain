@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
@@ -69,24 +70,15 @@ public class TelegramsResource {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Path("address/{address}/timestamp/{timestamp}")
-	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp) {
-		
-		JSONArray array = new JSONArray();
-		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(new Account(address), timestamp, null)) {
-			array.add(telegram.toJson());
-		}
-
-		return array.toJSONString();
-	}
-
-	@SuppressWarnings("unchecked")
-	@GET
-	@Path("address/{address}/timestamp/{timestamp}/filter/{filter}")
 	public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp,
-			@PathParam("filter") String filter) {
+			@QueryParam("filter") String filter) {
 		
+		Tuple2<Account, String> account = Account.tryMakeAccount(address);
+		if (account.a == null) {
+			throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);			
+		}
 		JSONArray array = new JSONArray();
-		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(new Account(address), timestamp, filter)) {
+		for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account.b, timestamp, filter)) {
 			array.add(telegram.toJson());
 		}
 

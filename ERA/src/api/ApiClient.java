@@ -832,13 +832,35 @@ public class ApiClient {
 			String method = args[0].toUpperCase();
 
 			//GET PATH
-			String path = args[1];
+			String path = command.substring((method + " ").length());
 
 			//GET CONTENT
 			String content = "";
+			String vars = "";
+
 			if(method.equals("POST"))
 			{
 				content = command.substring((method + " " + path + " ").length());
+			} else {
+
+				// get telegrams/address?erty=132 123&sdf=вва
+				int startVars = command.indexOf("?");
+				if (startVars > 0) {
+					content = command.substring(startVars + 1);
+					path = command.substring((method + " ").length(), startVars);
+					String[] items = content.split("&");
+	
+					for (String item : items) {
+						String[] value = item.split("=");
+						if (value.length > 1) {
+							vars += URLEncoder.encode(value[0], "UTF-8") + "=" + URLEncoder.encode(value[1], "UTF-8") + "&";
+						} else {
+							vars += URLEncoder.encode(item, "UTF-8") + "&";
+						}
+					}
+					vars = vars.substring(0, vars.length()-1);
+					
+				}
 			}
 
 			//URL CANNOT CONTAIN UNICODE CHARACTERS
@@ -849,6 +871,10 @@ public class ApiClient {
 			}
 			path2 = path2.substring(0,path2.length()-1);
 
+			if (vars.length() > 0) {
+				path2 += "?" + vars;
+			}
+			
 			//CREATE CONNECTION
 			URL url = new URL("http://127.0.0.1:" + Settings.getInstance().getRpcPort() + "/" + path2);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -897,7 +923,8 @@ public class ApiClient {
 		{
 			LOGGER.info(ioe);
 			return "Invalid command! \n" +
-			"Type help to get a list of commands.";
+			ioe.getMessage() + "\n" +
+			"Type help to get a list of commands. ";
 		}
 	}
 
