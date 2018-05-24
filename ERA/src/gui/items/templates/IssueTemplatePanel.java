@@ -192,7 +192,6 @@ public class IssueTemplatePanel extends JPanel {
 		jScrollPane1 = new javax.swing.JScrollPane();
 		jTextArea_Content = new javax.swing.JTextArea();
 		jLabel_Fee = new javax.swing.JLabel();
-		jLabel_Account_Creator = new javax.swing.JLabel();
 		// jComboBox_Account_Creator = new javax.swing.JComboBox<>();
 		jTextField_Fee = new javax.swing.JTextField();
 		jLabel_Template = new javax.swing.JLabel();
@@ -207,6 +206,15 @@ public class IssueTemplatePanel extends JPanel {
 		setLayout(layout);
 
 		lblNewLabel = new JLabel("New label");
+		jLabel_Account_Creator = new javax.swing.JLabel();
+
+		jLabel_Account_Creator.setText(Lang.getInstance().translate("Account Creator") + ":");
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
+		gridBagConstraints.insets = new Insets(0, 15, 5, 5);
+		add(jLabel_Account_Creator, gridBagConstraints);
 		add_Image_Panel = new My_Add_Image_Panel(
 				Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
 
@@ -291,14 +299,6 @@ public class IssueTemplatePanel extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
 		gridBagConstraints.insets = new Insets(0, 15, 5, 5);
 		add(jLabel_Fee, gridBagConstraints);
-
-		jLabel_Account_Creator.setText(Lang.getInstance().translate("Account Creator") + ":");
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
-		gridBagConstraints.insets = new Insets(0, 15, 5, 5);
-		add(jLabel_Account_Creator, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 3;
