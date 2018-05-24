@@ -719,17 +719,17 @@ public class ApiClient {
 				},
 				/// telegrams
 				{
-					"GET telegrams/address/<address>",
+					"GET telegrams/address/<address>?filter={filter}",
 					"Returns an array of the telegrams of a specific address.",
 					"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
 				},
 				{
-					"GET telegrams/timestamp/<timestamp>/filter/<filter>",
+					"GET telegrams/timestamp/<timestamp>?filter=<filter>",
 					"Returns an array of last telegrams from given timestamp by filter. Filter is optional parametr",
 					"Errors: 201 - Wallet does not exist."
 				},
 				{
-					"GET telegrams/address/<address>/timestamp/<timestamp>/filte/<filter>",
+					"GET telegrams/address/<address>/timestamp/<timestamp>?filter={filter}",
 					"Returns an array of the telegrams of a specific address from given timestamp by head filter. Filter is optional parametr.",
 					"Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - address does not exist in wallet"
 				},
@@ -739,7 +739,7 @@ public class ApiClient {
 					"Errors: 101 - Invalid signature. 311 - Telegram does not exist."
 				},
 				{
-					"GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122",
+					"GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false?password=122",
 					"Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
 					""
 				},
