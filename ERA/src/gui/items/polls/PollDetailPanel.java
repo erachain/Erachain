@@ -47,9 +47,9 @@ public class PollDetailPanel extends JPanel {
 		// LAYOUT
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0 };
-		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0 };
 		gridBagLayout.rowHeights = new int[] { 0, 69, 0, 0, 50 };
-		gridBagLayout.columnWidths = new int[] { 119, 71, 0, 0, 0, 0, 0 };
+		gridBagLayout.columnWidths = new int[] { 119, 71, 0, 0 };
 		this.setLayout(gridBagLayout);
 
 		// PADDING
@@ -91,6 +91,7 @@ public class PollDetailPanel extends JPanel {
 		JTextField creator = new JTextField(poll.getOwner().getAddress());
 		creator.setEditable(false);
 		GridBagConstraints gbc_creator = new GridBagConstraints();
+		gbc_creator.fill = GridBagConstraints.HORIZONTAL;
 		gbc_creator.insets = new Insets(0, 0, 5, 5);
 		gbc_creator.gridx = 2;
 		gbc_creator.gridy = 0;
@@ -131,7 +132,7 @@ public class PollDetailPanel extends JPanel {
 		TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
 		sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
 
-		JLabel ImageLabel = new JLabel("Image");
+		JLabel ImageLabel = new JLabel("");
 		GridBagConstraints gbc_ImageLabel = new GridBagConstraints();
 		gbc_ImageLabel.anchor = GridBagConstraints.NORTH;
 		gbc_ImageLabel.gridheight = 3;
@@ -163,6 +164,7 @@ public class PollDetailPanel extends JPanel {
 		JTextField name = new JTextField(poll.getName());
 		name.setEditable(false);
 		GridBagConstraints gbc_name = new GridBagConstraints();
+		gbc_name.fill = GridBagConstraints.HORIZONTAL;
 		gbc_name.insets = new Insets(0, 0, 5, 5);
 		gbc_name.gridx = 2;
 		gbc_name.gridy = 1;
@@ -178,6 +180,7 @@ public class PollDetailPanel extends JPanel {
 		JTextField date = new JTextField(dateTime);
 		date.setEditable(false);
 		GridBagConstraints gbc_date = new GridBagConstraints();
+		gbc_date.fill = GridBagConstraints.HORIZONTAL;
 		gbc_date.insets = new Insets(0, 0, 5, 5);
 		gbc_date.gridx = 2;
 		gbc_date.gridy = 2;
@@ -194,6 +197,7 @@ public class PollDetailPanel extends JPanel {
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setEditable(false);
 		GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
+		gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
 		gbc_txtAreaDescription.gridx = 2;
 		gbc_txtAreaDescription.gridy = 3;
