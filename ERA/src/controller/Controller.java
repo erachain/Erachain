@@ -1073,18 +1073,8 @@ public class Controller extends Observable {
 				MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), getBuildTimestamp())))
 			return;
 
-		// GET CHECKPOINT BLOCK - TEST WRONG CHAIN
-		byte[] hardCheckBlockSign;
-		int checkPoint = BlockChain.getCheckPoint(dcSet);
-		if (checkPoint < 10) {
-			hardCheckBlockSign = this.blockChain.getGenesisBlock().getSignature();
-		} else if (!BlockChain.DEVELOP_USE) {
-			hardCheckBlockSign = this.blockChain.CHECKPOINT.b;
-		} else {
-			hardCheckBlockSign = this.dcSet.getBlocksHeadsMap().get(checkPoint).a.c;
-		}
-		// CHECK CHECKPOINT BLOCK on CONNECT
-		Message mess = MessageFactory.getInstance().createGetHeadersMessage(hardCheckBlockSign);
+		// CHECK GENESIS BLOCK on CONNECT
+		Message mess = MessageFactory.getInstance().createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
 		SignaturesMessage response = (SignaturesMessage)peer.getResponse(mess, 20000);
 		if (response == null)
 			; // MAY BE IT HARD BUSY
