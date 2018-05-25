@@ -3,11 +3,13 @@ package gui.items.polls;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,7 +45,12 @@ public class PollDetailPanel extends JPanel {
 		this.asset = asset;
 
 		// LAYOUT
-		this.setLayout(new GridBagLayout());
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+		gridBagLayout.rowHeights = new int[] { 0, 69, 0, 0, 50 };
+		gridBagLayout.columnWidths = new int[] { 119, 71, 0, 0, 0, 0, 0 };
+		this.setLayout(gridBagLayout);
 
 		// PADDING
 		this.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -58,44 +65,44 @@ public class PollDetailPanel extends JPanel {
 
 		// DETAIL GBC
 		GridBagConstraints detailGBC = new GridBagConstraints();
-		detailGBC.insets = new Insets(0, 5, 5, 0);
+		detailGBC.insets = new Insets(0, 5, 0, 5);
 		detailGBC.fill = GridBagConstraints.HORIZONTAL;
 		detailGBC.anchor = GridBagConstraints.NORTHWEST;
 		detailGBC.weightx = 1;
-		detailGBC.gridwidth = 2;
-		detailGBC.gridx = 1;
+		detailGBC.gridx = 2;
 
 		// LABEL CREATOR
 		labelGBC.gridy = 1;
-		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
-		this.add(creatorLabel, labelGBC);
 
 		// CREATOR
-		detailGBC.gridy = 1;
-		JTextField creator = new JTextField(poll.getOwner().getAddress());
-		creator.setEditable(false);
-		this.add(creator, detailGBC);
+		detailGBC.gridy = 4;
 
 		// LABEL NAME
 		labelGBC.gridy = 2;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-		this.add(nameLabel, labelGBC);
+		JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
+		GridBagConstraints gbc_creatorLabel = new GridBagConstraints();
+		gbc_creatorLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_creatorLabel.gridx = 1;
+		gbc_creatorLabel.gridy = 0;
+		this.add(creatorLabel, gbc_creatorLabel);
 
 		// NAME
 		detailGBC.gridy = 2;
-		JTextField name = new JTextField(poll.getName());
-		name.setEditable(false);
-		this.add(name, detailGBC);
+		JTextField creator = new JTextField(poll.getOwner().getAddress());
+		creator.setEditable(false);
+		GridBagConstraints gbc_creator = new GridBagConstraints();
+		gbc_creator.insets = new Insets(0, 0, 5, 5);
+		gbc_creator.gridx = 2;
+		gbc_creator.gridy = 0;
+		this.add(creator, gbc_creator);
 
 		// LABEL DATE
 		labelGBC.gridy = 3;
-		JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date") + ":");
-		this.add(dateLabel, labelGBC);
 
 		String dateTime = "";
 
-		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(
-				poll.getOwner().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
+		List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap()
+				.getTransactionsByTypeAndAddress(poll.getOwner().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
 		for (Transaction transaction : transactions) {
 			CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
 			if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
@@ -106,27 +113,15 @@ public class PollDetailPanel extends JPanel {
 
 		// DATE
 		detailGBC.gridy = 3;
-		JTextField date = new JTextField(dateTime);
-		date.setEditable(false);
-		this.add(date, detailGBC);
 
 		// LABEL DESCRIPTION
 		labelGBC.gridy = 4;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-		this.add(descriptionLabel, labelGBC);
 
 		// DESCRIPTION
 		detailGBC.gridy = 4;
-		JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
-		txtAreaDescription.setRows(4);
-		txtAreaDescription.setBorder(name.getBorder());
-		txtAreaDescription.setEditable(false);
-		this.add(txtAreaDescription, detailGBC);
 
 		// LABEL OPTIONS
 		labelGBC.gridy = 5;
-		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
-		this.add(optionsLabel, labelGBC);
 
 		// OPTIONS
 		detailGBC.gridy = 5;
@@ -135,6 +130,82 @@ public class PollDetailPanel extends JPanel {
 
 		TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
 		sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
+
+		JLabel ImageLabel = new JLabel("Image");
+		GridBagConstraints gbc_ImageLabel = new GridBagConstraints();
+		gbc_ImageLabel.anchor = GridBagConstraints.NORTH;
+		gbc_ImageLabel.gridheight = 3;
+		gbc_ImageLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_ImageLabel.gridx = 0;
+		gbc_ImageLabel.gridy = 1;
+		add(ImageLabel, gbc_ImageLabel);
+
+		ImageIcon image = new ImageIcon(poll.getImage());
+		int x = image.getIconWidth();
+		int y = image.getIconHeight();
+		int x1 = 250;
+		double k = ((double) x / (double) x1);
+		y = (int) ((double) y / k);
+
+		if (y != 0) {
+			Image Im = image.getImage().getScaledInstance(x1, y, 1);
+
+			ImageLabel.setIcon(new ImageIcon(Im));
+		}
+
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+		GridBagConstraints gbc_nameLabel = new GridBagConstraints();
+		gbc_nameLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_nameLabel.gridx = 1;
+		gbc_nameLabel.gridy = 1;
+		this.add(nameLabel, gbc_nameLabel);
+
+		JTextField name = new JTextField(poll.getName());
+		name.setEditable(false);
+		GridBagConstraints gbc_name = new GridBagConstraints();
+		gbc_name.insets = new Insets(0, 0, 5, 5);
+		gbc_name.gridx = 2;
+		gbc_name.gridy = 1;
+		this.add(name, gbc_name);
+
+		JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date") + ":");
+		GridBagConstraints gbc_dateLabel = new GridBagConstraints();
+		gbc_dateLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_dateLabel.gridx = 1;
+		gbc_dateLabel.gridy = 2;
+		this.add(dateLabel, gbc_dateLabel);
+
+		JTextField date = new JTextField(dateTime);
+		date.setEditable(false);
+		GridBagConstraints gbc_date = new GridBagConstraints();
+		gbc_date.insets = new Insets(0, 0, 5, 5);
+		gbc_date.gridx = 2;
+		gbc_date.gridy = 2;
+		this.add(date, gbc_date);
+
+		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+		GridBagConstraints gbc_descriptionLabel = new GridBagConstraints();
+		gbc_descriptionLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_descriptionLabel.gridx = 1;
+		gbc_descriptionLabel.gridy = 3;
+		this.add(descriptionLabel, gbc_descriptionLabel);
+
+		JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
+		txtAreaDescription.setRows(4);
+		txtAreaDescription.setEditable(false);
+		GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
+		gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
+		gbc_txtAreaDescription.gridx = 2;
+		gbc_txtAreaDescription.gridy = 3;
+		this.add(txtAreaDescription, gbc_txtAreaDescription);
+
+		txtAreaDescription.setBorder(name.getBorder());
+		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
+		GridBagConstraints gbc_optionsLabel = new GridBagConstraints();
+		gbc_optionsLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_optionsLabel.gridx = 1;
+		gbc_optionsLabel.gridy = 4;
+		this.add(optionsLabel, gbc_optionsLabel);
 
 		this.add(new JScrollPane(table), detailGBC);
 
@@ -147,8 +218,6 @@ public class PollDetailPanel extends JPanel {
 				onVoteClick();
 			}
 		});
-		// this.add(allButton, detailGBC);
-
 		// PACK
 		this.setVisible(true);
 	}

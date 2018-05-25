@@ -28,6 +28,7 @@ import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
+import gui.library.My_Add_Image_Panel;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import gui.models.CreateOptionsTableModel;
@@ -43,30 +44,17 @@ public class IssuePollPanel extends JPanel {
 	private JButton createButton;
 	private CreateOptionsTableModel optionsTableModel;
 	private IssuePollPanel th;
+	private My_Add_Image_Panel add_Image_Panel;
+	private My_Add_Image_Panel add_Logo_Icon_Panel;
 
 	public IssuePollPanel() {
-		// super(Lang.getInstance().translate("Erachain.org") + " - " +
-		// Lang.getInstance().translate("Create Poll"));
-
-		// CLOSE
-		// setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-		// ICON
 
 		// LAYOUT
-		this.setLayout(new GridBagLayout());
+		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.rowHeights = new int[] { 0, 0, 88, 0, 0, 0, 0 };
+		gridBagLayout.columnWeights = new double[] { 0.0, 0.0, 1.0, 0.0 };
+		this.setLayout(gridBagLayout);
 		th = this;
-		// PADDING
-		// ((JComponent) this.getContentPane()).setBorder(new EmptyBorder(5, 5,
-		// 5, 5));
-
-		// LABEL GBC
-		GridBagConstraints labelGBC = new GridBagConstraints();
-		labelGBC.insets = new Insets(5, 5, 5, 5);
-		labelGBC.fill = GridBagConstraints.HORIZONTAL;
-		labelGBC.anchor = GridBagConstraints.NORTHWEST;
-		labelGBC.weightx = 0;
-		labelGBC.gridx = 0;
 
 		// COMBOBOX GBC
 		GridBagConstraints cbxGBC = new GridBagConstraints();
@@ -78,84 +66,130 @@ public class IssuePollPanel extends JPanel {
 
 		// TEXTFIELD GBC
 		GridBagConstraints txtGBC = new GridBagConstraints();
-		txtGBC.insets = new Insets(5, 5, 5, 5);
+		txtGBC.insets = new Insets(5, 5, 5, 0);
 		txtGBC.fill = GridBagConstraints.HORIZONTAL;
 		txtGBC.anchor = GridBagConstraints.NORTHWEST;
 		txtGBC.weightx = 1;
 		txtGBC.gridwidth = 2;
-		txtGBC.gridx = 1;
+		txtGBC.gridx = 2;
 
 		// BUTTON GBC
 		GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(5, 5, 5, 5);
+		buttonGBC.insets = new Insets(5, 5, 0, 5);
 		buttonGBC.fill = GridBagConstraints.NONE;
 		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
 		buttonGBC.gridwidth = 2;
 		buttonGBC.gridx = 0;
-
-		// LABEL FROM
-		labelGBC.gridy = 0;
 		JLabel fromLabel = new JLabel(Lang.getInstance().translate("Account") + ":");
-		this.add(fromLabel, labelGBC);
+		GridBagConstraints gbc_fromLabel = new GridBagConstraints();
+		gbc_fromLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_fromLabel.gridx = 1;
+		gbc_fromLabel.gridy = 0;
+		this.add(fromLabel, gbc_fromLabel);
 
 		// COMBOBOX FROM
 		txtGBC.gridy = 0;
 		this.cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
 		this.add(this.cbxFrom, txtGBC);
 
+		this.optionsTableModel = new CreateOptionsTableModel(new Object[] { Lang.getInstance().translate("Name") }, 0);
+
+		// LABEL GBC
+		GridBagConstraints labelGBC = new GridBagConstraints();
+		labelGBC.insets = new Insets(5, 5, 5, 5);
+		labelGBC.fill = GridBagConstraints.HORIZONTAL;
+		labelGBC.anchor = GridBagConstraints.NORTHWEST;
+		labelGBC.weightx = 0;
+		labelGBC.gridx = 1;
+
+		// ICON
+		add_Image_Panel = new My_Add_Image_Panel(
+				Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
+
+		GridBagConstraints gbc_add_Image_Panel = new GridBagConstraints();
+		gbc_add_Image_Panel.anchor = GridBagConstraints.NORTH;
+		gbc_add_Image_Panel.gridheight = 3;
+		gbc_add_Image_Panel.insets = new Insets(0, 0, 5, 5);
+		gbc_add_Image_Panel.gridx = 0;
+		gbc_add_Image_Panel.gridy = 1;
+		add(add_Image_Panel, gbc_add_Image_Panel);
+
 		// LABEL NAME
 		labelGBC.gridy = 1;
 		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
 		this.add(nameLabel, labelGBC);
 
-		// TXT NAME
-		txtGBC.gridy = 1;
+		// LABEL FEE
+		labelGBC.gridy = 5;
+		labelGBC.weighty = 0;
 		this.txtName = new JTextField();
-		this.add(this.txtName, txtGBC);
+		GridBagConstraints gbc_txtName = new GridBagConstraints();
+		gbc_txtName.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtName.insets = new Insets(0, 0, 5, 5);
+		gbc_txtName.gridx = 2;
+		gbc_txtName.gridy = 1;
+		this.add(this.txtName, gbc_txtName);
+		add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
 
-		// LABEL NAME
-		labelGBC.gridy = 2;
+		GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();
+		gbc_add_Logo_Icon_Panel.insets = new Insets(0, 0, 5, 0);
+		gbc_add_Logo_Icon_Panel.gridx = 3;
+		gbc_add_Logo_Icon_Panel.gridy = 1;
+		add(add_Logo_Icon_Panel, gbc_add_Logo_Icon_Panel);
+
 		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
-		this.add(descriptionLabel, labelGBC);
+		GridBagConstraints gbc_descriptionLabel = new GridBagConstraints();
+		gbc_descriptionLabel.anchor = GridBagConstraints.NORTH;
+		gbc_descriptionLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_descriptionLabel.gridx = 1;
+		gbc_descriptionLabel.gridy = 2;
+		this.add(descriptionLabel, gbc_descriptionLabel);
 
 		// TXTAREA NAME
 		// TABLE OPTIONS
 		GridBagConstraints txtGBC2 = new GridBagConstraints();
+		txtGBC2.gridwidth = 2;
+		txtGBC2.gridx = 2;
 		txtGBC2.gridy = 2;
 		txtGBC2.weighty = 0.3;
-		txtGBC2.gridwidth = 2;
 		txtGBC2.insets = new Insets(0, 5, 5, 0);
 		txtGBC2.fill = GridBagConstraints.BOTH;
 		txtGBC2.anchor = GridBagConstraints.NORTHWEST;
-		this.txtareaDescription = new JTextArea();
-		// this.txtareaDescription.setRows(4);
-		this.txtareaDescription.setBorder(this.txtName.getBorder());
 		JScrollPane ss = new JScrollPane();
-		ss.setViewportView(this.txtareaDescription);
 		this.add(ss, txtGBC2);
+		this.txtareaDescription = new JTextArea();
+		ss.setViewportView(txtareaDescription);
 
-		// LABEL OPTIONS
-		labelGBC.gridy = 3;
-		labelGBC.weighty = 0.5;
+		// BUTTON Register
+		buttonGBC.gridy = 6;
+		createButton = new JButton(Lang.getInstance().translate("Create"));
+		createButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				onRegisterClick();
+			}
+		});
+
 		JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
-		this.add(optionsLabel, labelGBC);
+		GridBagConstraints gbc_optionsLabel = new GridBagConstraints();
+		gbc_optionsLabel.anchor = GridBagConstraints.NORTH;
+		gbc_optionsLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_optionsLabel.gridx = 1;
+		gbc_optionsLabel.gridy = 3;
+		this.add(optionsLabel, gbc_optionsLabel);
 
 		// TABLE OPTIONS
 		GridBagConstraints txtGBC1 = new GridBagConstraints();
+		txtGBC1.gridwidth = 2;
+		txtGBC1.insets = new Insets(0, 0, 5, 0);
+		txtGBC1.gridx = 2;
 		txtGBC1.gridy = 3;
 		txtGBC1.weighty = 0.1;
-		txtGBC1.gridwidth = 2;
 		txtGBC1.fill = GridBagConstraints.BOTH;
 		txtGBC1.anchor = GridBagConstraints.NORTHWEST;
-		this.optionsTableModel = new CreateOptionsTableModel(new Object[] { Lang.getInstance().translate("Name") }, 0);
 		final JTable table = new JTable(optionsTableModel);
 		JScrollPane scroll = new JScrollPane();
 		scroll.setViewportView(table);
 		this.add(scroll, txtGBC1);
-
-		// TABLE OPTIONS DELETE
-		txtGBC.gridy = 4;
-		txtGBC.weighty = 0;
 		JButton deleteButton = new JButton(Lang.getInstance().translate("Delete"));
 		deleteButton.addActionListener(new ActionListener() {
 
@@ -171,28 +205,28 @@ public class IssuePollPanel extends JPanel {
 			}
 		});
 
-		this.add(deleteButton, txtGBC);
-
-		// LABEL FEE
-		labelGBC.gridy = 5;
-		labelGBC.weighty = 0;
+		GridBagConstraints gbc_deleteButton = new GridBagConstraints();
+		gbc_deleteButton.gridwidth = 2;
+		gbc_deleteButton.fill = GridBagConstraints.HORIZONTAL;
+		gbc_deleteButton.insets = new Insets(0, 0, 5, 5);
+		gbc_deleteButton.gridx = 2;
+		gbc_deleteButton.gridy = 4;
+		this.add(deleteButton, gbc_deleteButton);
 		JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
-		this.add(feeLabel, labelGBC);
-
-		// TXT FEE
-		txtGBC.gridy = 5;
+		GridBagConstraints gbc_feeLabel = new GridBagConstraints();
+		gbc_feeLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_feeLabel.gridx = 1;
+		gbc_feeLabel.gridy = 5;
+		this.add(feeLabel, gbc_feeLabel);
 		this.txtFee = new JTextField();
 		this.txtFee.setText("1");
-		this.add(this.txtFee, txtGBC);
-
-		// BUTTON Register
-		buttonGBC.gridy = 6;
-		createButton = new JButton(Lang.getInstance().translate("Create"));
-		createButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				onRegisterClick();
-			}
-		});
+		GridBagConstraints gbc_txtFee = new GridBagConstraints();
+		gbc_txtFee.gridwidth = 2;
+		gbc_txtFee.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtFee.insets = new Insets(0, 0, 5, 5);
+		gbc_txtFee.gridx = 2;
+		gbc_txtFee.gridy = 5;
+		this.add(this.txtFee, gbc_txtFee);
 		this.add(createButton, buttonGBC);
 
 		// PACK
@@ -206,20 +240,6 @@ public class IssuePollPanel extends JPanel {
 	public void onRegisterClick() {
 		// DISABLE
 		this.createButton.setEnabled(false);
-
-		// CHECK IF NETWORK OK
-		if (false && Controller.getInstance().getStatus() != Controller.STATUS_OK) {
-			// NETWORK NOT OK
-			JOptionPane.showMessageDialog(null,
-					Lang.getInstance().translate(
-							"You are unable to send a transaction while synchronizing or while having no connections!"),
-					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
-
-			// ENABLE
-			this.createButton.setEnabled(true);
-
-			return;
-		}
 
 		// CHECK IF WALLET UNLOCKED
 		if (!Controller.getInstance().isWalletUnlocked()) {
@@ -250,19 +270,17 @@ public class IssuePollPanel extends JPanel {
 			// ENABLE
 			this.createButton.setEnabled(true);
 			return;
-
 		}
 
-		// TODO: icon + IMAGE
+		byte[] icon = add_Logo_Icon_Panel.imgButes;
+		byte[] image = add_Image_Panel.imgButes;
 
 		// CREATE POLL
 		PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
 		IssuePollRecord issuePoll = (IssuePollRecord) Controller.getInstance().issuePoll(creator,
-				this.txtName.getText(), null, null, this.txtareaDescription.getText(),
+				this.txtName.getText(), icon, image, this.txtareaDescription.getText(),
 				this.optionsTableModel.getOptions(), feePow);
-		// Poll poll = issue_voiting.getPoll();
 
-		// Issue_Asset_Confirm_Dialog cont = new
 		// Issue_Asset_Confirm_Dialog(issueAssetTransaction);
 		String text = "<HTML><body>";
 		text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
@@ -294,10 +312,8 @@ public class IssuePollPanel extends JPanel {
 		dd.setVisible(true);
 
 		// JOptionPane.OK_OPTION
-		if (!dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
-
+		if (!dd.isConfirm) {
 			this.createButton.setEnabled(true);
-
 			return;
 		}
 
@@ -307,8 +323,6 @@ public class IssuePollPanel extends JPanel {
 		if (result == Transaction.VALIDATE_OK) {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Poll issue has been sent!"),
 					Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
-
-			// this.dispose();
 
 		} else {
 			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)),
