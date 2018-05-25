@@ -127,16 +127,13 @@ public class IssueStatusPanel extends JPanel {
 		this.add(nameLabel, gbc_nameLabel);
 
 		// TXT NAME
-		this.txtName = new JTextField();
-		GridBagConstraints gbc_txtName = new GridBagConstraints();
-		gbc_txtName.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtName.gridwidth = 5;
-		gbc_txtName.insets = new Insets(0, 0, 5, 5);
-		gbc_txtName.gridx = 2;
-		gbc_txtName.gridy = 2;
-		this.add(this.txtName, gbc_txtName);
-		this.txtareaDescription.setBorder(this.txtName.getBorder());
-
+		/*
+		 * this.txtName = new JTextField(); GridBagConstraints gbc_txtName = new
+		 * GridBagConstraints(); gbc_txtName.fill = GridBagConstraints.HORIZONTAL;
+		 * gbc_txtName.gridwidth = 5; gbc_txtName.insets = new Insets(0, 0, 5, 5);
+		 * gbc_txtName.gridx = 2; gbc_txtName.gridy = 2; this.add(this.txtName,
+		 * gbc_txtName); this.txtareaDescription.setBorder(this.txtName.getBorder());
+		 */
 		// size from height
 		add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
 		GridBagConstraints gbc_add_Logo_Icon_Panel = new GridBagConstraints();

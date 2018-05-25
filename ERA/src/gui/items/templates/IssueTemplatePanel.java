@@ -201,7 +201,7 @@ public class IssueTemplatePanel extends JPanel {
 		jButton_Create = new javax.swing.JButton();
 		jLabel_auto_saze = new javax.swing.JLabel();
 		java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-		layout.columnWidths = new int[] { 153, 32, 0, 0, 8, 0, 8, 0 };
+		layout.columnWidths = new int[] { 146, 32, 0, 0, 8, 0, 8, 0 };
 		layout.rowHeights = new int[] { 0, 4, 51, 32, 0, 4, 0, 4, -12, 4, 0, 4, 0, 4, 0, 4, 0 };
 		setLayout(layout);
 
@@ -237,7 +237,7 @@ public class IssueTemplatePanel extends JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 4;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+		gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new Insets(0, 15, 5, 5);
 		add(jLabel_Title, gridBagConstraints);
 
@@ -284,7 +284,7 @@ public class IssueTemplatePanel extends JPanel {
 		gridBagConstraints_5.gridheight = 3;
 		gridBagConstraints_5.gridx = 2;
 		gridBagConstraints_5.gridy = 6;
-		gridBagConstraints_5.gridwidth = 6;
+		gridBagConstraints_5.gridwidth = 5;
 		gridBagConstraints_5.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints_5.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
 		gridBagConstraints_5.weightx = 0.1;
