@@ -70,6 +70,11 @@ public class TransactionFactory {
 			//PARSE CREATE POLL VOTE
 			return VoteOnPollTransaction.Parse(data, releaserReference);		
 			
+		case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
+			
+			//PARSE CREATE ITEM POLL VOTE
+			return VoteOnItemPollTransaction.Parse(data, releaserReference);		
+
 		case Transaction.ARBITRARY_TRANSACTION:
 			
 			//PARSE ARBITRARY TRANSACTION

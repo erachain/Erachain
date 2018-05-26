@@ -18,9 +18,10 @@ public class PollTabPane extends JTabbedPane{
 
 	private static final long serialVersionUID = 2717571093561259483L;
 
-	private PollDetailPanel pollDetailPanel;
+	PollDetailPanel pollDetailPanel;
 	private ItemPollsTableModel myVotesTableModel;	
 	private ItemPollsTableModel allVotesTableModel;
+	JTable allVotesTable;
 	
 	@SuppressWarnings("unchecked")
 	public PollTabPane(PollCls poll, ItemCls asset)
@@ -34,7 +35,7 @@ public class PollTabPane extends JTabbedPane{
 		//ALL VOTES
 		allVotesTableModel = new ItemPollsTableModel();
 				//(Long)poll.getKey(DCSet.getInstance()), asset);
-		final JTable allVotesTable = Gui.createSortableTable(allVotesTableModel, 0);
+		allVotesTable = Gui.createSortableTable(allVotesTableModel, 0);
 		
 		TableRowSorter<VotesTableModel> sorter =  (TableRowSorter<VotesTableModel>) allVotesTable.getRowSorter();
 		sorter.setComparator(VotesTableModel.COLUMN_VOTES, new BigDecimalStringComparator());

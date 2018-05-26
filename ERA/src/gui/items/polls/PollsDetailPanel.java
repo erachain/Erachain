@@ -19,7 +19,7 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public class PollsDetailPanel extends JPanel {
 
-	private PollTabPane pollTabPane;
+	PollTabPane pollTabPane;
 	private JComboBox<ItemCls> cbxAssets;
 
 	public PollsDetailPanel(PollCls poll, AssetCls asset) {

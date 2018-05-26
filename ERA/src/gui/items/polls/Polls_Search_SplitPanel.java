@@ -60,15 +60,19 @@ public class Polls_Search_SplitPanel extends Split_Panel {
 
 	public void onVoteClick() {
 		// GET SELECTED OPTION
-		int row = allVotingsPanel.pollsTable.getSelectedRow();
-		if (row == -1) {
-			row = 0;
+		int option = votingDetailsPanel.pollTabPane.pollDetailPanel.optionsTable.getSelectedRow();
+		if (option >= 0) {
+			option = votingDetailsPanel.pollTabPane.pollDetailPanel.optionsTable.convertRowIndexToModel(option);
 		}
+		
+		//this.pollOptionsTableModel;
+
 		PollCls poll = null;
 		if (allVotingsPanel.pollsTable.getSelectedRow() >= 0)
 			poll = allVotingsPanel.pollsTableModel.getPoll(
 					allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
-		new Polls_Dialog(poll, 0, (AssetCls) allVotingsPanel.cbxAssets.getSelectedItem());
+		
+		new Polls_Dialog(poll, option, (AssetCls) allVotingsPanel.cbxAssets.getSelectedItem());
 	}
 
 	@Override

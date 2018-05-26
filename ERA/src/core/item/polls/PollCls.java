@@ -75,7 +75,7 @@ public abstract class PollCls extends ItemCls{
 	{
 		BigDecimal votes = BigDecimal.ZERO;
 		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
-		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		NavigableSet<Tuple3> optionVoteKeys;
 		Account voter;
 		
 		optionVoteKeys = map.getVotes(this.key);
@@ -91,7 +91,7 @@ public abstract class PollCls extends ItemCls{
 	{
 		BigDecimal votes = BigDecimal.ZERO;
 		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
-		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		NavigableSet<Tuple3> optionVoteKeys;
 		Account voter;
 		
 		optionVoteKeys = map.getVotes(this.key);
@@ -112,7 +112,7 @@ public abstract class PollCls extends ItemCls{
 		List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
 
 		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
-		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		NavigableSet<Tuple3> optionVoteKeys;
 		Pair<Account, Integer> vote;
 		Account voter;
 		
@@ -131,7 +131,7 @@ public abstract class PollCls extends ItemCls{
 		List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
 
 		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
-		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
+		NavigableSet<Tuple3> optionVoteKeys; // <Long, Integer, byte[]>
 		Pair<Account, Integer> vote;
 		Account voter;
 		
@@ -147,7 +147,6 @@ public abstract class PollCls extends ItemCls{
 
 		return votes;
 	}
-
 	
 	public int getOption(String option)
 	{
@@ -166,7 +165,11 @@ public abstract class PollCls extends ItemCls{
 		return -1;
 	}
 
-	
+	public String viewOption(int option)
+	{
+		return option + ": " + this.options.get(option);
+	}
+
 	// PARSE
 	public byte[] toBytes(boolean includeReference, boolean onlyBody)
 	{

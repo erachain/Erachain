@@ -33,9 +33,8 @@ import core.account.PrivateKeyAccount;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.polls.PollCls;
-import core.transaction.R_Send;
 import core.transaction.Transaction;
-import core.voting.PollOption;
+import core.transaction.VoteOnItemPollTransaction;
 import datachain.DCSet;
 import gui.AccountRenderer;
 import gui.PasswordPane;
@@ -44,7 +43,7 @@ import gui.library.Issue_Confirm_Dialog;
 import gui.models.AccountsComboBoxModel;
 import gui.models.OptionsComboBoxModel;
 import gui.transaction.OnDealClick;
-import gui.transaction.Send_RecordDetailsFrame;
+import gui.transaction.VoteOnItemPollDetailsFrame;
 import lang.Lang;
 
 @SuppressWarnings("serial")
@@ -190,18 +189,19 @@ public class Polls_Dialog extends JDialog {
 		// CBX ACCOUNT
 		detailGBC.gridy = 5;
 		this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.getOptions()));
-		this.cbxOptions.setSelectedIndex(option);
+		
+		if (this.cbxOptions.getItemCount() > option)
+			this.cbxOptions.setSelectedIndex(option);
+		
 		this.cbxOptions.setRenderer(new DefaultListCellRenderer() {
 			@SuppressWarnings("rawtypes")
 			@Override
 			public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected,
 					boolean cellHasFocus) {
-				PollOption employee = (PollOption) value;
 
-				AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
+				//AssetCls asset = ((AssetCls) cbxAssets.getSelectedItem());
 
-				value = employee.toString(asset.getKey(DCSet.getInstance()));
-				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+				return super.getListCellRendererComponent(list, (String)value, index, isSelected, cellHasFocus);
 			}
 		});
 
@@ -291,10 +291,10 @@ public class Polls_Dialog extends JDialog {
 		Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
 				+ " COMPU</b><br></body></HTML>";
 
-		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("Issue Poll"),
+		Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("Vote on Poll"),
 				(int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
 				Lang.getInstance().translate("Confirmation Transaction"));
-		Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
+		VoteOnItemPollDetailsFrame ww = new VoteOnItemPollDetailsFrame((VoteOnItemPollTransaction) transaction);
 		dd.jScrollPane1.setViewportView(ww);
 		dd.pack();
 		dd.setLocationRelativeTo(this);

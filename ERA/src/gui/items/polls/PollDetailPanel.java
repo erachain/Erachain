@@ -35,7 +35,7 @@ import utils.DateTimeFormat;
 @SuppressWarnings("serial")
 public class PollDetailPanel extends JPanel {
 	private PollCls poll;
-	private JTable table;
+	JTable optionsTable;
 	private ItemPollOptionsTableModel pollOptionsTableModel;
 	private AssetCls asset;
 
@@ -127,9 +127,9 @@ public class PollDetailPanel extends JPanel {
 		// OPTIONS
 		detailGBC.gridy = 5;
 		pollOptionsTableModel = new ItemPollOptionsTableModel(poll, asset);
-		table = Gui.createSortableTable(pollOptionsTableModel, 0);
+		optionsTable = Gui.createSortableTable(pollOptionsTableModel, 0);
 
-		TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) table.getRowSorter();
+		TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) optionsTable.getRowSorter();
 		sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
 
 		JLabel ImageLabel = new JLabel("");
@@ -211,7 +211,7 @@ public class PollDetailPanel extends JPanel {
 		gbc_optionsLabel.gridy = 4;
 		this.add(optionsLabel, gbc_optionsLabel);
 
-		this.add(new JScrollPane(table), detailGBC);
+		this.add(new JScrollPane(optionsTable), detailGBC);
 
 		// ADD EXCHANGE BUTTON
 		detailGBC.gridy = 6;
@@ -228,11 +228,11 @@ public class PollDetailPanel extends JPanel {
 
 	public void onVoteClick() {
 		// GET SELECTED OPTION
-		int row = this.table.getSelectedRow();
+		int row = this.optionsTable.getSelectedRow();
 		if (row == -1) {
 			row = 0;
 		}
-		row = this.table.convertRowIndexToModel(row);
+		row = this.optionsTable.convertRowIndexToModel(row);
 
 		new Polls_Dialog(this.poll, row, asset);
 	}
