@@ -233,6 +233,10 @@ public class ObserverMessage {
 	public static final int WALLET_ADD_POLL_TYPE = 10052;
 	public static final int WALLET_REMOVE_POLL_TYPE = 10053;
 	public static final int WALLET_LIST_POLL_TYPE = 10054;
+	public static final int WALLET_LIST_POLL_FAVORITES_TYPE = 10055;
+	public static final int WALLET_ADD_POLL_FAVORITES_TYPE = 10056;
+	public static final int WALLET_DELETE_POLL_FAVORITE_TYPE = 10057;
+				
 
 	public static final int WALLET_RESET_ASSET_TYPE = 10061;
 	public static final int WALLET_ADD_ASSET_TYPE = 10062;

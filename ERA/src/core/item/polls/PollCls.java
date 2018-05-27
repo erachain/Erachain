@@ -28,6 +28,7 @@ public abstract class PollCls extends ItemCls{
 
 	protected static final int OPTIONS_SIZE_LENGTH = 4;
 	protected static final int BASE_LENGTH = OPTIONS_SIZE_LENGTH;
+	public static final int INITIAL_FAVORITES = 0;
 
 	private List<String> options;
 

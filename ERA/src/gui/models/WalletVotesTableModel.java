@@ -130,7 +130,7 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
 		ObserverMessage message = (ObserverMessage) arg;
 		
 		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_POLL_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_LIST_POLL_TYPE)
 		{
 			if(this.polls == null)
 			{
@@ -143,7 +143,7 @@ public class WalletVotesTableModel extends TableModelCls<Tuple2<String, String>,
 		}
 		
 		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_POLL_TYPE || message.getType() == ObserverMessage.REMOVE_POLL_TYPE)
+		if(message.getType() == ObserverMessage.WALLET_ADD_POLL_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_POLL_TYPE || message.getType() == ObserverMessage.WALLET_RESET_POLL_TYPE)
 		{
 			this.fireTableDataChanged();
 		}	

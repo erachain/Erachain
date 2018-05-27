@@ -9,6 +9,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.imprints.ImprintCls;
 import core.item.persons.PersonCls;
+import core.item.polls.PollCls;
 import core.item.statuses.StatusCls;
 import core.item.templates.TemplateCls;
 import core.item.unions.UnionCls;
@@ -43,10 +44,12 @@ public class DWSet implements IDB
 	private WItemPersonMap personMap;
 	private WItemStatusMap statusMap;
 	private WItemUnionMap unionMap;
+	private WItemPollMap wPollMap;
 	private OrderMap orderMap;
 	private FavoriteItemAsset assetFavoritesSet;
 	private FavoriteItemTemplate templateFavoritesSet;
 	private FavoriteItemImprint imprintFavoritesSet;
+	private FavoriteItemPoll pollFavoriteSet;
 	
 	private FavoriteItemPerson personFavoritesSet;
 	private FavoriteItemStatus statusFavoritesSet;
@@ -93,10 +96,12 @@ public class DWSet implements IDB
 	    this.personMap = new WItemPersonMap(this, this.database);
 	    this.statusMap = new WItemStatusMap(this, this.database);
 	    this.unionMap = new WItemUnionMap(this, this.database);
+	    this.wPollMap = new WItemPollMap(this, this.database);
 	    this.orderMap = new OrderMap(this, this.database);
 	    this.assetFavoritesSet = new FavoriteItemAsset(this, this.database);
 	    this.templateFavoritesSet = new FavoriteItemTemplate(this, this.database);
 	    this.imprintFavoritesSet = new FavoriteItemImprint(this, this.database);
+	    this.pollFavoriteSet = new FavoriteItemPoll(this, this.database);
 	    this.personFavoritesSet = new FavoriteItemPerson(this, this.database);
 	    this.statusFavoritesSet = new FavoriteItemStatus(this, this.database);
 	    this.unionFavoritesSet = new FavoriteItemUnion(this, this.database);
@@ -215,6 +220,11 @@ public class DWSet implements IDB
 	{
 		return this.unionMap;
 	}
+	public WItemPollMap wPollMap()
+	{
+		return this.wPollMap;
+	}
+		
 	public WItem_Map getItemMap(ItemCls item)
 	{
 		if (item instanceof AssetCls) { 
@@ -229,6 +239,8 @@ public class DWSet implements IDB
 			return this.statusMap;
 		} else if (item instanceof UnionCls) { 
 			return this.unionMap;
+		} else if (item instanceof PollCls) { 
+			return this.wPollMap;
 		} else {
 			return null;
 		}
@@ -249,6 +261,9 @@ public class DWSet implements IDB
 				return this.statusMap;
 			case ItemCls.UNION_TYPE:
 				return this.unionMap;
+			case ItemCls.POLL_TYPE:
+				return this.wPollMap;
+				
 		}
 		return null;
 	}
@@ -283,7 +298,12 @@ public class DWSet implements IDB
 		return this.imprintFavoritesSet;
 	}
 	
+	public FavoriteItemPoll getPollFavoritesSet()
+	{
+		return this.pollFavoriteSet;
+	}
 
+	
 	public FavoriteItemPerson getPersonFavoritesSet()
 	{
 		return this.personFavoritesSet;
@@ -306,6 +326,8 @@ public class DWSet implements IDB
 			return this.assetFavoritesSet;
 		} else if (item instanceof ImprintCls) { 
 			return this.imprintFavoritesSet;
+		} else if (item instanceof PollCls) { 
+			return this.pollFavoriteSet;
 		} else if (item instanceof TemplateCls) { 
 			return this.templateFavoritesSet;
 		} else if (item instanceof PersonCls) { 
@@ -333,6 +355,7 @@ public class DWSet implements IDB
 		this.imprintMap.delete(account);
 		this.TemplateMap.delete(account);
 		this.unionMap.delete(account);
+		this.wPollMap.delete(account);
 		this.personMap.delete(account);
 		this.statusMap.delete(account);
 		this.orderMap.delete(account);
