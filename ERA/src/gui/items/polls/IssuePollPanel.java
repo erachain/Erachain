@@ -4,21 +4,31 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableModel;
+
+import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.account.Account;
@@ -33,6 +43,7 @@ import gui.models.AccountsComboBoxModel;
 import gui.models.CreateOptionsTableModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import utils.Pair;
 
 @SuppressWarnings("serial")
 public class IssuePollPanel extends JPanel {
@@ -43,6 +54,7 @@ public class IssuePollPanel extends JPanel {
 	private JButton createButton;
 	private CreateOptionsTableModel optionsTableModel;
 	private IssuePollPanel th;
+	protected int selRow;
 
 	public IssuePollPanel() {
 		// super(Lang.getInstance().translate("Erachain.org") + " - " +
@@ -194,6 +206,48 @@ public class IssuePollPanel extends JPanel {
 			}
 		});
 		this.add(createButton, buttonGBC);
+		
+		JPopupMenu menu = new JPopupMenu();
+
+		menu.addPopupMenuListener(new PopupMenuListener() {
+
+			@Override
+			public void popupMenuCanceled(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+				// TODO Auto-generated method stub
+				if (optionsTableModel.getRowCount() > 1) {
+					selRow = table.getSelectedRow();
+					
+				}
+
+			}
+		});
+
+		JMenuItem copyAddress = new JMenuItem(Lang.getInstance().translate("Delete"));
+		copyAddress.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				if (selRow > 0) {
+					((DefaultTableModel) optionsTableModel).removeRow(selRow);
+				}
+			}
+		});
+		menu.add(copyAddress);
+		
+		table.setComponentPopupMenu(menu);
+		
+		
 
 		// PACK
 		// this.pack();
