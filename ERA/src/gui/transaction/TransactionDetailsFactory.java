@@ -354,6 +354,6 @@ public class TransactionDetailsFactory
 			return genesisCertifyPersonRecordFrame ;
 		}
 		
-		return null;
+		return new JPanel();
 	}
 }

@@ -93,7 +93,7 @@ public class Union extends UnionCls {
 		int descriptionLength = Ints.fromByteArray(descriptionLengthBytes);
 		position += DESCRIPTION_SIZE_LENGTH;
 		
-		if(descriptionLength < 1 || descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
+		if( descriptionLength > BlockChain.MAX_REC_DATA_BYTES)
 		{
 			throw new Exception("Invalid description length");
 		}
