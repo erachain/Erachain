@@ -1,10 +1,13 @@
 package datachain;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NavigableSet;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -74,14 +77,35 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 	public NavigableSet<Tuple3<Long, Integer, byte[]>> getVotes(Long pollKey)
 	{
 		BTreeMap map = (BTreeMap) this.map;
-
+		NavigableSet<Tuple3<Long, Integer, byte[]>> keys1;
 		//FILTER ALL KEYS
 		NavigableSet<Tuple3<Long, Integer, byte[]>> keys = ((BTreeMap<Tuple3<Long, Integer, byte[]>, Tuple2>) map).subMap(
 				Fun.t3(pollKey, null, null),
-				Fun.t3(pollKey, Fun.HI(), Fun.HI())).keySet();
+				Fun.t3(pollKey,
+						Integer.MAX_VALUE,
+						Fun.HI()))
+									.keySet();
 
+		
+		
 		//RETURN
 		return keys;
+	}
+	
+	public NavigableSet<Tuple3<Long, Integer, byte[]>> getVotes1(Long pollKey){
+		@SuppressWarnings("rawtypes")
+		BTreeMap map = (BTreeMap) this.map;
+		Set ss = new TreeSet();
+		@SuppressWarnings("unchecked")
+		NavigableSet<Tuple3<Long, Integer, byte[]>> ks = map.keySet();
+		Iterator<Tuple3<Long, Integer, byte[]>> it = ks.iterator();
+		while (it.hasNext()){
+			Tuple3<Long, Integer, byte[]> a = it.next();
+			if(a.a != pollKey) continue;
+			ss.add(a);
+		}
+		return (NavigableSet<Tuple3<Long, Integer, byte[]>>) ss;
+		
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

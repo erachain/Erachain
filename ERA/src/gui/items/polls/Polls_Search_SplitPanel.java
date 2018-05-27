@@ -17,11 +17,11 @@ public class Polls_Search_SplitPanel extends Item_Search_SplitPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static TableModelPolls tableModelUnions = new TableModelPolls();
+	private static TableModelPolls tableModelPolls = new TableModelPolls();
 	private Polls_Search_SplitPanel th;
 
 	public Polls_Search_SplitPanel() {
-		super(tableModelUnions, "Search_Union_Tab", "Search_Union_Tab");
+		super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
 		th = this;
 
 		// ADD MENU ITEMS
@@ -41,13 +41,30 @@ public class Polls_Search_SplitPanel extends Item_Search_SplitPanel {
 		});
 		this.menu_Table.add(setStatus_Menu);
 
-	}
+	
+	
+	JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("Voting"));
+	setVote_Menu.addActionListener(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+//			new UnionSetStatusDialog(th, (UnionCls) item_Menu);
+
+			PollCls poll = (PollCls)(item_Table_Selected);
+			AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
+			new Polls_Dialog(poll,0, AssetCls);
+		}
+	});
+	this.menu_Table.add(setVote_Menu);
+	
+}
+	
+	
+	
 
 	// show details
 	@Override
 	public Component get_show(ItemCls item) {
 		AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));
-		PollDetailPanel pollInfo = new PollDetailPanel((PollCls) item, AssetCls);
+		PollsDetailPanel pollInfo = new PollsDetailPanel((PollCls) item, AssetCls);
 		
 		return pollInfo;
 		

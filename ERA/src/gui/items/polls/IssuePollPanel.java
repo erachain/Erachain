@@ -306,6 +306,24 @@ public class IssuePollPanel extends JPanel {
 			return;
 
 		}
+		
+		if (optionsTableModel.getRowCount() <1){
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Null Options!"),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			// ENABLE
+			this.createButton.setEnabled(true);
+			return;
+			
+		}
+		if (optionsTableModel.getRowCount() ==1 && optionsTableModel.getValueAt(0, 0).equals("") ){
+			JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Null Options!"),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			// ENABLE
+			this.createButton.setEnabled(true);
+			return;
+			
+		}
+		
 
 		// TODO: icon + IMAGE
 

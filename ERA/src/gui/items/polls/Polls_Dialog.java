@@ -191,6 +191,7 @@ public class Polls_Dialog extends JDialog {
 		detailGBC.gridy = 5;
 		this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.getOptions()));
 		this.cbxOptions.setSelectedIndex(option);
+		/*
 		this.cbxOptions.setRenderer(new DefaultListCellRenderer() {
 			@SuppressWarnings("rawtypes")
 			@Override
@@ -204,7 +205,7 @@ public class Polls_Dialog extends JDialog {
 				return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 			}
 		});
-
+	*/
 		this.add(this.cbxOptions, detailGBC);
 
 		// LABEL FEE

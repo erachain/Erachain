@@ -79,7 +79,7 @@ public abstract class PollCls extends ItemCls{
 		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
 		Account voter;
 		
-		optionVoteKeys = map.getVotes(this.key);
+		optionVoteKeys = map.getVotes1(this.key);
 		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
 			voter = Account.makeAccountFromShort(key.c);
 			votes.add(voter.getBalanceUSE(assetKey));
@@ -95,7 +95,7 @@ public abstract class PollCls extends ItemCls{
 		NavigableSet<Tuple3<Long, Integer, byte[]>> optionVoteKeys;
 		Account voter;
 		
-		optionVoteKeys = map.getVotes(this.key);
+		optionVoteKeys = map.getVotes1(this.key);
 		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
 			if (option != key.b)
 				continue;

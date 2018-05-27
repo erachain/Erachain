@@ -84,7 +84,7 @@ public class Item_SplitPanel extends Split_Panel {
 					return;
 
 				jScrollPane_jPanel_RightPanel.setViewportView(get_show(item_Table_Selected));
-				item_Table_Selected = null;
+			//	item_Table_Selected = null;
 
 			}
 
