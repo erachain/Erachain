@@ -18,6 +18,12 @@ public class VoteOnItemPollDetailsFrame extends Rec_DetailsFrame
 		super(pollVote);
 				
 		PollCls poll = Controller.getInstance().getPoll(pollVote.getAbsKey());
+
+		//LABEL NAME
+		++labelGBC.gridy;
+		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Poll") + ":");
+		this.add(nameLabel, labelGBC);
+
 		//NAME
 		++detailGBC.gridy;
 		JTextField name = new JTextField(poll.toString(DCSet.getInstance()));
@@ -27,12 +33,12 @@ public class VoteOnItemPollDetailsFrame extends Rec_DetailsFrame
 		
 		//LABEL OPTION
 		++labelGBC.gridy;
-		JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Option") + ":");
-		this.add(descriptionLabel, labelGBC);
+		JLabel optionLabel = new JLabel(Lang.getInstance().translate("Option") + ":");
+		this.add(optionLabel, labelGBC);
 				
 		//OPTION
 		++detailGBC.gridy;
-		JTextField option = new JTextField(String.valueOf(poll.viewOption(pollVote.getOption())));
+		JTextField option = new JTextField(poll.viewOption(pollVote.getOption()));
 		option.setEditable(false);
 		MenuPopupUtil.installContextMenu(option);
 		this.add(option, detailGBC);		
