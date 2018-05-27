@@ -1,6 +1,7 @@
 package core.item.polls;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +80,7 @@ public abstract class PollCls extends ItemCls{
 		Account voter;
 		
 		optionVoteKeys = map.getVotes(this.key);
-		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+		for (Tuple3<Long, Integer, BigInteger> key: optionVoteKeys) {
 			voter = Account.makeAccountFromShort(key.c);
 			votes.add(voter.getBalanceUSE(assetKey));
 		}
@@ -89,21 +90,22 @@ public abstract class PollCls extends ItemCls{
 
 	public BigDecimal getTotalVotes(DCSet dcSet, long assetKey, int option)
 	{
-		BigDecimal votes = BigDecimal.ZERO;
+		BigDecimal votesSum = BigDecimal.ZERO;
 		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
 		NavigableSet<Tuple3> optionVoteKeys;
 		Account voter;
 		
 		optionVoteKeys = map.getVotes(this.key);
-		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+		for (Tuple3<Long, Integer, BigInteger> key: optionVoteKeys) {
 			if (option != key.b)
 				continue;
 			
 			voter = Account.makeAccountFromShort(key.c);
-			votes.add(voter.getBalanceUSE(assetKey));
+			BigDecimal vol = voter.getBalanceUSE(assetKey);
+			votesSum.add(vol);
 		}
 
-		return votes;
+		return votesSum;
 	}
 
 
@@ -117,7 +119,7 @@ public abstract class PollCls extends ItemCls{
 		Account voter;
 		
 		optionVoteKeys = map.getVotes(this.key);
-		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+		for (Tuple3<Long, Integer, BigInteger> key: optionVoteKeys) {
 			voter = Account.makeAccountFromShort(key.c);
 			vote = new Pair<Account, Integer>(voter, key.b);
 			votes.add(vote);
@@ -136,7 +138,7 @@ public abstract class PollCls extends ItemCls{
 		Account voter;
 		
 		optionVoteKeys = map.getVotes(this.key);
-		for (Tuple3<Long, Integer, byte[]> key: optionVoteKeys) {
+		for (Tuple3<Long, Integer, BigInteger> key: optionVoteKeys) {
 			for (Account account: accounts) {
 				if (account.equals(key.c)) {
 					vote = new Pair<Account, Integer>(account, key.b);

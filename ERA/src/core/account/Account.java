@@ -70,6 +70,12 @@ public class Account {
 		return new Account(address);
 	}
 
+	public static Account makeAccountFromShort(BigInteger publicKeyHash) {
+
+		String address = Crypto.getInstance().getAddressFromShort(publicKeyHash.toByteArray());
+		return new Account(address);
+	}
+
 	public static Tuple2<Account, String> tryMakeAccount(String address) {
 
 		boolean isBase58 = false;

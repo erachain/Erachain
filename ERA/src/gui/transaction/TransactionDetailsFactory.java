@@ -198,11 +198,11 @@ public class TransactionDetailsFactory {
 
 			IssuePollRecord issuePoll = (IssuePollRecord) transaction;
 
-			IssuePersonDetailsFrame issuePollDetailsFrame = new IssuePollDetailsFrame(issuePoll);
-			gridBagConstraints.gridy = issuePersonDetailsFrame.labelGBC.gridy + 1;
-			issuePersonDetailsFrame.add(jLabel9, gridBagConstraints);
+			IssuePollDetailsFrame issuePollDetailsFrame = new IssuePollDetailsFrame(issuePoll);
+			gridBagConstraints.gridy = issuePollDetailsFrame.labelGBC.gridy + 1;
+			issuePollDetailsFrame.add(jLabel9, gridBagConstraints);
 
-			return issuePersonDetailsFrame;
+			return issuePollDetailsFrame;
 
 		case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 
