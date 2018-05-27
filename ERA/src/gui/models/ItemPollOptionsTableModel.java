@@ -57,23 +57,12 @@ public class ItemPollOptionsTableModel extends AbstractTableModel
 		{
 			return null;
 		}
-		
-		String option = this.poll.getOptions().get(row);
-		
+				
 		switch(column)
 		{
 		case COLUMN_NAME:
 			
-			String key = option;
-			
-			//CHECK IF ENDING ON A SPACE
-			if(key.endsWith(" "))
-			{
-				key = key.substring(0, key.length()-1);
-				key += ".";
-			}
-			
-			return key;
+			return this.poll.viewOption(row);
 		
 		case COLUMN_VOTES:
 			

@@ -1,5 +1,6 @@
 package datachain;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -19,7 +20,8 @@ import org.mapdb.Fun.Tuple3;
 import database.DBMap;
 
 // POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
-public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stack<Tuple2<Integer, Integer>>> 
+// byte[] - un CORAMPABLE
+public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> 
 {
 	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -46,7 +48,7 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 	protected void createIndexes(DB database){}
 
 	@Override
-	protected Map<Tuple3<Long, Integer, byte[]>, Stack<Tuple2<Integer, Integer>>> getMap(DB database) 
+	protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMap(DB database) 
 	{
 		//OPEN MAP
 		return database.createTreeMap("vote_item_poll")
@@ -56,9 +58,9 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 	}
 
 	@Override
-	protected Map<Tuple3<Long, Integer, byte[]>, Stack<Tuple2<Integer, Integer>>> getMemoryMap() 
+	protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMemoryMap() 
 	{
-		return new TreeMap<Tuple3<Long, Integer, byte[]>, Stack<Tuple2<Integer, Integer>>>();
+		return new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
 	}
 
 	@Override
@@ -74,17 +76,14 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public NavigableSet<Tuple3<Long, Integer, byte[]>> getVotes(Long pollKey)
+	public NavigableSet<Tuple3> getVotes(Long pollKey)
 	{
 		BTreeMap map = (BTreeMap) this.map;
-		NavigableSet<Tuple3<Long, Integer, byte[]>> keys1;
 		//FILTER ALL KEYS
-		NavigableSet<Tuple3<Long, Integer, byte[]>> keys = ((BTreeMap<Tuple3<Long, Integer, byte[]>, Tuple2>) map).subMap(
+		NavigableSet<Tuple3> keys = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
 				Fun.t3(pollKey, null, null),
-				Fun.t3(pollKey,
-						Integer.MAX_VALUE,
-						Fun.HI()))
-									.keySet();
+				Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI()))
+					.keySet();
 
 		
 		
@@ -92,29 +91,29 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 		return keys;
 	}
 	
-	public NavigableSet<Tuple3<Long, Integer, byte[]>> getVotes1(Long pollKey){
+	public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes_1(Long pollKey){
 		@SuppressWarnings("rawtypes")
 		BTreeMap map = (BTreeMap) this.map;
 		Set ss = new TreeSet();
 		@SuppressWarnings("unchecked")
-		NavigableSet<Tuple3<Long, Integer, byte[]>> ks = map.keySet();
-		Iterator<Tuple3<Long, Integer, byte[]>> it = ks.iterator();
+		NavigableSet<Tuple3<Long, Integer, BigInteger>> ks = map.keySet();
+		Iterator<Tuple3<Long, Integer, BigInteger>> it = ks.iterator();
 		while (it.hasNext()){
-			Tuple3<Long, Integer, byte[]> a = it.next();
+			Tuple3<Long, Integer, BigInteger> a = it.next();
 			if(a.a != pollKey) continue;
 			ss.add(a);
 		}
-		return (NavigableSet<Tuple3<Long, Integer, byte[]>>) ss;
+		return (NavigableSet<Tuple3<Long, Integer, BigInteger>>) ss;
 		
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public NavigableSet<Tuple3<Long, Integer, byte[]>> getVotes(Long pollKey, Integer option)
+	public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes(Long pollKey, Integer option)
 	{
 		BTreeMap map = (BTreeMap) this.map;
 
 		//FILTER ALL KEYS
-		NavigableSet<Tuple3<Long, Integer, byte[]>> keys = ((BTreeMap<Tuple3<Long, Integer, byte[]>, Tuple2>) map).subMap(
+		NavigableSet<Tuple3<Long, Integer, BigInteger>> keys = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
 				Fun.t3(pollKey, option, null),
 				Fun.t3(pollKey, option, Fun.HI())).keySet();
 
@@ -128,7 +127,7 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 		BTreeMap map = (BTreeMap) this.map;
 
 		//FILTER ALL KEYS
-		Tuple3<Long, Integer, byte[]> key = ((BTreeMap<Tuple3<Long, Integer, byte[]>, Tuple2>) map).subMap(
+		Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
 				Fun.t3(pollKey, null, null),
 				Fun.t3(pollKey, Fun.HI(), Fun.HI())).firstKey();
 
@@ -142,7 +141,7 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 		BTreeMap map = (BTreeMap) this.map;
 
 		//FILTER ALL KEYS
-		Tuple3<Long, Integer, byte[]> key = ((BTreeMap<Tuple3<Long, Integer, byte[]>, Tuple2>) map).subMap(
+		Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
 				Fun.t3(pollKey, option, null),
 				Fun.t3(pollKey, option, Fun.HI())).firstKey();
 
@@ -150,16 +149,19 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 		return key != null;
 	}
 
-	public Stack<Tuple2<Integer, Integer>> get(long pollKey, int optionKey, byte[] accountShort)
+	public Stack<Tuple2<Integer, Integer>> get(long pollKey, int optionKey, BigInteger accountShort)
 	{
-		return this.get(new Tuple3<Long, Integer, byte[]>(pollKey, optionKey, accountShort));
+		return this.get(new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort));
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void addItem(long pollKey, int optionKey, byte[] accountShort, Tuple2<Integer, Integer> value)
+	public void addItem(long pollKey, int optionKey, BigInteger accountShort, Tuple2<Integer, Integer> value)
 	{
-		Tuple3<Long, Integer, byte[]> key = new Tuple3<Long, Integer, byte[]>(pollKey, optionKey, accountShort);
+		Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
 		Stack<Tuple2<Integer, Integer>> stack = this.get(key);
+		if (stack == null)
+			stack = new Stack<Tuple2<Integer, Integer>>();
+		
 		Stack<Tuple2<Integer, Integer>> new_stack;
 		
 		if (this.parent == null)
@@ -174,17 +176,17 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, byte[]>, Stac
 		this.set(key, stack);
 	}
 	
-	public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, byte[] accountShort)
+	public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, BigInteger accountShort)
 	{
-		Tuple3<Long, Integer, byte[]> key = new Tuple3<Long, Integer, byte[]>(pollKey, optionKey, accountShort);
+		Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
 		Stack<Tuple2<Integer, Integer>> stack = this.get(key);
 		return !stack.isEmpty()? stack.peek() : null;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Tuple2<Integer, Integer> removeItem(long pollKey, int optionKey, byte[] accountShort)
+	public Tuple2<Integer, Integer> removeItem(long pollKey, int optionKey, BigInteger accountShort)
 	{
-		Tuple3<Long, Integer, byte[]> key = new Tuple3<Long, Integer, byte[]>(pollKey, optionKey, accountShort);
+		Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
 		Stack<Tuple2<Integer, Integer>> stack = this.get(key);
 		if (stack==null || stack.isEmpty())
 			return null;

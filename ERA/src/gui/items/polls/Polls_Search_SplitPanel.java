@@ -3,11 +3,12 @@ package gui.items.polls;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.JMenuItem;
+
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.polls.PollCls;
-import core.item.unions.UnionCls;
 import datachain.DCSet;
 import gui.items.Item_Search_SplitPanel;
 import lang.Lang;
@@ -60,7 +61,26 @@ public class Polls_Search_SplitPanel extends Item_Search_SplitPanel {
 	
 	
 
+	/*
 	// show details
+	public void onVoteClick() {
+		// GET SELECTED OPTION
+		int option = votingDetailsPanel.pollTabPane.pollDetailPanel.optionsTable.getSelectedRow();
+		if (option >= 0) {
+			option = votingDetailsPanel.pollTabPane.pollDetailPanel.optionsTable.convertRowIndexToModel(option);
+		}
+		
+		//this.pollOptionsTableModel;
+
+		PollCls poll = null;
+		if (allVotingsPanel.pollsTable.getSelectedRow() >= 0)
+			poll = allVotingsPanel.pollsTableModel.getPoll(
+					allVotingsPanel.pollsTable.convertRowIndexToModel(allVotingsPanel.pollsTable.getSelectedRow()));
+		
+		new Polls_Dialog(poll, option, (AssetCls) allVotingsPanel.cbxAssets.getSelectedItem());
+	}
+	*/
+
 	@Override
 	public Component get_show(ItemCls item) {
 		AssetCls AssetCls = DCSet.getInstance().getItemAssetMap().get((long) (1));

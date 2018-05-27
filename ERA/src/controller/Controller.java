@@ -2493,6 +2493,10 @@ public class Controller extends Observable {
 		return (PersonCls) this.dcSet.getItemPersonMap().get(key);
 	}
 
+	public PollCls getPoll(long key) {
+		return (PollCls) this.dcSet.getItemPollMap().get(key);
+	}
+
 	public ImprintCls getImprint(long key) {
 		return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
 	}

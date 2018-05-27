@@ -1,5 +1,6 @@
 package core.transaction;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -72,6 +73,14 @@ public class VoteOnItemPollTransaction extends Transaction
 
 	public long getKey()
 	{
+		return this.key;
+	}
+
+	public long getAbsKey()
+	{
+		if (this.key < 0)
+			return -this.key;
+			
 		return this.key;
 	}
 
@@ -227,7 +236,7 @@ public class VoteOnItemPollTransaction extends Transaction
 		super.process(block, asPack);
 
 		//ADD VOTE TO POLL		
-		this.dcSet.getVoteOnItemPollMap().addItem(this.key, this.option, this.creator.getShortAddressBytes(),
+		this.dcSet.getVoteOnItemPollMap().addItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()),
 				this.getHeightSeqNo());
 
 	}
@@ -241,7 +250,7 @@ public class VoteOnItemPollTransaction extends Transaction
 		super.orphan(asPack);
 
 		//DELETE VOTE FROM POLL
-		this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, this.creator.getShortAddressBytes());
+		this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()));
 	}
 
 	@Override
