@@ -644,6 +644,17 @@ public class Account_Send_Panel extends JPanel {
 			return;
 		}
 		Account recipient = resultRecipient.a;
+		
+		// confirt sender = recipient
+		if (sender.getAddress().equals(recipient.getAddress())){
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Sender and Recipient addresses match"),
+					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+			// ENABLE
+			this.sendButton.setEnabled(true);
+			return;
+			
+			
+		}
 
 		int parsing = 0;
 		int feePow = 0;
