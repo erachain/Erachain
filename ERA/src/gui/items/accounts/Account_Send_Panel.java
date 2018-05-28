@@ -647,7 +647,7 @@ public class Account_Send_Panel extends JPanel {
 		
 		// confirt sender = recipient
 		if (sender.getAddress().equals(recipient.getAddress())){
-			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Sender and Recipient addresses match"),
+			JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Sender and Recipient addresses match") + "!",
 					Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
 			// ENABLE
 			this.sendButton.setEnabled(true);
