@@ -48,6 +48,7 @@ import gui.items.persons.Persons_Favorite_SplitPanel;
 import gui.items.persons.Persons_My_SplitPanel;
 import gui.items.persons.Persons_Search_SplitPanel;
 import gui.items.polls.IssuePollPanel;
+import gui.items.polls.Polls_Favorite_SplitPanel;
 import gui.items.polls.Polls_My_SplitPanel;
 import gui.items.polls.Polls_Search_SplitPanel;
 import gui.items.records.Records_My_SplitPanel;
@@ -469,6 +470,11 @@ public class Main_Panel extends javax.swing.JPanel {
 			insertTab(Lang.getInstance().translate("Issue Poll"), new IssuePollPanel());
 			return;
 		}
+		if (str.equals(Lang.getInstance().translate("Favorite Polls")) || str.equals("Polls_Favorite_SplitPanel")) {
+			insertTab(Lang.getInstance().translate("Favorite Polls"), new Polls_Favorite_SplitPanel());
+			return;
+		}
+		
 
 		if (str.equals(Lang.getInstance().translate("My Records")) || str.equals("Records_My_SplitPanel")) {
 			insertTab(Lang.getInstance().translate("My Records"), Records_My_SplitPanel.getInstance());
