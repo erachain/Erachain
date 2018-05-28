@@ -1727,7 +1727,7 @@ public class BlockExplorer {
 			blockJSON.put("generator", block.getCreator().getAddress());
 			blockJSON.put("generatingBalance", block.getForgingValue());
 			blockJSON.put("winValue", block.getWinValue());
-			blockJSON.put("winValueTargetted", block.calcWinValueTargeted());
+			blockJSON.put("winValueTargetted", block.calcWinValueTargeted() * 0.001);
 			blockJSON.put("transactionCount", block.getTransactionCount());
 			blockJSON.put("timestamp", block.getTimestamp(dcSet));
 			blockJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
