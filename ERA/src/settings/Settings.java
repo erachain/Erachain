@@ -115,6 +115,7 @@ public class Settings {
 
 	private String getBackUpPath;
 	private String getWalletPath;
+	private String dataPath;
 
 	public static Settings getInstance()
 	{
@@ -201,18 +202,22 @@ public class Settings {
 
 	public String getWalletDir()
 	{
-		return this.getWalletPath + DEFAULT_WALLET_DIR;
+		if (this.getWalletPath.equals("")) return this.userPath + DEFAULT_WALLET_DIR; 
+		return this.getWalletPath;
 	}
 
 	public String getBackUpDir()
 	{
-		return this.getBackUpPath + DEFAULT_BACKUP_DIR;
+		if (this.getBackUpPath.equals("")) return this.userPath + DEFAULT_BACKUP_DIR;
+		return this.getBackUpPath;
 	}
 
 
 	public String getDataDir()
 	{
-		return this.getUserPath() + DEFAULT_DATA_DIR;
+		if(this.dataPath.equals(""))
+			return this.getUserPath() + DEFAULT_DATA_DIR;
+		return this.dataPath;
 	}
 	public String getLocalDir()
 	{
@@ -1029,7 +1034,26 @@ public class Settings {
 		else {
 			this.getWalletPath="";
 		}
+		
+		// set data dir getDataPath
+		if(this.settingsJSON.containsKey("datadir"))
+		{
+			this.dataPath = (String) this.settingsJSON.get("datadir");
 
+			try {
+				if (!(this.dataPath.endsWith("\\") || this.dataPath.endsWith("/")|| this.dataPath.endsWith(File.separator)))
+				{
+					this.dataPath += File.separator;
+				}
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				this.dataPath = "";
+			}
+		}
+		else {
+			this.dataPath="";
+		}
+		
 		//CREATE FILE IF IT DOESNT EXIST
 		if(!file.exists())
 		{

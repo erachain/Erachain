@@ -176,7 +176,7 @@ public class Account_Set_Name_Dialog extends javax.swing.JDialog {
             getContentPane().setLayout(layout);
 
             jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            jLabel_Title.setText(Lang.getInstance().translate("Set Name"));
+            jLabel_Title.setText(Lang.getInstance().translate("Set Name Account") + ":" + account);
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
