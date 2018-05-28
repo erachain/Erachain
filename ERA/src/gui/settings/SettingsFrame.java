@@ -330,7 +330,7 @@ public class SettingsFrame extends JDialog{
 			settingsJSONbuf.put("walletdir", settingsTabPane.settingsBasicPanel.textWallet.getText());
 			changeWallet = true;
 		}
-		
+				
 		if(!Settings.getInstance().getDataDir().equals(settingsTabPane.settingsBasicPanel.textDataFolder.getText()))
 		{
 			settingsJSONbuf.put("datadir", settingsTabPane.settingsBasicPanel.textDataFolder.getText());

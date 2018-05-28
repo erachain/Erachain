@@ -230,6 +230,7 @@ public class SettingsBasicPanel extends JPanel
         textDataFolder.setText(Settings.getInstance().getDataDir());
         textDataFolder.setHorizontalAlignment(SwingConstants.LEFT);
         textDataFolder.setColumns(10);
+        textDataFolder.setEditable(false);
         GridBagConstraints gbc_textDataFolder = new GridBagConstraints();
         gbc_textDataFolder.gridwidth = 2;
         gbc_textDataFolder.insets = new Insets(0, 0, 5, 5);
@@ -269,6 +270,7 @@ public class SettingsBasicPanel extends JPanel
         textWallet.setText(Settings.getInstance().getWalletDir());
         textWallet.setHorizontalAlignment(SwingConstants.LEFT);
         textWallet.setColumns(10);
+        textWallet.setEditable(false);
         GridBagConstraints gbc_textWallet = new GridBagConstraints();
         gbc_textWallet.gridwidth = 2;
         gbc_textWallet.insets = new Insets(0, 0, 5, 5);

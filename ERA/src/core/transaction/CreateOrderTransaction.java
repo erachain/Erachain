@@ -457,6 +457,10 @@ public class CreateOrderTransaction extends Transaction {
 
 			if (height > BlockChain.FREEZE_FROM && BlockChain.LOCKED__ADDRESSES.get(this.creator.getAddress()) != null)
 				return INVALID_CREATOR;
+			
+			Tuple3<String, Integer, Integer> unlockItem = BlockChain.LOCKED__ADDRESSES_PERIOD.get(this.creator.getAddress());
+			if (unlockItem != null && unlockItem.b > height && height < unlockItem.c)
+				return INVALID_CREATOR;
 
 		}
 
