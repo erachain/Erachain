@@ -75,7 +75,7 @@ public abstract class PollCls extends ItemCls{
 
 	public BigDecimal getTotalVotes(DCSet dcSet, long assetKey)
 	{
-		BigDecimal votes = BigDecimal.ZERO;
+		BigDecimal votesSum = BigDecimal.ZERO;
 		VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
 		NavigableSet<Tuple3> optionVoteKeys;
 		Account voter;
@@ -83,10 +83,10 @@ public abstract class PollCls extends ItemCls{
 		optionVoteKeys = map.getVotes(this.key);
 		for (Tuple3<Long, Integer, BigInteger> key: optionVoteKeys) {
 			voter = Account.makeAccountFromShort(key.c);
-			votes.add(voter.getBalanceUSE(assetKey));
+			votesSum = votesSum.add(voter.getBalanceUSE(assetKey));
 		}
 
-		return votes;
+		return votesSum;
 	}
 
 	public BigDecimal getTotalVotes(DCSet dcSet, long assetKey, int option)
@@ -102,8 +102,7 @@ public abstract class PollCls extends ItemCls{
 				continue;
 			
 			voter = Account.makeAccountFromShort(key.c);
-			BigDecimal vol = voter.getBalanceUSE(assetKey);
-			votesSum.add(vol);
+			votesSum = votesSum.add(voter.getBalanceUSE(assetKey));
 		}
 
 		return votesSum;
