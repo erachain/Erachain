@@ -5,9 +5,15 @@
 /wallet*
 ERA/settings.json
 ERA/*.jar
+/.idea/
+/.gradle/
 /build/
 .gradle
 log*.txt
+/ERA/build/
+/ERA/nullbackup/
 settings.json
 /.classpath
 /.project
+*.xml
+/out/
