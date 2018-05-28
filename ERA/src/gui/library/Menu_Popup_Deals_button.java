@@ -1,12 +1,5 @@
 package gui.library;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import gui.Send_Frame;
 import gui.items.accounts.Account_Confiscate_Debt_Dialog;
 import gui.items.accounts.Account_Lend_Dialog;
 import gui.items.accounts.Account_Repay_Debt_Dialog;
@@ -14,146 +7,132 @@ import gui.items.accounts.Account_Take_Hold_Dialog;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
 
-public class Menu_Popup_Deals_button extends JButton{
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-	
-	
-		private static final long serialVersionUID = 5237335232850181080L;
-		public static JMenuItem webServerItem;
-		public static JMenuItem blockExplorerItem;
-		public static JMenuItem lockItem;
-		private Menu_Popup_Deals_button this_component;
-		final JPopupMenu dealsMenu ;
-		
-
-	
-		public Menu_Popup_Deals_button()
-		{
-		
-			
-			super();
-			
-		this_component = this;
-		this.setText(Lang.getInstance().translate("Deals"));
-			//     button1_MainToolBar.setActionCommand("button1_Main_Panel");
-		this.setFocusable(false);
-		this.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-		this.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-		
-		this.addActionListener(new ActionListener() {
-			 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				
-				
-				Dimension d = dealsMenu.getPreferredSize();
-				d.width = Math.max(d.width, 300);
-				dealsMenu.setPreferredSize(d);
-				dealsMenu.show(this_component, 0, this_component.getHeight());
-			}
-		});
-	
-		
-			
-			
-				dealsMenu = new JPopupMenu("popup menu");
-				
-				// DEALS
-				// Send
-				        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
-				        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
-				        dealsMenuSendMessage.addActionListener(new ActionListener()
-				        {
-				        	public void actionPerformed(ActionEvent e)
-				        	{
-				        		// 
-				        		//library.selectOrAdd(new Send_Frame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
-				        	}
-				        });
-				       dealsMenu.add(dealsMenuSendMessage);
-				 //vouch       
-				        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
-				        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
-				        dealsMenuVouchRecord.addActionListener(new ActionListener()
-				        {
-				        	public void actionPerformed(ActionEvent e)
-				        	{
-				        		// 
-				        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-				        		new VouchRecordDialog(null, null);
-				        	}
-				        });
-				        dealsMenu.add(dealsMenuVouchRecord);
+public class Menu_Popup_Deals_button extends JButton {
 
 
-				        dealsMenu.addSeparator();  
+    private static final long serialVersionUID = 5237335232850181080L;
+    public static JMenuItem webServerItem;
+    public static JMenuItem blockExplorerItem;
+    public static JMenuItem lockItem;
+    final JPopupMenu dealsMenu;
+    private Menu_Popup_Deals_button this_component;
 
 
-				// Take on HOLD 
-				        
-				        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
-				  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-				        dealsMenu_Take_On_Hold.addActionListener(new ActionListener()
-				        {
-				        	public void actionPerformed(ActionEvent e)
-				        	{
-				        		// 
-				        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-				        		new Account_Take_Hold_Dialog(null,null);
-				        	}
-				        });
-				        dealsMenu.add(dealsMenu_Take_On_Hold);
-				        
-				             
-				        dealsMenu.addSeparator();  
+    public Menu_Popup_Deals_button() {
 
-				  // to lend 
-				        
-				        JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
-				  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-				        dealsMenuLend.addActionListener(new ActionListener()
-				        {
-				        	public void actionPerformed(ActionEvent e)
-				        	{
-				        		// 
-				        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-				        		new Account_Lend_Dialog(null,null);
-				        	}
-				        });
-				        dealsMenu.add(dealsMenuLend);
-				        
 
-				        
-				// Confiscate_Debt 
-				        
-				        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
-				  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-				        dealsMenu_Confiscate_Debt.addActionListener(new ActionListener()
-				        {
-				        	public void actionPerformed(ActionEvent e)
-				        	{
-				        		// 
-				        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-				        		new Account_Confiscate_Debt_Dialog(null,null);
-				        	}
-				        });
-				        dealsMenu.add(dealsMenu_Confiscate_Debt);
-				                
-				  // Repay_Debt 
-				        
-				        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
-				  //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
-				        dealsMenu_Repay_Debt.addActionListener(new ActionListener()
-				        {
-				        	public void actionPerformed(ActionEvent e)
-				        	{
-				        		// 
-				        		//selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
-				        		new Account_Repay_Debt_Dialog(null,null);
-				        	}
-				        });
-				        dealsMenu.add(dealsMenu_Repay_Debt);
+        super();
+
+        this_component = this;
+        this.setText(Lang.getInstance().translate("Deals"));
+        //     button1_MainToolBar.setActionCommand("button1_Main_Panel");
+        this.setFocusable(false);
+        this.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        this.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+
+        this.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+
+                Dimension d = dealsMenu.getPreferredSize();
+                d.width = Math.max(d.width, 300);
+                dealsMenu.setPreferredSize(d);
+                dealsMenu.show(this_component, 0, this_component.getHeight());
+            }
+        });
+
+
+        dealsMenu = new JPopupMenu("popup menu");
+
+        // DEALS
+        // Send
+        JMenuItem dealsMenuSendMessage = new JMenuItem(Lang.getInstance().translate("Send"));
+        dealsMenuSendMessage.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Send Asset and Message"));
+        dealsMenuSendMessage.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //library.selectOrAdd(new Send_Frame(null, null), MainFrame.getInstance().desktopPane.getAllFrames());
+            }
+        });
+        dealsMenu.add(dealsMenuSendMessage);
+        //vouch
+        JMenuItem dealsMenuVouchRecord = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        dealsMenuVouchRecord.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Vouching record"));
+        dealsMenuVouchRecord.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new VouchRecordDialog(null, null);
+            }
+        });
+        dealsMenu.add(dealsMenuVouchRecord);
+
+
+        dealsMenu.addSeparator();
+
+
+        // Take on HOLD
+
+        JMenuItem dealsMenu_Take_On_Hold = new JMenuItem(Lang.getInstance().translate("Take on Hold"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Take_On_Hold.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new Account_Take_Hold_Dialog(null, null);
+            }
+        });
+        dealsMenu.add(dealsMenu_Take_On_Hold);
+
+
+        dealsMenu.addSeparator();
+
+        // to lend
+
+        JMenuItem dealsMenuLend = new JMenuItem(Lang.getInstance().translate("Lend"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenuLend.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new Account_Lend_Dialog(null, null);
+            }
+        });
+        dealsMenu.add(dealsMenuLend);
+
+
+        // Confiscate_Debt
+
+        JMenuItem dealsMenu_Confiscate_Debt = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Confiscate_Debt.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new Account_Confiscate_Debt_Dialog(null, null);
+            }
+        });
+        dealsMenu.add(dealsMenu_Confiscate_Debt);
+
+        // Repay_Debt
+
+        JMenuItem dealsMenu_Repay_Debt = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Repay_Debt.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+                new Account_Repay_Debt_Dialog(null, null);
+            }
+        });
+        dealsMenu.add(dealsMenu_Repay_Debt);
 				        
 				               
 				                   
@@ -320,14 +299,13 @@ public class Menu_Popup_Deals_button extends JButton{
 				        	}
 				        });
 				        assetsMenu.add(issueAssetMenu);
-				        */  
+				        */
 
-				        
-					}
-		
-		
-		
-		}	
+
+    }
+
+
+}
 			
 		
 		

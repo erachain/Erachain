@@ -1,13 +1,5 @@
 package gui.items.assets;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-
-import javax.validation.constraints.Null;
-
 import controller.Controller;
 import core.item.assets.AssetCls;
 import datachain.DCSet;
@@ -16,177 +8,164 @@ import gui.models.TableModelCls;
 import lang.Lang;
 import utils.ObserverMessage;
 
+import javax.validation.constraints.Null;
+import java.util.*;
+
 @SuppressWarnings("serial")
-public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> implements Observer
-{
-	public static final int COLUMN_KEY = 0;
-	public static final int COLUMN_NAME = 1;
-	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_ASSET_TYPE = 3;
-	public static final int COLUMN_AMOUNT = 4;
-	public static final int COLUMN_FAVORITE = 5;
-	public static final int COLUMN_I_OWNER = 6;
+public class TableModelItemAssetsFavorute extends TableModelCls<Long, AssetCls> implements Observer {
+    public static final int COLUMN_KEY = 0;
+    public static final int COLUMN_NAME = 1;
+    public static final int COLUMN_ADDRESS = 2;
+    public static final int COLUMN_ASSET_TYPE = 3;
+    public static final int COLUMN_AMOUNT = 4;
+    public static final int COLUMN_FAVORITE = 5;
+    public static final int COLUMN_I_OWNER = 6;
 
-	private SortableList<Long, AssetCls> assets;
+    private SortableList<Long, AssetCls> assets;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
-	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false,false,false,false};
-	private List <AssetCls> persons;
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Favorite", "I Owner"});
+    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
+    private List<AssetCls> persons;
 
-	public TableModelItemAssetsFavorute()
-	{
-		super.COLUMN_FAVORITE=COLUMN_FAVORITE;
-		addObservers();
-	}
+    public TableModelItemAssetsFavorute() {
+        super.COLUMN_FAVORITE = COLUMN_FAVORITE;
+        addObservers();
+    }
 
-	// читаем колонки которые изменяем высоту
-	public Boolean[] get_Column_AutoHeight(){
+    // читаем колонки которые изменяем высоту
+    public Boolean[] get_Column_AutoHeight() {
 
-		return this.column_AutuHeight;
-	}
-	// устанавливаем колонки которым изменить высоту
-	public void set_get_Column_AutoHeight( Boolean[] arg0){
-		this.column_AutuHeight = arg0;
-	}
+        return this.column_AutuHeight;
+    }
 
-	@Override
-	public SortableList<Long, AssetCls> getSortableList()
-	{
-		return this.assets;
-	}
+    // устанавливаем колонки которым изменить высоту
+    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+        this.column_AutuHeight = arg0;
+    }
 
-	@Override
-	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object o = getValueAt(0, c);
-		return o==null?Null.class:o.getClass();
-	}
+    @Override
+    public SortableList<Long, AssetCls> getSortableList() {
+        return this.assets;
+    }
 
-	public AssetCls getAsset(int row)
-	{
-		return this.persons.get(row);
-	}
+    @Override
+    public Class<? extends Object> getColumnClass(int c) {     // set column type
+        Object o = getValueAt(0, c);
+        return o == null ? Null.class : o.getClass();
+    }
 
-	@Override
-	public int getColumnCount()
-	{
-		return this.columnNames.length;
-	}
+    public AssetCls getAsset(int row) {
+        return this.persons.get(row);
+    }
 
-	@Override
-	public String getColumnName(int index)
-	{
-		return this.columnNames[index];
-	}
+    @Override
+    public int getColumnCount() {
+        return this.columnNames.length;
+    }
 
-	@Override
-	public int getRowCount()
-	{
-		return this.persons.size();
+    @Override
+    public String getColumnName(int index) {
+        return this.columnNames[index];
+    }
 
-	}
+    @Override
+    public int getRowCount() {
+        return this.persons.size();
 
-	@Override
-	public Object getValueAt(int row, int column)
-	{
-		if(this.persons == null || row > this.persons.size() - 1 )
-		{
-			return null;
-		}
+    }
 
-		AssetCls asset = this.persons.get(row);
-		if (asset == null) return null;
+    @Override
+    public Object getValueAt(int row, int column) {
+        if (this.persons == null || row > this.persons.size() - 1) {
+            return null;
+        }
 
-		switch(column)
-		{
-		case COLUMN_KEY:
+        AssetCls asset = this.persons.get(row);
+        if (asset == null) return null;
 
-			return asset.getKey();
+        switch (column) {
+            case COLUMN_KEY:
 
-		case COLUMN_NAME:
+                return asset.getKey();
 
-			return asset.viewName();
+            case COLUMN_NAME:
 
-		case COLUMN_ADDRESS:
+                return asset.viewName();
 
-			return asset.getOwner().getPersonAsString();
+            case COLUMN_ADDRESS:
 
-		case COLUMN_ASSET_TYPE:
+                return asset.getOwner().getPersonAsString();
 
-			return Lang.getInstance().translate(asset.viewAssetType());
+            case COLUMN_ASSET_TYPE:
 
-		case COLUMN_AMOUNT:
+                return Lang.getInstance().translate(asset.viewAssetType());
 
-			return asset.getTotalQuantity(DCSet.getInstance());
+            case COLUMN_AMOUNT:
 
-		case COLUMN_FAVORITE:
+                return asset.getTotalQuantity(DCSet.getInstance());
 
-			return asset.isFavorite();
+            case COLUMN_FAVORITE:
 
-		case COLUMN_I_OWNER:
+                return asset.isFavorite();
 
-			if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))
-				return true;
-			return false;
-		}
+            case COLUMN_I_OWNER:
 
-		return null;
-	}
+                if (Controller.getInstance().isAddressIsMine(asset.getOwner().getAddress()))
+                    return true;
+                return false;
+        }
 
-	@Override
-	public void update(Observable o, Object arg)
-	{
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
-	}
+        return null;
+    }
 
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            //GUI ERROR
+        }
+    }
 
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && persons==null)
-		{
-			persons = new ArrayList<AssetCls>();
-			fill((Set<Long>) message.getValue());
-			this.fireTableDataChanged();
-		}
-		if(message.getType() == ObserverMessage.ADD_ASSET_FAVORITES_TYPE){
-			persons.add(  Controller.getInstance().getAsset((long) message.getValue()));
-			this.fireTableDataChanged();
-		}
-		if(message.getType() == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE){
-			persons.remove( Controller.getInstance().getAsset((long) message.getValue()));
-			this.fireTableDataChanged();
-		}
-	}
+    @SuppressWarnings("unchecked")
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
 
-	public void fill(Set<Long> set){
-		for(Long s:set){
-			if (s == 0) continue;
-			persons.add ( Controller.getInstance().getAsset(s));
-		}
-	}
+        //CHECK IF NEW LIST
+        if (message.getType() == ObserverMessage.LIST_ASSET_FAVORITES_TYPE && persons == null) {
+            persons = new ArrayList<AssetCls>();
+            fill((Set<Long>) message.getValue());
+            this.fireTableDataChanged();
+        }
+        if (message.getType() == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
+            persons.add(Controller.getInstance().getAsset((long) message.getValue()));
+            this.fireTableDataChanged();
+        }
+        if (message.getType() == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
+            persons.remove(Controller.getInstance().getAsset((long) message.getValue()));
+            this.fireTableDataChanged();
+        }
+    }
 
-	public void removeObservers()
-	{
-		Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
-	}
+    public void fill(Set<Long> set) {
+        for (Long s : set) {
+            if (s == 0) continue;
+            persons.add(Controller.getInstance().getAsset(s));
+        }
+    }
 
-	public void addObservers(){
+    public void removeObservers() {
+        Controller.getInstance().wallet.database.getAssetFavoritesSet().deleteObserver(this);
+    }
 
-		Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
-	}
+    public void addObservers() {
 
-	@Override
-	public Object getItem(int k) {
-		// TODO Auto-generated method stub
-		return  this.persons.get(k);
-	}
+        Controller.getInstance().wallet.database.getAssetFavoritesSet().addObserver(this);
+    }
+
+    @Override
+    public Object getItem(int k) {
+        // TODO Auto-generated method stub
+        return this.persons.get(k);
+    }
 }

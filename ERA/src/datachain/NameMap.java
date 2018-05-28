@@ -1,69 +1,60 @@
 package datachain;
 
+import core.naming.Name;
+import database.serializer.NameSerializer;
+import org.mapdb.DB;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mapdb.DB;
-
-import core.naming.Name;
 //import database.DBSet;
-import database.serializer.NameSerializer;
 
-public class NameMap extends DCMap<String, Name> 
-{
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-	
-	public NameMap(DCSet databaseSet, DB database)
-	{
-		super(databaseSet, database);
-	}
+public class NameMap extends DCMap<String, Name> {
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public NameMap(NameMap parent) 
-	{
-		super(parent, null);
-	}
-	
-	protected void createIndexes(DB database){}
+    public NameMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
+    }
 
-	@Override
-	protected Map<String, Name> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap("names")
-				.valueSerializer(new NameSerializer())
-				.makeOrGet();
-	}
+    public NameMap(NameMap parent) {
+        super(parent, null);
+    }
 
-	@Override
-	protected Map<String, Name> getMemoryMap() 
-	{
-		return new HashMap<String, Name>();
-	}
+    protected void createIndexes(DB database) {
+    }
 
-	@Override
-	protected Name getDefaultValue() 
-	{
-		return null;
-	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
-	
-	public boolean contains(Name name)
-	{
-		return this.contains(name.getName());
-	}
-	
-	public void add(Name name)
-	{
-		this.set(name.getName(), name);
-	}
-	
-	public void delete(Name name)
-	{
-		this.delete(name.getName());
-	}
+    @Override
+    protected Map<String, Name> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap("names")
+                .valueSerializer(new NameSerializer())
+                .makeOrGet();
+    }
+
+    @Override
+    protected Map<String, Name> getMemoryMap() {
+        return new HashMap<String, Name>();
+    }
+
+    @Override
+    protected Name getDefaultValue() {
+        return null;
+    }
+
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
+
+    public boolean contains(Name name) {
+        return this.contains(name.getName());
+    }
+
+    public void add(Name name) {
+        this.set(name.getName(), name);
+    }
+
+    public void delete(Name name) {
+        this.delete(name.getName());
+    }
 }

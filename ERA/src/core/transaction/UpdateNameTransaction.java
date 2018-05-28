@@ -1,297 +1,273 @@
 package core.transaction;
 
-import java.math.BigDecimal;
-//import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.Crypto;
 import core.naming.Name;
+import org.json.simple.JSONObject;
 
-public class UpdateNameTransaction extends Transaction
-{
-	private static final byte TYPE_ID = (byte)UPDATE_NAME_TRANSACTION;
-	private static final String NAME_ID = "OLD: Update Name";
-	private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
 
-	private Name name;
+//import java.math.BigInteger;
 
-	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference)
-	{
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+public class UpdateNameTransaction extends Transaction {
+    private static final byte TYPE_ID = (byte) UPDATE_NAME_TRANSACTION;
+    private static final String NAME_ID = "OLD: Update Name";
+    private static final int BASE_LENGTH = TransactionAmount.BASE_LENGTH;
 
-		this.creator = creator;
-		this.name = name;
-	}
-	public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference, byte[] signature)
-	{
-		this(typeBytes, creator, name, feePow, timestamp, reference);
-		this.signature = signature;
-		//this.calcFee();
-	}
-	public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference)
-	{
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference);
-	}
+    private Name name;
 
-	//GETTERS/SETTERS
+    public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
-	//public static String getName() { return "OLD: Update Name"; }
+        this.creator = creator;
+        this.name = name;
+    }
 
-	public Name getName()
-	{
-		return this.name;
-	}
+    public UpdateNameTransaction(byte[] typeBytes, PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, name, feePow, timestamp, reference);
+        this.signature = signature;
+        //this.calcFee();
+    }
 
-	@Override
-	public boolean hasPublicText() {
-		return true;
-	}
+    public UpdateNameTransaction(PublicKeyAccount creator, Name name, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, name, feePow, timestamp, reference);
+    }
 
-	//PARSE CONVERT
+    //GETTERS/SETTERS
 
-	public static Transaction Parse(byte[] data) throws Exception
-	{
-		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
-		{
-			throw new Exception("Data does not match block length");
-		}
+    //public static String getName() { return "OLD: Update Name"; }
+
+    public static Transaction Parse(byte[] data) throws Exception {
+        //CHECK IF WE MATCH BLOCK LENGTH
+        if (data.length < BASE_LENGTH) {
+            throw new Exception("Data does not match block length");
+        }
 
 
-		// READ TYPE
-		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-		int position = TYPE_LENGTH;
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
 
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
-		position += TIMESTAMP_LENGTH;
+        //READ TIMESTAMP
+        byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+        long timestamp = Longs.fromByteArray(timestampBytes);
+        position += TIMESTAMP_LENGTH;
 
-		//READ REFERENCE
-		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		Long reference = Longs.fromByteArray(referenceBytes);
-		position += REFERENCE_LENGTH;
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
-		//READ CREATOR
-		byte[] registrantBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(registrantBytes);
-		position += CREATOR_LENGTH;
+        //READ CREATOR
+        byte[] registrantBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+        PublicKeyAccount creator = new PublicKeyAccount(registrantBytes);
+        position += CREATOR_LENGTH;
 
-		//READ NAME
-		Name name = Name.Parse(Arrays.copyOfRange(data, position, data.length));
-		position += name.getDataLength();
+        //READ NAME
+        Name name = Name.Parse(Arrays.copyOfRange(data, position, data.length));
+        position += name.getDataLength();
 
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
+        //READ FEE POWER
+        byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+        byte feePow = feePowBytes[0];
+        position += 1;
 
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+        //READ SIGNATURE
+        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new UpdateNameTransaction(typeBytes, creator, name, feePow, timestamp, reference, signatureBytes);
-	}
+        return new UpdateNameTransaction(typeBytes, creator, name, feePow, timestamp, reference, signatureBytes);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public JSONObject toJson()
-	{
-		//GET BASE
-		JSONObject transaction = this.getJsonBase();
+    public Name getName() {
+        return this.name;
+    }
 
-		//ADD REGISTRANT/NAME/VALUE
-		transaction.put("creator", this.creator.getAddress());
-		transaction.put("newOwner", this.name.getOwner().getAddress());
-		transaction.put("name", this.name.getName());
-		transaction.put("newValue", this.name.getValue());
+    //PARSE CONVERT
 
-		return transaction;
-	}
+    @Override
+    public boolean hasPublicText() {
+        return true;
+    }
 
-	@Override
-	public byte[] toBytes(boolean withSign, Long releaserReference)
-	{
-		byte[] data = new byte[0];
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject transaction = this.getJsonBase();
 
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
+        //ADD REGISTRANT/NAME/VALUE
+        transaction.put("creator", this.creator.getAddress());
+        transaction.put("newOwner", this.name.getOwner().getAddress());
+        transaction.put("name", this.name.getName());
+        transaction.put("newValue", this.name.getValue());
 
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
+        return transaction;
+    }
 
-		//WRITE REFERENCE
-		//WRITE REFERENCE - in any case as Pack or not
-		if (this.reference != null) {
-			// NULL in imprints
-			byte[] referenceBytes = Longs.toByteArray(this.reference);
-			referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-			data = Bytes.concat(data, referenceBytes);
-		}
+    @Override
+    public byte[] toBytes(boolean withSign, Long releaserReference) {
+        byte[] data = new byte[0];
 
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
+        //WRITE TYPE
+        data = Bytes.concat(data, this.typeBytes);
 
-		//WRITE NAME
-		data = Bytes.concat(data , this.name.toBytes());
+        //WRITE TIMESTAMP
+        byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+        timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+        data = Bytes.concat(data, timestampBytes);
 
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
+        //WRITE REFERENCE
+        //WRITE REFERENCE - in any case as Pack or not
+        if (this.reference != null) {
+            // NULL in imprints
+            byte[] referenceBytes = Longs.toByteArray(this.reference);
+            referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+            data = Bytes.concat(data, referenceBytes);
+        }
 
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
+        //WRITE CREATOR
+        data = Bytes.concat(data, this.creator.getPublicKey());
 
-		return data;
-	}
+        //WRITE NAME
+        data = Bytes.concat(data, this.name.toBytes());
 
-	@Override
-	public int getDataLength(boolean asPack)
-	{
-		return BASE_LENGTH + this.name.getDataLength();
-	}
+        //WRITE FEE POWER
+        byte[] feePowBytes = new byte[1];
+        feePowBytes[0] = this.feePow;
+        data = Bytes.concat(data, feePowBytes);
 
-	//VALIDATE
+        //SIGNATURE
+        if (withSign) data = Bytes.concat(data, this.signature);
 
-	//@Override
-	@Override
-	public int isValid(Long releaserReference, long flags)
-	{
-		//CHECK NAME LENGTH
-		int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > 400 || nameLength < 1)
-		{
-			return INVALID_NAME_LENGTH;
-		}
+        return data;
+    }
 
-		//CHECK VALUE LENGTH
-		int valueLength = this.name.getValue().getBytes(StandardCharsets.UTF_8).length;
-		if(valueLength > BlockChain.MAX_REC_DATA_BYTES || valueLength < 1)
-		{
-			return INVALID_VALUE_LENGTH;
-		}
+    @Override
+    public int getDataLength(boolean asPack) {
+        return BASE_LENGTH + this.name.getDataLength();
+    }
 
-		//CHECK CREATOR
-		if(!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
+    //VALIDATE
 
-		//CHECK IF NAME EXISTS
-		if(!this.dcSet.getNameMap().contains(this.name))
-		{
-			return NAME_DOES_NOT_EXIST;
-		}
+    //@Override
+    @Override
+    public int isValid(Long releaserReference, long flags) {
+        //CHECK NAME LENGTH
+        int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
+        if (nameLength > 400 || nameLength < 1) {
+            return INVALID_NAME_LENGTH;
+        }
 
-		//CHECK IF NAMESALE EXISTS
-		if(this.dcSet.getNameExchangeMap().contains(this.name.getName()))
-		{
-			return NAME_ALREADY_ON_SALE;
-		}
+        //CHECK VALUE LENGTH
+        int valueLength = this.name.getValue().getBytes(StandardCharsets.UTF_8).length;
+        if (valueLength > BlockChain.MAX_REC_DATA_BYTES || valueLength < 1) {
+            return INVALID_VALUE_LENGTH;
+        }
 
-		//CHECK IF CREATOR IS CREATOR
-		if(!this.dcSet.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.creator.getAddress()))
-		{
-			return INVALID_CREATOR;
-		}
+        //CHECK CREATOR
+        if (!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddress())) {
+            return INVALID_ADDRESS;
+        }
 
-		return super.isValid(releaserReference, flags);
-	}
+        //CHECK IF NAME EXISTS
+        if (!this.dcSet.getNameMap().contains(this.name)) {
+            return NAME_DOES_NOT_EXIST;
+        }
 
-	//PROCESS/ORPHAN
+        //CHECK IF NAMESALE EXISTS
+        if (this.dcSet.getNameExchangeMap().contains(this.name.getName())) {
+            return NAME_ALREADY_ON_SALE;
+        }
 
-	//@Override
-	@Override
-	public void process(Block block, boolean asPack)
-	{
-		//UPDATE CREATOR
-		super.process(block, asPack);
+        //CHECK IF CREATOR IS CREATOR
+        if (!this.dcSet.getNameMap().get(this.name.getName()).getOwner().getAddress().equals(this.creator.getAddress())) {
+            return INVALID_CREATOR;
+        }
 
-		//SET ORPHAN DATA
-		Name oldName = this.dcSet.getNameMap().get(this.name.getName());
-		this.dcSet.getUpdateNameMap().set(this, oldName);
+        return super.isValid(releaserReference, flags);
+    }
 
-		//INSERT INTO DATABASE
-		this.dcSet.getNameMap().add(this.name);
-	}
+    //PROCESS/ORPHAN
 
-	//@Override
-	@Override
-	public void orphan(boolean asPack)
-	{
-		//UPDATE CREATOR
-		super.orphan(asPack);
+    //@Override
+    @Override
+    public void process(Block block, boolean asPack) {
+        //UPDATE CREATOR
+        super.process(block, asPack);
 
-		//RESTORE ORPHAN DATA
-		Name oldName = this.dcSet.getUpdateNameMap().get(this);
-		this.dcSet.getNameMap().add(oldName);
+        //SET ORPHAN DATA
+        Name oldName = this.dcSet.getNameMap().get(this.name.getName());
+        this.dcSet.getUpdateNameMap().set(this, oldName);
 
-		//DELETE ORPHAN DATA
-		this.dcSet.getUpdateNameMap().delete(this);
-	}
+        //INSERT INTO DATABASE
+        this.dcSet.getNameMap().add(this.name);
+    }
+
+    //@Override
+    @Override
+    public void orphan(boolean asPack) {
+        //UPDATE CREATOR
+        super.orphan(asPack);
+
+        //RESTORE ORPHAN DATA
+        Name oldName = this.dcSet.getUpdateNameMap().get(this);
+        this.dcSet.getNameMap().add(oldName);
+
+        //DELETE ORPHAN DATA
+        this.dcSet.getUpdateNameMap().delete(this);
+    }
 
 
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<Account>();
-		accounts.add(this.creator);
-		accounts.add(this.name.getOwner());
-		return accounts;
-	}
+    @Override
+    public HashSet<Account> getInvolvedAccounts() {
+        HashSet<Account> accounts = new HashSet<Account>();
+        accounts.add(this.creator);
+        accounts.add(this.name.getOwner());
+        return accounts;
+    }
 
-	@Override
-	public HashSet<Account> getRecipientAccounts() {
-		return new HashSet<Account>();
-	}
+    @Override
+    public HashSet<Account> getRecipientAccounts() {
+        return new HashSet<Account>();
+    }
 
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
+    @Override
+    public boolean isInvolved(Account account) {
+        String address = account.getAddress();
 
-		if(address.equals(this.creator.getAddress()) || address.equals(this.name.getOwner().getAddress()))
-		{
-			return true;
-		}
+        if (address.equals(this.creator.getAddress()) || address.equals(this.name.getOwner().getAddress())) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	//@Override
-	@Override
-	public BigDecimal getAmount(Account account)
-	{
-		if(account.getAddress().equals(this.creator.getAddress()))
-		{
-			return BigDecimal.ZERO.subtract(this.fee);
-		}
+    //@Override
+    @Override
+    public BigDecimal getAmount(Account account) {
+        if (account.getAddress().equals(this.creator.getAddress())) {
+            return BigDecimal.ZERO.subtract(this.fee);
+        }
 
-		return BigDecimal.ZERO;
-	}
+        return BigDecimal.ZERO;
+    }
 
-	//@Override
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
-	{
-		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
-	}
+    //@Override
+    public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
+        return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
+    }
 
-	@Override
-	public int calcBaseFee() {
-		return calcCommonFee();
-	}
+    @Override
+    public int calcBaseFee() {
+        return calcCommonFee();
+    }
 }

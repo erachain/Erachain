@@ -26,15 +26,12 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-
+    static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());
     private SortableList<Tuple2<String, String>, Block> blocks;
-
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
             "GB tWV", //"Generating Balance",
             "Transactions", "Fee"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
-
-    static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());
 
     public WalletBlocksTableModel() {
         //Controller.getInstance().addWalletListener(this);

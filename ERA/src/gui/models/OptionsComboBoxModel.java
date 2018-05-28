@@ -1,17 +1,14 @@
 package gui.models;
 
+import javax.swing.*;
 import java.util.List;
-
-import javax.swing.DefaultComboBoxModel;
 
 @SuppressWarnings("serial")
 public class OptionsComboBoxModel extends DefaultComboBoxModel<String> {
 
-	public OptionsComboBoxModel(List<String> options)
-	{
-		for(String option: options)
-		{
-			this.addElement(option);
-		}
-	}
+    public OptionsComboBoxModel(List<String> options) {
+        for (String option : options) {
+            this.addElement(option);
+        }
+    }
 }

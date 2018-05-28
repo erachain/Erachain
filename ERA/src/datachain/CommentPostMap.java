@@ -1,66 +1,62 @@
 package datachain;
 
+import com.google.common.primitives.SignedBytes;
+import org.mapdb.DB;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.mapdb.DB;
-
-import com.google.common.primitives.SignedBytes;
-
 /**
  * Get the parent post for a comment (the blogpost that was commented)
- * @author Skerberus
  *
+ * @author Skerberus
  */
-public class CommentPostMap extends DCMap<byte[], byte[]> { 
-	
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+public class CommentPostMap extends DCMap<byte[], byte[]> {
 
-	public CommentPostMap(DCSet databaseSet, DB database) {
-		super(databaseSet, database);
-	}
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public CommentPostMap(DCMap<byte[], byte[]> parent) {
-		super(parent, null);
-	}
+    public CommentPostMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
+    }
 
-	@Override
-	protected Map<byte[], byte[]> getMap(DB database) {
+    public CommentPostMap(DCMap<byte[], byte[]> parent) {
+        super(parent, null);
+    }
 
-		return database.createTreeMap("CommentPostMapTree")
-				.comparator(SignedBytes.lexicographicalComparator())
-				.makeOrGet();
+    @Override
+    protected Map<byte[], byte[]> getMap(DB database) {
 
-	}
-	
-	public void add(byte[] signatureOfComment, byte[] signatureOfBlogPost)
-	{
-		set(signatureOfComment, signatureOfBlogPost);
-	}
-	
-	public void remove(byte[] signatureOfComment)
-	{
-		delete(signatureOfComment);
-	}
+        return database.createTreeMap("CommentPostMapTree")
+                .comparator(SignedBytes.lexicographicalComparator())
+                .makeOrGet();
 
-	@Override
-	protected Map<byte[], byte[]> getMemoryMap() {
-		return new HashMap<>();
-	}
+    }
 
-	@Override
-	protected byte[] getDefaultValue() 
-	{
-		return null;
-	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
-	@Override
-	protected void createIndexes(DB database) {
-	}
+    public void add(byte[] signatureOfComment, byte[] signatureOfBlogPost) {
+        set(signatureOfComment, signatureOfBlogPost);
+    }
+
+    public void remove(byte[] signatureOfComment) {
+        delete(signatureOfComment);
+    }
+
+    @Override
+    protected Map<byte[], byte[]> getMemoryMap() {
+        return new HashMap<>();
+    }
+
+    @Override
+    protected byte[] getDefaultValue() {
+        return null;
+    }
+
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
+
+    @Override
+    protected void createIndexes(DB database) {
+    }
 }
 

@@ -1,4 +1,3 @@
-
 package org.whispersystems.curve25519.java;
 
 public class ge_p1p1 {

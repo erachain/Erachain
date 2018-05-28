@@ -1,119 +1,83 @@
 package gui.items.mails;
 
-import gui.items.assets.AssetsComboBoxModel;
-
+import core.item.assets.AssetCls;
 import gui.models.AccountsTableModel;
-import gui.models.Renderer_Left;
-import gui.models.Renderer_Right;
 import lang.Lang;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableRowSorter;
-
-import utils.BigDecimalStringComparator;
-import utils.NumberAsString;
-import utils.TableMenuPopupUtil;
-import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.item.assets.AssetCls;
-import core.item.persons.PersonCls;
-import core.transaction.Transaction;
-import gui.Gui;
 @SuppressWarnings("serial")
 public class Incoming_Mails_Panel extends JPanel // implements ItemListener
 
 
 //JInternalFrame
 {
-	//private JFrame parent;
+    //private JFrame parent;
 
-	public JComboBox<AssetCls> cbxFavorites;
-	public AccountsTableModel tableModel;
-	JTable table;
+    public JComboBox<AssetCls> cbxFavorites;
+    public AccountsTableModel tableModel;
+    JTable table;
 
-	@SuppressWarnings("unchecked")
-	public Incoming_Mails_Panel()
-	{
-		
-		this.setName(Lang.getInstance().translate("Incoming Mails"));
-		//this.parent = parent;
-		this.setLayout(new GridBagLayout());
-		
-		//PADDING
-		this.setBorder(new EmptyBorder(10, 10, 10, 10));
-	
-		
-		//TABLE GBC
-		GridBagConstraints tableGBC = new GridBagConstraints();
-		tableGBC.fill = GridBagConstraints.BOTH; 
-		tableGBC.anchor = GridBagConstraints.NORTHWEST;
-		tableGBC.weightx = 1;
-		tableGBC.weighty = 1;
-		tableGBC.gridx = 1;	
-		tableGBC.gridy= 1;	
-		
-		//BUTTON GBC
-		GridBagConstraints buttonGBC = new GridBagConstraints();
-		buttonGBC.insets = new Insets(10, 0, 0, 0);
-		buttonGBC.fill = GridBagConstraints.NONE;  
-		buttonGBC.anchor = GridBagConstraints.NORTHWEST;
-		buttonGBC.gridx = 1;	
-		buttonGBC.gridy = 2;	
-		
-		//FAVORITES GBC
-		GridBagConstraints favoritesGBC = new GridBagConstraints();
-		favoritesGBC.insets = new Insets(10, 0, 10, 0);
-		favoritesGBC.fill = GridBagConstraints.BOTH;  
-		favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
-		favoritesGBC.weightx = 1;
-		favoritesGBC.gridx = 1;	
-		favoritesGBC.gridy = 0;	
-		
-		//ASSET FAVORITES
+    @SuppressWarnings("unchecked")
+    public Incoming_Mails_Panel() {
+
+        this.setName(Lang.getInstance().translate("Incoming Mails"));
+        //this.parent = parent;
+        this.setLayout(new GridBagLayout());
+
+        //PADDING
+        this.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+
+        //TABLE GBC
+        GridBagConstraints tableGBC = new GridBagConstraints();
+        tableGBC.fill = GridBagConstraints.BOTH;
+        tableGBC.anchor = GridBagConstraints.NORTHWEST;
+        tableGBC.weightx = 1;
+        tableGBC.weighty = 1;
+        tableGBC.gridx = 1;
+        tableGBC.gridy = 1;
+
+        //BUTTON GBC
+        GridBagConstraints buttonGBC = new GridBagConstraints();
+        buttonGBC.insets = new Insets(10, 0, 0, 0);
+        buttonGBC.fill = GridBagConstraints.NONE;
+        buttonGBC.anchor = GridBagConstraints.NORTHWEST;
+        buttonGBC.gridx = 1;
+        buttonGBC.gridy = 2;
+
+        //FAVORITES GBC
+        GridBagConstraints favoritesGBC = new GridBagConstraints();
+        favoritesGBC.insets = new Insets(10, 0, 10, 0);
+        favoritesGBC.fill = GridBagConstraints.BOTH;
+        favoritesGBC.anchor = GridBagConstraints.NORTHWEST;
+        favoritesGBC.weightx = 1;
+        favoritesGBC.gridx = 1;
+        favoritesGBC.gridy = 0;
+
+        //ASSET FAVORITES
 //		cbxFavorites = new JComboBox<AssetCls>(new AssetsComboBoxModel());
 //		this.add(cbxFavorites, favoritesGBC);
-		
-		//TABLE
-		
-		// start data in model
-		
-		 table =new Mails_Transactions_Table(true);
-		 
-		
-	//	TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
-	//	sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
-	//	sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
-	//	sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
-		
-		// render
-	//	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
-	//	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
+
+        //TABLE
+
+        // start data in model
+
+        table = new Mails_Transactions_Table(true);
+
+
+        //	TableRowSorter<AccountsTableModel> sorter =  (TableRowSorter<AccountsTableModel>) table.getRowSorter();
+        //	sorter.setComparator(AccountsTableModel.COLUMN_CONFIRMED_BALANCE, new BigDecimalStringComparator());
+        //	sorter.setComparator(AccountsTableModel.COLUMN_WAINTING_BALANCE, new BigDecimalStringComparator());
+        //	sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
+
+        // render
+        //	table.setDefaultRenderer(Long.class, new Renderer_Right()); // set renderer
+        //	table.setDefaultRenderer(String.class, new Renderer_Left(table.getFontMetrics(table.getFont()), tableModel.get_Column_AutoHeight())); // set renderer
 		
 	
 				
@@ -246,17 +210,15 @@ public class Incoming_Mails_Panel extends JPanel // implements ItemListener
 
 		////////////////////
 		TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-	*/	
-		table.addMouseListener(new MouseAdapter() 
-		{
-		     @Override
-		     public void mousePressed(MouseEvent e) 
-		     {
-		        Point p = e.getPoint();
-		        int row = table.rowAtPoint(p);
-		        table.setRowSelectionInterval(row, row);
-		     }
-		});
+	*/
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point p = e.getPoint();
+                int row = table.rowAtPoint(p);
+                table.setRowSelectionInterval(row, row);
+            }
+        });
 		
 		
 	/*	
@@ -276,8 +238,8 @@ public class Incoming_Mails_Panel extends JPanel // implements ItemListener
 		//ADD ACCOUNTS TABLE
 		 
 		 */
-		
-		this.add(new JScrollPane(table), tableGBC);
+
+        this.add(new JScrollPane(table), tableGBC);
 
 		/*
 		//ADD NEW ACCOUNT BUTTON
@@ -293,8 +255,8 @@ public class Incoming_Mails_Panel extends JPanel // implements ItemListener
 		});	
 		this.add(newButton, buttonGBC);
 		*/
-		
-	}
+
+    }
 	
 	
 /*	
@@ -308,9 +270,8 @@ public class Incoming_Mails_Panel extends JPanel // implements ItemListener
         	tableModel.setAsset(asset);  
 		} 
 	}
-*/	
-	// set select in Favorites to FEE asset
-	
+*/
+    // set select in Favorites to FEE asset
 
 
 }

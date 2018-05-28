@@ -1,62 +1,55 @@
 package gui.items.persons;
 
+import core.item.persons.PersonCls;
+import datachain.DCSet;
+import datachain.ItemStatusMap;
+import lang.Lang;
+import org.mapdb.Fun.Tuple5;
+
+import javax.swing.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import javax.swing.JTextPane;
-import javax.swing.UIManager;
-
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
-
-import core.crypto.Base58;
-import core.item.persons.PersonCls;
-import datachain.DCSet;
-import datachain.ItemStatusMap;
-import lang.Lang;
-
 // Info for person
 public class Person_Info extends JTextPane {
-	
-	//private static final long serialVersionUID = 4763074704570450206L;
-	private static final long serialVersionUID = 2717571093561259483L;
 
-	
-	public  Person_Info() {
-	
-		this.setContentType("text/html");
-	//	this.setBackground(MainFrame.getFrames()[0].getBackground());
-		
-	}
-	
-	
-	static String Get_HTML_Person_Info_001(PersonCls person)
-	{
-		 
-		String message = "";
-		String date_birthday;
-		SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-		
-		if (person == null) return "Empty Person";
-		
-		if (!person.isConfirmed()) {
-			message = Lang.getInstance().translate("Not confirmed");
-		} else {
-			message = "" + person.getKey();
-		}
-	
-		message = "<b>" + message + "</b> : " + person.viewName();
-		//date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
-		date_birthday =  person.getBirthdayStr();
-		message += " (" + date_birthday;
-		if ( person.getBirthday()/10 < person.getDeathday()/10)
-			message += " - " + person.getDeathdayStr();
-		message += ")";
-		message = "<div>" + message + "</div>";
+    //private static final long serialVersionUID = 4763074704570450206L;
+    private static final long serialVersionUID = 2717571093561259483L;
+
+
+    public Person_Info() {
+
+        this.setContentType("text/html");
+        //	this.setBackground(MainFrame.getFrames()[0].getBackground());
+
+    }
+
+
+    static String Get_HTML_Person_Info_001(PersonCls person) {
+
+        String message = "";
+        String date_birthday;
+        SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+
+        if (person == null) return "Empty Person";
+
+        if (!person.isConfirmed()) {
+            message = Lang.getInstance().translate("Not confirmed");
+        } else {
+            message = "" + person.getKey();
+        }
+
+        message = "<b>" + message + "</b> : " + person.viewName();
+        //date_birthday =  formatDate.format(new Date(Long.valueOf(person.getBirthday())));
+        date_birthday = person.getBirthdayStr();
+        message += " (" + date_birthday;
+        if (person.getBirthday() / 10 < person.getDeathday() / 10)
+            message += " - " + person.getDeathdayStr();
+        message += ")";
+        message = "<div>" + message + "</div>";
 
 		/*
 		// GET CERTIFIED ACCOUNTS
@@ -85,51 +78,50 @@ public class Person_Info extends JTextPane {
 			}
 		}
 		*/
-		
-		/// STATUSES
-		TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DCSet.getInstance().getPersonStatusMap().get(person.getKey());
-		if ( statuses.isEmpty()){
-			message += "<div>" +  Lang.getInstance().translate("Not statuses")+ "</div";
-		} else {
-			//message += "<h3>"+ "Statuses" +"</h3>";
-			String from_date_str;
-			String to_date_str;
-			Long dte;
-			ItemStatusMap statusesMap = DCSet.getInstance().getItemStatusMap();
-			for( Map.Entry<Long, java.util.Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> status: statuses.entrySet())
-			{
-				if (status == null) continue;
-				
-				Tuple5<Long, Long, byte[], Integer, Integer> dates = status.getValue().peek();
 
-				message += "<div>" + statusesMap.get(status.getKey()).toString(DCSet.getInstance(), dates.c) + " : ";
-				
-				dte = dates.a;
-				if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
-				else from_date_str = formatDate.format( new Date(dte));
-				
-				dte = dates.b;
-				if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ? ";
-				else to_date_str = formatDate.format( new Date(dte));
-				
-				message += from_date_str + " - " + to_date_str + "</div";
+        /// STATUSES
+        TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = DCSet.getInstance().getPersonStatusMap().get(person.getKey());
+        if (statuses.isEmpty()) {
+            message += "<div>" + Lang.getInstance().translate("Not statuses") + "</div";
+        } else {
+            //message += "<h3>"+ "Statuses" +"</h3>";
+            String from_date_str;
+            String to_date_str;
+            Long dte;
+            ItemStatusMap statusesMap = DCSet.getInstance().getItemStatusMap();
+            for (Map.Entry<Long, java.util.Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> status : statuses.entrySet()) {
+                if (status == null) continue;
 
-			}
-			
-		}
-		
-		//message += "<div><font size='2'>" + Base58.encode(person.getReference()).substring(0, 25) + "..</font></div>";
-		//message += "<div>" + Base58.encode(person.getReference()).substring(0, 25) + "..</div>";
+                Tuple5<Long, Long, byte[], Integer, Integer> dates = status.getValue().peek();
 
-		return message;
-	}
-	 	
-	public void show_001(PersonCls person){
-		
-		setText("<html><head><style> body{ font-family:"
-				+ UIManager.getFont("Label.font").getFamily() + "; font-size:" +  UIManager.getFont("Label.font").getSize() + "px}"
-				+ "</style> </head><body>" + Get_HTML_Person_Info_001(person) + "</body></html>");
-		return;
-	}	
+                message += "<div>" + statusesMap.get(status.getKey()).toString(DCSet.getInstance(), dates.c) + " : ";
+
+                dte = dates.a;
+                if (dte == null || dte == Long.MIN_VALUE) from_date_str = " ? ";
+                else from_date_str = formatDate.format(new Date(dte));
+
+                dte = dates.b;
+                if (dte == null || dte == Long.MAX_VALUE) to_date_str = " ? ";
+                else to_date_str = formatDate.format(new Date(dte));
+
+                message += from_date_str + " - " + to_date_str + "</div";
+
+            }
+
+        }
+
+        //message += "<div><font size='2'>" + Base58.encode(person.getReference()).substring(0, 25) + "..</font></div>";
+        //message += "<div>" + Base58.encode(person.getReference()).substring(0, 25) + "..</div>";
+
+        return message;
+    }
+
+    public void show_001(PersonCls person) {
+
+        setText("<html><head><style> body{ font-family:"
+                + UIManager.getFont("Label.font").getFamily() + "; font-size:" + UIManager.getFont("Label.font").getSize() + "px}"
+                + "</style> </head><body>" + Get_HTML_Person_Info_001(person) + "</body></html>");
+        return;
+    }
 
 }

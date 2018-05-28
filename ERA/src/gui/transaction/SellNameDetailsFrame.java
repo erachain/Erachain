@@ -1,60 +1,44 @@
 package gui.transaction;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-
-import core.crypto.Base58;
 import core.transaction.SellNameTransaction;
 import lang.Lang;
-import utils.DateTimeFormat;
 import utils.MenuPopupUtil;
 
+import javax.swing.*;
+
 @SuppressWarnings("serial")
-public class SellNameDetailsFrame extends Rec_DetailsFrame
-{
-	public SellNameDetailsFrame(SellNameTransaction nameSale)
-	{
-		super(nameSale);
-		
-		//LABEL NAME
-		++labelGBC.gridy;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-		this.add(nameLabel, labelGBC);
-		
-		//NAME
-		++detailGBC.gridy;
-		JTextField name = new JTextField(nameSale.getNameSale().getKey());
-		name.setEditable(false);
-		MenuPopupUtil.installContextMenu(name);
-		this.add(name, detailGBC);		
-		
-		//LABEL PRICE
-		++labelGBC.gridy;
-		JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
-		this.add(priceLabel, labelGBC);
-				
-		//PRICE
-		++detailGBC.gridy;
-		JTextField price = new JTextField(nameSale.getNameSale().getAmount().toPlainString());
-		price.setEditable(false);
-		MenuPopupUtil.installContextMenu(price);
-		this.add(price, detailGBC);		
-				           
+public class SellNameDetailsFrame extends Rec_DetailsFrame {
+    public SellNameDetailsFrame(SellNameTransaction nameSale) {
+        super(nameSale);
+
+        //LABEL NAME
+        ++labelGBC.gridy;
+        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        this.add(nameLabel, labelGBC);
+
+        //NAME
+        ++detailGBC.gridy;
+        JTextField name = new JTextField(nameSale.getNameSale().getKey());
+        name.setEditable(false);
+        MenuPopupUtil.installContextMenu(name);
+        this.add(name, detailGBC);
+
+        //LABEL PRICE
+        ++labelGBC.gridy;
+        JLabel priceLabel = new JLabel(Lang.getInstance().translate("Price") + ":");
+        this.add(priceLabel, labelGBC);
+
+        //PRICE
+        ++detailGBC.gridy;
+        JTextField price = new JTextField(nameSale.getNameSale().getAmount().toPlainString());
+        price.setEditable(false);
+        MenuPopupUtil.installContextMenu(price);
+        this.add(price, detailGBC);
+
         //PACK
 //		this.pack();
 //        this.setResizable(false);
 //        this.setLocationRelativeTo(null);
         this.setVisible(true);
-	}
+    }
 }

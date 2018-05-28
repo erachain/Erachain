@@ -1,76 +1,72 @@
 package core.web;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
 import controller.Controller;
 import core.naming.Name;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
 public class ProfileHelper {
 
-	private Profile currentProfile = null;
+    private static ProfileHelper instance;
+    private Profile currentProfile = null;
 
-	private static ProfileHelper instance;
+    public ProfileHelper() {
+        List<Profile> enabledProfiles = Profile.getEnabledProfiles();
+        if (!enabledProfiles.isEmpty()) {
+            currentProfile = enabledProfiles.get(0);
+        }
+    }
 
-	public static synchronized ProfileHelper getInstance() {
-		if (instance == null) {
-			instance = new ProfileHelper();
-		}
+    public static synchronized ProfileHelper getInstance() {
+        if (instance == null) {
+            instance = new ProfileHelper();
+        }
 
-		return instance;
+        return instance;
 
-	}
+    }
 
-	public ProfileHelper() {
-		List<Profile> enabledProfiles = Profile.getEnabledProfiles();
-		if (!enabledProfiles.isEmpty()) {
-			currentProfile = enabledProfiles.get(0);
-		}
-	}
+    public Profile getActiveProfileOpt(HttpServletRequest servletRequestOpt) {
+        // ACTIVE PROFILE NOT FOR REMOTE
+        if (ServletUtils.isRemoteRequest(servletRequestOpt)) {
+            return null;
+        }
 
-	public Profile getActiveProfileOpt(HttpServletRequest servletRequestOpt) {
-		// ACTIVE PROFILE NOT FOR REMOTE
-		if(ServletUtils.isRemoteRequest(servletRequestOpt))
-		{
-			return null;
-		}
+        if (currentProfile != null) {
+            Name name = currentProfile.getName();
+            // RELOADING CURRENT VALUES
+            Profile profile = Profile.getProfileOpt(name);
+            // PROFILE STILL ENABLED AND DO I OWN IT?
+            if (profile != null && profile.isProfileEnabled()
+                    && Controller.getInstance().getName(name.getName()) != null) {
+                currentProfile = profile;
+            } else {
+                currentProfile = null;
+            }
 
-		if (currentProfile != null) {
-			Name name = currentProfile.getName();
-			// RELOADING CURRENT VALUES
-			Profile profile = Profile.getProfileOpt(name);
-			// PROFILE STILL ENABLED AND DO I OWN IT?
-			if (profile != null && profile.isProfileEnabled()
-					&& Controller.getInstance().getName(name.getName()) != null) {
-				currentProfile = profile;
-			} else {
-				currentProfile = null;
-			}
+        }
+        return currentProfile;
+    }
 
-		}
-		return currentProfile;
-	}
+    public void switchProfileOpt(String profileString) {
 
-	public void switchProfileOpt(String profileString) {
+        if (profileString != null) {
+            Name name = Controller.getInstance().getName(profileString);
+            if (name != null && Controller.getInstance().getNamesAsList().contains(name)) {
+                Profile profile = Profile.getProfileOpt(name);
+                if (profile != null && profile.isProfileEnabled()) {
+                    currentProfile = profile;
+                }
 
-		if (profileString != null) {
-			Name name = Controller.getInstance().getName(profileString);
-			if (name != null &&  Controller.getInstance().getNamesAsList().contains(name)) {
-				Profile profile = Profile.getProfileOpt(name);
-				if (profile != null && profile.isProfileEnabled()) {
-					currentProfile = profile;
-				}
+            }
+        }
 
-			}
-		}
+    }
 
-	}
-	
-	
-	public void disconnect()
-	{
-		currentProfile = null;
-	}
+
+    public void disconnect() {
+        currentProfile = null;
+    }
 
 }

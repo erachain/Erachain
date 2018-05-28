@@ -6,12 +6,14 @@ import java.util.Vector;
 public class ObservableThread extends Thread {
     private boolean changed = false;
     @SuppressWarnings("rawtypes")
-	private Vector obs;
+    private Vector obs;
 
-    /** Construct an Observable with zero Observers. */
+    /**
+     * Construct an Observable with zero Observers.
+     */
 
     @SuppressWarnings("rawtypes")
-	public ObservableThread() {
+    public ObservableThread() {
         obs = new Vector();
     }
 
@@ -21,11 +23,11 @@ public class ObservableThread extends Thread {
      * The order in which notifications will be delivered to multiple
      * observers is not specified. See the class comment.
      *
-     * @param   o   an observer to be added.
-     * @throws NullPointerException   if the parameter o is null.
+     * @param o an observer to be added.
+     * @throws NullPointerException if the parameter o is null.
      */
     @SuppressWarnings("unchecked")
-	public synchronized void addObserver(Observer o) {
+    public synchronized void addObserver(Observer o) {
         if (o == null)
             throw new NullPointerException();
         if (!obs.contains(o)) {
@@ -36,7 +38,8 @@ public class ObservableThread extends Thread {
     /**
      * Deletes an observer from the set of observers of this object.
      * Passing <CODE>null</CODE> to this method will have no effect.
-     * @param   o   the observer to be deleted.
+     *
+     * @param o the observer to be deleted.
      */
     public synchronized void deleteObserver(Observer o) {
         obs.removeElement(o);
@@ -54,9 +57,9 @@ public class ObservableThread extends Thread {
      * <blockquote><tt>
      * notifyObservers(null)</tt></blockquote>
      *
-     * @see     java.util.Observable#clearChanged()
-     * @see     java.util.Observable#hasChanged()
-     * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+     * @see java.util.Observable#clearChanged()
+     * @see java.util.Observable#hasChanged()
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     public void notifyObservers() {
         notifyObservers(null);
@@ -71,10 +74,10 @@ public class ObservableThread extends Thread {
      * Each observer has its <code>update</code> method called with two
      * arguments: this observable object and the <code>arg</code> argument.
      *
-     * @param   arg   any object.
-     * @see     java.util.Observable#clearChanged()
-     * @see     java.util.Observable#hasChanged()
-     * @see     java.util.Observer#update(java.util.Observable, java.lang.Object)
+     * @param arg any object.
+     * @see java.util.Observable#clearChanged()
+     * @see java.util.Observable#hasChanged()
+     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
     public void notifyObservers(Object arg) {
         /*
@@ -102,8 +105,8 @@ public class ObservableThread extends Thread {
             clearChanged();
         }
 
-        for (int i = arrLocal.length-1; i>=0; i--)
-            ((Observer)arrLocal[i]).update(null, arg);
+        for (int i = arrLocal.length - 1; i >= 0; i--)
+            ((Observer) arrLocal[i]).update(null, arg);
     }
 
     /**
@@ -128,8 +131,8 @@ public class ObservableThread extends Thread {
      * This method is called automatically by the
      * <code>notifyObservers</code> methods.
      *
-     * @see     java.util.Observable#notifyObservers()
-     * @see     java.util.Observable#notifyObservers(java.lang.Object)
+     * @see java.util.Observable#notifyObservers()
+     * @see java.util.Observable#notifyObservers(java.lang.Object)
      */
     protected synchronized void clearChanged() {
         changed = false;
@@ -138,12 +141,12 @@ public class ObservableThread extends Thread {
     /**
      * Tests if this object has changed.
      *
-     * @return  <code>true</code> if and only if the <code>setChanged</code>
-     *          method has been called more recently than the
-     *          <code>clearChanged</code> method on this object;
-     *          <code>false</code> otherwise.
-     * @see     java.util.Observable#clearChanged()
-     * @see     java.util.Observable#setChanged()
+     * @return <code>true</code> if and only if the <code>setChanged</code>
+     * method has been called more recently than the
+     * <code>clearChanged</code> method on this object;
+     * <code>false</code> otherwise.
+     * @see java.util.Observable#clearChanged()
+     * @see java.util.Observable#setChanged()
      */
     public synchronized boolean hasChanged() {
         return changed;
@@ -152,7 +155,7 @@ public class ObservableThread extends Thread {
     /**
      * Returns the number of observers of this <tt>Observable</tt> object.
      *
-     * @return  the number of observers of this object.
+     * @return the number of observers of this object.
      */
     public synchronized int countObservers() {
         return obs.size();

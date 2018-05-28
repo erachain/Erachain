@@ -24,7 +24,7 @@ public class ImageCropPanel extends JPanel {
         zoomSlider.setMinorTickSpacing(10);
         zoomSlider.setPaintTicks(true);
         zoomSlider.addChangeListener(e -> imageCropDisplayPanel.setZoom(zoomSlider.getValue() / 100d));
-        imageCropDisplayPanel.addZoomListener(e -> zoomSlider.setValue((int)(imageCropDisplayPanel.getZoom() * 100)));
+        imageCropDisplayPanel.addZoomListener(e -> zoomSlider.setValue((int) (imageCropDisplayPanel.getZoom() * 100)));
         sliderPanel.add(zoomSlider, BorderLayout.NORTH);
         frameSlider = new JSlider(JSlider.HORIZONTAL, 0, 30, 0);
         frameSlider.setMajorTickSpacing(10);

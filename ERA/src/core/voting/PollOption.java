@@ -1,206 +1,179 @@
 package core.voting;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import core.account.Account;
+import core.crypto.Base58;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-
-import core.account.Account;
-import core.crypto.Base58;
-
 public class PollOption {
 
-	private static final int NAME_SIZE_LENGTH = 4;
-	private static final int VOTERS_SIZE_LENGTH = 4;
-	private static final int VOTER_LENGTH = 25;
+    private static final int NAME_SIZE_LENGTH = 4;
+    private static final int VOTERS_SIZE_LENGTH = 4;
+    private static final int VOTER_LENGTH = 25;
 
-	private String name;
-	private List<Account> voters;
+    private String name;
+    private List<Account> voters;
 
-	public PollOption(String name)
-	{
-		this.name = name;
-		this.voters = new ArrayList<Account>();
-	}
+    public PollOption(String name) {
+        this.name = name;
+        this.voters = new ArrayList<Account>();
+    }
 
-	public PollOption(String name, List<Account> voters)
-	{
-		this.name = name;
-		this.voters = voters;
-	}
+    public PollOption(String name, List<Account> voters) {
+        this.name = name;
+        this.voters = voters;
+    }
 
-	//GETTERS/SETTERS
+    //GETTERS/SETTERS
 
-	public String getName()
-	{
-		return this.name;
-	}
+    public static PollOption parse(byte[] data) throws Exception {
+        int position = 0;
 
-	public List<Account> getVoters()
-	{
-		return this.voters;
-	}
+        //READ NAME SIZE
+        byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
+        int nameLength = Ints.fromByteArray(nameLengthBytes);
+        position += NAME_SIZE_LENGTH;
 
-	public boolean hasVoter(Account account)
-	{
-		for(Account voter: this.voters)
-		{
-			if(voter.getAddress().equals(account.getAddress()))
-			{
-				return true;
-			}
-		}
+        if (nameLength < 1 || nameLength > 400) {
+            throw new Exception("Invalid name length");
+        }
 
-		return false;
-	}
+        //READ NAME
+        byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
+        String name = new String(nameBytes, StandardCharsets.UTF_8);
+        position += nameLength;
 
-	public void removeVoter(Account account)
-	{
-		Account remove = null;
-		for(Account voter: this.voters)
-		{
-			if(voter.getAddress().equals(account.getAddress()))
-			{
-				remove = voter;
-			}
-		}
+        //READ VOTERS SIZE
+        byte[] votersLengthBytes = Arrays.copyOfRange(data, position, position + VOTERS_SIZE_LENGTH);
+        int votersLength = Ints.fromByteArray(votersLengthBytes);
+        position += VOTERS_SIZE_LENGTH;
 
-		if(remove != null)
-		{
-			this.voters.remove(remove);
-		}
-	}
+        //READ VOTERS
+        List<Account> voters = new ArrayList<Account>();
+        for (int i = 0; i < votersLength; i++) {
+            byte[] rawAddress = Arrays.copyOfRange(data, position, position + VOTER_LENGTH);
+            String address = Base58.encode(rawAddress);
+            voters.add(new Account(address));
+            position += VOTER_LENGTH;
+        }
 
-	public void addVoter(Account account)
-	{
-		this.voters.add(account);
-	}
+        return new PollOption(name, voters);
+    }
 
-	public BigDecimal getVotes()
-	{
-		return getVotes(0);
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public BigDecimal getVotes(long assetKey)
-	{
-		BigDecimal votes = BigDecimal.ZERO;
+    public List<Account> getVoters() {
+        return this.voters;
+    }
 
-		for(Account voter: this.voters)
-		{
-			votes = votes.add(voter.getBalanceUSE(assetKey));
-		}
+    public boolean hasVoter(Account account) {
+        for (Account voter : this.voters) {
+            if (voter.getAddress().equals(account.getAddress())) {
+                return true;
+            }
+        }
 
-		return votes;
-	}
+        return false;
+    }
 
-	//PARSE
+    public void removeVoter(Account account) {
+        Account remove = null;
+        for (Account voter : this.voters) {
+            if (voter.getAddress().equals(account.getAddress())) {
+                remove = voter;
+            }
+        }
 
-	public static PollOption parse(byte[] data) throws Exception
-	{
-		int position = 0;
+        if (remove != null) {
+            this.voters.remove(remove);
+        }
+    }
 
-		//READ NAME SIZE
-		byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-		int nameLength = Ints.fromByteArray(nameLengthBytes);
-		position += NAME_SIZE_LENGTH;
+    public void addVoter(Account account) {
+        this.voters.add(account);
+    }
 
-		if(nameLength < 1 || nameLength > 400)
-		{
-			throw new Exception("Invalid name length");
-		}
+    public BigDecimal getVotes() {
+        return getVotes(0);
+    }
 
-		//READ NAME
-		byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
-		String name = new String(nameBytes, StandardCharsets.UTF_8);
-		position += nameLength;
+    //PARSE
 
-		//READ VOTERS SIZE
-		byte[] votersLengthBytes = Arrays.copyOfRange(data, position, position + VOTERS_SIZE_LENGTH);
-		int votersLength = Ints.fromByteArray(votersLengthBytes);
-		position += VOTERS_SIZE_LENGTH;
+    public BigDecimal getVotes(long assetKey) {
+        BigDecimal votes = BigDecimal.ZERO;
 
-		//READ VOTERS
-		List<Account> voters = new ArrayList<Account>();
-		for(int i=0; i<votersLength; i++)
-		{
-			byte[] rawAddress = Arrays.copyOfRange(data, position, position + VOTER_LENGTH);
-			String address = Base58.encode(rawAddress);
-			voters.add(new Account(address));
-			position += VOTER_LENGTH;
-		}
+        for (Account voter : this.voters) {
+            votes = votes.add(voter.getBalanceUSE(assetKey));
+        }
 
-		return new PollOption(name, voters);
-	}
+        return votes;
+    }
 
-	@SuppressWarnings("unchecked")
-	public JSONObject toJson()
-	{
-		JSONObject pollOption = new JSONObject();
+    @SuppressWarnings("unchecked")
+    public JSONObject toJson() {
+        JSONObject pollOption = new JSONObject();
 
-		//ADD NAME/TOTAL VOTES/VOTERS
-		pollOption.put("name", this.getName());
-		pollOption.put("votes", this.getVotes().toPlainString());
+        //ADD NAME/TOTAL VOTES/VOTERS
+        pollOption.put("name", this.getName());
+        pollOption.put("votes", this.getVotes().toPlainString());
 
-		JSONArray voters = new JSONArray();
-		for(Account voter: this.voters)
-		{
-			voters.add(voter.getAddress());
-		}
+        JSONArray voters = new JSONArray();
+        for (Account voter : this.voters) {
+            voters.add(voter.getAddress());
+        }
 
-		pollOption.put("voters", voters);
+        pollOption.put("voters", voters);
 
-		return pollOption;
-	}
+        return pollOption;
+    }
 
-	public byte[] toBytes()
-	{
-		byte[] data = new byte[0];
+    public byte[] toBytes() {
+        byte[] data = new byte[0];
 
-		//WRITE NAME SIZE
-		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
-		int nameLength = nameBytes.length;
-		byte[] nameLengthBytes = Ints.toByteArray(nameLength);
-		data = Bytes.concat(data, nameLengthBytes);
+        //WRITE NAME SIZE
+        byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
+        int nameLength = nameBytes.length;
+        byte[] nameLengthBytes = Ints.toByteArray(nameLength);
+        data = Bytes.concat(data, nameLengthBytes);
 
-		//WRITE NAME
-		data = Bytes.concat(data, nameBytes);
+        //WRITE NAME
+        data = Bytes.concat(data, nameBytes);
 
-		//WRITE VOTERS SIZE
-		int votersLength = this.voters.size();
-		byte[] votersLengthBytes = Ints.toByteArray(votersLength);
-		data = Bytes.concat(data, votersLengthBytes);
+        //WRITE VOTERS SIZE
+        int votersLength = this.voters.size();
+        byte[] votersLengthBytes = Ints.toByteArray(votersLength);
+        data = Bytes.concat(data, votersLengthBytes);
 
-		//WRITE VOTERS
-		for(Account voter: this.voters)
-		{
-			data = Bytes.concat(data, Base58.decode(voter.getAddress()));
-		}
+        //WRITE VOTERS
+        for (Account voter : this.voters) {
+            data = Bytes.concat(data, Base58.decode(voter.getAddress()));
+        }
 
-		return data;
-	}
+        return data;
+    }
 
-	public int getDataLength()
-	{
-		return NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + VOTERS_SIZE_LENGTH + (this.voters.size() * VOTER_LENGTH);
-	}
+    public int getDataLength() {
+        return NAME_SIZE_LENGTH + this.name.getBytes(StandardCharsets.UTF_8).length + VOTERS_SIZE_LENGTH + (this.voters.size() * VOTER_LENGTH);
+    }
 
-	//REST
+    //REST
 
-	@Override
-	public String toString()
-	{
-		return this.name + " - " + this.getVotes().toPlainString();
-	}
+    @Override
+    public String toString() {
+        return this.name + " - " + this.getVotes().toPlainString();
+    }
 
-	public String toString(long assetKey)
-	{
-		return this.name + " - " + this.getVotes(assetKey).toPlainString();
-	}
+    public String toString(long assetKey) {
+        return this.name + " - " + this.getVotes(assetKey).toPlainString();
+    }
 }

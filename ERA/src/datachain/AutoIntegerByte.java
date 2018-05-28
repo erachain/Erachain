@@ -1,129 +1,116 @@
 package datachain;
 
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import database.DBMap;
 import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
-import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple2;
 
-import core.block.Block;
-import core.item.ItemCls;
-import database.DBMap;
-import utils.Pair;
+import java.util.HashMap;
+import java.util.Map;
 
 // Block Height -> creator
-public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> 
-{
-	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-		
-	// protected int type;
+public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
+    static Logger LOGGER = Logger.getLogger(AutoIntegerByte.class.getName());
 
-	protected Atomic.Integer atomicKey;
-	protected int key;
+    // protected int type;
+    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+    protected Atomic.Integer atomicKey;
+    protected int key;
 
-	static Logger LOGGER = Logger.getLogger(AutoIntegerByte.class.getName());
+    public AutoIntegerByte(DCSet databaseSet, DB database, String name) {
+        super(databaseSet, database);
 
-	public AutoIntegerByte(DCSet databaseSet, DB database, String name) {
-		super(databaseSet, database);
+        this.atomicKey = database.getAtomicInteger(name + "_key");
+        this.key = this.atomicKey.get();
+    }
 
-		this.atomicKey = database.getAtomicInteger(name + "_key");
-		this.key = this.atomicKey.get();
-	}
+    public AutoIntegerByte(DCSet databaseSet, DB database,
+                           String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
 
-	public AutoIntegerByte(DCSet databaseSet, DB database,
-			String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
+        this(databaseSet, database, name);
 
-		this(databaseSet, database, name);
+        if (databaseSet.isWithObserver()) {
+            if (observeReset > 0)
+                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+            if (databaseSet.isDynamicGUI()) {
+                if (observeAdd > 0)
+                    this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                if (observeRemove > 0)
+                    this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            }
+            if (observeList > 0)
+                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+        }
+    }
 
-		if (databaseSet.isWithObserver()) {
-			if (observeReset > 0)
-				this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-			if (databaseSet.isDynamicGUI()) {
-				if (observeAdd > 0)
-					this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-				if (observeRemove > 0)
-					this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
-			}
-			if (observeList > 0)
-				this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-		}
-	}
+    public AutoIntegerByte(AutoIntegerByte parent) {
+        super(parent, null);
 
-	public AutoIntegerByte(AutoIntegerByte parent) {
-		super(parent, null);
+        this.key = parent.size();
+    }
 
-		this.key = parent.size();
-	}
+    @Override
+    public int size() {
+        return this.key;
+    }
 
-	@Override
-	public int size() {
-		return this.key;
-	}
+    public void setSize(int size) {
+        // INCREMENT ATOMIC KEY IF EXISTS
+        if (this.atomicKey != null) {
+            this.atomicKey.set(size);
+        }
+        this.key = size;
+    }
 
-	public void setSize(int size) {
-		// INCREMENT ATOMIC KEY IF EXISTS
-		if (this.atomicKey != null) {
-			this.atomicKey.set(size);
-		}
-		this.key = size;
-	}
+    protected void createIndexes(DB database) {
+    }
 
-	protected void createIndexes(DB database) {
-	}
+    @Override
+    protected Map<Integer, byte[]> getMemoryMap() {
+        return new HashMap<Integer, byte[]>();
+    }
 
-	@Override
-	protected Map<Integer, byte[]> getMemoryMap() {
-		return new HashMap<Integer, byte[]>();
-	}
+    @Override
+    protected byte[] getDefaultValue() {
+        return null;
+    }
 
-	@Override
-	protected byte[] getDefaultValue() {
-		return null;
-	}
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
 
-	@Override
-	protected Map<Integer, Integer> getObservableData() {
-		return this.observableData;
-	}
+    public long add(byte[] item) {
+        // INCREMENT ATOMIC KEY IF EXISTS
+        if (this.atomicKey != null) {
+            this.atomicKey.incrementAndGet();
+        }
 
-	public long add(byte[] item) {
-		// INCREMENT ATOMIC KEY IF EXISTS
-		if (this.atomicKey != null) {
-			this.atomicKey.incrementAndGet();
-		}
+        // INCREMENT KEY
+        this.key++;
 
-		// INCREMENT KEY
-		this.key++;
+        // INSERT WITH NEW KEY
+        this.set(this.key, item);
 
-		// INSERT WITH NEW KEY
-		this.set(this.key, item);
+        // RETURN KEY
+        return this.key;
+    }
 
-		// RETURN KEY
-		return this.key;
-	}
+    public byte[] last() {
+        return this.get(this.key);
+    }
 
-	public byte[] last() {
-		return this.get(this.key);		
-	}
-	
-	public void remove() {
-		super.delete(key);
+    public void remove() {
+        super.delete(key);
 
-		if (this.atomicKey != null) {
-			this.atomicKey.decrementAndGet();
-		}
+        if (this.atomicKey != null) {
+            this.atomicKey.decrementAndGet();
+        }
 
-		// DECREMENT KEY
-		--this.key;
+        // DECREMENT KEY
+        --this.key;
 
-	}
+    }
 
 }

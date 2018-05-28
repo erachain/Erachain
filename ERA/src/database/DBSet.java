@@ -1,135 +1,116 @@
 package database;
 // 30/03 ++
-import java.io.File;
-
-import database.IDB;
-import database.wallet.DWSet;
-import datachain.DCSet;
-import datachain.TransactionMap;
 
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-//import org.mapdb.Serializer;
-
 import settings.Settings;
 
-public class DBSet implements IDB
-{
-	private static final File DATA_FILE = new File(Settings.getInstance().getLocalDir(), "data.dat");
-	
-	private static final String VERSION = "version";
-	
-	private static DB database;	
-	private static int uses;
+import java.io.File;
 
-	private PeerMap peerMap;
+//import org.mapdb.Serializer;
 
-	private static DBSet instance;
-	
-	public static boolean exists()
-	{
-		return DATA_FILE.exists();
-	}
-	
-	public static DBSet getinstanse(){
-		if(instance == null)
-		{
-			reCreateDatabase();
-		}
-		
-		return instance;
-		
-	}
-	
-	public static void reCreateDatabase() {
+public class DBSet implements IDB {
+    private static final File DATA_FILE = new File(Settings.getInstance().getLocalDir(), "data.dat");
 
-		//OPEN DB
-		//OPEN WALLET
-				DATA_FILE.getParentFile().mkdirs();
-						
-			   database = DBMaker.newFileDB(DATA_FILE)
-			    		.closeOnJvmShutdown()
-			    		//.cacheDisable()
-			    		.checksumEnable()
-			    		.mmapFileEnableIfSupported()
-						/// ICREATOR
-						.commitFileSyncDisable()
-						.transactionDisable()
-			            .make();
-			    
-			    uses = 0;
-		
-		//CREATE INSTANCE
-		instance = new DBSet();
+    private static final String VERSION = "version";
 
-		
-	}	
-	
-	private DBSet()
-	{
-			this.peerMap = new PeerMap(this, this.database);
-	}	
+    private static DB database;
+    private static int uses;
+    private static DBSet instance;
+    private PeerMap peerMap;
 
-	public PeerMap getPeerMap()
-	{
-		return this.peerMap;
-	}
-	
-	public void setVersion(int version)
-	{
-		this.uses++;
-		this.database.getAtomicInteger(VERSION).set(version);
-		this.uses--;
-	}
-	
-	public int getVersion()
-	{
-		this.uses++;
-		int u = this.database.getAtomicInteger(VERSION).intValue();
-		this.uses--;
-		return u;
-	}
-	
-	public void addUses()
-	{
-		this.uses++;
-		
-	}
-	public void outUses()
-	{
-		this.uses--;
-	}
-	
-	public boolean isBusy()
-	{
-		if (this.uses > 0) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-		
-		
-	public void commit()
-	{
-		this.uses++;
-		this.database.commit();
-		this.uses--;
+    private DBSet() {
+        this.peerMap = new PeerMap(this, this.database);
+    }
 
-	}
-	
-	public void close() 
-	{
-		if(this.database != null)
-		{
-			if(!this.database.isClosed())
-			{
-				this.uses++;
-				this.database.commit();
-				this.database.close();
-				this.uses--;
+    public static boolean exists() {
+        return DATA_FILE.exists();
+    }
 
-			}
-		}
-	}
+    public static DBSet getinstanse() {
+        if (instance == null) {
+            reCreateDatabase();
+        }
+
+        return instance;
+
+    }
+
+    public static void reCreateDatabase() {
+
+        //OPEN DB
+        //OPEN WALLET
+        DATA_FILE.getParentFile().mkdirs();
+
+        database = DBMaker.newFileDB(DATA_FILE)
+                .closeOnJvmShutdown()
+                //.cacheDisable()
+                .checksumEnable()
+                .mmapFileEnableIfSupported()
+                /// ICREATOR
+                .commitFileSyncDisable()
+                .transactionDisable()
+                .make();
+
+        uses = 0;
+
+        //CREATE INSTANCE
+        instance = new DBSet();
+
+
+    }
+
+    public PeerMap getPeerMap() {
+        return this.peerMap;
+    }
+
+    public int getVersion() {
+        this.uses++;
+        int u = this.database.getAtomicInteger(VERSION).intValue();
+        this.uses--;
+        return u;
+    }
+
+    public void setVersion(int version) {
+        this.uses++;
+        this.database.getAtomicInteger(VERSION).set(version);
+        this.uses--;
+    }
+
+    public void addUses() {
+        this.uses++;
+
+    }
+
+    public void outUses() {
+        this.uses--;
+    }
+
+    public boolean isBusy() {
+        if (this.uses > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public void commit() {
+        this.uses++;
+        this.database.commit();
+        this.uses--;
+
+    }
+
+    public void close() {
+        if (this.database != null) {
+            if (!this.database.isClosed()) {
+                this.uses++;
+                this.database.commit();
+                this.database.close();
+                this.uses--;
+
+            }
+        }
+    }
 }

@@ -1,206 +1,199 @@
 package gui.models;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import datachain.SortableList;
 import lang.Lang;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
 
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.math.BigDecimal;
+import java.util.*;
+
 @SuppressWarnings("serial")
 public class Balance_from_Adress_TableModel extends AbstractTableModel implements Observer {
-	// private static final int COLUMN_ADDRESS = 0;
-	public static final int COLUMN_D = 5;
-	public static final int COLUMN_C = 4;
-	public static final int COLUMN_B = 3;
-	public static final int COLUMN_A = 2;
-	public static final int COLUMN_ASSET_NAME = 1;
-	public static final int COLUMN_ASSET_KEY = 0;
-	List<Account> accounts;
-	Account account;
+    // private static final int COLUMN_ADDRESS = 0;
+    public static final int COLUMN_D = 5;
+    public static final int COLUMN_C = 4;
+    public static final int COLUMN_B = 3;
+    public static final int COLUMN_A = 2;
+    public static final int COLUMN_ASSET_NAME = 1;
+    public static final int COLUMN_ASSET_KEY = 0;
+    List<Account> accounts;
+    Account account;
+    Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
+    Object tab_Balances;
+    Tuple2<Long, String> asset;
+    private long key;
+    private String[] columnNames = Lang.getInstance()
+            .translate(new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"});
+    // balances;
+    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance;
+    private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1;
 
-	private long key;
-	private String[] columnNames = Lang.getInstance()
-			.translate(new String[] { "key Asset", "Asset", "Balance A", "Balance B", "Balance C" });
-	// balances;
-	private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
-	Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
-	Object tab_Balances;
-	private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance;
-	private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> table_balance1;
-	Tuple2<Long, String> asset;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public Balance_from_Adress_TableModel() {
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Balance_from_Adress_TableModel() {
+        // this.key = key;
+        Controller.getInstance().addObserver(this);
+        List<Account> accounts = Controller.getInstance().getAccounts();
+        // table_balance = new List();
+        table_balance = new ArrayList<>();// Pair();
+        table_balance1 = new ArrayList<>();
+        HashSet<Long> item;
+        item = new HashSet();
 
-		// this.key = key;
-		Controller.getInstance().addObserver(this);
-		List<Account> accounts = Controller.getInstance().getAccounts();
-		// table_balance = new List();
-		table_balance = new ArrayList<>();// Pair();
-		table_balance1 = new ArrayList<>();
-		HashSet<Long> item;
-		item = new HashSet();
+        for (int ia = 0; accounts.size() > ia; ia++) {
+            account = accounts.get(ia);
+            this.balances = Controller.getInstance().getBalances(account); // .getBalances(key);
+            for (int ib = 0; this.balances.size() > ib; ib++) {
+                balance = this.balances.get(ib);
+                table_balance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
+                item.add(balance.getA().b);
+            }
+        }
 
-		for (int ia = 0; accounts.size() > ia; ia++) {
-			account = accounts.get(ia);
-			this.balances = Controller.getInstance().getBalances(account); // .getBalances(key);
-			for (int ib = 0; this.balances.size() > ib; ib++) {
-				balance = this.balances.get(ib);
-				table_balance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
-				item.add(balance.getA().b);
-			}
-		}
+        for (Long i : item) {
+            BigDecimal sumAA = new BigDecimal(0);
+            BigDecimal sumBA = new BigDecimal(0);
+            BigDecimal sumCA = new BigDecimal(0);
+            BigDecimal sumDA = new BigDecimal(0);
+            BigDecimal sumEA = new BigDecimal(0);
+            BigDecimal sumAB = new BigDecimal(0);
+            BigDecimal sumBB = new BigDecimal(0);
+            BigDecimal sumCB = new BigDecimal(0);
+            BigDecimal sumDB = new BigDecimal(0);
+            BigDecimal sumEB = new BigDecimal(0);
+            for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.table_balance1) {
+                if (k.getB().getA().b == i) {
 
-		for (Long i : item) {
-			BigDecimal sumAA = new BigDecimal(0);
-			BigDecimal sumBA = new BigDecimal(0);
-			BigDecimal sumCA = new BigDecimal(0);
-			BigDecimal sumDA = new BigDecimal(0);
-			BigDecimal sumEA = new BigDecimal(0);
-			BigDecimal sumAB = new BigDecimal(0);
-			BigDecimal sumBB = new BigDecimal(0);
-			BigDecimal sumCB = new BigDecimal(0);
-			BigDecimal sumDB = new BigDecimal(0);
-			BigDecimal sumEB = new BigDecimal(0);
-			for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k: this.table_balance1) {
-				if (k.getB().getA().b == i ) {
+                    sumAA = sumAA.add(k.getB().getB().a.a);
+                    sumBA = sumBA.add(k.getB().getB().b.a);
+                    sumCA = sumCA.add(k.getB().getB().c.a);
+                    sumDA = sumDA.add(k.getB().getB().d.a);
+                    sumEA = sumEA.add(k.getB().getB().e.a);
 
-					sumAA = sumAA.add(k.getB().getB().a.a);
-					sumBA = sumBA.add(k.getB().getB().b.a);
-					sumCA = sumCA.add(k.getB().getB().c.a);
-					sumDA = sumDA.add(k.getB().getB().d.a);
-					sumEA = sumEA.add(k.getB().getB().e.a);
-					
-					sumAB = sumAB.add(k.getB().getB().a.b);
-					sumBB = sumBB.add(k.getB().getB().b.b);
-					sumCB = sumCB.add(k.getB().getB().c.b);
-					sumDB = sumDB.add(k.getB().getB().d.b);
-					sumEB = sumEB.add(k.getB().getB().e.b);
+                    sumAB = sumAB.add(k.getB().getB().a.b);
+                    sumBB = sumBB.add(k.getB().getB().b.b);
+                    sumCB = sumCB.add(k.getB().getB().c.b);
+                    sumDB = sumDB.add(k.getB().getB().d.b);
+                    sumEB = sumEB.add(k.getB().getB().e.b);
 
-				}
+                }
 
-			}
-			table_balance.add(new Pair(account, new Pair(i, new Tuple5(
-					new Tuple2(sumAA, sumAB), new Tuple2(sumBA, sumBB), new Tuple2(sumCA, sumCB),
-					new Tuple2(sumDA, sumDB), new Tuple2(sumEA, sumEB)))));
+            }
+            table_balance.add(new Pair(account, new Pair(i, new Tuple5(
+                    new Tuple2(sumAA, sumAB), new Tuple2(sumBA, sumBB), new Tuple2(sumCA, sumCB),
+                    new Tuple2(sumDA, sumDB), new Tuple2(sumEA, sumEB)))));
 
-		}
+        }
 
-		((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances)
-				.registerObserver();
-	}
+        ((SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>) this.balances)
+                .registerObserver();
+    }
 
-	public Class<? extends Object> getColumnClass(int c) { // set column type
-		Object o = getValueAt(0, c);
-		return o == null ? Null.class : o.getClass();
-	}
+    public Class<? extends Object> getColumnClass(int c) { // set column type
+        Object o = getValueAt(0, c);
+        return o == null ? Null.class : o.getClass();
+    }
 
-	public AssetCls getAsset(int row) {
-		return Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
-	}
+    public AssetCls getAsset(int row) {
+        return Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
+    }
 
-	public String getAccount(int row) {
-		// TODO Auto-generated method stub
-		return table_balance.get(row).getA().getAddress();
-	}
+    public String getAccount(int row) {
+        // TODO Auto-generated method stub
+        return table_balance.get(row).getA().getAddress();
+    }
 
-	@Override
-	public int getColumnCount() {
-		return columnNames.length;
-	}
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
 
-	@Override
-	public String getColumnName(int index) {
-		return columnNames[index];
-	}
+    @Override
+    public String getColumnName(int index) {
+        return columnNames[index];
+    }
 
-	@Override
-	public int getRowCount() {
+    @Override
+    public int getRowCount() {
 
-		return table_balance.size();
-	}
+        return table_balance.size();
+    }
 
-	@Override
-	public Object getValueAt(int row, int column) {
+    @Override
+    public Object getValueAt(int row, int column) {
 
-		if (table_balance == null || row > table_balance.size() - 1) {
-			return null;
-		}
+        if (table_balance == null || row > table_balance.size() - 1) {
+            return null;
+        }
 
-		AssetCls asset = Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
+        AssetCls asset = Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
 
-		// Pair<Tuple2<String, Long>, BigDecimal> sa;
+        // Pair<Tuple2<String, Long>, BigDecimal> sa;
 
-		switch (column) {
-		case COLUMN_ASSET_KEY:
+        switch (column) {
+            case COLUMN_ASSET_KEY:
 
-			return asset.getKey();
+                return asset.getKey();
 
-		case COLUMN_A:
+            case COLUMN_A:
 
-			return NumberAsString.formatAsString(table_balance.get(row).getB().getB().a.b);
+                return NumberAsString.formatAsString(table_balance.get(row).getB().getB().a.b);
 
-		case COLUMN_B:
+            case COLUMN_B:
 
-			return NumberAsString.formatAsString(table_balance.get(row).getB().getB().b.b);
+                return NumberAsString.formatAsString(table_balance.get(row).getB().getB().b.b);
 
-		case COLUMN_C:
+            case COLUMN_C:
 
-			return NumberAsString.formatAsString(table_balance.get(row).getB().getB().c.b);
+                return NumberAsString.formatAsString(table_balance.get(row).getB().getB().c.b);
 
-		//case COLUMN_D:
+            //case COLUMN_D:
 
-			//return NumberAsString.formatAsString(table_balance.get(row).getB().getB().d.b);
+            //return NumberAsString.formatAsString(table_balance.get(row).getB().getB().d.b);
 
-		case COLUMN_ASSET_NAME:
+            case COLUMN_ASSET_NAME:
 
-			return asset.viewName();
+                return asset.viewName();
 
-		}
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void update(Observable o, Object arg) {
-		try {
-			this.syncUpdate(o, arg);
-		} catch (Exception e) {
-			// GUI ERROR
-		}
-	}
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            // GUI ERROR
+        }
+    }
 
-	public synchronized void syncUpdate(Observable o, Object arg) {
-		ObserverMessage message = (ObserverMessage) arg;
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
 
-		// CHECK IF LIST UPDATED
-		if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
-				|| (Controller.getInstance().getStatus() == Controller.STATUS_OK
-						&& (message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-								|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))) {
-			this.fireTableDataChanged();
-		}
-	}
+        // CHECK IF LIST UPDATED
+        if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
+                || (Controller.getInstance().getStatus() == Controller.STATUS_OK
+                && (message.getType() == ObserverMessage.ADD_BALANCE_TYPE
+                || message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE))) {
+            this.fireTableDataChanged();
+        }
+    }
 
-	public void removeObservers() {
-		this.balances.removeObserver();
-		Controller.getInstance().deleteObserver(this);
-	}
+    public void removeObservers() {
+        this.balances.removeObserver();
+        Controller.getInstance().deleteObserver(this);
+    }
 
 }

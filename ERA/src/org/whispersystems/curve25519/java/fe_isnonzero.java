@@ -13,15 +13,14 @@ Preconditions:
    |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.
 */
 
-static final byte[] zero = new byte[32];
+    static final byte[] zero = new byte[32];
 
-@SuppressWarnings("all")
-public static int fe_isnonzero(int[] f)
-{
-  byte[] s = new byte[32];
-  fe_tobytes.fe_tobytes(s,f);
-  return crypto_verify_32.crypto_verify_32(s,zero);
-}
+    @SuppressWarnings("all")
+    public static int fe_isnonzero(int[] f) {
+        byte[] s = new byte[32];
+        fe_tobytes.fe_tobytes(s, f);
+        return crypto_verify_32.crypto_verify_32(s, zero);
+    }
 
 
 }

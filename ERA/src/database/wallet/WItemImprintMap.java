@@ -1,50 +1,45 @@
 package database.wallet;
 
-import java.util.Map;
-
+import core.item.ItemCls;
+import database.serializer.ItemSerializer;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
-
-import core.item.ItemCls;
 import utils.ObserverMessage;
-import database.serializer.ItemSerializer;
 
-public class WItemImprintMap extends WItem_Map
-{
-	
-	//static Logger LOGGER = Logger.getLogger(WItemImprintMap.class.getName());
-	static final String NAME = "imprint";
-	static final int TYPE = ItemCls.IMPRINT_TYPE;
+import java.util.Map;
+
+public class WItemImprintMap extends WItem_Map {
+
+    //static Logger LOGGER = Logger.getLogger(WItemImprintMap.class.getName());
+    static final String NAME = "imprint";
+    static final int TYPE = ItemCls.IMPRINT_TYPE;
 
 
-	public WItemImprintMap(DWSet dWSet, DB database)
-	{
-		super(dWSet, database,
-				TYPE, "item_imprints",
-				ObserverMessage.WALLET_RESET_IMPRINT_TYPE,
-				ObserverMessage.WALLET_ADD_IMPRINT_TYPE,
-				ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE,
-				ObserverMessage.WALLET_LIST_IMPRINT_TYPE
-				);
-	}
+    public WItemImprintMap(DWSet dWSet, DB database) {
+        super(dWSet, database,
+                TYPE, "item_imprints",
+                ObserverMessage.WALLET_RESET_IMPRINT_TYPE,
+                ObserverMessage.WALLET_ADD_IMPRINT_TYPE,
+                ObserverMessage.WALLET_REMOVE_IMPRINT_TYPE,
+                ObserverMessage.WALLET_LIST_IMPRINT_TYPE
+        );
+    }
 
-	public WItemImprintMap(WItemImprintMap parent) 
-	{
-		super(parent);
-	}
-	
-	@Override
-	// type+name not initialized yet! - it call as Super in New
-	protected Map<Tuple2<String, String>, ItemCls> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap(NAME)
-				.keySerializer(BTreeKeySerializer.TUPLE2)
-				.valueSerializer(new ItemSerializer(TYPE))
-				.counterEnable()
-				.makeOrGet();
-	}
+    public WItemImprintMap(WItemImprintMap parent) {
+        super(parent);
+    }
+
+    @Override
+    // type+name not initialized yet! - it call as Super in New
+    protected Map<Tuple2<String, String>, ItemCls> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap(NAME)
+                .keySerializer(BTreeKeySerializer.TUPLE2)
+                .valueSerializer(new ItemSerializer(TYPE))
+                .counterEnable()
+                .makeOrGet();
+    }
 
 
 	/*

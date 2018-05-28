@@ -30,36 +30,50 @@ package gui2;
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
- 
 
- 
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicButtonUI;
-
-import org.json.simple.JSONObject;
 
 import gui.Split_Panel;
 import gui.items.other.Other_Split_Panel;
+import org.json.simple.JSONObject;
 import settings.Settings;
 import utils.SaveStrToFile;
 
+import javax.swing.*;
+import javax.swing.plaf.basic.BasicButtonUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
- 
+
 /**
  * Component to be used as tabComponent;
- * Contains a JLabel to show the text and 
- * a JButton to close the tab it belongs to 
+ * Contains a JLabel to show the text and
+ * a JButton to close the tab it belongs to
  */
 public class ButtonTabComponent extends JPanel {
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private final JTabbedPane pane;
- 
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    private final static MouseListener buttonMouseListener = new MouseAdapter() {
+        public void mouseEntered(MouseEvent e) {
+            Component component = e.getComponent();
+            if (component instanceof AbstractButton) {
+                AbstractButton button = (AbstractButton) component;
+                button.setBorderPainted(true);
+            }
+        }
+
+        public void mouseExited(MouseEvent e) {
+            Component component = e.getComponent();
+            if (component instanceof AbstractButton) {
+                AbstractButton button = (AbstractButton) component;
+                button.setBorderPainted(false);
+            }
+        }
+    };
+    private final JTabbedPane pane;
+
     public ButtonTabComponent(final JTabbedPane pane) {
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -68,7 +82,7 @@ public class ButtonTabComponent extends JPanel {
         }
         this.pane = pane;
         setOpaque(false);
-         
+
         //make JLabel read titles from JTabbedPane
         JLabel label = new JLabel() {
             public String getText() {
@@ -76,10 +90,10 @@ public class ButtonTabComponent extends JPanel {
                 if (i != -1) {
                     return pane.getTitleAt(i);
                 }
-               return null;
+                return null;
             }
         };
-         
+
         add(label);
         //add more space between the label and the button
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
@@ -89,11 +103,11 @@ public class ButtonTabComponent extends JPanel {
         //add more space to the top of the component
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     }
- 
+
     private class TabButton extends JButton implements ActionListener {
         public TabButton() {
-            int size = UIManager.getFont("TextField.font").getSize() +4;
-            if (size <10) size = 10;
+            int size = UIManager.getFont("TextField.font").getSize() + 4;
+            if (size < 10) size = 10;
             setPreferredSize(new Dimension(size, size));
             setToolTipText("close this tab");
             //Make the button looks the same for all Laf's
@@ -111,68 +125,69 @@ public class ButtonTabComponent extends JPanel {
             //Close the proper tab by clicking the button
             addActionListener(this);
         }
- 
+
         public void actionPerformed(ActionEvent e) {
-        	
+
             int i = pane.indexOfTabComponent(ButtonTabComponent.this);
             JFrame frame1 = new JFrame();
             if (i != -1) {
-            	Component p_Comp = pane.getComponentAt(i);
-            	
-            // seve Split Panel params
-            		JSONObject settingsJSONbuf = new JSONObject();
-            		settingsJSONbuf = Settings.getInstance().Dump();
-            	   JSONObject settingsJSON = new JSONObject();
-            		if(settingsJSONbuf.containsKey("Main_Frame_Setting")) settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
-            		HashMap outTabbedDiv = new HashMap();
-            	if (p_Comp instanceof Other_Split_Panel) {
-            			Other_Split_Panel sP = ((Other_Split_Panel) p_Comp);
-            			sP.delay_on_close();
-            		}
-            	if (p_Comp instanceof Split_Panel) {
-					Split_Panel sP = ((Split_Panel) p_Comp);
-					outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation()+"");
+                Component p_Comp = pane.getComponentAt(i);
 
-					// write
+                // seve Split Panel params
+                JSONObject settingsJSONbuf = new JSONObject();
+                settingsJSONbuf = Settings.getInstance().Dump();
+                JSONObject settingsJSON = new JSONObject();
+                if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
+                    settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
+                HashMap outTabbedDiv = new HashMap();
+                if (p_Comp instanceof Other_Split_Panel) {
+                    Other_Split_Panel sP = ((Other_Split_Panel) p_Comp);
+                    sP.delay_on_close();
+                }
+                if (p_Comp instanceof Split_Panel) {
+                    Split_Panel sP = ((Split_Panel) p_Comp);
+                    outTabbedDiv.put("Div_Orientation", sP.jSplitPanel.getOrientation() + "");
 
-					int lDiv = sP.jSplitPanel.getLastDividerLocation();
-					int div = sP.jSplitPanel.getDividerLocation();
-					
+                    // write
 
-					outTabbedDiv.put("Div_Last_Loc", lDiv + "");
-					outTabbedDiv.put("Div_Loc", div + "");
+                    int lDiv = sP.jSplitPanel.getLastDividerLocation();
+                    int div = sP.jSplitPanel.getDividerLocation();
 
-					settingsJSON.put(p_Comp.getClass().getSimpleName(),
-							outTabbedDiv);
-					
-					settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
-					// save setting to setting file
-					try {
-						SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
-					} catch (IOException e1) {
-						
-						JOptionPane.showMessageDialog(frame1, "Error writing to the file: "
-								+ Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
-								JOptionPane.ERROR_MESSAGE);
-					}
-					sP.delay_on_close();
-					sP = null;
-					
-				}
+
+                    outTabbedDiv.put("Div_Last_Loc", lDiv + "");
+                    outTabbedDiv.put("Div_Loc", div + "");
+
+                    settingsJSON.put(p_Comp.getClass().getSimpleName(),
+                            outTabbedDiv);
+
+                    settingsJSONbuf.put("Main_Frame_Setting", settingsJSON);
+                    // save setting to setting file
+                    try {
+                        SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsJSONbuf);
+                    } catch (IOException e1) {
+
+                        JOptionPane.showMessageDialog(frame1, "Error writing to the file: "
+                                        + Settings.getInstance().getSettingsPath() + "\nProbably there is no access.", "Error!",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                    sP.delay_on_close();
+                    sP = null;
+
+                }
                 pane.remove(i);
                 p_Comp = null;
-                outTabbedDiv= null;
-				settingsJSON = null;
-				settingsJSONbuf = null;
-				frame1 = null;
-                
+                outTabbedDiv = null;
+                settingsJSON = null;
+                settingsJSONbuf = null;
+                frame1 = null;
+
             }
         }
- 
+
         //we don't want to update UI for this button
         public void updateUI() {
         }
- 
+
         //paint the cross
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -193,22 +208,4 @@ public class ButtonTabComponent extends JPanel {
             g2 = null;
         }
     }
- 
-    private final static MouseListener buttonMouseListener = new MouseAdapter() {
-        public void mouseEntered(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(true);
-            }
-        }
- 
-        public void mouseExited(MouseEvent e) {
-            Component component = e.getComponent();
-            if (component instanceof AbstractButton) {
-                AbstractButton button = (AbstractButton) component;
-                button.setBorderPainted(false);
-            }
-        }
-    };
 }

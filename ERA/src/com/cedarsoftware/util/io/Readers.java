@@ -3,13 +3,7 @@ package com.cedarsoftware.util.io;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Deque;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,25 +16,22 @@ import java.util.regex.Pattern;
  * primitive types and other JDK classes simply to allow for a more concise form.
  *
  * @author John DeRegnaucourt (jdereg@gmail.com)
- *         <br>
- *         Copyright (c) Cedar Software LLC
- *         <br><br>
- *         Licensed under the Apache License, Version 2.0 (the "License");
- *         you may not use this file except in compliance with the License.
- *         You may obtain a copy of the License at
- *         <br><br>
- *         http://www.apache.org/licenses/LICENSE-2.0
- *         <br><br>
- *         Unless required by applicable law or agreed to in writing, software
- *         distributed under the License is distributed on an "AS IS" BASIS,
- *         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *         See the License for the specific language governing permissions and
- *         limitations under the License.*
+ * <br>
+ * Copyright (c) Cedar Software LLC
+ * <br><br>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <br><br>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <br><br>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.*
  */
-public class Readers
-{
-    private Readers () {}
-    
+public class Readers {
     private static final String DAYS = "(monday|mon|tuesday|tues|tue|wednesday|wed|thursday|thur|thu|friday|fri|saturday|sat|sunday|sun)"; // longer before shorter matters
     private static final String MOS = "(January|Jan|February|Feb|March|Mar|April|Apr|May|June|Jun|July|Jul|August|Aug|September|Sept|Sep|October|Oct|November|Nov|December|Dec)";
     private static final Pattern datePattern1 = Pattern.compile("(\\d{4})[./-](\\d{1,2})[./-](\\d{1,2})");
@@ -55,8 +46,7 @@ public class Readers
     private static final Pattern dayPattern = Pattern.compile(DAYS, Pattern.CASE_INSENSITIVE);
     private static final Map<String, String> months = new LinkedHashMap<String, String>();
 
-    static
-    {
+    static {
         // Month name to number map
         months.put("jan", "1");
         months.put("january", "1");
@@ -84,14 +74,112 @@ public class Readers
         months.put("december", "12");
     }
 
-    public static class TimeZoneReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
-            JsonObject jObj = (JsonObject)o;
+    private Readers() {
+    }
+
+    private static Object getValueFromJsonObject(Object o, Object value, String typeName) {
+        if (o instanceof JsonObject) {
+            JsonObject jObj = (JsonObject) o;
+            if (jObj.containsKey("value")) {
+                value = jObj.get("value");
+            } else {
+                throw new JsonIoException(typeName + " defined as JSON {} object, missing 'value' field");
+            }
+        }
+        return value;
+    }
+
+    /**
+     * @param value to be converted to BigInteger.  Can be a null which will return null.  Can be
+     *              BigInteger in which case it will be returned as-is.  Can also be String, BigDecimal,
+     *              Boolean (which will be returned as BigInteger.ZERO or .ONE), byte, short, int, long, float,
+     *              or double.  If an unknown type is passed in, an exception will be thrown.
+     * @return a BigInteger from the given input.  A best attempt will be made to support
+     * as many input types as possible.  For example, if the input is a Boolean, a BigInteger of
+     * 1 or 0 will be returned.  If the input is a String "", a null will be returned.  If the
+     * input is a Double, Float, or BigDecimal, a BigInteger will be returned that retains the
+     * integer portion (fractional part is dropped).  The input can be a Byte, Short, Integer,
+     * or Long.
+     */
+    public static BigInteger bigIntegerFrom(Object value) {
+        if (value == null) {
+            return null;
+        } else if (value instanceof BigInteger) {
+            return (BigInteger) value;
+        } else if (value instanceof String) {
+            String s = (String) value;
+            if ("".equals(s.trim())) {   // Allows "" to be used to assign null to BigInteger field.
+                return null;
+            }
+            try {
+                return new BigInteger(MetaUtils.removeLeadingAndTrailingQuotes(s));
+            } catch (Exception e) {
+                throw new JsonIoException("Could not parse '" + value + "' as BigInteger.", e);
+            }
+        } else if (value instanceof BigDecimal) {
+            BigDecimal bd = (BigDecimal) value;
+            return bd.toBigInteger();
+        } else if (value instanceof Boolean) {
+            return (Boolean) value ? BigInteger.ONE : BigInteger.ZERO;
+        } else if (value instanceof Double || value instanceof Float) {
+            return new BigDecimal(((Number) value).doubleValue()).toBigInteger();
+        } else if (value instanceof Long || value instanceof Integer ||
+                value instanceof Short || value instanceof Byte) {
+            return new BigInteger(value.toString());
+        }
+        throw new JsonIoException("Could not convert value: " + value.toString() + " to BigInteger.");
+    }
+
+    /**
+     * @param value to be converted to BigDecimal.  Can be a null which will return null.  Can be
+     *              BigDecimal in which case it will be returned as-is.  Can also be String, BigInteger,
+     *              Boolean (which will be returned as BigDecimal.ZERO or .ONE), byte, short, int, long, float,
+     *              or double.  If an unknown type is passed in, an exception will be thrown.
+     * @return a BigDecimal from the given input.  A best attempt will be made to support
+     * as many input types as possible.  For example, if the input is a Boolean, a BigDecimal of
+     * 1 or 0 will be returned.  If the input is a String "", a null will be returned. The input
+     * can be a Byte, Short, Integer, Long, or BigInteger.
+     */
+    public static BigDecimal bigDecimalFrom(Object value) {
+        if (value == null) {
+            return null;
+        } else if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        } else if (value instanceof String) {
+            String s = (String) value;
+            if ("".equals(s.trim())) {
+                return null;
+            }
+            try {
+                return new BigDecimal(MetaUtils.removeLeadingAndTrailingQuotes(s));
+            } catch (Exception e) {
+                throw new JsonIoException("Could not parse '" + s + "' as BigDecimal.", e);
+            }
+        } else if (value instanceof BigInteger) {
+            return new BigDecimal((BigInteger) value);
+        } else if (value instanceof Boolean) {
+            return (Boolean) value ? BigDecimal.ONE : BigDecimal.ZERO;
+        } else if (value instanceof Long || value instanceof Integer || value instanceof Double ||
+                value instanceof Short || value instanceof Byte || value instanceof Float) {
+            return new BigDecimal(value.toString());
+        }
+        throw new JsonIoException("Could not convert value: " + value.toString() + " to BigInteger.");
+    }
+
+    // ========== Maintain dependency knowledge in once place, down here =========
+    static Class classForName(String name, ClassLoader classLoader) {
+        return MetaUtils.classForName(name, classLoader);
+    }
+
+    static Object newInstance(Class c, JsonObject jsonObject) {
+        return JsonReader.newInstance(c, jsonObject);
+    }
+
+    public static class TimeZoneReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
+            JsonObject jObj = (JsonObject) o;
             Object zone = jObj.get("zone");
-            if (zone == null)
-            {
+            if (zone == null) {
                 throw new JsonIoException("java.util.TimeZone must specify 'zone' field");
             }
             jObj.target = TimeZone.getTimeZone((String) zone);
@@ -99,25 +187,20 @@ public class Readers
         }
     }
 
-    public static class LocaleReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class LocaleReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             JsonObject jObj = (JsonObject) o;
             Object language = jObj.get("language");
-            if (language == null)
-            {
+            if (language == null) {
                 throw new JsonIoException("java.util.Locale must specify 'language' field");
             }
             Object country = jObj.get("country");
             Object variant = jObj.get("variant");
-            if (country == null)
-            {
+            if (country == null) {
                 jObj.target = new Locale((String) language);
                 return jObj.target;
             }
-            if (variant == null)
-            {
+            if (variant == null) {
                 jObj.target = new Locale((String) language, (String) country);
                 return jObj.target;
             }
@@ -127,85 +210,61 @@ public class Readers
         }
     }
 
-    public static class CalendarReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class CalendarReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             String time = null;
-            try
-            {
+            try {
                 JsonObject jObj = (JsonObject) o;
                 time = (String) jObj.get("time");
-                if (time == null)
-                {
+                if (time == null) {
                     throw new JsonIoException("Calendar missing 'time' field");
                 }
                 Date date = MetaUtils.dateFormat.get().parse(time);
                 Class c;
-                if (jObj.getTarget() != null)
-                {
+                if (jObj.getTarget() != null) {
                     c = jObj.getTarget().getClass();
-                }
-                else
-                {
+                } else {
                     Object type = jObj.type;
-                    c = classForName((String) type, (ClassLoader)args.get(JsonReader.CLASSLOADER));
+                    c = classForName((String) type, (ClassLoader) args.get(JsonReader.CLASSLOADER));
                 }
 
                 Calendar calendar = (Calendar) newInstance(c, jObj);
                 calendar.setTime(date);
                 jObj.setTarget(calendar);
                 String zone = (String) jObj.get("zone");
-                if (zone != null)
-                {
+                if (zone != null) {
                     calendar.setTimeZone(TimeZone.getTimeZone(zone));
                 }
                 return calendar;
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 throw new JsonIoException("Failed to parse calendar, time: " + time);
             }
         }
     }
 
-    public static class DateReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
-            if (o instanceof Long)
-            {
+    public static class DateReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
+            if (o instanceof Long) {
                 return new Date((Long) o);
-            }
-            else if (o instanceof String)
-            {
+            } else if (o instanceof String) {
                 return parseDate((String) o);
-            }
-            else if (o instanceof JsonObject)
-            {
+            } else if (o instanceof JsonObject) {
                 JsonObject jObj = (JsonObject) o;
                 Object val = jObj.get("value");
-                if (val instanceof Long)
-                {
+                if (val instanceof Long) {
                     return new Date((Long) val);
-                }
-                else if (val instanceof String)
-                {
+                } else if (val instanceof String) {
                     return parseDate((String) val);
                 }
                 throw new JsonIoException("Unable to parse date: " + o);
-            }
-            else
-            {
+            } else {
                 throw new JsonIoException("Unable to parse date, encountered unknown object: " + o);
             }
         }
 
-        private Date parseDate(String dateStr)
-        {
+        private Date parseDate(String dateStr) {
             dateStr = dateStr.trim();
-            if (dateStr.isEmpty())
-            {
+            if (dateStr.isEmpty()) {
                 return null;
             }
 
@@ -214,58 +273,42 @@ public class Readers
 
             String year, month = null, day, mon = null, remains;
 
-            if (matcher.find())
-            {
+            if (matcher.find()) {
                 year = matcher.group(1);
                 month = matcher.group(2);
                 day = matcher.group(3);
                 remains = matcher.replaceFirst("");
-            }
-            else
-            {
+            } else {
                 matcher = datePattern2.matcher(dateStr);
-                if (matcher.find())
-                {
+                if (matcher.find()) {
                     month = matcher.group(1);
                     day = matcher.group(2);
                     year = matcher.group(3);
                     remains = matcher.replaceFirst("");
-                }
-                else
-                {
+                } else {
                     matcher = datePattern3.matcher(dateStr);
-                    if (matcher.find())
-                    {
+                    if (matcher.find()) {
                         mon = matcher.group(1);
                         day = matcher.group(2);
                         year = matcher.group(4);
                         remains = matcher.replaceFirst("");
-                    }
-                    else
-                    {
+                    } else {
                         matcher = datePattern4.matcher(dateStr);
-                        if (matcher.find())
-                        {
+                        if (matcher.find()) {
                             day = matcher.group(1);
                             mon = matcher.group(3);
                             year = matcher.group(4);
                             remains = matcher.replaceFirst("");
-                        }
-                        else
-                        {
+                        } else {
                             matcher = datePattern5.matcher(dateStr);
-                            if (matcher.find())
-                            {
+                            if (matcher.find()) {
                                 year = matcher.group(1);
                                 mon = matcher.group(2);
                                 day = matcher.group(3);
                                 remains = matcher.replaceFirst("");
-                            }
-                            else
-                            {
+                            } else {
                                 matcher = datePattern6.matcher(dateStr);
-                                if (!matcher.find())
-                                {
+                                if (!matcher.find()) {
                                     throw new JsonIoException("Unable to parse: " + dateStr);
                                 }
                                 year = matcher.group(5);
@@ -278,8 +321,7 @@ public class Readers
                 }
             }
 
-            if (mon != null)
-            {   // Month will always be in Map, because regex forces this.
+            if (mon != null) {   // Month will always be in Map, because regex forces this.
                 month = months.get(mon.trim().toLowerCase());
             }
 
@@ -287,82 +329,61 @@ public class Readers
             String hour = null, min = null, sec = "00", milli = "0", tz = null;
             remains = remains.trim();
             matcher = timePattern1.matcher(remains);
-            if (matcher.find())
-            {
+            if (matcher.find()) {
                 hour = matcher.group(1);
                 min = matcher.group(2);
                 sec = matcher.group(3);
                 milli = matcher.group(4);
-                if (matcher.groupCount() > 4)
-                {
+                if (matcher.groupCount() > 4) {
                     tz = matcher.group(5);
                 }
-            }
-            else
-            {
+            } else {
                 matcher = timePattern2.matcher(remains);
-                if (matcher.find())
-                {
+                if (matcher.find()) {
                     hour = matcher.group(1);
                     min = matcher.group(2);
                     sec = matcher.group(3);
-                    if (matcher.groupCount() > 3)
-                    {
+                    if (matcher.groupCount() > 3) {
                         tz = matcher.group(4);
                     }
-                }
-                else
-                {
+                } else {
                     matcher = timePattern3.matcher(remains);
-                    if (matcher.find())
-                    {
+                    if (matcher.find()) {
                         hour = matcher.group(1);
                         min = matcher.group(2);
-                        if (matcher.groupCount() > 2)
-                        {
+                        if (matcher.groupCount() > 2) {
                             tz = matcher.group(3);
                         }
-                    }
-                    else
-                    {
+                    } else {
                         matcher = null;
                     }
                 }
             }
 
-            if (matcher != null)
-            {
+            if (matcher != null) {
                 remains = matcher.replaceFirst("");
             }
 
             // Clear out day of week (mon, tue, wed, ...)
-            if (remains != null && remains.length() > 0)
-            {
+            if (remains != null && remains.length() > 0) {
                 Matcher dayMatcher = dayPattern.matcher(remains);
-                if (dayMatcher.find())
-                {
+                if (dayMatcher.find()) {
                     remains = dayMatcher.replaceFirst("").trim();
                 }
             }
-            if (remains != null && remains.length() > 0)
-            {
+            if (remains != null && remains.length() > 0) {
                 remains = remains.trim();
-                if (!remains.equals(",") && (!remains.equals("T")))
-                {
+                if (!remains.equals(",") && (!remains.equals("T"))) {
                     throw new JsonIoException("Issue parsing data/time, other characters present: " + remains);
                 }
             }
 
             Calendar c = Calendar.getInstance();
             c.clear();
-            if (tz != null)
-            {
-                if ("z".equalsIgnoreCase(tz))
-                {
+            if (tz != null) {
+                if ("z".equalsIgnoreCase(tz)) {
                     c.setTimeZone(TimeZone.getTimeZone("GMT"));
-                }
-                else
-                {
+                } else {
                     c.setTimeZone(TimeZone.getTimeZone("GMT" + tz));
                 }
             }
@@ -372,37 +393,29 @@ public class Readers
             int m = Integer.parseInt(month) - 1;    // months are 0-based
             int d = Integer.parseInt(day);
 
-            if (m < 0 || m > 11)
-            {
+            if (m < 0 || m > 11) {
                 throw new JsonIoException("Month must be between 1 and 12 inclusive, date: " + dateStr);
             }
-            if (d < 1 || d > 31)
-            {
+            if (d < 1 || d > 31) {
                 throw new JsonIoException("Day must be between 1 and 31 inclusive, date: " + dateStr);
             }
 
-            if (matcher == null)
-            {   // no [valid] time portion
+            if (matcher == null) {   // no [valid] time portion
                 c.set(y, m, d);
-            }
-            else
-            {
+            } else {
                 // Regex prevents these from ever failing to parse.
                 int h = Integer.parseInt(hour);
                 int mn = Integer.parseInt(min);
                 int s = Integer.parseInt(sec);
                 int ms = Integer.parseInt(milli);
 
-                if (h > 23)
-                {
+                if (h > 23) {
                     throw new JsonIoException("Hour must be between 0 and 23 inclusive, time: " + dateStr);
                 }
-                if (mn > 59)
-                {
+                if (mn > 59) {
                     throw new JsonIoException("Minute must be between 0 and 59 inclusive, time: " + dateStr);
                 }
-                if (s > 59)
-                {
+                if (s > 59) {
                     throw new JsonIoException("Second must be between 0 and 59 inclusive, time: " + dateStr);
                 }
 
@@ -414,31 +427,24 @@ public class Readers
         }
     }
 
-    public static class SqlDateReader extends DateReader
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class SqlDateReader extends DateReader {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             return new java.sql.Date(((Date) super.read(o, stack, args)).getTime());
         }
     }
 
-    public static class StringReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
-            if (o instanceof String)
-            {
+    public static class StringReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
+            if (o instanceof String) {
                 return o;
             }
 
-            if (MetaUtils.isPrimitive(o.getClass()))
-            {
+            if (MetaUtils.isPrimitive(o.getClass())) {
                 return o.toString();
             }
 
             JsonObject jObj = (JsonObject) o;
-            if (jObj.containsKey("value"))
-            {
+            if (jObj.containsKey("value")) {
                 jObj.target = jObj.get("value");
                 return jObj.target;
             }
@@ -446,158 +452,104 @@ public class Readers
         }
     }
 
-    public static class ClassReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
-            if (o instanceof String)
-            {
-                return classForName((String) o, (ClassLoader)args.get(JsonReader.CLASSLOADER));
+    public static class ClassReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
+            if (o instanceof String) {
+                return classForName((String) o, (ClassLoader) args.get(JsonReader.CLASSLOADER));
             }
 
             JsonObject jObj = (JsonObject) o;
-            if (jObj.containsKey("value"))
-            {
-                jObj.target = classForName((String) jObj.get("value"), (ClassLoader)args.get(JsonReader.CLASSLOADER));
+            if (jObj.containsKey("value")) {
+                jObj.target = classForName((String) jObj.get("value"), (ClassLoader) args.get(JsonReader.CLASSLOADER));
                 return jObj.target;
             }
             throw new JsonIoException("Class missing 'value' field");
         }
     }
 
-    public static class AtomicBooleanReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class AtomicBooleanReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             Object value = o;
             value = getValueFromJsonObject(o, value, "AtomicBoolean");
 
-            if (value instanceof String)
-            {
+            if (value instanceof String) {
                 String state = (String) value;
-                if ("".equals(state.trim()))
-                {   // special case
+                if ("".equals(state.trim())) {   // special case
                     return null;
                 }
                 return new AtomicBoolean("true".equalsIgnoreCase(state));
-            }
-            else if (value instanceof Boolean)
-            {
+            } else if (value instanceof Boolean) {
                 return new AtomicBoolean((Boolean) value);
-            }
-            else if (value instanceof Number && !(value instanceof Double) && !(value instanceof Float))
-            {
-                return new AtomicBoolean(((Number)value).longValue() != 0);
+            } else if (value instanceof Number && !(value instanceof Double) && !(value instanceof Float)) {
+                return new AtomicBoolean(((Number) value).longValue() != 0);
             }
             throw new JsonIoException("Unknown value in JSON assigned to AtomicBoolean, value type = " + value.getClass().getName());
         }
     }
 
-    public static class AtomicIntegerReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class AtomicIntegerReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             Object value = o;
             value = getValueFromJsonObject(o, value, "AtomicInteger");
 
-            if (value instanceof String)
-            {
+            if (value instanceof String) {
                 String num = (String) value;
-                if ("".equals(num.trim()))
-                {   // special case
+                if ("".equals(num.trim())) {   // special case
                     return null;
                 }
                 return new AtomicInteger(Integer.parseInt(MetaUtils.removeLeadingAndTrailingQuotes(num)));
-            }
-            else if (value instanceof Number && !(value instanceof Double) && !(value instanceof Float))
-            {
-                return new AtomicInteger(((Number)value).intValue());
+            } else if (value instanceof Number && !(value instanceof Double) && !(value instanceof Float)) {
+                return new AtomicInteger(((Number) value).intValue());
             }
             throw new JsonIoException("Unknown value in JSON assigned to AtomicInteger, value type = " + value.getClass().getName());
         }
     }
 
-    public static class AtomicLongReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class AtomicLongReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             Object value = o;
             value = getValueFromJsonObject(o, value, "AtomicLong");
 
-            if (value instanceof String)
-            {
+            if (value instanceof String) {
                 String num = (String) value;
-                if ("".equals(num.trim()))
-                {   // special case
+                if ("".equals(num.trim())) {   // special case
                     return null;
                 }
                 return new AtomicLong(Long.parseLong(MetaUtils.removeLeadingAndTrailingQuotes(num)));
-            }
-            else if (value instanceof Number && !(value instanceof Double) && !(value instanceof Float))
-            {
-                return new AtomicLong(((Number)value).longValue());
+            } else if (value instanceof Number && !(value instanceof Double) && !(value instanceof Float)) {
+                return new AtomicLong(((Number) value).longValue());
             }
             throw new JsonIoException("Unknown value in JSON assigned to AtomicLong, value type = " + value.getClass().getName());
         }
     }
 
-    private static Object getValueFromJsonObject(Object o, Object value, String typeName)
-    {
-        if (o instanceof JsonObject)
-        {
-            JsonObject jObj = (JsonObject) o;
-            if (jObj.containsKey("value"))
-            {
-                value = jObj.get("value");
-            }
-            else
-            {
-                throw new JsonIoException(typeName + " defined as JSON {} object, missing 'value' field");
-            }
-        }
-        return value;
-    }
-
-    public static class BigIntegerReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class BigIntegerReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             JsonObject jObj = null;
             Object value = o;
-            if (o instanceof JsonObject)
-            {
+            if (o instanceof JsonObject) {
                 jObj = (JsonObject) o;
-                if (jObj.containsKey("value"))
-                {
+                if (jObj.containsKey("value")) {
                     value = jObj.get("value");
-                }
-                else
-                {
+                } else {
                     throw new JsonIoException("BigInteger missing 'value' field");
                 }
             }
 
-            if (value instanceof JsonObject)
-            {
-                JsonObject valueObj = (JsonObject)value;
-                if ("java.math.BigDecimal".equals(valueObj.type))
-                {
+            if (value instanceof JsonObject) {
+                JsonObject valueObj = (JsonObject) value;
+                if ("java.math.BigDecimal".equals(valueObj.type)) {
                     BigDecimalReader reader = new BigDecimalReader();
                     value = reader.read(value, stack, args);
-                }
-                else if ("java.math.BigInteger".equals(valueObj.type))
-                {
+                } else if ("java.math.BigInteger".equals(valueObj.type)) {
                     value = read(value, stack, args);
-                }
-                else
-                {
+                } else {
                     return bigIntegerFrom(valueObj.get("value"));
                 }
             }
 
             BigInteger x = bigIntegerFrom(value);
-            if (jObj != null)
-            {
+            if (jObj != null) {
                 jObj.target = x;
             }
 
@@ -605,176 +557,47 @@ public class Readers
         }
     }
 
-    /**
-     * @param value to be converted to BigInteger.  Can be a null which will return null.  Can be
-     * BigInteger in which case it will be returned as-is.  Can also be String, BigDecimal,
-     * Boolean (which will be returned as BigInteger.ZERO or .ONE), byte, short, int, long, float,
-     * or double.  If an unknown type is passed in, an exception will be thrown.
-     * @return a BigInteger from the given input.  A best attempt will be made to support
-     * as many input types as possible.  For example, if the input is a Boolean, a BigInteger of
-     * 1 or 0 will be returned.  If the input is a String "", a null will be returned.  If the
-     * input is a Double, Float, or BigDecimal, a BigInteger will be returned that retains the
-     * integer portion (fractional part is dropped).  The input can be a Byte, Short, Integer,
-     * or Long.
-     */
-    public static BigInteger bigIntegerFrom(Object value)
-    {
-        if (value == null)
-        {
-            return null;
-        }
-        else if (value instanceof BigInteger)
-        {
-            return (BigInteger) value;
-        }
-        else if (value instanceof String)
-        {
-            String s = (String) value;
-            if ("".equals(s.trim()))
-            {   // Allows "" to be used to assign null to BigInteger field.
-                return null;
-            }
-            try
-            {
-                return new BigInteger(MetaUtils.removeLeadingAndTrailingQuotes(s));
-            }
-            catch (Exception e)
-            {
-                throw new JsonIoException("Could not parse '" + value + "' as BigInteger.", e);
-            }
-        }
-        else if (value instanceof BigDecimal)
-        {
-            BigDecimal bd = (BigDecimal) value;
-            return bd.toBigInteger();
-        }
-        else if (value instanceof Boolean)
-        {
-            return (Boolean) value ? BigInteger.ONE : BigInteger.ZERO;
-        }
-        else if (value instanceof Double || value instanceof Float)
-        {
-            return new BigDecimal(((Number)value).doubleValue()).toBigInteger();
-        }
-        else if (value instanceof Long || value instanceof Integer ||
-                value instanceof Short || value instanceof Byte)
-        {
-            return new BigInteger(value.toString());
-        }
-        throw new JsonIoException("Could not convert value: " + value.toString() + " to BigInteger.");
-    }
-
-    public static class BigDecimalReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class BigDecimalReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             JsonObject jObj = null;
             Object value = o;
-            if (o instanceof JsonObject)
-            {
+            if (o instanceof JsonObject) {
                 jObj = (JsonObject) o;
-                if (jObj.containsKey("value"))
-                {
+                if (jObj.containsKey("value")) {
                     value = jObj.get("value");
-                }
-                else
-                {
+                } else {
                     throw new JsonIoException("BigDecimal missing 'value' field");
                 }
             }
 
-            if (value instanceof JsonObject)
-            {
-                JsonObject valueObj = (JsonObject)value;
-                if ("java.math.BigInteger".equals(valueObj.type))
-                {
+            if (value instanceof JsonObject) {
+                JsonObject valueObj = (JsonObject) value;
+                if ("java.math.BigInteger".equals(valueObj.type)) {
                     BigIntegerReader reader = new BigIntegerReader();
                     value = reader.read(value, stack, args);
-                }
-                else if ("java.math.BigDecimal".equals(valueObj.type))
-                {
+                } else if ("java.math.BigDecimal".equals(valueObj.type)) {
                     value = read(value, stack, args);
-                }
-                else
-                {
+                } else {
                     return bigDecimalFrom(valueObj.get("value"));
                 }
             }
 
             BigDecimal x = bigDecimalFrom(value);
-            if (jObj != null)
-            {
+            if (jObj != null) {
                 jObj.target = x;
             }
             return x;
         }
     }
 
-    /**
-     * @param value to be converted to BigDecimal.  Can be a null which will return null.  Can be
-     * BigDecimal in which case it will be returned as-is.  Can also be String, BigInteger,
-     * Boolean (which will be returned as BigDecimal.ZERO or .ONE), byte, short, int, long, float,
-     * or double.  If an unknown type is passed in, an exception will be thrown.
-     *
-     * @return a BigDecimal from the given input.  A best attempt will be made to support
-     * as many input types as possible.  For example, if the input is a Boolean, a BigDecimal of
-     * 1 or 0 will be returned.  If the input is a String "", a null will be returned. The input
-     * can be a Byte, Short, Integer, Long, or BigInteger.
-     */
-    public static BigDecimal bigDecimalFrom(Object value)
-    {
-        if (value == null)
-        {
-            return null;
-        }
-        else if (value instanceof BigDecimal)
-        {
-            return (BigDecimal) value;
-        }
-        else if (value instanceof String)
-        {
-            String s = (String) value;
-            if ("".equals(s.trim()))
-            {
-                return null;
-            }
-            try
-            {
-                return new BigDecimal(MetaUtils.removeLeadingAndTrailingQuotes(s));
-            }
-            catch (Exception e)
-            {
-                throw new JsonIoException("Could not parse '" + s + "' as BigDecimal.", e);
-            }
-        }
-        else if (value instanceof BigInteger)
-        {
-            return new BigDecimal((BigInteger) value);
-        }
-        else if (value instanceof Boolean)
-        {
-            return (Boolean) value ? BigDecimal.ONE : BigDecimal.ZERO;
-        }
-        else if (value instanceof Long || value instanceof Integer || value instanceof Double ||
-                value instanceof Short || value instanceof Byte || value instanceof Float)
-        {
-            return new BigDecimal(value.toString());
-        }
-        throw new JsonIoException("Could not convert value: " + value.toString() + " to BigInteger.");
-    }
-
-    public static class StringBuilderReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
-            if (o instanceof String)
-            {
+    public static class StringBuilderReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
+            if (o instanceof String) {
                 return new StringBuilder((String) o);
             }
 
             JsonObject jObj = (JsonObject) o;
-            if (jObj.containsKey("value"))
-            {
+            if (jObj.containsKey("value")) {
                 jObj.target = new StringBuilder((String) jObj.get("value"));
                 return jObj.target;
             }
@@ -782,18 +605,14 @@ public class Readers
         }
     }
 
-    public static class StringBufferReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
-            if (o instanceof String)
-            {
+    public static class StringBufferReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
+            if (o instanceof String) {
                 return new StringBuffer((String) o);
             }
 
             JsonObject jObj = (JsonObject) o;
-            if (jObj.containsKey("value"))
-            {
+            if (jObj.containsKey("value")) {
                 jObj.target = new StringBuffer((String) jObj.get("value"));
                 return jObj.target;
             }
@@ -801,19 +620,15 @@ public class Readers
         }
     }
 
-    public static class TimestampReader implements JsonReader.JsonClassReaderEx
-    {
-        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args)
-        {
+    public static class TimestampReader implements JsonReader.JsonClassReaderEx {
+        public Object read(Object o, Deque<JsonObject<String, Object>> stack, Map<String, Object> args) {
             JsonObject jObj = (JsonObject) o;
             Object time = jObj.get("time");
-            if (time == null)
-            {
+            if (time == null) {
                 throw new JsonIoException("java.sql.Timestamp must specify 'time' field");
             }
             Object nanos = jObj.get("nanos");
-            if (nanos == null)
-            {
+            if (nanos == null) {
                 jObj.target = new Timestamp(Long.valueOf((String) time));
                 return jObj.target;
             }
@@ -823,16 +638,5 @@ public class Readers
             jObj.target = tstamp;
             return jObj.target;
         }
-    }
-
-    // ========== Maintain dependency knowledge in once place, down here =========
-    static Class classForName(String name, ClassLoader classLoader)
-    {
-        return MetaUtils.classForName(name, classLoader);
-    }
-
-    static Object newInstance(Class c, JsonObject jsonObject)
-    {
-        return JsonReader.newInstance(c, jsonObject);
     }
 }

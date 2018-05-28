@@ -28,31 +28,29 @@ import java.util.Map;
  * read it in a JSON graph (any JSON graph), return the equivalent maps, allow mutations of
  * those maps, and finally this graph can be written out.
  * </p>
+ *
  * @author John DeRegnaucourt (jdereg@gmail.com)
- *         <br>
- *         Copyright (c) Cedar Software LLC
- *         <br><br>
- *         Licensed under the Apache License, Version 2.0 (the "License");
- *         you may not use this file except in compliance with the License.
- *         You may obtain a copy of the License at
- *         <br><br>
- *         http://www.apache.org/licenses/LICENSE-2.0
- *         <br><br>
- *         Unless required by applicable law or agreed to in writing, software
- *         distributed under the License is distributed on an "AS IS" BASIS,
- *         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *         See the License for the specific language governing permissions and
- *         limitations under the License.
+ * <br>
+ * Copyright (c) Cedar Software LLC
+ * <br><br>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <br><br>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <br><br>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-public class MapResolver extends Resolver
-{
-    protected MapResolver(JsonReader reader)
-    {
+public class MapResolver extends Resolver {
+    protected MapResolver(JsonReader reader) {
         super(reader);
     }
 
-    protected Object readIfMatching(Object o, Class compType, Deque<JsonObject<String, Object>> stack)
-    {
+    protected Object readIfMatching(Object o, Class compType, Deque<JsonObject<String, Object>> stack) {
         // No custom reader support for maps
         return null;
     }
@@ -61,30 +59,24 @@ public class MapResolver extends Resolver
      * Walk the JsonObject fields and perform necessary substitutions so that all references matched up.
      * This code patches @ref and @id pairings up, in the 'Map of Map' mode.  Where the JSON may contain
      * an @id of an object which can have more than one @ref to it, this code will make sure that each
-     * @ref (value side of the Map associated to a given field name) will be pointer to the appropriate Map
-     * instance.
+     *
      * @param stack   Stack (Deque) used for graph traversal.
      * @param jsonObj a Map-of-Map representation of the current object being examined (containing all fields).
+     * @ref (value side of the Map associated to a given field name) will be pointer to the appropriate Map
+     * instance.
      */
-    public void traverseFields(final Deque<JsonObject<String, Object>> stack, final JsonObject<String, Object> jsonObj)
-    {
+    public void traverseFields(final Deque<JsonObject<String, Object>> stack, final JsonObject<String, Object> jsonObj) {
         final Object target = jsonObj.target;
-        for (Map.Entry<String, Object> e : jsonObj.entrySet())
-        {
+        for (Map.Entry<String, Object> e : jsonObj.entrySet()) {
             final String fieldName = e.getKey();
             final Field field = (target != null) ? MetaUtils.getField(target.getClass(), fieldName) : null;
             final Object rhs = e.getValue();
 
-            if (rhs == null)
-            {
+            if (rhs == null) {
                 jsonObj.put(fieldName, null);
-            }
-            else if (rhs == JsonParser.EMPTY_OBJECT)
-            {
+            } else if (rhs == JsonParser.EMPTY_OBJECT) {
                 jsonObj.put(fieldName, new JsonObject());
-            }
-            else if (rhs.getClass().isArray())
-            {   // RHS is an array
+            } else if (rhs.getClass().isArray()) {   // RHS is an array
                 // Trace the contents of the array (so references inside the array and into the array work)
                 JsonObject<String, Object> jsonArray = new JsonObject<String, Object>();
                 jsonArray.put("@items", rhs);
@@ -92,53 +84,36 @@ public class MapResolver extends Resolver
 
                 // Assign the array directly to the Map key (field name)
                 jsonObj.put(fieldName, rhs);
-            }
-            else if (rhs instanceof JsonObject)
-            {
+            } else if (rhs instanceof JsonObject) {
                 JsonObject<String, Object> jObj = (JsonObject) rhs;
-                if (field != null && JsonObject.isPrimitiveWrapper(field.getType()))
-                {
+                if (field != null && JsonObject.isPrimitiveWrapper(field.getType())) {
                     jObj.put("value", MetaUtils.newPrimitiveWrapper(field.getType(), jObj.get("value")));
                     continue;
                 }
                 Long refId = jObj.getReferenceId();
 
-                if (refId != null)
-                {    // Correct field references
+                if (refId != null) {    // Correct field references
                     JsonObject refObject = getReferencedObj(refId);
                     jsonObj.put(fieldName, refObject);    // Update Map-of-Maps reference
-                }
-                else
-                {
+                } else {
                     stack.addFirst(jObj);
                 }
-            }
-            else if (field != null)
-            {   // The code below is 'upgrading' the RHS values in the passed in JsonObject Map
+            } else if (field != null) {   // The code below is 'upgrading' the RHS values in the passed in JsonObject Map
                 // by using the @type class name (when specified and exists), to coerce the vanilla
                 // JSON values into the proper types defined by the class listed in @type.  This is
                 // a cool feature of json-io, that even when reading a map-of-maps JSON file, it will
                 // improve the final types of values in the maps RHS, to be of the field type that
                 // was optionally specified in @type.
                 final Class fieldType = field.getType();
-                if (MetaUtils.isPrimitive(fieldType))
-                {
+                if (MetaUtils.isPrimitive(fieldType)) {
                     jsonObj.put(fieldName, MetaUtils.newPrimitiveWrapper(fieldType, rhs));
-                }
-                else if (BigDecimal.class == fieldType)
-                {
+                } else if (BigDecimal.class == fieldType) {
                     jsonObj.put(fieldName, Readers.bigDecimalFrom(rhs));
-                }
-                else if (BigInteger.class == fieldType)
-                {
+                } else if (BigInteger.class == fieldType) {
                     jsonObj.put(fieldName, Readers.bigIntegerFrom(rhs));
-                }
-                else if (rhs instanceof String)
-                {
-                    if (fieldType != String.class && fieldType != StringBuilder.class && fieldType != StringBuffer.class)
-                    {
-                        if ("".equals(((String)rhs).trim()))
-                        {   // Allow "" to null out a non-String field on the inbound JSON
+                } else if (rhs instanceof String) {
+                    if (fieldType != String.class && fieldType != StringBuilder.class && fieldType != StringBuffer.class) {
+                        if ("".equals(((String) rhs).trim())) {   // Allow "" to null out a non-String field on the inbound JSON
                             jsonObj.put(fieldName, null);
                         }
                     }
@@ -155,48 +130,39 @@ public class MapResolver extends Resolver
      * are filled in later.  For an indexable collection, the unresolved references are set
      * back into the proper element location.  For non-indexable collections (Sets), the
      * unresolved references are added via .add().
+     *
      * @param stack   a Stack (Deque) used to support graph traversal.
      * @param jsonObj a Map-of-Map representation of the JSON input stream.
      */
-    protected void traverseCollection(final Deque<JsonObject<String, Object>> stack, final JsonObject<String, Object> jsonObj)
-    {
+    protected void traverseCollection(final Deque<JsonObject<String, Object>> stack, final JsonObject<String, Object> jsonObj) {
         final Object[] items = jsonObj.getArray();
-        if (items == null || items.length == 0)
-        {
+        if (items == null || items.length == 0) {
             return;
         }
 
         int idx = 0;
         final List copy = new ArrayList(items.length);
 
-        for (Object element : items)
-        {
-            if (element == JsonParser.EMPTY_OBJECT)
-            {
+        for (Object element : items) {
+            if (element == JsonParser.EMPTY_OBJECT) {
                 copy.add(new JsonObject());
                 continue;
             }
 
             copy.add(element);
 
-            if (element instanceof Object[])
-            {   // array element inside Collection
+            if (element instanceof Object[]) {   // array element inside Collection
                 JsonObject<String, Object> jsonObject = new JsonObject<String, Object>();
                 jsonObject.put("@items", element);
                 stack.addFirst(jsonObject);
-            }
-            else if (element instanceof JsonObject)
-            {
+            } else if (element instanceof JsonObject) {
                 JsonObject<String, Object> jsonObject = (JsonObject<String, Object>) element;
                 Long refId = jsonObject.getReferenceId();
 
-                if (refId != null)
-                {    // connect reference
+                if (refId != null) {    // connect reference
                     JsonObject refObject = getReferencedObj(refId);
                     copy.set(idx, refObject);
-                }
-                else
-                {
+                } else {
                     stack.addFirst(jsonObject);
                 }
             }
@@ -204,14 +170,12 @@ public class MapResolver extends Resolver
         }
         jsonObj.target = null;  // don't waste space (used for typed return, not generic Map return)
 
-        for (int i=0; i < items.length; i++)
-        {
+        for (int i = 0; i < items.length; i++) {
             items[i] = copy.get(i);
         }
     }
 
-    protected void traverseArray(Deque<JsonObject<String, Object>> stack, JsonObject<String, Object> jsonObj)
-    {
+    protected void traverseArray(Deque<JsonObject<String, Object>> stack, JsonObject<String, Object> jsonObj) {
         traverseCollection(stack, jsonObj);
     }
 }

@@ -1,52 +1,51 @@
 package datachain;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LocalDataMap extends DCMap<String, String> {
 
-	public static final String LOCAL_DATA_VERSION_KEY = "dataversion";
-	
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+    public static final String LOCAL_DATA_VERSION_KEY = "dataversion";
 
-	public LocalDataMap(DCSet databaseSet, DB database) {
-		super(databaseSet, database);
-	}
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public LocalDataMap(DCMap<String,String> parent) {
-		super(parent, null);
-	}
+    public LocalDataMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
+    }
 
-	
-	
-	@Override
-	protected Map<String, String> getMap(DB database) {
-		/// OPEN MAP
-		BTreeMapMaker createTreeMap = database.createTreeMap("LocalDataMap");
-		return createTreeMap.makeOrGet();
-	}
-
-	@Override
-	protected Map<String, String> getMemoryMap() {
-		return new HashMap<String, String>();
-	}
+    public LocalDataMap(DCMap<String, String> parent) {
+        super(parent, null);
+    }
 
 
-	@Override
-	protected Map<Integer, Integer> getObservableData() {
-		return this.observableData;
-	}
+    @Override
+    protected Map<String, String> getMap(DB database) {
+        /// OPEN MAP
+        BTreeMapMaker createTreeMap = database.createTreeMap("LocalDataMap");
+        return createTreeMap.makeOrGet();
+    }
 
-	@Override
-	protected void createIndexes(DB database) {
-	}
+    @Override
+    protected Map<String, String> getMemoryMap() {
+        return new HashMap<String, String>();
+    }
 
-	@Override
-	protected String getDefaultValue() {
-		return null;
-	}
+
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
+
+    @Override
+    protected void createIndexes(DB database) {
+    }
+
+    @Override
+    protected String getDefaultValue() {
+        return null;
+    }
 
 }

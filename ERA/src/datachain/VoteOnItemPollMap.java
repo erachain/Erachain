@@ -1,15 +1,6 @@
 package datachain;
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NavigableSet;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import database.DBMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -17,194 +8,180 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import database.DBMap;
+import java.math.BigInteger;
+import java.util.*;
 
 // POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
 // byte[] - un CORAMPABLE
-public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> 
-{
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	public VoteOnItemPollMap(DCSet databaseSet, DB database)
-	{
-		super(databaseSet, database);
+    public VoteOnItemPollMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
 
-		if (databaseSet.isWithObserver()) {
-			this.observableData.put(DBMap.NOTIFY_RESET, utils.ObserverMessage.RESET_VOTEPOLL_TYPE);
-			if (databaseSet.isDynamicGUI()) {
-				this.observableData.put(DBMap.NOTIFY_ADD, utils.ObserverMessage.ADD_VOTEPOLL_TYPE);
-				this.observableData.put(DBMap.NOTIFY_REMOVE, utils.ObserverMessage.REMOVE_VOTEPOLL_TYPE);
-			}
-			this.observableData.put(DBMap.NOTIFY_LIST, utils.ObserverMessage.LIST_VOTEPOLL_TYPE);
-		}
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, utils.ObserverMessage.RESET_VOTEPOLL_TYPE);
+            if (databaseSet.isDynamicGUI()) {
+                this.observableData.put(DBMap.NOTIFY_ADD, utils.ObserverMessage.ADD_VOTEPOLL_TYPE);
+                this.observableData.put(DBMap.NOTIFY_REMOVE, utils.ObserverMessage.REMOVE_VOTEPOLL_TYPE);
+            }
+            this.observableData.put(DBMap.NOTIFY_LIST, utils.ObserverMessage.LIST_VOTEPOLL_TYPE);
+        }
 
-	}
+    }
 
-	public VoteOnItemPollMap(VoteOnItemPollMap parent) 
-	{
-		super(parent, null);
-	}
-	
-	protected void createIndexes(DB database){}
+    public VoteOnItemPollMap(VoteOnItemPollMap parent) {
+        super(parent, null);
+    }
 
-	@Override
-	protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap("vote_item_poll")
-				.keySerializer(BTreeKeySerializer.TUPLE3)
-				.counterEnable()
-				.makeOrGet();
-	}
+    protected void createIndexes(DB database) {
+    }
 
-	@Override
-	protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMemoryMap() 
-	{
-		return new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
-	}
+    @Override
+    protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap("vote_item_poll")
+                .keySerializer(BTreeKeySerializer.TUPLE3)
+                .counterEnable()
+                .makeOrGet();
+    }
 
-	@Override
-	protected Stack<Tuple2<Integer, Integer>> getDefaultValue() 
-	{
-		return null;
-	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public NavigableSet<Tuple3> getVotes(Long pollKey)
-	{
-		BTreeMap map = (BTreeMap) this.map;
-		//FILTER ALL KEYS
-		NavigableSet<Tuple3> keys = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
-				Fun.t3(pollKey, null, null),
-				Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI()))
-					.keySet();
+    @Override
+    protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMemoryMap() {
+        return new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
+    }
 
-		
-		
-		//RETURN
-		return keys;
-	}
-	
-	public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes_1(Long pollKey){
-		@SuppressWarnings("rawtypes")
-		BTreeMap map = (BTreeMap) this.map;
-		Set ss = new TreeSet();
-		@SuppressWarnings("unchecked")
-		NavigableSet<Tuple3<Long, Integer, BigInteger>> ks = map.keySet();
-		Iterator<Tuple3<Long, Integer, BigInteger>> it = ks.iterator();
-		while (it.hasNext()){
-			Tuple3<Long, Integer, BigInteger> a = it.next();
-			if(a.a != pollKey) continue;
-			ss.add(a);
-		}
-		return (NavigableSet<Tuple3<Long, Integer, BigInteger>>) ss;
-		
-	}
-	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes(Long pollKey, Integer option)
-	{
-		BTreeMap map = (BTreeMap) this.map;
+    @Override
+    protected Stack<Tuple2<Integer, Integer>> getDefaultValue() {
+        return null;
+    }
 
-		//FILTER ALL KEYS
-		NavigableSet<Tuple3<Long, Integer, BigInteger>> keys = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
-				Fun.t3(pollKey, option, null),
-				Fun.t3(pollKey, option, Fun.HI())).keySet();
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
 
-		//RETURN
-		return keys;
-	}
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public NavigableSet<Tuple3> getVotes(Long pollKey) {
+        BTreeMap map = (BTreeMap) this.map;
+        //FILTER ALL KEYS
+        NavigableSet<Tuple3> keys = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
+                Fun.t3(pollKey, null, null),
+                Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI()))
+                .keySet();
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public boolean hasVotes(Long pollKey)
-	{
-		BTreeMap map = (BTreeMap) this.map;
 
-		//FILTER ALL KEYS
-		Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
-				Fun.t3(pollKey, null, null),
-				Fun.t3(pollKey, Fun.HI(), Fun.HI())).firstKey();
+        //RETURN
+        return keys;
+    }
 
-		//RETURN
-		return key != null;
-	}
+    public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes_1(Long pollKey) {
+        @SuppressWarnings("rawtypes")
+        BTreeMap map = (BTreeMap) this.map;
+        Set ss = new TreeSet();
+        @SuppressWarnings("unchecked")
+        NavigableSet<Tuple3<Long, Integer, BigInteger>> ks = map.keySet();
+        Iterator<Tuple3<Long, Integer, BigInteger>> it = ks.iterator();
+        while (it.hasNext()) {
+            Tuple3<Long, Integer, BigInteger> a = it.next();
+            if (a.a != pollKey) continue;
+            ss.add(a);
+        }
+        return (NavigableSet<Tuple3<Long, Integer, BigInteger>>) ss;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public boolean hasVotes(Long pollKey, Integer option)
-	{
-		BTreeMap map = (BTreeMap) this.map;
+    }
 
-		//FILTER ALL KEYS
-		Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
-				Fun.t3(pollKey, option, null),
-				Fun.t3(pollKey, option, Fun.HI())).firstKey();
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes(Long pollKey, Integer option) {
+        BTreeMap map = (BTreeMap) this.map;
 
-		//RETURN
-		return key != null;
-	}
+        //FILTER ALL KEYS
+        NavigableSet<Tuple3<Long, Integer, BigInteger>> keys = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+                Fun.t3(pollKey, option, null),
+                Fun.t3(pollKey, option, Fun.HI())).keySet();
 
-	public Stack<Tuple2<Integer, Integer>> get(long pollKey, int optionKey, BigInteger accountShort)
-	{
-		return this.get(new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort));
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void addItem(long pollKey, int optionKey, BigInteger accountShort, Tuple2<Integer, Integer> value)
-	{
-		Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
-		Stack<Tuple2<Integer, Integer>> stack = this.get(key);
-		if (stack == null)
-			stack = new Stack<Tuple2<Integer, Integer>>();
-		
-		Stack<Tuple2<Integer, Integer>> new_stack;
-		
-		if (this.parent == null)
-			new_stack = stack;
-		else {
-			// !!!! NEEED .clone() !!!
-			// need for updates only in fork - not in parent DB
-			new_stack = (Stack<Tuple2<Integer, Integer>>)stack.clone();
-		}
+        //RETURN
+        return keys;
+    }
 
-		new_stack.push(value);
-		this.set(key, stack);
-	}
-	
-	public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, BigInteger accountShort)
-	{
-		Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
-		Stack<Tuple2<Integer, Integer>> stack = this.get(key);
-		return !stack.isEmpty()? stack.peek() : null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Tuple2<Integer, Integer> removeItem(long pollKey, int optionKey, BigInteger accountShort)
-	{
-		Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
-		Stack<Tuple2<Integer, Integer>> stack = this.get(key);
-		if (stack==null || stack.isEmpty())
-			return null;
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public boolean hasVotes(Long pollKey) {
+        BTreeMap map = (BTreeMap) this.map;
 
-		Stack<Tuple2<Integer, Integer>> new_stack;
-		if (this.parent == null)
-			new_stack = stack;
-		else {
-			// !!!! NEEED .clone() !!!
-			// need for updates only in fork - not in parent DB
-			new_stack = (Stack<Tuple2<Integer, Integer>>)stack.clone();
-		}
+        //FILTER ALL KEYS
+        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+                Fun.t3(pollKey, null, null),
+                Fun.t3(pollKey, Fun.HI(), Fun.HI())).firstKey();
 
-		Tuple2<Integer, Integer> itemRemoved = new_stack.pop();
-		
-		this.set(key, new_stack);
-		
-		return itemRemoved;
-		
-	}
+        //RETURN
+        return key != null;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public boolean hasVotes(Long pollKey, Integer option) {
+        BTreeMap map = (BTreeMap) this.map;
+
+        //FILTER ALL KEYS
+        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+                Fun.t3(pollKey, option, null),
+                Fun.t3(pollKey, option, Fun.HI())).firstKey();
+
+        //RETURN
+        return key != null;
+    }
+
+    public Stack<Tuple2<Integer, Integer>> get(long pollKey, int optionKey, BigInteger accountShort) {
+        return this.get(new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort));
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addItem(long pollKey, int optionKey, BigInteger accountShort, Tuple2<Integer, Integer> value) {
+        Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
+        Stack<Tuple2<Integer, Integer>> stack = this.get(key);
+        if (stack == null)
+            stack = new Stack<Tuple2<Integer, Integer>>();
+
+        Stack<Tuple2<Integer, Integer>> new_stack;
+
+        if (this.parent == null)
+            new_stack = stack;
+        else {
+            // !!!! NEEED .clone() !!!
+            // need for updates only in fork - not in parent DB
+            new_stack = (Stack<Tuple2<Integer, Integer>>) stack.clone();
+        }
+
+        new_stack.push(value);
+        this.set(key, stack);
+    }
+
+    public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, BigInteger accountShort) {
+        Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
+        Stack<Tuple2<Integer, Integer>> stack = this.get(key);
+        return !stack.isEmpty() ? stack.peek() : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Tuple2<Integer, Integer> removeItem(long pollKey, int optionKey, BigInteger accountShort) {
+        Tuple3<Long, Integer, BigInteger> key = new Tuple3<Long, Integer, BigInteger>(pollKey, optionKey, accountShort);
+        Stack<Tuple2<Integer, Integer>> stack = this.get(key);
+        if (stack == null || stack.isEmpty())
+            return null;
+
+        Stack<Tuple2<Integer, Integer>> new_stack;
+        if (this.parent == null)
+            new_stack = stack;
+        else {
+            // !!!! NEEED .clone() !!!
+            // need for updates only in fork - not in parent DB
+            new_stack = (Stack<Tuple2<Integer, Integer>>) stack.clone();
+        }
+
+        Tuple2<Integer, Integer> itemRemoved = new_stack.pop();
+
+        this.set(key, new_stack);
+
+        return itemRemoved;
+
+    }
 }

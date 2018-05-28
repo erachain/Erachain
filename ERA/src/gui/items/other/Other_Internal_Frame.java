@@ -1,52 +1,30 @@
 package gui.items.other;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.swing.JInternalFrame;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
-import controller.Controller;
-import core.BlockChain;
-import core.transaction.Transaction;
-import datachain.BlockMap;
-import datachain.DCSet;
-import datachain.TransactionMap;
-import gui.CoreRowSorter;
 import gui.Main_Internal_Frame;
-import gui.Split_Panel;
-import gui.items.persons.Persons_Search_SplitPanel;
 import gui.models.BlocksTableModel;
 import gui.models.PeersTableModel;
-import gui.models.TransactionsTableModel;
-import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
-import network.Network;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class Other_Internal_Frame extends Main_Internal_Frame {
-	
-	private BlocksTableModel blocksTableModel;
-	private PeersTableModel peersTableModel;
-	
 
-	
-	public  Other_Internal_Frame(){
-		
-		
-		
-	 //   Dimension size = MainFrame.getInstance().desktopPane.getSize();
-	   
-		
-		this.setTitle(Lang.getInstance().translate("Network DashBoard"));
-		
-		other_Panel other_panel = new other_Panel();
-		
-		jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
+    private BlocksTableModel blocksTableModel;
+    private PeersTableModel peersTableModel;
+
+
+    public Other_Internal_Frame() {
+
+
+        //   Dimension size = MainFrame.getInstance().desktopPane.getSize();
+
+
+        this.setTitle(Lang.getInstance().translate("Network DashBoard"));
+
+        other_Panel other_panel = new other_Panel();
+
+        jTabbedPane.setMinimumSize(new java.awt.Dimension(5, 40));
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -55,12 +33,12 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
         getContentPane().add(other_panel, gridBagConstraints);
-        
+
         jTabbedPane.setVisible(false);
-        
+
         this.jToolBar.setVisible(false);
-				
- // отключаем все что ниже  		
+
+        // отключаем все что ниже
 		
 	/*	// My block
 		Generated_Blocks_Panel split_generated_Block = new Generated_Blocks_Panel();
@@ -177,46 +155,36 @@ public class Other_Internal_Frame extends Main_Internal_Frame {
 		    split_Peers.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 	    split_Transaction.jSplitPanel.setDividerLocation((int)(size.getWidth()/2));
 		*
-		*/			
-				
-		
-		
-		this.pack();
-		//	this.setSize(800,600);
-		this.setMaximizable(true);
-		
-		this.setClosable(true);
-		this.setResizable(true);
-		this.setLocation(20, 20);
-		//CLOSE
-		setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-	  
-	    
-	 //   this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
-	  
-	
-	
-	    
-	    this.setVisible(true);
-	    
-	    
-	   
-	
-	    
-	    
-	    
-		
-	}
-	
-	public void close() 
-	{
-		//REMOVE OBSERVERS/HANLDERS
-		this.peersTableModel.deleteObserver();
-		
-		
-		this.blocksTableModel.removeObservers();
-		
-		
-	}
+		*/
+
+
+        this.pack();
+        //	this.setSize(800,600);
+        this.setMaximizable(true);
+
+        this.setClosable(true);
+        this.setResizable(true);
+        this.setLocation(20, 20);
+        //CLOSE
+        setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+
+
+        //   this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
+
+
+        this.setVisible(true);
+
+
+    }
+
+    public void close() {
+        //REMOVE OBSERVERS/HANLDERS
+        this.peersTableModel.deleteObserver();
+
+
+        this.blocksTableModel.removeObservers();
+
+
+    }
 
 }

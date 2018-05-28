@@ -440,17 +440,16 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
     }
 
+    public void deleteObserver() {
+        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
+
+    }
 
     class Trans {
         public BigDecimal amount;
         public Account owner;
         public Account recipient;
         public Transaction transaction;
-
-    }
-
-    public void deleteObserver() {
-        Controller.getInstance().wallet.database.getTransactionMap().deleteObserver(this);
 
     }
 

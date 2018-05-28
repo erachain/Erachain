@@ -6,31 +6,31 @@ import utils.NumberAsString;
 
 /**
  * Used for read only access on names for pebble injection. Here name
- * @author Skerberus
  *
+ * @author Skerberus
  */
 public class WebName {
 
-	
-	private final String name;
-	private final String owner;
-	private final String namebalanceString;
 
-	public WebName(Name name) {
-		this.name = name.getName();
-		this.owner = name.getOwner().getAddress();
-		namebalanceString = NumberAsString.formatAsString(name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a) + " - " + name.getName();
-	}
+    private final String name;
+    private final String owner;
+    private final String namebalanceString;
 
-	public String getName() {
-		return name;
-	}
+    public WebName(Name name) {
+        this.name = name.getName();
+        this.owner = name.getOwner().getAddress();
+        namebalanceString = NumberAsString.formatAsString(name.getOwner().getConfBalance3(0, Transaction.FEE_KEY).a) + " - " + name.getName();
+    }
 
-	public String getOwner() {
-		return owner;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getNameBalanceString() {
-		return namebalanceString;
-	}
+    public String getOwner() {
+        return owner;
+    }
+
+    public String getNameBalanceString() {
+        return namebalanceString;
+    }
 }

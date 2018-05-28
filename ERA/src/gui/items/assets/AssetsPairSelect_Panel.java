@@ -5,11 +5,11 @@ import gui.Split_Panel;
 public class AssetsPairSelect_Panel extends Split_Panel {
 
 
-	AssetsPairSelect_Panel(){
-		super ("AssetsPairSelect_Panel");
-		
-		
-	}
+    AssetsPairSelect_Panel() {
+        super("AssetsPairSelect_Panel");
+
+
+    }
 
 
 }

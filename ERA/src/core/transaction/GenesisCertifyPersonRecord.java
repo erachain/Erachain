@@ -1,216 +1,199 @@
 package core.transaction;
 
-import java.util.Arrays;
-import java.util.HashSet;
-
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
+import core.account.Account;
+import core.block.Block;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Longs;
-
-import core.account.Account;
-import core.block.Block;
-import core.crypto.Base58;
-import core.crypto.Crypto;
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class GenesisCertifyPersonRecord extends Genesis_Record {
 
-	private static final byte TYPE_ID = (byte)Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION;
-	private static final String NAME_ID = "GENESIS Certify Person";
-	private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
-	private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
+    private static final byte TYPE_ID = (byte) Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION;
+    private static final String NAME_ID = "GENESIS Certify Person";
+    private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
+    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
 
-	private Account recipient;
-	private long key;
+    private Account recipient;
+    private long key;
 
-	public GenesisCertifyPersonRecord(Account recipient, long key)
-	{
-		super(TYPE_ID, NAME_ID);
-		this.recipient = recipient;
-		this.key = key;
-		this.generateSignature();
-	}
+    public GenesisCertifyPersonRecord(Account recipient, long key) {
+        super(TYPE_ID, NAME_ID);
+        this.recipient = recipient;
+        this.key = key;
+        this.generateSignature();
+    }
 
-	//GETTERS/SETTERS
-	//public static String getName() { return NAME; }
+    //GETTERS/SETTERS
+    //public static String getName() { return NAME; }
 
-	public Account getRecipient()
-	{
-		return this.recipient;
-	}
+    public static Transaction Parse(byte[] data) throws Exception {
 
-	@Override
-	public long getKey()
-	{
-		return this.key;
-	}
+        //CHECK IF WE MATCH BLOCK LENGTH
+        if (data.length < BASE_LENGTH) {
+            throw new Exception("Data does not match block length: " + data.length + " in " + NAME_ID);
+        }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public JSONObject toJson()
-	{
-		//GET BASE
-		JSONObject transaction = super.toJson();
+        // READ TYPE
+        //byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
+        int position = SIMPLE_TYPE_LENGTH;
 
-		//ADD CREATOR/RECIPIENT/AMOUNT/ASSET
-		transaction.put("recipient", this.recipient.getAddress());
-		transaction.put("person", this.key);
+        //READ RECIPIENT
+        byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
+        Account recipient = new Account(Base58.encode(recipientBytes));
+        position += RECIPIENT_LENGTH;
 
-		return transaction;
-	}
+        //READ KEY
+        byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
+        long key = Longs.fromByteArray(keyBytes);
+        position += KEY_LENGTH;
 
-	//PARSE/CONVERT
+        return new GenesisCertifyPersonRecord(recipient, key);
+    }
 
-	public static Transaction Parse(byte[] data) throws Exception{
+    public Account getRecipient() {
+        return this.recipient;
+    }
 
-		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
-		{
-			throw new Exception("Data does not match block length: " + data.length + " in " + NAME_ID);
-		}
+    @Override
+    public long getKey() {
+        return this.key;
+    }
 
-		// READ TYPE
-		//byte[] typeBytes = Arrays.copyOfRange(data, 0, SIMPLE_TYPE_LENGTH);
-		int position = SIMPLE_TYPE_LENGTH;
+    //PARSE/CONVERT
 
-		//READ RECIPIENT
-		byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-		Account recipient = new Account(Base58.encode(recipientBytes));
-		position += RECIPIENT_LENGTH;
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject transaction = super.toJson();
 
-		//READ KEY
-		byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-		long key = Longs.fromByteArray(keyBytes);
-		position += KEY_LENGTH;
+        //ADD CREATOR/RECIPIENT/AMOUNT/ASSET
+        transaction.put("recipient", this.recipient.getAddress());
+        transaction.put("person", this.key);
 
-		return new GenesisCertifyPersonRecord(recipient, key);
-	}
+        return transaction;
+    }
 
-	//@Override
-	@Override
-	public byte[] toBytes(boolean withSign, Long releaserReference)
-	{
-		byte[] data = super.toBytes(withSign, releaserReference);
+    //@Override
+    @Override
+    public byte[] toBytes(boolean withSign, Long releaserReference) {
+        byte[] data = super.toBytes(withSign, releaserReference);
 
-		//WRITE RECIPIENT
-		data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        //WRITE RECIPIENT
+        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
 
-		//WRITE KEY
-		byte[] keyBytes = Longs.toByteArray(this.key);
-		keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
-		data = Bytes.concat(data, keyBytes);
+        //WRITE KEY
+        byte[] keyBytes = Longs.toByteArray(this.key);
+        keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
+        data = Bytes.concat(data, keyBytes);
 
-		return data;
-	}
+        return data;
+    }
 
-	@Override
-	public int getDataLength(boolean asPack)
-	{
-		return BASE_LENGTH;
-	}
+    @Override
+    public int getDataLength(boolean asPack) {
+        return BASE_LENGTH;
+    }
 
 
-	//VALIDATE
+    //VALIDATE
 
-	@Override
-	public int isValid(Long releaserReference, long flags)
-	{
+    @Override
+    public int isValid(Long releaserReference, long flags) {
 
-		//CHECK IF RECIPIENT IS VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.recipient.getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
+        //CHECK IF RECIPIENT IS VALID ADDRESS
+        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
+            return INVALID_ADDRESS;
+        }
 
-		if ( !this.dcSet.getItemPersonMap().contains(this.key) )
-		{
-			return Transaction.ITEM_PERSON_NOT_EXIST;
-		}
+        if (!this.dcSet.getItemPersonMap().contains(this.key)) {
+            return Transaction.ITEM_PERSON_NOT_EXIST;
+        }
 
-		return VALIDATE_OK;
-	}
+        return VALIDATE_OK;
+    }
 
-	//PROCESS/ORPHAN
+    //PROCESS/ORPHAN
 
-	@Override
-	public void process(Block block, boolean asPack)
-	{
+    @Override
+    public void process(Block block, boolean asPack) {
 
-		//Block block = new GenesisBlock();
-		int transactionIndex = -1;
-		int blockIndex = -1;
-		//Block block = this.getBlock(db);// == null (((
-		if (block == null) {
-			blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet);
-		} else {
-			blockIndex = block.getHeight(this.dcSet);
-			if (blockIndex < 1 ) {
-				// if block not is confirmed - get last block + 1
-				blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1;
-			}
-			//transactionIndex = this.getSeqNo(db);
-			transactionIndex = block.getTransactionSeq(signature);
-		}
+        //Block block = new GenesisBlock();
+        int transactionIndex = -1;
+        int blockIndex = -1;
+        //Block block = this.getBlock(db);// == null (((
+        if (block == null) {
+            blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet);
+        } else {
+            blockIndex = block.getHeight(this.dcSet);
+            if (blockIndex < 1) {
+                // if block not is confirmed - get last block + 1
+                blockIndex = this.dcSet.getBlockMap().last().getHeight(this.dcSet) + 1;
+            }
+            //transactionIndex = this.getSeqNo(db);
+            transactionIndex = block.getTransactionSeq(signature);
+        }
 
-		//UPDATE RECIPIENT
-		Tuple5<Long, Long, byte[], Integer, Integer> itemP =
-				new Tuple5<Long, Long, byte[], Integer, Integer>
-		(timestamp, Long.MAX_VALUE, null, blockIndex, transactionIndex);
+        //UPDATE RECIPIENT
+        Tuple5<Long, Long, byte[], Integer, Integer> itemP =
+                new Tuple5<Long, Long, byte[], Integer, Integer>
+                        (timestamp, Long.MAX_VALUE, null, blockIndex, transactionIndex);
 
-		// SET ALIVE PERSON for DURATION permanent
-		///db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
+        // SET ALIVE PERSON for DURATION permanent
+        ///db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY, itemP);
 
-		// SET PERSON ADDRESS - end date as timestamp
-		Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
-		Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
-		this.dcSet.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
-		this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
+        // SET PERSON ADDRESS - end date as timestamp
+        Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
+        Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
+        this.dcSet.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
+        this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 
-		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.setLastTimestamp(this.timestamp, this.dcSet);
-	}
+        //UPDATE REFERENCE OF RECIPIENT
+        this.recipient.setLastTimestamp(this.timestamp, this.dcSet);
+    }
 
-	@Override
-	public void orphan(boolean asPack)
-	{
+    @Override
+    public void orphan(boolean asPack) {
 
-		// UNDO ALIVE PERSON for DURATION
-		//db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
+        // UNDO ALIVE PERSON for DURATION
+        //db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
-		//UPDATE RECIPIENT
-		this.dcSet.getAddressPersonMap().removeItem(this.recipient.getAddress());
-		this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
+        //UPDATE RECIPIENT
+        this.dcSet.getAddressPersonMap().removeItem(this.recipient.getAddress());
+        this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
-		//UPDATE REFERENCE OF CREATOR
-		// not needthis.creator.setLastReference(this.reference, db);
-		//UPDATE REFERENCE OF RECIPIENT
-		this.recipient.removeLastTimestamp(this.dcSet);
-	}
+        //UPDATE REFERENCE OF CREATOR
+        // not needthis.creator.setLastReference(this.reference, db);
+        //UPDATE REFERENCE OF RECIPIENT
+        this.recipient.removeLastTimestamp(this.dcSet);
+    }
 
-	//REST
+    //REST
 
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.recipient);
-		return accounts;
-	}
+    @Override
+    public HashSet<Account> getRecipientAccounts() {
+        HashSet<Account> accounts = new HashSet<>();
+        accounts.add(this.recipient);
+        return accounts;
+    }
 
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
+    @Override
+    public boolean isInvolved(Account account) {
+        String address = account.getAddress();
 
-		if(address.equals(recipient.getAddress()))
-		{
-			return true;
-		}
+        if (address.equals(recipient.getAddress())) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 }

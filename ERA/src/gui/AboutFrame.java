@@ -1,13 +1,10 @@
 package gui;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import controller.Controller;
+import lang.Lang;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -15,74 +12,53 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
-import controller.Controller;
-import lang.Lang;
-
 @SuppressWarnings("serial")
-public class AboutFrame extends JDialog{
+public class AboutFrame extends JDialog {
 
-	private static AboutFrame instance;
-	private AboutPanel aboutPanel;
-	protected boolean user_close = true;
-	private JTextField console_Text;
-	
-	public static AboutFrame getInstance(){
-		
-		if(instance == null)
-		{
-			instance = new AboutFrame();
-		}
-		
-		return instance;
-		
-		
-	}
-	
-	private AboutFrame() 
-	{
-		//CREATE FRAME
-		setTitle(Lang.getInstance().translate("Erachain.org")+ " - " + Lang.getInstance().translate("Debug"));
-		//setModalityType(DEFAULT_MODALITY_TYPE);
-		setModalityType(ModalityType.MODELESS);
+    private static AboutFrame instance;
+    protected boolean user_close = true;
+    private AboutPanel aboutPanel;
+    private JTextField console_Text;
 
-		setAlwaysOnTop(false);
-		//ICON
-		List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
-		
-		//DEBUG TABPANE
+    private AboutFrame() {
+        //CREATE FRAME
+        setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Debug"));
+        //setModalityType(DEFAULT_MODALITY_TYPE);
+        setModalityType(ModalityType.MODELESS);
+
+        setAlwaysOnTop(false);
+        //ICON
+        List<Image> icons = new ArrayList<Image>();
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+        this.setIconImages(icons);
+
+        //DEBUG TABPANE
         this.aboutPanel = new AboutPanel();
-        this.getContentPane().setPreferredSize(new Dimension(802,370));
+        this.getContentPane().setPreferredSize(new Dimension(802, 370));
         this.setUndecorated(true);
-     
+
         this.aboutPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-            	if (user_close ){
-            	setVisible(false);
-                dispose();
-            	}
+                if (user_close) {
+                    setVisible(false);
+                    dispose();
+                }
             }
         });
-        
+
         this.addKeyListener(new KeyAdapter() {
-		    public void keyPressed(KeyEvent e) {
-		    	if (user_close){
-		    	setVisible(false);
-                dispose();
-		    	}
-		    }
-		});
-        
+            public void keyPressed(KeyEvent e) {
+                if (user_close) {
+                    setVisible(false);
+                    dispose();
+                }
+            }
+        });
+
         //ADD GENERAL TABPANE TO FRAME
         getContentPane().add(this.aboutPanel);
         GridBagLayout gbl_aboutPanel = new GridBagLayout();
@@ -93,8 +69,8 @@ public class AboutFrame extends JDialog{
         aboutPanel.setLayout(gbl_aboutPanel);
 
         JLabel lblAuthorsLabel = new JLabel(Lang.getInstance().translate("Author") + ": "
-        		//+ "Ермолаев Дмитрий Сергеевич");
-        		+ Lang.getInstance().translate("Dmitrii Ermolaev"));
+                //+ "Ермолаев Дмитрий Сергеевич");
+                + Lang.getInstance().translate("Dmitrii Ermolaev"));
         lblAuthorsLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblAuthorsLabel.setForeground(Color.RED);
         lblAuthorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -117,7 +93,7 @@ public class AboutFrame extends JDialog{
         gbc_lbllversionLabel.gridx = 1;
         gbc_lbllversionLabel.gridy = 2;
         aboutPanel.add(lblversionLabel, gbc_lbllversionLabel);
-        
+
         JLabel label = new JLabel(Lang.getInstance().translate("Build date: ") + Controller.getBuildDateString());
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setForeground(Color.RED);
@@ -128,11 +104,11 @@ public class AboutFrame extends JDialog{
         gbc_label.gridy = 3;
         aboutPanel.add(label, gbc_label);
 
-       
+
         console_Text = new JTextField();
         console_Text.setEditable(false);
         console_Text.setText("");
-      //  console_Text.setSize(100,26);
+        //  console_Text.setSize(100,26);
         console_Text.setForeground(Color.BLUE);
         console_Text.setFont(new Font("Tahoma", Font.PLAIN, 13));
         GridBagConstraints gbc_Console = new GridBagConstraints();
@@ -140,21 +116,34 @@ public class AboutFrame extends JDialog{
         gbc_Console.gridx = 0;
         gbc_Console.gridy = 4;
         gbc_Console.fill = GridBagConstraints.HORIZONTAL;
-        gbc_Console.weightx =1.0;
+        gbc_Console.weightx = 1.0;
         gbc_Console.gridwidth = 3;
         aboutPanel.add(console_Text, gbc_Console);
-        
+
         //SHOW FRAME
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-	}	
-	public void setUserClose(boolean uc){
-		user_close = uc;
-		
-	}
-	public void set_console_Text(String str){
-		console_Text.setText(str);
-		
-	}
+    }
+
+    public static AboutFrame getInstance() {
+
+        if (instance == null) {
+            instance = new AboutFrame();
+        }
+
+        return instance;
+
+
+    }
+
+    public void setUserClose(boolean uc) {
+        user_close = uc;
+
+    }
+
+    public void set_console_Text(String str) {
+        console_Text.setText(str);
+
+    }
 }

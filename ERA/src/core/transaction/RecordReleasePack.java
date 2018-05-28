@@ -1,334 +1,302 @@
 package core.transaction;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import datachain.DCSet;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.util.*;
 
 public class RecordReleasePack extends Transaction {
 
-	private static final byte TYPE_ID = (byte)Transaction.RELEASE_PACK;
-	private static final String NAME_ID = "Release pack";
-	private static final int PACK_SIZE_LENGTH = 4;
-	private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + PACK_SIZE_LENGTH;
-	private static final int BASE_LENGTH = Transaction.BASE_LENGTH + PACK_SIZE_LENGTH;
+    private static final byte TYPE_ID = (byte) Transaction.RELEASE_PACK;
+    private static final String NAME_ID = "Release pack";
+    private static final int PACK_SIZE_LENGTH = 4;
+    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + PACK_SIZE_LENGTH;
+    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + PACK_SIZE_LENGTH;
 
-	private List<Transaction> transactions;
+    private List<Transaction> transactions;
 
-	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference)
-	{
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
-		this.transactions = transactions;
-	}
-	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference, byte[] signature)
-	{
-		this(typeBytes, creator, transactions, feePow, timestamp, reference);
-		this.signature = signature;
-		//this.calcFee();
-	}
-	// as pack - calcFee not needed
-	public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, Long reference, byte[] signature)
-	{
-		this(typeBytes, creator, transactions, (byte)0, 0l, reference);
-		this.signature = signature;
-	}
-	public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference)
-	{
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, transactions, feePow, timestamp, reference);
-	}
-	// as Pack
-	public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, Long reference)
-	{
-		this(creator, transactions, (byte)0, 0l, reference);
-	}
+    public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+        this.transactions = transactions;
+    }
 
-	//GETTERS/SETTERS
+    public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, transactions, feePow, timestamp, reference);
+        this.signature = signature;
+        //this.calcFee();
+    }
 
-	//public static String getName() { return "Multi Send"; }
+    // as pack - calcFee not needed
+    public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, Long reference, byte[] signature) {
+        this(typeBytes, creator, transactions, (byte) 0, 0l, reference);
+        this.signature = signature;
+    }
 
-	public List<Transaction> getTransactions()
-	{
-		return this.transactions;
-	}
+    public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, transactions, feePow, timestamp, reference);
+    }
 
-	@Override
-	public boolean hasPublicText() {
-		return false;
-	}
+    // as Pack
+    public RecordReleasePack(PublicKeyAccount creator, List<Transaction> transactions, Long reference) {
+        this(creator, transactions, (byte) 0, 0l, reference);
+    }
 
-	//PARSE/CONVERT
+    //GETTERS/SETTERS
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public JSONObject toJson()
-	{
-		//GET BASE
-		JSONObject json = this.getJsonBase();
+    //public static String getName() { return "Multi Send"; }
 
-		//ADD CREATOR/PAYMENTS
-		json.put("creator", this.creator.getAddress());
+    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
 
-		JSONArray transactions = new JSONArray();
-		for(Transaction transaction: this.transactions)
-		{
-			transactions.add(transaction.toJson());
-		}
-		json.put("transactions", transactions);
+        boolean asPack = releaserReference != null;
+        int data_length = data.length;
 
-		return json;
-	}
+        //CHECK IF WE MATCH BLOCK LENGTH
+        if (data_length < BASE_LENGTH_AS_PACK
+                | !asPack & data_length < BASE_LENGTH) {
+            throw new Exception("Data does not match block length " + data.length);
+        }
 
-	public static Transaction Parse(byte[] data, Long releaserReference) throws Exception{
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
 
-		boolean asPack = releaserReference != null;
-		int data_length = data.length;
+        long timestamp = 0;
+        if (!asPack) {
+            //READ TIMESTAMP
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            timestamp = Longs.fromByteArray(timestampBytes);
+            position += TIMESTAMP_LENGTH;
+        }
 
-		//CHECK IF WE MATCH BLOCK LENGTH
-		if (data_length < BASE_LENGTH_AS_PACK
-				| !asPack & data_length < BASE_LENGTH)
-		{
-			throw new Exception("Data does not match block length " + data.length);
-		}
+        Long reference = null;
+        if (!asPack) {
+            //READ REFERENCE
+            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+            reference = Longs.fromByteArray(referenceBytes);
+            position += REFERENCE_LENGTH;
+        } else {
+            reference = releaserReference;
+        }
 
-		// READ TYPE
-		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-		int position = TYPE_LENGTH;
+        //READ CREATOR
+        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+        position += CREATOR_LENGTH;
 
-		long timestamp = 0;
-		if (!asPack) {
-			//READ TIMESTAMP
-			byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-			timestamp = Longs.fromByteArray(timestampBytes);
-			position += TIMESTAMP_LENGTH;
-		}
+        byte feePow = 0;
+        if (!asPack) {
+            //READ FEE POWER
+            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+            feePow = feePowBytes[0];
+            position += 1;
+        }
 
-		Long reference = null;
-		if (!asPack) {
-			//READ REFERENCE
-			byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-			reference = Longs.fromByteArray(referenceBytes);
-			position += REFERENCE_LENGTH;
-		} else {
-			reference = releaserReference;
-		}
+        //READ SIGNATURE
+        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+        position += SIGNATURE_LENGTH;
 
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
+        /////
+        //READ PACK SIZE
+        byte[] transactionsLengthBytes = Arrays.copyOfRange(data, position, position + PACK_SIZE_LENGTH);
+        int transactionsLength = Ints.fromByteArray(transactionsLengthBytes);
+        position += PACK_SIZE_LENGTH;
 
-		byte feePow = 0;
-		if (!asPack) {
-			//READ FEE POWER
-			byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-			feePow = feePowBytes[0];
-			position += 1;
-		}
+        if (transactionsLength < 1 || transactionsLength > 400) {
+            throw new Exception("Invalid pack length");
+        }
 
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-		position += SIGNATURE_LENGTH;
+        //READ TRANSACTIONS
+        TransactionFactory tf_inct = TransactionFactory.getInstance();
+        List<Transaction> transactions = new ArrayList<Transaction>();
+        for (int i = 0; i < transactionsLength; i++) {
+            Transaction transaction = tf_inct.parse(Arrays.copyOfRange(data, position, data_length), releaserReference);
+            transactions.add(transaction);
 
-		/////
-		//READ PACK SIZE
-		byte[] transactionsLengthBytes = Arrays.copyOfRange(data, position, position + PACK_SIZE_LENGTH);
-		int transactionsLength = Ints.fromByteArray(transactionsLengthBytes);
-		position += PACK_SIZE_LENGTH;
+            position += transaction.getDataLength(true);
+        }
 
-		if(transactionsLength < 1 || transactionsLength > 400)
-		{
-			throw new Exception("Invalid pack length");
-		}
+        if (!asPack) {
+            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference, signatureBytes);
+        } else {
+            return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
+        }
+    }
 
-		//READ TRANSACTIONS
-		TransactionFactory tf_inct = TransactionFactory.getInstance();
-		List<Transaction> transactions = new ArrayList<Transaction>();
-		for(int i=0; i<transactionsLength; i++)
-		{
-			Transaction transaction = tf_inct.parse(Arrays.copyOfRange(data, position, data_length), releaserReference);
-			transactions.add(transaction);
+    public List<Transaction> getTransactions() {
+        return this.transactions;
+    }
 
-			position += transaction.getDataLength(true);
-		}
+    //PARSE/CONVERT
 
-		if (!asPack) {
-			return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference, signatureBytes);
-		} else {
-			return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
-		}
-	}
+    @Override
+    public boolean hasPublicText() {
+        return false;
+    }
 
-	//@Override
-	@Override
-	public byte[] toBytes(boolean withSign, Long releaserReference)
-	{
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject json = this.getJsonBase();
 
-		byte[] data = super.toBytes(withSign, null);
+        //ADD CREATOR/PAYMENTS
+        json.put("creator", this.creator.getAddress());
 
-		//WRITE PAYMENTS SIZE
-		int transactionsLength = this.transactions.size();
-		byte[] transactionsLengthBytes = Ints.toByteArray(transactionsLength);
-		data = Bytes.concat(data, transactionsLengthBytes);
+        JSONArray transactions = new JSONArray();
+        for (Transaction transaction : this.transactions) {
+            transactions.add(transaction.toJson());
+        }
+        json.put("transactions", transactions);
 
-		//WRITE PAYMENTS
-		for(Transaction transaction: this.transactions)
-		{
-			data = Bytes.concat(data, transaction.toBytes(withSign, releaserReference));
-		}
+        return json;
+    }
 
-		return data;
-	}
+    //@Override
+    @Override
+    public byte[] toBytes(boolean withSign, Long releaserReference) {
 
-	@Override
-	public int getDataLength(boolean asPack)
-	{
-		int transactionsLength = 0;
-		for(Transaction transaction: this.getTransactions())
-		{
-			transactionsLength += transaction.getDataLength(asPack);
-		}
+        byte[] data = super.toBytes(withSign, null);
 
-		return asPack ? BASE_LENGTH_AS_PACK : BASE_LENGTH + transactionsLength;
-	}
+        //WRITE PAYMENTS SIZE
+        int transactionsLength = this.transactions.size();
+        byte[] transactionsLengthBytes = Ints.toByteArray(transactionsLength);
+        data = Bytes.concat(data, transactionsLengthBytes);
 
-	//VALIDATE
+        //WRITE PAYMENTS
+        for (Transaction transaction : this.transactions) {
+            data = Bytes.concat(data, transaction.toBytes(withSign, releaserReference));
+        }
 
-	//@Override
-	@Override
-	public int isValid(Long releaserReference, long flags)
-	{
+        return data;
+    }
 
-		//CHECK PAYMENTS SIZE
-		if(this.transactions.size() < 1 || this.transactions.size() > 400)
-		{
-			return INVALID_PAYMENTS_LENGTH;
-		}
+    @Override
+    public int getDataLength(boolean asPack) {
+        int transactionsLength = 0;
+        for (Transaction transaction : this.getTransactions()) {
+            transactionsLength += transaction.getDataLength(asPack);
+        }
 
-		DCSet fork = this.dcSet.fork();
+        return asPack ? BASE_LENGTH_AS_PACK : BASE_LENGTH + transactionsLength;
+    }
 
-		int counter = 0;
-		int result = 0;
-		//CHECK PAYMENTS
-		for(Transaction transaction: this.transactions)
-		{
+    //VALIDATE
 
-			result = transaction.isValid(releaserReference, flags);
-			if (result != Transaction.VALIDATE_OK)
-				// transaction counter x100
-				return result + counter * 100;
-			//PROCESS PAYMENT IN FORK AS PACK
-			transaction.process(this.block, true);
-			counter++;
-		}
+    //@Override
+    @Override
+    public int isValid(Long releaserReference, long flags) {
 
-		// IN FORK
-		return super.isValid(releaserReference, flags);
+        //CHECK PAYMENTS SIZE
+        if (this.transactions.size() < 1 || this.transactions.size() > 400) {
+            return INVALID_PAYMENTS_LENGTH;
+        }
 
-	}
+        DCSet fork = this.dcSet.fork();
 
-	//PROCESS/ORPHAN
+        int counter = 0;
+        int result = 0;
+        //CHECK PAYMENTS
+        for (Transaction transaction : this.transactions) {
 
-	//@Override
-	@Override
-	public void process(Block block, boolean asPack)
-	{
-		//UPDATE CREATOR
-		super.process(block, asPack);
+            result = transaction.isValid(releaserReference, flags);
+            if (result != Transaction.VALIDATE_OK)
+                // transaction counter x100
+                return result + counter * 100;
+            //PROCESS PAYMENT IN FORK AS PACK
+            transaction.process(this.block, true);
+            counter++;
+        }
 
-		//PROCESS PAYMENTS
-		for(Transaction transaction: this.transactions)
-		{
-			transaction.process(block, true); // as Pack in body
-		}
-	}
+        // IN FORK
+        return super.isValid(releaserReference, flags);
 
-	//@Override
-	@Override
-	public void orphan(boolean asPack)
-	{
-		//UPDATE CREATOR
-		super.orphan(asPack);
+    }
 
-		//ORPHAN PAYMENTS
-		for(Transaction transaction: this.transactions)
-		{
-			transaction.setDC(this.dcSet, true);
-			transaction.orphan(true); // as Pack in body
-		}
-	}
+    //PROCESS/ORPHAN
 
-	//REST
+    //@Override
+    @Override
+    public void process(Block block, boolean asPack) {
+        //UPDATE CREATOR
+        super.process(block, asPack);
 
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<Account>();
-		accounts.add(this.creator);
-		accounts.addAll(this.getRecipientAccounts());
-		return accounts;
-	}
+        //PROCESS PAYMENTS
+        for (Transaction transaction : this.transactions) {
+            transaction.process(block, true); // as Pack in body
+        }
+    }
 
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
+    //@Override
+    @Override
+    public void orphan(boolean asPack) {
+        //UPDATE CREATOR
+        super.orphan(asPack);
 
-		for(Transaction transaction: this.transactions)
-		{
-			accounts.addAll(transaction.getInvolvedAccounts());
-		}
+        //ORPHAN PAYMENTS
+        for (Transaction transaction : this.transactions) {
+            transaction.setDC(this.dcSet, true);
+            transaction.orphan(true); // as Pack in body
+        }
+    }
 
-		return accounts;
-	}
+    //REST
 
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
+    @Override
+    public HashSet<Account> getInvolvedAccounts() {
+        HashSet<Account> accounts = new HashSet<Account>();
+        accounts.add(this.creator);
+        accounts.addAll(this.getRecipientAccounts());
+        return accounts;
+    }
 
-		for(Account involved: this.getInvolvedAccounts())
-		{
-			if(address.equals(involved.getAddress()))
-			{
-				return true;
-			}
-		}
+    @Override
+    public HashSet<Account> getRecipientAccounts() {
+        HashSet<Account> accounts = new HashSet<>();
 
-		return false;
-	}
+        for (Transaction transaction : this.transactions) {
+            accounts.addAll(transaction.getInvolvedAccounts());
+        }
 
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
-	{
-		Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+        return accounts;
+    }
 
-		assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
+    @Override
+    public boolean isInvolved(Account account) {
+        String address = account.getAddress();
 
-		for(Transaction transaction: this.transactions)
-		{
-			//assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), transaction.getAsset(), transaction.getAmount());
-			//assetAmount = addAssetAmount(assetAmount, transaction.getRecipient().getAddress(), transaction.getAsset(), transaction.getAmount());
-		}
+        for (Account involved : this.getInvolvedAccounts()) {
+            if (address.equals(involved.getAddress())) {
+                return true;
+            }
+        }
 
-		return assetAmount;
-	}
-	@Override
-	public int calcBaseFee() {
-		return calcCommonFee();
-	}
+        return false;
+    }
+
+    public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
+        Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
+
+        assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
+
+        for (Transaction transaction : this.transactions) {
+            //assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), transaction.getAsset(), transaction.getAmount());
+            //assetAmount = addAssetAmount(assetAmount, transaction.getRecipient().getAddress(), transaction.getAsset(), transaction.getAmount());
+        }
+
+        return assetAmount;
+    }
+
+    @Override
+    public int calcBaseFee() {
+        return calcCommonFee();
+    }
 
 }

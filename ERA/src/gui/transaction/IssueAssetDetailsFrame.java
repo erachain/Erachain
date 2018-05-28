@@ -1,45 +1,26 @@
 package gui.transaction;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-
-import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.transaction.IssueAssetTransaction;
 import gui.items.assets.Asset_Info;
 import lang.Lang;
-import utils.DateTimeFormat;
-import utils.MenuPopupUtil;
+
+import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class IssueAssetDetailsFrame extends Rec_DetailsFrame
-{
-	public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue)
-	{
-		super(assetIssue);
-		
-		Asset_Info as_info = new Asset_Info((AssetCls) assetIssue.getItem());
-		//LABEL NAME
-		++labelGBC.gridy;
-		labelGBC.gridwidth=4;
-		labelGBC.fill = labelGBC.BOTH;
-		labelGBC.weightx = 0.1;
-		labelGBC.weightx = 0.1;
-		JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
-		this.add(as_info, labelGBC);
+public class IssueAssetDetailsFrame extends Rec_DetailsFrame {
+    public IssueAssetDetailsFrame(IssueAssetTransaction assetIssue) {
+        super(assetIssue);
+
+        Asset_Info as_info = new Asset_Info((AssetCls) assetIssue.getItem());
+        //LABEL NAME
+        ++labelGBC.gridy;
+        labelGBC.gridwidth = 4;
+        labelGBC.fill = labelGBC.BOTH;
+        labelGBC.weightx = 0.1;
+        labelGBC.weightx = 0.1;
+        JLabel nameLabel = new JLabel(Lang.getInstance().translate("Name") + ":");
+        this.add(as_info, labelGBC);
 		
 	/*	
 		//LABEL NAME
@@ -103,12 +84,12 @@ public class IssueAssetDetailsFrame extends Rec_DetailsFrame
 				movable.setSelected(((AssetCls)assetIssue.getItem()).isMovable());
 				movable.setEnabled(false);
 				this.add(movable, detailGBC);	
-*/				           
+*/
         //PACK
-	//	this.pack();
-    //    this.setResizable(false);
-    //    this.setLocationRelativeTo(null);
+        //	this.pack();
+        //    this.setResizable(false);
+        //    this.setLocationRelativeTo(null);
         this.setVisible(true);
-        
-	}
+
+    }
 }

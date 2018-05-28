@@ -1,23 +1,20 @@
 package gui.items.accounts;
 
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JOptionPane;
-
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-
 import controller.Controller;
 import core.account.Account;
 import database.wallet.AccountsPropertisMap;
 import gui.PasswordPane;
 import lang.Lang;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 import utils.StrJSonFine;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -26,105 +23,114 @@ import utils.StrJSonFine;
  */
 
 /**
- *
  * @author Саша
  */
 public class Account_Name_Add extends javax.swing.JDialog {
 
-    private Account_Name_Add th;
     AccountsPropertisMap db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
-	/**
+    private Account_Name_Add th;
+    // Variables declaration - do not modify
+    private javax.swing.ButtonGroup buttonGroupSelectType;
+    private javax.swing.JButton jButton_Cancel;
+    private javax.swing.JButton jButton_OK;
+    private javax.swing.JLabel jLabel_Account;
+    private javax.swing.JLabel jLabel_Description;
+    private javax.swing.JLabel jLabel_Name;
+    private javax.swing.JLabel jLabel_Title;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea_Description;
+    private javax.swing.JTextField jTextField_Account;
+    private javax.swing.JTextField jTextField_Name;
+    /**
      * Creates new form Account_Show
      */
     public Account_Name_Add() {
         super();
         th = this;
-        if(!Controller.getInstance().isWalletUnlocked())
-		{
-			//ASK FOR PASSWORD
-			String password = PasswordPane.showUnlockWalletDialog(this);
-			if(password.equals(""))
-			{
-				this.jButton_OK.setEnabled(true);
-				return;
-			}
-			if(!Controller.getInstance().unlockWallet(password))
-			{
-				//WRONG PASSWORD
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            //ASK FOR PASSWORD
+            String password = PasswordPane.showUnlockWalletDialog(this);
+            if (password.equals("")) {
+                this.jButton_OK.setEnabled(true);
+                return;
+            }
+            if (!Controller.getInstance().unlockWallet(password)) {
+                //WRONG PASSWORD
+                JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
 
-				//ENABLE
-				this.jButton_OK.setEnabled(true);
-				return;
-			}
-		}
-        
+                //ENABLE
+                this.jButton_OK.setEnabled(true);
+                return;
+            }
+        }
+
         List<Image> icons = new ArrayList<Image>();
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
-		icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
-		this.setIconImages(icons);
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
+        icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
+        this.setIconImages(icons);
         initComponents();
-        jButton_Cancel.addActionListener(new ActionListener(){
-        	
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				
-				setVisible(false);
-			}
-        	
+        jButton_Cancel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+
+                setVisible(false);
+            }
+
         });
-        
- jButton_OK.addActionListener(new ActionListener(){
-        	
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				// TODO Auto-generated method stub
-				String name = th.jTextField_Name.getText();
-				String desc = th.jTextArea_Description.getText();
-				JSONObject ans = new JSONObject();
-				
-				// account in db?
-				
-			if(name.length() ==0 && desc.length()==0) 
-			{
-				
-				setVisible(false);
-				return;
-			}
-			else if(name.length()==0){
-				name ="";
-			};
-			
-			
-			if(desc.length()!=0){
-				// write description
-				ans.put("description", desc);
-				
-			}
-			String acc = th.jTextField_Account.getText();
-			Account acc1;
-			try {
-				acc1 = new Account(acc);
-				db.set(acc, new Tuple2(name,StrJSonFine.convert(ans)));
-	            setVisible(false);
-	            return;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account"), Lang.getInstance().translate("Invalid Account"), JOptionPane.ERROR_MESSAGE);
-			}
-			
-			
-            //dispose();
-			}
-        	
+
+        jButton_OK.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                String name = th.jTextField_Name.getText();
+                String desc = th.jTextArea_Description.getText();
+                JSONObject ans = new JSONObject();
+
+                // account in db?
+
+                if (name.length() == 0 && desc.length() == 0) {
+
+                    setVisible(false);
+                    return;
+                } else if (name.length() == 0) {
+                    name = "";
+                }
+                ;
+
+
+                if (desc.length() != 0) {
+                    // write description
+                    ans.put("description", desc);
+
+                }
+                String acc = th.jTextField_Account.getText();
+                Account acc1;
+                try {
+                    acc1 = new Account(acc);
+                    db.set(acc, new Tuple2(name, StrJSonFine.convert(ans)));
+                    setVisible(false);
+                    return;
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account"), Lang.getInstance().translate("Invalid Account"), JOptionPane.ERROR_MESSAGE);
+                }
+
+
+                //dispose();
+            }
+
         });
-        
+
         this.setLocationRelativeTo(null);
         setModal(true);
-     //   setAlwaysOnTop(true);
+        //   setAlwaysOnTop(true);
         this.setVisible(true);
     }
 
@@ -134,7 +140,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
      * regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -154,8 +160,8 @@ public class Account_Name_Add extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-        layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0};
-        layout.rowHeights = new int[] {0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0};
+        layout.columnWidths = new int[]{0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.rowHeights = new int[]{0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0, 8, 0};
         getContentPane().setLayout(layout);
 
         jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -204,8 +210,8 @@ public class Account_Name_Add extends javax.swing.JDialog {
         getContentPane().add(jScrollPane2, gridBagConstraints);
 
         java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
-        jPanel1Layout.columnWidths = new int[] {0, 5, 0};
-        jPanel1Layout.rowHeights = new int[] {0};
+        jPanel1Layout.columnWidths = new int[]{0, 5, 0};
+        jPanel1Layout.rowHeights = new int[]{0};
         jPanel1.setLayout(jPanel1Layout);
 
         jButton_OK.setText("Ok");
@@ -266,24 +272,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         getContentPane().add(jTextField_Account, gridBagConstraints);
 
         pack();
-         
-    }// </editor-fold>                        
 
-    
-
-    // Variables declaration - do not modify                     
-    private javax.swing.ButtonGroup buttonGroupSelectType;
-    private javax.swing.JButton jButton_Cancel;
-    private javax.swing.JButton jButton_OK;
-    private javax.swing.JLabel jLabel_Account;
-    private javax.swing.JLabel jLabel_Description;
-    private javax.swing.JLabel jLabel_Name;
-    private javax.swing.JLabel jLabel_Title;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea_Description;
-    private javax.swing.JTextField jTextField_Account;
-    private javax.swing.JTextField jTextField_Name;
+    }// </editor-fold>
     // End of variables declaration                   
 }

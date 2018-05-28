@@ -1,19 +1,7 @@
 package core.transaction;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -21,162 +9,159 @@ import core.block.Block;
 import core.crypto.Crypto;
 import core.voting.Poll;
 import core.voting.PollOption;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
-public class CreatePollTransaction extends Transaction
-{
-	private static final int TYPE_ID = Transaction.CREATE_POLL_TRANSACTION;
-	private static final String NAME_ID = "Create Poll";
-	private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
-	private PublicKeyAccount creator;
-	private Poll poll;
+public class CreatePollTransaction extends Transaction {
+    private static final int TYPE_ID = Transaction.CREATE_POLL_TRANSACTION;
+    private static final String NAME_ID = "Create Poll";
+    private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference)
-	{
-		super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
+    private PublicKeyAccount creator;
+    private Poll poll;
 
-		this.creator = creator;
-		this.poll = poll;
-	}
-	public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature)
-	{
-		this(typeBytes, creator, poll, feePow, timestamp, reference);
+    public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference) {
+        super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
-		this.signature = signature;
-		//this.calcFee();
-	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature)
-	{
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference, signature);
-	}
-	public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference)
-	{
-		this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference);
-	}
+        this.creator = creator;
+        this.poll = poll;
+    }
 
-	//GETTERS/SETTERS
-	//public static String getName() { return "Create Poll"; }
+    public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(typeBytes, creator, poll, feePow, timestamp, reference);
 
-	public Poll getPoll()
-	{
-		return this.poll;
-	}
+        this.signature = signature;
+        //this.calcFee();
+    }
 
-	@Override
-	public boolean hasPublicText() {
-		return true;
-	}
+    public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference, signature);
+    }
 
-	//PARSE CONVERT
+    public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference);
+    }
 
-	public static Transaction Parse(byte[] data) throws Exception
-	{
-		//CHECK IF WE MATCH BLOCK LENGTH
-		if(data.length < BASE_LENGTH)
-		{
-			throw new Exception("Data does not match block length");
-		}
+    //GETTERS/SETTERS
+    //public static String getName() { return "Create Poll"; }
+
+    public static Transaction Parse(byte[] data) throws Exception {
+        //CHECK IF WE MATCH BLOCK LENGTH
+        if (data.length < BASE_LENGTH) {
+            throw new Exception("Data does not match block length");
+        }
 
 
-		// READ TYPE
-		byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-		int position = TYPE_LENGTH;
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
 
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
-		position += TIMESTAMP_LENGTH;
+        //READ TIMESTAMP
+        byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+        long timestamp = Longs.fromByteArray(timestampBytes);
+        position += TIMESTAMP_LENGTH;
 
-		//READ REFERENCE
-		byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-		long reference = Longs.fromByteArray(referenceBytes);
-		position += REFERENCE_LENGTH;
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-		position += CREATOR_LENGTH;
+        //READ CREATOR
+        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
+        position += CREATOR_LENGTH;
 
-		//READ POLL
-		Poll poll = Poll.parse(Arrays.copyOfRange(data, position, data.length));
-		position += poll.getDataLength();
+        //READ POLL
+        Poll poll = Poll.parse(Arrays.copyOfRange(data, position, data.length));
+        position += poll.getDataLength();
 
-		//READ FEE POWER
-		byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte feePow = feePowBytes[0];
-		position += 1;
+        //READ FEE POWER
+        byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+        byte feePow = feePowBytes[0];
+        position += 1;
 
-		//READ SIGNATURE
-		byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
+        //READ SIGNATURE
+        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-		return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes);
-	}
+        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public JSONObject toJson()
-	{
-		//GET BASE
-		JSONObject transaction = this.getJsonBase();
+    public Poll getPoll() {
+        return this.poll;
+    }
 
-		//ADD CREATOR/NAME/DESCRIPTION/OPTIONS
-		transaction.put("creator", this.creator.getAddress());
-		transaction.put("name", this.poll.getName());
-		transaction.put("description", this.poll.getDescription());
+    //PARSE CONVERT
 
-		JSONArray options = new JSONArray();
-		for(PollOption option: this.poll.getOptions())
-		{
-			options.add(option.getName());
-		}
+    @Override
+    public boolean hasPublicText() {
+        return true;
+    }
 
-		transaction.put("options", options);
+    @SuppressWarnings("unchecked")
+    @Override
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject transaction = this.getJsonBase();
 
-		return transaction;
-	}
+        //ADD CREATOR/NAME/DESCRIPTION/OPTIONS
+        transaction.put("creator", this.creator.getAddress());
+        transaction.put("name", this.poll.getName());
+        transaction.put("description", this.poll.getDescription());
 
-	@Override
-	public byte[] toBytes(boolean withSign, Long releaserReference)
-	{
-		byte[] data = new byte[0];
+        JSONArray options = new JSONArray();
+        for (PollOption option : this.poll.getOptions()) {
+            options.add(option.getName());
+        }
 
-		//WRITE TYPE
-		data = Bytes.concat(data, this.typeBytes);
+        transaction.put("options", options);
 
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-		data = Bytes.concat(data, timestampBytes);
+        return transaction;
+    }
 
-		//WRITE REFERENCE
-		byte[] referenceBytes = Longs.toByteArray(this.reference);
-		referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
-		data = Bytes.concat(data, referenceBytes);
+    @Override
+    public byte[] toBytes(boolean withSign, Long releaserReference) {
+        byte[] data = new byte[0];
 
-		//WRITE CREATOR
-		data = Bytes.concat(data, this.creator.getPublicKey());
+        //WRITE TYPE
+        data = Bytes.concat(data, this.typeBytes);
 
-		//WRITE POLL
-		data = Bytes.concat(data, this.poll.toBytes());
+        //WRITE TIMESTAMP
+        byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+        timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+        data = Bytes.concat(data, timestampBytes);
 
-		//WRITE FEE POWER
-		byte[] feePowBytes = new byte[1];
-		feePowBytes[0] = this.feePow;
-		data = Bytes.concat(data, feePowBytes);
+        //WRITE REFERENCE
+        byte[] referenceBytes = Longs.toByteArray(this.reference);
+        referenceBytes = Bytes.ensureCapacity(referenceBytes, REFERENCE_LENGTH, 0);
+        data = Bytes.concat(data, referenceBytes);
 
-		//SIGNATURE
-		if (withSign) data = Bytes.concat(data, this.signature);
+        //WRITE CREATOR
+        data = Bytes.concat(data, this.creator.getPublicKey());
 
-		return data;
-	}
+        //WRITE POLL
+        data = Bytes.concat(data, this.poll.toBytes());
 
-	@Override
-	public int getDataLength(boolean asPack)
-	{
-		return BASE_LENGTH + this.poll.getDataLength();
-	}
+        //WRITE FEE POWER
+        byte[] feePowBytes = new byte[1];
+        feePowBytes[0] = this.feePow;
+        data = Bytes.concat(data, feePowBytes);
 
-	//VALIDATE
+        //SIGNATURE
+        if (withSign) data = Bytes.concat(data, this.signature);
+
+        return data;
+    }
+
+    @Override
+    public int getDataLength(boolean asPack) {
+        return BASE_LENGTH + this.poll.getDataLength();
+    }
+
+    //VALIDATE
 
 	/*
 	public boolean isSignatureValid()
@@ -188,155 +173,135 @@ public class CreatePollTransaction extends Transaction
 	}
 	 */
 
-	@Override
-	public int isValid(Long releaserReference, long flags)
-	{
+    @Override
+    public int isValid(Long releaserReference, long flags) {
 
-		if (this.height > BlockChain.ITEM_POLL_FROM) 
-			return INVALID_TRANSACTION_TYPE;
-		
-		//CHECK POLL NAME LENGTH
-		int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
-		if(nameLength > 400 || nameLength < 1)
-		{
-			return INVALID_NAME_LENGTH;
-		}
+        if (this.height > BlockChain.ITEM_POLL_FROM)
+            return INVALID_TRANSACTION_TYPE;
 
-		//CHECK POLL NAME LOWERCASE
-		if(!this.poll.getName().equals(this.poll.getName().toLowerCase()))
-		{
-			return NAME_NOT_LOWER_CASE;
-		}
+        //CHECK POLL NAME LENGTH
+        int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
+        if (nameLength > 400 || nameLength < 1) {
+            return INVALID_NAME_LENGTH;
+        }
 
-		//CHECK POLL DESCRIPTION LENGTH
-		int descriptionLength = this.poll.getDescription().getBytes(StandardCharsets.UTF_8).length;
-		if(descriptionLength > BlockChain.MAX_REC_DATA_BYTES || descriptionLength < 1)
-		{
-			return INVALID_DESCRIPTION_LENGTH;
-		}
+        //CHECK POLL NAME LOWERCASE
+        if (!this.poll.getName().equals(this.poll.getName().toLowerCase())) {
+            return NAME_NOT_LOWER_CASE;
+        }
 
-		//CHECK POLL DOES NOT EXIST ALREADY
-		if(this.dcSet.getPollMap().contains(this.poll))
-		{
-			return POLL_ALREADY_CREATED;
-		}
+        //CHECK POLL DESCRIPTION LENGTH
+        int descriptionLength = this.poll.getDescription().getBytes(StandardCharsets.UTF_8).length;
+        if (descriptionLength > BlockChain.MAX_REC_DATA_BYTES || descriptionLength < 1) {
+            return INVALID_DESCRIPTION_LENGTH;
+        }
 
-		//CHECK IF POLL DOES NOT CONTAIN ANY VOTERS
-		if(this.poll.hasVotes())
-		{
-			return POLL_ALREADY_HAS_VOTES;
-		}
+        //CHECK POLL DOES NOT EXIST ALREADY
+        if (this.dcSet.getPollMap().contains(this.poll)) {
+            return POLL_ALREADY_CREATED;
+        }
 
-		//CHECK POLL CREATOR VALID ADDRESS
-		if(!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddress()))
-		{
-			return INVALID_ADDRESS;
-		}
+        //CHECK IF POLL DOES NOT CONTAIN ANY VOTERS
+        if (this.poll.hasVotes()) {
+            return POLL_ALREADY_HAS_VOTES;
+        }
 
-		//CHECK OPTIONS LENGTH
-		int optionsLength = poll.getOptions().size();
-		if(optionsLength > 100 || optionsLength < 1)
-		{
-			return INVALID_OPTIONS_LENGTH;
-		}
+        //CHECK POLL CREATOR VALID ADDRESS
+        if (!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddress())) {
+            return INVALID_ADDRESS;
+        }
 
-		//CHECK OPTIONS
-		List<String> options = new ArrayList<String>();
-		for(PollOption option: this.poll.getOptions())
-		{
-			//CHECK OPTION LENGTH
-			int optionLength = option.getName().getBytes(StandardCharsets.UTF_8).length;
-			if(optionLength > 400 || optionLength < 1)
-			{
-				return INVALID_OPTION_LENGTH;
-			}
+        //CHECK OPTIONS LENGTH
+        int optionsLength = poll.getOptions().size();
+        if (optionsLength > 100 || optionsLength < 1) {
+            return INVALID_OPTIONS_LENGTH;
+        }
 
-			//CHECK OPTION UNIQUE
-			if(options.contains(option.getName()))
-			{
-				return DUPLICATE_OPTION;
-			}
+        //CHECK OPTIONS
+        List<String> options = new ArrayList<String>();
+        for (PollOption option : this.poll.getOptions()) {
+            //CHECK OPTION LENGTH
+            int optionLength = option.getName().getBytes(StandardCharsets.UTF_8).length;
+            if (optionLength > 400 || optionLength < 1) {
+                return INVALID_OPTION_LENGTH;
+            }
 
-			options.add(option.getName());
-		}
+            //CHECK OPTION UNIQUE
+            if (options.contains(option.getName())) {
+                return DUPLICATE_OPTION;
+            }
 
-		return super.isValid(releaserReference, flags);
-	}
+            options.add(option.getName());
+        }
 
-	//PROCESS/ORPHAN
+        return super.isValid(releaserReference, flags);
+    }
 
-	//@Override
-	@Override
-	public void process(Block block, boolean asPack)
-	{
-		//UPDATE CREATOR
-		super.process(block, asPack);
+    //PROCESS/ORPHAN
 
-		//INSERT INTO DATABASE
-		this.dcSet.getPollMap().add(this.poll);
-	}
+    //@Override
+    @Override
+    public void process(Block block, boolean asPack) {
+        //UPDATE CREATOR
+        super.process(block, asPack);
+
+        //INSERT INTO DATABASE
+        this.dcSet.getPollMap().add(this.poll);
+    }
 
 
-	//@Override
-	@Override
-	public void orphan(boolean asPack)
-	{
-		//UPDATE CREATOR
-		super.orphan(asPack);
+    //@Override
+    @Override
+    public void orphan(boolean asPack) {
+        //UPDATE CREATOR
+        super.orphan(asPack);
 
-		//DELETE FROM DATABASE
-		this.dcSet.getPollMap().delete(this.poll);
-	}
+        //DELETE FROM DATABASE
+        this.dcSet.getPollMap().delete(this.poll);
+    }
 
 
-	@Override
-	public HashSet<Account> getInvolvedAccounts()
-	{
-		HashSet<Account> accounts = new HashSet<>();
-		accounts.add(this.creator);
-		accounts.add(this.poll.getCreator());
-		return accounts;
-	}
+    @Override
+    public HashSet<Account> getInvolvedAccounts() {
+        HashSet<Account> accounts = new HashSet<>();
+        accounts.add(this.creator);
+        accounts.add(this.poll.getCreator());
+        return accounts;
+    }
 
-	@Override
-	public HashSet<Account> getRecipientAccounts()
-	{
-		return new HashSet<>();
-	}
+    @Override
+    public HashSet<Account> getRecipientAccounts() {
+        return new HashSet<>();
+    }
 
-	@Override
-	public boolean isInvolved(Account account)
-	{
-		String address = account.getAddress();
+    @Override
+    public boolean isInvolved(Account account) {
+        String address = account.getAddress();
 
-		if(address.equals(this.creator.getAddress()) || address.equals(this.poll.getCreator().getAddress()))
-		{
-			return true;
-		}
+        if (address.equals(this.creator.getAddress()) || address.equals(this.poll.getCreator().getAddress())) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	//@Override
-	@Override
-	public BigDecimal getAmount(Account account)
-	{
-		if(account.getAddress().equals(this.creator.getAddress()))
-		{
-			return BigDecimal.ZERO.subtract(this.fee);
-		}
+    //@Override
+    @Override
+    public BigDecimal getAmount(Account account) {
+        if (account.getAddress().equals(this.creator.getAddress())) {
+            return BigDecimal.ZERO.subtract(this.fee);
+        }
 
-		return BigDecimal.ZERO;
-	}
+        return BigDecimal.ZERO;
+    }
 
-	//@Override
-	public Map<String, Map<Long, BigDecimal>> getAssetAmount()
-	{
-		return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
-	}
+    //@Override
+    public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
+        return subAssetAmount(null, this.creator.getAddress(), FEE_KEY, this.fee);
+    }
 
-	@Override
-	public int calcBaseFee() {
-		return calcCommonFee();
-	}
+    @Override
+    public int calcBaseFee() {
+        return calcCommonFee();
+    }
 }

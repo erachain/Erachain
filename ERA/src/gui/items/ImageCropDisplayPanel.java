@@ -15,11 +15,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ImageCropDisplayPanel extends JPanel {
-    private int cropX;
     private final int cropY;
-    private int cropWidth;
     private final int originalCropWidth;
     private final int cropHeight;
+    private int cropX;
+    private int cropWidth;
     private BufferedImage image;
     private int imageX;
     private int imageY;
@@ -41,7 +41,7 @@ public class ImageCropDisplayPanel extends JPanel {
         this.cropY = getPreferredSize().height / 2 - cropHeight / 2;
 
         long len = imageFile.length();
-        
+
         try {
             image = ImageIO.read(imageFile);
         } catch (IOException e) {
@@ -82,8 +82,7 @@ public class ImageCropDisplayPanel extends JPanel {
     }
 
 
-    private void moveImageBy(double deltaX, double deltaY)
-    {
+    private void moveImageBy(double deltaX, double deltaY) {
         imageX += deltaX;
         imageY += deltaY;
 //        imageX = between(imageX + deltaX, (cropX + cropWidth - image.getWidth()) / zoom, cropX / zoom);
@@ -111,8 +110,7 @@ public class ImageCropDisplayPanel extends JPanel {
     }
 
 
-    private void drawFrame(Graphics2D g2d)
-    {
+    private void drawFrame(Graphics2D g2d) {
         drawRect(g2d, cropX, cropY, cropWidth, cropHeight, Color.BLACK);
         drawRect(g2d, cropX - 1, cropY - 1, cropWidth + 2, cropHeight + 2, Color.WHITE);
         drawRect(g2d, cropX - 2, cropY - 2, cropWidth + 4, cropHeight + 4, Color.WHITE);
@@ -121,42 +119,26 @@ public class ImageCropDisplayPanel extends JPanel {
     }
 
 
-    private void drawRect(Graphics2D g2d, int x, int y, int width, int height, Color color)
-    {
+    private void drawRect(Graphics2D g2d, int x, int y, int width, int height, Color color) {
         g2d.setColor(color);
         g2d.drawRect(x, y, width, height);
     }
 
-
-    public void setZoom(double zoom)
-    {
-
-    	int deltaX = (int)(image.getWidth() / this.zoom - image.getWidth() / zoom);
-    	int deltaY = (int)(image.getHeight() / this.zoom - image.getHeight() / zoom);
-    	this.zoom = zoom;
-        imageX -= deltaX>>1;
-        imageY -= deltaY>>1;
-        repaint();
-    }
-
-
-    public void setFrameRate(int value)
-    {
+    public void setFrameRate(int value) {
         cropWidth = originalCropWidth - originalCropWidth * value / 100;
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         moveImageBy(0, 0);
     }
 
-
     public BufferedImage getSnapshot() {
-        BufferedImage snapshot = new BufferedImage(Math.max((int)(image.getWidth() * zoom) + 1, cropX + cropWidth), Math.max((int)(image.getHeight() * zoom) + 1, cropY + cropHeight), BufferedImage.TYPE_INT_RGB);
+        BufferedImage snapshot = new BufferedImage(Math.max((int) (image.getWidth() * zoom) + 1, cropX + cropWidth), Math.max((int) (image.getHeight() * zoom) + 1, cropY + cropHeight), BufferedImage.TYPE_INT_RGB);
         //snapshot.getScaledInstance(2, 2, 1).getSource().
-        Graphics2D g2d = (Graphics2D)snapshot.getGraphics();
+        Graphics2D g2d = (Graphics2D) snapshot.getGraphics();
         g2d.scale(zoom, zoom);
         g2d.drawImage(image, imageX, imageY, this);
 
         //g2d.rotate(theta);
-        
+
         int cropXnew = cropX;
         int cropYnew = cropY;
         int cropWidthNew = cropWidth;
@@ -169,35 +151,39 @@ public class ImageCropDisplayPanel extends JPanel {
         imageWidth *= zoom;
         int imageHeight = image.getHeight();
         imageHeight *= zoom;
-        
+
         if (imageXnew > cropX) {
-        	cropXnew = imageXnew;
+            cropXnew = imageXnew;
             if (imageXnew + imageWidth > cropX + cropWidth)
-            	cropWidthNew = cropX + cropWidth - cropXnew;
+                cropWidthNew = cropX + cropWidth - cropXnew;
         }
 
         if (imageYnew > cropY) {
-        	cropYnew = imageYnew; 
+            cropYnew = imageYnew;
             if (imageYnew + imageHeight > cropY + cropHeight)
-            	cropHeightNew = cropY + cropHeight - cropYnew;
+                cropHeightNew = cropY + cropHeight - cropYnew;
         }
-        
+
         if (imageXnew + imageWidth < cropX + cropWidth) {
             if (imageXnew > cropX)
-            	cropWidthNew = imageWidth;
+                cropWidthNew = imageWidth;
             else
-            	cropWidthNew = imageXnew + imageWidth - cropX;
+                cropWidthNew = imageXnew + imageWidth - cropX;
         }
 
         if (imageYnew + imageHeight < cropY + cropHeight) {
             if (imageYnew > cropY)
-            	cropHeightNew = imageHeight;
+                cropHeightNew = imageHeight;
             else
-            	cropHeightNew = imageYnew + imageHeight - cropY;
+                cropHeightNew = imageYnew + imageHeight - cropY;
         }
 
-        
+
         return snapshot.getSubimage(cropXnew, cropYnew, cropWidthNew, cropHeightNew);
+    }
+
+    public void addZoomListener(ChangeListener listener) {
+        zoomListeners.add(listener);
     }
 
 /*
@@ -207,12 +193,17 @@ public class ImageCropDisplayPanel extends JPanel {
     }
 */
 
-    public void addZoomListener(ChangeListener listener) {
-        zoomListeners.add(listener);
-    }
-
-
     public double getZoom() {
         return zoom;
+    }
+
+    public void setZoom(double zoom) {
+
+        int deltaX = (int) (image.getWidth() / this.zoom - image.getWidth() / zoom);
+        int deltaY = (int) (image.getHeight() / this.zoom - image.getHeight() / zoom);
+        this.zoom = zoom;
+        imageX -= deltaX >> 1;
+        imageY -= deltaY >> 1;
+        repaint();
     }
 }

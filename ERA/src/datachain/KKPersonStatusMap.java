@@ -1,13 +1,7 @@
 package datachain;
 
 
-import java.util.Stack;
-import java.util.TreeMap;
-
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple5;
-
-import datachain.DCSet;
 import utils.ObserverMessage;
 
 /*
@@ -26,22 +20,19 @@ TreeMap<Long, // item2 Key <-- STATUS
 {
 */
 
-public class KKPersonStatusMap extends KK_Map
-{
-		
-	public KKPersonStatusMap(DCSet databaseSet, DB database)
-	{
-		super(databaseSet, database, "person_status",
-				ObserverMessage.RESET_PERSON_STATUS_TYPE,
-				ObserverMessage.ADD_PERSON_STATUS_TYPE,
-				ObserverMessage.REMOVE_PERSON_STATUS_TYPE,
-				ObserverMessage.LIST_PERSON_STATUS_TYPE
-				);
-	}
+public class KKPersonStatusMap extends KK_Map {
 
-	public KKPersonStatusMap(KKPersonStatusMap parent) 
-	{
-		super(parent);
-	}
-	
+    public KKPersonStatusMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database, "person_status",
+                ObserverMessage.RESET_PERSON_STATUS_TYPE,
+                ObserverMessage.ADD_PERSON_STATUS_TYPE,
+                ObserverMessage.REMOVE_PERSON_STATUS_TYPE,
+                ObserverMessage.LIST_PERSON_STATUS_TYPE
+        );
+    }
+
+    public KKPersonStatusMap(KKPersonStatusMap parent) {
+        super(parent);
+    }
+
 }

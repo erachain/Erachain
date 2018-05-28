@@ -1,69 +1,59 @@
 package gui.library;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
-
-import javax.swing.JFileChooser;
-import javax.swing.UIManager;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
-
-import controller.Controller;
 import lang.Lang;
 import settings.Settings;
 
-public class My_JFileChooser extends JFileChooser{
-	
-	private static String default_path = Settings.getInstance().get_File_Chooser_Paht();
-	private My_JFileChooser th;
-	protected static int default_Wight = Settings.getInstance().get_File_Chooser_Wight();
-	protected static int default_Height = Settings.getInstance().get_File_Chooser_Height();
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-// настройка диалога файлового на русский язык
-	public My_JFileChooser () {
-		super(default_path);
-		th = this;
-		if (default_Wight != 0 || default_Height != 0) this.setPreferredSize(new Dimension(default_Wight, default_Height)); 
-		
-		UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
-		UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate( "Cancel"));
-		UIManager.put("FileChooser.lookInLabelText",Lang.getInstance().translate( "Look in"));
-		UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
-		UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
+public class My_JFileChooser extends JFileChooser {
 
-		UIManager.put("FileChooser.saveButtonText",Lang.getInstance().translate( "Save"));
-		UIManager.put("FileChooser.saveButtonToolTipText",Lang.getInstance().translate( "Save"));
-		UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
-		UIManager.put("FileChooser.openButtonToolTipText", Lang.getInstance().translate("Open"));
-		UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate("Cancel"));
-		UIManager.put("FileChooser.cancelButtonToolTipText",Lang.getInstance().translate( "Cancel"));
+    protected static int default_Wight = Settings.getInstance().get_File_Chooser_Wight();
+    protected static int default_Height = Settings.getInstance().get_File_Chooser_Height();
+    private static String default_path = Settings.getInstance().get_File_Chooser_Paht();
+    private My_JFileChooser th;
 
-		UIManager.put("FileChooser.lookInLabelText",Lang.getInstance().translate( "Folder"));
-		UIManager.put("FileChooser.saveInLabelText", Lang.getInstance().translate("Folder"));
-		UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
-		UIManager.put("FileChooser.folderNameLabelText", Lang.getInstance().translate("Folder Name"));
-		UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
+    // настройка диалога файлового на русский язык
+    public My_JFileChooser() {
+        super(default_path);
+        th = this;
+        if (default_Wight != 0 || default_Height != 0)
+            this.setPreferredSize(new Dimension(default_Wight, default_Height));
 
-		UIManager.put("FileChooser.upFolderToolTipText", Lang.getInstance().translate("UP Folder"));
-		UIManager.put("FileChooser.newFolderToolTipText", Lang.getInstance().translate("New Folder"));
-		UIManager.put("FileChooser.listViewButtonToolTipText", Lang.getInstance().translate("List View"));
-		UIManager.put("FileChooser.detailsViewButtonToolTipText", Lang.getInstance().translate("Details View"));
-		UIManager.put("FileChooser.fileNameHeaderText",  Lang.getInstance().translate("Name"));
-		UIManager.put("FileChooser.fileSizeHeaderText",  Lang.getInstance().translate("Size"));
-		UIManager.put("FileChooser.fileTypeHeaderText",  Lang.getInstance().translate("Type"));
-		UIManager.put("FileChooser.fileDateHeaderText",  Lang.getInstance().translate("File Date"));
-		UIManager.put("FileChooser.fileAttrHeaderText",  Lang.getInstance().translate("File Attr"));
-		
-		
-		
+        UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
+        UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate("Cancel"));
+        UIManager.put("FileChooser.lookInLabelText", Lang.getInstance().translate("Look in"));
+        UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
+        UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
 
-		UIManager.put("FileChooser.detailsViewButtonAccessibleName",  Lang.getInstance().translate("All Files"));
-		this.updateUI();
+        UIManager.put("FileChooser.saveButtonText", Lang.getInstance().translate("Save"));
+        UIManager.put("FileChooser.saveButtonToolTipText", Lang.getInstance().translate("Save"));
+        UIManager.put("FileChooser.openButtonText", Lang.getInstance().translate("Open"));
+        UIManager.put("FileChooser.openButtonToolTipText", Lang.getInstance().translate("Open"));
+        UIManager.put("FileChooser.cancelButtonText", Lang.getInstance().translate("Cancel"));
+        UIManager.put("FileChooser.cancelButtonToolTipText", Lang.getInstance().translate("Cancel"));
+
+        UIManager.put("FileChooser.lookInLabelText", Lang.getInstance().translate("Folder"));
+        UIManager.put("FileChooser.saveInLabelText", Lang.getInstance().translate("Folder"));
+        UIManager.put("FileChooser.fileNameLabelText", Lang.getInstance().translate("File Name"));
+        UIManager.put("FileChooser.folderNameLabelText", Lang.getInstance().translate("Folder Name"));
+        UIManager.put("FileChooser.filesOfTypeLabelText", Lang.getInstance().translate("File Type"));
+
+        UIManager.put("FileChooser.upFolderToolTipText", Lang.getInstance().translate("UP Folder"));
+        UIManager.put("FileChooser.newFolderToolTipText", Lang.getInstance().translate("New Folder"));
+        UIManager.put("FileChooser.listViewButtonToolTipText", Lang.getInstance().translate("List View"));
+        UIManager.put("FileChooser.detailsViewButtonToolTipText", Lang.getInstance().translate("Details View"));
+        UIManager.put("FileChooser.fileNameHeaderText", Lang.getInstance().translate("Name"));
+        UIManager.put("FileChooser.fileSizeHeaderText", Lang.getInstance().translate("Size"));
+        UIManager.put("FileChooser.fileTypeHeaderText", Lang.getInstance().translate("Type"));
+        UIManager.put("FileChooser.fileDateHeaderText", Lang.getInstance().translate("File Date"));
+        UIManager.put("FileChooser.fileAttrHeaderText", Lang.getInstance().translate("File Attr"));
+
+
+        UIManager.put("FileChooser.detailsViewButtonAccessibleName", Lang.getInstance().translate("All Files"));
+        this.updateUI();
 	
 		
 		/*
@@ -122,38 +112,38 @@ public class My_JFileChooser extends JFileChooser{
 		 */
 
 //   My_JFileChooser.set_Default_Path(chooser.getCurrentDirectory().getPath());
-	// save path	
-		addActionListener(new ActionListener() {
+        // save path
+        addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)){
+                if (e.getActionCommand().equals(JFileChooser.APPROVE_SELECTION)) {
                     // была нажата кнопка OK
-            	  // save path
-            	  default_path = getCurrentDirectory().getPath();
-            	  // save size
-            	  default_Wight = th.getWidth();
-            	  default_Height= th.getHeight();
-            	  
-            	  
-              } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) {
+                    // save path
+                    default_path = getCurrentDirectory().getPath();
+                    // save size
+                    default_Wight = th.getWidth();
+                    default_Height = th.getHeight();
+
+
+                } else if (e.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)) {
                     // была нажата кнопка Cancel
-              }
+                }
             }
         });
-		
-	} 
-	
 
-	public static String get_Default_Path(){
-		return default_path;
-	}
-	
-	public static int get_Default_Width(){
-		return default_Wight;
-	}
-	public static int get_Default_Height(){
-		return default_Height;
-	}
-	
-	
+    }
+
+
+    public static String get_Default_Path() {
+        return default_path;
+    }
+
+    public static int get_Default_Width() {
+        return default_Wight;
+    }
+
+    public static int get_Default_Height() {
+        return default_Height;
+    }
+
 
 }

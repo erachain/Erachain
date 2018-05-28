@@ -1,12 +1,5 @@
 package gui.models;
 
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -15,91 +8,84 @@ import datachain.DCSet;
 import lang.Lang;
 import utils.ObserverMessage;
 
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
 @SuppressWarnings("serial")
-public class AccountStatementsTableModel extends AbstractTableModel implements Observer
-{
-	private static final int COLUMN_ADDRESS = 0;
-	public static final int COLUMN_TEMPLATE_KEY = 1;
-	public static final int COLUMN_TEMPLATE_NAME = 2;
-	public static final int COLUMN_TEXT = 3;
+public class AccountStatementsTableModel extends AbstractTableModel implements Observer {
+    public static final int COLUMN_TEMPLATE_KEY = 1;
+    public static final int COLUMN_TEMPLATE_NAME = 2;
+    public static final int COLUMN_TEXT = 3;
+    private static final int COLUMN_ADDRESS = 0;
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Template Key", "Template Name", "Own Text"});
+    private List<PublicKeyAccount> publicKeyAccounts;
+    private TemplateCls template;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Template Key", "Template Name", "Own Text"});
-	private List<PublicKeyAccount> publicKeyAccounts;
-	private TemplateCls template;
-
-	public AccountStatementsTableModel()
-	{
-		this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
-		Controller.getInstance().addWalletListener(this);
-		Controller.getInstance().addObserver(this);
-	}
+    public AccountStatementsTableModel() {
+        this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addObserver(this);
+    }
 
 
-	@Override
-	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object o = getValueAt(0, c);
-		return o==null?Null.class:o.getClass();
-	}
+    @Override
+    public Class<? extends Object> getColumnClass(int c) {     // set column type
+        Object o = getValueAt(0, c);
+        return o == null ? Null.class : o.getClass();
+    }
 
 
+    public Account getAccount(int row) {
+        return publicKeyAccounts.get(row);
+    }
 
+    public PublicKeyAccount getPublicKeyAccount(int row) {
+        return publicKeyAccounts.get(row);
+    }
 
-	public Account getAccount(int row)
-	{
-		return publicKeyAccounts.get(row);
-	}
-	public PublicKeyAccount getPublicKeyAccount(int row)
-	{
-		return publicKeyAccounts.get(row);
-	}
+    public void setAsset(TemplateCls template) {
+        this.template = template;
+        this.fireTableDataChanged();
+    }
 
-	public void setAsset(TemplateCls template)
-	{
-		this.template = template;
-		this.fireTableDataChanged();
-	}
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
 
-	@Override
-	public int getColumnCount()
-	{
-		return columnNames.length;
-	}
+    @Override
+    public String getColumnName(int index) {
+        return columnNames[index];
+    }
 
-	@Override
-	public String getColumnName(int index)
-	{
-		return columnNames[index];
-	}
+    @Override
+    public int getRowCount() {
+        return this.publicKeyAccounts.size();
+    }
 
-	@Override
-	public int getRowCount()
-	{
-		return this.publicKeyAccounts.size();
-	}
+    @Override
+    public Object getValueAt(int row, int column) {
+        if (this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1) {
+            return null;
+        }
 
-	@Override
-	public Object getValueAt(int row, int column)
-	{
-		if(this.publicKeyAccounts == null || row > this.publicKeyAccounts.size() - 1 )
-		{
-			return null;
-		}
+        Account account = this.publicKeyAccounts.get(row);
 
-		Account account = this.publicKeyAccounts.get(row);
-
-		switch(column)
-		{
-		case COLUMN_ADDRESS:
-			return account.getPersonAsString();
-		case COLUMN_TEMPLATE_KEY:
-			if (this.template == null) return "-";
-			return this.template.getKey(DCSet.getInstance());
-		case COLUMN_TEMPLATE_NAME:
-			if (this.template == null) return "-";
-			return this.template.viewName();
-		case COLUMN_TEXT:
-			if (this.template == null) return "-";
-			return "+";
+        switch (column) {
+            case COLUMN_ADDRESS:
+                return account.getPersonAsString();
+            case COLUMN_TEMPLATE_KEY:
+                if (this.template == null) return "-";
+                return this.template.getKey(DCSet.getInstance());
+            case COLUMN_TEMPLATE_NAME:
+                if (this.template == null) return "-";
+                return this.template.viewName();
+            case COLUMN_TEXT:
+                if (this.template == null) return "-";
+                return "+";
 
 
 			/*
@@ -116,51 +102,44 @@ public class AccountStatementsTableModel extends AbstractTableModel implements O
 			}
 			 */
 
-		}
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void update(Observable o, Object arg)
-	{
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
-	}
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            //GUI ERROR
+        }
+    }
 
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
 
-		if( message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK ) {
+        if (message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK) {
 
-			this.fireTableRowsUpdated(0, this.getRowCount()-1);
+            this.fireTableRowsUpdated(0, this.getRowCount() - 1);
 
-		} else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
+        } else if (Controller.getInstance().getStatus() == Controller.STATUS_OK) {
 
-			if(message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
-					|| message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE)
-			{
-				this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
+            if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE
+                    || message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+                this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
 
-				this.fireTableRowsUpdated(0, this.getRowCount()-1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
-			}
+                this.fireTableRowsUpdated(0, this.getRowCount() - 1);  // WHEN UPDATE DATA - SELECTION DOES NOT DISAPPEAR
+            }
 
-			if(message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
-					|| message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-					//|| message.getType() == ObserverMessage.ADD_STATEMENT_TYPE
-					//|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
-					)
-			{
-				this.fireTableDataChanged();
-			}
-		}
-	}
+            if (message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
+                    || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
+                //|| message.getType() == ObserverMessage.ADD_STATEMENT_TYPE
+                //|| message.getType() == ObserverMessage.REMOVE_STATEMENT_TYPE
+                    ) {
+                this.fireTableDataChanged();
+            }
+        }
+    }
 
 }

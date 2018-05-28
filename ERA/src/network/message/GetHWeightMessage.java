@@ -1,15 +1,13 @@
 package network.message;
 
-public class GetHWeightMessage extends Message{
+public class GetHWeightMessage extends Message {
 
-	public GetHWeightMessage()
-	{
-		super(GET_HWEIGHT_TYPE);	
-	}
-		
-	public boolean isRequest()
-	{
-		return true;
-	}
+    public GetHWeightMessage() {
+        super(GET_HWEIGHT_TYPE);
+    }
+
+    public boolean isRequest() {
+        return true;
+    }
 
 }

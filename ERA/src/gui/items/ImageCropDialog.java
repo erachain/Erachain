@@ -1,9 +1,8 @@
 package gui.items;
 
-import javax.swing.*;
-
 import lang.Lang;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -27,7 +26,7 @@ public abstract class ImageCropDialog extends JDialog {
         c.gridx = 1;
         JButton cancelButton = new JButton(Lang.getInstance().translate("Cancel"));
         cancelButton.addActionListener(e ->
-            dispose()
+                dispose()
         );
         buttonPanel.add(cancelButton, c);
         contentPanel.add(buttonPanel, BorderLayout.SOUTH);

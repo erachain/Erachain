@@ -1,131 +1,117 @@
 package core.naming;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import core.BlockChain;
+import datachain.DCSet;
+import org.json.simple.JSONObject;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.json.simple.JSONObject;
+public class NameSale {
+    private static final int NAME_SIZE_LENGTH = 4;
+    private static final int AMOUNT_LENGTH = 8;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
+    private String key;
+    private BigDecimal amount;
 
-import core.BlockChain;
-import datachain.DCSet;
+    public NameSale(String key, BigDecimal amount) {
+        this.key = key;
+        this.amount = amount;
+    }
 
-public class NameSale
-{
-	private static final int NAME_SIZE_LENGTH = 4;
-	private static final int AMOUNT_LENGTH = 8;
+    //GETTERS/SETTERS
 
-	private String key;
-	private BigDecimal amount;
+    public static NameSale Parse(byte[] data) throws Exception {
+        int position = 0;
 
-	public NameSale(String key, BigDecimal amount)
-	{
-		this.key = key;
-		this.amount = amount;
-	}
+        //READ NAME
+        byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
+        int nameLength = Ints.fromByteArray(nameLengthBytes);
+        position += NAME_SIZE_LENGTH;
 
-	//GETTERS/SETTERS
+        if (nameLength < 1 || nameLength > 400) {
+            throw new Exception("Invalid name length");
+        }
 
-	public String getKey()
-	{
-		return key;
-	}
+        byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
+        String nameName = new String(nameBytes, StandardCharsets.UTF_8);
+        position += nameLength;
 
-	public Name getName(DCSet db)
-	{
-		return db.getNameMap().get(this.key);
-	}
+        //READ AMOUNT
+        byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+        position += AMOUNT_LENGTH;
 
-	public Name getName()
-	{
-		return this.getName(DCSet.getInstance());
-	}
+        return new NameSale(nameName, amount);
+    }
 
-	public BigDecimal getAmount()
-	{
-		return this.amount;
-	}
+    public String getKey() {
+        return key;
+    }
 
-	//PARSE
+    public Name getName(DCSet db) {
+        return db.getNameMap().get(this.key);
+    }
 
-	public static NameSale Parse(byte[] data) throws Exception
-	{
-		int position = 0;
+    public Name getName() {
+        return this.getName(DCSet.getInstance());
+    }
 
-		//READ NAME
-		byte[] nameLengthBytes = Arrays.copyOfRange(data, position, position + NAME_SIZE_LENGTH);
-		int nameLength = Ints.fromByteArray(nameLengthBytes);
-		position += NAME_SIZE_LENGTH;
+    //PARSE
 
-		if(nameLength < 1 || nameLength > 400)
-		{
-			throw new Exception("Invalid name length");
-		}
+    public BigDecimal getAmount() {
+        return this.amount;
+    }
 
-		byte[] nameBytes = Arrays.copyOfRange(data, position, position + nameLength);
-		String nameName = new String(nameBytes, StandardCharsets.UTF_8);
-		position += nameLength;
+    @SuppressWarnings("unchecked")
+    public JSONObject toJson() {
+        //GET BASE
+        JSONObject nameSale = new JSONObject();
 
-		//READ AMOUNT
-		byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-		position += AMOUNT_LENGTH;
+        //ADD NAME/AMOUNT/OWNER
+        nameSale.put("name", this.getKey());
+        nameSale.put("amount", this.getAmount().toPlainString());
+        nameSale.put("seller", this.getName().getOwner().getAddress());
 
-		return new NameSale(nameName, amount);
-	}
+        return nameSale;
+    }
 
-	@SuppressWarnings("unchecked")
-	public JSONObject toJson()
-	{
-		//GET BASE
-		JSONObject nameSale = new JSONObject();
+    public byte[] toBytes() {
+        byte[] data = new byte[0];
 
-		//ADD NAME/AMOUNT/OWNER
-		nameSale.put("name", this.getKey());
-		nameSale.put("amount", this.getAmount().toPlainString());
-		nameSale.put("seller", this.getName().getOwner().getAddress());
+        //WRITE NAME SIZE
+        byte[] nameBytes = this.key.getBytes(StandardCharsets.UTF_8);
+        int nameLength = nameBytes.length;
+        byte[] nameLengthBytes = Ints.toByteArray(nameLength);
+        data = Bytes.concat(data, nameLengthBytes);
 
-		return nameSale;
-	}
+        //WRITE NAME
+        data = Bytes.concat(data, nameBytes);
 
-	public byte[] toBytes()
-	{
-		byte[] data = new byte[0];
+        //WRITE AMOUNT
+        byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+        byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
+        amountBytes = Bytes.concat(fill, amountBytes);
+        data = Bytes.concat(data, amountBytes);
 
-		//WRITE NAME SIZE
-		byte[] nameBytes = this.key.getBytes(StandardCharsets.UTF_8);
-		int nameLength = nameBytes.length;
-		byte[] nameLengthBytes = Ints.toByteArray(nameLength);
-		data = Bytes.concat(data, nameLengthBytes);
+        return data;
+    }
 
-		//WRITE NAME
-		data = Bytes.concat(data, nameBytes);
+    public int getDataLength() {
+        byte[] nameBytes = this.key.getBytes(StandardCharsets.UTF_8);
+        int nameLength = nameBytes.length;
 
-		//WRITE AMOUNT
-		byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-		byte[] fill = new byte[AMOUNT_LENGTH - amountBytes.length];
-		amountBytes = Bytes.concat(fill, amountBytes);
-		data = Bytes.concat(data, amountBytes);
+        return NAME_SIZE_LENGTH + nameLength + AMOUNT_LENGTH;
+    }
 
-		return data;
-	}
+    //REST
 
-	public int getDataLength()
-	{
-		byte[] nameBytes = this.key.getBytes(StandardCharsets.UTF_8);
-		int nameLength = nameBytes.length;
-
-		return NAME_SIZE_LENGTH + nameLength + AMOUNT_LENGTH;
-	}
-
-	//REST
-
-	@Override
-	public String toString()
-	{
-		return this.key;
-	}
+    @Override
+    public String toString() {
+        return this.key;
+    }
 }

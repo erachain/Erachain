@@ -1,71 +1,64 @@
 package datachain;
 
+import com.google.common.primitives.UnsignedBytes;
+import core.block.Block;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.DB;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.DB;
-
-import com.google.common.primitives.UnsignedBytes;
-
-import core.block.Block;
-
 // block.signature -> Height, Weight(Win Value)
-public class BlockSignsMap extends DCMap<byte[], Integer>
-{
-	private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+public class BlockSignsMap extends DCMap<byte[], Integer> {
+    private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
-	// for saving in DB
-	//private Atomic.Long fullWeightVar;
-	//private Long fullWeight = 0L;
-	//private int startedInForkHeight = 0;
+    // for saving in DB
+    //private Atomic.Long fullWeightVar;
+    //private Long fullWeight = 0L;
+    //private int startedInForkHeight = 0;
 
-	public BlockSignsMap(DCSet databaseSet, DB database)
-	{
-		super(databaseSet, database);
+    public BlockSignsMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
 
-		//this.fullWeightVar = database.getAtomicLong("fullWeight");
-		//this.fullWeight = this.fullWeightVar.get();
-		//if (this.fullWeight == null)
-		//	this.fullWeight = 0L;
+        //this.fullWeightVar = database.getAtomicLong("fullWeight");
+        //this.fullWeight = this.fullWeightVar.get();
+        //if (this.fullWeight == null)
+        //	this.fullWeight = 0L;
 
-		//startedInForkHeight = 0;
-	}
+        //startedInForkHeight = 0;
+    }
 
-	public BlockSignsMap(BlockSignsMap parent, DCSet dcSet)
-	{
-		super(parent, dcSet);
-		//this.fullWeight = parent.getFullWeight();
-		//startedInForkHeight
-	}
+    public BlockSignsMap(BlockSignsMap parent, DCSet dcSet) {
+        super(parent, dcSet);
+        //this.fullWeight = parent.getFullWeight();
+        //startedInForkHeight
+    }
 
-	@Override
-	protected void createIndexes(DB database){}
+    @Override
+    protected void createIndexes(DB database) {
+    }
 
-	@Override
-	protected Map<byte[], Integer> getMap(DB database)
-	{
-		//OPEN MAP
-		return database.createTreeMap("height")
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.comparator(UnsignedBytes.lexicographicalComparator())
-				.counterEnable()
-				.makeOrGet();
-	}
+    @Override
+    protected Map<byte[], Integer> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap("height")
+                .keySerializer(BTreeKeySerializer.BASIC)
+                .comparator(UnsignedBytes.lexicographicalComparator())
+                .counterEnable()
+                .makeOrGet();
+    }
 
-	@Override
-	protected Map<byte[], Integer> getMemoryMap()
-	{
-		return new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
-	}
+    @Override
+    protected Map<byte[], Integer> getMemoryMap() {
+        return new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
+    }
 
-	@Override
-	protected Integer getDefaultValue()
-	{
-		//return new Tuple2<Integer, Long>(-1,-1L);
-		return null;
-	}
+    @Override
+    protected Integer getDefaultValue() {
+        //return new Tuple2<Integer, Long>(-1,-1L);
+        return null;
+    }
 
 	/*
 	private Long getFullWeight() {
@@ -91,41 +84,37 @@ public class BlockSignsMap extends DCMap<byte[], Integer>
 	 */
 
 
-	@Override
-	protected Map<Integer, Integer> getObservableData()
-	{
-		return this.observableData;
-	}
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
 
-	public Integer get(Block block)
-	{
-		return this.get(block.getSignature());
-	}
+    public Integer get(Block block) {
+        return this.get(block.getSignature());
+    }
 
-	public Block getBlock(byte[] signature)
-	{
-		Integer key = this.get(signature);
-		if (key != null && key > 0)
-			return this.getDCSet().getBlockMap().get(key);
+    public Block getBlock(byte[] signature) {
+        Integer key = this.get(signature);
+        if (key != null && key > 0)
+            return this.getDCSet().getBlockMap().get(key);
 
-		return null;
-	}
+        return null;
+    }
 
-	public Integer getHeight(Block block)
-	{
-		if (this.contains(block.getSignature()))
-			return this.get(block.getSignature());
-		return -1;
-	}
-	public Integer getHeight(byte[] signature)
-	{
-		if (this.contains(signature)) {
-			Integer o = this.get(signature);
-			if (o != null)
-				return this.get(signature);
-		}
-		return -1;
-	}
+    public Integer getHeight(Block block) {
+        if (this.contains(block.getSignature()))
+            return this.get(block.getSignature());
+        return -1;
+    }
+
+    public Integer getHeight(byte[] signature) {
+        if (this.contains(signature)) {
+            Integer o = this.get(signature);
+            if (o != null)
+                return this.get(signature);
+        }
+        return -1;
+    }
 
 	/*
 	private int getWeight(Block block)

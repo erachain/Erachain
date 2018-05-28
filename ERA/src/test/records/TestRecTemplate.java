@@ -1,21 +1,5 @@
 package test.records;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-//import java.math.BigInteger;
-//import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-//import java.util.List;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
@@ -30,511 +14,491 @@ import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import datachain.ItemTemplateMap;
 import ntp.NTP;
+import org.apache.log4j.Logger;
+import org.junit.Test;
 import utils.Corekeys;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+//import java.math.BigInteger;
+//import java.util.ArrayList;
+//import java.util.List;
 
 public class TestRecTemplate {
 
-	static Logger LOGGER = Logger.getLogger(TestRecTemplate.class.getName());
+    static Logger LOGGER = Logger.getLogger(TestRecTemplate.class.getName());
+
+    Long releaserReference = null;
+
+    boolean asPack = false;
+    long FEE_KEY = AssetCls.FEE_KEY;
+    long VOTE_KEY = AssetCls.ERA_KEY;
+    byte FEE_POWER = (byte) 1;
+    byte[] templateReference = new byte[64];
+    long timestamp = NTP.getTime();
+
+    long flags = 0l;
+    byte[] data = "test123!".getBytes();
+    byte[] isText = new byte[]{1};
+    byte[] encrypted = new byte[]{0};
+    //CREATE KNOWN ACCOUNT
+    byte[] seed = Crypto.getInstance().digest("test".getBytes());
+    byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+    PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
+    TemplateCls template;
+    long templateKey = -1;
+    IssueTemplateRecord issueTemplateRecord;
+    R_SignNote signNoteRecord;
+    ItemTemplateMap templateMap;
+    private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
+    private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
+    //CREATE EMPTY MEMORY DATABASE
+    private DCSet db;
+    private GenesisBlock gb;
+    private List<String> imagelinks = new ArrayList<String>();
+
+    // INIT TEMPLATES
+    private void init() {
+
+        db = DCSet.createEmptyDatabaseSet();
+        templateMap = db.getItemTemplateMap();
 
-	Long releaserReference = null;
+        gb = new GenesisBlock();
+        try {
+            gb.process(db);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	boolean asPack = false;
-	long FEE_KEY = AssetCls.FEE_KEY;
-	long VOTE_KEY = AssetCls.ERA_KEY;
-	byte FEE_POWER = (byte)1;
-	byte[] templateReference = new byte[64];
-	long timestamp = NTP.getTime();
+        // FEE FUND
+        maker.setLastTimestamp(gb.getTimestamp(db), db);
+        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
-	long flags = 0l;
+    }
 
-	private byte[] icon = new byte[]{1,3,4,5,6,9}; // default value
-	private byte[] image = new byte[]{4,11,32,23,45,122,11,-45}; // default value
+    private void initTemplate(boolean process) {
 
-	byte[] data = "test123!".getBytes();
-	byte[] isText = new byte[] { 1 };
-	byte[] encrypted = new byte[] { 0 };
+        template = new Template(maker, "test132", icon, image, "12345678910strontje");
 
-	//CREATE EMPTY MEMORY DATABASE
-	private DCSet db;
-	private GenesisBlock gb;
+        //CREATE ISSUE PLATE TRANSACTION
+        issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        issueTemplateRecord.sign(maker, false);
+        if (process) {
+            issueTemplateRecord.process(gb, false);
+            templateKey = template.getKey(db);
+        }
+    }
 
-	//CREATE KNOWN ACCOUNT
-	byte[] seed = Crypto.getInstance().digest("test".getBytes());
-	byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-	PrivateKeyAccount maker = new PrivateKeyAccount(privateKey);
-	TemplateCls template;
-	long templateKey = -1;
-	IssueTemplateRecord issueTemplateRecord;
-	R_SignNote signNoteRecord;
+    //ISSUE PLATE TRANSACTION
 
+    @Test
+    public void testAddreessVersion() {
+        int vers = Corekeys.findAddressVersion("E");
+        assertEquals(-1111, vers);
+    }
 
-	ItemTemplateMap templateMap;
+    @Test
+    public void validateSignatureIssueTemplateTransaction() {
 
-	// INIT TEMPLATES
-	private void init() {
+        init();
 
-		db = DCSet.createEmptyDatabaseSet();
-		templateMap = db.getItemTemplateMap();
+        initTemplate(false);
 
-		gb = new GenesisBlock();
-		try {
-			gb.process(db);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        //CHECK IF ISSUE PLATE TRANSACTION IS VALID
+        assertEquals(true, issueTemplateRecord.isSignatureValid(db));
 
-		// FEE FUND
-		maker.setLastTimestamp(gb.getTimestamp(db), db);
-		maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        //INVALID SIGNATURE
+        issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
 
-	}
-	private void initTemplate(boolean process) {
+        //CHECK IF ISSUE PLATE IS INVALID
+        assertEquals(false, issueTemplateRecord.isSignatureValid(db));
+    }
 
-		template = new Template(maker, "test132", icon, image, "12345678910strontje");
+    @Test
+    public void parseIssueTemplateTransaction() {
 
-		//CREATE ISSUE PLATE TRANSACTION
-		issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issueTemplateRecord.sign(maker, false);
-		if (process) {
-			issueTemplateRecord.process(gb, false);
-			templateKey = template.getKey(db);
-		}
-	}
+        init();
 
-	@Test
-	public void testAddreessVersion()
-	{
-		int vers = Corekeys.findAddressVersion("E");
-		assertEquals(-1111, vers);
-	}
+        TemplateCls template = new Template(maker, "test132", icon, image, "12345678910strontje");
+        byte[] raw = template.toBytes(false, false);
+        assertEquals(raw.length, template.getDataLength(false));
 
-	//ISSUE PLATE TRANSACTION
+        //CREATE ISSUE PLATE TRANSACTION
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        issueTemplateRecord.sign(maker, false);
+        issueTemplateRecord.process(gb, false);
 
-	@Test
-	public void validateSignatureIssueTemplateTransaction()
-	{
+        //CONVERT TO BYTES
+        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(true, null);
 
-		init();
+        //CHECK DATA LENGTH
+        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(false));
 
-		initTemplate(false);
+        try {
+            //PARSE FROM BYTES
+            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, releaserReference);
+            LOGGER.info("parsedIssueTemplateTransaction: " + parsedIssueTemplateTransaction);
 
-		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
-		assertEquals(true, issueTemplateRecord.isSignatureValid(db));
+            //CHECK INSTANCE
+            assertEquals(true, parsedIssueTemplateTransaction instanceof IssueTemplateRecord);
 
-		//INVALID SIGNATURE
-		issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueTemplateTransaction.getSignature()));
 
-		//CHECK IF ISSUE PLATE IS INVALID
-		assertEquals(false, issueTemplateRecord.isSignatureValid(db));
-	}
+            //CHECK ISSUER
+            assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
 
+            //CHECK OWNER
+            assertEquals(issueTemplateRecord.getItem().getOwner().getAddress(), parsedIssueTemplateTransaction.getItem().getOwner().getAddress());
 
+            //CHECK NAME
+            assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());
 
-	@Test
-	public void parseIssueTemplateTransaction()
-	{
+            //CHECK DESCRIPTION
+            assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueTemplateTransaction.getItem().getDescription());
 
-		init();
+            //CHECK FEE
+            assertEquals(issueTemplateRecord.getFee(), parsedIssueTemplateTransaction.getFee());
 
-		TemplateCls template = new Template(maker, "test132", icon, image, "12345678910strontje");
-		byte[] raw = template.toBytes(false, false);
-		assertEquals(raw.length, template.getDataLength(false));
+            //CHECK REFERENCE
+            //assertEquals(issueTemplateRecord.getReference(), parsedIssueTemplateTransaction.getReference());
 
-		//CREATE ISSUE PLATE TRANSACTION
-		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issueTemplateRecord.sign(maker, false);
-		issueTemplateRecord.process(gb, false);
+            //CHECK TIMESTAMP
+            assertEquals(issueTemplateRecord.getTimestamp(), parsedIssueTemplateTransaction.getTimestamp());
+        } catch (Exception e) {
+            fail("Exception while parsing transaction. " + e);
+        }
 
-		//CONVERT TO BYTES
-		byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(true, null);
+    }
 
-		//CHECK DATA LENGTH
-		assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(false));
+    @Test
+    public void processIssueTemplateTransaction() {
 
-		try
-		{
-			//PARSE FROM BYTES
-			IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, releaserReference);
-			LOGGER.info("parsedIssueTemplateTransaction: " + parsedIssueTemplateTransaction);
+        init();
 
-			//CHECK INSTANCE
-			assertEquals(true, parsedIssueTemplateTransaction instanceof IssueTemplateRecord);
+        Template template = new Template(maker, "test", icon, image, "strontje");
 
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(issueTemplateRecord.getSignature(), parsedIssueTemplateTransaction.getSignature()));
+        //CREATE ISSUE PLATE TRANSACTION
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
 
-			//CHECK ISSUER
-			assertEquals(issueTemplateRecord.getCreator().getAddress(), parsedIssueTemplateTransaction.getCreator().getAddress());
+        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference, flags));
 
-			//CHECK OWNER
-			assertEquals(issueTemplateRecord.getItem().getOwner().getAddress(), parsedIssueTemplateTransaction.getItem().getOwner().getAddress());
+        issueTemplateRecord.sign(maker, false);
+        issueTemplateRecord.process(gb, false);
+        int mapSize = templateMap.size();
 
-			//CHECK NAME
-			assertEquals(issueTemplateRecord.getItem().getName(), parsedIssueTemplateTransaction.getItem().getName());
+        LOGGER.info("template KEY: " + template.getKey(db));
 
-			//CHECK DESCRIPTION
-			assertEquals(issueTemplateRecord.getItem().getDescription(), parsedIssueTemplateTransaction.getItem().getDescription());
+        //CHECK PLATE EXISTS SENDER
+        long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+        assertEquals(true, templateMap.contains(key));
 
-			//CHECK FEE
-			assertEquals(issueTemplateRecord.getFee(), parsedIssueTemplateTransaction.getFee());
+        TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
+        IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db));
+        issueTemplateTransaction_2.sign(maker, false);
+        issueTemplateTransaction_2.process(gb, false);
+        LOGGER.info("template_2 KEY: " + template_2.getKey(db));
+        issueTemplateTransaction_2.orphan(false);
+        assertEquals(mapSize, templateMap.size());
 
-			//CHECK REFERENCE
-			//assertEquals(issueTemplateRecord.getReference(), parsedIssueTemplateTransaction.getReference());
+        //CHECK PLATE IS CORRECT
+        assertEquals(true, Arrays.equals(templateMap.get(key).toBytes(true, false), template.toBytes(true, false)));
 
-			//CHECK TIMESTAMP
-			assertEquals(issueTemplateRecord.getTimestamp(), parsedIssueTemplateTransaction.getTimestamp());
-		}
-		catch (Exception e)
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
+        //CHECK REFERENCE SENDER
+        assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
+    }
 
-	}
+    // TODO - in statement - valid on key = 999
 
+    //SIGN PLATE TRANSACTION
 
-	@Test
-	public void processIssueTemplateTransaction()
-	{
+    @Test
+    public void orphanIssueTemplateTransaction() {
 
-		init();
+        init();
 
-		Template template = new Template(maker, "test", icon, image, "strontje");
+        Template template = new Template(maker, "test", icon, image, "strontje");
 
-		//CREATE ISSUE PLATE TRANSACTION
-		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        //CREATE ISSUE PLATE TRANSACTION
+        IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        issueTemplateRecord.sign(maker, false);
+        issueTemplateRecord.process(gb, false);
+        long key = db.getIssueTemplateMap().get(issueTemplateRecord);
+        assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 
-		assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference, flags));
+        issueTemplateRecord.orphan(false);
 
-		issueTemplateRecord.sign(maker, false);
-		issueTemplateRecord.process(gb, false);
-		int mapSize = templateMap.size();
+        //CHECK PLATE EXISTS SENDER
+        assertEquals(false, templateMap.contains(key));
 
-		LOGGER.info("template KEY: " + template.getKey(db));
+        //CHECK REFERENCE SENDER
+        //assertEquals(issueTemplateRecord.getReference(), maker.getLastReference(db));
+    }
 
-		//CHECK PLATE EXISTS SENDER
-		long key = db.getIssueTemplateMap().get(issueTemplateRecord);
-		assertEquals(true, templateMap.contains(key));
+    @Test
+    public void validateSignatureSignNoteTransaction() {
 
-		TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
-		IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2, FEE_POWER, timestamp+10, maker.getLastTimestamp(db));
-		issueTemplateTransaction_2.sign(maker, false);
-		issueTemplateTransaction_2.process(gb, false);
-		LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-		issueTemplateTransaction_2.orphan(false);
-		assertEquals(mapSize, templateMap.size());
+        init();
 
-		//CHECK PLATE IS CORRECT
-		assertEquals(true, Arrays.equals(templateMap.get(key).toBytes(true, false), template.toBytes(true, false)));
+        initTemplate(true);
 
-		//CHECK REFERENCE SENDER
-		assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
-	}
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
+        signNoteRecord.sign(maker, asPack);
 
+        //CHECK IF ISSUE PLATE TRANSACTION IS VALID
+        assertEquals(true, signNoteRecord.isSignatureValid(db));
 
-	@Test
-	public void orphanIssueTemplateTransaction()
-	{
+        //INVALID SIGNATURE
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db), new byte[64]);
 
-		init();
+        //CHECK IF ISSUE PLATE IS INVALID
+        assertEquals(false, signNoteRecord.isSignatureValid(db));
+    }
 
-		Template template = new Template(maker, "test", icon, image, "strontje");
+    @Test
+    public void parseSignNoteTransaction() {
 
-		//CREATE ISSUE PLATE TRANSACTION
-		IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-		issueTemplateRecord.sign(maker, false);
-		issueTemplateRecord.process(gb, false);
-		long key = db.getIssueTemplateMap().get(issueTemplateRecord);
-		assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
+        init();
 
-		issueTemplateRecord.orphan(false);
+        initTemplate(true);
 
-		//CHECK PLATE EXISTS SENDER
-		assertEquals(false, templateMap.contains(key));
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
+        signNoteRecord.sign(maker, asPack);
 
-		//CHECK REFERENCE SENDER
-		//assertEquals(issueTemplateRecord.getReference(), maker.getLastReference(db));
-	}
+        //CONVERT TO BYTES
+        byte[] rawSignNoteRecord = signNoteRecord.toBytes(true, null);
 
-	// TODO - in statement - valid on key = 999
+        //CHECK DATA LENGTH
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
 
-	//SIGN PLATE TRANSACTION
+        try {
+            //PARSE FROM BYTES
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
-	@Test
-	public void validateSignatureSignNoteTransaction()
-	{
+            //CHECK INSTANCE
+            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
 
-		init();
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
 
-		initTemplate(true);
+            //CHECK ISSUER
+            assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
 
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
-		signNoteRecord.sign(maker, asPack);
+            //CHECK OWNER
+            assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
 
-		//CHECK IF ISSUE PLATE TRANSACTION IS VALID
-		assertEquals(true, signNoteRecord.isSignatureValid(db));
+            //CHECK NAME
+            assertEquals(true, Arrays.equals(signNoteRecord.getData(), parsedSignNoteRecord.getData()));
 
-		//INVALID SIGNATURE
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db), new byte[64]);
+            //CHECK DESCRIPTION
+            assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
 
-		//CHECK IF ISSUE PLATE IS INVALID
-		assertEquals(false, signNoteRecord.isSignatureValid(db));
-	}
+            //CHECK FEE
+            assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
 
+            //CHECK REFERENCE
+            //assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
 
+            //CHECK TIMESTAMP
+            assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
+        } catch (Exception e) {
+            fail("Exception while parsing transaction. " + e);
+        }
 
-	@Test
-	public void parseSignNoteTransaction()
-	{
 
-		init();
+        // NOT DATA
+        data = null;
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
+        signNoteRecord.sign(maker, asPack);
 
-		initTemplate(true);
+        //CONVERT TO BYTES
+        rawSignNoteRecord = signNoteRecord.toBytes(true, null);
 
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
-		signNoteRecord.sign(maker, asPack);
+        //CHECK DATA LENGTH
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
 
-		//CONVERT TO BYTES
-		byte[] rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+        try {
+            //PARSE FROM BYTES
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
-		//CHECK DATA LENGTH
-		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+            //CHECK INSTANCE
+            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
 
-		try
-		{
-			//PARSE FROM BYTES
-			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
-			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
 
-			//CHECK INSTANCE
-			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            //CHECK ISSUER
+            assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
 
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+            //CHECK OWNER
+            assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
 
-			//CHECK ISSUER
-			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+            //CHECK NAME
+            assertEquals(null, parsedSignNoteRecord.getData());
 
-			//CHECK OWNER
-			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+            //CHECK DESCRIPTION
+            assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
 
-			//CHECK NAME
-			assertEquals(true, Arrays.equals(signNoteRecord.getData(), parsedSignNoteRecord.getData()));
+            //CHECK FEE
+            assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
 
-			//CHECK DESCRIPTION
-			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+            //CHECK REFERENCE
+            //assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
 
-			//CHECK FEE
-			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
+            //CHECK TIMESTAMP
+            assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
+        } catch (Exception e) {
+            fail("Exception while parsing transaction. " + e);
+        }
 
-			//CHECK REFERENCE
-			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
+        // NOT KEY
+        //data = null;
+        templateKey = 0;
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
+        signNoteRecord.sign(maker, asPack);
 
-			//CHECK TIMESTAMP
-			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
-		}
-		catch (Exception e)
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
+        //CONVERT TO BYTES
+        rawSignNoteRecord = signNoteRecord.toBytes(true, null);
 
+        //CHECK DATA LENGTH
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
 
-		// NOT DATA
-		data = null;
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+20, maker.getLastTimestamp(db));
-		signNoteRecord.sign(maker, asPack);
+        try {
+            //PARSE FROM BYTES
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
-		//CONVERT TO BYTES
-		rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+            //CHECK INSTANCE
+            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
 
-		//CHECK DATA LENGTH
-		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
 
-		try
-		{
-			//PARSE FROM BYTES
-			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
-			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+            //CHECK ISSUER
+            assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
 
-			//CHECK INSTANCE
-			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            //CHECK OWNER
+            assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
 
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+            //CHECK NAME
+            assertEquals(null, parsedSignNoteRecord.getData());
 
-			//CHECK ISSUER
-			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+            //CHECK DESCRIPTION
+            assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
 
-			//CHECK OWNER
-			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+            //CHECK FEE
+            assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
 
-			//CHECK NAME
-			assertEquals(null, parsedSignNoteRecord.getData());
+            //CHECK REFERENCE
+            //assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
 
-			//CHECK DESCRIPTION
-			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+            //CHECK TIMESTAMP
+            assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
+        } catch (Exception e) {
+            fail("Exception while parsing transaction. " + e);
+        }
 
-			//CHECK FEE
-			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
+        // NOT KEY
+        data = null;
+        templateKey = 0;
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
+        signNoteRecord.sign(maker, asPack);
 
-			//CHECK REFERENCE
-			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
+        //CONVERT TO BYTES
+        rawSignNoteRecord = signNoteRecord.toBytes(true, null);
 
-			//CHECK TIMESTAMP
-			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
-		}
-		catch (Exception e)
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
+        //CHECK DATA LENGTH
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
 
-		// NOT KEY
-		//data = null;
-		templateKey = 0;
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+20, maker.getLastTimestamp(db));
-		signNoteRecord.sign(maker, asPack);
+        try {
+            //PARSE FROM BYTES
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
-		//CONVERT TO BYTES
-		rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+            //CHECK INSTANCE
+            assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
 
-		//CHECK DATA LENGTH
-		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+            //CHECK SIGNATURE
+            assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
 
-		try
-		{
-			//PARSE FROM BYTES
-			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
-			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+            //CHECK ISSUER
+            assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
 
-			//CHECK INSTANCE
-			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+            //CHECK OWNER
+            assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
 
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+            //CHECK NAME
+            assertEquals(null, parsedSignNoteRecord.getData());
 
-			//CHECK ISSUER
-			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+            //CHECK DESCRIPTION
+            assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
 
-			//CHECK OWNER
-			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+            //CHECK FEE
+            assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
 
-			//CHECK NAME
-			assertEquals(null, parsedSignNoteRecord.getData());
+            //CHECK REFERENCE
+            //assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
 
-			//CHECK DESCRIPTION
-			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
+            //CHECK TIMESTAMP
+            assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
+        } catch (Exception e) {
+            fail("Exception while parsing transaction. " + e);
+        }
 
-			//CHECK FEE
-			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
+    }
 
-			//CHECK REFERENCE
-			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
+    @Test
+    public void processSignNoteTransaction() {
 
-			//CHECK TIMESTAMP
-			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
-		}
-		catch (Exception e)
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
+        init();
 
-		// NOT KEY
-		data = null;
-		templateKey = 0;
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+20, maker.getLastTimestamp(db));
-		signNoteRecord.sign(maker, asPack);
+        initTemplate(true);
 
-		//CONVERT TO BYTES
-		rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+        signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
 
-		//CHECK DATA LENGTH
-		assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+        assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(releaserReference, flags));
 
-		try
-		{
-			//PARSE FROM BYTES
-			R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
-			LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
+        signNoteRecord.sign(maker, false);
+        signNoteRecord.process(gb, false);
 
-			//CHECK INSTANCE
-			assertEquals(true, parsedSignNoteRecord instanceof R_SignNote);
+        //CHECK REFERENCE SENDER
+        assertEquals(signNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
 
-			//CHECK SIGNATURE
-			assertEquals(true, Arrays.equals(signNoteRecord.getSignature(), parsedSignNoteRecord.getSignature()));
+        ///// ORPHAN
+        signNoteRecord.orphan(false);
 
-			//CHECK ISSUER
-			assertEquals(signNoteRecord.getCreator().getAddress(), parsedSignNoteRecord.getCreator().getAddress());
+        //CHECK REFERENCE SENDER
+        //assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));
+    }
 
-			//CHECK OWNER
-			assertEquals(signNoteRecord.getKey(), parsedSignNoteRecord.getKey());
+    private void handleVars(String description) {
+        Pattern pattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
+        //Pattern pattern = Pattern.compile("{{(.+)}}");
+        Matcher matcher = pattern.matcher(description);
+        while (matcher.find()) {
+            String url = matcher.group(1);
+            imagelinks.add(url);
+            //description = description.replace(matcher.group(), getImgHtml(url));
+        }
+    }
 
-			//CHECK NAME
-			assertEquals(null, parsedSignNoteRecord.getData());
-
-			//CHECK DESCRIPTION
-			assertEquals(signNoteRecord.isText(), parsedSignNoteRecord.isText());
-
-			//CHECK FEE
-			assertEquals(signNoteRecord.getFee(), parsedSignNoteRecord.getFee());
-
-			//CHECK REFERENCE
-			//assertEquals(signNoteRecord.getReference(), parsedSignNoteRecord.getReference());
-
-			//CHECK TIMESTAMP
-			assertEquals(signNoteRecord.getTimestamp(), parsedSignNoteRecord.getTimestamp());
-		}
-		catch (Exception e)
-		{
-			fail("Exception while parsing transaction. " + e);
-		}
-
-	}
-
-
-	@Test
-	public void processSignNoteTransaction()
-	{
-
-		init();
-
-		initTemplate(true);
-
-		signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp+10, maker.getLastTimestamp(db));
-
-		assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(releaserReference, flags));
-
-		signNoteRecord.sign(maker, false);
-		signNoteRecord.process(gb, false);
-
-		//CHECK REFERENCE SENDER
-		assertEquals(signNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
-
-		///// ORPHAN
-		signNoteRecord.orphan(false);
-
-		//CHECK REFERENCE SENDER
-		//assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));
-	}
-
-	private List<String> imagelinks = new ArrayList<String>();
-
-	private void handleVars(String description) {
-		Pattern pattern = Pattern.compile(Pattern.quote("{{") + "(.+?)" + Pattern.quote("}}"));
-		//Pattern pattern = Pattern.compile("{{(.+)}}");
-		Matcher matcher = pattern.matcher(description);
-		while (matcher.find()) {
-			String url = matcher.group(1);
-			imagelinks.add(url);
-			//description = description.replace(matcher.group(), getImgHtml(url));
-		}
-	}
-	@Test
-	public void regExTest()
-	{
-		String descr = "AJH {{wer}}, asdj {{we431!12}}";
-		handleVars(descr);
-		assertEquals(imagelinks, "");
-	}
+    @Test
+    public void regExTest() {
+        String descr = "AJH {{wer}}, asdj {{we431!12}}";
+        handleVars(descr);
+        assertEquals(imagelinks, "");
+    }
 
 
 }

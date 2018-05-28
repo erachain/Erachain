@@ -7,7 +7,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class ZIP_File {
-	  // распаковка файла с помощью GZIP
+    // распаковка файла с помощью GZIP
     public static void decompressGzipFile(String gzipFile, String newFile) {
         try {
             FileInputStream fis = new FileInputStream(gzipFile);
@@ -15,7 +15,7 @@ public class ZIP_File {
             FileOutputStream fos = new FileOutputStream(newFile);
             byte[] buffer = new byte[1024];
             int len;
-            while((len = gis.read(buffer)) != -1){
+            while ((len = gis.read(buffer)) != -1) {
                 fos.write(buffer, 0, len);
             }
             fos.close();
@@ -23,9 +23,9 @@ public class ZIP_File {
         } catch (IOException e) {
             e.printStackTrace();
         }
-         
+
     }
- 
+
     // архивация файла с помощью GZIP
     public static void compressGzipFile(String file, String gzipFile) {
         try {
@@ -34,15 +34,15 @@ public class ZIP_File {
             GZIPOutputStream gzipOS = new GZIPOutputStream(fos);
             byte[] buffer = new byte[1024];
             int len;
-            while((len=fis.read(buffer)) != -1){
+            while ((len = fis.read(buffer)) != -1) {
                 gzipOS.write(buffer, 0, len);
-            } 
+            }
             gzipOS.close();
             fos.close();
             fis.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-         
+
     }
 }

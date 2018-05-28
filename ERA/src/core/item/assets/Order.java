@@ -1,16 +1,5 @@
 package core.item.assets;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.List;
-
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import core.BlockChain;
 import core.account.Account;
 import core.crypto.Crypto;
@@ -18,280 +7,269 @@ import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.OrderMap;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
-public class Order implements Comparable<Order>
-{
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.List;
 
-	private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
+public class Order implements Comparable<Order> {
 
-	final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
+    private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
-	private static final int ID_LENGTH = Crypto.SIGNATURE_LENGTH;
-	private static final int CREATOR_LENGTH = 25;
-	private static final int HAVE_LENGTH = 8;
-	private static final int WANT_LENGTH = 8;
-	private static final int AMOUNT_LENGTH = 12;
-	private static final int FULFILLED_LENGTH = AMOUNT_LENGTH;
-	private static final int TIMESTAMP_LENGTH = 8;
-	private static final int EXECUTABLE_LENGTH = 1;
-	private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
-			+ 2*AMOUNT_LENGTH + 2*FULFILLED_LENGTH + TIMESTAMP_LENGTH + EXECUTABLE_LENGTH;
+    final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
 
-	protected DCSet dcSet;
-	private BigInteger id;
-	private Account creator;
-	private long haveKey;
-	private long wantKey;
-	private BigDecimal amountHave;
-	private BigDecimal fulfilledHave;
-	private BigDecimal amountWant;
-	private BigDecimal price;
-	protected long timestamp;
-	private boolean isExecutable = true;
+    private static final int ID_LENGTH = Crypto.SIGNATURE_LENGTH;
+    private static final int CREATOR_LENGTH = 25;
+    private static final int HAVE_LENGTH = 8;
+    private static final int WANT_LENGTH = 8;
+    private static final int AMOUNT_LENGTH = 12;
+    private static final int FULFILLED_LENGTH = AMOUNT_LENGTH;
+    private static final int TIMESTAMP_LENGTH = 8;
+    private static final int EXECUTABLE_LENGTH = 1;
+    private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
+            + 2 * AMOUNT_LENGTH + 2 * FULFILLED_LENGTH + TIMESTAMP_LENGTH + EXECUTABLE_LENGTH;
 
-	public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp)
-	{
-		this.id = id;
-		this.creator = creator;
-		this.haveKey = haveKey;
-		this.wantKey = wantKey;
+    protected DCSet dcSet;
+    protected long timestamp;
+    private BigInteger id;
+    private Account creator;
+    private long haveKey;
+    private long wantKey;
+    private BigDecimal amountHave;
+    private BigDecimal fulfilledHave;
+    private BigDecimal amountWant;
+    private BigDecimal price;
+    private boolean isExecutable = true;
 
-		this.amountHave = amountHave;
-		this.amountWant = amountWant;
+    public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
+        this.id = id;
+        this.creator = creator;
+        this.haveKey = haveKey;
+        this.wantKey = wantKey;
 
-		this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
+        this.amountHave = amountHave;
+        this.amountWant = amountWant;
 
-		this.price = calcPrice(amountHave, amountWant);
+        this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
 
-		this.timestamp = timestamp;
-	}
+        this.price = calcPrice(amountHave, amountWant);
 
-	public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
-			BigDecimal amountWant, BigDecimal fulfilledHave,
-			byte isExecutable, long timestamp)
-	{
-		this.id = id;
-		this.creator = creator;
-		this.haveKey = haveKey;
-		this.wantKey = wantKey;
+        this.timestamp = timestamp;
+    }
 
-		this.amountHave = amountHave;
-		this.amountWant = amountWant;
+    public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
+                 BigDecimal amountWant, BigDecimal fulfilledHave,
+                 byte isExecutable, long timestamp) {
+        this.id = id;
+        this.creator = creator;
+        this.haveKey = haveKey;
+        this.wantKey = wantKey;
 
-		this.fulfilledHave = fulfilledHave;
+        this.amountHave = amountHave;
+        this.amountWant = amountWant;
 
-		this.price = calcPrice(amountHave, amountWant);
+        this.fulfilledHave = fulfilledHave;
 
-		this.isExecutable = isExecutable == 1? true: false;
-		this.timestamp = timestamp;
-	}
+        this.price = calcPrice(amountHave, amountWant);
 
-	//GETTERS/SETTERS
+        this.isExecutable = isExecutable == 1 ? true : false;
+        this.timestamp = timestamp;
+    }
 
-	public void setDC(DCSet dcSet) {
-		this.dcSet = dcSet;
-	}
+    //GETTERS/SETTERS
 
-	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, BigInteger key)
-	{
-		if(db.getOrderMap().contains(key))
-		{
-			return db.getOrderMap().get(key);
-		}
+    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, BigInteger key) {
+        if (db.getOrderMap().contains(key)) {
+            return db.getOrderMap().get(key);
+        }
 
-		if(db.getCompletedOrderMap().contains(key))
-		{
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
-			return OrderMap.setExecutable(order, false);
-		}
+        if (db.getCompletedOrderMap().contains(key)) {
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
+            return OrderMap.setExecutable(order, false);
+        }
 
-		return null;
+        return null;
 
-	}
+    }
 
-	public BigInteger getId()
-	{
-		return this.id;
-	}
-	public void setId(byte[] id)
-	{
-		this.id = new BigInteger(id);
-	}
+    public static int powerTen(BigDecimal value) {
+        BigDecimal t = value;
+        int i = 0;
+        while (t.compareTo(BigDecimal.ONE) > 0) {
+            t = t.movePointLeft(1);
+            i++;
+        }
+        return i;
+    }
 
-	public Account getCreator()
-	{
-		return this.creator;
-	}
+    // BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
+    public static int precision(BigDecimal value) {
+        return powerTen(value) + value.scale();
+    }
 
-	public long getHave()
-	{
-		return this.haveKey;
-	}
+    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant) {
+        int scalePrice = amountWant.scale();
+        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
+        scalePrice = Order.powerTen(amountHave) + (scalePrice > 0 ? scalePrice : 0);
+        BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
-	public AssetCls getHaveAsset()
-	{
-		return this.getHaveAsset(this.dcSet);
-	}
+        // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
+        if (result.scale() < 0)
+            return result.setScale(0);
+        return result;
+    }
 
-	public AssetCls getHaveAsset(DCSet db)
-	{
-		return (AssetCls)db.getItemAssetMap().get(this.haveKey);
-	}
+    public static BigDecimal calcAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+        return order.b.b.subtract(order.b.c).multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
+    }
 
-	public long getWant()
-	{
-		return this.wantKey;
-	}
-	public boolean isExecutable() {
-		return this.isExecutable;
-	}
-	public void setExecutable(boolean is) {
-		this.isExecutable = is;
-	}
+    public static boolean isGoodIncrement(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order,
+                                          Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                                                  Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target) {
+        return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
+    }
 
-	public AssetCls getWantAsset()
-	{
-		return this.getWantAsset(this.dcSet);
-	}
+    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, BigInteger orderID) {
 
-	public AssetCls getWantAsset(DCSet db)
-	{
-		return (AssetCls)db.getItemAssetMap().get(this.wantKey);
-	}
+        return dcSet.getCompletedOrderMap().contains(orderID) ?
+                dcSet.getCompletedOrderMap().get(orderID) :
+                dcSet.getOrderMap().get(orderID);
 
-	///////////////////////// AMOUNTS
-	public BigDecimal getAmountHave()
-	{
-		return this.amountHave;
-	}
-	public BigDecimal getAmountWant()
-	{
-		return this.amountWant;
-	}
+    }
 
-	public BigDecimal getAmountHaveLeft()
-	{
-		return this.amountHave.subtract(this.fulfilledHave);
-	}
-	public BigDecimal getAmountWantLeft()
-	{
-		return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
-	}
+    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> toDBrec(Order order) {
+        return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
+                new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
+                new Tuple3<Long, BigDecimal, BigDecimal>(order.getHave(), order.getAmountHave(), order.getFulfilledHave()),
+                new Tuple2<Long, BigDecimal>(order.getWant(), order.getAmountWant()));
 
-	//////// FULFILLED
-	public BigDecimal getFulfilledHave()
-	{
-		return this.fulfilledHave;
-	}
+    }
 
-	public void setFulfilledHave(BigDecimal fulfilled)
-	{
-		this.fulfilledHave = fulfilled;
-	}
+    public static Order fromDBrec(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+        return new Order(order.a.a, new Account(order.a.b), order.b.a, order.c.a, order.b.b,
+                order.c.b, order.b.c,
+                (byte) (order.a.d ? 1 : 0), order.a.c);
 
-	public boolean isFulfilled()
-	{
-		return this.fulfilledHave.compareTo(this.amountHave) == 0;
-	}
+    }
 
-	public BigDecimal getFulfilledWant()
-	{
-		return this.fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
-	}
+    public void setDC(DCSet dcSet) {
+        this.dcSet = dcSet;
+    }
 
-	///////// PRICE
-	public BigDecimal getPrice()
-	{
-		return this.price;
-	}
+    public BigInteger getId() {
+        return this.id;
+    }
 
-	public static int powerTen(BigDecimal value)
-	{
-		BigDecimal t = value;
-		int i = 0;
-		while (t.compareTo(BigDecimal.ONE) > 0) {
-			t = t.movePointLeft(1);
-			i++;
-		}
-		return i;
-	}
+    public void setId(byte[] id) {
+        this.id = new BigInteger(id);
+    }
 
-	// BigDecimal.precision() - is WRONG calculating!!! Sometime = 0 for 100 or 10
-	public static int precision(BigDecimal value)
-	{
-		return powerTen(value) + value.scale();
-	}
+    public Account getCreator() {
+        return this.creator;
+    }
 
-	public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant)
-	{
-		int scalePrice = amountWant.scale();
-		// .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
-		scalePrice = Order.powerTen(amountHave) + (scalePrice>0?scalePrice : 0);
-		BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
+    public long getHave() {
+        return this.haveKey;
+    }
 
-		// IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
-		if (result.scale() < 0)
-			return result.setScale(0);
-		return result;
-	}
+    public AssetCls getHaveAsset() {
+        return this.getHaveAsset(this.dcSet);
+    }
 
-	public static BigDecimal calcAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order)
-	{
-		return 	order.b.b.subtract(order.b.c).multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
-	}
+    public AssetCls getHaveAsset(DCSet db) {
+        return (AssetCls) db.getItemAssetMap().get(this.haveKey);
+    }
 
-	public String viewPrice()
-	{
-		return getPrice().toPlainString();
-	}
+    public long getWant() {
+        return this.wantKey;
+    }
 
-	public long getTimestamp()
-	{
-		return this.timestamp;
-	}
+    public boolean isExecutable() {
+        return this.isExecutable;
+    }
 
-	public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades()
-	{
-		return this.getInitiatedTrades(DCSet.getInstance());
-	}
+    public void setExecutable(boolean is) {
+        this.isExecutable = is;
+    }
 
-	public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades(DCSet db)
-	{
-		return db.getTradeMap().getInitiatedTrades(this);
-	}
+    public AssetCls getWantAsset() {
+        return this.getWantAsset(this.dcSet);
+    }
 
-	public boolean isConfirmed()
-	{
-		return isConfirmed(DCSet.getInstance());
-	}
+    public AssetCls getWantAsset(DCSet db) {
+        return (AssetCls) db.getItemAssetMap().get(this.wantKey);
+    }
 
-	public boolean isConfirmed(DCSet dc)
-	{
-		return dc.getOrderMap().contains(this.id)
-				|| dc.getCompletedOrderMap().contains(this.id);
-	}
+    ///////////////////////// AMOUNTS
+    public BigDecimal getAmountHave() {
+        return this.amountHave;
+    }
 
-	public static boolean isGoodIncrement(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order,
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target)
-	{
-		return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
-	}
+    public BigDecimal getAmountWant() {
+        return this.amountWant;
+    }
 
-	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, BigInteger orderID) {
+    public BigDecimal getAmountHaveLeft() {
+        return this.amountHave.subtract(this.fulfilledHave);
+    }
 
-		return dcSet.getCompletedOrderMap().contains(orderID)?
-				dcSet.getCompletedOrderMap().get(orderID):
-					dcSet.getOrderMap().get(orderID);
+    public BigDecimal getAmountWantLeft() {
+        return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
+    }
 
-	}
+    //////// FULFILLED
+    public BigDecimal getFulfilledHave() {
+        return this.fulfilledHave;
+    }
 
-	//PARSE/CONVERT
+    public void setFulfilledHave(BigDecimal fulfilled) {
+        this.fulfilledHave = fulfilled;
+    }
+
+    public boolean isFulfilled() {
+        return this.fulfilledHave.compareTo(this.amountHave) == 0;
+    }
+
+    public BigDecimal getFulfilledWant() {
+        return this.fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
+    }
+
+    ///////// PRICE
+    public BigDecimal getPrice() {
+        return this.price;
+    }
+
+    public String viewPrice() {
+        return getPrice().toPlainString();
+    }
+
+    public long getTimestamp() {
+        return this.timestamp;
+    }
+
+    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades() {
+        return this.getInitiatedTrades(DCSet.getInstance());
+    }
+
+    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades(DCSet db) {
+        return db.getTradeMap().getInitiatedTrades(this);
+    }
+
+    //PARSE/CONVERT
 
 	/*
 	// forDB - use fulFill
@@ -434,206 +412,191 @@ public class Order implements Comparable<Order>
 	}
 	 */
 
-	@SuppressWarnings("unchecked")
-	public JSONObject toJson() {
+    public boolean isConfirmed() {
+        return isConfirmed(DCSet.getInstance());
+    }
 
-		JSONObject order = new JSONObject();
-		order.put("haveKey", this.haveKey);
-		order.put("wantKey", this.wantKey);
-		order.put("amountHave", this.amountHave.toPlainString());
-		order.put("amountWant", this.amountWant.toPlainString());
-		order.put("fulfilledHave", this.fulfilledHave.toPlainString());
-		order.put("price", this.price.toPlainString());
+    public boolean isConfirmed(DCSet dc) {
+        return dc.getOrderMap().contains(this.id)
+                || dc.getCompletedOrderMap().contains(this.id);
+    }
 
-		return order;
+    @SuppressWarnings("unchecked")
+    public JSONObject toJson() {
 
-	}
+        JSONObject order = new JSONObject();
+        order.put("haveKey", this.haveKey);
+        order.put("wantKey", this.wantKey);
+        order.put("amountHave", this.amountHave.toPlainString());
+        order.put("amountWant", this.amountWant.toPlainString());
+        order.put("fulfilledHave", this.fulfilledHave.toPlainString());
+        order.put("price", this.price.toPlainString());
 
-	public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-	Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> toDBrec(Order order) {
-		return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-				Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-						new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
-						new Tuple3<Long, BigDecimal, BigDecimal>(order.getHave(), order.getAmountHave(), order.getFulfilledHave()),
-						new Tuple2<Long, BigDecimal>(order.getWant(), order.getAmountWant()));
+        return order;
 
-	}
+    }
 
-	public static Order fromDBrec(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
-		return new Order(order.a.a, new Account(order.a.b), order.b.a, order.c.a, order.b.b,
-				order.c.b, order.b.c,
-				(byte)(order.a.d?1:0), order.a.c);
+    //PROCESS/ORPHAN
 
-	}
+    public void process(Transaction transaction) {
 
-	//PROCESS/ORPHAN
+        DCSet db = this.dcSet;
+        int compare = 0;
 
-	public void process(Transaction transaction)
-	{
+        if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+                (this.haveKey == 1010
+                        || this.wantKey == 1010)
+                && !db.isFork()
+                ) {
+            compare++;
+        }
 
-		DCSet db = this.dcSet;
-		int compare = 0;
-		
-		if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-				(this.haveKey == 1010
-				|| this.wantKey == 1010)
-				&& !db.isFork()
-				) {
-			compare++;
-		}
+        //REMOVE HAVE
+        //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
+        this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, false);
 
-		//REMOVE HAVE
-		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-		this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, false);
+        //ADD ORDER TO DATABASE
+        db.getOrderMap().add(Order.toDBrec(this));
 
-		//ADD ORDER TO DATABASE
-		db.getOrderMap().add(Order.toDBrec(this));
+        //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
+        //TRY AND COMPLETE ORDERS
+        boolean completedOrder = false;
+        int i = -1;
+        BigDecimal thisPrice = this.price;
+        BigDecimal tempPrice;
+        BigDecimal thisIncrement;
+        //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
-		//GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
-		//TRY AND COMPLETE ORDERS
-		boolean completedOrder = false;
-		int i = -1;
-		BigDecimal thisPrice = this.price;
-		BigDecimal tempPrice;
-		BigDecimal thisIncrement;
-		//boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, true);
+        //Collections.sort(orders);
 
-		List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-		Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, true);
-		//Collections.sort(orders);
+        //boolean isDivisibleHave = true; //this.isHaveDivisible(db);
+        //boolean isDivisibleWant = true; //this.isWantDivisible(db);
+        BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
 
-		//boolean isDivisibleHave = true; //this.isHaveDivisible(db);
-		//boolean isDivisibleWant = true; //this.isWantDivisible(db);
-		BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
+        while (!completedOrder && ++i < orders.size()) {
+            //GET ORDER
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
 
-		while( !completedOrder && ++i < orders.size())
-		{
-			//GET ORDER
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-			Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
+            BigDecimal orderAmountHaveLeft;
+            BigDecimal orderAmountWantLeft;
+            BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
+            BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
+            BigDecimal orderPriceTemp;
 
-			BigDecimal orderAmountHaveLeft;
-			BigDecimal orderAmountWantLeft;
-			BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-			BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
-			BigDecimal orderPriceTemp;
+            Trade trade;
+            BigDecimal tradeAmount;
+            BigDecimal tradeAmountGet;
+            BigDecimal tradeAmountAccurate;
+            BigDecimal differenceTrade;
+            BigDecimal differenceTradeThis;
 
-			Trade trade;
-			BigDecimal tradeAmount;
-			BigDecimal tradeAmountGet;
-			BigDecimal tradeAmountAccurate;
-			BigDecimal differenceTrade;
-			BigDecimal differenceTradeThis;
+            if (order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+                    (order.b.a == 1010
+                            || order.c.a == 1010)
+                    && !db.isFork()
+                    ) {
+                compare++;
+            }
 
-			if (order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-					(order.b.a == 1010
-					|| order.c.a == 1010)
-					&& !db.isFork()
-					) {
-				compare++;
-			}
+            ///////////////
+            //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
+            if (thisPrice.compareTo(orderReversePrice) > 0)
+                break;
 
-			///////////////
-			//CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-			if(thisPrice.compareTo(orderReversePrice) > 0)
-				break;
+            thisIncrement = orderPrice.scaleByPowerOfTen(-this.amountWant.scale());
+            if (thisAmountHaveLeft.compareTo(thisIncrement) < 0)
+                // if left not enough for 1 buy by price this order
+                break;
 
-			thisIncrement = orderPrice.scaleByPowerOfTen(-this.amountWant.scale());
-			if (thisAmountHaveLeft.compareTo(thisIncrement) < 0)
-				// if left not enough for 1 buy by price this order
-				break;
+            orderAmountHaveLeft = order.b.b.subtract(order.b.c); //.getAmountHaveLeft();
+            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
 
-			orderAmountHaveLeft = order.b.b.subtract(order.b.c); //.getAmountHaveLeft();
-			orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
+            compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
+            if (compare >= 0) {
 
-			compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-			if ( compare >= 0) {
+                tradeAmountGet = thisAmountHaveLeft;
+                if (compare == 0)
+                    tradeAmount = orderAmountHaveLeft;
+                else {
 
-				tradeAmountGet = thisAmountHaveLeft;
-				if (compare == 0)
-					tradeAmount = orderAmountHaveLeft;
-				else
-				{
+                    // RESOLVE amount with SCALE
+                    tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(orderAmountHaveLeft.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+                    tradeAmount = tradeAmountAccurate.setScale(orderAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
 
-					// RESOLVE amount with SCALE
-					tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(orderAmountHaveLeft.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-					tradeAmount = tradeAmountAccurate.setScale(orderAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
-					
-					// PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision(); 
-					int tradeAmountPrecision = Order.precision(tradeAmount);
-					if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
-						differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1,  RoundingMode.HALF_DOWN);
-						differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
-						if (differenceTrade.compareTo(precisionUnit) > 0) {
-							// it is BAD ACCURACY							
-							continue;
-						}
-					}
-				}
+                    // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
+                    int tradeAmountPrecision = Order.precision(tradeAmount);
+                    if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
+                        differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
+                        differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
+                        if (differenceTrade.compareTo(precisionUnit) > 0) {
+                            // it is BAD ACCURACY
+                            continue;
+                        }
+                    }
+                }
 
-				//THIS is COMPLETED
-				completedOrder = true;
+                //THIS is COMPLETED
+                completedOrder = true;
 
-			} else {
+            } else {
 
-				tradeAmount = orderAmountHaveLeft;
-				tradeAmountGet = orderAmountWantLeft;
+                tradeAmount = orderAmountHaveLeft;
+                tradeAmountGet = orderAmountWantLeft;
 
-			}
+            }
 
-			//CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
-			//AND WE CAN BUY ANYTHING
-			if(tradeAmount.compareTo(BigDecimal.ZERO) > 0)
-			{
-				//CREATE TRADE
-				trade = new Trade(this.getId(), order.a.a, tradeAmount, tradeAmountGet, transaction.getTimestamp());
-				trade.process(db);
+            //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
+            //AND WE CAN BUY ANYTHING
+            if (tradeAmount.compareTo(BigDecimal.ZERO) > 0) {
+                //CREATE TRADE
+                trade = new Trade(this.getId(), order.a.a, tradeAmount, tradeAmountGet, transaction.getTimestamp());
+                trade.process(db);
 
-				// need to update from DB -.copy() not update automative
-				this.fulfilledHave = this.fulfilledHave.add(tradeAmountGet);
+                // need to update from DB -.copy() not update automative
+                this.fulfilledHave = this.fulfilledHave.add(tradeAmountGet);
 
-				// update new values
-				thisAmountHaveLeft = this.getAmountHaveLeft();
+                // update new values
+                thisAmountHaveLeft = this.getAmountHaveLeft();
 
-				if ( !completedOrder
-						&&
-						// if can't trade by more good price than self - by orderOrice - then  auto cancel!
-						thisAmountHaveLeft.compareTo(thisIncrement) < 0)
-				{
-					// cancel order if it not fulfiled isDivisible
-					// or HAVE not enough to one WANT  = price
-					CancelOrderTransaction.process_it(db, toDBrec(this));
-					//and stop resolve
-					return;
-				}
+                if (!completedOrder
+                        &&
+                        // if can't trade by more good price than self - by orderOrice - then  auto cancel!
+                        thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
+                    // cancel order if it not fulfiled isDivisible
+                    // or HAVE not enough to one WANT  = price
+                    CancelOrderTransaction.process_it(db, toDBrec(this));
+                    //and stop resolve
+                    return;
+                }
 
-			}
-		}
-		if (!completedOrder) {
-			db.getOrderMap().add(toDBrec(this));
-		} else {
-			db.getCompletedOrderMap().add(toDBrec(this));
-		}
-	}
+            }
+        }
+        if (!completedOrder) {
+            db.getOrderMap().add(toDBrec(this));
+        } else {
+            db.getCompletedOrderMap().add(toDBrec(this));
+        }
+    }
 
-	public void orphan() {
+    public void orphan() {
 
-		DCSet db = this.dcSet;
+        DCSet db = this.dcSet;
 
-		//ORPHAN TRADES
-		for(Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade: this.getInitiatedTrades(db))
-		{
-			Trade.fromDBrec(trade).orphan(db);
-		}
+        //ORPHAN TRADES
+        for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade : this.getInitiatedTrades(db)) {
+            Trade.fromDBrec(trade).orphan(db);
+        }
 
-		//REMOVE ORDER FROM DATABASE
-		db.getOrderMap().delete(this);
+        //REMOVE ORDER FROM DATABASE
+        db.getOrderMap().delete(this);
 
-		//REMOVE HAVE
-		//this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).add(this.amountHave), db);
-		this.creator.changeBalance(db, false, this.haveKey, this.amountHave, true);
-	}
+        //REMOVE HAVE
+        //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).add(this.amountHave), db);
+        this.creator.changeBalance(db, false, this.haveKey, this.amountHave, true);
+    }
 
 	/*
 	// TODO delete this
@@ -673,36 +636,34 @@ public class Order implements Comparable<Order>
 	}
 	 */
 
-	//COMPARE
+    //COMPARE
 
-	//@Override
-	@Override
-	public int compareTo(Order order)
-	{
-		//COMPARE ONLY BY PRICE
-		int result = this.getPrice().compareTo(order.getPrice());
-		if (result != 0)
-			return result;
+    //@Override
+    @Override
+    public int compareTo(Order order) {
+        //COMPARE ONLY BY PRICE
+        int result = this.getPrice().compareTo(order.getPrice());
+        if (result != 0)
+            return result;
 
-		// TODO: REMOVE it in new CHAIN
-		//if (this.timestamp < 1501816130973000l)
-		//	return 0;
+        // TODO: REMOVE it in new CHAIN
+        //if (this.timestamp < 1501816130973000l)
+        //	return 0;
 
-		long orderTimestamp = order.getTimestamp();
-		if (this.timestamp < orderTimestamp)
-			return -1;
-		else if (this.timestamp > orderTimestamp)
-			return 1;
+        long orderTimestamp = order.getTimestamp();
+        if (this.timestamp < orderTimestamp)
+            return -1;
+        else if (this.timestamp > orderTimestamp)
+            return 1;
 
-		return 0;
+        return 0;
 
-	}
+    }
 
-	//COPY
+    //COPY
 
-	public Order copy()
-	{
-		return fromDBrec(toDBrec(this));
+    public Order copy() {
+        return fromDBrec(toDBrec(this));
 		/*
 		try
 		{
@@ -713,5 +674,5 @@ public class Order implements Comparable<Order>
 			return null;
 		}
 		 */
-	}
+    }
 }

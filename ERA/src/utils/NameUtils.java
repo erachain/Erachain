@@ -1,101 +1,87 @@
 package utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-
-import api.ApiErrorFactory;
-import controller.Controller;
 import core.account.Account;
 import core.naming.Name;
 import core.transaction.Transaction;
-import core.transaction.UpdateNameTransaction;
 import core.web.NameStorageMap;
 import datachain.DCSet;
 import datachain.NameMap;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 public class NameUtils {
 
-	public enum NameResult {
-		OK("OK", "OK", 0), NAME_NOT_REGISTERED("The name is not registered",
-				"Invalid address or name not registered!",
-				Transaction.NAME_DOES_NOT_EXIST), NAME_WITH_SPACE(
-				"For security purposes sending payments to a name that starts or ends with spaces is forbidden.",
-				"Name Payments with trailing or leading spaces are not allowed!",
-				Transaction.NAME_WITH_SPACE), NAME_FOR_SALE(
-				"For security purposes sending payments to a name that can be purchased through name exchange is disabled.",
-				"Payments with names that are for sale are not allowed!",
-				Transaction.NAME_NOT_FOR_SALE);
+    public static Pair<Account, NameResult> nameToAdress(String name) {
+        NameMap names = DCSet.getInstance().getNameMap();
+        // NAME NOT REGISTERED?
+        if (!names.contains(name)) {
 
-		private String statusMessage;
-		private String shortStatusMessage;
-		private int errorcode;
+            return new Pair<Account, NameUtils.NameResult>(null,
+                    NameResult.NAME_NOT_REGISTERED);
 
-		private NameResult(String statusMessage, String shortStatusMessage,
-				int errorcode) {
-			this.statusMessage = statusMessage;
-			this.shortStatusMessage = shortStatusMessage;
-			this.errorcode = errorcode;
+        }
 
-		}
+        // NAME STARTS OR ENDS WITH SPACE?
+        if (name.startsWith(" ") || name.endsWith(" ")) {
+            return new Pair<Account, NameUtils.NameResult>(null,
+                    NameResult.NAME_WITH_SPACE);
+        }
 
-		public String getStatusMessage() {
-			return statusMessage;
-		}
+        // NAME FOR SALE?
+        if (DCSet.getInstance().getNameExchangeMap().contains(name)) {
+            return new Pair<Account, NameUtils.NameResult>(null,
+                    NameResult.NAME_FOR_SALE);
+        }
 
-		public String getShortStatusMessage() {
-			return shortStatusMessage;
-		}
+        // LOOKUP ADDRESS FOR NAME
+        Name lookupName = names.get(name);
+        String recipientAddress = lookupName.getOwner().getAddress();
+        Account recipient = new Account(recipientAddress);
+        return new Pair<Account, NameUtils.NameResult>(recipient, NameResult.OK);
+    }
 
-		public int getErrorCode() {
-			return errorcode;
-		}
+    public static List<Pair<String, String>> getWebsitesByValue(
+            String searchvalue) {
+        return getWebsitesbyValueInternal(searchvalue);
 
-	}
+    }
 
-	public static Pair<Account, NameResult> nameToAdress(String name) {
-		NameMap names = DCSet.getInstance().getNameMap();
-		// NAME NOT REGISTERED?
-		if (!names.contains(name)) {
+    public static List<Pair<String, String>> getNamesContainingWebsites() {
+        return getWebsitesbyValueInternal(null);
+    }
 
-			return new Pair<Account, NameUtils.NameResult>(null,
-					NameResult.NAME_NOT_REGISTERED);
+    public static List<Pair<String, String>> getWebsitesbyValueInternal(
+            String searchValueOpt) {
 
-		}
 
-		// NAME STARTS OR ENDS WITH SPACE?
-		if (name.startsWith(" ") || name.endsWith(" ")) {
-			return new Pair<Account, NameUtils.NameResult>(null,
-					NameResult.NAME_WITH_SPACE);
-		}
+        List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
 
-		// NAME FOR SALE?
-		if (DCSet.getInstance().getNameExchangeMap().contains(name)) {
-			return new Pair<Account, NameUtils.NameResult>(null,
-					NameResult.NAME_FOR_SALE);
-		}
 
-		// LOOKUP ADDRESS FOR NAME
-		Name lookupName = names.get(name);
-		String recipientAddress = lookupName.getOwner().getAddress();
-		Account recipient = new Account(recipientAddress);
-		return new Pair<Account, NameUtils.NameResult>(recipient, NameResult.OK);
-	}
+        NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
+        Set<String> keys = nameStorageMap.getKeys();
 
-	public static List<Pair<String, String>> getWebsitesByValue(
-			String searchvalue) {
-		return getWebsitesbyValueInternal(searchvalue);
+        for (String key : keys) {
+            String value = nameStorageMap.getOpt(key, Corekeys.WEBSITE.getKeyname());
+            if (value != null) {
+                if (searchValueOpt == null) {
+                    results.add(new Pair<String, String>(key,
+                            value));
+                } else {
+                    if (value.toLowerCase().contains(
+                            searchValueOpt.toLowerCase())) {
+                        results.add(new Pair<String, String>(key,
+                                value));
+                    }
 
-	}
+                }
+            }
 
-	public static List<Pair<String, String>> getNamesContainingWebsites() {
-		return getWebsitesbyValueInternal(null);
-	}
+        }
+
+        return results;
+    }
 
 	/*
 	@SuppressWarnings("unchecked")
@@ -175,34 +161,40 @@ public class NameUtils {
 	}
 	*/
 
-	public static List<Pair<String, String>> getWebsitesbyValueInternal(
-			String searchValueOpt) {
+    public enum NameResult {
+        OK("OK", "OK", 0), NAME_NOT_REGISTERED("The name is not registered",
+                "Invalid address or name not registered!",
+                Transaction.NAME_DOES_NOT_EXIST), NAME_WITH_SPACE(
+                "For security purposes sending payments to a name that starts or ends with spaces is forbidden.",
+                "Name Payments with trailing or leading spaces are not allowed!",
+                Transaction.NAME_WITH_SPACE), NAME_FOR_SALE(
+                "For security purposes sending payments to a name that can be purchased through name exchange is disabled.",
+                "Payments with names that are for sale are not allowed!",
+                Transaction.NAME_NOT_FOR_SALE);
 
-		
-		List<Pair<String, String>> results = new ArrayList<Pair<String, String>>();
+        private String statusMessage;
+        private String shortStatusMessage;
+        private int errorcode;
 
-		
-		NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
-		Set<String> keys = nameStorageMap.getKeys();
+        private NameResult(String statusMessage, String shortStatusMessage,
+                           int errorcode) {
+            this.statusMessage = statusMessage;
+            this.shortStatusMessage = shortStatusMessage;
+            this.errorcode = errorcode;
 
-		for (String key : keys) {
-			String value = nameStorageMap.getOpt(key, Corekeys.WEBSITE.getKeyname());
-					if (value != null) {
-						if (searchValueOpt == null) {
-							results.add(new Pair<String, String>(key,
-									value));
-						} else {
-							if (value.toLowerCase().contains(
-									searchValueOpt.toLowerCase())) {
-								results.add(new Pair<String, String>(key,
-										value));
-							}
+        }
 
-						}
-					}
+        public String getStatusMessage() {
+            return statusMessage;
+        }
 
-		}
+        public String getShortStatusMessage() {
+            return shortStatusMessage;
+        }
 
-		return results;
-	}
+        public int getErrorCode() {
+            return errorcode;
+        }
+
+    }
 }

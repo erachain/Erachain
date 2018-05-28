@@ -2,13 +2,13 @@
 /**
  * Copyright 2011 Google Inc.
  * Copyright 2013-2014 Ronald W Hoffman
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,18 +27,19 @@ import java.util.Arrays;
 public class Base58 {
 
     /** Alphabet used for encoding and decoding */
-	
-	private static final String ALPHABET_STR = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-			
+
+    private static final String ALPHABET_STR = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+
     private static final char[] ALPHABET =
-    		ALPHABET_STR.toCharArray();
+            ALPHABET_STR.toCharArray();
 
     /** Lookup index for US-ASCII characters (code points 0-127) */
     private static final int[] INDEXES = new int[128];
+
     static {
-        for (int i=0; i<INDEXES.length; i++)
+        for (int i = 0; i < INDEXES.length; i++)
             INDEXES[i] = -1;
-        for (int i=0; i<ALPHABET.length; i++)
+        for (int i = 0; i < ALPHABET.length; i++)
             INDEXES[ALPHABET[i]] = i;
     }
 
@@ -46,9 +47,9 @@ public class Base58 {
      * Encodes a byte array as a Base58 string
      *
      * @param       bytes           Array to be encoded
-     * @return                      Encoded string
+     * @return Encoded string
      */
-    
+
     public static String encode(byte[] bytes) {
         //
         // Nothing to do for an empty array
@@ -70,24 +71,24 @@ public class Base58 {
         // Encode the input starting with the first non-zero byte
         //
         int offset = zeroCount;
-        byte[] encoded = new byte[input.length*2];
+        byte[] encoded = new byte[input.length * 2];
         int encodedOffset = encoded.length;
         while (offset < input.length) {
             byte mod = divMod58(input, offset);
             if (input[offset] == 0)
                 offset++;
-            encoded[--encodedOffset] = (byte)ALPHABET[mod];
+            encoded[--encodedOffset] = (byte) ALPHABET[mod];
         }
         //
         // Strip any leading zero values in the encoded result
         //
-        while (encodedOffset < encoded.length && encoded[encodedOffset] == (byte)ALPHABET[0])
+        while (encodedOffset < encoded.length && encoded[encodedOffset] == (byte) ALPHABET[0])
             encodedOffset++;
         //
         // Now add the number of leading zeroes that we found in the input array
         //
-        for (int i=0; i<zeroCount; i++)
-            encoded[--encodedOffset] = (byte)ALPHABET[0];
+        for (int i = 0; i < zeroCount; i++)
+            encoded[--encodedOffset] = (byte) ALPHABET[0];
         //
         // Create the return string from the encoded bytes
         //
@@ -105,8 +106,8 @@ public class Base58 {
      * Decodes a Base58 string
      *
      * @param       string                  Encoded string
-     * @return                              Decoded bytes
-     * @throws      NumberFormatException  Invalid Base-58 encoded string
+     * @return Decoded bytes
+     * @throws NumberFormatException  Invalid Base-58 encoded string
      */
     public static byte[] decode(String string) {
         //
@@ -115,25 +116,25 @@ public class Base58 {
         if (string.length() == 0)
             return null;
 
-		if (string.startsWith("+")) {
-			// BASE.32 from  BANK
-			return Base32.decode(string.substring(1));
-		}
+        if (string.startsWith("+")) {
+            // BASE.32 from  BANK
+            return Base32.decode(string.substring(1));
+        }
 
         //
         // Convert the input string to a byte sequence
         //
         byte[] input = new byte[string.length()];
-        for (int i=0; i<string.length(); i++) {
+        for (int i = 0; i < string.length(); i++) {
             int codePoint = string.codePointAt(i);
             int digit = -1;
-            if (codePoint>=0 && codePoint<INDEXES.length)
+            if (codePoint >= 0 && codePoint < INDEXES.length)
                 digit = INDEXES[codePoint];
             if (digit < 0)
-            	throw new NumberFormatException(
-            			String.format("Illegal character %c at index %d",
-                        string.charAt(i), i));
-            input[i] = (byte)digit;
+                throw new NumberFormatException(
+                        String.format("Illegal character %c at index %d",
+                                string.charAt(i), i));
+            input[i] = (byte) digit;
         }
         //
         // Count the number of leading zero characters
@@ -162,7 +163,7 @@ public class Base58 {
         // Return the decoded result prefixed with the number of leading zeroes
         // that were in the original string
         //
-        byte[] output = Arrays.copyOfRange(decoded, decodedOffset-zeroCount, decoded.length);
+        byte[] output = Arrays.copyOfRange(decoded, decodedOffset - zeroCount, decoded.length);
         return output;
     }
 
@@ -171,8 +172,8 @@ public class Base58 {
      * checksum will then be removed from the decoded value.
      *
      * @param       string                  Base-58 encoded checksummed string
-     * @return                              Decoded value
-     * @throws      NumberFormatException  The string is not valid or the checksum is incorrect
+     * @return Decoded value
+     * @throws NumberFormatException  The string is not valid or the checksum is incorrect
      */
     public static byte[] decodeChecked(String string) {
         //
@@ -184,8 +185,8 @@ public class Base58 {
         //
         // Verify the checksum contained in the last 4 bytes
         //
-        byte[] bytes = Arrays.copyOfRange(decoded, 0, decoded.length-4);
-        byte[] checksum = Arrays.copyOfRange(decoded, decoded.length-4, decoded.length);
+        byte[] bytes = Arrays.copyOfRange(decoded, 0, decoded.length - 4);
+        byte[] checksum = Arrays.copyOfRange(decoded, decoded.length - 4, decoded.length);
         byte[] hash = Arrays.copyOfRange(Crypto.getInstance().doubleDigest(bytes), 0, 4);
         if (!Arrays.equals(hash, checksum))
             throw new NumberFormatException("Decoded string is too short");
@@ -201,17 +202,17 @@ public class Base58 {
      *
      * @param       number          Number array
      * @param       offset          Offset within the array
-     * @return                      The remainder
+     * @return The remainder
      */
     private static byte divMod58(byte[] number, int offset) {
         int remainder = 0;
-        for (int i=offset; i<number.length; i++) {
-            int digit = (int)number[i]&0xff;
-            int temp = remainder*256 + digit;
-            number[i] = (byte)(temp/58);
-            remainder = temp%58;
+        for (int i = offset; i < number.length; i++) {
+            int digit = (int) number[i] & 0xff;
+            int temp = remainder * 256 + digit;
+            number[i] = (byte) (temp / 58);
+            remainder = temp % 58;
         }
-        return (byte)remainder;
+        return (byte) remainder;
     }
 
     /**
@@ -220,35 +221,33 @@ public class Base58 {
      *
      * @param       number          Number array
      * @param       offset          Offset within the array
-     * @return                      The remainder
+     * @return The remainder
      */
     private static byte divMod256(byte[] number, int offset) {
         int remainder = 0;
-        for (int i=offset; i<number.length; i++) {
-            int digit = (int)number[i]&0xff;
-            int temp = remainder*58 + digit;
-            number[i] = (byte)(temp/256);
-            remainder = temp%256;
+        for (int i = offset; i < number.length; i++) {
+            int digit = (int) number[i] & 0xff;
+            int temp = remainder * 58 + digit;
+            number[i] = (byte) (temp / 256);
+            remainder = temp % 256;
         }
-        return (byte)remainder;
+        return (byte) remainder;
     }
-    
-	public static String encode(BigInteger id) {
-		byte[] array = id.toByteArray();
-		return encode(array);
-	}
 
-	public static BigInteger decodeBI(String input) {
-		return new BigInteger(decode(input));
-	}
-	
-	public static String clean(String str)
-	{
-		return str.replaceAll("[^"+ALPHABET_STR+"]", "");
-	}
-	
-	public static boolean isExtraSymbols(String str)
-	{
-		return !clean(str).equals(str);
-	}
+    public static String encode(BigInteger id) {
+        byte[] array = id.toByteArray();
+        return encode(array);
+    }
+
+    public static BigInteger decodeBI(String input) {
+        return new BigInteger(decode(input));
+    }
+
+    public static String clean(String str) {
+        return str.replaceAll("[^" + ALPHABET_STR + "]", "");
+    }
+
+    public static boolean isExtraSymbols(String str) {
+        return !clean(str).equals(str);
+    }
 }

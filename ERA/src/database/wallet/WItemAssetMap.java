@@ -1,64 +1,44 @@
 package database.wallet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
+import core.item.ItemCls;
+import database.serializer.ItemSerializer;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-
-import core.account.Account;
-import core.block.GenesisBlock;
-import core.item.ItemCls;
-import core.item.assets.AssetCls;
-
-import org.mapdb.BTreeMap;
-
 import utils.ObserverMessage;
-import utils.Pair;
-import database.serializer.ItemSerializer;
-import database.serializer.TransactionSerializer;
-import datachain.DCMap;
-public class WItemAssetMap extends WItem_Map
-{	
-	//static Logger LOGGER = Logger.getLogger(WItemAssetMap.class.getName());
 
-	static final String NAME = "asset";
-	static final int TYPE = ItemCls.ASSET_TYPE;
+import java.util.Map;
 
-	public WItemAssetMap(DWSet dWSet, DB database)
-	{
-		super(dWSet, database,
-				TYPE, NAME,
-				ObserverMessage.WALLET_RESET_ASSET_TYPE,
-				ObserverMessage.WALLET_ADD_ASSET_TYPE,
-				ObserverMessage.WALLET_REMOVE_ASSET_TYPE,
-				ObserverMessage.WALLET_LIST_ASSET_TYPE
-				);
-	}
+public class WItemAssetMap extends WItem_Map {
+    //static Logger LOGGER = Logger.getLogger(WItemAssetMap.class.getName());
 
-	public WItemAssetMap(WItemAssetMap parent) 
-	{
-		super(parent);
-	}
-	
-	@Override
-	// type+name not initialized yet! - it call as Super in New
-	protected Map<Tuple2<String, String>, ItemCls> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap(NAME)
-				.keySerializer(BTreeKeySerializer.TUPLE2)
-				.valueSerializer(new ItemSerializer(TYPE))
-				.counterEnable()
-				.makeOrGet();
-	}
+    static final String NAME = "asset";
+    static final int TYPE = ItemCls.ASSET_TYPE;
+
+    public WItemAssetMap(DWSet dWSet, DB database) {
+        super(dWSet, database,
+                TYPE, NAME,
+                ObserverMessage.WALLET_RESET_ASSET_TYPE,
+                ObserverMessage.WALLET_ADD_ASSET_TYPE,
+                ObserverMessage.WALLET_REMOVE_ASSET_TYPE,
+                ObserverMessage.WALLET_LIST_ASSET_TYPE
+        );
+    }
+
+    public WItemAssetMap(WItemAssetMap parent) {
+        super(parent);
+    }
+
+    @Override
+    // type+name not initialized yet! - it call as Super in New
+    protected Map<Tuple2<String, String>, ItemCls> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap(NAME)
+                .keySerializer(BTreeKeySerializer.TUPLE2)
+                .valueSerializer(new ItemSerializer(TYPE))
+                .counterEnable()
+                .makeOrGet();
+    }
 
 	/*
 	//@SuppressWarnings({ "unchecked", "rawtypes" })

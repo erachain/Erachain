@@ -1,192 +1,169 @@
 package gui.models;
 
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.validation.constraints.Null;
-
-import org.mapdb.Fun.Tuple2;
-
 import controller.Controller;
 import core.item.assets.AssetCls;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
+import org.mapdb.Fun.Tuple2;
 import utils.ObserverMessage;
 
+import javax.validation.constraints.Null;
+import java.util.Observable;
+import java.util.Observer;
+
 @SuppressWarnings("serial")
-public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, String>, AssetCls> implements Observer
-{
-	public static final int COLUMN_KEY = 0;
-	public static final int COLUMN_NAME = 1;
-	public static final int COLUMN_ADDRESS = 2;
-	public static final int COLUMN_ASSET_TYPE = 3;
-	public static final int COLUMN_AMOUNT = 4;
-	public static final int COLUMN_CONFIRMED = 5;
-	public static final int COLUMN_FAVORITE = 6;
+public class WalletItemAssetsTableModel extends TableModelCls<Tuple2<String, String>, AssetCls> implements Observer {
+    public static final int COLUMN_KEY = 0;
+    public static final int COLUMN_NAME = 1;
+    public static final int COLUMN_ADDRESS = 2;
+    public static final int COLUMN_ASSET_TYPE = 3;
+    public static final int COLUMN_AMOUNT = 4;
+    public static final int COLUMN_CONFIRMED = 5;
+    public static final int COLUMN_FAVORITE = 6;
 
-	private SortableList<Tuple2<String, String>, AssetCls> assets;
+    private SortableList<Tuple2<String, String>, AssetCls> assets;
 
-	private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"});
-	private Boolean[] column_AutuHeight = new Boolean[]{false,true,true,false,false,false,false,false};
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Key", "Name", "Owner", "Type", "Quantity", "Confirmed", "Favorite"});
+    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false, false, false, false};
 
-	public WalletItemAssetsTableModel()
-	{
-		addObservers();
+    public WalletItemAssetsTableModel() {
+        addObservers();
 
-	}
+    }
 
-	@Override
-	public SortableList<Tuple2<String, String>, AssetCls> getSortableList() {
-		return this.assets;
-	}
+    @Override
+    public SortableList<Tuple2<String, String>, AssetCls> getSortableList() {
+        return this.assets;
+    }
 
-	@Override
-	public Class<? extends Object> getColumnClass(int c) {     // set column type
-		Object o = getValueAt(0, c);
-		return o==null?Null.class:o.getClass();
-	}
+    @Override
+    public Class<? extends Object> getColumnClass(int c) {     // set column type
+        Object o = getValueAt(0, c);
+        return o == null ? Null.class : o.getClass();
+    }
 
-	// читаем колонки которые изменяем высоту
-	public Boolean[] get_Column_AutoHeight(){
+    // читаем колонки которые изменяем высоту
+    public Boolean[] get_Column_AutoHeight() {
 
-		return this.column_AutuHeight;
-	}
-	// устанавливаем колонки которым изменить высоту
-	public void set_get_Column_AutoHeight( Boolean[] arg0){
-		this.column_AutuHeight = arg0;
-	}
+        return this.column_AutuHeight;
+    }
 
-	public AssetCls getAsset(int row)
-	{
-		return this.assets.get(row).getB();
-	}
+    // устанавливаем колонки которым изменить высоту
+    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+        this.column_AutuHeight = arg0;
+    }
 
-	@Override
-	public int getColumnCount()
-	{
-		return this.columnNames.length;
-	}
+    public AssetCls getAsset(int row) {
+        return this.assets.get(row).getB();
+    }
 
-	@Override
-	public String getColumnName(int index)
-	{
-		return this.columnNames[index];
-	}
+    @Override
+    public int getColumnCount() {
+        return this.columnNames.length;
+    }
 
-	@Override
-	public int getRowCount()
-	{
-		return (this.assets == null)? 0 : this.assets.size();
-	}
+    @Override
+    public String getColumnName(int index) {
+        return this.columnNames[index];
+    }
 
-	@Override
-	public Object getValueAt(int row, int column)
-	{
-		if(this.assets == null || row > this.assets.size() - 1 )
-		{
-			return null;
-		}
+    @Override
+    public int getRowCount() {
+        return (this.assets == null) ? 0 : this.assets.size();
+    }
 
-		try
-		{
-			AssetCls asset = this.assets.get(row).getB();
+    @Override
+    public Object getValueAt(int row, int column) {
+        if (this.assets == null || row > this.assets.size() - 1) {
+            return null;
+        }
 
-			switch(column)
-			{
-			case COLUMN_KEY:
+        try {
+            AssetCls asset = this.assets.get(row).getB();
 
-				return asset.getKey(DCSet.getInstance());
+            switch (column) {
+                case COLUMN_KEY:
 
-			case COLUMN_NAME:
+                    return asset.getKey(DCSet.getInstance());
 
-				return asset.viewName();
+                case COLUMN_NAME:
 
-			case COLUMN_ADDRESS:
+                    return asset.viewName();
 
-				return asset.getOwner().getPersonAsString();
+                case COLUMN_ADDRESS:
 
-			case COLUMN_ASSET_TYPE:
+                    return asset.getOwner().getPersonAsString();
 
-				return Lang.getInstance().translate(asset.viewAssetType());
+                case COLUMN_ASSET_TYPE:
 
-			case COLUMN_AMOUNT:
+                    return Lang.getInstance().translate(asset.viewAssetType());
 
-				return asset.getTotalQuantity(DCSet.getInstance());
+                case COLUMN_AMOUNT:
 
-			case COLUMN_CONFIRMED:
+                    return asset.getTotalQuantity(DCSet.getInstance());
 
-				return asset.isConfirmed();
+                case COLUMN_CONFIRMED:
 
-			case COLUMN_FAVORITE:
+                    return asset.isConfirmed();
 
-				return asset.isFavorite();
-			}
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
+                case COLUMN_FAVORITE:
+
+                    return asset.isFavorite();
+            }
+        } catch (Exception e) {
+            //GUI ERROR
+        }
 
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public void update(Observable o, Object arg)
-	{
-		try
-		{
-			this.syncUpdate(o, arg);
-		}
-		catch(Exception e)
-		{
-			//GUI ERROR
-		}
-	}
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            //GUI ERROR
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public synchronized void syncUpdate(Observable o, Object arg)
-	{
-		ObserverMessage message = (ObserverMessage) arg;
+    @SuppressWarnings("unchecked")
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
 
-		//CHECK IF NEW LIST
-		if(message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE)
-		{
-			if(this.assets == null)
-			{
-				this.assets = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
-				this.assets.registerObserver();
-				//this.assets.sort(PollMap.NAME_INDEX);
-			}
+        //CHECK IF NEW LIST
+        if (message.getType() == ObserverMessage.LIST_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_LIST_ASSET_TYPE) {
+            if (this.assets == null) {
+                this.assets = (SortableList<Tuple2<String, String>, AssetCls>) message.getValue();
+                this.assets.registerObserver();
+                //this.assets.sort(PollMap.NAME_INDEX);
+            }
 
-			this.fireTableDataChanged();
-		}
+            this.fireTableDataChanged();
+        }
 
-		//CHECK IF LIST UPDATED
-		if(message.getType() == ObserverMessage.ADD_ASSET_TYPE || message.getType() == ObserverMessage.REMOVE_ASSET_TYPE
-				|| message.getType() == ObserverMessage.WALLET_ADD_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ASSET_TYPE)
-		{
-			this.fireTableDataChanged();
-		}
-	}
+        //CHECK IF LIST UPDATED
+        if (message.getType() == ObserverMessage.ADD_ASSET_TYPE || message.getType() == ObserverMessage.REMOVE_ASSET_TYPE
+                || message.getType() == ObserverMessage.WALLET_ADD_ASSET_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ASSET_TYPE) {
+            this.fireTableDataChanged();
+        }
+    }
 
-	public void addObservers()
-	{
+    public void addObservers() {
 
-		Controller.getInstance().addWalletListener(this);
-	}
+        Controller.getInstance().addWalletListener(this);
+    }
 
 
-	public void removeObservers()
-	{
+    public void removeObservers() {
 
-		Controller.getInstance().deleteObserver(this);
-	}
+        Controller.getInstance().deleteObserver(this);
+    }
 
-	@Override
-	public Object getItem(int k) {
-		// TODO Auto-generated method stub
-		return this.assets.get(k).getB();
-	}
+    @Override
+    public Object getItem(int k) {
+        // TODO Auto-generated method stub
+        return this.assets.get(k).getB();
+    }
 }

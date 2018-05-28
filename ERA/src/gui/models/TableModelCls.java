@@ -1,16 +1,15 @@
 package gui.models;
 
-import javax.swing.table.AbstractTableModel;
-
-import core.item.ItemCls;
 import datachain.SortableList;
 
+import javax.swing.table.AbstractTableModel;
+
 @SuppressWarnings("serial")
-public abstract class TableModelCls<T, U> extends AbstractTableModel  {
+public abstract class TableModelCls<T, U> extends AbstractTableModel {
 
-	public int COLUMN_FAVORITE=1000;
-	
-	public abstract SortableList<T, U> getSortableList();
+    public int COLUMN_FAVORITE = 1000;
 
-	public abstract Object getItem(int k);
+    public abstract SortableList<T, U> getSortableList();
+
+    public abstract Object getItem(int k);
 }

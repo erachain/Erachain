@@ -1,210 +1,196 @@
 package gui.items.mails;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-
-import org.mapdb.Fun.Tuple2;
-
 import controller.Controller;
 import core.account.Account;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import lang.Lang;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
-import lang.Lang;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class TableModelMails extends AbstractTableModel implements Observer {
-	public static final int COLUMN_CONFIRMATION = 0;
-	public static final int COLUMN_DATA = 1;
-	public static final int COLUMN_SENDER = 3;
-	public static final int COLUMN_RECIEVER = 4;
-	public static final int COLUMN_HEAD = 2;
+    public static final int COLUMN_CONFIRMATION = 0;
+    public static final int COLUMN_DATA = 1;
+    public static final int COLUMN_SENDER = 3;
+    public static final int COLUMN_RECIEVER = 4;
+    public static final int COLUMN_HEAD = 2;
 //	public static final int COLUMN_CONFIRM = 5;
+    boolean incoming;
+    private ArrayList<R_Send> transactions;
+    private String[] columnNames = Lang.getInstance()
+            .translate(new String[]{"Confirmation", "Date", "Title", "Sender", "Reciever"});//, "Confirm" });
+    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
 
-	private ArrayList<R_Send> transactions;
+    public TableModelMails(boolean incoming) {
 
-	private String[] columnNames = Lang.getInstance()
-			.translate(new String[] { "Confirmation", "Date", "Title", "Sender", "Reciever"});//, "Confirm" });
-	private Boolean[] column_AutuHeight = new Boolean[] { false, true, true, false };
-	boolean incoming;
+        this.incoming = incoming;
+        transactions = new ArrayList<R_Send>();
+        //	DCSet.getInstance().getTransactionMap().addObserver(this);
+        Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
 
-	public TableModelMails(boolean incoming) {
+    }
 
-		this.incoming = incoming;
-		transactions = new ArrayList<R_Send>();
-	//	DCSet.getInstance().getTransactionMap().addObserver(this);
-		Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
+    public Class<? extends Object> getColumnClass(int c) { // set column type
+        Object o = getValueAt(0, c);
+        return o == null ? Null.class : o.getClass();
+    }
 
-	}
+    // читаем колонки которые изменяем высоту
+    public Boolean[] get_Column_AutoHeight() {
 
-	public Class<? extends Object> getColumnClass(int c) { // set column type
-		Object o = getValueAt(0, c);
-		return o==null?Null.class:o.getClass();
-	}
+        return this.column_AutuHeight;
+    }
 
-	// читаем колонки которые изменяем высоту
-	public Boolean[] get_Column_AutoHeight() {
+    // устанавливаем колонки которым изменить высоту
+    public void set_get_Column_AutoHeight(Boolean[] arg0) {
+        this.column_AutuHeight = arg0;
+    }
 
-		return this.column_AutuHeight;
-	}
+    public Transaction getTransaction(int row) {
+        return this.transactions.get(row);
+    }
 
-	// устанавливаем колонки которым изменить высоту
-	public void set_get_Column_AutoHeight(Boolean[] arg0) {
-		this.column_AutuHeight = arg0;
-	}
+    @Override
+    public int getColumnCount() {
+        return this.columnNames.length;
+    }
 
-	public Transaction getTransaction(int row) {
-		return this.transactions.get(row);
-	}
+    @Override
+    public String getColumnName(int index) {
+        return this.columnNames[index];
+    }
 
-	@Override
-	public int getColumnCount() {
-		return this.columnNames.length;
-	}
+    @Override
+    public int getRowCount() {
+        return this.transactions.size();
 
-	@Override
-	public String getColumnName(int index) {
-		return this.columnNames[index];
-	}
+    }
 
-	@Override
-	public int getRowCount() {
-		return this.transactions.size();
+    @Override
+    public Object getValueAt(int row, int column) {
+        if (this.transactions == null || row > this.transactions.size() - 1) {
+            return null;
+        }
 
-	}
+        R_Send tran = this.transactions.get(row);
 
-	@Override
-	public Object getValueAt(int row, int column) {
-		if (this.transactions == null || row > this.transactions.size() - 1) {
-			return null;
-		}
+        switch (column) {
+            case COLUMN_CONFIRMATION:
 
-		R_Send tran = this.transactions.get(row);
+                return tran.getConfirmations(DCSet.getInstance());
 
-		switch (column) {
-		case COLUMN_CONFIRMATION:
+            case COLUMN_DATA:
 
-			return tran.getConfirmations(DCSet.getInstance());
 
-		case COLUMN_DATA:
-			
+                return DateTimeFormat.timestamptoString(tran.getTimestamp());
 
-			return DateTimeFormat.timestamptoString(tran.getTimestamp());
+            //	case COLUMN_CONFIRM:
 
-	//	case COLUMN_CONFIRM:
+            //		return tran.isConfirmed(DBSet.getInstance());
 
-	//		return tran.isConfirmed(DBSet.getInstance());
+            case COLUMN_SENDER:
 
-		case COLUMN_SENDER:
+                return tran.getCreator().viewPerson();
 
-			return tran.getCreator().viewPerson();
+            case COLUMN_RECIEVER:
 
-		case COLUMN_RECIEVER:
+                return tran.getRecipient().viewPerson();
 
-			return tran.getRecipient().viewPerson();
+            case COLUMN_HEAD:
 
-		case COLUMN_HEAD:
+                return tran.getHead();
 
-			return tran.getHead();
+        }
 
-		}
+        return null;
+    }
 
-		return null;
-	}
+    @Override
+    public void update(Observable o, Object arg) {
+        try {
+            this.syncUpdate(o, arg);
+        } catch (Exception e) {
+            // GUI ERROR
+        }
+    }
 
-	@Override
-	public void update(Observable o, Object arg) {
-		try {
-			this.syncUpdate(o, arg);
-		} catch (Exception e) {
-			// GUI ERROR
-		}
-	}
+    public synchronized void syncUpdate(Observable o, Object arg) {
+        ObserverMessage message = (ObserverMessage) arg;
 
-	public synchronized void syncUpdate(Observable o, Object arg) {
-		ObserverMessage message = (ObserverMessage) arg;
+        // CHECK IF LIST UPDATED
+        if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
+            filter(message);
+            this.fireTableDataChanged();
+        }
 
-		// CHECK IF LIST UPDATED
-		if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE ) {
-			filter(message);
-			this.fireTableDataChanged();
-		}
+    }
 
-	}
+    public void removeObservers() {
+        DCSet.getInstance().getTransactionMap().deleteObserver(this);
+    }
 
-	public void removeObservers() {
-		DCSet.getInstance().getTransactionMap().deleteObserver(this);
-	}
+    public void filter(ObserverMessage message) {
 
-	public void filter(ObserverMessage message) {
+        ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
-		ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
-		
+        for (Account account : Controller.getInstance().getAccounts()) {
+            all_transactions.addAll(DCSet.getInstance().getTransactionFinalMap()
+                    .getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
+        }
 
-		for (Account account : Controller.getInstance().getAccounts()) {
-			all_transactions.addAll(DCSet.getInstance().getTransactionFinalMap()
-					.getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
-		}
+        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
+            if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                all_transactions.add(transaction);
+            }
+        }
 
-		for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
-			if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-				all_transactions.add(transaction);
-			}
-		}
-		
-		
-		
-		
-		for (Transaction messagetx : all_transactions) {
-			boolean is = false;
-			if (!this.transactions.isEmpty()){
-			for (R_Send message1 : this.transactions) {
-				if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
-					is = true;
-					break;
-				}
-			}
-			}
-			if (!is) {
 
-				if (messagetx.getAssetKey() == 0) {
-					for (Account account1 : Controller.getInstance().getAccounts()) {
-						R_Send a = (R_Send) messagetx;
-						if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
-							this.transactions.add(a);
-						}
+        for (Transaction messagetx : all_transactions) {
+            boolean is = false;
+            if (!this.transactions.isEmpty()) {
+                for (R_Send message1 : this.transactions) {
+                    if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
+                        is = true;
+                        break;
+                    }
+                }
+            }
+            if (!is) {
 
-						if (a.getCreator().getAddress().equals(account1.getAddress()) && !incoming) {
-							this.transactions.add(a);
-						}
+                if (messagetx.getAssetKey() == 0) {
+                    for (Account account1 : Controller.getInstance().getAccounts()) {
+                        R_Send a = (R_Send) messagetx;
+                        if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
+                            this.transactions.add(a);
+                        }
 
-					}
-				}
-			}
-		}
-		
-		
-		this.transactions.sort(new Comparator<Transaction>(){
+                        if (a.getCreator().getAddress().equals(account1.getAddress()) && !incoming) {
+                            this.transactions.add(a);
+                        }
 
-			
-			
-			public int compare(Transaction o1, Transaction o2) {
-				// TODO Auto-generated method stub
-				
-				return  (int) (o2.getTimestamp()- o1.getTimestamp());
-			}});
-		
+                    }
+                }
+            }
+        }
 
-	}
+
+        this.transactions.sort(new Comparator<Transaction>() {
+
+
+            public int compare(Transaction o1, Transaction o2) {
+                // TODO Auto-generated method stub
+
+                return (int) (o2.getTimestamp() - o1.getTimestamp());
+            }
+        });
+
+
+    }
 }

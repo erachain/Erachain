@@ -1,72 +1,62 @@
 package core.wallet;
 
-import java.math.BigDecimal;
+import controller.Controller;
+import core.item.templates.TemplateCls;
+import gui.Gui;
+import utils.ObserverMessage;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.mapdb.Fun.Tuple2;
 
-import controller.Controller;
-import core.account.Account;
-import core.item.templates.TemplateCls;
-import core.transaction.Transaction;
-import datachain.DCSet;
-import datachain.SortableList;
-import gui.Gui;
-import utils.ObserverMessage;
+public class TemplatesFavorites implements Observer {
+
+    private List<Long> favorites;
+
+    public TemplatesFavorites() {
+        this.favorites = new ArrayList<Long>();
+
+        Controller.getInstance().addWalletListener(this);
+        Controller.getInstance().addObserver(this);
+    }
+
+    public List<Long> getKeys() {
+        return this.favorites;
+    }
+
+    public List<TemplateCls> getTemplates() {
+        List<TemplateCls> template = new ArrayList<TemplateCls>();
+        //template.add(Controller.getInstance().getTemplate(Transaction.FEE_KEY));
+        //template.add(Controller.getInstance().getTemplate(Transaction.FEE_KEY + 1l));
+        for (Long key : this.favorites) {
+            template.add(Controller.getInstance().getItemTemplate(key));
+        }
+        return template;
+    }
 
 
-public class TemplatesFavorites implements Observer{
+    @Override
+    // if some changed in wallet - reload favorites
+    public void update(Observable o, Object arg) {
 
-	private List<Long> favorites;
-	
-	public TemplatesFavorites() {
-		this.favorites = new ArrayList<Long>(); 
-		
-		Controller.getInstance().addWalletListener(this);
-		Controller.getInstance().addObserver(this);
-	}
-	
-	public List<Long> getKeys()
-	{
-		return this.favorites;
-	}
-	
-	public List<TemplateCls> getTemplates()
-	{
-		List<TemplateCls> template = new ArrayList<TemplateCls>();
-		//template.add(Controller.getInstance().getTemplate(Transaction.FEE_KEY));		
-		//template.add(Controller.getInstance().getTemplate(Transaction.FEE_KEY + 1l));		
-		for (Long key : this.favorites) {
-			template.add(Controller.getInstance().getItemTemplate(key));
-		}
-		return template;
-	}
-	
-	
-	@Override
-	// if some changed in wallet - reload favorites
-	public void update(Observable o, Object arg) {
+        if (!Gui.isGuiStarted()) {
+            return;
+        }
 
-		if(!Gui.isGuiStarted()){
-			return;
-		}
-		
-		ObserverMessage message = (ObserverMessage) arg;
+        ObserverMessage message = (ObserverMessage) arg;
 
-		if((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
-			||((Controller.getInstance().getStatus() == Controller.STATUS_OK) && 
-					(
-							message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
-							|| message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
-							//|| message.getType() == ObserverMessage.ADD_BALANCE_TYPE
-							//|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
-					)))
-		{
-			List<Long> favoritesUpadate = new ArrayList<Long>();
-			//favoritesUpadate.add(0L);
+        if ((message.getType() == ObserverMessage.NETWORK_STATUS && (int) message.getValue() == Controller.STATUS_OK)
+                || ((Controller.getInstance().getStatus() == Controller.STATUS_OK) &&
+                (
+                        message.getType() == ObserverMessage.ADD_ACCOUNT_TYPE
+                                || message.getType() == ObserverMessage.REMOVE_ACCOUNT_TYPE
+                        //|| message.getType() == ObserverMessage.ADD_BALANCE_TYPE
+                        //|| message.getType() == ObserverMessage.REMOVE_BALANCE_TYPE
+                ))) {
+            List<Long> favoritesUpadate = new ArrayList<Long>();
+            //favoritesUpadate.add(0L);
 			
 			/* balancec = nil
 			for (Account account : Controller.getInstance().getAccounts()) {
@@ -81,10 +71,10 @@ public class TemplatesFavorites implements Observer{
 				}
 			}
 			*/
-			
-			////////this.favorites = favoritesUpadate;
 
-			///////Controller.getInstance().replaseTemplatesFavorites();
-		}
-	}
+            ////////this.favorites = favoritesUpadate;
+
+            ///////Controller.getInstance().replaseTemplatesFavorites();
+        }
+    }
 }

@@ -1,17 +1,16 @@
 package datachain;
 
 
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /*
  *  Block Height ->
@@ -21,49 +20,42 @@ import org.mapdb.Fun.Tuple5;
  *  + Forging Data - Forging Value, Win Value, Target Value
  *
  */
-public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>>
-{
+public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> {
 
-	protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
-
-	static Logger LOGGER = Logger.getLogger(BlocksHeadsMap.class.getName());
-
-	static final String NAME = "blocks_heads";
-
-	// for saving in DB
-	private Atomic.Long fullWeightVar;
-	private Long fullWeight = 0L;
-	private int startedInForkHeight = 0;
+    static final String NAME = "blocks_heads";
+    static Logger LOGGER = Logger.getLogger(BlocksHeadsMap.class.getName());
+    protected Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
+    // for saving in DB
+    private Atomic.Long fullWeightVar;
+    private Long fullWeight = 0L;
+    private int startedInForkHeight = 0;
 
 
-	public BlocksHeadsMap(DCSet databaseSet, DB database)
-	{
-		super(databaseSet, database);
+    public BlocksHeadsMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
 
-		this.fullWeightVar = database.getAtomicLong("fullWeight");
-		this.fullWeight = this.fullWeightVar.get();
-		if (this.fullWeight == null)
-			this.fullWeight = 0L;
+        this.fullWeightVar = database.getAtomicLong("fullWeight");
+        this.fullWeight = this.fullWeightVar.get();
+        if (this.fullWeight == null)
+            this.fullWeight = 0L;
 
-	}
+    }
 
-	public BlocksHeadsMap(BlocksHeadsMap parent, DCSet dcSet)
-	{
-		super(parent, dcSet);
+    public BlocksHeadsMap(BlocksHeadsMap parent, DCSet dcSet) {
+        super(parent, dcSet);
 
-		this.fullWeight = parent.getFullWeight();
+        this.fullWeight = parent.getFullWeight();
 
-	}
+    }
 
-	@Override
-	protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMap(DB database)
-	{
-		//OPEN MAP
-		return database.createTreeMap(NAME)
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.counterEnable()
-				.makeOrGet();
-	}
+    @Override
+    protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap(NAME)
+                .keySerializer(BTreeKeySerializer.BASIC)
+                .counterEnable()
+                .makeOrGet();
+    }
 
 	/*
 	 *  NEED .counterEnable in MAP(non-Javadoc)
@@ -74,103 +66,101 @@ public class BlocksHeadsMap extends DCMap<Integer, Tuple3<Tuple5<Integer, byte[]
 	}
 	 */
 
-	@Override
-	protected void createIndexes(DB database) {
-	}
+    @Override
+    protected void createIndexes(DB database) {
+    }
 
-	@Override
-	protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMemoryMap() {
-		return new HashMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>>();
-	}
+    @Override
+    protected Map<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>> getMemoryMap() {
+        return new HashMap<Integer, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>>>();
+    }
 
-	@Override
-	protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> getDefaultValue() {
-		return null;
-	}
+    @Override
+    protected Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> getDefaultValue() {
+        return null;
+    }
 
-	@Override
-	protected Map<Integer, Integer> getObservableData() {
-		return this.observableData;
-	}
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
 
-	public Long getFullWeight() {
-		return this.fullWeight;
-	}
+    public Long getFullWeight() {
+        return this.fullWeight;
+    }
 
-	public int getStartedInForkHeight() {
-		return this.startedInForkHeight;
-	}
+    public int getStartedInForkHeight() {
+        return this.startedInForkHeight;
+    }
 
-	public void recalcWeightFull(DCSet dcSet) {
+    public void recalcWeightFull(DCSet dcSet) {
 
-		long weightFull = 0l;
-		Iterator<Integer> iterator = this.getIterator(0, true);
-		while (iterator.hasNext()) {
-			Integer key = iterator.next();
-			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item = this.get(key);
-			weightFull += item.c.c;
-		}
+        long weightFull = 0l;
+        Iterator<Integer> iterator = this.getIterator(0, true);
+        while (iterator.hasNext()) {
+            Integer key = iterator.next();
+            Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item = this.get(key);
+            weightFull += item.c.c;
+        }
 
-		fullWeight = weightFull;
-		this.fullWeightVar.set(fullWeight);
+        fullWeight = weightFull;
+        this.fullWeightVar.set(fullWeight);
 
-	}
-	
-	public boolean set(int height, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
+    }
 
-		//int key = this.size() + 1;
+    public boolean set(int height, Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
 
-		// get Win Value of block
-		long weight = item.c.b;
+        //int key = this.size() + 1;
 
-		if (startedInForkHeight == 0 && this.parent != null) {
-			startedInForkHeight = height;
-		}
+        // get Win Value of block
+        long weight = item.c.b;
 
-		fullWeight += weight;
+        if (startedInForkHeight == 0 && this.parent != null) {
+            startedInForkHeight = height;
+        }
 
-		if(this.fullWeightVar != null)
-		{
-			this.fullWeightVar.set(fullWeight);
-		}
+        fullWeight += weight;
 
-		// INSERT WITH NEW KEY
-		return super.set(height, item);
+        if (this.fullWeightVar != null) {
+            this.fullWeightVar.set(fullWeight);
+        }
 
-	}
+        // INSERT WITH NEW KEY
+        return super.set(height, item);
 
-	public int add(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
+    }
 
-		int key = this.size() + 1;
+    public int add(Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> item) {
 
-		// INSERT WITH NEW KEY
-		this.set(key, item);
+        int key = this.size() + 1;
 
-		// RETURN KEY
-		return key;
-	}
+        // INSERT WITH NEW KEY
+        this.set(key, item);
 
-	public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> last() {
-		return this.get(this.size());
-	}
+        // RETURN KEY
+        return key;
+    }
 
-	public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> remove() {
+    public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> last() {
+        return this.get(this.size());
+    }
 
-		int key = this.size();
-		if (this.contains(key)) {
-			// sub old value from FULL
-			Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> value_old = this.get(key);
-			fullWeight -= value_old.c.b;
+    public Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> remove() {
 
-			if(this.fullWeightVar != null)
-			{
-				this.fullWeightVar.set(fullWeight);
-			}
-			return super.delete(key);
-		}
+        int key = this.size();
+        if (this.contains(key)) {
+            // sub old value from FULL
+            Tuple3<Tuple5<Integer, byte[], byte[], Integer, byte[]>, byte[], Tuple3<Integer, Long, Long>> value_old = this.get(key);
+            fullWeight -= value_old.c.b;
 
-		return null;
-	}
+            if (this.fullWeightVar != null) {
+                this.fullWeightVar.set(fullWeight);
+            }
+            return super.delete(key);
+        }
+
+        return null;
+    }
 
 
 }

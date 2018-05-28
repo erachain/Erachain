@@ -1,119 +1,106 @@
 package datachain;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.Stack;
-
+import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
+
+import java.util.Map;
+import java.util.Stack;
+import java.util.TreeMap;
+
 //import org.mapdb.Fun.Tuple2;
 //import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-
-import com.google.common.primitives.UnsignedBytes;
 
 // hash[byte] -> Stack person + block.height + transaction.seqNo
 // Example - database.AddressPersonMap
 public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
-		Long, // person key
-		Integer, // block height 
-		Integer>>> // transaction index
+        Long, // person key
+        Integer, // block height
+        Integer>>> // transaction index
 {
-	private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // icreator -HashMap
-	
-	public HashesSignsMap(DCSet databaseSet, DB database)
-	{
-		super(databaseSet, database);
-	}
+    private Map<Integer, Integer> observableData = new TreeMap<Integer, Integer>(); // icreator -HashMap
 
-	public HashesSignsMap(HashesSignsMap parent) 
-	{
-		super(parent, null);
-	}
-	
-	protected void createIndexes(DB database){}
+    public HashesSignsMap(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
+    }
 
-	@Override
-	protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMap(DB database) 
-	{
-		//OPEN MAP
-		return database.createTreeMap("hashes_signs")
-				.keySerializer(BTreeKeySerializer.BASIC)
-				.comparator(UnsignedBytes.lexicographicalComparator())
-				.makeOrGet();
-	}
+    public HashesSignsMap(HashesSignsMap parent) {
+        super(parent, null);
+    }
 
-	@Override
-	protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMemoryMap() 
-	{
-		return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
-	}
+    protected void createIndexes(DB database) {
+    }
 
-	@Override
-	protected Stack<Tuple3<Long, Integer, Integer>> getDefaultValue() 
-	{
-		return new Stack<Tuple3<Long, Integer, Integer>>();
-	}
-	
-	@Override
-	protected Map<Integer, Integer> getObservableData() 
-	{
-		return this.observableData;
-	}
-	
-	///////////////////////////////
-	@SuppressWarnings("unchecked")
-	public void addItem(byte[] hash, Tuple3<Long, Integer, Integer> item)
-	{
-		
-		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
-		
-		Stack<Tuple3<Long, Integer, Integer>> value_new;
+    @Override
+    protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMap(DB database) {
+        //OPEN MAP
+        return database.createTreeMap("hashes_signs")
+                .keySerializer(BTreeKeySerializer.BASIC)
+                .comparator(UnsignedBytes.lexicographicalComparator())
+                .makeOrGet();
+    }
 
-		if (this.parent == null)
-			value_new = value;
-		else {
-			// !!!! NEEED .clone() !!!
-			// need for updates only in fork - not in parent DB
-			value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
-		}
+    @Override
+    protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMemoryMap() {
+        return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
+    }
 
-		value_new.push(item);
-		
-		this.set(hash, value_new);
-		
-	}
-	
-	public Tuple3<Long, Integer, Integer> getItem(byte[] hash)
-	{
-		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
-		return !value.isEmpty()? value.peek(): null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void removeItem(byte[] hash)
-	{
-		Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
-		if (value==null || value.isEmpty()) return;
+    @Override
+    protected Stack<Tuple3<Long, Integer, Integer>> getDefaultValue() {
+        return new Stack<Tuple3<Long, Integer, Integer>>();
+    }
 
-		Stack<Tuple3<Long, Integer, Integer>> value_new;
-		if (this.parent == null)
-			value_new = value;
-		else {
-			// !!!! NEEED .clone() !!!
-			// need for updates only in fork - not in parent DB
-			value_new = (Stack<Tuple3<Long, Integer, Integer>>)value.clone();
-		}
+    @Override
+    protected Map<Integer, Integer> getObservableData() {
+        return this.observableData;
+    }
 
-		value_new.pop();
-		
-		this.set(hash, value_new);
-		
-	}
+    ///////////////////////////////
+    @SuppressWarnings("unchecked")
+    public void addItem(byte[] hash, Tuple3<Long, Integer, Integer> item) {
+
+        Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
+
+        Stack<Tuple3<Long, Integer, Integer>> value_new;
+
+        if (this.parent == null)
+            value_new = value;
+        else {
+            // !!!! NEEED .clone() !!!
+            // need for updates only in fork - not in parent DB
+            value_new = (Stack<Tuple3<Long, Integer, Integer>>) value.clone();
+        }
+
+        value_new.push(item);
+
+        this.set(hash, value_new);
+
+    }
+
+    public Tuple3<Long, Integer, Integer> getItem(byte[] hash) {
+        Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
+        return !value.isEmpty() ? value.peek() : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void removeItem(byte[] hash) {
+        Stack<Tuple3<Long, Integer, Integer>> value = this.get(hash);
+        if (value == null || value.isEmpty()) return;
+
+        Stack<Tuple3<Long, Integer, Integer>> value_new;
+        if (this.parent == null)
+            value_new = value;
+        else {
+            // !!!! NEEED .clone() !!!
+            // need for updates only in fork - not in parent DB
+            value_new = (Stack<Tuple3<Long, Integer, Integer>>) value.clone();
+        }
+
+        value_new.pop();
+
+        this.set(hash, value_new);
+
+    }
 
 }

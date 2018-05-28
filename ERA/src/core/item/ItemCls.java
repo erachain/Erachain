@@ -1,17 +1,7 @@
 package core.item;
 
-import java.nio.charset.Charset;
-//import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple6;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-//import com.google.common.primitives.Longs;
-
 import controller.Controller;
 import core.BlockChain;
 import core.account.PublicKeyAccount;
@@ -20,309 +10,306 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple6;
 import utils.Pair;
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+//import java.math.BigDecimal;
+//import com.google.common.primitives.Longs;
 
 public abstract class ItemCls {
 
-	public static final int ASSET_TYPE = 1;
-	public static final int IMPRINT_TYPE = 2;
-	public static final int TEMPLATE_TYPE = 3;
-	public static final int PERSON_TYPE = 4;
-	public static final int STATUS_TYPE = 5;
-	public static final int UNION_TYPE = 6;
-	public static final int STATEMENT_TYPE = 7;
-	public static final int POLL_TYPE = 8;
+    public static final int ASSET_TYPE = 1;
+    public static final int IMPRINT_TYPE = 2;
+    public static final int TEMPLATE_TYPE = 3;
+    public static final int PERSON_TYPE = 4;
+    public static final int STATUS_TYPE = 5;
+    public static final int UNION_TYPE = 6;
+    public static final int STATEMENT_TYPE = 7;
+    public static final int POLL_TYPE = 8;
+    public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
+    public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
+    protected static final int TYPE_LENGTH = 2;
+    protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
+    protected static final int NAME_SIZE_LENGTH = 1;
+    //public static final int MIN_NAME_LENGTH = 10;
+    public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
+    protected static final int ICON_SIZE_LENGTH = 2;
+    protected static final int IMAGE_SIZE_LENGTH = 4;
+    protected static final int DESCRIPTION_SIZE_LENGTH = 4;
+    protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
+    protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
 
-	protected static final int TYPE_LENGTH = 2;
-	protected static final int OWNER_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
-	protected static final int NAME_SIZE_LENGTH = 1;
-	//public static final int MIN_NAME_LENGTH = 10;
-	public static final int MAX_NAME_LENGTH = (int) Math.pow(256, NAME_SIZE_LENGTH) - 1;
-	protected static final int ICON_SIZE_LENGTH = 2;
-	public static final int MAX_ICON_LENGTH = 11000; //(int) Math.pow(256, ICON_SIZE_LENGTH) - 1;
-	protected static final int IMAGE_SIZE_LENGTH = 4;
-	public static final int MAX_IMAGE_LENGTH = 1100000; //(int) Math.pow(256, IMAGE_SIZE_LENGTH) - 1;
-	protected static final int DESCRIPTION_SIZE_LENGTH = 4;
-	protected static final int REFERENCE_LENGTH = Transaction.SIGNATURE_LENGTH;
-	protected static final int BASE_LENGTH = TYPE_LENGTH + OWNER_LENGTH + NAME_SIZE_LENGTH + ICON_SIZE_LENGTH + IMAGE_SIZE_LENGTH + DESCRIPTION_SIZE_LENGTH;
+    protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
 
-	protected static final int TIMESTAMP_LENGTH = Transaction.TIMESTAMP_LENGTH;
+    //protected DCMap dbMap;
+    //protected DCMap dbIssueMap;
+    static Logger LOGGER = Logger.getLogger(ItemCls.class.getName());
+    protected String TYPE_NAME = "unknown";
+    protected byte[] typeBytes;
+    protected PublicKeyAccount owner;
+    protected String name;
+    protected String description;
+    protected long key = 0;
+    protected byte[] reference = null; // this is signature of issued record
+    protected byte[] icon;
+    protected byte[] image;
 
-	//protected DCMap dbMap;
-	//protected DCMap dbIssueMap;
+    public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        this.typeBytes = typeBytes;
+        this.owner = owner;
+        this.name = name.trim();
+        this.description = description;
+        this.icon = icon == null ? new byte[0] : icon;
+        this.image = image == null ? new byte[0] : image;
 
-	protected String TYPE_NAME = "unknown";
-	protected byte[] typeBytes;
-	protected PublicKeyAccount owner;
-	protected String name;
-	protected String description;
-	protected long key = 0;
-	protected byte[] reference = null; // this is signature of issued record
-	protected byte[] icon;
-	protected byte[] image;
+    }
 
-	static Logger LOGGER = Logger.getLogger(ItemCls.class.getName());
+    public ItemCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description) {
+        this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
+        this.typeBytes[0] = (byte) type;
+    }
 
-	public ItemCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
-	{
-		this.typeBytes = typeBytes;
-		this.owner = owner;
-		this.name = name.trim();
-		this.description = description;
-		this.icon = icon == null? new byte[0]: icon;
-		this.image = image == null? new byte[0]: image;
+    //GETTERS/SETTERS
 
-	}
-	public ItemCls(int type, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description)
-	{
-		this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
-		this.typeBytes[0] = (byte)type;
-	}
+    public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol) {
+        if (str.length() == 0) return new Pair<Integer, Long>(0, defaultVol);
+        else if (str.length() == 1) {
+            if (str == "+")
+                return new Pair<Integer, Long>(0, Long.MAX_VALUE);
+            else if (str == "-")
+                return new Pair<Integer, Long>(0, Long.MIN_VALUE);
+            else
+                return new Pair<Integer, Long>(0, defaultVol);
+        } else {
+            try {
+                Long date = Long.parseLong(str);
+                return new Pair<Integer, Long>(0, date);
+            } catch (Exception e) {
+                return new Pair<Integer, Long>(-1, 0l);
+            }
+        }
+    }
 
-	//GETTERS/SETTERS
+    public static Pair<Integer, Integer> resolveEndDayFromStr(String str, Integer defaultVol) {
+        if (str.length() == 0) return new Pair<Integer, Integer>(0, defaultVol);
+        else if (str.length() == 1) {
+            if (str == "+")
+                return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
+            else if (str == "-")
+                return new Pair<Integer, Integer>(0, Integer.MIN_VALUE);
+            else
+                return new Pair<Integer, Integer>(0, defaultVol);
+        } else {
+            try {
+                Integer date = Integer.parseInt(str);
+                return new Pair<Integer, Integer>(0, date);
+            } catch (Exception e) {
+                return new Pair<Integer, Integer>(-1, 0);
+            }
+        }
+    }
 
-	public abstract int getMinNameLen();
-	public abstract int getItemTypeInt();
-	public abstract String getItemTypeStr();
-	public abstract String getItemSubType();
+    public static ItemCls getItem(DCSet db, int type, long key) {
+        //return Controller.getInstance().getItem(db, type, key);
+        return db.getItem_Map(type).get(key);
+    }
 
-	public abstract Item_Map getDBMap(DCSet db);
-	public abstract Issue_ItemMap getDBIssueMap(DCSet db);
-	//public abstract FavoriteItem getDBFavoriteMap();
+    public abstract int getMinNameLen();
 
-	public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol)
-	{
-		if (str.length() == 0) return new Pair<Integer, Long>(0, defaultVol);
-		else if (str.length() == 1)
-		{
-			if (str == "+")
-				return new Pair<Integer, Long>(0, Long.MAX_VALUE);
-			else if (str == "-")
-				return new Pair<Integer, Long>(0, Long.MIN_VALUE);
-			else
-				return new Pair<Integer, Long>(0, defaultVol);
-		}
-		else {
-			try {
-				Long date = Long.parseLong(str);
-				return new Pair<Integer, Long>(0, date);
-			}
-			catch(Exception e)
-			{
-				return new Pair<Integer, Long>(-1, 0l);
-			}
-		}
-	}
+    public abstract int getItemTypeInt();
 
-	public static Pair<Integer, Integer> resolveEndDayFromStr(String str, Integer defaultVol)
-	{
-		if (str.length() == 0) return new Pair<Integer, Integer>(0, defaultVol);
-		else if (str.length() == 1)
-		{
-			if (str == "+")
-				return new Pair<Integer, Integer>(0, Integer.MAX_VALUE);
-			else if (str == "-")
-				return new Pair<Integer, Integer>(0, Integer.MIN_VALUE);
-			else
-				return new Pair<Integer, Integer>(0, defaultVol);
-		}
-		else {
-			try {
-				Integer date = Integer.parseInt(str);
-				return new Pair<Integer, Integer>(0, date);
-			}
-			catch(Exception e)
-			{
-				return new Pair<Integer, Integer>(-1, 0);
-			}
-		}
-	}
+    public abstract String getItemTypeStr();
+    //public abstract FavoriteItem getDBFavoriteMap();
 
-	public byte[] getType()
-	{
-		return this.typeBytes;
-	}
+    public abstract String getItemSubType();
 
-	public byte getProps()
-	{
-		return this.typeBytes[1];
-	}
-	public void setProps(byte props)
-	{
-		this.typeBytes[1] = props;
-	}
+    public abstract Item_Map getDBMap(DCSet db);
 
-	public PublicKeyAccount getOwner() {
-		return this.owner;
-	}
+    public abstract Issue_ItemMap getDBIssueMap(DCSet db);
 
-	public String getName() {
-		return this.name;
-	}
-	public String getShortName() {
-		String[] words = this.viewName().split(" ");
-		String result = "";
-		for (String word: words) {
-			if (word.length() > 6) {
-				result += word.substring(0, 5) + ".";
-			} else {
-				result += word + " ";
-			}
-			if (result.length() > 25)
-				break;
-		}
-		
-		return result.trim();
-		
-	}
-	public byte[] getIcon() {
-		return this.icon;
-	}
-	public byte[] getImage() {
-		return this.image;
-	}
+    public byte[] getType() {
+        return this.typeBytes;
+    }
 
+    public byte getProps() {
+        return this.typeBytes[1];
+    }
 
-	public long getKey() {
-		return getKey(DCSet.getInstance());
-	}
-	public long getKey(DCSet db) {
-		// resolve key in that DB
-		resolveKey(db);
-		return this.key;
-	}
+    public void setProps(byte props) {
+        this.typeBytes[1] = props;
+    }
 
-	public long getHeight(DCSet db)
-	{
-		//INSERT INTO DATABASE
-		Item_Map dbMap = this.getDBMap(db);
-		long key = dbMap.getLastKey();
-		return key;
+    public PublicKeyAccount getOwner() {
+        return this.owner;
+    }
 
-	}
+    public String getName() {
+        return this.name;
+    }
 
-	public long resolveKey(DCSet db) {
-		if (this.key == 0 // & this.reference != null
-				) {
-			if (this.getDBIssueMap(db).contains(this.reference)) {
-				this.key = this.getDBIssueMap(db).get(this.reference);
-			}
-		}
-		return this.key;
-	}
-	public void setKey(long key) {
-		this.key = key;
-	}
-	public void resetKey() {
-		this.key = 0;
-	}
+    public String getShortName() {
+        String[] words = this.viewName().split(" ");
+        String result = "";
+        for (String word : words) {
+            if (word.length() > 6) {
+                result += word.substring(0, 5) + ".";
+            } else {
+                result += word + " ";
+            }
+            if (result.length() > 25)
+                break;
+        }
 
-	public String viewName() {
-		return this.name;			
-	}
+        return result.trim();
 
-	public static ItemCls getItem(DCSet db, int type, long key) {
-		//return Controller.getInstance().getItem(db, type, key);
-		return db.getItem_Map(type).get(key);
-	}
+    }
 
-	public String getDescription() {
-		return this.description;
-	}
+    public byte[] getIcon() {
+        return this.icon;
+    }
 
-	public byte[] getReference() {
-		return this.reference;
-	}
-	public void setReference(byte[] reference) {
-		// TODO - if few itens issued in one recor - need reference to include nonce here
-		this.reference = reference;
+    public byte[] getImage() {
+        return this.image;
+    }
 
-	}
+    public long getKey() {
+        return getKey(DCSet.getInstance());
+    }
 
-	public boolean isConfirmed() {
-		return isConfirmed(DCSet.getInstance());
-	}
+    public void setKey(long key) {
+        this.key = key;
+    }
 
-	public boolean isConfirmed(DCSet db) {
-		return this.getDBIssueMap(db).contains(this.reference);
-	}
+    public long getKey(DCSet db) {
+        // resolve key in that DB
+        resolveKey(db);
+        return this.key;
+    }
 
-	public boolean isFavorite() {
-		return Controller.getInstance().isItemFavorite(this);
-	}
+    public long getHeight(DCSet db) {
+        //INSERT INTO DATABASE
+        Item_Map dbMap = this.getDBMap(db);
+        long key = dbMap.getLastKey();
+        return key;
 
-	// forOwnerSign - use only DATA needed for making signature
-	public byte[] toBytes(boolean includeReference, boolean forOwnerSign)
-	{
+    }
 
-		byte[] data = new byte[0];
-		boolean useAll = !forOwnerSign;
+    public long resolveKey(DCSet db) {
+        if (this.key == 0 // & this.reference != null
+                ) {
+            if (this.getDBIssueMap(db).contains(this.reference)) {
+                this.key = this.getDBIssueMap(db).get(this.reference);
+            }
+        }
+        return this.key;
+    }
 
-		if (useAll) {
-			//WRITE TYPE
-			data = Bytes.concat(data, this.typeBytes);
-		}
+    public void resetKey() {
+        this.key = 0;
+    }
 
-		if (useAll) {
-			//WRITE OWNER
-			try
-			{
-				data = Bytes.concat(data, this.owner.getPublicKey());
-			}
-			catch(Exception e)
-			{
-				//DECODE EXCEPTION
-			}
-		}
+    public String viewName() {
+        return this.name;
+    }
 
-		byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
-		if (useAll) {
-			//WRITE NAME SIZE
-			data = Bytes.concat(data, new byte[]{(byte)nameBytes.length});
-		}
+    public String getDescription() {
+        return this.description;
+    }
 
-		//WRITE NAME
-		data = Bytes.concat(data, nameBytes);
+    public byte[] getReference() {
+        return this.reference;
+    }
 
-		if (useAll) {
-			//WRITE ICON SIZE - 2 bytes = 64kB max
-			int iconLength = this.icon.length;
-			byte[] iconLengthBytes = Ints.toByteArray(iconLength);
-			data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
+    public void setReference(byte[] reference) {
+        // TODO - if few itens issued in one recor - need reference to include nonce here
+        this.reference = reference;
 
-			//WRITE ICON
-			data = Bytes.concat(data, this.icon);
-		}
+    }
 
-		if (useAll) {
-			//WRITE IMAGE SIZE
-			int imageLength = this.image.length;
-			byte[] imageLengthBytes = Ints.toByteArray(imageLength);
-			data = Bytes.concat(data, imageLengthBytes);
-		}
+    public boolean isConfirmed() {
+        return isConfirmed(DCSet.getInstance());
+    }
 
-		//WRITE IMAGE
-		data = Bytes.concat(data, this.image);
+    public boolean isConfirmed(DCSet db) {
+        return this.getDBIssueMap(db).contains(this.reference);
+    }
 
-		byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
-		if (useAll) {
-			//WRITE DESCRIPTION SIZE
-			int descriptionLength = descriptionBytes.length;
-			byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
-			data = Bytes.concat(data, descriptionLengthBytes);
-		}
+    public boolean isFavorite() {
+        return Controller.getInstance().isItemFavorite(this);
+    }
 
-		//WRITE DESCRIPTION
-		data = Bytes.concat(data, descriptionBytes);
+    // forOwnerSign - use only DATA needed for making signature
+    public byte[] toBytes(boolean includeReference, boolean forOwnerSign) {
 
-		if(useAll && includeReference)
-		{
-			//WRITE REFERENCE
-			data = Bytes.concat(data, this.reference);
-		}
+        byte[] data = new byte[0];
+        boolean useAll = !forOwnerSign;
 
-		return data;
-	}
+        if (useAll) {
+            //WRITE TYPE
+            data = Bytes.concat(data, this.typeBytes);
+        }
+
+        if (useAll) {
+            //WRITE OWNER
+            try {
+                data = Bytes.concat(data, this.owner.getPublicKey());
+            } catch (Exception e) {
+                //DECODE EXCEPTION
+            }
+        }
+
+        byte[] nameBytes = this.name.getBytes(StandardCharsets.UTF_8);
+        if (useAll) {
+            //WRITE NAME SIZE
+            data = Bytes.concat(data, new byte[]{(byte) nameBytes.length});
+        }
+
+        //WRITE NAME
+        data = Bytes.concat(data, nameBytes);
+
+        if (useAll) {
+            //WRITE ICON SIZE - 2 bytes = 64kB max
+            int iconLength = this.icon.length;
+            byte[] iconLengthBytes = Ints.toByteArray(iconLength);
+            data = Bytes.concat(data, new byte[]{iconLengthBytes[2], iconLengthBytes[3]});
+
+            //WRITE ICON
+            data = Bytes.concat(data, this.icon);
+        }
+
+        if (useAll) {
+            //WRITE IMAGE SIZE
+            int imageLength = this.image.length;
+            byte[] imageLengthBytes = Ints.toByteArray(imageLength);
+            data = Bytes.concat(data, imageLengthBytes);
+        }
+
+        //WRITE IMAGE
+        data = Bytes.concat(data, this.image);
+
+        byte[] descriptionBytes = this.description.getBytes(StandardCharsets.UTF_8);
+        if (useAll) {
+            //WRITE DESCRIPTION SIZE
+            int descriptionLength = descriptionBytes.length;
+            byte[] descriptionLengthBytes = Ints.toByteArray(descriptionLength);
+            data = Bytes.concat(data, descriptionLengthBytes);
+        }
+
+        //WRITE DESCRIPTION
+        data = Bytes.concat(data, descriptionBytes);
+
+        if (useAll && includeReference) {
+            //WRITE REFERENCE
+            data = Bytes.concat(data, this.reference);
+        }
+
+        return data;
+    }
 
 	/*
 	@SuppressWarnings("unchecked")
@@ -341,153 +328,147 @@ public abstract class ItemCls {
 	public abstract JSONObject toJson();
 	 */
 
-	public int getDataLength(boolean includeReference)
-	{
-		return BASE_LENGTH
-				+ this.name.getBytes(StandardCharsets.UTF_8).length
-				+ this.icon.length
-				+ this.image.length
-				+ this.description.getBytes(StandardCharsets.UTF_8).length
-				+ (includeReference? REFERENCE_LENGTH: 0);
-	}
+    public int getDataLength(boolean includeReference) {
+        return BASE_LENGTH
+                + this.name.getBytes(StandardCharsets.UTF_8).length
+                + this.icon.length
+                + this.image.length
+                + this.description.getBytes(StandardCharsets.UTF_8).length
+                + (includeReference ? REFERENCE_LENGTH : 0);
+    }
 
-	//OTHER
+    //OTHER
 
-	public String toString(DCSet db)
-	{
-		long key = this.getKey(db);
-		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
-		return "[" + (key==0?"?:":key)
-				+ "] " + this.viewName();
-				//+ (creator.length()==0?"": " (" +creator + ")");
-	}
+    public String toString(DCSet db) {
+        long key = this.getKey(db);
+        //String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(false);
+        return "[" + (key == 0 ? "?:" : key)
+                + "] " + this.viewName();
+        //+ (creator.length()==0?"": " (" +creator + ")");
+    }
 
 
-	public String toString(DCSet db, byte[] data) {
-		String str = this.toString(db);
+    public String toString(DCSet db, byte[] data) {
+        String str = this.toString(db);
 
-		Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = core.transaction.R_SetStatusToItem.unpackData(data);
+        Tuple6<Long, Long, byte[], byte[], Long, byte[]> tuple = core.transaction.R_SetStatusToItem.unpackData(data);
 
-		if (str.contains("%1") && tuple.a != null)
-			str = str.replace("%1", tuple.a.toString());
-		if (str.contains("%2") && tuple.b != null)
-			str = str.replace("%2", tuple.b.toString());
-		if (str.contains("%3") && tuple.c != null)
-			str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
-		if (str.contains("%4") && tuple.d != null)
-			str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
-		if (str.contains("%D") && tuple.f != null)
-			str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
+        if (str.contains("%1") && tuple.a != null)
+            str = str.replace("%1", tuple.a.toString());
+        if (str.contains("%2") && tuple.b != null)
+            str = str.replace("%2", tuple.b.toString());
+        if (str.contains("%3") && tuple.c != null)
+            str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+        if (str.contains("%4") && tuple.d != null)
+            str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+        if (str.contains("%D") && tuple.f != null)
+            str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
 
-		return str;
-	}
+        return str;
+    }
 
-	@Override
-	public String toString()
-	{
-		return toString(DCSet.getInstance());
-	}
+    @Override
+    public String toString() {
+        return toString(DCSet.getInstance());
+    }
 
-	public String getShort(DCSet db)
-	{
-		long key = this.getKey(db);
-		//String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
-		return (key<1?"? ":key + ": ") + this.viewName().substring(0, Math.min(this.viewName().length(), 30));
-		//+ (creator.length()==0?"": " (" +creator + ")");
-	}
-	public String getShort()
-	{
-		return getShort(DCSet.getInstance());
-	}
+    public String getShort(DCSet db) {
+        long key = this.getKey(db);
+        //String creator = GenesisBlock.CREATOR.equals(this.owner)? "GENESIS": this.owner.getPersonAsString_01(true);
+        return (key < 1 ? "? " : key + ": ") + this.viewName().substring(0, Math.min(this.viewName().length(), 30));
+        //+ (creator.length()==0?"": " (" +creator + ")");
+    }
 
-	@SuppressWarnings("unchecked")
-	public JSONObject toJson() {
+    public String getShort() {
+        return getShort(DCSet.getInstance());
+    }
 
-		JSONObject itemJSON = new JSONObject();
+    @SuppressWarnings("unchecked")
+    public JSONObject toJson() {
 
-		// ADD DATA
-		itemJSON.put("item_type", this.getItemTypeStr());
-		itemJSON.put("item_type_sub", this.getItemSubType());
-		itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
-		itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
-		itemJSON.put("key", this.getKey());
-		itemJSON.put("name", this.name);
-		itemJSON.put("description", this.description);
-		itemJSON.put("creator", this.owner.getAddress());
-		itemJSON.put("isConfirmed", this.isConfirmed());
-		itemJSON.put("reference", Base58.encode(this.reference));
+        JSONObject itemJSON = new JSONObject();
 
-		Transaction txReference = Controller.getInstance().getTransaction(this.reference);
-		if(txReference != null)
-		{
-			itemJSON.put("timestamp", txReference.getTimestamp());
-		}
+        // ADD DATA
+        itemJSON.put("item_type", this.getItemTypeStr());
+        itemJSON.put("item_type_sub", this.getItemSubType());
+        itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
+        itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
+        itemJSON.put("key", this.getKey());
+        itemJSON.put("name", this.name);
+        itemJSON.put("description", this.description);
+        itemJSON.put("creator", this.owner.getAddress());
+        itemJSON.put("isConfirmed", this.isConfirmed());
+        itemJSON.put("reference", Base58.encode(this.reference));
 
-		return itemJSON;
-	}
-	@SuppressWarnings("unchecked")
-	public JSONObject toJsonData() {
+        Transaction txReference = Controller.getInstance().getTransaction(this.reference);
+        if (txReference != null) {
+            itemJSON.put("timestamp", txReference.getTimestamp());
+        }
 
-		JSONObject itemJSON = new JSONObject();
+        return itemJSON;
+    }
 
-		// ADD DATA
-		itemJSON.put("icon", Base58.encode(this.icon));
-		itemJSON.put("image", Base58.encode(this.image));
+    @SuppressWarnings("unchecked")
+    public JSONObject toJsonData() {
 
-		return itemJSON;
-	}
+        JSONObject itemJSON = new JSONObject();
 
-	//
-	public void insertToMap(DCSet db, long startKey)
-	{
-		//INSERT INTO DATABASE
-		Item_Map dbMap = this.getDBMap(db);
+        // ADD DATA
+        itemJSON.put("icon", Base58.encode(this.icon));
+        itemJSON.put("image", Base58.encode(this.image));
 
-		long newKey;
-		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-		if (pair == null) {
+        return itemJSON;
+    }
 
-			newKey = dbMap.getLastKey();
-			if (newKey < startKey) {
-				// IF this not GENESIS issue - start from startKey
-				dbMap.setLastKey(startKey);
-			}
-			newKey = dbMap.add(this);
+    //
+    public void insertToMap(DCSet db, long startKey) {
+        //INSERT INTO DATABASE
+        Item_Map dbMap = this.getDBMap(db);
 
-		} else {
-			// INSERT WITH NEW KEY
-			newKey = pair.getA();
-			dbMap.set(newKey, this);
+        long newKey;
+        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+        if (pair == null) {
 
-		}
+            newKey = dbMap.getLastKey();
+            if (newKey < startKey) {
+                // IF this not GENESIS issue - start from startKey
+                dbMap.setLastKey(startKey);
+            }
+            newKey = dbMap.add(this);
 
-		this.key = newKey;
-		//SET ORPHAN DATA
-		this.getDBIssueMap(db).set(this.reference, newKey);
+        } else {
+            // INSERT WITH NEW KEY
+            newKey = pair.getA();
+            dbMap.set(newKey, this);
 
-	}
+        }
 
-	public long removeFromMap(DCSet db)
-	{
-		//DELETE FROM DATABASE
+        this.key = newKey;
+        //SET ORPHAN DATA
+        this.getDBIssueMap(db).set(this.reference, newKey);
 
-		long thisKey = this.getKey(db);
-		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
-		Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
-		if (pair == null) {
-			this.getDBMap(db).remove();
-		} else {
-			this.getDBMap(db).delete(thisKey);
-		}
+    }
 
-		//DELETE ORPHAN DATA
-		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
-		this.getDBIssueMap(db).delete(this.reference);
+    public long removeFromMap(DCSet db) {
+        //DELETE FROM DATABASE
 
-		//LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+        long thisKey = this.getKey(db);
+        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 1a, getKey= " + thisKey);
+        Pair<Integer, byte[]> pair = BlockChain.NOVA_ASSETS.get(this.name);
+        if (pair == null) {
+            this.getDBMap(db).remove();
+        } else {
+            this.getDBMap(db).delete(thisKey);
+        }
 
-		return thisKey;
+        //DELETE ORPHAN DATA
+        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 2");
+        this.getDBIssueMap(db).delete(this.reference);
 
-	}
+        //LOGGER.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+
+        return thisKey;
+
+    }
 
 }

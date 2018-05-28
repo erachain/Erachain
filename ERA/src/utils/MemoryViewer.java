@@ -1,52 +1,51 @@
 package utils;
 
+import controller.Controller;
 import org.apache.log4j.Logger;
 
-import controller.Controller;
-
 public class MemoryViewer extends Thread {
-	private static final Logger LOGGER = Logger.getLogger(Controller.class);
+    private static final Logger LOGGER = Logger.getLogger(Controller.class);
 
-	Controller controller;
-	
-	public MemoryViewer(Controller controller) {
+    Controller controller;
 
-		this.controller = controller;
-		setName("Memory manager");
+    public MemoryViewer(Controller controller) {
 
-	}
+        this.controller = controller;
+        setName("Memory manager");
 
-	public void run() {
+    }
 
-		try {
-			sleep(100000);
-		} catch (Exception e) {
-		}
-		
-		// if memory !Ok
-		while (true) {
-			try {
-				sleep(1000);
-			} catch (InterruptedException e) {
-			}
+    public void run() {
 
-			//threads
-			if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-				// System.out.println("########################### Free Memory:"
-				// + Runtime.getRuntime().freeMemory());
-				if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
-					System.gc();
+        try {
+            sleep(100000);
+        } catch (Exception e) {
+        }
 
-					if (controller.isAllThreadsGood()) {
-						continue;	
-					}
+        // if memory !Ok
+        while (true) {
+            try {
+                sleep(1000);
+            } catch (InterruptedException e) {
+            }
 
-					if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL>>2)
-						Controller.getInstance().stopAll(99);
-				}
-			}
-			
-		}
-	}
+            //threads
+            if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+                // System.out.println("########################### Free Memory:"
+                // + Runtime.getRuntime().freeMemory());
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                    System.gc();
+
+                    if (controller.isAllThreadsGood()) {
+                        continue;
+                    }
+
+                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 2)
+                        Controller.getInstance().stopAll(99);
+                }
+            }
+
+        }
+    }
 
 }

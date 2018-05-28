@@ -1,66 +1,60 @@
 package network;
 // 30/03
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
 
 import controller.Controller;
 import core.BlockChain;
-import database.DBSet;
 import datachain.DCSet;
 import network.message.HWeightMessage;
 import network.message.Message;
 import network.message.MessageFactory;
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 
-public class Pinger extends Thread
-{
-	
-	private static final Logger LOGGER = Logger.getLogger(Pinger.class);
-	private static final int DEFAULT_QUICK_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>3; 
+public class Pinger extends Thread {
 
-	private Peer peer;
-	private boolean needPing = false;
-	//private boolean run;
-	private int ping;
-	private Message messageWinBlock;
-	private Message messageQueue;
-	private Message messageQueuePing;
-	
-	public Pinger(Peer peer)
-	{
-		this.peer = peer;
-		//this.run = true;
-		this.ping = Integer.MAX_VALUE;
-		this.setName("Thread Pinger - "+ this.getId());
-		this.start();
-	}
-	
-	public long getPing()
-	{
-		return this.ping;
-	}
+    private static final Logger LOGGER = Logger.getLogger(Pinger.class);
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
 
-	public void setPing(int ping)
-	{		
-		this.ping = ping;
-	}
+    private Peer peer;
+    private boolean needPing = false;
+    //private boolean run;
+    private int ping;
+    private Message messageWinBlock;
+    private Message messageQueue;
+    private Message messageQueuePing;
 
-	public void setNeedPing()
-	{		
-		this.needPing = true;
-	}
+    public Pinger(Peer peer) {
+        this.peer = peer;
+        //this.run = true;
+        this.ping = Integer.MAX_VALUE;
+        this.setName("Thread Pinger - " + this.getId());
+        this.start();
+    }
 
-	public void setMessageQueue(Message message) {
-		this.messageQueue = message;
-	}
+    public long getPing() {
+        return this.ping;
+    }
 
-	public void setMessageWinBlock(Message message) {
-		this.messageWinBlock = message;
-	}
+    public void setPing(int ping) {
+        this.ping = ping;
+    }
 
-	public void setMessageQueuePing(Message message) {
-		this.messageQueuePing = message;
-	}
+    public void setNeedPing() {
+        this.needPing = true;
+    }
+
+    public void setMessageQueue(Message message) {
+        this.messageQueue = message;
+    }
+
+    public void setMessageWinBlock(Message message) {
+        this.messageWinBlock = message;
+    }
+
+    public void setMessageQueuePing(Message message) {
+        this.messageQueuePing = message;
+    }
 	
 	/*
 	public boolean isRun()
@@ -68,175 +62,166 @@ public class Pinger extends Thread
 		return this.run;
 	}
 	*/
-	
-	public boolean tryPing(long timeSOT) {
-		
-		//LOGGER.info("try PING " + this.peer.getAddress());
 
-		peer.addPingCounter();
+    public boolean tryPing(long timeSOT) {
 
-		//CREATE PING
-		//Message pingMessage = MessageFactory.getInstance().createPingMessage();
-		// TODO remove it and set HWeigtn response
-		// TODO make wait SoTome 10 when ping
-		Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
-					
-		//GET RESPONSE
-		long start = System.currentTimeMillis();
-		Message response = peer.getResponse(pingMessage, timeSOT);
+        //LOGGER.info("try PING " + this.peer.getAddress());
 
-		if(Controller.getInstance().isOnStopping()) {
-			return false;
-		}
+        peer.addPingCounter();
 
-		//CHECK IF VALID PING
-		if(response == null)
-		{
-			
-			//UPDATE PING
-			if (this.ping < 0)
-				this.ping -= 1;
-			else
-				this.ping = -1;
+        //CREATE PING
+        //Message pingMessage = MessageFactory.getInstance().createPingMessage();
+        // TODO remove it and set HWeigtn response
+        // TODO make wait SoTome 10 when ping
+        Message pingMessage = MessageFactory.getInstance().createGetHWeightMessage();
 
-			if (!this.peer.isUsed())
-				return false;
+        //GET RESPONSE
+        long start = System.currentTimeMillis();
+        Message response = peer.getResponse(pingMessage, timeSOT);
 
-			//PING FAILES
-			if (this.ping < -4) {
-				this.peer.ban(10, "on PING FAILES");
-				return false;
-			}
+        if (Controller.getInstance().isOnStopping()) {
+            return false;
+        }
 
-		} else {
-			//UPDATE PING
-			this.ping = (int)(System.currentTimeMillis() - start);
-		}
-						
-		//LOGGER.info("PING " + this.peer.getAddress() + " @ms " + this.ping);
-		Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
-		
-		if (response != null && response.getType() == Message.HWEIGHT_TYPE) {
-			HWeightMessage hWeightMessage = (HWeightMessage) response;
-			Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
+        //CHECK IF VALID PING
+        if (response == null) {
 
-			Controller.getInstance().setWeightOfPeer(peer, hW);
-		}
-		
-		return ping >= 0;
+            //UPDATE PING
+            if (this.ping < 0)
+                this.ping -= 1;
+            else
+                this.ping = -1;
 
-	}
-	
-	public boolean tryPing() {
-		return tryPing(60000l);
-	}
-	
-	public void run()
-	{
-	
-		Controller cnt = Controller.getInstance();
-		BlockChain chain = cnt.getBlockChain();
+            if (!this.peer.isUsed())
+                return false;
 
-		int sleepTimeFull = Settings.getInstance().getPingInterval();
-		int sleepTimestep = 10;
-		int sleepsteps = sleepTimeFull / sleepTimestep + 10;
-		int sleepStepTimeCounter;
-		long pingOld = 100;
-		boolean resultSend;
-		while(true)
-		{
+            //PING FAILES
+            if (this.ping < -4) {
+                this.peer.ban(10, "on PING FAILES");
+                return false;
+            }
 
-			if (this.ping < 0) {
-				sleepStepTimeCounter = 10000;
-			} else if (this.ping > 10000) {
-				sleepStepTimeCounter = 30000;				
-			} else {
-				sleepStepTimeCounter = sleepsteps;				
-			}
-		
-			while (sleepStepTimeCounter-- > 0) {
-				
-				//SLEEP
-				try 
-				{
-					Thread.sleep(sleepTimestep);
-				} 
-				catch (InterruptedException e)
-				{
-					//FAILED TO SLEEP
-				}
+        } else {
+            //UPDATE PING
+            this.ping = (int) (System.currentTimeMillis() - start);
+        }
 
-				if (!this.peer.isUsed()) {
-					try 
-					{
-						Thread.sleep(500);
-					} 
-					catch (InterruptedException e)
-					{
-						//FAILED TO SLEEP
-					}
-					continue;
-				}
-								
-				if (messageQueue != null) {
-					//LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer.getAddress());
+        //LOGGER.info("PING " + this.peer.getAddress() + " @ms " + this.ping);
+        Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
 
-					resultSend = this.peer.sendMessage(messageQueue);
-					messageQueue = null;
+        if (response != null && response.getType() == Message.HWEIGHT_TYPE) {
+            HWeightMessage hWeightMessage = (HWeightMessage) response;
+            Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
 
-					if (!resultSend)
-						continue;
-					
-					//LOGGER.debug("try ASYNC send " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
+            Controller.getInstance().setWeightOfPeer(peer, hW);
+        }
 
-				}
+        return ping >= 0;
 
-				if (messageWinBlock != null) {
-					//LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " - " + this.peer.getAddress());
+    }
 
-					resultSend = this.peer.sendMessage(messageWinBlock);
-					messageWinBlock = null;
+    public boolean tryPing() {
+        return tryPing(60000l);
+    }
 
-					if (!resultSend)
-						continue;
-					
-					//LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
+    public void run() {
 
-				}
+        Controller cnt = Controller.getInstance();
+        BlockChain chain = cnt.getBlockChain();
 
-				pingOld = this.ping;
+        int sleepTimeFull = Settings.getInstance().getPingInterval();
+        int sleepTimestep = 10;
+        int sleepsteps = sleepTimeFull / sleepTimestep + 10;
+        int sleepStepTimeCounter;
+        long pingOld = 100;
+        boolean resultSend;
+        while (true) {
 
-				if (this.messageQueuePing != null) {
-					// PING before and THEN send
-					//LOGGER.debug("try ASYNC PING sendMessage " + messageQueuePing.viewType() + " - " + this.peer.getAddress());
-					///this.peer.so(message);
-					
-					this.tryPing(DEFAULT_QUICK_PING_TIMEOUT);
-					this.peer.sendMessage(this.messageQueuePing);
+            if (this.ping < 0) {
+                sleepStepTimeCounter = 10000;
+            } else if (this.ping > 10000) {
+                sleepStepTimeCounter = 30000;
+            } else {
+                sleepStepTimeCounter = sleepsteps;
+            }
 
-					this.needPing = false;
-					this.messageQueuePing = null;
-					sleepStepTimeCounter = sleepsteps;
-					continue;
-					
-				} else if(this.needPing) {
-					// PING NOW
-					this.needPing = false;
-					this.tryPing();
-					pingOld = this.ping;
-					sleepStepTimeCounter = sleepsteps;
-					continue;
-				}
-				
-			}
-			
-			if(this.peer.isUsed()) {
-				tryPing();
-				pingOld = this.ping;
-			}
-			
-		}
-	}
+            while (sleepStepTimeCounter-- > 0) {
+
+                //SLEEP
+                try {
+                    Thread.sleep(sleepTimestep);
+                } catch (InterruptedException e) {
+                    //FAILED TO SLEEP
+                }
+
+                if (!this.peer.isUsed()) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        //FAILED TO SLEEP
+                    }
+                    continue;
+                }
+
+                if (messageQueue != null) {
+                    //LOGGER.debug("try ASYNC sendMessage " + messageQueue.viewType() + " - " + this.peer.getAddress());
+
+                    resultSend = this.peer.sendMessage(messageQueue);
+                    messageQueue = null;
+
+                    if (!resultSend)
+                        continue;
+
+                    //LOGGER.debug("try ASYNC send " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
+
+                }
+
+                if (messageWinBlock != null) {
+                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " - " + this.peer.getAddress());
+
+                    resultSend = this.peer.sendMessage(messageWinBlock);
+                    messageWinBlock = null;
+
+                    if (!resultSend)
+                        continue;
+
+                    //LOGGER.debug("try ASYNC send WINblock " + messageQueue.viewType() + " " + this.peer.getAddress() + " @ms " + (System.currentTimeMillis() - start));
+
+                }
+
+                pingOld = this.ping;
+
+                if (this.messageQueuePing != null) {
+                    // PING before and THEN send
+                    //LOGGER.debug("try ASYNC PING sendMessage " + messageQueuePing.viewType() + " - " + this.peer.getAddress());
+                    ///this.peer.so(message);
+
+                    this.tryPing(DEFAULT_QUICK_PING_TIMEOUT);
+                    this.peer.sendMessage(this.messageQueuePing);
+
+                    this.needPing = false;
+                    this.messageQueuePing = null;
+                    sleepStepTimeCounter = sleepsteps;
+                    continue;
+
+                } else if (this.needPing) {
+                    // PING NOW
+                    this.needPing = false;
+                    this.tryPing();
+                    pingOld = this.ping;
+                    sleepStepTimeCounter = sleepsteps;
+                    continue;
+                }
+
+            }
+
+            if (this.peer.isUsed()) {
+                tryPing();
+                pingOld = this.ping;
+            }
+
+        }
+    }
 
 	/*
 	public void stopPing() 
@@ -259,29 +244,27 @@ public class Pinger extends Thread
 		}
 	}
 	 */
-	
-	// icreator - wair is DB is busy
-	// https://github.com/jankotek/mapdb/search?q=ClosedByInterruptException&type=Issues&utf8=%E2%9C%93
-	//
-	public void goInterrupt_old()
-	{
 
-		DCSet dcSet = DCSet.getInstance(); 
-		//int i =0;
-		while(dcSet.getBlockMap().isProcessing() || dcSet.isBusy() ) {
-			try {
-				LOGGER.info(" pinger.goInterrupt wait DB : " + this.peer.getAddress());
-				Thread.sleep(50);
-			}
-			catch (Exception e) {		
-			}
+    // icreator - wair is DB is busy
+    // https://github.com/jankotek/mapdb/search?q=ClosedByInterruptException&type=Issues&utf8=%E2%9C%93
+    //
+    public void goInterrupt_old() {
+
+        DCSet dcSet = DCSet.getInstance();
+        //int i =0;
+        while (dcSet.getBlockMap().isProcessing() || dcSet.isBusy()) {
+            try {
+                LOGGER.info(" pinger.goInterrupt wait DB : " + this.peer.getAddress());
+                Thread.sleep(50);
+            } catch (Exception e) {
+            }
 			/*
 			i++;
 			if (i > 20) 
 				break;
 				*/
 
-		}
-		this.interrupt();
-	}
+        }
+        this.interrupt();
+    }
 }
