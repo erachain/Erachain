@@ -1,5 +1,6 @@
 package gui.create;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -26,6 +27,7 @@ import com.github.rjeschke.txtmark.Processor;
 import controller.Controller;
 import core.transaction.R_SignNote;
 import datachain.DCSet;
+import gui.MainFrame;
 import lang.Lang;
 import settings.Settings;
 
@@ -239,12 +241,14 @@ public class License_JFrame extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
         if (needAccept)
             getContentPane().add(jLabel1, gridBagConstraints);
-
+        this.setAlwaysOnTop(true);
         this.setUndecorated(false);
-        if (needAccept) this.setUndecorated(true);
-
+     //   if (needAccept) this.setUndecorated(true);
+     // Current size of the default screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         pack();
-        this.setLocationRelativeTo(null);
+      //  this.setLocationRelativeTo(null);
+        this.setSize(dim);
         this.setVisible(true);
     }
     // </editor-fold>
