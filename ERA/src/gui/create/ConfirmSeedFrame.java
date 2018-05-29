@@ -253,21 +253,10 @@ public class ConfirmSeedFrame extends JFrame {
             return;
         }
 
-        // save wallet dir
-        
-    	JSONObject settingsLangJSON = new JSONObject();
-    	settingsLangJSON.putAll(Settings.getInstance().read_setting_JSON());
-    	Settings.getInstance().setWalletDir(jTextFieldDataDir.getText());
-    	settingsLangJSON.put("walletdir", Settings.getInstance().getWalletDir());
-    	try {
-			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+       
     	
         //CALLBACK
-        this.parent.onConfirm(password);
+        this.parent.onConfirm(password,jTextFieldDataDir.getText() );
 
         //CLOSE THIS WINDOW
         this.dispose();

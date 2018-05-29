@@ -17,7 +17,7 @@ public class License_JFrame extends JDialog {
     static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
     boolean needAccept;
     NoWalletFrame parent;
-    boolean goCreateWallet;
+    int goCreateWallet;
     TemplateCls template;
     // Variables declaration - do not modify
     private javax.swing.JButton jButton1;
@@ -26,7 +26,7 @@ public class License_JFrame extends JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
-    public License_JFrame(TemplateCls template, boolean needAccept, NoWalletFrame parent, boolean goCreateWallet) {
+    public License_JFrame(TemplateCls template, boolean needAccept, NoWalletFrame parent, int goCreateWallet) {
         this.template = template;
         this.needAccept = needAccept;
         this.parent = parent;

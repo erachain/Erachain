@@ -174,16 +174,24 @@ public class CreateWalletFrame extends JFrame {
         return this.seed;
     }
 
-    public void onConfirm(String password) {
+    public void onConfirm(String password, String path) {
         //CREATE WALLET
-        Controller.getInstance().recoverWallet(this.seed, password, Settings.DEFAULT_ACCOUNTS);
+       boolean res = Controller.getInstance().recoverWallet(this.seed, password, Settings.DEFAULT_ACCOUNTS, path);
 
-        //LET GUI KNOW
-        parent.onWalletCreated();
+        if (res){
+        	//LET GUI KNOW
+            parent.onWalletCreated();
 
 
-        //CLOSE THIS WINDOW
-        this.dispose();
+            //CLOSE THIS WINDOW
+            this.dispose();
+            } else {
+           	 JOptionPane.showMessageDialog(
+                        new JFrame(), Lang.getInstance().translate("Wallet already exists") + "!",
+                        "Error!",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        
     }
 
     //GENERATE

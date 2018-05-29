@@ -9,7 +9,7 @@ import settings.Settings;
 import java.io.File;
 
 public class SecureWalletDatabase {
-    private static final File SECURE_WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.s.dat");
+    private final File SECURE_WALLET_FILE;
 
     private static final String SEED = "seed";
     private static final String NONCE = "nonce";
@@ -20,6 +20,7 @@ public class SecureWalletDatabase {
 
     public SecureWalletDatabase(String password) {
         //OPEN WALLET
+    	SECURE_WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.s.dat");
         SECURE_WALLET_FILE.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
@@ -37,9 +38,9 @@ public class SecureWalletDatabase {
         this.accountSeedMap = new AccountSeedMap(this, this.database);
     }
 
-    public static boolean exists() {
-        return SECURE_WALLET_FILE.exists();
-    }
+   // public static boolean exists() {
+   //     return SECURE_WALLET_FILE.exists();
+   // }
 
     public AccountSeedMap getAccountSeedMap() {
         return this.accountSeedMap;

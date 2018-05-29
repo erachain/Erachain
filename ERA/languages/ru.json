@@ -524,6 +524,7 @@
 	"Open":"Открыть",
 	"Open Image":"Открыть Изображение",
 	"Open pair":"Открыть пару",
+	"Open Wallet":"Открыть Кошелёк",
 	"option does not exist":"вариант не существует",
 	"Option":"Вариант",
 	"Options":"Варианты",
@@ -681,7 +682,6 @@
 	"Set data dir":"Установить data папку",
 	"Set Status":"Присвоить Статус",
 	"Set Status to Person":"Задать Назначение Лицу",
-	"Set the Wallet directory or leave it as default":"Установите директорию кошелька или оставьте по умолчанию"
 	"Set wallet dir":"Установить папку кошелька",
 	"Settings of program": "Настройки программы",
 	"Settings": "Настройки",

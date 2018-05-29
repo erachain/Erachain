@@ -419,8 +419,8 @@ public class ApiClient {
                             "Errors: 201 - Wallet does not exist."
                     },
                     {
-                            "POST wallet {\"seed\":\"<seed>\", \"password\":\"<password>\", \"recover\":<false/true>,  \"amount\":<amount>} ",
-                            "Creates a wallet using the given 32-byte long base58-encoded seed, password,recover flag and amount.",
+                            "POST wallet {\"seed\":\"<seed>\", \"password\":\"<password>\", \"recover\":<false/true>,  \"amount\":<amount>, \"dir\":<wallet dir>} ",
+                            "Creates a wallet using the given 32-byte long base58-encoded seed, password,recover flag and amount., Wallet dir",
                             "Errors: 1 - Json error. 103 - Invalid seed. 104 - Invalid amount. 204 - Wallet already exists."
                     },
                     {

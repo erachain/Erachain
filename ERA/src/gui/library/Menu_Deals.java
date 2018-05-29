@@ -8,6 +8,9 @@ import gui.records.VouchRecordDialog;
 import lang.Lang;
 
 import javax.swing.*;
+
+import controller.Controller;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -109,7 +112,28 @@ public class Menu_Deals extends JMenu {
         });
         add(dealsMenu_Repay_Debt);
 		        
-		               
+        JMenuItem dealsMenu_Open_Wallet = new JMenuItem(Lang.getInstance().translate("Open Wallet"));
+        //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));
+        dealsMenu_Open_Wallet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                //selectOrAdd(new VouchRecordDialog(), MainFrame.desktopPane.getAllFrames());
+               // new Account_Repay_Debt_Dialog(null, null);
+            	 Integer res = Controller.getInstance().wallet.loadFromDir();
+                 if (res == 0){
+              	   JOptionPane.showMessageDialog(
+                             new JFrame(), Lang.getInstance().translate("Wallet Error") + "!",
+                             "Error!",
+                             JOptionPane.ERROR_MESSAGE);
+              	  
+                 }else{
+                	 Controller.getInstance().forgingStatusChanged(Controller.getInstance().getForgingStatus());
+            }
+            }
+        });
+       
+      //  add(dealsMenu_Open_Wallet);
+		                       
 		                   
 		     /*   
 		        

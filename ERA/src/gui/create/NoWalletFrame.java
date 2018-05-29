@@ -2,14 +2,22 @@ package gui.create;
 
 import controller.Controller;
 import core.item.templates.TemplateCls;
+import core.wallet.Wallet;
 import datachain.DCSet;
 import gui.Gui;
 import lang.Lang;
+import settings.Settings;
+import utils.SaveStrToFile;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import org.json.simple.JSONObject;
+
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,7 +135,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(template, true, th, true);
+                new License_JFrame(template, true, th, 1);
 
 
             }
@@ -188,7 +196,7 @@ public class NoWalletFrame extends JFrame {
 
                 //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(template, true, th, false);
+                new License_JFrame(template, true, th, 2);
 
 
             }
@@ -197,8 +205,71 @@ public class NoWalletFrame extends JFrame {
         });
 
 
+        optionsGBC.gridy = 4;
+        //	this.recoverButton = new JRadioButton(Lang.getInstance().translate("Recover a wallet using an existing seed"));
+        // 	this.add(this.recoverButton, optionsGBC);
+        //
+        // 	ButtonGroup group = new ButtonGroup();
+        // 	group.add(this.createButton);
+        // 	group.add(this.recoverButton);
+
+        // CREATE WALLET LABEL
+        JLabel dir_Label = new JLabel("<HTML><a href =''>" + Lang.getInstance().translate("Open Wallet") + " </a>");
+        dir_Label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.add(dir_Label, optionsGBC);
+        dir_Label.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent arg0) {
+                // TODO Auto-generated method stub
+
+                //OPEN CREATE WALLET FRAME
+                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
+                if (template == null) {
+                    // USE default LICENSE
+                    template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
+                }
+
+
+                //OPEN CREATE WALLET FRAME
+                th.setVisible(false);
+                new License_JFrame(template, true, th, 3);
+
+
+            }
+
+
+        });
+
+
+        
+        
         //BUTTON NEXT
-        buttonGBC.gridy = 4;
+        buttonGBC.gridy = 5;
         buttonGBC.gridx = 1;
         JButton nextButton = new JButton(Lang.getInstance().translate("Next"));
         nextButton.addActionListener(new ActionListener() {
@@ -211,7 +282,7 @@ public class NoWalletFrame extends JFrame {
 
         //BUTTON CANCEL
         buttonGBC.gridx = 0;
-        buttonGBC.gridy = 4;
+        buttonGBC.gridy = 5;
         JButton cancelButton = new JButton(Lang.getInstance().translate("Cancel"));
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -238,11 +309,25 @@ public class NoWalletFrame extends JFrame {
         this.setVisible(true);
     }
 
-    public void goAfterLicence(boolean createWallet) {
-        if (createWallet)
+    public void goAfterLicence(int createWallet) {
+        if (createWallet ==1)
             new CreateWalletFrame(this);
-        else
+        else if (createWallet ==2)
             new RecoverWalletFrame(this);
+        else if (createWallet ==3) {
+            // open file dialog
+       Integer res = Controller.getInstance().wallet.loadFromDir();
+       if (res == 0){
+    	   JOptionPane.showMessageDialog(
+                   new JFrame(), Lang.getInstance().translate("Wallet Error") + "!",
+                   "Error!",
+                   JOptionPane.ERROR_MESSAGE);
+    	   this.setVisible(true);
+       }else{
+        onWalletCreated();
+        this.dispose();
+       }
+       }
     }
 
     public void onNextClick() {
@@ -256,13 +341,13 @@ public class NoWalletFrame extends JFrame {
         if (createButton.isSelected()) {
             //OPEN CREATE WALLET FRAME
             this.setVisible(false);
-            new License_JFrame(template, true, this, true);
+           // new License_JFrame(template, true, this, true);
         }
 
         if (recoverButton.isSelected()) {
             //OPEN RECOVER WALLET FRAME
             this.setVisible(false);
-            new License_JFrame(template, true, this, false);
+          //  new License_JFrame(template, true, this, false);
         }
     }
 

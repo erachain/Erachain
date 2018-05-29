@@ -108,6 +108,7 @@ public class WalletResource {
             boolean recover = (boolean) jsonObject.get("recover");
             String seed = (String) jsonObject.get("seed");
             int amount = ((Long) jsonObject.get("amount")).intValue();
+            String path = (String) jsonObject.get("dir");
 
             //CHECK IF WALLET EXISTS
             if (Controller.getInstance().doesWalletExists()) {
@@ -134,9 +135,9 @@ public class WalletResource {
 
             //CREATE WALLET
             if (recover) {
-                return String.valueOf(Controller.getInstance().recoverWallet(seedBytes, password, amount));
+                return String.valueOf(Controller.getInstance().recoverWallet(seedBytes, password, amount, path));
             } else {
-                return String.valueOf(Controller.getInstance().createWallet(Controller.getInstance().getWalletLicense(), seedBytes, password, amount));
+                return String.valueOf(Controller.getInstance().createWallet(Controller.getInstance().getWalletLicense(), seedBytes, password, amount, path));
             }
         } catch (NullPointerException | ClassCastException e) {
             LOGGER.info(e);

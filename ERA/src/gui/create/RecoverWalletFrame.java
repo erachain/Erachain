@@ -278,13 +278,21 @@ public class RecoverWalletFrame extends JFrame {
         }
 
         //RECOVER WALLET
-        Controller.getInstance().recoverWallet(seed, password, amount);
-
+        boolean res = Controller.getInstance().recoverWallet(seed, password, amount, jTextFieldDataDir.getText());
+         if (res){
         //CALLBACK
-        this.parent.onWalletCreated();
+         this.parent.onWalletCreated();
 
-        //CLOSE THIS WINDOW
-        this.dispose();
+             //CLOSE THIS WINDOW
+             this.dispose();
+        } else {
+       	 JOptionPane.showMessageDialog(
+                    new JFrame(), Lang.getInstance().translate("Wallet already exists") + "!",
+                    "Error!",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
+       
     }
 
     private void onBackClick() {

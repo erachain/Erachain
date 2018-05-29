@@ -1905,17 +1905,17 @@ public class Controller extends Observable {
     }
 
     // use license KEY
-    public boolean createWallet(long licenseKey, byte[] seed, String password, int amount) {
+    public boolean createWallet(long licenseKey, byte[] seed, String password, int amount, String path) {
         // IF NEW WALLET CREADED
-        if (this.wallet.create(seed, password, amount, false)) {
+        if (this.wallet.create(seed, password, amount, false, path)) {
             this.setWalletLicense(licenseKey);
             return true;
         } else
             return false;
     }
 
-    public boolean recoverWallet(byte[] seed, String password, int amount) {
-        if (this.wallet.create(seed, password, amount, false)) {
+    public boolean recoverWallet(byte[] seed, String password, int amount, String path) {
+        if (this.wallet.create(seed, password, amount, false, path)) {
             LOGGER.info("Wallet needs to synchronize!");
             this.actionAfterConnect();
             this.setNeedSyncWallet(true);
