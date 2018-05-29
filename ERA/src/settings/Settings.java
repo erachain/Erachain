@@ -168,20 +168,35 @@ public class Settings {
     }
 
     public String getWalletDir() {
-        if (this.getWalletPath.equals("")) return this.userPath + DEFAULT_WALLET_DIR;
-        return this.getWalletPath;
+        try {
+			if (this.getWalletPath.equals("")) return this.userPath + DEFAULT_WALLET_DIR;
+			return this.getWalletPath;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return this.userPath + DEFAULT_WALLET_DIR;
+		}
     }
 
     public String getBackUpDir() {
-        if (this.getBackUpPath.equals("")) return this.userPath + DEFAULT_BACKUP_DIR;
-        return this.getBackUpPath;
+        try {
+			if (this.getBackUpPath.equals("")) return this.userPath + DEFAULT_BACKUP_DIR;
+			return this.getBackUpPath;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return this.userPath + DEFAULT_BACKUP_DIR;
+		}
     }
 
 
     public String getDataDir() {
-        if (this.dataPath.equals(""))
-            return this.getUserPath() + DEFAULT_DATA_DIR;
-        return this.dataPath;
+        try {
+			if (this.dataPath.equals(""))
+			    return this.getUserPath() + DEFAULT_DATA_DIR;
+			return this.dataPath;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return this.getUserPath() + DEFAULT_DATA_DIR;
+		}
     }
 
     public String getLocalDir() {
