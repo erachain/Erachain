@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class RecoverWalletFrame extends JFrame {
     private JTextField passwordTxt;
     private JTextField amountTxt;
     private JTextField confirmPasswordTxt;
+	private JTextField jTextFieldDataDir;
 
     public RecoverWalletFrame(NoWalletFrame parent) {
         super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Recover Wallet"));
@@ -138,9 +140,55 @@ public class RecoverWalletFrame extends JFrame {
         this.amountTxt.setText("" + Settings.DEFAULT_ACCOUNTS);
         this.add(this.amountTxt, labelGBC);
 
-
+        // path label
+        labelGBC.gridy = labelGBC.gridy+1;
+        JLabel labelPath = new JLabel(Lang.getInstance().translate("Set the Wallet directory or leave it as default") + ":");
+        this.add(labelPath, labelGBC);
+        JPanel pan = new JPanel();
+        pan.setLayout(new java.awt.GridBagLayout());
+        GridBagConstraints panGBC = new GridBagConstraints();
+        panGBC.insets = new Insets(5, 5, 5, 5);
+        panGBC.fill = GridBagConstraints.HORIZONTAL;
+        panGBC.anchor = GridBagConstraints.NORTHWEST;
+        panGBC.weightx = 0.2;
+        panGBC.gridx = 0;
+        panGBC.gridy =0;
+      //path text
+      //  labelGBC.gridy = labelGBC.gridy+1;
+        jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletDir());
+        jTextFieldDataDir.setEditable(false);
+        pan.add(jTextFieldDataDir, panGBC);
+       // this.add(jTextFieldDataDir, labelGBC);
+     
+        // button path  
+        JButton btnBrowseWallet = new JButton(Lang.getInstance().translate("Browse..."));
+        labelGBC.gridy = labelGBC.gridy+1;
+        btnBrowseWallet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileopen = new JFileChooser();
+                fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                String path = jTextFieldDataDir.getText(); 
+                File ff = new File(path);
+                if (!ff.exists()) path = ".." + File.separator;
+                fileopen.setCurrentDirectory(new File(path));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set wallet dir"));
+                if (ret == JFileChooser.APPROVE_OPTION) {
+                	jTextFieldDataDir.setText(fileopen.getSelectedFile().toString());
+                	
+                }
+            }
+        });
+        
+        panGBC = new java.awt.GridBagConstraints();
+        panGBC.anchor = java.awt.GridBagConstraints.NORTHEAST;
+       // panGBC.gridx = 1;
+        pan.add(btnBrowseWallet, panGBC);
+        
+        this.add(pan, labelGBC);
+        
+      
         //BUTTON confirm
-        buttonGBC.gridy = 9;
+        buttonGBC.gridy = labelGBC.gridy+1;;
         JButton confirmButton = new JButton(Lang.getInstance().translate("Confirm"));
         confirmButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

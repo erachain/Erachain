@@ -21,7 +21,7 @@ import java.io.File;
 //import org.mapdb.Serializer;
 
 public class DWSet implements IDB {
-    private static final File WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.dat");
+    private final File WALLET_FILE;
 
     private static final String VERSION = "version";
     private static final String LAST_BLOCK = "lastBlock";
@@ -57,6 +57,7 @@ public class DWSet implements IDB {
 
     public DWSet() {
         //OPEN WALLET
+    	WALLET_FILE = new File(Settings.getInstance().getWalletDir(), "wallet.dat");
         WALLET_FILE.getParentFile().mkdirs();
 
         //DELETE TRANSACTIONS
@@ -101,7 +102,7 @@ public class DWSet implements IDB {
 
     }
 
-    public static boolean exists() {
+    public boolean exists() {
         return WALLET_FILE.exists();
     }
 

@@ -21,6 +21,8 @@ import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 import datachain.DCSet;
 import lang.Lang;
+import settings.Settings;
+
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -30,6 +32,7 @@ import utils.ObserverMessage;
 import utils.Pair;
 import utils.StrJSonFine;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -181,7 +184,8 @@ public class Wallet extends Observable implements Observer {
     }
 
     public boolean exists() {
-        return DWSet.exists();
+    	String p = Settings.getInstance().getWalletDir();
+        return new File(p).exists();
     }
 
     public List<Pair<Account, Transaction>> getLastTransactions(int limit) {

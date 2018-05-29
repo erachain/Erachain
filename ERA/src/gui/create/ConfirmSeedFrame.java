@@ -4,7 +4,11 @@ package gui.create;
 import controller.Controller;
 import core.crypto.Base58;
 import lang.Lang;
+import settings.Settings;
+import utils.SaveStrToFile;
+
 import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +35,7 @@ public class ConfirmSeedFrame extends JFrame {
     private JTextField seedTxt;
     private JTextField passwordTxt;
     private JTextField confirmPasswordTxt;
+	private JTextField jTextFieldDataDir;
 
     public ConfirmSeedFrame(CreateWalletFrame parent) {
         super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Create Wallet"));
@@ -68,14 +74,16 @@ public class ConfirmSeedFrame extends JFrame {
         buttonGBC.gridwidth = 1;
         buttonGBC.gridx = 0;
 
+        
+        
         //LABEL
-        labelGBC.gridy = 0;
+        labelGBC.gridy = 0; //labelGBC.gridy+1;
         JLabel label1 = new JLabel(Lang.getInstance().translate("Please confirm your wallet seed") + ":");
         this.add(label1, labelGBC);
 
 
         //ADD TEXTBOX
-        labelGBC.gridy = 1;
+        labelGBC.gridy = labelGBC.gridy+1;
         this.seedTxt = new JTextField();
         this.add(this.seedTxt, labelGBC);
 
@@ -98,37 +106,82 @@ public class ConfirmSeedFrame extends JFrame {
 
 
         //LABEL
-        labelGBC.gridy = 2;
+        labelGBC.gridy = labelGBC.gridy+1;
         labelGBC.insets.top = 0;
         JLabel label2 = new JLabel(Lang.getInstance().translate("By confirming your wallet seed we know you have saved the seed."));
         this.add(label2, labelGBC);
 
         //LABEL
-        labelGBC.gridy = 3;
+        labelGBC.gridy = labelGBC.gridy+1;
         labelGBC.insets.top = 10;
         JLabel label3 = new JLabel(Lang.getInstance().translate("Please enter your wallet password") + ":");
         this.add(label3, labelGBC);
 
         //ADD TEXTBOX
-        labelGBC.gridy = 4;
+        labelGBC.gridy = labelGBC.gridy+1;
         labelGBC.insets.top = 5;
         this.passwordTxt = new JPasswordField();
         this.add(this.passwordTxt, labelGBC);
 
         //LABEL
-        labelGBC.gridy = 5;
+        labelGBC.gridy = labelGBC.gridy+1;
         labelGBC.insets.top = 10;
         JLabel label4 = new JLabel(Lang.getInstance().translate("Please confirm your password") + ":");
         this.add(label4, labelGBC);
 
         //ADD TEXTBOX
-        labelGBC.gridy = 6;
+        labelGBC.gridy = labelGBC.gridy+1;
         labelGBC.insets.top = 5;
         this.confirmPasswordTxt = new JPasswordField();
         this.add(this.confirmPasswordTxt, labelGBC);
 
+       // path label
+        labelGBC.gridy = labelGBC.gridy+1;
+        JLabel labelPath = new JLabel(Lang.getInstance().translate("Set the Wallet directory or leave it as default") + ":");
+        this.add(labelPath, labelGBC);
+        JPanel pan = new JPanel();
+        pan.setLayout(new java.awt.GridBagLayout());
+        GridBagConstraints panGBC = new GridBagConstraints();
+        panGBC.insets = new Insets(5, 5, 5, 5);
+        panGBC.fill = GridBagConstraints.HORIZONTAL;
+        panGBC.anchor = GridBagConstraints.NORTHWEST;
+        panGBC.weightx = 0.2;
+        panGBC.gridx = 0;
+        panGBC.gridy =0;
+      //path text
+      //  labelGBC.gridy = labelGBC.gridy+1;
+        jTextFieldDataDir = new JTextField(Settings.getInstance().getWalletDir());
+        jTextFieldDataDir.setEditable(false);
+        pan.add(jTextFieldDataDir, panGBC);
+       // this.add(jTextFieldDataDir, labelGBC);
+     
+        // button path  
+        JButton btnBrowseWallet = new JButton(Lang.getInstance().translate("Browse..."));
+        labelGBC.gridy = labelGBC.gridy+1;
+        btnBrowseWallet.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileopen = new JFileChooser();
+                fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                String path = jTextFieldDataDir.getText(); 
+                File ff = new File(path);
+                if (!ff.exists()) path = ".." + File.separator;
+                fileopen.setCurrentDirectory(new File(path));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set wallet dir"));
+                if (ret == JFileChooser.APPROVE_OPTION) {
+                	jTextFieldDataDir.setText(fileopen.getSelectedFile().toString());
+                	
+                }
+            }
+        });
+        panGBC = new java.awt.GridBagConstraints();
+        panGBC.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        pan.add(btnBrowseWallet, panGBC);
+        
+        this.add(pan, labelGBC);
+        
+        
         //BUTTON confirm
-        buttonGBC.gridy = 7;
+        buttonGBC.gridy = labelGBC.gridy+1;
         JButton confirmButton = new JButton(Lang.getInstance().translate("Confirm"));
         confirmButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -200,6 +253,19 @@ public class ConfirmSeedFrame extends JFrame {
             return;
         }
 
+        // save wallet dir
+        
+    	JSONObject settingsLangJSON = new JSONObject();
+    	settingsLangJSON.putAll(Settings.getInstance().read_setting_JSON());
+    	Settings.getInstance().setWalletDir(jTextFieldDataDir.getText());
+    	settingsLangJSON.put("walletdir", Settings.getInstance().getWalletDir());
+    	try {
+			SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	
         //CALLBACK
         this.parent.onConfirm(password);
 

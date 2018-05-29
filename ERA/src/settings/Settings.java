@@ -176,6 +176,13 @@ public class Settings {
 			return this.userPath + DEFAULT_WALLET_DIR;
 		}
     }
+    
+    public void setWalletDir(String dir) {
+       
+			this.getWalletPath = dir;
+		
+    }
+    
 
     public String getBackUpDir() {
         try {
