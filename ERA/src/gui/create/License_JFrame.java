@@ -42,7 +42,6 @@ public class License_JFrame extends JDialog {
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    //private javax.swing.JTextArea jTextArea1;
     private JTextPane messageText;
     
     public License_JFrame(boolean needAccept, NoWalletFrame parent, int goCreateWallet) {
@@ -131,7 +130,7 @@ public class License_JFrame extends JDialog {
 
         //      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle(Lang.getInstance().translate("License"));
-        setMinimumSize(new java.awt.Dimension(800, 550));
+        setMinimumSize(new java.awt.Dimension(500, 350));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         jCheckBox1.setText(Lang.getInstance().translate("I accept"));
@@ -202,31 +201,6 @@ public class License_JFrame extends JDialog {
                 }
             }
         });
-    /*
-
-      jTextArea1.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            	if (!needAccept){
-
-            	setVisible(false);
-                dispose();
-            	}
-            }
-        });
-
-      jTextArea1.addKeyListener(new KeyAdapter() {
-		    public void keyPressed(KeyEvent e) {
-		    	if (!needAccept){
-
-		    	setVisible(false);
-                dispose();
-		    	}
-		    }
-		});
-
-     */
-
 
         //CLOSE NICELY
         this.addWindowListener(new WindowAdapter() {
@@ -236,40 +210,12 @@ public class License_JFrame extends JDialog {
                     return;
 
                 Controller.getInstance().stopAll(0);
-                // 	System.exit(0);
 
             }
         });
-
-        // jTextArea1.setColumns(20);
-        //jTextArea1.setLineWrap(true);
-        //jTextArea1.setEditable(false);
-        //jT/extArea1.setRows(5);
-        //jTextArea1.setText(this.license);
-        //jScrollPane1.setViewportView(jTextArea1);
 
         messageText.setText(this.license);
         jScrollPane1.setViewportView(messageText);
-
- /*
-        this.jTextArea1.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            	if(parent != null) return;
-            	setVisible(false);
-                dispose();
-            }
-        });
-
-        this.addKeyListener(new KeyAdapter() {
-		    public void keyPressed(KeyEvent e) {
-		    	if(parent != null) return;
-		    	setVisible(false);
-                dispose();
-		    }
-		});
-
-   */
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -294,17 +240,14 @@ public class License_JFrame extends JDialog {
         if (needAccept)
             getContentPane().add(jLabel1, gridBagConstraints);
 
-
-        //     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        //      if(!needAccept)
         this.setUndecorated(false);
         if (needAccept) this.setUndecorated(true);
 
         pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-    }// </editor-fold>
+    }
+    // </editor-fold>
     // End of variables declaration                   
-
 
 }
