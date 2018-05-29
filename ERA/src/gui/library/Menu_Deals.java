@@ -2,6 +2,7 @@ package gui.library;
 
 import core.item.assets.AssetCls;
 import datachain.DCSet;
+import gui.MainFrame;
 import gui.items.accounts.*;
 import gui.items.assets.ExchangeFrame;
 import gui.records.VouchRecordDialog;
@@ -128,11 +129,12 @@ public class Menu_Deals extends JMenu {
               	  
                  }else{
                 	 Controller.getInstance().forgingStatusChanged(Controller.getInstance().getForgingStatus());
+                	 MainFrame.getInstance().mainPanel.jTabbedPane1.removeAll();
             }
             }
         });
        
-      //  add(dealsMenu_Open_Wallet);
+        add(dealsMenu_Open_Wallet);
 		                       
 		                   
 		     /*   

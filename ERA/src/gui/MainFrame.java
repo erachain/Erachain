@@ -29,7 +29,7 @@ public class MainFrame extends JFrame implements Observer {
     private Menu_Files jMenu1;
     private Menu_Deals jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
-    private Main_Panel mainPanel;
+    public Main_Panel mainPanel;
     private StatusPanel statusPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration
