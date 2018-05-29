@@ -34,6 +34,7 @@ public class IssueImprintPanel extends JPanel {
     private JTextField txtAmount;
     private JButton issueButton;
     private IssueImprintPanel th;
+    private JTextArea txtDescription;
 
     public IssueImprintPanel() {
         //	super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Issue Imprint"));
@@ -162,6 +163,21 @@ public class IssueImprintPanel extends JPanel {
         txtGBC.gridy = gridy++;
         this.txtCreditor = new JTextField();
         this.add(this.txtCreditor, txtGBC);
+        
+      //LABEL CREDITOR
+        labelGBC.gridy = gridy;
+        JLabel descriptionLabel = new JLabel(Lang.getInstance().translate("Description") + ":");
+        this.add(descriptionLabel, labelGBC);
+
+        //TXT DEBITOR
+        txtGBC.gridy = gridy++;
+        this.txtDescription = new JTextArea();
+        txtDescription.setColumns(20);
+        txtDescription.setRows(5);
+        JScrollPane jScrollPane1 = new JScrollPane();
+        jScrollPane1.setViewportView(txtDescription);
+        this.add(jScrollPane1, txtGBC);
+
 
         //LABEL CREDITOR
         labelGBC.gridy = gridy;
@@ -285,17 +301,13 @@ public class IssueImprintPanel extends JPanel {
 
             // CUT BYTES LEN
             name_total = Imprint.hashNameToBase58(name_total);
-            String description = Lang.getInstance().translate("Number") + ": " + this.txtNumber.getText() + " \n";
-            description += Lang.getInstance().translate("Date") + ": " + this.txtDate.getText() + " \n";
-            description += Lang.getInstance().translate("Debitor INN") + ": " + this.txtDebitor.getText() + " \n";
-            description += Lang.getInstance().translate("Creditor INN") + ": " + this.txtCreditor.getText() + " \n";
-            description += Lang.getInstance().translate("Amount") + ": " + this.txtAmount.getText();
+            String description = this.txtDescription.getText();
 
             byte[] icon = null;
             byte[] image = null;
             //CREATE IMPRINT
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
-            IssueImprintRecord result = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, name_total, description,
+            IssueImprintRecord result = (IssueImprintRecord) Controller.getInstance().issueImprint1(creator, name_total,  description,
                     icon, image, feePow);
 
             //Issue_Asset_Confirm_Dialog cont = new Issue_Asset_Confirm_Dialog(issueAssetTransaction);
