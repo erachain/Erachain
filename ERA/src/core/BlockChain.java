@@ -1,7 +1,20 @@
 package core;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
 import controller.Controller;
 import core.account.Account;
+import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.block.GenesisBlock;
 import core.crypto.Base58;
@@ -12,14 +25,8 @@ import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import network.Peer;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import settings.Settings;
 import utils.Pair;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 public class BlockChain {
 
@@ -157,6 +164,7 @@ public class BlockChain {
     public static HashMap<String, Pair<Integer, byte[]>> NOVA_ASSETS = new HashMap<String, Pair<Integer, byte[]>>();
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
+    public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
     static Logger LOGGER = Logger.getLogger(BlockChain.class.getName());
     private GenesisBlock genesisBlock;
     private long genesisTimestamp;
@@ -178,6 +186,9 @@ public class BlockChain {
         // GENERAL TRUST
         TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
         //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+
+        ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+        ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
 
         if (DEVELOP_USE) {
             ;

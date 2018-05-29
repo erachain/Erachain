@@ -1,5 +1,16 @@
 package core.item.assets;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import core.BlockChain;
 import core.account.Account;
 import core.crypto.Crypto;
@@ -7,16 +18,6 @@ import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.OrderMap;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.List;
 
 public class Order implements Comparable<Order> {
 
@@ -501,6 +502,11 @@ public class Order implements Comparable<Order> {
                 compare++;
             }
 
+            if (this.creator.equals(order.a.b)) {
+        	// IGNORE my self orders
+        	continue;
+            }
+            
             ///////////////
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             if (thisPrice.compareTo(orderReversePrice) > 0)

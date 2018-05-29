@@ -1,13 +1,14 @@
 package core.item.assets;
 
 
+import org.json.simple.JSONObject;
+
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
-import org.json.simple.JSONObject;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -128,6 +129,14 @@ public abstract class AssetCls extends ItemCls {
         }
     }
 
+
+    public PublicKeyAccount getOwner() {
+	if (this.key == 7 || this.key == 8) {
+	    return BlockChain.ASSET_OWNERS.get(this.key);
+	}
+	
+        return this.owner;
+    }
 
     @Override
     public String getDescription() {
