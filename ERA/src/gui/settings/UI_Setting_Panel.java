@@ -1,22 +1,33 @@
 package gui.settings;
 
-import com.google.common.base.Charsets;
-import lang.Lang;
-import lang.LangFile;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import settings.Settings;
-import utils.DateTimeFormat;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
+import com.google.common.base.Charsets;
+
+import lang.Lang;
+import lang.LangFile;
+import settings.Settings;
+import utils.DateTimeFormat;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -249,7 +260,7 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
         for (LangFile langFile : Lang.getInstance().getLangListAvailable()) {
             jComboBox_Lang.addItem(langFile);
 
-            if (langFile.getFileName().equals(Settings.getInstance().getLang())) {
+            if (langFile.getFileName().equals(Settings.getInstance().getLangFileName())) {
                 jComboBox_Lang.setSelectedItem(langFile);
             }
         }

@@ -1,11 +1,57 @@
 package controller;
 
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.TrayIcon.MessageType;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.security.SecureRandom;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
+import com.google.common.primitives.Longs;
+
 // 04/01 +-
 
 import api.ApiClient;
 import api.ApiService;
 import at.AT;
-import com.google.common.primitives.Longs;
 import core.BlockChain;
 import core.BlockGenerator;
 import core.BlockGenerator.ForgingStatus;
@@ -38,49 +84,45 @@ import core.voting.Poll;
 import core.voting.PollOption;
 import core.wallet.Wallet;
 import database.DBSet;
-import datachain.*;
+import datachain.DCSet;
+import datachain.Item_Map;
+import datachain.LocalDataMap;
+import datachain.SortableList;
+import datachain.TransactionMap;
 import gui.AboutFrame;
 import gui.Gui;
 import lang.Lang;
 import network.Network;
 import network.Peer;
-import network.message.*;
+import network.message.BlockWinMessage;
+import network.message.GetBlockMessage;
+import network.message.GetSignaturesMessage;
+import network.message.HWeightMessage;
+import network.message.Message;
+import network.message.MessageFactory;
+import network.message.SignaturesMessage;
+import network.message.TelegramMessage;
+import network.message.TransactionMessage;
+import network.message.VersionMessage;
 import ntp.NTP;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import settings.Settings;
-import utils.*;
+import utils.DateTimeFormat;
+import utils.MemoryViewer;
+import utils.ObserverMessage;
+import utils.Pair;
+import utils.SimpleFileVisitorForRecursiveFolderDeletion;
+import utils.SysTray;
 import webserver.WebService;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.TrayIcon.MessageType;
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.security.SecureRandom;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.List;
-import java.util.Timer;
 
 public class Controller extends Observable {
 
     // IF new abilities is made - new license insert in CHAIN and set this KEY
-    public static final long LICENSE_KEY = 1014l;
+    public static final long LICENSE_VERS = 107; // versopn of LICENSE
+    public static HashMap<String, Tuple2<Integer, Integer>> LICENSE_LANG_REFS = new HashMap<String, Tuple2<Integer, Integer>>() {{
+	put("en", new Tuple2<Integer, Integer>(50475, 1));
+	put("ru", new Tuple2<Integer, Integer>(50475, 1));
+    }};
+
     public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
     public final static long MIN_MEMORY_TAIL = 50000000;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
@@ -187,7 +229,7 @@ public class Controller extends Observable {
         if (instance == null) {
             instance = new Controller();
             instance.setDCSetWithObserver(Settings.getInstance().isGuiEnabled());
-            instance.setDynamicGUI(Settings.getInstance().isGuiDynamic());
+            instance.setDynamicGUI(Settings.getInstance().isGuiDynamic());            
         }
 
         return instance;

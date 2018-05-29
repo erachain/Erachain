@@ -367,7 +367,7 @@ public class Wallet extends Observable implements Observer {
 		this.database.setVersion(1);
 
 		// SET LICENSE KEY
-		this.setLicenseKey(Controller.LICENSE_KEY);
+		this.setLicenseKey(Controller.LICENSE_VERS);
 
 		// ADD SEED
 		try {

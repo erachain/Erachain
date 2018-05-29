@@ -2,13 +2,18 @@ package settings;
 // 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
 // 30/03 ++
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import controller.Controller;
-import core.BlockChain;
-import lang.Lang;
-import network.Peer;
-import ntp.NTP;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -16,13 +21,14 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
+import controller.Controller;
+import core.BlockChain;
+import lang.Lang;
+import network.Peer;
+import ntp.NTP;
 
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
@@ -82,7 +88,7 @@ public class Settings {
     private static final boolean DEFAULT_FORGING_ENABLED = true;
     private static final String NOTEFY_INCOMING_URL = "http://127.0.0.1:8000/exhange/era/income";
     private static final int NOTEFY_INCOMING_CONFIRMATIONS = 0;
-    public static String DEFAULT_LANGUAGE = "en.json";
+    public static String DEFAULT_LANGUAGE = "en";
     private static Settings instance;
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
@@ -754,10 +760,20 @@ public class Settings {
 
     public String getLang() {
         if (this.settingsJSON.containsKey("lang")) {
-            return ((String) this.settingsJSON.get("lang").toString());
+            String langStr = (String)this.settingsJSON.get("lang");
+            
+            // delete .json
+            String[] tokens = langStr.split("\\.");
+            if (tokens.length > 1)
+        	return tokens[0];
+            return langStr;
         }
 
         return DEFAULT_LANGUAGE;
+    }
+
+    public String getLangFileName() {
+	return getLang() + ".json";
     }
 
     public String get_Font() {

@@ -1,6 +1,14 @@
 package gui;
 
 
+import java.awt.TrayIcon.MessageType;
+import java.io.File;
+
+import javax.swing.JFrame;
+import javax.swing.RowFilter;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import controller.Controller;
 import gui.create.NoWalletFrame;
 import gui.create.SettingLangFrame;
@@ -8,12 +16,6 @@ import gui.library.MTable;
 import lang.Lang;
 import settings.Settings;
 import utils.SysTray;
-
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
-import java.awt.TrayIcon.MessageType;
-import java.io.File;
 
 public class Gui extends JFrame {
 
@@ -30,11 +32,9 @@ public class Gui extends JFrame {
         gui.library.library.Set_GUI_Look_And_Feel("");
 
         if (Settings.getInstance().Dump().containsKey("lang")) {
-            if (!Settings.getInstance().getLang().equals(Settings.DEFAULT_LANGUAGE)) {
-                File langFile = new File(Settings.getInstance().getLangDir(), Settings.getInstance().getLang());
-                if (!langFile.isFile()) {
-                    new SettingLangFrame();
-                }
+            File langFile = new File(Settings.getInstance().getLangDir(), Settings.getInstance().getLangFileName());
+            if (!langFile.isFile()) {
+                new SettingLangFrame();
             }
         } else {
             new SettingLangFrame();

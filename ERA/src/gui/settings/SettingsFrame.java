@@ -1,19 +1,10 @@
 package gui.settings;
 
-import controller.Controller;
-import gui.library.Menu_Files;
-import lang.Lang;
-import lang.LangFile;
-import network.Network;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import settings.Settings;
-import utils.SaveStrToFile;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -22,6 +13,24 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import controller.Controller;
+import gui.library.Menu_Files;
+import lang.Lang;
+import lang.LangFile;
+import network.Network;
+import settings.Settings;
+import utils.SaveStrToFile;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JDialog {
@@ -292,9 +301,9 @@ public class SettingsFrame extends JDialog {
             changeDataDir = true;
         }
 
-        if (!Settings.getInstance().getLang().equals(
-                ((LangFile) settingsTabPane.uI_Settings_Panel.jComboBox_Lang.getSelectedItem()).getFileName())) {
-            settingsJSONbuf.put("lang", ((LangFile) settingsTabPane.uI_Settings_Panel.jComboBox_Lang.getSelectedItem()).getFileName());
+        String fileName = ((LangFile) settingsTabPane.uI_Settings_Panel.jComboBox_Lang.getSelectedItem()).getFileName();
+        if (!Settings.getInstance().getLangFileName().equals(fileName)) {
+            settingsJSONbuf.put("lang", fileName);
             changeLang = true;
         }
 

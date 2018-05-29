@@ -1,30 +1,47 @@
 package webserver;
 // 30/03
 
-import api.ApiErrorFactory;
-import api.BlogPostResource;
-import api.NameStorageResource;
-import com.google.common.base.Charsets;
-import com.mitchellbosecke.pebble.error.PebbleException;
-import controller.Controller;
-import core.account.Account;
-import core.account.PrivateKeyAccount;
-import core.blockexplorer.BlockExplorer;
-import core.crypto.Base58;
-import core.crypto.Base64;
-import core.item.assets.AssetCls;
-import core.item.persons.PersonCls;
-import core.naming.Name;
-import core.payment.Payment;
-import core.transaction.ArbitraryTransaction;
-import core.transaction.Transaction;
-import core.web.*;
-import core.web.blog.BlogEntry;
-import datachain.DCSet;
-import datachain.ItemAssetMap;
-import datachain.ItemPersonMap;
-import datachain.NameMap;
-import lang.Lang;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,26 +55,53 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.mapdb.Fun.Tuple2;
-import settings.Settings;
-import utils.*;
-import utils.NameUtils.NameResult;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
-import java.io.*;
-import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.google.common.base.Charsets;
+import com.mitchellbosecke.pebble.error.PebbleException;
+
+import api.ApiErrorFactory;
+import api.BlogPostResource;
+import api.NameStorageResource;
+import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.blockexplorer.BlockExplorer;
+import core.crypto.Base58;
+import core.crypto.Base64;
+import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
+import core.naming.Name;
+import core.payment.Payment;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.Transaction;
+import core.web.BlogBlackWhiteList;
+import core.web.BlogProfile;
+import core.web.HTMLSearchResult;
+import core.web.NameStorageMap;
+import core.web.NameStorageTransactionHistory;
+import core.web.NavbarElements;
+import core.web.Profile;
+import core.web.ProfileHelper;
+import core.web.ServletUtils;
+import core.web.WebNameStorageHistoryHelper;
+import core.web.blog.BlogEntry;
+import datachain.DCSet;
+import datachain.ItemAssetMap;
+import datachain.ItemPersonMap;
+import datachain.NameMap;
+import lang.Lang;
+import settings.Settings;
+import utils.AccountBalanceComparator;
+import utils.BlogUtils;
+import utils.Corekeys;
+import utils.DiffHelper;
+import utils.NameUtils;
+import utils.NameUtils.NameResult;
+import utils.Pair;
+import utils.PebbleHelper;
+import utils.StorageUtils;
+import utils.StrJSonFine;
+import utils.UpdateUtil;
 
 @Path("/")
 public class WebResource {
@@ -3265,7 +3309,7 @@ public class WebResource {
     @GET
     public Response translationjson() {
 
-        File file = new File("languages/" + Settings.getInstance().getLang());
+        File file = new File("languages/" + Settings.getInstance().getLangFileName());
 
         if (file.exists()) {
             return Response.ok(file, "application/json").build();

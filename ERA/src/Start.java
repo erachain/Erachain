@@ -1,23 +1,24 @@
-import api.ApiClient;
-import controller.Controller;
-import core.BlockChain;
-import core.item.templates.TemplateCls;
-import datachain.DCSet;
-import gui.AboutFrame;
-import gui.Gui;
-import gui.library.Issue_Confirm_Dialog;
-import lang.Lang;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import settings.Settings;
-import utils.SysTray;
-import webserver.Status;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
+
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import api.ApiClient;
+import controller.Controller;
+import core.BlockChain;
+import gui.AboutFrame;
+import gui.Gui;
+import gui.library.Issue_Confirm_Dialog;
+import lang.Lang;
+import settings.Settings;
+import utils.SysTray;
+import webserver.Status;
 
 // 30/03
 
@@ -133,22 +134,25 @@ public class Start {
                         //START GUI
 
                         if (Gui.getInstance() != null && Settings.getInstance().isSysTrayEnabled()) {
+                            
                             SysTray.getInstance().createTrayIcon();
                             about_frame.setVisible(false);
                             about_frame.getInstance().dispose();
                             //Controller.getInstance().setWalletLicense(0); // TEST
+                            /*
                             if (Controller.getInstance().doesWalletExists() &&
-                                    Controller.LICENSE_KEY > Controller.getInstance().getWalletLicense()) {
+                                    Controller.LICENSE_VERS > Controller.getInstance().getWalletLicense()) {
                                 // TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
                                 //ItemCls.TEMPLATE_TYPE
-                                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
+                                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_VERS);
                                 if (template == null) {
                                     // USE default LICENSE
                                     template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
                                 }
                                 //	new License_JFrame(template);
-                                Controller.getInstance().setWalletLicense(template.getKey());
+                                Controller.getInstance().setWalletLicense(Controller.LICENSE_VERS);
                             }
+                            */
                         }
                     } catch (Exception e1) {
                         if (Controller.useGui) about_frame.setVisible(false);

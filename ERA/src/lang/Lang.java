@@ -1,19 +1,21 @@
 package lang;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-import settings.Settings;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
+import settings.Settings;
 
 public class Lang {
 
@@ -77,8 +79,8 @@ public class Lang {
     }
 
     public void loadLang() {
-        LOGGER.debug("try lang file: " + Settings.getInstance().getLang());
-        langObj = openLangFile(Settings.getInstance().getLang());
+        LOGGER.debug("try lang file: " + Settings.getInstance().getLangFileName());
+        langObj = openLangFile(Settings.getInstance().getLangFileName());
         noTranslateMap = new LinkedHashMap<String, String>();
     }
 

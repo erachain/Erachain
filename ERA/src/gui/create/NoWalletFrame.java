@@ -1,25 +1,31 @@
 package gui.create;
 
-import controller.Controller;
-import core.item.templates.TemplateCls;
-import core.wallet.Wallet;
-import datachain.DCSet;
-import gui.Gui;
-import lang.Lang;
-import settings.Settings;
-import utils.SaveStrToFile;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import org.json.simple.JSONObject;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
+import java.awt.Cursor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.border.EmptyBorder;
+
+import controller.Controller;
+import gui.Gui;
+import lang.Lang;
 
 @SuppressWarnings("serial")
 public class NoWalletFrame extends JFrame {
@@ -126,17 +132,8 @@ public class NoWalletFrame extends JFrame {
                 // TODO Auto-generated method stub
 
                 //OPEN CREATE WALLET FRAME
-                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
-                if (template == null) {
-                    // USE default LICENSE
-                    template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
-                }
-
-
-                //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(template, true, th, 1);
-
+                new License_JFrame(true, th, 1);
 
             }
 
@@ -187,16 +184,8 @@ public class NoWalletFrame extends JFrame {
                 // TODO Auto-generated method stub
 
                 //OPEN CREATE WALLET FRAME
-                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
-                if (template == null) {
-                    // USE default LICENSE
-                    template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
-                }
-
-
-                //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(template, true, th, 2);
+                new License_JFrame(true, th, 2);
 
 
             }
@@ -248,17 +237,8 @@ public class NoWalletFrame extends JFrame {
                 // TODO Auto-generated method stub
 
                 //OPEN CREATE WALLET FRAME
-                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
-                if (template == null) {
-                    // USE default LICENSE
-                    template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
-                }
-
-
-                //OPEN CREATE WALLET FRAME
                 th.setVisible(false);
-                new License_JFrame(template, true, th, 3);
-
+                new License_JFrame(true, th, 3);
 
             }
 
@@ -332,11 +312,13 @@ public class NoWalletFrame extends JFrame {
 
     public void onNextClick() {
 
-        TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_KEY);
+	/*
+        TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_VERS);
         if (template == null) {
             // USE default LICENSE
             template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
         }
+        */
 
         if (createButton.isSelected()) {
             //OPEN CREATE WALLET FRAME

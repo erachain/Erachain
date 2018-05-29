@@ -1,16 +1,33 @@
 package gui.create;
 
-import controller.Controller;
-import core.item.templates.TemplateCls;
-import datachain.DCSet;
-import lang.Lang;
-import org.apache.log4j.Logger;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JDialog;
+import javax.swing.JTextPane;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
+import com.github.rjeschke.txtmark.Processor;
+
+import controller.Controller;
+import core.transaction.R_SignNote;
+import datachain.DCSet;
+import lang.Lang;
+import settings.Settings;
 
 public class License_JFrame extends JDialog {
 
@@ -18,37 +35,69 @@ public class License_JFrame extends JDialog {
     boolean needAccept;
     NoWalletFrame parent;
     int goCreateWallet;
-    TemplateCls template;
-    // Variables declaration - do not modify
+    String license;
+
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
-    public License_JFrame(TemplateCls template, boolean needAccept, NoWalletFrame parent, int goCreateWallet) {
-        this.template = template;
+    //private javax.swing.JTextArea jTextArea1;
+    private JTextPane messageText;
+    
+    public License_JFrame(boolean needAccept, NoWalletFrame parent, int goCreateWallet) {
+	
         this.needAccept = needAccept;
         this.parent = parent;
         this.goCreateWallet = goCreateWallet;
+
+        this.license = "<html>" + Processor.process(getLicenseText())
+        		+ "</html>";
+        
         initComponents();
     }
-    public License_JFrame(TemplateCls template, boolean needAccept) {
-        this.template = template;
-        this.needAccept = needAccept;
-        initComponents();
-    }
-    public License_JFrame(TemplateCls template) {
-        this.template = template;
-        needAccept = true;
-        initComponents();
-    }
+    
     public License_JFrame() {
-        this.template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.getInstance().getWalletLicense());
+        this.license = "<html>" + Processor.process(getLicenseText())
+        		+ "</html>";
+
         needAccept = false;
         initComponents();
     }
 
+    public String getLicenseText() {
+        try {
+            Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
+            if (langRef == null)
+                langRef = Controller.LICENSE_LANG_REFS.get("en");
+            
+            R_SignNote record = (R_SignNote) DCSet.getInstance().getTransactionFinalMap().get(langRef);
+            
+            String message;
+            if (record.getVersion() == 2) {
+                Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
+                message = (String)a.c.get("MS");
+                
+            } else {
+    
+                try {
+                    JSONObject data = (JSONObject) JSONValue
+                            .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
+                    message = (String) data.get("Message");
+                } catch (Exception e) {
+            	message = new String(record.getData(), Charset.forName("UTF-8"));
+                }
+            }
+
+            return message; // Processor.process(
+            
+        } catch (Exception e1) {
+            // USE default LICENSE
+            return DCSet.getInstance().getItemTemplateMap().get(2l).getDescription();
+            
+        }
+	
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -72,7 +121,12 @@ public class License_JFrame extends JDialog {
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        //jTextArea1 = new javax.swing.JTextArea();
+        
+        messageText = new JTextPane();
+        messageText.setContentType("text/html");
+
+
         jLabel1 = new javax.swing.JLabel();
 
         //      setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -188,11 +242,14 @@ public class License_JFrame extends JDialog {
         });
 
         // jTextArea1.setColumns(20);
-        jTextArea1.setLineWrap(true);
-        jTextArea1.setEditable(false);
-        jTextArea1.setRows(5);
-        jTextArea1.setText(template.getDescription());
-        jScrollPane1.setViewportView(jTextArea1);
+        //jTextArea1.setLineWrap(true);
+        //jTextArea1.setEditable(false);
+        //jT/extArea1.setRows(5);
+        //jTextArea1.setText(this.license);
+        //jScrollPane1.setViewportView(jTextArea1);
+
+        messageText.setText(this.license);
+        jScrollPane1.setViewportView(messageText);
 
  /*
         this.jTextArea1.addMouseListener(new MouseAdapter() {
