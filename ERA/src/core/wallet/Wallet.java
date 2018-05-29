@@ -1816,6 +1816,8 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	public Integer loadFromDir() {
+		// return 1 - is ok
+		// if > 1 - error
 		String pathOld = Settings.getInstance().getWalletDir();
 		JFileChooser fileopen = new JFileChooser();
 		fileopen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -1833,10 +1835,10 @@ public class Wallet extends Observable implements Observer {
 			// open wallet
 							Controller.getInstance().wallet = new Wallet();
 				// not wallet return 0;
-				if (!Controller.getInstance().wallet.exists()) return 0;
+				if (!Controller.getInstance().wallet.exists()) return 2;
 				// accounts 
 				List<Account> aa = Controller.getInstance().wallet.getAccounts();
-				if (Controller.getInstance().wallet.getAccounts().size()<1) return 0;
+				if (Controller.getInstance().wallet.getAccounts().size()<1) return 5;
 				if (Controller.getInstance().wallet.isWalletDatabaseExisting()) {
 					Controller.getInstance().wallet.initiateItemsFavorites();
 					// save path from setting json
@@ -1858,6 +1860,6 @@ public class Wallet extends Observable implements Observer {
 		
 	}
 		//is abort
-				return -1;
+				return 3;
 }
 }

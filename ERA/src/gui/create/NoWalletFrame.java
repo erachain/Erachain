@@ -317,9 +317,9 @@ public class NoWalletFrame extends JFrame {
         else if (createWallet ==3) {
             // open file dialog
        Integer res = Controller.getInstance().wallet.loadFromDir();
-       if (res == 0){
+       if (res > 1){
     	   JOptionPane.showMessageDialog(
-                   new JFrame(), Lang.getInstance().translate("Wallet Error") + "!",
+                   new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",
                    "Error!",
                    JOptionPane.ERROR_MESSAGE);
     	   this.setVisible(true);

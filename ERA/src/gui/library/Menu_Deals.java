@@ -122,7 +122,7 @@ public class Menu_Deals extends JMenu {
             	 Integer res = Controller.getInstance().wallet.loadFromDir();
                  if (res == 0){
               	   JOptionPane.showMessageDialog(
-                             new JFrame(), Lang.getInstance().translate("Wallet Error") + "!",
+                             new JFrame(), Lang.getInstance().translate("wallet does not exist") + "!",
                              "Error!",
                              JOptionPane.ERROR_MESSAGE);
               	  
