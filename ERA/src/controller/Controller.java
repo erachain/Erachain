@@ -2106,6 +2106,10 @@ public class Controller extends Observable {
         this.blockChain.clearUnconfirmedRecords(this, this.dcSet);
     }
 
+    /**
+     * Check if wallet is unlocked
+     * @return bool value wallet unlock or not
+     */
     public boolean isWalletUnlocked() {
         return this.wallet.isUnlocked();
     }
