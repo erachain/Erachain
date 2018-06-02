@@ -1,10 +1,23 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
+
 // import org.apache.log4j.Logger;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -17,14 +30,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import datachain.AddressTime_SignatureMap;
 import datachain.DCSet;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple4;
 import utils.DateTimeFormat;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 //import java.math.RoundingMode;
 //import java.math.MathContext;
@@ -86,8 +92,12 @@ public abstract class Transaction {
     public static final int TRANSACTION_DOES_NOT_EXIST = 24;
     public static final int CREATOR_NOT_PERSONALIZED = 25;
     public static final int RECEIVER_NOT_PERSONALIZED = 26;
+    public static final int INVALID_CLAIM_RECIPIENT = 27;
+    public static final int INVALID_CLAIM_DEBT = 28;
+
     // ASSETS
     public static final int INVALID_QUANTITY = 30;
+    
     // public static final int ASSET_DOES_NOT_EXIST = 31;
     public static final int NEGATIVE_AMOUNT = 32;
     public static final int INVALID_AMOUNT = 33;

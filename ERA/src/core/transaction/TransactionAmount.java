@@ -1,7 +1,18 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -10,16 +21,7 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import datachain.DCSet;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import utils.NumberAsString;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /*
 
@@ -478,6 +480,15 @@ public abstract class TransactionAmount extends Transaction {
                                 return NOT_DEBT_ASSET;
                             }
 
+                            
+                    	// CLAIMs DEBT - only for OWNER
+                    	if (this.asset.getAssetType() == AssetCls.AS_CLAIM) {
+                    	    if (!this.recipient.equals(this.asset.getOwner())) {
+                    		// ERROR
+                    		return Transaction.INVALID_CLAIM_DEBT;
+                    	    }
+                    	}
+
                             // 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 ->
                             // 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
                             if (confiscate_credit) {
@@ -577,6 +588,16 @@ public abstract class TransactionAmount extends Transaction {
                                 }
 
                             } else {
+                        	
+                        	// CLAIMs invalid
+                        	if (this.asset.getAssetType() == AssetCls.AS_CLAIM) {
+                        	    if (this.recipient.equals(this.asset.getOwner())) {
+                        		// ERROR
+                        		return Transaction.INVALID_CLAIM_RECIPIENT;
+                        	    }
+                        	}
+                        	
+                        	
                                 if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
                                     if (height > 41100 || BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
@@ -725,7 +746,9 @@ public abstract class TransactionAmount extends Transaction {
         // UPDATE RECIPIENT
         this.recipient.changeBalance(db, confiscate, key, this.amount, false);
 
+        // ASSET ACTIONS PRCESS
         int actionType = Account.actionType(key, amount);
+       
         if (actionType == 2) {
             if (confiscate) {
                 // BORROW
@@ -748,6 +771,19 @@ public abstract class TransactionAmount extends Transaction {
                     db.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
                 }
             }
+        }
+
+        // ASSET TYPE PROCESS
+        switch (this.asset.getAssetType()) {
+        case AssetCls.AS_CLAIM: // RIGHTS
+            if (actionType == 2 && confiscate) {
+        	// CLOSE CLAIN - back amount to claim ISSUER
+                this.creator.changeBalance(db, confiscate, absKey, this.amount.abs(), false);
+                this.recipient.changeBalance(db, !confiscate, absKey, this.amount.abs(), false);
+        	
+            }
+            break;
+        
         }
 
         if (absKey == Transaction.RIGHTS_KEY) {
@@ -825,6 +861,19 @@ public abstract class TransactionAmount extends Transaction {
                 }
 
             }
+        }
+
+        // ASSET TYPE PROCESS
+        switch (this.asset.getAssetType()) {
+        case AssetCls.AS_CLAIM: // RIGHTS
+            if (actionType == 2 && confiscate) {
+        	// CLOSE CLAIN - back amount to claim ISSUER
+                this.creator.changeBalance(db, !confiscate, absKey, this.amount.abs(), false);
+                this.recipient.changeBalance(db, confiscate, absKey, this.amount.abs(), false);
+        	
+            }
+            break;
+        
         }
 
         if (absKey == Transaction.RIGHTS_KEY) {

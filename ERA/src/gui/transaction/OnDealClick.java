@@ -1,12 +1,13 @@
 package gui.transaction;
 
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
 import controller.Controller;
 import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
 import lang.Lang;
-
-import javax.swing.*;
 
 //import javax.swing.JFrame;
 //import javax.swing.JOptionPane;
@@ -184,6 +185,12 @@ public class OnDealClick {
                 mess = "Transaction does not exist";
                 break;
 
+            case Transaction.INVALID_CLAIM_RECIPIENT:
+                mess = "Invalid: claim recipient it is CLAIM issuer";
+                break;
+            case Transaction.INVALID_CLAIM_DEBT:
+                mess = "Invalid: claim DEBT not for issuer";
+                break;
 
             case Transaction.INVALID_QUANTITY:
                 mess = "Invalid quantity";

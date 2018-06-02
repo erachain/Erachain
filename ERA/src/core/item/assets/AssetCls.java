@@ -64,6 +64,12 @@ public abstract class AssetCls extends ItemCls {
     public static final int INITIAL_FAVORITES = 4;
     protected static final int SCALE_LENGTH = 1;
     protected static final int ASSET_TYPE_LENGTH = 1;
+
+    public static final int AS_GOODS = 0;
+    public static final int AS_CURRENCY = 1;
+    public static final int AS_CLAIM = 2;
+    public static final int AS_ACCOUNTING = 3;
+
     // + or -
     protected int scale;
     //protected boolean divisible;
@@ -99,9 +105,9 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public int getMinNameLen() {
 
-        if (this.asset_type == 2)
+        if (this.asset_type == AS_CLAIM)
             return 6;
-        if (this.asset_type == 3)
+        if (this.asset_type == AS_ACCOUNTING)
             return 6;
 
         return BlockChain.DEVELOP_USE ? 10 : 12;
@@ -115,11 +121,11 @@ public abstract class AssetCls extends ItemCls {
         }
 
         switch (this.asset_type) {
-            case 1:
+            case AS_CURRENCY:
                 return "▼" + this.name;
-            case 2:
+            case AS_CLAIM:
                 return "◄" + this.name; // ® ■ ± █
-            case 3:
+            case AS_ACCOUNTING:
                 if (this.key == 555l || this.key == 666l || this.key == 777l)
                     return this.name;
 
@@ -214,33 +220,33 @@ public abstract class AssetCls extends ItemCls {
         if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
             return (this.typeBytes[1] & (byte) 1) > 0;
         }
-        return this.asset_type == 0;
+        return this.asset_type == AS_GOODS;
     }
 
     public boolean isImMovable() {
         if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
             return (this.typeBytes[1] & (byte) 1) <= 0;
         }
-        return this.asset_type == 1;
+        return this.asset_type == AS_CURRENCY;
     }
 
     public boolean isClaim() {
-        return this.asset_type == 2;
+        return this.asset_type == AS_CLAIM;
     }
 
     public boolean isAccounting() {
-        return this.asset_type == 3;
+        return this.asset_type == AS_ACCOUNTING;
     }
 
     public String viewAssetType() {
         switch (this.asset_type) {
-            case 0:
+            case AS_GOODS:
                 return "Movable";
-            case 1:
+            case AS_CURRENCY:
                 return "Immovable";
-            case 2:
+            case AS_CLAIM:
                 return "Claim";
-            case 3:
+            case AS_ACCOUNTING:
                 return "Accounting";
         }
         return "unknown";
