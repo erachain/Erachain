@@ -69,6 +69,7 @@ public abstract class Transaction {
     };
     // VALIDATION CODE
     public static final int VALIDATE_OK = 1;
+    public static final int FUTURE_ABILITY = 2;
     public static final int INVALID_MAKER_ADDRESS = 5;
     public static final int INVALID_REFERENCE = 6;
     public static final int INVALID_TIMESTAMP = 7;

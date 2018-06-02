@@ -52,6 +52,9 @@ public class OnDealClick {
         String mess = "Unknown error: " + error;
 
         switch (error) {
+            case Transaction.FUTURE_ABILITY:
+                mess = "ERROR: Future Ability";
+                break;
             case Transaction.INVALID_ADDRESS:
                 mess = "Invalid Account";
                 break;

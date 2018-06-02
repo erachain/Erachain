@@ -479,15 +479,15 @@ public abstract class TransactionAmount extends Transaction {
                             if (absKey == FEE_KEY) {
                                 return NOT_DEBT_ASSET;
                             }
-
                             
-                    	// CLAIMs DEBT - only for OWNER
-                    	if (this.asset.getAssetType() == AssetCls.AS_CLAIM) {
-                    	    if (!this.recipient.equals(this.asset.getOwner())) {
-                    		// ERROR
-                    		return Transaction.INVALID_CLAIM_DEBT;
-                    	    }
-                    	}
+                            // CLAIMs DEBT - only for OWNER
+                            if (this.asset.getAssetType() == AssetCls.AS_CLAIM) {
+                    	    	if (!this.recipient.equals(this.asset.getOwner())) {
+                    	    	    // ERROR
+                    	    	    return Transaction.INVALID_CLAIM_DEBT;
+                    	    	}
+                            }
+
 
                             // 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 ->
                             // 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
@@ -775,7 +775,7 @@ public abstract class TransactionAmount extends Transaction {
 
         // ASSET TYPE PROCESS
         switch (this.asset.getAssetType()) {
-        case AssetCls.AS_CLAIM: // RIGHTS
+        case AssetCls.AS_CLAIM:
             if (actionType == 2 && confiscate) {
         	// CLOSE CLAIN - back amount to claim ISSUER
                 this.creator.changeBalance(db, confiscate, absKey, this.amount.abs(), false);
@@ -829,9 +829,9 @@ public abstract class TransactionAmount extends Transaction {
 
         // UPDATE SENDER
         if (absKey == 666l) {
-            this.creator.changeBalance(db, !confiscate, key, this.amount, false);
+            this.creator.changeBalance(db, !confiscate, key, this.amount, true);
         } else {
-            this.creator.changeBalance(db, confiscate, key, this.amount, false);
+            this.creator.changeBalance(db, confiscate, key, this.amount, true);
         }
         // UPDATE RECIPIENT
         this.recipient.changeBalance(db, !confiscate, key, this.amount, true);
@@ -868,8 +868,8 @@ public abstract class TransactionAmount extends Transaction {
         case AssetCls.AS_CLAIM: // RIGHTS
             if (actionType == 2 && confiscate) {
         	// CLOSE CLAIN - back amount to claim ISSUER
-                this.creator.changeBalance(db, !confiscate, absKey, this.amount.abs(), false);
-                this.recipient.changeBalance(db, confiscate, absKey, this.amount.abs(), false);
+                this.creator.changeBalance(db, !confiscate, absKey, this.amount.abs(), true);
+                this.recipient.changeBalance(db, confiscate, absKey, this.amount.abs(), true);
         	
             }
             break;
