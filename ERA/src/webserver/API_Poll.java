@@ -119,8 +119,8 @@ public class API_Poll {
     /**
      * Vote to
      * @param data data vote
-     * @param name
-     * @return
+     * @param name name poll
+     * @return polling creation status
      */
     @GET
     @Path("vote")
