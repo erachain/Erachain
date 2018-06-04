@@ -35,7 +35,7 @@ sourceSets {
 
     test {
         java {
-            srcDir 'ERA/test'
+            srcDir 'ERA/src/test'
         }
     }
 }
