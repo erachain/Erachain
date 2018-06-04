@@ -63,7 +63,7 @@ public class GenesisIssuePersonRecord extends GenesisIssue_ItemRecord {
             return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
         if (person.getEyeColor().length() < 1 || person.getEyeColor().length() > 255)
             return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
-        if (person.getHairСolor().length() < 1 || person.getHairСolor().length() > 255)
+        if (person.getHairColor().length() < 1 || person.getHairColor().length() > 255)
             return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
         //int ii = Math.abs(person.getHeight());
         if (Math.abs(person.getHeight()) < 40) return Transaction.ITEM_PERSON_HEIGHT_ERROR;

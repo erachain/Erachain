@@ -237,7 +237,7 @@ public class TestRecPerson {
         assertEquals(true, person.getBirthLongitude() == parsedPerson.getBirthLongitude());
         assertEquals(person.getSkinColor(), parsedPerson.getSkinColor());
         assertEquals(person.getEyeColor(), parsedPerson.getEyeColor());
-        assertEquals(person.getHairСolor(), parsedPerson.getHairСolor());
+        assertEquals(person.getHairColor(), parsedPerson.getHairColor());
         assertEquals(person.getHeight(), parsedPerson.getHeight());
 
 
@@ -294,7 +294,7 @@ public class TestRecPerson {
         assertEquals(true, person.getBirthLongitude() == parsedPerson.getBirthLongitude());
         assertEquals(person.getSkinColor(), parsedPerson.getSkinColor());
         assertEquals(person.getEyeColor(), parsedPerson.getEyeColor());
-        assertEquals(person.getHairСolor(), parsedPerson.getHairСolor());
+        assertEquals(person.getHairColor(), parsedPerson.getHairColor());
         assertEquals(person.getHeight(), parsedPerson.getHeight());
 
         //PARSE TRANSACTION FROM WRONG BYTES

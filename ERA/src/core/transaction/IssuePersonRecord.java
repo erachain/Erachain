@@ -177,7 +177,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
             return Transaction.ITEM_PERSON_SKIN_COLOR_ERROR;
         if (person.getEyeColor().getBytes(StandardCharsets.UTF_8).length > 255)
             return Transaction.ITEM_PERSON_EYE_COLOR_ERROR;
-        if (person.getHairСolor().getBytes(StandardCharsets.UTF_8).length > 255)
+        if (person.getHairColor().getBytes(StandardCharsets.UTF_8).length > 255)
             return Transaction.ITEM_PERSON_HAIR_COLOR_ERROR;
         //int ii = Math.abs(person.getHeight());
         //if (Math.abs(person.getHeight()) < 1) return Transaction.ITEM_PERSON_HEIGHT_ERROR;

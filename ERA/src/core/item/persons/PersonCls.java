@@ -144,7 +144,7 @@ public abstract class PersonCls extends ItemCls {
         return this.eyeColor;
     }
 
-    public String getHairСolor() {
+    public String getHairColor() {
         return this.hairСolor;
     }
 
