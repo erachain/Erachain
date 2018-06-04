@@ -205,7 +205,7 @@ public class RIPPersonFrame extends JInternalFrame {
         } else {
             // SHOW account for FEE asset
             String personDetails = person.toString() + "<br>";
-            personDetails += person.getSkinColor() + ":" + person.getEyeColor() + ":" + person.getHairСolor() + "<br>";
+            personDetails += person.getSkinColor() + ":" + person.getEyeColor() + ":" + person.getHairColor() + "<br>";
             personDetails += person.getHeight() + ":" + person.getBirthLatitude() + ":" + person.getBirthLongitude() + "<br>";
 
             // IF PERSON DEAD

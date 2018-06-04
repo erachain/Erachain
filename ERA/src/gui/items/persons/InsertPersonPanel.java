@@ -294,8 +294,8 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     txtSkinColor.setText(person.getSkinColor());
                 if (person.getEyeColor() != null)
                     txtEyeColor.setText(person.getEyeColor());
-                if (person.getHairСolor() != null)
-                    txtHairСolor.setText(person.getHairСolor());
+                if (person.getHairColor() != null)
+                    txtHairСolor.setText(person.getHairColor());
                 txtHeight.setText("" + person.getHeight());
 
                 txt_Sign.setText(
