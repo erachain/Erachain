@@ -90,7 +90,6 @@ public class library {
          * UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
          * // UIManager.setLookAndFeel(
          * UIManager.getCrossPlatformLookAndFeelClassName()); // С‚РѕР¶Рµ С‡С‚Рѕ
-         * Рё РјРµС‚Р°Р» //
          * UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
          * // work //
          * UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
