@@ -110,9 +110,10 @@ public abstract class DCMap<T, U> extends Observable {
         }
     }
 
-    // ОШИБКА если ключ не уникальный для каждлшл значения:
-    // пос удаления из форка ключа который есть в родителе происходит неверный подстчет
-    // так как из .deleted ключ удален а в родителе нет и полчается что удаленных меньше и размер на 1 увеличивается
+    // ERROR if key is not unique for each value:
+    // After removing the key from the fork, which is in the parent, an incorrect post occurs
+    //since from.deleted the key is removed and there is no parent in the parent and that
+    // the deleted ones are smaller and the size is increased by 1
     public int size() {
         this.addUses();
 

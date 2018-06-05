@@ -60,13 +60,11 @@ public class PeersTableModel extends AbstractTableModel implements Observer {
         return o == null ? Null.class : o.getClass();
     }
 
-    // С‡РёС‚Р°РµРј РєРѕР»РѕРЅРєРё РєРѕС‚РѕСЂС‹Рµ РёР·РјРµРЅСЏРµРј РІС‹СЃРѕС‚Сѓ
     public Boolean[] get_Column_AutoHeight() {
 
         return this.column_AutuHeight;
     }
 
-    // СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєРѕР»РѕРЅРєРё РєРѕС‚РѕСЂС‹Рј РёР·РјРµРЅРёС‚СЊ РІС‹СЃРѕС‚Сѓ
     public void set_get_Column_AutoHeight(Boolean[] arg0) {
         this.column_AutuHeight = arg0;
     }
