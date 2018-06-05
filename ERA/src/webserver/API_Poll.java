@@ -5,27 +5,28 @@ import com.google.gson.Gson;
 import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
-import core.transaction.CreatePollTransaction;
 import core.transaction.Transaction;
 import core.voting.Poll;
 import core.voting.PollOption;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import utils.APIUtils;
 import utils.Pair;
 import utils.StrJSonFine;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Poll class (Create, vote by poll, get poll, )
+ */
 @Path("apipoll")
 @Produces(MediaType.APPLICATION_JSON)
 public class API_Poll {
@@ -38,9 +39,11 @@ public class API_Poll {
         Map<String, String> help = new LinkedHashMap<>();
 
         help.put("apipoll/CreatePoll?poll={poll}", "Create new poll.");
-        help.put("apipoll/CreatePoll?poll={poll}", "Create new poll.");
+        help.put("apipoll/createPollVote?data={data}&name={name}", "Vote to poll.");
+        help.put("apipoll/allPoll", "Get all poll.");
+        help.put("apipoll/getPoll", "Get single poll by name.");
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-            .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
+                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
     }
 
     /**
@@ -52,7 +55,7 @@ public class API_Poll {
      * @param poll is poll in json format
      * @return record trades
      * @author Ruslan
-     * @apiNote example param poll : {"creator":"", "name":"", "description":"", "options":["1","2","3"], "feePow":""}
+     * <h3>  example param poll : {"creator":"", "name":"", "description":"", "options":["1","2","3"], "feePow":""}</h3>
      */
 
     @GET
@@ -101,9 +104,7 @@ public class API_Poll {
                 throw ApiErrorFactory.getInstance().createError(Transaction.CREATOR_NOT_OWNER);
 
             //CREATE POLL
-            CreatePollTransaction issue_voiting =
-                (CreatePollTransaction) Controller.getInstance().createPoll_old(account, name, description, options, feePow);
-
+            Controller.getInstance().createPoll_old(account, name, description, options, feePow);
 
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
@@ -112,19 +113,19 @@ public class API_Poll {
         }
         result.toJson("ok");
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-            .header("Access-Control-Allow-Origin", "*")
-            .entity(result).build();
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(result).build();
     }
 
     /**
-     * Vote to
+     * Vote to poll
+     *
      * @param data data vote
-     * @param name name poll
+     * @param name is name poll
      * @return polling creation status
      */
     @GET
     @Path("vote")
-    @Consumes(MediaType.WILDCARD)
     public Response createPollVote(@QueryParam("data") String data, @QueryParam("name") String name) {
         try {
             //READ JSON
@@ -170,8 +171,8 @@ public class API_Poll {
             if (result.getB() == Transaction.VALIDATE_OK) {
 
                 return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                    .header("Access-Control-Allow-Origin", "*")
-                    .entity(result.getA().toJson().toJSONString()).build();
+                        .header("Access-Control-Allow-Origin", "*")
+                        .entity(result.getA().toJson().toJSONString()).build();
             } else
                 throw ApiErrorFactory.getInstance().createError(result.getB());
 
@@ -179,5 +180,46 @@ public class API_Poll {
             //JSON EXCEPTION
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
+    }
+
+    /**
+     * Get all poll
+     *
+     * @return all poll in JSON
+     */
+    @GET
+    @Path("allPoll")
+    public Response getAllPolls() {
+        Collection<Poll> polls = Controller.getInstance().getAllPolls();
+        JSONArray array = new JSONArray();
+
+        for (Poll poll : polls) {
+            array.add(poll.getName());
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(array.toJSONString()).build();
+    }
+
+    /**
+     * Find poll by name
+     *
+     * @param name is name poll
+     * @return poll in JSON
+     */
+    @GET
+    @Path("getPoll")
+    public Response getPoll(@QueryParam("name") String name) {
+        Poll poll = Controller.getInstance().getPoll(name);
+
+        //CHECK IF NAME EXISTS
+        if (poll == null) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.POLL_NOT_EXISTS);
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(poll.toJson()).build();
     }
 }
