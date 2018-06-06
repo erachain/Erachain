@@ -17,3 +17,4 @@ settings.json
 /.project
 *.xml
 /out/
+.settings
