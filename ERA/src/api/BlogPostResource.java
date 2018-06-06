@@ -8,7 +8,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
@@ -68,7 +67,7 @@ public class BlogPostResource {
     @DELETE
     @Path("/comment/{signature}")
     public String deleteCommentEntry(
-            @PathParam("signature") String signatureOfComment, @QueryParam("password") String password) {
+            @PathParam("signature") String signatureOfComment) {
         try {
 
             BlogEntry commentEntryOpt = BlogUtils
@@ -97,6 +96,7 @@ public class BlogPostResource {
                         Transaction.INVALID_ADDRESS);
             }
 
+            String password = null;
             APIUtils.askAPICallAllowed(password, "POST blogpost/comment/"
                     + signatureOfComment, request);
 
@@ -154,7 +154,7 @@ public class BlogPostResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("/comment")
-    public String commentBlogEntry(String x, @QueryParam("password") String password) {
+    public String commentBlogEntry(String x) {
         try {
 
             // READ JSON
@@ -166,6 +166,7 @@ public class BlogPostResource {
             String body = (String) jsonObject.get("body");
             // this is the post we are commenting
             String postid = (String) jsonObject.get("postid");
+            String password = (String) jsonObject.get("password");
 
             if (StringUtil.isBlank(body)) {
                 throw ApiErrorFactory.getInstance().createError(
@@ -283,7 +284,7 @@ public class BlogPostResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("/{blogname}")
-    public String addBlogEntry(String x, @PathParam("blogname") String blogname, @QueryParam("password") String password) {
+    public String addBlogEntry(String x, @PathParam("blogname") String blogname) {
         try {
 
             // READ JSON
@@ -296,6 +297,8 @@ public class BlogPostResource {
             String share = (String) jsonObject.get(BlogPostResource.SHARE_KEY);
             String delete = (String) jsonObject
                     .get(BlogPostResource.DELETE_KEY);
+            String password = (String) jsonObject.get("password");
+
 
             if (StringUtil.isBlank(body)) {
                 throw ApiErrorFactory.getInstance().createError(

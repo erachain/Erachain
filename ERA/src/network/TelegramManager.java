@@ -1,5 +1,16 @@
 package network;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -10,20 +21,16 @@ import datachain.DCSet;
 import network.message.Message;
 import network.message.TelegramMessage;
 import ntp.NTP;
-import org.apache.log4j.Logger;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
-    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 4096 << 4 : 4096;
+    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 1<<16;
     /**
      * time to live telegram
      */
-    private static final int KEEP_TIME = 60000 * 10;
+    private static final int KEEP_TIME = 60000 * 60 * 24;
     static Logger LOGGER = Logger.getLogger(TelegramManager.class.getName());
     private Network network;
     private boolean isRun;

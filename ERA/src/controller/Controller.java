@@ -2123,6 +2123,9 @@ public class Controller extends Observable {
             if (headers.hasMoreElements()) {
                 uuid = headers.nextElement();
                 if (ApiClient.isAllowedDebugWindowCall(uuid)) {
+                    
+                    //Gui.getInstance().bringtoFront();
+                    
                     return ApiClient.SELF_CALL;
                 }
             }

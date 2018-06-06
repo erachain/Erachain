@@ -1,21 +1,28 @@
 package gui;
 // 30/03
 
-import controller.Controller;
-import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+
+import controller.Controller;
+import lang.Lang;
+
 public class PasswordPane {
     public static String showUnlockWalletDialog(Component parent) {
 
         ///
-        parent = null;
+        ///parent = null;
 
         JPanel userPanel = new JPanel();
         userPanel.setLayout(new GridLayout(2, 2));

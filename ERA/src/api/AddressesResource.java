@@ -239,9 +239,11 @@ public class AddressesResource {
     @Consumes(MediaType.WILDCARD)
     public String createNewAddress(String x) {
         // CHECK IF CONTENT IS EMPTY
+	String password = null;
+	
         if (x.isEmpty()) {
-            String password = null;
-            APIUtils.askAPICallAllowed(password, "POST addresses seed\nGenerates a new account", request);
+            
+            APIUtils.askAPICallAllowed(password, "POST addresses new\nGenerates a new account", request);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
@@ -257,8 +259,7 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewAccount();
         } else {
-            String password = null;
-            APIUtils.askAPICallAllowed(password, "POST addresses seed\n " + x, request);
+            APIUtils.askAPICallAllowed(password, "POST addresses import seed\n " + x, request);
 
             String seed = x;
 
