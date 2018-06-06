@@ -1,5 +1,18 @@
 package api;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.json.simple.JSONArray;
+
 import controller.Controller;
 import core.account.Account;
 import core.block.Block;
@@ -9,19 +22,8 @@ import core.crypto.Crypto;
 import core.transaction.Transaction;
 import datachain.BlockMap;
 import datachain.DCSet;
-import org.json.simple.JSONArray;
 import utils.APIUtils;
 import utils.Pair;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
 
 @Path("blocks")
 @Produces(MediaType.APPLICATION_JSON)
@@ -152,8 +154,6 @@ public class BlocksResource {
     @GET
     @Path("/addresses/{limit}")
     public String getLastAccountsBlocks(@PathParam("limit") int limit) {
-        //String password = null;
-        //APIUtils.askAPICallAllowed(password, "GET blocks", request);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {

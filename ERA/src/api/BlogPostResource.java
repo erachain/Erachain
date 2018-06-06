@@ -1,5 +1,22 @@
 package api;
 
+import java.nio.charset.StandardCharsets;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.util.StringUtil;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import controller.Controller;
 import core.account.PrivateKeyAccount;
 import core.crypto.Crypto;
@@ -8,20 +25,10 @@ import core.transaction.Transaction;
 import core.web.Profile;
 import core.web.blog.BlogEntry;
 import datachain.DCSet;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.util.StringUtil;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import utils.APIUtils;
 import utils.BlogUtils;
 import utils.Corekeys;
 import utils.Pair;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.nio.charset.StandardCharsets;
 
 @Path("blogpost")
 @Produces(MediaType.APPLICATION_JSON)
@@ -61,7 +68,7 @@ public class BlogPostResource {
     @DELETE
     @Path("/comment/{signature}")
     public String deleteCommentEntry(
-            @PathParam("signature") String signatureOfComment) {
+            @PathParam("signature") String signatureOfComment, @QueryParam("password") String password) {
         try {
 
             BlogEntry commentEntryOpt = BlogUtils
@@ -90,7 +97,6 @@ public class BlogPostResource {
                         Transaction.INVALID_ADDRESS);
             }
 
-            String password = null;
             APIUtils.askAPICallAllowed(password, "POST blogpost/comment/"
                     + signatureOfComment, request);
 
@@ -148,7 +154,7 @@ public class BlogPostResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("/comment")
-    public String commentBlogEntry(String x) {
+    public String commentBlogEntry(String x, @QueryParam("password") String password) {
         try {
 
             // READ JSON
@@ -199,7 +205,6 @@ public class BlogPostResource {
                         ApiErrorFactory.ERROR_COMMENTING_DISABLED);
             }
 
-            String password = null;
             APIUtils.askAPICallAllowed(password,
                     "POST blogpost/comment" + "\n" + x, request);
 
@@ -278,7 +283,7 @@ public class BlogPostResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("/{blogname}")
-    public String addBlogEntry(String x, @PathParam("blogname") String blogname) {
+    public String addBlogEntry(String x, @PathParam("blogname") String blogname, @QueryParam("password") String password) {
         try {
 
             // READ JSON
@@ -312,7 +317,6 @@ public class BlogPostResource {
 
             isPostAllowed(blogname);
 
-            String password = null;
             APIUtils.askAPICallAllowed(password,
                     "POST blogpost/" + blogname + "\n" + x, request);
 

@@ -1,5 +1,28 @@
 package api;
 
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -10,22 +33,8 @@ import core.crypto.Crypto;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
 import utils.APIUtils;
 import utils.Pair;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
 
 @Path("addresses")
 @Produces(MediaType.APPLICATION_JSON)
@@ -58,10 +67,9 @@ public class AddressesResource {
 
     @SuppressWarnings("unchecked")
     @GET
-    public String getAddresses() {
+    public String getAddresses(@QueryParam("password") String password) {
 
-        String password = null;
-        //APIUtils.askAPICallAllowed(password, "GET addresses", request);
+        APIUtils.askAPICallAllowed(password, "GET addresses", request);
 
         // CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {
@@ -173,8 +181,7 @@ public class AddressesResource {
 
     @GET
     @Path("/seed/{address}")
-    public String getSeed(@PathParam("address") String address) {
-        String password = null;
+    public String getSeed(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -210,8 +217,7 @@ public class AddressesResource {
 
     @GET
     @Path("/new")
-    public String generateNewAccount() {
-        String password = null;
+    public String generateNewAccount(@QueryParam("password") String password) {
         APIUtils.askAPICallAllowed(password, "GET addresses/new", request);
 
         // CHECK IF WALLET EXISTS
@@ -291,9 +297,8 @@ public class AddressesResource {
 
     @DELETE
     @Path("/{address}")
-    public String deleteAddress(@PathParam("address") String address) {
+    public String deleteAddress(@PathParam("address") String address, @QueryParam("password") String password) {
 
-        String password = null;
         APIUtils.askAPICallAllowed(password, "DELETE addresses/" + address, request);
 
         // CHECK IF WALLET EXISTS
@@ -511,9 +516,9 @@ public class AddressesResource {
     @SuppressWarnings("unchecked")
     @POST
     @Path("sign/{address}")
-    public String sign(String x, @PathParam("address") String address) {
+    public String sign(String x, @PathParam("address") String address, @QueryParam("password") String password) {
 
-        String password = null;
+        //String password = null;
         APIUtils.askAPICallAllowed(password, "POST addresses/sign/" + address, request);
 
         // CHECK IF WALLET EXISTS
