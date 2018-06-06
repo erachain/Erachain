@@ -149,8 +149,8 @@ public class WalletResource {
     @Path("/unlock")
     @Consumes(MediaType.WILDCARD)
     public String unlock(String x) {
-        String password = null;
-        APIUtils.askAPICallAllowed(password, "POST wallet/unlock " + x, request);
+        //String password = null;
+        APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request);
 
         //JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
         //String password = (String) jsonObject.get("password");
