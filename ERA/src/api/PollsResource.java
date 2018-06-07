@@ -280,8 +280,8 @@ public class PollsResource {
     }
 
     @SuppressWarnings("unchecked")
-    @Path("/network")
     @GET
+    @Path("/network")
     public String getAllPolls() {
         Collection<Poll> polls = Controller.getInstance().getAllPolls();
         JSONArray array = new JSONArray();
@@ -292,5 +292,4 @@ public class PollsResource {
 
         return array.toJSONString();
     }
-
 }

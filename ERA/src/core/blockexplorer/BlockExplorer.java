@@ -55,14 +55,11 @@ import java.util.regex.Pattern;
 public class BlockExplorer {
     public static final String LANG_DEFAULT = "en";
     private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
-    // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљР В°
-    // Р Т‘Р В°РЎвЂљРЎвЂ№
     private static final long FEE_KEY = Transaction.FEE_KEY;
     private static BlockExplorer blockExplorer;
     private JSONObject langObj;
-    private Locale local = new Locale("ru", "RU"); // РЎвЂћР С•РЎР‚Р С�Р В°РЎвЂљ
-    // Р Т‘Р В°РЎвЂљРЎвЂ№
-    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // Р Т‘Р В»РЎРЏ
+    private Locale local = new Locale("ru", "RU"); // Date format
+    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for date format
     private String lang_file;
     private DCSet dcSet;
 
