@@ -1,5 +1,4 @@
 /data*
-/backup*
 /Data Files
 /wallet*
 /bin/
@@ -10,7 +9,5 @@
 
 log.txt
 log.txt.*
-settings.json
-gui_settings.json
 *.zip
 /*.theme

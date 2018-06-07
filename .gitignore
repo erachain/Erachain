@@ -1,20 +1,21 @@
+# idea
+/.idea/
+# eclipse
+/.classpath
+/.project
+# project
 *.class
 /data*
-/*backup*
-/backup*
-/wallet*
+*backup*
+wallet*
 ERA/settings.json
 ERA/*.jar
-/.idea/
-/.gradle/
 /build/
 .gradle
 log*.txt
 /ERA/build/
-/ERA/nullbackup/
 settings.json
-/.classpath
-/.project
+gui_settings.json
 *.xml
 /out/
 .settings
