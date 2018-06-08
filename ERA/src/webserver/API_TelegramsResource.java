@@ -1,23 +1,29 @@
 package webserver;
 
+import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.Transaction;
 import network.message.TelegramMessage;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
 import utils.StrJSonFine;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Path("apitelegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -40,11 +46,14 @@ public class API_TelegramsResource {
         help.put("apitelegrams/getbysignature/{signature}", "Get Telegramm by signature");
         help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}",
                 "Get messages by filter. Filter is title.");
+        help.put("apitelegrams/timestamp/{timestamp}?filter={filter}",
+                "Get messages from timestamp with filter. Filter is title.");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
     }
 
+    
     /**
      * @param signature is signature message
      * @return telegram
@@ -97,6 +106,22 @@ public class API_TelegramsResource {
 
         JSONArray array = new JSONArray();
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter)) {
+            array.add(telegram.toJson());
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(array.toJSONString())).build();
+    }
+
+    @GET
+    @Path("timestamp/{timestamp}")
+    public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
+                                      @QueryParam("filter") String filter) {
+
+        // CREATE JSON OBJECT
+        JSONArray array = new JSONArray();
+
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, filter)) {
             array.add(telegram.toJson());
         }
 
