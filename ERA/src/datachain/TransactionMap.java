@@ -254,8 +254,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     public List<Transaction> getTransactions(int from, int count, boolean descending) {
         
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        TransactionMap map = getDCSet().getTransactionMap();
-        Iterator<byte[]> iterator = map.getIterator(from, descending);
+        Iterator<byte[]> iterator = this.getIterator(from, descending);
         
         for (int i = 0; i < count; i++) {
             if (!iterator.hasNext())
@@ -264,16 +263,16 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
             values.add(map.get(iterator.next()));
         }
         iterator = null;
-        map = null;
         return values;
     }
     
-    public List<Transaction> getIncomedTransactions(String address) {
+    public List<Transaction> getIncomedTransactions(String address, int from, int count, boolean descending) {
         
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<byte[]> iterator = this.getIterator(0, false);
+        Iterator<byte[]> iterator = this.getIterator(from, descending);
         Account account = new Account(address);
         
+        int i = 0;
         while (iterator.hasNext()) {
             Transaction transaction = map.get(iterator.next());
             HashSet<Account> recipients = transaction.getRecipientAccounts();
@@ -282,6 +281,9 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
             
             if (recipients.contains(account)) {
                 values.add(transaction);
+                i++;
+                if (count > 0 && i > count)
+                    break;
             }
         }
         return values;

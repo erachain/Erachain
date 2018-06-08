@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -62,6 +63,10 @@ public class API_TransactionsResource {
                 "Get last Records (and Unconfirmed) from Unix Timestamp milisec(1512777600000)");
         help.put("apirecords/getbyaddressfromtransactionlimit?address={address}&asset={asset}&start={start record}&end={end record}&type={type Transaction}&sort={des/asc}",
                 Lang.getInstance().translate("Get all Records for Address & Asset Key from Start to End"));
+
+        help.put("apirecords/unconfirmedincomes/{address}?from={from}&count={count}&descending=true",
+                Lang.getInstance().translate("Get all unconfirmed Records for Address from Start at Count"));
+
         help.put("apirecords/getbyblock?block={block}", Lang.getInstance().translate("Get all Records from Block"));
 
         help.put("apirecords/find?address={address}&sender={sender}&recipient={recipient}&startblock{s_minHeight}&endblock={s_maxHeight}&type={type Transaction}&service={service}&desc={des/asc}&offset={offset}&limit={limit}&unconfirmed=true",
@@ -227,6 +232,26 @@ public class API_TransactionsResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(new JSONObject(k_Map.subMap(start, end)).toJSONString()).build();
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("/unconfirmedincomes/{address}")
+    // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
+    public String getNetworkIncomesTransactions(@PathParam("address") String address,
+            @QueryParam("from") int from, @QueryParam("count") int count,
+            @QueryParam("descending") boolean descending) {
+
+        JSONArray array = new JSONArray();
+
+        DCSet dcSet = DCSet.getInstance();
+
+        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
+            record.setDC(dcSet, false);
+            array.add(record.toJson());
+        }
+
+        return array.toJSONString();
     }
 
     @SuppressWarnings("unchecked")

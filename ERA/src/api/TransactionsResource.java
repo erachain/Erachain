@@ -1,5 +1,30 @@
 package api;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -10,22 +35,8 @@ import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import utils.APIUtils;
 import utils.Pair;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 // 30/03
 
@@ -186,14 +197,16 @@ public class TransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("/unconfirmedincomes/{address}")
-    // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
-    public String getNetworkIncomesTransactions(@PathParam("address") String address) {
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
+    // get transactions/unconfirmedincomes/7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7?from=123&count=13&descending=true
+    public String getNetworkIncomesTransactions(@PathParam("address") String address,
+            @QueryParam("from") int from, @QueryParam("count") int count,
+            @QueryParam("descending") boolean descending) {
+
         JSONArray array = new JSONArray();
 
         DCSet dcSet = DCSet.getInstance();
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address)) {
+        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
             record.setDC(dcSet, false);
             array.add(record.toJson());
         }
