@@ -1,5 +1,25 @@
 package api;
 
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -8,20 +28,7 @@ import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import network.message.TelegramMessage;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
 import utils.APIUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -202,6 +209,20 @@ public class TelegramsResource {
 
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out.toJSONString();
+    }
+
+    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false?password=1
+    @SuppressWarnings("unchecked")
+    @GET
+    @Path("send/{sender}/{recipient}")
+    public String sendQuery(@PathParam("sender") String sender, @PathParam("recipient") String recipient,
+            @QueryParam("asset") long asset, @QueryParam("amount") String amount,
+            @QueryParam("title") String title, @QueryParam("message") String message,
+            @QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
+            @QueryParam("password") String password) {
+
+        return send(sender, recipient, asset, amount, title, message, istextmessage, encrypt, password);
+
     }
 
     // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
