@@ -748,6 +748,11 @@ public class ApiClient {
         return allowedcalls.contains(uuid);
     }
 
+    /**
+     *
+     * @param command send command
+     * @return result execute command or error
+     */
     public String executeCommand(String command) {
         if (command.toLowerCase().equals("help all")) {
             String help = "\n";
