@@ -1,9 +1,22 @@
 package core.account;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.mapdb.Fun.Tuple5;
+
 //04/01 +-
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+
 import controller.Controller;
 import core.BlockChain;
 import core.block.Block;
@@ -14,26 +27,16 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import datachain.DCSet;
 import datachain.ItemAssetBalanceMap;
 import datachain.OrderMap;
 import datachain.ReferenceMap;
 import lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.NumberAsString;
 import utils.Pair;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
 
 //import core.item.assets.AssetCls;
 
@@ -586,12 +589,14 @@ public class Account {
         for (int i = 1; i < confirmations && block != null && block.getVersion() > 0; i++) {
             for (Transaction transaction : block.getTransactions()) {
                 if (transaction.isInvolved(this)) {
-                    if (transaction.getType() == Transaction.HOLD_ASSET_TRANSACTION) {
+                    if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
 
-                    } else if (transaction.getKey() > 0) {
-                        own = own.subtract(transaction.getAmount(this));
-                    } else {
-                        rent = own.subtract(transaction.getAmount(this));
+                        int actionType = ((TransactionAmount)transaction).getActionType();
+                        if (actionType == 1) {
+                            own = own.subtract(transaction.getAmount(this));
+                        } else {
+                            rent = own.subtract(transaction.getAmount(this));
+                        }
                     }
 
                 }

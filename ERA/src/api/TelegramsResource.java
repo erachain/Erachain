@@ -116,14 +116,14 @@ public class TelegramsResource {
     // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false?password=1
     @SuppressWarnings("unchecked")
     @GET
-    @Path("send/{sender}/{recipient}/{asset}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
-    public String send(@PathParam("sender") String sender1, @PathParam("recipient") String recipient1,
-                       @PathParam("asset") long asset_in, @PathParam("amount") String amount_in,
+    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
+    public String send(@PathParam("sender") String sender_in, @PathParam("recipient") String recipient_in,
+                       @PathParam("assetKey") long asset_in, @PathParam("amount") String amount_in,
                        @PathParam("title") String title_in, @PathParam("message") String message_in,
                        @PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "POST telegrams/send", request);
+        APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -131,7 +131,7 @@ public class TelegramsResource {
         // READ SENDER
         Account sender;
         try {
-            sender = new Account(sender1);
+            sender = new Account(sender_in);
             if (sender.getAddress() == null)
                 throw new Exception("");
         } catch (Exception e1) {
@@ -144,7 +144,7 @@ public class TelegramsResource {
         // READ RECIPIENT
         Account recip;
         try {
-            recip = new Account(recipient1);
+            recip = new Account(recipient_in);
             if (recip.getAddress() == null)
                 throw new Exception("");
         } catch (Exception e1) {

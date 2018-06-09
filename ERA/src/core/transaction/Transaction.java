@@ -70,6 +70,7 @@ public abstract class Transaction {
     // VALIDATION CODE
     public static final int VALIDATE_OK = 1;
     public static final int FUTURE_ABILITY = 2;
+    public static final int INVALID_WALLET_ADDRESS = 3;
     public static final int INVALID_MAKER_ADDRESS = 5;
     public static final int INVALID_REFERENCE = 6;
     public static final int INVALID_TIMESTAMP = 7;
@@ -95,11 +96,13 @@ public abstract class Transaction {
     public static final int RECEIVER_NOT_PERSONALIZED = 26;
     public static final int INVALID_CLAIM_RECIPIENT = 27;
     public static final int INVALID_CLAIM_DEBT = 28;
+    public static final int INVALID_RECEIVER = 29;
 
     // ASSETS
     public static final int INVALID_QUANTITY = 30;
     
     // public static final int ASSET_DOES_NOT_EXIST = 31;
+    public static final int INVALID_AMOUNT_IS_NULL = 31;
     public static final int NEGATIVE_AMOUNT = 32;
     public static final int INVALID_AMOUNT = 33;
     public static final int INVALID_RETURN = 34;
@@ -120,6 +123,7 @@ public abstract class Transaction {
     public static final int INVALID_IMAGE_LENGTH = 52;
     public static final int INVALID_DESCRIPTION_LENGTH = 53;
     public static final int INVALID_VALUE_LENGTH = 55;
+    public static final int INVALID_TITLE_LENGTH = 56;
     // NAMES
     public static final int NAME_DOES_NOT_EXIST = 60;
     public static final int NAME_ALREADY_REGISTRED = 61;
@@ -132,6 +136,8 @@ public abstract class Transaction {
     public static final int NAME_KEY_ALREADY_EXISTS = 68;
     public static final int NAME_KEY_NOT_EXISTS = 69;
     public static final int LAST_KEY_IS_DEFAULT_KEY = 70;
+    
+    
     // POLL
     public static final int INVALID_OPTIONS_LENGTH = 80;
     public static final int INVALID_OPTION_LENGTH = 81;
@@ -146,7 +152,13 @@ public abstract class Transaction {
     public static final int INVALID_PARAMS_LENGTH = 90;
     public static final int INVALID_URL_LENGTH = 91;
     public static final int INVALID_HEAD_LENGTH = 92;
+
+    public static final int INVALID_MESSAGE_FORMAT = 95;
+    public static final int INVALID_MESSAGE_LENGTH = 96;
+    public static final int UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT = 97;
+
     // ITEMS
+    public static final int INVALID_ITEM_KEY = 99;
     public static final int INVALID_ITEM_VALUE = 100;
     public static final int ITEM_DOES_NOT_EXIST = 101;
     public static final int ITEM_ASSET_NOT_EXIST = 102;
@@ -179,6 +191,8 @@ public abstract class Transaction {
     public static final int TELEGRAM_DOES_NOT_EXIST = 240;
     public static final int NOT_YET_RELEASED = 299;
     public static final int AT_ERROR = 300;
+
+    // 
     // TYPES *******
     // universal
     public static final int EXTENDED = 0;
@@ -205,9 +219,9 @@ public abstract class Transaction {
     // SEND ASSET
     public static final int SEND_ASSET_TRANSACTION = 31;
     // RENT ASSET
-    public static final int RENT_ASSET_TRANSACTION = 32; //
+    //public static final int RENT_ASSET_TRANSACTION = 32; //
     // HOLD ASSET
-    public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
+    //public static final int HOLD_ASSET_TRANSACTION = 33; // not in gui
     // OTHER
     public static final int SIGN_NOTE2_TRANSACTION = 34;
     public static final int SIGN_NOTE_TRANSACTION = 35;

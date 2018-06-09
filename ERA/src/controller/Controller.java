@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -106,6 +108,7 @@ import network.message.TransactionMessage;
 import network.message.VersionMessage;
 import ntp.NTP;
 import settings.Settings;
+import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MemoryViewer;
 import utils.ObserverMessage;
@@ -2856,6 +2859,139 @@ public class Controller extends Observable {
         }
     }
 
+    public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
+            String feePowStr, String assetKeyStr, String amountStr, boolean needAmount,
+            String title, String message, boolean isText, boolean encrypt) {
+
+        Controller cnt = Controller.getInstance();
+        
+        // READ CREATOR
+        if (creatorStr != null && creator == null) {
+            Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
+            if (resultCreator.b != null) {
+                return new Pair<Integer, Transaction>(Transaction.INVALID_CREATOR, null);
+            }
+            creator = resultCreator.a;
+        }
+
+        // READ RECIPIENT
+        Tuple2<Account, String> resultRecipient = Account.tryMakeAccount(recipientStr);
+        if (resultRecipient.b != null) {
+            return new Pair<Integer, Transaction>(Transaction.INVALID_ADDRESS, null);
+        }
+        Account recipient = resultRecipient.a;
+
+        // creator != recipient
+        if (creator.equals(recipient)) {
+            return new Pair<Integer, Transaction>(Transaction.INVALID_RECEIVER, null);
+        }
+
+        // READ FEE
+        int feePow = 0;
+        if (feePowStr != null) {
+            try {
+                feePow = Integer.parseInt(feePowStr);
+            } catch (Exception e) {
+                return new Pair<Integer, Transaction>(Transaction.INVALID_FEE_POWER, null);
+            }
+        }
+
+        // READ AMOUNT
+        BigDecimal amount = null;
+        if (amountStr != null) {
+            try {
+                amount = new BigDecimal(amountStr);
+            } catch (Exception e) {
+                return new Pair<Integer, Transaction>(Transaction.INVALID_AMOUNT, null);
+            }
+
+        }
+
+        if (needAmount && (amount == null || amount.signum() == 0)) {
+            return new Pair<Integer, Transaction>(Transaction.INVALID_AMOUNT_IS_NULL, null);
+        }
+
+        long assetKey = 0;
+        if (amount != null) {
+            // PARSE asset Key
+            if (assetKeyStr == null) {
+                assetKey = 2;
+            } else {
+                try {
+                    assetKey = new Long(assetKeyStr);
+                } catch (Exception e) {
+                    return new Pair<Integer, Transaction>(Transaction.INVALID_ITEM_KEY, null);
+                }
+            }
+        }
+        
+        if (title == null)
+            title = "";
+        else if (title.getBytes(StandardCharsets.UTF_8).length > 256) {
+            return new Pair<Integer, Transaction>(Transaction.INVALID_TITLE_LENGTH, null);
+        }
+
+        byte[] messageBytes = null;
+
+        if (message != null && message.length() > 0) {
+            if (isText) {
+                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+            } else {
+                try {
+                    messageBytes = Converter.parseHexString(message);
+                } catch (Exception g) {
+                    try {
+                        messageBytes = Base58.decode(message);
+                    } catch (Exception e) {
+                        return new Pair<Integer, Transaction>(Transaction.INVALID_MESSAGE_FORMAT, null);
+                    }
+                }
+            }
+        }
+
+        // if no TEXT - set null
+        if (messageBytes != null && messageBytes.length == 0)
+            messageBytes = null;
+
+        if (amount.compareTo(BigDecimal.ZERO) == 0)
+            amount = null;
+
+        PrivateKeyAccount privateKeyAccount = cnt.getPrivateKeyAccountByAddress(creator.getAddress());
+        if (privateKeyAccount == null) {
+            return new Pair<Integer, Transaction>(Transaction.INVALID_WALLET_ADDRESS, null);
+        }
+
+        byte[] encrypted = (encrypt) ? new byte[]{1} : new byte[]{0};
+        byte[] isTextByte = (isText) ? new byte[]{1} : new byte[]{0};
+
+        
+        if (messageBytes != null) {
+            if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+                return new Pair<Integer, Transaction>(Transaction.INVALID_MESSAGE_LENGTH, null);
+            }
+
+            if (encrypt) {
+                // sender
+                byte[] privateKey = privateKeyAccount.getPrivateKey();
+
+                // recipient
+                byte[] publicKey = cnt.getPublicKeyByAddress(recipient.getAddress());
+                if (publicKey == null) {
+                    return new Pair<Integer, Transaction>(Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT, null);
+                }
+
+                messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
+            }
+        }
+
+        // CREATE R_Send
+        return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK,
+                this.r_Send(privateKeyAccount, feePow, recipient, assetKey,
+                        amount, title, messageBytes, isTextByte, encrypted)
+                );
+
+    }
+    
     public Transaction r_Send(PrivateKeyAccount sender, int feePow, Account recipient, long key, BigDecimal amount) {
         return this.r_Send(sender, feePow, recipient, key, amount, "", null, null, null);
     }

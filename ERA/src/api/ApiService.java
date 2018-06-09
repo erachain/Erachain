@@ -1,15 +1,16 @@
 package api;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.IPAccessHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
-import settings.Settings;
 
-import java.util.HashSet;
-import java.util.Set;
+import settings.Settings;
 
 public class ApiService {
 
@@ -26,6 +27,7 @@ public class ApiService {
         s.add(BlocksResource.class);
         s.add(AddressesResource.class);
         s.add(WalletResource.class);
+        s.add(R_SendResource.class);
         s.add(Rec_PaymentResource.class);
         s.add(NamesResource.class);
         s.add(NameSalesResource.class);

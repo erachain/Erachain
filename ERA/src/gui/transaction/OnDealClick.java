@@ -55,9 +55,16 @@ public class OnDealClick {
             case Transaction.FUTURE_ABILITY:
                 mess = "ERROR: Future Ability";
                 break;
-            case Transaction.INVALID_ADDRESS:
-                mess = "Invalid Account";
+            case Transaction.INVALID_WALLET_ADDRESS:
+                mess = "Invalid Wallet Address";
                 break;
+            case Transaction.INVALID_ADDRESS:
+                mess = "Invalid Address";
+                break;
+            case Transaction.INVALID_RECEIVER:
+                mess = "Invalid Receiver";
+                break;
+
             case Transaction.NEGATIVE_AMOUNT:
                 mess = "Negative amount";
                 break;
@@ -130,6 +137,21 @@ public class OnDealClick {
                 break;
             case Transaction.INVALID_AMOUNT:
                 mess = "Invalid amount";
+                break;
+            case Transaction.INVALID_AMOUNT_IS_NULL:
+                mess = "Invalid amount is ZERO";
+                break;
+            case Transaction.INVALID_TITLE_LENGTH:
+                mess = "Invalid title length";
+                break;
+            case Transaction.INVALID_MESSAGE_FORMAT:
+                mess = "Invalid message format as data";
+                break;
+            case Transaction.INVALID_MESSAGE_LENGTH:
+                mess = "Invalid message length";
+                break;
+            case Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT:
+                mess = "Unknown public key for encrypt";
                 break;
 
             case Transaction.NAME_NOT_LOWER_CASE:
@@ -254,6 +276,10 @@ public class OnDealClick {
                 mess = "Not enough rights";
                 break;
 
+            case Transaction.INVALID_ITEM_KEY:
+                mess = "Invalid item key";
+                break;
+                
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;
