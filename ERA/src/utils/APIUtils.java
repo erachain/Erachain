@@ -282,7 +282,7 @@ public class APIUtils {
         // GET ACCOUNT
         PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender);
         if (account == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
         
         // TODO R_Send insert!

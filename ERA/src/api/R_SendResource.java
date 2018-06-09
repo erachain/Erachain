@@ -68,8 +68,10 @@ public class R_SendResource {
         Controller cntr = Controller.getInstance();
         
         boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr, assetKeyStr,
-                amountStr, needAmount, title, message, !nottext, encrypt);
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
+                assetKeyStr, true,
+                amountStr, needAmount,
+                title, message, !nottext, encrypt);
         
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -154,8 +156,10 @@ public class R_SendResource {
         Controller cntr = Controller.getInstance();
         
         boolean needAmount = false;
-        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr, assetKeyStr,
-                amountStr, needAmount, title, message, !nottext, encrypt);
+        Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
+                assetKeyStr, true,
+                amountStr, needAmount,
+                title, message, !nottext, encrypt);
         
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -177,6 +181,7 @@ public class R_SendResource {
      */
     @POST
     @Consumes(MediaType.WILDCARD)
+    @Path("raw")
     public String rawSendPost(String x) {
 
         JSONObject jsonObject;

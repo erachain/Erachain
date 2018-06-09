@@ -430,13 +430,22 @@ public class ApiClient {
                             "Errors: 201 - Wallet does not exist."
                     },
 
+                    {"GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
+                            "Make and broadcast SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
+                    {"GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
+                            "Make RAW for SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
+                    {"POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+                            "Make and broadcast SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
+                    {"POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+                            "Make RAW for SEND asset amount and mail. If \"asset\" is omitted, 2 is provided (default commission asset"},
+
                     {
-                            "GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}?password={password}",
+                            "(deprecated) GET rec_payment/{feePow}/{sender}/{assetKey}/{amount}/{recipient}?password={password}",
                             "Send a new payment using the given data. Returns the transaction in JSON when successful. If \"asset\" is omitted, 2 is provided (default commission asset).",
                             "Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
-                            "POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+                            "(deprecated) POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                             "Send a payment with message using the given data. \"istextmessage\" and \"encrypt\" are optional and default true. Sender and recipient can also be a name.",
                             "Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },

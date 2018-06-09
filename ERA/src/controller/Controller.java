@@ -2860,7 +2860,7 @@ public class Controller extends Observable {
     }
 
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
-            String feePowStr, String assetKeyStr, String amountStr, boolean needAmount,
+            String feePowStr, String assetKeyStr, boolean checkAsset, String amountStr, boolean needAmount,
             String title, String message, boolean isText, boolean encrypt) {
 
         Controller cnt = Controller.getInstance();
@@ -2921,6 +2921,17 @@ public class Controller extends Observable {
                     assetKey = new Long(assetKeyStr);
                 } catch (Exception e) {
                     return new Pair<Integer, Transaction>(Transaction.INVALID_ITEM_KEY, null);
+                }
+
+                if (checkAsset) {
+                    AssetCls asset;
+                    if (assetKey > 0)
+                        asset = cnt.getAsset(assetKey);
+                    else
+                        asset = cnt.getAsset( -assetKey);
+
+                    if (asset == null)
+                        return new Pair<Integer, Transaction>(Transaction.ITEM_ASSET_NOT_EXIST, null);
                 }
             }
         }
