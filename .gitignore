@@ -1,6 +1,21 @@
+# idea
+/.idea/
+# eclipse
+/.classpath
+/.project
+# project
 *.class
 /data*
-/backup*
-/wallet*
+*backup*
+wallet*
 ERA/settings.json
 ERA/*.jar
+/build/
+.gradle
+log*.txt
+/ERA/build/
+settings.json
+gui_settings.json
+*.xml
+/out/
+.settings

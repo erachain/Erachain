@@ -411,7 +411,7 @@ public class MTable<U, T> extends JTable {
 					if(filters.get(col).a!=null){
 						if(filters.get(col).a.a !=null){
 	//			 cx = filters.get(col).a.a;
-				rememberChk.setSelected((boolean) filters.get(col).a.a);
+				rememberChk.setSelected(Boolean.parseBoolean(filters.get(col).a.a.toString()));
 						}
 					}
 				}
