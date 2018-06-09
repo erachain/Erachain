@@ -1,11 +1,6 @@
 package api;
 // 30/03
 
-import core.item.assets.AssetCls;
-import org.apache.log4j.Logger;
-import settings.Settings;
-import utils.StrJSonFine;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,6 +12,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.apache.log4j.Logger;
+
+import core.item.assets.AssetCls;
+import settings.Settings;
+import utils.StrJSonFine;
 
 public class ApiClient {
 
@@ -173,7 +174,7 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "GET transactions/unconfirmedincomes/<address>",
+                            "GET transactions/unconfirmedincomes/<address>?from={from}&count={count}&descending=true",
                             "Returns an array of all the unconfirmed incoming transactions of address known to the client.",
                             ""
                     },
@@ -735,6 +736,11 @@ public class ApiClient {
                             "GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122",
                             "Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
                             ""
+                    },
+                    {
+                        "GET telegrams/send/{sender}/{recipient}?asset={asset}&amount={amount}&title={title}&message={message}&istextmessage=true/false&encrypt=true/false&password={password}",
+                        "Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+                        ""
                     },
                     {
                             "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
