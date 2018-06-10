@@ -900,5 +900,15 @@ public abstract class TransactionAmount extends Transaction {
     }
 
     // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
+    
+    @Override
+    public int calcBaseFee() {
+        
+        if (this.height < BlockChain.SEND_AMOUNT_FEE_UP || this.amount == null)
+            return calcCommonFee();
+        
+        return calcCommonFee() + (BlockChain.FEE_PER_BYTE * 200); // for calculate balance
+    }
+
 
 }

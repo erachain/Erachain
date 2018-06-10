@@ -2913,27 +2913,32 @@ public class Controller extends Observable {
             return new Pair<Integer, Transaction>(Transaction.INVALID_AMOUNT_IS_NULL, null);
         }
 
+
         long assetKey = 0;
         if (amount != null) {
-            // PARSE asset Key
-            if (assetKeyStr == null) {
-                assetKey = 2;
-            } else {
-                try {
-                    assetKey = new Long(assetKeyStr);
-                } catch (Exception e) {
-                    return new Pair<Integer, Transaction>(Transaction.INVALID_ITEM_KEY, null);
-                }
-
-                if (checkAsset) {
-                    AssetCls asset;
-                    if (assetKey > 0)
-                        asset = cnt.getAsset(assetKey);
-                    else
-                        asset = cnt.getAsset( -assetKey);
-
-                    if (asset == null)
-                        return new Pair<Integer, Transaction>(Transaction.ITEM_ASSET_NOT_EXIST, null);
+            if (amount.compareTo(BigDecimal.ZERO) == 0)
+                amount = null;
+            else {
+                // PARSE asset Key
+                if (assetKeyStr == null) {
+                    assetKey = 2;
+                } else {
+                    try {
+                        assetKey = new Long(assetKeyStr);
+                    } catch (Exception e) {
+                        return new Pair<Integer, Transaction>(Transaction.INVALID_ITEM_KEY, null);
+                    }
+    
+                    if (checkAsset) {
+                        AssetCls asset;
+                        if (assetKey > 0)
+                            asset = cnt.getAsset(assetKey);
+                        else
+                            asset = cnt.getAsset( -assetKey);
+    
+                        if (asset == null)
+                            return new Pair<Integer, Transaction>(Transaction.ITEM_ASSET_NOT_EXIST, null);
+                    }
                 }
             }
         }
@@ -2969,9 +2974,6 @@ public class Controller extends Observable {
         // if no TEXT - set null
         if (messageBytes != null && messageBytes.length == 0)
             messageBytes = null;
-
-        if (amount.compareTo(BigDecimal.ZERO) == 0)
-            amount = null;
 
         PrivateKeyAccount privateKeyAccount = cnt.getPrivateKeyAccountByAddress(creator.getAddress());
         if (privateKeyAccount == null) {

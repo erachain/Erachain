@@ -1,5 +1,6 @@
 package api;
 
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 
 import controller.Controller;
+import core.crypto.Base58;
 import core.transaction.Transaction;
 import utils.APIUtils;
 import utils.Pair;
@@ -60,8 +62,8 @@ public class R_SendResource {
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
             @QueryParam("feePow") String feePowStr, @QueryParam("assetKey") String assetKeyStr,
             @QueryParam("amount") String amountStr, @QueryParam("title") String title,
-            @QueryParam("message") String message, @PathParam("codebase") int codebase,
-            @PathParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
+            @QueryParam("message") String message, @QueryParam("codebase") int codebase,
+            @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
         
         APIUtils.askAPICallAllowed(password, "GET send\n ", request);
         
@@ -139,20 +141,24 @@ public class R_SendResource {
     
     /*
      * make and return RAW
-     * GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}"
+     * GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&codebase={codebase}&encrypt=true&rawbase={58/64}&password={password}
      * 
+     * GET r_send/raw/79QuhunbPbc3svqsXMC2JHbh8ix6kwNAao/74eD7JSrkXPsz3xxKMhMEDoTF6TqkfEHBt?feePow=3&assetKey=1001&amount=111&title=probe&message=message&codebase=0&encrypt=true&password=1
+     * GET r_send/raw/79QuhunbPbc3svqsXMC2JHbh8ix6kwNAao/74eD7JSrkXPsz3xxKMhMEDoTF6TqkfEHBt?title=probe&message=message&rawbase=64&password=1
      */
     @GET
     // @Consumes(MediaType.WILDCARD)
+    //@Produces("text/plain")
     @Path("raw/{creator}/{recipient}")
     public String rawSendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
             @QueryParam("feePow") String feePowStr,
             @QueryParam("assetKey") String assetKeyStr, @QueryParam("amount") String amountStr,
             @QueryParam("title") String title, @QueryParam("message") String message,
-            @PathParam("codebase") int codebase, @PathParam("encrypt") boolean encrypt,
+            @QueryParam("codebase") int codebase, @QueryParam("encrypt") boolean encrypt,
+            @QueryParam("rawbase") int rawbase,
             @QueryParam("password") String password) {
         
-        APIUtils.askAPICallAllowed(password, "GET send\n ", request);
+        APIUtils.askAPICallAllowed(password, "GET rawSend\n ", request);
         
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -170,14 +176,19 @@ public class R_SendResource {
             return out.toJSONString();
         }
         
-        out.put("raw", transaction.toBytes(true, null));
+        String str;
+        if (rawbase == 64)
+            out.put("raw64", Base64.getEncoder().encodeToString(transaction.toBytes(true, null)));
+        else
+            out.put("raw", Base58.encode(transaction.toBytes(true, null)));
+        
         return out.toJSONString();
         
     }
 
     /*
      * make and return RAW
-     * POST r_send/raw {"creator": "<creator>", "recipient": "<recipient>", "asset":"<assetKey>", "amount":"<amount>", "title": "<title>", "message": "<message>", "codebase": <codebase>, "encrypt": <true/false>,  "password": "<password>"}"
+     * POST r_send/raw64 {"creator": "<creator>", "recipient": "<recipient>", "asset":"<assetKey>", "amount":"<amount>", "title": "<title>", "message": "<message>", "codebase": <codebase>, "encrypt": <true/false>,  "password": "<password>"}"
      * 
      */
     @POST
@@ -206,6 +217,7 @@ public class R_SendResource {
         String message = (String)jsonObject.getOrDefault("message", null);
         int codebase = (int)jsonObject.getOrDefault("codebase", 0);
         boolean encrypt = (boolean)jsonObject.getOrDefault("encrypt", false);
+        int rawbase = (int)jsonObject.getOrDefault("rawbase", 58);
         String password = (String)jsonObject.getOrDefault("password", null);
         
         return rawSendGet(
@@ -215,6 +227,7 @@ public class R_SendResource {
                 assetKey, amount,
                 title, message,
                 codebase, encrypt,
+                rawbase,
                 password
                 );
 

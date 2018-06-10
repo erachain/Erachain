@@ -78,6 +78,7 @@ public class BlockChain {
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
     public static final int ORDER_FEE_DOWN = DEVELOP_USE ? 80000 : 140000;
+    public static final int SEND_AMOUNT_FEE_UP = DEVELOP_USE ? 100000 : 150000;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
