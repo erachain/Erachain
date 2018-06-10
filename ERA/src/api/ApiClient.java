@@ -835,15 +835,17 @@ public class ApiClient {
             String method = args[0].toUpperCase();
 
             //GET PATH
-            String path = command.substring((method + " ").length());
+            String path;
 
             //GET CONTENT
             String content = "";
             String vars = "";
 
             if (method.equals("POST")) {
+                path =  args[1];
                 content = command.substring((method + " " + path + " ").length());
             } else {
+                path = command.substring((method + " ").length());
 
                 // get telegrams/address?erty=132 123&sdf=вва
                 int startVars = command.indexOf("?");

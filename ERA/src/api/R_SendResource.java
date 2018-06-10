@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.ParseException;
 
 import controller.Controller;
 import core.transaction.Transaction;
@@ -59,7 +60,7 @@ public class R_SendResource {
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
             @QueryParam("feePow") String feePowStr, @QueryParam("assetKey") String assetKeyStr,
             @QueryParam("amount") String amountStr, @QueryParam("title") String title,
-            @QueryParam("message") String message, @PathParam("nottext") boolean nottext,
+            @QueryParam("message") String message, @PathParam("codebase") int codebase,
             @PathParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
         
         APIUtils.askAPICallAllowed(password, "GET send\n ", request);
@@ -71,7 +72,7 @@ public class R_SendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKeyStr, true,
                 amountStr, needAmount,
-                title, message, !nottext, encrypt);
+                title, message, codebase, encrypt);
         
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -99,6 +100,7 @@ public class R_SendResource {
      * 
      */
     @POST
+    @SuppressWarnings("unchecked")
     @Consumes(MediaType.WILDCARD)
     public String sendPost(String x) {
 
@@ -112,16 +114,16 @@ public class R_SendResource {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
-        String creator = (String)jsonObject.get("creator");
-        String recipient = (String)jsonObject.get("recipient");
-        String feePow = (String)jsonObject.get("feePow");
-        String assetKey = (String)jsonObject.get("assetKey");
-        String amount = (String)jsonObject.get("amount");
-        String title = (String)jsonObject.get("title");
-        String message = (String)jsonObject.get("message");
-        boolean nottext = (boolean)jsonObject.get("nottext");
-        boolean encrypt = (boolean)jsonObject.get("encrypt");
-        String password = (String)jsonObject.get("password");
+        String creator = (String)jsonObject.getOrDefault("creator", null);
+        String recipient = (String)jsonObject.getOrDefault("recipient", null);
+        String feePow = (String)jsonObject.getOrDefault("feePow", null);
+        String assetKey = (String)jsonObject.getOrDefault("assetKey", null);
+        String amount = (String)jsonObject.getOrDefault("amount", null);
+        String title = (String)jsonObject.getOrDefault("title", null);
+        String message = (String)jsonObject.getOrDefault("message", null);
+        int codebase = (int)jsonObject.getOrDefault("codebase", 0);
+        boolean encrypt = (boolean)jsonObject.getOrDefault("encrypt", false);
+        String password = (String)jsonObject.getOrDefault("password", null);
         
         return sendGet(
                 creator,
@@ -129,7 +131,7 @@ public class R_SendResource {
                 feePow,
                 assetKey, amount,
                 title, message,
-                nottext, encrypt,
+                codebase, encrypt,
                 password
                 );
 
@@ -147,7 +149,7 @@ public class R_SendResource {
             @QueryParam("feePow") String feePowStr,
             @QueryParam("assetKey") String assetKeyStr, @QueryParam("amount") String amountStr,
             @QueryParam("title") String title, @QueryParam("message") String message,
-            @PathParam("nottext") boolean nottext, @PathParam("encrypt") boolean encrypt,
+            @PathParam("codebase") int codebase, @PathParam("encrypt") boolean encrypt,
             @QueryParam("password") String password) {
         
         APIUtils.askAPICallAllowed(password, "GET send\n ", request);
@@ -159,7 +161,7 @@ public class R_SendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKeyStr, true,
                 amountStr, needAmount,
-                title, message, !nottext, encrypt);
+                title, message, codebase, encrypt);
         
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -175,35 +177,36 @@ public class R_SendResource {
 
     /*
      * make and return RAW
-     * POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}"
-     * 
+     * POST r_send/raw {"creator": "<creator>", "recipient": "<recipient>", "asset":"<assetKey>", "amount":"<amount>", "title": "<title>", "message": "<message>", "codebase": <codebase>, "encrypt": <true/false>,  "password": "<password>"}"
      * 
      */
     @POST
     @Consumes(MediaType.WILDCARD)
+    //@Consumes(MediaType.APPLICATION_JSON)
+    //@Produces(MediaType.APPLICATION_JSON)
     @Path("raw")
+    @SuppressWarnings("unchecked")
     public String rawSendPost(String x) {
 
         JSONObject jsonObject;
         try {
             //READ JSON
-            jsonObject = (JSONObject) JSONValue.parse(x);
-        } catch (NullPointerException | ClassCastException e) {
+            jsonObject = (JSONObject) JSONValue.parseWithException(x);
+        } catch (ParseException | NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
-            ///LOGGER.info(e);
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
-        String creator = (String)jsonObject.get("creator");
-        String recipient = (String)jsonObject.get("recipient");
-        String feePow = (String)jsonObject.get("feePow");
-        String assetKey = (String)jsonObject.get("assetKey");
-        String amount = (String)jsonObject.get("amount");
-        String title = (String)jsonObject.get("title");
-        String message = (String)jsonObject.get("message");
-        boolean nottext = (boolean)jsonObject.get("nottext");
-        boolean encrypt = (boolean)jsonObject.get("encrypt");
-        String password = (String)jsonObject.get("password");
+        String creator = (String)jsonObject.getOrDefault("creator", null);
+        String recipient = (String)jsonObject.getOrDefault("recipient", null);
+        String feePow = (String)jsonObject.getOrDefault("feePow", null);
+        String assetKey = (String)jsonObject.getOrDefault("assetKey", null);
+        String amount = (String)jsonObject.getOrDefault("amount", null);
+        String title = (String)jsonObject.getOrDefault("title", null);
+        String message = (String)jsonObject.getOrDefault("message", null);
+        int codebase = (int)jsonObject.getOrDefault("codebase", 0);
+        boolean encrypt = (boolean)jsonObject.getOrDefault("encrypt", false);
+        String password = (String)jsonObject.getOrDefault("password", null);
         
         return rawSendGet(
                 creator,
@@ -211,7 +214,7 @@ public class R_SendResource {
                 feePow,
                 assetKey, amount,
                 title, message,
-                nottext, encrypt,
+                codebase, encrypt,
                 password
                 );
 

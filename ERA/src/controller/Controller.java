@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
@@ -64,6 +65,7 @@ import core.account.PrivateKeyAccount;
 import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.crypto.AEScrypto;
+import core.crypto.Base32;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
@@ -2861,7 +2863,7 @@ public class Controller extends Observable {
 
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
             String feePowStr, String assetKeyStr, boolean checkAsset, String amountStr, boolean needAmount,
-            String title, String message, boolean isText, boolean encrypt) {
+            String title, String message, int codebase, boolean encrypt) {
 
         Controller cnt = Controller.getInstance();
         
@@ -2945,17 +2947,21 @@ public class Controller extends Observable {
         byte[] messageBytes = null;
 
         if (message != null && message.length() > 0) {
-            if (isText) {
+            if (codebase == 0) {
                 messageBytes = message.getBytes(Charset.forName("UTF-8"));
             } else {
                 try {
-                    messageBytes = Converter.parseHexString(message);
-                } catch (Exception g) {
-                    try {
+                    if (codebase == 16) {
+                        messageBytes = Converter.parseHexString(message);
+                    } else if (codebase == 32) {
+                        messageBytes = Base32.decode(message);
+                    } else if (codebase == 58) {
                         messageBytes = Base58.decode(message);
-                    } catch (Exception e) {
-                        return new Pair<Integer, Transaction>(Transaction.INVALID_MESSAGE_FORMAT, null);
+                    } else if (codebase == 64) {
+                        messageBytes = Base64.getDecoder().decode(message);
                     }
+                } catch (Exception e) {
+                    return new Pair<Integer, Transaction>(Transaction.INVALID_MESSAGE_FORMAT, null);
                 }
             }
         }
@@ -2973,7 +2979,7 @@ public class Controller extends Observable {
         }
 
         byte[] encrypted = (encrypt) ? new byte[]{1} : new byte[]{0};
-        byte[] isTextByte = (isText) ? new byte[]{1} : new byte[]{0};
+        byte[] isTextByte = (codebase==0) ? new byte[]{1} : new byte[]{0};
 
         
         if (messageBytes != null) {
