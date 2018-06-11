@@ -8,7 +8,7 @@ import lang.Lang;
 
 public class AssetTypeComboBoxModel extends AbstractListModel implements ComboBoxModel {
     Integer[] list = { AssetCls.AS_OUTSIDE_GOODS, AssetCls.AS_OUTSIDE_IMMOVABLE, AssetCls.AS_OUTSIDE_CLAIM,
-            AssetCls.AS_INSIDE_ASSETS, AssetCls.AS_ACCOUNTING, };
+            AssetCls.AS_INSIDE_ASSETS, AssetCls.AS_ACCOUNTING };
 
     String selection = null;
 
@@ -17,20 +17,8 @@ public class AssetTypeComboBoxModel extends AbstractListModel implements ComboBo
     }
 
     public Object getElementAt(int index) {
-        Integer ll = list[index];
-        switch (ll) {
-        case AssetCls.AS_OUTSIDE_GOODS:
-            return Lang.getInstance().translate("Movable");
-        case AssetCls.AS_OUTSIDE_IMMOVABLE:
-            return Lang.getInstance().translate("Immovable");
-        case AssetCls.AS_OUTSIDE_CLAIM:
-            return Lang.getInstance().translate("Claim");
-        case AssetCls.AS_INSIDE_ASSETS:
-            return Lang.getInstance().translate("Inside Asset");
-        case AssetCls.AS_ACCOUNTING:
-            return Lang.getInstance().translate("Accounting");
-        }
-        return "unknown";
+        int asset_type = list[index];
+        return Lang.getInstance().translate(AssetCls.viewAssetTypeCls(asset_type));
     }
 
     public int getSize() {
@@ -48,18 +36,19 @@ public class AssetTypeComboBoxModel extends AbstractListModel implements ComboBo
     }
 
     public Integer getSelectedType() {
-        if (selection.equals(Lang.getInstance().translate("Movable")))
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_GOODS))))
             return AssetCls.AS_OUTSIDE_GOODS;
-        if (selection.equals(Lang.getInstance().translate("Immovable")))
+
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_IMMOVABLE))))
             return AssetCls.AS_OUTSIDE_IMMOVABLE;
 
-        if (selection.equals(Lang.getInstance().translate("Claim")))
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_CLAIM))))
             return AssetCls.AS_OUTSIDE_CLAIM;
 
-        if (selection.equals(Lang.getInstance().translate("Inside Asset")))
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_ASSETS))))
             return AssetCls.AS_INSIDE_ASSETS;
 
-        if (selection.equals(Lang.getInstance().translate("Accounting")))
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_ACCOUNTING))))
             return AssetCls.AS_ACCOUNTING;
 
         return -1;

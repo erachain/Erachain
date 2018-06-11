@@ -277,8 +277,8 @@ public abstract class AssetCls extends ItemCls {
         return this.asset_type == AS_ACCOUNTING;
     }
 
-    public String viewAssetType() {
-        switch (this.asset_type) {
+    public static String viewAssetTypeCls(int asset_type) {
+        switch (asset_type) {
             case AS_OUTSIDE_GOODS:
                 return "Movable";
             case AS_OUTSIDE_IMMOVABLE:
@@ -292,7 +292,11 @@ public abstract class AssetCls extends ItemCls {
         }
         return "unknown";
     }
+    public String viewAssetType() {
+        return viewAssetTypeCls(this.asset_type);
+    }
 
+    
 	/*
 	public void setMovable(boolean movable) {
 		this.typeBytes[1] = (byte)(this.typeBytes[1] & (movable?1:0));
