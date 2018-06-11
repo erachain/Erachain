@@ -476,12 +476,25 @@ public abstract class TransactionAmount extends Transaction {
                             
                             if (asset.isMovable()) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
+                                boolean unLimited = absKey > AssetCls.REAL_KEY // not
+                                        // genesis
+                                        // assets!
+                                        && asset.getQuantity().equals(0l)
+                                        && asset.getOwner().getAddress().equals(this.creator.getAddress());
+
                                 balance = this.creator.getBalance(dcSet, absKey, actionType).b;
-                                if (amount.compareTo(balance) > 0) {
-                                    return NO_HOLD_BALANCE;
+                                if (unLimited) {
+                                    BigDecimal amontOWN = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b;
+                                    if (balance.subtract(this.amount).compareTo(amontOWN) < 0) {
+                                        return NO_HOLD_BALANCE;
+                                    }
+                                } else {
+                                    if (this.amount.compareTo(balance) > 0) {
+                                        return NO_HOLD_BALANCE;
+                                    }
                                 }
-                            } else if (asset.isAsset()) {
-                                return NOT_MOVABLE_ASSET;
+                            //} else if (asset.isAsset()) {
+                            //    return NOT_MOVABLE_ASSET;
                             }
                             
                             break;

@@ -1,6 +1,14 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -8,12 +16,6 @@ import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
 import core.item.assets.AssetVenture;
 import datachain.DCSet;
-import org.json.simple.JSONObject;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class IssueAssetTransaction extends Issue_ItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
@@ -245,8 +247,18 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         //ADD ASSETS TO OWNER
         //this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
         AssetCls asset = (AssetCls) this.getItem();
-        this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
-                new BigDecimal(asset.getQuantity()).setScale(asset.getScale()), false);
+        long quantity = asset.getQuantity();
+        if (quantity > 0) {
+            this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+                    new BigDecimal(quantity).setScale(0), false);
+            
+            if (asset.isMovable()) {
+                // make HOLD balance
+                this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+                        new BigDecimal(-quantity).setScale(0), false);
+                
+            }
+        }
 
     }
 
@@ -258,9 +270,17 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
         //REMOVE ASSETS FROM OWNER
         AssetCls asset = (AssetCls) this.getItem();
-        //this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
-        this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
-                new BigDecimal(asset.getQuantity()).setScale(0), true);
+        long quantity = asset.getQuantity();
+        if (quantity > 0) {
+            //this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
+            this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+                    new BigDecimal(quantity).setScale(0), true);
+
+            if (asset.isMovable()) {
+                this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+                        new BigDecimal(-quantity).setScale(0), true);            
+            }
+        }
     }
 
 	/*
