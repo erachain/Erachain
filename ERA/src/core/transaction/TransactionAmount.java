@@ -474,7 +474,7 @@ public abstract class TransactionAmount extends Transaction {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
                             
-                            if (asset.isMovable()) {
+                            if (height > BlockChain.HOLD_VALID_START && asset.isMovable()) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
                                 boolean unLimited = absKey > AssetCls.REAL_KEY // not
                                         // genesis

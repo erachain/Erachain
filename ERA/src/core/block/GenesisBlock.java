@@ -1,10 +1,19 @@
 package core.block;
 
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.mapdb.Fun.Tuple2;
+
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -17,17 +26,15 @@ import core.item.statuses.Status;
 import core.item.statuses.StatusCls;
 import core.item.templates.Template;
 import core.item.templates.TemplateCls;
-import core.transaction.*;
+import core.transaction.GenesisCertifyPersonRecord;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueStatusRecord;
+import core.transaction.GenesisIssueTemplateRecord;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.Transaction;
 import datachain.DCSet;
-import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 import utils.Pair;
-
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 // import org.apache.log4j.Logger;
 //import core.item.assets.AssetCls;
@@ -575,7 +582,7 @@ public class GenesisBlock extends Block {
             // MAKE OLD STYLE ASSET with DEVISIBLE:
             // PROP1 = 0 (unMOVABLE, SCALE = 8, assetTYPE = 1 (divisible)
             asset = new AssetVenture((byte) 0, asset.getOwner(), asset.getName(),
-                    asset.getIcon(), asset.getImage(), asset.getDescription(), 1, 8, 0l);
+                    asset.getIcon(), asset.getImage(), asset.getDescription(), AssetCls.AS_INSIDE_ASSETS, 8, 0l);
             transactions.add(new GenesisIssueAssetTransaction(asset));
         }
 
