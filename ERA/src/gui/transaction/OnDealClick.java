@@ -211,10 +211,10 @@ public class OnDealClick {
                 break;
 
             case Transaction.INVALID_CLAIM_RECIPIENT:
-                mess = "Invalid: claim recipient it is CLAIM issuer";
+                mess = "Invalid: claim recipient can not be the CLAIM issuer";
                 break;
-            case Transaction.INVALID_CLAIM_DEBT:
-                mess = "Invalid: claim DEBT not for issuer";
+            case Transaction.INVALID_CLAIM_DEBT_RECIPIENT:
+                mess = "Invalid: claim DEBT may be only the CLAIM issuer";
                 break;
 
             case Transaction.INVALID_QUANTITY:

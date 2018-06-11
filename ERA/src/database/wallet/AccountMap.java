@@ -1,9 +1,13 @@
 package database.wallet;
 
-import com.google.common.primitives.UnsignedBytes;
-import controller.Controller;
-import core.account.Account;
-import core.account.PublicKeyAccount;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Set;
+
 import org.mapdb.Atomic.Var;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -11,10 +15,14 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import utils.ObserverMessage;
 
-import java.math.BigDecimal;
-import java.util.*;
+import com.google.common.primitives.UnsignedBytes;
+
+import controller.Controller;
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.transaction.TransactionAmount;
+import utils.ObserverMessage;
 
 // UNCONFIRMED balances for accounts in owner wallet only
 public class AccountMap extends Observable {
@@ -186,7 +194,7 @@ public class AccountMap extends Observable {
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(String address, boolean subtract, long key, BigDecimal amount) {
 
-        int type = core.account.Account.actionType(key, amount);
+        int actionType = core.account.Account.actionType(key, amount);
         long absKey;
         if (key > 0) {
             absKey = key;
@@ -201,26 +209,26 @@ public class AccountMap extends Observable {
 
         Tuple3<BigDecimal, BigDecimal, BigDecimal> balance = this.assetsBalanceMap.get(k);
 
-        if (type == 1) {
+        if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
             balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
                     subtract ? balance.a.subtract(amount) : balance.a.add(amount),
                     balance.b, balance.c
             );
-        } else if (type == 2) {
+        } else if (actionType == TransactionAmount.ACTION_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
                     balance.a,
                     subtract ? balance.b.subtract(amount) : balance.b.add(amount),
                     balance.c
             );
-        } else if (type == 3) {
+        } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK
             balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
                     balance.a, balance.b,
                     subtract ? balance.c.subtract(amount) : balance.c.add(amount)
             );
-        } else {
+        } else if (actionType == TransactionAmount.ACTION_SPEND) {
             // TODO - SPEND + PRODUCE
             balance = new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
                     balance.a, balance.b,

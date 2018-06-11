@@ -65,10 +65,37 @@ public abstract class AssetCls extends ItemCls {
     protected static final int SCALE_LENGTH = 1;
     protected static final int ASSET_TYPE_LENGTH = 1;
 
-    public static final int AS_GOODS = 0;
-    public static final int AS_CURRENCY = 1;
-    public static final int AS_CLAIM = 2;
-    public static final int AS_ACCOUNTING = 3;
+    ///////////////////////////////////////////////////
+    /*
+     *  передача в собственность, взять на хранение
+     */
+    public static final int AS_OUTSIDE_GOODS = 0; // movable
+    
+    /*
+     *  передача в сосбтвенность, дать в аренду (по графику времени), взять на охрану
+     */
+    public static final int AS_OUTSIDE_IMMOVABLE = 1;
+
+    /*
+     * учет обязательств прав и требований на услуги и действия во внешнем мире - в том числе займы, ссуды, кредиты, фьючерсы и т.д.
+     * нельзя вернуть эмитенту - но можно потребовать исполнение прав и можно подтвердить исполнение (погасить требование)
+     * это делается теми же трнзакциями что выдать и забрать долг у внутренних активов
+     * И в момент погашения одновременно передается как имущество эмитенту
+     */
+    public static final int AS_OUTSIDE_CLAIM = 2;
+
+    /*
+     *  передача имущества не требует действий во вне - все исполняется тут же. Их можно дать в долг и заьрать самостоятельно
+     *  Требования не предъявляются.
+     *  
+     *  
+     */
+    public static final int AS_INSIDE_ASSETS = 3;
+        
+    /*
+     * учетные единицы - нельзя на бирже торговать - они ничего не стоят, можно делать любые действия от своего имени
+     */
+    public static final int AS_ACCOUNTING = 4;
 
     // + or -
     protected int scale;
@@ -105,7 +132,7 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public int getMinNameLen() {
 
-        if (this.asset_type == AS_CLAIM)
+        if (this.asset_type == AS_OUTSIDE_CLAIM)
             return 6;
         if (this.asset_type == AS_ACCOUNTING)
             return 6;
@@ -121,17 +148,21 @@ public abstract class AssetCls extends ItemCls {
         }
 
         switch (this.asset_type) {
-            case AS_CURRENCY:
+            case AS_OUTSIDE_GOODS:
+                return "▲" + this.name;
+            case AS_OUTSIDE_IMMOVABLE:
                 return "▼" + this.name;
-            case AS_CLAIM:
+            case AS_OUTSIDE_CLAIM:
                 return "◄" + this.name; // ® ■ ± █
+            case AS_INSIDE_ASSETS:
+                return "►" + this.name;
             case AS_ACCOUNTING:
                 if (this.key == 555l || this.key == 666l || this.key == 777l)
                     return this.name;
 
                 return "±" + this.name;
             default:
-                return "▲" + this.name;
+                return "?" + this.name;
         }
     }
 
@@ -220,18 +251,22 @@ public abstract class AssetCls extends ItemCls {
         if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
             return (this.typeBytes[1] & (byte) 1) > 0;
         }
-        return this.asset_type == AS_GOODS;
+        return this.asset_type == AS_OUTSIDE_GOODS;
     }
 
     public boolean isImMovable() {
         if (false && this.key < BlockChain.AMOUNT_SCALE_FROM) {
             return (this.typeBytes[1] & (byte) 1) <= 0;
         }
-        return this.asset_type == AS_CURRENCY;
+        return this.asset_type == AS_OUTSIDE_IMMOVABLE;
+    }
+
+    public boolean isAsset() {
+        return this.asset_type == AS_INSIDE_ASSETS;
     }
 
     public boolean isClaim() {
-        return this.asset_type == AS_CLAIM;
+        return this.asset_type == AS_OUTSIDE_CLAIM;
     }
 
     public boolean isAccounting() {
@@ -240,12 +275,14 @@ public abstract class AssetCls extends ItemCls {
 
     public String viewAssetType() {
         switch (this.asset_type) {
-            case AS_GOODS:
+            case AS_OUTSIDE_GOODS:
                 return "Movable";
-            case AS_CURRENCY:
+            case AS_OUTSIDE_IMMOVABLE:
                 return "Immovable";
-            case AS_CLAIM:
+            case AS_OUTSIDE_CLAIM:
                 return "Claim";
+            case AS_INSIDE_ASSETS:
+                return "Inside Asset";
             case AS_ACCOUNTING:
                 return "Accounting";
         }

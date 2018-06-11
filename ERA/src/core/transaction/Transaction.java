@@ -95,7 +95,7 @@ public abstract class Transaction {
     public static final int CREATOR_NOT_PERSONALIZED = 25;
     public static final int RECEIVER_NOT_PERSONALIZED = 26;
     public static final int INVALID_CLAIM_RECIPIENT = 27;
-    public static final int INVALID_CLAIM_DEBT = 28;
+    public static final int INVALID_CLAIM_DEBT_RECIPIENT = 28;
     public static final int INVALID_RECEIVER = 29;
 
     // ASSETS

@@ -121,18 +121,18 @@ public class Account {
         if (key > 0) {
             if (amount_sign > 0) {
                 // SEND
-                type = 1;
+                type = TransactionAmount.ACTION_SEND;
             } else {
                 // HOLD in STOCK
-                type = 3;
+                type = TransactionAmount.ACTION_HOLD;
             }
         } else {
             if (amount_sign > 0) {
                 // give CREDIT or BORROW CREDIT
-                type = 2;
+                type = TransactionAmount.ACTION_DEBT;
             } else {
                 // PRODUCE or SPEND
-                type = 4;
+                type = TransactionAmount.ACTION_SPEND;
             }
         }
 
@@ -472,7 +472,7 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), key);
 
-        if (actionType == 1) {
+        if (actionType == TransactionAmount.ACTION_SEND) {
             if (BlockChain.DEVELOP_USE) {
                 if (key == 1)
                     return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(1000)));
@@ -481,11 +481,11 @@ public class Account {
             }
 
             return balance.a;
-        } else if (actionType == 2)
+        } else if (actionType == TransactionAmount.ACTION_DEBT)
             return balance.b;
-        else if (actionType == 3)
+        else if (actionType == TransactionAmount.ACTION_HOLD)
             return balance.c;
-        else if (actionType == 4)
+        else if (actionType == TransactionAmount.ACTION_SPEND)
             return balance.d;
         else
             return balance.e;
@@ -501,7 +501,7 @@ public class Account {
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean subtract, long key,
                                                                     BigDecimal amount, boolean asOrphan) {
 
-        int type = actionType(key, amount);
+        int actionType = actionType(key, amount);
         long absKey;
         if (key > 0) {
             absKey = key;
@@ -509,7 +509,8 @@ public class Account {
             absKey = -key;
         }
 
-        if (this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork() && (type == 1 || type == 2)
+        if (this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork()
+                && (actionType == TransactionAmount.ACTION_SEND || actionType == TransactionAmount.ACTION_DEBT)
                 && true) {
             ;
         }
@@ -519,7 +520,7 @@ public class Account {
 
         boolean updateIncomed = subtract && asOrphan || !subtract && !asOrphan;
 
-        if (type == 1) {
+        if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     subtract ? new Tuple2<BigDecimal, BigDecimal>(
@@ -527,7 +528,7 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
                     balance.b, balance.c, balance.d, balance.e);
-        } else if (type == 2) {
+        } else if (actionType == TransactionAmount.ACTION_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a,
@@ -536,7 +537,7 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
                     balance.c, balance.d, balance.e);
-        } else if (type == 3) {
+        } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
@@ -545,7 +546,7 @@ public class Account {
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
                     balance.d, balance.e);
-        } else {
+        } else if (actionType == TransactionAmount.ACTION_SPEND) {
             // TODO - SPEND + PRODUCE
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b, balance.c,
@@ -592,7 +593,7 @@ public class Account {
                     if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
 
                         int actionType = ((TransactionAmount)transaction).getActionType();
-                        if (actionType == 1) {
+                        if (actionType == TransactionAmount.ACTION_SEND) {
                             own = own.subtract(transaction.getAmount(this));
                         } else {
                             rent = own.subtract(transaction.getAmount(this));
