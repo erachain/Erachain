@@ -1,5 +1,19 @@
 package gui.items.assets;
 
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
 import controller.Controller;
 import core.account.Account;
 import core.block.GenesisBlock;
@@ -7,11 +21,6 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class AssetDetailsPanel extends JPanel {
 
@@ -117,16 +126,18 @@ public class AssetDetailsPanel extends JPanel {
 
         }
 
-        //LABEL DIVISIBLE
-        labelGBC.gridy = ++gridy;
-        this.add(new JLabel(Lang.getInstance().translate("Movable") + ":"), labelGBC);
-
-        //DIVISIBLE
-        detailGBC.gridy = gridy;
-        JCheckBox chkMovable = new JCheckBox();
-        chkMovable.setSelected(asset.isMovable());
-        chkMovable.setEnabled(false);
-        this.add(chkMovable, detailGBC);
+        if (false) {
+            //LABEL DIVISIBLE
+            labelGBC.gridy = ++gridy;
+            this.add(new JLabel(Lang.getInstance().translate("Movable") + ":"), labelGBC);
+    
+            //DIVISIBLE
+            detailGBC.gridy = gridy;
+            JCheckBox chkMovable = new JCheckBox();
+            chkMovable.setSelected(asset.isMovable());
+            chkMovable.setEnabled(false);
+            this.add(chkMovable, detailGBC);
+        }
 
 
         //LABEL QUANTITY
@@ -140,9 +151,9 @@ public class AssetDetailsPanel extends JPanel {
         txtQuantity.setEditable(false);
         this.add(txtQuantity, detailGBC);
 
-        //LABEL DIVISIBLE
+        //LABEL TYPE
         labelGBC.gridy = ++gridy;
-        JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Divis-ible") + ":");
+        JLabel divisibleLabel = new JLabel(Lang.getInstance().translate("Type") + ":");
         this.add(divisibleLabel, labelGBC);
 
         //TYPE
