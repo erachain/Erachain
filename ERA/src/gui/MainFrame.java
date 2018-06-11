@@ -1,5 +1,27 @@
 package gui;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import org.json.simple.JSONObject;
+
 import controller.Controller;
 import gui.library.Menu_Deals;
 import gui.library.Menu_Files;
@@ -7,18 +29,9 @@ import gui.library.My_JFileChooser;
 import gui.status.StatusPanel;
 import gui2.Main_Panel;
 import lang.Lang;
-import org.json.simple.JSONObject;
 import settings.Settings;
 import utils.ObserverMessage;
 import utils.SaveStrToFile;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements Observer {
@@ -334,7 +347,6 @@ public class MainFrame extends JFrame implements Observer {
 
         // reat Main tree
 
-<<<<<<< HEAD
         if (settingsJSONbuf.containsKey("Main_Tree")) {
             JSONObject aa = (JSONObject) settingsJSONbuf.get("Main_Tree");
             Iterator<?> it = aa.values().iterator();
@@ -342,29 +354,12 @@ public class MainFrame extends JFrame implements Observer {
             while (it.hasNext()) {
                 long d2 = Long.parseLong(it.next().toString());
                 s1.add(d2);
-=======
-		if (settingsJSONbuf.containsKey("Main_Tree")) {
-			JSONObject aa = (JSONObject) settingsJSONbuf.get("Main_Tree");
-			Iterator<?> it = aa.values().iterator();
-			TreeSet s1 = new TreeSet();
-			while (it.hasNext()) {
-				long d2 = Long.parseLong(it.next().toString());
-				s1.add(d2);
->>>>>>> refs/remotes/origin/develop
 
-<<<<<<< HEAD
             }
             Iterator<?> s1_It = s1.iterator();
             while (s1_It.hasNext()) {
                 long sa = Long.parseLong(s1_It.next().toString());
                 mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
-=======
-			}
-			Iterator<?> s1_It = s1.iterator();
-			while (s1_It.hasNext()) {
-				long sa = Long.parseLong(s1_It.next().toString());
-				mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
->>>>>>> refs/remotes/origin/develop
 
             }
 
