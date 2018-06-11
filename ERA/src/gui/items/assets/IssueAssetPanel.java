@@ -14,7 +14,6 @@ import gui.library.My_Add_Image_Panel;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
 import lang.Lang;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -34,24 +33,17 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     protected byte[] imgButes;
     protected byte[] iconButes;
     private IssueAssetPanel th;
-    private ButtonGroup group;
     // Variables declaration - do not modify
     private javax.swing.JLabel Title_jLabel;
     private javax.swing.JLabel account_jLabel;
     private javax.swing.JTextArea txtareaDescription;
     private javax.swing.JLabel description_jLabel;
-    private javax.swing.JRadioButton goods_movable_chk;
-    private javax.swing.JRadioButton claim_right_obligation_chk;
-    private javax.swing.JLabel goods_movable_jLabel;
     private javax.swing.JLabel fee_jLabel;
     private javax.swing.JTextField txtFeePow;
-    //   private javax.swing.JButton icon_jButton;
-    //   private javax.swing.JButton image_jButton;
     private javax.swing.JButton issue_jButton;
     private JComboBox<Account> cbxFrom;
+    private JComboBox<?> cbxAssetType;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JRadioButton currency_unmovabl_chk;
-    private javax.swing.JLabel currency_unmovable_jLabel;
     private javax.swing.JLabel name_jLabel;
     private javax.swing.JTextField txtName;
     private javax.swing.JLabel quantity_jLabel;
@@ -60,6 +52,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JTextField txtScale;
     private My_Add_Image_Panel add_Image_Panel;
     private My_Add_Image_Panel add_Logo_Icon_Panel;
+    private AssetTypeComboBoxModel assetTypeModet;
+    private JLabel type_jLabel;
     /**
      * Creates new form Issue_Asset_Panel_01
      */
@@ -71,30 +65,14 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 
         name_jLabel.setText(Lang.getInstance().translate("Name") + ":");
         txtName.setText("");
-
-
-        //- goods or movable - это товары и движимое
-        //- currency or unmovable - это валюты и недвижимое
-        //- claim or right or obligation - это требования, права и обязательства
-
-        goods_movable_chk.setText(Lang.getInstance().translate("Goods or Movable"));
-        goods_movable_chk.setSelected(true);
-        //goods_movable_jLabel.setText(Lang.getInstance().translate("Divisible") + ":");
-        //currency_unmovable_jLabel.setText(Lang.getInstance().translate("Movable") + ":");
-        currency_unmovabl_chk.setText(Lang.getInstance().translate("Currency or Unmovable"));
-        claim_right_obligation_chk.setText(Lang.getInstance().translate("Claim or Right or Obligation"));
-
-
         Title_jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         Title_jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Title_jLabel.setText(Lang.getInstance().translate("Issue Asset"));
         Title_jLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         description_jLabel.setText(Lang.getInstance().translate("Description") + ":");
-
+        type_jLabel.setText(Lang.getInstance().translate("Type") + ":");
         txtareaDescription.setLineWrap(true);
         txtareaDescription.setText("");
-
-
         quantity_jLabel.setText(Lang.getInstance().translate("Quantity") + ":");
         txtQuantity.setText("1");
         scale_jLabel.setText(Lang.getInstance().translate("Scale") + ":");
@@ -129,17 +107,14 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 
         account_jLabel = new javax.swing.JLabel();
         cbxFrom = new JComboBox<Account>(new AccountsComboBoxModel());
+        cbxAssetType = new JComboBox();
         name_jLabel = new javax.swing.JLabel();
         txtName = new javax.swing.JTextField();
-        goods_movable_chk = new javax.swing.JRadioButton();
-        goods_movable_jLabel = new javax.swing.JLabel();
-        currency_unmovable_jLabel = new javax.swing.JLabel();
-        currency_unmovabl_chk = new javax.swing.JRadioButton();
-        claim_right_obligation_chk = new javax.swing.JRadioButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtareaDescription = new javax.swing.JTextArea();
         Title_jLabel = new javax.swing.JLabel();
         description_jLabel = new javax.swing.JLabel();
+        type_jLabel = new javax.swing.JLabel();
         quantity_jLabel = new javax.swing.JLabel();
         txtQuantity = new javax.swing.JTextField();
         scale_jLabel = new javax.swing.JLabel();
@@ -151,14 +126,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         add_Image_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Image") + (" (max %1%kB)").replace("%1%", "1024"), 250, 250);
         // size from height
         add_Logo_Icon_Panel = new My_Add_Image_Panel(Lang.getInstance().translate("Add Logo"), 50, 50);
-
-        group = new ButtonGroup();
-        group.add(goods_movable_chk);
-        group.add(currency_unmovabl_chk);
-        group.add(claim_right_obligation_chk);
-
         setLayout(new java.awt.GridBagLayout());
-
         account_jLabel.setText("jLabel2");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -209,52 +177,18 @@ public class IssueAssetPanel extends javax.swing.JPanel {
 
         add_Image_Panel.setPreferredSize(new Dimension(250, 350));
         add(add_Image_Panel, gridBagConstraints);
-        goods_movable_chk.setText("jCheckBox1");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
-        add(goods_movable_chk, gridBagConstraints);
-
-        goods_movable_jLabel.setText("jLabel4");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 10, 7);
-        //	add(goods_movable_jLabel, gridBagConstraints);
-
-        currency_unmovable_jLabel.setText("jLabel5");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 10, 7);
-        //	add(currency_unmovable_jLabel, gridBagConstraints);
-
-        currency_unmovabl_chk.setText("jCheckBox2");
+      
+        assetTypeModet = new AssetTypeComboBoxModel();
+        cbxAssetType.setModel(assetTypeModet);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 10);
-        add(currency_unmovabl_chk, gridBagConstraints);
-
-        claim_right_obligation_chk.setText("jCheckBox2");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 6;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 10);
-        add(claim_right_obligation_chk, gridBagConstraints);
-
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
+        add(cbxAssetType, gridBagConstraints);
 
         txtareaDescription.setColumns(20);
         txtareaDescription.setRows(5);
@@ -287,6 +221,14 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
         add(description_jLabel, gridBagConstraints);
+        
+        type_jLabel.setText("jLabel9");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
+        add(type_jLabel, gridBagConstraints);
 
         quantity_jLabel.setText("jLabel6");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -392,10 +334,11 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             // SCALE, ASSET_TYPE, QUANTITY
             PrivateKeyAccount creator = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress());
             int asset_type = 0;
-            if (currency_unmovabl_chk.isSelected()) asset_type = 1;
-            if (claim_right_obligation_chk.isSelected()) asset_type = 2;
-
-
+        //    if (currency_unmovabl_chk.isSelected()) asset_type = 1;
+         //   if (claim_right_obligation_chk.isSelected()) asset_type = 2;
+            parsestep++;
+            asset_type =  assetTypeModet.getSelectedType();
+            
             IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
                     creator,
                     this.txtName.getText(),
@@ -506,8 +449,10 @@ public class IssueAssetPanel extends javax.swing.JPanel {
                 case 2:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Quantity!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
-
-                default:
+                case 4:
+                    JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Type!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                    break;
+                case 3:
                     JOptionPane.showMessageDialog(MainFrame.getInstance(), Lang.getInstance().translate("Invalid Asset!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
                     break;
             }
