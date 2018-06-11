@@ -360,7 +360,41 @@ public class MTable<U, T> extends JTable {
                 }
             }
 // date
+<<<<<<< HEAD
             if (model.getColumnClass(col) == Date.class) {
+=======
+			if (model.getColumnClass(col) == Date.class) {
+				
+				if (filters.get(col) != null) {
+					if (filters.get(col).a != null)
+						sss = filters.get(col).a;
+				}
+				str = JOptionPane.showInputDialog(th, Lang.getInstance().translate("Filter column")+": "+ column.getHeaderValue().toString(), "data");
+				if (str != null) {
+					if (!str.toString().equals("")) {
+						column.setHeaderRenderer(new Renderer_Right());
+						filters.put(col, new Tuple2(new Tuple3(str, RowFilter.regexFilter(".*" + str.toString() + ".*", col),null), new Tuple3(null,null,null)));
+					} else {
+						column.setHeaderRenderer(null);
+						filters.remove(col);
+					}
+				}
+			}
+			
+			if (model.getColumnClass(col)==Boolean.class){
+			
+			//	String resultString = (String) JOptionPane.showInputDialog(null, "Input an answer", "Input", JOptionPane.QUESTION_MESSAGE, flag, listArr, "Cuatro");	
+				JCheckBox   rememberChk = new JCheckBox(Lang.getInstance().translate("Filter"));
+				if(filters.get(col) != null){
+					if(filters.get(col).a!=null){
+						if(filters.get(col).a.a !=null){
+	//			 cx = filters.get(col).a.a;
+				rememberChk.setSelected(Boolean.parseBoolean(filters.get(col).a.a.toString()));
+						}
+					}
+				}
+				String            msg = Lang.getInstance().translate("Filter column")+": "+ column.getHeaderValue().toString();
+>>>>>>> refs/remotes/origin/develop
 
                 if (filters.get(col) != null) {
                     if (filters.get(col).a != null)

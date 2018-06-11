@@ -18,4 +18,8 @@ settings.json
 gui_settings.json
 *.xml
 /out/
+<<<<<<< HEAD
 .settings
+=======
+.settings
+>>>>>>> refs/remotes/origin/develop

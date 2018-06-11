@@ -417,16 +417,15 @@ public abstract class TransactionAmount extends Transaction {
                 }
             }
             
-            // CHECK IF AMOUNT IS DIVISIBLE
-            int amount_sign = this.amount.signum();
-            
+            int amount_sign = this.amount.signum();            
             if (amount_sign != 0) {
                 
-                int actionType = Account.actionType(key, amount);
+                int actionType = Account.actionType(this.key, this.amount);
+                int assetType = this.asset.getAssetType();
                 BigDecimal balance;
                 
                 // BACKWARD - CONFISCATE
-                boolean confiscate_credit = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+                boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
                 
                 if (asset.isAccounting()) {
                     
@@ -494,7 +493,7 @@ public abstract class TransactionAmount extends Transaction {
                             }
                             
                             // CLAIMs DEBT - only for OWNER
-                            if (this.asset.getAssetType() == AssetCls.AS_OUTSIDE_CLAIM) {
+                            if (assetType == AssetCls.AS_OUTSIDE_CLAIM) {
                                 if (!this.recipient.equals(this.asset.getOwner())) {
                                     // ERROR
                                     return Transaction.INVALID_CLAIM_DEBT_RECIPIENT;
@@ -503,7 +502,7 @@ public abstract class TransactionAmount extends Transaction {
                             
                             // 75hXUtuRoKGCyhzps7LenhWnNtj9BeAF12 ->
                             // 7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7
-                            if (confiscate_credit) {
+                            if (backward) {
                                 // BACKWARD - BORROW - CONFISCATE CREDIT
                                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(
                                         this.creator.getAddress(), absKey, this.recipient.getAddress());
@@ -607,7 +606,7 @@ public abstract class TransactionAmount extends Transaction {
                             } else {
                                 
                                 // CLAIMs invalid
-                                if (this.asset.getAssetType() == AssetCls.AS_OUTSIDE_CLAIM) {
+                                if (assetType == AssetCls.AS_OUTSIDE_CLAIM) {
                                     if (this.recipient.equals(this.asset.getOwner())) {
                                         // ERROR
                                         return Transaction.INVALID_CLAIM_RECIPIENT;
@@ -666,6 +665,7 @@ public abstract class TransactionAmount extends Transaction {
                             }
                             
                             break;
+                            
                         case ACTION_SPEND: // PRODUCE - SPEND
                             
                             // TRY FEE
@@ -752,22 +752,22 @@ public abstract class TransactionAmount extends Transaction {
         long absKey = getAbsKey();
         
         // BACKWARD - CONFISCATE
-        boolean confiscate = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+        boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
         
         // UPDATE SENDER
         if (absKey == 666l) {
-            this.creator.changeBalance(db, confiscate, key, this.amount, false);
+            this.creator.changeBalance(db, backward, key, this.amount, false);
         } else {
-            this.creator.changeBalance(db, !confiscate, key, this.amount, false);
+            this.creator.changeBalance(db, !backward, key, this.amount, false);
         }
         // UPDATE RECIPIENT
-        this.recipient.changeBalance(db, confiscate, key, this.amount, false);
+        this.recipient.changeBalance(db, backward, key, this.amount, false);
         
         // ASSET ACTIONS PRCESS
         int actionType = Account.actionType(key, amount);
         
         if (actionType == ACTION_DEBT) {
-            if (confiscate) {
+            if (backward) {
                 // BORROW
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
                         absKey, this.recipient.getAddress());
@@ -793,10 +793,10 @@ public abstract class TransactionAmount extends Transaction {
         // ASSET TYPE PROCESS
         switch (this.asset.getAssetType()) {
             case AssetCls.AS_OUTSIDE_CLAIM:
-                if (actionType == ACTION_DEBT && confiscate) {
+                if (actionType == ACTION_DEBT && backward) {
                     // CLOSE CLAIN - back amount to claim ISSUER
-                    this.creator.changeBalance(db, confiscate, absKey, this.amount.abs(), false);
-                    this.recipient.changeBalance(db, !confiscate, absKey, this.amount.abs(), false);
+                    this.creator.changeBalance(db, backward, absKey, this.amount.abs(), false);
+                    this.recipient.changeBalance(db, !backward, absKey, this.amount.abs(), false);
                     
                 }
                 break;
@@ -842,20 +842,20 @@ public abstract class TransactionAmount extends Transaction {
         long absKey = getAbsKey();
         
         // BACKWARD - CONFISCATE
-        boolean confiscate = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+        boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
         
         // UPDATE SENDER
         if (absKey == 666l) {
-            this.creator.changeBalance(db, !confiscate, key, this.amount, true);
+            this.creator.changeBalance(db, !backward, key, this.amount, true);
         } else {
-            this.creator.changeBalance(db, confiscate, key, this.amount, true);
+            this.creator.changeBalance(db, backward, key, this.amount, true);
         }
         // UPDATE RECIPIENT
-        this.recipient.changeBalance(db, !confiscate, key, this.amount, true);
+        this.recipient.changeBalance(db, !backward, key, this.amount, true);
         
         int actionType = Account.actionType(key, amount);
         if (actionType == ACTION_DEBT) {
-            if (confiscate) {
+            if (backward) {
                 // BORROW
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.creator.getAddress(),
                         absKey, this.recipient.getAddress());
@@ -883,10 +883,10 @@ public abstract class TransactionAmount extends Transaction {
         // ASSET TYPE PROCESS
         switch (this.asset.getAssetType()) {
             case AssetCls.AS_OUTSIDE_CLAIM: // RIGHTS
-                if (actionType == ACTION_DEBT && confiscate) {
+                if (actionType == ACTION_DEBT && backward) {
                     // CLOSE CLAIN - back amount to claim ISSUER
-                    this.creator.changeBalance(db, !confiscate, absKey, this.amount.abs(), true);
-                    this.recipient.changeBalance(db, confiscate, absKey, this.amount.abs(), true);
+                    this.creator.changeBalance(db, !backward, absKey, this.amount.abs(), true);
+                    this.recipient.changeBalance(db, backward, absKey, this.amount.abs(), true);
                     
                 }
                 break;

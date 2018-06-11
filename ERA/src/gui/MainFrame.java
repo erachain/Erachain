@@ -334,6 +334,7 @@ public class MainFrame extends JFrame implements Observer {
 
         // reat Main tree
 
+<<<<<<< HEAD
         if (settingsJSONbuf.containsKey("Main_Tree")) {
             JSONObject aa = (JSONObject) settingsJSONbuf.get("Main_Tree");
             Iterator<?> it = aa.values().iterator();
@@ -341,12 +342,29 @@ public class MainFrame extends JFrame implements Observer {
             while (it.hasNext()) {
                 long d2 = Long.parseLong(it.next().toString());
                 s1.add(d2);
+=======
+		if (settingsJSONbuf.containsKey("Main_Tree")) {
+			JSONObject aa = (JSONObject) settingsJSONbuf.get("Main_Tree");
+			Iterator<?> it = aa.values().iterator();
+			TreeSet s1 = new TreeSet();
+			while (it.hasNext()) {
+				long d2 = Long.parseLong(it.next().toString());
+				s1.add(d2);
+>>>>>>> refs/remotes/origin/develop
 
+<<<<<<< HEAD
             }
             Iterator<?> s1_It = s1.iterator();
             while (s1_It.hasNext()) {
                 long sa = Long.parseLong(s1_It.next().toString());
                 mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
+=======
+			}
+			Iterator<?> s1_It = s1.iterator();
+			while (s1_It.hasNext()) {
+				long sa = Long.parseLong(s1_It.next().toString());
+				mainPanel.mlp.tree.tree.collapseRow(Integer.valueOf((int) sa));
+>>>>>>> refs/remotes/origin/develop
 
             }
 
