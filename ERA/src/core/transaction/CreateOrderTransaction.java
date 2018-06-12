@@ -1,7 +1,20 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -10,17 +23,6 @@ import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.DCSet;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /*
 
@@ -357,6 +359,10 @@ public class CreateOrderTransaction extends Transaction {
 
         if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()) {
             return INVALID_ACCOUNTING_PAIR;
+        }
+        
+        if (this.wantAsset.isInsideBonus() ^ this.haveAsset.isInsideBonus()) {
+            return INVALID_ECXHANGE_PAIR;
         }
 
         for (byte[] valid_item : VALID_REC) {

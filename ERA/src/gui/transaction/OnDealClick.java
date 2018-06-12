@@ -227,6 +227,10 @@ public class OnDealClick {
             case Transaction.INVALID_ACCOUNTING_PAIR:
                 mess = "Invalid Accounting Pair";
                 break;
+            case Transaction.INVALID_ECXHANGE_PAIR:
+                mess = "Invalid Ecxhange Pair";
+                break;
+                
             case Transaction.INVALID_RETURN:
                 mess = "Invalid return";
                 break;

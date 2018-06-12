@@ -706,6 +706,7 @@ public abstract class TransactionAmount extends Transaction {
                     // IF send from PERSON to ANONIMOUSE
                     // TODO: PERSON RULE 1
                     if (BlockChain.PERSON_SEND_PROTECT && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                            && assetType != AssetCls.AS_INSIDE_BONUS
                             && isPerson
                             && absKey != FEE_KEY) {
                         HashSet<Account> recipients = this.getRecipientAccounts();
