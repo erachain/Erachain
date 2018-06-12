@@ -35,7 +35,6 @@ public class TableMenuPopupUtil {
                     int row = component.rowAtPoint(p);
                     component.setRowSelectionInterval(row, row);
 
-                    //menu.i
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }

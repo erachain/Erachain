@@ -484,16 +484,18 @@ public abstract class TransactionAmount extends Transaction {
                                         // genesis
                                         // assets!
                                         && asset.getQuantity().equals(0l)
-                                        && asset.getOwner().getAddress().equals(this.creator.getAddress());
+                                        && asset.getOwner().getAddress().equals(this.recipient.getAddress());
 
-                                balance = this.creator.getBalance(dcSet, absKey, actionType).b;
+                                balance = this.recipient.getBalance(dcSet, absKey, actionType).b;
                                 if (unLimited) {
-                                    BigDecimal amontOWN = this.creator.getBalance(dcSet, absKey, ACTION_SEND).b;
-                                    if (balance.subtract(this.amount).compareTo(amontOWN) < 0) {
+                                    BigDecimal amontOWN = this.recipient.getBalance(dcSet, absKey, ACTION_SEND).b;
+                                    // amontOWN, balance and amount - is negative
+                                    if (balance.add(this.amount).compareTo(amontOWN) < 0) {
                                         return NO_HOLD_BALANCE;
                                     }
                                 } else {
-                                    if (this.amount.compareTo(balance) > 0) {
+                                    // amount - is negative
+                                    if (this.amount.abs().compareTo(balance) > 0) {
                                         return NO_HOLD_BALANCE;
                                     }
                                 }
