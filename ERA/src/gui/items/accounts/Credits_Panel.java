@@ -1,5 +1,30 @@
 package gui.items.accounts;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.item.assets.AssetCls;
@@ -8,15 +33,6 @@ import gui.items.assets.AssetsComboBoxModel;
 import gui.library.MTable;
 import lang.Lang;
 import utils.TableMenuPopupUtil;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.*;
 
 @SuppressWarnings("serial")
 public class Credits_Panel extends JPanel // implements ItemListener
@@ -102,6 +118,7 @@ public class Credits_Panel extends JPanel // implements ItemListener
 
         //MENU
         JPopupMenu menu = new JPopupMenu();
+        AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
 
         JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
         sendAsset.addActionListener(new ActionListener() {
@@ -120,7 +137,16 @@ public class Credits_Panel extends JPanel // implements ItemListener
         });
         menu.add(sendAsset);
 
-        JMenuItem holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
+        String hold_check_label;
+        if (asset.isMovable()) {
+            hold_check_label = "Hold by Me";
+        } else if (asset.isImMovable()) {
+            hold_check_label = "Rent by Me";            
+        } else {
+            hold_check_label = "Check transfer to Me";
+        }
+        
+        JMenuItem holdAsset = new JMenuItem(Lang.getInstance().translate(hold_check_label));
         holdAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
@@ -139,7 +165,7 @@ public class Credits_Panel extends JPanel // implements ItemListener
 
         menu.addSeparator();
 
-        JMenuItem lend_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Lend"));
+        JMenuItem lend_Debt_Asset = new JMenuItem(Lang.getInstance().translate(asset.isOutsideType()? "Предявить требование к погашению" : "Lend"));
         lend_Debt_Asset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();
@@ -156,25 +182,26 @@ public class Credits_Panel extends JPanel // implements ItemListener
         });
         menu.add(lend_Debt_Asset);
 
+        if (asset.isInsideType()) { 
+            JMenuItem repay_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
+            repay_Debt_Asset.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    int row = table.getSelectedRow();
+                    row = table.convertRowIndexToModel(row);
+    
+                    AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+                    Account account = tableModel.getAccount(row);
+                    //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
+                    //Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
+    
+                    new Account_Repay_Debt_Dialog(asset, account);
+    
+                }
+            });
+            menu.add(repay_Debt_Asset);
+        }
 
-        JMenuItem repay_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Repay Debt"));
-        repay_Debt_Asset.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                int row = table.getSelectedRow();
-                row = table.convertRowIndexToModel(row);
-
-                AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-                Account account = tableModel.getAccount(row);
-                //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-                //Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
-
-                new Account_Repay_Debt_Dialog(asset, account);
-
-            }
-        });
-        menu.add(repay_Debt_Asset);
-
-        JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+        JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         confiscate_Debt_Asset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = table.getSelectedRow();

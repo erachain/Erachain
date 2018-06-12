@@ -4,11 +4,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
@@ -16,25 +11,20 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.RowSorter;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import core.account.PublicKeyAccount;
-import core.crypto.Base32;
 import core.item.assets.AssetCls;
-import core.transaction.Transaction;
 import gui.Gui;
 import gui.items.assets.AssetsComboBoxModel;
+import gui.library.DealsPopupMenu;
 import gui.library.MTable;
 import gui.library.Wallet_Create_Account_Button;
 import gui.library.Wallet_Sync_Button;
@@ -171,8 +161,9 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 
 
         //MENU
-        JPopupMenu menu = new JPopupMenu();
+        DealsPopupMenu menu = new DealsPopupMenu(tableModel, table, cbxFavorites);
 
+        /*
         menu.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
@@ -196,10 +187,10 @@ public class Accounts_Panel extends JPanel // implements ItemListener
                 row = table.convertRowIndexToModel(row);
                 asset = (AssetCls) cbxFavorites.getSelectedItem();
                 pub_Key = tableModel.getPublicKeyAccount(row);
+                menu.init(asset, pub_Key);
 
             }
         });
-
 
         JMenuItem sendAsset = new JMenuItem(Lang.getInstance().translate("Send"));
         sendAsset.addActionListener(new ActionListener() {
@@ -282,7 +273,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
 
         try {
             JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate(
-                    asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
+                    asset != null && asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
             confiscate_Debt_Asset.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     //		int row = table.getSelectedRow();
@@ -340,42 +331,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
         });
 
         menu.add(copyBalance);
-
-        JMenuItem copyConfirmedBalance = new JMenuItem(Lang.getInstance().translate("Copy Confirmed Balance"));
-        copyConfirmedBalance.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //	int row = table.getSelectedRow();
-                //	if (row < 1 ) return;
-
-                //	row = table.convertRowIndexToModel(row);
-                //	Account account = tableModel.getAccount(row);
-
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection value = new StringSelection(pub_Key.getBalanceUSE(Transaction.FEE_KEY).toPlainString());
-                clipboard.setContents(value, null);
-            }
-        });
-        menu.add(copyConfirmedBalance);
 		
-		/*
-		JMenuItem copyGeneratingBalance = new JMenuItem(Lang.getInstance().translate("Copy Generating Balance"));
-		copyGeneratingBalance.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e) 
-			{
-				int row = table.getSelectedRow();
-				row = table.convertRowIndexToModel(row);
-				
-				Account account = tableModel.getAccount(row);
-				
-				Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection value = new StringSelection("" + account.getGeneratingBalance());
-			    clipboard.setContents(value, null);
-			}
-		});
-		menu.add(copyGeneratingBalance);
-		*/
-
         menu.addSeparator();
         JMenuItem copyPublicKey = new JMenuItem(Lang.getInstance().translate("Copy Public Key"));
         copyPublicKey.addActionListener(new ActionListener() {
@@ -422,6 +378,7 @@ public class Accounts_Panel extends JPanel // implements ItemListener
             }
         });
         menu.add(set_name);
+        */
 		
 	/*	JMenuItem hiddenAccountKey = new JMenuItem(Lang.getInstance().translate("Hidden Account"));
 		hiddenAccountKey.addActionListener(new ActionListener()

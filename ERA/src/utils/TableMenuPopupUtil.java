@@ -1,9 +1,12 @@
 package utils;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 
 public class TableMenuPopupUtil {
     // https://github.com/jrwalsh/CycTools/blob/master/src/edu/iastate/cyctools/externalSourceCode/MenuPopupUtil.java
@@ -32,6 +35,7 @@ public class TableMenuPopupUtil {
                     int row = component.rowAtPoint(p);
                     component.setRowSelectionInterval(row, row);
 
+                    //menu.i
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }

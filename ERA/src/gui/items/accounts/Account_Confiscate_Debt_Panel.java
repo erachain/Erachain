@@ -1,5 +1,16 @@
 package gui.items.accounts;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -18,15 +29,7 @@ import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import utils.Converter;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 //import settings.Settings;
 
@@ -44,15 +47,16 @@ public class Account_Confiscate_Debt_Panel extends Class_Account_Transaction_Pan
         else
             a = asset.viewName();
 
-        sendButton.setText(Lang.getInstance().translate("Confiscate Debt"));
+        sendButton.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         jTextArea_Title.setText(Lang.getInstance()
-                .translate("If You want to confiscate in debt issued asset %asset%, fill in this form")
+                .translate(asset.isOutsideType()? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
+                        : "If You want to confiscate in debt issued asset %asset%, fill this form")
                 .replace("%asset%", a));
 
         // icon.setIcon(null);
 
-        toLabel.setText(Lang.getInstance().translate("Debtor Account") + ":");
-        recDetailsLabel.setText(Lang.getInstance().translate("Debtor Details") + ":");
+        toLabel.setText(Lang.getInstance().translate(asset.isOutsideType()?"Счет эмитента" : "Debtor Account") + ":");
+        recDetailsLabel.setText(Lang.getInstance().translate(asset.isOutsideType()?"Детали эмитента" : "Debtor Details") + ":");
 
         // favorite combo box
         cbxFavorites.setModel(new AssetsComboBoxModel());
