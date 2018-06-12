@@ -143,6 +143,20 @@ public abstract class AssetCls extends ItemCls {
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_SHARE = 53;
+    
+    /*
+     * inside BONUS
+     * +++ бонусы
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_BONUS = 54;
+    
+    /*
+     * inside RIGHTS
+     * +++ права и доступы
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_RIGHTS = 55;
 
     /*
      * inside CLAIMS
@@ -338,8 +352,10 @@ public abstract class AssetCls extends ItemCls {
 
     public boolean isInsideAsset() {return this.asset_type == AS_INSIDE_ASSETS;}
     public boolean isInsideCurrency() {return this.asset_type == AS_INSIDE_CURRENCY;}
-    public boolean isInsideShare() {return this.asset_type == AS_INSIDE_SHARE;}
     public boolean isInsideUtility() {return this.asset_type == AS_INSIDE_UTILITY;}
+    public boolean isInsideShare() {return this.asset_type == AS_INSIDE_SHARE;}
+    public boolean isInsideBonus() {return this.asset_type == AS_INSIDE_BONUS;}
+    public boolean isInsideRights() {return this.asset_type == AS_INSIDE_RIGHTS;}
     public boolean isInsideOtherClaim() {return this.asset_type == AS_INSIDE_OTHER_CLAIM;}
 
     public boolean isOutsideType() {
@@ -376,10 +392,14 @@ public abstract class AssetCls extends ItemCls {
                 return "Inside Asset";
             case AS_INSIDE_CURRENCY:
                 return "Inside Currency";
-            case AS_INSIDE_SHARE:
-                return "Inside Asset";
             case AS_INSIDE_UTILITY:
                 return "Inside Utility";
+            case AS_INSIDE_SHARE:
+                return "Inside Share";
+            case AS_INSIDE_BONUS:
+                return "Inside Bonus";
+            case AS_INSIDE_RIGHTS:
+                return "Inside Rights";
             case AS_INSIDE_OTHER_CLAIM:
                 return "Inside Other Claim";
 

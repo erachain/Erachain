@@ -895,7 +895,7 @@ public abstract class TransactionAmount extends Transaction {
             }
         }
         
-        // ASSET TYPE PROCESS
+        // ASSET TYPE ORPHAN
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_DEBT && backward) {
                 // CLOSE CLAIN - back amount to claim ISSUER

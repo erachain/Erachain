@@ -15,14 +15,16 @@ public class AssetTypeComboBoxModel extends AbstractListModel implements ComboBo
                     AssetCls.AS_OUTSIDE_OTHER_CLAIM,
                     AssetCls.AS_INSIDE_ASSETS,
                     AssetCls.AS_INSIDE_CURRENCY, AssetCls.AS_INSIDE_UTILITY, AssetCls.AS_INSIDE_SHARE,
-                    AssetCls.AS_OUTSIDE_OTHER_CLAIM,
+                    AssetCls.AS_INSIDE_BONUS, AssetCls.AS_INSIDE_RIGHTS,
+                    AssetCls.AS_INSIDE_OTHER_CLAIM,
                     AssetCls.AS_ACCOUNTING }
             : new Integer[] { AssetCls.AS_OUTSIDE_GOODS, AssetCls.AS_OUTSIDE_IMMOVABLE,
                     AssetCls.AS_OUTSIDE_CURRENCY, AssetCls.AS_OUTSIDE_SERVICE, AssetCls.AS_OUTSIDE_SHARE,
                     AssetCls.AS_OUTSIDE_OTHER_CLAIM,
                     AssetCls.AS_INSIDE_ASSETS,
                     AssetCls.AS_INSIDE_CURRENCY, AssetCls.AS_INSIDE_UTILITY, AssetCls.AS_INSIDE_SHARE,
-                    AssetCls.AS_OUTSIDE_OTHER_CLAIM,
+                    AssetCls.AS_INSIDE_BONUS, AssetCls.AS_INSIDE_RIGHTS,
+                    AssetCls.AS_INSIDE_OTHER_CLAIM,
                     AssetCls.AS_ACCOUNTING };
     
     String selection = null;
@@ -51,24 +53,35 @@ public class AssetTypeComboBoxModel extends AbstractListModel implements ComboBo
     }
     
     public Integer getSelectedType() {
-        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_GOODS))))
-            return AssetCls.AS_OUTSIDE_GOODS;
         
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_GOODS))))
+            return AssetCls.AS_OUTSIDE_GOODS;        
         if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_IMMOVABLE))))
             return AssetCls.AS_OUTSIDE_IMMOVABLE;
-        
-        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_ASSETS))))
-            return AssetCls.AS_INSIDE_ASSETS;
-        
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_CURRENCY))))
+            return AssetCls.AS_OUTSIDE_CURRENCY;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_SERVICE))))
+            return AssetCls.AS_OUTSIDE_SERVICE;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_SHARE))))
+            return AssetCls.AS_OUTSIDE_SHARE;
         if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_OTHER_CLAIM))))
             return AssetCls.AS_OUTSIDE_OTHER_CLAIM;
         
-        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_CURRENCY))))
-            return AssetCls.AS_OUTSIDE_CURRENCY;
-        
-        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_SERVICE))))
-            return AssetCls.AS_OUTSIDE_SERVICE;
-        
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_ASSETS))))
+            return AssetCls.AS_INSIDE_ASSETS;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_CURRENCY))))
+            return AssetCls.AS_INSIDE_CURRENCY;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_UTILITY))))
+            return AssetCls.AS_INSIDE_UTILITY;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_SHARE))))
+            return AssetCls.AS_INSIDE_SHARE;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_BONUS))))
+            return AssetCls.AS_INSIDE_BONUS;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_RIGHTS))))
+            return AssetCls.AS_INSIDE_RIGHTS;
+        if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_INSIDE_OTHER_CLAIM))))
+            return AssetCls.AS_INSIDE_OTHER_CLAIM;
+
         if (selection.equals(Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_ACCOUNTING))))
             return AssetCls.AS_ACCOUNTING;
         
