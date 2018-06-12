@@ -1,13 +1,17 @@
 package gui.items.accounts;
 
+import java.awt.BorderLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JDialog;
+import javax.swing.JInternalFrame;
+
 import core.account.Account;
 import core.item.assets.AssetCls;
 import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Account_Confiscate_Debt_Dialog extends JDialog {
 
@@ -32,7 +36,7 @@ public class Account_Confiscate_Debt_Dialog extends JDialog {
         //SHOW FRAME
         this.pack();
         //     this.setMaximizable(true);
-        this.setTitle(Lang.getInstance().translate("Confiscate Debt"));
+        this.setTitle(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         //	this.setClosable(true);
         this.setResizable(false);
         //this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
