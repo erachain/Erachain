@@ -146,8 +146,8 @@ public abstract class AssetCls extends ItemCls {
     
     /*
      * inside BONUS
-     * +++ бонусы
-     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     * +++ бонусы - для анонимов так же платежи возможны
+     * === ASSET - без обмена на бирже и можно анонимам переводить
      */
     public static final int AS_INSIDE_BONUS = 54;
     
