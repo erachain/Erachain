@@ -5,6 +5,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
+import core.item.assets.AssetType;
 import core.transaction.IssueAssetTransaction;
 import core.transaction.Transaction;
 import gui.MainFrame;
@@ -42,7 +43,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JTextField txtFeePow;
     private javax.swing.JButton issue_jButton;
     private JComboBox<Account> cbxFrom;
-    private JComboBox<?> cbxAssetType;
+    private JComboBox<AssetType> cbxAssetType;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel name_jLabel;
     private javax.swing.JTextField txtName;
@@ -52,7 +53,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JTextField txtScale;
     private My_Add_Image_Panel add_Image_Panel;
     private My_Add_Image_Panel add_Logo_Icon_Panel;
-    private AssetTypeComboBoxModel assetTypeModet;
+    private AssetTypesComboBoxModel assetTypeModet;
     private JLabel type_jLabel;
     /**
      * Creates new form Issue_Asset_Panel_01
@@ -178,7 +179,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         add_Image_Panel.setPreferredSize(new Dimension(250, 350));
         add(add_Image_Panel, gridBagConstraints);
       
-        assetTypeModet = new AssetTypeComboBoxModel();
+        assetTypeModet = new AssetTypesComboBoxModel();
         cbxAssetType.setModel(assetTypeModet);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -337,7 +338,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         //    if (currency_unmovabl_chk.isSelected()) asset_type = 1;
          //   if (claim_right_obligation_chk.isSelected()) asset_type = 2;
             parsestep++;
-            asset_type =  assetTypeModet.getSelectedType();
+            asset_type =  ((AssetType)assetTypeModet.getSelectedItem()).getId();
             
             IssueAssetTransaction issueAssetTransaction = (IssueAssetTransaction) Controller.getInstance().issueAsset(
                     creator,
