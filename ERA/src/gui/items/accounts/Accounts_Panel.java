@@ -280,24 +280,29 @@ public class Accounts_Panel extends JPanel // implements ItemListener
         });
         menu.add(repay_Debt_Asset);
 
-        JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate(
-                asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
-        confiscate_Debt_Asset.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                //		int row = table.getSelectedRow();
-                //		if (row < 1 ) return;
+        try {
+            JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate(
+                    asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
+            confiscate_Debt_Asset.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    //		int row = table.getSelectedRow();
+                    //		if (row < 1 ) return;
 
-                //		row = table.convertRowIndexToModel(row);
-                //		AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
-                //		Account account = tableModel.getAccount(row);
-                //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
-                //Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
+                    //		row = table.convertRowIndexToModel(row);
+                    //		AssetCls asset = (AssetCls) cbxFavorites.getSelectedItem();
+                    //		Account account = tableModel.getAccount(row);
+                    //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
+                    //Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 
-                new Account_Confiscate_Debt_Dialog(asset, pub_Key);
+                    new Account_Confiscate_Debt_Dialog(asset, pub_Key);
 
-            }
-        });
-        menu.add(confiscate_Debt_Asset);
+                }
+            });
+            menu.add(confiscate_Debt_Asset);
+        } catch (Exception e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
 
         menu.addSeparator();
