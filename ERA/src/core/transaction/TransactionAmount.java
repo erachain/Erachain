@@ -510,7 +510,7 @@ public abstract class TransactionAmount extends Transaction {
                             }
                             
                             // CLAIMs DEBT - only for OWNER
-                            if (assetType == AssetCls.AS_OUTSIDE_CLAIM) {
+                            if (asset.isOutsideType()) {
                                 if (!this.recipient.equals(this.asset.getOwner())) {
                                     // ERROR
                                     return Transaction.INVALID_CLAIM_DEBT_RECIPIENT;
@@ -623,7 +623,7 @@ public abstract class TransactionAmount extends Transaction {
                             } else {
                                 
                                 // CLAIMs invalid
-                                if (assetType == AssetCls.AS_OUTSIDE_CLAIM) {
+                                if (asset.isOutsideType()) {
                                     if (this.recipient.equals(this.asset.getOwner())) {
                                         // ERROR
                                         return Transaction.INVALID_CLAIM_RECIPIENT;
@@ -809,16 +809,13 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         // ASSET TYPE PROCESS
-        switch (this.asset.getAssetType()) {
-            case AssetCls.AS_OUTSIDE_CLAIM:
-                if (actionType == ACTION_DEBT && backward) {
-                    // CLOSE CLAIN - back amount to claim ISSUER
-                    this.creator.changeBalance(db, backward, absKey, this.amount.abs(), false);
-                    this.recipient.changeBalance(db, !backward, absKey, this.amount.abs(), false);
-                    
-                }
-                break;
-            
+        if (this.asset.isOutsideType()) {
+            if (actionType == ACTION_DEBT && backward) {
+                // CLOSE CLAIN - back amount to claim ISSUER
+                this.creator.changeBalance(db, backward, absKey, this.amount.abs(), false);
+                this.recipient.changeBalance(db, !backward, absKey, this.amount.abs(), false);
+                
+            }            
         }
         
         if (absKey == Transaction.RIGHTS_KEY) {
@@ -899,16 +896,13 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         // ASSET TYPE PROCESS
-        switch (this.asset.getAssetType()) {
-            case AssetCls.AS_OUTSIDE_CLAIM: // RIGHTS
-                if (actionType == ACTION_DEBT && backward) {
-                    // CLOSE CLAIN - back amount to claim ISSUER
-                    this.creator.changeBalance(db, !backward, absKey, this.amount.abs(), true);
-                    this.recipient.changeBalance(db, backward, absKey, this.amount.abs(), true);
-                    
-                }
-                break;
-            
+        if (this.asset.isOutsideType()) {
+            if (actionType == ACTION_DEBT && backward) {
+                // CLOSE CLAIN - back amount to claim ISSUER
+                this.creator.changeBalance(db, !backward, absKey, this.amount.abs(), true);
+                this.recipient.changeBalance(db, backward, absKey, this.amount.abs(), true);
+                
+            }
         }
         
         if (absKey == Transaction.RIGHTS_KEY) {

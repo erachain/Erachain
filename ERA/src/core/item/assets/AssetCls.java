@@ -67,12 +67,14 @@ public abstract class AssetCls extends ItemCls {
 
     ///////////////////////////////////////////////////
     /*
+     * GOODS
      *  передача в собственность, взять на хранение
      *  0 : движимая вещь вовне - может быть доставлена и передана на хранение (товары)
      */
     public static final int AS_OUTSIDE_GOODS = 0; // movable
 
     /*
+     * ASSETS
      *  передача имущества не требует действий во вне - все исполняется тут же. Их можно дать в долг и заьрать самостоятельно
      *  Требования не предъявляются.
      *  3 : цифровое имущество - не требует действий вовне и исполняется внутри платформы (токены, цифровые валюты, цифровые билеты, цифровые права и т.д.)
@@ -81,6 +83,7 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_INSIDE_ASSETS = 1;
 
     /*
+     * IMMOVABLE
      *  передача в сосбтвенность, дать в аренду (по графику времени), взять на охрану
      *  1 : недвижимая вещь вовне - может быть передана в аренду (недвижимость)
      */
@@ -88,19 +91,72 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_IMMOVABLE = 2;
 
     /*
+     * outside CURRENCY
+     * +++ деньги вовне - можно истребовать вернуть и подтвердить получение денег
+     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_OUTSIDE_CURRENCY = 11;
+       
+    /*
+     * outside SERVICE
+     * +++ услуги во вне
+     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_OUTSIDE_SERVICE = 12; // UTILITY
+
+    /*
+     * outside SHARE
+     * +++ акция предприятия вовне
+     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_OUTSIDE_SHARE = 13;
+
+    /*
+     * outside CLAIMS
+     * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
+     *
      * учет обязательств прав и требований на услуги и действия во внешнем мире - в том числе займы, ссуды, кредиты, фьючерсы и т.д.
      * нельзя вернуть эмитенту - но можно потребовать исполнение прав и можно подтвердить исполнение (погасить требование)
      * это делается теми же трнзакциями что выдать и забрать долг у внутренних активов
      * И в момент погашения одновременно передается как имущество эмитенту
-     * 2 : обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
      */
-    public static final int AS_OUTSIDE_CLAIM = 3;
-        
+    public static final int AS_OUTSIDE_OTHER_CLAIM = 49;
+
+    ///////////////
     /*
+     * inside CURRENCY
+     * +++ деньги 
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_CURRENCY = 51;
+
+    /*
+     * inside CLAIMS
+     * +++ требования и обязательства
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_UTILITY = 52; // SERVICE
+    
+    /*
+     * inside CLAIMS
+     * +++ требования и обязательства
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_SHARE = 53;
+
+    /*
+     * inside CLAIMS
+     * +++ требования и обязательства
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_OTHER_CLAIM = 119;
+
+    /*
+     * ACCOUNTING
      * учетные единицы - нельзя на бирже торговать - они ничего не стоят, можно делать любые действия от своего имени
      * 4 : учетные единицы - не имеет стоимости и не может быть продано (бухгалтерский учет)
      */
-    public static final int AS_ACCOUNTING = 4;
+    public static final int AS_ACCOUNTING = 123;
 
     // + or -
     protected int scale;
@@ -137,10 +193,12 @@ public abstract class AssetCls extends ItemCls {
     @Override
     public int getMinNameLen() {
 
-        if (this.asset_type == AS_OUTSIDE_CLAIM)
+        if (this.asset_type == AS_OUTSIDE_OTHER_CLAIM)
             return 6;
+        if (this.asset_type == AS_OUTSIDE_CURRENCY)
+            return 3;
         if (this.asset_type == AS_ACCOUNTING)
-            return 6;
+            return 3;
 
         return BlockChain.DEVELOP_USE ? 10 : 12;
     }
@@ -157,18 +215,24 @@ public abstract class AssetCls extends ItemCls {
                 return "▲" + this.name;
             case AS_OUTSIDE_IMMOVABLE:
                 return "▼" + this.name;
-            case AS_OUTSIDE_CLAIM:
-                return "◄" + this.name; // ® ■ ± █
-            case AS_INSIDE_ASSETS:
-                return "►" + this.name;
             case AS_ACCOUNTING:
                 if (this.key == 555l || this.key == 666l || this.key == 777l)
                     return this.name;
 
                 return "±" + this.name;
-            default:
-                return "?" + this.name;
         }
+        
+        if (this.asset_type >= AS_OUTSIDE_CURRENCY
+                && this.asset_type <= AS_OUTSIDE_OTHER_CLAIM)
+                return "◄" + this.name;
+                
+        if (this.asset_type == AS_INSIDE_ASSETS
+                || this.asset_type >= AS_INSIDE_CURRENCY
+                && this.asset_type <= AS_INSIDE_OTHER_CLAIM)
+                return "►" + this.name;
+                
+        return "?" + this.name;
+
     }
 
 
@@ -266,13 +330,27 @@ public abstract class AssetCls extends ItemCls {
         return this.asset_type == AS_OUTSIDE_IMMOVABLE;
     }
 
-    public boolean isAsset() {
-        return this.asset_type == AS_INSIDE_ASSETS;
+    public boolean isInsideType() {
+        return this.asset_type == AS_INSIDE_ASSETS
+                || this.asset_type >= AS_INSIDE_CURRENCY
+                    && this.asset_type <= AS_INSIDE_OTHER_CLAIM;
     }
 
-    public boolean isClaim() {
-        return this.asset_type == AS_OUTSIDE_CLAIM;
+    public boolean isInsideAsset() {return this.asset_type == AS_INSIDE_ASSETS;}
+    public boolean isInsideCurrency() {return this.asset_type == AS_INSIDE_CURRENCY;}
+    public boolean isInsideShare() {return this.asset_type == AS_INSIDE_SHARE;}
+    public boolean isInsideUtility() {return this.asset_type == AS_INSIDE_UTILITY;}
+    public boolean isInsideOtherClaim() {return this.asset_type == AS_INSIDE_OTHER_CLAIM;}
+
+    public boolean isOutsideType() {
+        return this.asset_type >= AS_OUTSIDE_CURRENCY
+                && this.asset_type <= AS_OUTSIDE_OTHER_CLAIM;
     }
+
+    public boolean isOutsideCurrency() {return this.asset_type == AS_OUTSIDE_CURRENCY;}
+    public boolean isOutsideService() {return this.asset_type == AS_OUTSIDE_SERVICE;}
+    public boolean isOutsideShare() {return this.asset_type == AS_OUTSIDE_SHARE;}
+    public boolean isOutsideOtherClaim() {return this.asset_type == AS_OUTSIDE_OTHER_CLAIM;}
 
     public boolean isAccounting() {
         return this.asset_type == AS_ACCOUNTING;
@@ -284,10 +362,27 @@ public abstract class AssetCls extends ItemCls {
                 return "Movable";
             case AS_OUTSIDE_IMMOVABLE:
                 return "Immovable";
-            case AS_OUTSIDE_CLAIM:
-                return "Claim";
+                
+            case AS_OUTSIDE_CURRENCY:
+                return "Outside Currency";
+            case AS_OUTSIDE_SERVICE:
+                return "Outside Service";
+            case AS_OUTSIDE_SHARE:
+                return "Outside Share";
+            case AS_OUTSIDE_OTHER_CLAIM:
+                return "Outside Other Claim";
+
             case AS_INSIDE_ASSETS:
                 return "Inside Asset";
+            case AS_INSIDE_CURRENCY:
+                return "Inside Currency";
+            case AS_INSIDE_SHARE:
+                return "Inside Asset";
+            case AS_INSIDE_UTILITY:
+                return "Inside Utility";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "Inside Other Claim";
+
             case AS_ACCOUNTING:
                 return "Accounting";
         }
