@@ -85,6 +85,10 @@ public class OnDealClick {
                 mess = "No hold balance";
                 break;
 
+            case Transaction.INVALID_HOLD_DIRECTION:
+                mess = "Invalid hold direction";
+                break;
+                
             case Transaction.INVALID_REFERENCE:
                 mess = "Invalid reference";
                 break;

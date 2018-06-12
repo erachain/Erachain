@@ -498,16 +498,20 @@ public class Account {
      */
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean subtract, long key,
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
                                                                     BigDecimal amount, boolean asOrphan) {
 
         int actionType = actionType(key, amount);
+        
         long absKey;
         if (key > 0) {
             absKey = key;
         } else {
             absKey = -key;
         }
+        
+        //if (amount.signum() < 0)
+        //    amount = amount.negate();
 
         if (this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork()
                 && (actionType == TransactionAmount.ACTION_SEND || actionType == TransactionAmount.ACTION_DEBT)
@@ -518,12 +522,12 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), absKey);
 
-        boolean updateIncomed = subtract && asOrphan || !subtract && !asOrphan;
+        boolean updateIncomed = substract && asOrphan || !substract && !asOrphan;
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
@@ -532,7 +536,7 @@ public class Account {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
@@ -541,7 +545,7 @@ public class Account {
             // HOLD + STOCK
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
@@ -550,7 +554,7 @@ public class Account {
             // TODO - SPEND + PRODUCE
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     balance.a, balance.b, balance.c,
-                    subtract ? new Tuple2<BigDecimal, BigDecimal>(
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(
                             updateIncomed ? balance.d.a.subtract(amount) : balance.d.a, balance.d.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.d.a.add(amount) : balance.d.a,
                             balance.d.b.add(amount)),

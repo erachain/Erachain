@@ -118,6 +118,9 @@ public abstract class Transaction {
     public static final int NOT_MOVABLE_ASSET = 44;
     public static final int NOT_DEBT_ASSET = 45;
     public static final int INVALID_ACCOUNTING_PAIR = 46;
+    public static final int INVALID_HOLD_DIRECTION = 47;
+    
+    
     public static final int INVALID_NAME_LENGTH = 50;
     public static final int INVALID_ICON_LENGTH = 51;
     public static final int INVALID_IMAGE_LENGTH = 52;

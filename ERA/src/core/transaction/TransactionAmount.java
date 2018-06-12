@@ -474,6 +474,10 @@ public abstract class TransactionAmount extends Transaction {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
                             
+                            if (backward) {
+                                return INVALID_HOLD_DIRECTION;
+                            }
+                            
                             if (height > BlockChain.HOLD_VALID_START && asset.isMovable()) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
                                 boolean unLimited = absKey > AssetCls.REAL_KEY // not
@@ -766,7 +770,10 @@ public abstract class TransactionAmount extends Transaction {
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-        
+
+        // ASSET ACTIONS PRCESS
+        int actionType = Account.actionType(key, amount);
+                
         // UPDATE SENDER
         if (absKey == 666l) {
             this.creator.changeBalance(db, backward, key, this.amount, false);
@@ -776,8 +783,6 @@ public abstract class TransactionAmount extends Transaction {
         // UPDATE RECIPIENT
         this.recipient.changeBalance(db, backward, key, this.amount, false);
         
-        // ASSET ACTIONS PRCESS
-        int actionType = Account.actionType(key, amount);
         
         if (actionType == ACTION_DEBT) {
             if (backward) {
