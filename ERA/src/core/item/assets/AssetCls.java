@@ -311,10 +311,7 @@ public abstract class AssetCls extends ItemCls {
 	 */
 
     public int getScale() {
-        if (this.key == 0) {
-            Long error = null;
-            error++;
-        } else if (this.key < 5 ||
+        if (this.key > 0 && this.key < 5 ||
                 this.key > 1000 &&
                         this.key < BlockChain.AMOUNT_SCALE_FROM
                 ) {

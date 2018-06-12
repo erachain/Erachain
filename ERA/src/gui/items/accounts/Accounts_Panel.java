@@ -1,5 +1,34 @@
 package gui.items.accounts;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.RowSorter;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
+
 import core.account.PublicKeyAccount;
 import core.crypto.Base32;
 import core.item.assets.AssetCls;
@@ -13,19 +42,6 @@ import gui.models.AccountsTableModel;
 import lang.Lang;
 import utils.NumberAsString;
 import utils.TableMenuPopupUtil;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.*;
 
 @SuppressWarnings("serial")
 public class Accounts_Panel extends JPanel // implements ItemListener
@@ -264,7 +280,8 @@ public class Accounts_Panel extends JPanel // implements ItemListener
         });
         menu.add(repay_Debt_Asset);
 
-        JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate("Confiscate Debt"));
+        JMenuItem confiscate_Debt_Asset = new JMenuItem(Lang.getInstance().translate(
+                asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         confiscate_Debt_Asset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //		int row = table.getSelectedRow();
