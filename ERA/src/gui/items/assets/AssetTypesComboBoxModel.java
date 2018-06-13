@@ -22,8 +22,8 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
         ArrayList<AssetType> list = new ArrayList<AssetType>();
 
         if( BlockChain.DEVELOP_USE){
-            list.add(new AssetType( AssetCls.AS_OUTSIDE_GOODS,Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_GOODS)), ""));
-            list.add(new AssetType(AssetCls.AS_OUTSIDE_IMMOVABLE,Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_IMMOVABLE)),""));
+            list.add(new AssetType( AssetCls.AS_OUTSIDE_GOODS,Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_GOODS)), "Description AS_OUTSIDE_GOODS"));
+            list.add(new AssetType(AssetCls.AS_OUTSIDE_IMMOVABLE,Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_IMMOVABLE)),"Description AS_OUTSIDE_IMMOVABLE"));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_CURRENCY,
                                 Lang.getInstance().translate(AssetCls.viewAssetTypeCls(AssetCls.AS_OUTSIDE_CURRENCY)),
                                 ""));
