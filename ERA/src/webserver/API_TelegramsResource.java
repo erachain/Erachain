@@ -88,6 +88,8 @@ public class API_TelegramsResource {
     }
 
     /**
+     * Get telegrams by timestamp
+     *
      * @param address   account user
      * @param timestamp value time
      * @param filter    is title message.
