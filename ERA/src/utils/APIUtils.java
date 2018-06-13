@@ -348,17 +348,21 @@ public class APIUtils {
                 if (!ServletUtils.isRemoteRequest(request)) {
                     if (Controller.getInstance().isWalletUnlocked())
                         return;
-                    if (password != null && password.length() > 0
+                    if (password != null && password.length() > 3
                             && Controller.getInstance().unlockOnceWallet(password))
                         return;
                 } else {
-                    if (password != null && password.length() > 0
+                    if (password != null && password.length() > 6
                             && Controller.getInstance().unlockOnceWallet(password))
                         return;
                 }
                 
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
                 
+            } else {
+                if (password != null && password.length() > 6
+                        && Controller.getInstance().unlockOnceWallet(password))
+                    return;
             }
             
             int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay, request);
