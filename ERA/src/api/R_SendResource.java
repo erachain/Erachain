@@ -38,13 +38,13 @@ public class R_SendResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
+        help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&codebase={codebase}&encrypt=true&password={password}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}",
+        help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&codebase={codebase}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");
-        help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"codebase\": <codebase>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"codebase\": <codebase>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
         
         return StrJSonFine.convert(help);
@@ -52,7 +52,7 @@ public class R_SendResource {
     
     /*
      * send and broadcast GET
-     * GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&nottext=true&encrypt=true&password={password}"
+     * GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&codebase={codebase}&encrypt=true&password={password}"
      * 
      */
     
@@ -97,7 +97,7 @@ public class R_SendResource {
     
     /*
      * send and broadcast POST r_send
-     * POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"nottext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}"
+     * POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"codebase\": <codebase>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}"
      * 
      * 
      */
