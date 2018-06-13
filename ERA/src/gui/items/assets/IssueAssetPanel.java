@@ -19,6 +19,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -55,6 +57,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private My_Add_Image_Panel add_Logo_Icon_Panel;
     private AssetTypesComboBoxModel assetTypeModet;
     private JLabel type_jLabel;
+    private JTextArea textaresAssetTypeDescription;
     /**
      * Creates new form Issue_Asset_Panel_01
      */
@@ -89,8 +92,21 @@ public class IssueAssetPanel extends javax.swing.JPanel {
                 onIssueClick();
             }
         });
+        // select combobox Asset type
+        cbxAssetType.addActionListener(new ActionListener(){
 
-
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+               
+               JComboBox ss = (JComboBox) e.getSource();
+              AssetType aa = (AssetType) ss.getSelectedItem();
+              textaresAssetTypeDescription.setText(aa.getDescription());
+            }
+        });
+        
+      // set start text area asset type  
+        textaresAssetTypeDescription.setText(((AssetType)assetTypeModet.getSelectedItem()).getDescription());
         add_Logo_Icon_Panel.setPreferredSize(new Dimension(250, 50));
 
 
@@ -187,10 +203,29 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 0);
+        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
         add(cbxAssetType, gridBagConstraints);
-
+// description asset type
+        textaresAssetTypeDescription = new JTextArea();
+        textaresAssetTypeDescription.setEditable(false);
+        textaresAssetTypeDescription.setEnabled(false);
+        textaresAssetTypeDescription.setColumns(20);
+        textaresAssetTypeDescription.setRows(5);
+        JScrollPane jScrollPane2 = new JScrollPane();
+        jScrollPane2.setViewportView(textaresAssetTypeDescription);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.gridwidth = 6;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 8);
+        add(jScrollPane2, gridBagConstraints);
+        
         txtareaDescription.setColumns(20);
         txtareaDescription.setRows(5);
         jScrollPane1.setViewportView(txtareaDescription);
@@ -198,7 +233,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 0.3;
         gridBagConstraints.weighty = 0.5;
@@ -209,7 +244,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 7;
+        gridBagConstraints.gridwidth = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(8, 6, 6, 9);
@@ -234,7 +269,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         quantity_jLabel.setText("jLabel6");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
         add(quantity_jLabel, gridBagConstraints);
@@ -242,7 +277,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         txtQuantity.setText("jTextField2");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -252,14 +287,14 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         scale_jLabel.setText("jLabel7");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
         add(scale_jLabel, gridBagConstraints);
 
         txtScale.setText("jTextField3");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -269,14 +304,14 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         fee_jLabel.setText("jLabel8");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy =7;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
         add(fee_jLabel, gridBagConstraints);
 
         txtFeePow.setText("jTextField4");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.1;
@@ -286,7 +321,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         // issue_jButton.setText("jButton3");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
         add(issue_jButton, gridBagConstraints);
