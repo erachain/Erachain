@@ -208,6 +208,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         add(cbxAssetType, gridBagConstraints);
 // description asset type
         textaresAssetTypeDescription = new JTextArea();
+        textaresAssetTypeDescription.setLineWrap(true);
+        textaresAssetTypeDescription.setWrapStyleWord(true);
         textaresAssetTypeDescription.setEditable(false);
         textaresAssetTypeDescription.setEnabled(false);
         textaresAssetTypeDescription.setColumns(20);
