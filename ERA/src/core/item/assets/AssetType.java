@@ -1,14 +1,19 @@
 package core.item.assets;
 
-import org.mapdb.Fun.Tuple2;
-
-import core.item.persons.PersonCls;
+import lang.Lang;
 
 public class AssetType {
     Integer id;
     String name;
     String description;
-    
+
+    public AssetType(Integer id){
+        this.id = id;
+        this.name = Lang.getInstance().translate(AssetCls.viewAssetTypeCls(id));
+        this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(id));
+        
+    }
+
     public AssetType(Integer id, String name, String description){
         this.id = id;
         this.name = name;
