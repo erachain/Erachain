@@ -1,5 +1,22 @@
 package gui.items.records;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+
 import controller.Controller;
 import core.item.unions.UnionCls;
 import core.transaction.Transaction;
@@ -10,18 +27,6 @@ import gui.models.Debug_Transactions_Table_Model;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import utils.TableMenuPopupUtil;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.text.SimpleDateFormat;
 
 //import java.awt.ScrollPaneLayout;
 //import java.awt.la
@@ -226,8 +231,10 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
                 int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsModel.getTransaction(row);
-                // DBSet db = DBSet.getInstance();
-                Controller.getInstance().broadcastTransaction(trans);
+                DCSet dcSet = DCSet.getInstance();
+                trans.setDC(dcSet, false);
+                if (trans.isValid(null, 0) == Transaction.VALIDATE_OK)
+                    Controller.getInstance().broadcastTransaction(trans);
 
             }
         });

@@ -57,7 +57,8 @@ public class License_JFrame extends JDialog {
     }
     
     public License_JFrame() {
-        this.license = "<html>" + Processor.process(getLicenseText()) + "</html>";
+        //this.license = "<html>" + Processor.process(getLicenseText()) + "</html>";
+        this.license = getLicenseText();
         
         needAccept = false;
         initComponents();

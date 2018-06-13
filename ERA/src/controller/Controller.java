@@ -125,8 +125,8 @@ public class Controller extends Observable {
     public static final long LICENSE_VERS = 107; // versopn of LICENSE
     public static HashMap<String, Tuple2<Integer, Integer>> LICENSE_LANG_REFS = new HashMap<String, Tuple2<Integer, Integer>>() {
         {
-            put("en", new Tuple2<Integer, Integer>(50475, 1));
-            put("ru", new Tuple2<Integer, Integer>(50475, 1));
+            put("en", new Tuple2<Integer, Integer>(147830, 1));
+            put("ru", new Tuple2<Integer, Integer>(147830, 1));
         }
     };
     

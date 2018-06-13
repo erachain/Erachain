@@ -208,13 +208,15 @@ public abstract class AssetCls extends ItemCls {
     public int getMinNameLen() {
 
         if (this.asset_type == AS_OUTSIDE_OTHER_CLAIM)
-            return 6;
+            return 8;
         if (this.asset_type == AS_OUTSIDE_CURRENCY)
-            return 3;
+            return 6;
+        if (this.asset_type == AS_INSIDE_CURRENCY)
+            return 4;
         if (this.asset_type == AS_ACCOUNTING)
             return 3;
 
-        return BlockChain.DEVELOP_USE ? 10 : 12;
+        return BlockChain.DEVELOP_USE ? 8 : 12;
     }
 
     @Override
