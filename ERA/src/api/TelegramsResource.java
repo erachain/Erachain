@@ -123,7 +123,7 @@ public class TelegramsResource {
                        @PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
+        //APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -248,11 +248,15 @@ public class TelegramsResource {
 			) {
 		 */
 
-        return send((String) jsonObject.get("sender"), (String) jsonObject.get("recipient"),
-                (long) jsonObject.get("asset"), (String) jsonObject.get("amount"),
-                (String) jsonObject.get("title"), (String) jsonObject.get("message"),
-                (boolean) jsonObject.get("istextmessage"), (boolean) jsonObject.get("encrypt"),
-                (String) jsonObject.get("password"));
+        return send((String) jsonObject.getOrDefault("sender", null),
+                (String) jsonObject.getOrDefault("recipient", null),
+                Integer.valueOf((String) jsonObject.getOrDefault("asset", 0)),
+                (String) jsonObject.getOrDefault("amount", null),
+                (String) jsonObject.getOrDefault("title", null),
+                (String) jsonObject.getOrDefault("message", null),
+                Boolean.valueOf((String) jsonObject.getOrDefault("istextmessage", false)),
+                Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false)),
+                (String) jsonObject.getOrDefault("password", null));
     }
 
     // GET telegrams/datadecrypt/GerrwwEJ9Ja8gZnzLrx8zdU53b7jhQjeUfVKoUAp1StCDSFP9wuyyqYSkoUhXNa8ysoTdUuFHvwiCbwarKhhBg5?password=1

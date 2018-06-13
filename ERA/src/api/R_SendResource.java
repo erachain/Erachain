@@ -102,8 +102,12 @@ public class R_SendResource {
      * 
      */
     @POST
-    @SuppressWarnings("unchecked")
     @Consumes(MediaType.WILDCARD)
+    //@Consumes(MediaType.TEXT_PLAIN)
+    //@Produces(MediaType.TEXT_PLAIN)
+    //@Path("send")
+    @SuppressWarnings("unchecked")
+    //@SuppressWarnings("unchecked")
     public String sendPost(String x) {
 
         JSONObject jsonObject;
@@ -123,8 +127,8 @@ public class R_SendResource {
         String amount = (String)jsonObject.getOrDefault("amount", null);
         String title = (String)jsonObject.getOrDefault("title", null);
         String message = (String)jsonObject.getOrDefault("message", null);
-        int codebase = (int)jsonObject.getOrDefault("codebase", 0);
-        boolean encrypt = (boolean)jsonObject.getOrDefault("encrypt", false);
+        int codebase = Integer.valueOf((String) jsonObject.getOrDefault("codebase", 0));
+        boolean encrypt =  Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false));
         String password = (String)jsonObject.getOrDefault("password", null);
         
         return sendGet(
