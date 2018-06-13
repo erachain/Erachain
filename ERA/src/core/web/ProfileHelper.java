@@ -1,10 +1,11 @@
 package core.web;
 
-import controller.Controller;
-import core.naming.Name;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
+
+import controller.Controller;
+import core.naming.Name;
 
 public class ProfileHelper {
 
@@ -29,7 +30,8 @@ public class ProfileHelper {
 
     public Profile getActiveProfileOpt(HttpServletRequest servletRequestOpt) {
         // ACTIVE PROFILE NOT FOR REMOTE
-        if (ServletUtils.isRemoteRequest(servletRequestOpt)) {
+        String ipAddress = ServletUtils.getRemoteAddress(servletRequestOpt);
+        if (ServletUtils.isRemoteRequest(servletRequestOpt, ipAddress)) {
             return null;
         }
 

@@ -2,22 +2,15 @@ package core.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-import settings.Settings;
-
 public class ServletUtils {
 
 
-    public static boolean isRemoteRequest(HttpServletRequest servletRequestOpt) {
+    public static boolean isRemoteRequest(HttpServletRequest servletRequestOpt, String ipAddress) {
         if (servletRequestOpt != null) {
-            String ipAdress = getRemoteAddress(servletRequestOpt);
 
-            if (!ipAdress.equals("127.0.0.1")
-                    && !ipAdress.equals("localhost")) {
+            if (!ipAddress.equals("127.0.0.1")
+                    && !ipAddress.equals("localhost")) {
                 
-                for (String ip: Settings.getInstance().getRpcAllowed()) {
-                    if (ip.equals(ipAdress))
-                        return false;
-                }
                 return true;
             }
         }
@@ -25,14 +18,14 @@ public class ServletUtils {
         return false;
     }
 
-    public static String getRemoteAddress(
-            HttpServletRequest servletRequest) {
-        String ipAdress = servletRequest.getHeader("X-FORWARDED-FOR");
+    public static String getRemoteAddress(HttpServletRequest servletRequest) {
+        
+        String ipAddress = servletRequest.getHeader("X-FORWARDED-FOR");
 
-        if (ipAdress == null) {
-            ipAdress = servletRequest.getRemoteAddr();
+        if (ipAddress == null) {
+            ipAddress = servletRequest.getRemoteAddr();
         }
-        return ipAdress;
+        return ipAddress;
     }
 
 }

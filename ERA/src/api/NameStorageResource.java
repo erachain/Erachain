@@ -1,7 +1,29 @@
 package api;
 
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -11,21 +33,10 @@ import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.Transaction;
 import datachain.DCSet;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import utils.APIUtils;
 import utils.GZIP;
 import utils.Pair;
 import utils.StorageUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 @Path("namestorage")
 @Produces(MediaType.APPLICATION_JSON)
@@ -130,10 +141,7 @@ public class NameStorageResource {
             JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
             String password = (String) jsonObject.get("password");
 
-            //password = null;
-            //APIUtils.askAPICallAllowed(password, "POST update\n " + x, request);
-            APIUtils.disallowRemote(request);
-
+            APIUtils.askAPICallAllowed(password, "POST updateEntry\n " + x, request);
 
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {

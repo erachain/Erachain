@@ -993,7 +993,8 @@ public class WebResource {
             PebbleHelper pebbleHelper = PebbleHelper.getPebbleHelper(
                     "web/settings.html", request);
 
-            if (ServletUtils.isRemoteRequest(request)) {
+            String ipAddress = ServletUtils.getRemoteAddress(request);
+            if (ServletUtils.isRemoteRequest(request, ipAddress)) {
                 return error404(request,
                         "This page is disabled for remote usage");
             }

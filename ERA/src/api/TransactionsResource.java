@@ -34,6 +34,7 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import core.web.ServletUtils;
 import datachain.DCSet;
 import utils.APIUtils;
 import utils.Pair;
@@ -249,11 +250,13 @@ public class TransactionsResource {
                 if (blockLimit > 360) // 360 ensures at least six hours of
                 // blocks can be queried at once
                 {
-                    APIUtils.disallowRemote(request);
+                    String ipAddress = ServletUtils.getRemoteAddress(request);
+                    APIUtils.disallowRemote(request, ipAddress);
                 }
             } catch (NullPointerException e) {
                 // OPTION DOES NOT EXIST
-                APIUtils.disallowRemote(request);
+                String ipAddress = ServletUtils.getRemoteAddress(request);
+                APIUtils.disallowRemote(request, ipAddress);
             } catch (ClassCastException e) {
                 // JSON EXCEPTION
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);

@@ -41,151 +41,89 @@ public class APIUtils {
         return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
     }
     
-    public static String processPaymentGet(String password, String sender_in, String feePow_in, String recipient_in,
-            String assetKey_in, String amount_in, String title, String message_in,  boolean istextmessage, boolean encrypt,
-            JSONObject jsonObject) {
-        
-        // PARSE AMOUNT
-        AssetCls asset;
-        BigDecimal amount;
-        
-        if (amount_in == null) {
-            amount = null;
-            asset = null;
-        } else {
-            if (assetKey_in == null) {
-                asset = Controller.getInstance().getAsset(AssetCls.FEE_KEY);
-            } else {
-                try {
-                    asset = Controller.getInstance().getAsset(new Long(assetKey_in));
-                } catch (Exception e) {
-                    throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
-                }
+    public static void disallowRemote(HttpServletRequest request, String ipAddress) throws WebApplicationException {
+
+        if (ServletUtils.isRemoteRequest(request, ipAddress)) {
+            for (String ip: Settings.getInstance().getRpcAllowed()) {
+                if (ip.equals(ipAddress))
+                    return;
             }
-            
-            if (asset == null)
-                throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
-            
-            // PARSE AMOUNT
-            try {
-                amount = new BigDecimal(amount_in);
-            } catch (Exception e) {
-                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_AMOUNT);
-            }
+
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
         }
-        
-        // PARSE FEE POWER
-        int feePow;
-        try {
-            feePow = Integer.parseInt(feePow_in);
-        } catch (Exception e) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_FEE_POWER);
-        }
-        
-        // CHECK ADDRESS
-        if (!Crypto.getInstance().isValidAddress(sender_in)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
-        }
-        
-        // CHECK IF WALLET EXISTS
-        if (!Controller.getInstance().doesWalletExists()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
-        }
-        
-        byte[] message = null;
-        
-        if (jsonObject != null) {
-            if (jsonObject.containsKey("title")) {
-                title = (String) jsonObject.get("title");
-                if (title.getBytes(StandardCharsets.UTF_8).length > 256) {
-                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_HEAD_LENGTH);
-                }
-            }
-            
-            if (jsonObject.containsKey("message")) {
-                message_in = (String) jsonObject.get("message");
-                message = message_in.getBytes(StandardCharsets.UTF_8);
-                if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
-                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_DESCRIPTION_LENGTH);
-                }
-            }
-            
-            
-            if (jsonObject.containsKey("istextmessage")) {
-                try {
-                    istextmessage = (boolean) jsonObject.get("istextmessage");
-                } catch (Exception e) {
-                    throw ApiErrorFactory.getInstance().createError(api.ApiErrorFactory.ERROR_JSON);
-                }
-            }
-            if (jsonObject.containsKey("encrypt")) {
-                try {
-                    encrypt = (boolean) jsonObject.get("encrypt");
-                } catch (Exception e) {
-                    throw ApiErrorFactory.getInstance().createError(api.ApiErrorFactory.ERROR_JSON);
-                }
-            }
-        }
-        
-        byte[] isText = istextmessage ? new byte[] { 1 } : new byte[] { 0 };
-        byte[] isEncrypted = encrypt ? new byte[] { 1 } : new byte[] { 0 };
-                
-        // CHECK WALLET UNLOCKED
-        if (!Controller.getInstance().isWalletUnlocked()) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
-        }
-        
-        // GET ACCOUNT
-        PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender_in);
-        if (account == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
-        }
-        
-        // TODO R_Send insert!
-        Integer result;
-        // SEND ASSET PAYMENT
-        Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient_in),
-                asset.getKey(DCSet.getInstance()), amount, title, message, isText, isEncrypted);
-        
-        boolean confirmed = true;
-        if (gui.Gui.isGuiStarted()) {
-            String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;"
-                    + transaction.viewSize(true) + " Bytes, ";
-            Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
-                    + " COMPU</b><br></body></HTML>";
-            
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
-                    Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
-                    Lang.getInstance().translate("Confirmation Transaction"));
-            Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
-            
-            // ww.jTabbedPane1.setVisible(false);
-            dd.jScrollPane1.setViewportView(ww);
-            dd.setLocationRelativeTo(null);
-            dd.setVisible(true);
-            
-            // JOptionPane.OK_OPTION
-            confirmed = dd.isConfirm;
-            
-        }
-        
-        if (confirmed) {
-            
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
-            
-            if (result == Transaction.VALIDATE_OK)
-                return transaction.toJson().toJSONString();
-            else {
-                
-                // Lang.getInstance().translate(OnDealClick.resultMess(result.getB()));
-                throw ApiErrorFactory.getInstance().createError(result);
-                
-            }
-            
-        }
-        return "error";
     }
     
+    public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request)
+            throws WebApplicationException {
+        // CHECK API CALL ALLOWED
+        
+        try {
+            
+            String ipAddress = ServletUtils.getRemoteAddress(request);
+            disallowRemote(request, ipAddress);
+            
+            if (!gui.Gui.isGuiStarted()) {
+                
+                if (!ServletUtils.isRemoteRequest(request, ipAddress)) {
+                    if (Controller.getInstance().isWalletUnlocked())
+                        return;
+                    if (password != null && password.length() > 3
+                            && Controller.getInstance().unlockOnceWallet(password))
+                        return;
+                } else {
+                    if (password != null && password.length() > 6
+                            && Controller.getInstance().unlockOnceWallet(password))
+                        return;
+                }
+                
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+                
+            } else {
+                if (password != null && password.length() > 6
+                        && Controller.getInstance().unlockOnceWallet(password))
+                    return;
+            }
+            
+            int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay, request);
+            
+            if (answer == JOptionPane.NO_OPTION) {
+                throw ApiErrorFactory.getInstance()
+                        .createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+                
+            } else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
+                if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL
+                        || !Controller.getInstance().isWalletUnlocked()) {
+                    // if (true) {
+                    password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
+                    // password =
+                    // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
+                    // password =
+                    // PasswordPane.showUnlockWalletDialog(Gui.getInstance());
+                    // password = PasswordPane.showUnlockWalletDialog(new
+                    // DebugTabPane());
+                    
+                    if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
+                        return;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    return;
+                }
+            }
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+            
+        } catch (Exception e) {
+            if (e instanceof WebApplicationException) {
+                throw (WebApplicationException) e;
+            }
+            LOGGER.error(e.getMessage(), e);
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);
+        }
+        
+    }
+        
     public static String processPayment(String password, String sender, String feePowStr, String recipient,
             String assetKeyString, String amount, String x, HttpServletRequest request, JSONObject jsonObject) {
         
@@ -330,81 +268,6 @@ public class APIUtils {
         return "error";
     }
     
-    public static void disallowRemote(HttpServletRequest request) throws WebApplicationException {
-        if (ServletUtils.isRemoteRequest(request)) {
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
-        }
-    }
-    
-    public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request)
-            throws WebApplicationException {
-        // CHECK API CALL ALLOWED
-        
-        try {
-            disallowRemote(request);
-            
-            if (!gui.Gui.isGuiStarted()) {
-                
-                if (!ServletUtils.isRemoteRequest(request)) {
-                    if (Controller.getInstance().isWalletUnlocked())
-                        return;
-                    if (password != null && password.length() > 3
-                            && Controller.getInstance().unlockOnceWallet(password))
-                        return;
-                } else {
-                    if (password != null && password.length() > 6
-                            && Controller.getInstance().unlockOnceWallet(password))
-                        return;
-                }
-                
-                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
-                
-            } else {
-                if (password != null && password.length() > 6
-                        && Controller.getInstance().unlockOnceWallet(password))
-                    return;
-            }
-            
-            int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay, request);
-            
-            if (answer == JOptionPane.NO_OPTION) {
-                throw ApiErrorFactory.getInstance()
-                        .createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
-                
-            } else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
-                if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL
-                        || !Controller.getInstance().isWalletUnlocked()) {
-                    // if (true) {
-                    password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
-                    // password =
-                    // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
-                    // password =
-                    // PasswordPane.showUnlockWalletDialog(Gui.getInstance());
-                    // password = PasswordPane.showUnlockWalletDialog(new
-                    // DebugTabPane());
-                    
-                    if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
-                        return;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
-                    return;
-                }
-            }
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
-            
-        } catch (Exception e) {
-            if (e instanceof WebApplicationException) {
-                throw (WebApplicationException) e;
-            }
-            LOGGER.error(e.getMessage(), e);
-            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_UNKNOWN);
-        }
-        
-    }
-    
     public static Tuple3<JSONObject, PrivateKeyAccount, Integer> postPars(HttpServletRequest request, String x) {
         
         try {
@@ -443,7 +306,6 @@ public class APIUtils {
             // check this up here to avoid leaking wallet information to remote
             // user
             // full check is later to prompt user with calculated fee
-            disallowRemote(request);
             
             // CHECK IF WALLET EXISTS
             if (!Controller.getInstance().doesWalletExists()) {
