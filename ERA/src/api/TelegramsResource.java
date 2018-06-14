@@ -91,7 +91,7 @@ public class TelegramsResource {
     public String getTelegramBySignature(@PathParam("signature") String signature) throws Exception {
 
         ///String password = null;
-        ///APIUtils.askAPICallAllowed(password, "GET telegrams/get/" + signature, request);
+        //APIUtils.askAPICallAllowed(password, "GET telegrams/get/" + signature, request);
 
         // DECODE SIGNATURE
         byte[] signatureBytes;
