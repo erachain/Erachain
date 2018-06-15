@@ -58,7 +58,7 @@ public class Settings {
     private static final Integer DEFAULT_FONT_SIZE = 11;
     private static final String DEFAULT_FONT_NAME = "Arial";
     //RPC
-    private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1;localhost";
+    private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
     private static final boolean DEFAULT_RPC_ENABLED = false;
     private static final boolean DEFAULT_BACUP_ENABLED = true;
     private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
