@@ -43,14 +43,14 @@ public class APIUtils {
     
     public static void disallowRemote(HttpServletRequest request, String ipAddress) throws WebApplicationException {
 
-        //if (ServletUtils.isRemoteRequest(request, ipAddress)) {
-        //    for (String ip: Settings.getInstance().getRpcAllowed()) {
-        //        if (ip.equals(ipAddress))
-        //            return;
-        //    }
+        if (ServletUtils.isRemoteRequest(request, ipAddress)) {
+            for (String ip: Settings.getInstance().getRpcAllowed()) {
+                if (ip.equals(ipAddress))
+                    return;
+            }
 
-        //    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
-        //}
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
+        }
     }
     
     public static void askAPICallAllowed(String password, final String messageToDisplay, HttpServletRequest request)

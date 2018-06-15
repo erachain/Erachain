@@ -9,7 +9,8 @@ public class ServletUtils {
         if (servletRequestOpt != null) {
 
             if (!ipAddress.equals("127.0.0.1")
-                    && !ipAddress.equals("localhost")) {
+                    //&& !ipAddress.equals("localhost") - localhost = erro in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
+                    ) {
                 
                 return true;
             }
