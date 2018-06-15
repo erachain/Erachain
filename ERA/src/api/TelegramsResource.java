@@ -113,7 +113,7 @@ public class TelegramsResource {
     }
 
 
-    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false?password=1
+    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false/1
     @SuppressWarnings("unchecked")
     @GET
     @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
@@ -137,7 +137,7 @@ public class TelegramsResource {
         } catch (Exception e1) {
             // TODO Auto-generated catch block
             out.put("status_code", Transaction.INVALID_CREATOR);
-            out.put("status", "Invalid Senser");
+            out.put("status", "Invalid Sender");
             return out.toJSONString();
         }
 

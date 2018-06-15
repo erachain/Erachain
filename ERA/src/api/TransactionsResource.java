@@ -697,7 +697,7 @@ public class TransactionsResource {
         } catch (Exception e1) {
             // TODO Auto-generated catch block
             out.put("status_code", Transaction.INVALID_CREATOR);
-            out.put("status", "Invalid Senser");
+            out.put("status", "Invalid Sender");
             return out.toJSONString();
         }
 
