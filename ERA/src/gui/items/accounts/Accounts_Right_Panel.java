@@ -1,8 +1,19 @@
 package gui.items.accounts;
 
+import gui.AboutFrame;
+import gui.MainFrame;
+import gui.library.Issue_Confirm_Dialog;
 import gui.library.MTable;
+import lang.Lang;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+
+import core.transaction.Transaction;
 
 public class Accounts_Right_Panel extends JPanel {
 
@@ -20,6 +31,10 @@ public class Accounts_Right_Panel extends JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton2;
+    private JPopupMenu mainMenu;
+    private JMenuItem viewInfo;
+    private Accounts_Right_Panel th;
+    protected int row;
     /**
      * Creates new form НовыйJPanel
      */
@@ -36,7 +51,7 @@ public class Accounts_Right_Panel extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-
+        th = this;
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -91,6 +106,50 @@ public class Accounts_Right_Panel extends JPanel {
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(jScrollPane1, gridBagConstraints);
+        
+        mainMenu = new JPopupMenu();
+        mainMenu.addPopupMenuListener(new PopupMenuListener() {
+
+           
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+                // TODO Auto-generated method stub
+                int row1 = jTable1.getSelectedRow();
+                if (row1 < 0) return;
+
+                row = jTable1.convertRowIndexToModel(row1);
+
+
+            }
+        });
+        viewInfo = new JMenuItem(Lang.getInstance().translate("View Transaction"));
+        viewInfo.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+               Transaction transaction = table_Model.getItem(th.row);
+               Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Lang.getInstance().translate("Transaction"));
+               dd.setLocationRelativeTo(th);
+               dd.setVisible(true);
+            }
+            
+        });
+        mainMenu.add(viewInfo);
+        jTable1.setComponentPopupMenu(mainMenu);
     }// </editor-fold>
     // End of variables declaration                   
 }
