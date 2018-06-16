@@ -96,8 +96,6 @@ public class API_TransactionsResource {
         if (unconfirmed)
             result.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address));
 
-        result.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(address));
-
         JSONArray array = new JSONArray();
         for (Transaction transaction : result) {
             if (recordType != null) {

@@ -12,6 +12,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.crypto.Base32;
 import core.item.assets.AssetCls;
@@ -198,6 +199,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность"));
                 this.holdAsset.setText(Lang.getInstance().translate("Подтвердить прием \"на руки\""));
 
+                // поидее тут как ЛИЗИНГ
                 this.debtAsset.setVisible(false);
                 this.debtAssetReturn.setVisible(false);
                 this.debtAssetBackward.setVisible(false);
@@ -219,11 +221,15 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_IMMOVABLE:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить прием в аренду / из аренды"));
+                if(BlockChain.DEVELOP_USE)
+                    this.holdAsset.setText(Lang.getInstance().translate("Прием на охрану/получено из охраны"));
 
-                this.debtAsset.setVisible(false);
-                this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setVisible(false);
+                this.debtAsset.setText(Lang.getInstance().translate("Пепедать в аренду"));
+                this.debtAsset.setVisible(true);
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Изъять из аренды"));
+                this.debtAssetReturn.setVisible(true);
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Вернуть из аренды"));
+                this.debtAssetBackward.setVisible(true);
 
                 break;
                 
