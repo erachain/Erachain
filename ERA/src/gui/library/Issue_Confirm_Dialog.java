@@ -8,6 +8,10 @@ package gui.library;
 import lang.Lang;
 
 import javax.swing.*;
+
+import core.transaction.Transaction;
+import gui.transaction.TransactionDetailsFactory;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,6 +43,11 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
         super(parent, modal);
         Init(parent, modal, text, w, h, status_Text, "");
     }
+    
+    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, int w, int h, String status_Text) {
+        super(parent, modal);
+        Init(parent, modal, transaction, w, h, status_Text, "");
+    }
 
     public void Init(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text, String title_Text) {
         // setUndecorated(true);
@@ -69,6 +78,27 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
         });
     }
 
+    public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, int w, int h, String status_Text, String title_Text) {
+        // setUndecorated(true);
+        insest = UIManager.getFont("Label.font").getSize();
+        if (insest <= 7) insest = 8;
+        initComponents();
+        jTitle_Label.setText(title_Text);
+        JPanel pp = TransactionDetailsFactory.getInstance().createTransactionDetail(transaction);
+        jScrollPane1.setViewportView(pp);
+        jStatus_Label.setText(status_Text);
+        //  setMaximumSize(new Dimension(350,200));
+        setSize(w, h);
+        jButton1.setVisible(false);
+        jButton2.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                dispose();
+            }
+        });
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

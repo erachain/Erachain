@@ -41,7 +41,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     public static final int COLUMN_CONFIRM = 9;
     public static final int COLUMN_ACTION_TYPE = 10;
 
-    private List<Transaction> r_Trans;
+ //   private List<Transaction> r_Trans;
     private HashMap<String, Trans> trans_Hash_Map;
     private Object[] trans_List;
     private boolean isEncrypted = true;
@@ -65,13 +65,9 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
         //sender = new Account("");
         // trans_List = new ArrayList<Trans>();
 
-        r_Trans = new ArrayList<Transaction>();
+       // r_Trans = new ArrayList<Transaction>();
         Controller.getInstance().wallet.database.getTransactionMap().addObserver(this);
         // Controller.getInstance().addObserver(this);
-    }
-
-    public List<Transaction> getList() {
-        return this.r_Trans;
     }
 
     public void repaint() {
@@ -113,7 +109,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
     }
 
     public Transaction getItem(int row) {
-        return this.r_Trans.get(row);
+        return ((Trans) this.trans_List[row]).transaction;
     }
 
     @Override
@@ -310,13 +306,15 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
         // CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
-            if (this.r_Trans.isEmpty()) {
+            if (this.trans_List == null) {
+                
                 ss = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
                 //ss.registerObserver();
                 Controller.getInstance().wallet.database.getTransactionMap().addObserver(ss);
                 ss.sort(TransactionMap.ADDRESS_INDEX, true);
                 // this.r_Trans.sort(NameMap.NAME_INDEX);
                 get_R_Send();
+               
             }
 
             //	this.fireTableDataChanged();
@@ -348,7 +346,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
         if (this.sender == null || this.asset == null)
             return;
-        this.r_Trans.clear();
+     //   this.r_Trans.clear();
         trans_Hash_Map = new HashMap<String, Trans>();
         trans_List = null;
         Iterator<Pair<Tuple2<String, String>, Transaction>> s_it = ss.iterator();
