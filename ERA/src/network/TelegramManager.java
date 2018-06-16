@@ -68,22 +68,17 @@ public class TelegramManager extends Thread {
             if (telegramsAddress == null)
                 return telegrams;
             for (TelegramMessage telegram : telegramsAddress) {
-                if (filter == null)
-                    telegrams.add(telegram);
-                else {
-                    Transaction transaction = telegram.getTransaction();
-                    if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION)
-                        ;
+                Transaction transaction = telegram.getTransaction();
+                if (timestamp >= 0 && telegram.getTransaction().getTimestamp() < timestamp)
+                    continue;
+
+                if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                     String head = ((R_Send) transaction).getHead();
-                    if (head.equals(filter)) {
-                        if (timestamp > 0) {
-                            if (telegram.getTransaction().getTimestamp() >= timestamp)
-                                telegrams.add(telegram);
-                        } else {
-                            telegrams.add(telegram);
-                        }
-                    }
+                    if (!filter.equals(head))
+                        continue;
                 }
+                
+                telegrams.add(telegram);
             }
         }
 
@@ -101,18 +96,17 @@ public class TelegramManager extends Thread {
                 List<TelegramMessage> telegramsTimestamp = item.getValue();
                 if (telegramsTimestamp != null) {
                     for (TelegramMessage telegram : telegramsTimestamp) {
-                        if (filter == null) {
-                            telegrams.add(telegram);
-                        } else {
-                            Transaction transactopn = telegram.getTransaction();
-                            // if (transactopn instanceof R_Send) {
-                            if (transactopn.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                                String head = ((R_Send) transactopn).getHead();
-                                if (head.equals(filter)) {
-                                    telegrams.add(telegram);
-                                }
-                            }
+                        Transaction transaction = telegram.getTransaction();
+                        if (timestamp >= 0 && telegram.getTransaction().getTimestamp() < timestamp)
+                            continue;
+
+                        if (filter != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                            String head = ((R_Send) transaction).getHead();
+                            if (!filter.equals(head))
+                                continue;
                         }
+                        
+                        telegrams.add(telegram);
                     }
                 }
             }
