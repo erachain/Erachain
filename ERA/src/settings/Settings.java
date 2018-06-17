@@ -29,6 +29,7 @@ import core.BlockChain;
 import lang.Lang;
 import network.Peer;
 import ntp.NTP;
+import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
@@ -43,6 +44,7 @@ public class Settings {
     public static final String DEFAULT_LOCAL_DIR = "datalocal";
     public static final String DEFAULT_WALLET_DIR = "wallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
+    public static final String DEFAULT_TEMP_DIR = "temp";
     private static final Logger LOGGER = Logger.getLogger(Settings.class);
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 20; // for OWN maked connections
@@ -99,6 +101,7 @@ public class Settings {
     private InetAddress localAddress;
     private String[] defaultPeers = {};
 
+    private String tmpPath;
     private String getBackUpPath;
     private String getWalletPath;
     private String dataPath;
@@ -189,6 +192,26 @@ public class Settings {
 		
     }
     
+ public String getTemDir(){
+     String path = "";
+     try {
+         
+         if (this.tmpPath.equals("")) {
+             path= this.userPath + DEFAULT_TEMP_DIR;
+         }
+         else path =  this.tmpPath;
+     } catch (Exception e) {
+         // TODO Auto-generated catch block
+         path = this.userPath + DEFAULT_TEMP_DIR;
+     }
+     // if temp dir not exist make dir
+     File tempDir = new File(path);
+     if (!tempDir.exists()) {
+             tempDir.mkdir();
+     }
+        
+     return path;
+    }
 
     public String getBackUpDir() {
         try {
@@ -953,6 +976,8 @@ public class Settings {
         return settingsJSON;
 
     }
+    
+   
 
 
 }

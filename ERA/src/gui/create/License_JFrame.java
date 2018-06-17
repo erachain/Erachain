@@ -1,168 +1,364 @@
 package gui.create;
 
+
+
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.nio.charset.Charset;
+import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JTextPane;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
 import com.github.rjeschke.txtmark.Processor;
+import com.sun.pdfview.PDFFile;
+import com.sun.pdfview.PDFPage;
+import com.sun.pdfview.PagePanel;
 
 import controller.Controller;
-import core.transaction.R_SignNote;
-import datachain.DCSet;
+import core.BlockChain;
+import gui.MainFrame;
 import lang.Lang;
-import settings.Settings;
 
+/**
+ * An example of using the PagePanel class to show PDFs. For more advanced
+ * usage including navigation and zooming, look ad the 
+ * com.sun.pdfview.PDFViewer class.
+ *
+ * @author joshua.marinacci@sun.com
+ */
 public class License_JFrame extends JDialog {
+
+    private JScrollPane ss;
+    private int pages1;
+    private PDFPage page;
+    private PagePanel panel;
+    private PDFFile pdffile;
+    private License_JFrame th = this;
+  //  private static JFrame frame;
+    private boolean needAccept;
+    private int goCreateWallet;
+    int height;
+    int width;
     
-    static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
-    boolean needAccept;
-    NoWalletFrame parent;
-    int goCreateWallet;
-    String license;
+    JFrame parent;
+    Tuple2 Transaction = BlockChain.DEVELOP_USE?new Tuple2(1,1): new Tuple2(148450,1);;
     
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JCheckBox jCheckBox1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private JTextPane messageText;
-    
-    public License_JFrame(boolean needAccept, NoWalletFrame parent, int goCreateWallet) {
+public License_JFrame(boolean needAccept, JFrame parent, int goCreateWallet) {
         
         this.needAccept = needAccept;
         this.parent = parent;
         this.goCreateWallet = goCreateWallet;
         
-        this.license = "<html>" + Processor.process(getLicenseText()) + "</html>";
-        
-        initComponents();
-    }
-    
-    public License_JFrame() {
-        //this.license = "<html>" + Processor.process(getLicenseText()) + "</html>";
-        this.license = getLicenseText();
-        
-        needAccept = false;
-        initComponents();
-    }
-    
-    public String getLicenseText() {
         try {
-            Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
-            if (langRef == null)
-                langRef = Controller.LICENSE_LANG_REFS.get("en");
-            
-            R_SignNote record = (R_SignNote) DCSet.getInstance().getTransactionFinalMap().get(langRef);
-            
-            String message;
-            if (record.getVersion() == 2) {
-                Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
-                message = (String) a.c.get("MS");
-                
-            } else {
-                
-                try {
-                    JSONObject data = (JSONObject) JSONValue
-                            .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
-                    message = (String) data.get("Message");
-                } catch (Exception e) {
-                    message = new String(record.getData(), Charset.forName("UTF-8"));
-                }
-            }
-            
-            return message; // Processor.process(
-            
-        } catch (Exception e1) {
-            // USE default LICENSE
-            return DCSet.getInstance().getItemTemplateMap().get(2l).getDescription();
-            
+            setup();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        
     }
+
+public License_JFrame() {
+    //this.license = "<html>" + Processor.process(getLicenseText()) + "</html>";
+    needAccept = false;
     
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
-    private void initComponents() {
+    try {
+        setup();
+       
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+}
+
+    public void setup() throws IOException {
         
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        
+        width =  screens.width;
+        height = (int) (width*1.4);
+        initComponents();
+        setTitle(Lang.getInstance().translate("License"));
         List<Image> icons = new ArrayList<Image>();
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon16.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        this.setModal(true);
+      // 
+        okButton.setEnabled(false);
+        okCheckBox.setEnabled(false);
         
-        java.awt.GridBagConstraints gridBagConstraints;
-        
-        jCheckBox1 = new javax.swing.JCheckBox();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        // jTextArea1 = new javax.swing.JTextArea();
-        
-        messageText = new JTextPane();
-        messageText.setContentType("text/html");
-        
-        jLabel1 = new javax.swing.JLabel();
-        
-        // setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle(Lang.getInstance().translate("License"));
-        setMinimumSize(new java.awt.Dimension(500, 350));
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-        
-        jCheckBox1.setText(Lang.getInstance().translate("I accept"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(6, 8, 6, 0);
-        if (needAccept)
-            getContentPane().add(jCheckBox1, gridBagConstraints);
-        
-        jCheckBox1.addItemListener(new ItemListener() {
-            
+        okCheckBox.addActionListener(new ActionListener(){
+
             @Override
-            public void itemStateChanged(ItemEvent arg0) {
+            public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub
-                jButton1.setEnabled(!jButton1.isEnabled());
+                if(okCheckBox.isSelected()) okButton.setEnabled(true);
+                else okButton.setEnabled(false);
             }
+            
         });
         
-        jButton1.setEnabled(false);
-        jButton1.setText(Lang.getInstance().translate("Next"));
+        nextPageButton.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+               if( pages1 < pdffile.getNumPages()){
+                pages1++;
+                page = pdffile.getPage(pages1);
+                panel.showPage(page);
+               } else
+                   okCheckBox.setEnabled(true);
+            }
+            
+        });
+        
+        cancelButton.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+             th.dispose();
+            }
+            
+        });
+        prevPageButton.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+               if( pages1 > 0){
+                pages1--;
+                page = pdffile.getPage(pages1);
+                panel.showPage(page);
+               }
+            }
+            
+        });
+        
+        zoomAddutton.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                zoomIndex+=0.1;
+                th.height = (int)(th.height*zoomIndex);
+                th.width = (int)(th.width*zoomIndex);
+                panel.setPreferredSize(new Dimension(th.width, th.height));
+                //panel.repaint();
+                jScrollPane1.setViewportView(panel);
+                
+               }
+            
+        });
+        
+        zoomMinButton.addActionListener(new ActionListener(){
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                if (zoomIndex> 0.3) zoomIndex-=0.1;
+                
+                th.height = (int)(th.height*zoomIndex);
+                th.width = (int)(th.width*zoomIndex);
+                panel.setPreferredSize(new Dimension(th.width, th.height));
+                //panel.repaint();
+                jScrollPane1.setViewportView(panel);
+                
+               }
+            
+        });
+        
+        //set up the frame and panel
+  //       th.setTitle("");
+  //      th.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+       panel = new PagePanel();
+        jScrollPane1.setViewportView(panel);
+         th.add(mainPanel);
+       
+
+        //load a pdf from a byte buffer
+        File file = new File("License Erachain 0107.pdf");
+        RandomAccessFile raf = new RandomAccessFile(file, "r");
+        FileChannel channel = raf.getChannel();
+        ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
+            0, channel.size());
+        pdffile = new PDFFile(buf);
+        zoomIndex = 1.0;
+      //  PDFViewer vv = new PDFViewer(true);
+        th.setPreferredSize(new Dimension());
+        pages1 = 1;
+        // show the first page
+       
+        this.addComponentListener(new ComponentListener(){
+
+            @Override
+            public void componentHidden(ComponentEvent arg0) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent arg0) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            @Override
+            public void componentResized(ComponentEvent arg0) {
+                // TODO Auto-generated method stub
+                
+            }
+
+            @Override
+            public void componentShown(ComponentEvent arg0) {
+                // TODO Auto-generated method stub
+                page = pdffile.getPage(pages1);
+                panel.setPreferredSize(new Dimension(th.width, th.height));
+                panel.showPage(page);
+            }
+            
+        });
+       // Toolkit kit = Toolkit.getDefaultToolkit();
+       // Dimension screens = kit.getScreenSize();
+        int h = (int) (screens.height*0.9);
+        int w = (int) (screens.width*0.9);
+        this.setModal(true);
+        th.setPreferredSize(new Dimension(w,h));
+        
+        th.pack();
+        this.setLocationRelativeTo(null);
+        th.setVisible(true);
+       
+    //    new PDFDisplay("C:\\Users\\Саша\\workspace\\ERA+Berkeley\\License Erachain 0107.pdf", 1);
+
+    }
+    private void initComponents() {
+        mainPanel = new JPanel();
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        PagejPanel = new javax.swing.JPanel();
+        prevPageButton = new javax.swing.JButton();
+        nextPageButton = new javax.swing.JButton();
+        jnumPageTextField = new javax.swing.JTextField();
+        zoomMinButton = new javax.swing.JButton();
+        zoomAddutton = new javax.swing.JButton();
+        okButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        zoom_jPanel = new javax.swing.JPanel();
+        okCheckBox = new JCheckBox ();
+
+        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+        layout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        layout.rowHeights = new int[] {0, 8, 0, 8, 0, 8, 0};
+        mainPanel.setLayout(layout);
+
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText(Lang.getInstance().translate("Read carefully") + "!");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 15, 8, 0);
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 13;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(10, 8, 0, 8);
+       
+        
         
         if (needAccept)
-            getContentPane().add(jButton1, gridBagConstraints);
+            mainPanel.add(jLabel1, gridBagConstraints);
         
-        jButton1.addActionListener(new ActionListener() {
+        
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 13;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
+        mainPanel.add(jScrollPane1, gridBagConstraints);
+
+        java.awt.GridBagLayout PagejPanelLayout = new java.awt.GridBagLayout();
+        PagejPanelLayout.columnWidths = new int[] {0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0, 5, 0};
+        PagejPanelLayout.rowHeights = new int[] {0, 8, 0};
+        PagejPanel.setLayout(PagejPanelLayout);
+
+        prevPageButton.setText("<<");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        PagejPanel.add(prevPageButton, gridBagConstraints);
+
+        nextPageButton.setText(">>");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        PagejPanel.add(nextPageButton, gridBagConstraints);
+
+        jnumPageTextField.setPreferredSize(new java.awt.Dimension(30, 20));
+        jnumPageTextField.setRequestFocusEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+     //   PagejPanel.add(jnumPageTextField, gridBagConstraints);
+
+        zoomMinButton.setText("Zoom -");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 14;
+        gridBagConstraints.gridy = 0;
+        PagejPanel.add(zoomMinButton, gridBagConstraints);
+
+        zoomAddutton.setText("Zoom +");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 12;
+        gridBagConstraints.gridy = 0;
+        PagejPanel.add(zoomAddutton, gridBagConstraints);
+
+        okCheckBox.setText(Lang.getInstance().translate("I accept"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+    //    PagejPanel.add(okCheckBox, gridBagConstraints);
+        if (needAccept)
+            PagejPanel.add(okCheckBox, gridBagConstraints);
+        
+        okButton.setText(Lang.getInstance().translate("Next"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 3;
+       // PagejPanel.add(okButton, gridBagConstraints);
+
+        if (needAccept)
+            PagejPanel.add(okButton, gridBagConstraints);
+        
+        okButton.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -170,21 +366,20 @@ public class License_JFrame extends JDialog {
                 setVisible(false);
                 
                 if (parent != null)
-                    parent.goAfterLicence(goCreateWallet);
+                   ((NoWalletFrame) parent).goAfterLicence(goCreateWallet);
             }
             
         });
-        
-        jButton2.setText(Lang.getInstance().translate(parent == null ? "Not Accept" : "Back"));
+        cancelButton.setText(Lang.getInstance().translate(parent == null ? "Not Accept" : "Back"));
+        cancelButton.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 8;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 8, 8);
+      //  PagejPanel.add(cancelButton, gridBagConstraints);
         if (needAccept)
-            getContentPane().add(jButton2, gridBagConstraints);
+            PagejPanel.add(cancelButton, gridBagConstraints);
         
-        jButton2.addActionListener(new ActionListener() {
+        cancelButton.addActionListener(new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -199,8 +394,27 @@ public class License_JFrame extends JDialog {
                 }
             }
         });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 13;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 10, 8);
+        mainPanel.add(PagejPanel, gridBagConstraints);
+
+        zoom_jPanel.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 13;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
+        mainPanel.add(zoom_jPanel, gridBagConstraints);
         
-        // CLOSE NICELY
+     // CLOSE NICELY
         this.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 
@@ -212,42 +426,25 @@ public class License_JFrame extends JDialog {
             }
         });
         
-        messageText.setText(this.license);
-        jScrollPane1.setViewportView(messageText);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        getContentPane().add(jScrollPane1, gridBagConstraints);
-        
-        jLabel1.setText(Lang.getInstance().translate("Read carefully") + "!");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 0, 8);
-        if (needAccept)
-            getContentPane().add(jLabel1, gridBagConstraints);
-        this.setAlwaysOnTop(true);
-        this.setUndecorated(false);
-        // if (needAccept) this.setUndecorated(true);
-        // Current size of the default screen
-        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        pack();
-        // this.setLocationRelativeTo(null);
-        this.setSize(dim);
-        this.setVisible(true);
-    }
-    // </editor-fold>
-    // End of variables declaration
+    }// </editor-fold>                        
+   
+   
+
     
+ // Variables declaration - do not modify                     
+    private  javax.swing.JPanel PagejPanel;
+    private javax.swing.JButton cancelButton;
+    private  javax.swing.JLabel jLabel1;
+    public  javax.swing.JScrollPane jScrollPane1;
+    private  javax.swing.JTextField jnumPageTextField;
+    private  javax.swing.JButton nextPageButton;
+    private  javax.swing.JButton okButton;
+    private  javax.swing.JButton prevPageButton;
+    private  javax.swing.JButton zoomAddutton;
+    private  javax.swing.JButton zoomMinButton;
+    private  javax.swing.JPanel zoom_jPanel;
+    private  JPanel mainPanel;
+    static double zoomIndex;
+    private javax.swing.JCheckBox okCheckBox;
+    // End of variables declaration    
 }

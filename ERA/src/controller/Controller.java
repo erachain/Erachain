@@ -839,6 +839,10 @@ public class Controller extends Observable {
         if (this.isStopping)
             return;
         this.isStopping = true;
+        // delete temp Dir
+        LOGGER.info("Delete files from TEMP dir");
+        for (File file: new File(Settings.getInstance().getTemDir()).listFiles()) 
+            if (file.isFile()) file.delete();
         
         // STOP MESSAGE PROCESSOR
         LOGGER.info("Stopping message processor");
