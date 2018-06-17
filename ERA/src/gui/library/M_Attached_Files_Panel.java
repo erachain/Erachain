@@ -1,12 +1,15 @@
 package gui.library;
 
 import lang.Lang;
+import settings.Settings;
 import utils.TableMenuPopupUtil;
 import utils.Zip_Bytes;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
+
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
@@ -94,8 +97,73 @@ public class M_Attached_Files_Panel extends JPanel {
 
             }
         });
-
+        
         menu.add(vsend_Coins_Item);
+        
+        JMenuItem open_Item = new JMenuItem(Lang.getInstance().translate("Open File"));
+
+        open_Item.addActionListener(new ActionListener() {
+
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (table.getSelectedRow() < 0) return;
+                int row = table.convertRowIndexToModel(table.getSelectedRow());
+                String str = (String) model.getValueAt(row, 0);
+               
+
+               
+
+                    String pp = Settings.getInstance().getTemDir()+ File.separator + str;// "era_default_file" ;
+
+                    File ff = new File( pp);
+                    // if file
+                    if (ff.exists() && ff.isFile()) {
+                        ff.delete();
+
+                    }
+
+
+                    try (FileOutputStream fos = new FileOutputStream(pp)) {
+                        byte[] buffer = (byte[]) model.getValueAt(row, 2);
+                        // if ZIP
+                        if ((boolean) model.getValueAt(row, 1)) {
+                            byte[] buffer1 = null;
+                            try {
+                                buffer1 = Zip_Bytes.decompress(buffer);
+                            } catch (DataFormatException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                            fos.write(buffer1, 0, buffer1.length);
+                        } else {
+                            fos.write(buffer, 0, buffer.length);
+                        }
+                       
+                        
+
+                    } catch (IOException ex) {
+
+                      //  System.out.println(ex.getMessage());
+                    }
+
+                                
+                        try {
+                             
+                            Desktop.getDesktop().open(ff);
+                        } catch (IOException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                
+
+
+            }
+        });
+        
+        // if desctop supported
+        if(Desktop.getDesktop().isDesktopSupported())    menu.add(open_Item);
 
         TableMenuPopupUtil.installContextMenu(table, menu);
 
