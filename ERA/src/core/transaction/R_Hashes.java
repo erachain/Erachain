@@ -1,8 +1,22 @@
 package core.transaction;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Stack;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -10,14 +24,6 @@ import core.crypto.Base58;
 import core.item.persons.PersonCls;
 import datachain.DCSet;
 import datachain.HashesSignsMap;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 //import java.math.BigDecimal;
 //import java.math.BigInteger;
@@ -240,8 +246,9 @@ public class R_Hashes extends Transaction {
         if (url != null && url.length != 0)
             return true;
 
-        if (data == null || data.length == 0)
+        if (true || data == null || data.length == 0)
             return false;
+        
         //if (Arrays.equals(this.encrypted,new byte[0]))
         //	return false;
 
@@ -282,6 +289,10 @@ public class R_Hashes extends Transaction {
         byte[] data = super.toBytes(withSign, releaserReference);
 
         //WRITE URL SIZE
+        if (this.url == null) {
+            this.url = new byte[0];
+        }
+         
         data = Bytes.concat(data, new byte[]{(byte) this.url.length});
 
         //WRITE URL
@@ -312,7 +323,7 @@ public class R_Hashes extends Transaction {
     @Override
     public int getDataLength(boolean asPack) {
 
-        int add_len = this.url.length
+        int add_len = this.url == null? 0 : this.url.length
                 + this.data.length
                 + this.hashes.length * HASH_LENGTH;
 
@@ -327,7 +338,7 @@ public class R_Hashes extends Transaction {
     public int isValid(Long releaserReference, long flags) {
 
         //CHECK DATA SIZE
-        if (url.length > MAX_URL_LENGTH) {
+        if (url != null && url.length > MAX_URL_LENGTH) {
             return INVALID_URL_LENGTH;
         }
 

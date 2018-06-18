@@ -1,5 +1,15 @@
 package test.records;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Stack;
+
+import org.junit.Test;
+import org.mapdb.Fun.Tuple3;
+
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
@@ -11,15 +21,6 @@ import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import datachain.HashesSignsMap;
 import ntp.NTP;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple3;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Stack;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 //import java.math.BigInteger;
 //import java.util.ArrayList;
@@ -152,7 +153,8 @@ public class TestRecHash {
         byte[] hash0 = maker.getPublicKey();
         hashes[0] = hash0;
 
-        hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new R_Hashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord.setDC(db, false);
 
         assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(releaserReference, flags));
 
