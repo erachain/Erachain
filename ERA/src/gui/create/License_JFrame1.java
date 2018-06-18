@@ -25,7 +25,10 @@ import org.mapdb.Fun.Tuple3;
 import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
+import core.item.templates.TemplateCls;
+import core.transaction.IssueTemplateRecord;
 import core.transaction.R_SignNote;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
 import settings.Settings;
@@ -57,7 +60,6 @@ public class License_JFrame1 extends JDialog {
     }
     
     public License_JFrame1() {
-        //this.license = "<html>" + Processor.process(getLicenseText()) + "</html>";
         this.license = getLicenseText();
         
         needAccept = false;
@@ -65,36 +67,48 @@ public class License_JFrame1 extends JDialog {
     }
     
     public String getLicenseText() {
-        try {
-            Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
-            if (langRef == null)
-                langRef = Controller.LICENSE_LANG_REFS.get("en");
-            
-            R_SignNote record = (R_SignNote) DCSet.getInstance().getTransactionFinalMap().get(langRef);
-            
-            String message;
-            if (record.getVersion() == 2) {
-                Tuple3<String, String, JSONObject> a = record.parse_Data_V2_Without_Files();
-                message = (String) a.c.get("MS");
+        
+        Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
+        if (langRef == null)
+            langRef = Controller.LICENSE_LANG_REFS.get("en");
+        
+        String message;
+        Transaction record = DCSet.getInstance().getTransactionFinalMap().get(langRef);
+        if (record == null) {
+            TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
+            message = Processor.process(template.getDescription());
+        } else {
+            if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
                 
-            } else {
-                
-                try {
-                    JSONObject data = (JSONObject) JSONValue
-                            .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
-                    message = (String) data.get("Message");
-                } catch (Exception e) {
-                    message = new String(record.getData(), Charset.forName("UTF-8"));
+                R_SignNote note = (R_SignNote) record;
+                if (record.getVersion() == 2) {
+                    try {
+                        Tuple3<String, String, JSONObject> a = note.parse_Data_V2_Without_Files();
+                        message = (String) a.c.get("MS");
+                    } catch (Exception e) {
+                        message = new String(note.getData(), Charset.forName("UTF-8"));
+                    }
+                    
+                } else {
+                    
+                    try {
+                        JSONObject data = (JSONObject) JSONValue
+                                .parseWithException(new String(note.getData(), Charset.forName("UTF-8")));
+                        message = (String) data.get("Message");
+                    } catch (Exception e) {
+                        message = new String(note.getData(), Charset.forName("UTF-8"));
+                    }
                 }
+            } else if (record.getType() == Transaction.ISSUE_TEMPLATE_TRANSACTION) {
+                IssueTemplateRecord template = (IssueTemplateRecord) record;
+                message = template.getItem().getDescription();
+            } else {
+                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
+                message = Processor.process(template.getDescription());
             }
-            
-            return message; // Processor.process(
-            
-        } catch (Exception e1) {
-            // USE default LICENSE
-            return DCSet.getInstance().getItemTemplateMap().get(2l).getDescription();
-            
         }
+        
+        return message;
         
     }
     

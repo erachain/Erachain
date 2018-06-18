@@ -138,21 +138,6 @@ public class Start {
                             SysTray.getInstance().createTrayIcon();
                             about_frame.setVisible(false);
                             about_frame.getInstance().dispose();
-                            //Controller.getInstance().setWalletLicense(0); // TEST
-                            /*
-                            if (Controller.getInstance().doesWalletExists() &&
-                                    Controller.LICENSE_VERS > Controller.getInstance().getWalletLicense()) {
-                                // TODO: тут нужно чтобы лицензия вызывалась для подтверждения и если НЕТ то закрывать прогу сразу
-                                //ItemCls.TEMPLATE_TYPE
-                                TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(Controller.LICENSE_VERS);
-                                if (template == null) {
-                                    // USE default LICENSE
-                                    template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
-                                }
-                                //	new License_JFrame(template);
-                                Controller.getInstance().setWalletLicense(Controller.LICENSE_VERS);
-                            }
-                            */
                         }
                     } catch (Exception e1) {
                         if (Controller.useGui) about_frame.setVisible(false);
