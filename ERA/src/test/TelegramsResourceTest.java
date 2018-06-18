@@ -74,4 +74,25 @@ public class TelegramsResourceTest extends SettingTests {
  */
         new ApiClient().executeCommand("GET wallet/lock");
     }
+
+    @Test
+    public void sendPost() throws Exception {
+        new ApiClient().executeCommand("POST wallet/unlock 1234567");
+
+        String resultAddresses = new ApiClient().executeCommand("GET addresses");
+        String[] parse = (resultAddresses.replace("\r\n", "").split(","));
+        String address = (parse[0].replace("[", "").replace("]", ""))
+                .trim().replace("\"", "");
+
+
+        String r = new ApiClient().executeCommand("POST telegrams/send {'sender': '" + address + "', " +
+                "'recipient': '7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu', " +
+                "'asset': 2, " +
+                "'amount': '0.0001', " +
+                "'title': 'title'," +
+                "'message': 'some text', " +
+                "'istextmessage': 'true', " +
+                "'encrypt': false, " +
+                "'password': '12' }");
+    }
 }
