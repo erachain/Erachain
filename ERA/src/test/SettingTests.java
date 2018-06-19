@@ -16,7 +16,14 @@ public class SettingTests {
      * url remote node
      */
     protected final static String URL_REMOTE_NODE = "http://explorer.erachain.org:9067";
-    //TODO сделать запуск всей ноды для теста
-    //Class.forName("Start").getMethod("main", String[].class).in;
+
+    protected void Init() throws Exception {
+
+        Class<? extends String[]> initArgs = (new String[]{"test5"}).getClass();
+        Class.forName("Start").getMethod("main", initArgs).invoke(null);
+
+    }
+
+
 }
 
