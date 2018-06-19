@@ -253,7 +253,7 @@ public abstract class AssetCls extends ItemCls {
 
 
     public PublicKeyAccount getOwner() {
-	if (this.key == 7 || this.key == 8) {
+	if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
 	    return BlockChain.ASSET_OWNERS.get(this.key);
 	}
 	

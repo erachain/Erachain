@@ -35,7 +35,7 @@ import settings.Settings;
 
 public class License_JFrame1 extends JDialog {
     
-    static Logger LOGGER = Logger.getLogger(License_JFrame.class.getName());
+    static Logger LOGGER = Logger.getLogger(License_JFrame1.class.getName());
     boolean needAccept;
     NoWalletFrame parent;
     int goCreateWallet;

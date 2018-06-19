@@ -121,7 +121,8 @@ public abstract class Transaction {
     public static final int INVALID_HOLD_DIRECTION = 47;
     public static final int INVALID_ECXHANGE_PAIR = 48;
     
-    
+    public static final int NO_INCLAIM_BALANCE = 49;
+
     public static final int INVALID_NAME_LENGTH = 50;
     public static final int INVALID_ICON_LENGTH = 51;
     public static final int INVALID_IMAGE_LENGTH = 52;
