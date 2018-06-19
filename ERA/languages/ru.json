@@ -757,7 +757,7 @@
   "Timestamp": "Дата",
   "To": "Для",
   "To: (Account or name)": "Кому: (Счёт или имя)",
-  "To: (address or name)": "Кому: (Адрес или имя)",
+  "To: (address or name)": "Кому: (Счет или публичный ключ)",
   "Total": "Итого",
   "To Buy": "Купить",
   "Total Buy": "Сумма продажи",
