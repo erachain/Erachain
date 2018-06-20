@@ -809,12 +809,13 @@ public abstract class TransactionAmount extends Transaction {
             return;
         
         long absKey = getAbsKey();
+        int actionType = Account.actionType(key, amount);
+        boolean incomeReverse = actionType == ACTION_HOLD;
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
         // ASSET ACTIONS PROCESS
-        int actionType = Account.actionType(key, amount);
                 
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
@@ -840,7 +841,7 @@ public abstract class TransactionAmount extends Transaction {
                 this.recipient.changeBalance(db, backward, key, this.amount, false);
                 
             }
-        } if (actionType == ACTION_DEBT) {
+        } if (false && actionType == ACTION_DEBT) {
             if (backward) {
                 // UPDATE CREDITOR
                 this.creator.changeBalance(db, !backward, key, this.amount, true);
@@ -856,12 +857,12 @@ public abstract class TransactionAmount extends Transaction {
         } else {
             // UPDATE SENDER
             if (absKey == 666l) {
-                this.creator.changeBalance(db, backward, key, this.amount, !backward);
+                this.creator.changeBalance(db, backward, key, this.amount, !incomeReverse);
             } else {
-                this.creator.changeBalance(db, !backward, key, this.amount, !backward);
+                this.creator.changeBalance(db, !backward, key, this.amount, !incomeReverse);
             }
             // UPDATE RECIPIENT
-            this.recipient.changeBalance(db, backward, key, this.amount, backward);            
+            this.recipient.changeBalance(db, backward, key, this.amount, incomeReverse);            
         }
         
         
@@ -938,12 +939,13 @@ public abstract class TransactionAmount extends Transaction {
             return;
         
         long absKey = getAbsKey();
+        int actionType = Account.actionType(key, amount);
+        boolean incomeReverse = actionType == ACTION_HOLD;
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
         // ASSET ACTIONS PROCESS
-        int actionType = Account.actionType(key, amount);
 
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
@@ -968,7 +970,7 @@ public abstract class TransactionAmount extends Transaction {
                 
             }
 
-        } if (actionType == ACTION_DEBT) {
+        } if (false && actionType == ACTION_DEBT) {
             if (backward) {
                 // UPDATE CREDITOR
                 this.creator.changeBalance(db, backward, key, this.amount, true);
@@ -985,12 +987,12 @@ public abstract class TransactionAmount extends Transaction {
     
             // UPDATE SENDER
             if (absKey == 666l) {
-                this.creator.changeBalance(db, !backward, key, this.amount, !backward);
+                this.creator.changeBalance(db, !backward, key, this.amount, !incomeReverse);
             } else {
-                this.creator.changeBalance(db, backward, key, this.amount, !backward);
+                this.creator.changeBalance(db, backward, key, this.amount, !incomeReverse);
             }
             // UPDATE RECIPIENT
-            this.recipient.changeBalance(db, !backward, key, this.amount, backward);
+            this.recipient.changeBalance(db, !backward, key, this.amount, incomeReverse);
             
         }
         
