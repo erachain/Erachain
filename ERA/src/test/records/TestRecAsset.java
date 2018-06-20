@@ -39,6 +39,10 @@ public class TestRecAsset {
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
 
+    byte version = 2;
+    byte prop2 = 0;    
+    byte prop1_backward = core.transaction.TransactionAmount.BACKWARD_MASK;
+
     long flags = 0l;
     Controller cntrl;
     //CREATE KNOWN ACCOUNT
@@ -856,31 +860,33 @@ public class TestRecAsset {
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueMessageTransaction = new IssueAssetTransaction(maker, assetMovable, FEE_POWER, timestamp++, maker.getLastTimestamp(db));
-        assertEquals(Transaction.VALIDATE_OK, issueMessageTransaction.isValid(releaserReference, flags));
+        issueMessageTransaction.setDC(db, false);
 
         issueMessageTransaction.sign(maker, false);
         issueMessageTransaction.process(gb, false);
         long key = assetMovable.getKey(db);
 
         //assertEquals(asset.getQuantity(), maker.getConfirmedBalance(FEE_KEY, db));
-        assertEquals(new BigDecimal(assetMovable.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
+        assertEquals(new BigDecimal(assetMovable.getQuantity()), maker.getBalanceUSE(key, db));
 
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
 
         //CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100),
                 "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS INVALID
-        assertEquals(Transaction.NO_HOLD_BALANCE, rsend.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_HOLD_DIRECTION, rsend.isValid(releaserReference, flags));
 
         //CREATE VALID ASSET TRANSFER
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS VALID
         assertEquals(Transaction.VALIDATE_OK, rsend.isValid(releaserReference, flags));
 
@@ -888,10 +894,15 @@ public class TestRecAsset {
         rsend.process(gb, false);
 
         //NOW IT WILL BE vaLID
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(
+                version,
+                prop1_backward,
+                prop2,
+                maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS INVALID
         assertEquals(Transaction.VALIDATE_OK, rsend.isValid(releaserReference, flags));
 
@@ -899,62 +910,74 @@ public class TestRecAsset {
 
         //CREATE VALID ASSET TRANSFER
         //maker.setConfirmedBalance(key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), db);
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS VALID
         assertEquals(Transaction.VALIDATE_OK, rsend.isValid(releaserReference, flags));
 
         //CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(
+                version,
+                prop1_backward,
+                prop2,
+                maker, FEE_POWER, recipient, key, BigDecimal.valueOf(-100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS INVALID
         assertEquals(Transaction.NO_HOLD_BALANCE, rsend.isValid(releaserReference, flags));
 
 
         //CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
-        rsend = new R_Send(maker, FEE_POWER, recipient, 99, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(maker, FEE_POWER, recipient, 99, BigDecimal.valueOf(100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS INVALID
         assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, rsend.isValid(releaserReference, flags));
 
         //CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
-        rsend = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(maker, FEE_POWER, recipient, key - 1, BigDecimal.valueOf(100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS INVALID
         assertEquals(Transaction.NO_BALANCE, rsend.isValid(releaserReference, flags));
 
         //CREATE INVALID ASSET TRANSFER WRONG REFERENCE
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, -123L);
 
+        rsend.setDC(db, false);
         //CHECK IF ASSET TRANSFER IS INVALID
         assertEquals(Transaction.INVALID_REFERENCE, rsend.isValid(releaserReference, flags));
 
         // NOT DIVISIBLE
         asset = new AssetVenture(maker, "not divisible", icon, image, "asdasda", 0, 8, 0l);
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp++, maker.getLastTimestamp(db));
+        issueAssetTransaction.setDC(db, false);
+
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(releaserReference, flags));
         issueAssetTransaction.sign(maker, false);
         issueAssetTransaction.process(gb, false);
         Long key_1 = issueAssetTransaction.getAssetKey(db);
         assertEquals(key + 1, (long) key_1);
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key_1, db));
+        assertEquals(BigDecimal.ZERO, maker.getBalanceUSE(key_1, db));
 
         BigDecimal amo = BigDecimal.TEN.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         //CREATE INVALID ASSET TRANSFER WRONG REFERENCE
         rsend = new R_Send(maker, FEE_POWER, recipient, key_1,
                 amo,
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker.getLastTimestamp(db));
+        rsend.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, rsend.isValid(releaserReference, flags));
         rsend.process(gb, false);
 
@@ -965,12 +988,13 @@ public class TestRecAsset {
 
         rsend = new R_Send(maker_1, FEE_POWER, recipient, key_1,
                 amo,
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, maker_1.getLastTimestamp(db));
+        rsend.setDC(db, false);
         assertEquals(Transaction.NO_BALANCE, rsend.isValid(releaserReference, flags));
 
         //CHECK IF UNLIMITED ASSET TRANSFERED with no balance
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker_1.getBalanceUSE(key_1, db));
+        assertEquals(BigDecimal.ZERO, maker_1.getBalanceUSE(key_1, db));
 
     }
 
@@ -989,10 +1013,10 @@ public class TestRecAsset {
         balance5 = maker.getBalance(db, keyMovable);
 
         //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.a);
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.c.a);
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.c.b);
+        assertEquals(BigDecimal.valueOf(500), balance5.a.a);
+        assertEquals(BigDecimal.valueOf(500), balance5.a.b);
+        assertEquals(BigDecimal.valueOf(500), balance5.c.a);
+        assertEquals(BigDecimal.valueOf(500), balance5.c.b);
 
 
         //CREATE SIGNATURE
@@ -1000,13 +1024,13 @@ public class TestRecAsset {
         long timestamp = NTP.getTime();
 
         //CREATE ASSET TRANSFER
-        rsend = new R_Send(maker, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
+        rsend = new R_Send(maker, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(1000),
+                "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, 0l);
         rsend.setDC(db, false);
         assertEquals(rsend.isValid(releaserReference, flags), Transaction.NO_BALANCE);
 
-        rsend = new R_Send(maker, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+        rsend = new R_Send(maker, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(5),
                 "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, 0l);
         rsend.setDC(db, false);
@@ -1020,14 +1044,14 @@ public class TestRecAsset {
         balance5 = maker.getBalance(db, keyMovable);
 
         //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.a);
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
+        assertEquals(BigDecimal.valueOf(500), balance5.a.a);
+        assertEquals(BigDecimal.valueOf(495), balance5.a.b);
 
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
-        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
+        assertEquals(BigDecimal.valueOf(500), balance5.c.b);
+        assertEquals(BigDecimal.valueOf(500), balance5.c.b);
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.valueOf(5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(keyMovable, db));
+        assertEquals(BigDecimal.valueOf(5), recipient.getBalanceUSE(keyMovable, db));
 
         //CHECK REFERENCE SENDER
         assertEquals(rsend.getTimestamp(), maker.getLastTimestamp(db));
@@ -1041,10 +1065,10 @@ public class TestRecAsset {
         rsend.orphan(false);
 
         //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(keyMovable, db));
+        assertEquals(BigDecimal.valueOf(500), maker.getBalanceUSE(keyMovable, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(keyMovable, db));
+        assertEquals(BigDecimal.ZERO, recipient.getBalanceUSE(keyMovable, db));
 
         //CHECK REFERENCE SENDER
         //assertEquals(rsend.getReference(), maker.getLastReference(db));
