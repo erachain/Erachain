@@ -356,7 +356,7 @@ public class Account {
         return this.getBalance(DCSet.getInstance(), key);
     }
 
-    public BigDecimal getForSale(DCSet dcSet, long key, int height) {
+    public BigDecimal getForSale(DCSet dcSet, long key, int height, boolean withCredit) {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = this
                 .getBalance(dcSet, key);
         BigDecimal ownVol = balance.a.b;
@@ -381,7 +381,7 @@ public class Account {
         }
 
         BigDecimal inDebt = balance.b.b;
-        if (inDebt.signum() < 0) {
+        if (inDebt.signum() < 0 && withCredit) {
             ownVol = ownVol.add(inDebt);
         }
         return ownVol;
@@ -499,7 +499,7 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
-                                                                    BigDecimal amount, boolean asOrphan) {
+                                                                    BigDecimal amount, boolean notUpdateIncomed) {
 
         int actionType = actionType(key, amount);
         
@@ -522,7 +522,7 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), absKey);
 
-        boolean updateIncomed = substract && asOrphan || !substract && !asOrphan;
+        boolean updateIncomed = !notUpdateIncomed;
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property

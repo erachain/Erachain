@@ -1,24 +1,6 @@
 package core.transaction;
 
 
-import at.AT;
-import at.AT_Constants;
-import at.AT_Controller;
-import at.AT_Exception;
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-import core.BlockChain;
-import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.block.Block;
-import core.crypto.Base58;
-import core.crypto.Crypto;
-import datachain.DCSet;
-import org.eclipse.jetty.util.StringUtil;
-import org.json.simple.JSONObject;
-import utils.Converter;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -28,6 +10,26 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.eclipse.jetty.util.StringUtil;
+import org.json.simple.JSONObject;
+
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
+import at.AT;
+import at.AT_Constants;
+import at.AT_Controller;
+import at.AT_Exception;
+import core.BlockChain;
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.block.Block;
+import core.crypto.Base58;
+import core.crypto.Crypto;
+import datachain.DCSet;
+import utils.Converter;
 
 public class DeployATTransaction extends Transaction {
 
@@ -441,7 +443,7 @@ public class DeployATTransaction extends Transaction {
         //UPDATE ISSUER
         super.orphan(asPack);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
-        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, true);
+        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false);
 
         String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
 
@@ -449,7 +451,7 @@ public class DeployATTransaction extends Transaction {
 
         //UPDATE RECIPIENT
         //atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
-        atAccount.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, true);
+        atAccount.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false);
 
         //UPDATE REFERENCE OF SENDER
         this.creator.setLastTimestamp(this.reference, this.dcSet);

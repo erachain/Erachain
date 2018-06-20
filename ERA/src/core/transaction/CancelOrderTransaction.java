@@ -1,7 +1,20 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -9,17 +22,6 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import datachain.DCSet;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class CancelOrderTransaction extends Transaction {
     public static final byte[][] VALID_REC = new byte[][]{
@@ -139,7 +141,7 @@ public class CancelOrderTransaction extends Transaction {
         //REMOVE BALANCE OF CREATOR
         Account creator = new Account(order.a.b);
         //creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).subtract(orderID.getAmountHaveLeft()), db);
-        creator.changeBalance(db, true, order.b.a, order.b.b.subtract(order.b.c), true);
+        creator.changeBalance(db, true, order.b.a, order.b.b.subtract(order.b.c), false);
 
         //DELETE ORPHAN DATA
         db.getCompletedOrderMap().delete(order.a.a);

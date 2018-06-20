@@ -1,21 +1,23 @@
 package core.transaction;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Longs;
-import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.block.Block;
-import core.crypto.Base58;
-import core.naming.Name;
-import core.naming.NameSale;
-import org.json.simple.JSONObject;
-
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.json.simple.JSONObject;
+
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
+
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.block.Block;
+import core.crypto.Base58;
+import core.naming.Name;
+import core.naming.NameSale;
 
 //import java.math.BigInteger;
 
@@ -266,11 +268,11 @@ public class BuyNameTransaction extends Transaction {
         //UPDATE CREATOR
         super.orphan(asPack);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
-        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), true);
+        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
 
         //UPDATE SELLER
         //this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
-        this.seller.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), true);
+        this.seller.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
 
         //UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
         Name name = this.nameSale.getName(this.dcSet);

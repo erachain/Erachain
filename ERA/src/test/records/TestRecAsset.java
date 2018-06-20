@@ -1,5 +1,17 @@
 package test.records;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.fail;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -15,15 +27,6 @@ import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import ntp.NTP;
-import org.apache.log4j.Logger;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-
-import static org.junit.Assert.*;
 
 public class TestRecAsset {
 
@@ -73,10 +76,13 @@ public class TestRecAsset {
 
         maker_1.setLastTimestamp(gb.getTimestamp(db), db);
 
-        asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 0, 8, 50000l);
-        //key = asset.getKey();
+        asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
+        // set SCALABLE assets ++
+        asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+        asset.insertToMap(db, 0l);
+        key = asset.getKey(db);
 
-        assetMovable = new AssetVenture(maker, "movable", icon, image, "...", 0, 8, 50000l);
+        assetMovable = new AssetVenture(maker, "movable", icon, image, "...", 0, 8, 500l);
 
     }
 
@@ -500,6 +506,7 @@ public class TestRecAsset {
         maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
         assetTransfer.sign(maker, false);
+        assetTransfer.setDC(db, false);
         assetTransfer.isValid(releaserReference, flags);
         assetTransfer.process(gb, false);
 
@@ -507,7 +514,6 @@ public class TestRecAsset {
         assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
 
         //CHECK REFERENCE SENDER
@@ -819,7 +825,6 @@ public class TestRecAsset {
 
 
         //CREATE ASSET TRANSFER
-        long key = 2l;
         BigDecimal amountSend = BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         BigDecimal bal = maker.getBalanceUSE(key, db);
 
@@ -836,11 +841,7 @@ public class TestRecAsset {
         assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
-
-        //CHECK REFERENCE SENDER
-        //assertEquals(messageTransaction.getReference(), maker.getLastReference(db));
 
         //CHECK REFERENCE RECIPIENT
         assertNotEquals(messageTransaction.getTimestamp(), recipient.getLastTimestamp(db));
@@ -980,50 +981,53 @@ public class TestRecAsset {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, assetMovable, FEE_POWER, timestamp++, maker.getLastTimestamp(db));
         issueAssetTransaction.sign(maker, false);
+        issueAssetTransaction.setDC(db, false);
         issueAssetTransaction.process(gb, false);
 
-        key = assetMovable.getKey(db);
+        long keyMovable = assetMovable.getKey(db);
+
+        balance5 = maker.getBalance(db, keyMovable);
+
+        //CHECK BALANCE SENDER
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.a);
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.c.a);
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.c.b);
+
 
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         long timestamp = NTP.getTime();
 
-        // SET BALANCES
-        db.getAssetBalanceMap().set(maker.getAddress(), key, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(20).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)),
-                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.valueOf(0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE))
-                )
-        );
-
         //CREATE ASSET TRANSFER
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+        rsend = new R_Send(maker, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
                 "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
-                timestamp++, maker.getLastTimestamp(db));
+                timestamp++, 0l);
+        rsend.setDC(db, false);
         assertEquals(rsend.isValid(releaserReference, flags), Transaction.NO_BALANCE);
 
-        rsend = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(25).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
-                timestamp++, maker.getLastTimestamp(db));
+        rsend = new R_Send(maker, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+                "", null, new byte[]{1}, new byte[]{1},
+                timestamp++, 0l);
+        rsend.setDC(db, false);
         assertEquals(rsend.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
 
 
         rsend.sign(maker, false);
+        rsend.setDC(db, false);
         rsend.process(gb, false);
 
-        balance5 = maker.getBalance(db, key);
+        balance5 = maker.getBalance(db, keyMovable);
 
         //CHECK BALANCE SENDER
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.a);
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
 
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.c);
-        //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
+        assertEquals(BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), balance5.a.b);
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
+        assertEquals(BigDecimal.valueOf(5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(keyMovable, db));
 
         //CHECK REFERENCE SENDER
         assertEquals(rsend.getTimestamp(), maker.getLastTimestamp(db));
@@ -1037,11 +1041,10 @@ public class TestRecAsset {
         rsend.orphan(false);
 
         //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
+        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(keyMovable, db));
 
         //CHECK BALANCE RECIPIENT
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
+        assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(keyMovable, db));
 
         //CHECK REFERENCE SENDER
         //assertEquals(rsend.getReference(), maker.getLastReference(db));

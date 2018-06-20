@@ -129,6 +129,9 @@ public abstract class Transaction {
     public static final int INVALID_DESCRIPTION_LENGTH = 53;
     public static final int INVALID_VALUE_LENGTH = 55;
     public static final int INVALID_TITLE_LENGTH = 56;
+
+    public static final int INVALID_BACKWARD_ACTION = 57;
+
     // NAMES
     public static final int NAME_DOES_NOT_EXIST = 60;
     public static final int NAME_ALREADY_REGISTRED = 61;
@@ -1095,7 +1098,7 @@ public abstract class Transaction {
             // USE all GIFT for current ACCOUNT
             // creator.addBalanceOWN(FEE_KEY,BigDecimal.valueOf(asOrphan?-fee_gift:fee_gift,
             // BlockChain.FEE_SCALE), db);
-            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
+            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
             return;
         }
 
@@ -1107,7 +1110,7 @@ public abstract class Transaction {
         Account invitedAccount = person.getOwner();
         if (creator.equals(invitedAccount)) {
             // IT IS ME - all fee!
-            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), asOrphan);
+            creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
             return;
         }
 
@@ -1119,8 +1122,7 @@ public abstract class Transaction {
 
         int fee_gift_get = fee_gift - fee_gift_next;
         // invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
-        invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE),
-                asOrphan);
+        invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE), false);
 
         if (level < BlockChain.FEE_INVITED_DEEP && fee_gift_next > 0) {
             process_gifts(++level, fee_gift_next, invitedAccount, asOrphan);
@@ -1170,7 +1172,7 @@ public abstract class Transaction {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // this.creator.setBalance(FEE_KEY, this.creator.getBalance(db,
                 // FEE_KEY).add(this.fee), db);
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, false);
 
             }
 
@@ -1191,7 +1193,7 @@ public abstract class Transaction {
 
     public Transaction copy() {
         try {
-            return TransactionFactory.getInstance().parse(this.toBytes(false, null), null);
+            return TransactionFactory.getInstance().parse(this.toBytes(true, null), null);
         } catch (Exception e) {
             return null;
         }

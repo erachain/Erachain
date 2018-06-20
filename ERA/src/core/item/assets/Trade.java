@@ -1,16 +1,17 @@
 package core.item.assets;
 // 16/03
 
-import core.crypto.Crypto;
-import datachain.DCSet;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
+import core.crypto.Crypto;
+import datachain.DCSet;
 
 public class Trade {
 
@@ -218,9 +219,9 @@ public class Trade {
 
         //REVERSE FUNDS
         //initiator.getCreator().setBalance(initiator.getWant(), initiator.getCreator().getBalance(db, initiator.getWant()).subtract(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, true, initiator.getWant(), this.amountHave, true);
+        initiator.getCreator().changeBalance(db, true, initiator.getWant(), this.amountHave, false);
         //target.getCreator().setBalance(target.getWant(), target.getCreator().getBalance(db, target.getWant()).subtract(this.amountWant), db);
-        target.getCreator().changeBalance(db, true, target.getWant(), this.amountWant, true);
+        target.getCreator().changeBalance(db, true, target.getWant(), this.amountWant, false);
 
         //CHECK IF ORDER IS FULFILLED
         if (initiator.isFulfilled()) {

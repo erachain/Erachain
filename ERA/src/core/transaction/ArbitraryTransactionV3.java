@@ -1,19 +1,20 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.payment.Payment;
 import datachain.DCSet;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 //import java.math.BigInteger;
 
@@ -142,7 +143,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
     @Override
     public boolean hasPublicText() {
-        return true;
+        return false;
     }
 
     @Override
@@ -224,6 +225,11 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     //@Override
     @Override
     public int isValid(Long releaserReference, long flags) {
+        
+        int result = super.isValid(releaserReference, flags); 
+        if (result != VALIDATE_OK) {
+            return result;
+        }
 
         // CHECK PAYMENTS SIZE
         if (this.payments.size() < 0 || this.payments.size() > 400) {
@@ -235,9 +241,15 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
             return INVALID_DATA_LENGTH;
         }
 
+        //if (true)
+        //    return INVALID_AMOUNT;
+        
         // REMOVE FEE
+        Transaction forkTransaction = this.copy();
         DCSet fork = this.dcSet.fork();
-        super.process(this.block, false);
+        forkTransaction.setDC(fork, false);
+        forkTransaction.process(this.block, false);
+        // TODO process && orphan && isValid balances
 
         // CHECK PAYMENTS
         for (Payment payment : this.payments) {
@@ -264,11 +276,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
                 return AMOUNT_SCALE_WRONG;
             }
 
-            // PROCESS PAYMENT IN FORK
-            payment.process(this.creator, fork);
         }
 
-        return super.isValid(releaserReference, flags);
+        return VALIDATE_OK;
     }
 
     @Override

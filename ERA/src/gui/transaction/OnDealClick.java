@@ -84,6 +84,10 @@ public class OnDealClick {
             case Transaction.NO_INCLAIM_BALANCE:
                 mess = "No in claims balance";
                 break;
+            case Transaction.INVALID_BACKWARD_ACTION:
+                mess = "Invalid backward action";
+                break;
+                
             case Transaction.NO_HOLD_BALANCE:
                 mess = "No hold balance";
                 break;

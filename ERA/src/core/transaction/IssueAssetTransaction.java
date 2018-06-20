@@ -274,11 +274,11 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         if (quantity > 0) {
             //this.creator.setBalance(this.getItem().getKey(db), BigDecimal.ZERO.setScale(), db);
             this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
-                    new BigDecimal(quantity).setScale(0), true);
+                    new BigDecimal(quantity).setScale(0), false);
 
             if (asset.isMovable()) {
                 this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
-                        new BigDecimal(-quantity).setScale(0), true);            
+                        new BigDecimal(-quantity).setScale(0), false);            
             }
         }
     }

@@ -433,7 +433,7 @@ public class CreateOrderTransaction extends Transaction {
 
             if (!unLimited) {
 
-                BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height);
+                BigDecimal forSale = this.creator.getForSale(this.dcSet, haveKey, height, true);
 
                 if (forSale.compareTo(amountHave) < 0) {
                     boolean wrong = true;

@@ -601,7 +601,7 @@ public class Order implements Comparable<Order> {
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).add(this.amountHave), db);
-        this.creator.changeBalance(db, false, this.haveKey, this.amountHave, true);
+        this.creator.changeBalance(db, false, this.haveKey, this.amountHave, false);
     }
 
 	/*

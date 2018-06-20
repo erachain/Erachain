@@ -1,5 +1,20 @@
 package test.records;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.Arrays;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
@@ -8,23 +23,13 @@ import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.item.assets.Order;
 import core.item.assets.Trade;
-import core.transaction.*;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import ntp.NTP;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.MathContext;
-import java.math.RoundingMode;
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 public class OrderTestsMy {
     Long releaserReference = null;
@@ -2150,7 +2155,7 @@ public class OrderTestsMy {
         cancelOrderTransaction.process(null, false);
 
         //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(assetA.getQuantity()),
+        assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(assetA.getScale()),
                 accountA.getBalanceUSE(keyA, db));
 
         //CHECK REFERENCE SENDER
@@ -2161,7 +2166,7 @@ public class OrderTestsMy {
 
         ////////// OPHRAN ////////////////
         //CHECK BALANCE SENDER
-        assertEquals(BigDecimal.valueOf(assetA.getQuantity()), accountA.getBalanceUSE(keyA, db));
+        assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(assetA.getScale()), accountA.getBalanceUSE(keyA, db));
         cancelOrderTransaction.orphan(false);
 
         //CHECK BALANCE SENDER

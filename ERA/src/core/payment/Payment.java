@@ -1,17 +1,19 @@
 package core.payment;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+
+import org.json.simple.JSONObject;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import datachain.DCSet;
-import org.json.simple.JSONObject;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Payment {
 
@@ -119,10 +121,10 @@ public class Payment {
     public void orphan(PublicKeyAccount sender, DCSet db) {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).add(this.amount), db);
-        sender.changeBalance(db, false, this.asset, this.amount, true);
+        sender.changeBalance(db, false, this.asset, this.amount, false);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).subtract(this.amount), db);
-        this.recipient.changeBalance(db, true, this.asset, this.amount, true);
+        this.recipient.changeBalance(db, true, this.asset, this.amount, false);
     }
 }

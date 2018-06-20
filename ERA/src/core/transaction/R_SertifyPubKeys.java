@@ -1,8 +1,19 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -14,15 +25,6 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
 import datachain.DCSet;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 
 
 // if person has not ALIVE status - add it
@@ -602,15 +604,15 @@ public class R_SertifyPubKeys extends Transaction {
 
             // BACK FEE FOR ISSUER without gift for this.CREATOR
             transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY, issued_FEE_BD
-                    .subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), true);
+                    .subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
 
             // GIVE GIFTs
-            this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, true);
-            pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, true);
+            this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
+            pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
 
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD
-                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
+                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), false);
 
         }
 

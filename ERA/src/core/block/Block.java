@@ -1,10 +1,26 @@
 package core.block;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+
 import at.AT_Block;
 import at.AT_Controller;
 import at.AT_Exception;
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -19,21 +35,7 @@ import datachain.TransactionFinalMap;
 import datachain.TransactionFinalMapSigns;
 import datachain.TransactionMap;
 import ntp.NTP;
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import utils.Converter;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class Block {
@@ -1145,7 +1147,7 @@ public class Block {
 
             // ADD from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY,
-                    BlockChain.ROBINHOOD_USE ? blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)) : blockTotalFee.subtract(blockFee), false);
+                    BlockChain.ROBINHOOD_USE ? blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)) : blockTotalFee.subtract(blockFee), true);
 
             blockFee = blockTotalFee;
 
@@ -1159,7 +1161,7 @@ public class Block {
 
                     Account richAccount = new Account(rich);
                     //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-                    richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), false);
+                    richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), true);
                 }
             }
         }
@@ -1169,7 +1171,7 @@ public class Block {
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
-        this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee, false);
+        this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee, true);
 
 		/*
 		if (!dcSet.isFork()) {
