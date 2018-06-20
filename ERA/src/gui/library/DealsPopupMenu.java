@@ -55,15 +55,6 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(sendAsset);
 
-        holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
-        holdAsset.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                new Account_Take_Hold_Dialog(asset, pubKey);
-
-            }
-        });
-        this.add(holdAsset);
-
         this.addSeparator();
 
         debtAsset = new JMenuItem(Lang.getInstance().translate("Lend"));
@@ -91,6 +82,17 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(debtAssetBackward);
+
+        this.addSeparator();
+
+        holdAsset = new JMenuItem(Lang.getInstance().translate("Hold"));
+        holdAsset.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new Account_Take_Hold_Dialog(asset, pubKey);
+
+            }
+        });
+        this.add(holdAsset);
 
         this.addSeparator();
 
