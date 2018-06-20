@@ -520,7 +520,7 @@ public class R_SertifyPubKeys extends Transaction {
 
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD
-                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), false);
+                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
 
         }
 
@@ -612,7 +612,7 @@ public class R_SertifyPubKeys extends Transaction {
 
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD
-                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), false);
+                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
 
         }
 

@@ -254,7 +254,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
             
             if (asset.isMovable()) {
                 // make HOLD balance
-                this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
+                this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
                         new BigDecimal(-quantity).setScale(0), false);
                 
             }
@@ -277,7 +277,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
                     new BigDecimal(quantity).setScale(0), false);
 
             if (asset.isMovable()) {
-                this.creator.changeBalance(this.dcSet, false, asset.getKey(this.dcSet),
+                this.creator.changeBalance(this.dcSet, true, asset.getKey(this.dcSet),
                         new BigDecimal(-quantity).setScale(0), false);            
             }
         }

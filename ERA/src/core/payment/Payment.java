@@ -111,7 +111,7 @@ public class Payment {
     public void process(PublicKeyAccount sender, DCSet db) {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).subtract(this.amount), db);
-        sender.changeBalance(db, true, this.asset, this.amount, false);
+        sender.changeBalance(db, true, this.asset, this.amount, true);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).add(this.amount), db);
@@ -121,7 +121,7 @@ public class Payment {
     public void orphan(PublicKeyAccount sender, DCSet db) {
         //UPDATE SENDER
         //sender.setBalance(this.asset, sender.getBalance(db, this.asset).add(this.amount), db);
-        sender.changeBalance(db, false, this.asset, this.amount, false);
+        sender.changeBalance(db, false, this.asset, this.amount, true);
 
         //UPDATE RECIPIENT
         //this.recipient.setBalance(this.asset, this.recipient.getBalance(db, this.asset).subtract(this.amount), db);

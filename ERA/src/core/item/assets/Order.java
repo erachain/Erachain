@@ -454,7 +454,7 @@ public class Order implements Comparable<Order> {
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
-        this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, false);
+        this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, true);
 
         //ADD ORDER TO DATABASE
         db.getOrderMap().add(Order.toDBrec(this));
@@ -601,7 +601,7 @@ public class Order implements Comparable<Order> {
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).add(this.amountHave), db);
-        this.creator.changeBalance(db, false, this.haveKey, this.amountHave, false);
+        this.creator.changeBalance(db, false, this.haveKey, this.amountHave, true);
     }
 
 	/*

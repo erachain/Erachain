@@ -3022,15 +3022,17 @@ public class Controller extends Observable {
         return this.r_Send(sender, feePow, recipient, key, amount, "", null, null, null);
     }
     
-    public Transaction r_Send(PrivateKeyAccount sender, int feePow, Account recipient, long key, BigDecimal amount,
-            String head, byte[] isText, byte[] message, byte[] encryptMessage) {
+    public Transaction r_Send(PrivateKeyAccount sender, int feePow,
+            Account recipient, long key, BigDecimal amount, String head, byte[] isText, byte[] message,
+            byte[] encryptMessage) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, head, message, isText,
                     encryptMessage);
         }
     }
     
-    public Transaction r_Send(byte version, byte property1, byte property2, PrivateKeyAccount sender, int feePow,
+    public Transaction r_Send(byte version, byte property1, byte property2,
+            PrivateKeyAccount sender, int feePow,
             Account recipient, long key, BigDecimal amount, String head, byte[] isText, byte[] message,
             byte[] encryptMessage) {
         synchronized (this.transactionCreator) {

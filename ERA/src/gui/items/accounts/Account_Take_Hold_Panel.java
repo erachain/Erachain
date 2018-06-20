@@ -1,5 +1,14 @@
 package gui.items.accounts;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -10,6 +19,7 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 import gui.AccountRenderer;
 import gui.MainFrame;
 import gui.PasswordPane;
@@ -23,13 +33,6 @@ import utils.Converter;
 import utils.NameUtils;
 import utils.NameUtils.NameResult;
 import utils.Pair;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 //import settings.Settings;
 
@@ -292,7 +295,10 @@ public class Account_Take_Hold_Panel extends Class_Account_Transaction_Panel {
 
 
         //CREATE TX MESSAGE
-        Transaction transaction = Controller.getInstance().r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
+        // HOLD on STOCK - with BACKWARD flag
+        Transaction transaction = Controller.getInstance().r_Send(
+                (byte) 2, TransactionAmount.BACKWARD_MASK, (byte) 0,
+                Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
                 key, BigDecimal.ZERO.subtract(amount),
                 head, messageBytes, isTextByte, encrypted);
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);

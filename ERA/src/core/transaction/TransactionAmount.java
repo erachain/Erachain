@@ -482,7 +482,7 @@ public abstract class TransactionAmount extends Transaction {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
                             
-                            if (backward) {
+                            if (!backward) {
                                 // HOLD backward for INSIDE CLAIM - is OK
                                 if (false && this.asset.isInsideOtherClaim())
                                     ;
@@ -490,7 +490,10 @@ public abstract class TransactionAmount extends Transaction {
                                     return INVALID_HOLD_DIRECTION;
                             }
                             
-                            if (height > BlockChain.HOLD_VALID_START && asset.isMovable()) {
+                            if (//(height > BlockChain.HOLD_VALID_START
+                                 //   || BlockChain.DEVELOP_USE // for TESTs
+                                 //   ) &&
+                                    asset.isMovable()) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
                                 boolean unLimited = absKey > AssetCls.REAL_KEY // not
                                         // genesis
@@ -837,16 +840,28 @@ public abstract class TransactionAmount extends Transaction {
                 this.recipient.changeBalance(db, backward, key, this.amount, false);
                 
             }
+        } if (actionType == ACTION_DEBT) {
+            if (backward) {
+                // UPDATE CREDITOR
+                this.creator.changeBalance(db, !backward, key, this.amount, true);
+                // UPDATE DEBTOR
+                this.recipient.changeBalance(db, backward, key, this.amount, false);                            
+            } else {
+                // UPDATE CREDITOR
+                this.creator.changeBalance(db, !backward, key, this.amount, true);
+                // UPDATE DEBTOR
+                this.recipient.changeBalance(db, backward, key, this.amount, false);            
+            }
             
         } else {
             // UPDATE SENDER
             if (absKey == 666l) {
-                this.creator.changeBalance(db, backward, key, this.amount, false);
+                this.creator.changeBalance(db, backward, key, this.amount, !backward);
             } else {
-                this.creator.changeBalance(db, !backward, key, this.amount, false);
+                this.creator.changeBalance(db, !backward, key, this.amount, !backward);
             }
             // UPDATE RECIPIENT
-            this.recipient.changeBalance(db, backward, key, this.amount, false);            
+            this.recipient.changeBalance(db, backward, key, this.amount, backward);            
         }
         
         
@@ -865,8 +880,16 @@ public abstract class TransactionAmount extends Transaction {
                     // ALL CREDIT RETURN
                     db.getCredit_AddressesMap().sub(creditKey, this.amount);
                 } else {
-                    // GET CREDIT for left AMOUNT
-                    BigDecimal leftAmount = amount.subtract(creditAmount);
+                    // update creditAmount to 0
+                    BigDecimal leftAmount;
+                    if (creditAmount.signum() != 0) {
+                        db.getCredit_AddressesMap().sub(creditKey, creditAmount);
+                        // GET CREDIT for left AMOUNT
+                        leftAmount = amount.subtract(creditAmount);
+                    } else {
+                        leftAmount = amount;
+                    }
+                    
                     Tuple3<String, Long, String> leftCreditKey = new Tuple3<String, Long, String>(
                             this.creator.getAddress(), absKey, this.recipient.getAddress()); // REVERSE
                     db.getCredit_AddressesMap().add(leftCreditKey, leftAmount);
@@ -945,16 +968,29 @@ public abstract class TransactionAmount extends Transaction {
                 
             }
 
+        } if (actionType == ACTION_DEBT) {
+            if (backward) {
+                // UPDATE CREDITOR
+                this.creator.changeBalance(db, backward, key, this.amount, true);
+                // UPDATE DEBTOR
+                this.recipient.changeBalance(db, !backward, key, this.amount, false);                            
+            } else {
+                // UPDATE CREDITOR
+                this.creator.changeBalance(db, backward, key, this.amount, true);
+                // UPDATE DEBTOR
+                this.recipient.changeBalance(db, !backward, key, this.amount, false);            
+            }
+
         } else {
     
             // UPDATE SENDER
             if (absKey == 666l) {
-                this.creator.changeBalance(db, !backward, key, this.amount, false);
+                this.creator.changeBalance(db, !backward, key, this.amount, !backward);
             } else {
-                this.creator.changeBalance(db, backward, key, this.amount, false);
+                this.creator.changeBalance(db, backward, key, this.amount, !backward);
             }
             // UPDATE RECIPIENT
-            this.recipient.changeBalance(db, !backward, key, this.amount, false);
+            this.recipient.changeBalance(db, !backward, key, this.amount, backward);
             
         }
         
@@ -978,7 +1014,7 @@ public abstract class TransactionAmount extends Transaction {
                     db.getCredit_AddressesMap().add(creditKey, amount.subtract(leftAmount));
                 } else {
                     // ONLY RETURN CREDIT
-                    db.getCredit_AddressesMap().add(leftCreditKey, amount);
+                    db.getCredit_AddressesMap().sub(leftCreditKey, amount);
                 }
                 
             }
