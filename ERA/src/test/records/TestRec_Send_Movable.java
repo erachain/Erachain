@@ -1,6 +1,7 @@
 package test.records;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import java.math.BigDecimal;
 
@@ -11,6 +12,7 @@ import org.mapdb.Fun.Tuple5;
 
 import controller.Controller;
 import core.BlockChain;
+import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
@@ -104,6 +106,84 @@ public class TestRec_Send_Movable {
   
     /////////////////////////////////////////////
     ////////////
+    
+    
+
+    @Test
+    public void process_Movable_Asset() {
+
+        init(true);
+
+        long keyMovable = assetMovable.getKey(db);
+
+        producerBalance = producer.getBalance(db, keyMovable);
+
+        //CHECK BALANCE SENDER
+        assertEquals(BigDecimal.valueOf(500), producerBalance.a.a);
+        assertEquals(BigDecimal.valueOf(500), producerBalance.a.b);
+        assertEquals(BigDecimal.valueOf(500), producerBalance.c.a);
+        assertEquals(BigDecimal.valueOf(500), producerBalance.c.b);
+
+
+        //CREATE SIGNATURE
+        Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
+        long timestamp = NTP.getTime();
+
+        //CREATE ASSET TRANSFER
+        r_Send = new R_Send(producer, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(1000),
+                "", null, new byte[]{1}, new byte[]{1},
+                timestamp++, 0l);
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_BALANCE);
+
+        r_Send = new R_Send(producer, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(5),
+                "", null, new byte[]{1}, new byte[]{1},
+                timestamp++, 0l);
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+
+
+        r_Send.sign(producer, false);
+        r_Send.setDC(db, false);
+        r_Send.process(gb, false);
+
+        producerBalance = producer.getBalance(db, keyMovable);
+
+        //CHECK BALANCE SENDER
+        assertEquals(BigDecimal.valueOf(500), producerBalance.a.a);
+        assertEquals(BigDecimal.valueOf(495), producerBalance.a.b);
+
+        assertEquals(BigDecimal.valueOf(500), producerBalance.c.b);
+        assertEquals(BigDecimal.valueOf(500), producerBalance.c.b);
+
+        //CHECK BALANCE RECIPIENT
+        assertEquals(BigDecimal.valueOf(5), recipient.getBalanceUSE(keyMovable, db));
+
+        //CHECK REFERENCE SENDER
+        assertEquals(r_Send.getTimestamp(), producer.getLastTimestamp(db));
+
+        //CHECK REFERENCE RECIPIENT
+        assertNotEquals(r_Send.getTimestamp(), recipient.getLastTimestamp(db));
+
+        //////////////////////////////////////////////////
+        /// ORPHAN
+        /////////////////////////////////////////////////
+        r_Send.orphan(false);
+
+        //CHECK BALANCE SENDER
+        assertEquals(BigDecimal.valueOf(500), producer.getBalanceUSE(keyMovable, db));
+
+        //CHECK BALANCE RECIPIENT
+        assertEquals(BigDecimal.ZERO, recipient.getBalanceUSE(keyMovable, db));
+
+        //CHECK REFERENCE SENDER
+        //assertEquals(r_Send.getReference(), producer.getLastReference(db));
+
+        //CHECK REFERENCE RECIPIENT
+        assertNotEquals(r_Send.getTimestamp(), recipient.getLastTimestamp(db));
+    }
+
+    
     @Test
     public void validate_R_Send_Movable_Asset() {
 
