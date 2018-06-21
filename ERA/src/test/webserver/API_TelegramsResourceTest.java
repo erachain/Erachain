@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import api.ApiClient;
 
 public class API_TelegramsResourceTest extends SettingTests {
 
