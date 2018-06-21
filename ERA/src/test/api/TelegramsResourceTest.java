@@ -1,6 +1,5 @@
-package test.api;
+package api;
 
-import api.ApiClient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -66,7 +65,6 @@ public class TelegramsResourceTest extends SettingTests {
         String address = (parse[0].replace("[", "").replace("]", ""))
                 .trim().replace("\"", "");
 
-
         String sendTelegram = new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address + "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
 
         String sendRequest = "[ " + sendTelegram + "]";
@@ -80,8 +78,17 @@ public class TelegramsResourceTest extends SettingTests {
         while (iterator.hasNext()) {
             JSONObject jsonObject = (JSONObject) iterator.next();
             for (Object key : jsonObject.keySet()) {
-                Assert.assertNotNull(requestField.get(key));
+                Assert.assertEquals(key.toString(), requestField.get(key));
             }
         }
+    }
+
+    @Test
+    public void getTelegramsTwo() {
+
+    }
+
+    @Test
+    public void getTelegramsTimestamp() {
     }
 }
