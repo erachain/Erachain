@@ -1,20 +1,22 @@
-package webserver;
+package test.webserver;
 
-import api.ApiClient;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.ws.rs.core.Response;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import api.ApiClient;
 import test.CallRemoteApi;
 import test.SettingTests;
-
-import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import api.ApiClient;
+import webserver.API_TelegramsResource;
 
 public class API_TelegramsResourceTest extends SettingTests {
 

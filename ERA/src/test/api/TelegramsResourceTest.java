@@ -1,16 +1,17 @@
-package api;
+package test.api;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Test;
-import test.SettingTests;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import api.ApiClient;
+import test.SettingTests;
 
 public class TelegramsResourceTest extends SettingTests {
     /**

@@ -1,7 +1,8 @@
-package api;
+package test.api;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import api.ApiClient;
 
 public class AddressesResourceTest {
