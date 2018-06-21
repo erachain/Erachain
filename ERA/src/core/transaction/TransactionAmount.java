@@ -482,17 +482,18 @@ public abstract class TransactionAmount extends Transaction {
                         // HOLD GOODS, CHECK myself DEBT for CLAIMS
                         case ACTION_HOLD:
                             
-                            if (!backward) {
-                                // HOLD backward for INSIDE CLAIM - is OK
-                                if (false && this.asset.isInsideOtherClaim())
-                                    ;
-                                else
-                                    return INVALID_HOLD_DIRECTION;
+                            if (height > BlockChain.HOLD_VALID_START) {
+                                if (!backward) {
+                                    // HOLD only must be backward
+                                        return INVALID_HOLD_DIRECTION;
+                                }
+                            } else {
+                                if (backward) {
+                                        return INVALID_HOLD_DIRECTION;
+                                }                                
                             }
                             
-                            if (//(height > BlockChain.HOLD_VALID_START
-                                 //   || BlockChain.DEVELOP_USE // for TESTs
-                                 //   ) &&
+                            if (height > BlockChain.HOLD_VALID_START &&
                                     asset.isMovable()) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
                                 boolean unLimited = absKey > AssetCls.REAL_KEY // not
