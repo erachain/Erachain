@@ -61,7 +61,7 @@ public class R_SendResourceTest extends SettingTests {
         while (iterator.hasNext()) {
             JSONObject jsonObject = (JSONObject) iterator.next();
             for (Object key : jsonObject.keySet()) {
-                Assert.assertNotNull(requestField.get(key));
+                Assert.assertEquals(key.toString(), requestField.get(key));
             }
         }
 
@@ -117,7 +117,6 @@ public class R_SendResourceTest extends SettingTests {
         while (iterator.hasNext()) {
             JSONObject jsonObject = (JSONObject) iterator.next();
             for (Object key : jsonObject.keySet()) {
-                System.out.println(key);
                 Assert.assertEquals(key.toString(), requestField.get(key));
             }
         }
