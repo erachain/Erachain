@@ -61,7 +61,7 @@ public class R_SendResource {
      * GET r_send/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH?message={\"msg\":\"123\"}&amp;encrypt=false&amp;password=123456789
      * <h2>Example response</h2>
      * {"type_name":"LETTER", "creator":"7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP",
-     * "data":"{\\\"msg\\\":\\\"123\\\"}","signature":"Vf8qtG3tiYV6LwvCrrTPf6zq3ikUVNZWfgwkrLU1tckvEQ2Dx8qB1qLEGkX8Wqj4WVKDYZRYfJyGb3dZCTR3asz",
+     * "data":"{"msg":"123"}","signature":"Vf8qtG3tiYV6LwvCrrTPf6zq3ikUVNZWfgwkrLU1tckvEQ2Dx8qB1qLEGkX8Wqj4WVKDYZRYfJyGb3dZCTR3asz",
      * "fee":"0.00010624", "publickey":"5sD1mTM2tB8aiQdUzKtXiNtesmJQCvHjXMrcCZWQca37", "type":31,
      * "confirmations":0, "version":0, "record_type":"LETTER", "property2":0, "property1":128, "size":166,
      * "encrypted":false, "recipient":"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH", "sub_type_name":"", "isText":true, "timestamp":1529585877655}
@@ -111,7 +111,7 @@ public class R_SendResource {
      * @return
      * <h2>Example request</h2>
      * POST r_send {"creator":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH",
-     * "feePow":"1","assetKey":"643","amount":"1","title":"123","message":"{""msg"":""1223""}",
+     * "feePow":"1","assetKey":"643","amount":"1","title":"123","message":"{"msg":"1223"}",
      * "codebase":"0","encrypt":"false","password":"123456789"}
      *
      * <h2>Example response</h2>
