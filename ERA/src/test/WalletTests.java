@@ -1,5 +1,10 @@
 package test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.junit.Test;
+
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
@@ -7,10 +12,6 @@ import core.wallet.Wallet;
 import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 import ntp.NTP;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class WalletTests {
 
