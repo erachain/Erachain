@@ -1,25 +1,5 @@
 package api;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -28,7 +8,20 @@ import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import network.message.TelegramMessage;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
 import utils.APIUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -67,6 +60,40 @@ public class TelegramsResource {
         return array.toJSONString();
     }
 
+    /**
+     * @param address   its e recipient
+     * @param timestamp the value more than which will be searched
+     * @param filter    is title in telegram
+     * @return Array all telegram by recipient in format JSON
+     *
+     * <h2>Example request</h2>
+     * GET telegrams/address/" + recipient + "/timestamp/1
+     * <h2>Example response</h2>
+     * [{
+     * "transaction":{
+     * "type_name":"SEND",
+     * "creator":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy",
+     * "amount":"0.01",
+     * "signature":"2SgAAsV83V7HxGN8rwhBgjVrfUZmvHc6qYNK5uodRQ5sz7mX8kinct9q3hphA43gSDXoXYcYbPS1amdNAbBKCmHg",
+     * "fee":"0.00023168",
+     * "publickey":"krksTcZunJmmnXQtUoNVQhwWAXFfQ4LbCJw3Qg8THo8",
+     * "type":31,
+     * "confirmations":0,
+     * "version":0,
+     * "record_type":"SEND",
+     * "property2":128,
+     * "action_key":1,
+     * "head":"NPL",
+     * "property1":0,
+     * "size":162,
+     * "action_name":"PROPERTY",
+     * "recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
+     * "backward":false,
+     * "asset":643,
+     * "sub_type_name":"PROPERTY",
+     * "timestamp":1529583735448
+     * }}]
+     */
     @SuppressWarnings("unchecked")
     @GET
     @Path("address/{address}/timestamp/{timestamp}")
@@ -112,8 +139,27 @@ public class TelegramsResource {
         return telegram.toJson().toJSONString();
     }
 
-
-    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false?password=1
+    /**
+     * Send telegram. not in block chain
+     *
+     * @param sender_in     address in wallet
+     * @param recipient_in  recipient
+     * @param asset_in      asset
+     * @param amount_in     amount
+     * @param title_in      title or head
+     * @param message_in    message
+     * @param istextmessage bool value isText
+     * @param encrypt       bool value isEncrypt
+     * @param password      password
+     * @return return signature telegram
+     *
+     * <h2>Example request</h2>
+     * GET telegrams/send/79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false/1
+     * <h2>Example response</h2>
+     * {
+     * "signature":"2vcTBHyCSUD7Qh968S1hr9mQpRgSswpCinCMeMX26XaUq58MDSCah3q9ntavhezqUGe7doR4hz4ZuPbc1QS2XzNg"
+     * }
+     */
     @SuppressWarnings("unchecked")
     @GET
     @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
@@ -137,7 +183,7 @@ public class TelegramsResource {
         } catch (Exception e1) {
             // TODO Auto-generated catch block
             out.put("status_code", Transaction.INVALID_CREATOR);
-            out.put("status", "Invalid Senser");
+            out.put("status", "Invalid Sender");
             return out.toJSONString();
         }
 
@@ -216,10 +262,10 @@ public class TelegramsResource {
     @GET
     @Path("send/{sender}/{recipient}")
     public String sendQuery(@PathParam("sender") String sender, @PathParam("recipient") String recipient,
-            @QueryParam("asset") long asset, @QueryParam("amount") String amount,
-            @QueryParam("title") String title, @QueryParam("message") String message,
-            @QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
-            @QueryParam("password") String password) {
+                            @QueryParam("asset") long asset, @QueryParam("amount") String amount,
+                            @QueryParam("title") String title, @QueryParam("message") String message,
+                            @QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
+                            @QueryParam("password") String password) {
 
         return send(sender, recipient, asset, amount, title, message, istextmessage, encrypt, password);
 
@@ -227,6 +273,20 @@ public class TelegramsResource {
 
     // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
     // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
+
+    /**
+     * Send telegram. not in block chain
+     *
+     * @param x JSON data row
+     * @return signature telegram
+     * <h2>Example request</h2>
+     * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
+     * "asset":"643","amount":"0.01","title":"NPL","istextmessage":"true","encrypt":"true","password":"123456789"}
+     * <h2>Example response</h2>
+     * {
+     * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
+     * }
+     */
     @SuppressWarnings("unchecked")
     @POST
     @Path("send")
