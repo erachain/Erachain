@@ -1,19 +1,22 @@
 package gui.models;
 
+import java.math.BigDecimal;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+
 import controller.Controller;
 import core.account.Account;
 import datachain.SortableList;
 import lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple5;
+import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class BalancesTableModel extends AbstractTableModel implements Observer {
@@ -86,7 +89,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
             case COLUMN_OWN:
 
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> val = account.getBalance(this.key);
-                return val.a; // NumberAsString.getInstance().numberAsString(val.a);
+                return NumberAsString.formatAsString(val.a);
         }
 
         return null;

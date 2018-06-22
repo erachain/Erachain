@@ -5,13 +5,15 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+import controller.Controller;
+
 public class NumberAsString {
 
     public static String formatAsString(Object amount) {
         Locale locale = new Locale("en", "US");
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-        symbols.setDecimalSeparator('.');
-        symbols.setGroupingSeparator(',');
+        symbols.setDecimalSeparator(Controller.DECIMAL_SEPARATOR);
+        symbols.setGroupingSeparator(Controller.GROUPING_SEPARATOR);
 
         if (amount instanceof BigDecimal) {
             int scale = ((BigDecimal) amount).scale();
@@ -36,8 +38,8 @@ public class NumberAsString {
     public static String formatAsString(BigDecimal amount, int scale) {
         Locale locale = new Locale("en", "US");
         DecimalFormatSymbols symbols = new DecimalFormatSymbols(locale);
-        symbols.setDecimalSeparator('.');
-        symbols.setGroupingSeparator(',');
+        symbols.setDecimalSeparator(Controller.DECIMAL_SEPARATOR);
+        symbols.setGroupingSeparator(Controller.GROUPING_SEPARATOR);
 
         if (scale <= 0) {
             return new DecimalFormat("###,##0", symbols).format(amount);

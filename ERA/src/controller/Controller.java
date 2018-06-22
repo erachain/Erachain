@@ -121,6 +121,8 @@ import webserver.WebService;
 
 public class Controller extends Observable {
     
+    public static final char DECIMAL_SEPARATOR = '.';
+    public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
     public static final long LICENSE_VERS = 107; // versopn of LICENSE
     public static HashMap<String, Tuple2<Integer, Integer>> LICENSE_LANG_REFS = new HashMap<String, Tuple2<Integer, Integer>>() {

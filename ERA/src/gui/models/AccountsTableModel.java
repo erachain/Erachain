@@ -1,5 +1,16 @@
 package gui.models;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -7,18 +18,8 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class AccountsTableModel extends AbstractTableModel implements Observer {
@@ -99,7 +100,7 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
 
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance;
-        Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
+        //Tuple3<BigDecimal, BigDecimal, BigDecimal> unconfBalance;
         String str;
 
         switch (column) {
@@ -112,7 +113,9 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
             case COLUMN_CONFIRMED_BALANCE:
                 if (this.asset == null) return "-";
                 balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
-                str = NumberAsString.formatAsString(balance.a.b) + "/" + balance.b.b.toPlainString() + "/" + balance.c.b.toPlainString();
+                str = NumberAsString.formatAsString(balance.a.b.setScale(asset.getScale()))
+                        + " / " + NumberAsString.formatAsString(balance.b.b.setScale(asset.getScale()))
+                        + " / " + NumberAsString.formatAsString(balance.c.b.setScale(asset.getScale()));
                 return str;
 			/*
 		case COLUMN_WAINTING_BALANCE:
@@ -125,9 +128,9 @@ public class AccountsTableModel extends AbstractTableModel implements Observer {
 			return str;
 			 */
             case COLUMN_FEE_BALANCE:
-                if (this.asset == null) return "-";
-                return account.getBalanceUSE(Transaction.FEE_KEY);
-
+                if (this.asset == null)
+                    return "-";
+                return NumberAsString.formatAsString(account.getBalanceUSE(Transaction.FEE_KEY).stripTrailingZeros());
 
             case COLUMN_NO:
                 return account.getAccountNo();
