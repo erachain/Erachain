@@ -17,7 +17,10 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -25,15 +28,23 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple4;
 
+import com.github.rjeschke.txtmark.Processor;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PagePanel;
 
 import controller.Controller;
-import core.BlockChain;
+import core.exdata.ExData;
+import core.item.templates.TemplateCls;
+import core.transaction.R_SignNote;
+import core.transaction.Transaction;
+import datachain.DCSet;
 import lang.Lang;
+import settings.Settings;
 
 /**
  * An example of using the PagePanel class to show PDFs. For more advanced
@@ -57,7 +68,6 @@ public class License_JFrame extends JDialog {
     int width;
     
     JFrame parent;
-    Tuple2 Transaction = BlockChain.DEVELOP_USE?new Tuple2(1,1): new Tuple2(148450,1);;
     
 public License_JFrame(boolean needAccept, JFrame parent, int goCreateWallet) {
         
@@ -202,8 +212,46 @@ public License_JFrame() {
         ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
             0, channel.size());
 
-        byte[] byte1 = null;
-        //PDFFile ppp = new PDFFile(byte1);
+        Tuple2<Integer, Integer> langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
+        if (langRef == null)
+            langRef = Controller.LICENSE_LANG_REFS.get("en");
+        
+        String message;
+        Transaction record = DCSet.getInstance().getTransactionFinalMap().get(langRef);
+        if (record == null) {
+            TemplateCls template = (TemplateCls) DCSet.getInstance().getItemTemplateMap().get(2l);
+            message = Processor.process(template.getDescription());
+        } else {
+            if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
+                
+                R_SignNote note = (R_SignNote) record;
+                if (record.getVersion() == 2) {
+                    byte[] data = note.getData();
+
+                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+                    try {
+                         map = ExData.parse_Data_V2(data);
+                    } catch (Exception e) {
+                        map = null;
+                    }
+                        
+                    if (map != null) {
+                        HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+                        if (files != null) {
+                            Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                            while (it_Files.hasNext()) {
+                                Entry<String, Tuple2<Boolean, byte[]>> fileData = it_Files.next();
+                                boolean zip = new Boolean(fileData.getValue().a);
+                                String name_File = (String) fileData.getKey();
+                                byte[] file_byte = (byte[]) fileData.getValue().b;
+                                buf = ByteBuffer.wrap(file_byte);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         pdffile = new PDFFile(buf);
         zoomIndex = 1.0;
       //  PDFViewer vv = new PDFViewer(true);
