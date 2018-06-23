@@ -72,7 +72,7 @@ public class License_JFrame extends JDialog {
         this.needAccept = needAccept;
         this.parent = parent;
         this.goCreateWallet = goCreateWallet;
-        
+                
         try {
             setup();
         } catch (IOException e) {
@@ -235,6 +235,8 @@ public class License_JFrame extends JDialog {
                                 Entry<String, Tuple2<Boolean, byte[]>> fileData = it_Files.next();
                                 boolean zip = new Boolean(fileData.getValue().a);
                                 String name_File = (String) fileData.getKey();
+                                setTitle(getTitle() + " - " + name_File);
+
                                 byte[] file_byte = (byte[]) fileData.getValue().b;
                                 if (zip) {
                                     try {
