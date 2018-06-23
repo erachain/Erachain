@@ -1,22 +1,24 @@
 package gui.models;
 
-import controller.Controller;
-import core.block.Block;
-import datachain.DCSet;
-import lang.Lang;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import utils.DateTimeFormat;
-import utils.NumberAsString;
-import utils.ObserverMessage;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
+import controller.Controller;
+import core.block.Block;
+import datachain.DCSet;
+import lang.Lang;
+import utils.DateTimeFormat;
+import utils.NumberAsString;
+import utils.ObserverMessage;
 
 @SuppressWarnings("serial")
 public class BlocksTableModel extends AbstractTableModel implements Observer {
@@ -30,7 +32,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     static Logger LOGGER = Logger.getLogger(BlocksTableModel.class.getName());
     private List<Block> blocks;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
-            "GB pH WV tWV", //"Generating Balance",
+            "GB pH WV dtWV", //"Generating Balance",
             "Transactions", "Fee"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
 
@@ -160,7 +162,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
                     return forgingPoint.b + " "
                             + (height - forgingPoint.a) + " "
                             + block.getWinValue() + " "
-                            + new BigDecimal(block.calcWinValueTargeted()).movePointLeft(3);
+                            + new BigDecimal(block.calcWinValueTargeted() - 100000);//.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
                     if (block == null) {

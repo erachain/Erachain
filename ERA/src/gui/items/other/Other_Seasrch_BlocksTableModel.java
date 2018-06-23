@@ -1,19 +1,21 @@
 package gui.items.other;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.block.Block;
 import datachain.DCSet;
 import lang.Lang;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
@@ -27,7 +29,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
     static Logger LOGGER = Logger.getLogger(Other_Seasrch_BlocksTableModel.class.getName());
     private List<Block> blocks;
     private String[] columnNames = Lang.getInstance()
-            .translate(new String[]{"Height", "Timestamp", "Generator", "GB pH WV tWV", // "Generating
+            .translate(new String[]{"Height", "Timestamp", "Generator", "GB pH WV dtWV", // "Generating
                     // Balance",
                     "Transactions", "Fee"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
@@ -165,7 +167,7 @@ public class Other_Seasrch_BlocksTableModel extends AbstractTableModel {
                     return forgingPoint.b + " "
                             + (height - forgingPoint.a) + " "
                             + block.getWinValue() + " "
-                            + new BigDecimal(block.calcWinValueTargeted()).movePointLeft(3);
+                            + new BigDecimal(block.calcWinValueTargeted() - 100000);
 
                 case COLUMN_TRANSACTIONS:
                     if (block == null) {

@@ -11,7 +11,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -25,18 +24,15 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 import org.mapdb.Fun.Tuple2;
 
-import com.github.rjeschke.txtmark.Processor;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFPage;
 import com.sun.pdfview.PagePanel;
 
 import controller.Controller;
 import core.BlockChain;
-import gui.MainFrame;
 import lang.Lang;
 
 /**
@@ -205,6 +201,9 @@ public License_JFrame() {
         FileChannel channel = raf.getChannel();
         ByteBuffer buf = channel.map(FileChannel.MapMode.READ_ONLY,
             0, channel.size());
+
+        byte[] byte1 = null;
+        //PDFFile ppp = new PDFFile(byte1);
         pdffile = new PDFFile(buf);
         zoomIndex = 1.0;
       //  PDFViewer vv = new PDFViewer(true);

@@ -29,7 +29,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
     static Logger LOGGER = Logger.getLogger(WalletBlocksTableModel.class.getName());
     private SortableList<Tuple2<String, String>, Block> blocks;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Height", "Timestamp", "Generator",
-            "GB tWV", //"Generating Balance",
+            "GB dtWV", //"Generating Balance",
             "Transactions", "Fee"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, true, false};
 
@@ -121,7 +121,7 @@ public class WalletBlocksTableModel extends TableModelCls<Tuple2<String, String>
                 case COLUMN_BASETARGET:
 
                     return block.getForgingValue() + " "
-                            + new BigDecimal(block.calcWinValueTargeted()).movePointLeft(3);
+                            + new BigDecimal(block.calcWinValueTargeted() - 100000); //.movePointLeft(3);
 
                 case COLUMN_TRANSACTIONS:
 
