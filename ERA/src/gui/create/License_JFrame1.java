@@ -11,7 +11,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.JDialog;
 import javax.swing.JTextPane;
@@ -21,10 +24,12 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
 
 import com.github.rjeschke.txtmark.Processor;
 
 import controller.Controller;
+import core.exdata.ExData;
 import core.item.templates.TemplateCls;
 import core.transaction.IssueTemplateRecord;
 import core.transaction.R_SignNote;
@@ -82,6 +87,29 @@ public class License_JFrame1 extends JDialog {
                 
                 R_SignNote note = (R_SignNote) record;
                 if (record.getVersion() == 2) {
+                    byte[] data = note.getData();
+
+                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
+                    try {
+                         map = ExData.parse_Data_V2(data);
+                    } catch (Exception e) {
+                        map = null;
+                    }
+                        
+                    if (map != null) {
+                        HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
+                        if (files != null) {
+                            Iterator<Entry<String, Tuple2<Boolean, byte[]>>> it_Files = files.entrySet().iterator();
+                            while (it_Files.hasNext()) {
+                                Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
+                                boolean zip = new Boolean(file.getValue().a);
+                                String name_File = (String) file.getKey();
+                                byte[] file_byte = (byte[]) file.getValue().b;
+                                return name_File;
+                            }
+                        }
+                    }
+
                     try {
                         Tuple3<String, String, JSONObject> a = note.parse_Data_V2_Without_Files();
                         message = (String) a.c.get("MS");
@@ -92,9 +120,9 @@ public class License_JFrame1 extends JDialog {
                 } else {
                     
                     try {
-                        JSONObject data = (JSONObject) JSONValue
+                        JSONObject dataJSON = (JSONObject) JSONValue
                                 .parseWithException(new String(note.getData(), Charset.forName("UTF-8")));
-                        message = (String) data.get("Message");
+                        message = (String) dataJSON.get("Message");
                     } catch (Exception e) {
                         message = new String(note.getData(), Charset.forName("UTF-8"));
                     }

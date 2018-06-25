@@ -1,5 +1,17 @@
 package gui.models;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PublicKeyAccount;
@@ -7,18 +19,8 @@ import core.item.assets.AssetCls;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import utils.NumberAsString;
 import utils.ObserverMessage;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements Observer {
@@ -77,15 +79,13 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
         for (PublicKeyAccount account : this.publicKeyAccounts) {
             ss = ss.add(account.getBalance(this.asset.getKey(DCSet.getInstance())).a.b);
 
-
             sW = sW.add(account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance())).a);
-
 
         }
 
         //	balance = account.getBalance(this.asset.getKey(DBSet.getInstance()));
 
-        return NumberAsString.formatAsString(ss.subtract(sW));
+        return NumberAsString.formatAsString(ss.subtract(sW).stripTrailingZeros());
     }
 
 
@@ -163,13 +163,13 @@ public class Accounts_Of_Deals_TableModel extends AbstractTableModel implements 
             case COLUMN_CONFIRMED_BALANCE:
                 if (this.asset == null) return "-";
                 balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
-                str = NumberAsString.formatAsString(balance.a); // + "/" + balance.b.toPlainString() + "/" + balance.c.toPlainString();
+                str = NumberAsString.formatAsString(balance.a.b.setScale(asset.getScale()));
                 return str;
             case COLUMN_WAINTING_BALANCE:
                 if (this.asset == null) return "-";
                 balance = account.getBalance(this.asset.getKey(DCSet.getInstance()));
                 unconfBalance = account.getUnconfirmedBalance(this.asset.getKey(DCSet.getInstance()));
-                str = NumberAsString.formatAsString(unconfBalance.a.subtract(balance.a.b));
+                str = NumberAsString.formatAsString(unconfBalance.a.subtract(balance.a.b).setScale(asset.getScale()));
                 //	+ "/" + unconfBalance.b.subtract(balance.b).toPlainString()
                 //	+ "/" + unconfBalance.c.subtract(balance.c).toPlainString();
                 return str;

@@ -470,7 +470,7 @@ function blocks(data)
 	output += '<table id=blocks_Transactions BORDER=0 cellpadding=15 cellspacing=0 width="1180" ><tr><td><a href=?unconfirmed'+get_lang()+'>' + data.Label_Unconfirmed_transactions+': '+data.unconfirmedTxs+'</a>';
 	output += '<td align="right">' + data.Label_total_transactions+': '+data.totaltransactions + "</table>";
 	output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr><td><b>'+ data.Label_Height +' <td><b>'+data.Label_Time+'<td><b>'+ data.Label_Generator +'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_Amount+'<td><b>'+data.Label_Gen_balance+'<td><b>WV tWV'; 
+	output += '<tr><td><b>'+ data.Label_Height +' <td><b>'+data.Label_Time+'<td><b>'+ data.Label_Generator +'<td><b>'+data.Label_TXs+'<td><b>'+data.Label_Fee+'<td><b>'+data.Label_Amount+'<td><b>'+data.Label_Gen_balance+'<td><b>WV dtWV'; 
 
 	minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
 	for(var i = data.maxHeight; i >= minHeight; i--)
