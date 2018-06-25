@@ -260,6 +260,7 @@ public class TestRec_Send_Movable {
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
         r_Send.setDC(db, false);
+        
         assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_HOLD_BALANCE);
 
         // GET ON HOLD - доставщик берет к себе на руки товар
