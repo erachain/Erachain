@@ -169,8 +169,8 @@ public class TestRec_Send {
         assertEquals((long) maker.getLastTimestamp(db), timestamp);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
-        assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1090).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1010).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
         byte[] rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
         int dd = r_SendV3.getDataLength(false);
@@ -217,8 +217,8 @@ public class TestRec_Send {
         assertEquals((long) maker.getLastTimestamp(db), timestamp);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
-        assertEquals(BigDecimal.valueOf(0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
         rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
         dd = r_SendV3.getDataLength(false);
@@ -265,8 +265,8 @@ public class TestRec_Send {
         r_SendV3.process(gb, false);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
-        assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1090).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1010).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
         rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
         dd = r_SendV3.getDataLength(false);
@@ -310,8 +310,8 @@ public class TestRec_Send {
         r_SendV3.process(gb, false);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
-        assertEquals(BigDecimal.valueOf(0).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
         rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
         dd = r_SendV3.getDataLength(false);
@@ -356,8 +356,8 @@ public class TestRec_Send {
         r_SendV3.process(gb, false);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
-        assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
+        assertEquals(BigDecimal.valueOf(1010).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
         rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
         dd = r_SendV3.getDataLength(false);

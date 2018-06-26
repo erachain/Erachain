@@ -103,7 +103,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
 
             case COLUMN_USE:
                 
-                return NumberAsString.formatAsString(account.getBalanceUSE(this.key)); // NumberAsString.getInstance().numberAsString(account.getBalanceUSE(this.key));
+                return NumberAsString.formatAsString(account.getBalanceUSE(this.key));
 
             case COLUMN_HAND:
                 
