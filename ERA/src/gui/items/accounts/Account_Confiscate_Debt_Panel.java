@@ -50,7 +50,7 @@ public class Account_Confiscate_Debt_Panel extends Class_Account_Transaction_Pan
         sendButton.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         jTextArea_Title.setText(Lang.getInstance()
                 .translate(asset.isOutsideType()? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
-                        : "If You want to confiscate in debt issued asset %asset%, fill this form")
+                        : "If You want to confiscate in debt issued asset %asset%, fill in this form")
                 .replace("%asset%", a));
 
         // icon.setIcon(null);
