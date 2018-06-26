@@ -1,13 +1,15 @@
 package gui.items.imprints;
 
-import core.item.imprints.ImprintCls;
-import gui.models.BalancesTableModel;
-import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
+
+import core.item.imprints.ImprintCls;
+import lang.Lang;
 
 @SuppressWarnings("serial")
 public class ImprintFrame extends JFrame {
@@ -38,13 +40,15 @@ public class ImprintFrame extends JFrame {
         //DETAILS
         tabPane.add(Lang.getInstance().translate("Details"), new ImprintDetailsPanel(this.imprint));
 
+        /*
         //BALANCES
-        BalancesTableModel balancesTableModel = new BalancesTableModel(imprint.getKey());
+        BalancesTableModel balancesTableModel = new BalancesTableModel(imprint);
         final JTable balancesTable = new JTable(balancesTableModel);
         tabPane.add(Lang.getInstance().translate("Holders"), new JScrollPane(balancesTable));
 
         //ADD TAB PANE
         this.add(tabPane);
+        */
 
         //PACK
         this.pack();

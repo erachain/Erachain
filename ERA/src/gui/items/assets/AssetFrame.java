@@ -1,13 +1,18 @@
 package gui.items.assets;
 
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+
 import core.item.assets.AssetCls;
 import gui.models.BalancesTableModel;
 import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("serial")
 public class AssetFrame extends JFrame {
@@ -39,7 +44,7 @@ public class AssetFrame extends JFrame {
         tabPane.add(Lang.getInstance().translate("Details"), new AssetDetailsPanel(this.asset));
 
         //BALANCES
-        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
+        BalancesTableModel balancesTableModel = new BalancesTableModel(asset, -1);
         final JTable balancesTable = new JTable(balancesTableModel);
         tabPane.add(Lang.getInstance().translate("Holders"), new JScrollPane(balancesTable));
 
