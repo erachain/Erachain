@@ -335,7 +335,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
 
-            case AssetCls.AS_INSIDE_RIGHTS:
+            case AssetCls.AS_INSIDE_ACCESS:
                 this.sendAsset.setText(Lang.getInstance().translate("Наделить правами"));
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
 
@@ -344,6 +344,19 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
                 this.debtAssetReturn.setVisible(true);
                 this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setVisible(true);
+
+                break;
+
+            case AssetCls.AS_INSIDE_VOTE:
+                this.sendAsset.setText(Lang.getInstance().translate("Наделить голосом"));
+                //this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+
+                this.debtAsset.setText(Lang.getInstance().translate("Передать делегату"));
+                this.debtAsset.setVisible(true);
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть делегированный голос"));
+                this.debtAssetReturn.setVisible(true);
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Забрать у делегата"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;

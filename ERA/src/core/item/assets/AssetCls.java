@@ -156,7 +156,14 @@ public abstract class AssetCls extends ItemCls {
      * +++ права и доступы
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
-    public static final int AS_INSIDE_RIGHTS = 55;
+    public static final int AS_INSIDE_ACCESS = 55;
+
+    /*
+     * inside МЩЕУ
+     * +++ права и доступы
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INSIDE_VOTE = 56;
 
     /*
      * inside CLAIMS
@@ -354,7 +361,8 @@ public abstract class AssetCls extends ItemCls {
     public boolean isInsideUtility() {return this.asset_type == AS_INSIDE_UTILITY;}
     public boolean isInsideShare() {return this.asset_type == AS_INSIDE_SHARE;}
     public boolean isInsideBonus() {return this.asset_type == AS_INSIDE_BONUS;}
-    public boolean isInsideRights() {return this.asset_type == AS_INSIDE_RIGHTS;}
+    public boolean isInsideAccess() {return this.asset_type == AS_INSIDE_ACCESS;}
+    public boolean isInsideVote() {return this.asset_type == AS_INSIDE_VOTE;}
     public boolean isInsideOtherClaim() {return this.asset_type == AS_INSIDE_OTHER_CLAIM;}
 
     public boolean isOutsideType() {
@@ -388,19 +396,21 @@ public abstract class AssetCls extends ItemCls {
                 return "Outside Other Claim";
 
             case AS_INSIDE_ASSETS:
-                return "Inside Asset";
+                return "Digital Asset";
             case AS_INSIDE_CURRENCY:
-                return "Inside Currency";
+                return "Digital Currency";
             case AS_INSIDE_UTILITY:
-                return "Inside Utility";
+                return "Digital Utility";
             case AS_INSIDE_SHARE:
-                return "Inside Share";
+                return "Digital Share";
             case AS_INSIDE_BONUS:
-                return "Inside Bonus";
-            case AS_INSIDE_RIGHTS:
-                return "Inside Rights";
+                return "Digital Bonus";
+            case AS_INSIDE_ACCESS:
+                return "Digital Access";
+            case AS_INSIDE_VOTE:
+                return "Digital Vote";
             case AS_INSIDE_OTHER_CLAIM:
-                return "Inside Other Claim";
+                return "Other Digital Claim";
 
             case AS_ACCOUNTING:
                 return "Accounting";
@@ -437,8 +447,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Цифровая акция. Доля собственности на внешнее или внутренне предприятие, обладание которой устанавливает право на владение соотвествующей долей на предприятии без надобности совершать какие-либо внешние действия";
             case AS_INSIDE_BONUS:
                 return "Цифровая награда (бонус). То что не имеет общепринятой стомости и не может обмениваться на другие виды активов внутри Эрачейн. Хотя обмен на другие бонусы и награды разрешены";
-            case AS_INSIDE_RIGHTS:
-                return "Цифовые права и голоса. Например права доступа или голосования";
+            case AS_INSIDE_ACCESS:
+                return "Цифовые права доступа и управления";
+            case AS_INSIDE_VOTE:
+                return "Цифовой голос для голосований";
             case AS_INSIDE_OTHER_CLAIM:
                 return "Другие цифровые права, требования и обязательства. Эти активы (как и другие цифровые) можно передать в долг и самостоятельно конфисковать долг у должника.";
 
