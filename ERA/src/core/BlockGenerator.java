@@ -1,6 +1,18 @@
 package core;
 
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+
 import at.AT_Block;
 import at.AT_Constants;
 import at.AT_Controller;
@@ -15,15 +27,9 @@ import network.Peer;
 import network.message.MessageFactory;
 import network.message.SignaturesMessage;
 import ntp.NTP;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import settings.Settings;
 import utils.ObserverMessage;
 import utils.TransactionTimestampComparator;
-
-import java.sql.Timestamp;
-import java.util.*;
 
 public class BlockGenerator extends Thread implements Observer {
 
@@ -563,7 +569,7 @@ public class BlockGenerator extends Thread implements Observer {
                                 generatedBlock = null;
                                 try {
                                     generatedBlock = generateNextBlock(dcSet, acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(dcSet, timePoint, bchain, winned_winValue),
+                                            getUnconfirmedTransactions(dcSet, timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME * 1000, bchain, winned_winValue),
                                             height, winned_forgingValue, winned_winValue, previousTarget);
                                 } catch (java.lang.OutOfMemoryError e) {
                                     // TRY CATCH OUTofMemory error - heap space

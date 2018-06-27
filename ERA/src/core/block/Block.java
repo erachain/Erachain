@@ -383,7 +383,7 @@ public class Block {
 
         BlockChain blockChain = Controller.getInstance().getBlockChain();
 
-        return blockChain.getTimestamp(height);
+        return blockChain.getTimestamp(height + 1);
     }
 
 	/*
@@ -968,7 +968,7 @@ public class Block {
 
             byte[] transactionsSignatures = new byte[0];
 
-            long timestampEnd = this.getTimestamp(dcSet);
+            long timestampEnd = this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 
