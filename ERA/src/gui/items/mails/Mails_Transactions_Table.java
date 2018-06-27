@@ -1,5 +1,41 @@
 package gui.items.mails;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -11,27 +47,11 @@ import core.wallet.Wallet;
 import datachain.DCSet;
 import gui.PasswordPane;
 import lang.Lang;
-import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import utils.*;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.List;
+import utils.Converter;
+import utils.DateTimeFormat;
+import utils.NumberAsString;
+import utils.ObserverMessage;
+import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
 public class Mails_Transactions_Table extends JTable implements Observer {
@@ -83,6 +103,8 @@ public class Mails_Transactions_Table extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
+            messagetx.setDC(DCSet.getInstance(), false);
+            
             boolean is = false;
             for (MessageBuf message : messageBufs) {
                 if (Arrays.equals(messagetx.getSignature(), message.getSignature())) {
@@ -276,6 +298,8 @@ public class Mails_Transactions_Table extends JTable implements Observer {
 
 
         for (Transaction messagetx : transactions) {
+
+            messagetx.setDC(DCSet.getInstance(), false);
 
             if (asset.getKey() == messagetx.getAssetKey()) {
                 boolean is = false;

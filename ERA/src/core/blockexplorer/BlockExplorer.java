@@ -3075,6 +3075,8 @@ public class BlockExplorer {
             if (unit.getUnit() instanceof TransactionAmount) {
 
                 TransactionAmount tx = (TransactionAmount) unit.getUnit();
+                tx.setDC(dcSet, false);
+                
                 tXincome = tx.getAssetAmount();
 
                 if (tx.getCreator() != null && addresses.contains(tx.getCreator().getAddress())) {

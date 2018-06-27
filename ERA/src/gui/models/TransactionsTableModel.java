@@ -1,5 +1,15 @@
 package gui.models;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.validation.constraints.Null;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
@@ -8,16 +18,8 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
-
-import javax.validation.constraints.Null;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 // IN gui.DebugTabPane used
@@ -61,6 +63,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
             transactions = new ArrayList<>();
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), string);
             if (transaction != null) {
+                transaction.setDC(DCSet.getInstance(), false);
                 transactions.add(transaction);
             }
             this.fireTableDataChanged();
@@ -68,6 +71,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
         }
 
         transactions = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
+        for (Transaction transaction: transactions) {
+            transaction.setDC(DCSet.getInstance(), false);
+        }
         this.fireTableDataChanged();
 
     }
@@ -102,6 +108,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
                         ac = assetTransfer.getOwner().getAddress();
                         //				System.out.print("\n k="+ k + "ac="+ac);
                         if (ac.equals(address)) {
+                            gT.setDC(DCSet.getInstance(), false);
                             transactions.add(gT);
                         }
                     }
@@ -112,7 +119,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
 
             transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
-
+            for (Transaction transaction: transactions) {
+                transaction.setDC(DCSet.getInstance(), false);
+            }
 
             this.fireTableDataChanged();
         } else {
@@ -126,6 +135,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     public void view_Transactioms_From_Adress(String str) {
 
         transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(str);
+        for (Transaction transaction: transactions) {
+            transaction.setDC(DCSet.getInstance(), false);
+        }
         this.fireTableDataChanged();
 
 

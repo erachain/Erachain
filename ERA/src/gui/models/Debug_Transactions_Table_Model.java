@@ -1,18 +1,25 @@
 package gui.models;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.table.AbstractTableModel;
+import javax.validation.constraints.Null;
+
+import org.apache.log4j.Logger;
+
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import lang.Lang;
-import org.apache.log4j.Logger;
 import utils.DateTimeFormat;
 import utils.NumberAsString;
 import utils.ObserverMessage;
 import utils.Pair;
-
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
-import java.util.*;
 
 @SuppressWarnings("serial")
 public class Debug_Transactions_Table_Model extends AbstractTableModel implements Observer {
@@ -134,6 +141,8 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
             //CHECK IF LIST UPDATED
             //	this.transactions.add((Transaction)message.getValue());
             Pair<byte[], Transaction> ss = (Pair<byte[], Transaction>) message.getValue();
+            ss.getB().setDC(DCSet.getInstance(), false);
+            
             this.transactions.add(ss.getB());
             this.fireTableRowsInserted(0, 0);
             if (this.transactions.size() > MAX_ROWS) {
@@ -173,7 +182,9 @@ public class Debug_Transactions_Table_Model extends AbstractTableModel implement
         while (iterator.hasNext() && i++ < MAX_ROWS) {
 
             key = iterator.next();
-            this.transactions.add(map.get(key));
+            Transaction tx = map.get(key);
+            tx.setDC(DCSet.getInstance(), false);
+            this.transactions.add(tx);
         }
     }
 
