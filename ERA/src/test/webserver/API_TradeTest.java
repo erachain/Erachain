@@ -32,7 +32,7 @@ public class API_TradeTest extends SettingTests {
         String resultStatus = RemoteAPI.ResponseCodeAPI(SettingTests.URL_REMOTE_NODE + "/api", "get");
         Assert.assertEquals(Integer.parseInt(resultStatus), 200);
 
-        String resultValue = RemoteAPI.ResponseValueAPI(SettingTests.URL_REMOTE_NODE + "/api", "get");
+        String resultValue = RemoteAPI.ResponseValueAPI(SettingTests.URL_REMOTE_NODE + "/api", "get", "");
         Assert.assertNotNull(resultValue);
         Assert.assertNotEquals(resultValue, "");
 
