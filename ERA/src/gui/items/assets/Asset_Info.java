@@ -1,26 +1,9 @@
 package gui.items.assets;
 
-import core.account.PublicKeyAccount;
-import core.item.assets.AssetCls;
-import core.transaction.Transaction;
-import datachain.DCSet;
-import gui.library.Holders_Library_Panel;
-import gui.library.HyperLinkAccount;
-import gui.library.Voush_Library_Panel;
-import gui.library.library;
-import lang.Lang;
-import org.apache.commons.net.util.Base64;
-import utils.MenuPopupUtil;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -31,6 +14,31 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JTextPane;
+import javax.swing.UIManager;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+import org.apache.commons.net.util.Base64;
+
+import core.account.PublicKeyAccount;
+import core.item.assets.AssetCls;
+import core.transaction.Transaction;
+import datachain.DCSet;
+import gui.library.Holders_Library_Panel;
+import gui.library.HyperLinkAccount;
+import gui.library.Voush_Library_Panel;
+import gui.library.library;
+import lang.Lang;
+import utils.MenuPopupUtil;
 
 
 public class Asset_Info extends JTextPane {
@@ -200,7 +208,11 @@ public class Asset_Info extends JTextPane {
             // vouches
             jTabbedPane1.add(new Voush_Library_Panel(transaction));
             // holders
-            jTabbedPane1.add(new Holders_Library_Panel(asset));
+            jTabbedPane1.add(new Holders_Library_Panel(asset, -1));
+//            jTabbedPane1.add(new Holders_Library_Panel(asset, 2));
+  //          jTabbedPane1.add(new Holders_Library_Panel(asset, 3));
+   //         jTabbedPane1.add(new Holders_Library_Panel(asset, 4));
+
             // Get the text pane's document
             // JTextPane textPane = new JTextPane();
             StyledDocument doc = (StyledDocument) this.getDocument();

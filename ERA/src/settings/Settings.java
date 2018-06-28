@@ -29,7 +29,6 @@ import core.BlockChain;
 import lang.Lang;
 import network.Peer;
 import ntp.NTP;
-import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
@@ -62,7 +61,7 @@ public class Settings {
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
     private static final boolean DEFAULT_RPC_ENABLED = false;
-    private static final boolean DEFAULT_BACUP_ENABLED = true;
+    private static final boolean DEFAULT_BACUP_ENABLED = false;
     private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;

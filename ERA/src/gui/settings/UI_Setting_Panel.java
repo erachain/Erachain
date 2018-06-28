@@ -317,22 +317,22 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
                                 JSONObject internetValue = (JSONObject) inernetLangsJSON.get(internetKey);
 
                                 String itemText = null;
-                                final String langFileName = (String) (internetValue).get("_file_");
+                                final String langFileName = (String) internetValue.get("_file_");
 
-                                long time_of_translation = ((Long) (internetValue).get("_timestamp_of_translation_")).longValue();
+                                long time_of_translation = ((Long) internetValue.get("_timestamp_of_translation_")).longValue();
 
                                 try {
                                     //LOGGER.error("try lang file: " + langFileName);
                                     JSONObject oldLangFile = Lang.openLangFile(langFileName);
 
                                     if (oldLangFile == null) {
-                                        itemText = (String) (internetValue).get("download lang_name translation");
+                                        itemText = (String) internetValue.get("download lang_name translation");
 
                                     } else if (time_of_translation > (Long) oldLangFile.get("_timestamp_of_translation_")) {
-                                        itemText = ((String) (internetValue).get("download update of lang_name translation from %date%")).replace("%date%", DateTimeFormat.timestamptoString(time_of_translation, "yyyy-MM-dd", ""));
+                                        itemText = ((String) internetValue.get("download update of lang_name translation from %date%")).replace("%date%", DateTimeFormat.timestamptoString(time_of_translation, "yyyy-MM-dd", ""));
                                     }
                                 } catch (Exception e2) {
-                                    itemText = (String) (internetValue).get("download lang_name translation");
+                                    itemText = (String) internetValue.get("download lang_name translation");
                                 }
 
                                 if (itemText != null) {

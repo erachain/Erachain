@@ -1,6 +1,18 @@
 package gui.status;
 // 16/03
 
+import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.ToolTipManager;
+
 import controller.Controller;
 import core.BlockChain;
 import core.BlockGenerator;
@@ -10,15 +22,6 @@ import datachain.DCSet;
 import lang.Lang;
 import utils.GUIUtils;
 import utils.ObserverMessage;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.math.BigDecimal;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("serial")
 public class ForgingStatus extends JLabel implements Observer {
@@ -69,7 +72,7 @@ public class ForgingStatus extends JLabel implements Observer {
                     //timeForge = getTimeToGoodView((60*5+19)*Controller.getInstance().getLastBlock().getGeneratingBalance()/totalBalanceInt);
                     timeForge = new BigDecimal(BlockChain.calcWinValueTargetedBase(dcSet, newHeight, winBalance, target)).movePointLeft(3).toPlainString();
                     //timeForge = "" + (BlockChain.BASE_TARGET * winBalance / target);
-                    timeForge = winBalance2 > 0 ? timeForge : ("(" + winBalance2 + ")");
+                    timeForge = winBalance2 > 0 ? timeForge + "%" : ("(" + winBalance2 + ")");
                     timeForge = timeForge + " " + winAccount.getAddress();
                     timeForge = Lang.getInstance().translate("Won data for forging: %timeForge%.").replace("%timeForge%", timeForge);
                 } else {

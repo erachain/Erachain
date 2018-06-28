@@ -1,13 +1,11 @@
 package gui.items.imprints;
 
+import javax.swing.JLabel;
+
 import core.item.imprints.ImprintCls;
 import gui.library.MTable;
-import gui.library.library;
 import gui.models.BalancesTableModel;
 import lang.Lang;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -167,6 +165,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 9);
         add(holders_jLabel, gridBagConstraints);
 
+        /*
         // BALANCES
         table_model = new BalancesTableModel(imprint.getKey());
         holders_jTable1 = new MTable(table_model);
@@ -179,6 +178,7 @@ public class Imprints_Info_Panel extends javax.swing.JPanel {
         to_Date_Column1.setPreferredWidth(120);// .setWidth(30);
 
         jScrollPane2.setViewportView(holders_jTable1);
+        */
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;

@@ -5,11 +5,11 @@
  */
 package gui.items.assets;
 
+import javax.swing.JTable;
+
 import core.item.assets.AssetCls;
 import gui.models.BalancesTableModel;
 import lang.Lang;
-
-import javax.swing.*;
 
 /**
  * @author Саша
@@ -68,7 +68,7 @@ public class AssetPanel extends javax.swing.JPanel {
 
 
         //BALANCES
-        BalancesTableModel balancesTableModel = new BalancesTableModel(asset.getKey());
+        BalancesTableModel balancesTableModel = new BalancesTableModel(asset, -1);
         final JTable balancesTable = new JTable(balancesTableModel);
 
         jScrollPane2.setViewportView(balancesTable);

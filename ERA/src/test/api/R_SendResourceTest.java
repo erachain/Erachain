@@ -30,10 +30,10 @@ public class R_SendResourceTest extends SettingTests {
         String[] parse = (resultAddresses.replace("\r\n", "").split(","));
         String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
         String sendTransaction = ApiClient.executeCommand("GET r_send/" + address + "/79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH?message={\\\"msg\\\":\\\"123\\\"}&encrypt=false&password=123456789 ");
-        String result = "[" + sendTransaction + "]";
+        String result = sendTransaction;
 
         JSONParser jsonParser = new JSONParser();
-        JSONArray jsonArray = (JSONArray) jsonParser.parse(result);
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(result);
 
         Map<String, String> requestField = new HashMap<String, String>() {{
             put("type_name", "type_name");
@@ -56,17 +56,11 @@ public class R_SendResourceTest extends SettingTests {
             put("timestamp", "timestamp");
         }};
 
-
-        Iterator<Object> iterator = jsonArray.iterator();
-        while (iterator.hasNext()) {
-            JSONObject jsonObject = (JSONObject) iterator.next();
-            for (Object key : jsonObject.keySet()) {
-                Assert.assertEquals(key.toString(), requestField.get(key));
-            }
+        for (Object key : jsonObject.keySet()) {
+            Assert.assertEquals(key.toString(), requestField.get(key));
         }
 
         ApiClient.executeCommand("GET wallet/lock");
-
     }
 
     @Test
@@ -81,10 +75,8 @@ public class R_SendResourceTest extends SettingTests {
                 "\"recipient\":\"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH\",\"feePow\":\"1\",\"assetKey\":\"643\",\"amount\":\"1\"," +
                 "\"title\":\"123\",\"message\":\"{\"\"msg\"\":\"\"1223\"\"}\",\"codebase\":\"0\",\"encrypt\":\"false\",\"password\":\"123456789\"}");
 
-        String result = "[" + sendTransaction + "]";
-
         JSONParser jsonParser = new JSONParser();
-        JSONArray jsonArray = (JSONArray) jsonParser.parse(result);
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(sendTransaction);
 
         Map<String, String> requestField = new HashMap<String, String>() {{
             put("type_name", "type_name");
@@ -113,12 +105,9 @@ public class R_SendResourceTest extends SettingTests {
             put("timestamp", "timestamp");
         }};
 
-        Iterator<Object> iterator = jsonArray.iterator();
-        while (iterator.hasNext()) {
-            JSONObject jsonObject = (JSONObject) iterator.next();
-            for (Object key : jsonObject.keySet()) {
-                Assert.assertEquals(key.toString(), requestField.get(key));
-            }
+
+        for (Object key : jsonObject.keySet()) {
+            Assert.assertEquals(key.toString(), requestField.get(key));
         }
 
         ApiClient.executeCommand("GET wallet/lock");

@@ -1,27 +1,46 @@
 package gui.library;
 
+import java.awt.GridBagConstraints;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
 import core.item.assets.AssetCls;
 import gui.models.BalancesTableModel;
 import lang.Lang;
-
-import javax.swing.*;
-import java.awt.*;
 
 public class Holders_Library_Panel extends JPanel {
 
 
     private BalancesTableModel balancesTableModel;
 
-    public Holders_Library_Panel(AssetCls asset) {
+    public Holders_Library_Panel(AssetCls asset, int balanceIndex) {
         super();
-        this.setName(Lang.getInstance().translate("Holders"));
+        
+        switch (balanceIndex) {
+            case 1:
+                this.setName(Lang.getInstance().translate("Owners"));
+                break;
+            case 2:
+                this.setName(Lang.getInstance().translate("Debtors"));
+                break;
+            case 3:
+                this.setName(Lang.getInstance().translate("Holders"));
+                break;
+            case 4:
+                this.setName(Lang.getInstance().translate("Spenders"));
+                break;
+            default:
+                this.setName(Lang.getInstance().translate("Balances"));
+                break;
+        }
 
         JScrollPane jScrollPane_Tab_Holders = new javax.swing.JScrollPane();
 
         this.setLayout(new java.awt.GridBagLayout());
 
 
-        balancesTableModel = new BalancesTableModel(asset.getKey());
+        balancesTableModel = new BalancesTableModel(asset, balanceIndex);
         MTable jTable1 = new MTable(balancesTableModel);
 
         //  jTable1.setMinimumSize(new Dimension(0,0));

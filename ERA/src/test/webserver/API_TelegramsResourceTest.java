@@ -36,7 +36,7 @@ public class API_TelegramsResourceTest extends SettingTests {
         String resultStatus = RemoteAPI.ResponseCodeAPI(SettingTests.URL_REMOTE_NODE + "/apitelegrams", "get");
         Assert.assertEquals(Integer.parseInt(resultStatus), 200);
 
-        String resultValue = RemoteAPI.ResponseValueAPI(SettingTests.URL_REMOTE_NODE + "/apitelegrams", "get");
+        String resultValue = RemoteAPI.ResponseValueAPI(SettingTests.URL_REMOTE_NODE + "/apitelegrams", "get", "");
         Assert.assertNotNull(resultValue);
         Assert.assertNotEquals(resultValue, "");
 

@@ -31,7 +31,8 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_INSIDE_UTILITY));
             list.add(new AssetType(AssetCls.AS_INSIDE_SHARE));
             list.add(new AssetType(AssetCls.AS_INSIDE_BONUS));
-            list.add(new AssetType(AssetCls.AS_INSIDE_RIGHTS));
+            list.add(new AssetType(AssetCls.AS_INSIDE_ACCESS));
+            list.add(new AssetType(AssetCls.AS_INSIDE_VOTE));
             list.add(new AssetType(AssetCls.AS_INSIDE_OTHER_CLAIM));
             
             list.add(new AssetType(AssetCls.AS_ACCOUNTING));
@@ -42,13 +43,16 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             //list.add(new AssetType(AssetCls.AS_OUTSIDE_SERVICE));
             //list.add(new AssetType(AssetCls.AS_OUTSIDE_SHARE));
             //list.add(new AssetType(AssetCls.AS_OUTSIDE_OTHER_CLAIM));
+            
             list.add(new AssetType(AssetCls.AS_INSIDE_ASSETS));
             list.add(new AssetType(AssetCls.AS_INSIDE_CURRENCY));
             //list.add(new AssetType(AssetCls.AS_INSIDE_UTILITY));
             //list.add(new AssetType(AssetCls.AS_INSIDE_SHARE));
             //list.add(new AssetType(AssetCls.AS_INSIDE_BONUS));
             //list.add(new AssetType(AssetCls.AS_INSIDE_RIGHTS));
+            //list.add(new AssetType(AssetCls.AS_INSIDE_VOTE));
             //list.add(new AssetType(AssetCls.AS_INSIDE_OTHER_CLAIM));
+            
             list.add(new AssetType(AssetCls.AS_ACCOUNTING));
         }
         

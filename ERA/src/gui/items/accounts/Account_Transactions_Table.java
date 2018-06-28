@@ -1,28 +1,10 @@
 package gui.items.accounts;
 // 30/03
 
-import controller.Controller;
-import core.account.Account;
-import core.account.PrivateKeyAccount;
-import core.crypto.AEScrypto;
-import core.item.assets.AssetCls;
-import core.transaction.R_Send;
-import core.transaction.Transaction;
-import core.wallet.Wallet;
-import datachain.DCSet;
-import gui.PasswordPane;
-import lang.Lang;
-import org.apache.log4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
-import utils.*;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -31,8 +13,47 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+
+import org.apache.log4j.Logger;
+import org.bouncycastle.crypto.InvalidCipherTextException;
+
+import controller.Controller;
+import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.item.assets.AssetCls;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.R_Send;
+import core.transaction.Transaction;
+import core.wallet.Wallet;
+import datachain.DCSet;
+import gui.PasswordPane;
+import lang.Lang;
+import utils.Converter;
+import utils.DateTimeFormat;
+import utils.NumberAsString;
+import utils.ObserverMessage;
+import utils.TableMenuPopupUtil;
 
 @SuppressWarnings("serial")
 public class Account_Transactions_Table extends JTable implements Observer {
@@ -86,6 +107,8 @@ public class Account_Transactions_Table extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
+            messagetx.setDC(DCSet.getInstance(), false);
+
             boolean is = false;
             for (MessageBuf message : messageBufs) {
                 if (Arrays.equals(messagetx.getSignature(), message.getSignature())) {
@@ -94,7 +117,7 @@ public class Account_Transactions_Table extends JTable implements Observer {
                 }
             }
             if (!is) {
-                //			addMessage(messageBufs.size(),(R_Send)messagetx, null);
+                addMessage(messageBufs.size(), (R_Send)messagetx, null);
             }
         }
 
@@ -261,12 +284,11 @@ public class Account_Transactions_Table extends JTable implements Observer {
         if (account != null) {
             transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.GENESIS_SEND_ASSET_TRANSACTION, 0));
             transactions.addAll(dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
-
-
         }
 
         for (Transaction messagetx : transactions) {
-
+            messagetx.setDC(DCSet.getInstance(), false);
+            
             if (asset.getKey() == messagetx.getAssetKey()) {
                 boolean is = false;
                 for (MessageBuf message : messageBufs) {
@@ -375,7 +397,10 @@ public class Account_Transactions_Table extends JTable implements Observer {
                         }
                     }
                 if (!is) {
-                    addMessage(0, (R_Send) message.getValue(), null);
+                    
+                    Transaction transactopn = (Transaction)message.getValue();
+                    transactopn.setDC(DCSet.getInstance(), false);
+                    addMessage(0, (R_Send) transactopn, null);
 
                     messagesModel.setRowCount(messageBufs.size());
 
@@ -417,9 +442,6 @@ public class Account_Transactions_Table extends JTable implements Observer {
             R_Send messagetx = (R_Send) transaction;
             messageBufs.add(pos, new MessageBuf(
                     messagetx.getData(),
-                    // TODO MAKE VIEW DATA
-                    // TODO DELE THIS CLASS - USE transaction instead
-                    //messagetx.viewData(),
                     messagetx.isEncrypted(),
                     messagetx.getCreator(), //.asPerson(),
                     messagetx.getRecipient(), //.asPerson(),
@@ -430,6 +452,23 @@ public class Account_Transactions_Table extends JTable implements Observer {
                     messagetx.getSignature(),
                     messagetx.getCreator().getPublicKey(),
                     messagetx.isText(),
+                    account
+            ));
+
+        } else if (transaction.getType() == Transaction.CREATE_ORDER_TRANSACTION) {
+            CreateOrderTransaction messagetx = (CreateOrderTransaction) transaction;
+            messageBufs.add(pos, new MessageBuf(
+                    null, //messagetx.getData(),
+                    false, //messagetx.isEncrypted(),
+                    messagetx.getCreator(), //.asPerson(),
+                    null, //messagetx.getRecipient(), //.asPerson(),
+                    messagetx.getTimestamp(),
+                    messagetx.getAmount(),
+                    messagetx.getKey(),
+                    messagetx.getFee(),
+                    messagetx.getSignature(),
+                    messagetx.getCreator().getPublicKey(),
+                    true, //messagetx.isText(),
                     account
             ));
 

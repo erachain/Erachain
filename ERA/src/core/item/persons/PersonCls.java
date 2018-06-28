@@ -1,21 +1,23 @@
 package core.item.persons;
 
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+
+import org.json.simple.JSONObject;
+
 //import java.math.BigDecimal;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
-import org.json.simple.JSONObject;
 import settings.Settings;
 import utils.ByteArrayUtils;
 import utils.DateTimeFormat;
-
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 
 //import java.util.Arrays;
 // import org.apache.log4j.Logger;
@@ -113,11 +115,17 @@ public abstract class PersonCls extends ItemCls {
     }
 
     public String getBirthdayStr() {
-        return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
+        if (true)
+            return utils.DateTimeFormat.timestamptoString(this.birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
+        else
+            return DateTimeFormat.timestamptoString(birthday, Settings.getInstance().getBirthTimeFormat(), "UTC");
     }
 
     public String getDeathdayStr() {
-        return utils.DateTimeFormat.timestamptoString(this.deathday, Settings.getInstance().getBirthTimeFormat(), "UTC");
+        if (true)
+            return utils.DateTimeFormat.timestamptoString(this.deathday, Settings.getInstance().getBirthTimeFormat(), "UTC");
+        else
+            return DateTimeFormat.timestamptoString(deathday, Settings.getInstance().getBirthTimeFormat(), "UTC");
     }
 
     public byte getGender() {
@@ -240,7 +248,7 @@ public abstract class PersonCls extends ItemCls {
         long key = this.getKey(db);
         return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
                 + this.name + "♥"
-                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "");
+                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC");
     }
 
     @Override
@@ -248,7 +256,7 @@ public abstract class PersonCls extends ItemCls {
         long key = this.getKey(db);
         return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
                 + this.name.substring(0, Math.min(this.name.length(), 20)) + "♥"
-                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "");
+                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC");
     }
 
     @SuppressWarnings("unchecked")
