@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.net.util.Base64;
@@ -4239,9 +4240,13 @@ public class BlockExplorer {
         output.put("blockSignature", Base58.encode(block.getSignature()));
         output.put("blockHeight", block.getHeight(dcSet));
 
-        if (block.getParent(dcSet) != null) {
+       if (block.getHeight(dcSet) >1){
+        if (block.getParent(dcSet) != null ) {
             output.put("parentBlockSignature", Base58.encode(block.getParent(dcSet).getSignature()));
         }
+       } else {
+           output.put("parentBlockSignature", "");
+       }
 
         if (block.getChild(dcSet) != null) {
             output.put("childBlockSignature", Base58.encode(block.getChild(dcSet).getSignature()));
