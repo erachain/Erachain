@@ -78,7 +78,7 @@ public class Main_Panel extends javax.swing.JPanel {
 
     private Main_Panel() {
         initComponents();
-        jSplitPane1.M_setDividerSize(20);
+ //       jSplitPane1.M_setDividerSize(40);
     }
 
     // Variables declaration - do not modify
