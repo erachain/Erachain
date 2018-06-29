@@ -49,7 +49,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendAsset = new JMenuItem();
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Send_Dialog(asset, pubKey, null, null).setVisible(true);
+                new Account_Send_Dialog(asset, pubKey, null, null);
 
             }
         });
