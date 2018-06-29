@@ -178,7 +178,9 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
 
                             // GET ROW
                             int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
-                            row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                            try {
+                                row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                            
 
                             // GET TRANSACTION
                             Transaction transaction = transactionsModel.getTransaction(row);
@@ -212,7 +214,10 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
                             panel.add(jLabel9, gridBagConstraints);
 
                             record_stpit.jScrollPane_jPanel_RightPanel.setViewportView(panel);
-
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                record_stpit.jScrollPane_jPanel_RightPanel.setViewportView(null);
+                            }
                         }
                     }
                 });
