@@ -1,17 +1,38 @@
 package gui.items.accounts;
 
+import core.BlockChain;
 import core.account.Account;
+import core.account.PrivateKeyAccount;
+import core.crypto.AEScrypto;
+import core.crypto.Base58;
+import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 import gui.AccountRenderer;
+import gui.PasswordPane;
+import gui.items.assets.AssetsComboBoxModel;
 import gui.models.AccountsComboBoxModel;
+import gui.transaction.OnDealClick;
 import lang.Lang;
+import utils.Converter;
 import utils.MenuPopupUtil;
+import utils.NameUtils;
+import utils.Pair;
+import utils.NameUtils.NameResult;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import controller.Controller;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 
@@ -26,7 +47,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
     public JTextField txtAmount;
     public JTextField txtFeePow;
     public JTextArea txtMessage;
-    public JCheckBox encrypted;
+    public JCheckBox encryptedCHcKBox;
     public JCheckBox isText;
     public JButton sendButton;
     public AccountsComboBoxModel accountsModel;
@@ -40,8 +61,35 @@ public class Class_Account_Transaction_Panel extends JPanel {
     public JTextField txt_Title;
     int y;
 
-    public Class_Account_Transaction_Panel() {
+    public Account recipient;
 
+    public String message;
+
+    public byte[] messageBytes;
+
+    public BigDecimal amount;
+
+    public int feePow;
+
+    public boolean isTextB;
+
+    public Account sender;
+
+    public AssetCls asset;
+
+    public long key;
+
+    public String head;
+
+    public byte[] isTextByte;
+
+    public byte[] encrypted;
+    public Integer result;
+    public Account account;
+
+    public Class_Account_Transaction_Panel(AssetCls asset2, Account account2) {
+        account = account2;
+        asset =asset2;
         y = 0;
         GridBagLayout gridBagLayout = new GridBagLayout();
         // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
@@ -314,9 +362,9 @@ public class Class_Account_Transaction_Panel extends JPanel {
         ChkEncGBC.gridx = 3;
         ChkEncGBC.gridy = y;
 
-        encrypted = new JCheckBox();
-        encrypted.setSelected(true);
-        this.add(encrypted, ChkEncGBC);
+        encryptedCHcKBox = new JCheckBox();
+        encryptedCHcKBox.setSelected(true);
+        this.add(encryptedCHcKBox, ChkEncGBC);
 
         // coin TITLE
         GridBagConstraints labecoin = new GridBagConstraints();
@@ -445,6 +493,54 @@ public class Class_Account_Transaction_Panel extends JPanel {
         // splitPane_1.setDividerLocation((int)((double)(this.getHeight())*0.7));//.setDividerLocation(.8);
         // this.setVisible(true);
 
+        // favorite combo box
+        cbxFavorites.setModel(new AssetsComboBoxModel());
+        if (asset != null) {
+            for (int i = 0; i < cbxFavorites.getItemCount(); i++) {
+                AssetCls item = cbxFavorites.getItemAt(i);
+                if (item.getKey() == asset.getKey()) {
+                    // not worked cbxFavorites.setSelectedItem(asset);
+                    cbxFavorites.setSelectedIndex(i);
+                    cbxFavorites.setEnabled(false);// .setEditable(false);
+                    break;
+                } else {
+                    cbxFavorites.setEnabled(true);
+                }
+            }
+        }
+
+        // accoutn ComboBox
+        this.accountsModel = new AccountsComboBoxModel();
+        this.cbxFrom.setModel(accountsModel);
+        this.cbxFrom.setRenderer(new AccountRenderer(0));
+        ((AccountRenderer) cbxFrom.getRenderer()).setAsset(((AssetCls) cbxFavorites.getSelectedItem()).getKey());
+        if (account != null) cbxFrom.setSelectedItem(account);
+
+        //ON FAVORITES CHANGE
+
+        cbxFavorites.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
+
+                if (asset != null) {
+                    ((AccountRenderer) cbxFrom.getRenderer()).setAsset(asset.getKey());
+                    cbxFrom.repaint();
+
+                }
+
+            }
+        });
+
+        
+        
+        sendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                onSendClick();
+            }
+        });
     }
 
     private void refreshReceiverDetails() {
@@ -454,12 +550,218 @@ public class Class_Account_Transaction_Panel extends JPanel {
         txtRecDetails.setText(Account.getDetails(toValue, asset));
 
         if (false && toValue != null && toValue.startsWith(wrongFirstCharOfAddress)) {
-            encrypted.setEnabled(false);
-            encrypted.setSelected(false);
+            encryptedCHcKBox.setEnabled(false);
+            encryptedCHcKBox.setSelected(false);
             isText.setSelected(false);
         } else {
-            encrypted.setEnabled(true);
+            encryptedCHcKBox.setEnabled(true);
         }
     }
+     public boolean cheskError(){
+         this.sendButton.setEnabled(false);
+         //TODO TEST
+         //CHECK IF NETWORK OK
+         /*if(Controller.getInstance().getStatus() != Controller.STATUS_OKE)
+         {
+             //NETWORK NOT OK
+             JOptionPane.showMessageDialog(null, "You are unable to send a transaction while synchronizing or while having no connections!", "Error", JOptionPane.ERROR_MESSAGE);
 
+             //ENABLE
+             this.sendButton.setEnabled(true);
+
+             return;
+         }*/
+
+         //READ SENDER
+         sender = (Account) cbxFrom.getSelectedItem();
+         //CHECK IF WALLET UNLOCKED
+         if (!Controller.getInstance().isWalletUnlocked()) {
+             //ASK FOR PASSWORD
+             String password = PasswordPane.showUnlockWalletDialog(this);
+             if (password.equals("")) {
+                 this.sendButton.setEnabled(true);
+                 return false;
+             }
+             if (!Controller.getInstance().unlockWallet(password)) {
+                 //WRONG PASSWORD
+                 JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid password"), Lang.getInstance().translate("Unlock Wallet"), JOptionPane.ERROR_MESSAGE);
+
+                 //ENABLE
+                 this.sendButton.setEnabled(true);
+                 return false;
+             }
+         }
+
+         //READ RECIPIENT
+         String recipientAddress = txtTo.getText();
+
+          //ORDINARY RECIPIENT
+         if (Crypto.getInstance().isValidAddress(recipientAddress)) {
+            this.recipient = new Account(recipientAddress);
+         } else {
+             //IS IS NAME of RECIPIENT - resolve ADDRESS
+             Pair<Account, NameResult> result = NameUtils.nameToAdress(recipientAddress);
+
+             if (result.getB() == NameResult.OK) {
+                 recipient = result.getA();
+             } else {
+                 JOptionPane.showMessageDialog(null, result.getB().getShortStatusMessage(), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                 //ENABLE
+                 this.sendButton.setEnabled(true);
+                 return false;
+             }
+         }
+
+         int parsing = 0;
+        
+        
+         try {
+             //READ AMOUNT
+             parsing = 1;
+             amount = new BigDecimal(txtAmount.getText());
+
+             //READ FEE
+             parsing = 2;
+             feePow = Integer.parseInt(txtFeePow.getText());
+         } catch (Exception e) {
+             //CHECK WHERE PARSING ERROR HAPPENED
+             switch (parsing) {
+                 case 1:
+
+                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid amount!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                     break;
+
+                 case 2:
+
+                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+                     break;
+             }
+             //ENABLE
+             this.sendButton.setEnabled(true);
+             return false;
+         }
+
+         if (amount.equals(new BigDecimal("0.0"))) {
+             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Amount must be greater 0.0"), Lang.getInstance().translate("Error") + ":  " + Lang.getInstance().translate("Invalid amount!"), JOptionPane.ERROR_MESSAGE);
+
+             //ENABLE
+             this.sendButton.setEnabled(true);
+             return false;
+         }
+
+         this.message = txtMessage.getText();
+
+        isTextB = isText.isSelected();
+
+        
+
+         if (message != null && message.length() > 0) {
+             if (isTextB) {
+                 messageBytes = message.getBytes(Charset.forName("UTF-8"));
+             } else {
+                 try {
+                     messageBytes = Converter.parseHexString(message);
+                 } catch (Exception g) {
+                     try {
+                         messageBytes = Base58.decode(message);
+                     } catch (Exception e) {
+                         JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message format is not base58 or hex!"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                         //ENABLE
+                         this.sendButton.setEnabled(true);
+                         return false;
+                     }
+                 }
+             }
+         }
+         // if no TEXT - set null
+         if (messageBytes != null && messageBytes.length == 0) messageBytes = null;
+         // if amount = 0 - set null
+         if (amount.compareTo(BigDecimal.ZERO) == 0) amount = null;
+
+         boolean encryptMessage = encryptedCHcKBox.isSelected();
+
+         encrypted = (encryptMessage) ? new byte[]{1} : new byte[]{0};
+         isTextByte = (isTextB) ? new byte[]{1} : new byte[]{0};
+
+        
+         if (amount != null) {
+             //CHECK IF PAYMENT OR ASSET TRANSFER
+             asset = (AssetCls) this.cbxFavorites.getSelectedItem();
+             key = asset.getKey();
+         }
+
+         if (messageBytes != null) {
+             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
+                 JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message size exceeded!") + " <= MAX", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                 //ENABLE
+                 this.sendButton.setEnabled(true);
+                 return false;
+             }
+
+             if (encryptMessage) {
+                 //sender
+                 PrivateKeyAccount account = Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress().toString());
+                 byte[] privateKey = account.getPrivateKey();
+
+                 //recipient
+                 byte[] publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                 if (publicKey == null) {
+                     JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("The recipient has not yet performed any action in the blockchain.\nYou can't send an encrypted message to him."), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+
+                     //ENABLE
+                     this.sendButton.setEnabled(true);
+
+                     return false;
+                 }
+
+                 messageBytes = AEScrypto.dataEncrypt(messageBytes, privateKey, publicKey);
+             }
+         }
+        head = this.txt_Title.getText();
+         if (head == null)
+             head = "";
+         if (head.getBytes(StandardCharsets.UTF_8).length > 256) {
+
+             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Title size exceeded!") + " <= 256", Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+             return false;
+
+         }
+
+         
+         return true;
+     }
+
+     public void confirmaftecreatetransaction(){
+         //CHECK VALIDATE MESSAGE
+         if (result == Transaction.VALIDATE_OK) {
+             //RESET FIELDS
+
+             if (amount != null && amount.compareTo(BigDecimal.ZERO) == 1) //IF MORE THAN ZERO
+             {
+                 this.txtAmount.setText("0");
+             }
+
+             // TODO "A" ??
+             if (false && this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
+                 this.txtTo.setText("");
+             }
+
+             this.txtMessage.setText("");
+
+             // TODO "A" ??
+             if (true || this.txtTo.getText().startsWith(wrongFirstCharOfAddress)) {
+                 JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+             }
+         } else {
+             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate(OnDealClick.resultMess(result)), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);
+         }
+     
+    
+     }
+     public void onSendClick(){
+         
+     }
 }
