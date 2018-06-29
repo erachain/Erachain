@@ -225,7 +225,7 @@ public class SysTray implements Observer {
                 //    frame.setSize(800, 600);
                 frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-                Account_Send_Panel ap = new Account_Send_Panel(null, null);
+                Account_Send_Panel ap = new Account_Send_Panel(null, null,null,null);
                 frame.getContentPane().add(ap);
                 frame.setIconImage(Toolkit.getDefaultToolkit().getImage("images/icons/icon32.png"));
                 frame.pack();

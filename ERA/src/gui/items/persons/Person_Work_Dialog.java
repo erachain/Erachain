@@ -109,7 +109,7 @@ public class Person_Work_Dialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        new Account_Send_Dialog(null, null, null, person).show();
+                        new Account_Send_Dialog(null, null, null, person);
                     }
                     dispose();
                 }

@@ -131,7 +131,7 @@ public class Credits_Panel extends JPanel // implements ItemListener
                 //Menu.selectOrAdd( new SendMessageFrame(asset, account), MainFrame.desktopPane.getAllFrames());
                 //Menu.selectOrAdd( new Account_Send_Dialog(asset, account), null);
 
-                new Account_Send_Dialog(asset, account, null, null).show();
+                new Account_Send_Dialog(asset, account, null, null);
 
             }
         });

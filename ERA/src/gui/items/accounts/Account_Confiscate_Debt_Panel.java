@@ -18,6 +18,7 @@ import core.account.PrivateKeyAccount;
 import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import gui.AccountRenderer;
@@ -40,8 +41,8 @@ public class Account_Confiscate_Debt_Panel extends Class_Account_Transaction_Pan
 
     private Transaction transaction;
 
-    public Account_Confiscate_Debt_Panel(AssetCls asset, Account account) {
-        super(asset,account);
+    public Account_Confiscate_Debt_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
+        super(asset,account,account_To, person);
         String a;
         if (asset == null)
             a = "";

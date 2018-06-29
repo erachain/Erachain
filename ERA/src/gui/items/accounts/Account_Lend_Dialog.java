@@ -25,7 +25,7 @@ public class Account_Lend_Dialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        Account_Lend_Panel panel = new Account_Lend_Panel(asset, account);
+        Account_Lend_Panel panel = new Account_Lend_Panel(asset, account, null,null);
         getContentPane().add(panel, BorderLayout.CENTER);
 
         //SHOW FRAME

@@ -47,8 +47,8 @@ public class Account_Send_Panel extends Class_Account_Transaction_Panel {
     private Account_Send_Panel th;
     public boolean noRecive;
 
-    public Account_Send_Panel(AssetCls asset, Account account) {
-        super(asset,account);
+    public Account_Send_Panel(AssetCls asset, Account account, Account account_To, PersonCls person) {
+        super(asset,account,account_To, person);
         String a;
         th = this;
         if (asset == null) a = "";
@@ -60,7 +60,7 @@ public class Account_Send_Panel extends Class_Account_Transaction_Panel {
         sendButton.setText(Lang.getInstance().translate("Send"));
         toLabel.setText(Lang.getInstance().translate("To: (address or name)") + ":");
         recDetailsLabel.setText(Lang.getInstance().translate("Receiver details") + ":");
-                
+        
         
         
 

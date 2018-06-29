@@ -30,7 +30,7 @@ public class Account_Confiscate_Debt_Dialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        Account_Confiscate_Debt_Panel panel = new Account_Confiscate_Debt_Panel(asset, account);
+        Account_Confiscate_Debt_Panel panel = new Account_Confiscate_Debt_Panel(asset, account, null,null);
         getContentPane().add(panel, BorderLayout.CENTER);
 
         //SHOW FRAME

@@ -31,7 +31,7 @@ public class Account_Repay_Debt_Dialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        Account_Repay_Debt_Panel panel = new Account_Repay_Debt_Panel(asset, account);
+        Account_Repay_Debt_Panel panel = new Account_Repay_Debt_Panel(asset, account, null,null);
         getContentPane().add(panel, BorderLayout.CENTER);
 
         //SHOW FRAME

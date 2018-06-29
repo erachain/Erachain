@@ -31,7 +31,7 @@ public class Account_Take_Hold_Dialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        Account_Take_Hold_Panel panel = new Account_Take_Hold_Panel(asset, account);
+        Account_Take_Hold_Panel panel = new Account_Take_Hold_Panel(asset, account, null,null);
         getContentPane().add(panel, BorderLayout.CENTER);
 
         //SHOW FRAME

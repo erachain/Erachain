@@ -25,7 +25,7 @@ public class Account_Send_Dialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
-        panel = new Account_Send_Panel(asset, account);
+        panel = new Account_Send_Panel(asset, account, account_To,  person);
         getContentPane().add(panel, BorderLayout.CENTER);
         this.setTitle(Lang.getInstance().translate("Send"));
         this.pack();

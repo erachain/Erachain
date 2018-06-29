@@ -195,7 +195,7 @@ public class Voush_Library_Panel extends JPanel {
 
                 Account account = (Account) model.get_Public_Account(row);
 
-                new Account_Send_Dialog(null, null, account, null).show();
+                new Account_Send_Dialog(null, null, account, null);
                 ;
 
             }

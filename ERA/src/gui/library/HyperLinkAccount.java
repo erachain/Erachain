@@ -76,7 +76,7 @@ public class HyperLinkAccount {
         JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Asset"));
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new Account_Send_Dialog(null, null, account, null).show();
+                new Account_Send_Dialog(null, null, account, null);
             }
         });
         account_Menu.add(Send_Coins_Crator);

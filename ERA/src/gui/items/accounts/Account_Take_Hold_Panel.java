@@ -17,6 +17,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
 import core.transaction.TransactionAmount;
@@ -45,8 +46,8 @@ public class Account_Take_Hold_Panel extends Class_Account_Transaction_Panel {
     private Account_Take_Hold_Panel th;
 
 
-    public Account_Take_Hold_Panel(AssetCls asset, Account account) {
-       super(asset,account);
+    public Account_Take_Hold_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
+        super(asset,account,account_To, person);
         String a;
         th = this;
         if (asset == null) a = "";

@@ -36,7 +36,7 @@ public class Menu_Deals extends JMenu {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                new Account_Send_Dialog(null, null, null, null).show();
+                new Account_Send_Dialog(null, null, null, null);
                 ;
             }
         });

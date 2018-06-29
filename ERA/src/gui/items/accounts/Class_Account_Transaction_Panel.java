@@ -7,6 +7,7 @@ import core.crypto.AEScrypto;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.item.persons.PersonCls;
 import core.transaction.Transaction;
 import gui.AccountRenderer;
 import gui.PasswordPane;
@@ -99,10 +100,15 @@ public class Class_Account_Transaction_Panel extends JPanel {
 
     private int max_Widht;
     private Image Im;
+    private String defaultImagePath = "images/icons/coin.png";
 
-    public Class_Account_Transaction_Panel(AssetCls asset2, Account account2) {
+    private PersonCls person_To;
+
+    public Class_Account_Transaction_Panel(AssetCls asset2, Account account2,  Account account_To, PersonCls person) {
         account = account2;
         asset =asset2;
+        recipient = account_To;
+        person_To = person;
         y = 0;
         GridBagLayout gridBagLayout = new GridBagLayout();
         // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
@@ -123,7 +129,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         iconlabelGBC.gridwidth = 1;
 
         icon = new JLabel();
-        icon.setIcon(new ImageIcon("images/icons/coin.png"));
+        icon.setIcon(new ImageIcon(defaultImagePath));
         this.add(icon, iconlabelGBC);
 
         // title info
@@ -535,18 +541,22 @@ public class Class_Account_Transaction_Panel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                AssetCls asset = ((AssetCls) cbxFavorites.getSelectedItem());
+               asset = ((AssetCls) cbxFavorites.getSelectedItem());
 
                 if (asset != null) {
                     ((AccountRenderer) cbxFrom.getRenderer()).setAsset(asset.getKey());
                     cbxFrom.repaint();
-
+                 // set image
+                    setImage();
+                    icon.repaint();
                 }
 
             }
         });
 
         
+        // default set asset
+        if (asset == null) asset = ((AssetCls) cbxFavorites.getSelectedItem());
         
         sendButton.addActionListener(new ActionListener() {
             @Override
@@ -555,13 +565,20 @@ public class Class_Account_Transaction_Panel extends JPanel {
             }
         });
         
-       // set image
+       // set image asset
         setImage();
+       // set acoount TO
+       if( recipient != null){
+           txtTo.setText(recipient.getAddress());
+           
+       }
+      //  person_To = person;
     }
     
     public void setImage(){
  // image view
         InputStream inputStream = null;
+        if(asset == null) return;
         byte[] image_Byte = asset.getImage();
         if (image_Byte.length > 0) {
             inputStream = new ByteArrayInputStream(asset.getImage());
@@ -598,7 +615,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
             icon.setIcon(new ImageIcon("images/icons/icon64.png"));
             return;
        }
-        
+       icon.setIcon(new ImageIcon(defaultImagePath));
 
         
     }

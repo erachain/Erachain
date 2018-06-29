@@ -150,7 +150,7 @@ public class Statuses_Library_Panel extends JPanel {
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = statusModel.get_Creator_Account(row);
-                new Account_Send_Dialog(null, null, account, null).show();
+                new Account_Send_Dialog(null, null, account, null);
 
             }
         });
