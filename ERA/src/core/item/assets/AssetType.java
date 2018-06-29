@@ -5,21 +5,17 @@ import lang.Lang;
 public class AssetType {
     Integer id;
     String name;
+    String nameFull;
     String description;
 
     public AssetType(Integer id){
         this.id = id;
         this.name = Lang.getInstance().translate(AssetCls.viewAssetTypeCls(id));
+        this.nameFull = Lang.getInstance().translate(AssetCls.viewAssetTypeFullCls(id));
         this.description = Lang.getInstance().translate(AssetCls.viewAssetTypeDescriptionCls(id));
         
     }
 
-    public AssetType(Integer id, String name, String description){
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        
-    }
     @Override
     public String toString() {
         
@@ -27,10 +23,13 @@ public class AssetType {
         return " {"
                 // + NumberAsString.formatAsString(this.getBalanceUSE(FEE_KEY))
                 + id
-                + "}" + " " + name ;
+                + "}" + " " + nameFull ;
     }
     public String getName(){
         return name;
+    }
+    public String getNameFull(){
+        return nameFull;
     }
     public String getDescription(){
         return description;

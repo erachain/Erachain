@@ -271,6 +271,30 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
                 
+            case AssetCls.AS_OUTSIDE_BILL:
+                this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
+                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+
+                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя"));
+                this.debtAsset.setVisible(true);
+                this.debtAssetReturn.setVisible(false);
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetBackward.setVisible(true);
+
+                break;
+                
+            case AssetCls.AS_OUTSIDE_BILL_EX:
+                this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
+                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+
+                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя"));
+                this.debtAsset.setVisible(true);
+                this.debtAssetReturn.setVisible(false);
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetBackward.setVisible(true);
+
+                break;
+                
             case AssetCls.AS_OUTSIDE_OTHER_CLAIM:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность требование"));
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием требования на баланс"));
