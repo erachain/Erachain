@@ -196,7 +196,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 3, 8);
 
         if (person.isConfirmed()) {
-            jPanel1.add(btn_Block, gridBagConstraints);
+          //  jPanel1.add(btn_Block, gridBagConstraints);
             btn_Block.addMouseListener(new MouseListener() {
 
                 @Override
