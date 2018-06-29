@@ -3,12 +3,12 @@ package test;
 import org.junit.Test;
 import utils.StrJSonFine;
 
+import javax.swing.tree.ExpandVetoException;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -23,8 +23,10 @@ public class CallRemoteApi extends SettingTests {
      * @param requestMethod request method (get, post, etc...)
      * @return number request answer
      */
-    public String ResponseCodeAPI(String urlNode, String requestMethod) throws Exception {
-        Integer result;
+    public String ResponseCodeAPI(String urlNode, String requestMethod)  {
+      try {
+          Integer result;
+
         URL obj = new URL(urlNode);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -32,6 +34,11 @@ public class CallRemoteApi extends SettingTests {
         result = con.getResponseCode();
 
         return result.toString();
+      }
+      catch (Exception e)
+      {
+          return "0";
+      }
     }
 
     /**
