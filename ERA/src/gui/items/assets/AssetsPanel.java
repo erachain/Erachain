@@ -4,6 +4,7 @@ import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.models.WalletItemAssetsTableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -91,7 +92,9 @@ public class AssetsPanel extends JPanel {
             }
         });
         assetsMenu.add(dividend);
-        table.setComponentPopupMenu(assetsMenu);
+      //  table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         //MOUSE ADAPTER
         table.addMouseListener(new MouseAdapter() {

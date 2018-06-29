@@ -5,6 +5,8 @@ import gui.library.MTable;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
+
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -198,7 +200,9 @@ public class My_Order_Tab extends Split_Panel {
             }
         });
         assetsMenu.add(dividend);
-        table.setComponentPopupMenu(assetsMenu);
+    //    table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         //MOUSE ADAPTER
         table.addMouseListener(new MouseAdapter() {

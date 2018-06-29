@@ -11,6 +11,7 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import utils.Pair;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -219,7 +220,9 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
             }
         });
         sellOrdersMenu.add(cancel);
-        sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
+    //    sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
+        TableMenuPopupUtil.installContextMenu(sellOrdersTable, sellOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         sellOrdersTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -340,7 +343,9 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
             }
         });
         buyOrdersMenu.add(buyCancel);
-        buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
+  //      buyOrdersTable.setComponentPopupMenu(buyOrdersMenu);
+        TableMenuPopupUtil.installContextMenu(buyOrdersTable, buyOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         JScrollPane buyScrollPane = new JScrollPane(buyOrdersTable);
         jPanel_Trade.add(buyScrollPane, tableGBC);

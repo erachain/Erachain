@@ -12,6 +12,7 @@ import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import org.mapdb.Fun.Tuple2;
 import utils.MenuPopupUtil;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -115,7 +116,9 @@ public class Records_Search_SplitPanel extends Split_Panel {
 
         mainMenu.add(vouch_menu);
 
-        this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
+       // this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
+        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         this.jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 

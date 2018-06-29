@@ -6,6 +6,7 @@ import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.WalletItemImprintsTableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -259,7 +260,9 @@ public class My_Imprints_Tab extends Split_Panel {
             }
         });
 
-        table.setComponentPopupMenu(assetsMenu);
+       // table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         //MOUSE ADAPTER
         table.addMouseListener(new MouseAdapter() {

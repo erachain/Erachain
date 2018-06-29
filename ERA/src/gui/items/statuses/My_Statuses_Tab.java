@@ -7,6 +7,7 @@ import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.WalletItemStatusesTableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -189,7 +190,9 @@ public class My_Statuses_Tab extends Split_Panel {
                                                     }
 
         );
-        jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
+   //     jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(my_Statuses_Table_menu);
+        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, my_Statuses_Table_menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
     }
 

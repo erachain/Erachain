@@ -22,6 +22,7 @@ import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 import utils.Pair;
 import utils.SaveStrToFile;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -281,7 +282,8 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         });
         menu.add(menuItemDelete);
 
-        imprintsTable.setComponentPopupMenu(menu);
+      //  imprintsTable.setComponentPopupMenu(menu);
+        TableMenuPopupUtil.installContextMenu(imprintsTable, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         btnSaveButton.addActionListener(new ActionListener() {
 

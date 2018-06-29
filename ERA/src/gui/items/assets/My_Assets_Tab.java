@@ -6,6 +6,7 @@ import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.WalletItemAssetsTableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -317,7 +318,9 @@ public class My_Assets_Tab extends Split_Panel {
             }
         });
         assetsMenu.add(dividend);
-        table.setComponentPopupMenu(assetsMenu);
+   //     table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         //MOUSE ADAPTER
         table.addMouseListener(new MouseAdapter() {

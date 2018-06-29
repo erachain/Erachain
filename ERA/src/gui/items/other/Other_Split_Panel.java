@@ -13,16 +13,23 @@ import network.Peer;
 import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableCellEditor;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Other_Split_Panel extends Split_Panel {
 
     private PeersTableModel peersTableModel;
-    private MTable jTable_Peers;
+   
     private JPanel jPanel2;
     private GridBagConstraints gridBagConstraints;
     private JLabel jLabel_Peer_Title;
@@ -36,14 +43,15 @@ public class Other_Split_Panel extends Split_Panel {
     private Wallet_Sync_Button sync_Button;
     private Wallet_Orphan_Button return_Button;
     private JMenuItem connect_Item;
+    // final AtomicInteger selectedCol=new AtomicInteger(-1);
 
     public Other_Split_Panel() {
         super("Other_Split_Panel");
         // TODO Auto-generated constructor stub
         jLabel_Peer_Title = new JLabel();
         this.peersTableModel = new PeersTableModel();
-        this.jTable_Peers = new MTable(this.peersTableModel);
-        this.jTable_Peers.setAutoCreateRowSorter(true);
+        this.jTable_jScrollPanel_LeftPanel.setModel(this.peersTableModel);
+        this.jTable_jScrollPanel_LeftPanel.setAutoCreateRowSorter(true);
 
 
         peers_Menu = new JPopupMenu();
@@ -67,14 +75,15 @@ public class Other_Split_Panel extends Split_Panel {
                 // TODO Auto-generated method stub
 
                 // TODO Auto-generated method stub
-                item_Peer_Menu = peersTableModel.get_Peers(jTable_Peers.convertRowIndexToModel(jTable_Peers.getSelectedRow()));
+                item_Peer_Menu = peersTableModel.get_Peers(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
             }
-
+            
+       
 
         });
 
-
+       
         connect_Item = new JMenuItem(Lang.getInstance().translate("Connect"));
         connect_Item.addActionListener(new ActionListener() {
 
@@ -162,7 +171,7 @@ public class Other_Split_Panel extends Split_Panel {
         });
         //  peers_Menu.add(allow_Item);
 
-        TableMenuPopupUtil.installContextMenu(this.jTable_Peers, peers_Menu);
+        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, peers_Menu);
 
 
         this.toolBar_LeftPanel.setVisible(false);
@@ -187,13 +196,13 @@ public class Other_Split_Panel extends Split_Panel {
         jScrollPane_Peers_Table.setBorder(null);
 
 
-        jScrollPane_Peers_Table.setViewportView(jTable_Peers);
+        jScrollPane_Peers_Table.setViewportView(jTable_jScrollPanel_LeftPanel);
         jScrollPane_Peers_Table.setMinimumSize(new Dimension(0, 0));
-        jTable_Peers.setMinimumSize(new Dimension(0, 0));
+        jTable_jScrollPanel_LeftPanel.setMinimumSize(new Dimension(0, 0));
         //   jTable_Peers.setPreferredSize(jTable_Peers.getPreferredSize());
         jPanel2.setMinimumSize(new Dimension(0, 0));
-        jTable_Peers.setOpaque(false);
-
+        jTable_jScrollPanel_LeftPanel.setOpaque(false);
+    
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -211,7 +220,7 @@ public class Other_Split_Panel extends Split_Panel {
 
         this.All_Blocks_TableModel = new BlocksTableModel(true);
         this.jTable_All_Block = new MTable(this.All_Blocks_TableModel);
-        this.jTable_All_Block.setEnabled(false);
+        //this.jTable_All_Block.setEnabled(false);
 
         //TRANSACTIONS
         this.blocksModel = new WalletBlocksTableModel();
@@ -297,7 +306,8 @@ public class Other_Split_Panel extends Split_Panel {
 
         jScrollPane_jPanel_RightPanel.setViewportView(jSplitPane5);
         jSplitPane5.setDividerLocation(0.5);
-
+        
+        
 
     }
 

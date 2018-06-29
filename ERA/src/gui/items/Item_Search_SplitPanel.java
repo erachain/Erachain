@@ -64,6 +64,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
                             return;
                         }
                         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+                        jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
                     }
                 }.start();
             }
@@ -106,6 +107,7 @@ public class Item_Search_SplitPanel extends Item_SplitPanel {
                             return;
                         }
                         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
+                        jTable_jScrollPanel_LeftPanel. getSelectionModel().addSelectionInterval(0, 0);
                     }
                 }.start();
             }

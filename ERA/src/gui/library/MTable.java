@@ -17,7 +17,12 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
 import javax.swing.RowFilter.ComparisonType;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -51,6 +56,8 @@ public class MTable<U, T> extends JTable {
     private JPopupMenu menu_From_Heade_Col;
 
     private Tuple4<ComparisonType, String, ComparisonType, String> pp;
+
+    protected int selectedRow;
 
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -132,6 +139,7 @@ public class MTable<U, T> extends JTable {
 
 
         show_search(true);
+        addselectSelectedRow();
     }
 
     // Filter from Column on/off
@@ -452,6 +460,56 @@ public class MTable<U, T> extends JTable {
         }
 
     }
+ // selected select row for firechange model data 
+    public void addselectSelectedRow(){
+        // Save selected row table
+        this.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 
+                @Override
+                public void valueChanged(ListSelectionEvent e) {
+                    // TODO Auto-generated method stub
+                    selectedRow=(e.getLastIndex());//jTable_Peers.getSelectedRow());
+            //        selectedCol.set(jTable_Peers.getSelectedColumn());
+                    
+                }
+                
+            });
+         
+        // set selected row
+        this.getModel().addTableModelListener(new TableModelListener() {      
+               
+               
+                @Override
+                public void tableChanged(TableModelEvent e) {
+                    // TODO Auto-generated method stub
+             //       TableCellEditor editor=jTable_Peers.getCellEditor();
+             //       if (editor!=null) editor.cancelCellEditing();
+
+                  
+                   if (selectedRow <0) selectedRow =0;
+              //      final int col=0;
+                //    if (row<0||col<0) return;
+
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            // http://book.javanb.com/the-java-developers-almanac-1-4/egs/javax.swing.table/Sel.html
+                       //     jTable_Peers.changeSelection(row,col, false, false);
+                            getSelectionModel().addSelectionInterval(selectedRow, selectedRow);
+                         }
+                    });
+                }
+            });
+
+    
+    }
+   
+    @Override
+    public void setModel(TableModel model){
+        super.setModel(model);
+        addselectSelectedRow(); 
+        getSelectionModel().addSelectionInterval(0, 0);
+    };
+    
 
 }

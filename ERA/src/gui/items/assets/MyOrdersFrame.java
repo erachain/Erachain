@@ -3,6 +3,8 @@ package gui.items.assets;
 import gui.CoreRowSorter;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
+
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -121,7 +123,9 @@ public class MyOrdersFrame extends JFrame {
             }
         });
         ordersMenu.add(cancel);
-        ordersTable.setComponentPopupMenu(ordersMenu);
+   //     ordersTable.setComponentPopupMenu(ordersMenu);
+        TableMenuPopupUtil.installContextMenu(ordersTable, ordersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
 
         ordersTable.addMouseListener(new MouseAdapter() {

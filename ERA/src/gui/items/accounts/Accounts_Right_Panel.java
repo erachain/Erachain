@@ -5,6 +5,7 @@ import gui.MainFrame;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.MTable;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -149,7 +150,8 @@ public class Accounts_Right_Panel extends JPanel {
             
         });
         mainMenu.add(viewInfo);
-        jTable1.setComponentPopupMenu(mainMenu);
+     //   jTable1.setComponentPopupMenu(mainMenu);
+        TableMenuPopupUtil.installContextMenu(jTable1, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
     }// </editor-fold>
     // End of variables declaration                   
 }

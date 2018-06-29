@@ -179,6 +179,8 @@ public class MSplitPane extends JSplitPane {
             }
 
         });
+         
+        M_setDividerSize((int)(button1.getFont().getSize()*1.5));
 
     }
 

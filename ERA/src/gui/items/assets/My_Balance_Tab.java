@@ -6,6 +6,8 @@ import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.Balance_from_Adress_TableModel;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
+
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -299,7 +301,9 @@ public class My_Balance_Tab extends Split_Panel {
             }
         });
         assetsMenu.add(dividend);
-        table.setComponentPopupMenu(assetsMenu);
+     //   table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
 
         //MOUSE ADAPTER
         table.addMouseListener(new MouseAdapter() {

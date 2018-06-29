@@ -4,6 +4,7 @@ import core.item.assets.AssetCls;
 import gui.CoreRowSorter;
 import gui.library.MTable;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -140,7 +141,9 @@ public class AllAssetsFrame extends JFrame {
         });
         nameSalesMenu.add(details);
 
-        assetsTable.setComponentPopupMenu(nameSalesMenu);
+       // assetsTable.setComponentPopupMenu(nameSalesMenu);
+        TableMenuPopupUtil.installContextMenu(assetsTable, nameSalesMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+
         assetsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {

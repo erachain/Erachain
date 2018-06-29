@@ -14,6 +14,7 @@ import gui.models.AccountsComboBoxModel;
 import gui.models.CreateOptionsTableModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
+import utils.TableMenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
@@ -257,7 +258,8 @@ public class IssuePollPanel extends JPanel {
         });
         menu.add(copyAddress);
 
-        table.setComponentPopupMenu(menu);
+     //   table.setComponentPopupMenu(menu);
+        TableMenuPopupUtil.installContextMenu(table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
         // PACK
