@@ -1,9 +1,30 @@
 package core.wallet;
 // 09/03
 
-import at.AT_Transaction;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import javax.swing.JFileChooser;
+
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+
+import at.AT_Transaction;
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -15,31 +36,29 @@ import core.crypto.Crypto;
 import core.item.ItemCls;
 import core.naming.Name;
 import core.naming.NameSale;
-import core.transaction.*;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.Issue_ItemRecord;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 import datachain.DCSet;
 import lang.Lang;
 import settings.Settings;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import utils.ObserverMessage;
 import utils.Pair;
 import utils.SaveStrToFile;
 import utils.StrJSonFine;
-
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
-
-import javax.swing.JFileChooser;
 
 //import core.transaction.IssueAssetTransaction;
 //import core.transaction.IssueImprintRecord;
@@ -983,6 +1002,35 @@ public class Wallet extends Observable implements Observer {
 		return false;
 
 	}
+	
+	public void feeProcess(DCSet dcSet, Block block, Account blockGenerator, boolean asOrphan) {
+	    
+        BigDecimal bonusFee = block.getBonusFee();
+        BigDecimal blockTotalFee = block.getTotalFee(dcSet);
+        BigDecimal emittedFee;
+        
+        if (BlockChain.ROBINHOOD_USE) {
+            // find rich account
+            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+
+            if (!rich.equals(blockGenerator.getAddress())) {
+                emittedFee = bonusFee.divide(new BigDecimal(2));
+                
+                if (this.accountExists(rich)) {
+                    Account richAccount = new Account(rich);
+                    this.database.getAccountMap().changeBalance(richAccount.getAddress(), !asOrphan, FEE_KEY, bonusFee);
+                }
+            } else {
+                emittedFee = BigDecimal.ZERO;
+            }
+            
+        } else {
+            emittedFee = bonusFee;
+        }
+
+        this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), asOrphan, FEE_KEY, blockTotalFee);
+
+	}
 
 	private void processBlock(Block block) {
 		// CHECK IF WALLET IS OPEN
@@ -998,6 +1046,8 @@ public class Wallet extends Observable implements Observer {
 		Account blockGenerator = block.getCreator();
 		String blockGeneratorStr = blockGenerator.getAddress();
 
+	      DCSet dcSet = DCSet.getInstance();
+
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
 			// ADD BLOCK
@@ -1005,34 +1055,10 @@ public class Wallet extends Observable implements Observer {
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
 			// PROCESS FEE
-			BigDecimal blockFee = block.getTotalFeeForProcess(DCSet.getInstance());
-			BigDecimal blockTotalFee = block.getTotalFee(DCSet.getInstance());
-
-			if (blockFee.compareTo(blockTotalFee) < 0) {
-
-				blockFee = blockTotalFee;
-
-				if (BlockChain.ROBINHOOD_USE) {
-
-					// find rich account
-					String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
-					if (!rich.equals(blockGeneratorStr)) {
-
-						if (this.accountExists(rich)) {
-
-							BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-							Account richAccount = new Account(rich);
-							this.database.getAccountMap().changeBalance(richAccount.getAddress(), true, FEE_KEY,
-									bonus_fee.divide(new BigDecimal(2)));
-						}
-					}
-				}
-			}
-
-			this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), false, FEE_KEY, blockFee);
+			feeProcess(dcSet, block, blockGenerator, false);
+			
 		}
 
-		DCSet dcSet = DCSet.getInstance();
 		// CHECK TRANSACTIONS
 		for (Transaction transaction : block.getTransactions()) {
 
@@ -1201,30 +1227,8 @@ public class Wallet extends Observable implements Observer {
 			// this.database.setLastBlockSignature(block.getReference());
 
 			// KEEP TRACK OF UNCONFIRMED BALANCE
-			BigDecimal blockFee = block.getTotalFeeForProcess(DCSet.getInstance());
-			BigDecimal blockTotalFee = block.getTotalFee(DCSet.getInstance());
-
-			if (blockFee.compareTo(blockTotalFee) < 0) {
-
-				blockFee = blockTotalFee;
-
-				if (BlockChain.ROBINHOOD_USE) {
-					// find rich account
-					String rich = Account.getRichWithForks(DCSet.getInstance(), Transaction.FEE_KEY);
-					if (!rich.equals(blockGeneratorStr)) {
-
-						if (this.accountExists(rich)) {
-
-							BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-							Account richAccount = new Account(rich);
-							this.database.getAccountMap().changeBalance(richAccount.getAddress(), false, FEE_KEY,
-									bonus_fee.divide(new BigDecimal(2)));
-						}
-					}
-				}
-			}
-
-			this.database.getAccountMap().changeBalance(blockGenerator.getAddress(), true, FEE_KEY, blockFee);
+            feeProcess(dcSet, block, blockGenerator, true);
+            
 		}
 
 		// SET AS LAST BLOCK

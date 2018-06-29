@@ -419,38 +419,37 @@ public class Block {
         return this.creator;
     }
 
-    public BigDecimal getTotalFee(DCSet db) {
-        BigDecimal fee = this.getTotalFeeForProcess(db);
+    public BigDecimal getBonusFee() {
 
         // NOT GIFT for MISSed forger
         long cut1 = this.target << 1;
         // TODO - off START POINT
         if (this.heightBlock > 140000
                 && this.winValue >= cut1) {
-            return fee;
+            return BigDecimal.ZERO;
         }
 
-        // TODO calculate AT FEE
-        // fee = fee.add(BigDecimal.valueOf(this.atFees, BlockChain.AMOUNT_DEDAULT_SCALE));
         int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
 
-        BigDecimal minFee = BlockChain.MIN_FEE_IN_BLOCK;
+        BigDecimal bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
         //int height = this.getHeightByParent(db);
         if (this.heightBlock < inDay30 << 1)
             ;
         else if (this.heightBlock < inDay30 << 2)
-            minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+            bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         else if (this.heightBlock < inDay30 << 3) // < 72000
-            minFee = minFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+            bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         else if (this.heightBlock < 87000) //87000)
-            minFee = minFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+            bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         else
-            minFee = minFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+            bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
-        if (fee.compareTo(minFee) < 0)
-            fee = minFee;
+        return bonusFee;
+    }
 
-        return fee;
+    public BigDecimal getTotalFee(DCSet db) {
+        BigDecimal fee = this.getFeeByProcess(db);
+        return fee.add(getBonusFee());
     }
 
 	/*
@@ -464,7 +463,7 @@ public class Block {
         return getTotalFee(DCSet.getInstance());
     }
 
-    public BigDecimal getTotalFeeForProcess(DCSet db) {
+    public BigDecimal getFeeByProcess(DCSet db) {
         //BigDecimal fee = BigDecimal.ZERO;
         int fee = 0;
 
@@ -1134,45 +1133,46 @@ public class Block {
     }
 
     //PROCESS/ORPHAN
+    public void feeProcess(DCSet dcSet, boolean asOrphan) {
+        //REMOVE FEE
+        BigDecimal blockTotalFee = this.getTotalFee(dcSet);
+        BigDecimal bonusFee = this.getBonusFee();
+        BigDecimal emittedFee;
+        
+        if (BlockChain.ROBINHOOD_USE) {
+            // find rich account
+            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
+            if (!rich.equals(this.creator.getAddress())) {
+                emittedFee = bonusFee.divide(new BigDecimal(2));
+                
+                Account richAccount = new Account(rich);
+                //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
+                richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
+            } else {
+                emittedFee = BigDecimal.ZERO;
+            }
+            
+        } else {
+            emittedFee = bonusFee;
+        }
+
+        // SUBSTRACT from EMISSION (with minus)
+        GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
+
+        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
+
+        //UPDATE GENERATOR BALANCE WITH FEE
+        this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY, blockTotalFee, true);
+
+    }
+    
     // TODO - make it trownable
     public void process_after(Controller cnt, DCSet dcSet) throws Exception {
 
         //PROCESS FEE
-        BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
-        BigDecimal blockTotalFee = this.getTotalFee(dcSet);
-
-
-        if (blockFee.compareTo(blockTotalFee) < 0) {
-
-            // ADD from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, Transaction.FEE_KEY,
-                    BlockChain.ROBINHOOD_USE ? blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)) : blockTotalFee.subtract(blockFee), true);
-
-            blockFee = blockTotalFee;
-
-            if (BlockChain.ROBINHOOD_USE) {
-                // find rich account
-                String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
-
-                if (!rich.equals(this.creator.getAddress())) {
-                    BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-                    blockFee = blockTotalFee;
-
-                    Account richAccount = new Account(rich);
-                    //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-                    richAccount.changeBalance(dcSet, true, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), true);
-                }
-            }
-        }
-
-        //UPDATE GENERATOR BALANCE WITH FEE
-        //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(dcSet, Transaction.FEE_KEY).add(blockFee), dcSet);
-        if (cnt.isOnStopping())
-            throw new Exception("on stoping");
-
-        this.creator.changeBalance(dcSet, false, Transaction.FEE_KEY, blockFee, true);
-
+        feeProcess(dcSet, false);
+        
 		/*
 		if (!dcSet.isFork()) {
 			int lastHeight = dcSet.getBlockMap().getLastBlock().getHeight(dcSet);
@@ -1312,36 +1312,7 @@ public class Block {
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #2f FEE");
 
         //REMOVE FEE
-        BigDecimal blockFee = this.getTotalFeeForProcess(dcSet);
-        BigDecimal blockTotalFee = getTotalFee(dcSet);
-
-        if (blockFee.compareTo(blockTotalFee) < 0) {
-
-            // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, Transaction.FEE_KEY,
-                    BlockChain.ROBINHOOD_USE ? blockTotalFee.subtract(blockFee).divide(new BigDecimal(2)) : blockTotalFee.subtract(blockFee), true);
-
-            blockFee = blockTotalFee;
-
-            if (BlockChain.ROBINHOOD_USE) {
-                // find rich account
-                String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
-
-                if (!rich.equals(this.creator.getAddress())) {
-                    BigDecimal bonus_fee = blockTotalFee.subtract(blockFee);
-                    blockFee = blockTotalFee;
-
-                    Account richAccount = new Account(rich);
-                    //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
-                    richAccount.changeBalance(dcSet, false, Transaction.FEE_KEY, bonus_fee.divide(new BigDecimal(2)), true);
-                }
-            }
-        }
-
-        //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
-
-        //UPDATE GENERATOR BALANCE WITH FEE
-        this.creator.changeBalance(dcSet, true, Transaction.FEE_KEY, blockFee, true);
+        feeProcess(dcSet, true);
 
         //DELETE BLOCK FROM DB
         dcSet.getBlockMap().remove(this.signature, this.reference);
