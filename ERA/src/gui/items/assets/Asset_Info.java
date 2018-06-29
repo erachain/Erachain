@@ -70,8 +70,6 @@ public class Asset_Info extends JTextPane {
         byte[] recordReference = asset.getReference();
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));
-        // image +
-        String img_HTML = "";
         image_Label = new JLabel("");
         byte[] image_Byte = asset.getImage();
         if (image_Byte.length > 0) {

@@ -20,16 +20,23 @@ import utils.NameUtils;
 import utils.Pair;
 import utils.NameUtils.NameResult;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import org.apache.commons.net.util.Base64;
 
 import controller.Controller;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -86,6 +93,12 @@ public class Class_Account_Transaction_Panel extends JPanel {
     public byte[] encrypted;
     public Integer result;
     public Account account;
+    BufferedImage image1;
+
+    private int max_Height;
+
+    private int max_Widht;
+    private Image Im;
 
     public Class_Account_Transaction_Panel(AssetCls asset2, Account account2) {
         account = account2;
@@ -541,6 +554,53 @@ public class Class_Account_Transaction_Panel extends JPanel {
                 onSendClick();
             }
         });
+        
+       // set image
+        setImage();
+    }
+    
+    public void setImage(){
+ // image view
+        InputStream inputStream = null;
+        byte[] image_Byte = asset.getImage();
+        if (image_Byte.length > 0) {
+            inputStream = new ByteArrayInputStream(asset.getImage());
+        
+            try {
+                image1 = ImageIO.read(inputStream);
+
+                // jLabel2.setText("jLabel2");
+                ImageIcon image = new ImageIcon(image1);
+                int x = image.getIconWidth();
+                max_Height = image.getIconHeight();
+
+                max_Widht = 350;
+                double k = ((double) x / (double) max_Widht);
+                max_Height = (int) (max_Height / k);
+
+
+                if (max_Height != 0) {
+                    Im = image.getImage().getScaledInstance(max_Widht, max_Height, 1);
+                    ImageIcon ic = new ImageIcon(Im);
+                    icon.setIcon(ic);
+                    icon.setSize(ic.getIconWidth(), ic.getIconHeight());
+                }
+
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            return;
+        }
+        // if era then file system icon
+       if(asset.getKey()== 1l){
+            icon.setIcon(new ImageIcon("images/icons/icon64.png"));
+            return;
+       }
+        
+
+        
     }
 
     private void refreshReceiverDetails() {
