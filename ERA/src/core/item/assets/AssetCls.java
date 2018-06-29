@@ -112,6 +112,20 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_SHARE = 13;
 
     /*
+     * outside BILL - вексель
+     * +++ вексель на оплату во вне
+     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_OUTSIDE_BILL = 14;
+
+    /*
+     * outside BILL - вексель
+     * +++ вексель на оплату во вне
+     * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_OUTSIDE_BILL_EX = 15;
+
+    /*
      * outside CLAIMS
      * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
      *
@@ -373,6 +387,8 @@ public abstract class AssetCls extends ItemCls {
     public boolean isOutsideCurrency() {return this.asset_type == AS_OUTSIDE_CURRENCY;}
     public boolean isOutsideService() {return this.asset_type == AS_OUTSIDE_SERVICE;}
     public boolean isOutsideShare() {return this.asset_type == AS_OUTSIDE_SHARE;}
+    public boolean isOutsideBill() {return this.asset_type == AS_OUTSIDE_BILL;}
+    public boolean isOutsideBillEx() {return this.asset_type == AS_OUTSIDE_BILL_EX;}
     public boolean isOutsideOtherClaim() {return this.asset_type == AS_OUTSIDE_OTHER_CLAIM;}
 
     public boolean isAccounting() {
@@ -392,6 +408,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Outside Service";
             case AS_OUTSIDE_SHARE:
                 return "Outside Share";
+            case AS_OUTSIDE_BILL:
+                return "Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "Bill of exchange";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Outside Other Claim";
 
@@ -417,8 +437,56 @@ public abstract class AssetCls extends ItemCls {
         }
         return "unknown";
     }
+
     public String viewAssetType() {
         return viewAssetTypeCls(this.asset_type);
+    }
+
+    public static String viewAssetTypeFullCls(int asset_type) {
+        switch (asset_type) {
+            case AS_OUTSIDE_GOODS:
+                return "Movable Goods";
+            case AS_OUTSIDE_IMMOVABLE:
+                return "Immovable Goods, Real Estate";
+                
+            case AS_OUTSIDE_CURRENCY:
+                return "Outside Currency";
+            case AS_OUTSIDE_SERVICE:
+                return "Outside Service";
+            case AS_OUTSIDE_SHARE:
+                return "Outside Share Rignts";
+            case AS_OUTSIDE_BILL:
+                return "Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "Bill of Exchange";
+            case AS_OUTSIDE_OTHER_CLAIM:
+                return "Оther Outside Right of Claim";
+
+            case AS_INSIDE_ASSETS:
+                return "Digital Asset";
+            case AS_INSIDE_CURRENCY:
+                return "Digital Currency";
+            case AS_INSIDE_UTILITY:
+                return "Digital Utility";
+            case AS_INSIDE_SHARE:
+                return "Digital Share";
+            case AS_INSIDE_BONUS:
+                return "Digital Bonus";
+            case AS_INSIDE_ACCESS:
+                return "Digital Access Rights";
+            case AS_INSIDE_VOTE:
+                return "Digital Vote";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "Other Digital Right of Claim";
+
+            case AS_ACCOUNTING:
+                return "Accounting";
+        }
+        return "unknown";
+    }
+
+    public String viewAssetTypeFull() {
+        return viewAssetTypeFullCls(this.asset_type);
     }
 
     public static String viewAssetTypeDescriptionCls(int asset_type) {
@@ -434,6 +502,10 @@ public abstract class AssetCls extends ItemCls {
                 return "Внешняя услуга, которую необходимо оказать вовне. Для уведомления вашего желания на оказание услуги необходимо предъявить требование и потом подтвердить его исполнение для вас";
             case AS_OUTSIDE_SHARE:
                 return "Внешние акции, которые необходимо передать во внешнем депозитарии. Депозитарий можно уведомить предъявлением требования и после подтвердить передачу акций";
+            case AS_OUTSIDE_BILL:
+                return "Цифровой простой вексель, который можно предъявить к погашению внешними деньгами";
+            case AS_OUTSIDE_BILL_EX:
+                return "Цифровой переводной вексель, который можно предъявить к погашению внешними деньгами";
             case AS_OUTSIDE_OTHER_CLAIM:
                 return "Другие внешние права, требования и обязательства. Любое обязательство (как и другие внешние активы), которое может быть истребовано внесением записи \"требования исполнения\" и погашено записью \"подтверждения исполнения\" этого обязательства";
 

@@ -24,6 +24,8 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_CURRENCY));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_SERVICE));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_SHARE));
+            list.add(new AssetType(AssetCls.AS_OUTSIDE_BILL));
+            list.add(new AssetType(AssetCls.AS_OUTSIDE_BILL_EX));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_OTHER_CLAIM));
             
             list.add(new AssetType(AssetCls.AS_INSIDE_ASSETS));
