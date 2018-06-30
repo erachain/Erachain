@@ -111,8 +111,8 @@ public class PersonSetStatusDialog extends JDialog {
         jAData2Txt.setText("");
         jFeeTxt.setText("0");
         jParentRecTxt.setText("0");
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        //	 this.setPreferredSize(new Dimension(600,450));
+        this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
         setModal(true);
         //PACK
         this.pack();

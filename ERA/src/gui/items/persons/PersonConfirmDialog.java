@@ -78,7 +78,7 @@ public class PersonConfirmDialog extends JDialog {
         this.setResizable(true);
         this.setModal(true);
 
-        // setPreferredSize(new Dimension(500, 600));
+         setPreferredSize(MainFrame.getInstance().getPreferredSize());
         // PACK
         this.pack();
         this.setResizable(false);
