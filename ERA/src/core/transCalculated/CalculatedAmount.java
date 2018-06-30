@@ -1,4 +1,4 @@
-package core.transaction;
+package core.transCalculated;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -20,83 +20,21 @@ import core.block.Block;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import utils.NumberAsString;
 
 /*
 
-## typeBytes
-0 - record type
-1 - record version
-2 - property 1
-3 = property 2
-
-## version 0
-// typeBytes[2] = -128 if NO AMOUNT
-// typeBytes[3] = -128 if NO DATA
-
-## version 1
-if backward - CONFISCATE CREDIT
-
-## version 2
-
-#### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT - check sign
-typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
-
-#### PROPERTY 2
-typeBytes[3].0 = -128 if NO DATA - check sign
-
-## version 3
-
-#### PROPERTY 1
-typeBytes[2].0 = -128 if NO AMOUNT - check sign
-typeBytes[2].1 = 64 if backward (CONFISCATE CREDIT, ...)
-
-#### PROPERTY 2
-typeBytes[3].0 = 128 if NO DATA - check sign = '10000000' = Integer.toBinaryString(128)
-typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
+вычисляемая трнзакция по изменению объеиов
 
  */
 
-public abstract class TransactionAmount extends Transaction {
-    
-    public static final int SCALE_MASK = 31;
-    public static final int SCALE_MASK_HALF = (SCALE_MASK + 1) >> 1;
-    public static final byte BACKWARD_MASK = 64;
-    
-    // BALANCES types and ACTION with IT
-    public static final int ACTION_SEND = 1;
-    public static final int ACTION_DEBT = 2;
-    public static final int ACTION_HOLD = 3;
-    public static final int ACTION_SPEND = 4;
-    public static final int ACTION_PLEDGE = 5;
-    
-    /*
-     * public static final String NAME_ACTION_TYPE_BACKWARD_PROPERTY =
-     * "backward PROPERTY"; public static final String
-     * NAME_ACTION_TYPE_BACKWARD_HOLD = "backward HOLD"; public static final
-     * String NAME_ACTION_TYPE_BACKWARD_CREDIT = "backward CREDIT"; public
-     * static final String NAME_ACTION_TYPE_BACKWARD_SPEND = "backward SPEND";
-     */
-    public static final String NAME_ACTION_TYPE_PROPERTY = "PROPERTY";
-    public static final String NAME_ACTION_TYPE_HOLD = "HOLD";
-    public static final String NAME_CREDIT = "CREDIT";
-    public static final String NAME_SPEND = "SPEND";
-    public static final int AMOUNT_LENGTH = 8;
-    public static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + RECIPIENT_LENGTH + KEY_LENGTH
-            + AMOUNT_LENGTH;
-    protected Account recipient;
-    protected BigDecimal amount;
-    protected long key = Transaction.FEE_KEY;
-    protected AssetCls asset;
-    
-    // need for calculate fee by feePow into GUI
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
-            BigDecimal amount, long key, long timestamp, Long reference) {
-        super(typeBytes, name, creator, feePow, timestamp, reference);
+public abstract class CalculatedAmount extends Calculated {
+            
+    protected CalculatedAmount(byte[] typeBytes, Account sender, Account recipient,
+            BigDecimal amount, Long assetKey) {
+        super(typeBytes, );
         this.recipient = recipient;
         
         if (amount == null || amount.equals(BigDecimal.ZERO)) {
@@ -113,7 +51,7 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     // need for calculate fee
-    protected TransactionAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
+    protected CalculatedAmount(byte[] typeBytes, String name, PublicKeyAccount creator, byte feePow, Account recipient,
             BigDecimal amount, long key, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, name, creator, feePow, recipient, amount, key, timestamp, reference);
         this.signature = signature;
@@ -295,7 +233,7 @@ public abstract class TransactionAmount extends Transaction {
                 // RESCALE AMOUNT
                 amountBase = this.amount.scaleByPowerOfTen(different_scale);
                 if (different_scale < 0)
-                    different_scale += TransactionAmount.SCALE_MASK + 1;
+                    different_scale += CalculatedAmount.SCALE_MASK + 1;
                 
                 data[3] = (byte) (data[3] | different_scale);
             } else {

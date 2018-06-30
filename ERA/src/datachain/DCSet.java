@@ -1,6 +1,14 @@
 package datachain;
 // upd 09/03
 
+import java.io.File;
+import java.util.Observable;
+import java.util.Observer;
+
+import org.apache.log4j.Logger;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+
 import controller.Controller;
 import core.BlockChain;
 import core.item.ItemCls;
@@ -8,15 +16,8 @@ import core.web.NameStorageMap;
 import core.web.OrphanNameStorageHelperMap;
 import core.web.OrphanNameStorageMap;
 import core.web.SharedPostsMap;
-import org.apache.log4j.Logger;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import settings.Settings;
 import utils.ObserverMessage;
-
-import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
 
 //import core.item.ItemCls;
 
@@ -101,6 +102,7 @@ public class DCSet implements Observer, IDB {
     private ATStateMap atStateMap;
     private ATTransactionMap atTransactionMap;
     private TransactionFinalMap transactionFinalMap;
+    private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
     private TransactionMap transactionMap;
 
@@ -142,6 +144,7 @@ public class DCSet implements Observer, IDB {
             this.personAddressMap = new PersonAddressMap(this, database);
             this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(this, database);
             this.transactionFinalMap = new TransactionFinalMap(this, database);
+            this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
             this.transactionMap = new TransactionMap(this, database);
@@ -247,6 +250,7 @@ public class DCSet implements Observer, IDB {
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
         this.kK_KPersonStatusUnionMap = new KK_KPersonStatusUnionMap(parent.kK_KPersonStatusUnionMap);
         this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
+        this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
         this.transactionMap = new TransactionMap(parent.transactionMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
@@ -507,6 +511,7 @@ public class DCSet implements Observer, IDB {
 
         this.referenceMap.reset();
         this.transactionFinalMap.reset();
+        this.transactionFinalCalculatedMap.reset();        
         this.transactionFinalMapSigns.reset();
         this.transactionMap.reset();
         this.nameMap.reset();
@@ -684,6 +689,10 @@ public class DCSet implements Observer, IDB {
 
     public TransactionFinalMap getTransactionFinalMap() {
         return this.transactionFinalMap;
+    }
+
+    public TransactionFinalCalculatedMap getTransactionFinalCalculatedMap() {
+        return this.transactionFinalCalculatedMap;
     }
 
     public TransactionFinalMapSigns getTransactionFinalMapSigns() {

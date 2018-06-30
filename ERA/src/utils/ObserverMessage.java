@@ -122,6 +122,12 @@ public class ObserverMessage {
     public static final int REMOVE_VOTEPOLL_TYPE = 153;
     public static final int LIST_VOTEPOLL_TYPE = 154;
 
+    public static final int RESET_CLACULATED_TYPE = 166;
+    public static final int ADD_CLACULATED_TYPE = 167;
+    public static final int REMOVE_CLACULATED_TYPE = 168;
+    public static final int LIST_CLACULATED_TYPE = 169;
+    public static final int COUNT_CLACULATED_TYPE = 170;
+
     public static final int RESET_ASSET_STATUS_TYPE = 1151;
     public static final int ADD_ASSET_STATUS_TYPE = 1152;
     public static final int REMOVE_ASSET_STATUS_TYPE = 1153;
