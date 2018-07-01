@@ -9,6 +9,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.text.BadLocationException;
 
 import controller.Controller;
 import core.account.Account;
@@ -21,6 +24,7 @@ import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
+import gui.library.M_DecimalFormatedTextField;
 import gui.library.My_Add_Image_Panel;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
@@ -54,14 +58,15 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JLabel name_jLabel;
     private javax.swing.JTextField txtName;
     private javax.swing.JLabel quantity_jLabel;
-    private javax.swing.JTextField txtQuantity;
+    private M_DecimalFormatedTextField txtQuantity;
     private javax.swing.JLabel scale_jLabel;
-    private javax.swing.JTextField txtScale;
+    
     private My_Add_Image_Panel add_Image_Panel;
     private My_Add_Image_Panel add_Logo_Icon_Panel;
     private AssetTypesComboBoxModel assetTypeModet;
     private JLabel type_jLabel;
     private JTextArea textaresAssetTypeDescription;
+    private JComboBox<String> txtScale;
     
     /**
      * Creates new form Issue_Asset_Panel_01
@@ -83,9 +88,10 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         txtareaDescription.setLineWrap(true);
         txtareaDescription.setText("");
         quantity_jLabel.setText(Lang.getInstance().translate("Quantity") + ":");
+        
+        txtQuantity.setMaskType(txtQuantity.maskLong);
         txtQuantity.setText("1");
         scale_jLabel.setText(Lang.getInstance().translate("Scale") + ":");
-        txtScale.setText("8");
         fee_jLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
         txtFeePow.setText("0");
         issue_jButton.setText(Lang.getInstance().translate("Issue"));
@@ -114,6 +120,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         textaresAssetTypeDescription.setText(((AssetType) assetTypeModet.getSelectedItem()).getDescription());
         add_Logo_Icon_Panel.setPreferredSize(new Dimension(250, 50));
         
+       
     }
     
     /**
@@ -137,9 +144,9 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         description_jLabel = new javax.swing.JLabel();
         type_jLabel = new javax.swing.JLabel();
         quantity_jLabel = new javax.swing.JLabel();
-        txtQuantity = new javax.swing.JTextField();
+        txtQuantity = new M_DecimalFormatedTextField();
         scale_jLabel = new javax.swing.JLabel();
-        txtScale = new javax.swing.JTextField();
+        txtScale = new JComboBox<String>();
         fee_jLabel = new javax.swing.JLabel();
         txtFeePow = new javax.swing.JTextField();
         issue_jButton = new javax.swing.JButton();
@@ -297,7 +304,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 7, 7);
         add(scale_jLabel, gridBagConstraints);
         
-        txtScale.setText("jTextField3");
+        txtScale.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" }));
+        txtScale.setSelectedIndex(8);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 6;
@@ -364,7 +372,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             
             // READ SCALE
             parsestep++;
-            byte scale = Byte.parseByte(this.txtScale.getText());
+            byte scale = Byte.parseByte((String) this.txtScale.getSelectedItem());
+            
             
             // READ QUANTITY
             parsestep++;
