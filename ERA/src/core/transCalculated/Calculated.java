@@ -40,7 +40,6 @@ public abstract class Calculated {
     protected static final int BLOCK_NO_LENGTH = 4;
     protected static final int TRANS_NO_LENGTH = 4;
     protected static final int SEQ_NO_LENGTH = 8;
-    protected static final int COUNTER_LENGTH = 8;
     protected static final int BASE_LENGTH = TYPE_LENGTH + BLOCK_NO_LENGTH + TRANS_NO_LENGTH + SEQ_NO_LENGTH;
 
     static Logger LOGGER = Logger.getLogger(Calculated.class.getName());
