@@ -10,6 +10,7 @@ import gui.AccountRenderer;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
+import gui.library.M_DecimalFormatedTextField;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.CreateOrderDetailsFrame;
 import gui.transaction.OnDealClick;
@@ -30,22 +31,18 @@ import java.math.RoundingMode;
 public class CreateOrderPanel extends JPanel {
     static Logger LOGGER = Logger.getLogger(CreateOrderPanel.class.getName());
     public JComboBox<Account> cbxAccount;
-    public JTextField txtAmountHave;
-    public JTextField txtPrice;
+    public M_DecimalFormatedTextField txtAmountHave;
+    public M_DecimalFormatedTextField txtPrice;
     private AssetCls have;
     private AssetCls want;
     private JButton sellButton;
     private JTextField txtFeePow;
-    private JTextField txtBuyingPrice;
     private JTextField txtBuyingAmount;
     private JTextPane superHintText;
-
     private boolean SHOW_HINTS = false;
-    private CreateOrderPanel th;
-
+    
     public CreateOrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
         this.setLayout(new GridBagLayout());
-        th = this;
         this.have = have;
         this.want = want;
 
@@ -170,7 +167,9 @@ public class CreateOrderPanel extends JPanel {
 
         // AMOUNT
         detailGBC.gridy++;
-        this.txtAmountHave = new JTextField();
+        this.txtAmountHave = new M_DecimalFormatedTextField();
+        // set scale
+        this.txtAmountHave.setScale(setScale(have));
         this.add(this.txtAmountHave, detailGBC);
 
         // ASSET HINT
@@ -187,7 +186,9 @@ public class CreateOrderPanel extends JPanel {
         this.add(priceLabel, labelGBC);
         // PRICE
         detailGBC.gridy++;
-        txtPrice = new JTextField();
+        txtPrice = new M_DecimalFormatedTextField();
+        // set scale
+        txtPrice.setScale(setScale(want));
         this.add(txtPrice, detailGBC);
         // ASSET HINT
         assetHintGBC.gridy = detailGBC.gridy;
@@ -536,7 +537,7 @@ public class CreateOrderPanel extends JPanel {
 
                 // this.txtFeePow.setText("0");
                 this.txtAmountHave.setText("0");
-                // this.txtPrice.setText("0");
+                this.txtPrice.setText("0");
 
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
@@ -546,6 +547,13 @@ public class CreateOrderPanel extends JPanel {
         }
         // ENABLE
         this.sellButton.setEnabled(true);
+    }
+    // confirm asset & return scale
+    private int setScale(AssetCls asset){
+        if (asset!=null) {
+            return asset.getScale();
+        }
+        return 8;
     }
 
 }

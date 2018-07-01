@@ -95,6 +95,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
 
             case COLUMN_AMOUNT:
 
+                
                 String result = NumberAsString.formatAsString(trade.c); //getAmountHave());
 
                 if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {

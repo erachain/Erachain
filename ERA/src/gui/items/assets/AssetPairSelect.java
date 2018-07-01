@@ -4,6 +4,7 @@ import controller.Controller;
 import core.item.assets.AssetCls;
 import gui.MainFrame;
 import gui.library.MTable;
+import gui.library.M_DecimalFormatedTextField;
 import lang.Lang;
 import utils.MenuPopupUtil;
 
@@ -30,7 +31,7 @@ public class AssetPairSelect extends JDialog {
     public AssetCls pairAsset;
     AssetsPairSelect_Panel pair_Panel = new AssetsPairSelect_Panel();
     RowSorter sorter;
-    private JTextField key_Item;
+    private M_DecimalFormatedTextField key_Item;
 
     public AssetPairSelect(long key, String action, String account) {
 
@@ -112,7 +113,8 @@ public class AssetPairSelect extends JDialog {
 
         pair_Panel.searchToolBar_LeftPanel.setVisible(true);
         pair_Panel.toolBar_LeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
-        key_Item = new JTextField();
+        key_Item = new M_DecimalFormatedTextField();
+        key_Item.setMaskType(key_Item.maskLong);     
         key_Item.setToolTipText("");
         key_Item.setAlignmentX(1.0F);
         key_Item.setMinimumSize(new java.awt.Dimension(100, 20));
