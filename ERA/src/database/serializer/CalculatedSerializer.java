@@ -18,7 +18,7 @@ public class CalculatedSerializer implements Serializer<Calculated>, Serializabl
 
     @Override
     public void serialize(DataOutput out, Calculated value) throws IOException {
-        out.writeInt(value.getDataLength(false));
+        out.writeInt(value.getDataLength());
         out.write(value.toBytes());
     }
 

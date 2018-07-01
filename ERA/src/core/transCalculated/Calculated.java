@@ -15,10 +15,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 
 import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import core.transaction.Transaction;
 import datachain.DCSet;
 
 //import java.math.RoundingMode;
@@ -39,45 +36,46 @@ public abstract class Calculated {
     public static final int CHANGE_BALANCE_CALCULATED = 1;
 
     // LENGTH
-    public static final int COUNTER_LENGTH = 8;
-    public static final int KEY_LENGTH = 8;
-    public static final int SIGNATURE_LENGTH = Crypto.SIGNATURE_LENGTH;
     protected static final int TYPE_LENGTH = 4;
-    protected static final int HEIGHT_LENGTH = 4;
-    protected static final int SEQ_LENGTH = 4;
-    protected static final int DATA_SIZE_LENGTH = 4;
-    protected static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
-    protected static final int BASE_LENGTH = TYPE_LENGTH + CREATOR_LENGTH + SIGNATURE_LENGTH;
-    // in pack toByte and Parse - reference not included
+    protected static final int BLOCK_NO_LENGTH = 4;
+    protected static final int TRANS_NO_LENGTH = 4;
+    protected static final int SEQ_NO_LENGTH = 8;
+    protected static final int COUNTER_LENGTH = 8;
+    protected static final int BASE_LENGTH = TYPE_LENGTH + BLOCK_NO_LENGTH + TRANS_NO_LENGTH + SEQ_NO_LENGTH;
 
     static Logger LOGGER = Logger.getLogger(Calculated.class.getName());
     protected String TYPE_NAME = "unknown";
+
+    protected DCSet dcSet;
     protected byte[] typeBytes;
     protected int blockNo;
     protected int transNo;
     protected long seqNo;
 
-    protected Account sender;
-    protected Account recipient;
-    protected BigDecimal amount;
-    protected long assetKey = Transaction.FEE_KEY;
-    protected AssetCls asset;
-
-    protected Calculated(byte[] typeBytes, String type_name, Account sender,) {
+    protected Calculated(byte[] typeBytes, String type_name, Integer blockNo, Integer transNo, long seqNo) {
         this.typeBytes = typeBytes;
         this.TYPE_NAME = type_name;
+        this.blockNo = blockNo;
+        this.transNo = transNo;
+        this.seqNo = seqNo;
+    }
+
+    // GETTERS/SETTERS
+
+    public void setDC(DCSet dcSet) {
+        this.dcSet = dcSet;
     }
 
     public static int getVersion(byte[] typeBytes) {
         return Byte.toUnsignedInt(typeBytes[1]);
     }
 
-    public static Calculated findByHeightSeqNo(DCSet db, int blockNo, int transNo, Long seq) {
+    public static Calculated findByHeightSeqNo(DCSet db, int blockNo, int transNo, long seq) {
         return db.getTransactionFinalCalculatedMap().getCalculated(blockNo, transNo, seq);
     }
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
-    public static Calculated findByDBRef(DCSet db, byte[] dbRef, Long seq) {
+    public static Calculated findByDBRef(DCSet db, byte[] dbRef, long seq) {
 
         if (dbRef == null)
             return null;
@@ -103,36 +101,45 @@ public abstract class Calculated {
     }
 
     public Account getSender() {
-        return this.sender;
+        return null;
     }
     
     public Account getRecipient() {
-        return this.recipient;
+        return null;
     }
     
     public HashSet<Account> getRecipientAccounts() {
         HashSet<Account> accounts = new HashSet<Account>();
-        accounts.add(this.recipient);
         return accounts;
     }
 
     public HashSet<Account> getInvolvedAccounts() {
         HashSet<Account> accounts = new HashSet<Account>();
-        accounts.add(this.sender);
-        accounts.addAll(this.getRecipientAccounts());
         return accounts;
     }
 
     public long getAssetKey() {
-        return this.assetKey;
+        return 0L;
     }
 
+    public long getAbsKey() {
+        return 0L;
+    }
+    
     public BigDecimal getAmount() {
-        return this.amount;
+        return null;
+    }
+    
+    public BigDecimal getAmount(String address) {
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getAmount(Account account) {
+        return BigDecimal.ZERO;
     }
 
     public AssetCls getAsset() {
-        return this.asset;
+        return null;
     }
 
     public Tuple3<Integer, Integer, Long> getBlockNoTransNoSeqNo() {
@@ -178,6 +185,14 @@ public abstract class Calculated {
         return this.blockNo + "-" + this.transNo;
     }
 
+    public String viewSender() {
+        return "-";
+    }
+
+    public String viewRecipient() {
+        return "-";
+    }
+
     public String viewAmount(Account account) {
         return account == null ? "" : viewAmount(account.getAddress());
     }
@@ -186,8 +201,8 @@ public abstract class Calculated {
         return "";
     }
 
-    public int viewSize(boolean asPack) {
-        return getDataLength(asPack);
+    public int viewSize() {
+        return getDataLength();
     }
 
     // PARSE/CONVERT
@@ -203,7 +218,6 @@ public abstract class Calculated {
     @SuppressWarnings("unchecked")
     protected JSONObject getJsonBase() {
 
-
         JSONObject transaction = new JSONObject();
 
         transaction.put("type", Byte.toUnsignedInt(this.typeBytes[0]));
@@ -217,12 +231,8 @@ public abstract class Calculated {
         transaction.put("blockNo", this.blockNo);
         transaction.put("transactionNo", this.transNo);
         transaction.put("sequenceNo", this.seqNo);
-        transaction.put("sender", this.sender.getAddress());
-        transaction.put("recipient", this.recipient.getAddress());
-        transaction.put("assetKey", this.assetKey);
-        transaction.put("amount", this.amount);
 
-        transaction.put("size", this.viewSize(false));
+        transaction.put("size", this.viewSize());
         return transaction;
     }
 
@@ -247,9 +257,11 @@ public abstract class Calculated {
 
     }
 
-    public abstract int getDataLength(boolean asPack);
+    public abstract int getDataLength();
 
     // PROCESS/ORPHAN
+    public abstract void process();
+    public abstract void orphan();
 
 
     public Calculated copy() {
@@ -258,6 +270,10 @@ public abstract class Calculated {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public boolean isInvolved(Account account) {
+        return false;
     }
 
     @Override

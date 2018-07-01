@@ -59,7 +59,7 @@ public class Crypto {
         }
     }
 
-    public String getAddressFromShort(byte[] publicKeyHash) {
+    public String getAddressFromShort(byte[] addressShort) {
 
         //CONVERT TO LIST
         List<Byte> addressList = new ArrayList<Byte>();
@@ -68,7 +68,7 @@ public class Crypto {
         Byte versionByte = Byte.valueOf(ADDRESS_VERSION);
         addressList.add(versionByte);
 
-        addressList.addAll(Bytes.asList(publicKeyHash));
+        addressList.addAll(Bytes.asList(addressShort));
 
         //GENERATE CHECKSUM
         byte[] checkSum = this.doubleDigest(Bytes.toArray(addressList));

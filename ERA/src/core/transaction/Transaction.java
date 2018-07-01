@@ -316,12 +316,12 @@ public abstract class Transaction {
     protected static final int DATA_TITLE_PART_LENGTH = 4;
     protected static final int DATA_NUM_FILE_LENGTH = 4;
     protected static final int SEQ_LENGTH = 4;
-    protected static final int DATA_SIZE_LENGTH = 4;
-    protected static final int ENCRYPTED_LENGTH = 1;
-    protected static final int IS_TEXT_LENGTH = 1;
+    public static final int DATA_SIZE_LENGTH = 4;
+    public static final int ENCRYPTED_LENGTH = 1;
+    public static final int IS_TEXT_LENGTH = 1;
     protected static final int FEE_POWER_LENGTH = 1;
     // protected static final int HKEY_LENGTH = 20;
-    protected static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
+    public static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
     // in pack toByte and Parse - reference not included

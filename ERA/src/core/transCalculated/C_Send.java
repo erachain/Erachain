@@ -14,9 +14,9 @@ import com.google.common.primitives.Longs;
 
 import core.BlockChain;
 import core.account.Account;
-import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import core.transaction.Transaction;
+import core.transaction.TransactionAmount;
 
 /*
 
@@ -60,7 +60,7 @@ public class C_Send extends CalculatedAmount {
     public static final int NO_DATA_MASK = 128; // 0x10000000
     public static final int MAX_DATA_VIEW = 64;
     //private static int position;
-    protected static final int BASE_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.IS_TEXT_LENGTH + Transaction.ENCRYPTED_LENGTH + Transaction.DATA_SIZE_LENGTH;
     private static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
     private static final String NAME_ID = "Send";
     protected String head;
@@ -68,10 +68,10 @@ public class C_Send extends CalculatedAmount {
     protected byte[] encrypted;
     protected byte[] isText;
 
-    public C_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
-                  BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
-                  Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
+    public C_Send(byte[] typeBytes, int blockNo, int transNo, long seqNo,
+            Account sender, Account recipient, long assetKey, BigDecimal amount, 
+            String head, byte[] data, byte[] isText, byte[] encrypted) {
+        super(typeBytes, NAME_ID, blockNo, transNo, seqNo, sender, recipient, assetKey, amount);
 
         this.head = head;
         if (head == null)
@@ -87,84 +87,21 @@ public class C_Send extends CalculatedAmount {
         }
     }
 
-    public C_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
-                  BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
-                  Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
-        this.signature = signature;
-        // this.calcFee();
-    }
-
-    // as pack
-    public C_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount,
-                  String head, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
-        this(typeBytes, creator, (byte) 0, recipient, key, amount, head, data, isText, encrypted, 0l, reference);
-        this.signature = signature;
-    }
-
-    // FOR BACKWARDS - CONFISCATE CREDIT
-    public C_Send(byte version, byte property1, byte property2, PublicKeyAccount creator, byte feePow,
-                  Account recipient, long key, BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted,
-                  long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, version, property1, property2}, creator, feePow, recipient, key, amount, head, data,
-                isText, encrypted, timestamp, reference);
-    }
-
-    public C_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head,
-                  byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, head, data, isText, encrypted,
-                timestamp, reference);
-    }
-
-    public C_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, String head,
-                  byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, head, data, isText, encrypted,
-                timestamp, reference, signature);
-    }
-
-    // as pack
-    public C_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, String head, byte[] data,
-                  byte[] isText, byte[] encrypted, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, recipient, key, amount, head, data, isText, encrypted,
-                0l, reference);
+    public C_Send(byte version, byte property1, byte property2, int blockNo, int transNo, long seqNo,
+            Account sender, Account recipient, long assetKey, BigDecimal amount,
+            String head, byte[] data, byte[] isText, byte[] encrypted
+            ) {
+        this(new byte[]{TYPE_ID, version, property1, property2}, blockNo, transNo, seqNo,
+                sender, recipient, assetKey, amount, head, data, isText, encrypted);
     }
 
     ////////////////////////// SHOR -text DATA
-    public C_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
-                  BigDecimal amount, long timestamp, Long reference) {
-        super(typeBytes, NAME_ID, creator, feePow, recipient, amount, key, timestamp, reference);
-        // typeBytes[3] = (byte)(typeBytes[3] & (byte)-128);
+    public C_Send(byte[] typeBytes, int blockNo, int transNo, long seqNo,
+            Account sender, Account recipient, long assetKey, BigDecimal amount) {
+        super(typeBytes, NAME_ID, blockNo, transNo, seqNo, sender, recipient, assetKey, amount);
         this.head = "";
         typeBytes[3] = (byte) (typeBytes[3] | (byte) -128);
 
-    }
-
-    public C_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
-                  BigDecimal amount, long timestamp, Long reference, byte[] signature) {
-        this(typeBytes, creator, feePow, recipient, key, amount, timestamp, reference);
-        this.signature = signature;
-        // this.calcFee();
-    }
-
-    // as pack
-    public C_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount) {
-        this(typeBytes, creator, (byte) 0, recipient, key, amount, 0l, null);
-    }
-
-    public C_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp,
-                  Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, timestamp, reference);
-    }
-
-    public C_Send(PublicKeyAccount creator, byte feePow, Account recipient, long key, BigDecimal amount, long timestamp,
-                  Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, feePow, recipient, key, amount, timestamp, reference,
-                signature);
-    }
-
-    // as pack
-    public C_Send(PublicKeyAccount creator, Account recipient, long key, BigDecimal amount, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, (byte) 0, recipient, key, amount, 0l, reference);
     }
 
     // GETTERS/SETTERS
@@ -175,7 +112,7 @@ public class C_Send extends CalculatedAmount {
 
         //
         // CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK | !asPack & data.length < BASE_LENGTH) {
+        if (data.length < BASE_LENGTH) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -183,75 +120,54 @@ public class C_Send extends CalculatedAmount {
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
 
-        long timestamp = 0;
-        if (!asPack) {
-            // READ TIMESTAMP
-            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-            timestamp = Longs.fromByteArray(timestampBytes);
-            position += TIMESTAMP_LENGTH;
-        }
+        // READ BLOCK NO
+        byte[] bytes = Arrays.copyOfRange(data, position, position + BLOCK_NO_LENGTH);
+        int blockNo = Ints.fromByteArray(bytes);
+        position += BLOCK_NO_LENGTH;
 
-        Long reference = null;
-        if (!asPack) {
-            // READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        // READ TRANS NO
+        bytes = Arrays.copyOfRange(data, position, position + TRANS_NO_LENGTH);
+        int transNo = Ints.fromByteArray(bytes);
+        position += TRANS_NO_LENGTH;
+
+        // READ SEQ NO
+        bytes = Arrays.copyOfRange(data, position, position + SEQ_NO_LENGTH);
+        long seqNo = Longs.fromByteArray(bytes);
+        position += SEQ_NO_LENGTH;
 
         // READ CREATOR
-        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-        PublicKeyAccount creator = new PublicKeyAccount(creatorBytes);
-        position += CREATOR_LENGTH;
-
-        byte feePow = 0;
-        if (!asPack) {
-            // READ FEE POWER
-            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-            feePow = feePowBytes[0];
-            position += 1;
-        }
-
-        // READ SIGNATURE
-        byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
-        position += SIGNATURE_LENGTH;
+        byte[] senderBytes = Arrays.copyOfRange(data, position, position + Transaction.CREATOR_LENGTH);
+        Account sender = Account.makeAccountFromShort(senderBytes);
+        position += Transaction.CREATOR_LENGTH;
 
         // READ RECIPIENT
-        byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-        Account recipient = new Account(Base58.encode(recipientBytes));
-        position += RECIPIENT_LENGTH;
+        byte[] recipientBytes = Arrays.copyOfRange(data, position, position + TransactionAmount.RECIPIENT_LENGTH);
+        //Account recipient = new Account(Base58.encode(recipientBytes));
+        Account recipient = Account.makeAccountFromShort(recipientBytes);
+        position += TransactionAmount.RECIPIENT_LENGTH;
 
-        long key = 0;
-        BigDecimal amount = null;
-        if (typeBytes[2] >= 0) {
-            // IF here is AMOUNT
+        // READ ASSET KEY
+        byte[] keyBytes = Arrays.copyOfRange(data, position, position + TransactionAmount.KEY_LENGTH);
+        long assetKey = Longs.fromByteArray(keyBytes);
+        position += TransactionAmount.KEY_LENGTH;
 
-            // READ KEY
-            byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
-            key = Longs.fromByteArray(keyBytes);
-            position += KEY_LENGTH;
+        // READ AMOUNT
+        byte[] amountBytes = Arrays.copyOfRange(data, position, position + TransactionAmount.AMOUNT_LENGTH);
+        BigDecimal amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+        position += TransactionAmount.AMOUNT_LENGTH;
 
-            // READ AMOUNT
-            byte[] amountBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-            amount = new BigDecimal(new BigInteger(amountBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-            position += AMOUNT_LENGTH;
-
-            // CHECK ACCURACY of AMOUNT
-            if (typeBytes[3] != -1) {
-                // not use old FLAG from vers 2
-                int accuracy = typeBytes[3] & SCALE_MASK;
-                if (accuracy > 0) {
-                    if (accuracy > CalculatedAmount.SCALE_MASK_HALF + 1) {
-                        accuracy -= CalculatedAmount.SCALE_MASK + 1;
-                    }
-
-                    // RESCALE AMOUNT
-                    amount = amount.scaleByPowerOfTen(-accuracy);
+        // CHECK ACCURACY of AMOUNT
+        if (typeBytes[3] != -1) {
+            // not use old FLAG from vers 2
+            int accuracy = typeBytes[3] & TransactionAmount.SCALE_MASK;
+            if (accuracy > 0) {
+                if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+                    accuracy -= TransactionAmount.SCALE_MASK + 1;
                 }
-            }
 
+                // RESCALE AMOUNT
+                amount = amount.scaleByPowerOfTen(-accuracy);
+            }
         }
 
         // HEAD LEN
@@ -270,28 +186,24 @@ public class C_Send extends CalculatedAmount {
             // IF here is DATA
 
             // READ DATA SIZE
-            byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + DATA_SIZE_LENGTH);
+            byte[] dataSizeBytes = Arrays.copyOfRange(data, position, position + Transaction.DATA_SIZE_LENGTH);
             int dataSize = Ints.fromByteArray(dataSizeBytes);
-            position += DATA_SIZE_LENGTH;
+            position += Transaction.DATA_SIZE_LENGTH;
 
             // READ DATA
             arbitraryData = Arrays.copyOfRange(data, position, position + dataSize);
             position += dataSize;
 
-            encryptedByte = Arrays.copyOfRange(data, position, position + ENCRYPTED_LENGTH);
-            position += ENCRYPTED_LENGTH;
+            encryptedByte = Arrays.copyOfRange(data, position, position + TransactionAmount.ENCRYPTED_LENGTH);
+            position += TransactionAmount.ENCRYPTED_LENGTH;
 
-            isTextByte = Arrays.copyOfRange(data, position, position + IS_TEXT_LENGTH);
-            position += IS_TEXT_LENGTH;
+            isTextByte = Arrays.copyOfRange(data, position, position + TransactionAmount.IS_TEXT_LENGTH);
+            position += TransactionAmount.IS_TEXT_LENGTH;
         }
 
-        if (!asPack) {
-            return new C_Send(typeBytes, creator, feePow, recipient, key, amount, head, arbitraryData, isTextByte,
-                    encryptedByte, timestamp, reference, signatureBytes);
-        } else {
-            return new C_Send(typeBytes, creator, recipient, key, amount, head, arbitraryData, isTextByte,
-                    encryptedByte, reference, signatureBytes);
-        }
+        return new C_Send(typeBytes, blockNo, transNo, seqNo,
+                sender, recipient, assetKey, amount,
+                head, arbitraryData, isTextByte, encryptedByte);
 
     }
 
@@ -351,19 +263,6 @@ public class C_Send extends CalculatedAmount {
         return (Arrays.equals(this.encrypted, new byte[1])) ? false : true;
     }
 
-    @Override
-    public boolean hasPublicText() {
-        if (head.length() > 2)
-            return true;
-
-        if (data == null || data.length == 0)
-            return false;
-        if (!Arrays.equals(this.encrypted, new byte[1]))
-            return false;
-
-        return true;
-    }
-
     // PARSE/CONVERT
 
     @SuppressWarnings("unchecked")
@@ -391,9 +290,9 @@ public class C_Send extends CalculatedAmount {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes() {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes();
 
         // WRITE HEAD
         byte[] headBytes = this.head.getBytes(StandardCharsets.UTF_8);
@@ -421,31 +320,14 @@ public class C_Send extends CalculatedAmount {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength() {
 
-        int dataLen = super.getDataLength(asPack) + 1 + head.getBytes(StandardCharsets.UTF_8).length;
+        int dataLen = super.getDataLength() + 1 + head.getBytes(StandardCharsets.UTF_8).length;
 
         if (this.typeBytes[3] >= 0)
             return dataLen + BASE_LENGTH + this.data.length;
         else
             return dataLen;
-    }
-
-    // @Override
-    @Override
-    public int isValid(Long releaserReference, long flags) {
-
-        if (head.getBytes(StandardCharsets.UTF_8).length > 256)
-            return INVALID_HEAD_LENGTH;
-
-        if (this.data != null) {
-            // CHECK DATA SIZE
-            if (data.length > Integer.MAX_VALUE) {
-                return INVALID_DATA_LENGTH;
-            }
-        }
-
-        return super.isValid(releaserReference, flags);
     }
 
 }

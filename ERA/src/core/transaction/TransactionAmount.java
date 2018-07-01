@@ -191,9 +191,12 @@ public abstract class TransactionAmount extends Transaction {
         return getAmount(address);
     }
     
+    public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
+        int type = core.account.Account.actionType(assetKey, amount);
+        return type * (isBackward ? -1 : 1);
+    }
     public int getActionType() {
-        int type = core.account.Account.actionType(this.key, this.amount);
-        return type * (isBackward() ? -1 : 1);
+        return getActionType(this.key, this.amount, this.isBackward());
     }
     
     // BACKWARD AMOUNT
@@ -249,12 +252,12 @@ public abstract class TransactionAmount extends Transaction {
         return NumberAsString.formatAsString(getAmount(address));
     }
     
-    private String viewActionType() {
+    public static String viewActionType(long assetKey, BigDecimal amount, boolean isBackward) {
         
-        if (this.amount == null || this.amount.signum() == 0)
+        if (amount == null || amount.signum() == 0)
             return "";
         
-        int actionType = Account.actionType(this.key, this.amount);
+        int actionType = Account.actionType(assetKey, amount);
         
         switch (actionType) {
             case ACTION_SEND:
@@ -270,7 +273,12 @@ public abstract class TransactionAmount extends Transaction {
         return "???";
         
     }
-    
+
+    public String viewActionType() {
+        return viewActionType(this.key, this.amount, this.isBackward());
+    }
+        
+
     // PARSE/CONVERT
     // @Override
     @Override

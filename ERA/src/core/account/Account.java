@@ -67,15 +67,15 @@ public class Account {
         this.address = address;
     }
 
-    public static Account makeAccountFromShort(byte[] publicKeyHash) {
+    public static Account makeAccountFromShort(byte[] addressShort) {
 
-        String address = Crypto.getInstance().getAddressFromShort(publicKeyHash);
+        String address = Crypto.getInstance().getAddressFromShort(addressShort);
         return new Account(address);
     }
 
-    public static Account makeAccountFromShort(BigInteger publicKeyHash) {
+    public static Account makeAccountFromShort(BigInteger addressShort) {
 
-        String address = Crypto.getInstance().getAddressFromShort(publicKeyHash.toByteArray());
+        String address = Crypto.getInstance().getAddressFromShort(addressShort.toByteArray());
         return new Account(address);
     }
 
