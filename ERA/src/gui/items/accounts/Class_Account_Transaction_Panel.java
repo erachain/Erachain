@@ -12,6 +12,7 @@ import core.transaction.Transaction;
 import gui.AccountRenderer;
 import gui.PasswordPane;
 import gui.items.assets.AssetsComboBoxModel;
+import gui.library.M_DecimalFormatedTextField;
 import gui.models.AccountsComboBoxModel;
 import gui.transaction.OnDealClick;
 import lang.Lang;
@@ -26,6 +27,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.MaskFormatter;
 
 import org.apache.commons.net.util.Base64;
 
@@ -39,8 +41,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 
 @SuppressWarnings("serial")
 
@@ -52,8 +57,8 @@ public class Class_Account_Transaction_Panel extends JPanel {
 
     public JComboBox<Account> cbxFrom;
     public JTextField txtTo;
-    public JTextField txtAmount;
-    public JTextField txtFeePow;
+    public M_DecimalFormatedTextField txtAmount;
+    public M_DecimalFormatedTextField txtFeePow;
     public JTextArea txtMessage;
     public JCheckBox encryptedCHcKBox;
     public JCheckBox isText;
@@ -103,6 +108,8 @@ public class Class_Account_Transaction_Panel extends JPanel {
     private String defaultImagePath = "images/icons/coin.png";
 
     private PersonCls person_To;
+
+    private DecimalFormat format;
 
     public Class_Account_Transaction_Panel(AssetCls asset2, Account account2,  Account account_To, PersonCls person) {
         account = account2;
@@ -432,7 +439,18 @@ public class Class_Account_Transaction_Panel extends JPanel {
         txtAmountGBC.gridx = 1;
         txtAmountGBC.gridy = y;
 
-        txtAmount = new JTextField("0.00000000");
+      
+        
+     //   format.setRoundingMode(RoundingMode.HALF_UP);
+        
+        
+       
+        txtAmount = new M_DecimalFormatedTextField();
+        int scale = 8;
+        if(asset!=null)scale = asset.getScale();
+        txtAmount.setScale(scale);
+        
+     //   txtAmount = new JTextField("0.00000000");
         // txtAmount.setPreferredSize(new Dimension(130,22));
         this.add(txtAmount, txtAmountGBC);
 
@@ -456,8 +474,8 @@ public class Class_Account_Transaction_Panel extends JPanel {
         feetxtGBC.anchor = GridBagConstraints.NORTH;
         feetxtGBC.gridx = 3;
         feetxtGBC.gridy = y;
-
-        txtFeePow = new JTextField();
+        txtFeePow = new M_DecimalFormatedTextField();
+        txtFeePow.setScale(Controller.getInstance().getAsset(2).getScale());
         txtFeePow.setText("0");
         // txtFeePow.setPreferredSize(new Dimension(130,22));
         this.add(txtFeePow, feetxtGBC);
@@ -549,6 +567,11 @@ public class Class_Account_Transaction_Panel extends JPanel {
                  // set image
                     setImage();
                     icon.repaint();
+                 // set scale
+                    int scale = 8;
+                    if(asset!=null)scale = asset.getScale();
+                    txtAmount.setScale(scale);
+                    
                 }
 
             }
