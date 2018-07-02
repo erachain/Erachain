@@ -27,7 +27,7 @@ public class CalculatedFactory {
             case Calculated.COUNTER_CALCULATED:
 
                 // PARSE COUNTER
-                return C_Send.Parse(data);
+                return CalculatedCounter.Parse(data);
 
             case Calculated.CHANGE_BALANCE_CALCULATED:
 

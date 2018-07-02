@@ -1,8 +1,11 @@
 package core.transCalculated;
 
+import java.util.Arrays;
+
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
 /*
@@ -11,15 +14,16 @@ import com.google.common.primitives.Longs;
 
  */
 
-public abstract class CalculatedCounter extends Calculated {
+public class CalculatedCounter extends Calculated {
             
     protected static final int COUNTER_LENGTH = 8;
+    private static final String NAME_ID = "Counter";
 
     protected long counter;
 
-    protected CalculatedCounter(byte[] typeBytes, String type_name, Integer blockNo, Integer transNo, long seq,
+    protected CalculatedCounter(byte[] typeBytes, Integer blockNo, Integer transNo, long seq,
             long counter) {
-        super(typeBytes, type_name, blockNo, transNo, seq);
+        super(typeBytes, NAME_ID, blockNo, transNo, seq);
         this.counter = counter;
     }
         
@@ -51,8 +55,45 @@ public abstract class CalculatedCounter extends Calculated {
         return data;
     }
     
+    public static Calculated Parse(byte[] data) throws Exception {
+
+        //
+        // CHECK IF WE MATCH BLOCK LENGTH
+        if (data.length < BASE_LENGTH) {
+            throw new Exception("Data does not match block length " + data.length);
+        }
+
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
+
+        // READ BLOCK NO
+        byte[] bytes = Arrays.copyOfRange(data, position, position + BLOCK_NO_LENGTH);
+        int blockNo = Ints.fromByteArray(bytes);
+        position += BLOCK_NO_LENGTH;
+
+        // READ TRANS NO
+        bytes = Arrays.copyOfRange(data, position, position + TRANS_NO_LENGTH);
+        int transNo = Ints.fromByteArray(bytes);
+        position += TRANS_NO_LENGTH;
+
+        // READ SEQ NO
+        bytes = Arrays.copyOfRange(data, position, position + SEQ_NO_LENGTH);
+        long seqNo = Longs.fromByteArray(bytes);
+        position += SEQ_NO_LENGTH;
+
+        // READ COUNTER
+        bytes = Arrays.copyOfRange(data, position, position + COUNTER_LENGTH);
+        long counter = Longs.fromByteArray(bytes);
+        position += COUNTER_LENGTH;
+
+        return new CalculatedCounter(typeBytes, blockNo, transNo, seqNo,
+                counter);
+
+    }
+
     @SuppressWarnings("unchecked")
-    protected JSONObject getJsonBase() {
+    public JSONObject toJson() {
         JSONObject transaction = super.getJsonBase();
         
         transaction.put("counter", this.counter);
@@ -68,6 +109,6 @@ public abstract class CalculatedCounter extends Calculated {
     }
     
     public void orphan() {
-    }    
+    }
     
 }

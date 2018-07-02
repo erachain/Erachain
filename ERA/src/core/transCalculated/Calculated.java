@@ -18,14 +18,20 @@ import core.account.Account;
 import core.item.assets.AssetCls;
 import datachain.DCSet;
 
-//import java.math.RoundingMode;
-//import java.math.MathContext;
-//import java.util.Comparator;
-//import javax.swing.JFrame;
-//import javax.swing.JOptionPane;
-//import lang.Lang;
-//import settings.Settings;
-
+/*
+ * Вычисленные транзакции (вычисления) - нужны для показа причин изменения остатов и состояний
+ * Заносятся в таблицу datachain/TransactionFinalCalculatedMap.java
+ * по ключу из номера блока, номера трнзакции внем и порядковому номеру вычисления
+ * число вычисленний для блока хранится в ключе Номер_Блока + 0 + 0
+ * число вычислений для транзакции хранится в ключе Номер_Блока_Номер_Транзакции_в_Блоке + 0
+ * номера вычислений начинаются с 1
+ * Число вычислений это тоже вычисление - счетчик: core/transCalculated/CalculatedCounter.java
+ * 
+ * поидее в базу не нужно их номера катать - они и так есть в ключах
+ * 
+ * сериализатор для базы данных - database/serializer/CalculatedSerializer.java
+ * 
+ */
 public abstract class Calculated {
 
     // 
