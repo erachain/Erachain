@@ -42,7 +42,7 @@ import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 
-public class Account_Send_Panel extends Class_Account_Transaction_Panel {
+public class Account_Send_Panel extends AssetSendPanel {
     
     private Account_Send_Panel th;
     public boolean noRecive;
@@ -54,12 +54,12 @@ public class Account_Send_Panel extends Class_Account_Transaction_Panel {
         if (asset == null) a = "";
         else a = asset.viewName();
 
-        jTextArea_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").replace("%asset%", a));
 
         //  icon.setIcon(null);
-        sendButton.setText(Lang.getInstance().translate("Send"));
-        toLabel.setText(Lang.getInstance().translate("To: (address or name)") + ":");
-        recDetailsLabel.setText(Lang.getInstance().translate("Receiver details") + ":");
+        this.jButton_ok.setText(Lang.getInstance().translate("Send"));
+        this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
         
         
         
@@ -165,7 +165,7 @@ public class Account_Send_Panel extends Class_Account_Transaction_Panel {
             }
         }
         // ENABLE
-        this.sendButton.setEnabled(true);
+        this.jButton_ok.setEnabled(true);
     }
 
 }

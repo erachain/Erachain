@@ -39,7 +39,7 @@ import utils.Pair;
 
 @SuppressWarnings("serial")
 
-public class Account_Take_Hold_Panel extends Class_Account_Transaction_Panel {
+public class Account_Take_Hold_Panel extends AssetSendPanel {
     //private final MessagesTableModel messagesTableModel;
 
 
@@ -50,15 +50,18 @@ public class Account_Take_Hold_Panel extends Class_Account_Transaction_Panel {
         super(asset,account,account_To, person);
         String a;
         th = this;
-        if (asset == null) a = "";
+        if (asset == null) {
+            a = "";
+            asset = Controller.getInstance().getAsset(1);
+        }
         else a = asset.viewName();
 
-        jTextArea_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
+        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form").replace("%asset%", a));
 
         //	icon.setIcon(null);
-        sendButton.setText(Lang.getInstance().translate("Hold Asset"));
-        toLabel.setText(Lang.getInstance().translate("Vendor Account") + ":");
-        recDetailsLabel.setText(Lang.getInstance().translate("Vendor Details") + ":");
+        this.jButton_ok.setText(Lang.getInstance().translate("Hold Asset"));
+        this.jLabel_To.setText(Lang.getInstance().translate("Vendor Account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Vendor Details") + ":");
       
     }
 
@@ -96,7 +99,7 @@ public class Account_Take_Hold_Panel extends Class_Account_Transaction_Panel {
 
         }
         //ENABLE
-        this.sendButton.setEnabled(true);
+        this.jButton_ok.setEnabled(true);
     }
 
 }

@@ -202,10 +202,10 @@ public class Menu_Files extends JMenu {
                 if (!js.containsKey("amount")) return;
                 String amount = (String) js.get("amount");
                 Account_Send_Dialog dd = new Account_Send_Dialog(ct.getAsset(assetKey), ct.getAccountByAddress((String) creator), ct.getAccountByAddress(recipient), null);
-                dd.panel.txtTo.setEditable(false);
-                dd.panel.txt_Title.setEditable(false);
-                dd.panel.txtAmount.setEditable(false);
-                dd.panel.cbxFavorites.enable(false);
+                dd.panel.jTextField_To.setEditable(false);
+                dd.panel.jTextField_Mess_Title.setEditable(false);
+                dd.panel.jTextField_Ammount.setEditable(false);
+                dd.panel.jComboBox_Asset.enable(false);
                 dd.sertParams(amount, "", head);
                 dd.show();
             }

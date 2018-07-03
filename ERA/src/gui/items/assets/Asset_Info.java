@@ -73,8 +73,6 @@ public class Asset_Info extends JTextPane {
         image_Label = new JLabel("");
         byte[] image_Byte = asset.getImage();
         if (image_Byte.length > 0) {
-            //base 64
-            String a = Base64.encodeBase64String(image_Byte);
             //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
             // label
             InputStream inputStream = new ByteArrayInputStream(asset.getImage());

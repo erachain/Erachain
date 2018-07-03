@@ -2,9 +2,13 @@ package gui.items.accounts;
 
 import core.account.Account;
 import core.item.assets.AssetCls;
+import gui.MainFrame;
 import lang.Lang;
 
 import javax.swing.*;
+
+import controller.Controller;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +29,17 @@ public class Account_Lend_Dialog extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
+        if (asset == null) asset = Controller.getInstance().getAsset(1);
         Account_Lend_Panel panel = new Account_Lend_Panel(asset, account, null,null);
         getContentPane().add(panel, BorderLayout.CENTER);
-
+        this.setTitle(Lang.getInstance().translate("Lend"));
+        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
         //SHOW FRAME
         this.pack();
         //     this.setMaximizable(true);
-        this.setTitle(Lang.getInstance().translate("Lend"));
+        
         //	this.setClosable(true);
-        this.setResizable(false);
+        this.setResizable(true);
         //this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
         //	this.setLocation(20, 20);
         //	this.setIconImages(icons);

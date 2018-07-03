@@ -36,24 +36,26 @@ import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 
-public class Account_Repay_Debt_Panel extends Class_Account_Transaction_Panel {
+public class Account_Repay_Debt_Panel extends AssetSendPanel {
     // private final MessagesTableModel messagesTableModel;
 
     public Account_Repay_Debt_Panel(AssetCls asset, Account account,   Account account_To, PersonCls person) {
         super(asset,account,account_To, person);
         String a;
-        if (asset == null)
+        if (asset == null){
             a = "";
+            asset = Controller.getInstance().getAsset(1);
+        }
         else
             a = asset.viewName();
 
-        jTextArea_Title.setText(Lang.getInstance()
+        this.jLabel_Title.setText(Lang.getInstance()
                 .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", a));
 
         // icon.setIcon(null);
-        sendButton.setText(Lang.getInstance().translate("Repay Debt"));
-        toLabel.setText(Lang.getInstance().translate("Lender Account") + ":");
-        recDetailsLabel.setText(Lang.getInstance().translate("Lender Details") + ":");
+        this.jButton_ok.setText(Lang.getInstance().translate("Repay Debt"));
+        this.jLabel_To.setText(Lang.getInstance().translate("Lender Account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Lender Details") + ":");
 
     
     }
@@ -89,7 +91,7 @@ public class Account_Repay_Debt_Panel extends Class_Account_Transaction_Panel {
             confirmaftecreatetransaction();
         }
         // ENABLE
-        this.sendButton.setEnabled(true);
+        this.jButton_ok.setEnabled(true);
     }
 
 }

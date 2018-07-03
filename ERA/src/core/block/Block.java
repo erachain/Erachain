@@ -300,9 +300,14 @@ public class Block {
     }
 
     public Block getParent(DCSet dcSet) {
-        int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
-        //assert (parentHeight, this.heightBlock - 1);
-        return dcSet.getBlockMap().get(parentHeight);
+        try {
+            int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
+            //assert (parentHeight, this.heightBlock - 1);
+            return dcSet.getBlockMap().get(parentHeight);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+           return null;
+        }
     }
 
     public void loadHeadMind(DCSet dcSet) {

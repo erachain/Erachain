@@ -1862,8 +1862,8 @@ public class BlockExplorer {
             for (int i = 0; i < rowCount; i++) {
                 Map accountJSON = new LinkedHashMap();
                 accountJSON.put("adress", personModel.getValueAt(i, 0));
-                accountJSON.put("data", personModel.getValueAt(i, 1));
-                accountJSON.put("creator", personModel.getValueAt(i, 2));
+                accountJSON.put("data", personModel.getValueAt(i, 2));
+                accountJSON.put("creator", personModel.getValueAt(i, 1));
 
                 PersonCls creator = (PersonCls) personModel.getValueAt(i, 4);
 
