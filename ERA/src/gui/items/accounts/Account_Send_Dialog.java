@@ -29,7 +29,11 @@ public class Account_Send_Dialog extends JDialog {
         panel = new Account_Send_Panel(asset, account, account_To,  person);
         getContentPane().add(panel, BorderLayout.CENTER);
         this.setTitle(Lang.getInstance().translate("Send"));
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = screens.height - 50;
+        int w = screens.width - 50;
+        this.setPreferredSize(new Dimension(w,h));
         this.pack();
         this.setResizable(true);
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);

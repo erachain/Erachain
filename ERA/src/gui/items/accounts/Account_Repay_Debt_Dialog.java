@@ -44,7 +44,11 @@ public class Account_Repay_Debt_Dialog extends JDialog {
         this.setTitle(Lang.getInstance().translate("Repay Debt"));
         //	this.setClosable(true);
         this.setResizable(true);
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = screens.height - 50;
+        int w = screens.width - 50;
+        this.setPreferredSize(new Dimension(w,h));
         //this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));
         //	this.setLocation(20, 20);
         //	this.setIconImages(icons);

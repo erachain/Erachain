@@ -1,6 +1,7 @@
 package gui.items.accounts;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -49,12 +50,17 @@ public class Account_Confiscate_Debt_Dialog extends JDialog {
         //	this.setIconImages(icons);
         //CLOSE
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+        
 //		 setMinimumSize(new java.awt.Dimension(650, 23));
         setModal(true);
 //        setPreferredSize(new java.awt.Dimension(650, 650));
 
 
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = screens.height - 50;
+        int w = screens.width - 50;
+        this.setPreferredSize(new Dimension(w,h));
         //PACK
         this.pack();
         //    this.setResizable(false);

@@ -42,7 +42,11 @@ public class Account_Take_Hold_Dialog extends JDialog {
         
         //     this.setMaximizable(true);
         this.setTitle(Lang.getInstance().translate("Take on Hold"));
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = screens.height - 50;
+        int w = screens.width - 50;
+        this.setPreferredSize(new Dimension(w,h));
         //	this.setClosable(true);
         this.setResizable(true);
         //this.setSize(new Dimension( (int)parent.getSize().getWidth()-80,(int)parent.getSize().getHeight()-150));

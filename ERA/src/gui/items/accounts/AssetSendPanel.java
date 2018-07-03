@@ -695,7 +695,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        gridBagConstraints.gridwidth = 17;
        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
        gridBagConstraints.weightx = 0.4;
-       gridBagConstraints.weighty = 0.1;
+       gridBagConstraints.weighty = 0.2;
        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
        add(jScrollPane2, gridBagConstraints);
    }// </editor-fold>                        

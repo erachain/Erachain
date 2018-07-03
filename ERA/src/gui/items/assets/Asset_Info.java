@@ -54,6 +54,7 @@ public class Asset_Info extends JTextPane {
     private int max_Widht;
     private int max_Height;
     private Image Im;
+    ImageIcon image = null;
 
     /**
      * Creates new form Asset_Info003
@@ -71,6 +72,7 @@ public class Asset_Info extends JTextPane {
         transaction = Transaction.findByDBRef(DCSet.getInstance(), recordReference);
         this.setMinimumSize(new Dimension(0, 0));
         image_Label = new JLabel("");
+        
         byte[] image_Byte = asset.getImage();
         if (image_Byte.length > 0) {
             //   img_HTML = "<img src='data:image/gif;base64," + a + "' width = '350' /></td><td style ='padding-left:20px'>";
@@ -78,9 +80,20 @@ public class Asset_Info extends JTextPane {
             InputStream inputStream = new ByteArrayInputStream(asset.getImage());
             try {
                 image1 = ImageIO.read(inputStream);
+                image = new ImageIcon(image1);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 
+        }
+        else{
+            if (asset.getKey() == 1l) image = new ImageIcon("images/icons/icon32.png");
+            else if (asset.getKey() == 2l)  image = new ImageIcon("images/icons/icon32_Se.png");
+            else image = new ImageIcon("images/icons/coin.png");
+        }
                 // jLabel2.setText("jLabel2");
-                ImageIcon image = new ImageIcon(image1);
+               
                 int x = image.getIconWidth();
                 max_Height = image.getIconHeight();
 
@@ -97,13 +110,11 @@ public class Asset_Info extends JTextPane {
                 }
 
 
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            
 
-        }
-
+        
+            
+        
         String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
 
 
@@ -112,7 +123,7 @@ public class Asset_Info extends JTextPane {
 
         text += "<table><tr valign='top' align = 'left'><td>";
         text += "<DIV  style='float:left'><b>" + Lang.getInstance().translate("Key") + ": </b>" + asset.getKey() + "</DIV>";
-        if (image1 != null)
+        if (image != null)
             text += "<div><a href ='!!img'  style='color: " + color + "' ><img src=\"" + img_Local_URL + "\"></a></div>";
         Transaction record = Transaction.findByDBRef(DCSet.getInstance(), asset.getReference());
         if (record != null)

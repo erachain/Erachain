@@ -33,7 +33,11 @@ public class Account_Lend_Dialog extends JDialog {
         Account_Lend_Panel panel = new Account_Lend_Panel(asset, account, null,null);
         getContentPane().add(panel, BorderLayout.CENTER);
         this.setTitle(Lang.getInstance().translate("Lend"));
-        this.setPreferredSize(MainFrame.getInstance().getPreferredSize());
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = screens.height - 50;
+        int w = screens.width - 50;
+        this.setPreferredSize(new Dimension(w,h));
         //SHOW FRAME
         this.pack();
         //     this.setMaximizable(true);
