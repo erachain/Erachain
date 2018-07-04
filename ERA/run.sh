@@ -1,4 +1,4 @@
-#!/bin/bash
+﻿#!/bin/bash
 # 512Mb, x32
 
 app=erachain-test-001
