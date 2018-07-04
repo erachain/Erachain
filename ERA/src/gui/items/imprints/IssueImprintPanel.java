@@ -26,7 +26,7 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class IssueImprintPanel extends JPanel {
     private JComboBox<Account> cbxFrom;
-    private JTextField txtFeePow;
+    private JComboBox<String> txtFeePow;
     private JTextField txtNumber;
     private JTextField txtDate;
     private JTextField txtDebitor;
@@ -218,8 +218,9 @@ public class IssueImprintPanel extends JPanel {
 
         //TXT FEE
         txtGBC.gridy = gridy++;
-        this.txtFeePow = new JTextField();
-        this.txtFeePow.setText("0");
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         this.add(this.txtFeePow, txtGBC);
 
         //BUTTON Register
@@ -291,7 +292,7 @@ public class IssueImprintPanel extends JPanel {
         try {
 
             //READ FEE POW
-            int feePow = Integer.parseInt(this.txtFeePow.getText());
+            int feePow =  Integer.parseInt((String)this.txtFeePow.getSelectedItem());
             // READ AMOUNT
             //float amount = Float.parseFloat(this.txtAmount.getText());
 
@@ -348,7 +349,7 @@ public class IssueImprintPanel extends JPanel {
                 this.txtAmount.setText("");
                 this.txtCreditor.setText("");
                 this.txtDate.setText("");
-                this.txtFeePow.setText("");
+                this.txtFeePow.setSelectedItem("0");
                 this.txtNumber.setText("");
                 this.txtDebitor.setText("");
                 this.cbxFrom.setSelectedIndex(0);

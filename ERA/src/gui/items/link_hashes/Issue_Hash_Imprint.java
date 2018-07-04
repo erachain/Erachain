@@ -38,7 +38,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
     // Variables declaration - do not modify
     public javax.swing.JButton jButton;
     public javax.swing.JComboBox jComboBox_Account;
-    public javax.swing.JTextField txtFeePow;
+    public javax.swing.JComboBox<String> txtFeePow;
     public javax.swing.JLabel jLabel1;
     public javax.swing.JLabel jLabel_Account;
     public javax.swing.JLabel jLabel_Description;
@@ -114,7 +114,7 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         try {
 
             //READ FEE POW
-            int feePow = Integer.parseInt(this.txtFeePow.getText());
+            int feePow =  Integer.parseInt((String)this.txtFeePow.getSelectedItem());
             // READ AMOUNT
             //float amount = Float.parseFloat(this.txtAmount.getText());
 
@@ -311,12 +311,14 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
-
-        this.txtFeePow = new JTextField();
-        this.txtFeePow.setSize(80, 20);
-        this.txtFeePow.setMaximumSize(new Dimension(80, 20));
-        this.txtFeePow.setPreferredSize(new Dimension(80, 20));
-        this.txtFeePow.setText("0");
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.1;
+       
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
+       
+        
         this.add(this.txtFeePow, gridBagConstraints);
 
     }// </editor-fold>

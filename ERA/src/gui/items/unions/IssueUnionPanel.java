@@ -29,7 +29,7 @@ import java.text.ParseException;
 @SuppressWarnings("serial")
 public class IssueUnionPanel extends JPanel {
     private JComboBox<Account> cbxFrom;
-    private JTextField txtFeePow;
+    private JComboBox<String> txtFeePow;
     private JTextField txtName;
     private JTextArea txtareaDescription;
     private JTextField txtBirthday;
@@ -54,7 +54,7 @@ public class IssueUnionPanel extends JPanel {
         String colorText = "ff0000"; // цвет текста в форме
         th = this;
         this.issueButton = new JButton();
-        txtFeePow = new JTextField();
+        txtFeePow = new JComboBox<String>();
         txtName = new JTextField();
         txtareaDescription = new JTextArea();
         txtBirthday = new JTextField();
@@ -120,7 +120,7 @@ public class IssueUnionPanel extends JPanel {
         try {
 
             //READ FEE POW
-            feePow = Integer.parseInt(this.txtFeePow.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
 
             // READ BIRTHDAY
             parse++;
@@ -214,7 +214,7 @@ public class IssueUnionPanel extends JPanel {
         this.txtareaDescription.setText("");
         this.txtBirthday.setText("1970-12-08");
         this.txtParent.setText("-1");
-        this.txtFeePow.setText("0");
+        this.txtFeePow.setSelectedItem("0");
 
 
     }
@@ -373,7 +373,9 @@ public class IssueUnionPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
         add(fee_jLabel, gridBagConstraints);
 
-        txtFeePow.setText("0");
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 6;

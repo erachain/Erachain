@@ -36,7 +36,7 @@ public class CreateOrderPanel extends JPanel {
     private AssetCls have;
     private AssetCls want;
     private JButton sellButton;
-    private JTextField txtFeePow;
+    private JComboBox<String> txtFeePow;
     private JTextField txtBuyingAmount;
     private JTextPane superHintText;
     private boolean SHOW_HINTS = false;
@@ -291,7 +291,9 @@ public class CreateOrderPanel extends JPanel {
 
         // FEE
         detailGBC.gridy++;
-        txtFeePow = new JTextField("0");
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         this.add(txtFeePow, detailGBC);
 
         // ASSET HINT
@@ -434,7 +436,7 @@ public class CreateOrderPanel extends JPanel {
         long parse = 0;
         try {
             // READ FEE
-            feePow = Integer.parseInt(this.txtFeePow.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
 
             // READ AMOUNT
             parse = 1;

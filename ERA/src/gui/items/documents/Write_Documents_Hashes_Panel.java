@@ -150,7 +150,7 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
         try {
 
             // READ FEE POW
-            feePow = Integer.parseInt(issue_Hash_Imprint.txtFeePow.getText());
+            feePow = Integer.parseInt((String)issue_Hash_Imprint.txtFeePow.getSelectedItem());
             // READ AMOUNT
             // float amount = Float.parseFloat(this.txtAmount.getText());
 

@@ -104,7 +104,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         this.txtBirthLatitude.setText("");
         this.txtBirthLongitude.setText("");
         this.txtHeight.setText("");
-        this.txtFeePow.setText("0");
+        this.txtFeePow.setSelectedItem("0");
 
         // cbxFrom.setEnabled(false);
         // txtFeePow.setEditable(false);
@@ -354,7 +354,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                 try {
 
                     // READ FEE POW
-                    feePow = Integer.parseInt(txtFeePow.getText());
+                    feePow = Integer.parseInt((String)txtFeePow.getSelectedItem());
                     // String b = txtFeePow.getText();
 
                 } catch (Exception e) {
@@ -445,7 +445,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
     }
 
     protected void erase_Fields() {
-        txtFeePow.setText("0");
+        txtFeePow.setSelectedItem("0");
         txtName.setText("");
         txtareaDescription.setText("");
         txtGenderTxt.setText("");

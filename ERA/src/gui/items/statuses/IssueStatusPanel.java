@@ -37,7 +37,7 @@ import lang.Lang;
 @SuppressWarnings("serial")
 public class IssueStatusPanel extends JPanel {
     private JComboBox<Account> cbxFrom;
-    private JTextField txtFeePow;
+    private JComboBox<String> txtFeePow;
     private JTextField txtName;
     private JTextArea txtareaDescription;
     private JButton issueButton;
@@ -175,8 +175,9 @@ public class IssueStatusPanel extends JPanel {
         gbc_feeLabel.gridx = 2;
         gbc_feeLabel.gridy = 4;
         this.add(feeLabel, gbc_feeLabel);
-        this.txtFeePow = new JTextField();
-        this.txtFeePow.setText("0");
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         GridBagConstraints gbc_txtFeePow = new GridBagConstraints();
         gbc_txtFeePow.gridwidth = 3;
         gbc_txtFeePow.fill = GridBagConstraints.HORIZONTAL;
@@ -246,7 +247,7 @@ public class IssueStatusPanel extends JPanel {
         try {
 
             // READ FEE POW
-            feePow = Integer.parseInt(this.txtFeePow.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
 
         } catch (Exception e) {
             String mess = "Invalid pars... " + parse;
@@ -324,7 +325,7 @@ public class IssueStatusPanel extends JPanel {
 
         this.txtName.setText("");
         this.txtareaDescription.setText("");
-        this.txtFeePow.setText("0");
+        this.txtFeePow.setSelectedItem("0");
 
     }
 

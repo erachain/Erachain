@@ -195,10 +195,7 @@ public abstract class AssetCls extends ItemCls {
 
     // + or -
     protected int scale;
-    //protected boolean divisible;
-    // 0 - goods, movable
-    // 1 - currency, immovable
-    // 2 - claim or right or obligation
+    //
     protected int asset_type;
 
     protected AssetCls(byte[] typeBytes, PublicKeyAccount owner, String name, byte[] icon, byte[] image, String description, int asset_type, int scale) {

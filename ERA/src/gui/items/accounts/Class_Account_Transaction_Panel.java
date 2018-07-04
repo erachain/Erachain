@@ -58,7 +58,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
     public JComboBox<Account> cbxFrom;
     public JTextField txtTo;
     public M_DecimalFormatedTextField txtAmount;
-    public M_DecimalFormatedTextField txtFeePow;
+    public JComboBox<String> txtFeePow;
     public JTextArea txtMessage;
     public JCheckBox encryptedCHcKBox;
     public JCheckBox isText;
@@ -107,15 +107,10 @@ public class Class_Account_Transaction_Panel extends JPanel {
     private Image Im;
     private String defaultImagePath = "images/icons/coin.png";
 
-    private PersonCls person_To;
-
-    private DecimalFormat format;
-
     public Class_Account_Transaction_Panel(AssetCls asset2, Account account2,  Account account_To, PersonCls person) {
         account = account2;
         asset =asset2;
         recipient = account_To;
-        person_To = person;
         y = 0;
         GridBagLayout gridBagLayout = new GridBagLayout();
         // gridBagLayout.columnWidths = new int[]{0, 112, 140, 0, 0};
@@ -320,9 +315,10 @@ public class Class_Account_Transaction_Panel extends JPanel {
         // GridBagConstraints txtMessageGBC = new GridBagConstraints();
         txtMessageGBC.gridwidth = 4;
         txtMessageGBC.insets = new Insets(5, 5, 5, 0);
-        txtMessageGBC.fill = GridBagConstraints.HORIZONTAL;
+        txtMessageGBC.fill = GridBagConstraints.BOTH;
         txtMessageGBC.anchor = GridBagConstraints.NORTHWEST;
-        txtMessageGBC.weightx = 0;
+        txtMessageGBC.weightx = 0.1;
+        txtMessageGBC.weightx = 0.1;
         txtMessageGBC.gridx = 1;
         txtMessageGBC.gridy = y;
 
@@ -355,9 +351,10 @@ public class Class_Account_Transaction_Panel extends JPanel {
         // TEXT ISTEXT
         GridBagConstraints isChkTextGBC = new GridBagConstraints();
         isChkTextGBC.insets = new Insets(5, 5, 5, 5);
-        isChkTextGBC.fill = GridBagConstraints.HORIZONTAL;
+        isChkTextGBC.fill = GridBagConstraints.BOTH;
         isChkTextGBC.anchor = GridBagConstraints.NORTHWEST;
-        isChkTextGBC.weightx = 0;
+        isChkTextGBC.weightx = 0.2;
+        isChkTextGBC.weighty = 0.2;
         isChkTextGBC.gridx = 1;
         isChkTextGBC.gridy = y;
 
@@ -435,7 +432,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         txtAmountGBC.insets = new Insets(5, 5, 5, 5);
         txtAmountGBC.fill = GridBagConstraints.HORIZONTAL;
         txtAmountGBC.anchor = GridBagConstraints.NORTHWEST;
-        txtAmountGBC.weightx = 0;
+        txtAmountGBC.weightx = 0.4;
         txtAmountGBC.gridx = 1;
         txtAmountGBC.gridy = y;
 
@@ -462,7 +459,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         feelabelGBC.fill = GridBagConstraints.BOTH;
         feelabelGBC.weightx = 0;
         feelabelGBC.gridx = 2;
-        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee") + ":");
+        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Level") + ":");
         feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         feeLabel.setVerticalAlignment(SwingConstants.TOP);
         this.add(feeLabel, feelabelGBC);
@@ -474,9 +471,11 @@ public class Class_Account_Transaction_Panel extends JPanel {
         feetxtGBC.anchor = GridBagConstraints.NORTH;
         feetxtGBC.gridx = 3;
         feetxtGBC.gridy = y;
-        txtFeePow = new M_DecimalFormatedTextField();
-        txtFeePow.setScale(Controller.getInstance().getAsset(2).getScale());
-        txtFeePow.setText("0");
+        txtFeePow = new JComboBox();//new M_DecimalFormatedTextField();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
+        
+        
         // txtFeePow.setPreferredSize(new Dimension(130,22));
         this.add(txtFeePow, feetxtGBC);
 
@@ -495,7 +494,6 @@ public class Class_Account_Transaction_Panel extends JPanel {
 
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(txtTo);
-        MenuPopupUtil.installContextMenu(txtFeePow);
         MenuPopupUtil.installContextMenu(txtAmount);
         MenuPopupUtil.installContextMenu(txtMessage);
         MenuPopupUtil.installContextMenu(txtRecDetails);
@@ -723,7 +721,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
 
              //READ FEE
              parsing = 2;
-             feePow = Integer.parseInt(txtFeePow.getText());
+             feePow = Integer.parseInt((String)txtFeePow.getSelectedItem());
          } catch (Exception e) {
              //CHECK WHERE PARSING ERROR HAPPENED
              switch (parsing) {

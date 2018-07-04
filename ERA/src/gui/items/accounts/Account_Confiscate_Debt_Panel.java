@@ -21,6 +21,7 @@ import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
+import database.DBSet;
 import gui.AccountRenderer;
 import gui.MainFrame;
 import gui.PasswordPane;
@@ -36,7 +37,7 @@ import utils.Converter;
 
 @SuppressWarnings("serial")
 
-public class Account_Confiscate_Debt_Panel extends Class_Account_Transaction_Panel {
+public class Account_Confiscate_Debt_Panel extends AssetSendPanel {
     // private final MessagesTableModel messagesTableModel;
 
     private Transaction transaction;
@@ -45,20 +46,22 @@ public class Account_Confiscate_Debt_Panel extends Class_Account_Transaction_Pan
         super(asset,account,account_To, person);
         String a;
         if (asset == null)
+        {  asset = Controller.getInstance().getAsset(1);
             a = "";
+        }
         else
             a = asset.viewName();
 
-        sendButton.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
-        jTextArea_Title.setText(Lang.getInstance()
+        this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
+        this.jLabel_Title.setText(Lang.getInstance()
                 .translate(asset.isOutsideType()? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
                         : "If You want to confiscate in debt issued asset %asset%, fill in this form")
                 .replace("%asset%", a));
 
         // icon.setIcon(null);
 
-        toLabel.setText(Lang.getInstance().translate(asset.isOutsideType()?"Счет эмитента" : "Debtor Account") + ":");
-        recDetailsLabel.setText(Lang.getInstance().translate(asset.isOutsideType()?"Детали эмитента" : "Debtor Details") + ":");
+        this.jLabel_To.setText(Lang.getInstance().translate(asset.isOutsideType()?"Счет эмитента" : "Debtor Account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(asset.isOutsideType()?"Детали эмитента" : "Debtor Details") + ":");
 
       }
 
@@ -94,7 +97,7 @@ public class Account_Confiscate_Debt_Panel extends Class_Account_Transaction_Pan
             confirmaftecreatetransaction();
         }
         // ENABLE
-        this.sendButton.setEnabled(true);
+        this.jButton_ok.setEnabled(true);
     }
 
 }

@@ -55,7 +55,7 @@ public class Mail_Send_Panel extends JPanel {
     private JComboBox cbx_To;
     private JTextField txtTo;
     private JTextField txtAmount;
-    private JTextField txtFeePow;
+    private JComboBox<String> txtFeePow;
     private JCheckBox encrypted;
     private JCheckBox isText;
     private MButton sendButton;
@@ -386,8 +386,9 @@ public class Mail_Send_Panel extends JPanel {
         feetxtGBC.gridx = 3;
         feetxtGBC.gridy = y;
 
-        txtFeePow = new JTextField();
-        txtFeePow.setText("0");
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         txtFeePow.setPreferredSize(new Dimension(130, 22));
         this.add(txtFeePow, feetxtGBC);
 
@@ -455,7 +456,6 @@ public class Mail_Send_Panel extends JPanel {
 
         // CONTEXT MENU
         MenuPopupUtil.installContextMenu(txtTo);
-        MenuPopupUtil.installContextMenu(txtFeePow);
         MenuPopupUtil.installContextMenu(txtAmount);
         MenuPopupUtil.installContextMenu(txtMessage);
         MenuPopupUtil.installContextMenu(txtRecDetails);
@@ -605,7 +605,7 @@ public class Mail_Send_Panel extends JPanel {
 
             // READ FEE
             parsing = 2;
-            feePow = Integer.parseInt(txtFeePow.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
         } catch (Exception e) {
             // CHECK WHERE PARSING ERROR HAPPENED
             switch (parsing) {

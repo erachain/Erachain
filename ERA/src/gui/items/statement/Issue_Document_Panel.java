@@ -33,7 +33,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Account_Work;
     private javax.swing.JLabel jLabel_Fee_Work;
     private javax.swing.JPanel jPanel_Work;
-    private javax.swing.JTextField jTextField_Fee_Work;
+    private javax.swing.JComboBox<String> txtFeePow;
     /**
      * Creates new form Issue_Document_Panel
      */
@@ -42,7 +42,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         th = this;
         initComponents();
 
-        jTextField_Fee_Work.setText("0");
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         jLabel_Account_Work.setText(Lang.getInstance().translate("Select Account") + ":");
         jButton_Work_OK.setText(Lang.getInstance().translate("Sign and Send"));
         jButton_Work_OK.addActionListener(new ActionListener() {
@@ -68,7 +69,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         jLabel_Account_Work = new javax.swing.JLabel();
         jComboBox_Account_Work = new JComboBox<Account>(new AccountsComboBoxModel());
         jLabel_Fee_Work = new javax.swing.JLabel();
-        jTextField_Fee_Work = new javax.swing.JTextField();
+        txtFeePow = new javax.swing.JComboBox();
         jButton_Work_Cancel = new MButton();
         jButton_Work_OK = new MButton();
         jButton_Work_OK1 = new MButton();
@@ -116,15 +117,13 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 0);
         jPanel_Work.add(jLabel_Fee_Work, gridBagConstraints);
 
-        jTextField_Fee_Work.setText("jTextField2");
-        jTextField_Fee_Work.setMinimumSize(new java.awt.Dimension(0, 20));
-        jTextField_Fee_Work.setPreferredSize(new java.awt.Dimension(120, 20));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        jPanel_Work.add(jTextField_Fee_Work, gridBagConstraints);
+        gridBagConstraints.gridwidth = 3;
+        jPanel_Work.add(txtFeePow, gridBagConstraints);
 
         jButton_Work_Cancel.setText("Cancel");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -136,7 +135,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
         jButton_Work_OK.setText("OK");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new java.awt.Insets(8, 16, 8, 16);
@@ -196,7 +195,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
             // READ FEE
             parsing = 2;
-            feePow = Integer.parseInt(this.jTextField_Fee_Work.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
             // read byte[] from exData Panel
             messageBytes = exData_Panel.getExData();
 

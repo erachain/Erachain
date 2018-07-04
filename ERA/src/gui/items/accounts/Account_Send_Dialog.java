@@ -3,6 +3,7 @@ package gui.items.accounts;
 import core.account.Account;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
+import gui.MainFrame;
 import lang.Lang;
 
 import javax.swing.*;
@@ -28,6 +29,11 @@ public class Account_Send_Dialog extends JDialog {
         panel = new Account_Send_Panel(asset, account, account_To,  person);
         getContentPane().add(panel, BorderLayout.CENTER);
         this.setTitle(Lang.getInstance().translate("Send"));
+        Toolkit kit = Toolkit.getDefaultToolkit();
+        Dimension screens = kit.getScreenSize();
+        int h = screens.height - 50;
+        int w = screens.width - 50;
+        this.setPreferredSize(new Dimension(w,h));
         this.pack();
         this.setResizable(true);
         setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
@@ -40,9 +46,9 @@ public class Account_Send_Dialog extends JDialog {
 
     public void sertParams(String ammount, String title, String message) {
 
-        panel.txtAmount.setText(ammount);
-        panel.txtMessage.setText(title);
-        panel.txt_Title.setText(message);
+        panel.jTextField_Ammount.setText(ammount);
+        panel.jTextArea_Description.setText(title);
+        panel.jTextField_Mess_Title.setText(message);
 
     }
 
