@@ -51,7 +51,7 @@ public class IssuePersonPanel extends JPanel {
 
     protected MaskFormatter AccFormat;
     protected JComboBox<Account> cbxFrom;
-    protected JTextField txtFeePow;
+    protected JComboBox<String> txtFeePow;
     protected JTextField txtName;
     protected JTextArea txtareaDescription;
     protected JDateChooser txtBirthday;
@@ -143,7 +143,7 @@ public class IssuePersonPanel extends JPanel {
         // this.txtBirthLatitude.setText("0");
         this.txtBirthLongitude.setText("0");
         this.txtHeight.setText("170");
-        this.txtFeePow.setText("0");
+        this.txtFeePow.setSelectedItem("0");
 
         this.setMinimumSize(new Dimension(0, 0));
         this.setVisible(true);
@@ -262,7 +262,7 @@ public class IssuePersonPanel extends JPanel {
         try {
 
             // READ FEE POW
-            feePow = Integer.parseInt(this.txtFeePow.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
 
             // READ GENDER
             parse++;
@@ -469,7 +469,9 @@ public class IssuePersonPanel extends JPanel {
         jLabel_BirthLongitude = new javax.swing.JLabel();
         txtBirthLongitude = new javax.swing.JTextField();
         jLabel_Fee = new javax.swing.JLabel();
-        txtFeePow = new javax.swing.JTextField();
+        txtFeePow = new JComboBox<String>();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtareaDescription = new javax.swing.JTextArea();

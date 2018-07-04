@@ -29,7 +29,7 @@ import java.util.List;
 public class IssuePollPanel extends JPanel {
     protected int selRow;
     private JComboBox<Account> cbxFrom;
-    private JTextField txtFee;
+    private JComboBox<String> txtFee;
     private JTextField txtName;
     private JTextArea txtareaDescription;
     private JButton createButton;
@@ -209,8 +209,9 @@ public class IssuePollPanel extends JPanel {
         gbc_feeLabel.gridx = 1;
         gbc_feeLabel.gridy = 5;
         this.add(feeLabel, gbc_feeLabel);
-        this.txtFee = new JTextField();
-        this.txtFee.setText("1");
+        txtFee = new JComboBox<String>();
+        txtFee.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFee.setSelectedIndex(0);
         GridBagConstraints gbc_txtFee = new GridBagConstraints();
         gbc_txtFee.gridwidth = 2;
         gbc_txtFee.fill = GridBagConstraints.HORIZONTAL;
@@ -295,7 +296,7 @@ public class IssuePollPanel extends JPanel {
 
         try {
             // READ FEE POWER
-            feePow = Integer.parseInt(txtFee.getText());
+            feePow =  Integer.parseInt((String)this.txtFee.getSelectedItem());
 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee Power!"),

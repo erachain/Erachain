@@ -36,7 +36,7 @@ public class IssueTemplatePanel extends JPanel {
     private javax.swing.JLabel jLabel_auto_saze;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea_Content;
-    private javax.swing.JTextField jTextField_Fee;
+    private javax.swing.JComboBox<String> txtFeePow;
     private javax.swing.JTextField jTextField_Title;
     private GridBagConstraints gridBagConstraints_1;
     private GridBagConstraints gridBagConstraints_2;
@@ -86,7 +86,7 @@ public class IssueTemplatePanel extends JPanel {
         try {
 
             // READ FEE POW
-            feePow = Integer.parseInt(this.jTextField_Fee.getText());
+            feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
         } catch (Exception e) {
             if (parse == 0) {
                 JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid fee!"),
@@ -209,7 +209,7 @@ public class IssueTemplatePanel extends JPanel {
         jTextArea_Content = new javax.swing.JTextArea();
         jLabel_Fee = new javax.swing.JLabel();
         // jComboBox_Account_Creator = new javax.swing.JComboBox<>();
-        jTextField_Fee = new javax.swing.JTextField();
+        txtFeePow = new javax.swing.JComboBox<String>();
         jLabel_Template = new javax.swing.JLabel();
         jLabel_Issue_Template = new javax.swing.JLabel();
         jComboBox_Template = new javax.swing.JComboBox<>();
@@ -326,19 +326,20 @@ public class IssueTemplatePanel extends JPanel {
         gridBagConstraints.insets = new Insets(0, 0, 5, 15);
         add(jComboBox_Account_Creator, gridBagConstraints);
 
-        jTextField_Fee.setText("0");
-        jTextField_Fee.setToolTipText("Level of FEE Power");
-        jTextField_Fee.setMaximumSize(new java.awt.Dimension(80, 20));
-        jTextField_Fee.setMinimumSize(new java.awt.Dimension(80, 20));
-        jTextField_Fee.setName(""); // NOI18N
-        jTextField_Fee.setPreferredSize(new java.awt.Dimension(80, 20));
+       
+        txtFeePow.setToolTipText("Level of FEE Power");
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
+        txtFeePow.setSelectedIndex(0);
+        txtFeePow.setPreferredSize(new java.awt.Dimension(80, 20));
         gridBagConstraints_1 = new java.awt.GridBagConstraints();
         gridBagConstraints_1.insets = new Insets(0, 0, 5, 5);
         gridBagConstraints_1.gridx = 3;
         gridBagConstraints_1.gridy = 12;
         gridBagConstraints_1.gridwidth = 3;
+        gridBagConstraints_1.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints_1.weightx = 0.1;
         gridBagConstraints_1.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(jTextField_Fee, gridBagConstraints_1);
+        add(txtFeePow, gridBagConstraints_1);
 
         jLabel_Template.setText(Lang.getInstance().translate("Template") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();

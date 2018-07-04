@@ -50,7 +50,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
     private javax.swing.JTextArea txtareaDescription;
     private javax.swing.JLabel description_jLabel;
     private javax.swing.JLabel fee_jLabel;
-    private javax.swing.JTextField txtFeePow;
+    private JComboBox<String> txtFeePow;
     private javax.swing.JButton issue_jButton;
     private JComboBox<Account> cbxFrom;
     private JComboBox<AssetType> cbxAssetType;
@@ -93,7 +93,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         txtQuantity.setText("1");
         scale_jLabel.setText(Lang.getInstance().translate("Scale") + ":");
         fee_jLabel.setText(Lang.getInstance().translate("Fee Power") + ":");
-        txtFeePow.setText("0");
+        txtFeePow.setSelectedItem("0");
         issue_jButton.setText(Lang.getInstance().translate("Issue"));
         issue_jButton.addActionListener(new ActionListener() {
             
@@ -148,7 +148,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         scale_jLabel = new javax.swing.JLabel();
         txtScale = new JComboBox<String>();
         fee_jLabel = new javax.swing.JLabel();
-        txtFeePow = new javax.swing.JTextField();
+        txtFeePow = new JComboBox();
         issue_jButton = new javax.swing.JButton();
         // size from widht
         add_Image_Panel = new My_Add_Image_Panel(
@@ -322,7 +322,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
         add(fee_jLabel, gridBagConstraints);
         
-        txtFeePow.setText("jTextField4");
+        txtFeePow = new JComboBox();
+        txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 7;
@@ -368,7 +369,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
         try {
             
             // READ FEE POW
-            int feePow = Integer.parseInt(this.txtFeePow.getText());
+            int feePow = Integer.parseInt((String)this.txtFeePow.getSelectedItem());
             
             // READ SCALE
             parsestep++;
