@@ -372,14 +372,13 @@ public class TelegramsResource {
 
     /**
      * Remove telegram by signature,
-     * POST telegrams/deleteTelegram
-     * { "_DELETE_": {"list": ["5HUqfaaY2uFgdmDM7XNky31rkdcUCPTzhHXeanBviSvyDfhgYnH4a64Aje3L53Jxmyb3CcouRiBeUF4HZNc7yySy"]}}
+     * POST telegrams/delete {"list": ["5HUqfaaY2uFgdmDM7XNky31rkdcUCPTzhHXeanBviSvyDfhgYnH4a64Aje3L53Jxmyb3CcouRiBeUF4HZNc7yySy"]}
      *
      * @param value JSON string not delete telegram
      * @return
      */
     @POST
-    @Path("deletetelegram")
+    @Path("delete")
     public String deleteTelegram(String value) {
 
         JSONObject jsonObject;
@@ -389,7 +388,7 @@ public class TelegramsResource {
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
-        JSONArray arraySign = (JSONArray) ((JSONObject) jsonObject.get("_DELETE_")).get("list");
+        JSONArray arraySign = (JSONArray)(jsonObject.get("list"));
         JSONObject out = new JSONObject();
         List<TelegramMessage> lst = new ArrayList<>();
         for (Object obj : arraySign) {

@@ -758,7 +758,7 @@ public class ApiClient {
                     }
                     ,
                     {
-                            "POST telegrams/deleteTelegram { \"_DELETE_\": {\"list\": [{signature1},{signature2}...]}}",
+                            "POST telegrams/delete {\"list\": [{signature1},{signature2}...]}",
                             "Delete telegram by list of signature"
                     }
 
