@@ -8,6 +8,7 @@ import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
 import gui.library.Issue_Confirm_Dialog;
+import gui.library.MTable;
 import gui.library.My_Add_Image_Panel;
 import gui.library.library;
 import gui.models.AccountsComboBoxModel;
@@ -37,6 +38,7 @@ public class IssuePollPanel extends JPanel {
     private IssuePollPanel th;
     private My_Add_Image_Panel add_Image_Panel;
     private My_Add_Image_Panel add_Logo_Icon_Panel;
+    final MTable table;
 
     public IssuePollPanel() {
 
@@ -177,7 +179,8 @@ public class IssuePollPanel extends JPanel {
         txtGBC1.weighty = 0.1;
         txtGBC1.fill = GridBagConstraints.BOTH;
         txtGBC1.anchor = GridBagConstraints.NORTHWEST;
-        final JTable table = new JTable(optionsTableModel);
+        table = new MTable(optionsTableModel);
+        
         JScrollPane scroll = new JScrollPane();
         scroll.setViewportView(table);
         this.add(scroll, txtGBC1);
@@ -187,12 +190,7 @@ public class IssuePollPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (optionsTableModel.getRowCount() > 1) {
-                    int selRow = table.getSelectedRow();
-                    if (selRow != -1) {
-                        ((DefaultTableModel) optionsTableModel).removeRow(selRow);
-                    }
-                }
+                delrow();
             }
         });
 
@@ -252,9 +250,7 @@ public class IssuePollPanel extends JPanel {
         copyAddress.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                if (selRow > 0) {
-                    ((DefaultTableModel) optionsTableModel).removeRow(selRow);
-                }
+                delrow();
             }
         });
         menu.add(copyAddress);
@@ -383,5 +379,14 @@ public class IssuePollPanel extends JPanel {
 
         // ENABLE
         this.createButton.setEnabled(true);
+    }
+    private void delrow(){
+        if (optionsTableModel.getRowCount() > 1) {
+            int selRow = table.getSelectedRow();
+            if (selRow != -1) {
+                ((DefaultTableModel) optionsTableModel).removeRow(selRow);
+                
+            }
+        }
     }
 }
