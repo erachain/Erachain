@@ -21,12 +21,13 @@ import datachain.DCSet;
 import network.message.Message;
 import network.message.TelegramMessage;
 import ntp.NTP;
+import org.jsoup.Connection;
 
 public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
-    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 1<<16;
+    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 1 << 16;
     /**
      * time to live telegram
      */
@@ -77,13 +78,34 @@ public class TelegramManager extends Thread {
                     if (!filter.equals(head))
                         continue;
                 }
-                
+
                 telegrams.add(telegram);
             }
         }
 
         // RETURN
         return telegrams;
+    }
+
+    /**
+     * Remove telegram
+     *
+     * @param SignTelegram list of telegramMessage
+     * @return list not remove signature(not found in list)
+     */
+    public List<TelegramMessage> deleteTelegram(List<TelegramMessage> SignTelegram) {
+
+        // not use list
+        List<TelegramMessage> notRemoveTelegram = new ArrayList<>();
+
+        for (TelegramMessage signature : SignTelegram) {
+            String signatureKye = Base58.encode((signature).getTransaction().getSignature());
+            this.handledTelegrams.remove(signatureKye);
+            this.telegramsForTime.remove((signature).getTransaction().getTimestamp());
+            this.telegramsForAddress.remove((signature).getTransaction().getRecipientAccounts());
+            this.telegramsCounts.remove((signature).getTransaction().getCreator());
+        }
+        return notRemoveTelegram;
     }
 
     // GET telegrams for RECIPIENT from TIME
@@ -105,7 +127,7 @@ public class TelegramManager extends Thread {
                             if (!filter.equals(head))
                                 continue;
                         }
-                        
+
                         telegrams.add(telegram);
                     }
                 }

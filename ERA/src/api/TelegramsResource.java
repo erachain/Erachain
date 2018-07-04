@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 import org.mapdb.Fun.Tuple2;
 import utils.APIUtils;
 
@@ -19,9 +20,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -362,6 +367,43 @@ public class TelegramsResource {
         } else {
             String str = Base58.encode(ddd);
             return str;
+        }
+    }
+
+    /**
+     * Remove telegram by signature,
+     * POST telegrams/deleteTelegram
+     * { "_DELETE_": {"list": ["5HUqfaaY2uFgdmDM7XNky31rkdcUCPTzhHXeanBviSvyDfhgYnH4a64Aje3L53Jxmyb3CcouRiBeUF4HZNc7yySy"]}}
+     *
+     * @param value JSON string not delete telegram
+     * @return
+     */
+    @POST
+    @Path("deletetelegram")
+    public String deleteTelegram(String value) {
+
+        JSONObject jsonObject;
+        try {
+            JSONParser jsonParser = new JSONParser();
+            jsonObject = (JSONObject) jsonParser.parse(value);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+        }
+        JSONArray arraySign = (JSONArray) ((JSONObject) jsonObject.get("_DELETE_")).get("list");
+        JSONObject out = new JSONObject();
+        List<TelegramMessage> lst = new ArrayList<>();
+        for (Object obj : arraySign) {
+            if (Controller.getInstance().getTelegram(obj.toString()) == null)
+                out.put("signature", obj.toString());
+            else
+                lst.add(Controller.getInstance().getTelegram(obj.toString()));
+        }
+        try {
+            Controller.getInstance().deleteTelegram(lst);
+            return out.toJSONString();
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(e.getMessage());
+
         }
     }
 }
