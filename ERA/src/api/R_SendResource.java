@@ -52,8 +52,8 @@ public class R_SendResource {
      * @param amountStr    amount
      * @param title        title or head
      * @param message      message
-     * @param codebase     code if exist is text
-     * @param encrypt      bool value encrypt
+     * @param codebase     code if exist is text (not required field)
+     * @param encrypt      bool value encrypt (not required field)
      * @param password     password
      * @return JSON row
      *

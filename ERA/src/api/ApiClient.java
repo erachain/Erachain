@@ -755,7 +755,12 @@ public class ApiClient {
                             "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
                             "Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
                             ""
-                    },
+                    }
+                    ,
+                    {
+                            "POST telegrams/delete {\"list\": [{signature1},{signature2}...]}",
+                            "Delete telegram by list of signature"
+                    }
 
             };
 

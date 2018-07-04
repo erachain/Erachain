@@ -9,9 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import test.SettingTests;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 public class TelegramsResourceTest extends SettingTests {
     /**
@@ -85,7 +83,8 @@ public class TelegramsResourceTest extends SettingTests {
     }
 
     @Test
-    public void getTelegramsTwo() {
+    public void removeTelegram()throws Exception {
+
 
     }
 
