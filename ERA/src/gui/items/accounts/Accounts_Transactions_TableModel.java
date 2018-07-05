@@ -29,25 +29,23 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class Accounts_Transactions_TableModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
-
-    public static final int COLUMN_BLOCK = 1;
-    public static final int COLUMN_TRANSACTION = 2;
-    public static final int COLUMN_AMOUNT = 3;
-    public static final int COLUMN_ASSET = 4;
-    public static final int COLUMN_TYPE = 5;
-    public static final int COLUMN_SENDER = 6;
-    public static final int COLUMN_RECIPIENT = 7;
-    public static final int COLUMN_MESSAGE = 8;
-    public static final int COLUMN_CONFIRM = 9;
-    public static final int COLUMN_ACTION_TYPE = 10;
+    public static final int COLUMN_TRANSACTION = 1;
+    public static final int COLUMN_AMOUNT = 2;
+    public static final int COLUMN_ASSET = 3;
+    public static final int COLUMN_TYPE = 4;
+    public static final int COLUMN_SENDER = 5;
+    public static final int COLUMN_RECIPIENT = 6;
+    public static final int COLUMN_MESSAGE = 7;
+    public static final int COLUMN_CONFIRM = 8;
+    public static final int COLUMN_ACTION_TYPE = 19;
 
  //   private List<Transaction> r_Trans;
     private HashMap<String, Trans> trans_Hash_Map;
     private Object[] trans_List;
     private boolean isEncrypted = true;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "Block", "RecNo", "Amount",
-            "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "type1"});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Date", "RecNo", "Amount",
+            "Asset", "Type", "Sender", "Recipient", "Title", "Confirmation", "Type Asset"});
     private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false, false};
 
     private SortableList<Tuple2<String, String>, Transaction> ss;
@@ -181,10 +179,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
                 if (r_Tran.transaction.getTimestamp() == 0)
                     return "---";
                 return r_Tran.transaction.viewTimestamp();
-            case COLUMN_BLOCK:
-
-                // return Block + segNo from bigdecimal block.segNo
-                return library.getBlockSegToBigInteger(r_Tran.transaction);
+           
             case COLUMN_TRANSACTION:
 
                 if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))

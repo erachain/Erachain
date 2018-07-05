@@ -5,23 +5,25 @@ import core.account.Account;
 import core.item.assets.AssetCls;
 import gui.Split_Panel;
 import lang.Lang;
-
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 
-// панель моих адресов
+
 public class My_Accounts_SplitPanel extends Split_Panel {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     public Accounts_Panel accountPanel;
-    public Accounts_Right_Panel rightPanel;
     public AssetCls assetSelect;
     private Account selecArg;
+    private Accounts_Right_Panel rightPanel;
 
     public My_Accounts_SplitPanel() {
         super("My_Accounts_SplitPanel");
 
-        //	LayoutManager favoritesGBC = this.getLayout();
         this.jScrollPanel_LeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBar_LeftPanel.setVisible(false);
@@ -35,20 +37,13 @@ public class My_Accounts_SplitPanel extends Split_Panel {
         PanelGBC.weighty = 1;
         PanelGBC.gridx = 0;
         PanelGBC.gridy = 0;
-
         accountPanel = new Accounts_Panel();
-        rightPanel = new Accounts_Right_Panel();
-
         this.leftPanel.add(accountPanel, PanelGBC);
-        //this.rightPanel1.add(rightPanel,PanelGBC);
-        jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
-        //	 this.jSplitPanel.setDividerLocation(0.3);
-
         // EVENTS on CURSOR
         accountPanel.table.getSelectionModel().addListSelectionListener(new Account_Tab_Listener());
+        rightPanel = new Accounts_Right_Panel();
 
-
-        this.repaint();
+     //   this.repaint();
 
     }
 
@@ -62,8 +57,6 @@ public class My_Accounts_SplitPanel extends Split_Panel {
 
     class Account_Tab_Listener implements ListSelectionListener {
 
-
-        //@SuppressWarnings("deprecation")
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
 
@@ -71,24 +64,16 @@ public class My_Accounts_SplitPanel extends Split_Panel {
             Account account = null;
             if (accountPanel.table.getSelectedRow() >= 0)
                 account = accountPanel.tableModel.getAccount(accountPanel.table.convertRowIndexToModel(accountPanel.table.getSelectedRow()));
-            //info1.show_001(person);
             if (account == null) return;
-            if( assetSelect == null) return;
             if(asset ==null)return;
             if (account.equals(selecArg) && asset.equals(assetSelect)) return;
             selecArg = account;
             assetSelect = asset;
-            if (account != null) rightPanel.table_Model.set_Account(account);
-            rightPanel.table_Model.set_Asset(asset);
-            rightPanel.table_Model.set_Encryption(false);
-            rightPanel.table_Model.get_R_Send();
-//			rightPanel.jTable1.repaint();
-//			my_Accounts_SplitPanel.rightPanel.jTable1.revalidate();
-            // PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
-            //my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());
-            ////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
-
-
+            rightPanel.table_Model.set_Account(account);
+            rightPanel.table_Model.fireTableDataChanged();
+            rightPanel.set_Asset(asset);
+            jScrollPane_jPanel_RightPanel.setViewportView(rightPanel);
+            
         }
 
     }

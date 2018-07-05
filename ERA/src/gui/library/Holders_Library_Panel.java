@@ -2,9 +2,14 @@ package gui.library;
 
 import java.awt.GridBagConstraints;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.RowSorter;
+import javax.swing.SortOrder;
+import javax.swing.table.TableRowSorter;
 
 import core.item.assets.AssetCls;
 import gui.models.BalancesTableModel;
@@ -47,7 +52,15 @@ public class Holders_Library_Panel extends JPanel {
 
 
         balancesTableModel = new BalancesTableModel(asset, balanceIndex);
+        @SuppressWarnings("rawtypes")
         MTable jTable1 = new MTable(balancesTableModel);
+        
+        TableRowSorter t = new TableRowSorter(balancesTableModel);
+        List<RowSorter.SortKey> sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(balancesTableModel.COLUMN_OWN, SortOrder.DESCENDING));
+        t.setSortKeys(sortKeys);
+        jTable1.setRowSorter(t);
+        
         jTable1.setDefaultRenderer(BigDecimal.class, new Renderer_BigDecimals(asset.getScale()));
         //  jTable1.setMinimumSize(new Dimension(0,0));
 
