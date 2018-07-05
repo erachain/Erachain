@@ -94,21 +94,21 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
                 
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = account
                         .getBalance(this.key);
-                return NumberAsString.formatAsString(balance.a.b.setScale(scale));
+                return (balance.a.b.setScale(scale));
 
             case COLUMN_DEBT:
                 
                 balance = account.getBalance(this.key);
-                return NumberAsString.formatAsString(balance.b.b.setScale(scale));
+                return (balance.b.b.setScale(scale));
 
             case COLUMN_USE:
                 
-                return NumberAsString.formatAsString(account.getBalanceUSE(this.key));
+                return (account.getBalanceUSE(this.key));
 
             case COLUMN_HAND:
                 
                 balance = account.getBalance(this.key);
-                return NumberAsString.formatAsString(balance.c.b.setScale(scale));
+                return (balance.c.b.setScale(scale));
 
                 /*
             case COLUMN_OWN:
