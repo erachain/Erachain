@@ -4,10 +4,7 @@ import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
-/**
- * @author Subbotin B.P.
- * @see http://www.sbp-program.ru
- */
+
 public class Renderer_Account_Panel extends JPanel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
     JLabel jLabel1;

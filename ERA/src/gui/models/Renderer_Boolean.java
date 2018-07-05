@@ -7,10 +7,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
-/**
- * @author Subbotin B.P.
- * @see http://www.sbp-program.ru
- */
+
 public class Renderer_Boolean extends JCheckBox implements TableCellRenderer {
 
     private static final Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);

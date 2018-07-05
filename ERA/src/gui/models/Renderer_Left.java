@@ -5,10 +5,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
-/**
- * @author Subbotin B.P.
- * @see http://www.sbp-program.ru
- */
+
 public class Renderer_Left extends JLabel implements TableCellRenderer {
     private static final long serialVersionUID = 1L;
     int roww = 0;

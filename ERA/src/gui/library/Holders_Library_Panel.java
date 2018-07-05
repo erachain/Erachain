@@ -1,17 +1,23 @@
 package gui.library;
 
 import java.awt.GridBagConstraints;
+import java.math.BigDecimal;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import core.item.assets.AssetCls;
 import gui.models.BalancesTableModel;
+import gui.models.Renderer_BigDecimals;
 import lang.Lang;
 
 public class Holders_Library_Panel extends JPanel {
 
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private BalancesTableModel balancesTableModel;
 
     public Holders_Library_Panel(AssetCls asset, int balanceIndex) {
@@ -42,7 +48,7 @@ public class Holders_Library_Panel extends JPanel {
 
         balancesTableModel = new BalancesTableModel(asset, balanceIndex);
         MTable jTable1 = new MTable(balancesTableModel);
-
+        jTable1.setDefaultRenderer(BigDecimal.class, new Renderer_BigDecimals(asset.getScale()));
         //  jTable1.setMinimumSize(new Dimension(0,0));
 
         //    Dimension d = jTable1.getPreferredSize();
