@@ -29,6 +29,10 @@ public class SettingTests {
      * url remote node
      */
     protected final static String URL_REMOTE_NODE_API = "http://explorer.erachain.org:9067";
+    /**
+     * Password for test wallet
+     */
+  public  final static String WALLET_PASSWORD = "1234567";
 
     protected void Init() throws Exception {
 

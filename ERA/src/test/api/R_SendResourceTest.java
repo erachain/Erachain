@@ -1,7 +1,6 @@
 package test.api;
 
 import api.ApiClient;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
@@ -9,9 +8,8 @@ import org.junit.Test;
 import test.SettingTests;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import api.ApiClient;
+
 
 public class R_SendResourceTest extends SettingTests {
 
@@ -24,7 +22,7 @@ public class R_SendResourceTest extends SettingTests {
     public void sendGet() throws Exception {
 
         ApiClient ApiClient = new ApiClient();
-        ApiClient.executeCommand("POST wallet/unlock 1234567");
+        ApiClient.executeCommand("POST wallet/unlock " + SettingTests.WALLET_PASSWORD);
 
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
         String[] parse = (resultAddresses.replace("\r\n", "").split(","));
@@ -66,7 +64,7 @@ public class R_SendResourceTest extends SettingTests {
     @Test
     public void sendPost() throws Exception {
         ApiClient ApiClient = new ApiClient();
-        ApiClient.executeCommand("POST wallet/unlock 1234567");
+        ApiClient.executeCommand("POST wallet/unlock " + SettingTests.WALLET_PASSWORD);
 
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
         String[] parse = (resultAddresses.replace("\r\n", "").split(","));

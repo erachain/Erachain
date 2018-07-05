@@ -3,8 +3,9 @@ package test.api;
 import api.ApiClient;
 import org.junit.Assert;
 import org.junit.Test;
+import test.SettingTests;
 
-public class WalletResourceTest {
+public class WalletResourceTest  {
 
     /**
      * unlock wallet in node run in localhost
@@ -14,7 +15,7 @@ public class WalletResourceTest {
     @Test
     public void unlock() {
 
-        String resultWallet = new ApiClient().executeCommand("POST wallet/unlock 1234567");
+        String resultWallet = new ApiClient().executeCommand("POST wallet/unlock "+ SettingTests.WALLET_PASSWORD);
         String data = resultWallet.replaceAll("\r\n", "");
         String[] pars = data.split(",");
         String val = pars[1].replace("}", "");

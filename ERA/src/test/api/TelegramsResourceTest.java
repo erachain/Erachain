@@ -7,6 +7,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
+import test.CallRemoteApi;
 import test.SettingTests;
 
 import java.util.*;
@@ -57,17 +58,17 @@ public class TelegramsResourceTest extends SettingTests {
 
     @Test
     public void sendPost() throws Exception {
-        new ApiClient().executeCommand("POST wallet/unlock 1234567");
+        new ApiClient().executeCommand("POST wallet/unlock " + WALLET_PASSWORD);
 
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
-        String[] parse = (resultAddresses.replace("\r\n", "").split(","));
-        String address = (parse[0].replace("[", "").replace("]", ""))
-                .trim().replace("\"", "");
+
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArrayAddress = (JSONArray) jsonParser.parse(resultAddresses);
+        String address = jsonArrayAddress.get(0).toString();
 
         String sendTelegram = new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address + "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
 
         String sendRequest = "[ " + sendTelegram + "]";
-        JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = (JSONArray) jsonParser.parse(sendRequest);
 
         Map<String, String> requestField = new HashMap<String, String>() {{
@@ -83,27 +84,50 @@ public class TelegramsResourceTest extends SettingTests {
     }
 
     @Test
-    public void removeTelegram()throws Exception {
+    public void deleteTelegram() throws Exception {
 
+        new ApiClient().executeCommand("POST wallet/unlock " + WALLET_PASSWORD);
+        String resultAddresses = new ApiClient().executeCommand("GET addresses");
 
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArrayAddress = (JSONArray) jsonParser.parse(resultAddresses);
+        String address = jsonArrayAddress.get(0).toString();
+        for (int i = 0; i < 5; i++) {
+            new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address +
+                    "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
+        }
+
+        String telegramList = new ApiClient().executeCommand("GET telegrams/timestamp/1");
+        JSONArray jsonArray = (JSONArray) jsonParser.parse(telegramList);
+        JSONArray jsonArraySign = new JSONArray();
+        for (Object object : jsonArray) {
+            jsonArraySign.add(((JSONObject) ((JSONObject) object).get("transaction")).get("signature").toString());
+        }
+        JSONObject result = new JSONObject();
+        result.put("list", jsonArraySign);
+
+        String callRemoteAPI = new CallRemoteApi().ResponseValueAPI
+                (SettingTests.URL_LOCAL_NODE_RPC + "/telegrams/delete", "post", result.toJSONString());
+        //   String callRemoteAPI = new ApiClient().executeCommand("POST telegrams/delete " + result.toJSONString());
+        JSONObject countTelegrams = (JSONObject) jsonParser.parse(callRemoteAPI);
+        Assert.assertEquals(countTelegrams.size(), 0);
     }
 
     @Test
     public void getTelegramsTimestamp() throws ParseException {
-        new ApiClient().executeCommand("POST wallet/unlock 1234567");
+        new ApiClient().executeCommand("POST wallet/unlock " + WALLET_PASSWORD);
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
-        String[] parse = (resultAddresses.replace("\r\n", "").split(","));
-        String address = (parse[0].replace("[", "").replace("]", ""))
-                .trim().replace("\"", "");
+        JSONParser jsonParser = new JSONParser();
+        JSONArray jsonArrayAddress = (JSONArray) jsonParser.parse(resultAddresses);
+        String address = jsonArrayAddress.get(0).toString();
 
         String recipient = "7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob";
-        /* String sendTelegram =*/
+
         new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address +
                 "\",\"recipient\":\"" + recipient + "\",\"asset\":\"643\",\"amount\":\"0.01\"," +
                 "\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
 
         String getTelegram = new ApiClient().executeCommand("GET telegrams/address/" + recipient + "/timestamp/1");
-        JSONParser jsonParser = new JSONParser();
         JSONArray jsonArray = (JSONArray) jsonParser.parse(getTelegram);
 
         Object objTransaction = (((JSONObject) jsonArray.get(0)).get("transaction")).toString();
