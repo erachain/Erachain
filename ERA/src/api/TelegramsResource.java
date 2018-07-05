@@ -371,8 +371,14 @@ public class TelegramsResource {
     }
 
     /**
-     * Remove telegram by signature,
+     * Remove telegram by signature. signature not delete if signature not contains in node.
+     * <h2>Example request</h2>
      * POST telegrams/delete {"list": ["5HUqfaaY2uFgdmDM7XNky31rkdcUCPTzhHXeanBviSvyDfhgYnH4a64Aje3L53Jxmyb3CcouRiBeUF4HZNc7yySy"]}
+     *
+     * <h2>Example response</h2>
+     * if all telegram delete return empty JSON string "[]"
+     * if some telegram not delete return signature not remove telegram
+     * ["5HUqfaaY2uFgdmDM7XNky31rkdcUCPTzhHXeanBviSvyDfhgYnH4a64Aje3L53Jxmyb3CcouRiBeUF4HZNc7yySy",...]
      *
      * @param value JSON string not delete telegram
      * @return
@@ -388,7 +394,7 @@ public class TelegramsResource {
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
-        JSONArray arraySign = (JSONArray)(jsonObject.get("list"));
+        JSONArray arraySign = (JSONArray) (jsonObject.get("list"));
         JSONObject out = new JSONObject();
         List<TelegramMessage> lst = new ArrayList<>();
         for (Object obj : arraySign) {
