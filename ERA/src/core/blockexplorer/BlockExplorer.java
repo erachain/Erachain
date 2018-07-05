@@ -2128,6 +2128,8 @@ public class BlockExplorer {
             blockJSON.put("creator", person.getOwner().getAddress());
             String img = Base64.encodeBase64String(person.getImage());
             blockJSON.put("img", img);
+            String ico = Base64.encodeBase64String(person.getIcon());
+            blockJSON.put("ico", ico);
 
             /*
              * blockJSON.put("generatingBalance",
