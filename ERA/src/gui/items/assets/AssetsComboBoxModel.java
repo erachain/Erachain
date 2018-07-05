@@ -44,7 +44,10 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.LIST_ASSET_FAVORITES_TYPE) {
+        if (message.getType() == ObserverMessage.LIST_ASSET_FAVORITES_TYPE
+              
+                
+                ) {
             //GET SELECTED ITEM
             AssetCls selected = (AssetCls) this.getSelectedItem();
             int selectedIndex = -1;
@@ -84,6 +87,14 @@ public class AssetsComboBoxModel extends DefaultComboBoxModel<AssetCls> implemen
                     }
                 }
             }
+        } 
+        if (message.getType() == ObserverMessage.ADD_ASSET_FAVORITES_TYPE) {
+            this.addElement(Controller.getInstance().getAsset((long) message.getValue()));
+           
+        }
+        if (message.getType() == ObserverMessage.DELETE_ASSET_FAVORITES_TYPE) {
+            this.removeElement(Controller.getInstance().getAsset((long) message.getValue()));
+            
         }
     }
 }

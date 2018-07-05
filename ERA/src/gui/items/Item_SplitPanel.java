@@ -74,8 +74,16 @@ public class Item_SplitPanel extends Split_Panel {
                     jScrollPane_jPanel_RightPanel.setViewportView(null);
                     return;
                 }
+                int row;
+                try {
+                    row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+               
                 item_Table_Selected = (ItemCls) table_Model.getItem(jTable_jScrollPanel_LeftPanel
-                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+                        .convertRowIndexToModel(row));
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    return;
+                }
                 if (item_Table_Selected == null)
                     return;
 

@@ -34,18 +34,26 @@ public class Renderer_BigDecimals extends JFormattedTextField implements TableCe
     @Override
     public Component getTableCellRendererComponent(JTable table,
                                                    Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-        if (isSelected) {
-            setBackground(SystemColor.activeCaption);
-            setForeground(SystemColor.white);
-         
-        } else {
-            setBackground(SystemColor.white);
-            setForeground(SystemColor.black);
        
-        }
+       
+         // using L&F colors
+            setForeground(isSelected ?
+                UIManager.getColor("Table.selectionForeground") :
+                UIManager.getColor("Table.foreground"));
+            setBackground(isSelected ?
+                UIManager.getColor("Table.selectionBackground") :
+                UIManager.getColor("Table.background"));
+           
+               
+     //           BorderFactory.createEmptyBorder(BT, BT, BT, BT));
+     //       setIcon(icon);
+     //       return this;
+            
+            
+     //   }
 
         if (hasFocus) {
-            setBorder(new LineBorder(new Color(99, 130, 191)));
+            BorderFactory.createLineBorder(UIManager.getColor("Table.LineBorder"), 1) ;
         } else {
             setBorder(new LineBorder(null, 0));
         }
