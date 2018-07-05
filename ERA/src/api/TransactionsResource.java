@@ -593,6 +593,11 @@ public class TransactionsResource {
 
     }
 
+    /*
+     * used in FACE2FACE
+     * http://127.0.0.1:9048/transactions/incoming/148598/7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK/decrypt/***
+     * 
+     */
     @SuppressWarnings("unchecked")
     @GET
     @Path("incoming/{height}/{address}/decrypt/{password}")

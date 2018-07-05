@@ -94,7 +94,7 @@ public class TestRec_Send {
         assertEquals((byte) 128, (byte) -128);
         //assertEquals(core.transaction.R_Send.NO_DATA_MASK));
 
-        BigDecimal amountTest = new BigDecimal("1234567812345678");
+        BigDecimal amountTest = new BigDecimal("123456781234567812345678");
         BigDecimal amountBase;
         BigDecimal amount1;
         BigDecimal amount2;
