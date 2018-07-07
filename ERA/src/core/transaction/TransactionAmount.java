@@ -299,7 +299,7 @@ public abstract class TransactionAmount extends Transaction {
             keyBytes = Bytes.ensureCapacity(keyBytes, KEY_LENGTH, 0);
             data = Bytes.concat(data, keyBytes);
             
-            // WRITE ACCURACY of AMMOUNT
+            // CALCULATE ACCURACY of AMMOUNT
             int different_scale = this.amount.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
             BigDecimal amountBase;
             if (different_scale != 0) {
@@ -308,6 +308,7 @@ public abstract class TransactionAmount extends Transaction {
                 if (different_scale < 0)
                     different_scale += TransactionAmount.SCALE_MASK + 1;
                 
+                // WRITE ACCURACY of AMMOUNT
                 data[3] = (byte) (data[3] | different_scale);
             } else {
                 amountBase = this.amount;

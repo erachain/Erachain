@@ -164,7 +164,7 @@ public class CreateOrderTransaction extends Transaction {
         // CHECK ACCURACY of AMOUNT
         int accuracy = typeBytes[2] & TransactionAmount.SCALE_MASK;
         if (accuracy > 0) {
-            if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+            if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
                 accuracy -= TransactionAmount.SCALE_MASK + 1;
             }
 
@@ -179,7 +179,7 @@ public class CreateOrderTransaction extends Transaction {
         // CHECK ACCURACY of AMOUNT
         accuracy = typeBytes[3] & TransactionAmount.SCALE_MASK;
         if (accuracy > 0) {
-            if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+            if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
                 accuracy -= TransactionAmount.SCALE_MASK + 1;
             }
 
@@ -307,7 +307,7 @@ public class CreateOrderTransaction extends Transaction {
         wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
         data = Bytes.concat(data, wantBytes);
 
-        // WRITE ACCURACY of AMMOUNT
+        // WRITE ACCURACY of AMOUNT HAVE
         int different_scale = this.amountHave.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
         BigDecimal amountBase;
         if (different_scale != 0) {
@@ -326,7 +326,7 @@ public class CreateOrderTransaction extends Transaction {
         amountHaveBytes = Bytes.concat(fill_H, amountHaveBytes);
         data = Bytes.concat(data, amountHaveBytes);
 
-        // WRITE ACCURACY of AMMOUNT
+        // WRITE ACCURACY of AMOUNT WANT
         different_scale = this.amountWant.scale() - BlockChain.AMOUNT_DEDAULT_SCALE;
         if (different_scale != 0) {
             // RESCALE AMOUNT
@@ -471,7 +471,9 @@ public class CreateOrderTransaction extends Transaction {
             if (amountBytes.length > AMOUNT_LENGTH) {
                 return AMOUNT_LENGHT_SO_LONG;
             }
-            if (amountHave.stripTrailingZeros().scale() > haveAsset.getScale()) {
+            // SCALE wrong
+            int scale = amountHave.stripTrailingZeros().scale();
+            if (scale > haveAsset.getScale() || scale > TransactionAmount.maxSCALE || scale < TransactionAmount.minSCALE) {
                 return AMOUNT_SCALE_WRONG;
             }
         }
@@ -480,7 +482,8 @@ public class CreateOrderTransaction extends Transaction {
             if (amountBytes.length > AMOUNT_LENGTH) {
                 return AMOUNT_LENGHT_SO_LONG;
             }
-            if (amountWant.stripTrailingZeros().scale() > wantAsset.getScale()) {
+            int scale = amountWant.stripTrailingZeros().scale();
+            if (scale > wantAsset.getScale() || scale > TransactionAmount.maxSCALE || scale < TransactionAmount.minSCALE) {
                 return AMOUNT_SCALE_WRONG;
             }
         }
