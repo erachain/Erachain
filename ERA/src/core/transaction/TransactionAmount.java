@@ -63,6 +63,9 @@ public abstract class TransactionAmount extends Transaction {
     
     public static final int SCALE_MASK = 31;
     public static final int SCALE_MASK_HALF = (SCALE_MASK + 1) >> 1;
+    public static final int maxSCALE = TransactionAmount.SCALE_MASK_HALF + BlockChain.AMOUNT_DEDAULT_SCALE - 1;
+    public static final int minSCALE = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
+
     public static final byte BACKWARD_MASK = 64;
     
     // BALANCES types and ACTION with IT
@@ -419,7 +422,8 @@ public abstract class TransactionAmount extends Transaction {
                     return AMOUNT_LENGHT_SO_LONG;
                 }
                 // SCALE wrong
-                if (this.amount.stripTrailingZeros().scale() > asset.getScale()) {
+                int scale = this.amount.stripTrailingZeros().scale();
+                if (scale > asset.getScale() || scale > maxSCALE || scale < minSCALE) {
                     return AMOUNT_SCALE_WRONG;
                 }
             }

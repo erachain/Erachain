@@ -1,6 +1,13 @@
 package core.transaction;
 
+import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.google.common.primitives.Longs;
+
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -8,12 +15,6 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import datachain.AddressTime_SignatureMap;
-
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 //import java.util.Map;
 // import org.apache.log4j.Logger;
@@ -246,7 +247,14 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
     //PROCESS/ORPHAN
 
+    // GET only INVITED FEE
     @Override
+    public int getInvitedFee() {
+        int fee = this.fee.unscaledValue().intValue();
+        return fee >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+    }
+
+    //@Override
     public void process(Block block, boolean asPack) {
         //UPDATE CREATOR
         super.process(block, asPack);

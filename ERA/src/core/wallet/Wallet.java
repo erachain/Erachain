@@ -1509,7 +1509,7 @@ public class Wallet extends Observable implements Observer {
 				// BlockChain.GIFTED_COMPU_AMOUNT;
 				// BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE,
 				// BlockChain.FEE_SCALE);
-				BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
+				BigDecimal issueGIFT_FEE_BD = BlockChain.GIFTED_COMPU_AMOUNT_BD;
 
 				// GIFTs
 				if (this.accountExists(creator.getAddress())) {
@@ -1561,7 +1561,7 @@ public class Wallet extends Observable implements Observer {
 			// BlockChain.GIFTED_COMPU_AMOUNT;
 			// BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE,
 			// BlockChain.FEE_SCALE);
-			BigDecimal issueGIFT_FEE_BD = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
+			BigDecimal issueGIFT_FEE_BD = BlockChain.GIFTED_COMPU_AMOUNT_BD;
 
 			// GIFTs
 			if (this.accountExists(creator.getAddress())) {

@@ -1,19 +1,21 @@
 package core.transaction;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
-import com.google.common.primitives.Longs;
-import core.BlockChain;
-import core.account.Account;
-import core.account.PublicKeyAccount;
-import core.crypto.Base58;
-import org.json.simple.JSONObject;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+
+import org.json.simple.JSONObject;
+
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+
+import core.BlockChain;
+import core.account.Account;
+import core.account.PublicKeyAccount;
+import core.crypto.Base58;
 
 /*
 
@@ -242,7 +244,7 @@ public class R_Send extends TransactionAmount {
                 // not use old FLAG from vers 2
                 int accuracy = typeBytes[3] & SCALE_MASK;
                 if (accuracy > 0) {
-                    if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+                    if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
                         accuracy -= TransactionAmount.SCALE_MASK + 1;
                     }
 

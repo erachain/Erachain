@@ -95,47 +95,88 @@ public class TestRec_Send {
         //assertEquals(core.transaction.R_Send.NO_DATA_MASK));
 
         BigDecimal amountTest = new BigDecimal("123456781234567812345678");
+        BigDecimal amountForParse = new BigDecimal("1234567812345678");
         BigDecimal amountBase;
-        BigDecimal amount1;
-        BigDecimal amount2;
+        BigDecimal amount;
+        BigDecimal amount_result;
 
         //int shift = 64;
         int scale;
-        int scaleBase;
+        int different_scale;
+        int fromScale = TransactionAmount.SCALE_MASK_HALF + BlockChain.AMOUNT_DEDAULT_SCALE - 1;
+        int toScale = BlockChain.AMOUNT_DEDAULT_SCALE - TransactionAmount.SCALE_MASK_HALF;
+        assertEquals("11111".equals(Integer.toBinaryString(fromScale - toScale)), true);
 
-        for (int i = 0; i < TransactionAmount.SCALE_MASK; i++) {
+        R_Send r_Send;
+        byte[] raw_r_Send;
+        R_Send r_Send_2;
+        for (scale = fromScale; scale >= toScale; scale--) {
 
-            amount1 = amountTest.scaleByPowerOfTen(-TransactionAmount.SCALE_MASK_HALF - BlockChain.AMOUNT_DEDAULT_SCALE + i);
-
-            scale = amount1.scale();
+            amount = amountTest.scaleByPowerOfTen(-scale);
 
             // TO BASE
-            scaleBase = scale - BlockChain.AMOUNT_DEDAULT_SCALE;
+            different_scale = scale - BlockChain.AMOUNT_DEDAULT_SCALE;
+            
+            if (different_scale != 0) {
+                // to DEFAUTL base 8 decimals
+                amountBase = amount.scaleByPowerOfTen(different_scale);
+                if (different_scale < 0)
+                    different_scale += TransactionAmount.SCALE_MASK + 1;
+                
+            } else {
+                amountBase = amount;
+            }
 
-            // to DEFAUTL base 8 decimals
-            amountBase = amount1.scaleByPowerOfTen(scaleBase);
-
-            if (scaleBase < 0)
-                scaleBase += TransactionAmount.SCALE_MASK + 1;
-
+            assertEquals(8, amountBase.scale());
 
             // CHECK ACCURACY of AMOUNT
-            int accuracy = scaleBase & TransactionAmount.SCALE_MASK;
+            int accuracy = different_scale & TransactionAmount.SCALE_MASK;
             String sss = Integer.toBinaryString(accuracy);
-
+            if (scale == 24)
+                assertEquals("10000".equals(sss), true);
+            else if (scale < 9)
+                assertEquals(true, true);
 
             if (accuracy > 0) {
-                if (accuracy > TransactionAmount.SCALE_MASK_HALF + 1) {
+                if (accuracy >= TransactionAmount.SCALE_MASK_HALF) {
                     accuracy -= TransactionAmount.SCALE_MASK + 1;
                 }
                 // RESCALE AMOUNT
-                amount2 = amountBase.scaleByPowerOfTen(-accuracy);
+                amount_result = amountBase.scaleByPowerOfTen(-accuracy);
             } else {
-                amount2 = amountBase;
+                amount_result = amountBase;
             }
+                
+            assertEquals(amount, amount_result);
+            
+            // TRY PARSE - PRICISION must be LESS
+            amount = amountForParse.scaleByPowerOfTen(-scale);
 
+            r_Send = new R_Send(maker, FEE_POWER, recipient, ERA_KEY,
+                    amount,
+                    head, data, isText, encrypted, timestamp, 123l
+            );
+            r_Send.sign(maker, false);
+            
+            raw_r_Send = r_Send.toBytes(true, null);
 
-            assertEquals(amount1, amount2);
+            r_Send_2 = null;
+            try {
+                r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, releaserReference);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            
+            if (!r_Send.getAmount().equals(r_Send_2.getAmount())) {
+                try {
+                    r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, releaserReference);
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+                
+            assertEquals(r_Send.getAmount(), r_Send_2.getAmount());
+
 
         }
     }

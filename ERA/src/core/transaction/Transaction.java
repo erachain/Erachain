@@ -1146,6 +1146,7 @@ public abstract class Transaction {
 
             }
 
+            // Multi Level Referal
             process_gifts(0, getInvitedFee(), this.creator, false);
 
             String creatorAddress = this.creator.getAddress();
