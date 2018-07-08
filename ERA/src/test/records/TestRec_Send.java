@@ -84,6 +84,8 @@ public class TestRec_Send {
     @Test
     public void scaleTest() {
 
+        init();
+        
         Integer bbb = 31;
         assertEquals("11111", Integer.toBinaryString(bbb));
 
@@ -167,6 +169,7 @@ public class TestRec_Send {
                 LOGGER.error(e.getMessage(), e);
             }
             
+            // FOR DEBUG POINT
             if (!r_Send.getAmount().equals(r_Send_2.getAmount())) {
                 try {
                     r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, releaserReference);
@@ -177,8 +180,99 @@ public class TestRec_Send {
                 
             assertEquals(r_Send.getAmount(), r_Send_2.getAmount());
 
+            // NAGATIVE AMOUNT
+            r_Send = new R_Send(maker, FEE_POWER, recipient, ERA_KEY,
+                    amount.negate(),
+                    head, data, isText, encrypted, timestamp, 123l
+            );
+            r_Send.sign(maker, false);
+            
+            raw_r_Send = r_Send.toBytes(true, null);
 
+            r_Send_2 = null;
+            try {
+                r_Send_2 = (R_Send) R_Send.Parse(raw_r_Send, releaserReference);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+
+            assertEquals(r_Send.getAmount(), r_Send_2.getAmount());
+            
         }
+        
+        /////////////////////// VALIDATE
+        int thisScale = 5;
+        AssetCls assetA = new AssetVenture(maker, "AAA", icon, image, ".", 0, thisScale, 0L);
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+        long assetKey = assetA.getKey(db);
+        head = "";
+        data = null;
+
+        // IS VALID
+        BigDecimal bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+                bal_A_keyA,
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.sign(maker, false);
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.VALIDATE_OK);
+
+        // INVALID
+        bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale - 1);
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+                bal_A_keyA,
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.AMOUNT_SCALE_WRONG);
+
+        ///////////////////////
+        // INVALID
+        BigDecimal amountInvalid = amountTest;
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey + 1,
+                amountInvalid,
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.ITEM_ASSET_NOT_EXIST);
+
+        // INVALID
+        assetA = new AssetVenture(maker, "AAA", icon, image, ".", 0, 30, 0L);
+        assetA.insertToMap(db, 0l);
+        assetKey = assetA.getKey(db);
+
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+                amountInvalid,
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
+
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+                amountInvalid.negate(),
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
+
+        // INVALID
+        amountInvalid = amountForParse.scaleByPowerOfTen(-fromScale - 1);
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+                amountInvalid,
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.AMOUNT_SCALE_WRONG);
+
+        amountInvalid = amountForParse.scaleByPowerOfTen(-toScale + 1);
+        r_Send = new R_Send(maker, FEE_POWER, recipient, assetKey,
+                amountInvalid,
+                head, data, isText, encrypted, timestamp, 123l
+        );
+        r_Send.setDC(db, false);
+        assertEquals(r_Send.isValid(releaserReference, 0l), Transaction.AMOUNT_SCALE_WRONG);            
+
     }
 
     @Test

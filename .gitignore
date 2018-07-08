@@ -19,5 +19,5 @@ gui_settings.json
 *.xml
 /out/
 .settings
-/bin
-bin/
+/bin*
+/bin/
