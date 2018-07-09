@@ -13,6 +13,7 @@ import org.mapdb.Fun.Tuple5;
 
 import core.BlockChain;
 import core.account.Account;
+import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
@@ -444,9 +445,10 @@ public class Order implements Comparable<Order> {
         DCSet db = this.dcSet;
         int compare = 0;
 
-        if (this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                (this.haveKey == 1010
-                        || this.wantKey == 1010)
+        if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+            //    (this.haveKey == 1010
+            //            || this.wantKey == 1010)
+                this.id.equals(new BigInteger(Base58.decode("e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j")))
                 && !db.isFork()
                 ) {
             compare++;
@@ -494,9 +496,9 @@ public class Order implements Comparable<Order> {
             BigDecimal differenceTrade;
             BigDecimal differenceTradeThis;
 
-            if (order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                    (order.b.a == 1010
-                            || order.c.a == 1010)
+            if ( //(order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+                 //   (order.b.a == 1010 || order.c.a == 1010)
+                    order.a.a.equals(new BigInteger(Base58.decode("e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j")))
                     && !db.isFork()
                     ) {
                 compare++;
