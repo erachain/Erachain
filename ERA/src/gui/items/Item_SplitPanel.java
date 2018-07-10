@@ -2,6 +2,7 @@ package gui.items;
 
 import controller.Controller;
 import core.item.ItemCls;
+import gui.MainFrame;
 import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.TableModelCls;
@@ -195,8 +196,9 @@ public class Item_SplitPanel extends Split_Panel {
 
         // CHECK IF FAVORITES
         if (Controller.getInstance().isItemFavorite(itemCls)) {
-
-            Controller.getInstance().removeItemFavorite(itemCls);
+           int dd = JOptionPane.showConfirmDialog(MainFrame.getInstance(), Lang.getInstance().translate("Delete from Favorite") +"?", Lang.getInstance().translate("Delete from Favorite") , JOptionPane.OK_CANCEL_OPTION);
+           
+           if (dd ==0) Controller.getInstance().removeItemFavorite(itemCls);
         } else {
 
             Controller.getInstance().addItemFavorite(itemCls);

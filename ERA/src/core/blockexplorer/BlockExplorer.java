@@ -88,13 +88,14 @@ import settings.Settings;
 import utils.BlExpUnit;
 import utils.DateTimeFormat;
 import utils.GZIP;
+import utils.M_Integer;
 import utils.NumberAsString;
 import utils.Pair;
 import utils.ReverseComparator;
 
 // 30/03 ++ asset - Trans_Amount
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class BlockExplorer {
     public static final String LANG_DEFAULT = "en";
     private static final Logger LOGGER = Logger.getLogger(BlockExplorer.class);
@@ -102,7 +103,9 @@ public class BlockExplorer {
     private static BlockExplorer blockExplorer;
     private JSONObject langObj;
     private Locale local = new Locale("ru", "RU"); // Date format
-    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for date format
+    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
+                                                                                      // date
+                                                                                      // format
     private String lang_file;
     private DCSet dcSet;
 
@@ -298,15 +301,10 @@ public class BlockExplorer {
         }
 
         if (info.getQueryParameters().containsKey("peers")) {
-            int start = 0;
-
-            if (info.getQueryParameters().containsKey("start")) {
-                start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
-            }
 
             output.put("lastBlock", jsonQueryLastBlock());
 
-            output.putAll(jsonQueryPeers(start));
+            output.putAll(jsonQueryPeers(info));
 
             output.put("queryTimeMs", stopwatchAll.elapsedTime());
             return output;
@@ -542,7 +540,6 @@ public class BlockExplorer {
 
         if (info.getQueryParameters().containsKey("Seg_No")) {
 
-
             output.put("lastBlock", jsonQueryLastBlock());
 
             if (info.getQueryParameters().containsKey("statement")) {
@@ -556,7 +553,8 @@ public class BlockExplorer {
                 return output;
             } else {
 
-                Transaction transaction = dcSet.getTransactionFinalMap().getTransaction(new Integer(info.getQueryParameters().getFirst("block")),
+                Transaction transaction = dcSet.getTransactionFinalMap().getTransaction(
+                        new Integer(info.getQueryParameters().getFirst("block")),
                         new Integer(info.getQueryParameters().getFirst("Seg_No")));
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
 
@@ -1345,8 +1343,7 @@ public class BlockExplorer {
 
         for (Map.Entry<Long, Integer> pair : pairsOpenOrders.entrySet()) {
             all.put(pair.getKey(), Fun.t6(pair.getValue(), 0, volumePriceOrders.get(pair.getKey()),
-                    volumeAmountOrders.get(pair.getKey()), BigDecimal.ZERO,
-                    BigDecimal.ZERO));
+                    volumeAmountOrders.get(pair.getKey()), BigDecimal.ZERO, BigDecimal.ZERO));
         }
 
         for (Map.Entry<Long, Integer> pair : pairsTrades.entrySet()) {
@@ -1357,10 +1354,8 @@ public class BlockExplorer {
                                 all.get(pair.getKey()).d, volumePriceTrades.get(pair.getKey()),
                                 volumeAmountTrades.get(pair.getKey())));
             } else {
-                all.put(pair.getKey(),
-                        Fun.t6(0, pair.getValue(), BigDecimal.ZERO,
-                                BigDecimal.ZERO,
-                                volumePriceTrades.get(pair.getKey()), volumeAmountTrades.get(pair.getKey())));
+                all.put(pair.getKey(), Fun.t6(0, pair.getValue(), BigDecimal.ZERO, BigDecimal.ZERO,
+                        volumePriceTrades.get(pair.getKey()), volumeAmountTrades.get(pair.getKey())));
             }
         }
 
@@ -1750,8 +1745,7 @@ public class BlockExplorer {
             BigDecimal totalATAmount = BigDecimal.ZERO;
 
             for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : aTtxs.entrySet()) {
-                totalATAmount = totalATAmount
-                        .add(BigDecimal.valueOf(e.getValue().getAmount()));
+                totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
             }
 
             blockJSON.put("totalATAmount", totalATAmount.toPlainString());
@@ -1875,7 +1869,7 @@ public class BlockExplorer {
                     accountJSON.put("creator_key", "");
 
                 }
-                //accountJSON.put("creator_name"
+                // accountJSON.put("creator_name"
 
                 accountsJSON.put(i, accountJSON);
 
@@ -1889,19 +1883,19 @@ public class BlockExplorer {
 
                 for (int idr = 0; idr < balanceTableModel.getRowCount(); idr++) {
                     switch ((String) balanceTableModel.getValueAt(idr, balanceTableModel.COLUMN_ASSET_NAME)) {
-                        case "ERA":
-                            eraBalanceA = eraBalanceA
-                                    .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A));
-                            eraBalanceB = eraBalanceB
-                                    .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
-                            eraBalanceC = eraBalanceC
-                                    .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_C));
-                            eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
-                            break;
-                        case "COMPU":
-                            compuBalance = compuBalance
-                                    .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A));
-                            break;
+                    case "ERA":
+                        eraBalanceA = eraBalanceA
+                                .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A));
+                        eraBalanceB = eraBalanceB
+                                .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_B));
+                        eraBalanceC = eraBalanceC
+                                .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_C));
+                        eraBalanceTotal = eraBalanceA.add(eraBalanceB).add(eraBalanceC);
+                        break;
+                    case "COMPU":
+                        compuBalance = compuBalance
+                                .add((BigDecimal) balanceTableModel.getBalanceAt(idr, balanceTableModel.COLUMN_A));
+                        break;
                     }
                 }
             }
@@ -2015,11 +2009,10 @@ public class BlockExplorer {
                  * blockJSON.put("totalFee",
                  * block.getTotalFee().toPlainString());
                  *
-                 * BigDecimal totalAmount =
-                 * BigDecimal.ZERO;
-                 * for (Transaction transaction : block.getTransactions()) { for
-                 * (Account account : transaction.getInvolvedAccounts()) {
-                 * BigDecimal amount = transaction.getAmount(account);
+                 * BigDecimal totalAmount = BigDecimal.ZERO; for (Transaction
+                 * transaction : block.getTransactions()) { for (Account account
+                 * : transaction.getInvolvedAccounts()) { BigDecimal amount =
+                 * transaction.getAmount(account);
                  * if(amount.compareTo(BigDecimal.ZERO) > 0) { totalAmount =
                  * totalAmount.add(amount); } } }
                  *
@@ -2029,14 +2022,12 @@ public class BlockExplorer {
                  * aTtxs =
                  * dcSet.getATTransactionMap().getATTransactions(counter);
                  *
-                 * BigDecimal totalATAmount =
-                 * BigDecimal.ZERO;
+                 * BigDecimal totalATAmount = BigDecimal.ZERO;
                  *
                  * for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e :
                  * aTtxs.entrySet()) { totalATAmount =
                  * totalATAmount.add(BigDecimal.valueOf(
-                 * e.getValue().getAmount() ));
-                 * }
+                 * e.getValue().getAmount() )); }
                  *
                  * blockJSON.put("totalATAmount",
                  * totalATAmount.toPlainString()); //blockJSON.put("aTfee",
@@ -2142,11 +2133,10 @@ public class BlockExplorer {
              * BlockExplorer.timestampToStr(block.getTimestamp(dcSet)));
              * blockJSON.put("totalFee", block.getTotalFee().toPlainString());
              *
-             * BigDecimal totalAmount =
-             * BigDecimal.ZERO; for
-             * (Transaction transaction : block.getTransactions()) { for
-             * (Account account : transaction.getInvolvedAccounts()) {
-             * BigDecimal amount = transaction.getAmount(account);
+             * BigDecimal totalAmount = BigDecimal.ZERO; for (Transaction
+             * transaction : block.getTransactions()) { for (Account account :
+             * transaction.getInvolvedAccounts()) { BigDecimal amount =
+             * transaction.getAmount(account);
              * if(amount.compareTo(BigDecimal.ZERO) > 0) { totalAmount =
              * totalAmount.add(amount); } } }
              *
@@ -2155,12 +2145,12 @@ public class BlockExplorer {
              * LinkedHashMap< Tuple2<Integer, Integer> , AT_Transaction> aTtxs =
              * dcSet.getATTransactionMap().getATTransactions(counter);
              *
-             * BigDecimal totalATAmount =
-             * BigDecimal.ZERO;
+             * BigDecimal totalATAmount = BigDecimal.ZERO;
              *
              * for(Map.Entry<Tuple2<Integer, Integer> , AT_Transaction> e :
              * aTtxs.entrySet()) { totalATAmount =
-             * totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount())); }
+             * totalATAmount.add(BigDecimal.valueOf( e.getValue().getAmount()));
+             * }
              *
              * blockJSON.put("totalATAmount", totalATAmount.toPlainString());
              * //blockJSON.put("aTfee", block.getATfee().toPlainString());
@@ -2764,13 +2754,13 @@ public class BlockExplorer {
                 if ((transaction.getType() == Transaction.REGISTER_NAME_TRANSACTION
                         && ((RegisterNameTransaction) transaction).getName().toString().equals(name))
                         || (transaction.getType() == Transaction.UPDATE_NAME_TRANSACTION
-                        && ((UpdateNameTransaction) transaction).getName().toString().equals(name))
+                                && ((UpdateNameTransaction) transaction).getName().toString().equals(name))
                         || (transaction.getType() == Transaction.SELL_NAME_TRANSACTION
-                        && ((SellNameTransaction) transaction).getNameSale().toString().equals(name))
+                                && ((SellNameTransaction) transaction).getNameSale().toString().equals(name))
                         || (transaction.getType() == Transaction.CANCEL_SELL_NAME_TRANSACTION
-                        && ((CancelSellNameTransaction) transaction).getName().equals(name))
+                                && ((CancelSellNameTransaction) transaction).getName().equals(name))
                         || (transaction.getType() == Transaction.BUY_NAME_TRANSACTION
-                        && ((BuyNameTransaction) transaction).getNameSale().toString().equals(name))) {
+                                && ((BuyNameTransaction) transaction).getNameSale().toString().equals(name))) {
                     all.add(new BlExpUnit(height, seq, transaction));
                     txsTypeCount[transaction.getType() - 1]++;
                 }
@@ -2888,9 +2878,9 @@ public class BlockExplorer {
         return output;
     }
 
-    @SuppressWarnings({"serial", "static-access"})
+    @SuppressWarnings({ "serial", "static-access" })
     public Map jsonQueryAddress(List<String> addresses, int transPage, int start, int txOnPage, String filter,
-                                boolean allOnOnePage, String showOnly, String showWithout) {
+            boolean allOnOnePage, String showOnly, String showWithout) {
 
         List<Transaction> tt = dcSet.getTransactionFinalMap().getTransactionsByAddress(addresses.get(0));
 
@@ -3079,7 +3069,7 @@ public class BlockExplorer {
 
                 TransactionAmount tx = (TransactionAmount) unit.getUnit();
                 tx.setDC(dcSet, false);
-                
+
                 tXincome = tx.getAssetAmount();
 
                 if (tx.getCreator() != null && addresses.contains(tx.getCreator().getAddress())) {
@@ -3096,8 +3086,7 @@ public class BlockExplorer {
 
                 tXincome = Transaction.addAssetAmount(tXincome, generator, FEE_KEY, fee);
 
-                generatedFee.put(generator, generatedFee
-                        .getOrDefault(generator, BigDecimal.ZERO).add(fee));
+                generatedFee.put(generator, generatedFee.getOrDefault(generator, BigDecimal.ZERO).add(fee));
 
                 totalBlocksGeneratedFee = totalBlocksGeneratedFee.add(fee);
 
@@ -3164,26 +3153,17 @@ public class BlockExplorer {
             for (String address : addresses) {
                 for (Map.Entry<Long, BigDecimal> assetAmount : tXincome.getOrDefault(address, zeroAmount).entrySet()) {
                     if (assetAmount.getValue().compareTo(BigDecimal.ZERO) < 0) {
-                        sentCoins.put(assetAmount.getKey(),
-                                sentCoins
-                                        .getOrDefault(assetAmount.getKey(),
-                                                BigDecimal.ZERO)
-                                        .subtract(assetAmount.getValue()));
+                        sentCoins.put(assetAmount.getKey(), sentCoins
+                                .getOrDefault(assetAmount.getKey(), BigDecimal.ZERO).subtract(assetAmount.getValue()));
                     }
 
                     if (assetAmount.getValue().compareTo(BigDecimal.ZERO) > 0) {
-                        receivedCoins.put(assetAmount.getKey(),
-                                receivedCoins
-                                        .getOrDefault(assetAmount.getKey(),
-                                                BigDecimal.ZERO)
-                                        .add(assetAmount.getValue()));
+                        receivedCoins.put(assetAmount.getKey(), receivedCoins
+                                .getOrDefault(assetAmount.getKey(), BigDecimal.ZERO).add(assetAmount.getValue()));
                     }
 
-                    newTotalBalance.put(assetAmount.getKey(),
-                            newTotalBalance
-                                    .getOrDefault(assetAmount.getKey(),
-                                            BigDecimal.ZERO)
-                                    .add(assetAmount.getValue()));
+                    newTotalBalance.put(assetAmount.getKey(), newTotalBalance
+                            .getOrDefault(assetAmount.getKey(), BigDecimal.ZERO).add(assetAmount.getValue()));
                 }
 
                 if ((newTotalBalance.containsKey(FEE_KEY))
@@ -3574,11 +3554,67 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryPeers(int start) {
+   // http://127.0.0.1:9067/index/blockexplorer.json?peers&lang=en&view=1&sort_reliable=1&sort_ping=1&start=4&row_view=3
+    //view=1            0- view only work Peers; 1 - view all Peers
+    //sort_reliable=1   0 - as sort  ;  1 - des sort
+    //sort_ping=1       0 - as sort  ;  1 - des sort
+    //start=0           start records 0....   
+    //row_view=3        view records 1.....
+    
+    
+    public Map jsonQueryPeers(UriInfo info) {
 
-        Map output = new LinkedHashMap();
+        int start = 0;
+        int end =20;
+        int view = 0;
+        int sortPing = 0;
         PeersTableModel model_Peers = new PeersTableModel();
-        int rowCount = start + 20;
+        // start records
+            try {
+                start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+            } catch (NumberFormatException e3) {
+                // TODO Auto-generated catch block
+               
+            }
+            // end records
+            try {
+                end = Integer.valueOf((info.getQueryParameters().getFirst("row_view")));
+            } catch (NumberFormatException e3) {
+                // TODO Auto-generated catch block
+               
+            }
+        // view Active|Broken
+       
+           
+            try {
+                model_Peers.setView(Integer.valueOf((info.getQueryParameters().getFirst("view"))));
+            } catch (NumberFormatException e2) {
+                // TODO Auto-generated catch block
+                // all peers
+                model_Peers.setView(1);
+            }
+       
+        
+        // sort reliable
+        try {
+            model_Peers.setSortReliable(Integer.valueOf(info.getQueryParameters().getFirst("sort_reliable")));
+        } catch (NumberFormatException e) { 
+            // TODO Auto-generated catch block
+            // e.printStackTrace();
+        }
+        // sort PING
+        try {
+            model_Peers.setSortPing(Integer.valueOf(info.getQueryParameters().getFirst("sort_ping")));
+        } catch (NumberFormatException e1) {
+            // TODO Auto-generated catch block
+            // e1.printStackTrace();
+        }
+        // repaint model
+        model_Peers.fireTableDataChanged();
+        
+        Map output = new LinkedHashMap();
+
+        
         int column_Count = model_Peers.getColumnCount();
 
         for (int column = 0; column < column_Count; column++) {
@@ -3590,8 +3626,13 @@ public class BlockExplorer {
         Map out_peers = new LinkedHashMap();
         // if (rowCount> model_Peers.getRowCount()) rowCount =
         // model_Peers.getRowCount();
-        rowCount = model_Peers.getRowCount();
-        for (int row = 0; row < rowCount; row++) {
+        int rowCount = start + end;
+        int rowCount1 = model_Peers.getRowCount();
+        if(rowCount>= rowCount1 ) {
+            rowCount= rowCount1;
+            output.put("end_page","end"); 
+        }
+         for (int row = start; row < rowCount; row++) {
             Map out_peer = new LinkedHashMap();
 
             for (int column = 0; column < column_Count; column++) {
@@ -3601,8 +3642,10 @@ public class BlockExplorer {
             }
             out_peers.put(row, out_peer);
         }
-        // output.put("rowCount", rowCount);
-        // output.put("start", start);
+         
+       
+        // calc many pages 
+        output.put("pages",  M_Integer.roundUp((float)rowCount1/end));
         output.put("Label_No", Lang.getInstance().translate_from_langObj("No.", langObj));
         output.put("Peers", out_peers);
         return output;
@@ -4244,13 +4287,13 @@ public class BlockExplorer {
         output.put("blockSignature", Base58.encode(block.getSignature()));
         output.put("blockHeight", block.getHeight(dcSet));
 
-       if (block.getHeight(dcSet) >1){
-        if (block.getParent(dcSet) != null ) {
-            output.put("parentBlockSignature", Base58.encode(block.getParent(dcSet).getSignature()));
+        if (block.getHeight(dcSet) > 1) {
+            if (block.getParent(dcSet) != null) {
+                output.put("parentBlockSignature", Base58.encode(block.getParent(dcSet).getSignature()));
+            }
+        } else {
+            output.put("parentBlockSignature", "");
         }
-       } else {
-           output.put("parentBlockSignature", "");
-       }
 
         if (block.getChild(dcSet) != null) {
             output.put("childBlockSignature", Base58.encode(block.getChild(dcSet).getSignature()));
@@ -4296,15 +4339,13 @@ public class BlockExplorer {
         BigDecimal totalATAmount = BigDecimal.ZERO;
 
         for (Map.Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
-            totalATAmount = totalATAmount
-                    .add(BigDecimal.valueOf(e.getValue().getAmount()));
+            totalATAmount = totalATAmount.add(BigDecimal.valueOf(e.getValue().getAmount()));
         }
 
         output.put("totalATAmount", totalATAmount.toPlainString());
         // output.put("aTfee", block.getATfee().toPlainString());
         output.put("totalFee", block.getTotalFee().toPlainString());
         output.put("version", block.getVersion());
-
 
         output.put("generatingBalance", block.getForgingValue());
         output.put("winValue", block.getWinValue());
@@ -4368,9 +4409,11 @@ public class BlockExplorer {
         output.put("label_Total_Fee", Lang.getInstance().translate_from_langObj("Total Fee", langObj));
 
         output.put("label_Win_Value", Lang.getInstance().translate_from_langObj("Win Value", langObj));
-        output.put("label_Generating_Balance", Lang.getInstance().translate_from_langObj("Generating Balance", langObj));
+        output.put("label_Generating_Balance",
+                Lang.getInstance().translate_from_langObj("Generating Balance", langObj));
         output.put("label_Target", Lang.getInstance().translate_from_langObj("Target", langObj));
-        output.put("label_Targeted_Win_Value", Lang.getInstance().translate_from_langObj("Targeted Win Value", langObj));
+        output.put("label_Targeted_Win_Value",
+                Lang.getInstance().translate_from_langObj("Targeted Win Value", langObj));
 
         output.put("label_Parent_block", Lang.getInstance().translate_from_langObj("Parent block", langObj));
         output.put("label_Current_block", Lang.getInstance().translate_from_langObj("Current block", langObj));

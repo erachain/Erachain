@@ -1,9 +1,12 @@
 package webserver;
 // 30/03
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -325,6 +329,40 @@ public class WebResource {
     @GET
     public Response blockexplorer() {
         return blockexplorerhtml();
+    }
+    
+    @GET
+    @Path("blockexplorer")
+    public Response newBlockExplorerIndex() {
+        File file = new File("web/blockexplorer/index.html");
+        try {
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            String type = URLConnection.guessContentTypeFromStream(is);
+            return Response.ok(file, type).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
+    }
+    
+    @GET
+    @Path("blockexplorer/{address: .+}")
+    public Response newBlockExplorer(@PathParam("address") String address) {
+        String addr = "web/blockexplorer/" + address;
+        File file = new File(addr);
+
+        if (!file.exists()) {
+            file = new File("web/blockexplorer/index.html");
+        }
+
+        try {
+            BufferedInputStream is = new BufferedInputStream(new FileInputStream(file));
+            String type = URLConnection.guessContentTypeFromStream(is);
+            return Response.ok(file, type).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(500).build();
+        }
     }
 
     @Path("index/blockexplorer.html")
