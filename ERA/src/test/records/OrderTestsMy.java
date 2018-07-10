@@ -296,6 +296,7 @@ public class OrderTestsMy {
             
             assertEquals(orderCreation.getAmountHave(), orderCreation_2.getAmountHave());
             assertEquals(orderCreation.getAmountWant(), orderCreation_2.getAmountWant());
+            assertEquals(Arrays.equals(orderCreation.getSignature(), orderCreation_2.getSignature()), true);
             
         }
         
@@ -332,13 +333,13 @@ public class OrderTestsMy {
         
         // INVALID HAVE
         amountInvalid = amountTest;
-        orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, amountInvalid, bal_A_keyA,
+        orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, amountInvalid, BigDecimal.ONE,
                 (byte) 0, timestamp, 0l);
         orderCreation.setDC(db, false);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
         
         // INVALID WANT
-        orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, assetA.getKey(db), bal_A_keyA,
+        orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, assetA.getKey(db), BigDecimal.ONE,
                 amountInvalid, (byte) 0, timestamp, 0l);
         orderCreation.setDC(db, false);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);

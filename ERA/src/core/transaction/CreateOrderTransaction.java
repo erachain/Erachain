@@ -466,24 +466,34 @@ public class CreateOrderTransaction extends Transaction {
         // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
         // and SCALE
         byte[] amountBytes;
-        if (BlockChain.AMOUNT_SCALE_FROM < haveKey) {
+        if (true || BlockChain.AMOUNT_SCALE_FROM < haveKey) {
             amountBytes = amountHave.unscaledValue().toByteArray();
             if (amountBytes.length > AMOUNT_LENGTH) {
                 return AMOUNT_LENGHT_SO_LONG;
             }
             // SCALE wrong
-            int scale = amountHave.stripTrailingZeros().scale();
-            if (scale > haveAsset.getScale() || scale > TransactionAmount.maxSCALE || scale < TransactionAmount.minSCALE) {
+            int scale = this.amountHave.scale();
+            if (scale < TransactionAmount.minSCALE
+                    || scale > TransactionAmount.maxSCALE) {
+                return AMOUNT_SCALE_WRONG;
+            }
+            scale = this.amountHave.stripTrailingZeros().scale();
+            if (scale > haveAsset.getScale()) {
                 return AMOUNT_SCALE_WRONG;
             }
         }
-        if (BlockChain.AMOUNT_SCALE_FROM < wantKey) {
+        if (true || BlockChain.AMOUNT_SCALE_FROM < wantKey) {
             amountBytes = amountWant.unscaledValue().toByteArray();
             if (amountBytes.length > AMOUNT_LENGTH) {
                 return AMOUNT_LENGHT_SO_LONG;
             }
-            int scale = amountWant.stripTrailingZeros().scale();
-            if (scale > wantAsset.getScale() || scale > TransactionAmount.maxSCALE || scale < TransactionAmount.minSCALE) {
+            int scale = this.amountWant.scale();
+            if (scale < TransactionAmount.minSCALE
+                    || scale > TransactionAmount.maxSCALE) {
+                return AMOUNT_SCALE_WRONG;
+            }
+            scale = this.amountWant.stripTrailingZeros().scale();
+            if (scale > wantAsset.getScale()) {
                 return AMOUNT_SCALE_WRONG;
             }
         }
