@@ -25,10 +25,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
-
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -40,7 +37,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
-
 import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
@@ -152,24 +148,25 @@ public class BlockExplorer {
 
         }
         output.put("Lang", lang_list);
-
+        // main menu
         output.put("id_home2", Lang.getInstance().translate_from_langObj("Blocks", langObj));
         output.put("id_menu_top_100", Lang.getInstance().translate_from_langObj("Top 100 Richest", langObj));
         output.put("id_menu_percons", Lang.getInstance().translate_from_langObj("Persons", langObj));
         output.put("id_menu_pals_asset", Lang.getInstance().translate_from_langObj("Polls", langObj));
         output.put("id_menu_assets", Lang.getInstance().translate_from_langObj("Assets", langObj));
         output.put("id_menu_aTs", Lang.getInstance().translate_from_langObj("ATs", langObj));
+        // servece info
+        output.put("lastBlock", jsonQueryLastBlock());
 
         if (info.getQueryParameters().containsKey("balance")) {
-            output.put("lastBlock", jsonQueryLastBlock());
+            
             for (String address : info.getQueryParameters().get("balance")) {
                 output.put(address, jsonQueryBalance(address));
             }
-            return output;
+           
         }
 
         if (info.getQueryParameters().containsKey("q")) {
-            output.put("lastBlock", jsonQueryLastBlock());
 
             if (info.getQueryParameters().containsKey("search")) {
 
@@ -178,98 +175,39 @@ public class BlockExplorer {
                     // search persons
                     output.put("search", type);
                     output.putAll(jsonQuerySearchPersons(info.getQueryParameters().getFirst("q")));
-                    return output;
-                } else if (type.equals("assets") || type.equals("asset")) {
+               } else if (type.equals("assets") || type.equals("asset")) {
                     // search assets
                     output.put("search", type);
                     output.putAll(jsonQuerySearchAssets(info.getQueryParameters().getFirst("q")));
-                    return output;
+                    
                 } else if (type.equals("status") || type.equals("statuses")) {
                     // search assets
                     output.put("search", type);
                     output.putAll(jsonQuerySearchStatuses(info.getQueryParameters().getFirst("q")));
-                    return output;
+                    
                 }
 
             }
-            output.putAll(jsonQuerySearch(URLDecoder.decode(info.getQueryParameters().getFirst("q"), "UTF-8")));
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("names")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryNames());
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("top")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            if (info.getQueryParameters().containsKey("asset")) {
-                output.putAll(jsonQueryTopRichest(Integer.valueOf((info.getQueryParameters().getFirst("top"))),
-                        Long.valueOf((info.getQueryParameters().getFirst("asset")))));
-            } else {
-                output.putAll(jsonQueryTopRichest(Integer.valueOf((info.getQueryParameters().getFirst("top"))), 1l));
-            }
-
-            output.put("assets", jsonQueryAssetsLite());
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("assetsLite")) {
+        // top 100   
+        } else  if (info.getQueryParameters().containsKey("top")) 
+                output.putAll(jsonQueryTopRichest(info));
+        // asset lite
+        else if (info.getQueryParameters().containsKey("assetsLite")) {
             output.put("assetsLite", jsonQueryAssetsLite());
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("assets")) {
-
-            output.put("lastBlock", jsonQueryLastBlock());
-            int start = 0;
-            if (info.getQueryParameters().containsKey("start")) {
-                if (info.getQueryParameters().getFirst("start").matches("[0-9]*"))
-                    start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
-            }
-
-            output.putAll(jsonQueryAssets(start));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-
-        }
-
-        if (info.getQueryParameters().containsKey("aTs")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.put("aTs", jsonQueryATs());
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("polls")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryPools(info.getQueryParameters().getFirst("asset")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("asset")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            if (info.getQueryParameters().get("asset").size() == 1) {
+         // assets list
+        }else if (info.getQueryParameters().containsKey("assets")) {
+             output.putAll(jsonQueryAssets(info));
+        // polls list
+        }else if (info.getQueryParameters().containsKey("polls")) {
+            output.putAll(jsonQueryPools(info));
+        // asset 
+        } else if (info.getQueryParameters().containsKey("asset")) {
+          if (info.getQueryParameters().get("asset").size() == 1) {
                 try {
                     output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
                 } catch (Exception e) {
                     output.put("error", "Asset with given key is missing!");
+                    output.put("queryTimeMs", stopwatchAll.elapsedTime());
                     return output;
                 }
             }
@@ -280,44 +218,16 @@ public class BlockExplorer {
 
                 output.putAll(jsonQueryTrades(have, want));
             }
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("blocks")) {
-            int start = -1;
-
-            if (info.getQueryParameters().containsKey("start")) {
-                start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
-            }
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryBlocks(start));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("peers")) {
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
+        } else if (info.getQueryParameters().containsKey("blocks")) {
+             output.putAll(jsonQueryBlocks(info));
+            //peers
+        } else if (info.getQueryParameters().containsKey("peers")) {
             output.putAll(jsonQueryPeers(info));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("lastBlock")) {
+            // last block
+        } else  if (info.getQueryParameters().containsKey("lastBlock")) {
             output = jsonQueryLastBlock();
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("addr")) {
+            // address
+        } else if (info.getQueryParameters().containsKey("addr")) {
             int start = -1;
             int txOnPage = 100;
             String filter = "standart";
@@ -353,15 +263,12 @@ public class BlockExplorer {
                 showWithout = info.getQueryParameters().getFirst("showWithout");
             }
 
-            output.put("lastBlock", jsonQueryLastBlock());
+            
             output.putAll(jsonQueryAddress(info.getQueryParameters().get("addr"), transPage, start, txOnPage, filter,
                     allOnOnePage, showOnly, showWithout));
 
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("name")) {
+         // name 
+        }else if (info.getQueryParameters().containsKey("name")) {
             int start = -1;
             int txOnPage = 100;
             String filter = "standart";
@@ -382,126 +289,60 @@ public class BlockExplorer {
             if (info.getQueryParameters().containsKey("allOnOnePage")) {
                 allOnOnePage = true;
             }
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
             output.putAll(
                     jsonQueryName(info.getQueryParameters().getFirst("name"), start, txOnPage, filter, allOnOnePage));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("block")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            int transPage = 1;
+       // block
+        } else  if (info.getQueryParameters().containsKey("block")) {
+         int transPage = 1;
             if (info.getQueryParameters().containsKey("page")) {
                 transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
             }
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), transPage));
+            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), transPage));        }
 
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
+        // transaction
+        else if (info.getQueryParameters().containsKey("tx")) {
+           output.putAll(jsonQueryTX(info.getQueryParameters().getFirst("tx")));
         }
-
-        if (info.getQueryParameters().containsKey("tx")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryTX(info.getQueryParameters().getFirst("tx")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("trade")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
+        // trade
+        else if (info.getQueryParameters().containsKey("trade")) {
             output.putAll(jsonQueryTrade(info.getQueryParameters().getFirst("trade")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("atTx")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryATtx(info.getQueryParameters().getFirst("atTx")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
-        }
-
-        if (info.getQueryParameters().containsKey("poll")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll"),
+        //poll
+        else if (info.getQueryParameters().containsKey("poll")) {
+          output.putAll(jsonQueryPool(info.getQueryParameters().getFirst("poll"),
                     info.getQueryParameters().getFirst(" asset")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("unconfirmed")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryUnconfirmedTXs());
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
+        // unconfirmed transactions
+        else if (info.getQueryParameters().containsKey("unconfirmed")) {
+           output.putAll(jsonQueryUnconfirmedTXs());
         }
-
-        if (info.getQueryParameters().containsKey("blogposts")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
-            output.putAll(jsonQueryBlogPostsTx(info.getQueryParameters().getFirst("blogposts")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
+        // blog tx
+        else if (info.getQueryParameters().containsKey("blogposts")) {
+         output.putAll(jsonQueryBlogPostsTx(info.getQueryParameters().getFirst("blogposts")));
         }
-
-        if (info.getQueryParameters().containsKey("persons")) {
+        // persons list
+        else if (info.getQueryParameters().containsKey("persons")) {
             String start = null;
-
             if (info.getQueryParameters().containsKey("startPerson")) {
                 start = info.getQueryParameters().getFirst("startPerson");
             }
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
             output.putAll(jsonQueryPersons(start));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("person")) {
-
-            output.put("lastBlock", jsonQueryLastBlock());
+        // person
+        else if (info.getQueryParameters().containsKey("person")) {
             output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("templates")) {
+        // templates list
+        else if (info.getQueryParameters().containsKey("templates")) {
             int start = -1;
-
             if (info.getQueryParameters().containsKey("start")) {
                 start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
             }
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
             output.putAll(jsonQueryTemplates(start));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("statuses")) {
+        // statises list
+        else if (info.getQueryParameters().containsKey("statuses")) {
             int start = -1;
-
             if (info.getQueryParameters().containsKey("start")) {
 
                 try {
@@ -511,68 +352,37 @@ public class BlockExplorer {
                     start = 0;
                 }
             }
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
             output.putAll(jsonQueryStatuses(start));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("template")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
+        // template
+        else if (info.getQueryParameters().containsKey("template")) {
             output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("status")) {
-            output.put("lastBlock", jsonQueryLastBlock());
-
+        // status
+        else if (info.getQueryParameters().containsKey("status")) {
             output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
-
-            output.put("queryTimeMs", stopwatchAll.elapsedTime());
-            return output;
         }
-
-        if (info.getQueryParameters().containsKey("Seg_No")) {
-
-            output.put("lastBlock", jsonQueryLastBlock());
-
+        // tx from seq-No
+        else if (info.getQueryParameters().containsKey("Seg_No")) {
             if (info.getQueryParameters().containsKey("statement")) {
-
-                output.put("lastBlock", jsonQueryLastBlock());
-
                 output.putAll(jsonQueryStatement(info.getQueryParameters().getFirst("statement"),
                         info.getQueryParameters().getFirst("Seg_No")));
-
-                output.put("queryTimeMs", stopwatchAll.elapsedTime());
-                return output;
             } else {
 
                 Transaction transaction = dcSet.getTransactionFinalMap().getTransaction(
                         new Integer(info.getQueryParameters().getFirst("block")),
                         new Integer(info.getQueryParameters().getFirst("Seg_No")));
                 output.put("body", WEB_Transactions_HTML.getInstance().get_HTML(transaction, langObj));
-
-                output.put("queryTimeMs", stopwatchAll.elapsedTime());
-                return output;
             }
+        } 
+        // not key
+        else {
+            output.put("error", "Not enough parameters.");
+            output.put("help", jsonQueryHelp());
         }
-
+        // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
-
-        /*
-         * } catch (Exception e1) { output = new LinkedHashMap();
-         * output.put("error", e1.getLocalizedMessage()); output.put("help",
-         * jsonQueryHelp()); return output; }
-         */
-
-        output.put("error", "Not enough parameters.");
-        output.put("help", jsonQueryHelp());
+        
 
         return output;
     }
@@ -933,9 +743,19 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryAssets(int start) {
+    public Map jsonQueryAssets(UriInfo info) {
         Map output = new LinkedHashMap();
 
+        int start = 0;
+       
+                try {
+                    start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+                } catch (NumberFormatException e) {
+                    // TODO Auto-generated catch block
+                   // e.printStackTrace();
+                    start = 0;
+                }
+       
         SortableList<Long, ItemCls> it = dcSet.getItemAssetMap().getList();
 
         int view_Row = 21;
@@ -1078,33 +898,15 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryATs() {
-        Map output = new LinkedHashMap();
-
-        Iterable<String> ids = dcSet.getATMap().getATsLimited(100);
-
-        Iterator<String> iter = ids.iterator();
-        while (iter.hasNext()) {
-            String atAddr = iter.next();
-
-            AT at = dcSet.getATMap().getAT(atAddr);
-
-            output.put(atAddr, at.toJSON());
-        }
-
-        return output;
-    }
-
-    public Map jsonQueryPools(String asset_1) {
+     public Map jsonQueryPools(UriInfo info) {
         Map lastPools = new LinkedHashMap();
-        ;
         Map output = new LinkedHashMap();
-
+        String key = info.getQueryParameters().getFirst("asset");
         Long asset_g;
-        if (asset_1 == null) {
+        if (key == null) {
             asset_g = (long) 1;
         } else {
-            asset_g = Long.valueOf(asset_1);
+            asset_g = Long.valueOf(key);
         }
 
         List<Poll> pools = new ArrayList<Poll>(dcSet.getPollMap().getValuesAll());
@@ -1147,7 +949,7 @@ public class BlockExplorer {
 
             poolJSON.put("new", lastPools.containsKey(pool.getName()));
 
-            poolsJSON.put(pool.getName(), poolJSON);
+            poolsJSON.put(JSONObject.escape(pool.getName()), poolJSON);
         }
 
         output.put("pools", poolsJSON);
@@ -1169,7 +971,7 @@ public class BlockExplorer {
         Map pollJSON = new LinkedHashMap();
 
         pollJSON.put("creator", poll.getCreator().getAddress());
-        pollJSON.put("name", poll.getName());
+        pollJSON.put("name", JSONObject.escape(poll.getName()));
         pollJSON.put("description", poll.getDescription());
         pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
@@ -1648,23 +1450,14 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryNames() {
-        Map output = new LinkedHashMap();
-        Map namesJSON = new LinkedHashMap();
-
-        Collection<Name> names = dcSet.getNameMap().getValuesAll();
-
-        for (Name name : names) {
-            namesJSON.put(name.toString(), name.getOwner().getAddress());
+     public Map jsonQueryBlocks(UriInfo info) {
+         int start =-1;
+         try {
+            start = Integer.valueOf(info.getQueryParameters().getFirst("start"));
+        } catch (NumberFormatException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
         }
-
-        output.put("names", namesJSON);
-        output.put("count", names.size());
-
-        return output;
-    }
-
-    public Map jsonQueryBlocks(int start) {
         Block block = null;
         if (start > 0) {
             block = Controller.getInstance().getBlockByHeight(start);
@@ -2194,13 +1987,16 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTopRichest(int limit, long key) {
+    public Map jsonQueryTopRichest(UriInfo info) {
         Map output = new LinkedHashMap();
         Map balances = new LinkedHashMap();
         BigDecimal all = BigDecimal.ZERO;
         BigDecimal alloreders = BigDecimal.ZERO;
-
-        List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
+        int limit = Integer.valueOf((info.getQueryParameters().getFirst("top")));
+        long key = 1l;
+        if (info.getQueryParameters().containsKey("asset")) 
+            key =  Long.valueOf(info.getQueryParameters().getFirst("asset"));
+         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
         for (Tuple2<String, Long> addr : addrs) {
@@ -2215,12 +2011,7 @@ public class BlockExplorer {
             }
         }
 
-        /*
-         * // LIST to LOG.txt JSONObject listJSON = new JSONObject();
-         * listJSON.put("item", top100s); LOGGER.info(listJSON);
-         */
-
-        Collection<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+       Collection<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
                 .getOrderMap().getValuesAll();
 
         for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
@@ -2296,6 +2087,7 @@ public class BlockExplorer {
         output.put("Label_Total_coins_in_the_system",
                 Lang.getInstance().translate_from_langObj("Total asset units in the system", langObj));
 
+        output.put("assets", jsonQueryAssetsLite());
         return output;
     }
 
@@ -3491,35 +3283,6 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryATtx(String query) {
-        Map output = new LinkedHashMap();
-
-        int blockHeight = Integer.valueOf(query.split(":")[0]);
-        int seq = Integer.valueOf(query.split(":")[1]);
-
-        output.put("type", "atTransaction");
-
-        output.put("atTransaction", query);
-
-        LinkedHashMap<Tuple2<Integer, Integer>, AT_Transaction> atTxs = dcSet.getATTransactionMap()
-                .getATTransactions(blockHeight);
-
-        AssetNames assetNames = new AssetNames();
-
-        for (Entry<Tuple2<Integer, Integer>, AT_Transaction> e : atTxs.entrySet()) {
-            if (e.getValue().getSeq() == seq) {
-                output.put(1, jsonUnitPrint(e.getValue(), assetNames));
-            }
-        }
-
-        output.put("assetNames", assetNames.getMap());
-
-        output.put("start", 1);
-        output.put("end", 1);
-
-        return output;
-    }
-
     public Map jsonQueryTrade(String query) {
         Map output = new LinkedHashMap();
         AssetNames assetNames = new AssetNames();
@@ -3554,51 +3317,47 @@ public class BlockExplorer {
         return output;
     }
 
-   // http://127.0.0.1:9067/index/blockexplorer.json?peers&lang=en&view=1&sort_reliable=1&sort_ping=1&start=4&row_view=3
-    //view=1            0- view only work Peers; 1 - view all Peers
-    //sort_reliable=1   0 - as sort  ;  1 - des sort
-    //sort_ping=1       0 - as sort  ;  1 - des sort
-    //start=0           start records 0....   
-    //row_view=3        view records 1.....
-    
-    
+    // http://127.0.0.1:9067/index/blockexplorer.json?peers&lang=en&view=1&sort_reliable=1&sort_ping=1&start=4&row_view=3
+    // view=1 0- view only work Peers; 1 - view all Peers
+    // sort_reliable=1 0 - as sort ; 1 - des sort
+    // sort_ping=1 0 - as sort ; 1 - des sort
+    // start=0 start records 0....
+    // row_view=3 view records 1.....
+
     public Map jsonQueryPeers(UriInfo info) {
 
         int start = 0;
-        int end =20;
+        int end = 20;
         int view = 0;
         int sortPing = 0;
         PeersTableModel model_Peers = new PeersTableModel();
         // start records
-            try {
-                start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
-            } catch (NumberFormatException e3) {
-                // TODO Auto-generated catch block
-               
-            }
-            // end records
-            try {
-                end = Integer.valueOf((info.getQueryParameters().getFirst("row_view")));
-            } catch (NumberFormatException e3) {
-                // TODO Auto-generated catch block
-               
-            }
-        // view Active|Broken
-       
-           
-            try {
-                model_Peers.setView(Integer.valueOf((info.getQueryParameters().getFirst("view"))));
-            } catch (NumberFormatException e2) {
-                // TODO Auto-generated catch block
-                // all peers
-                model_Peers.setView(1);
-            }
-       
-        
+        try {
+            start = Integer.valueOf((info.getQueryParameters().getFirst("start")));
+        } catch (NumberFormatException e3) {
+            // TODO Auto-generated catch block
+
+        }
+        // end records
+        try {
+            end = Integer.valueOf((info.getQueryParameters().getFirst("row_view")));
+        } catch (NumberFormatException e3) {
+            // TODO Auto-generated catch block
+
+        }
+        // view all| only Active
+        try {
+            model_Peers.setView(Integer.valueOf((info.getQueryParameters().getFirst("view"))));
+        } catch (NumberFormatException e2) {
+            // TODO Auto-generated catch block
+            // all peers
+            model_Peers.setView(1);
+        }
+
         // sort reliable
         try {
             model_Peers.setSortReliable(Integer.valueOf(info.getQueryParameters().getFirst("sort_reliable")));
-        } catch (NumberFormatException e) { 
+        } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
             // e.printStackTrace();
         }
@@ -3611,10 +3370,9 @@ public class BlockExplorer {
         }
         // repaint model
         model_Peers.fireTableDataChanged();
-        
+
         Map output = new LinkedHashMap();
 
-        
         int column_Count = model_Peers.getColumnCount();
 
         for (int column = 0; column < column_Count; column++) {
@@ -3628,11 +3386,11 @@ public class BlockExplorer {
         // model_Peers.getRowCount();
         int rowCount = start + end;
         int rowCount1 = model_Peers.getRowCount();
-        if(rowCount>= rowCount1 ) {
-            rowCount= rowCount1;
-            output.put("end_page","end"); 
+        if (rowCount >= rowCount1) {
+            rowCount = rowCount1;
+            output.put("end_page", "end");
         }
-         for (int row = start; row < rowCount; row++) {
+        for (int row = start; row < rowCount; row++) {
             Map out_peer = new LinkedHashMap();
 
             for (int column = 0; column < column_Count; column++) {
@@ -3642,10 +3400,9 @@ public class BlockExplorer {
             }
             out_peers.put(row, out_peer);
         }
-         
-       
-        // calc many pages 
-        output.put("pages",  M_Integer.roundUp((float)rowCount1/end));
+
+        // calc many pages
+        output.put("pages", M_Integer.roundUp((float) rowCount1 / end));
         output.put("Label_No", Lang.getInstance().translate_from_langObj("No.", langObj));
         output.put("Peers", out_peers);
         return output;
