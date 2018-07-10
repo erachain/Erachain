@@ -405,33 +405,38 @@ public abstract class TransactionAmount extends Transaction {
         boolean isPerson = this.creator.isPerson(dcSet, height);
         
         // CHECK IF AMOUNT AND ASSET
-        if (this.amount != null) {
-            
-            long absKey = this.key;
-            if (absKey < 0)
-                absKey = -absKey;
-            
-            // AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
-            if (asset == null) {
-                return ITEM_ASSET_NOT_EXIST;
-            }
-            
-            // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
-            if (true || this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
-                byte[] amountBytes = this.amount.unscaledValue().toByteArray();
-                if (amountBytes.length > AMOUNT_LENGTH) {
-                    return AMOUNT_LENGHT_SO_LONG;
-                }
-                // SCALE wrong
-                int scale = this.amount.stripTrailingZeros().scale();
-                if (scale > asset.getScale() || scale > maxSCALE || scale < minSCALE) {
-                    return AMOUNT_SCALE_WRONG;
-                }
-            }
+        if (this.amount != null) {            
             
             int amount_sign = this.amount.signum();
             if (amount_sign != 0) {
                 
+                long absKey = this.key;
+                if (absKey < 0)
+                    absKey = -absKey;
+                
+                // AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
+                if (asset == null) {
+                    return ITEM_ASSET_NOT_EXIST;
+                }
+                
+                // for PARSE and toBYTES need only AMOUNT_LENGTH bytes
+                if (true || this.getAbsKey() > BlockChain.AMOUNT_SCALE_FROM) {
+                    byte[] amountBytes = this.amount.unscaledValue().toByteArray();
+                    if (amountBytes.length > AMOUNT_LENGTH) {
+                        return AMOUNT_LENGHT_SO_LONG;
+                    }
+                    // SCALE wrong
+                    int scale = this.amount.scale();
+                    if (scale < minSCALE
+                            || scale > maxSCALE) {
+                        return AMOUNT_SCALE_WRONG;
+                    }
+                    scale = this.amount.stripTrailingZeros().scale();
+                    if (scale > asset.getScale()) {
+                        return AMOUNT_SCALE_WRONG;
+                    }
+                }
+
                 int actionType = Account.actionType(this.key, this.amount);
                 int assetType = this.asset.getAssetType();
                 BigDecimal balance;

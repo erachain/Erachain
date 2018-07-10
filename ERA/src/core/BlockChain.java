@@ -35,7 +35,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -90,10 +90,14 @@ public class BlockChain {
                     //Base58.decode("4xDHswuk5GsmHAeu82qysfdq9GyTxZ798ZQQGquprirrNBr7ACUeLZxBv7c73ADpkEvfBbhocGMhouM9y13sP8dK"),
                     //Base58.decode("2Y81A7YjBji7NDKxYWMeNapSqFWFr8D4PSxBc4dCxSrCCVia6HPy2ZsezYKgeqZugNibAMra6DYT7NKCk6cSVUWX"),
                     //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
-                    //Base58.decode("3t9wdnPfDdKxjxjTr7yhVq21ygX5oBMiJLkDFLxp4ZDwH7CiBA8vVcPAk455ec17xub71jYXNtxaMNe7KyERK97N")
+                    // TRANS: Cancel Order - e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j
+                    ////Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V")
+                    
             };
 
     public static final byte[][] VALID_RECORDS = new byte[][]{
+        // TRANS: Cancel Order - e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j
+       ///// Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V")
     };
 
     public static final byte[][] VALID_ADDRESSES = new byte[][]{
