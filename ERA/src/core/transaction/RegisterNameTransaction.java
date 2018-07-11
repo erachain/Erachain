@@ -19,6 +19,9 @@ import java.util.Map;
 
 //import java.math.BigInteger;
 
+/**
+ * @deprecated
+ */
 public class RegisterNameTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) REGISTER_NAME_TRANSACTION;
     private static final String NAME_ID = "OLD: Register Name";

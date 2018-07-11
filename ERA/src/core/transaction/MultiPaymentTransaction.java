@@ -16,6 +16,9 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.util.*;
 
+/**
+ * @deprecated
+ */
 public class MultiPaymentTransaction extends Transaction {
 
     private static final byte TYPE_ID = (byte) Transaction.MULTI_PAYMENT_TRANSACTION;

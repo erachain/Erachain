@@ -18,6 +18,9 @@ import datachain.DCSet;
 
 //import java.math.BigInteger;
 
+/**
+ * @deprecated 
+ */
 public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     protected static final int SERVICE_LENGTH = 4;
     private static final int PAYMENTS_SIZE_LENGTH = 4;

@@ -31,6 +31,9 @@ import core.crypto.Crypto;
 import datachain.DCSet;
 import utils.Converter;
 
+/**
+ * @deprecated
+ */
 public class DeployATTransaction extends Transaction {
 
     private static final byte TYPE_ID = (byte) Transaction.DEPLOY_AT_TRANSACTION;

@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+ * @deprecated
+ */
 public class CancelSellNameTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) Transaction.CANCEL_SELL_NAME_TRANSACTION;
     private static final String NAME_ID = "OLD: Cancel Sell Name";

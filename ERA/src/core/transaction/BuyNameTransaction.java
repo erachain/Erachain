@@ -21,6 +21,9 @@ import core.naming.NameSale;
 
 //import java.math.BigInteger;
 
+/**
+ * @deprecated
+ */
 public class BuyNameTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) BUY_NAME_TRANSACTION;
     private static final String NAME_ID = "OLD: Buy Name";

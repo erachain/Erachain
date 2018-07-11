@@ -23,6 +23,9 @@ import java.util.*;
 
 //import com.google.common.primitives.Longs;
 
+/**
+ * @deprecated
+ */
 public abstract class ArbitraryTransaction extends Transaction {
 
     protected static final byte TYPE_ID = (byte) ARBITRARY_TRANSACTION;
