@@ -16,6 +16,10 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * old create poll from QORA
+ * @deprecated
+ */
 public class CreatePollTransaction extends Transaction {
     private static final int TYPE_ID = Transaction.CREATE_POLL_TRANSACTION;
     private static final String NAME_ID = "Create Poll";

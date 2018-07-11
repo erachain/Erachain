@@ -17,6 +17,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+ * old poll transaction from QORA
+ * @deprecated
+ */
 public class VoteOnPollTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) VOTE_ON_POLL_TRANSACTION;
     private static final String NAME_ID = "Vote on Poll";
