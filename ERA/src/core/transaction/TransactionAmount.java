@@ -418,7 +418,7 @@ public abstract class TransactionAmount extends Transaction {
             
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
-                    && BlockChain.ALL_BALANCES_OK_TO < height) {
+                    && height > BlockChain.ALL_BALANCES_OK_TO) {
                 
                 long absKey = this.key;
                 if (absKey < 0)

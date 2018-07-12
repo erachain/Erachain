@@ -81,10 +81,17 @@ public class BlockChain {
     public static final int ORDER_FEE_DOWN = DEVELOP_USE ? 80000 : 140000;
     public static final int SEND_AMOUNT_FEE_UP = DEVELOP_USE ? 100000 : 150000;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : DEVELOP_USE ? 153333 : 150000;
-    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 0 : 150000;
+    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 0 : 160000;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
+        
+        Base58.decode("57vyEGwMH2eya5Czk7GSjG4hjJ2ABH165igGHU6BcnwSsu93ypL59Xj35MY5K5Cevy72Qp2dhNRzsJMqVeysjrvq"),
+        Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V"),
+        
+                    //Base58.decode("2MDJQ8RvDNZipWuDFJNdPUJraweQqXBbGBHYtVvqb7pRbniCXFFzaxtsJ1cqVckSifMhgzwU5u3GJE2RiAKXF9XH"),
+                    //Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN")        
+        
                     //Base58.decode("2yTFTetbUrpZzTU3Y1kRSg3nfdetJDC2diwLJTGosnG7sScTkGaFudrTf6iyCkTfUDjP2rXP7pR1o5Y8M4DuwLe3"),
                     //Base58.decode("zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH"),
                     //Base58.decode("585CPBAusjDWpx9jyx2S2hsHByTd52wofYB3vVd9SvgZqd3igYHSqpS2gWu2THxNevv4LNkk4RRiJDULvHahPRGr"),
@@ -92,9 +99,8 @@ public class BlockChain {
                     //Base58.decode("2Y81A7YjBji7NDKxYWMeNapSqFWFr8D4PSxBc4dCxSrCCVia6HPy2ZsezYKgeqZugNibAMra6DYT7NKCk6cSVUWX"),
                     //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
                     // TRANS: Cancel Order - e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j
-                    Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V"),
-                    //Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN")
-        
+                    //Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V"),
+                    
     };
 
     /*
@@ -109,11 +115,12 @@ public class BlockChain {
 
     public static final byte[][] VALID_BAL = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
-                    Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
-                    Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
-                    Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
-                    Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
-                    Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),
+                    //Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
+                    //Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
+                    //Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
+                    //Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
+                    //Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),
+                    
                     //Base58.decode("54xdM25ommdxTbAVvP7C9cFYPmwaAexkWHfkhgb8yhfCVvvRNrs166q8maYuXWpk4w9ft2HvctaFaafnKNfjyoKR"),
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };

@@ -1015,35 +1015,43 @@ function trades(data)
 	
 	output += '<br><br>';
 	
-	output += '<table border="0" cellspacing="10"><tr valign="top"><td width="600">';
-	output += '<h4>'+ data.label_Sell_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName) + '</h4></td><td width="10">&nbsp;<td width="600"><h4>'+data.label_Buy_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName)+ '</h4></td></tr>';
-	output += '<tr valign="top"><td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
+	output += '<table border="0" cellspacing="10"><tr valign="top"><td width="60">';
+	output += '<tr valign="top"><td width="60">';
 	
-	i = 1;
+	output += '<td width="10">&nbsp;<td width="600">';
+	output += '<h4>'+ data.label_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName) + '</h4>';
+	
+	output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd; margin-bottom: 0px;">';
+	
+	i = 0;
 	for(key in data.sells) {
 	
 		//if(!data.sells[key].good)
 		//	continue;
 			
 		output += '<tr>';
-		
-		output += '<td><a href=?tx='+key+get_lang()+'>#' + i++ +'</a>';
+		output += '<td><a href=?tx='+key+get_lang()+'>#' + (Object.keys(data.sells).length - i++) +'</a>';
 		output += '<td>' + addCommas(data.sells[key].price) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		output += '<td>' + addCommas(data.sells[key].amount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 		output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	}
 	
 	output += '<tr bgcolor="#f9f9f9">';
-	
-	output += '<td colspan=2><b>'+ data.label_Total+':<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td colspan=2><b>'+ data.label_Total_For_Sell+':<td>' + addCommas(data.sellsSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 	output += '<td>' + addCommas(data.sellsSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-	
+		
 	output += '</table>';
-	
-	output += '<td width="10">&nbsp;<td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
-	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
-	
+
+	output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
+	//output += '<tr><td><h4>'+data.label_Buy_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName)+ '</h4></td></tr>';	
+
+	output += '<tr bgcolor="#f9f9f9">';
+	output += '<tr bgcolor="e0e0e0"><td><b>tx<td><b>'+ data.label_Price +'</b></td><td><b>'+ data.label_Amount+'</b></td><td><b>'+data.label_Total+'</b></td></tr>';
+
+	output += '<tr bgcolor="#f9f9f9">';
+	output += '<td colspan=2><b>'+data.label_Total_For_Buy+':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+
 	i = 1;
 	for(key in data.buys) {
 		
@@ -1059,12 +1067,14 @@ function trades(data)
 	}
 
 	output += '<tr bgcolor="#f9f9f9">';
-	
-	output += '<td colspan=2><b>'+data.label_Total+':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-	output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+
+	//output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
+
+	//output += '<td colspan=2><b>'+data.label_Total_For_Buy+':<td>' + addCommas(data.buysSumAmountGood) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+	//output += '<td>' + addCommas(data.buysSumTotalGood) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	
 	output += '</table>';
-	
+
 	output += '<tr><td colspan=3 width="100%" align=center>';
 	
 	output += '<h4 style="text-align: left;">'+ data.label_Trade_History+'</h4>';
@@ -1098,11 +1108,12 @@ function trades(data)
 			}
 			output += '<a href=?addr='+data.trades[key].initiatorCreator+'>' + data.trades[key].initiatorCreator + '</a>';
 			output += '<br>';
-			output += addCommas(data.trades[key].price);
+			output += addCommas(data.trades[key].amountHave);
 			output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 			output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
 			output += '<td align=center>' + addCommas(data.trades[key].realReversePrice);
+			//output += '<td align=center>' + addCommas(data.trades[key].realPrice) + ' - ' + addCommas(data.trades[key].realReversePrice);
 			
 			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		
@@ -1120,7 +1131,8 @@ function trades(data)
 			
 			output += '<br>';
 			output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
-			output += addCommas(data.trades[key].amount);
+			///output += addCommas(data.trades[key].amount);
+			output += addCommas(data.trades[key].amountWant);
 			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
 		}
@@ -1139,7 +1151,7 @@ function trades(data)
 			}
 			output += '<a href=?addr='+data.trades[key].targetCreator+'>' + data.trades[key].targetCreator + '</a>';
 			output += '<br>';
-			output += addCommas(data.trades[key].amount);
+			output += addCommas(data.trades[key].amountHave);
 			output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 			output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
@@ -1161,7 +1173,7 @@ function trades(data)
 			
 			output += '<br>';
 			output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
-			output += addCommas(data.trades[key].price);
+			output += addCommas(data.trades[key].amountWant);
 			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);		
 		}
 	}

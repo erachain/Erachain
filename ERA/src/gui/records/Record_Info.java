@@ -1,11 +1,10 @@
 package gui.records;
 
+import javax.swing.JTextPane;
+
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
-
-import javax.swing.*;
-import java.text.SimpleDateFormat;
 
 //import gui.MainFrame;
 
@@ -29,7 +28,7 @@ public class Record_Info extends JTextPane {
         DCSet db = DCSet.getInstance();
 
         String message = "";
-        SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+        //SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
 
         if (record == null) return message += "Empty Record";
 

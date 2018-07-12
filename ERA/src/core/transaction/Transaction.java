@@ -1094,7 +1094,7 @@ public abstract class Transaction {
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
         if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
-                && BlockChain.ALL_BALANCES_OK_TO > height
+                && height > BlockChain.ALL_BALANCES_OK_TO 
                 && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
             return NOT_ENOUGH_FEE;
         }
