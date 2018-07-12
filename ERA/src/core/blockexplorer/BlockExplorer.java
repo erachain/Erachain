@@ -1416,12 +1416,12 @@ public class BlockExplorer {
             tradeJSON.put("initiatorCreator", orderInitiator.a.b);
             tradeJSON.put("initiatorAmount", orderInitiator.b.b.toPlainString());
             if (orderInitiator.b.a == have) {
-                tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Sell", langObj));
+                tradeJSON.put("type", "sell");
                 tradeWantAmount = tradeWantAmount.add(trade.c);
                 tradeHaveAmount = tradeHaveAmount.add(trade.d);
 
             } else {
-                tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Buy", langObj));
+                tradeJSON.put("type", "buy");
                 tradeHaveAmount = tradeHaveAmount.add(trade.c);
                 tradeWantAmount = tradeWantAmount.add(trade.d);
             }

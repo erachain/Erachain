@@ -1112,9 +1112,7 @@ function trades(data)
 			output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 			output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
-			output += '<td align=center>' + addCommas(data.trades[key].realReversePrice);
-			//output += '<td align=center>' + addCommas(data.trades[key].realPrice) + ' - ' + addCommas(data.trades[key].realReversePrice);
-			
+			output += '<td align=center>' + addCommas(data.trades[key].realReversePrice);			
 			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		
 			output += '<td style="line-height: 150%;">';
@@ -1131,7 +1129,6 @@ function trades(data)
 			
 			output += '<br>';
 			output += '<img src=img/grleft.png style="vertical-align: middle;"> ';
-			///output += addCommas(data.trades[key].amount);
 			output += addCommas(data.trades[key].amountWant);
 			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 
@@ -1156,7 +1153,6 @@ function trades(data)
 			output += ' <img src=img/grright.png style="vertical-align: middle;">';
 
 			output += '<td align=center>' + addCommas(data.trades[key].realPrice);
-			
 			output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		
 			output += '<td style="line-height: 150%;">';
