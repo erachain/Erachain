@@ -38,9 +38,13 @@ sourceSets {
     }
 
     test {
+        System.setProperty 'version', '411'
         java {
-            srcDir 'ERA'
+            srcDir 'ERA/src/test'
         }
+    }
+    build {
+        System.setProperty("version", "0")
     }
 }
 
