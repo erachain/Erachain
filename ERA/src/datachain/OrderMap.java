@@ -1,17 +1,33 @@
 package datachain;
 
-import core.item.assets.Order;
-import database.DBMap;
-import org.mapdb.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
-import utils.ObserverMessage;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
+import core.item.assets.Order;
+import core.item.assets.OrderComparator;
+import core.item.assets.OrderComparatorReverseTimestamp;
+import database.DBMap;
+import utils.ObserverMessage;
 
 /*
  * Tuple5
@@ -254,13 +270,6 @@ public class OrderMap extends DCMap<BigInteger,
             }
         }
 
-        //IF THIS IS A FORK
-        if (this.parent != null) {
-            //RESORT ORDERS
-            Collections.sort(orders);
-        }
-
-        //RETURN
         return orders;
     }
 
@@ -292,31 +301,25 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(long have, long want, boolean orderReverse) {
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(long have, long want, boolean reverseTimestamp) {
         //FILTER ALL KEYS
         Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
 
         //GET ALL ORDERS FOR KEYS
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new ArrayList<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>();
+                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>();
 
-        if (false && orderReverse) {
-            for (BigInteger key : keys) {
-                orders.add(this.get(key));
-            }
+        for (BigInteger key : keys) {
+            orders.add(this.get(key));
+        }
+
+        if (reverseTimestamp) {
+            Collections.sort(orders, new OrderComparatorReverseTimestamp());
         } else {
-            for (BigInteger key : keys) {
-                orders.add(this.get(key));
-            }
+            Collections.sort(orders, new OrderComparator());
         }
-
-        //IF THIS IS A FORK
-        if (false && this.parent != null) {
-            //RESORT ORDERS
-            Collections.sort(orders);
-        }
-
+            
         //RETURN
         return orders;
     }

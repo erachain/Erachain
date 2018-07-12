@@ -213,8 +213,12 @@ public class IssuePersonRecord extends Issue_ItemRecord {
             }
         }
 
+        // IF BALANCE 0 or more - not check FEE
+        boolean check_fee_balance = this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;        
+        int res = super.isValid(releaserReference, flags | (check_fee_balance? 0l : NOT_VALIDATE_FLAG_FEE));
+
+        // FIRST PERSSONS INSERT as ADMIN
         boolean creator_admin = false;
-        int res = super.isValid(releaserReference, flags);
         if (res == Transaction.CREATOR_NOT_PERSONALIZED) {
             long count = this.dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
@@ -251,7 +255,10 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     @Override
     public int getInvitedFee() {
         int fee = this.fee.unscaledValue().intValue();
-        return fee >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+        if (true || this.height > 150000)
+            return fee >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+        else
+            return fee >> BlockChain.FEE_INVITED_SHIFT;
     }
 
     //@Override

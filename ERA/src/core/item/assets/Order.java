@@ -449,7 +449,7 @@ public class Order implements Comparable<Order> {
             //    (this.haveKey == 1010
             //            || this.wantKey == 1010)
                 this.id.equals(new BigInteger(Base58.decode("e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j")))
-                && !db.isFork()
+                //&& !db.isFork()
                 ) {
             compare++;
         }
@@ -472,7 +472,32 @@ public class Order implements Comparable<Order> {
 
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, true);
-        //Collections.sort(orders);
+        
+        //Collections.sort(orders, );
+
+        if (true) {
+            // for develop
+            tempPrice = BigDecimal.ZERO;
+            while (++i < orders.size()) {
+                //GET ORDER
+                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
+
+                String signB58 = Base58.encode(order.a.a);
+
+                BigDecimal orderAmountHaveLeft;
+                BigDecimal orderAmountWantLeft;
+                BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
+                BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
+                i = i;
+                if (tempPrice.compareTo(orderPrice) > 0) {
+                    //error
+                    //i = 999999999;
+                    i = i;
+                }
+            }
+            i = 0;
+        }
 
         //boolean isDivisibleHave = true; //this.isHaveDivisible(db);
         //boolean isDivisibleWant = true; //this.isWantDivisible(db);
@@ -482,6 +507,9 @@ public class Order implements Comparable<Order> {
             //GET ORDER
             Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
+            
+            // for develop
+            String signB58 = Base58.encode(order.a.a);
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;

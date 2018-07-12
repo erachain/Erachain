@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -25,7 +24,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.ws.rs.core.UriInfo;
+
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -37,6 +38,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
+
 import at.AT;
 import at.AT_Transaction;
 import controller.Controller;
@@ -52,7 +54,6 @@ import core.item.assets.Trade;
 import core.item.persons.PersonCls;
 import core.item.statuses.StatusCls;
 import core.item.templates.TemplateCls;
-import core.naming.Name;
 import core.payment.Payment;
 import core.transaction.ArbitraryTransaction;
 import core.transaction.BuyNameTransaction;
@@ -1278,7 +1279,7 @@ public class BlockExplorer {
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
                 .getOrderMap().getOrders(have, want, false);
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
-                .getOrderMap().getOrders(want, have, false);
+                .getOrderMap().getOrders(want, have, true);
 
         // Collections.reverse(ordersWant);
 

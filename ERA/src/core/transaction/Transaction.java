@@ -66,6 +66,18 @@ public abstract class Transaction {
             Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
             Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
+    
+    /*
+     *  SEE in concrete TRANSACTIONS
+     * public static final byte[][] VALID_RECORDS = new byte[][]{
+     * };
+     */
+
+    public static final long NOT_VALIDATE_FLAG_FEE = 1l;
+    public static final long NOT_VALIDATE_FLAG_PERSONAL = 2l;
+    public static final long NOT_VALIDATE_FLAG_PUBLIC_TEXT = 4l;
+    public static final long NOT_VALIDATE_FLAG_BALANCE = 8l;
+
     // VALIDATION CODE
     public static final int VALIDATE_OK = 1;
     public static final int FUTURE_ABILITY = 2;
@@ -1059,7 +1071,8 @@ public abstract class Transaction {
 
         int height = this.getBlockHeightByParentOrLast(dcSet);
 
-        if (this.hasPublicText() && (flags & 4l) == 0
+        if ( (flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
+                && this.hasPublicText()
                 && (!BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 || BlockChain.NOVA_ASSETS.get(this.creator.getAddress()) == null)
                 && !this.creator.isPerson(dcSet, height)) {
@@ -1080,7 +1093,8 @@ public abstract class Transaction {
 
         // CHECK IT AFTER isPERSON ! because in ignored in IssuePerson
         // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-        if ((flags & 1l) == 0
+        if ((flags & NOT_VALIDATE_FLAG_FEE) == 0l
+                && BlockChain.ALL_BALANCES_OK_TO > height
                 && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
             return NOT_ENOUGH_FEE;
         }

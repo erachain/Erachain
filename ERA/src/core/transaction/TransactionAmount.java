@@ -60,6 +60,9 @@ typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
  */
 
 public abstract class TransactionAmount extends Transaction {
+    public static final byte[][] VALID_REC = new byte[][]{
+        //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
+    };
     
     public static final int SCALE_MASK = 31;
     public static final int SCALE_MASK_HALF = (SCALE_MASK + 1) >> 1;
@@ -377,6 +380,12 @@ public abstract class TransactionAmount extends Transaction {
     @Override // - fee + balance - calculate here
     public int isValid(Long releaserReference, long flags) {
         
+        for (byte[] valid_item : VALID_REC) {
+            if (Arrays.equals(this.signature, valid_item)) {
+                return VALIDATE_OK;
+            }
+        }
+
         int height = this.getBlockHeightByParentOrLast(dcSet);
         boolean wrong = true;
         
@@ -408,7 +417,8 @@ public abstract class TransactionAmount extends Transaction {
         if (this.amount != null) {            
             
             int amount_sign = this.amount.signum();
-            if (amount_sign != 0) {
+            if (amount_sign != 0
+                    && BlockChain.ALL_BALANCES_OK_TO < height) {
                 
                 long absKey = this.key;
                 if (absKey < 0)
@@ -648,8 +658,10 @@ public abstract class TransactionAmount extends Transaction {
                                 if (backward)
                                     return NO_INCLAIM_BALANCE;
                                 
-                                if (this.creator.getBalance(dcSet, FEE_KEY, 1).b
+                                if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
+                                        && this.creator.getBalance(dcSet, FEE_KEY, 1).b
                                         .compareTo(this.amount.add(this.fee)) < 0) {
+                                    
                                     if (height > 120000 || BlockChain.DEVELOP_USE)
                                         return NO_BALANCE;
                                     
@@ -688,7 +700,8 @@ public abstract class TransactionAmount extends Transaction {
                                     
                                 }
                                 
-                                if (this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
+                                if ((flags | Transaction.NOT_VALIDATE_FLAG_FEE) == 0
+                                        && this.creator.getBalance(dcSet, FEE_KEY, 1).b.compareTo(this.fee) < 0) {
                                     if (height > 41100 || BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
                                         
@@ -788,7 +801,8 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         // PUBLICK TEXT only from PERSONS
-        if (this.hasPublicText() && !isPerson) {
+        if ((flags | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
+                && this.hasPublicText() && !isPerson) {
             if (BlockChain.DEVELOP_USE) {
                 boolean good = false;
                 for (String admin : BlockChain.GENESIS_ADMINS) {

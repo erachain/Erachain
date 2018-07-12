@@ -19,7 +19,6 @@ import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.DCSet;
@@ -34,10 +33,15 @@ typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
 
  */
 public class CreateOrderTransaction extends Transaction {
-    public static final byte[][] VALID_REC = new byte[][]{
-            Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
-            Base58.decode(
-                    "4fWbpHBsEzyG9paXH5oJswn3YMhvxw6fRssk6qZmB7jxQ72sRXJunEQhi9bnTwg2cUjwGCZy54u4ZseLRM7xh2x6")
+    public static final byte[][] VALID_REC = new byte[][]{        
+        //Base58.decode("3C41sWQNguCxhe66QhKSUr7NTFYQqQ8At6E2LfKDBNxpDtWZDjRBTwVRZN9ZuxQrzXL9R4V4EF1EP7B1HucctkqJ"),
+        //Base58.decode("3BTEfHJ6cQJtrvA2A1QkKwuznN7LckVUU9YDBjaZiBPapQrN6zHtc6JhgBy1tU8k6z6i7iW9Q4H7ZpordUYdfu2t"),
+        //Base58.decode("4EbKCt4QDfMvCHRPM36y5TyDayZUQzURBhS8wJ4Em4ejpbfd2bUn9oDyEWgXKy5Mwkc7MovGcvU5svAVfQyJW8y6"),
+        //Base58.decode("5nv56Enkt24y2Lcxe1Zbjpeuk7Fd5vSNo4gY7oTbAh42RwPtrZ1jpaTZX8CdWAvqQzpbUNFD7AHAuvRxeMirrjnV"),
+        
+        //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
+        //Base58.decode("5XMmLXACUPu74absaKQwVSnzf91ppvYcMK8mBqQ18dALQxvVrB46atw2bfv4xXXq7ZXrM1iELKyW5jMiLgf8uHKf"),
+        //Base58.decode("4fWbpHBsEzyG9paXH5oJswn3YMhvxw6fRssk6qZmB7jxQ72sRXJunEQhi9bnTwg2cUjwGCZy54u4ZseLRM7xh2x6")
     };
     private static final byte TYPE_ID = (byte) Transaction.CREATE_ORDER_TRANSACTION;
     private static final String NAME_ID = "Create Order";
@@ -411,7 +415,9 @@ public class CreateOrderTransaction extends Transaction {
         }
 
         // CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-        if (FEE_KEY == haveKey) {
+        if (BlockChain.ALL_BALANCES_OK_TO < height) {
+            ; // NOT CHECK
+        } else if (FEE_KEY == haveKey) {
             if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {
                 return NO_BALANCE;
             }
@@ -419,7 +425,7 @@ public class CreateOrderTransaction extends Transaction {
         } else if (wantKey == FEE_KEY && haveKey == RIGHTS_KEY
                 && amountHave.compareTo(BigDecimal.ONE) >= 0
                 && this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(this.FEE_MIN_1) > 0) {
-            flags = flags | 1l;
+            flags = flags | NOT_VALIDATE_FLAG_FEE;
         } else {
 
             // CHECK IF SENDER HAS ENOUGH FEE BALANCE
@@ -510,9 +516,11 @@ public class CreateOrderTransaction extends Transaction {
         super.process(block, asPack);
 
         // PROCESS ORDER
+        // изменяемые объекты нужно заново создавать
         //this.order.copy().process(this);
         //this.order.process(this);
 
+        // изменяемые объекты нужно заново создавать
         Order order = makeOrder();
         order.setDC(dcSet);
         order.process(this);
@@ -526,8 +534,10 @@ public class CreateOrderTransaction extends Transaction {
         super.orphan(asPack);
 
         // ORPHAN ORDER
+        // изменяемые объекты нужно заново создавать
         //this.order.copy().orphan();
 
+        // изменяемые объекты нужно заново создавать
         Order order = makeOrder();
         order.setDC(dcSet);
         order.orphan();

@@ -990,5 +990,9 @@ public class DCSet implements Observer, IDB {
         return this.database.getEngine().preallocate();
 
     }
+    
+    public String toString() {
+        return this.isFork()? "forked" : "main" + " "  + super.toString();
+    }
 
 }

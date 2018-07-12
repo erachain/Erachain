@@ -1,6 +1,16 @@
 package core;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import com.google.common.primitives.Bytes;
+
 import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
@@ -26,17 +36,40 @@ import core.item.unions.UnionCls;
 import core.naming.Name;
 import core.naming.NameSale;
 import core.payment.Payment;
-import core.transaction.*;
+import core.transaction.ArbitraryTransactionV3;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.DeployATTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
+import core.transaction.IssuePersonRecord;
+import core.transaction.IssuePollRecord;
+import core.transaction.IssueStatusRecord;
+import core.transaction.IssueTemplateRecord;
+import core.transaction.IssueUnionRecord;
+import core.transaction.Issue_ItemRecord;
+import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Hashes;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
+import core.transaction.R_SetStatusToItem;
+import core.transaction.R_SignNote;
+import core.transaction.R_Vouch;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
+import core.transaction.Transaction;
+import core.transaction.TransactionFactory;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnItemPollTransaction;
+import core.transaction.VoteOnPollTransaction;
 import datachain.DCSet;
 import datachain.TransactionMap;
 import ntp.NTP;
 import utils.Pair;
 import utils.TransactionTimestampComparator;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 //import java.math.BigInteger;
 //import settings.Settings;
@@ -431,7 +464,8 @@ public class TransactionCreator {
             return new Pair<Transaction, Integer>(issuePersonRecord, 1);//this.afterCreate(issuePersonRecord, asPack));
         } else {
             // for COPY -
-            int valid = issuePersonRecord.isValid(lastReference, 0l);
+            int valid = issuePersonRecord.isValid(lastReference,
+                    Transaction.NOT_VALIDATE_FLAG_FEE | Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT);
             if (valid == Transaction.NOT_ENOUGH_FEE
                     || valid == Transaction.CREATOR_NOT_PERSONALIZED) {
                 valid = Transaction.VALIDATE_OK;

@@ -1016,18 +1016,19 @@ function trades(data)
 	output += '<br><br>';
 	
 	output += '<table border="0" cellspacing="10"><tr valign="top"><td width="600">';
-	output += '<h4>'+ data.label_Sell_Orders+'</h4></td><td width="10">&nbsp;<td width="600"><h4>'+data.label_Buy_Orders+'</h4></td></tr>';
+	output += '<h4>'+ data.label_Sell_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName) + '</h4></td><td width="10">&nbsp;<td width="600"><h4>'+data.label_Buy_Orders+' ' + getAssetName2(data.assetHave, data.assetHaveName)+ '</h4></td></tr>';
 	output += '<tr valign="top"><td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
 	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
 	
+	i = 1;
 	for(key in data.sells) {
 	
-		if(!data.sells[key].good)
-			continue;
+		//if(!data.sells[key].good)
+		//	continue;
 			
 		output += '<tr>';
 		
-		output += '<td><a href=?tx='+key+get_lang()+'>#';
+		output += '<td><a href=?tx='+key+get_lang()+'>#' + i++ +'</a>';
 		output += '<td>' + addCommas(data.sells[key].price) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		output += '<td>' + addCommas(data.sells[key].amount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 		output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
@@ -1043,14 +1044,15 @@ function trades(data)
 	output += '<td width="10">&nbsp;<td width="600"><table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="border: 1px solid #ddd;">';
 	output += '<tr bgcolor="e0e0e0"><td><b>tx<td width="190"><b>'+ data.label_Price +'</b></td><td width="190"><b>'+ data.label_Amount+'</b></td><td width="190"><b>'+data.label_Total+'</b></td></tr>';
 	
+	i = 1;
 	for(key in data.buys) {
 		
-		if(!data.buys[key].good)
-			continue;
+		//if(!data.buys[key].good)
+		//	continue;
 		
 		output += '<tr>';
 	
-		output += '<td><a href=?tx='+key+get_lang()+'>#';
+		output += '<td><a href=?tx='+key+get_lang()+'>#' + i++ +'</a>';
 		output += '<td>' + addCommas(data.buys[key].buyingPrice) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		output += '<td>' + addCommas(data.buys[key].buyingAmount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 		output += '<td>' + addCommas(data.buys[key].amount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);

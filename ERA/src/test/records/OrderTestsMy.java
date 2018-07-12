@@ -2761,5 +2761,69 @@ public class OrderTestsMy {
         // CHECK ORDER EXISTS
         assertEquals(true, db.getOrderMap().contains(orderID));
     }
-    
+
+    //////////////////////////// Order is exist??
+    @Test
+    public void testOrderCreateCancel() {
+        // тут надо сделать тест на одинковые цены с разными датами чтобы выбиралась сначала дата более старая
+        
+        init();
+        
+        // 
+        orderCreation = new CreateOrderTransaction(accountA, keyB, keyA,
+                BigDecimal.valueOf(1), BigDecimal.valueOf(100),
+                (byte) 0, timestamp++, 0l);
+        orderCreation.sign(accountA, false);
+        orderCreation.setDC(db, false);
+        orderCreation.process(null, false);
+        order_AB_1_ID = orderCreation.makeOrder().getId();
+
+
+        
+        // CHECK ORDERS
+        Order order_AB_1 = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
+        Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1.getId()));
+        Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
+        Assert.assertEquals(true, order_AB_1.isFulfilled());
+        
+        Order order_BA_1 = Order.fromDBrec(db.getOrderMap().get(order_BA_1_ID));
+        Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_BA_1.getId()));
+        Assert.assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(1000));
+        // if order is not fulfiller - recalc getFulfilledWant by own price:
+        Assert.assertEquals(BigDecimal.valueOf(50), order_BA_1.getFulfilledHave().multiply(order_BA_1.getPrice()));
+        Assert.assertEquals(false, order_BA_1.isFulfilled());
+        
+        // CHECK TRADES
+        Assert.assertEquals(1, order_BA_1.getInitiatedTrades(db).size());
+        
+        Trade trade = Trade.fromDBrec(order_BA_1.getInitiatedTrades(db).get(0));
+        Assert.assertEquals(0, trade.getInitiator().compareTo(order_BA_1_ID));
+        Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
+        Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(100)));
+        Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(1000));
+        
+        bal_A_keyA = accountA.getBalanceUSE(keyA, db);
+        bal_A_keyB = accountA.getBalanceUSE(keyB, db);
+        bal_B_keyB = accountB.getBalanceUSE(keyB, db);
+        bal_B_keyA = accountB.getBalanceUSE(keyA, db);
+        
+        // CREATE ORDER THREE (SELLING 19.99999999 A FOR B AT A PRICE OF 20)
+        BigDecimal amoHave = BigDecimal.valueOf(1.99999999);
+        BigDecimal amoWant = BigDecimal.valueOf(3.99999998);
+        
+        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0l);
+        orderCreation.sign(accountA, false);
+        orderCreation.setDC(db, false);
+        orderCreation.process(null, false);
+        Order order_BA_2 = orderCreation.makeOrder();
+        BigInteger order_AB_2_ID = order_BA_2.getId();
+        order_BA_2 = Order.fromDBrec(reloadOrder(order_BA_2));
+        
+        /////// BigDecimal haveTaked =
+        /////// amoHave.multiply(order_BA_1.getPriceCalcReverse()).setScale(8,
+        /////// RoundingMode.HALF_DOWN);
+        BigDecimal order_BA_2_wantTaked = amoHave.divide(order_BA_1.getPrice(), 8, RoundingMode.HALF_DOWN);
+    }
+        
+
 }

@@ -25,6 +25,8 @@ import datachain.DCSet;
 
 public class CancelOrderTransaction extends Transaction {
     public static final byte[][] VALID_REC = new byte[][]{
+        Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
+        Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
     };
     // TODO - reference to ORDER - by recNor INT+INT - not 64xBYTE[] !!!
     private static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;

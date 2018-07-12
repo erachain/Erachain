@@ -854,6 +854,12 @@ public class Block {
         int height = this.getHeightByParent(dcSet);
         Controller cnt = Controller.getInstance();
 
+        // for DEBUG
+        if (height == 65431
+                || height == 86549) {
+            height = this.getHeightByParent(dcSet);
+        }
+
 		/*
 		// FOR PROBE START !!!
 		if(height > 1000)
@@ -1052,6 +1058,9 @@ public class Block {
                     timerProcess += System.currentTimeMillis() - timerStart;
 
                 } else {
+
+                    transaction.setDC(validatingDC, false);
+
                     //UPDATE REFERENCE OF SENDER
                     if (transaction.isReferenced())
                         // IT IS REFERENCED RECORD?
@@ -1122,6 +1131,12 @@ public class Block {
                 LOGGER.debug("*** Block[" + height + "].digest(transactionsSignatures) invalid");
                 return false;
             }
+            
+            // for DEBUG
+            if (!validatingDC.isFork() && height == 86549) {
+                return false;
+            }
+
         }
 
         //BLOCK IS VALID
@@ -1211,6 +1226,12 @@ public class Block {
         LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
 
         this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
+        
+        // for DEBUG
+        if (this.heightBlock == 65431
+                || this.heightBlock == 86549) {
+            this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
+        }
 
         //PROCESS TRANSACTIONS
         int seq = 1;
@@ -1235,9 +1256,11 @@ public class Block {
 
             //LOGGER.debug("[" + seq + "] record is process" );
 
+            // NEED set DC for WIPED too
+            transaction.setDC(dcSet, false);
+
             //PROCESS
             if (!transaction.isWiped()) {
-                transaction.setDC(dcSet, false);
                 timerStart = System.currentTimeMillis();
                 transaction.process(this, false);
                 timerProcess += System.currentTimeMillis() - timerStart;
