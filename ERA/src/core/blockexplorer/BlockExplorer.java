@@ -1277,9 +1277,9 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
 
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
-                .getOrderMap().getOrders(have, want, false);
+                .getOrderMap().getOrdersForTradeWithFork(have, want, false);
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
-                .getOrderMap().getOrders(want, have, true);
+                .getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
         // Collections.reverse(ordersWant);
 

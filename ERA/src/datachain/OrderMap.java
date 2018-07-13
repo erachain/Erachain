@@ -301,7 +301,7 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(long have, long want, boolean reverseTimestamp) {
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForTradeWithFork(long have, long want, boolean reverseTimestamp) {
         //FILTER ALL KEYS
         Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
 

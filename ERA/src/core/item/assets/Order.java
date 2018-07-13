@@ -473,7 +473,7 @@ public class Order implements Comparable<Order> {
         //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, false);
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
         
         //Collections.sort(orders, );
 
