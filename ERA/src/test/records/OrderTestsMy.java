@@ -2826,11 +2826,15 @@ public class OrderTestsMy {
         BigDecimal order_BA_2_wantTaked = amoHave.divide(order_BA_1.getPrice(), 8, RoundingMode.HALF_DOWN);
     }
     
-    private void testgetOrdersForTradeWithFork() {
+    @Test
+    public void testgetOrdersForTradeWithFork() {
         
         init();
         
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
+        long wantKey = keyA;
+        long haveKey = keyB;
+        
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
@@ -2838,7 +2842,7 @@ public class OrderTestsMy {
         order_AB_1 = orderCreation.makeOrder();
         order_AB_1_ID = orderCreation.getOrderId();
         
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(300), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
@@ -2846,7 +2850,7 @@ public class OrderTestsMy {
         order_AB_4 = orderCreation.makeOrder();
         order_AB_4_ID = order_AB_4.getId();
         
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1400),
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1400),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
@@ -2854,7 +2858,11 @@ public class OrderTestsMy {
         order_AB_3 = orderCreation.makeOrder();
         order_AB_3_ID = order_AB_3.getId();
         
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
+        /// for delete in FORK
+        BigInteger deletedID = order_AB_3_ID;
+
+        
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(130), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
@@ -2866,7 +2874,7 @@ public class OrderTestsMy {
         
         DCSet fork = db.fork();
 
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(100),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(fork, false);
@@ -2874,75 +2882,79 @@ public class OrderTestsMy {
         order_AB_1 = orderCreation.makeOrder();
         order_AB_1_ID = orderCreation.getOrderId();
         
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(300), (byte) 0, timestamp++, 0l, new byte[64]);
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
+                BigDecimal.valueOf(30), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(fork, false);
         orderCreation.process(null, false);
         order_AB_4 = orderCreation.makeOrder();
         order_AB_4_ID = order_AB_4.getId();
         
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1400),
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1400),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(fork, false);
         orderCreation.process(null, false);
         order_AB_3 = orderCreation.makeOrder();
         order_AB_3_ID = order_AB_3.getId();
-        
-        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(130), (byte) 0, timestamp++, 0l, new byte[64]);
+                
+        // BACK TIMESTAMP
+        orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
+                BigDecimal.valueOf(130), (byte) 0, timestamp - 1000, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
         orderCreation.setDC(fork, false);
         orderCreation.process(null, false);
         order_AB_2 = orderCreation.makeOrder();
         order_AB_2_ID = order_AB_2.getId();
 
+        ///////// DELETE in FORK
+        fork.getOrderMap().delete(deletedID);
         
         int compare;
         int index = 0;
         BigDecimal thisPrice;
         BigDecimal tempPrice;
 
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db
-                .getOrderMap().getOrdersForTradeWithFork(FEE_KEY, ERM_KEY, false);
-        
-        // Collections.sort(orders, );
-        
-        if (true) {
-            // for develop
-            tempPrice = BigDecimal.ZERO;
-            long timestamp = 0;
-            while (index < orders.size()) {
-                // GET ORDER
-                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders
-                        .get(index++);
+        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = fork
+                .getOrderMap().getOrdersForTradeWithFork(wantKey, haveKey, false);
                 
-                String signB58 = Base58.encode(order.a.a);
-                
-                BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-                BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
-                String date = DateTimeFormat.timestamptoString(order.a.c);
-                compare = tempPrice.compareTo(orderPrice);
-                Assert.assertEquals(compare <= 0, true);
-                if (compare > 0) {
+        tempPrice = BigDecimal.ZERO;
+        long timestamp = 0;
+        while (index < orders.size()) {
+            
+            // GET ORDER
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders
+                    .get(index++);
+            
+            String signB58 = Base58.encode(order.a.a);
+            
+            Assert.assertEquals(deletedID.equals(order.a.a), false);
+            
+            BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
+            BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
+            
+            String date = DateTimeFormat.timestamptoString(order.a.c);
+            
+            if (tempPrice.signum() == 0) {
+                tempPrice = orderReversePrice;
+            }
+            
+            compare = tempPrice.compareTo(orderReversePrice);
+            Assert.assertEquals(compare >= 0, true);
+            if (compare < 0) {
+                // error
+                compare = index;
+            } else if (compare == 0) {
+                Assert.assertEquals(timestamp <= order.a.c, true);
+                if (timestamp > order.a.c) {
                     // error
                     compare = index;
-                } else if (compare == 0) {
-                    Assert.assertEquals(timestamp <= order.a.c, true);
-                    if (timestamp > order.a.c) {
-                        // error
-                        compare = index;
-                    } else {
-                        timestamp = order.a.c;
-                    }
-                } else {
-                    tempPrice = orderPrice;
-                    timestamp = order.a.c;
                 }
-                
             }
-            index = 0;
+
+            tempPrice = orderReversePrice;
+            timestamp = order.a.c;
+            
         }
         
     }

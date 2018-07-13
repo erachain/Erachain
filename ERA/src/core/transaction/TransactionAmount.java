@@ -794,7 +794,8 @@ public abstract class TransactionAmount extends Transaction {
         } else {
             // TODO first records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-            if (this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+            if (height > BlockChain.ALL_BALANCES_OK_TO
+                    && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
                 return NOT_ENOUGH_FEE;
             }
             

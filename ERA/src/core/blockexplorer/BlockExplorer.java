@@ -1352,7 +1352,10 @@ public class BlockExplorer {
         BigDecimal sumBuyingAmount = BigDecimal.ZERO;
         BigDecimal sumBuyingAmountGood = BigDecimal.ZERO;
 
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : ordersWant) {
+        for (int i = ordersHave.size() - 1; i >= 0; i--) {
+
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
+        
             Map buyJSON = new LinkedHashMap();
 
             buyJSON.put("price", order.a.e.toPlainString());

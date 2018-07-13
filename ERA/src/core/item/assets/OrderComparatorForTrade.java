@@ -13,7 +13,7 @@ import org.mapdb.Fun.Tuple5;
  *
  * @author icreator
  */
-public class OrderComparator implements Comparator<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+public class OrderComparatorForTrade implements Comparator<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
 
     @Override

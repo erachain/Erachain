@@ -1032,6 +1032,7 @@ function trades(data)
 		output += '<tr>';
 		output += '<td><a href=?tx='+key+get_lang()+'>#' + (Object.keys(data.sells).length - i++) +'</a>';
 		output += '<td>' + addCommas(data.sells[key].price) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+		//output += '<td>' + addCommas(data.sells[key].sellingPrice) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 		output += '<td>' + addCommas(data.sells[key].amount) + ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 		output += '<td>' + addCommas(data.sells[key].sellingAmount) + ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
 	}

@@ -24,8 +24,8 @@ import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import core.item.assets.Order;
-import core.item.assets.OrderComparator;
-import core.item.assets.OrderComparatorReverseTimestamp;
+import core.item.assets.OrderComparatorForTrade;
+import core.item.assets.OrderComparatorForTradeReverse;
 import database.DBMap;
 import utils.ObserverMessage;
 
@@ -301,7 +301,7 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForTradeWithFork(long have, long want, boolean reverseTimestamp) {
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
         Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
 
@@ -314,10 +314,10 @@ public class OrderMap extends DCMap<BigInteger,
             orders.add(this.get(key));
         }
 
-        if (reverseTimestamp) {
-            Collections.sort(orders, new OrderComparatorReverseTimestamp());
+        if (reverse) {
+            Collections.sort(orders, new OrderComparatorForTradeReverse());
         } else {
-            Collections.sort(orders, new OrderComparator());
+            Collections.sort(orders, new OrderComparatorForTrade());
         }
             
         //RETURN
