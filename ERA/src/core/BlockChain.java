@@ -85,19 +85,21 @@ public class BlockChain {
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
+
+        // WRONG Issue Person #125
+        Base58.decode("zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH"),
+        // WRONG orders by Person 90 Yakovlev
+        Base58.decode("585CPBAusjDWpx9jyx2S2hsHByTd52wofYB3vVd9SvgZqd3igYHSqpS2gWu2THxNevv4LNkk4RRiJDULvHahPRGr"),
+        Base58.decode("4xDHswuk5GsmHAeu82qysfdq9GyTxZ798ZQQGquprirrNBr7ACUeLZxBv7c73ADpkEvfBbhocGMhouM9y13sP8dK"),
+        //Base58.decode("2Y81A7YjBji7NDKxYWMeNapSqFWFr8D4PSxBc4dCxSrCCVia6HPy2ZsezYKgeqZugNibAMra6DYT7NKCk6cSVUWX"),
+        //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
         
+        // CANCEL ORDERS - wrong after fix exchange
         Base58.decode("2XXmMPUD85h1m93N1Zks9gzs4jsQYB6qk9iQoK5UEgdi7ESXceTX3TZnQX6rieCE3uoTZ53KNfu3o38YYsxJsDzq"),
         Base58.decode("57vyEGwMH2eya5Czk7GSjG4hjJ2ABH165igGHU6BcnwSsu93ypL59Xj35MY5K5Cevy72Qp2dhNRzsJMqVeysjrvq"),
-        // TRANS: Cancel Order - e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j
         Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V"),
         Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"),
         Base58.decode("2WrgVBhG244Pb1BMgQrt6K4AXbeLWNbBwknV4ghNxQefd3wvFoZcQmo3sU4ZMrpTNKJA9f9XPu3FzpmwEXDxzpCH"),
-        //Base58.decode("5WTHtFHXAQekYw2iD4ebHKAZuiaLEGUoqabYQzbaPjr3kZVAXCv8XRAKwM5jBgrQaaHRvvS8VR52Sjqt6819NTdo"),
-        //Base58.decode("5oWHjwD9EiU5T9EGKiK2u7nFsZUEaSrk81uzWkZDH2tJ9cVoJGDRZvuSVNwHP4BtALpgnw4xpDLgZAYx2hoe4Fza"),
-        //Base58.decode("TRxL9SzT18nuBDTkLHVv174RPdXVLRdutXZtHijAyTEZg3nxnJ1Ysv18jtHteNcbYEKFmx8JuPXqWfXBbp7QhGb"),
-        //Base58.decode("H4G6Kex1sZV9LJNCbBPiwBaWEbbvR1GTX78zK1pYPCJxg3MGnAbNWgEE9SDY4erbHqLEKaK2UPwfsNyBkQ4k43S"),
-                    //Base58.decode("2Y81A7YjBji7NDKxYWMeNapSqFWFr8D4PSxBc4dCxSrCCVia6HPy2ZsezYKgeqZugNibAMra6DYT7NKCk6cSVUWX"),
-                    //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
                     
     };
 
