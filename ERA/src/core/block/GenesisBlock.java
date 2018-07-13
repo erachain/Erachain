@@ -743,4 +743,15 @@ public class GenesisBlock extends Block {
 
         return true;
     }
+    
+    public void process(DCSet dcSet) throws Exception {
+        super.process(dcSet);
+
+        AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+        item.setReference(this.signature);
+        dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
+        //this.getDBIssueMap(db).set(this.reference, newKey);
+
+        
+    }
 }

@@ -155,8 +155,8 @@ public class BlockChain {
     public static final int ISSUE_ASSET_MULT_FEE = 1 << 8;
     //
     public static final int FEE_INVITED_DEEP = 4; // levels for deep
-    public static final int FEE_INVITED_SHIFT = 5; // 2^5 = 64 - total FEE -> fee for Forger and fee for Inviter
-    public static final int FEE_INVITED_SHIFT_FOR_INVITE = 2; // 2^3 = 8 - total FEE for Inviter of Person
+    public static final int FEE_INVITED_SHIFT = 6; // 2^5 = 32 - total FEE -> fee for Forger and fee for Inviter
+    public static final int FEE_INVITED_SHIFT_FOR_INVITE = 1; // - total FEE for Inviter of Person
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
     public static final int FEE_FOR_ANONIMOUSE = 33;
     // SERTIFY

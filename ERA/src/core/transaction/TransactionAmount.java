@@ -424,6 +424,10 @@ public abstract class TransactionAmount extends Transaction {
                 if (absKey < 0)
                     absKey = -absKey;
                 
+                if (absKey == AssetCls.LIA_KEY) {
+                    return INVALID_TRANSFER_TYPE;
+                }
+                
                 // AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
                 if (asset == null) {
                     return ITEM_ASSET_NOT_EXIST;

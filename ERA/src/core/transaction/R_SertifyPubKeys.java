@@ -24,6 +24,7 @@ import core.block.GenesisBlock;
 import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.ItemCls;
+import core.item.assets.AssetCls;
 import datachain.DCSet;
 
 
@@ -522,6 +523,11 @@ public class R_SertifyPubKeys extends Transaction {
             GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD
                     .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
 
+            // EMITTE LIA
+            this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+
         }
 
         int add_day = this.add_day;
@@ -613,6 +619,11 @@ public class R_SertifyPubKeys extends Transaction {
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD
                     .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
+
+            // EMITTE LIA
+            this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
         }
 

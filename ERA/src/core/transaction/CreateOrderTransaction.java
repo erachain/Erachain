@@ -369,6 +369,13 @@ public class CreateOrderTransaction extends Transaction {
             return INVALID_ECXHANGE_PAIR;
         }
 
+        long haveKey = this.haveKey;
+        long wantKey = this.wantKey;
+
+        if (haveKey == AssetCls.LIA_KEY || wantKey == AssetCls.LIA_KEY) {
+            return INVALID_ECXHANGE_PAIR;
+        }
+
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
                 return VALIDATE_OK;
@@ -378,9 +385,6 @@ public class CreateOrderTransaction extends Transaction {
         int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
         // CHECK IF ASSETS NOT THE SAME
-        long haveKey = this.haveKey;
-        long wantKey = this.wantKey;
-
         if (haveKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
             // && wantKey != FEE_KEY
                 ) {

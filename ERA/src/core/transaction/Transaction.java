@@ -658,7 +658,7 @@ public abstract class Transaction {
             this.setDC(db, false);
 
         int fee = this.fee.unscaledValue().intValue();
-        int fee_invited = fee >> BlockChain.FEE_INVITED_SHIFT;
+        int fee_invited = this.getInvitedFee();
         return fee - fee_invited;
     }
 

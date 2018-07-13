@@ -53,10 +53,14 @@ public class ItemAssetMap extends Item_Map {
 
     public AssetCls get(Long key) {
 
-        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
+        if (BlockChain.DEVELOP_USE && key > 1 && key < 1000) {
             AssetCls item;
             switch (key.intValue()) {
                 // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
+                case (int)AssetCls.LIA_KEY:
+                    item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
+                            AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+                    break;
                 case 555:
                     item = new AssetVenture((byte) 0, core.block.GenesisBlock.CREATOR, new String("¤¤¤"), null, null,
                             "Businessman", AssetCls.AS_ACCOUNTING, 8, 0l);

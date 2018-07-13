@@ -11,6 +11,8 @@ import com.google.common.primitives.Longs;
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.block.Block;
+import core.block.GenesisBlock;
+import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
@@ -255,8 +257,13 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     @Override
     public int getInvitedFee() {
         int fee = this.fee.unscaledValue().intValue();
-        if (true || this.height > 150000)
+        long counter = this.dcSet.getItemPersonMap().getLastKey();
+        if (counter < 10000l)
             return fee >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+        else if (counter < 100000l)
+            return fee >> (BlockChain.FEE_INVITED_SHIFT_FOR_INVITE + 1);
+        else if (counter < 1000000l)
+            return fee >> (BlockChain.FEE_INVITED_SHIFT_FOR_INVITE + 2);
         else
             return fee >> BlockChain.FEE_INVITED_SHIFT;
     }
@@ -266,7 +273,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         //UPDATE CREATOR
         super.process(block, asPack);
 
-        // for quick search public keys
+        // for quick search public keys - use PUB_KEY from Person DATA
         PersonHuman person = (PersonHuman) this.item;
         if (person.isMustBeSigned()) {
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
@@ -275,6 +282,24 @@ public class IssuePersonRecord extends Issue_ItemRecord {
                 dbASmap.set(creatorAddress, this.signature);
             }
         }
+
+        // EMITTE LIA
+        this.creator.changeBalance(this.dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, false);
+        // SUBSTRACT from EMISSION (with minus)
+        GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true);
+        
+    }
+
+    //@Override
+    public void orphan(boolean asPack) {
+        //UPDATE CREATOR
+        super.orphan(asPack);
+
+        // EMITTE LIA
+        this.creator.changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false);
+        // SUBSTRACT from EMISSION (with minus)
+        GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true);
+        
     }
 
     @Override

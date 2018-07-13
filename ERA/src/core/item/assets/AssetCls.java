@@ -51,14 +51,13 @@ public abstract class AssetCls extends ItemCls {
     public static final String REAL_DESCR = "Труд, знания, заслуги и польза" + ": "
             + REAL_NAME + "(" + REAL_ABBREV + "). ";
 
-	/*
 	// DEaL KEY
-	public static final long DEAL_KEY = 5l;
-	public static final String DEAL_ABBREV = "DIL"; // COMPU (compute units)
-	public static final String DEAL_NAME = "DEAL";
-	public static final String DEAL_DESCR = "It is an drops of the deal (" + DEAL_NAME + ")";
-	 */
-    public static final int UNIQUE = 1;
+	public static final long LIA_KEY = 5l;
+	public static final String LIA_ABBREV = "LIA"; // COMPU (compute units)
+	public static final String LIA_NAME = "LIA";
+	public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
+
+	public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
     public static final int NAME = 3;
     public static final int INITIAL_FAVORITES = 4;
