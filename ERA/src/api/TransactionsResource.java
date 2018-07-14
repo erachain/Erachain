@@ -633,13 +633,13 @@ public class TransactionsResource {
 
                     JSONObject json = transaction.toJson();
 
-                    if (json.containsKey("encrypted")) {
+                    if (transaction instanceof R_Send) {
 
+                        R_Send r_Send = (R_Send) transaction;
                         byte[] r_data = null;
+                        r_data = r_Send.getData();
 
-                        if (transaction instanceof R_Send) {
-                            R_Send r_Send = (R_Send) transaction;
-                            r_data = r_Send.getData();
+                        if (r_Send.isEncrypted()) {
 
                             if (r_data != null && r_data.length > 0) {
 

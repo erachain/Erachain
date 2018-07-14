@@ -369,7 +369,14 @@ public class OrderMap extends DCMap<BigInteger,
             keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
                     Fun.t4(want, have, null, null),
                     Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-            keys.addAll(keysWH);
+            
+            if (!keysWH.isEmpty()) {
+                // add only new unique
+                Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
+                combinedKeys.addAll(keysWH);
+                keys = combinedKeys;
+            }
+
         }
 
         if (filter) {
