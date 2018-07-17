@@ -1468,24 +1468,21 @@ public class API {
         }
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
-        if (!DCSet.getInstance().getAddressTime_SignatureMap().contains(publicKeyAccount.getAddress())) {
+        byte[] pkBytes = publicKeyAccount.getPublicKey();
+        if (!DCSet.getInstance().getIssuePersonMap().contains(pkBytes)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_PERSON_NOT_EXIST);
         } else {
-            byte[] signature = DCSet.getInstance().getAddressTime_SignatureMap().get(publicKeyAccount.getAddress());
-            Transaction transaction = Controller.getInstance().getTransaction(signature);
-            if (transaction == null || transaction.getType() != Transaction.ISSUE_PERSON_TRANSACTION) {
+            Long key = DCSet.getInstance().getIssuePersonMap().get(pkBytes);
+            if (key == null || key == 0) {
                 throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_PERSON_NOT_EXIST);
             }
 
-            IssuePersonRecord issue_person = (IssuePersonRecord) transaction;
-            PersonCls person = (PersonCls)issue_person.getItem();
-
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")
                     .header("Access-Control-Allow-Origin", "*")
-                    .entity("" + person.getKey())
+                    .entity("" + key)
                     .build();
         }
     }
@@ -1602,19 +1599,22 @@ public class API {
         }
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
-        if (!DCSet.getInstance().getAddressTime_SignatureMap().contains(publicKeyAccount.getAddress())) {
+        byte[] pkBytes = publicKeyAccount.getPublicKey();
+        if (!DCSet.getInstance().getIssuePersonMap().contains(pkBytes)) {
             throw ApiErrorFactory.getInstance().createError(
                     Transaction.ITEM_PERSON_NOT_EXIST);
         } else {
-            byte[] signature = DCSet.getInstance().getAddressTime_SignatureMap().get(publicKeyAccount.getAddress());
-            Transaction transaction = Controller.getInstance().getTransaction(signature);
-            if (transaction == null || transaction.getType() != Transaction.ISSUE_PERSON_TRANSACTION) {
+            Long key = DCSet.getInstance().getIssuePersonMap().get(pkBytes);
+            if (key == null || key == 0) {
                 throw ApiErrorFactory.getInstance().createError(
                         Transaction.ITEM_PERSON_NOT_EXIST);
             }
 
-            IssuePersonRecord issue_person = (IssuePersonRecord) transaction;
-            PersonCls person = (PersonCls)issue_person.getItem();
+            PersonCls person = (PersonCls) DCSet.getInstance().getItemPersonMap().get(key);
+            if (person == null) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.ITEM_PERSON_NOT_EXIST);
+            }
 
             return Response.status(200)
                     .header("Content-Type", "application/json; charset=utf-8")

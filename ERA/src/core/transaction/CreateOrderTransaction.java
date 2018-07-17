@@ -361,7 +361,8 @@ public class CreateOrderTransaction extends Transaction {
     @Override
     public int isValid(Long releaserReference, long flags) {
 
-        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()) {
+        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting() && !BlockChain.DEVELOP_USE) {
+
             return INVALID_ACCOUNTING_PAIR;
         }
         
