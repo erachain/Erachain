@@ -294,12 +294,11 @@ public class Controller extends Observable {
     }
     
     public void statusInfo() {
+        long timestamp = this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet);
         LOGGER.info("STATUS " + this.getStatus() + "\n" + "| Last Block Signature: "
                 + Base58.encode(this.blockChain.getLastBlock(dcSet).getSignature()) + "\n" + "| Last Block Height: "
                 + this.blockChain.getLastBlock(dcSet).getHeight(this.dcSet) + "\n" + "| Last Block Time: "
-                + DateTimeFormat.timestamptoString(this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet)) + "\n"
-                + "| Last Block Found "
-                + DateTimeFormat.timeAgo(this.blockChain.getLastBlock(dcSet).getTimestamp(this.dcSet)) + " ago.");
+                + DateTimeFormat.timestamptoString(timestamp));
     }
     
     public byte[] getFoundMyselfID() {

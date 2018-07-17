@@ -24,8 +24,8 @@ import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
 import core.item.assets.Order;
-import core.item.assets.OrderComparator;
-import core.item.assets.OrderComparatorReverseTimestamp;
+import core.item.assets.OrderComparatorForTrade;
+import core.item.assets.OrderComparatorForTradeReverse;
 import database.DBMap;
 import utils.ObserverMessage;
 
@@ -179,12 +179,35 @@ public class OrderMap extends DCMap<BigInteger,
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected Collection<BigInteger> getSubKeysWithParent(long have, long want) {
 
+        Collection<BigInteger> keys;
         //FILTER ALL KEYS
-        Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+
+        ///if (false) {
+            // in haveWantKeyMap - NOT ALL ORDERS!
+        keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
                 //Fun.t4(have, want, null, null),
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
+        //keys = new TreeSet<BigInteger>(keys);
+        ///} else {
+            // in wantHaveKeyMap - ALL ORDERS
+        Collection<BigInteger> keysWH;
+        keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
+                //Fun.t4(have, want, null, null),
+                Fun.t4(want, have, null, null),
+                Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
+        //keysWH = new TreeSet<BigInteger>(keysWH);
+            
+        //}
 
+        if (!keysWH.isEmpty()) {
+            // add only new unique
+            Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
+            combinedKeys.addAll(keysWH);
+            keys = combinedKeys;
+        }
+
+            
         //IF THIS IS A FORK
         if (this.parent != null) {
 
@@ -275,19 +298,6 @@ public class OrderMap extends DCMap<BigInteger,
 
     public boolean isExecutable(DCSet db, BigInteger key) {
 
-		/* OLD
-		Order order = this.get(key);
-
-		BigDecimal increment = order.calculateBuyIncrement(order, db);
-		BigDecimal amount = order.getAmountHaveLeft();
-		amount = amount.subtract(amount.remainder(increment));
-		return  (amount.compareTo(BigDecimal.ZERO) > 0);
-		} else {
-
-		}
-		 */
-
-
         Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.get(key);
         // если произведение остатка
@@ -301,7 +311,7 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(long have, long want, boolean reverseTimestamp) {
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
         Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
 
@@ -314,10 +324,10 @@ public class OrderMap extends DCMap<BigInteger,
             orders.add(this.get(key));
         }
 
-        if (reverseTimestamp) {
-            Collections.sort(orders, new OrderComparatorReverseTimestamp());
+        if (reverse) {
+            Collections.sort(orders, new OrderComparatorForTradeReverse());
         } else {
-            Collections.sort(orders, new OrderComparator());
+            Collections.sort(orders, new OrderComparatorForTrade());
         }
             
         //RETURN
@@ -335,6 +345,11 @@ public class OrderMap extends DCMap<BigInteger,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersSortableList(long have, long want, boolean filter) {
         //FILTER ALL KEYS
         Collection<BigInteger> keys;
+        
+        keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
+        
         if (false) {
             keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
                     Fun.t4(have, want, null, null),
@@ -348,15 +363,22 @@ public class OrderMap extends DCMap<BigInteger,
                     Fun.t4(want, have, null, null),
                     Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
         } else {
+            Collection<BigInteger> keysWH;
             // CORRECT! - haveWantKeyMap LOSES some orders!
             // https://github.com/icreator/Erachain/issues/178
-            keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
+            keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
                     Fun.t4(want, have, null, null),
                     Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
+            
+            if (!keysWH.isEmpty()) {
+                // add only new unique
+                Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
+                combinedKeys.addAll(keysWH);
+                keys = combinedKeys;
+            }
+
         }
 
-        // 3736689355080347897954007846376144397840229205698623203564810984254622835951327166579305402606772203148742040644598072529939453854935677087096743677805573
-        //Filters orders with unacceptably small amount. These orders have not worked
         if (filter) {
             List<BigInteger> keys2 = new ArrayList<BigInteger>();
 

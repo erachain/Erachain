@@ -3,7 +3,6 @@ package core.block;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -388,7 +387,7 @@ public class Block {
 
         BlockChain blockChain = Controller.getInstance().getBlockChain();
 
-        return blockChain.getTimestamp(height + 1);
+        return blockChain.getTimestamp(height);
     }
 
 	/*
@@ -882,12 +881,13 @@ public class Block {
         }
 
         // TODO - show it to USER
-        long myTime = this.getTimestamp(dcSet);
+        long blockTime = this.getTimestamp(dcSet);
+        long thisTimestamp = NTP.getTime();
         //LOGGER.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
-        if (myTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
+        if (blockTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > thisTimestamp) {
             LOGGER.debug("*** Block[" + height + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-                    + NTP.getTime() + " \n " + new Timestamp(myTime) + " diff sec: " + (this.getTimestamp(dcSet) - NTP.getTime()) / 1000);
+                    + " \n " + " diff sec: " + (blockTime - thisTimestamp) / 1000);
             return false;
         }
 
@@ -978,7 +978,7 @@ public class Block {
 
             byte[] transactionsSignatures = new byte[0];
 
-            long timestampEnd = this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME * 1000;
+            long timestampEnd = this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 
@@ -1421,10 +1421,10 @@ public class Block {
     }
 
     public String toString(DCSet dcSet) {
-        return " WT: " + this.calcWinValueTargeted()
+        
+        return this.forgingValue != 0? " GB: " + this.forgingValue : "" //this.calcWinValueTargeted()
                 + " recs: " + this.transactionCount
                 + " H: " + this.getHeightByParent(dcSet)
-                //+ " W: " + this.getWinValue()
                 + " C: " + this.getCreator().getPersonAsString();
     }
 

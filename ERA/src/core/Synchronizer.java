@@ -1,5 +1,14 @@
 package core;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
 import controller.Controller;
 import core.block.Block;
 import core.crypto.Base58;
@@ -14,15 +23,7 @@ import network.message.Message;
 import network.message.MessageFactory;
 import network.message.SignaturesMessage;
 import ntp.NTP;
-import org.apache.log4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import settings.Settings;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TreeMap;
 
 // import org.apache.log4j.Logger;
 

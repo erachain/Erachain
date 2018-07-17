@@ -418,11 +418,15 @@ public abstract class TransactionAmount extends Transaction {
             
             int amount_sign = this.amount.signum();
             if (amount_sign != 0
-                    && BlockChain.ALL_BALANCES_OK_TO < height) {
+                    && height > BlockChain.ALL_BALANCES_OK_TO) {
                 
                 long absKey = this.key;
                 if (absKey < 0)
                     absKey = -absKey;
+                
+                if (absKey == AssetCls.LIA_KEY) {
+                    return INVALID_TRANSFER_TYPE;
+                }
                 
                 // AssetCls asset = (AssetCls)dcSet.getItemAssetMap().get(absKey);
                 if (asset == null) {
@@ -794,7 +798,8 @@ public abstract class TransactionAmount extends Transaction {
         } else {
             // TODO first records is BAD already ((
             // CHECK IF CREATOR HAS ENOUGH FEE MONEY
-            if (this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
+            if (height > BlockChain.ALL_BALANCES_OK_TO
+                    && this.creator.getBalance(dcSet, FEE_KEY).a.b.compareTo(this.fee) < 0) {
                 return NOT_ENOUGH_FEE;
             }
             

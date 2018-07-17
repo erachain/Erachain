@@ -138,7 +138,8 @@ public class Order implements Comparable<Order> {
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order,
                                           Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                                                   Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target) {
-        return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
+        // return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
+        return true;
     }
 
     public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
@@ -446,10 +447,9 @@ public class Order implements Comparable<Order> {
         int compare = 0;
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-            //    (this.haveKey == 1010
-            //            || this.wantKey == 1010)
-                this.id.equals(new BigInteger(Base58.decode("e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j")))
-                //&& !db.isFork()
+                (this.haveKey == 1 && this.wantKey == 2)
+                //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
+                && !db.isFork()
                 ) {
             compare++;
         }
@@ -464,49 +464,24 @@ public class Order implements Comparable<Order> {
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
         boolean completedOrder = false;
-        int i = -1;
+        int index = 0;
         BigDecimal thisPrice = this.price;
-        BigDecimal tempPrice;
+        //BigDecimal tempPrice;
         BigDecimal thisIncrement;
         //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap().getOrders(this.wantKey, this.haveKey, true);
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap()
+                .getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
         
-        //Collections.sort(orders, );
-
-        if (true) {
-            // for develop
-            tempPrice = BigDecimal.ZERO;
-            while (++i < orders.size()) {
-                //GET ORDER
-                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
-
-                String signB58 = Base58.encode(order.a.a);
-
-                BigDecimal orderAmountHaveLeft;
-                BigDecimal orderAmountWantLeft;
-                BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-                BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
-                i = i;
-                if (tempPrice.compareTo(orderPrice) > 0) {
-                    //error
-                    //i = 999999999;
-                    i = i;
-                }
-            }
-            i = 0;
-        }
-
         //boolean isDivisibleHave = true; //this.isHaveDivisible(db);
         //boolean isDivisibleWant = true; //this.isWantDivisible(db);
         BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
 
-        while (!completedOrder && ++i < orders.size()) {
+        while (!completedOrder && index < orders.size()) {
             //GET ORDER
             Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(i);
+                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(index++);
             
             // for develop
             String signB58 = Base58.encode(order.a.a);
@@ -515,19 +490,19 @@ public class Order implements Comparable<Order> {
             BigDecimal orderAmountWantLeft;
             BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
             BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
-            BigDecimal orderPriceTemp;
+            //BigDecimal orderPriceTemp;
 
             Trade trade;
             BigDecimal tradeAmount;
             BigDecimal tradeAmountGet;
             BigDecimal tradeAmountAccurate;
             BigDecimal differenceTrade;
-            BigDecimal differenceTradeThis;
+            //BigDecimal differenceTradeThis;
 
             if ( //(order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                  //   (order.b.a == 1010 || order.c.a == 1010)
-                    order.a.a.equals(new BigInteger(Base58.decode("e6cZemYsrTZLmU6VqC5n6BizSVmEWNcXfa6d6aFQVRRZErxFCcJcM9o4phs2iXmCBaWxntTPXXtejr17M7AN73j")))
-                    && !db.isFork()
+                    order.a.a.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
+                    //&& !db.isFork()
                     ) {
                 compare++;
             }

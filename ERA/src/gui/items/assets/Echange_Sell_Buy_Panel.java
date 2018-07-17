@@ -1,26 +1,39 @@
 package gui.items.assets;
 
-import controller.Controller;
-import core.item.assets.AssetCls;
-import core.item.assets.Order;
-import datachain.DCSet;
-import datachain.SortableList;
-import gui.library.MTable;
-import lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
-import utils.Pair;
-import utils.TableMenuPopupUtil;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
+
+import controller.Controller;
+import core.item.assets.AssetCls;
+import core.item.assets.Order;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.Transaction;
+import datachain.DCSet;
+import datachain.SortableList;
+import gui.MainFrame;
+import gui.library.Issue_Confirm_Dialog;
+import gui.library.MTable;
+import gui.transaction.CreateOrderDetailsFrame;
+import lang.Lang;
+import utils.Pair;
+import utils.TableMenuPopupUtil;
 
 public class Echange_Sell_Buy_Panel extends JTabbedPane {
 
@@ -184,6 +197,39 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
         this.sellOrdersTableModel = new SellOrdersTableModel(this.have, this.want);
         final MTable sellOrdersTable = new MTable(this.sellOrdersTableModel);
 
+        // ORDER INFO
+        JMenuItem orderInfo = new JMenuItem(Lang.getInstance().translate("Order Info"));
+        orderInfo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (sellOrdersTableModel.getSortableList().isEmpty())
+                    return;
+
+                int row = sellOrdersTable.getSelectedRow();
+                if (row < 0)
+                    return;
+                row = sellOrdersTable.convertRowIndexToModel(row);
+
+                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = sellOrdersTableModel
+                        .getOrder(row);
+                
+                Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a.toByteArray());
+                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
+
+                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+                        Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
+                        (int) (MainFrame.getInstance().getHeight() / 1.2), "",
+                        Lang.getInstance().translate("Create Order Transaction"));
+
+                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
+                dd.jScrollPane1.setViewportView(ww);
+                dd.setLocationRelativeTo(null);
+                dd.setVisible(true);
+
+            }
+        });
+        sellOrdersMenu.add(orderInfo);
+
         // MENU on MY ORDERS
         JMenuItem trades = new JMenuItem(Lang.getInstance().translate("Trades"));
         trades.addActionListener(new ActionListener() {
@@ -203,6 +249,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
             }
         });
         sellOrdersMenu.add(trades);
+
         JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
         cancel.addActionListener(new ActionListener() {
             @Override
@@ -302,6 +349,40 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 }
             }
         });
+        
+        // ORDER INFO
+        JMenuItem buyOrderInfo = new JMenuItem(Lang.getInstance().translate("Order Info"));
+        buyOrderInfo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (buyOrdersTableModel.getSortableList().isEmpty())
+                    return;
+
+                int row = buyOrdersTable.getSelectedRow();
+                if (row < 0)
+                    return;
+                row = buyOrdersTable.convertRowIndexToModel(row);
+
+                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = buyOrdersTableModel
+                        .getOrder(row);
+                
+                Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a.toByteArray());
+                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
+
+                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+                        Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
+                        (int) (MainFrame.getInstance().getHeight() / 1.2), "",
+                        Lang.getInstance().translate("Create Order Transaction"));
+
+                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
+                dd.jScrollPane1.setViewportView(ww);
+                dd.setLocationRelativeTo(null);
+                dd.setVisible(true);
+
+            }
+        });
+        buyOrdersMenu.add(buyOrderInfo);
+
         // MENU on MY ORDERS
         JMenuItem buyTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
         buyTrades.addActionListener(new ActionListener() {

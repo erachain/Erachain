@@ -33,7 +33,7 @@ typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
 
  */
 public class CreateOrderTransaction extends Transaction {
-    public static final byte[][] VALID_REC = new byte[][]{        
+    public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("3C41sWQNguCxhe66QhKSUr7NTFYQqQ8At6E2LfKDBNxpDtWZDjRBTwVRZN9ZuxQrzXL9R4V4EF1EP7B1HucctkqJ"),
         //Base58.decode("3BTEfHJ6cQJtrvA2A1QkKwuznN7LckVUU9YDBjaZiBPapQrN6zHtc6JhgBy1tU8k6z6i7iW9Q4H7ZpordUYdfu2t"),
         //Base58.decode("4EbKCt4QDfMvCHRPM36y5TyDayZUQzURBhS8wJ4Em4ejpbfd2bUn9oDyEWgXKy5Mwkc7MovGcvU5svAVfQyJW8y6"),
@@ -369,6 +369,13 @@ public class CreateOrderTransaction extends Transaction {
             return INVALID_ECXHANGE_PAIR;
         }
 
+        long haveKey = this.haveKey;
+        long wantKey = this.wantKey;
+
+        if (haveKey == AssetCls.LIA_KEY || wantKey == AssetCls.LIA_KEY) {
+            return INVALID_ECXHANGE_PAIR;
+        }
+
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
                 return VALIDATE_OK;
@@ -378,9 +385,6 @@ public class CreateOrderTransaction extends Transaction {
         int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
         // CHECK IF ASSETS NOT THE SAME
-        long haveKey = this.haveKey;
-        long wantKey = this.wantKey;
-
         if (haveKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
             // && wantKey != FEE_KEY
                 ) {
@@ -415,7 +419,7 @@ public class CreateOrderTransaction extends Transaction {
         }
 
         // CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-        if (BlockChain.ALL_BALANCES_OK_TO < height) {
+        if (height < BlockChain.ALL_BALANCES_OK_TO ) {
             ; // NOT CHECK
         } else if (FEE_KEY == haveKey) {
             if (this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(amountHave.add(this.fee)) == -1) {

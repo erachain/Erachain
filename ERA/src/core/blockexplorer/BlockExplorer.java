@@ -1277,9 +1277,9 @@ public class BlockExplorer {
         Map output = new LinkedHashMap();
 
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
-                .getOrderMap().getOrders(have, want, false);
+                .getOrderMap().getOrdersForTradeWithFork(have, want, false);
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
-                .getOrderMap().getOrders(want, have, true);
+                .getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
         // Collections.reverse(ordersWant);
 
@@ -1307,7 +1307,10 @@ public class BlockExplorer {
         BigDecimal sumSellingAmountGood = BigDecimal.ZERO;
 
         BigDecimal vol;
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : ordersHave) {
+        // show SELLs in BACK order
+        for (int i = ordersHave.size() - 1; i >= 0; i--) {
+            
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
             sellJSON.put("price", order.a.e.toPlainString());
@@ -1349,7 +1352,10 @@ public class BlockExplorer {
         BigDecimal sumBuyingAmount = BigDecimal.ZERO;
         BigDecimal sumBuyingAmountGood = BigDecimal.ZERO;
 
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : ordersWant) {
+        for (int i = ordersHave.size() - 1; i >= 0; i--) {
+
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
+        
             Map buyJSON = new LinkedHashMap();
 
             buyJSON.put("price", order.a.e.toPlainString());
@@ -1413,12 +1419,12 @@ public class BlockExplorer {
             tradeJSON.put("initiatorCreator", orderInitiator.a.b);
             tradeJSON.put("initiatorAmount", orderInitiator.b.b.toPlainString());
             if (orderInitiator.b.a == have) {
-                tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Sell", langObj));
+                tradeJSON.put("type", "sell");
                 tradeWantAmount = tradeWantAmount.add(trade.c);
                 tradeHaveAmount = tradeHaveAmount.add(trade.d);
 
             } else {
-                tradeJSON.put("type", Lang.getInstance().translate_from_langObj("Buy", langObj));
+                tradeJSON.put("type", "buy");
                 tradeHaveAmount = tradeHaveAmount.add(trade.c);
                 tradeWantAmount = tradeWantAmount.add(trade.d);
             }
@@ -1439,9 +1445,12 @@ public class BlockExplorer {
         output.put("label_Trades", Lang.getInstance().translate_from_langObj("Trades", langObj));
         output.put("label_Price", Lang.getInstance().translate_from_langObj("Price", langObj));
         output.put("label_Amount", Lang.getInstance().translate_from_langObj("Amount", langObj));
+        output.put("label_Orders", Lang.getInstance().translate_from_langObj("Orders", langObj));
         output.put("label_Sell_Orders", Lang.getInstance().translate_from_langObj("Sell Orders", langObj));
         output.put("label_Buy_Orders", Lang.getInstance().translate_from_langObj("Buy Orders", langObj));
         output.put("label_Total", Lang.getInstance().translate_from_langObj("Total", langObj));
+        output.put("label_Total_For_Sell", Lang.getInstance().translate_from_langObj("Total for Sell", langObj));
+        output.put("label_Total_For_Buy", Lang.getInstance().translate_from_langObj("Total for Buy", langObj));
         output.put("label_Trade_History", Lang.getInstance().translate_from_langObj("Trade History", langObj));
         output.put("label_Date", Lang.getInstance().translate_from_langObj("Date", langObj));
         output.put("label_Type", Lang.getInstance().translate_from_langObj("Type", langObj));
@@ -1457,7 +1466,7 @@ public class BlockExplorer {
             start = Integer.valueOf(info.getQueryParameters().getFirst("start"));
         } catch (NumberFormatException e1) {
             // TODO Auto-generated catch block
-            e1.printStackTrace();
+            //e1.printStackTrace();
         }
         Block block = null;
         if (start > 0) {
