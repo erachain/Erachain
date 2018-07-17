@@ -53,7 +53,7 @@ public class ItemAssetMap extends Item_Map {
 
     public AssetCls get(Long key) {
 
-        if (BlockChain.DEVELOP_USE && key > 1 && key < 1000) {
+        if (BlockChain.DEVELOP_USE && key > 3 && key < 1000) {
             AssetCls item;
             switch (key.intValue()) {
                 // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html

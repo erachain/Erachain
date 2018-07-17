@@ -13,6 +13,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.item.persons.PersonCls;
+import core.transaction.IssuePersonRecord;
 import core.transaction.Transaction;
 import core.transaction.TransactionFactory;
 import datachain.*;
@@ -1455,6 +1456,60 @@ public class API {
     }
 
     @GET
+    @Path("personkeybycreatorpublickey/{publickey}")
+    public Response getPersonKeyByCreatorPublicKey(@PathParam("publickey") String publicKey) {
+
+        // CHECK IF VALID ADDRESS
+        if (!core.account.PublicKeyAccount.isValidPublicKey(publicKey)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_PUBLIC_KEY);
+
+        }
+
+        PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
+        if (!DCSet.getInstance().getAddressTime_SignatureMap().contains(publicKeyAccount.getAddress())) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        } else {
+            byte[] signature = DCSet.getInstance().getAddressTime_SignatureMap().get(publicKeyAccount.getAddress());
+            Transaction transaction = Controller.getInstance().getTransaction(signature);
+            if (transaction == null || transaction.getType() != Transaction.ISSUE_PERSON_TRANSACTION) {
+                throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+            }
+
+            IssuePersonRecord issue_person = (IssuePersonRecord) transaction;
+            PersonCls person = (PersonCls)issue_person.getItem();
+
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity("" + person.getKey())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("personkeybycreatorpublickey32/{publickey}")
+    public Response getPersonKeyByCreatorPublicKey32(@PathParam("publickey") String publicKey32) {
+
+        JSONObject answer = new JSONObject();
+        try {
+            byte[] publicKey = Base32.decode(publicKey32);
+            return getPersonKeyByCreatorPublicKey(Base58.encode(publicKey));
+        } catch (Exception e) {
+            answer.put("Error", "Invalid Base32 Key");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(StrJSonFine.convert(answer))
+                    .build();
+        }
+    }
+
+
+    @GET
     @Path("personbyaddress/{address}")
     public Response personByAddress(@PathParam("address") String address) {
 
@@ -1508,6 +1563,7 @@ public class API {
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
         Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+      //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
@@ -1531,46 +1587,67 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(person.toJson()))
                 .build();
+    }
 
+    @GET
+    @Path("personbycreatorpublickey/{publickey}")
+    public Response getPersonByCreatorPublicKey(@PathParam("publickey") String publicKey) {
+
+        // CHECK IF VALID ADDRESS
+        if (!core.account.PublicKeyAccount.isValidPublicKey(publicKey)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_PUBLIC_KEY);
+
+        }
+
+        PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
+        if (!DCSet.getInstance().getAddressTime_SignatureMap().contains(publicKeyAccount.getAddress())) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_PERSON_NOT_EXIST);
+        } else {
+            byte[] signature = DCSet.getInstance().getAddressTime_SignatureMap().get(publicKeyAccount.getAddress());
+            Transaction transaction = Controller.getInstance().getTransaction(signature);
+            if (transaction == null || transaction.getType() != Transaction.ISSUE_PERSON_TRANSACTION) {
+                throw ApiErrorFactory.getInstance().createError(
+                        Transaction.ITEM_PERSON_NOT_EXIST);
+            }
+
+            IssuePersonRecord issue_person = (IssuePersonRecord) transaction;
+            PersonCls person = (PersonCls)issue_person.getItem();
+
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(StrJSonFine.convert(person.toJson()))
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("personbycreatorpublickey32/{publickey}")
+    public Response getPersonByCreatorPublicKey32(@PathParam("publickey") String publicKey32) {
+
+        JSONObject answer = new JSONObject();
+        try {
+            byte[] publicKey = Base32.decode(publicKey32);
+            return getPersonByCreatorPublicKey(Base58.encode(publicKey));
+        } catch (Exception e) {
+            answer.put("Error", "Invalid Base32 Key");
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(StrJSonFine.convert(answer))
+                    .build();
+        }
     }
 
     @GET
     @Path("personbypublickeybase32/{publickeybase}")
-    public Response personsByBankKey(@PathParam("publickeybase") String bankkey) {
+    @Deprecated
+    public Response personsByBankKey(@PathParam("publickeybase") String publicKey32) {
 
-        JSONObject ansver;
-        ansver = new JSONObject();
-        try {
-            byte[] publicKey = Base32.decode(bankkey);
-
-            Iterator<Pair<Long, ItemCls>> tt = DCSet.getInstance().getItemPersonMap().getList().iterator();
-            while (tt.hasNext()) {
-                Pair<Long, ItemCls> s = tt.next();
-                PersonCls p = (PersonCls) s.getB();
-                PublicKeyAccount own = p.getOwner();
-                byte[] ow = own.getPublicKey();
-                if (Arrays.equals(ow, publicKey)) {
-                    ansver = p.toJson();
-
-                }
-            }
-
-            if (ansver.isEmpty()) {
-
-                ansver.put("Error", "Public Key Not Found");
-            }
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            ansver.put("Error", "Invalid Base32 Key");
-        }
-
-
-        return Response.status(200)
-                .header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(ansver))
-                .build();
+        return getPersonByCreatorPublicKey32(publicKey32);
 
     }
 
