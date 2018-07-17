@@ -12,6 +12,7 @@ import core.item.assets.AssetVenture;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -26,7 +27,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
-
+@Ignore
 public class BlockExplorerTest {
 
 

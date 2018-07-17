@@ -1,13 +1,10 @@
-package test.records;
+package core.transaction;
 
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
-import core.transaction.GenesisIssuePersonRecord;
-import core.transaction.Transaction;
-import core.transaction.TransactionFactory;
 import datachain.AddressPersonMap;
 import datachain.DCSet;
 import datachain.KKPersonStatusMap;
@@ -197,7 +194,7 @@ public class TestRecGenesisPerson2 {
 
         //CHECK REFERENCE RECIPIENT
         //assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
-
+        genesisIssuePersonTransaction.setDC(db,false);
         genesisIssuePersonTransaction.process(gb, false);
         keyPerson = person.getKey(db);
 

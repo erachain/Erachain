@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,9 +17,6 @@ import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
-import core.transaction.IssueAssetTransaction;
-import core.transaction.R_Send;
-import core.transaction.Transaction;
 import core.wallet.Wallet;
 import datachain.DCSet;
 import ntp.NTP;

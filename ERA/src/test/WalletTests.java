@@ -3,6 +3,7 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import core.block.GenesisBlock;
@@ -12,7 +13,7 @@ import core.wallet.Wallet;
 import database.wallet.DWSet;
 import database.wallet.SecureWalletDatabase;
 import ntp.NTP;
-
+@Ignore
 public class WalletTests {
 
     byte[] releaserReference = null;

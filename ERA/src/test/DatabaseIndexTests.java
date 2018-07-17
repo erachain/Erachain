@@ -6,10 +6,11 @@ import database.DBMap;
 import datachain.NameMap;
 import datachain.SortableList;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-
+@Ignore
 public class DatabaseIndexTests {
 
     @Test

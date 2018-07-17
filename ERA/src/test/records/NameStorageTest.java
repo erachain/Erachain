@@ -11,6 +11,7 @@ import datachain.DCSet;
 import ntp.NTP;
 import org.json.simple.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import utils.Corekeys;
 import utils.Pair;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertNull;
 //import core.transaction.GenesisTransaction;
 
 @SuppressWarnings("unchecked")
+@Ignore
 public class NameStorageTest {
 
     Long releaserReference = null;

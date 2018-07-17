@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.primitives.Bytes;
@@ -24,10 +25,6 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.payment.Payment;
-import core.transaction.ArbitraryTransactionV3;
-import core.transaction.R_Send;
-import core.transaction.Transaction;
-import core.transaction.TransactionAmount;
 import datachain.DCSet;
 import ntp.NTP;
 
@@ -63,6 +60,8 @@ public class TestRec_Send {
 
     // INIT ASSETS
     private void init() {
+
+        System.setProperty("qwe","qw");
 
         db = DCSet.createEmptyDatabaseSet();
         Controller.getInstance().setDCSet(db);
@@ -491,7 +490,8 @@ public class TestRec_Send {
 
     }
 
-
+    @Ignore
+    //TODO actualize the test
     @Test
     public void validateMessageTransactionV3() {
 

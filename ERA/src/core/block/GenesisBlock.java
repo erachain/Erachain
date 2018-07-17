@@ -515,20 +515,21 @@ public class GenesisBlock extends Block {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
                 String license = "";
-                try {
-                    //File file = new File("License Erachain.txt");
-                    File file = new File("Erachain Licence Agreement (genesis).txt");
-                    //READ SETTINS JSON FILE
-                    List<String> lines = Files.readLines(file, Charsets.UTF_8);
+                if(!(BlockChain.TESTS_VERS!=0 && BlockChain.DEVELOP_USE==true)) {
+                    try {
+                        //File file = new File("License Erachain.txt");
+                        File file = new File("Erachain Licence Agreement (genesis).txt");
+                        //READ SETTINS JSON FILE
+                        List<String> lines = Files.readLines(file, Charsets.UTF_8);
 
-                    for (String line : lines) {
-                        license += line + "\n";
+                        for (String line : lines) {
+                            license += line + "\n";
+                        }
+                        //file.close();
+                    } catch (Exception e) {
+                        return null;
                     }
-                    //file.close();
-                } catch (Exception e) {
-                    return null;
                 }
-
                 return new Template(CREATOR, "Пользовательское соглашение на использование данного программного продукта"
                         //+ " \"" + Controller.APP_NAME + "\"", icon, image,
                         + " \"ERM4\"", icon, image,

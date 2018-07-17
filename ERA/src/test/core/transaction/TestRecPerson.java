@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
@@ -9,7 +9,6 @@ import core.item.ItemCls;
 import core.item.ItemFactory;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonHuman;
-import core.transaction.*;
 import core.wallet.Wallet;
 import datachain.AddressPersonMap;
 import datachain.DCSet;
@@ -17,6 +16,7 @@ import datachain.KKPersonStatusMap;
 import datachain.PersonAddressMap;
 import ntp.NTP;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple4;
 
@@ -107,11 +107,13 @@ public class TestRecPerson {
         //personGeneral.setKey(genesisPersonKey);
 
         GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
+        genesis_issue_person.setDC(db,false);
         genesis_issue_person.process(gb, false);
         //genesisPersonKey = db.getIssuePersonMap().size();
         genesisPersonKey = genesis_issue_person.getAssetKey(db);
 
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
+        genesis_certify.setDC(db, false);
         genesis_certify.process(gb, false);
 
         certifier.setLastTimestamp(last_ref, db);
@@ -178,7 +180,7 @@ public class TestRecPerson {
 
     }
 
-
+    @Ignore
     @Test
     public void validateIssuePersonRecord() {
 
@@ -311,7 +313,7 @@ public class TestRecPerson {
         }
     }
 
-
+    @Ignore
     @Test
     public void processIssuePersonRecord() {
 
@@ -319,7 +321,7 @@ public class TestRecPerson {
 
         //assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, releaserReference));
         assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(releaserReference, flags));
-
+        issuePersonTransaction.setDC(db,false);
         issuePersonTransaction.sign(certifier, false);
 
         issuePersonTransaction.process(gb, false);
@@ -359,7 +361,7 @@ public class TestRecPerson {
     ///////////////////////////////////////
     // PERSONONALIZE RECORD
     ///////////////////////////////////////
-
+    @Ignore
     @Test
     public void validatePersonalizeRecord() {
 
@@ -409,7 +411,7 @@ public class TestRecPerson {
         assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(releaserReference, flags));
 
     }
-
+    @Ignore
     @Test
     public void validateSignaturePersonalizeRecord() {
 
@@ -454,7 +456,7 @@ public class TestRecPerson {
         assertEquals(true, r_SertifyPubKeys.isSignatureValid(db));
 
     }
-
+    @Ignore
     @Test
     public void parsePersonalizeRecord() {
 
@@ -525,7 +527,7 @@ public class TestRecPerson {
             //EXCEPTION IS THROWN OK
         }
     }
-
+    @Ignore
     @Test
     public void process_orphan_PersonalizeRecord() {
 
@@ -725,7 +727,7 @@ public class TestRecPerson {
         assertEquals(true, userAccount2.isPerson(db, db.getBlockSignsMap().getHeight(db.getBlockMap().getLastBlockSignature())));
 
     }
-
+    @Ignore
     @Test
     public void fork_process_orphan_PersonalizeRecord() {
 

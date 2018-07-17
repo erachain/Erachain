@@ -15,6 +15,7 @@ import datachain.BlocksHeadsMap;
 import datachain.DCSet;
 import ntp.NTP;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 
@@ -23,7 +24,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-
+@Ignore
 public class TestChain {
 
     static Logger LOGGER = Logger.getLogger(TestChain.class.getName());
