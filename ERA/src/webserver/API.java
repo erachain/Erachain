@@ -1456,8 +1456,8 @@ public class API {
     }
 
     @GET
-    @Path("personkeybycreatorpublickey/{publickey}")
-    public Response getPersonKeyByCreatorPublicKey(@PathParam("publickey") String publicKey) {
+    @Path("personkeybyownerpublickey/{publickey}")
+    public Response getPersonKeyByOwnerPublicKey(@PathParam("publickey") String publicKey) {
 
         // CHECK IF VALID ADDRESS
         if (!core.account.PublicKeyAccount.isValidPublicKey(publicKey)) {
@@ -1488,13 +1488,13 @@ public class API {
     }
 
     @GET
-    @Path("personkeybycreatorpublickey32/{publickey}")
-    public Response getPersonKeyByCreatorPublicKey32(@PathParam("publickey") String publicKey32) {
+    @Path("personkeybyownerpublickey32/{publickey}")
+    public Response getPersonKeyByOwnerPublicKey32(@PathParam("publickey") String publicKey32) {
 
         JSONObject answer = new JSONObject();
         try {
             byte[] publicKey = Base32.decode(publicKey32);
-            return getPersonKeyByCreatorPublicKey(Base58.encode(publicKey));
+            return getPersonKeyByOwnerPublicKey(Base58.encode(publicKey));
         } catch (Exception e) {
             answer.put("Error", "Invalid Base32 Key");
             return Response.status(200)
@@ -1587,8 +1587,8 @@ public class API {
     }
 
     @GET
-    @Path("personbycreatorpublickey/{publickey}")
-    public Response getPersonByCreatorPublicKey(@PathParam("publickey") String publicKey) {
+    @Path("personbyownerpublickey/{publickey}")
+    public Response getPersonByOwnerPublicKey(@PathParam("publickey") String publicKey) {
 
         // CHECK IF VALID ADDRESS
         if (!core.account.PublicKeyAccount.isValidPublicKey(publicKey)) {
@@ -1625,13 +1625,13 @@ public class API {
     }
 
     @GET
-    @Path("personbycreatorpublickey32/{publickey}")
-    public Response getPersonByCreatorPublicKey32(@PathParam("publickey") String publicKey32) {
+    @Path("personbyownerpublickey32/{publickey}")
+    public Response getPersonByOwnerPublicKey32(@PathParam("publickey") String publicKey32) {
 
         JSONObject answer = new JSONObject();
         try {
             byte[] publicKey = Base32.decode(publicKey32);
-            return getPersonByCreatorPublicKey(Base58.encode(publicKey));
+            return getPersonByOwnerPublicKey(Base58.encode(publicKey));
         } catch (Exception e) {
             answer.put("Error", "Invalid Base32 Key");
             return Response.status(200)
@@ -1647,7 +1647,7 @@ public class API {
     @Deprecated
     public Response personsByBankKey(@PathParam("publickeybase") String publicKey32) {
 
-        return getPersonByCreatorPublicKey32(publicKey32);
+        return getPersonByOwnerPublicKey32(publicKey32);
 
     }
 
