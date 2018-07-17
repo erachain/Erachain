@@ -14,6 +14,7 @@ import datachain.DCSet;
 import datachain.ItemAssetMap;
 import ntp.NTP;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -23,7 +24,7 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
-
+@Ignore
 public class DatabaseTests {
 
     static Logger LOGGER = Logger.getLogger(DatabaseTests.class.getName());

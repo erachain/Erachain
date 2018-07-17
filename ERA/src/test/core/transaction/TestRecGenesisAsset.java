@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import core.BlockChain;
 import core.account.Account;
@@ -6,12 +6,9 @@ import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import core.transaction.GenesisIssueAssetTransaction;
-import core.transaction.GenesisTransferAssetTransaction;
-import core.transaction.Transaction;
-import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -20,7 +17,7 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 ;
-
+@Ignore
 public class TestRecGenesisAsset {
 
     static Logger LOGGER = Logger.getLogger(TestRecGenesisAsset.class.getName());

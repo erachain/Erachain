@@ -32,7 +32,7 @@ public class SettingTests {
     /**
      * Password for test wallet
      */
-  public  final static String WALLET_PASSWORD = "1234567";
+  public  final static String WALLET_PASSWORD = "12345678";
 
     protected void Init() throws Exception {
 

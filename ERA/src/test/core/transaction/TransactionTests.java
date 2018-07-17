@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import core.BlockChain;
 import core.account.Account;
@@ -9,13 +9,13 @@ import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
 import core.naming.Name;
 import core.naming.NameSale;
-import core.transaction.*;
 import core.voting.Poll;
 import core.voting.PollOption;
 import datachain.DCSet;
 import ntp.NTP;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 //import core.transaction.MultiPaymentTransaction;
-
+@Ignore
 public class TransactionTests {
 
     static Logger LOGGER = Logger.getLogger(TransactionTests.class.getName());
@@ -94,7 +94,7 @@ public class TransactionTests {
 
     @Test
     public void validateSignatureR_Send() {
-
+String  s= "";
         init();
 
         //CREATE PAYMENT
@@ -424,6 +424,7 @@ public class TransactionTests {
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
+        nameRegistration.setDC(db,false);
         nameRegistration.sign(maker, false);
         nameRegistration.process(gb, false);
 

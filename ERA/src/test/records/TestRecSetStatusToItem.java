@@ -88,6 +88,7 @@ public class TestRecSetStatusToItem {
 
         //CREATE ISSUE PERSON TRANSACTION
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        issuePersonTransaction.setDC(db, false);
         issuePersonTransaction.process(gb, false);
         person = (PersonCls) issuePersonTransaction.getItem();
         personkey = person.getKey(db);
@@ -201,7 +202,7 @@ public class TestRecSetStatusToItem {
     public void process_orphanSetStatusTransaction() {
 
         init();
-
+        setStatusTransaction.setDC(db,false);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(releaserReference, flags));
         assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(), 0);
 
@@ -228,6 +229,7 @@ public class TestRecSetStatusToItem {
                 0l,
                 "tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
                 timestamp + 10, maker.getLastTimestamp(db));
+        setStatusTransaction_2.setDC(db,false);
         setStatusTransaction_2.sign(maker, false);
         setStatusTransaction_2.process(gb, false);
 

@@ -23,7 +23,7 @@ public class TelegramsResourceTest extends SettingTests {
     @Test
     public void send() throws Exception {
 
-        new ApiClient().executeCommand("POST wallet/unlock 1234567");
+        new ApiClient().executeCommand("POST wallet/unlock " + WALLET_PASSWORD);
 
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
         String[] parse = (resultAddresses.replace("\r\n", "").split(","));

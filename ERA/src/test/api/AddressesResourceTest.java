@@ -4,12 +4,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import api.ApiClient;
+import test.SettingTests;
 
-public class AddressesResourceTest {
+public class AddressesResourceTest extends SettingTests {
 
     @Test
     public void getAddresses() {
-        new ApiClient().executeCommand("POST wallet/unlock 1234567");
+        new ApiClient().executeCommand("POST wallet/unlock " + WALLET_PASSWORD);
 
         String resultAddresses = new ApiClient().executeCommand("GET addresses");
 

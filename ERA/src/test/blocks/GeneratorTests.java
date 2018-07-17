@@ -14,6 +14,8 @@ import core.transaction.Transaction;
 import core.wallet.Wallet;
 import datachain.DCSet;
 import ntp.NTP;
+import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 
@@ -25,7 +27,7 @@ import java.util.TreeMap;
 import static org.junit.Assert.assertEquals;
 
 //import core.transaction.GenesisTransaction;
-
+@Ignore
 public class GeneratorTests {
 
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -34,7 +36,7 @@ public class GeneratorTests {
     byte[] assetReference = new byte[Crypto.SIGNATURE_LENGTH];
     long timestamp = NTP.getTime();
     Controller cntrlr = Controller.getInstance();
-
+    private DCSet db;
     long flags = 0l;
 
     PrivateKeyAccount generator1;
@@ -44,6 +46,12 @@ public class GeneratorTests {
 
     //CREATE EMPTY MEMORY DATABASE
     DCSet dcSet = DCSet.createEmptyDatabaseSet();
+
+    @Before
+    public void init() {
+        db = DCSet.createEmptyDatabaseSet();
+    }
+
 
     @Test
     public void generateNewBlock() {
@@ -647,6 +655,8 @@ public class GeneratorTests {
             Transaction payment = new R_Send(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
                     timestamp++, generator.getLastTimestamp(snapshot));
+
+            payment.setDC(db, false);
             payment.sign(generator, false);
             assertEquals(payment.isValid(null, flags), Transaction.VALIDATE_OK);
 

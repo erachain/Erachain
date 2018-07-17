@@ -38,15 +38,24 @@ sourceSets {
     }
 
     test {
-        System.setProperty 'version', '411'
         java {
             srcDir 'ERA/src/test'
         }
     }
-    build {
-        System.setProperty("version", "0")
-    }
 }
+
+test{
+    systemProperty('version', '411')
+    systemProperty('developer', 'true')
+}
+
+
+
+build{
+    System.setProperty("version","0")
+    System.setProperty("developer","false")
+}
+
 
 dependencies {
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'

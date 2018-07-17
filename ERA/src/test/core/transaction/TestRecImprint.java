@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
@@ -8,9 +8,6 @@ import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.imprints.Imprint;
 import core.item.imprints.ImprintCls;
-import core.transaction.IssueImprintRecord;
-import core.transaction.Transaction;
-import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import datachain.ItemImprintMap;
 import ntp.NTP;
@@ -171,6 +168,7 @@ public class TestRecImprint {
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
+        issueImprintRecord.setDC(db,false);
         assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
         issueImprintRecord.sign(maker, false);
 
@@ -189,6 +187,7 @@ public class TestRecImprint {
         ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
         IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp + 10);
         issueImprintTransaction_2.sign(maker, false);
+        issueImprintTransaction_2.setDC(db,false);
         issueImprintTransaction_2.process(gb, false);
         LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
         issueImprintTransaction_2.orphan(false);
@@ -212,6 +211,7 @@ public class TestRecImprint {
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
         issueImprintRecord.sign(maker, false);
+        issueImprintRecord.setDC(db,false);
         issueImprintRecord.process(gb, false);
         long key = db.getIssueImprintMap().get(issueImprintRecord);
         //		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));

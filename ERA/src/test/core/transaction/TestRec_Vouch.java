@@ -1,16 +1,14 @@
-package test.records;
+package core.transaction;
 
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import core.transaction.R_Vouch;
-import core.transaction.Transaction;
-import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import ntp.NTP;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 
@@ -87,6 +85,8 @@ public class TestRec_Vouch {
         assertEquals(false, vouchRecord.isSignatureValid(db));
     }
 
+    @Ignore
+    //TODO actualize the test
     @Test
     public void validate_R_Vouch() {
 
@@ -171,7 +171,7 @@ public class TestRec_Vouch {
         }
     }
 
-
+@Ignore
     @Test
     public void processR_Vouch() {
 
@@ -192,6 +192,7 @@ public class TestRec_Vouch {
 		block.addTransaction(vouchRecord);
 		block.process(db);
 		 */
+        vouchRecord.setDC(db,false);
         vouchRecord.process(gb, false);
 
         Tuple2<Integer, Integer> ggg = new Tuple2<Integer, Integer>(height, seq);

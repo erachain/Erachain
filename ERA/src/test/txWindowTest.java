@@ -12,12 +12,13 @@ import core.transaction.R_Send;
 import gui.transaction.ArbitraryTransactionDetailsFrame;
 import gui.transaction.Send_RecordDetailsFrame;
 import ntp.NTP;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+@Ignore
 public class txWindowTest {
 
     byte FEE_POWER = 0;
