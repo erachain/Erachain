@@ -298,7 +298,8 @@ public class BlockExplorer {
             if (info.getQueryParameters().containsKey("page")) {
                 transPage = Integer.parseInt(info.getQueryParameters().getFirst("page"));
             }
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), transPage));        }
+            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), transPage));
+        }
 
         // transaction
         else if (info.getQueryParameters().containsKey("tx")) {
@@ -1352,7 +1353,7 @@ public class BlockExplorer {
         BigDecimal sumBuyingAmount = BigDecimal.ZERO;
         BigDecimal sumBuyingAmountGood = BigDecimal.ZERO;
 
-        for (int i = ordersHave.size() - 1; i >= 0; i--) {
+        for (int i = ordersWant.size() - 1; i >= 0; i--) {
 
             Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
         

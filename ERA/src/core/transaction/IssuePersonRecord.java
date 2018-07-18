@@ -273,11 +273,15 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         //UPDATE CREATOR
         super.process(block, asPack);
 
-        // for quick search public keys - use PUB_KEY from Person DATA
         PersonHuman person = (PersonHuman) this.item;
+        PublicKeyAccount maker = person.getOwner();
+        byte[] makerBytes = maker.getPublicKey();
+        this.dcSet.getIssuePersonMap().set(makerBytes, person.getKey());
+
+        // for quick search public keys - use PUB_KEY from Person DATA
         if (person.isMustBeSigned()) {
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
-            String creatorAddress = person.getOwner().getAddress();
+            String creatorAddress = maker.getAddress();
             if (!dbASmap.contains(creatorAddress)) {
                 dbASmap.set(creatorAddress, this.signature);
             }
@@ -294,6 +298,11 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     public void orphan(boolean asPack) {
         //UPDATE CREATOR
         super.orphan(asPack);
+
+        PersonHuman person = (PersonHuman) this.item;
+        PublicKeyAccount maker = person.getOwner();
+        byte[] makerBytes = maker.getPublicKey();
+        this.dcSet.getIssuePersonMap().delete(makerBytes);
 
         // EMITTE LIA
         this.creator.changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false);
