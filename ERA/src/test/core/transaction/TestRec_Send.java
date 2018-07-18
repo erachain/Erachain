@@ -1,19 +1,7 @@
 package core.transaction;
 
-import static org.junit.Assert.assertEquals;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-
 import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
@@ -27,6 +15,15 @@ import core.item.assets.AssetVenture;
 import core.payment.Payment;
 import datachain.DCSet;
 import ntp.NTP;
+import org.apache.log4j.Logger;
+import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class TestRec_Send {
@@ -34,7 +31,7 @@ public class TestRec_Send {
     static Logger LOGGER = Logger.getLogger(TestRec_Send.class.getName());
 
     Long releaserReference = null;
-
+    long assetKeyTest = 1011;
     long ERA_KEY = AssetCls.ERA_KEY;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 0;
@@ -490,8 +487,6 @@ public class TestRec_Send {
 
     }
 
-    @Ignore
-    //TODO actualize the test
     @Test
     public void validateMessageTransactionV3() {
 
@@ -514,7 +509,7 @@ public class TestRec_Send {
         r_SendV3.sign(maker, false);
         r_SendV3.setDC(db, false);
 
-        assertEquals(r_SendV3.isValid(releaserReference, flags), 25); //Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(releaserReference, flags),Transaction.VALIDATE_OK ); //);
 
         assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp(db));
         r_SendV3.process(gb, false);
@@ -563,7 +558,7 @@ public class TestRec_Send {
         r_SendV3.sign(maker, false);
         r_SendV3.setDC(db, false);
 
-        assertEquals(r_SendV3.isValid(releaserReference, flags), 25); //Transaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK); //Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, false);
         assertEquals((long) maker.getLastTimestamp(db), timestamp);
@@ -703,7 +698,7 @@ public class TestRec_Send {
         r_SendV3.sign(maker, false);
         r_SendV3.setDC(db, false);
 
-        assertEquals(r_SendV3.isValid(releaserReference, flags), 25); //ransaction.VALIDATE_OK);
+        assertEquals(r_SendV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK); //ransaction.VALIDATE_OK);
 
         r_SendV3.process(gb, false);
 
@@ -743,7 +738,7 @@ public class TestRec_Send {
         AssetCls aTFundingAsset = new AssetVenture(new GenesisBlock().getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
         aTFundingAsset.setReference(assetReference);
-        db.getItemAssetMap().set(61l, aTFundingAsset);
+        db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
 
         GenesisBlock genesisBlock = gb; //new GenesisBlock();
 		/*
@@ -768,12 +763,12 @@ public class TestRec_Send {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         List<Payment> payments = new ArrayList<Payment>();
-        payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
-        payments.add(new Payment(recipient2, 61l, BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
-        payments.add(new Payment(recipient3, 61l, BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+        payments.add(new Payment(recipient1, assetKeyTest, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+        payments.add(new Payment(recipient2, assetKeyTest, BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
+        payments.add(new Payment(recipient3, assetKeyTest, BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
 
         ArbitraryTransactionV3 arbitraryTransactionV3 = new ArbitraryTransactionV3(
                 maker, payments, 111,
@@ -794,10 +789,10 @@ public class TestRec_Send {
         arbitraryTransactionV3.process(gb, false);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(1000 - 110 - 120 - 201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
-        assertEquals(BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient1.getBalanceUSE(61l, db));
-        assertEquals(BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient2.getBalanceUSE(61l, db));
-        assertEquals(BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient3.getBalanceUSE(61l, db));
+        assertEquals(BigDecimal.valueOf(1000 - 110 - 120 - 201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(assetKeyTest, db));
+        assertEquals(BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient1.getBalanceUSE(assetKeyTest, db));
+        assertEquals(BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient2.getBalanceUSE(assetKeyTest, db));
+        assertEquals(BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient3.getBalanceUSE(assetKeyTest, db));
 
         byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
 
@@ -832,7 +827,7 @@ public class TestRec_Send {
         AssetCls aTFundingAsset = new AssetVenture(gb.getCreator(), "ATFunding", icon, image, "This asset represents the funding of AT team for the integration of a Turing complete virtual machine into ERM.",
                 0, 8, 250000000l);
         aTFundingAsset.setReference(gb.getSignature());
-        db.getItemAssetMap().set(61l, aTFundingAsset);
+        db.getItemAssetMap().set(assetKeyTest, aTFundingAsset);
 
         //CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -844,7 +839,7 @@ public class TestRec_Send {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         List<Payment> payments = new ArrayList<Payment>();
 
@@ -867,7 +862,7 @@ public class TestRec_Send {
         arbitraryTransactionV3.process(gb, false);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
-        assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
+        assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(assetKeyTest, db));
 
 
         byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
