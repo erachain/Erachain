@@ -82,18 +82,21 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
     public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         // this order is NOT executable
-        order = datachain.OrderMap.setExecutable(order, false);
+        ////order = datachain.OrderMap.setExecutable(order, false);
 
         this.set(order.a.a, order);
     }
 
+    /*
     @Override
     public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(BigInteger key) {
         Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
-        return datachain.OrderMap.setExecutable(order, false);
+        ///return datachain.OrderMap.setExecutable(order, false);
+        return order;
     }
+    */
 
     public void delete(Order order) {
         this.delete(order.getId());

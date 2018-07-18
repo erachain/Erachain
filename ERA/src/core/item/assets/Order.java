@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.List;
 
 import org.json.simple.JSONObject;
@@ -95,7 +96,8 @@ public class Order implements Comparable<Order> {
         if (db.getCompletedOrderMap().contains(key)) {
             Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
-            return OrderMap.setExecutable(order, false);
+            ///return OrderMap.setExecutable(order, false);
+            return order;
         }
 
         return null;
@@ -473,7 +475,32 @@ public class Order implements Comparable<Order> {
         List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap()
                 .getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
-        
+
+        orders.sort(new OrderComparatorForTrade());
+
+        if (true && !orders.isEmpty()) {
+            BigDecimal price = orders.get(0).a.e;
+            Long timestamp = orders.get(0).a.c;
+            for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>item: orders) {
+                int comp = price.compareTo(item.a.e);
+                if (comp > 0) {
+                    // RISE ERROR
+                    timestamp = null;
+                    ++timestamp;
+                } else if (comp == 0) {
+                    if (timestamp.compareTo(item.a.c) > 0) {
+                        // RISE ERROR
+                        timestamp = null;
+                        ++timestamp;
+                    }
+                }
+
+                price = item.a.e;
+                timestamp = item.a.c;
+            }
+
+        }
         //boolean isDivisibleHave = true; //this.isHaveDivisible(db);
         //boolean isDivisibleWant = true; //this.isWantDivisible(db);
         BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();

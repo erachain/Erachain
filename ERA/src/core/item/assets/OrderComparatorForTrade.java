@@ -28,7 +28,7 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
         if (compare < 0)
             return -1;
 
-        compare = (int)(order1.a.c - order2.a.c);
+        compare = order1.a.c.compareTo(order2.a.c);
         if (compare > 0)
             return 1;
         if (compare < 0)

@@ -76,6 +76,7 @@ public class OrderMap extends DCMap<BigInteger,
 
     }
 
+    /*
     public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> setExecutable(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order, boolean executable) {
@@ -85,6 +86,7 @@ public class OrderMap extends DCMap<BigInteger,
                 order.b, order.c);
         return newOrder;
     }
+    */
 
     @Override
     protected void createIndexes(DB database) {
@@ -126,9 +128,9 @@ public class OrderMap extends DCMap<BigInteger,
                         Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>() {
                     @Override
-                    public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key,
-                                                                          Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                                                                  Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
+                    public Tuple4<Long, Long, BigDecimal, BigInteger> run(
+                            BigInteger key, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
                         return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.b.a, value.c.a,
                                 Order.calcPrice(value.b.b, value.c.b), key);
                     }
@@ -140,13 +142,14 @@ public class OrderMap extends DCMap<BigInteger,
                 .makeOrGet();
 
         //BIND HAVE/WANT KEY
-        Bind.secondaryKey(map, this.wantHaveKeyMap, new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger,
-                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Bind.secondaryKey(map, this.wantHaveKeyMap,
+                new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger,
+                    Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                         Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>() {
-            @Override
-            public Tuple4<Long, Long, BigDecimal, BigInteger> run(BigInteger key,
-                                                                  Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                                                          Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
+                @Override
+                public Tuple4<Long, Long, BigDecimal, BigInteger> run(
+                        BigInteger key, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                                              Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
                 return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.c.a, value.b.a,
                         Order.calcPrice(value.b.b, value.c.b), key);
             }
@@ -166,13 +169,6 @@ public class OrderMap extends DCMap<BigInteger,
     @Override
     protected Map<Integer, Integer> getObservableData() {
         return this.observableData;
-    }
-
-    public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
-
-        // this order is NOT executable
-        this.set(order.a.a, setExecutable(order, true));
     }
 
     // GET KEYs with FORKED rules
@@ -423,6 +419,15 @@ public class OrderMap extends DCMap<BigInteger,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
     }
 
+    public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+
+        // this order is NOT executable
+        ////this.set(order.a.a, setExecutable(order, true));
+        this.set(order.a.a, order);
+    }
+
+    /*
     @Override
     public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(BigInteger key) {
@@ -433,6 +438,7 @@ public class OrderMap extends DCMap<BigInteger,
 
         return setExecutable(order, true);
     }
+    */
 
 
     public void delete(Order order) {
