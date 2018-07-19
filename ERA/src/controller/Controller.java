@@ -2536,8 +2536,8 @@ public class Controller extends Observable {
      */
     
     public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(
-            AssetCls have, AssetCls want, boolean filter) {
-        return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), filter);
+            AssetCls have, AssetCls want) {
+        return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
     }
     
     public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(

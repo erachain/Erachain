@@ -40,7 +40,7 @@ public class BuyOrdersTableModel extends
         this.have = have;
         this.want = want;
 
-        this.orders = Controller.getInstance().getOrders(have, want, true);
+        this.orders = Controller.getInstance().getOrders(have, want);
 
         // columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
         columnNames[COLUMN_PRICE] += " " + have.getShort();
@@ -120,7 +120,7 @@ public class BuyOrdersTableModel extends
             }
 
         } else if (size > row) {
-            this.orders = Controller.getInstance().getOrders(have, want, true);
+            this.orders = Controller.getInstance().getOrders(have, want);
             totalCalc();
             this.fireTableDataChanged();
             return null;
@@ -195,7 +195,7 @@ public class BuyOrdersTableModel extends
                 || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
                 || message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
-            this.orders = Controller.getInstance().getOrders(have, want, true);
+            this.orders = Controller.getInstance().getOrders(have, want);
             totalCalc();
             this.fireTableDataChanged();
         }

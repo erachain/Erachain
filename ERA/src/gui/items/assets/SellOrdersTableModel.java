@@ -36,7 +36,7 @@ public class SellOrdersTableModel extends
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
         this.have = have;
         this.want = want;
-        this.orders = Controller.getInstance().getOrders(have, want, true);
+        this.orders = Controller.getInstance().getOrders(have, want);
 
         columnNames[COLUMN_PRICE] += " " + want.getShort();
         columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();
@@ -110,7 +110,7 @@ public class SellOrdersTableModel extends
             }
 
         } else if (size > row) {
-            this.orders = Controller.getInstance().getOrders(have, want, true);
+            this.orders = Controller.getInstance().getOrders(have, want);
             totalCalc();
             this.fireTableDataChanged();
             return null;
@@ -173,7 +173,7 @@ public class SellOrdersTableModel extends
             //|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
             //|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
                 ) {
-            this.orders = Controller.getInstance().getOrders(this.have, want, true);
+            this.orders = Controller.getInstance().getOrders(this.have, want);
             // List<Order> items =
             // DCSet.getInstance().getOrderMap().getOrders(have.getKey(),
             // want.getKey(), false);

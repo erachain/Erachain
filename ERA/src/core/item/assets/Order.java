@@ -476,19 +476,27 @@ public class Order implements Comparable<Order> {
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap()
                 .getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
 
-        orders.sort(new OrderComparatorForTrade());
-
         if (true && !orders.isEmpty()) {
             BigDecimal price = orders.get(0).a.e;
             Long timestamp = orders.get(0).a.c;
             for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>item: orders) {
+                if (!item.b.a.equals(this.wantKey)
+                        || !item.c.a.equals(this.haveKey)) {
+                    // RISE ERROR
+                    timestamp = null;
+                    ++timestamp;
+                }
+                // потому что сранивается потом обратная цена то тут должно быть возрастание
+                // и если не так то ошибка
                 int comp = price.compareTo(item.a.e);
                 if (comp > 0) {
                     // RISE ERROR
                     timestamp = null;
                     ++timestamp;
                 } else if (comp == 0) {
+                    // здесь так же должно быть возростание
+                    // если не так то ошибка
                     if (timestamp.compareTo(item.a.c) > 0) {
                         // RISE ERROR
                         timestamp = null;

@@ -2940,40 +2940,38 @@ public class OrderTestsMy {
                 .getOrderMap().getOrdersForTradeWithFork(wantKey, haveKey, false);
                 
         tempPrice = BigDecimal.ZERO;
-        long timestamp = 0;
-        while (index < orders.size()) {
-            
-            // GET ORDER
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders
-                    .get(index++);
-            
+        Long timestamp = 0L;
+        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order: orders) {
+
+            Assert.assertEquals((long)order.b.a, wantKey);
+            Assert.assertEquals((long)order.c.a, haveKey);
+
             String signB58 = Base58.encode(order.a.a);
             
             Assert.assertEquals(deletedID.equals(order.a.a), false);
             
             BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-            BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
-            
+            BigDecimal orderPrice = order.a.e;
+
+            Assert.assertEquals(Order.calcPrice(order.b.b, order.c.b).equals(orderPrice), true);
+
             String date = DateTimeFormat.timestamptoString(order.a.c);
-            
-            if (tempPrice.signum() == 0) {
-                tempPrice = orderReversePrice;
-            }
-            
-            compare = tempPrice.compareTo(orderReversePrice);
-            Assert.assertEquals(compare >= 0, true);
-            if (compare < 0) {
+
+            compare = tempPrice.compareTo(orderPrice);
+            Assert.assertEquals(compare <= 0, true);
+            if (compare > 0) {
                 // error
                 compare = index;
             } else if (compare == 0) {
-                Assert.assertEquals(timestamp <= order.a.c, true);
-                if (timestamp > order.a.c) {
+                compare = timestamp.compareTo(order.a.c);
+                Assert.assertEquals(compare <= 0, true);
+                if (compare > 0) {
                     // error
                     compare = index;
                 }
             }
 
-            tempPrice = orderReversePrice;
+            tempPrice = orderPrice;
             timestamp = order.a.c;
             
         }
