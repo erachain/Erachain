@@ -257,6 +257,11 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     @Override
     public int getInvitedFee() {
         int fee = this.fee.unscaledValue().intValue();
+
+        if (true) {
+            return fee >> BlockChain.FEE_INVITED_SHIFT;
+        }
+
         long counter = this.dcSet.getItemPersonMap().getLastKey();
         if (counter < 10000l)
             return fee >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
