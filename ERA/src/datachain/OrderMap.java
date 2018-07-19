@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import core.item.assets.OrderKeysComparatorForTrade;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -280,18 +281,13 @@ public class OrderMap extends DCMap<BigInteger,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>();
 
         for (Map.Entry<BigInteger, Boolean> orderKey : orderKeys.entrySet()) {
-            //Filters orders with unacceptably small amount. These orders have not worked
-            if (filter) {
-                if (isExecutable(getDCSet(), orderKey.getKey()))
-                    orders.add(this.get(orderKey.getKey()));
-            } else {
-                orders.add(this.get(orderKey.getKey()));
-            }
+            orders.add(this.get(orderKey.getKey()));
         }
 
         return orders;
     }
 
+    /*
     public boolean isExecutable(DCSet db, BigInteger key) {
 
         Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
@@ -305,6 +301,7 @@ public class OrderMap extends DCMap<BigInteger,
         return true;
 
     }
+    */
 
     public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
@@ -330,15 +327,10 @@ public class OrderMap extends DCMap<BigInteger,
         return orders;
     }
 
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersSortableList(long have, long want) {
-        //RETURN
-        return getOrdersSortableList(have, want, false);
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersSortableList(long have, long want, boolean filter) {
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersSortableList(long have, long want) {
+
         //FILTER ALL KEYS
         Collection<BigInteger> keys;
         
@@ -375,22 +367,12 @@ public class OrderMap extends DCMap<BigInteger,
 
         }
 
-        if (filter) {
-            List<BigInteger> keys2 = new ArrayList<BigInteger>();
-
-            DCSet db = getDCSet();
-            Iterator<BigInteger> iter = keys.iterator();
-            while (iter.hasNext()) {
-                BigInteger key = iter.next();
-                if (isExecutable(db, key))
-                    keys2.add(key);
-            }
-            keys = keys2;
-        }
+        List<BigInteger> keysList = new ArrayList<BigInteger>(keys);
+        Collections.sort(keysList, new OrderKeysComparatorForTrade());
 
         //RETURN
         return new SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keysList);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

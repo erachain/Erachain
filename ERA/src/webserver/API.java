@@ -1202,6 +1202,7 @@ public class API {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
+        /* OLD
         SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersA = this.dcSet.getOrderMap().getOrdersSortableList(have, want, true);
 
@@ -1237,14 +1238,36 @@ public class API {
                 arrayB.add(itemJson);
             }
         }
+        */
+
+        JSONArray arraySell = new JSONArray();
+        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order: orders) {
+            JSONArray itemJson = new JSONArray();
+            itemJson.add(order.b.b.subtract(order.b.c));
+            itemJson.add(Order.calcPrice(order.b.b, order.c.b));
+
+            arraySell.add(itemJson);
+
+        }
+
+        JSONArray arrayBuy = new JSONArray();
+        orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, false);
+        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order: orders) {
+            JSONArray itemJson = new JSONArray();
+            itemJson.add(order.b.b.subtract(order.b.c));
+            itemJson.add(Order.calcPrice(order.c.b, order.b.b)); // REVERSE
+
+            arrayBuy.add(itemJson);
+
+        }
 
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("buy", arrayA);
-        itemJSON.put("sell", arrayB);
+        itemJSON.put("buy", arrayBuy);
+        itemJSON.put("sell", arraySell);
         itemJSON.put("pair", have + ":" + want);
-
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")

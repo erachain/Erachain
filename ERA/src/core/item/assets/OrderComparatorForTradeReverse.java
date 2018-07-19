@@ -21,20 +21,13 @@ Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1,
             Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2) {
-        
+
         int compare = order1.a.e.compareTo(order2.a.e);
-        if (compare < 0)
-            return 1;
-        if (compare > 0)
-            return -1;
+        if (compare != 0)
+            return -compare;
 
-        compare = (int)(order1.a.c - order2.a.c);
-        if (compare > 0)
-            return 1;
-        if (compare < 0)
-            return -1;
+        return -order1.a.c.compareTo(order2.a.c);
 
-        return 0;
     }
 
 }
