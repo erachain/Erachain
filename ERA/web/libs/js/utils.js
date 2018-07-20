@@ -1,28 +1,26 @@
 // select view format 
 function fformat(text){
-var pref = text.substring(0,2);
-if (pref =="<\n"){
+var pref1 = text.substring(0,1);
+var pref2 = text.substring(1,2);
+
+if (pref1 =="<"){
 // return HTML
+if (pref2 =="\n"){
 return text.substring(2);
 }
-if (pref=="#\n"){
+return text;
+}
+
+if (pref1=="#"){
+// return MarkDown
+if (pref2=="\n"){
 // return MarkDown
 return marked(text.substring(2));
 }
-
-var pref = text.substring(0,1);
-if (pref =="<"){
-// return HTML
-return text;
-}
-if (pref=="#"){
-// return MarkDown
 return marked(text);
 }
 
-
-
-//  return text
-return htmlFilter(wordwrap(text, 100, '\n', true));
+//  return plain text
+return htmlFilter(wordwrap(text, 80, '\n', true));
 
 }
