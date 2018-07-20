@@ -24,9 +24,6 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
     // public static final int COLUMN_TEMPLATE = 2;
     public static final int COLUMN_BODY = 2;
     public static final int COLUMN_FAVORITE = 3;
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
     List<R_SignNote> transactions;
     private String[] columnNames = new String[]{"Timestamp",
@@ -40,7 +37,6 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
     }
 
     // set class
-
     public Class<? extends Object> getColumnClass(int c) { // set column type
         Object o = getValueAt(0, c);
         return o == null ? Null.class : o.getClass();
@@ -59,7 +55,6 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        // TODO Auto-generated method stub
         return this.columnNames.length;
     }
 
@@ -82,14 +77,11 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        // TODO Auto-generated method stub
         return transactions.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        // TODO Auto-generated method stub
-        // try {
         if (this.transactions == null || this.transactions.size() - 1 < row) {
             return null;
         }
@@ -105,10 +97,7 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
              *
              * if (record.getVersion() ==2) {
              *
-             *
              * return " "; } //view version 1
-             *
-             *
              *
              * return ItemCls.getItem(DBSet.getInstance(), ItemCls.TEMPLATE_TYPE,
              * record.getKey()).toString();
@@ -126,12 +115,11 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 
                         return a.b;
                     } catch (Exception e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
                 }
 
-                String str = "";
+                String str;
                 try {
                     JSONObject data = (JSONObject) JSONValue
                             .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
@@ -139,8 +127,6 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
                     if (str == null)
                         str = (String) data.get("Title");
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-
                     str = new String(record.getData(), Charset.forName("UTF-8"));
                 }
                 if (str == null)
@@ -156,11 +142,6 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
         }
 
         return null;
-
-        // } catch (Exception e) {
-        // LOGGER.error(e.getMessage(),e);
-        // return null;
-        // }
     }
 
     private List<R_SignNote> read_Statement(String str, Long key, boolean b) {
@@ -193,20 +174,16 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
                     if (key > 0) {
                         if (statement.getKey() == key)
                             tran.add(statement);
-
                     }
                 }
             }
-
         }
 
         // filter key
         if (key > 0) {
 
         }
-
         return tran;
-
     }
 
     public void Find_item_from_key(String text) {
@@ -219,13 +196,11 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
             return;
         transactions = read_Statement("", new Long(text), false);
         fireTableDataChanged();
-
     }
 
     public void clear() {
         transactions = new ArrayList<R_SignNote>();
         fireTableDataChanged();
-
     }
 
     public void set_Filter_By_Name(String str, boolean b) {
@@ -252,14 +227,12 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
 
                 return false;
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 return false;
             }
-
         }
 
-        String str = "";
+        String str;
         try {
             JSONObject data = (JSONObject) JSONValue
                     .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
@@ -267,16 +240,12 @@ public class Statements_Table_Model_Search extends AbstractTableModel {
             if (str == null)
                 str = (String) data.get("Title");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-
             str = new String(record.getData(), Charset.forName("UTF-8"));
         }
         if (str == null)
             return false;
         if (str.contains(filter))
             return true;
-        return false;// t
-
+        return false;
     }
-
 }
