@@ -84,6 +84,17 @@ public class API_Trade {
                 .entity(result).build();
     }
 
+    /**
+     * Get orders. The number of items in SEL and BUY is limited by LIMIT
+     * param.
+     *
+     * @param have      is HaveKey
+     * @param want      is WantKey
+     * @param limit     count out record, default = 20
+     * @return orders for SELL and BUY
+     * @author Icreator
+     */
+
     @GET
     @Path("orders")
     // apitrade/orders?have=1&want=2&limit=20
@@ -192,6 +203,17 @@ public class API_Trade {
                 .build();
 
     }
+
+    /**
+     * Get trades. The number of items in SEL and BUY is limited by LIMIT
+     * param.
+     *
+     * @param have      is HaveKey
+     * @param want      is WantKey
+     * @param limit     count out record, default = 100
+     * @return trades
+     * @author Icreator
+     */
 
     @GET
     @Path("trades")
