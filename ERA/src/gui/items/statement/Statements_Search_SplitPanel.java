@@ -85,7 +85,6 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 
 
         // Custom renderer for the String column;
-
         // this.search_Table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION
         // );
 
@@ -93,9 +92,9 @@ public class Statements_Search_SplitPanel extends Split_Panel {
         TableColumn favoriteColumn = jTable_jScrollPanel_LeftPanel.getColumnModel()
                 .getColumn(Statements_Table_Model_Search.COLUMN_FAVORITE);
         // favoriteColumn.setCellRenderer(new Renderer_Boolean());
-        favoriteColumn.setMinWidth(50);
-        favoriteColumn.setMaxWidth(50);
-        favoriteColumn.setPreferredWidth(50);
+        favoriteColumn.setMinWidth(150);
+        favoriteColumn.setMaxWidth(300);
+        favoriteColumn.setPreferredWidth(100);
 
         // hand cursor for Favorite column
         jTable_jScrollPanel_LeftPanel.addMouseMotionListener(new MouseMotionListener() {
@@ -233,13 +232,10 @@ public class Statements_Search_SplitPanel extends Split_Panel {
                         // jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                         // PersonCls asset = search_Table_Model.getPerson(row);
                         favorite_set(jTable_jScrollPanel_LeftPanel);
-
                     }
-
                 }
             }
         });
-
     }
 
     // set favorite Search
@@ -312,5 +308,4 @@ public class Statements_Search_SplitPanel extends Split_Panel {
             // jSplitPanel.setRightComponent(info_panel);
         }
     }
-
 }
