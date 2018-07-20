@@ -182,6 +182,13 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_INSIDE_VOTE = 56;
 
     /*
+     * INDEXES (FOREX etc.)
+     * +++ требования и обязательства
+     * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
+     */
+    public static final int AS_INDEX = 100;
+
+    /*
      * inside CLAIMS
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
@@ -376,6 +383,7 @@ public abstract class AssetCls extends ItemCls {
     public boolean isInsideBonus() {return this.asset_type == AS_INSIDE_BONUS;}
     public boolean isInsideAccess() {return this.asset_type == AS_INSIDE_ACCESS;}
     public boolean isInsideVote() {return this.asset_type == AS_INSIDE_VOTE;}
+    public boolean isIndex() {return this.asset_type == AS_INDEX;}
     public boolean isInsideOtherClaim() {return this.asset_type == AS_INSIDE_OTHER_CLAIM;}
 
     public boolean isOutsideType() {
@@ -428,6 +436,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Digital Access";
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
+            case AS_INDEX:
+                return "Index";
             case AS_INSIDE_OTHER_CLAIM:
                 return "Other Digital Claim";
 
@@ -475,6 +485,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Digital Access Rights";
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
+            case AS_INDEX:
+                return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
                 return "Other Digital Right of Claim";
 
@@ -522,6 +534,8 @@ public abstract class AssetCls extends ItemCls {
                 return "Цифовые права доступа и управления";
             case AS_INSIDE_VOTE:
                 return "Цифовой голос для голосований";
+            case AS_INDEX:
+                return "Индекс на внешние и внутренние активы, например на валюты на ФОРЕКСе";
             case AS_INSIDE_OTHER_CLAIM:
                 return "Другие цифровые права, требования и обязательства. Эти активы (как и другие цифровые) можно передать в долг и самостоятельно конфисковать долг у должника.";
 

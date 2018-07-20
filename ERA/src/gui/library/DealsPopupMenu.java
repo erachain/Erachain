@@ -385,6 +385,20 @@ public class DealsPopupMenu extends JPopupMenu {
 
                 break;
 
+            case AssetCls.AS_INDEX:
+                this.sendAsset.setText(Lang.getInstance().translate("Певести в собственность индекс"));
+                //this.holdAsset.setText(Lang.getInstance().translate("Учесть прием индекса на баланс"));
+                this.holdAsset.setVisible(false);
+
+                //this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setVisible(false);
+                //this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setVisible(false);
+                //this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setVisible(false);
+
+                break;
+
             case AssetCls.AS_INSIDE_OTHER_CLAIM:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность требование"));
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием требования на баланс"));
