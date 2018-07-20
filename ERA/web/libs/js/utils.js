@@ -1,5 +1,8 @@
 // select view format 
 function fformat(text){
+
+if (text.lenght == 0) return "";
+
 var pref1 = text.substring(0,1);
 var pref2 = text.substring(1,2);
 
