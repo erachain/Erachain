@@ -136,6 +136,7 @@ public class Order implements Comparable<Order> {
         return order.b.b.subtract(order.b.c).multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
     }
 
+    /*
     public static boolean isGoodIncrement(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order,
                                           Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
@@ -143,6 +144,7 @@ public class Order implements Comparable<Order> {
         // return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
         return true;
     }
+    */
 
     public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, BigInteger orderID) {

@@ -1325,15 +1325,9 @@ public class BlockExplorer {
 
             sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
-            boolean good = Order.isGoodIncrement(order, order);
+            sumAmountGood = sumAmountGood.add(vol);
 
-            sellJSON.put("good", good);
-
-            if (good) {
-                sumAmountGood = sumAmountGood.add(vol);
-
-                sumSellingAmountGood = sumSellingAmountGood.add(sellingAmount);
-            }
+            sumSellingAmountGood = sumSellingAmountGood.add(sellingAmount);
 
             sumSellingAmount = sumSellingAmount.add(sellingAmount);
 
@@ -1371,14 +1365,9 @@ public class BlockExplorer {
 
             buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
-            boolean good = Order.isGoodIncrement(order, order);
+            sumBuyingAmountGood = sumBuyingAmountGood.add(buyingAmount);
 
-            buyJSON.put("good", good);
-
-            if (good) {
-                sumBuyingAmountGood = sumBuyingAmountGood.add(buyingAmount);
-                sumAmountGood = sumAmountGood.add(vol);
-            }
+            sumAmountGood = sumAmountGood.add(vol);
 
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
