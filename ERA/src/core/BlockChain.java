@@ -35,7 +35,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -220,10 +220,43 @@ public class BlockChain {
 
             // TIKER = KEY + CREATOR
             NOVA_ASSETS.put("BTC",
+                    new Pair<Integer, byte[]>(12, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("USD",
+                    new Pair<Integer, byte[]>(95, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("EUR",
+                    new Pair<Integer, byte[]>(94, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("CNY",
+                    new Pair<Integer, byte[]>(93, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("RUB",
+                    new Pair<Integer, byte[]>(92, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("JPY",
+                    new Pair<Integer, byte[]>(91, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("GBP",
+                    new Pair<Integer, byte[]>(90, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("CHF",
+                    new Pair<Integer, byte[]>(89, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("AUD",
+                    new Pair<Integer, byte[]>(88, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("SGD",
+                    new Pair<Integer, byte[]>(87, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("TRY",
+                    new Pair<Integer, byte[]>(86, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
+
+            // COMMODITY
+            NOVA_ASSETS.put("GOLD",
                     new Pair<Integer, byte[]>(21, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("OIL",
+                    new Pair<Integer, byte[]>(22, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("GAS",
+                    new Pair<Integer, byte[]>(23, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("BREND",
+                    new Pair<Integer, byte[]>(24, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
+
             /// Права для Кибальникова в Боевой Версии
             NOVA_ASSETS.put("ERG",
-                    new Pair<Integer, byte[]>(50, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
+                    new Pair<Integer, byte[]>(20, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
             
             //NOVA_ASSETS.put("@@USD",
             //		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
