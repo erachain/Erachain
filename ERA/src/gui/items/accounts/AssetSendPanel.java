@@ -88,11 +88,18 @@ public class AssetSendPanel extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
    public AssetSendPanel(AssetCls asset2, Account account2,  Account account_To, PersonCls person) {
+
        account = account2;
        asset =asset2;
        recipient = account_To;
        person_To = person;
+
        initComponents();
+
+       this.jTextField_Recive_Detail.setText("");
+       this.jTextField_Mess_Title.setText("");
+       this.jTextField_Ammount.setText("0");
+       this.jLabel_Icon.setText("");
        // icon
        jLabel_Icon.setIcon(new ImageIcon(defaultImagePath));
        // account model
@@ -102,6 +109,8 @@ public class AssetSendPanel extends javax.swing.JPanel {
     // favorite combo box
       jComboBox_Asset.setModel(new AssetsComboBoxModel());
        if (asset != null) {
+           this.jTextArea_Account_Description.setText(asset.getDescription());
+
            for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
                AssetCls item = jComboBox_Asset.getItemAt(i);
                if (item.getKey() == asset.getKey()) {
@@ -187,11 +196,8 @@ public class AssetSendPanel extends javax.swing.JPanel {
        
       // set image asset
        setImage();
+
       // set acoount TO
-      if( recipient != null){
-          jTextField_To.setText(recipient.getAddress());
-          
-      }
       this.jTextField_To.getDocument().addDocumentListener(new DocumentListener() {
 
           @Override
@@ -208,7 +214,13 @@ public class AssetSendPanel extends javax.swing.JPanel {
               refreshReceiverDetails();
           }
       });
-   
+
+       if( recipient != null){
+           jTextField_To.setText(recipient.getAddress());
+           //refreshReceiverDetails()
+
+       }
+
       this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
       this.jLabel_Account.setText(Lang.getInstance().translate("Select Account") + ":");
       this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
@@ -219,13 +231,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
       this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
       this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
       this.jLabel_Fee.setText(Lang.getInstance().translate("Fee Level") + ":");
-      this.jTextField_To.setText("");
-      this.jTextField_Recive_Detail.setText("");
-      this.jTextField_Mess_Title.setText("");
-      this.jTextField_Ammount.setText("0");
-      this.jLabel_Icon.setText("");
-      this.jTextArea_Account_Description.setText(asset.getDescription());
-     
+
       this.jButton_ok.setText(Lang.getInstance().translate("Send"));
    // CONTEXT MENU
       MenuPopupUtil.installContextMenu(this.jTextField_To);
