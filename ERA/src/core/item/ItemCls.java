@@ -396,7 +396,9 @@ public abstract class ItemCls {
         itemJSON.put("key", this.getKey());
         itemJSON.put("name", this.name);
         itemJSON.put("description", this.description);
-        itemJSON.put("creator", this.owner.getAddress());
+        itemJSON.put("creator", this.owner.getAddress()); // @Deprecated
+        itemJSON.put("owner", this.owner.getAddress());
+        itemJSON.put("owner_publick_key", this.owner.getBase58());
         itemJSON.put("isConfirmed", this.isConfirmed());
         itemJSON.put("reference", Base58.encode(this.reference));
 

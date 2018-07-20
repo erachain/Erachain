@@ -273,24 +273,28 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_BILL:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));  //"Учесть прием на баланс"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя"));
+                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя!"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Отозвать погашение векселя?"));
+                this.debtAssetReturn.setVisible(true);
+                //this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Отменить погашение векселя?"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
                 
             case AssetCls.AS_OUTSIDE_BILL_EX:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));  //"Учесть прием на баланс"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя"));
+                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя!"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Отозвать погашение векселя?"));
+                this.debtAssetReturn.setVisible(true);
+                //this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Отменить погашение векселя?"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;

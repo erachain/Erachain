@@ -741,7 +741,6 @@ function poll(data)
 	
 	output += '<font size=+1><b>Poll:</b> <a href=?poll='+encodeURIComponent(data.pool.name)+get_lang()+'>'+htmlFilter(data.pool.name)+'</a></font><br><br>';
 	
-	
 	output += '<b>Description:</b><br>'+htmlFilter(wordwrap(fformat(data.pool.description), 100, '\n', true))+'<br><br>';
 
 	output += '<b>Creator:</b> <a href=?addr='+data.pool.creator+get_lang()+'>'+data.pool.creator+'</a><br><br>';
@@ -898,7 +897,9 @@ function asset(data)
 	output += '<br><br>';
 	
 	
-	output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(fformat(data.asset.this.description), 80, '\n', true);
+	//output += '<b>' + data.asset.label_Description + ':</b> ' + htmlFilter(wordwrap(fformat(data.asset.this.description), 80, '\n', true));
+	//output += '<b>' + data.asset.label_Description + ':</b> ' + wordwrap(data.asset.this.description, 80, '\n', true);
+	output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
 	
 	output += '<br><br>';
 	
