@@ -97,7 +97,7 @@ public class Asset_Info extends JTextPane {
                 int x = image.getIconWidth();
                 max_Height = image.getIconHeight();
 
-                max_Widht = 350;
+                max_Widht = 200;
                 double k = ((double) x / (double) max_Widht);
                 max_Height = (int) (max_Height / k);
 

@@ -722,7 +722,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
                       int x = image.getIconWidth();
                       max_Height = image.getIconHeight();
 
-                      max_Widht = 250;
+                      max_Widht = 150;
                       double k = ((double) x / (double) max_Widht);
                       max_Height = (int) (max_Height / k);
 
