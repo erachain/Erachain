@@ -3413,7 +3413,7 @@ else
 }
 output +=   data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b><br>';
 output +=   data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
-output +=   data.Label_description + ': &nbsp&nbsp<b> ' + fformat(data.description) + '</b><br>';
+output +=   data.Label_description + ': &nbsp&nbsp' + fformat(data.description) + '<br>';
 if (data.era_balance_a) {
 	output +=   '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
 }
