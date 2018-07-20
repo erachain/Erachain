@@ -40,7 +40,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
     //ItemAssetMap dbItemAssetMap;
     private ArrayList<R_Send> trans;
     private String[] columnNames = Lang.getInstance().translate(new String[]{
-            "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
+            "Confirmation", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
 
     public Payment_Orders_TableModel() {
