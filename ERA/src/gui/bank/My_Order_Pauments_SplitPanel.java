@@ -79,8 +79,8 @@ public class My_Order_Pauments_SplitPanel extends Split_Panel {
         TableColumn confirmedColumn = payment_Orders_table.getColumnModel().getColumn(Payment_Orders_TableModel.COLUMN_CONFIRMATIONS);
         // confirmedColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
 
-        confirmedColumn.setMinWidth(50);
-        confirmedColumn.setMaxWidth(50);
+        confirmedColumn.setMinWidth(110);
+        confirmedColumn.setMaxWidth(150);
         confirmedColumn.setPreferredWidth(50);//.setWidth(30);
 
         // UPDATE FILTER ON TEXT CHANGE
