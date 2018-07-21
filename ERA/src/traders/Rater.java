@@ -17,10 +17,14 @@ import settings.Settings;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
-public class Rater extends Thread {
+
+public abstract class Rater extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(Rater.class);
+
+    protected static TreeMap<Fun.Tuple2<Long, Long>, BigDecimal> rates = new TreeMap<Fun.Tuple2<Long, Long>, BigDecimal>();
 
     private Traders trader;
     private long sleepTimestep;
@@ -34,8 +38,9 @@ public class Rater extends Thread {
     //   cryp_url = 'https://' + exchg.url + '/public?command=returnOrderBook&depth=1&currencyPair=' + pair.ticker
     // https://wex.nz/api/3/ticker/btc_rur
     protected String apiURL;
+    protected BigDecimal shiftRate = BigDecimal.ONE;
+    private boolean run = true;
 
-    private List<Fun.Tuple3<Long, Long, BigDecimal>> rates = new ArrayList<Fun.Tuple3<Long, Long, BigDecimal>>();;
 
     public Rater(Traders trader, int sleepSec) {
 
@@ -45,19 +50,22 @@ public class Rater extends Thread {
         this.trader = trader;
         this.sleepTimestep = sleepSec * 1000;
 
-        this.setName("Thread Rater - " + this.getId());
+        this.setName("Thread Rater - " + this.getClass().getName());
         this.start();
     }
 
-    public List<Fun.Tuple3<Long, Long, BigDecimal>> getRates() {
+    protected abstract void parse(String result);
+
+    public TreeMap<Fun.Tuple2<Long, Long>, BigDecimal> getRates() {
         return this.rates;
     }
 
     public boolean tryGetRate() {
 
+        String callerResult = null;
         try {
-            String resultAsset = caller.ResponseValueAPI
-                    (this.apiURL, "GET", "");
+            callerResult = caller.ResponseValueAPI(this.apiURL, "GET", "");
+            this.parse(callerResult);
         } catch (Exception e) {
             //FAILED TO SLEEP
             return false;
@@ -71,7 +79,14 @@ public class Rater extends Thread {
 
         int sleepTimeFull = Settings.getInstance().getPingInterval();
 
-        while (true) {
+        while (this.run) {
+
+            try {
+                this.tryGetRate();
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
 
             //SLEEP
             try {
@@ -80,9 +95,10 @@ public class Rater extends Thread {
                 //FAILED TO SLEEP
             }
 
-            this.tryGetRate();
-
         }
     }
 
+    public void close() {
+        this.run = false;
+    }
 }

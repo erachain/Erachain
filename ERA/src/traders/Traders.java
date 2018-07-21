@@ -31,7 +31,6 @@ public class Traders extends Observable {
 
     private static final Logger LOGGER = Logger.getLogger(Traders.class);
     private List<Rater> knownRaters;
-    private SortedSet<String> handledMessages;
     private boolean run;
 
     public Traders() {
@@ -43,12 +42,9 @@ public class Traders extends Observable {
 
     private void start() {
 
-        this.handledMessages = Collections.synchronizedSortedSet(new TreeSet<String>());
-
         //START ConnectionCreator THREAD
-        Rater raterForex = new Rater(this, 200);
+        RaterWEX raterForex = new RaterWEX(this, 200);
         this.knownRaters.add(raterForex);
-        raterForex.start();
     }
 
     @Override
@@ -68,5 +64,9 @@ public class Traders extends Observable {
 
     public void stop() {
         this.run = false;
+
+        for (Rater rater: this.knownRaters) {
+            //rater.close();
+        }
     }
 }
