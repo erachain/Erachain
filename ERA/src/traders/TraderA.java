@@ -8,9 +8,6 @@ import org.json.simple.JSONValue;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
 
 // import org.apache.log4j.Logger;
 //import core.BlockChain;
@@ -18,11 +15,11 @@ import java.util.TreeMap;
 //import database.TransactionMap;
 //import lang.Lang;
 
-public class RaterWEX extends Rater {
+public class TraderA extends Trader {
 
-    private static final Logger LOGGER = Logger.getLogger(RaterWEX.class);
+    private static final Logger LOGGER = Logger.getLogger(TraderA.class);
 
-    public RaterWEX(TradersManager tradersManager, int sleepSec) {
+    public TraderA(TradersManager tradersManager, int sleepSec) {
         super(tradersManager, sleepSec);
 
         this.apiURL = "https://wex.nz/api/3/ticker/btc_rur-btc_usd";

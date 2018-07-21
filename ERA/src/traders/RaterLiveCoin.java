@@ -19,8 +19,8 @@ public class RaterLiveCoin extends Rater {
 
     private static final Logger LOGGER = Logger.getLogger(RaterLiveCoin.class);
 
-    public RaterLiveCoin(Traders trader, int sleepSec) {
-        super(trader, sleepSec);
+    public RaterLiveCoin(TradersManager tradersManager, int sleepSec) {
+        super(tradersManager, sleepSec);
 
         this.apiURL = "https://api.livecoin.net/exchange/ticker?currencyPair=ETH/BTC";
 

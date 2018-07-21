@@ -2,29 +2,20 @@ package traders;
 // 30/03
 
 import controller.Controller;
-import core.BlockChain;
-import core.blockexplorer.BlockExplorer;
-import datachain.DCSet;
-import network.Peer;
-import network.message.HWeightMessage;
-import network.message.Message;
-import network.message.MessageFactory;
 import org.apache.log4j.Logger;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
 import java.util.TreeMap;
 
 
-public abstract class Rater extends Thread {
+public abstract class Trader extends Thread {
 
-    private static final Logger LOGGER = Logger.getLogger(Rater.class);
+    private static final Logger LOGGER = Logger.getLogger(Trader.class);
 
-    protected static TreeMap<Fun.Tuple2<Long, Long>, BigDecimal> rates = new TreeMap<Fun.Tuple2<Long, Long>, BigDecimal>();
+    protected static TreeMap<BigInteger, BigDecimal> orders = new TreeMap<BigInteger, BigDecimal>();
 
     private TradersManager tradersManager;
     private long sleepTimestep;
@@ -32,15 +23,12 @@ public abstract class Rater extends Thread {
     protected Controller cnt;
     protected CallRemoteApi caller;
 
-    // https://api.livecoin.net/exchange/ticker?currencyPair=EMC/BTC
-    // https://poloniex.com/public?command=returnTradeHistory&currencyPair=BTC_DOGE
-    // https://wex.nz/api/3/ticker/btc_rur
     protected String apiURL;
     protected BigDecimal shiftRate = BigDecimal.ONE;
     private boolean run = true;
 
 
-    public Rater(TradersManager tradersManager, int sleepSec) {
+    public Trader(TradersManager tradersManager, int sleepSec) {
 
         this.cnt = Controller.getInstance();
         this.caller = new CallRemoteApi();
@@ -48,14 +36,14 @@ public abstract class Rater extends Thread {
         this.tradersManager = tradersManager;
         this.sleepTimestep = sleepSec * 1000;
 
-        this.setName("Thread Rater - " + this.getClass().getName());
+        this.setName("Thread Trader - " + this.getClass().getName());
         this.start();
     }
 
     protected abstract void parse(String result);
 
-    public TreeMap<Fun.Tuple2<Long, Long>, BigDecimal> getRates() {
-        return this.rates;
+    public TreeMap<BigInteger, BigDecimal> getOrders() {
+        return this.orders;
     }
 
     public boolean tryGetRate() {

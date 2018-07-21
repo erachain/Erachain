@@ -110,7 +110,7 @@ import network.message.TransactionMessage;
 import network.message.VersionMessage;
 import ntp.NTP;
 import settings.Settings;
-import traders.Traders;
+import traders.TradersManager;
 import utils.Converter;
 import utils.DateTimeFormat;
 import utils.MemoryViewer;
@@ -156,7 +156,7 @@ public class Controller extends Observable {
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
     private Network network;
-    private Traders traders;
+    private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
     private BlockChain blockChain;
@@ -590,7 +590,7 @@ public class Controller extends Observable {
         this.network = new Network();
 
         // CREATE NETWORK
-        this.traders = new Traders();
+        this.tradersManager = new TradersManager();
 
         // CLOSE ON UNEXPECTED SHUTDOWN
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -873,7 +873,7 @@ public class Controller extends Observable {
 
         // STOP TRADERS PROCESSOR
         LOGGER.info("Stopping traders");
-        this.traders.stop();
+        this.tradersManager.stop();
 
         LOGGER.info("Closed.");
         // FORCE CLOSE

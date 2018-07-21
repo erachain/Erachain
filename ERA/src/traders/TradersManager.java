@@ -26,15 +26,17 @@ import java.util.*;
 //import database.TransactionMap;
 //import lang.Lang;
 
-public class Traders extends Observable {
+public class TradersManager extends Observable {
 
 
-    private static final Logger LOGGER = Logger.getLogger(Traders.class);
+    private static final Logger LOGGER = Logger.getLogger(TradersManager.class);
     private List<Rater> knownRaters;
+    private List<Trader> knownTraders;
     private boolean run;
 
-    public Traders() {
+    public TradersManager() {
         this.knownRaters = new ArrayList<Rater>();
+        this.knownTraders = new ArrayList<Trader>();
         this.run = true;
 
         this.start();
@@ -42,13 +44,18 @@ public class Traders extends Observable {
 
     private void start() {
 
-        //START ConnectionCreator THREAD
+        //START RATERs THREADs
         RaterWEX raterForex = new RaterWEX(this, 600);
         this.knownRaters.add(raterForex);
         RaterLiveCoin raterLiveCoin = new RaterLiveCoin(this, 600);
         this.knownRaters.add(raterLiveCoin);
         RaterPolonex raterPolonex = new RaterPolonex(this, 600);
         this.knownRaters.add(raterPolonex);
+
+        //START TRADERs THREADs
+        Trader trader1 = new TraderA(this, 1000);
+        this.knownTraders.add(trader1);
+
     }
 
     @Override
