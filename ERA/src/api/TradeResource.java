@@ -39,7 +39,9 @@ public class TradeResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                 "make and broadcast CreateOrder ");
-        help.put("GET trade/cancel/{creator}/{orderID}?password={password}",
+        help.put("GET trade/cancel/{creator}/{signature}?password={password}",
+                "Cancel Order by orderID");
+        help.put("GET trade/cancelbyid/{creator}/{orderID}?password={password}",
                 "Cancel Order by orderID");
 
         return StrJSonFine.convert(help);
@@ -112,19 +114,49 @@ public class TradeResource {
      * send and broadcast GET
      *
      * @param creatorStr   address in wallet
+     * @param signatureStr    signature
+     * @param feePower     fee Power
+     * @param password     password
+     * @return JSON row
+     *
+     * <h2>Example request</h2>
+     * GET cancelbyid/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/1234567898765432134567899876545678?password=123456789
+     * <h2>Example response</h2>
+     * {}
+     */
+    @GET
+    @Path("cancel/{creator}/{signature}")
+    public String cancel(@PathParam("creator") String creatorStr,
+                             @PathParam("signature") String signatureStr,
+                             @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
+
+        byte[] signature;
+        try {
+            signature = Base58.decode(signatureStr);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+        }
+
+        return this.cancelByID(creatorStr, new BigInteger(signature), feePower, password);
+    }
+
+    /**
+     * send and broadcast GET
+     *
+     * @param creatorStr   address in wallet
      * @param orderID      orderID
      * @param feePower     fee Power
      * @param password     password
      * @return JSON row
      *
      * <h2>Example request</h2>
-     * GET cancel/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/1234567898765432134567899876545678?password=123456789
+     * GET cancelbyid/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/1234567898765432134567899876545678?password=123456789
      * <h2>Example response</h2>
      * {}
      */
     @GET
-    @Path("cancel/{creator}/{orderID}")
-    public String sendGet(@PathParam("creator") String creatorStr,
+    @Path("cancelbyid/{creator}/{orderID}")
+    public String cancelByID(@PathParam("creator") String creatorStr,
                           @PathParam("orderID") BigInteger orderID,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 

@@ -760,9 +760,22 @@ public class ApiClient {
                     {
                             "POST telegrams/delete {\"list\": [{signature1},{signature2}...]}",
                             "Delete telegram by list of signature"
+                    },
+                    {
+                            "GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
+                            "make and broadcast CreateOrder "
+                    },
+                    {
+                            "GET trade/cancel/{creator}/{signature}?password={password}",
+                            "Cancel Order by orderID"
+                    },
+                    {
+                            "GET trade/cancelbyid/{creator}/{orderID}?password={password}",
+                            "Cancel Order by orderID"
                     }
 
-            };
+
+};
 
     public static boolean isAllowedDebugWindowCall(String uuid) {
         return allowedcalls.contains(uuid);
