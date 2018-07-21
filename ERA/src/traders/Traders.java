@@ -43,8 +43,12 @@ public class Traders extends Observable {
     private void start() {
 
         //START ConnectionCreator THREAD
-        RaterWEX raterForex = new RaterWEX(this, 200);
+        RaterWEX raterForex = new RaterWEX(this, 600);
         this.knownRaters.add(raterForex);
+        RaterLiveCoin raterLiveCoin = new RaterLiveCoin(this, 600);
+        this.knownRaters.add(raterLiveCoin);
+        RaterPolonex raterPolonex = new RaterPolonex(this, 600);
+        this.knownRaters.add(raterPolonex);
     }
 
     @Override

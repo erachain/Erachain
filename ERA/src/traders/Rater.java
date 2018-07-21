@@ -33,9 +33,7 @@ public abstract class Rater extends Thread {
     protected CallRemoteApi caller;
 
     // https://api.livecoin.net/exchange/ticker?currencyPair=EMC/BTC
-    // 'https://' + exchg.url + '/' + exchg.API + '?currencyPair=' + t1 + '/' + t2
     // https://poloniex.com/public?command=returnTradeHistory&currencyPair=BTC_DOGE
-    //   cryp_url = 'https://' + exchg.url + '/public?command=returnOrderBook&depth=1&currencyPair=' + pair.ticker
     // https://wex.nz/api/3/ticker/btc_rur
     protected String apiURL;
     protected BigDecimal shiftRate = BigDecimal.ONE;
