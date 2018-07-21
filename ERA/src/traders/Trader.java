@@ -8,6 +8,7 @@ import settings.Settings;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.TreeMap;
 
 
@@ -25,6 +26,10 @@ public abstract class Trader extends Thread {
 
     protected String apiURL;
     protected BigDecimal shiftRate = BigDecimal.ONE;
+    protected Long have;
+    protected Long want;
+    protected BigDecimal rate;
+
     private boolean run = true;
 
 

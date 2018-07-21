@@ -2858,7 +2858,14 @@ public class Controller extends Observable {
             return this.transactionCreator.createOrderTransaction(creator, have, want, amountHave, amountWant, feePow);
         }
     }
-    
+
+    public Transaction cancelOrder2(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createCancelOrderTransaction2(creator, orderID, feePow);
+        }
+    }
+
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
         return cancelOrder(creator, order.getId(), feePow);
     }

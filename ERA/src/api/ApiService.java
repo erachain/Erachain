@@ -45,6 +45,7 @@ public class ApiService {
         s.add(AssetsResource.class);
         s.add(Rec_StatementResource.class);
         s.add(MultiPaymentResource.class);
+        s.add(TradeResource.class);
 
         ResourceConfig config = new ResourceConfig(s);
 
