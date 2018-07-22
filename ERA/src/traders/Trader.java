@@ -4,6 +4,7 @@ package traders;
 import api.ApiClient;
 import controller.Controller;
 import core.account.Account;
+import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
 import datachain.DCSet;
@@ -46,19 +47,22 @@ public abstract class Trader extends Thread {
     protected String address;
     protected String apiURL;
     protected BigDecimal shiftRate = BigDecimal.ONE;
-    protected Long have;
-    protected Long want;
+    protected Long haveKey;
+    protected Long wantKey;
+    protected AssetCls haveAsset;
+    protected AssetCls wantAsset;
     protected BigDecimal rate;
     protected BigDecimal limitUP = new BigDecimal(0.01);
     protected BigDecimal limitDown = new BigDecimal(0.01);
 
     // AMOUNT + SPREAD
-    protected List<Tuple2<BigDecimal, BigDecimal>> scheme;
+    protected TreeMap<BigDecimal, BigDecimal> scheme;
 
     private boolean run = true;
 
 
-    public Trader(TradersManager tradersManager, String accountStr, int sleepSec, List<Tuple2<BigDecimal, BigDecimal>> scheme) {
+    public Trader(TradersManager tradersManager, String accountStr, int sleepSec, TreeMap<BigDecimal, BigDecimal> scheme,
+                  Long haveKey, Long wantKey) {
 
         this.cnt = Controller.getInstance();
         this.dcSet = DCSet.getInstance();
@@ -70,7 +74,14 @@ public abstract class Trader extends Thread {
         this.sleepTimestep = sleepSec * 1000;
         this.scheme = scheme;
 
+        this.haveKey = haveKey;
+        this.wantKey = wantKey;
+
+        this.haveAsset = dcSet.getItemAssetMap().get(haveKey);
+        this.wantAsset = dcSet.getItemAssetMap().get(wantKey);
+
         this.setName("Thread Trader - " + this.getClass().getName());
+
         this.start();
     }
 
@@ -80,7 +91,7 @@ public abstract class Trader extends Thread {
         return this.orders;
     }
 
-    private void createOrder(BigInteger orderID) {
+    private void createOrder(BigDecimal amount) {
 
         ApiClient ApiClient = new ApiClient();
         ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
@@ -89,8 +100,12 @@ public abstract class Trader extends Thread {
         //String[] parse = (resultAddresses.replace("\r\n", "").split(","));
         //String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
 
+        BigDecimal shiftPercentage = this.scheme.get(amount);
+        BigDecimal price = this.rate.multiply(BigDecimal.ONE.add(shiftPercentage.movePointLeft(2)));
+        BigDecimal total = amount.multiply(price).setScale(wantAsset.getScale());
 
-        String result = ApiClient.executeCommand("GET trade/create" + this.address + "/" + this.have + "/" + this.want);
+        String result = ApiClient.executeCommand("GET trade/create" + this.address + "/" + this.haveKey + "/" + this.wantKey
+                amount + "/" + total);
         LOGGER.info(result);
 
 
