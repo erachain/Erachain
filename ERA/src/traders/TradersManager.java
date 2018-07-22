@@ -70,12 +70,12 @@ public class TradersManager extends Observable {
             scheme.put(new BigDecimal(10000), new BigDecimal(1));
             scheme.put(new BigDecimal(1000), new BigDecimal(0.5));
             scheme.put(new BigDecimal(100), new BigDecimal(0.2));
-            scheme.put(new BigDecimal(100), new BigDecimal(-0.2));
-            scheme.put(new BigDecimal(1000), new BigDecimal(-0.5));
-            scheme.put(new BigDecimal(10000), new BigDecimal(-1));
-            Account account = Controller.getInstance().wallet.getAccounts().get(0);
-            Trader trader1 = new TraderA(this, account.getAddress(), 300,
-                    1l, 2l, scheme);
+            scheme.put(new BigDecimal(-100), new BigDecimal(0.2));
+            scheme.put(new BigDecimal(-1000), new BigDecimal(0.5));
+            scheme.put(new BigDecimal(-10000), new BigDecimal(1));
+            Account account = Controller.getInstance().wallet.getAccounts().get(1);
+            Trader trader1 = new TraderA(this, "7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP", 30,
+                    1077, 1078, scheme);
             this.knownTraders.add(trader1);
         }
 

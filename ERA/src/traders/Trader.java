@@ -82,13 +82,12 @@ public abstract class Trader extends Thread {
         return this.orders;
     }
 
-    private void createOrder(BigDecimal amount) {
+    private boolean createOrder(BigDecimal amount) {
 
         ApiClient ApiClient = new ApiClient();
-        ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
+        String result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
 
         BigDecimal shiftPercentage = this.scheme.get(amount);
-        BigDecimal shift = BigDecimal.ONE.add(shiftPercentage.movePointLeft(2));
 
         long haveKey;
         long wantKey;
@@ -100,36 +99,55 @@ public abstract class Trader extends Thread {
             haveKey = this.haveKey;
             wantKey = this.wantKey;
 
+            BigDecimal shift = BigDecimal.ONE.add(shiftPercentage.movePointLeft(2));
+
             amountHave = amount;
-            amountWant = amount.multiply(shift).setScale(wantAsset.getScale());
+            amountWant = amount.divide(this.rate.multiply(shift), wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
         } else {
             haveKey = this.wantKey;
             wantKey = this.haveKey;
 
-            amountWant = amount;
-            amountHave = amount.multiply(shift).setScale(wantAsset.getScale());
+            BigDecimal shift = BigDecimal.ONE.subtract(shiftPercentage.movePointLeft(2));
+
+            amountWant = amount.negate();
+            amountHave = amountWant.multiply(this.rate).multiply(shift).setScale(wantAsset.getScale());
         }
 
-        String result = ApiClient.executeCommand("GET trade/create" + this.address + "/" + haveKey + "/" + wantKey
-                + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
+        result = ApiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
+                + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
         LOGGER.info(result);
 
+        JSONObject jsonObject = null;
+        try {
+            //READ JSON
+            jsonObject = (JSONObject) JSONValue.parse(result);
+        } catch (NullPointerException | ClassCastException e) {
+            //JSON EXCEPTION
+            LOGGER.info(e);
+            //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+        } finally {
+            ApiClient.executeCommand("GET wallet/lock");
+        }
 
-        ApiClient.executeCommand("GET wallet/lock");
+        if (jsonObject != null && !jsonObject.containsKey("error")) {
+            return true;
+        }
+
+        return true;
 
     }
 
     private boolean cancelOrder(BigInteger orderID) {
 
         ApiClient ApiClient = new ApiClient();
-        ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
+        String result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
 
         //String resultAddresses = new ApiClient().executeCommand("GET addresses");
         //String[] parse = (resultAddresses.replace("\r\n", "").split(","));
         //String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
 
 
-        String result = ApiClient.executeCommand("GET trade/cancel/" + orderID);
+        result = ApiClient.executeCommand("GET trade/cancel/" + orderID);
         LOGGER.info("CANCEL " + orderID + " result:\n" + result);
 
         JSONObject jsonObject = null;
@@ -144,7 +162,7 @@ public abstract class Trader extends Thread {
             ApiClient.executeCommand("GET wallet/lock");
         }
 
-        if (jsonObject != null) {
+        if (jsonObject != null && !jsonObject.containsKey("error")) {
             return true;
         }
 
@@ -167,6 +185,12 @@ public abstract class Trader extends Thread {
             this.orders.remove(orderID);
 
         }
+
+        //BigDecimal persent;
+        for(BigDecimal amount: this.scheme.keySet()) {
+            //persent = this.scheme.get(amount);
+            createOrder(amount);
+        }
     }
 
     private boolean process() {
@@ -176,13 +200,26 @@ public abstract class Trader extends Thread {
         TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = Rater.getRates();
         BigDecimal newRate = rates.get(new Fun.Tuple3<Long, Long, String>(this.haveKey, this.wantKey, "wex"));
         if (newRate != null) {
-            if (this.rate == null || !newRate.equals(this.rate)) {
+            if (this.rate == null) {
+                if (newRate == null)
+                    return false;
+
+                this.rate = newRate;
+                shiftAll();
+
+            } else {
+                if (newRate == null || newRate.compareTo(this.rate) == 0)
+                    return false;
+
                 BigDecimal diffPerc = newRate.divide(this.rate, 8, BigDecimal.ROUND_HALF_UP)
                         .subtract(BigDecimal.ONE).multiply(Trader.M100);
                 if (diffPerc.compareTo(this.limitUP) > 0
                         || diffPerc.abs().compareTo(this.limitDown) > 0) {
+
+                    this.rate = newRate;
                     shiftAll();
                 }
+
             }
         }
 
