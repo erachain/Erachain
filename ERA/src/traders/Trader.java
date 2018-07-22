@@ -2,6 +2,7 @@ package traders;
 // 30/03
 
 import api.ApiClient;
+import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
 import core.item.assets.AssetCls;
@@ -11,6 +12,7 @@ import datachain.DCSet;
 import gui.models.WalletOrdersTableModel;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.mapdb.Fun;
@@ -60,9 +62,7 @@ public abstract class Trader extends Thread {
 
     private boolean run = true;
 
-
-    public Trader(TradersManager tradersManager, String accountStr, int sleepSec, TreeMap<BigDecimal, BigDecimal> scheme,
-                  Long haveKey, Long wantKey) {
+    public Trader(TradersManager tradersManager, String accountStr, int sleepSec) {
 
         this.cnt = Controller.getInstance();
         this.dcSet = DCSet.getInstance();
@@ -72,20 +72,11 @@ public abstract class Trader extends Thread {
         this.address = accountStr;
         this.tradersManager = tradersManager;
         this.sleepTimestep = sleepSec * 1000;
-        this.scheme = scheme;
-
-        this.haveKey = haveKey;
-        this.wantKey = wantKey;
-
-        this.haveAsset = dcSet.getItemAssetMap().get(haveKey);
-        this.wantAsset = dcSet.getItemAssetMap().get(wantKey);
 
         this.setName("Thread Trader - " + this.getClass().getName());
 
         this.start();
     }
-
-    protected abstract void parse(String result);
 
     public TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders() {
         return this.orders;
@@ -96,16 +87,31 @@ public abstract class Trader extends Thread {
         ApiClient ApiClient = new ApiClient();
         ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
 
-        //String resultAddresses = new ApiClient().executeCommand("GET addresses");
-        //String[] parse = (resultAddresses.replace("\r\n", "").split(","));
-        //String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
-
         BigDecimal shiftPercentage = this.scheme.get(amount);
-        BigDecimal price = this.rate.multiply(BigDecimal.ONE.add(shiftPercentage.movePointLeft(2)));
-        BigDecimal total = amount.multiply(price).setScale(wantAsset.getScale());
+        BigDecimal shift = BigDecimal.ONE.add(shiftPercentage.movePointLeft(2));
 
-        String result = ApiClient.executeCommand("GET trade/create" + this.address + "/" + this.haveKey + "/" + this.wantKey
-                amount + "/" + total);
+        long haveKey;
+        long wantKey;
+
+        BigDecimal amountHave;
+        BigDecimal amountWant;
+
+        if (amount.signum() > 0) {
+            haveKey = this.haveKey;
+            wantKey = this.wantKey;
+
+            amountHave = amount;
+            amountWant = amount.multiply(shift).setScale(wantAsset.getScale());
+        } else {
+            haveKey = this.wantKey;
+            wantKey = this.haveKey;
+
+            amountWant = amount;
+            amountHave = amount.multiply(shift).setScale(wantAsset.getScale());
+        }
+
+        String result = ApiClient.executeCommand("GET trade/create" + this.address + "/" + haveKey + "/" + wantKey
+                + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
         LOGGER.info(result);
 
 
@@ -113,7 +119,7 @@ public abstract class Trader extends Thread {
 
     }
 
-    private void cancelOrder(BigInteger orderID) {
+    private boolean cancelOrder(BigInteger orderID) {
 
         ApiClient ApiClient = new ApiClient();
         ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
@@ -126,8 +132,23 @@ public abstract class Trader extends Thread {
         String result = ApiClient.executeCommand("GET trade/cancel/" + orderID);
         LOGGER.info("CANCEL " + orderID + " result:\n" + result);
 
+        JSONObject jsonObject = null;
+        try {
+            //READ JSON
+            jsonObject = (JSONObject) JSONValue.parse(result);
+        } catch (NullPointerException | ClassCastException e) {
+            //JSON EXCEPTION
+            LOGGER.info(e);
+            //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+        } finally {
+            ApiClient.executeCommand("GET wallet/lock");
+        }
 
-        ApiClient.executeCommand("GET wallet/lock");
+        if (jsonObject != null) {
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -136,13 +157,14 @@ public abstract class Trader extends Thread {
         // REMOVE ALL ORDERS
         for (BigInteger orderID: this.orders.keySet()) {
 
-            this.orders.remove(orderID);
-
             Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(orderID);
             if (orderInChain == null)
                 continue;
 
-            cancelOrder(orderID);
+            if (!cancelOrder(orderID))
+                break;
+
+            this.orders.remove(orderID);
 
         }
     }
@@ -152,7 +174,7 @@ public abstract class Trader extends Thread {
         String callerResult = null;
 
         TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = Rater.getRates();
-        BigDecimal newRate = rates.get(new Fun.Tuple3<Long, Long, String>(this.want, this.have, "wex"));
+        BigDecimal newRate = rates.get(new Fun.Tuple3<Long, Long, String>(this.haveKey, this.wantKey, "wex"));
         if (newRate != null) {
             if (this.rate == null || !newRate.equals(this.rate)) {
                 BigDecimal diffPerc = newRate.divide(this.rate, 8, BigDecimal.ROUND_HALF_UP)
@@ -165,8 +187,6 @@ public abstract class Trader extends Thread {
         }
 
         try {
-            callerResult = caller.ResponseValueAPI(this.apiURL, "GET", "");
-            this.parse(callerResult);
         } catch (Exception e) {
             //FAILED TO SLEEP
             return false;
@@ -197,9 +217,6 @@ public abstract class Trader extends Thread {
                 this.orders.put(orderInChain.a.a, orderInChain);
 
         }
-
-
-        int sleepTimeFull = Settings.getInstance().getPingInterval();
 
         while (this.run) {
 

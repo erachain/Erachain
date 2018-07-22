@@ -25,7 +25,7 @@ public abstract class Rater extends Thread {
     private static final Logger LOGGER = Logger.getLogger(Rater.class);
 
     // HAVE KEY + WANT KEY + COURSE NAME
-    protected static TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = new TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal>();
+    private static TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = new TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal>();
 
     private TradersManager tradersManager;
     private long sleepTimestep;
@@ -68,7 +68,7 @@ public abstract class Rater extends Thread {
             callerResult = caller.ResponseValueAPI(this.apiURL, "GET", "");
             this.parse(callerResult);
         } catch (Exception e) {
-            //FAILED TO SLEEP
+            LOGGER.error(e.getMessage(), e);
             return false;
         }
 
@@ -80,7 +80,16 @@ public abstract class Rater extends Thread {
 
         int sleepTimeFull = Settings.getInstance().getPingInterval();
 
-        while (this.run) {
+        while (true) {
+
+            if (!this.run) {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    //FAILED TO SLEEP
+                }
+                continue;
+            }
 
             try {
                 this.tryGetRate();
@@ -97,6 +106,14 @@ public abstract class Rater extends Thread {
             }
 
         }
+    }
+
+    protected static synchronized void setRate(Long haveKey, Long wantKey, String courseName, BigDecimal rate) {
+            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(haveKey, wantKey, courseName), rate);
+    }
+
+    public void setRun(boolean status) {
+        this.run = status;
     }
 
     public void close() {

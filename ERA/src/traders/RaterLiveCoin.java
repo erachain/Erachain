@@ -47,7 +47,7 @@ public class RaterLiveCoin extends Rater {
                 && "ETH/BTC".equals((String)json.get("symbol"))) {
             price = new BigDecimal((Double)json.get("vwap")).setScale(10, BigDecimal.ROUND_HALF_UP);
             price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(14L, 12L, this.courseName), price);
+            Rater.setRate(14L, 12L, this.courseName, price);
         }
 
     }

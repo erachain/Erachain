@@ -3,6 +3,7 @@ package traders;
 
 import controller.Controller;
 import core.BlockChain;
+import core.account.Account;
 import core.crypto.Base58;
 import datachain.DCSet;
 import network.*;
@@ -15,6 +16,7 @@ import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 import utils.ObserverMessage;
 
+import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -33,12 +35,12 @@ public class TradersManager extends Observable {
     private static final Logger LOGGER = Logger.getLogger(TradersManager.class);
     private List<Rater> knownRaters;
     private List<Trader> knownTraders;
-    private boolean run;
+    //private boolean run;
 
     public TradersManager() {
         this.knownRaters = new ArrayList<Rater>();
         this.knownTraders = new ArrayList<Trader>();
-        this.run = true;
+        //this.run = true;
 
         this.start();
     }
@@ -46,7 +48,7 @@ public class TradersManager extends Observable {
     private void start() {
 
         //START RATERs THREADs
-        RaterWEX raterForex = new RaterWEX(this, 600);
+        RaterWEX raterForex = new RaterWEX(this, 300);
         this.knownRaters.add(raterForex);
         RaterLiveCoin raterLiveCoin = new RaterLiveCoin(this, 600);
         this.knownRaters.add(raterLiveCoin);
@@ -60,9 +62,22 @@ public class TradersManager extends Observable {
             //FAILED TO SLEEP
         }
 
-        //START TRADERs THREADs
-        Trader trader1 = new TraderA(this, 1000);
-        this.knownTraders.add(trader1);
+        if (true) {
+
+            //START TRADERs THREADs
+
+            TreeMap<BigDecimal, BigDecimal> scheme = new TreeMap<>();
+            scheme.put(new BigDecimal(10000), new BigDecimal(1));
+            scheme.put(new BigDecimal(1000), new BigDecimal(0.5));
+            scheme.put(new BigDecimal(100), new BigDecimal(0.2));
+            scheme.put(new BigDecimal(100), new BigDecimal(-0.2));
+            scheme.put(new BigDecimal(1000), new BigDecimal(-0.5));
+            scheme.put(new BigDecimal(10000), new BigDecimal(-1));
+            Account account = Controller.getInstance().wallet.getAccounts().get(0);
+            Trader trader1 = new TraderA(this, account.getAddress(), 300,
+                    1l, 2l, scheme);
+            this.knownTraders.add(trader1);
+        }
 
     }
 
@@ -81,11 +96,17 @@ public class TradersManager extends Observable {
 
     }
 
-    public void stop() {
-        this.run = false;
+    public void setRun(boolean status) {
 
         for (Rater rater: this.knownRaters) {
-            //rater.close();
+            rater.setRun(status);
+        }
+    }
+
+    public void stop() {
+
+        for (Rater rater: this.knownRaters) {
+            rater.setRun(false);
         }
     }
 }

@@ -25,7 +25,7 @@ public class RaterWEX extends Rater {
     public RaterWEX(TradersManager tradersManager, int sleepSec) {
         super(tradersManager, "wex", sleepSec);
 
-        this.apiURL = "https://wex.nz/api/3/ticker/btc_rur-btc_usd";
+        this.apiURL = "https://wex.nz/api/3/ticker/btc_rur-btc_usd-usd_rur";
 
     }
 
@@ -45,18 +45,84 @@ public class RaterWEX extends Rater {
 
         JSONObject pair;
         BigDecimal price;
+        BigDecimal rate_avg = null;
 
         if (json.containsKey("btc_rur")) {
             pair = (JSONObject) json.get("btc_rur");
-            price = new BigDecimal((Double)pair.get("avg")).setScale(10, BigDecimal.ROUND_HALF_UP);
-            price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(12L, 92L, this.courseName), price);
+            rate_avg = null;
+            try {
+                rate_avg = new BigDecimal((Double)pair.get("avg"));
+            } catch (Exception e){
+                try {
+                    rate_avg = new BigDecimal((Long)pair.get("avg"));
+                } catch (Exception e1){
+                    try {
+                        rate_avg = new BigDecimal((String)pair.get("avg"));
+                    } catch (Exception e2){
+                        //LOGGER.error(e.getMessage(), e);
+                    }
+                }
+            }
+
+            if (rate_avg != null) {
+                price = rate_avg;//.setScale(10, BigDecimal.ROUND_HALF_UP);
+                price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
+                Rater.setRate(1079L, 1078L, this.courseName, price);
+                LOGGER.info("WEX rate: BTC - RUB " + price);
+            }
+
         }
+
         if (json.containsKey("btc_usd")) {
             pair = (JSONObject) json.get("btc_usd");
-            price = new BigDecimal((Double)pair.get("avg")).setScale(10, BigDecimal.ROUND_HALF_UP);
-            price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(12L, 95L, this.courseName), price);
+            rate_avg = null;
+            try {
+                rate_avg = new BigDecimal((Double)pair.get("avg"));
+            } catch (Exception e){
+                try {
+                    rate_avg = new BigDecimal((Long)pair.get("avg"));
+                } catch (Exception e1){
+                    try {
+                        rate_avg = new BigDecimal((String)pair.get("avg"));
+                    } catch (Exception e2){
+                        //LOGGER.error(e.getMessage(), e);
+                    }
+                }
+            }
+
+            if (rate_avg != null) {
+                price = rate_avg; //).setScale(10, BigDecimal.ROUND_HALF_UP);
+                price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
+                Rater.setRate(1079L, 1077L, this.courseName, price);
+                LOGGER.info("WEX rate: BTC - USD " + price);
+            }
+
+        }
+
+        if (json.containsKey("usd_rur")) {
+            pair = (JSONObject) json.get("usd_rur");
+            rate_avg = null;
+            try {
+                rate_avg = new BigDecimal((Double)pair.get("avg"));
+            } catch (Exception e){
+                try {
+                    rate_avg = new BigDecimal((Long)pair.get("avg"));
+                } catch (Exception e1){
+                    try {
+                        rate_avg = new BigDecimal((String)pair.get("avg"));
+                    } catch (Exception e2){
+                        //LOGGER.error(e.getMessage(), e);
+                    }
+                }
+            }
+
+            if (rate_avg != null) {
+                price = rate_avg;//).setScale(10, BigDecimal.ROUND_HALF_UP);
+                price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
+                Rater.setRate(1077L, 1078L, this.courseName, price);
+                LOGGER.info("WEX rate: USD - RUR " + price);
+            }
+
         }
 
     }

@@ -1,6 +1,7 @@
 package api;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
@@ -37,6 +38,8 @@ public class TradeResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
+        help.put("GET trade/rater/{start/stop}",
+                "Start Rater: 1 - start, 0 - stop");
         help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                 "make and broadcast CreateOrder ");
         help.put("GET trade/cancel/{creator}/{signature}?password={password}",
@@ -47,23 +50,30 @@ public class TradeResource {
         return StrJSonFine.convert(help);
     }
 
-    /**
-     * send and broadcast GET
-     *
-     * @param creatorStr   address in wallet
-     * @param haveKey      haveKey
-     * @param wantKey      wantKey
-     * @param haveAmount   haveAmount or head
-     * @param wantAmount   wantAmount
-     * @param feePower     fee Power
-     * @param password     password
-     * @return JSON row
-     *
-     * <h2>Example request</h2>
-     * GET create/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/2/1/1.0/100.0?password=123456789
-     * <h2>Example response</h2>
-     * {}
-     */
+    @GET
+    @Path("rater/{status}")
+    public String rater(@PathParam("status") Long status) {
+
+
+        return "+";
+    }
+        /**
+         * send and broadcast GET
+         *
+         * @param creatorStr   address in wallet
+         * @param haveKey      haveKey
+         * @param wantKey      wantKey
+         * @param haveAmount   haveAmount or head
+         * @param wantAmount   wantAmount
+         * @param feePower     fee Power
+         * @param password     password
+         * @return JSON row
+         *
+         * <h2>Example request</h2>
+         * GET create/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/2/1/1.0/100.0?password=123456789
+         * <h2>Example response</h2>
+         * {}
+         */
     @GET
     @Path("create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}")
     public String sendGet(@PathParam("creator") String creatorStr,
@@ -71,7 +81,8 @@ public class TradeResource {
                           @PathParam("haveAmount") Double haveAmount, @PathParam("wantAmount") Double wantAmount,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
+        if (!BlockChain.DEVELOP_USE)
+            APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -160,7 +171,8 @@ public class TradeResource {
                           @PathParam("orderID") BigInteger orderID,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
-        APIUtils.askAPICallAllowed(password, "GET cancel Order\n ", request);
+        if (!BlockChain.DEVELOP_USE)
+            APIUtils.askAPICallAllowed(password, "GET cancel Order\n ", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
