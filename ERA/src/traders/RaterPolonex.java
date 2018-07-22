@@ -20,7 +20,7 @@ public class RaterPolonex extends Rater {
     private static final Logger LOGGER = Logger.getLogger(RaterPolonex.class);
 
     public RaterPolonex(TradersManager tradersManager, int sleepSec) {
-        super(tradersManager, sleepSec);
+        super(tradersManager, "polonex", sleepSec);
 
         // https://poloniex.com/support/api/v1/
         //https://poloniex.com/public?command=returnTicker&
@@ -50,7 +50,7 @@ public class RaterPolonex extends Rater {
             pair = (JSONObject) json.get("USDT_BTC");
             price = new BigDecimal((String)pair.get("last"));
             price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple2<Long, Long>(95L, 12L), price);
+            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(95L, 12L, this.courseName), price);
         }
 
     }

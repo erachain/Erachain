@@ -20,7 +20,7 @@ public class RaterLiveCoin extends Rater {
     private static final Logger LOGGER = Logger.getLogger(RaterLiveCoin.class);
 
     public RaterLiveCoin(TradersManager tradersManager, int sleepSec) {
-        super(tradersManager, sleepSec);
+        super(tradersManager, "livecoin", sleepSec);
 
         this.apiURL = "https://api.livecoin.net/exchange/ticker?currencyPair=ETH/BTC";
 
@@ -47,7 +47,7 @@ public class RaterLiveCoin extends Rater {
                 && "ETH/BTC".equals((String)json.get("symbol"))) {
             price = new BigDecimal((Double)json.get("vwap")).setScale(10, BigDecimal.ROUND_HALF_UP);
             price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple2<Long, Long>(14L, 12L), price);
+            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(14L, 12L, this.courseName), price);
         }
 
     }

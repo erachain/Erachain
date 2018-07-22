@@ -28,6 +28,7 @@ import java.util.*;
 
 public class TradersManager extends Observable {
 
+    protected static final String WALLET_PASSWORD = "1";
 
     private static final Logger LOGGER = Logger.getLogger(TradersManager.class);
     private List<Rater> knownRaters;
@@ -51,6 +52,13 @@ public class TradersManager extends Observable {
         this.knownRaters.add(raterLiveCoin);
         RaterPolonex raterPolonex = new RaterPolonex(this, 600);
         this.knownRaters.add(raterPolonex);
+
+        // WAIT START WALLET
+        try {
+            Thread.sleep(10000);
+        } catch (Exception e) {
+            //FAILED TO SLEEP
+        }
 
         //START TRADERs THREADs
         Trader trader1 = new TraderA(this, 1000);

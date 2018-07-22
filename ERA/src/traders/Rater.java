@@ -24,7 +24,8 @@ public abstract class Rater extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(Rater.class);
 
-    protected static TreeMap<Fun.Tuple2<Long, Long>, BigDecimal> rates = new TreeMap<Fun.Tuple2<Long, Long>, BigDecimal>();
+    // HAVE KEY + WANT KEY + COURSE NAME
+    protected static TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = new TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal>();
 
     private TradersManager tradersManager;
     private long sleepTimestep;
@@ -35,27 +36,29 @@ public abstract class Rater extends Thread {
     // https://api.livecoin.net/exchange/ticker?currencyPair=EMC/BTC
     // https://poloniex.com/public?command=returnTradeHistory&currencyPair=BTC_DOGE
     // https://wex.nz/api/3/ticker/btc_rur
+    protected String courseName; // course name
     protected String apiURL;
     protected BigDecimal shiftRate = BigDecimal.ONE;
     private boolean run = true;
 
 
-    public Rater(TradersManager tradersManager, int sleepSec) {
+    public Rater(TradersManager tradersManager, String courseName, int sleepSec) {
 
         this.cnt = Controller.getInstance();
         this.caller = new CallRemoteApi();
 
         this.tradersManager = tradersManager;
         this.sleepTimestep = sleepSec * 1000;
+        this.courseName = courseName;
 
-        this.setName("Thread Rater - " + this.getClass().getName());
+        this.setName("Thread Rater - " + this.getClass().getName() + ": " + this.courseName);
         this.start();
     }
 
     protected abstract void parse(String result);
 
-    public TreeMap<Fun.Tuple2<Long, Long>, BigDecimal> getRates() {
-        return this.rates;
+    public static TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> getRates() {
+        return rates;
     }
 
     public boolean tryGetRate() {

@@ -23,7 +23,7 @@ public class RaterWEX extends Rater {
     private static final Logger LOGGER = Logger.getLogger(RaterWEX.class);
 
     public RaterWEX(TradersManager tradersManager, int sleepSec) {
-        super(tradersManager, sleepSec);
+        super(tradersManager, "wex", sleepSec);
 
         this.apiURL = "https://wex.nz/api/3/ticker/btc_rur-btc_usd";
 
@@ -50,13 +50,13 @@ public class RaterWEX extends Rater {
             pair = (JSONObject) json.get("btc_rur");
             price = new BigDecimal((Double)pair.get("avg")).setScale(10, BigDecimal.ROUND_HALF_UP);
             price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple2<Long, Long>(12L, 92L), price);
+            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(12L, 92L, this.courseName), price);
         }
         if (json.containsKey("btc_usd")) {
             pair = (JSONObject) json.get("btc_usd");
             price = new BigDecimal((Double)pair.get("avg")).setScale(10, BigDecimal.ROUND_HALF_UP);
             price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
-            Rater.rates.put(new Fun.Tuple2<Long, Long>(12L, 95L), price);
+            Rater.rates.put(new Fun.Tuple3<Long, Long, String>(12L, 95L, this.courseName), price);
         }
 
     }
