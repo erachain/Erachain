@@ -246,20 +246,17 @@ public class TransactionsResource {
             int blockLimit = -1;
             try {
                 blockLimit = ((Long) jsonObject.get("blocklimit")).intValue();
-
-                if (blockLimit > 360) // 360 ensures at least six hours of
-                // blocks can be queried at once
-                {
-                    String ipAddress = ServletUtils.getRemoteAddress(request);
-                    APIUtils.disallowRemote(request, ipAddress);
-                }
-            } catch (NullPointerException e) {
-                // OPTION DOES NOT EXIST
-                String ipAddress = ServletUtils.getRemoteAddress(request);
-                APIUtils.disallowRemote(request, ipAddress);
             } catch (ClassCastException e) {
                 // JSON EXCEPTION
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            }
+
+            if (blockLimit > 360) // 360 ensures at least six hours of
+            // blocks can be queried at once
+            {
+                String ipAddress = ServletUtils.getRemoteAddress(request);
+                if (!ServletUtils.isRemoteRequest(request, ipAddress))
+                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
             }
 
             // CHECK FOR TRANSACTIONLIMIT

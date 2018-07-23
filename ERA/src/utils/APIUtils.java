@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
 import javax.ws.rs.WebApplicationException;
 
+import core.web.ProfileHelper;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -43,6 +44,9 @@ public class APIUtils {
     
     public static void disallowRemote(HttpServletRequest request, String ipAddress) throws WebApplicationException {
 
+        // SEE in api.ApiService.ApiService -
+        //      and in ProfileHelper.getActiveProfileOpt()
+        
         //if (ServletUtils.isRemoteRequest(request, ipAddress)) {
         //    for (String ip: Settings.getInstance().getRpcAllowed()) {
         //        if (ip.equals(ipAddress))
