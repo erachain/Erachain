@@ -65,14 +65,14 @@ public abstract class AssetCls extends ItemCls {
     protected static final int ASSET_TYPE_LENGTH = 1;
 
     ///////////////////////////////////////////////////
-    /*
+    /**
      * GOODS
      *  передача в собственность, взять на хранение
      *  0 : движимая вещь вовне - может быть доставлена и передана на хранение (товары)
      */
     public static final int AS_OUTSIDE_GOODS = 0; // movable
 
-    /*
+    /**
      * ASSETS
      *  передача имущества не требует действий во вне - все исполняется тут же. Их можно дать в долг и заьрать самостоятельно
      *  Требования не предъявляются.
@@ -81,7 +81,7 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_INSIDE_ASSETS = 1;
 
-    /*
+    /**
      * IMMOVABLE
      *  передача в сосбтвенность, дать в аренду (по графику времени), взять на охрану
      *  1 : недвижимая вещь вовне - может быть передана в аренду (недвижимость)
@@ -89,42 +89,42 @@ public abstract class AssetCls extends ItemCls {
     
     public static final int AS_OUTSIDE_IMMOVABLE = 2;
 
-    /*
+    /**
      * outside CURRENCY
      * +++ деньги вовне - можно истребовать вернуть и подтвердить получение денег
      * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_OUTSIDE_CURRENCY = 11;
-       
-    /*
+
+    /**
      * outside SERVICE
      * +++ услуги во вне
      * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_OUTSIDE_SERVICE = 12; // UTILITY
 
-    /*
+    /**
      * outside SHARE
      * +++ акция предприятия вовне
      * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_OUTSIDE_SHARE = 13;
 
-    /*
+    /**
      * outside BILL - вексель
      * +++ вексель на оплату во вне
      * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_OUTSIDE_BILL = 14;
 
-    /*
+    /**
      * outside BILL - вексель
      * +++ вексель на оплату во вне
      * === полный аналог OUTSIDE_CLAIM по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_OUTSIDE_BILL_EX = 15;
 
-    /*
+    /**
      * outside CLAIMS
      * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
      *
@@ -136,35 +136,35 @@ public abstract class AssetCls extends ItemCls {
     public static final int AS_OUTSIDE_OTHER_CLAIM = 49;
 
     ///////////////
-    /*
+    /**
      * inside CURRENCY
      * +++ деньги 
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_CURRENCY = 51;
 
-    /*
+    /**
      * inside CLAIMS
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_UTILITY = 52; // SERVICE
-    
-    /*
+
+    /**
      * inside CLAIMS
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_SHARE = 53;
-    
-    /*
+
+    /**
      * inside BONUS
      * +++ бонусы - для анонимов так же платежи возможны
      * === ASSET - без обмена на бирже и можно анонимам переводить
      */
     public static final int AS_INSIDE_BONUS = 54;
-    
-    /*
+
+    /**
      * inside RIGHTS
      * +++ права и доступы
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
@@ -174,28 +174,28 @@ public abstract class AssetCls extends ItemCls {
      */
     public static final int AS_INSIDE_ACCESS = 55;
 
-    /*
+    /**
      * inside МЩЕУ
      * +++ права и доступы
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_VOTE = 56;
 
-    /*
+    /**
      * INDEXES (FOREX etc.)
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INDEX = 100;
 
-    /*
+    /**
      * inside CLAIMS
      * +++ требования и обязательства
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_OTHER_CLAIM = 119;
 
-    /*
+    /**
      * ACCOUNTING
      * учетные единицы - нельзя на бирже торговать - они ничего не стоят, можно делать любые действия от своего имени
      * 4 : учетные единицы - не имеет стоимости и не может быть продано (бухгалтерский учет)
@@ -457,13 +457,12 @@ public abstract class AssetCls extends ItemCls {
                 return "Movable Goods";
             case AS_OUTSIDE_IMMOVABLE:
                 return "Immovable Goods, Real Estate";
-                
             case AS_OUTSIDE_CURRENCY:
                 return "Outside Currency";
             case AS_OUTSIDE_SERVICE:
                 return "Outside Service";
             case AS_OUTSIDE_SHARE:
-                return "Outside Share Rignts";
+                return "Outside Share Rights";
             case AS_OUTSIDE_BILL:
                 return "Promissory Note";
             case AS_OUTSIDE_BILL_EX:

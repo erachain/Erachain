@@ -511,7 +511,7 @@ public class CreateOrderPanel extends JPanel {
                 amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
         String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
-                + " Bytes, ";
+                + " " + Lang.getInstance().translate("Bytes") + ", ";
         Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
                 + " COMPU</b><br></body></HTML>";
 
@@ -519,7 +519,7 @@ public class CreateOrderPanel extends JPanel {
                 Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                 (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction") + ": "
-                        + Lang.getInstance().translate("Order Creation"));
+                        + Lang.getInstance().translate("order creation"));
 
         CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
         dd.jScrollPane1.setViewportView(ww);

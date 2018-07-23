@@ -44,7 +44,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<BigInteger, BigIntege
 
         this.columnNames[4] = want.getShort();
 
-        this.columnNames[3] = "Price: " + this.columnNames[4];
+        this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
 
         totalCalc();
     }
