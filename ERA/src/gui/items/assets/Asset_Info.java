@@ -108,15 +108,8 @@ public class Asset_Info extends JTextPane {
                     image_Label.setIcon(ic);
                     image_Label.setSize(ic.getIconWidth(), ic.getIconHeight());
                 }
-
-
-            
-
-        
-            
         
         String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
-
 
         String text = "<body style= 'font-family:"
                 + UIManager.getFont("Label.font").getFamily() + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;'>";
@@ -132,10 +125,9 @@ public class Asset_Info extends JTextPane {
         text += "<div   style='word-wrap: break-word; '>" + library.to_HTML(asset.getDescription()) + "</div>";
         text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
         text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetType()) + "</b>,";
-        text += " " + Lang.getInstance().translate("Accuracy") + ": <b>" + asset.getScale() + "</b>,";
-        text += " " + Lang.getInstance().translate("Quantity") + ": <b>" + asset.getQuantity() + "</b></div><<BR></td></tr></table>";
+        text += " " + Lang.getInstance().translate("accuracy") + ": <b>" + asset.getScale() + "</b>,";
+        text += " " + Lang.getInstance().translate("quantity") + ": <b>" + asset.getQuantity() + "</b></div><<BR></td></tr></table>";
         text += "<div>";
-
 
         this.setContentType("text/html");
         this.setText(text);
@@ -144,7 +136,6 @@ public class Asset_Info extends JTextPane {
         MenuPopupUtil.installContextMenu(this);
         add_comp();
         setCaretPosition(0);
-
 
         this.addHyperlinkListener(new HyperlinkListener() {
 
@@ -161,12 +152,8 @@ public class Asset_Info extends JTextPane {
                     return;
                 }
                 if (arg0.getDescription().toString().equals("!!img")) {
-
                 }
-
             }
-
-
         });
         this.addMouseListener(new MouseListener() {
 
@@ -174,31 +161,26 @@ public class Asset_Info extends JTextPane {
             public void mouseClicked(MouseEvent e) {
                 // TODO Auto-generated method stub
                 //		System.out.print("\nMouse" + getComponentAt(e.getPoint()) +"\n");
-
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
                 // TODO Auto-generated method stub
-
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 // TODO Auto-generated method stub
-
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 // TODO Auto-generated method stub
-
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 // TODO Auto-generated method stub
-
             }
 
         });

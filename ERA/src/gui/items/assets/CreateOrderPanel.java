@@ -169,7 +169,7 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridy++;
         this.txtAmountHave = new M_DecimalFormatedTextField();
         // set scale
-        this.txtAmountHave.setScale(setScale(have));
+        this.txtAmountHave.setScale(have==null? 8: have.getScale());
         this.add(this.txtAmountHave, detailGBC);
 
         // ASSET HINT
@@ -188,7 +188,8 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridy++;
         txtPrice = new M_DecimalFormatedTextField();
         // set scale
-        txtPrice.setScale(setScale(want));
+
+        txtPrice.setScale(setScale(have, want));
         this.add(txtPrice, detailGBC);
         // ASSET HINT
         assetHintGBC.gridy = detailGBC.gridy;
@@ -511,7 +512,7 @@ public class CreateOrderPanel extends JPanel {
                 amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
         String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
-                + " Bytes, ";
+                + " " + Lang.getInstance().translate("Bytes") + ", ";
         Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
                 + " COMPU</b><br></body></HTML>";
 
@@ -519,7 +520,7 @@ public class CreateOrderPanel extends JPanel {
                 Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                 (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction") + ": "
-                        + Lang.getInstance().translate("Order Creation"));
+                        + Lang.getInstance().translate("order creation"));
 
         CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) transaction);
         dd.jScrollPane1.setViewportView(ww);
@@ -551,9 +552,9 @@ public class CreateOrderPanel extends JPanel {
         this.sellButton.setEnabled(true);
     }
     // confirm asset & return scale
-    private int setScale(AssetCls asset){
-        if (asset!=null) {
-            return asset.getScale();
+    private int setScale(AssetCls assetHave, AssetCls assetWant){
+        if (assetHave != null && assetWant != null) {
+            return assetHave.getScale() + assetWant.getScale() + 3;
         }
         return 8;
     }
