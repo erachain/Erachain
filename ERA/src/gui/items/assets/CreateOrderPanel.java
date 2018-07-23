@@ -188,7 +188,7 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridy++;
         txtPrice = new M_DecimalFormatedTextField();
         // set scale
-        txtPrice.setScale(setScale(want));
+        txtPrice.setScale(setScale(buying ? have : want));
         this.add(txtPrice, detailGBC);
         // ASSET HINT
         assetHintGBC.gridy = detailGBC.gridy;
