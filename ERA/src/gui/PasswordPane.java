@@ -66,7 +66,7 @@ public class PasswordPane {
         //a JPanel containing the dialog components we want
 
         int n = JOptionPane.showOptionDialog(
-                (Component) null, //parent,
+                (Component) parent,
                 userPanel,
                 Lang.getInstance().translate("Unlock Wallet"),
                 JOptionPane.YES_NO_CANCEL_OPTION,

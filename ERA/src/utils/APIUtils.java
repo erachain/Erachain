@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.ws.rs.WebApplicationException;
 
 import core.web.ProfileHelper;
+import gui.Gui;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -101,14 +102,17 @@ public class APIUtils {
                 throw ApiErrorFactory.getInstance()
                         .createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
             } else if (answer == ApiClient.SELF_CALL) {
-                return;
+                // STOP ACCESS from CONCOLE without PASSWORD or UNLOCKED wallet
+                if (Controller.getInstance().isWalletUnlocked())
+                    return;
             } else if (//!BlockChain.DEVELOP_USE ||
                         !Controller.getInstance().isWalletUnlocked()) {
-                password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
+                //password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
                 // password =
                 // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
-                // password =
-                // PasswordPane.showUnlockWalletDialog(Gui.getInstance());
+                //Gui.getInstance().bringtoFront();
+                password = PasswordPane.showUnlockWalletDialog(Gui.getInstance());
+                //Gui.getInstance().bringtoFront();
                 // password = PasswordPane.showUnlockWalletDialog(new
                 // DebugTabPane());
 
