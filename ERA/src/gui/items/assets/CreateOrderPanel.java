@@ -169,7 +169,7 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridy++;
         this.txtAmountHave = new M_DecimalFormatedTextField();
         // set scale
-        this.txtAmountHave.setScale(setScale(have));
+        this.txtAmountHave.setScale(have==null? 8: have.getScale());
         this.add(this.txtAmountHave, detailGBC);
 
         // ASSET HINT
@@ -188,7 +188,8 @@ public class CreateOrderPanel extends JPanel {
         detailGBC.gridy++;
         txtPrice = new M_DecimalFormatedTextField();
         // set scale
-        txtPrice.setScale(setScale(buying ? have : want));
+
+        txtPrice.setScale(setScale(have, want));
         this.add(txtPrice, detailGBC);
         // ASSET HINT
         assetHintGBC.gridy = detailGBC.gridy;
@@ -551,9 +552,9 @@ public class CreateOrderPanel extends JPanel {
         this.sellButton.setEnabled(true);
     }
     // confirm asset & return scale
-    private int setScale(AssetCls asset){
-        if (asset!=null) {
-            return asset.getScale();
+    private int setScale(AssetCls assetHave, AssetCls assetWant){
+        if (assetHave != null && assetWant != null) {
+            return assetHave.getScale() + assetWant.getScale() + 3;
         }
         return 8;
     }
