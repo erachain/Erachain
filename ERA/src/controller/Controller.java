@@ -2151,7 +2151,7 @@ public class Controller extends Observable {
                 uuid = headers.nextElement();
                 if (ApiClient.isAllowedDebugWindowCall(uuid)) {
                     
-                    // Gui.getInstance().bringtoFront();
+                    //Gui.getInstance().bringtoFront();
                     
                     return ApiClient.SELF_CALL;
                 }
@@ -2160,7 +2160,6 @@ public class Controller extends Observable {
         
         if (!GraphicsEnvironment.isHeadless()
                 && (Settings.getInstance().isGuiEnabled() || Settings.getInstance().isSysTrayEnabled())) {
-            Gui gui = Gui.getInstance();
             SysTray.getInstance().sendMessage(Lang.getInstance().translate("INCOMING API CALL"),
                     Lang.getInstance().translate("An API call needs authorization!"), MessageType.WARNING);
             Object[] options = { Lang.getInstance().translate("Yes"), Lang.getInstance().translate("No") };
@@ -2182,7 +2181,8 @@ public class Controller extends Observable {
                     return new Dimension(480, 200);
                 }
             };
-            
+
+            Gui gui = Gui.getInstance();
             gui.bringtoFront();
             
             result = JOptionPane.showOptionDialog(gui, jsp, Lang.getInstance().translate("INCOMING API CALL"),

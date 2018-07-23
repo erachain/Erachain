@@ -51,6 +51,7 @@ public class ApiErrorFactory {
     public static final int ERROR_WALLET_LOCKED = ERROR + 203;
     public static final int ERROR_WALLET_ALREADY_EXISTS = ERROR + 204;
     public static final int ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER = ERROR + 205;
+    public static final int ERROR_WALLET_PASSWORD_SO_SHORT = ERROR + 206;
 
     //BLOCKS
     //public static final int ERROR_BLOCK_NO_EXISTS = ERROR + 301;
@@ -157,6 +158,7 @@ public class ApiErrorFactory {
         this.errorMessages.put(ERROR_WALLET_LOCKED, Lang.getInstance().translate("wallet is locked"));
         this.errorMessages.put(ERROR_WALLET_ALREADY_EXISTS, Lang.getInstance().translate("wallet already exists"));
         this.errorMessages.put(ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER, Lang.getInstance().translate("user denied api call"));
+        this.errorMessages.put(ERROR_WALLET_PASSWORD_SO_SHORT, Lang.getInstance().translate("password is too short"));
 
         //BLOCK
         //this.errorMessages.put(ERROR_BLOCK_NO_EXISTS, Lang.getInstance().translate("block does not exist"));
