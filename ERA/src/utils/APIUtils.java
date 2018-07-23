@@ -46,7 +46,7 @@ public class APIUtils {
 
         // SEE in api.ApiService.ApiService -
         //      and in ProfileHelper.getActiveProfileOpt()
-        
+
         //if (ServletUtils.isRemoteRequest(request, ipAddress)) {
         //    for (String ip: Settings.getInstance().getRpcAllowed()) {
         //        if (ip.equals(ipAddress))
@@ -64,58 +64,62 @@ public class APIUtils {
         try {
             
             String ipAddress = ServletUtils.getRemoteAddress(request);
-            disallowRemote(request, ipAddress);
-            
-            if (!gui.Gui.isGuiStarted()) {
-                
+            // now not used - disallowRemote(request, ipAddress);
+
+            int min_length;
+            boolean noGUI = !gui.Gui.isGuiStarted();
+            if (noGUI) {
+
                 if (!ServletUtils.isRemoteRequest(request, ipAddress)) {
                     if (Controller.getInstance().isWalletUnlocked())
                         return;
-                    if (password != null && password.length() > 3
-                            && Controller.getInstance().unlockOnceWallet(password))
-                        return;
+                    min_length = 3;
                 } else {
-                    if (password != null && password.length() > 6
-                            && Controller.getInstance().unlockOnceWallet(password))
-                        return;
+                    min_length = 6;
                 }
-                
-                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
-                
             } else {
-                if (password != null && password.length() > 6
-                        && Controller.getInstance().unlockOnceWallet(password))
-                    return;
+                min_length = 8;
             }
-            
+
+            if (password != null) {
+                if (password.length() <= min_length)
+                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_PASSWORD_SO_SHORT);
+
+                if (Controller.getInstance().unlockOnceWallet(password))
+                    return;
+
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+
+            } else if (noGUI) {
+                throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
+            }
+
+            // GUI ON and not PASSWORD
             int answer = Controller.getInstance().checkAPICallAllowed(messageToDisplay, request);
             
             if (answer == JOptionPane.NO_OPTION) {
                 throw ApiErrorFactory.getInstance()
                         .createError(ApiErrorFactory.ERROR_WALLET_API_CALL_FORBIDDEN_BY_USER);
-                
-            } else if (!GraphicsEnvironment.isHeadless() && (Settings.getInstance().isGuiEnabled())) {
-                if (!BlockChain.DEVELOP_USE || answer != ApiClient.SELF_CALL
-                        || !Controller.getInstance().isWalletUnlocked()) {
-                    // if (true) {
-                    password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
-                    // password =
-                    // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
-                    // password =
-                    // PasswordPane.showUnlockWalletDialog(Gui.getInstance());
-                    // password = PasswordPane.showUnlockWalletDialog(new
-                    // DebugTabPane());
-                    
-                    if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
-                        return;
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
+            } else if (answer == ApiClient.SELF_CALL) {
+                return;
+            } else if (//!BlockChain.DEVELOP_USE ||
+                        !Controller.getInstance().isWalletUnlocked()) {
+                password = PasswordPane.showUnlockWalletDialog(MainFrame.getInstance());
+                // password =
+                // PasswordPane.showUnlockWalletDialog(Main_Panel.getInstance());
+                // password =
+                // PasswordPane.showUnlockWalletDialog(Gui.getInstance());
+                // password = PasswordPane.showUnlockWalletDialog(new
+                // DebugTabPane());
+
+                if (password.length() > 0 && Controller.getInstance().unlockWallet(password)) {
                     return;
+                } else {
+                    JOptionPane.showMessageDialog(null, "Invalid password", "Unlock Wallet",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
+
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_LOCKED);
             
         } catch (Exception e) {
