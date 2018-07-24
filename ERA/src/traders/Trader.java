@@ -33,9 +33,6 @@ public abstract class Trader extends Thread {
 
     protected static final BigDecimal M100 = new BigDecimal(100).setScale(0);
 
-    protected static TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new TreeMap<>();
-
     private TradersManager tradersManager;
     private long sleepTimestep;
 
@@ -57,6 +54,9 @@ public abstract class Trader extends Thread {
     protected BigDecimal rate;
     protected BigDecimal limitUP = new BigDecimal(0.01);
     protected BigDecimal limitDown = new BigDecimal(0.01);
+
+    protected TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new TreeMap<>();
 
     // AMOUNT + SPREAD
     protected TreeMap<BigDecimal, BigDecimal> scheme;
@@ -121,9 +121,13 @@ public abstract class Trader extends Thread {
 
             BigDecimal shift = BigDecimal.ONE.subtract(shiftPercentage.movePointLeft(2));
 
-            amountWant = amount.negate();
+            amountWant = amount.negate().setScale(haveAsset.getScale(), BigDecimal.ROUND_HALF_UP);
             amountHave = amountWant.multiply(this.rate).multiply(shift)
                     .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
+        }
+
+        if (haveKey==1079) {
+            ;
         }
 
         // Invalid command!
@@ -227,7 +231,7 @@ public abstract class Trader extends Thread {
         while (!this.orders.keySet().isEmpty()) {
             // RESOLVE SYNCHRONIZE REMOVE
             orderID = this.orders.firstKey();
-            Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(this.orders.firstKey());
+            Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(orderID);
             if (orderInChain != null
                     && notInCancelingArray(orderID, array)) {
                 cancelOrder(orderID);
@@ -246,7 +250,7 @@ public abstract class Trader extends Thread {
         //BigDecimal persent;
         for(BigDecimal amount: this.scheme.keySet()) {
             //persent = this.scheme.get(amount);
-            createOrder(amount);
+            createOrder(amount.setScale(this.haveAsset.getScale(), BigDecimal.ROUND_HALF_UP));
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {

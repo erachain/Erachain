@@ -67,17 +67,33 @@ public class TradersManager extends Observable {
         }
 
         //START TRADERs THREADs
-        TreeMap<BigDecimal, BigDecimal> scheme = new TreeMap<>();
-        scheme.put(new BigDecimal(10000), new BigDecimal(1));
-        scheme.put(new BigDecimal(1000), new BigDecimal(0.5));
-        scheme.put(new BigDecimal(100), new BigDecimal(0.2));
-        scheme.put(new BigDecimal(-100), new BigDecimal(0.2));
-        scheme.put(new BigDecimal(-1000), new BigDecimal(0.5));
-        scheme.put(new BigDecimal(-10000), new BigDecimal(1));
+        TreeMap<BigDecimal, BigDecimal> schemeUSD_RUB = new TreeMap<>();
+        schemeUSD_RUB.put(new BigDecimal(10000), new BigDecimal("1"));
+        schemeUSD_RUB.put(new BigDecimal(1000), new BigDecimal("0.5"));
+        schemeUSD_RUB.put(new BigDecimal(100), new BigDecimal("0.2"));
+        schemeUSD_RUB.put(new BigDecimal(10), new BigDecimal("0.1"));
+        schemeUSD_RUB.put(new BigDecimal(-10), new BigDecimal("0.1"));
+        schemeUSD_RUB.put(new BigDecimal(-100), new BigDecimal("0.2"));
+        schemeUSD_RUB.put(new BigDecimal(-1000), new BigDecimal("0.5"));
+        schemeUSD_RUB.put(new BigDecimal(-10000), new BigDecimal("1"));
         Account account = Controller.getInstance().wallet.getAccounts().get(1);
         Trader trader1 = new TraderA(this, account.getAddress(), 100,
-                1077, 1078, scheme);
+                1077, 1078, schemeUSD_RUB);
         this.knownTraders.add(trader1);
+
+
+        TreeMap<BigDecimal, BigDecimal> schemeBTC_USD = new TreeMap<>();
+        schemeBTC_USD.put(new BigDecimal(10), new BigDecimal("1"));
+        schemeBTC_USD.put(new BigDecimal(1), new BigDecimal("0.5"));
+        schemeBTC_USD.put(new BigDecimal("0.1"), new BigDecimal("0.2"));
+        schemeBTC_USD.put(new BigDecimal("0.01"), new BigDecimal("0.1")); // !!!! FIR GOOD SCALE USE STRING - not DOUBLE
+        schemeBTC_USD.put(new BigDecimal("-0.01"), new BigDecimal("0.1"));
+        schemeBTC_USD.put(new BigDecimal("-0.1"), new BigDecimal("0.2"));
+        schemeBTC_USD.put(new BigDecimal(-1), new BigDecimal("0.5"));
+        schemeBTC_USD.put(new BigDecimal(-10), new BigDecimal("1"));
+        Trader trader2 = new TraderA(this, account.getAddress(), 100,
+                1079, 1077, schemeBTC_USD);
+        this.knownTraders.add(trader2);
 
     }
 
