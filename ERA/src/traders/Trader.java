@@ -12,6 +12,7 @@ import core.transaction.CreateOrderTransaction;
 import datachain.DCSet;
 import gui.models.WalletOrdersTableModel;
 import org.apache.log4j.Logger;
+import org.bouncycastle.jcajce.provider.symmetric.ARC4;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
@@ -19,7 +20,6 @@ import org.junit.Assert;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import settings.Settings;
-import test.SettingTests;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -164,7 +164,7 @@ public abstract class Trader extends Thread {
         //String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
 
 
-        result = ApiClient.executeCommand("GET trade/cancel/" + orderID
+        result = ApiClient.executeCommand("GET trade/cancel/" + this.address + "/" + Base58.encode(orderID)
                 + "?password=" + TradersManager.WALLET_PASSWORD);
         LOGGER.info("CANCEL: " + result);
 

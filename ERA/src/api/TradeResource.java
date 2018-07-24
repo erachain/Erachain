@@ -43,9 +43,7 @@ public class TradeResource {
         help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                 "make and broadcast CreateOrder ");
         help.put("GET trade/cancel/{creator}/{signature}?password={password}",
-                "Cancel Order by orderID");
-        help.put("GET trade/cancelbyid/{creator}/{orderID}?password={password}",
-                "Cancel Order by orderID");
+                "Cancel Order");
 
         return StrJSonFine.convert(help);
     }
@@ -83,7 +81,6 @@ public class TradeResource {
 
         APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
 
-        JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
 
         // READ CREATOR
@@ -113,6 +110,7 @@ public class TradeResource {
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
         else {
+            JSONObject out = new JSONObject();
             out.put("error", validate);
             out.put("error_message", gui.transaction.OnDealClick.resultMess(validate));
             return out.toJSONString();
@@ -140,6 +138,8 @@ public class TradeResource {
                              @PathParam("signature") String signatureStr,
                              @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
+        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
+
         byte[] signature;
         try {
             signature = Base58.decode(signatureStr);
@@ -147,44 +147,18 @@ public class TradeResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
         }
 
-        return this.cancelByID(creatorStr, new BigInteger(signature), feePower, password);
-    }
-
-    /**
-     * send and broadcast GET
-     *
-     * @param creatorStr   address in wallet
-     * @param orderID      orderID
-     * @param feePower     fee Power
-     * @param password     password
-     * @return JSON row
-     *
-     * <h2>Example request</h2>
-     * GET cancelbyid/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/1234567898765432134567899876545678?password=123456789
-     * <h2>Example response</h2>
-     * {}
-     */
-    @GET
-    @Path("cancelbyid/{creator}/{orderID}")
-    public String cancelByID(@PathParam("creator") String creatorStr,
-                          @PathParam("orderID") BigInteger orderID,
-                          @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
-
-        APIUtils.askAPICallAllowed(password, "GET cancel Order\n ", request);
-
-        JSONObject out = new JSONObject();
-        Controller cntr = Controller.getInstance();
-
         // READ CREATOR
         Fun.Tuple2<Account, String> resultCreator = Account.tryMakeAccount(creatorStr);
         if (resultCreator.b != null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
         }
 
+        BigInteger orderID = new BigInteger(signature);
         if(!DCSet.getInstance().getOrderMap().contains(orderID)) {
             throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
         }
 
+        Controller cntr = Controller.getInstance();
         PrivateKeyAccount privateKeyAccount = cntr.getPrivateKeyAccountByAddress(resultCreator.a.getAddress());
         if (privateKeyAccount == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
@@ -198,6 +172,7 @@ public class TradeResource {
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
         else {
+            JSONObject out = new JSONObject();
             out.put("error", validate);
             out.put("error_message", gui.transaction.OnDealClick.resultMess(validate));
             return out.toJSONString();
