@@ -81,31 +81,37 @@ public abstract class Rater extends Thread {
         int sleepTimeFull = Settings.getInstance().getPingInterval();
 
         while (true) {
+            try {
 
-            if (!this.run) {
+                if (!this.run) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                        //FAILED TO SLEEP
+                    }
+                    continue;
+                }
+
                 try {
+                    this.tryGetRate();
                     Thread.sleep(1000);
                 } catch (Exception e) {
                     //FAILED TO SLEEP
                 }
-                continue;
-            }
 
-            try {
-                this.tryGetRate();
-                Thread.sleep(1000);
+                //SLEEP
+                try {
+                    Thread.sleep(sleepTimestep);
+                } catch (InterruptedException e) {
+                    //FAILED TO SLEEP
+                }
+
             } catch (Exception e) {
-                //FAILED TO SLEEP
-            }
-
-            //SLEEP
-            try {
-                Thread.sleep(sleepTimestep);
-            } catch (InterruptedException e) {
-                //FAILED TO SLEEP
+                LOGGER.error(e.getMessage(), e);
             }
 
         }
+
     }
 
     protected static synchronized void setRate(Long haveKey, Long wantKey, String courseName, BigDecimal rate) {

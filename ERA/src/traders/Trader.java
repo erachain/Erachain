@@ -61,7 +61,8 @@ public abstract class Trader extends Thread {
 
     // AMOUNT + SPREAD
     protected TreeMap<BigDecimal, BigDecimal> scheme;
-    protected TreeMap<BigDecimal, BigInteger> schemeOrders;
+    // AMOUNT + ORDER SIGNATUTE
+    protected TreeMap<BigDecimal, byte[]> schemeOrders;
 
     private boolean run = true;
 
@@ -85,10 +86,19 @@ public abstract class Trader extends Thread {
         return this.orders;
     }
 
+    protected synchronized void schemeOrdersPut(BigDecimal amount, byte[] signature) {
+        schemeOrders.put(amount, signature);
+    }
+
+    protected synchronized void removeOrders(BigInteger orderID) {
+        orders.remove(orderID);
+    }
+
     private boolean createOrder(BigDecimal amount) {
 
         ApiClient ApiClient = new ApiClient();
-        String result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
+        String result;
+        //String result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
 
         BigDecimal shiftPercentage = this.scheme.get(amount);
 
@@ -137,7 +147,8 @@ public abstract class Trader extends Thread {
             return false;
 
         if (jsonObject.containsKey("signature")) {
-            schemeOrders.put(amount, new BigInteger(Base58.decode((String)jsonObject.get("signature"))));
+
+            schemeOrdersPut(amount, Base58.decode((String)jsonObject.get("signature")));
             return true;
         }
 
@@ -190,7 +201,7 @@ public abstract class Trader extends Thread {
             if (false && !cancelOrder(orderID))
                 break;
 
-            this.orders.remove(orderID);
+            removeOrders(orderID);
 
         }
 
@@ -242,13 +253,6 @@ public abstract class Trader extends Thread {
 
     public void run() {
 
-        while(!cnt.doesWalletExists()) {
-            try {
-                Thread.sleep(1000);
-            } catch (Exception e) {
-            }
-        }
-
         // CHECJ MY ORDERS from WALLET
         this.ordersTableModel = new WalletOrdersTableModel();
         for (int i=0; i < this.ordersTableModel.getRowCount(); i++) {
@@ -257,29 +261,39 @@ public abstract class Trader extends Thread {
             if (orderInChain == null)
                 continue;
 
-            CreateOrderTransaction createTx = (CreateOrderTransaction) cnt.getTransaction(orderInChain.a.a.toByteArray());
-            if (createTx.getCreator().equals(this.account))
-                this.orders.put(orderInChain.a.a, orderInChain);
+            if (order.b.a.equals(this.haveKey) && order.c.a.equals(this.wantKey)
+                || order.b.a.equals(this.wantKey) && order.c.a.equals(this.haveKey)) {
+                CreateOrderTransaction createTx = (CreateOrderTransaction) cnt.getTransaction(orderInChain.a.a.toByteArray());
+                if (createTx.getCreator().equals(this.account) && createTx.)
+                    this.orders.put(orderInChain.a.a, orderInChain);
+            }
 
         }
 
         while (this.run) {
 
             try {
-                this.process();
                 Thread.sleep(1000);
             } catch (Exception e) {
                 //FAILED TO SLEEP
             }
 
-            //SLEEP
             try {
-                Thread.sleep(sleepTimestep);
-            } catch (InterruptedException e) {
-                //FAILED TO SLEEP
-            }
 
+                this.process();
+
+                //SLEEP
+                try {
+                    Thread.sleep(sleepTimestep);
+                } catch (InterruptedException e) {
+                    //FAILED TO SLEEP
+                }
+
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
         }
+
     }
 
     public void close() {

@@ -56,8 +56,9 @@ public class TradersManager extends Observable {
         this.knownRaters.add(raterPolonex);
 
 
+        Controller cnt = Controller.getInstance();
         // WAIT START WALLET
-        while(!Controller.getInstance().doesWalletExists()) {
+        while(!cnt.doesWalletDatabaseExists() ||  Rater.getRates().isEmpty()) {
             try {
                 Thread.sleep(1000);
             } catch (Exception e) {
@@ -66,7 +67,6 @@ public class TradersManager extends Observable {
         }
 
         //START TRADERs THREADs
-
         TreeMap<BigDecimal, BigDecimal> scheme = new TreeMap<>();
         scheme.put(new BigDecimal(10000), new BigDecimal(1));
         scheme.put(new BigDecimal(1000), new BigDecimal(0.5));

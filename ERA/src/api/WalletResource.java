@@ -152,8 +152,7 @@ public class WalletResource {
     @Consumes(MediaType.WILDCARD)
     public String unlock(String x) {
         //String password = null;
-        if (!BlockChain.DEVELOP_USE)
-            APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request);
+        APIUtils.askAPICallAllowed(x, "POST wallet/unlock " + x, request);
 
         //JSONObject jsonObject = (JSONObject) JSONValue.parse(x);
         //String password = (String) jsonObject.get("password");
