@@ -81,33 +81,28 @@ public abstract class Rater extends Thread {
         int sleepTimeFull = Settings.getInstance().getPingInterval();
 
         while (true) {
+
             try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
 
-                if (!this.run) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                        //FAILED TO SLEEP
-                    }
-                    continue;
-                }
+            if (!this.run) {
+                continue;
+            }
 
-                try {
-                    this.tryGetRate();
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    //FAILED TO SLEEP
-                }
-
-                //SLEEP
-                try {
-                    Thread.sleep(sleepTimestep);
-                } catch (InterruptedException e) {
-                    //FAILED TO SLEEP
-                }
-
+            try {
+                this.tryGetRate();
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
+            }
+
+            //SLEEP
+            try {
+                Thread.sleep(sleepTimestep);
+            } catch (InterruptedException e) {
+                //FAILED TO SLEEP
             }
 
         }

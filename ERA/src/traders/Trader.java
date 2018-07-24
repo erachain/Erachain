@@ -23,10 +23,7 @@ import test.SettingTests;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 
 public abstract class Trader extends Thread {
@@ -90,8 +87,8 @@ public abstract class Trader extends Thread {
         schemeOrders.put(amount, signature);
     }
 
-    protected synchronized void removeOrders(BigInteger orderID) {
-        orders.remove(orderID);
+    protected synchronized boolean removeOrder(BigInteger orderID) {
+        return null != orders.remove(orderID);
     }
 
     private boolean createOrder(BigDecimal amount) {
@@ -129,7 +126,7 @@ public abstract class Trader extends Thread {
 
         result = ApiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
                 + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
-        LOGGER.info(result);
+        LOGGER.info("CREATE: " + result);
 
         JSONObject jsonObject = null;
         try {
@@ -159,15 +156,17 @@ public abstract class Trader extends Thread {
     private boolean cancelOrder(BigInteger orderID) {
 
         ApiClient ApiClient = new ApiClient();
-        String result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
+        String result;
+        //result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
 
         //String resultAddresses = new ApiClient().executeCommand("GET addresses");
         //String[] parse = (resultAddresses.replace("\r\n", "").split(","));
         //String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
 
 
-        result = ApiClient.executeCommand("GET trade/cancel/" + orderID);
-        LOGGER.info("CANCEL " + orderID + " result:\n" + result);
+        result = ApiClient.executeCommand("GET trade/cancel/" + orderID
+                + "?password=" + TradersManager.WALLET_PASSWORD);
+        LOGGER.info("CANCEL: " + result);
 
         JSONObject jsonObject = null;
         try {
@@ -192,17 +191,15 @@ public abstract class Trader extends Thread {
     private void shiftAll() {
 
         // REMOVE ALL ORDERS
-        for (BigInteger orderID: this.orders.keySet()) {
+        BigInteger orderID;
+        while (!this.orders.keySet().isEmpty()) {
+            // RESOLVE SYNCHRONIZE REMOVE
+            orderID = this.orders.firstKey();
+            Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(this.orders.firstKey());
+            if (orderInChain != null)
+                cancelOrder(orderID);
 
-            Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(orderID);
-            if (orderInChain == null)
-                continue;
-
-            if (false && !cancelOrder(orderID))
-                break;
-
-            removeOrders(orderID);
-
+            removeOrder(orderID);
         }
 
         //BigDecimal persent;
@@ -264,7 +261,7 @@ public abstract class Trader extends Thread {
             if (order.b.a.equals(this.haveKey) && order.c.a.equals(this.wantKey)
                 || order.b.a.equals(this.wantKey) && order.c.a.equals(this.haveKey)) {
                 CreateOrderTransaction createTx = (CreateOrderTransaction) cnt.getTransaction(orderInChain.a.a.toByteArray());
-                if (createTx.getCreator().equals(this.account) && createTx.)
+                if (createTx.getCreator().equals(this.account))
                     this.orders.put(orderInChain.a.a, orderInChain);
             }
 
@@ -278,20 +275,25 @@ public abstract class Trader extends Thread {
                 //FAILED TO SLEEP
             }
 
+            if (!this.run) {
+                continue;
+            }
+
             try {
 
                 this.process();
 
-                //SLEEP
-                try {
-                    Thread.sleep(sleepTimestep);
-                } catch (InterruptedException e) {
-                    //FAILED TO SLEEP
-                }
-
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
+
+            //SLEEP
+            try {
+                Thread.sleep(sleepTimestep);
+            } catch (InterruptedException e) {
+                //FAILED TO SLEEP
+            }
+
         }
 
     }
