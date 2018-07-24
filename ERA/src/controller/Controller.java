@@ -18,23 +18,7 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.JOptionPane;
@@ -132,7 +116,9 @@ public class Controller extends Observable {
             put("ru", new Tuple2<Integer, Integer>(148450, 1));
         }
     };
-    
+
+    public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
+
     public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
     public final static long MIN_MEMORY_TAIL = 50000000;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
@@ -182,7 +168,7 @@ public class Controller extends Observable {
     private AboutFrame about_frame;
     private boolean isStopping = false;
     private String info;
-    
+
     public static String getVersion() {
         return version;
     }
@@ -637,7 +623,12 @@ public class Controller extends Observable {
         // start memory viewer
         MemoryViewer mamoryViewer = new MemoryViewer(this);
         mamoryViewer.start();
-        
+
+
+        this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>
+                (new BigDecimal(245 * 62).setScale(2), "\u20BD"));
+        this.COMPU_RATES.put("en", new Tuple2<BigDecimal, String>
+                (new BigDecimal(245).setScale(2), "$"));
     }
     
     // need for TESTS

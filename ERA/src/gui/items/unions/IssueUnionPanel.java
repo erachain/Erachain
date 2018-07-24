@@ -173,16 +173,16 @@ public class IssueUnionPanel extends JPanel {
         text += Lang.getInstance().translate("Description") + ":<br>" + library.to_HTML(issue_Union.getItem().getDescription()) + "<br>";
         text += Lang.getInstance().translate("Date") + ":&nbsp;" + ((UnionCls) issue_Union.getItem()).getBirthday() + "<br>";
         text += Lang.getInstance().translate("Parent") + ":&nbsp;" + ((UnionCls) issue_Union.getItem()).getParent() + "<br>";
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + issue_Union.viewSize(false) + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + issue_Union.getFee().toString() + " COMPU</b><br></body></HTML>";
 
+        String Status_text = "";
 
         //	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
         //	    UIManager.put("OptionPane.okButtonText", "Готово");
 
         //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issue_Union,
+                text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         dd.setLocationRelativeTo(th);
         dd.setVisible(true);
 

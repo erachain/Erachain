@@ -35,28 +35,41 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
      * @param th
      * @param th
      */
-    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text, String title_Text) {
+    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
+                                int w, int h, String status_Text, String title_Text) {
         super(parent, modal);
-        Init(parent, modal, text, w, h, status_Text, title_Text);
+        Init(parent, modal, transaction, text, w, h, status_Text, title_Text);
     }
-    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text) {
+    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
+                                int w, int h, String status_Text) {
         super(parent, modal);
-        Init(parent, modal, text, w, h, status_Text, "");
+        Init(parent, modal, transaction, text, w, h, status_Text, "");
     }
     
-    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, int w, int h, String status_Text) {
+    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction,
+                                int w, int h, String status_Text) {
         super(parent, modal);
         Init(parent, modal, transaction, w, h, status_Text, "");
     }
 
-    public void Init(java.awt.Frame parent, boolean modal, String text, int w, int h, String status_Text, String title_Text) {
+    public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
+                     int w, int h, String status_Text, String title_Text) {
         // setUndecorated(true);
         insest = UIManager.getFont("Label.font").getSize();
         if (insest <= 7) insest = 8;
         initComponents();
         jTitle_Label.setText(title_Text);
         jTextPane1.set_text(text);
-        jStatus_Label.setText(status_Text);
+        if (transaction != null) {
+            String feeText = "" + Lang.getInstance().translate("Size") + ":&nbsp;"
+                    + transaction.viewSize(false) + " Bytes, ";
+            feeText += Lang.getInstance().translate("Fee") + ":&nbsp;<b>" + transaction.viewFee()
+                    + "</b>";
+            status_Text += feeText;
+        }
+
+        jStatus_Label.setText("<HTML>" + status_Text + "</HTML>");
+
         //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
         jButton1.addActionListener(new ActionListener() {

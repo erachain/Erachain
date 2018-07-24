@@ -7,8 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import lang.Lang;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
 
@@ -30,6 +32,7 @@ import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import datachain.AddressTime_SignatureMap;
 import datachain.DCSet;
+import settings.Settings;
 import utils.DateTimeFormat;
 
 //import java.math.RoundingMode;
@@ -830,8 +833,22 @@ public abstract class Transaction {
 
     // PARSE/CONVERT
 
-    public String viewFee() {
+    public String viewFee1() {
         return feePow + ":" + this.fee.unscaledValue().longValue();
+    }
+
+    public String viewFee() {
+        Fun.Tuple2<BigDecimal, String> compu_rate = Controller.COMPU_RATES.get(Settings.getInstance().getLang());
+        if (compu_rate == null) {
+            compu_rate = Controller.COMPU_RATES.get("en");
+        }
+        String text = fee.toString();
+        if (compu_rate != null) {
+            BigDecimal fee_fiat = fee.multiply(compu_rate.a).setScale(compu_rate.a.scale(), BigDecimal.ROUND_HALF_UP);
+            text += "(" + compu_rate.b + fee_fiat.toString() + ")";
+        }
+
+        return text;
     }
 
     public String viewItemName() {

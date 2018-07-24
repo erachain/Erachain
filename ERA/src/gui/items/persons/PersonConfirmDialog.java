@@ -213,12 +213,8 @@ public class PersonConfirmDialog extends JDialog {
         Transaction transaction = Controller.getInstance().r_SertifyPerson(version, false, authenticator, feePow,
                 person.getKey(), sertifiedPublicKeys, toDate);
 
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
-                + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
-
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2),
                 (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         SertifyPubKeysDetailsFrame ww = new SertifyPubKeysDetailsFrame((R_SertifyPubKeys) transaction);

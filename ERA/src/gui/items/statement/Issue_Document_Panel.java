@@ -262,10 +262,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         // ((AssetCls)issueAssetTransaction.getItem()).getScale()+ "<br>";
         // text += Lang.getInstance().translate("Description")+":<br>"+
         // library.to_HTML(issueAssetTransaction.getItem().getDescription())+"<br>";
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + issueDoc.viewSize(false)
-                + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + issueDoc.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
+        String Status_text = "";
 
         // System.out.print("\n"+ text +"\n");
         // UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -275,7 +272,8 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         // Lang.getInstance().translate("Issue Asset"),
         // JOptionPane.YES_NO_OPTION);
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text,
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issueDoc,
+                text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction") + " "
                         + Lang.getInstance().translate("Issue Document"));

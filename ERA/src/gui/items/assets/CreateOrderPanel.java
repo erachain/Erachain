@@ -511,12 +511,9 @@ public class CreateOrderPanel extends JPanel {
         Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
                 amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
-                + " " + Lang.getInstance().translate("Bytes") + ", ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
                 Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                 (int) (MainFrame.getInstance().getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction") + ": "

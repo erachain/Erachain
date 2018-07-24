@@ -348,12 +348,9 @@ public class IssuePollPanel extends JPanel {
         }
         text += "<br>    ";
 
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + issuePoll.viewSize(false)
-                + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + issuePoll.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
-
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text,
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issuePoll,
+                text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));
         dd.setLocationRelativeTo(th);

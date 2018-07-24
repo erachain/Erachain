@@ -169,11 +169,9 @@ public class VouchRecordDialog extends JDialog {
                 record.getBlockHeight(DCSet.getInstance()), record.getSeqNo(DCSet.getInstance()));
         //Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
 
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false) + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString() + " COMPU</b><br></body></HTML>";
-
-
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         //Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         VouchingDetailsFrame ww = new VouchingDetailsFrame((R_Vouch) transaction);
 

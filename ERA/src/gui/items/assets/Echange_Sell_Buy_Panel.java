@@ -216,7 +216,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a.toByteArray());
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
 
-                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
                         Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2), "",
                         Lang.getInstance().translate("Create Order Transaction"));
@@ -369,7 +369,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a.toByteArray());
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
 
-                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+                Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
                         Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
                         (int) (MainFrame.getInstance().getHeight() / 1.2), "",
                         Lang.getInstance().translate("Create Order Transaction"));

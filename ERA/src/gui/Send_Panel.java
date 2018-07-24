@@ -18,6 +18,8 @@ import gui.models.Send_TableModel;
 import gui.transaction.OnDealClick;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
+import org.mapdb.Fun;
+import settings.Settings;
 import utils.Converter;
 import utils.MenuPopupUtil;
 import utils.NameUtils;
@@ -707,11 +709,9 @@ public class Send_Panel extends JPanel {
         // test result = new Pair<Transaction, Integer>(null, Transaction.VALIDATE_OK);
 
 
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false) + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString() + " COMPU</b><br></body></HTML>";
-
-
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
 
         // ww.jTabbedPane1.setVisible(false);

@@ -281,14 +281,12 @@ public class IssueStatusPanel extends JPanel {
 
         text += Lang.getInstance().translate("Unique") + ": " + ((StatusCls) issue_Status.getItem()).isUnique()
                 + "<br>";
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + issue_Status.viewSize(false)
-                + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + issue_Status.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
+        String Status_text = "";
 
-        System.out.print("\n" + text + "\n");
+        //System.out.print("\n" + text + "\n");
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text,
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issue_Status,
+                text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));
         dd.setLocationRelativeTo(th);

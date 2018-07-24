@@ -316,8 +316,8 @@ public class IssueImprintPanel extends JPanel {
             text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;" + Lang.getInstance().translate("Issue Imprint") + "<br><br><br>";
             text += Lang.getInstance().translate("Creator") + ":&nbsp;" + result.getCreator() + "<br>";
             text += library.to_HTML(result.getItem().getDescription()) + "<br>";
-            String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + result.viewSize(false) + " Bytes, ";
-            Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + result.getFee().toString() + " COMPU</b><br></body></HTML>";
+
+            String Status_text = "";
 
             //	  System.out.print("\n"+ text +"\n");
             //	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -325,7 +325,8 @@ public class IssueImprintPanel extends JPanel {
 
             //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, result,
+                    text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
             dd.setLocationRelativeTo(th);
             dd.setVisible(true);
 

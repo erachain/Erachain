@@ -259,11 +259,9 @@ public class PersonSetStatusDialog extends JDialog {
                 value_1, value_2, data_1, data_2, refParent, description
         );
 
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false) + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString() + " COMPU</b><br></body></HTML>";
-
-
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
+                Lang.getInstance().translate("Send Mail"), (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
 
         SetStatusToItemDetailsFrame ww = new SetStatusToItemDetailsFrame((R_SetStatusToItem) transaction);
         dd.jScrollPane1.setViewportView(ww);

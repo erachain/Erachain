@@ -119,10 +119,7 @@ public class IssueTemplatePanel extends JPanel {
         text += Lang.getInstance().translate("Title") + ":&nbsp;" + issueTemplate.getItem().viewName() + "<br>";
         text += Lang.getInstance().translate("Description") + ":<br>"
                 + library.to_HTML(issueTemplate.getItem().getDescription()) + "<br>";
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + issueTemplate.viewSize(false)
-                + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + issueTemplate.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
+        String Status_text = "";
 
         // System.out.print("\n"+ text +"\n");
         // UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -131,7 +128,8 @@ public class IssueTemplatePanel extends JPanel {
         // int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text,
         // Lang.getInstance().translate("Issue Asset"), JOptionPane.YES_NO_OPTION);
 
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text,
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,  issueTemplate,
+                text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction") + " "
                         + Lang.getInstance().translate("Issue Template"));
