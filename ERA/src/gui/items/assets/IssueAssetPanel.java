@@ -414,10 +414,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             text += Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
             text += Lang.getInstance().translate("Description") + ":<br>" + library.to_HTML(asset.getDescription())
                     + "<br>";
-            String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;"
-                    + issueAssetTransaction.viewSize(false) + " Bytes, ";
-            Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;"
-                    + issueAssetTransaction.getFee().toString() + " COMPU</b><br></body></HTML>";
+            String Status_text = "";
             
             // System.out.print("\n"+ text +"\n");
             // UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -427,8 +424,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             // text, Lang.getInstance().translate("Issue Asset"),
             // JOptionPane.YES_NO_OPTION);
             
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text,
-                    (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
+            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issueAssetTransaction,
+                    text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction"));
             dd.setLocationRelativeTo(th);
             dd.setVisible(true);

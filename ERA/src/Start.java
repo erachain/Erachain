@@ -155,7 +155,8 @@ public class Start {
                 // show error dialog
                 if (Controller.useGui) {
                     if (Settings.getInstance().isGuiEnabled()) {
-                        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage(), 600, 400, Lang.getInstance().translate(" "));
+                        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, null,
+                                Lang.getInstance().translate("STARTUP ERROR") + ": " + e.getMessage(), 600, 400, Lang.getInstance().translate(" "));
                         dd.jButton1.setVisible(false);
                         dd.jButton2.setText(Lang.getInstance().translate("Cancel"));
                         dd.setLocationRelativeTo(null);

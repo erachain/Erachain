@@ -505,14 +505,14 @@ public class AssetSendPanel extends javax.swing.JPanel {
        setLayout(layout);
 
        jLabel_Recive_Detail.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Recive_Detail.setText("jLabel1");
+       jLabel_Recive_Detail.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 6;
        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
        add(jLabel_Recive_Detail, gridBagConstraints);
 
-       jTextField_To.setText("jTextField1");
+       jTextField_To.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 4;
@@ -549,7 +549,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        add(jComboBox_Account, gridBagConstraints);
 
        jLabel_Mess_Title.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Mess_Title.setText("jLabel4");
+       jLabel_Mess_Title.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 8;
@@ -557,7 +557,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        add(jLabel_Mess_Title, gridBagConstraints);
 
        jTextField_Recive_Detail.setEditable(false);
-       jTextField_Recive_Detail.setText("jTextField2");
+       jTextField_Recive_Detail.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 6;
@@ -577,7 +577,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        gridBagConstraints.insets = new java.awt.Insets(15, 15, 6, 15);
        add(jLabel_Title, gridBagConstraints);
 
-       jTextField_Mess_Title.setText("jTextField3");
+       jTextField_Mess_Title.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 8;
@@ -588,7 +588,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        add(jTextField_Mess_Title, gridBagConstraints);
 
        jLabel_Mess.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Mess.setText("jLabel6");
+       jLabel_Mess.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 10;
@@ -609,7 +609,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 15);
        add(jScrollPane1, gridBagConstraints);
 
-       jCheckBox_Enscript.setText("jCheckBox1");
+       jCheckBox_Enscript.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 12;
@@ -619,7 +619,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        add(jCheckBox_Enscript, gridBagConstraints);
 
        jLabel_Asset.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Asset.setText("jLabel7");
+       jLabel_Asset.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 14;
@@ -636,14 +636,14 @@ public class AssetSendPanel extends javax.swing.JPanel {
        add(jComboBox_Asset, gridBagConstraints);
 
        jLabel_Ammount.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Ammount.setText("jLabel8");
+       jLabel_Ammount.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 0;
        gridBagConstraints.gridy = 18;
        gridBagConstraints.insets = new java.awt.Insets(0, 15, 0, 0);
        add(jLabel_Ammount, gridBagConstraints);
 
-       jTextField_Ammount.setText("jTextField4");
+       jTextField_Ammount.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 18;
@@ -654,7 +654,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
        add(jTextField_Ammount, gridBagConstraints);
 
        jLabel_Fee.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-       jLabel_Fee.setText("jLabel9");
+       jLabel_Fee.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 12;
        gridBagConstraints.gridy = 18;
@@ -673,14 +673,14 @@ public class AssetSendPanel extends javax.swing.JPanel {
        gridBagConstraints.insets = new java.awt.Insets(0, 0, 6, 15);
        add(jComboBox_Fee, gridBagConstraints);
 
-       jButton_ok.setText("jButton1");
+       jButton_ok.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 16;
        gridBagConstraints.gridy = 20;
        gridBagConstraints.insets = new java.awt.Insets(7, 0, 15, 15);
        add(jButton_ok, gridBagConstraints);
 
-       jLabel_Icon.setText("jLabel10");
+       jLabel_Icon.setText("");
        gridBagConstraints = new java.awt.GridBagConstraints();
        gridBagConstraints.gridx = 2;
        gridBagConstraints.gridy = 16;

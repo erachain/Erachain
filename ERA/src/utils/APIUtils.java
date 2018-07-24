@@ -243,12 +243,8 @@ public class APIUtils {
         
         boolean confirmed = true;
         if (gui.Gui.isGuiStarted()) {
-            String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;"
-                    + transaction.viewSize(true) + " Bytes, ";
-            Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
-                    + " COMPU</b><br></body></HTML>";
-            
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,
+            String Status_text = "";
+            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, transaction,
                     Lang.getInstance().translate("Send Mail"), (600), (450), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction"));
             Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);

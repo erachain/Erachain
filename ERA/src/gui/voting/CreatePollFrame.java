@@ -244,16 +244,15 @@ public class CreatePollFrame extends JFrame {
             }
             text += "<br>    ";
 
-            String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + issue_voiting.viewSize(false) + " Bytes, ";
-            Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + issue_voiting.getFee().toString() + " COMPU</b><br></body></HTML>";
-
+            String Status_text = "";
 
             //	    UIManager.put("OptionPane.cancelButtonText", "Отмена");
             //	    UIManager.put("OptionPane.okButtonText", "Готово");
 
             //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issue_voiting,
+                    text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
             dd.setLocationRelativeTo(th);
             dd.setVisible(true);
 

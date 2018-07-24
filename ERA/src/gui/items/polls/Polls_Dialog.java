@@ -268,12 +268,9 @@ public class Polls_Dialog extends JDialog {
                 option, feePow);
 
         // CHECK VALIDATE MESSAGE
-        String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;" + transaction.viewSize(false)
-                + " Bytes, ";
-        Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + transaction.getFee().toString()
-                + " COMPU</b><br></body></HTML>";
-
-        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, Lang.getInstance().translate("Vote on Poll"),
+        String Status_text = "";
+        Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
+                Lang.getInstance().translate("Vote on Poll"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
                 Lang.getInstance().translate("Confirmation Transaction"));
         VoteOnItemPollDetailsFrame ww = new VoteOnItemPollDetailsFrame((VoteOnItemPollTransaction) transaction);

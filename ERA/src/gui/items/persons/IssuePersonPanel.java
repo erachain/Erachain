@@ -368,10 +368,7 @@ public class IssuePersonPanel extends JPanel {
                 return;
             }
 
-            String Status_text = "<HTML>" + Lang.getInstance().translate("Size") + ":&nbsp;"
-                    + result.getA().viewSize(false) + " Bytes, ";
-            Status_text += "<b>" + Lang.getInstance().translate("Fee") + ":&nbsp;" + result.getA().getFee().toString()
-                    + " COMPU</b><br></body></HTML>";
+            String Status_text = "";
 
             // System.out.print("\n"+ text +"\n");
             // UIManager.put("OptionPane.cancelButtonText", "Отмена");
@@ -381,7 +378,8 @@ public class IssuePersonPanel extends JPanel {
             // text, Lang.getInstance().translate("Issue Asset"),
             // JOptionPane.YES_NO_OPTION);
 
-            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, " ",
+            Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issuePersonRecord,
+                    " ",
                     (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction") + " "
                             + Lang.getInstance().translate("Issue Person"));
