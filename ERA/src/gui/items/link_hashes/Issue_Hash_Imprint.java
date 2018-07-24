@@ -57,6 +57,8 @@ public class Issue_Hash_Imprint extends javax.swing.JPanel {
     public Issue_Hash_Imprint() {
 
         initComponents();
+        this.jLabel_Title.setFont(new java.awt.Font("Tahoma", 0, 18));
+        ;
         this.jLabel_Title.setText(Lang.getInstance().translate("Write Hashs to BlockChain"));
         table_Model = new Table_Model_Issue_Hashes(0);
         this.jTable_Hash.setModel(table_Model);

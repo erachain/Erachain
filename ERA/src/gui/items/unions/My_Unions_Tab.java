@@ -46,14 +46,14 @@ public class My_Unions_Tab extends Split_Panel {
         //unionsModel.fireTableDataChanged();
         //CHECKBOX FOR CONFIRMED
         TableColumn confirmedColumn = tableUnion.getColumnModel().getColumn(WalletItemUnionsTableModel.COLUMN_CONFIRMED);
-        confirmedColumn.setMinWidth(50);
-        confirmedColumn.setMaxWidth(50);
+        confirmedColumn.setMinWidth(170);
+        confirmedColumn.setMaxWidth(170);
         confirmedColumn.setPreferredWidth(50);
         //CHECKBOX FOR FAVORITE
         favoriteColumn = tableUnion.getColumnModel().getColumn(WalletItemUnionsTableModel.COLUMN_FAVORITE);
         //favoriteColumn.setCellRenderer(table.getDefaultRenderer(Boolean.class));
-        favoriteColumn.setMinWidth(50);
-        favoriteColumn.setMaxWidth(50);
+        favoriteColumn.setMinWidth(150);
+        favoriteColumn.setMaxWidth(150);
         favoriteColumn.setPreferredWidth(50);//.setWidth(30);
 
         //Sorter
@@ -86,8 +86,6 @@ public class My_Unions_Tab extends Split_Panel {
                 RowFilter filter1 = RowFilter.regexFilter(".*" + search + ".*", 1);
                 ((DefaultRowSorter<WalletItemUnionsTableModel, ?>) sorter11).setRowFilter(filter1);
                 unionsModel.fireTableDataChanged();
-
-
             }
         });
         // set show

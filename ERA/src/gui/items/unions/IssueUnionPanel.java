@@ -300,6 +300,8 @@ public class IssueUnionPanel extends JPanel {
         add(jScrollPane1, gridBagConstraints);
 
         title_jLabel.setText(Lang.getInstance().translate("Issue Union"));
+        title_jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        title_jLabel.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
