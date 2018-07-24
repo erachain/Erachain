@@ -26,7 +26,6 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class SettingLangFrame extends JDialog {
 
-
     private static final Logger LOGGER = Logger
             .getLogger(SettingLangFrame.class);
     private JList<LangFile> listLang;
@@ -72,7 +71,6 @@ public class SettingLangFrame extends JDialog {
         listLangGBC.gridy = 1;
         listLangGBC.gridx = 1;
 
-
         //LANGS GBC
         GridBagConstraints font_LabelGBC = new GridBagConstraints();
         font_LabelGBC.insets = new Insets(0, 0, 5, 0);
@@ -95,7 +93,6 @@ public class SettingLangFrame extends JDialog {
         size_Font.setModel(new javax.swing.DefaultComboBoxModel<String>(new String[]{"11", "12", "14", "16", "18", "20", "24"}));
         this.add(size_Font, fontGBC);
 
-
         //BUTTON GBC
         GridBagConstraints buttonGBC = new GridBagConstraints();
         buttonGBC.insets = new Insets(0, 0, 0, 0);
@@ -108,9 +105,8 @@ public class SettingLangFrame extends JDialog {
         this.add(labelSelect, labelGBC);
 
         // read internet
-        String stringFromInternet = "";
+        String stringFromInternet;
         try {
-            //String url = Lang.translationsUrl + Controller.getInstance().getVersion().replace(" ", "%20") + "/available.json";
             String url = Lang.translationsUrl + "available.json";
 
             URL u = new URL(url);
@@ -119,8 +115,6 @@ public class SettingLangFrame extends JDialog {
         } catch (Exception e1) {
             LOGGER.error(e1.getMessage(), e1);
             stringFromInternet = "";
-
-
         }
 
         JSONObject inernetLangsJSON = (JSONObject) JSONValue.parse(stringFromInternet);
@@ -130,14 +124,29 @@ public class SettingLangFrame extends JDialog {
         if (inernetLangsJSON != null && !inernetLangsJSON.isEmpty()) {
             for (Object internetKey : inernetLangsJSON.keySet()) {
                 JSONObject internetValue = (JSONObject) inernetLangsJSON.get(internetKey);
-                listModel.addElement(new LangFile((String) internetValue.get("_lang_name_"), (String) internetValue.get("_file_"), new Long((String) internetValue.get("_timestamp_of_translation_"))));
+                listModel.addElement(new LangFile((String) internetValue.get("_lang_name_"),
+                        (String) internetValue.get("_file_"),
+                        new Long(internetValue.get("_timestamp_of_translation_").toString())));
             }
         }
 
         listLang = new JList<LangFile>(listModel);
         listLang.setSelectedIndex(0);
         listLang.setFocusable(false);
+        listLang.addListSelectionListener(e -> {
+            String valueLang = listLang.getSelectedValue().toString();
 
+            switch (valueLang) {
+                case "[ru] Русский":
+                    label_font_size.setText("Размер шрифта:");
+                    labelSelect.setText("Язык");
+                    break;
+                case "[en] English":
+                    label_font_size.setText("Font size:");
+                    labelSelect.setText("Language");
+                    break;
+            }
+        });
 
         JScrollPane scrollPaneLang = new JScrollPane(listLang);
 
@@ -150,11 +159,7 @@ public class SettingLangFrame extends JDialog {
 
         //BUTTON OK
         nextButton = new JButton("OK");
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onOKClick();
-            }
-        });
+        nextButton.addActionListener(e -> onOKClick());
         this.add(nextButton, buttonGBC);
 
         //CLOSE NICELY
@@ -170,8 +175,6 @@ public class SettingLangFrame extends JDialog {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 // TODO Auto-generated method stub
-
-
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     String size = size_Font.getSelectedItem().toString();
 
@@ -186,8 +189,6 @@ public class SettingLangFrame extends JDialog {
                     pack();
                     th.repaint();
                 }
-
-
             }
         });
 
