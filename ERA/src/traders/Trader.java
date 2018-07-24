@@ -13,6 +13,7 @@ import datachain.DCSet;
 import gui.models.WalletOrdersTableModel;
 import org.apache.log4j.Logger;
 import org.bouncycastle.jcajce.provider.symmetric.ARC4;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
@@ -43,6 +44,7 @@ public abstract class Trader extends Thread {
     protected Controller cnt;
     protected DCSet dcSet;
     protected CallRemoteApi caller;
+    protected ApiClient apiClient;
 
     protected Account account;
     protected String address;
@@ -59,7 +61,7 @@ public abstract class Trader extends Thread {
     // AMOUNT + SPREAD
     protected TreeMap<BigDecimal, BigDecimal> scheme;
     // AMOUNT + ORDER SIGNATUTE
-    protected TreeMap<BigDecimal, byte[]> schemeOrders;
+    protected TreeMap<BigDecimal, byte[]> schemeOrders = new TreeMap();
 
     private boolean run = true;
 
@@ -68,6 +70,8 @@ public abstract class Trader extends Thread {
         this.cnt = Controller.getInstance();
         this.dcSet = DCSet.getInstance();
         this.caller = new CallRemoteApi();
+        this.apiClient = new ApiClient();
+
 
         this.account = new Account(accountStr);
         this.address = accountStr;
@@ -93,10 +97,7 @@ public abstract class Trader extends Thread {
 
     private boolean createOrder(BigDecimal amount) {
 
-        ApiClient ApiClient = new ApiClient();
         String result;
-        //String result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
-
         BigDecimal shiftPercentage = this.scheme.get(amount);
 
         long haveKey;
@@ -112,7 +113,8 @@ public abstract class Trader extends Thread {
             BigDecimal shift = BigDecimal.ONE.add(shiftPercentage.movePointLeft(2));
 
             amountHave = amount;
-            amountWant = amount.divide(this.rate.multiply(shift), wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
+            amountWant = amount.multiply(this.rate).multiply(shift)
+                    .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
         } else {
             haveKey = this.wantKey;
             wantKey = this.haveKey;
@@ -124,7 +126,10 @@ public abstract class Trader extends Thread {
                     .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
         }
 
-        result = ApiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
+        // Invalid command!
+        //Server returned HTTP response code: 500 for URL: http://127.0.0.1:9068/trade/create/7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP/1078/1077/548984.60/10000?password=123456789
+        //Type help to get a list of commands.
+        result = this.apiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
                 + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
         LOGGER.info("CREATE: " + result);
 
@@ -137,7 +142,7 @@ public abstract class Trader extends Thread {
             LOGGER.info(e);
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         } finally {
-            ApiClient.executeCommand("GET wallet/lock");
+            this.apiClient.executeCommand("GET wallet/lock");
         }
 
         if (jsonObject == null)
@@ -155,16 +160,16 @@ public abstract class Trader extends Thread {
 
     private boolean cancelOrder(BigInteger orderID) {
 
-        ApiClient ApiClient = new ApiClient();
         String result;
-        //result = ApiClient.executeCommand("POST wallet/unlock " + TradersManager.WALLET_PASSWORD);
 
-        //String resultAddresses = new ApiClient().executeCommand("GET addresses");
-        //String[] parse = (resultAddresses.replace("\r\n", "").split(","));
-        //String address = parse[1].replace("[", "").replace("]", "").trim().replace("\"", "");
+        result = this.apiClient.executeCommand("GET trade/cancel/" + this.address + "/" + Base58.encode(orderID)
+                + "?password=" + TradersManager.WALLET_PASSWORD);
+        LOGGER.info("CANCEL: " + result);
+
+        Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(this.orders.firstKey());
 
 
-        result = ApiClient.executeCommand("GET trade/cancel/" + this.address + "/" + Base58.encode(orderID)
+        result = this.apiClient.executeCommand("GET trade/cancel/" + this.address + "/" + Base58.encode(orderID)
                 + "?password=" + TradersManager.WALLET_PASSWORD);
         LOGGER.info("CANCEL: " + result);
 
@@ -177,7 +182,7 @@ public abstract class Trader extends Thread {
             LOGGER.info(e);
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         } finally {
-            ApiClient.executeCommand("GET wallet/lock");
+            this.apiClient.executeCommand("GET wallet/lock");
         }
 
         if (jsonObject != null && !jsonObject.containsKey("error")) {
@@ -188,24 +193,66 @@ public abstract class Trader extends Thread {
 
     }
 
+    private boolean notInCancelingArray(BigInteger orderID, JSONArray array) {
+        String signatureOrder = Base58.encode(orderID);
+        if (array != null) {
+            for (int i=0; i < array.size(); i++) {
+                JSONObject item = (JSONObject) array.get(i);
+                if (item.containsKey("orderID"))
+                    if (item.get("orderID").equals(signatureOrder))
+                        return false;
+            }
+        }
+
+        return true;
+
+    }
+
     private void shiftAll() {
 
         // REMOVE ALL ORDERS
+
+        String result = this.apiClient.executeCommand("GET transactions/unconfirmedof/" + this.address);
+
+        JSONArray array = null;
+        try {
+            //READ JSON
+            array = (JSONArray) JSONValue.parse(result);
+        } catch (NullPointerException | ClassCastException e) {
+            //JSON EXCEPTION
+            LOGGER.info(e);
+        }
+
         BigInteger orderID;
         while (!this.orders.keySet().isEmpty()) {
             // RESOLVE SYNCHRONIZE REMOVE
             orderID = this.orders.firstKey();
             Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(this.orders.firstKey());
-            if (orderInChain != null)
+            if (orderInChain != null
+                    && notInCancelingArray(orderID, array)) {
                 cancelOrder(orderID);
+            }
 
             removeOrder(orderID);
+
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
+
         }
 
         //BigDecimal persent;
         for(BigDecimal amount: this.scheme.keySet()) {
             //persent = this.scheme.get(amount);
             createOrder(amount);
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
+
         }
     }
 
@@ -261,7 +308,7 @@ public abstract class Trader extends Thread {
             if (order.b.a.equals(this.haveKey) && order.c.a.equals(this.wantKey)
                 || order.b.a.equals(this.wantKey) && order.c.a.equals(this.haveKey)) {
                 CreateOrderTransaction createTx = (CreateOrderTransaction) cnt.getTransaction(orderInChain.a.a.toByteArray());
-                if (createTx.getCreator().equals(this.account))
+                if (createTx != null && createTx.getCreator().equals(this.account))
                     this.orders.put(orderInChain.a.a, orderInChain);
             }
 

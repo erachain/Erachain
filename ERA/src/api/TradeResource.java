@@ -76,7 +76,8 @@ public class TradeResource {
     @Path("create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}")
     public String sendGet(@PathParam("creator") String creatorStr,
                           @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey,
-                          @PathParam("haveAmount") Double haveAmount, @PathParam("wantAmount") Double wantAmount,
+                          /// STRING for AMOUNT!!! SCALE is GOOD
+                          @PathParam("haveAmount") BigDecimal haveAmount, @PathParam("wantAmount") BigDecimal wantAmount,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
         APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
@@ -103,7 +104,9 @@ public class TradeResource {
         }
 
         Transaction transaction = cntr.createOrder(privateKeyAccount, haveAsset, wantAsset,
-                new BigDecimal(haveAmount), new BigDecimal(wantAmount), feePower.intValue());
+                haveAmount, //new BigDecimal(haveAmount), // becouse String .setScale(haveAsset.getScale()),
+                wantAmount, //new BigDecimal(wantAmount), //.setScale(wantAsset.getScale()),
+                feePower.intValue());
 
         int validate = cntr.getTransactionCreator().afterCreate(transaction, false);
 

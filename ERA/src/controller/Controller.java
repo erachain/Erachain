@@ -2472,9 +2472,13 @@ public class Controller extends Observable {
     
     public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
         return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
-        
+
     }
-    
+
+    public List<Transaction> getUnconfirmedTransactionsByAddress(String address) {
+        return this.dcSet.getTransactionMap().getTransactionsByAddress(address);
+    }
+
     // BALANCES
     
     public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
