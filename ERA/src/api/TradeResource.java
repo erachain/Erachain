@@ -81,8 +81,8 @@ public class TradeResource {
                           @PathParam("haveAmount") Double haveAmount, @PathParam("wantAmount") Double wantAmount,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE)
-            APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
+        //if (!BlockChain.DEVELOP_USE)
+        APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();
@@ -171,8 +171,8 @@ public class TradeResource {
                           @PathParam("orderID") BigInteger orderID,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE)
-            APIUtils.askAPICallAllowed(password, "GET cancel Order\n ", request);
+        //if (!BlockChain.DEVELOP_USE)
+        APIUtils.askAPICallAllowed(password, "GET cancel Order\n ", request);
 
         JSONObject out = new JSONObject();
         Controller cntr = Controller.getInstance();

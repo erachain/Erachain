@@ -30,7 +30,7 @@ import java.util.*;
 
 public class TradersManager extends Observable {
 
-    protected static final String WALLET_PASSWORD = "1";
+    protected static final String WALLET_PASSWORD = "123456789";
 
     private static final Logger LOGGER = Logger.getLogger(TradersManager.class);
     private List<Rater> knownRaters;
@@ -55,29 +55,29 @@ public class TradersManager extends Observable {
         RaterPolonex raterPolonex = new RaterPolonex(this, 600);
         this.knownRaters.add(raterPolonex);
 
+
         // WAIT START WALLET
-        try {
-            Thread.sleep(10000);
-        } catch (Exception e) {
-            //FAILED TO SLEEP
+        while(!Controller.getInstance().doesWalletExists()) {
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
         }
 
-        if (true) {
+        //START TRADERs THREADs
 
-            //START TRADERs THREADs
-
-            TreeMap<BigDecimal, BigDecimal> scheme = new TreeMap<>();
-            scheme.put(new BigDecimal(10000), new BigDecimal(1));
-            scheme.put(new BigDecimal(1000), new BigDecimal(0.5));
-            scheme.put(new BigDecimal(100), new BigDecimal(0.2));
-            scheme.put(new BigDecimal(-100), new BigDecimal(0.2));
-            scheme.put(new BigDecimal(-1000), new BigDecimal(0.5));
-            scheme.put(new BigDecimal(-10000), new BigDecimal(1));
-            Account account = Controller.getInstance().wallet.getAccounts().get(1);
-            Trader trader1 = new TraderA(this, "7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP", 30,
-                    1077, 1078, scheme);
-            this.knownTraders.add(trader1);
-        }
+        TreeMap<BigDecimal, BigDecimal> scheme = new TreeMap<>();
+        scheme.put(new BigDecimal(10000), new BigDecimal(1));
+        scheme.put(new BigDecimal(1000), new BigDecimal(0.5));
+        scheme.put(new BigDecimal(100), new BigDecimal(0.2));
+        scheme.put(new BigDecimal(-100), new BigDecimal(0.2));
+        scheme.put(new BigDecimal(-1000), new BigDecimal(0.5));
+        scheme.put(new BigDecimal(-10000), new BigDecimal(1));
+        Account account = Controller.getInstance().wallet.getAccounts().get(1);
+        Trader trader1 = new TraderA(this, account.getAddress(), 30,
+                1077, 1078, scheme);
+        this.knownTraders.add(trader1);
 
     }
 

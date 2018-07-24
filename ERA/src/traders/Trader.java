@@ -5,6 +5,7 @@ import api.ApiClient;
 import api.ApiErrorFactory;
 import controller.Controller;
 import core.account.Account;
+import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
@@ -34,7 +35,8 @@ public abstract class Trader extends Thread {
 
     protected static final BigDecimal M100 = new BigDecimal(100).setScale(0);
 
-    protected static TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new TreeMap<>();
+    protected static TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new TreeMap<>();
 
     private TradersManager tradersManager;
     private long sleepTimestep;
@@ -59,6 +61,7 @@ public abstract class Trader extends Thread {
 
     // AMOUNT + SPREAD
     protected TreeMap<BigDecimal, BigDecimal> scheme;
+    protected TreeMap<BigDecimal, BigInteger> schemeOrders;
 
     private boolean run = true;
 
@@ -110,7 +113,8 @@ public abstract class Trader extends Thread {
             BigDecimal shift = BigDecimal.ONE.subtract(shiftPercentage.movePointLeft(2));
 
             amountWant = amount.negate();
-            amountHave = amountWant.multiply(this.rate).multiply(shift).setScale(wantAsset.getScale());
+            amountHave = amountWant.multiply(this.rate).multiply(shift)
+                    .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
         }
 
         result = ApiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
@@ -129,11 +133,15 @@ public abstract class Trader extends Thread {
             ApiClient.executeCommand("GET wallet/lock");
         }
 
-        if (jsonObject != null && !jsonObject.containsKey("error")) {
+        if (jsonObject == null)
+            return false;
+
+        if (jsonObject.containsKey("signature")) {
+            schemeOrders.put(amount, new BigInteger(Base58.decode((String)jsonObject.get("signature"))));
             return true;
         }
 
-        return true;
+        return false;
 
     }
 
@@ -179,7 +187,7 @@ public abstract class Trader extends Thread {
             if (orderInChain == null)
                 continue;
 
-            if (!cancelOrder(orderID))
+            if (false && !cancelOrder(orderID))
                 break;
 
             this.orders.remove(orderID);
