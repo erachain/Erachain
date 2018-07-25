@@ -4,6 +4,7 @@ package traders;
 import api.ApiClient;
 import api.ApiErrorFactory;
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
@@ -55,13 +56,18 @@ public abstract class Trader extends Thread {
     protected BigDecimal limitUP = new BigDecimal(0.01);
     protected BigDecimal limitDown = new BigDecimal(0.01);
 
+    // KEY -> ORDER
     protected TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new TreeMap<>();
 
     // AMOUNT + SPREAD
     protected TreeMap<BigDecimal, BigDecimal> scheme;
-    // AMOUNT + ORDER SIGNATUTE
-    protected TreeMap<BigDecimal, byte[]> schemeOrders = new TreeMap();
+
+    // AMOUNT -> Tree Map of (ORDER.Tuple3 + his STATUS)
+    protected TreeMap<BigDecimal, TreeMap<BigInteger, Fun.Tuple2<
+            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                    Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>,
+            Integer>>> schemeOrders = new TreeMap();
 
     private boolean run = true;
 
@@ -87,8 +93,12 @@ public abstract class Trader extends Thread {
         return this.orders;
     }
 
-    protected synchronized void schemeOrdersPut(BigDecimal amount, byte[] signature) {
-        schemeOrders.put(amount, signature);
+    protected synchronized void schemeOrdersPut(BigDecimal amount, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order, Integer status) {
+        TreeMap<BigInteger, Tuple2<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>, Integer>>
+                treeMap = schemeOrders.get(amount);
+        treeMap.put(order.a.a, new Tuple2<>(order, status));
+        schemeOrders.put(amount, treeMap);
     }
 
     protected synchronized boolean removeOrder(BigInteger orderID) {
@@ -126,13 +136,6 @@ public abstract class Trader extends Thread {
                     .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
         }
 
-        if (haveKey==1079) {
-            ;
-        }
-
-        // Invalid command!
-        //Server returned HTTP response code: 500 for URL: http://127.0.0.1:9068/trade/create/7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP/1078/1077/548984.60/10000?password=123456789
-        //Type help to get a list of commands.
         result = this.apiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
                 + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
         LOGGER.info("CREATE: " + result);
@@ -144,7 +147,6 @@ public abstract class Trader extends Thread {
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
             LOGGER.info(e);
-            //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         } finally {
             this.apiClient.executeCommand("GET wallet/lock");
         }
@@ -216,24 +218,48 @@ public abstract class Trader extends Thread {
 
         // REMOVE ALL ORDERS
 
+        // CHECK MY SELL ORDERS in CAP
+        for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
+                order: dcSet.getOrderMap().getOrdersSForAddress(this.address, this.haveKey, this.wantKey)) {
+
+            // IS IT MY ORDER?
+            // BY HAVE AMOUNT
+            if (scheme.get(order.b.b) != null)
+                this.orders.put(order.a.a, order);
+
+        }
+
+        // CHECK MY BUY ORDERS in CAP
+        for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
+                order: dcSet.getOrderMap().getOrdersSForAddress(this.address, this.wantKey, this.haveKey)) {
+
+            // IS IT MY ORDER?
+            // BY WANT AMOUNT
+            if (scheme.get(order.c.b.negate()) != null)
+                this.orders.put(order.a.a, order);
+            this.orders.put(order.a.a, order);
+
+        }
+
         String result = this.apiClient.executeCommand("GET transactions/unconfirmedof/" + this.address);
 
-        JSONArray array = null;
+        JSONArray arrayUnconfirmed = null;
         try {
             //READ JSON
-            array = (JSONArray) JSONValue.parse(result);
+            arrayUnconfirmed = (JSONArray) JSONValue.parse(result);
         } catch (NullPointerException | ClassCastException e) {
             //JSON EXCEPTION
             LOGGER.info(e);
         }
 
+        // CANCEL ALL MY ORDERS
         BigInteger orderID;
         while (!this.orders.keySet().isEmpty()) {
             // RESOLVE SYNCHRONIZE REMOVE
-            orderID = this.orders.firstKey();
+            orderID = this.orders;
             Fun.Tuple3 orderInChain = this.dcSet.getOrderMap().get(orderID);
             if (orderInChain != null
-                    && notInCancelingArray(orderID, array)) {
+                    && notInCancelingArray(orderID, arrayUnconfirmed)) {
                 cancelOrder(orderID);
             }
 
@@ -245,6 +271,12 @@ public abstract class Trader extends Thread {
                 //FAILED TO SLEEP
             }
 
+        }
+
+        try {
+            Thread.sleep(BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+        } catch (Exception e) {
+            //FAILED TO SLEEP
         }
 
         //BigDecimal persent;
@@ -300,23 +332,6 @@ public abstract class Trader extends Thread {
     }
 
     public void run() {
-
-        // CHECJ MY ORDERS from WALLET
-        this.ordersTableModel = new WalletOrdersTableModel();
-        for (int i=0; i < this.ordersTableModel.getRowCount(); i++) {
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.ordersTableModel.getOrder(i);
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInChain = this.dcSet.getOrderMap().get(order.a.a);
-            if (orderInChain == null)
-                continue;
-
-            if (order.b.a.equals(this.haveKey) && order.c.a.equals(this.wantKey)
-                || order.b.a.equals(this.wantKey) && order.c.a.equals(this.haveKey)) {
-                CreateOrderTransaction createTx = (CreateOrderTransaction) cnt.getTransaction(orderInChain.a.a.toByteArray());
-                if (createTx != null && createTx.getCreator().equals(this.account))
-                    this.orders.put(orderInChain.a.a, orderInChain);
-            }
-
-        }
 
         while (this.run) {
 
