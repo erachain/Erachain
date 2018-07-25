@@ -80,7 +80,7 @@ public class TradersManager extends Observable {
             schemeUSD_RUB.put(new BigDecimal(-1000), new BigDecimal("0.5"));
             schemeUSD_RUB.put(new BigDecimal(-10000), new BigDecimal("1"));
             Trader trader1 = new TraderA(this, account.getAddress(), 100,
-                    1077, 1078, schemeUSD_RUB);
+                    1077, 1078, schemeUSD_RUB, true);
             this.knownTraders.add(trader1);
         }
 
@@ -95,7 +95,7 @@ public class TradersManager extends Observable {
             schemeBTC_USD.put(new BigDecimal(-1), new BigDecimal("0.5"));
             schemeBTC_USD.put(new BigDecimal(-10), new BigDecimal("1"));
             Trader trader2 = new TraderA(this, account.getAddress(), 100,
-                    1079, 1077, schemeBTC_USD);
+                    1079, 1077, schemeBTC_USD, true);
             this.knownTraders.add(trader2);
         }
 

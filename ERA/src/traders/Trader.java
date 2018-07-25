@@ -48,6 +48,7 @@ public abstract class Trader extends Thread {
     protected CallRemoteApi caller;
     protected ApiClient apiClient;
 
+    protected boolean cleanAllOnStart;
     protected Account account;
     protected String address;
     protected String apiURL;
@@ -64,24 +65,20 @@ public abstract class Trader extends Thread {
     protected static final int STATUS_UNFCONFIRMED = -1;
 
     // KEY -> ORDER
-    protected TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new TreeMap<>();
+    protected TreeSet<BigInteger> orders = new TreeSet<>();
 
     // AMOUNT + SPREAD
     protected TreeMap<BigDecimal, BigDecimal> scheme;
 
     // AMOUNT -> Tree Map of (ORDER.Tuple3 + his STATUS)
-    protected TreeMap<BigDecimal, TreeMap<BigInteger, Fun.Tuple2<
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                    Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>,
-            Integer>>> schemeOrders = new TreeMap();
+    protected TreeMap<BigDecimal, TreeMap<BigInteger, Integer>> schemeOrders = new TreeMap();
 
     // AMOUNT -> Tree Set of SIGNATURE
     protected TreeMap<BigDecimal, TreeSet<String>> schemeUnconfirmeds = new TreeMap();
 
     private boolean run = true;
 
-    public Trader(TradersManager tradersManager, String accountStr, int sleepSec) {
+    public Trader(TradersManager tradersManager, String accountStr, int sleepSec, boolean cleanAllOnStart) {
 
         this.cnt = Controller.getInstance();
         this.dcSet = DCSet.getInstance();
@@ -89,7 +86,7 @@ public abstract class Trader extends Thread {
         this.caller = new CallRemoteApi();
         this.apiClient = new ApiClient();
 
-
+        this.cleanAllOnStart = cleanAllOnStart;
         this.account = new Account(accountStr);
         this.address = accountStr;
         this.tradersManager = tradersManager;
@@ -100,23 +97,20 @@ public abstract class Trader extends Thread {
         this.start();
     }
 
-    public TreeMap<BigInteger, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders() {
+    public TreeSet<BigInteger> getOrders() {
         return this.orders;
     }
 
-    protected synchronized void schemeOrdersPut(BigDecimal amount, Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order, Integer status) {
-        TreeMap<BigInteger, Tuple2<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>, Integer>>
-                treeMap = schemeOrders.get(amount);
+    protected synchronized void schemeOrdersPut(BigDecimal amount, BigInteger orderID, Integer status) {
+        TreeMap<BigInteger, Integer> treeMap = schemeOrders.get(amount);
         if (treeMap == null)
             treeMap = new TreeMap();
 
-        treeMap.put(order.a.a, new Tuple2<>(order, status));
+        treeMap.put(orderID, status);
         schemeOrders.put(amount, treeMap);
     }
     protected synchronized boolean schemeOrdersRemove(BigDecimal amount, BigInteger orderID, Integer status) {
-        TreeMap<BigInteger, Tuple2<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>, Integer>>
-                treeMap = schemeOrders.get(amount);
+        TreeMap<BigInteger, Integer> treeMap = schemeOrders.get(amount);
 
         boolean removed = treeMap.remove(orderID) == null;
         schemeOrders.put(amount, treeMap);
@@ -178,7 +172,6 @@ public abstract class Trader extends Thread {
 
         result = this.apiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
                 + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
-        LOGGER.info("CREATE: " + result);
 
         JSONObject jsonObject = null;
         try {
@@ -191,15 +184,13 @@ public abstract class Trader extends Thread {
             this.apiClient.executeCommand("GET wallet/lock");
         }
 
-        if (jsonObject == null)
+        if (jsonObject == null || !jsonObject.containsKey("signature")) {
+            LOGGER.info("CREATE: " + result);
             return false;
-
-        if (jsonObject.containsKey("signature")) {
-            schemeUnconfirmedsPut(amount, (String)jsonObject.get("signature"));
-            return true;
         }
 
-        return false;
+        this.schemeOrdersPut(amount, Base58.decodeBI((String)jsonObject.get("signature")), STATUS_UNFCONFIRMED);
+        return true;
 
     }
 
@@ -208,7 +199,7 @@ public abstract class Trader extends Thread {
         String result;
 
         result = this.apiClient.executeCommand("GET trade/get/" + Base58.encode(orderID));
-        LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
+        //LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
 
         JSONObject jsonObject = null;
         try {
@@ -238,20 +229,16 @@ public abstract class Trader extends Thread {
             this.apiClient.executeCommand("GET wallet/lock");
         }
 
-        if (jsonObject == null) {
+        if (jsonObject == null || !jsonObject.containsKey("signature")) {
             LOGGER.info("CANCEL: " + Base58.encode(orderID) + "\n" + result);
             return false;
         }
 
-        if (jsonObject.containsKey("signature")) {
+        if (amount != null) {
             schemeUnconfirmedsPut(amount, Base58.encode(orderID));
-
-            return true;
         }
 
-        LOGGER.info("CANCEL: " + Base58.encode(orderID) + "\n" + result);
-
-        return false;
+        return true;
 
     }
 
@@ -294,18 +281,39 @@ public abstract class Trader extends Thread {
         // GET CANCELS in UNCONFIRMEDs
         TreeSet<BigInteger> cancelsIsUnconfirmed = makeCancelingArray(arrayUnconfirmed);
         BigDecimal amount;
+        BigInteger orderID;
+
+        // CHECK MY ORDERs in UNCONFIRMED
+        for (Object json: arrayUnconfirmed) {
+
+            JSONObject transaction = (JSONObject)json;
+            if (((Long)transaction.get("type")).intValue() == Transaction.CREATE_ORDER_TRANSACTION) {
+                if (((Long)transaction.get("haveKey")).equals(this.haveKey)
+                        && ((Long)transaction.get("wantKey")).equals(this.wantKey)
+                    || ((Long)transaction.get("haveKey")).equals(this.wantKey)
+                        && ((Long)transaction.get("wantKey")).equals(this.wantKey)) {
+
+                    orderID = Base58.decodeBI((String)transaction.get("signature"));
+                    // IF not aldeady CANCEL in WAITING
+                    if (cancelsIsUnconfirmed.contains(orderID))
+                        continue;
+
+                    cancelOrder(null, orderID);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                        //FAILED TO SLEEP
+                    }
+                }
+            }
+        }
 
         // CHECK MY SELL ORDERS in CAP
         for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
                 order: this.ordersMap.getOrdersForAddress(this.address, this.haveKey, this.wantKey)) {
 
-            // IS IT MY ORDER?
-            // BY HAVE AMOUNT
-            if (scheme.get(order.b.b) != null
-                    && !cancelsIsUnconfirmed.contains(order.a.a)) {
-                //this.orders.put(order.a.a, order);
-                schemeOrdersPut(order.b.b, order, STATUS_INCHAIN);
-            }
+            cancelOrder(null, order.a.a);
 
         }
 
@@ -313,54 +321,26 @@ public abstract class Trader extends Thread {
         for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
                 order: this.ordersMap.getOrdersForAddress(this.address, this.wantKey, this.haveKey)) {
 
-            // IS IT MY ORDER?
-            // BY WANT AMOUNT
-            if (scheme.get(order.c.b.negate()) != null
-                    && !cancelsIsUnconfirmed.contains(order.a.a)) {
-                //this.orders.put(order.a.a, order);
-                schemeOrdersPut(order.c.b.negate(), order, STATUS_INCHAIN);
-            }
+            cancelOrder(null, order.a.a);
 
         }
+    }
 
+    // REMOVE ALL ORDERS
+    private boolean cleanSchemeOrders() {
 
-        // CHECK MY ORDER in UNCONFIRMED
-        for (Object json: arrayUnconfirmed) {
-
-            JSONObject transaction = (JSONObject)json;
-            if (((Long)transaction.get("type")).intValue() == Transaction.CREATE_ORDER_TRANSACTION) {
-                if (((Long)transaction.get("haveKey")).equals(this.haveKey)
-                        && ((Long)transaction.get("wantKey")).equals(this.wantKey)) {
-                    // IS IT MY ORDER BY HAVE AMOUNT
-                    amount = new BigDecimal ((String)transaction.get("amountHave"));
-                    if (scheme.get(amount) != null) {
-                        schemeUnconfirmedsPut(amount, (String)transaction.get("signature"));
-                    }
-                } else if (((Long)transaction.get("haveKey")).equals(this.wantKey)
-                        && ((Long)transaction.get("wantKey")).equals(this.wantKey)) {
-                    // IS IT MY ORDER BY WANT AMOUNT
-                    amount = new BigDecimal ((String)transaction.get("amountWant")).negate();
-                    if (scheme.get(amount) != null) {
-                        schemeUnconfirmedsPut(amount, (String)transaction.get("signature"));
-                    }
-                }
-            }
-        }
+        boolean cleaned = false;
 
         // CANCEL ALL MY ORDERS in UNCONFIRMED
 
-        BigInteger orderID;
+        BigDecimal amount;
+        String result;
+        JSONObject transaction = null;
         for (BigDecimal amountKey: this.schemeOrders.keySet()) {
-            TreeMap<BigInteger, Tuple2<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>, Integer>>
-                    schemeItems = this.schemeOrders.get(amountKey);
-            for (Tuple2<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                    Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>, Integer> orderSet: schemeItems.values()) {
-                // RESOLVE SYNCHRONIZE REMOVE
-
-                orderID = orderSet.a.a.a;
+            TreeMap<BigInteger, Integer> schemeItems = this.schemeOrders.get(amountKey);
+            for (BigInteger orderID: schemeItems.keySet()) {
+                // IF that TRANSACTION exist in CHAIN or queue
                 result = this.apiClient.executeCommand("GET transactions/signature/" + Base58.encode(orderID));
-                JSONObject transaction = null;
                 try {
                     //READ JSON
                     transaction = (JSONObject) JSONValue.parse(result);
@@ -369,15 +349,11 @@ public abstract class Trader extends Thread {
                     LOGGER.info(e);
                 }
 
-                if (transaction == null)
+                if (transaction == null || !transaction.containsKey("signature"))
                     continue;
 
-                if (((Long) transaction.get("haveKey")).equals(this.haveKey)) {
-                    amount = new BigDecimal((String) transaction.get("amountHave"));
-                } else {
-                    amount = new BigDecimal((String) transaction.get("amountWant")).negate();
-                }
-                cancelOrder(amount, orderID);
+                cleaned = true;
+                cancelOrder(amountKey, orderID);
 
                 try {
                     Thread.sleep(1000);
@@ -385,19 +361,22 @@ public abstract class Trader extends Thread {
                     //FAILED TO SLEEP
                 }
             }
-
         }
 
+        return cleaned;
     }
+
+
     private void shiftAll() {
 
         // REMOVE ALL ORDERS
-        removaAll();
+        if (cleanSchemeOrders()) {
 
-        try {
-            Thread.sleep(BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
-        } catch (Exception e) {
-            //FAILED TO SLEEP
+            try {
+                Thread.sleep(BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
         }
 
         //BigDecimal persent;
@@ -452,6 +431,18 @@ public abstract class Trader extends Thread {
     }
 
     public void run() {
+
+        if (cleanAllOnStart) {
+            removaAll();
+
+            try {
+                Thread.sleep(5000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
+
+        }
+
 
         while (this.run) {
 
