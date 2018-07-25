@@ -6,6 +6,7 @@ import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base58;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import org.apache.log4j.Logger;
@@ -42,6 +43,8 @@ public class TradeResource {
                 "Start Rater: 1 - start, 0 - stop");
         help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
                 "make and broadcast CreateOrder ");
+        help.put("GET trade/get/{signature}",
+                "Get Order");
         help.put("GET trade/cancel/{creator}/{signature}?password={password}",
                 "Cancel Order");
 
@@ -119,6 +122,27 @@ public class TradeResource {
             return out.toJSONString();
         }
 
+    }
+
+    @GET
+    @Path("get/{signature}")
+    public String get(@PathParam("signature") String signatureStr) {
+
+        byte[] signature;
+        try {
+            signature = Base58.decode(signatureStr);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+        }
+
+        BigInteger orderID = new BigInteger(signature);
+        if(!DCSet.getInstance().getOrderMap().contains(orderID)) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+        }
+
+        Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>
+                order = DCSet.getInstance().getOrderMap().get(orderID);
+        return Order.fromDBrec(order).toJson().toJSONString();
     }
 
     /**

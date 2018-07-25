@@ -430,7 +430,7 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersSForAddress(
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForAddress(
             String address, Long have, Long want) {
 
         Collection<BigInteger> keys;
