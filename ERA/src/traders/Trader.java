@@ -35,6 +35,8 @@ public abstract class Trader extends Thread {
 
     private static final Logger LOGGER = Logger.getLogger(Trader.class);
 
+    private static final int INVALID_TIMESTAMP = 7;
+
     protected static final BigDecimal M100 = new BigDecimal(100).setScale(0);
 
     private TradersManager tradersManager;
@@ -169,24 +171,45 @@ public abstract class Trader extends Thread {
                     .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
         }
 
-        result = this.apiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
-                + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
-
         JSONObject jsonObject = null;
-        try {
-            //READ JSON
-            jsonObject = (JSONObject) JSONValue.parse(result);
-        } catch (NullPointerException | ClassCastException e) {
-            //JSON EXCEPTION
-            LOGGER.info(e);
-        } finally {
-            this.apiClient.executeCommand("GET wallet/lock");
-        }
+        // TRY MAKE ORDER in LOOP
+        do {
 
-        if (jsonObject == null || !jsonObject.containsKey("signature")) {
+            result = this.apiClient.executeCommand("GET trade/create/" + this.address + "/" + haveKey + "/" + wantKey
+                    + "/" + amountHave + "/" + amountWant + "?password=" + TradersManager.WALLET_PASSWORD);
+
+            try {
+                //READ JSON
+                jsonObject = (JSONObject) JSONValue.parse(result);
+            } catch (NullPointerException | ClassCastException e) {
+                //JSON EXCEPTION
+                LOGGER.info(e);
+            } finally {
+                this.apiClient.executeCommand("GET wallet/lock");
+            }
+
+            if (jsonObject == null)
+                return false;
+
+            if (jsonObject.containsKey("signature"))
+                break;
+
+            int error = ((Long)jsonObject.get("error")).intValue();
+            if (error == INVALID_TIMESTAMP) {
+                // INVALIT TIMESTAMP
+                LOGGER.info("CREATE - TRY ANEW");
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    //FAILED TO SLEEP
+                }
+                continue;
+            }
+
             LOGGER.info("CREATE: " + result);
             return false;
-        }
+
+        } while (true);
 
         this.schemeOrdersPut(amount, Base58.decodeBI((String)jsonObject.get("signature")), STATUS_UNFCONFIRMED);
         return true;
@@ -214,24 +237,44 @@ public abstract class Trader extends Thread {
         }
 
         jsonObject = null;
-        result = this.apiClient.executeCommand("GET trade/cancel/" + this.address + "/" + Base58.encode(orderID)
-                + "?password=" + TradersManager.WALLET_PASSWORD);
 
-        try {
-            //READ JSON
-            jsonObject = (JSONObject) JSONValue.parse(result);
-        } catch (NullPointerException | ClassCastException e) {
-            //JSON EXCEPTION
-            LOGGER.info(e);
-            //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-        } finally {
-            this.apiClient.executeCommand("GET wallet/lock");
-        }
+        do {
+            result = this.apiClient.executeCommand("GET trade/cancel/" + this.address + "/" + Base58.encode(orderID)
+                    + "?password=" + TradersManager.WALLET_PASSWORD);
 
-        if (jsonObject == null || !jsonObject.containsKey("signature")) {
+            try {
+                //READ JSON
+                jsonObject = (JSONObject) JSONValue.parse(result);
+            } catch (NullPointerException | ClassCastException e) {
+                //JSON EXCEPTION
+                LOGGER.info(e);
+                //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            } finally {
+                this.apiClient.executeCommand("GET wallet/lock");
+            }
+
+            if (jsonObject == null)
+                return false;
+
+            if (jsonObject.containsKey("signature"))
+                break;
+
+            int error = ((Long) jsonObject.get("error")).intValue();
+            if (error == INVALID_TIMESTAMP) {
+                // INVALIT TIMESTAMP
+                LOGGER.info("CANCEL - TRY ANEW");
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    //FAILED TO SLEEP
+                }
+                continue;
+            }
+
             LOGGER.info("CANCEL: " + Base58.encode(orderID) + "\n" + result);
             return false;
-        }
+
+        } while(true);
 
         if (amount != null) {
             schemeUnconfirmedsPut(amount, Base58.encode(orderID));
