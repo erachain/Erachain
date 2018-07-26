@@ -32,8 +32,6 @@ public class TraderA extends Trader {
         this.haveAsset = dcSet.getItemAssetMap().get(haveKey);
         this.wantAsset = dcSet.getItemAssetMap().get(wantKey);
 
-        this.apiURL = "https://wex.nz/api/3/ticker/btc_rur-btc_usd";
-
     }
 
 }

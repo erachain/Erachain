@@ -2,6 +2,7 @@ package traders;
 // 30/03 ++
 
 import api.ApiErrorFactory;
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -30,9 +31,9 @@ public class RaterWEX extends Rater {
 
     }
 
-    private BigDecimal calcPrice(BigDecimal rateBye, BigDecimal rateSell, BigDecimal rateLast) {
+    private BigDecimal calcPrice(BigDecimal rateBuy, BigDecimal rateSell, BigDecimal rateLast) {
         try {
-            return (rateBye.add(rateSell).divide(new BigDecimal(2), 10, BigDecimal.ROUND_HALF_UP))
+            return (rateBuy.add(rateSell).divide(new BigDecimal(2), 10, BigDecimal.ROUND_HALF_UP))
                 .multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
         } catch (NullPointerException | ClassCastException e) {
             return null;
@@ -66,23 +67,11 @@ public class RaterWEX extends Rater {
             rateBuy = null;
             pair = (JSONObject) json.get("btc_rur");
             try {
-                rateLast = new BigDecimal((Double)pair.get("last"));
-                rateBuy = new BigDecimal((Double)pair.get("buy"));
-                rateSell = new BigDecimal((Double)pair.get("sell"));
+                rateLast = new BigDecimal(pair.get("last").toString());
+                rateBuy = new BigDecimal(pair.get("buy").toString());
+                rateSell = new BigDecimal(pair.get("sell").toString());
             } catch (Exception e){
-                try {
-                    rateLast = new BigDecimal((Long)pair.get("last"));
-                    rateBuy = new BigDecimal((Long)pair.get("buy"));
-                    rateSell = new BigDecimal((Long)pair.get("sell"));
-                } catch (Exception e1){
-                    try {
-                        rateLast = new BigDecimal((String)pair.get("last"));
-                        rateBuy = new BigDecimal((String)pair.get("buy"));
-                        rateSell = new BigDecimal((String)pair.get("sell"));
-                    } catch (Exception e2){
-                        //LOGGER.error(e.getMessage(), e);
-                    }
-                }
+                LOGGER.error(e.getMessage(), e);
             }
 
             if (rateBuy != null) {
@@ -97,28 +86,24 @@ public class RaterWEX extends Rater {
             rateBuy = null;
             pair = (JSONObject) json.get("btc_usd");
             try {
-                rateLast = new BigDecimal((Double)pair.get("last"));
-                rateBuy = new BigDecimal((Double)pair.get("buy"));
-                rateSell = new BigDecimal((Double)pair.get("sell"));
+                rateLast = new BigDecimal(pair.get("last").toString());
+                rateBuy = new BigDecimal(pair.get("buy").toString());
+                rateSell = new BigDecimal(pair.get("sell").toString());
             } catch (Exception e){
-                try {
-                    rateLast = new BigDecimal((Long)pair.get("last"));
-                    rateBuy = new BigDecimal((Long)pair.get("buy"));
-                    rateSell = new BigDecimal((Long)pair.get("sell"));
-                } catch (Exception e1){
-                    try {
-                        rateLast = new BigDecimal((String)pair.get("last"));
-                        rateBuy = new BigDecimal((String)pair.get("buy"));
-                        rateSell = new BigDecimal((String)pair.get("sell"));
-                    } catch (Exception e2){
-                        //LOGGER.error(e.getMessage(), e);
-                    }
-                }
+                LOGGER.error(e.getMessage(), e);
             }
 
-            if (rateLast != null) {
+            if (rateBuy != null) {
                 price = calcPrice(rateBuy, rateSell, rateLast);
                 Rater.setRate(1079L, 1077L, this.courseName, price);
+                if (true) {
+                    /// MAKE COMPU - ERA rate
+                    Rater.setRate(2L, 1L, this.courseName,
+                            price.divide(new BigDecimal(10),8, BigDecimal.ROUND_HALF_UP));
+                    /// MAKE COMPU - BTC rate
+                    Rater.setRate(1079L, 2L, this.courseName,
+                            price.divide(new BigDecimal(245),8, BigDecimal.ROUND_HALF_UP));
+                }
                 LOGGER.info("WEX rate: BTC - USD " + price);
             }
 
@@ -128,23 +113,11 @@ public class RaterWEX extends Rater {
             rateBuy = null;
             pair = (JSONObject) json.get("usd_rur");
             try {
-                rateLast = new BigDecimal((Double)pair.get("last"));
-                rateBuy = new BigDecimal((Double)pair.get("buy"));
-                rateSell = new BigDecimal((Double)pair.get("sell"));
+                rateLast = new BigDecimal(pair.get("last").toString());
+                rateBuy = new BigDecimal(pair.get("buy").toString());
+                rateSell = new BigDecimal(pair.get("sell").toString());
             } catch (Exception e){
-                try {
-                    rateLast = new BigDecimal((Long)pair.get("last"));
-                    rateBuy = new BigDecimal((Long)pair.get("buy"));
-                    rateSell = new BigDecimal((Long)pair.get("sell"));
-                } catch (Exception e1){
-                    try {
-                        rateLast = new BigDecimal((String)pair.get("last"));
-                        rateBuy = new BigDecimal((String)pair.get("buy"));
-                        rateSell = new BigDecimal((String)pair.get("sell"));
-                    } catch (Exception e2){
-                        //LOGGER.error(e.getMessage(), e);
-                    }
-                }
+                    LOGGER.error(e.getMessage(), e);
             }
 
             if (rateBuy != null) {

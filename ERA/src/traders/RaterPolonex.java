@@ -48,7 +48,7 @@ public class RaterPolonex extends Rater {
 
         if (json.containsKey("USDT_BTC")) {
             pair = (JSONObject) json.get("USDT_BTC");
-            price = new BigDecimal((String)pair.get("last"));
+            price = new BigDecimal(pair.get("last").toString());
             price = price.multiply(this.shiftRate).setScale(10, BigDecimal.ROUND_HALF_UP);
             Rater.setRate(95L, 12L, this.courseName, price);
         }

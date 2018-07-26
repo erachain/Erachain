@@ -50,8 +50,16 @@ public class TradersManager extends Observable {
         //START RATERs THREADs
         RaterWEX raterForex = new RaterWEX(this, 300);
         this.knownRaters.add(raterForex);
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+        }
         RaterLiveCoin raterLiveCoin = new RaterLiveCoin(this, 600);
         this.knownRaters.add(raterLiveCoin);
+        try {
+            Thread.sleep(1000);
+        } catch (Exception e) {
+        }
         RaterPolonex raterPolonex = new RaterPolonex(this, 600);
         this.knownRaters.add(raterPolonex);
 
@@ -67,8 +75,10 @@ public class TradersManager extends Observable {
         }
 
         Account account = Controller.getInstance().wallet.getAccounts().get(1);
+        if (!account.equals("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP"))
+            return;
 
-        if (false) {
+        if (true) {
             //START TRADERs THREADs
             TreeMap<BigDecimal, BigDecimal> schemeUSD_RUB = new TreeMap<>();
             schemeUSD_RUB.put(new BigDecimal(10000), new BigDecimal("1"));
@@ -82,6 +92,12 @@ public class TradersManager extends Observable {
             Trader trader1 = new TraderA(this, account.getAddress(), 100,
                     1077, 1078, schemeUSD_RUB, true);
             this.knownTraders.add(trader1);
+
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+            }
+
         }
 
         if (true) {
@@ -97,6 +113,32 @@ public class TradersManager extends Observable {
             Trader trader2 = new TraderA(this, account.getAddress(), 100,
                     1079, 1077, schemeBTC_USD, true);
             this.knownTraders.add(trader2);
+
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+            }
+        }
+
+        if (true) {
+            //START TRADER COMPU <> ERA
+            TreeMap<BigDecimal, BigDecimal> schemeCOMPU_ERA = new TreeMap<>();
+            schemeCOMPU_ERA.put(new BigDecimal("10"), new BigDecimal("10"));
+            schemeCOMPU_ERA.put(new BigDecimal("1"), new BigDecimal("5"));
+            schemeCOMPU_ERA.put(new BigDecimal("0.1"), new BigDecimal("2"));
+            schemeCOMPU_ERA.put(new BigDecimal("0.01"), new BigDecimal("1"));
+            schemeCOMPU_ERA.put(new BigDecimal("-0.01"), new BigDecimal("1"));
+            schemeCOMPU_ERA.put(new BigDecimal("-0.1"), new BigDecimal("2"));
+            schemeCOMPU_ERA.put(new BigDecimal("-1"), new BigDecimal("5"));
+            schemeCOMPU_ERA.put(new BigDecimal("-10"), new BigDecimal("10"));
+            Trader trader = new TraderA(this, account.getAddress(), 100,
+                    2, 1, schemeCOMPU_ERA, true);
+            this.knownTraders.add(trader);
+
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+            }
         }
 
     }

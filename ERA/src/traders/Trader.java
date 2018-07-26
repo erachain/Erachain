@@ -51,7 +51,6 @@ public abstract class Trader extends Thread {
     protected boolean cleanAllOnStart;
     protected Account account;
     protected String address;
-    protected String apiURL;
     protected BigDecimal shiftRate = BigDecimal.ONE;
     protected Long haveKey;
     protected Long wantKey;
@@ -247,15 +246,17 @@ public abstract class Trader extends Thread {
         TreeSet<BigInteger> cancelingArray = new TreeSet();
         if (array != null && !array.isEmpty()) {
             for (int i=0; i < array.size(); i++) {
-                JSONObject transaction = (JSONObject) array.get(i);
-                Transaction transactin = dcSet.getTransactionMap().get(Base58.decode((String) transaction.get("signature")));
-                transactin.setDC(dcSet, false);
-                if (transactin.isValid(null, 0l) != Transaction.VALIDATE_OK) {
-                    dcSet.getTransactionMap().delete(Base58.decode((String) transaction.get("signature")));
+                JSONObject transactionJSON = (JSONObject) array.get(i);
+                Transaction transaction = dcSet.getTransactionMap().get(Base58.decode((String) transactionJSON.get("signature")));
+                if (transaction == null)
+                    continue;
+                transaction.setDC(dcSet, false);
+                if (transaction.isValid(null, 0l) != Transaction.VALIDATE_OK) {
+                    dcSet.getTransactionMap().delete(transaction.getSignature());
                     continue;
                 }
-                if (((Long)transaction.get("type")).intValue() == Transaction.CANCEL_ORDER_TRANSACTION) {
-                    cancelingArray.add(new BigInteger(Base58.decode((String) transaction.get("orderID"))));
+                if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
+                    cancelingArray.add(new BigInteger(Base58.decode((String) transactionJSON.get("orderID"))));
                 }
             }
         }
