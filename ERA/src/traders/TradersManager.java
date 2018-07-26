@@ -78,6 +78,8 @@ public class TradersManager extends Observable {
         if (!account.equals("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP"))
             return;
 
+        BigDecimal limit1 = new BigDecimal("0.2");
+        BigDecimal limit2 = new BigDecimal("0.5");
         if (true) {
             //START TRADERs THREADs
             TreeMap<BigDecimal, BigDecimal> schemeUSD_RUB = new TreeMap<>();
@@ -90,7 +92,7 @@ public class TradersManager extends Observable {
             schemeUSD_RUB.put(new BigDecimal(-1000), new BigDecimal("0.5"));
             schemeUSD_RUB.put(new BigDecimal(-10000), new BigDecimal("1"));
             Trader trader1 = new TraderA(this, account.getAddress(), 100,
-                    1077, 1078, schemeUSD_RUB, true);
+                    1077, 1078, schemeUSD_RUB, limit1, limit1,true);
             this.knownTraders.add(trader1);
 
             try {
@@ -111,7 +113,7 @@ public class TradersManager extends Observable {
             schemeBTC_USD.put(new BigDecimal(-1), new BigDecimal("0.5"));
             schemeBTC_USD.put(new BigDecimal(-10), new BigDecimal("1"));
             Trader trader2 = new TraderA(this, account.getAddress(), 100,
-                    1079, 1077, schemeBTC_USD, true);
+                    1079, 1077, schemeBTC_USD, limit1, limit1, true);
             this.knownTraders.add(trader2);
 
             try {
@@ -132,7 +134,7 @@ public class TradersManager extends Observable {
             schemeCOMPU_ERA.put(new BigDecimal("-1"), new BigDecimal("5"));
             schemeCOMPU_ERA.put(new BigDecimal("-10"), new BigDecimal("10"));
             Trader trader = new TraderA(this, account.getAddress(), 100,
-                    2, 1, schemeCOMPU_ERA, true);
+                    2, 1, schemeCOMPU_ERA, limit2, limit2, true);
             this.knownTraders.add(trader);
 
             try {

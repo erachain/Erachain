@@ -42,8 +42,6 @@ public abstract class Trader extends Thread {
     private TradersManager tradersManager;
     private long sleepTimestep;
 
-    protected WalletOrdersTableModel ordersTableModel;
-
     protected Controller cnt;
     protected DCSet dcSet;
     protected OrderMap ordersMap;
@@ -59,8 +57,10 @@ public abstract class Trader extends Thread {
     protected AssetCls haveAsset;
     protected AssetCls wantAsset;
     protected BigDecimal rate;
-    protected BigDecimal limitUP = new BigDecimal(0.01);
-    protected BigDecimal limitDown = new BigDecimal(0.01);
+
+    // in PERCENT
+    protected BigDecimal limitUP;
+    protected BigDecimal limitDown;
 
     protected static final int STATUS_INCHAIN = 2;
     protected static final int STATUS_UNFCONFIRMED = -1;
@@ -79,7 +79,9 @@ public abstract class Trader extends Thread {
 
     private boolean run = true;
 
-    public Trader(TradersManager tradersManager, String accountStr, int sleepSec, boolean cleanAllOnStart) {
+    public Trader(TradersManager tradersManager, String accountStr, int sleepSec,
+                  BigDecimal limitUP, BigDecimal limitDown, // = new BigDecimal("0.1")
+            boolean cleanAllOnStart) {
 
         this.cnt = Controller.getInstance();
         this.dcSet = DCSet.getInstance();
@@ -92,6 +94,8 @@ public abstract class Trader extends Thread {
         this.address = accountStr;
         this.tradersManager = tradersManager;
         this.sleepTimestep = sleepSec * 1000;
+        this.limitUP = limitUP;
+        this.limitDown = limitDown;
 
         this.setName("Thread Trader - " + this.getClass().getName());
 

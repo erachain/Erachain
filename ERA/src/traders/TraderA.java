@@ -21,8 +21,8 @@ public class TraderA extends Trader {
     private static final Logger LOGGER = Logger.getLogger(TraderA.class);
 
     public TraderA(TradersManager tradersManager, String accountStr, int sleepSec, long haveKey, long wantKey,
-                   TreeMap<BigDecimal, BigDecimal> scheme, boolean cleanAllOnStart) {
-        super(tradersManager, accountStr, sleepSec, cleanAllOnStart);
+                   TreeMap<BigDecimal, BigDecimal> scheme, BigDecimal limitUP, BigDecimal limitDown, boolean cleanAllOnStart) {
+        super(tradersManager, accountStr, sleepSec, limitUP, limitDown, cleanAllOnStart);
 
         this.scheme = scheme;
 
