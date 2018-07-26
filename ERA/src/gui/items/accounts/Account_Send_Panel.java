@@ -1,44 +1,21 @@
 package gui.items.accounts;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
-import core.account.PrivateKeyAccount;
-import core.crypto.AEScrypto;
-import core.crypto.Base58;
 import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
-import gui.AccountRenderer;
-import gui.PasswordPane;
-import gui.items.assets.AssetsComboBoxModel;
 import gui.library.Issue_Confirm_Dialog;
-import gui.library.MButton;
 import gui.library.My_JFileChooser;
-import gui.models.AccountsComboBoxModel;
-import gui.transaction.OnDealClick;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import utils.Converter;
-import utils.MenuPopupUtil;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
-//import settings.Settings;
 
 @SuppressWarnings("serial")
 
@@ -60,10 +37,7 @@ public class Account_Send_Panel extends AssetSendPanel {
         this.jButton_ok.setText(Lang.getInstance().translate("Send"));
         this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
-        
-        
-        
-
+        this.jComboBox_Asset.setEnabled(false);
     }
 
    
@@ -158,7 +132,6 @@ public class Account_Send_Panel extends AssetSendPanel {
 
                 result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
                 confirmaftecreatetransaction();
-               
             }
         }
         // ENABLE

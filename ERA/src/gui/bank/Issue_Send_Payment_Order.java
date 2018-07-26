@@ -59,10 +59,9 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 onSendClick();
-
             }
-
         });
+        issue_Panel.jButton_Cancel.addActionListener(e -> onClearAllClick());
 
 
     }
@@ -276,6 +275,24 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
         issue_Panel.jButton_OK.setEnabled(true);
     }
 
+    /**
+     * Clear all text field in form "issue send payment"
+     */
+    public void onClearAllClick() {
+        issue_Panel.jComboBox_ACCOUNT_ERA_Of_Bank.setText("");
+        issue_Panel.jTextArea_Description.setText("");
+        issue_Panel.jTextField_Doc_Num.setText("");
+        issue_Panel.jTextField_Ammount.setText("");
+        issue_Panel.jTextField_Doc_Date.setText("");
+        issue_Panel.jTextField_Account_in_Bank.setText("");
+        issue_Panel.jTextField_Ammount.setText("");
+        issue_Panel.jTextField_BIK.setText("");
+        issue_Panel.jTextField_INN.setText("");
+        issue_Panel.jTextField_Reciever_BIK.setText("");
+        issue_Panel.jTextField_Reciever_INN.setText("");
+        issue_Panel.jTextField_Recivier_Account_in_Bank1.setText("");
+    }
+
     private String packMessage() {
         // TODO Auto-generated method stub
         JSONObject jSON_Message = new JSONObject();
@@ -337,6 +354,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
     My_INN_JTextField jTextField_Reciever_INN;
     My_Bank_Account_JTextField jTextField_Recivier_Account_in_Bank1;
     private AccountsComboBoxModel accountsModel;
+
     public Issue_Send_Payment_Order1() {
         this.accountsModel = new AccountsComboBoxModel();
         this.jComboBox_Account = new JComboBox<Account>(accountsModel);
@@ -345,7 +363,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         MenuPopupUtil.installContextMenu(this.jComboBox_ACCOUNT_ERA_Of_Bank);
         MenuPopupUtil.installContextMenu(this.jTextArea_Description);
         // labels
-        this.jButton_Cancel.setText(Lang.getInstance().translate("Cancel"));
+        this.jButton_Cancel.setText(Lang.getInstance().translate("Clear all"));
         this.jButton_OK.setText(Lang.getInstance().translate("Send"));
         this.jCheckBox_Encrypted.setText(Lang.getInstance().translate("Encrypt"));
         this.jLabel_4_Data.setText(Lang.getInstance().translate("INN"));
@@ -359,14 +377,12 @@ class Issue_Send_Payment_Order1 extends JPanel {
         this.jLabel_Payment_info.setText(Lang.getInstance().translate("Payment details"));
         this.jLabel_Reciever.setText(Lang.getInstance().translate("Recipient"));
         this.jLabel_Reciever_BIK.setText(Lang.getInstance().translate("BIK"));
-        ;
+
         this.jLabel_Reciever_INN.setText(Lang.getInstance().translate("INN"));
         this.jLabel_Recivier_in_Bank1.setText(Lang.getInstance().translate("Account"));
         this.jLabel_Sender.setText(Lang.getInstance().translate("Sender"));
         this.jLabel_Title.setText(Lang.getInstance().translate("Send Payment Order"));
         this.jLabel_in_Bank.setText(Lang.getInstance().translate("Account"));
-
-
     }
 
     /**
@@ -418,7 +434,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
             e.printStackTrace();
         }
 
-
         jTextField_Doc_Date = new My_Date_JFormatedTextField(mf);
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
@@ -432,7 +447,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
                 5, 0, 5, 0, 5, 0, 5, 0};
         setLayout(layout);
 
-        jLabel_4_Data.setText("inn");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 10;
@@ -450,7 +464,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_INN, gridBagConstraints);
 
-        jLabel_in_Bank.setText("Account in Bank");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 12;
@@ -469,7 +482,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Account_in_Bank, gridBagConstraints);
 
-        jLabel_Account.setText("Account");
         jLabel_Account.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -490,7 +502,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jComboBox_Account, gridBagConstraints);
 
-        jLabel_BIK.setText("BIK");
         jLabel_BIK.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
@@ -509,7 +520,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_BIK, gridBagConstraints);
 
-        jLabel_ACCOUNT_ERA_Of_Bank.setText("ACCOUNT_ERA_Of_Bank");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -531,7 +541,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         add(jComboBox_ACCOUNT_ERA_Of_Bank, gridBagConstraints);
 
         jLabel_Sender.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel_Sender.setText("Sender");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -543,7 +553,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         add(jLabel_Sender, gridBagConstraints);
 
         jLabel_Reciever.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel_Reciever.setText("Reciever");
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 16;
@@ -554,7 +564,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
         add(jLabel_Reciever, gridBagConstraints);
 
-        jLabel_Reciever_INN.setText("Reciever INN");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 18;
@@ -572,7 +581,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Reciever_INN, gridBagConstraints);
 
-        jLabel_Reciever_BIK.setText("Reciever BIK");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 18;
@@ -590,7 +598,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Reciever_BIK, gridBagConstraints);
 
-        jLabel_Recivier_in_Bank1.setText("Reciever Account in Bank");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 20;
@@ -609,7 +616,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Recivier_Account_in_Bank1, gridBagConstraints);
 
-        jLabel_Ammount.setText("Ammount");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 28;
@@ -628,7 +634,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Ammount, gridBagConstraints);
 
-        jLabel_Description.setText("Description");
+        //  jLabel_Description.setText("Description");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 30;
@@ -639,7 +645,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         jTextArea_Description.setColumns(20);
         jTextArea_Description.setLineWrap(true);
         jTextArea_Description.setRows(5);
-        jTextArea_Description.setText("");
+        jTextArea_Description.setText("wd");
         jScrollPane1.setViewportView(jTextArea_Description);
         jScrollPane1.setMinimumSize(new Dimension(100, 25));
 
@@ -654,7 +660,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jScrollPane1, gridBagConstraints);
 
-        jCheckBox_Encrypted.setText("Encrypted");
+        // jCheckBox_Encrypted.setText("Encrypted");
         jCheckBox_Encrypted.setSelected(true);
         jCheckBox_Encrypted.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -665,7 +671,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         add(jCheckBox_Encrypted, gridBagConstraints);
 
         jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel_Title.setText("Title");
+        jLabel_Title.setFont(new java.awt.Font("Tahoma", 0, 18));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -676,7 +682,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         add(jLabel_Title, gridBagConstraints);
 
         jLabel_Payment_info.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel_Payment_info.setText("Payment Info");
         jLabel_Payment_info.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -688,7 +693,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
         add(jLabel_Payment_info, gridBagConstraints);
 
-        jLabel_Number.setText("Number");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 26;
@@ -706,7 +710,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
         add(jTextField_Doc_Num, gridBagConstraints);
 
-        jLabel_Date.setText("Date");
+        // jLabel_Date.setText("Date");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 26;
@@ -748,7 +752,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         add(jSeparator3, gridBagConstraints);
 
-        jButton_Cancel.setText("Cancel");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 6;
         gridBagConstraints.gridy = 34;
@@ -756,7 +759,6 @@ class Issue_Send_Payment_Order1 extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         add(jButton_Cancel, gridBagConstraints);
 
-        jButton_OK.setText("OK");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 34;
