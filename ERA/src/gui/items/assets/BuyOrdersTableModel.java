@@ -59,7 +59,10 @@ public class BuyOrdersTableModel extends
         sumAmountHave = BigDecimal.ZERO;
         for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
 
-            Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orderPair.getB();
+            if (order == null)
+                return;
+            Tuple3<Long, BigDecimal, BigDecimal> haveItem = order.b;
             sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
 
             sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));

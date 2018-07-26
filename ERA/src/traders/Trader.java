@@ -313,7 +313,10 @@ public abstract class Trader extends Thread {
         for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
                 order: this.ordersMap.getOrdersForAddress(this.address, this.haveKey, this.wantKey)) {
 
-            cancelOrder(null, order.a.a);
+            if (this.scheme.containsKey(order.b.b))
+                cancelOrder(order.b.b, order.a.a);
+            else
+                cancelOrder(null, order.a.a);
 
         }
 
@@ -321,7 +324,10 @@ public abstract class Trader extends Thread {
         for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
                 order: this.ordersMap.getOrdersForAddress(this.address, this.wantKey, this.haveKey)) {
 
-            cancelOrder(null, order.a.a);
+            if (this.scheme.containsKey(order.c.b.negate()))
+                cancelOrder(order.c.b.negate(), order.a.a);
+            else
+                cancelOrder(null, order.a.a);
 
         }
     }
@@ -331,6 +337,9 @@ public abstract class Trader extends Thread {
 
         boolean cleaned = false;
 
+        if (this.schemeOrders == null || this.schemeOrders.isEmpty())
+            return cleaned;
+
         // CANCEL ALL MY ORDERS in UNCONFIRMED
 
         BigDecimal amount;
@@ -338,6 +347,9 @@ public abstract class Trader extends Thread {
         JSONObject transaction = null;
         for (BigDecimal amountKey: this.schemeOrders.keySet()) {
             TreeMap<BigInteger, Integer> schemeItems = this.schemeOrders.get(amountKey);
+            if (schemeItems == null || schemeItems.isEmpty())
+                continue;
+
             for (BigInteger orderID: schemeItems.keySet()) {
                 // IF that TRANSACTION exist in CHAIN or queue
                 result = this.apiClient.executeCommand("GET transactions/signature/" + Base58.encode(orderID));
