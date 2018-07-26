@@ -99,7 +99,7 @@ public class RaterWEX extends Rater {
                 if (true) {
                     /// MAKE COMPU - ERA rate
                     Rater.setRate(2L, 1L, this.courseName,
-                            price.divide(new BigDecimal(10),8, BigDecimal.ROUND_HALF_UP));
+                            price.divide(new BigDecimal(245),8, BigDecimal.ROUND_HALF_UP));
                     /// MAKE COMPU - BTC rate
                     Rater.setRate(1079L, 2L, this.courseName,
                             price.divide(new BigDecimal(245),8, BigDecimal.ROUND_HALF_UP));

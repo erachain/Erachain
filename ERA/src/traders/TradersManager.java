@@ -78,7 +78,7 @@ public class TradersManager extends Observable {
         if (!account.equals("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP"))
             return;
 
-        BigDecimal limit1 = new BigDecimal("0.2");
+        BigDecimal limit1 = new BigDecimal("0.01");
         BigDecimal limit2 = new BigDecimal("0.5");
         if (true) {
             //START TRADERs THREADs
@@ -92,11 +92,11 @@ public class TradersManager extends Observable {
             schemeUSD_RUB.put(new BigDecimal(-1000), new BigDecimal("0.5"));
             schemeUSD_RUB.put(new BigDecimal(-10000), new BigDecimal("1"));
             Trader trader1 = new TraderA(this, account.getAddress(), 100,
-                    1077, 1078, schemeUSD_RUB, limit1, limit1,true);
+                    1077, 1078, schemeUSD_RUB, limit2, limit2,true);
             this.knownTraders.add(trader1);
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (Exception e) {
             }
 
@@ -117,7 +117,7 @@ public class TradersManager extends Observable {
             this.knownTraders.add(trader2);
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (Exception e) {
             }
         }

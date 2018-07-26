@@ -210,23 +210,27 @@ public class OrderMap extends DCMap<BigInteger,
                 //Fun.t4(have, want, null, null),
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-        //keys = new TreeSet<BigInteger>(keys);
-        ///} else {
-        // in wantHaveKeyMap - ALL ORDERS
-        Collection<BigInteger> keysWH;
-        keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
-                //Fun.t4(have, want, null, null),
-                Fun.t4(want, have, null, null),
-                Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-        //keysWH = new TreeSet<BigInteger>(keysWH);
 
-        //}
 
-        if (!keysWH.isEmpty()) {
-            // add only new unique
-            Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
-            combinedKeys.addAll(keysWH);
-            keys = combinedKeys;
+        if (false) {
+            // фантомные ордера делает - которых нету в базе данных а они отображаются в спике ноды и в облокэесплорере
+
+            // in wantHaveKeyMap - ALL ORDERS ??
+            Collection<BigInteger> keysWH;
+            keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
+                    //Fun.t4(have, want, null, null),
+                    Fun.t4(want, have, null, null),
+                    Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
+            //keysWH = new TreeSet<BigInteger>(keysWH);
+
+            //}
+
+            if (!keysWH.isEmpty()) {
+                // add only new unique
+                Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
+                combinedKeys.addAll(keysWH);
+                keys = combinedKeys;
+            }
         }
 
 
@@ -378,10 +382,12 @@ public class OrderMap extends DCMap<BigInteger,
             keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
                     Fun.t4(want, have, null, null),
                     Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-        } else {
-            Collection<BigInteger> keysWH;
-            // CORRECT! - haveWantKeyMap LOSES some orders!
+        } else if (false) {
+            // фантомные ордера делает - которых нету в базе данных а они отображаются в спике ноды и в облокэесплорере
+
+            // ??? CORRECT! - haveWantKeyMap LOSES some orders!
             // https://github.com/icreator/Erachain/issues/178
+            Collection<BigInteger> keysWH;
             keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
                     Fun.t4(want, have, null, null),
                     Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
