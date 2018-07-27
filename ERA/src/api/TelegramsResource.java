@@ -88,7 +88,8 @@ public class TelegramsResource {
      * "record_type":"SEND",
      * "property2":128,
      * "action_key":1,
-     * "head":"NPL",
+     * "title":"NPL",
+     * "message:"MESSAGE",
      * "property1":0,
      * "size":162,
      * "action_name":"PROPERTY",
@@ -153,7 +154,7 @@ public class TelegramsResource {
      * @param amount_in     amount
      * @param title_in      title or head
      * @param message_in    message
-     * @param istextmessage bool value isText
+     * @param istext bool value isText
      * @param encrypt       bool value isEncrypt
      * @param password      password
      * @return return signature telegram
@@ -167,11 +168,11 @@ public class TelegramsResource {
      */
     @SuppressWarnings("unchecked")
     @GET
-    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
+    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{istext}/{encrypt}/{password}")
     public String send(@PathParam("sender") String sender_in, @PathParam("recipient") String recipient_in,
                        @PathParam("assetKey") long asset_in, @PathParam("amount") String amount_in,
                        @PathParam("title") String title_in, @PathParam("message") String message_in,
-                       @PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
+                       @PathParam("istext") boolean istext, @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
         //APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
@@ -228,7 +229,7 @@ public class TelegramsResource {
         }
 
         byte[] encrypted = encrypt ? new byte[]{1} : new byte[]{0};
-        byte[] isTextByte = istextmessage ? new byte[]{1} : new byte[]{0};
+        byte[] isTextByte = istext ? new byte[]{1} : new byte[]{0};
 
         // title
         if (title_in != null && title_in.getBytes(StandardCharsets.UTF_8).length > 256) {
@@ -269,15 +270,15 @@ public class TelegramsResource {
     public String sendQuery(@PathParam("sender") String sender, @PathParam("recipient") String recipient,
                             @QueryParam("asset") long asset, @QueryParam("amount") String amount,
                             @QueryParam("title") String title, @QueryParam("message") String message,
-                            @QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
+                            @QueryParam("istext") boolean istext, @QueryParam("encrypt") boolean encrypt,
                             @QueryParam("password") String password) {
 
-        return send(sender, recipient, asset, amount, title, message, istextmessage, encrypt, password);
+        return send(sender, recipient, asset, amount, title, message, istext, encrypt, password);
 
     }
 
-    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
-    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
+    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istext\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istext": true, "encrypt": false, "password": "122"}
 
     /**
      * Send telegram. not in block chain
@@ -286,7 +287,7 @@ public class TelegramsResource {
      * @return signature telegram
      * <h2>Example request</h2>
      * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
-     * "asset":"643","amount":"0.01","title":"NPL","istextmessage":"true","encrypt":"true","password":"123456789"}
+     * "asset":"643","amount":"0.01","title":"NPL","istext":"true","encrypt":"true","password":"123456789"}
      * <h2>Example response</h2>
      * {
      * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
@@ -319,7 +320,7 @@ public class TelegramsResource {
                 (String) jsonObject.getOrDefault("amount", null),
                 (String) jsonObject.getOrDefault("title", null),
                 (String) jsonObject.getOrDefault("message", null),
-                Boolean.valueOf((String) jsonObject.getOrDefault("istextmessage", false)),
+                Boolean.valueOf((String) jsonObject.getOrDefault("istext", false)),
                 Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false)),
                 (String) jsonObject.getOrDefault("password", null));
     }
