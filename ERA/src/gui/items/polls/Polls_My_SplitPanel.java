@@ -49,8 +49,8 @@ public class Polls_My_SplitPanel extends Split_Panel {
         // CHECKBOX FOR CONFIRMED
         TableColumn confirmedColumn = my_Poll_table.getColumnModel()
                 .getColumn(WalletItemPersonsTableModel.COLUMN_CONFIRMED);
-        confirmedColumn.setMinWidth(50);
-        confirmedColumn.setMaxWidth(50);
+        confirmedColumn.setMinWidth(150);
+        confirmedColumn.setMaxWidth(150);
         confirmedColumn.setPreferredWidth(50);// .setWidth(30);
 
         // UPDATE FILTER ON TEXT CHANGE

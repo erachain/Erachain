@@ -19,7 +19,7 @@ public class Wallet_Create_Account_Button extends JButton implements Observer {
 
     public Wallet_Create_Account_Button(MTable table) {
 
-        super(Lang.getInstance().translate("New Account"));
+        super(Lang.getInstance().translate("New account"));
         th = this;
 
 
