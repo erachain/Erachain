@@ -66,7 +66,7 @@ public class TelegramsResourceTest extends SettingTests {
         JSONArray jsonArrayAddress = (JSONArray) jsonParser.parse(resultAddresses);
         String address = jsonArrayAddress.get(0).toString();
 
-        String sendTelegram = new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address + "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
+        String sendTelegram = new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address + "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istext\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
 
         String sendRequest = "[ " + sendTelegram + "]";
         JSONArray jsonArray = (JSONArray) jsonParser.parse(sendRequest);
@@ -94,7 +94,7 @@ public class TelegramsResourceTest extends SettingTests {
         String address = jsonArrayAddress.get(0).toString();
         for (int i = 0; i < 5; i++) {
             new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address +
-                    "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
+                    "\",\"recipient\":\"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob\",\"asset\":\"643\",\"amount\":\"0.01\",\"title\":\"NPL\",\"istext\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
         }
 
         String telegramList = new ApiClient().executeCommand("GET telegrams/timestamp/1");
@@ -125,7 +125,7 @@ public class TelegramsResourceTest extends SettingTests {
 
         new ApiClient().executeCommand("POST telegrams/send {\"sender\":\"" + address +
                 "\",\"recipient\":\"" + recipient + "\",\"asset\":\"643\",\"amount\":\"0.01\"," +
-                "\"title\":\"NPL\",\"istextmessage\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
+                "\"title\":\"NPL\",\"istext\":\"true\",\"encrypt\":\"true\",\"password\":\"123456789\"}");
 
         String getTelegram = new ApiClient().executeCommand("GET telegrams/address/" + recipient + "/timestamp/1");
         JSONArray jsonArray = (JSONArray) jsonParser.parse(getTelegram);
