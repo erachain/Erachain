@@ -145,7 +145,6 @@ public class Lang {
 
                     String lang_name = (String) langFile.get("_lang_name_");
                     long time_of_translation = Long.parseLong(langFile.get("_timestamp_of_translation_").toString());
-                    //long time_of_translation = (long)langFile.get("_timestamp_of_translation_");
                     lngList.add(new LangFile(lang_name, fileList.get(i), time_of_translation));
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);

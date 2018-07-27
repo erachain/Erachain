@@ -126,8 +126,7 @@ public class SettingLangFrame extends JDialog {
                 JSONObject internetValue = (JSONObject) inernetLangsJSON.get(internetKey);
                 listModel.addElement(new LangFile((String) internetValue.get("_lang_name_"),
                         (String) internetValue.get("_file_"),
-                        //new Long(internetValue.get("_timestamp_of_translation_").toString())
-                        Long.parseLong(((Object) internetValue.get("_timestamp_of_translation_")).toString())
+                        Long.parseLong(internetValue.get("_timestamp_of_translation_").toString())
                 ));
             }
         }
