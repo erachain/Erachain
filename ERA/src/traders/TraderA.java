@@ -45,7 +45,7 @@ public class TraderA extends Trader {
         //BigDecimal persent;
         for (BigDecimal amount : this.scheme.keySet()) {
             //persent = this.scheme.get(amount);
-            createOrder(amount.setScale(this.haveAsset.getScale(), BigDecimal.ROUND_HALF_UP));
+            createOrder(amount);
             try {
                 Thread.sleep(100);
             } catch (Exception e) {
@@ -61,6 +61,14 @@ public class TraderA extends Trader {
 
         TreeMap<Fun.Tuple3<Long, Long, String>, BigDecimal> rates = Rater.getRates();
         BigDecimal newRate = rates.get(new Fun.Tuple3<Long, Long, String>(this.haveKey, this.wantKey, "wex"));
+
+        if (newRate == null) {
+            // если курса нет то отменим все ордера и ждем
+            LOGGER.info("Rate " + this.haveAsset.getName() + "/" + this.wantAsset.getName() +  " not found - clear all orders anr awaiting...");
+            cleanSchemeOrders();
+            return false;
+        }
+
         if (newRate != null) {
             if (this.rate == null) {
                 if (newRate == null)

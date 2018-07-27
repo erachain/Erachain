@@ -172,19 +172,30 @@ public abstract class Trader extends Thread {
 
             BigDecimal shift = BigDecimal.ONE.add(shiftPercentage.movePointLeft(2));
 
-            amountHave = amount;
-            amountWant = amount.multiply(this.rate).multiply(shift)
-                    .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
+            amountHave = amount.stripTrailingZeros();
+            amountWant = amountHave.multiply(this.rate).multiply(shift).stripTrailingZeros();
+
+            // NEED SCALE for VALIDATE
+            if (amountWant.scale() > this.wantAsset.getScale()) {
+                amountWant = amountWant.setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
+            }
+
         } else {
             haveKey = this.wantKey;
             wantKey = this.haveKey;
 
             BigDecimal shift = BigDecimal.ONE.subtract(shiftPercentage.movePointLeft(2));
 
-            amountWant = amount.negate().setScale(haveAsset.getScale(), BigDecimal.ROUND_HALF_UP);
-            amountHave = amountWant.multiply(this.rate).multiply(shift)
-                    .setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
+            amountWant = amount.negate().stripTrailingZeros();
+            amountHave = amountWant.multiply(this.rate).multiply(shift).stripTrailingZeros();
+
+            // NEED SCALE for VALIDATE
+            if (amountHave.scale() > this.wantAsset.getScale()) {
+                amountHave = amountHave.setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
+            }
         }
+
+        LOGGER.info("TRY CREATE " + amountHave.toString() + " : " + amountWant.toString());
 
         JSONObject jsonObject = null;
         // TRY MAKE ORDER in LOOP
@@ -231,7 +242,7 @@ public abstract class Trader extends Thread {
 
     }
 
-    protected boolean cancelOrder(BigDecimal amount, String orderID) {
+    protected boolean cancelOrder(String orderID) {
 
         String result;
 
@@ -357,7 +368,7 @@ public abstract class Trader extends Thread {
                     if (cancelsIsUnconfirmed.contains(orderID))
                         continue;
 
-                    cancelOrder(null, orderID);
+                    cancelOrder(orderID);
 
                     try {
                         Thread.sleep(100);
@@ -377,10 +388,9 @@ public abstract class Trader extends Thread {
                 continue;
 
             if (this.scheme.containsKey(orderID)) {
-                cancelOrder(order.b.b, orderID);
                 schemeOrdersRemove(order.b.b, orderID);
-            } else
-                cancelOrder(null, orderID);
+            }
+            cancelOrder( orderID);
 
             try {
                 Thread.sleep(100);
@@ -399,10 +409,9 @@ public abstract class Trader extends Thread {
                 continue;
 
             if (this.scheme.containsKey(order.c.b.negate())) {
-                cancelOrder(order.c.b.negate(), orderID);
                 schemeOrdersRemove(order.c.b.negate(), orderID);
-            } else
-                cancelOrder(null, orderID);
+            }
+            cancelOrder(orderID);
 
             try {
                 Thread.sleep(100);
@@ -455,7 +464,7 @@ public abstract class Trader extends Thread {
                 if (transaction == null || !transaction.containsKey("signature"))
                     continue;
 
-                cleaned = cancelOrder(amountKey, orderID);
+                cleaned = cancelOrder(orderID);
 
                 try {
                     Thread.sleep(100);
