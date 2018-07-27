@@ -93,7 +93,7 @@ public class TelegramsResource {
      * "record_type":"SEND",
      * "property2":128,
      * "action_key":1,
-     * "title":"NPL",
+     * "    // _description - Описание заголовка, если нет то null":"NPL",
      * "message:"MESSAGE",
      * "property1":0,
      * "size":162,
