@@ -646,8 +646,8 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "POST rec_hashes {\"sender\": \"<sender>\", \"url\": \"<url>\", \"data\": \"<data>\", \"hahses\": \"<hashes>\"}",
-                            "Record HASHes. \"url\" link to files. \"data\" short description. \"hashes\" - String of HASHes delimited by \" \".",
+                            "POST rec_hashes {\"sender\": \"<sender>\", \"url\": \"<url>\", \"message\": \"<message>\", \"hahses\": \"<hashes>\"}",
+                            "Record HASHes. \"url\" link to files. \"message\" short description. \"hashes\" - String of HASHes delimited by \" \".",
                             ""
                     },
                     {

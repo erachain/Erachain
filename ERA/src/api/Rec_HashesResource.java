@@ -50,7 +50,7 @@ public class Rec_HashesResource {
             int feePow = resultRequet.c;
 
             String url = (String) jsonObject.get("url");
-            String data = (String) jsonObject.get("data");
+            String message = (String) jsonObject.get("message");
             String hashesStr = (String) jsonObject.get("hashes"); // :"12312 12123 234234"
 
             String password = (String) jsonObject.get("password");
@@ -118,7 +118,7 @@ public class Rec_HashesResource {
 
             Pair<Transaction, Integer> result = Controller.getInstance()
                     .r_Hashes(maker, feePow,
-                            url, data, hashes);
+                            url, message, hashes);
 
             if (result.getB() == Transaction.VALIDATE_OK) {
                 //return result.getA().toJson().toJSONString();
