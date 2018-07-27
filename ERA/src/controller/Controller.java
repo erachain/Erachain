@@ -2870,7 +2870,7 @@ public class Controller extends Observable {
     
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
             String feePowStr, String assetKeyStr, boolean checkAsset, String amountStr, boolean needAmount,
-            String title, String message, int codebase, boolean encrypt) {
+            String title, String message, int messagecode, boolean encrypt) {
         
         Controller cnt = Controller.getInstance();
         
@@ -2958,17 +2958,17 @@ public class Controller extends Observable {
         byte[] messageBytes = null;
         
         if (message != null && message.length() > 0) {
-            if (codebase == 0) {
+            if (messagecode == 0) {
                 messageBytes = message.getBytes(Charset.forName("UTF-8"));
             } else {
                 try {
-                    if (codebase == 16) {
+                    if (messagecode == 16) {
                         messageBytes = Converter.parseHexString(message);
-                    } else if (codebase == 32) {
+                    } else if (messagecode == 32) {
                         messageBytes = Base32.decode(message);
-                    } else if (codebase == 58) {
+                    } else if (messagecode == 58) {
                         messageBytes = Base58.decode(message);
-                    } else if (codebase == 64) {
+                    } else if (messagecode == 64) {
                         messageBytes = Base64.getDecoder().decode(message);
                     }
                 } catch (Exception e) {
@@ -2987,7 +2987,7 @@ public class Controller extends Observable {
         }
         
         byte[] encrypted = (encrypt) ? new byte[] { 1 } : new byte[] { 0 };
-        byte[] isTextByte = (codebase == 0) ? new byte[] { 1 } : new byte[] { 0 };
+        byte[] isTextByte = (messagecode == 0) ? new byte[] { 1 } : new byte[] { 0 };
         
         if (messageBytes != null) {
             if (messageBytes.length > BlockChain.MAX_REC_DATA_BYTES) {
