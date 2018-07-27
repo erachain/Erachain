@@ -55,7 +55,7 @@ public class RaterWEX extends Rater {
         if (json == null)
             return;
 
-        LOGGER.info("WEX : " + result);
+        //LOGGER.info("WEX : " + result);
 
         JSONObject pair;
         BigDecimal price;

@@ -485,6 +485,13 @@ public class Order implements Comparable<Order> {
             Long timestamp = orders.get(0).a.c;
             for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>item: orders) {
+
+                if (!db.getOrderMap().contains(item.a.a)
+                        || db.getOrderMap().get(item.a.a) == null) {
+                    timestamp = null;
+                    ++timestamp;
+                }
+
                 if (!item.b.a.equals(this.wantKey)
                         || !item.c.a.equals(this.haveKey)) {
                     // RISE ERROR

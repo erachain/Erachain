@@ -77,8 +77,9 @@ public abstract class Rater extends Thread {
 
     public void run() {
 
-
         int sleepTimeFull = Settings.getInstance().getPingInterval();
+
+        Controller cntr = Controller.getInstance();
 
         while (true) {
 
@@ -88,7 +89,8 @@ public abstract class Rater extends Thread {
                 //FAILED TO SLEEP
             }
 
-            if (!this.run) {
+            if (!cntr.isStatusOK() ||
+                    !this.run) {
                 continue;
             }
 

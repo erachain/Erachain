@@ -49,6 +49,7 @@ public class SellOrdersTableModel extends
 
     }
 
+    // gui.items.assets.SellOrdersTableModel.totalCalc
     private void totalCalc() {
         sumAmountHave = BigDecimal.ZERO;
         sumAmountWant = BigDecimal.ZERO;

@@ -54,6 +54,7 @@ public class OrderMap extends DCMap<BigInteger,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
+    private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")
     private BTreeMap haveWantKeyMap;
     @SuppressWarnings("rawtypes")
@@ -212,8 +213,8 @@ public class OrderMap extends DCMap<BigInteger,
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
 
 
-        if (false) {
-            // фантомные ордера делает - которых нету в базе данных а они отображаются в спике ноды и в облокэесплорере
+        if (useWantHaveKeys) {
+            // нет??? фантомные ордера делает - которых нету в базе данных а они отображаются в спике ноды и в облокэесплорере
 
             // in wantHaveKeyMap - ALL ORDERS ??
             Collection<BigInteger> keysWH;
@@ -382,8 +383,8 @@ public class OrderMap extends DCMap<BigInteger,
             keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
                     Fun.t4(want, have, null, null),
                     Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-        } else if (false) {
-            // фантомные ордера делает - которых нету в базе данных а они отображаются в спике ноды и в облокэесплорере
+        } else if (useWantHaveKeys) {
+            // ?? нет фантомные ордера делает - которых нету в базе данных а они отображаются в спике ноды и в облокэесплорере
 
             // ??? CORRECT! - haveWantKeyMap LOSES some orders!
             // https://github.com/icreator/Erachain/issues/178

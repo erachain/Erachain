@@ -47,26 +47,9 @@ public class TradersManager extends Observable {
 
     private void start() {
 
-        //START RATERs THREADs
-        RaterWEX raterForex = new RaterWEX(this, 300);
-        this.knownRaters.add(raterForex);
-        try {
-            Thread.sleep(1000);
-        } catch (Exception e) {
-        }
-        RaterLiveCoin raterLiveCoin = new RaterLiveCoin(this, 600);
-        this.knownRaters.add(raterLiveCoin);
-        try {
-            Thread.sleep(1000);
-        } catch (Exception e) {
-        }
-        RaterPolonex raterPolonex = new RaterPolonex(this, 600);
-        this.knownRaters.add(raterPolonex);
-
-
         Controller cnt = Controller.getInstance();
         // WAIT START WALLET
-        while(!cnt.doesWalletDatabaseExists() ||  Rater.getRates().isEmpty()) {
+        while(!cnt.doesWalletDatabaseExists()) {
             try {
                 Thread.sleep(3000);
             } catch (Exception e) {
@@ -78,11 +61,36 @@ public class TradersManager extends Observable {
         if (!account.equals("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP"))
             return;
 
+        if (true) {
+            //START RATERs THREADs
+            RaterWEX raterForex = new RaterWEX(this, 300);
+            this.knownRaters.add(raterForex);
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+            }
+        }
+
+        if (true) {
+            RaterLiveCoin raterLiveCoin = new RaterLiveCoin(this, 600);
+            this.knownRaters.add(raterLiveCoin);
+            try {
+                Thread.sleep(1000);
+            } catch (Exception e) {
+            }
+
+        }
+
+        if (true) {
+            RaterPolonex raterPolonex = new RaterPolonex(this, 600);
+            this.knownRaters.add(raterPolonex);
+        }
+
         BigDecimal limit1 = new BigDecimal("0.01");
         BigDecimal limit2 = new BigDecimal("0.5");
         if (true) {
             //START TRADERs THREADs
-            TreeMap<BigDecimal, BigDecimal> schemeUSD_RUB = new TreeMap<>();
+            HashMap<BigDecimal, BigDecimal> schemeUSD_RUB = new HashMap<>();
             schemeUSD_RUB.put(new BigDecimal(10000), new BigDecimal("1"));
             schemeUSD_RUB.put(new BigDecimal(1000), new BigDecimal("0.5"));
             schemeUSD_RUB.put(new BigDecimal(100), new BigDecimal("0.2"));
@@ -103,7 +111,7 @@ public class TradersManager extends Observable {
         }
 
         if (true) {
-            TreeMap<BigDecimal, BigDecimal> schemeBTC_USD = new TreeMap<>();
+            HashMap<BigDecimal, BigDecimal> schemeBTC_USD = new HashMap<>();
             schemeBTC_USD.put(new BigDecimal(10), new BigDecimal("1"));
             schemeBTC_USD.put(new BigDecimal(1), new BigDecimal("0.5"));
             schemeBTC_USD.put(new BigDecimal("0.1"), new BigDecimal("0.2"));
@@ -124,7 +132,7 @@ public class TradersManager extends Observable {
 
         if (true) {
             //START TRADER COMPU <> ERA
-            TreeMap<BigDecimal, BigDecimal> schemeCOMPU_ERA = new TreeMap<>();
+            HashMap<BigDecimal, BigDecimal> schemeCOMPU_ERA = new HashMap<>();
             schemeCOMPU_ERA.put(new BigDecimal("10"), new BigDecimal("10"));
             schemeCOMPU_ERA.put(new BigDecimal("1"), new BigDecimal("5"));
             schemeCOMPU_ERA.put(new BigDecimal("0.1"), new BigDecimal("2"));

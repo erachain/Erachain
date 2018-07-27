@@ -319,7 +319,9 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
                                 String itemText = null;
                                 final String langFileName = (String) internetValue.get("_file_");
 
-                                long time_of_translation = ((Long) internetValue.get("_timestamp_of_translation_")).longValue();
+                                //long time_of_translation = ((Long) internetValue.get("_timestamp_of_translation_")).longValue();
+                                long time_of_translation = Long.parseLong(((Object) internetValue.get("_timestamp_of_translation_")).toString());
+
 
                                 try {
                                     //LOGGER.error("try lang file: " + langFileName);
@@ -328,7 +330,11 @@ public class UI_Setting_Panel extends javax.swing.JPanel {
                                     if (oldLangFile == null) {
                                         itemText = (String) internetValue.get("download lang_name translation");
 
-                                    } else if (time_of_translation > (Long) oldLangFile.get("_timestamp_of_translation_")) {
+                                    } else if (time_of_translation >
+                                            //(Long) oldLangFile.get("_timestamp_of_translation_")
+                                            Long.parseLong(((Object) oldLangFile.get("_timestamp_of_translation_")).toString())
+
+                                            ) {
                                         itemText = ((String) internetValue.get("download update of lang_name translation from %date%")).replace("%date%", DateTimeFormat.timestamptoString(time_of_translation, "yyyy-MM-dd", ""));
                                     }
                                 } catch (Exception e2) {
