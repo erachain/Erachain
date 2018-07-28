@@ -770,7 +770,7 @@ public class Controller extends Observable {
             this.dcSet.getNameExchangeMap().addObserver(o);
             
             // ADD OBSERVER TO POLLS
-            this.dcSet.getPollMap().addObserver(o);
+            //////this.dcSet.getPollMap().addObserver(o);
             
             // ADD OBSERVER TO ASSETS
             this.dcSet.getItemAssetMap().addObserver(o);
@@ -783,7 +783,10 @@ public class Controller extends Observable {
             
             // ADD OBSERVER TO PERSONS
             this.dcSet.getItemPersonMap().addObserver(o);
-            
+
+            // ADD OBSERVER TO POLLS
+            this.dcSet.getItemPollMap().addObserver(o);
+
             // ADD OBSERVER TO STATUSES
             this.dcSet.getItemStatusMap().addObserver(o);
             
