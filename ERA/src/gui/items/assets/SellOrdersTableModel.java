@@ -3,7 +3,6 @@ package gui.items.assets;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
-import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
@@ -21,13 +20,15 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class SellOrdersTableModel extends
-        TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
+        TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
         implements Observer {
     public static final int COLUMN_AMOUNT_HAVE = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_WANT = 2;
 
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
     BigDecimal sumAmountHave;
     BigDecimal sumAmountWant;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Have", "Price", "Want"});
@@ -46,33 +47,31 @@ public class SellOrdersTableModel extends
         totalCalc();
 
         Controller.getInstance().addObserver(this);
-        // this.orders.registerObserver();
+        //this.orders.registerObserver();
 
     }
 
-    // gui.items.assets.SellOrdersTableModel.totalCalc
     private void totalCalc() {
         sumAmountHave = BigDecimal.ZERO;
         sumAmountWant = BigDecimal.ZERO;
-        for (int i=0; i < this.orders.size(); i++) {
-            Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-                    Tuple2<Long, BigDecimal>>> orderPair = this.orders.get(i);
+        for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
 
-            if (DCSet.getInstance().getOrderMap().get(orderPair.getA()) == null) {
-                this.orders.remove(i);
-            }
             Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
             sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
+
             sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));
         }
     }
 
     @Override
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
+    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
         return this.orders;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(
+    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+            Tuple2<Long, BigDecimal>> getOrder(
             int row) {
         return this.orders.get(row).getB();
     }
@@ -98,7 +97,8 @@ public class SellOrdersTableModel extends
             return null;
         }
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
+        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+                Tuple2<Long, BigDecimal>> order = null;
         boolean isMine = false;
         int size = this.orders.size();
         if (row < size) {
@@ -179,7 +179,7 @@ public class SellOrdersTableModel extends
             //|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
             //|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
                 ) {
-            this.orders = Controller.getInstance().getOrders(this.have, this.want);
+            this.orders = Controller.getInstance().getOrders(this.have, want);
             // List<Order> items =
             // DCSet.getInstance().getOrderMap().getOrders(have.getKey(),
             // want.getKey(), false);
