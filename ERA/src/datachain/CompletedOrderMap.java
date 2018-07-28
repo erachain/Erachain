@@ -22,6 +22,8 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
     public CompletedOrderMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
+        /*
+        // THIS is DUPLICATE in OrderMap
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ORDER_TYPE);
             if (databaseSet.isDynamicGUI()) {
@@ -30,6 +32,7 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
             }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
         }
+        */
     }
 
     public CompletedOrderMap(CompletedOrderMap parent) {

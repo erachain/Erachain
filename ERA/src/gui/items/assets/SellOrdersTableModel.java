@@ -3,6 +3,7 @@ package gui.items.assets;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
@@ -53,11 +54,15 @@ public class SellOrdersTableModel extends
     private void totalCalc() {
         sumAmountHave = BigDecimal.ZERO;
         sumAmountWant = BigDecimal.ZERO;
-        for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
+        for (int i=0; i < this.orders.size(); i++) {
+            Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+                    Tuple2<Long, BigDecimal>>> orderPair = this.orders.get(i);
 
+            if (DCSet.getInstance().getOrderMap().get(orderPair.getA()) == null) {
+                this.orders.remove(i);
+            }
             Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
             sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
-
             sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));
         }
     }
@@ -174,7 +179,7 @@ public class SellOrdersTableModel extends
             //|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
             //|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
                 ) {
-            this.orders = Controller.getInstance().getOrders(this.have, want);
+            this.orders = Controller.getInstance().getOrders(this.have, this.want);
             // List<Order> items =
             // DCSet.getInstance().getOrderMap().getOrders(have.getKey(),
             // want.getKey(), false);
