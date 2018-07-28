@@ -759,7 +759,7 @@ public class Controller extends Observable {
         this.dcSet.getTransactionMap().addObserver(o);
         // this.dcSet.getTransactionFinalMap().addObserver(o);
         
-        if (false && this.dcSetWithObserver) {
+        if (this.dcSetWithObserver) {
             // ADD OBSERVER TO SYNCHRONIZER
             // this.synchronizer.addObserver(o);
             

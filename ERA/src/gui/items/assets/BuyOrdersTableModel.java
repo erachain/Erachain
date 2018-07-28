@@ -20,14 +20,16 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class BuyOrdersTableModel extends
-        TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
+        TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
         implements Observer {
     //public static final int COLUMN_BUYING_PRICE = -1;
     public static final int COLUMN_AMOUNT_WANT = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_HAVE = 2;
 
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
     BigDecimal sumAmountWant;
     BigDecimal sumAmountHave;
     // private String[] columnNames = Lang.getInstance().translate(new
@@ -50,14 +52,15 @@ public class BuyOrdersTableModel extends
         totalCalc();
 
         Controller.getInstance().addObserver(this);
-        // this.orders.registerObserver();
+        //this.orders.registerObserver();
 
     }
 
     private void totalCalc() {
         sumAmountWant = BigDecimal.ZERO;
         sumAmountHave = BigDecimal.ZERO;
-        for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
+        for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
 
             Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
             sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
@@ -193,8 +196,9 @@ public class BuyOrdersTableModel extends
         // CHECK IF LIST UPDATED
         if (message.getType() == ObserverMessage.ADD_ORDER_TYPE
                 || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
-                || message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
-                || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
+                //|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
+                //|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
+                ) {
             this.orders = Controller.getInstance().getOrders(have, want);
             totalCalc();
             this.fireTableDataChanged();
