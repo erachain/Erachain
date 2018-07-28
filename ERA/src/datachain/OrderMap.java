@@ -451,7 +451,13 @@ public class OrderMap extends DCMap<BigInteger,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>();
 
         for (BigInteger key : keys) {
-            orders.add(this.get(key));
+
+            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+                    Tuple2<Long, BigDecimal>> order = this.get(key);
+
+            // MAY BE NULLS!!!
+            if (order != null)
+                orders.add(this.get(key));
         }
 
         return orders;

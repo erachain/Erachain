@@ -59,10 +59,6 @@ public abstract class Trader extends Thread {
     protected AssetCls wantAsset;
     protected BigDecimal rate;
 
-    // in PERCENT
-    protected BigDecimal limitUP;
-    protected BigDecimal limitDown;
-
     protected static final int STATUS_INCHAIN = 2;
     protected static final int STATUS_UNFCONFIRMED = -1;
 
@@ -82,7 +78,6 @@ public abstract class Trader extends Thread {
 
     public Trader(TradersManager tradersManager, String accountStr, int sleepSec,
                   HashMap<BigDecimal, BigDecimal> scheme, Long haveKey, Long wantKey,
-                  BigDecimal limitUP, BigDecimal limitDown, // = new BigDecimal("0.1")
             boolean cleanAllOnStart) {
 
         this.cnt = Controller.getInstance();
@@ -104,9 +99,6 @@ public abstract class Trader extends Thread {
 
         this.haveAsset = dcSet.getItemAssetMap().get(haveKey);
         this.wantAsset = dcSet.getItemAssetMap().get(wantKey);
-
-        this.limitUP = limitUP;
-        this.limitDown = limitDown;
 
         this.setName("Thread Trader - " + this.getClass().getName());
 
@@ -155,47 +147,12 @@ public abstract class Trader extends Thread {
     }
     */
 
-    protected boolean createOrder(BigDecimal amount) {
+    protected boolean createOrder(BigDecimal schemeAmount, Long haveKey, Long wantKey,
+                                  BigDecimal amountHave, BigDecimal amountWant) {
 
         String result;
-        BigDecimal shiftPercentage = this.scheme.get(amount);
 
-        long haveKey;
-        long wantKey;
-
-        BigDecimal amountHave;
-        BigDecimal amountWant;
-
-        if (amount.signum() > 0) {
-            haveKey = this.haveKey;
-            wantKey = this.wantKey;
-
-            BigDecimal shift = BigDecimal.ONE.add(shiftPercentage.movePointLeft(2));
-
-            amountHave = amount.stripTrailingZeros();
-            amountWant = amountHave.multiply(this.rate).multiply(shift).stripTrailingZeros();
-
-            // NEED SCALE for VALIDATE
-            if (amountWant.scale() > this.wantAsset.getScale()) {
-                amountWant = amountWant.setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
-            }
-
-        } else {
-            haveKey = this.wantKey;
-            wantKey = this.haveKey;
-
-            BigDecimal shift = BigDecimal.ONE.subtract(shiftPercentage.movePointLeft(2));
-
-            amountWant = amount.negate().stripTrailingZeros();
-            amountHave = amountWant.multiply(this.rate).multiply(shift).stripTrailingZeros();
-
-            // NEED SCALE for VALIDATE
-            if (amountHave.scale() > this.wantAsset.getScale()) {
-                amountHave = amountHave.setScale(wantAsset.getScale(), BigDecimal.ROUND_HALF_UP);
-            }
-        }
-
-        LOGGER.info("TRY CREATE " + amountHave.toString() + " : " + amountWant.toString());
+        LOGGER.debug("TRY CREATE " + amountHave.toString() + " : " + amountWant.toString());
 
         JSONObject jsonObject = null;
         // TRY MAKE ORDER in LOOP
@@ -209,7 +166,7 @@ public abstract class Trader extends Thread {
                 jsonObject = (JSONObject) JSONValue.parse(result);
             } catch (NullPointerException | ClassCastException e) {
                 //JSON EXCEPTION
-                LOGGER.info(e);
+                LOGGER.error(e);
             } finally {
                 this.apiClient.executeCommand("GET wallet/lock");
             }
@@ -223,7 +180,7 @@ public abstract class Trader extends Thread {
             int error = ((Long)jsonObject.get("error")).intValue();
             if (error == INVALID_TIMESTAMP) {
                 // INVALIT TIMESTAMP
-                LOGGER.info("CREATE - TRY ANEW");
+                //LOGGER.info("CREATE - TRY ANEW");
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
@@ -232,12 +189,12 @@ public abstract class Trader extends Thread {
                 continue;
             }
 
-            LOGGER.info("CREATE: " + result);
+            LOGGER.error("CREATE: " + result);
             return false;
 
         } while (true);
 
-        this.schemeOrdersPut(amount, (String)jsonObject.get("signature"));
+        this.schemeOrdersPut(schemeAmount, (String)jsonObject.get("signature"));
         return true;
 
     }
@@ -288,9 +245,9 @@ public abstract class Trader extends Thread {
             int error = ((Long) jsonObject.get("error")).intValue();
             if (error == INVALID_TIMESTAMP) {
                 // INVALIT TIMESTAMP
-                LOGGER.info("CANCEL - TRY ANEW");
+                //LOGGER.info("CANCEL - TRY ANEW");
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
                 } catch (Exception e) {
                     //FAILED TO SLEEP
                 }
@@ -458,7 +415,7 @@ public abstract class Trader extends Thread {
                     transaction = (JSONObject) JSONValue.parse(result);
                 } catch (NullPointerException | ClassCastException e) {
                     //JSON EXCEPTION
-                    LOGGER.info(e);
+                    LOGGER.error(e);
                 }
 
                 if (transaction == null || !transaction.containsKey("signature"))

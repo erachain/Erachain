@@ -2350,19 +2350,23 @@ public class BlockExplorer {
                 }
 
                 Map orderJSON = new LinkedHashMap();
+                if (order != null) {
 
-                if (assetNames != null) {
-                    assetNames.setKey(order.b.a);
-                    assetNames.setKey(order.c.a);
+                    if (assetNames != null) {
+                        assetNames.setKey(order.b.a);
+                        assetNames.setKey(order.c.a);
+                    }
+
+                    orderJSON.put("have", order.b.a);
+                    orderJSON.put("want", order.c.a);
+
+                    orderJSON.put("amount", order.b.b.toPlainString());
+                    orderJSON.put("amountLeft", order.b.c.toPlainString());
+                    orderJSON.put("amountWant", order.c.b.toPlainString());
+                    orderJSON.put("price", order.a.e.toPlainString());
+                } else {
+                    orderJSON.put("body", "none");
                 }
-
-                orderJSON.put("have", order.b.a);
-                orderJSON.put("want", order.c.a);
-
-                orderJSON.put("amount", order.b.b.toPlainString());
-                orderJSON.put("amountLeft", order.b.c.toPlainString());
-                orderJSON.put("amountWant", order.c.b.toPlainString());
-                orderJSON.put("price", order.a.e.toPlainString());
 
                 transactionDataJSON.put("orderSource", orderJSON);
 
@@ -3947,6 +3951,10 @@ public class BlockExplorer {
         for (int i = 0; i < signatures.length; i++) {
             signatureBytes = Base58.decode(signatures[i]);
             Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+            if (transaction == null) {
+                output.put("body", "none");
+                continue;
+            }
             transaction.setDC(dcSet, false);
             List<Transaction> tt = new ArrayList<Transaction>();
             tt.add(transaction);

@@ -32,6 +32,7 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
             }
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
         }
+        */
     }
 
     public CompletedOrderMap(CompletedOrderMap parent) {
