@@ -254,31 +254,22 @@ public class TradeMap extends DCMap<Tuple2<byte[], byte[]>,
     public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(long haveWant)
     // get trades for order as HAVE and as WANT
     {
-        Map<Tuple2<byte[], byte[]>, Boolean> tradesKeys = new TreeMap<Tuple2<byte[], byte[]>, Boolean>();
 
         String haveKey = String.valueOf(haveWant);
-        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.haveKeyMap).subMap(
+        HashSet<Tuple2<byte[], byte[]>> tradesKeys = new HashSet<Tuple2<byte[], byte[]>>(((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.haveKeyMap).subMap(
                 Fun.t3(haveKey, null, null),
-                Fun.t3(haveKey, Fun.HI(), Fun.HI())).values();
-
-        for (Tuple2<byte[], byte[]> key : keys) {
-            tradesKeys.put(key, true);
-        }
+                Fun.t3(haveKey, Fun.HI(), Fun.HI())).values());
 
         String wantKey = String.valueOf(haveWant);
-        keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.wantKeyMap).subMap(
+        tradesKeys.addAll(((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.wantKeyMap).subMap(
                 Fun.t3(wantKey, null, null),
-                Fun.t3(wantKey, Fun.HI(), Fun.HI())).values();
-
-        for (Tuple2<byte[], byte[]> key : keys) {
-            tradesKeys.put(key, true);
-        }
+                Fun.t3(wantKey, Fun.HI(), Fun.HI())).values());
 
         //GET ALL ORDERS FOR KEYS
         List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
 
-        for (Map.Entry<Tuple2<byte[], byte[]>, Boolean> tradeKey : tradesKeys.entrySet()) {
-            trades.add(this.get(tradeKey.getKey()));
+        for (Tuple2<byte[], byte[]> tradeKey : tradesKeys) {
+            trades.add(this.get(tradeKey));
         }
 
         //RETURN
