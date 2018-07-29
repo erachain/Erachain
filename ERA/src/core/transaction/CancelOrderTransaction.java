@@ -210,12 +210,12 @@ public class CancelOrderTransaction extends Transaction {
         if (this.dcSet.getOrderMap().contains(this.orderID))
             order = this.dcSet.getOrderMap().get(this.orderID);
 
-        if (order == null)
+        if (order == null && !BlockChain.DEVELOP_USE)
             return ORDER_DOES_NOT_EXIST;
 
         ///
         //CHECK IF CREATOR IS CREATOR
-        if (!order.a.b.equals(this.creator.getAddress())) {
+        if (order != null && !order.a.b.equals(this.creator.getAddress())) {
             return INVALID_ORDER_CREATOR;
         }
 
@@ -230,6 +230,11 @@ public class CancelOrderTransaction extends Transaction {
 
         Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getOrderMap().get(this.orderID);
+
+        if (order == null && BlockChain.DEVELOP_USE) {
+            return;
+        }
+
         process_it(this.dcSet, order);
     }
 
@@ -242,6 +247,11 @@ public class CancelOrderTransaction extends Transaction {
         //ADD TO DATABASE
         Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getCompletedOrderMap().get(this.orderID);
+
+        if (order == null && BlockChain.DEVELOP_USE) {
+            return;
+        }
+
         orphan_it(this.dcSet, order);
     }
 

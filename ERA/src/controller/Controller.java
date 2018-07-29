@@ -2528,12 +2528,20 @@ public class Controller extends Observable {
      * public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls
      * want) { return this.getOrders(have, want, true); }
      */
-    
-    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(
+
+    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(
             AssetCls have, AssetCls want) {
         return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
     }
-    
+
+    public List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+            Tuple2<Long, BigDecimal>>> getOrders(Long have, Long want) {
+
+        return dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+    }
+
+
     public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(
             AssetCls have, AssetCls want) {
         return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
