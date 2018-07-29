@@ -207,7 +207,7 @@ public class BlockExplorer {
                 try {
                     output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
                 } catch (Exception e) {
-                    output.put("error", "Asset with given key is missing!");
+                    output.put("error", e.getMessage() + "</br>" + e.toString());
                     output.put("queryTimeMs", stopwatchAll.elapsedTime());
                     return output;
                 }
@@ -1197,16 +1197,25 @@ public class BlockExplorer {
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap()
-                .getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
-        for (Transaction transaction : transactions) {
-            IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
-            if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
-                assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
-                assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
-                break;
+        if (true) {
+            Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
+            Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
+            assetJSON.put("timestamp", transactions.getTimestamp());
+            assetJSON.put("dateTime", BlockExplorer.timestampToStr(transactions.getTimestamp()));
+        } else {
+            // OLD
+            List<Transaction> transactions = dcSet.getTransactionFinalMap()
+                    .getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+            for (Transaction transaction : transactions) {
+                IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
+                if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
+                    assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
+                    assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
+                    break;
+                }
             }
         }
+
 
         output.put("this", assetJSON);
 

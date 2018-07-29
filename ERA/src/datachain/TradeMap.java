@@ -261,6 +261,7 @@ public class TradeMap extends DCMap<Tuple2<byte[], byte[]>,
                 Fun.t3(haveKey, Fun.HI(), Fun.HI())).values());
 
         String wantKey = String.valueOf(haveWant);
+
         tradesKeys.addAll(((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.wantKeyMap).subMap(
                 Fun.t3(wantKey, null, null),
                 Fun.t3(wantKey, Fun.HI(), Fun.HI())).values());
