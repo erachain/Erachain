@@ -1109,9 +1109,6 @@ public class BlockExplorer {
 
         for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
 
-            if (true)
-                continue;
-
             Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
                     Tuple2<Long, BigDecimal>> initiator = Order.getOrder(dcSet, trade.a);
             if (!pairsTrades.containsKey(initiator.c.a)) {
@@ -1412,9 +1409,6 @@ public class BlockExplorer {
         for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
 
             i++;
-
-            if (true)
-                continue;
 
             Map tradeJSON = new LinkedHashMap();
 
