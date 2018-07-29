@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import core.crypto.Base58;
 import core.item.assets.OrderKeysComparatorForTrade;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -466,6 +467,11 @@ public class OrderMap extends DCMap<BigInteger,
 
     public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
         Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+
+        if (Base58.encode(order.a.a).equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
 
         // this order is NOT executable
         ////this.set(order.a.a, setExecutable(order, true));

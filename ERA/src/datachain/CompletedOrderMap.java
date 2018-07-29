@@ -1,5 +1,6 @@
 package datachain;
 
+import core.crypto.Base58;
 import core.item.assets.Order;
 import database.DBMap;
 import org.mapdb.BTreeMap;
@@ -86,6 +87,11 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         // this order is NOT executable
         ////order = datachain.OrderMap.setExecutable(order, false);
+
+        if (Base58.encode(order.a.a).equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
 
         this.set(order.a.a, order);
     }

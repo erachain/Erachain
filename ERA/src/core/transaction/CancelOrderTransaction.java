@@ -116,12 +116,15 @@ public class CancelOrderTransaction extends Transaction {
 
     public static void process_it(DCSet db, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
-        if (false & !db.isFork() &&
+        if ((false & !db.isFork() &&
                 (order.b.a == 1027l && order.c.a == 2l
-                        || order.c.a == 2l && order.c.a == 1027l)) {
+                        || order.c.a == 2l && order.c.a == 1027l))
+        || Base58.encode(order.a.a).equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+        ) {
             int ii = 123;
             ii++;
         }
+
         //SET ORPHAN DATA
         db.getCompletedOrderMap().add(order);
 
@@ -138,6 +141,13 @@ public class CancelOrderTransaction extends Transaction {
 
     public static void orphan_it(DCSet db, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+
+        if (Base58.encode(order.a.a).equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+        ) {
+            int ii = 123;
+            ii++;
+        }
+
         db.getOrderMap().add(order);
 
         //REMOVE BALANCE OF CREATOR

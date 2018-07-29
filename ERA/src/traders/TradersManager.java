@@ -97,8 +97,8 @@ public class TradersManager extends Observable {
 
         }
 
-        BigDecimal limit3 = new BigDecimal("0.5");
         if (true) {
+            BigDecimal limit = new BigDecimal("0.5");
             //START TRADERs THREADs
             HashMap<BigDecimal, BigDecimal> schemeUSD_RUB = new HashMap<>();
             schemeUSD_RUB.put(new BigDecimal(30000), new BigDecimal("1.0"));
@@ -107,7 +107,7 @@ public class TradersManager extends Observable {
             schemeUSD_RUB.put(new BigDecimal(-30000), new BigDecimal("1.0"));
             Trader trader1 = new StoneGuardAbs(this, account.getAddress(),
                     BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1,
-            1077, 1078, schemeUSD_RUB, limit3, limit3,true);
+            1077, 1078, schemeUSD_RUB, limit, limit,true);
             this.knownTraders.add(trader1);
 
             try {
@@ -121,12 +121,31 @@ public class TradersManager extends Observable {
             HashMap<BigDecimal, BigDecimal> schemeBTC_USD = new HashMap<>();
             schemeBTC_USD.put(new BigDecimal(1), new BigDecimal("0.5"));
             schemeBTC_USD.put(new BigDecimal("0.1"), new BigDecimal("0.2"));
-            schemeBTC_USD.put(new BigDecimal("0.01"), new BigDecimal("0.1")); // !!!! FIR GOOD SCALE USE STRING - not DOUBLE
-            schemeBTC_USD.put(new BigDecimal("-0.01"), new BigDecimal("0.1"));
+            schemeBTC_USD.put(new BigDecimal("0.01"), new BigDecimal("0.05")); // !!!! FOR GOOD SCALE USE STRING - not DOUBLE
+            schemeBTC_USD.put(new BigDecimal("-0.01"), new BigDecimal("0.05"));
             schemeBTC_USD.put(new BigDecimal("-0.1"), new BigDecimal("0.2"));
             schemeBTC_USD.put(new BigDecimal(-1), new BigDecimal("0.5"));
-            Trader trader2 = new StoneGuard(this, account.getAddress(), 300,
+            Trader trader2 = new StoneGuard(this, account.getAddress(),
+                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS,
                     1079, 1077, schemeBTC_USD, limit1, limit1, true);
+            this.knownTraders.add(trader2);
+
+            try {
+                Thread.sleep(100);
+            } catch (Exception e) {
+            }
+        }
+
+        if (true) {
+            BigDecimal limit = new BigDecimal("0.5");
+            HashMap<BigDecimal, BigDecimal> schemeBTC_USD = new HashMap<>();
+            schemeBTC_USD.put(new BigDecimal(7), new BigDecimal("1"));
+            schemeBTC_USD.put(new BigDecimal(3), new BigDecimal("0.8"));
+            schemeBTC_USD.put(new BigDecimal(-3), new BigDecimal("0.8"));
+            schemeBTC_USD.put(new BigDecimal(-7), new BigDecimal("1.0"));
+            Trader trader2 = new StoneGuard(this, account.getAddress(),
+                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1,
+                    1079, 1077, schemeBTC_USD, limit, limit, true);
             this.knownTraders.add(trader2);
 
             try {
@@ -146,7 +165,8 @@ public class TradersManager extends Observable {
             schemeCOMPU_ERA.put(new BigDecimal("-0.1"), new BigDecimal("2"));
             schemeCOMPU_ERA.put(new BigDecimal("-1"), new BigDecimal("5"));
             schemeCOMPU_ERA.put(new BigDecimal("-10"), new BigDecimal("10"));
-            Trader trader = new StoneGuard(this, account.getAddress(), 300,
+            Trader trader = new StoneGuard(this, account.getAddress(),
+                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS,
                     2, 1, schemeCOMPU_ERA, limit2, limit2, true);
             this.knownTraders.add(trader);
 
