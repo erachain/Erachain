@@ -977,14 +977,22 @@ public class BlockExplorer {
         pollJSON.put("description", poll.getDescription());
         pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(
-                poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
-        for (Transaction transaction : transactions) {
-            CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
-            if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
-                pollJSON.put("timestamp", createPollTransaction.getTimestamp());
-                pollJSON.put("dateTime", BlockExplorer.timestampToStr(createPollTransaction.getTimestamp()));
-                break;
+        if (true) {
+            //Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(poll.getReference());
+            //Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
+            pollJSON.put("timestamp", 0l);//transactions.getTimestamp());
+            pollJSON.put("dateTime", BlockExplorer.timestampToStr(0l)); //transactions.getTimestamp()));
+        } else {
+            // OLD
+            List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(
+                    poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
+            for (Transaction transaction : transactions) {
+                CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
+                if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
+                    pollJSON.put("timestamp", createPollTransaction.getTimestamp());
+                    pollJSON.put("dateTime", BlockExplorer.timestampToStr(createPollTransaction.getTimestamp()));
+                    break;
+                }
             }
         }
 
