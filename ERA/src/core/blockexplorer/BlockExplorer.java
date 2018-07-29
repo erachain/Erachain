@@ -207,8 +207,9 @@ public class BlockExplorer {
                 try {
                     output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
                 } catch (Exception e) {
-                    output.put("error", e.getMessage() + "</br>" + e.toString());
-                    output.put("queryTimeMs", stopwatchAll.elapsedTime());
+                    output.put("error", e.getMessage());
+                    LOGGER.error(e.getMessage(), e);
+                    //output.put("queryTimeMs", stopwatchAll.elapsedTime());
                     return output;
                 }
             }
@@ -1108,8 +1109,11 @@ public class BlockExplorer {
 
         for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initiator = Order
-                    .getOrder(dcSet, trade.a);
+            if (true)
+                continue;
+
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+                    Tuple2<Long, BigDecimal>> initiator = Order.getOrder(dcSet, trade.a);
             if (!pairsTrades.containsKey(initiator.c.a)) {
                 count = 0;
                 volumePrice = BigDecimal.ZERO;
@@ -1406,7 +1410,12 @@ public class BlockExplorer {
 
         int i = 0;
         for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
+
             i++;
+
+            if (true)
+                continue;
+
             Map tradeJSON = new LinkedHashMap();
 
             Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = Order

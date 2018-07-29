@@ -175,6 +175,9 @@ public class Trade {
 
         //ADD TRADE TO DATABASE
         db.getTradeMap().add(toDBrec(this));
+        if (!db.getTradeMap().contains(new Tuple2<byte[], byte[]>(this.initiator, this.target))) {
+            int error = 0;
+        }
 
         //UPDATE FULFILLED HAVE
         initiator.setFulfilledHave(initiator.getFulfilledHave().add(this.amountWant));

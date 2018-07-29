@@ -1,5 +1,6 @@
 package datachain;
 
+import com.google.common.primitives.UnsignedBytes;
 import core.item.assets.Order;
 import core.item.assets.Trade;
 import database.DBMap;
@@ -70,9 +71,18 @@ public class TradeMap extends DCMap<Tuple2<byte[], byte[]>,
     @SuppressWarnings("unchecked")
     private Map<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> openMap(final DB database) {
         //OPEN MAP
+
+        /* EXAMPLE for byte[], byte[]
+        Fun.Tuple2Comparator<Long, byte[]> comparator = new Fun.Tuple2Comparator<Long, byte[]>(Fun.COMPARATOR,
+                UnsignedBytes.lexicographicalComparator());
+        NavigableSet<Tuple2<Integer, byte[]>> heightIndex = database.createTreeSet("transactions_index_timestamp")
+                .comparator(comparator).makeOrGet();
+                */
+
         BTreeMap<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> map = database.createTreeMap("trades")
-                //.valueSerializer(new TradeSerializer())
+                .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
                 .makeOrGet();
+
 
         //CHECK IF NOT MEMORY DATABASE
         if (parent == null) {
@@ -142,7 +152,7 @@ public class TradeMap extends DCMap<Tuple2<byte[], byte[]>,
 
             //REVERSE KEY
             this.reverseKeyMap = database.createTreeMap("trades_key_reverse")
-                    .comparator(Fun.COMPARATOR)
+                    .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
                     .makeOrGet();
 
             //BIND REVERSE KEY
