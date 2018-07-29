@@ -22,8 +22,8 @@ import java.util.*;
 	private long timestamp;
  */
 @SuppressWarnings("rawtypes")
-public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
-        Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> {
+public class TradeMap extends DCMap<Tuple2<byte[], byte[]>,
+        Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     private BTreeMap pairKeyMap;
@@ -54,13 +54,13 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     @Override
-    protected Map<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getMap(DB database) {
+    protected Map<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getMemoryMap() {
+    protected Map<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
@@ -68,9 +68,9 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> openMap(final DB database) {
+    private Map<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> openMap(final DB database) {
         //OPEN MAP
-        BTreeMap<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> map = database.createTreeMap("trades")
+        BTreeMap<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> map = database.createTreeMap("trades")
                 //.valueSerializer(new TradeSerializer())
                 .makeOrGet();
 
@@ -82,10 +82,10 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
                     .makeOrGet();
 
             //BIND PAIR KEY
-            Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple3<String, Long, Tuple2<BigInteger, BigInteger>>, Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>() {
+            Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple3<String, Long, Tuple2<byte[], byte[]>>, Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>() {
                 @Override
-                public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value) {
-                    Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                public Tuple3<String, Long, Tuple2<byte[], byte[]>> run(Tuple2<byte[], byte[]> key, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> value) {
+                    Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
                     long have = order.b.a;
                     long want = order.c.a;
@@ -96,7 +96,7 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
                         pairKey = want + "/" + have;
                     }
 
-                    return new Tuple3<String, Long, Tuple2<BigInteger, BigInteger>>(pairKey, Long.MAX_VALUE - value.e, key);
+                    return new Tuple3<String, Long, Tuple2<byte[], byte[]>>(pairKey, Long.MAX_VALUE - value.e, key);
                 }
             });
 
@@ -106,17 +106,17 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
                     .makeOrGet();
 
             //BIND
-            Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple3<String, Long, Tuple2<BigInteger, BigInteger>>, Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>() {
+            Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple3<String, Long, Tuple2<byte[], byte[]>>, Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>() {
                 @Override
-                public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value) {
-                    Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                public Tuple3<String, Long, Tuple2<byte[], byte[]>> run(Tuple2<byte[], byte[]> key, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> value) {
+                    Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
                     long want = order.c.a;
 
                     String wantKey;
                     wantKey = String.valueOf(want);
 
-                    return new Tuple3<String, Long, Tuple2<BigInteger, BigInteger>>(wantKey, Long.MAX_VALUE - value.e, key);
+                    return new Tuple3<String, Long, Tuple2<byte[], byte[]>>(wantKey, Long.MAX_VALUE - value.e, key);
                 }
             });
 
@@ -126,17 +126,17 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
                     .makeOrGet();
 
             //BIND
-            Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple3<String, Long, Tuple2<BigInteger, BigInteger>>, Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>() {
+            Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple3<String, Long, Tuple2<byte[], byte[]>>, Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>() {
                 @Override
-                public Tuple3<String, Long, Tuple2<BigInteger, BigInteger>> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value) {
-                    Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                public Tuple3<String, Long, Tuple2<byte[], byte[]>> run(Tuple2<byte[], byte[]> key, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> value) {
+                    Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
                     long have = order.b.a;
 
                     String haveKey;
                     haveKey = String.valueOf(have);
 
-                    return new Tuple3<String, Long, Tuple2<BigInteger, BigInteger>>(haveKey, Long.MAX_VALUE - value.e, key);
+                    return new Tuple3<String, Long, Tuple2<byte[], byte[]>>(haveKey, Long.MAX_VALUE - value.e, key);
                 }
             });
 
@@ -146,17 +146,17 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
                     .makeOrGet();
 
             //BIND REVERSE KEY
-            Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<BigInteger, BigInteger>, Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>() {
+            Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<byte[], byte[]>, Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>() {
                 @Override
-                public Tuple2<BigInteger, BigInteger> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value) {
+                public Tuple2<byte[], byte[]> run(Tuple2<byte[], byte[]> key, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> value) {
 
-                    return new Tuple2<BigInteger, BigInteger>(key.b, key.a);
+                    return new Tuple2<byte[], byte[]>(key.b, key.a);
                 }
             });
-            Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<BigInteger, BigInteger>, Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>() {
+            Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<byte[], byte[]>, Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>() {
                 @Override
-                public Tuple2<BigInteger, BigInteger> run(Tuple2<BigInteger, BigInteger> key, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> value) {
-                    return new Tuple2<BigInteger, BigInteger>(key.a, key.b);
+                public Tuple2<byte[], byte[]> run(Tuple2<byte[], byte[]> key, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> value) {
+                    return new Tuple2<byte[], byte[]>(key.a, key.b);
                 }
             });
         }
@@ -166,7 +166,7 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     @Override
-    protected Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> getDefaultValue() {
+    protected Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> getDefaultValue() {
         return null;
     }
 
@@ -175,8 +175,8 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
         return this.observableData;
     }
 
-    public void add(Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade) {
-        this.set(new Tuple2<BigInteger, BigInteger>(trade.a, trade.b), trade);
+    public void add(Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade) {
+        this.set(new Tuple2<byte[], byte[]>(trade.a, trade.b), trade);
     }
 
     @SuppressWarnings("unchecked")
@@ -213,12 +213,12 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     @SuppressWarnings("unchecked")
-    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades(Order order) {
+    public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getInitiatedTrades(Order order) {
         //FILTER ALL TRADES
         Collection<Tuple2> keys = this.getKeys(order);
 
         //GET ALL TRADES FOR KEYS
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>();
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
         for (Tuple2 key : keys) {
             trades.add(this.get(key));
         }
@@ -228,56 +228,56 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(BigInteger orderID) {
+    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(byte[] orderID) {
         //ADD REVERSE KEYS
-        Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple2, Tuple2<BigInteger, BigInteger>>) this.reverseKeyMap).subMap(
+        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple2, Tuple2<byte[], byte[]>>) this.reverseKeyMap).subMap(
                 Fun.t2(orderID, null),
                 Fun.t2(orderID, Fun.HI())).values();
 
         //RETURN
-        return new SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>(this, keys);
+        return new SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>(this, keys);
     }
 
     @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTradesByOrderID(BigInteger orderID) {
+    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTradesByOrderID(byte[] orderID) {
         //ADD REVERSE KEYS
-        Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple2, Tuple2<BigInteger, BigInteger>>) this.reverseKeyMap).subMap(
+        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple2, Tuple2<byte[], byte[]>>) this.reverseKeyMap).subMap(
                 Fun.t2(orderID, null),
                 Fun.t2(orderID, Fun.HI())).values();
 
         //RETURN
-        return new SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>(this, keys);
+        return new SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>(this, keys);
     }
 
 
     @SuppressWarnings("unchecked")
-    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(long haveWant)
+    public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(long haveWant)
     // get trades for order as HAVE and as WANT
     {
-        Map<Tuple2<BigInteger, BigInteger>, Boolean> tradesKeys = new TreeMap<Tuple2<BigInteger, BigInteger>, Boolean>();
+        Map<Tuple2<byte[], byte[]>, Boolean> tradesKeys = new TreeMap<Tuple2<byte[], byte[]>, Boolean>();
 
         String haveKey = String.valueOf(haveWant);
-        Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple3, Tuple2<BigInteger, BigInteger>>) this.haveKeyMap).subMap(
+        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.haveKeyMap).subMap(
                 Fun.t3(haveKey, null, null),
                 Fun.t3(haveKey, Fun.HI(), Fun.HI())).values();
 
-        for (Tuple2<BigInteger, BigInteger> key : keys) {
+        for (Tuple2<byte[], byte[]> key : keys) {
             tradesKeys.put(key, true);
         }
 
         String wantKey = String.valueOf(haveWant);
-        keys = ((BTreeMap<Tuple3, Tuple2<BigInteger, BigInteger>>) this.wantKeyMap).subMap(
+        keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.wantKeyMap).subMap(
                 Fun.t3(wantKey, null, null),
                 Fun.t3(wantKey, Fun.HI(), Fun.HI())).values();
 
-        for (Tuple2<BigInteger, BigInteger> key : keys) {
+        for (Tuple2<byte[], byte[]> key : keys) {
             tradesKeys.put(key, true);
         }
 
         //GET ALL ORDERS FOR KEYS
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>();
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
 
-        for (Map.Entry<Tuple2<BigInteger, BigInteger>, Boolean> tradeKey : tradesKeys.entrySet()) {
+        for (Map.Entry<Tuple2<byte[], byte[]>, Boolean> tradeKey : tradesKeys.entrySet()) {
             trades.add(this.get(tradeKey.getKey()));
         }
 
@@ -286,7 +286,7 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTradesSortableList(long have, long want) {
+    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTradesSortableList(long have, long want) {
         String pairKey;
         if (have > want) {
             pairKey = have + "/" + want;
@@ -295,16 +295,16 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
         }
 
         //FILTER ALL KEYS
-        Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple3, Tuple2<BigInteger, BigInteger>>) this.pairKeyMap).subMap(
+        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, null, null),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
         //RETURN
-        return new SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>(this, keys);
+        return new SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>(this, keys);
     }
 
     @SuppressWarnings("unchecked")
-    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(long have, long want) {
+    public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(long have, long want) {
         String pairKey;
         if (have > want) {
             pairKey = have + "/" + want;
@@ -313,13 +313,13 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
         }
 
         //FILTER ALL KEYS
-        Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple3, Tuple2<BigInteger, BigInteger>>) this.pairKeyMap).subMap(
+        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, null, null),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>();
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
 
-        for (Tuple2<BigInteger, BigInteger> key : keys) {
+        for (Tuple2<byte[], byte[]> key : keys) {
             trades.add(this.get(key));
         }
 
@@ -334,7 +334,7 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
      * @param want      wish
      * @param timestamp is time
      */
-    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTradesByTimestamp(long have, long want, long timestamp) {
+    public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTradesByTimestamp(long have, long want, long timestamp) {
         String pairKey;
         if (have > want)
             pairKey = have + "/" + want;
@@ -342,13 +342,13 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
             pairKey = want + "/" + have;
 
         //FILTER ALL KEYS
-        Collection<Tuple2<BigInteger, BigInteger>> keys = ((BTreeMap<Tuple3, Tuple2<BigInteger, BigInteger>>) this.pairKeyMap).subMap(
+        Collection<Tuple2<byte[], byte[]>> keys = ((BTreeMap<Tuple3, Tuple2<byte[], byte[]>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, timestamp, null),
                 Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>();
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new ArrayList<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
 
-        for (Tuple2<BigInteger, BigInteger> key : keys) {
+        for (Tuple2<byte[], byte[]> key : keys) {
             trades.add(this.get(key));
         }
 
@@ -357,6 +357,6 @@ public class TradeMap extends DCMap<Tuple2<BigInteger, BigInteger>,
     }
 
     public void delete(Trade trade) {
-        this.delete(new Tuple2<BigInteger, BigInteger>(trade.getInitiator(), trade.getTarget()));
+        this.delete(new Tuple2<byte[], byte[]>(trade.getInitiator(), trade.getTarget()));
     }
 }

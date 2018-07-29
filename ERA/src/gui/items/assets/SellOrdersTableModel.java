@@ -20,14 +20,14 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class SellOrdersTableModel extends
-        TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        TableModelCls<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
         implements Observer {
     public static final int COLUMN_AMOUNT_HAVE = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_WANT = 2;
 
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
     BigDecimal sumAmountHave;
     BigDecimal sumAmountWant;
@@ -54,7 +54,7 @@ public class SellOrdersTableModel extends
     private void totalCalc() {
         sumAmountHave = BigDecimal.ZERO;
         sumAmountWant = BigDecimal.ZERO;
-        for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        for (Pair<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
 
             Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
@@ -65,12 +65,12 @@ public class SellOrdersTableModel extends
     }
 
     @Override
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
         return this.orders;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
             Tuple2<Long, BigDecimal>> getOrder(
             int row) {
         return this.orders.get(row).getB();
@@ -97,7 +97,7 @@ public class SellOrdersTableModel extends
             return null;
         }
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
                 Tuple2<Long, BigDecimal>> order = null;
         boolean isMine = false;
         int size = this.orders.size();

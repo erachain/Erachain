@@ -595,7 +595,7 @@ public class TransactionCreator {
         return createCancelOrderTransaction(creator, order.getId(), feePow);
     }
 
-    public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+    public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, byte[] orderID, int feePow) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 

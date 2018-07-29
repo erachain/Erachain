@@ -18,7 +18,7 @@ public class TradesFrame extends JDialog {
 
     private OrderTradesTableModel tradesTableModel;
 
-    public TradesFrame(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public TradesFrame(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
 
         //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));

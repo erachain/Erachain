@@ -268,7 +268,7 @@ public class My_Order_Tab extends Split_Panel {
     class search_listener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
             if (table.getSelectedRow() >= 0)
                 order = ordersModel.getOrder(table.convertRowIndexToModel(table.getSelectedRow()));

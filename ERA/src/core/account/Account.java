@@ -208,8 +208,8 @@ public class Account {
     public static Map<String, BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
 
         OrderMap map = dcSet.getOrderMap();
-        Iterator<BigInteger> iterator = map.getIterator(0, true);
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+        Iterator<byte[]> iterator = map.getIterator(0, true);
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
         while (iterator.hasNext()) {
             order = map.get(iterator.next());
             if (order.b.a == key) {

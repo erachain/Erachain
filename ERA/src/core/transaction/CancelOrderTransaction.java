@@ -33,25 +33,25 @@ public class CancelOrderTransaction extends Transaction {
     private static final String NAME_ID = "Cancel Order";
     private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
-    private BigInteger orderID;
+    private byte[] orderID;
 
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
         this.orderID = order;
     }
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, order, feePow, timestamp, reference);
         this.signature = signature;
         //this.calcFee();
     }
 
-    public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
+    public CancelOrderTransaction(PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference, signature);
     }
 
-    public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
+    public CancelOrderTransaction(PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference);
     }
 
@@ -108,13 +108,13 @@ public class CancelOrderTransaction extends Transaction {
 
         //READ ORDER
         byte[] orderBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-        BigInteger order = new BigInteger(orderBytes);
+        byte[] order = orderBytes;
         position += ORDER_LENGTH;
 
         return new CancelOrderTransaction(typeBytes, creator, order, feePow, timestamp, reference, signatureBytes);
     }
 
-    public static void process_it(DCSet db, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public static void process_it(DCSet db, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         if (false & !db.isFork() &&
                 (order.b.a == 1027l && order.c.a == 2l
@@ -136,7 +136,7 @@ public class CancelOrderTransaction extends Transaction {
 
     //PARSE CONVERT
 
-    public static void orphan_it(DCSet db, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public static void orphan_it(DCSet db, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         db.getOrderMap().add(order);
 
@@ -149,7 +149,7 @@ public class CancelOrderTransaction extends Transaction {
         db.getCompletedOrderMap().delete(order.a.a);
     }
 
-    public BigInteger getOrderID() {
+    public byte[] getOrderID() {
         return this.orderID;
     }
 
@@ -166,7 +166,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //ADD CREATOR/ORDER
         transaction.put("creator", this.creator.getAddress());
-        transaction.put("orderID", Base58.encode(this.orderID.toByteArray()));
+        transaction.put("orderID", Base58.encode(this.orderID));
 
         return transaction;
     }
@@ -179,7 +179,7 @@ public class CancelOrderTransaction extends Transaction {
         byte[] data = super.toBytes(withSign, releaserReference);
 
         //WRITE ORDER
-        byte[] orderBytes = this.orderID.toByteArray();
+        byte[] orderBytes = this.orderID;
         byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
         orderBytes = Bytes.concat(fill, orderBytes);
         data = Bytes.concat(data, orderBytes);
@@ -205,7 +205,7 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         //CHECK IF ORDER EXISTS
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
         if (this.dcSet.getOrderMap().contains(this.orderID))
             order = this.dcSet.getOrderMap().get(this.orderID);
@@ -228,7 +228,7 @@ public class CancelOrderTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, asPack);
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getOrderMap().get(this.orderID);
         process_it(this.dcSet, order);
     }
@@ -240,7 +240,7 @@ public class CancelOrderTransaction extends Transaction {
         super.orphan(asPack);
 
         //ADD TO DATABASE
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getCompletedOrderMap().get(this.orderID);
         orphan_it(this.dcSet, order);
     }
@@ -289,7 +289,7 @@ public class CancelOrderTransaction extends Transaction {
 
         assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
 
         if (this.dcSet.getCompletedOrderMap().contains(this.orderID)) {

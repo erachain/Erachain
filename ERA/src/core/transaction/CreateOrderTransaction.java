@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import core.crypto.Base58;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -205,8 +206,8 @@ public class CreateOrderTransaction extends Transaction {
 
     }
 
-    public BigInteger getOrderId() {
-        return new BigInteger(this.signature);
+    public byte[] getOrderId() {
+        return this.signature;
     }
 
     @Override
@@ -262,16 +263,17 @@ public class CreateOrderTransaction extends Transaction {
         // set SCALE by ASSETs
         BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
-        return new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey,
+
+        return new Order(this.signature, this.creator, this.haveKey, this.wantKey,
                 amountHave, amountWant, // new SCALE
                 this.timestamp);
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> makeOrderDB() {
-        return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        return new Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-                new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(this.getOrderId(),
+                new Tuple5<byte[], String, Long, Boolean, BigDecimal>(this.getOrderId(),
                         this.creator.getAddress(), this.timestamp, true, this.getPriceCalc()),
                 new Tuple3<Long, BigDecimal, BigDecimal>(this.haveKey, this.amountHave, BigDecimal.ZERO),
                 new Tuple2<Long, BigDecimal>(this.wantKey, this.amountWant));

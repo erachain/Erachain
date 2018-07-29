@@ -1596,7 +1596,8 @@ public class Wallet extends Observable implements Observer {
 
 			// TODO : FULLFILL not work - нужно сделать запись заявок по записи
 			// заявок в основную базу а не по записи транзакций
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew;
+			Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
+					Tuple2<Long, BigDecimal>> orderNew;
 
 			orderNew = DCSet.getInstance().getOrderMap().get(orderCreation.getOrderId());
 			if (orderNew == null) {
@@ -1618,8 +1619,8 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCreation.getCreator().getAddress(),
-					new BigInteger(orderCreation.getSignature())));
+			this.database.getOrderMap().delete(new Tuple2<String, byte[]>(orderCreation.getCreator().getAddress(),
+					orderCreation.getSignature()));
 		}
 	}
 
@@ -1632,8 +1633,8 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCancel.getCreator().getAddress(),
-					new BigInteger(orderCancel.getSignature())));
+			this.database.getOrderMap().delete(new Tuple2<String, byte[]>(orderCancel.getCreator().getAddress(),
+					orderCancel.getSignature()));
 		}
 	}
 
@@ -1646,7 +1647,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			// DELETE ORDER
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet
+			Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet
 					.getInstance().getOrderMap().get(orderCancel.getOrderID());
 			this.database.getOrderMap().add(order);
 		}

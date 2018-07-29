@@ -731,9 +731,9 @@ public class BlockExplorer {
 
             assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
             assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
                     .getOrderMap().getOrders(asset.getKey());
-            List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
+            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
                     .getTrades(asset.getKey());
 
             assetJSON.put("operations", orders.size() + trades.size());
@@ -798,9 +798,9 @@ public class BlockExplorer {
 
             assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
             assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
                     .getOrderMap().getOrders(asset.getKey());
-            List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
+            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
                     .getTrades(asset.getKey());
 
             assetJSON.put("operations", orders.size() + trades.size());
@@ -872,9 +872,9 @@ public class BlockExplorer {
 
             assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
             assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
                     .getOrderMap().getOrders(asset.getKey());
-            List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
+            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
                     .getTrades(asset.getKey());
 
             assetJSON.put("operations", orders.size() + trades.size());
@@ -1027,8 +1027,8 @@ public class BlockExplorer {
 
     // TODO: что-то тут напутано
     public Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> calcForAsset(
-            List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders,
-            List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades) {
+            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders,
+            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades) {
 
         Map<Long, Integer> pairsOpenOrders = new TreeMap<Long, Integer>();
         Map<Long, BigDecimal> volumePriceOrders = new TreeMap<Long, BigDecimal>();
@@ -1038,7 +1038,7 @@ public class BlockExplorer {
         BigDecimal volumePrice = BigDecimal.ZERO;
         BigDecimal volumeAmount = BigDecimal.ZERO;
 
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
+        for (Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
             if (!pairsOpenOrders.containsKey(order.c.a)) {
                 count = 0;
             } else {
@@ -1098,9 +1098,9 @@ public class BlockExplorer {
         Map<Long, BigDecimal> volumePriceTrades = new TreeMap<Long, BigDecimal>();
         Map<Long, BigDecimal> volumeAmountTrades = new TreeMap<Long, BigDecimal>();
 
-        for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initiator = Order
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initiator = Order
                     .getOrder(dcSet, trade.a);
             if (!pairsTrades.containsKey(initiator.c.a)) {
                 count = 0;
@@ -1121,7 +1121,7 @@ public class BlockExplorer {
             volumePriceTrades.put(initiator.c.a, volumePrice);
             volumeAmountTrades.put(initiator.c.a, volumeAmount);
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target = Order
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target = Order
                     .getOrder(dcSet, trade.b);
             if (!pairsTrades.containsKey(target.c.a)) {
                 count = 0;
@@ -1169,10 +1169,10 @@ public class BlockExplorer {
     public Map jsonQueryAsset(long key) {
         Map output = new LinkedHashMap();
 
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
                 .getOrderMap().getOrders(key);
 
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(key);
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(key);
 
         AssetCls asset = Controller.getInstance().getAsset(key);
 
@@ -1277,14 +1277,14 @@ public class BlockExplorer {
     public Map jsonQueryTrades(long have, long want) {
         Map output = new LinkedHashMap();
 
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
+        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
                 .getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
+        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
                 .getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
         // Collections.reverse(ordersWant);
 
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
                 want);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
@@ -1311,7 +1311,7 @@ public class BlockExplorer {
         // show SELLs in BACK order
         for (int i = ordersHave.size() - 1; i >= 0; i--) {
             
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
             sellJSON.put("price", order.a.e.toPlainString());
@@ -1349,7 +1349,7 @@ public class BlockExplorer {
 
         for (int i = ordersWant.size() - 1; i >= 0; i--) {
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
         
             Map buyJSON = new LinkedHashMap();
 
@@ -1388,14 +1388,14 @@ public class BlockExplorer {
         BigDecimal tradeHaveAmount = BigDecimal.ZERO;
 
         int i = 0;
-        for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
             i++;
             Map tradeJSON = new LinkedHashMap();
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = Order
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = Order
                     .getOrder(dcSet, trade.a);
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget = Order
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget = Order
                     .getOrder(dcSet, trade.b);
 
             tradeJSON.put("amountHave", trade.c.toPlainString());
@@ -2011,10 +2011,10 @@ public class BlockExplorer {
             }
         }
 
-       Collection<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+       Collection<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
                 .getOrderMap().getValuesAll();
 
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
+        for (Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
             if (order.b.a == key) {
                 alloreders = alloreders.add(order.b.c);
             }
@@ -2262,7 +2262,7 @@ public class BlockExplorer {
         if (unit instanceof Trade) {
             Trade trade = (Trade) unit;
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = trade
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = trade
                     .getInitiatorOrder(dcSet);
 
             /*
@@ -2272,7 +2272,7 @@ public class BlockExplorer {
              * dcSet.getCompletedOrderMap().get(trade.getInitiator()); }
              */
 
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget = trade
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget = trade
                     .getTargetOrder(dcSet);
 
             /*
@@ -2304,7 +2304,7 @@ public class BlockExplorer {
             transactionDataJSON.put("targetCreator", orderTarget.a.b);
             transactionDataJSON.put("targetAmount", orderTarget.b.b.toPlainString());
 
-            Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.a.a.toByteArray())
+            Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.a.a)
                     .getBlock(dcSet);
             transactionDataJSON.put("height", parentBlock.getHeight(dcSet));
             transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(dcSet) + 1);
@@ -2341,8 +2341,8 @@ public class BlockExplorer {
                     transactionDataJSON.put("compressed", false);
                 }
             } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
-                BigInteger key = ((CancelOrderTransaction) unit).getOrderID();
-                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+                byte[] key = ((CancelOrderTransaction) unit).getOrderID();
+                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
                 if (dcSet.getCompletedOrderMap().contains(key)) {
                     order = dcSet.getCompletedOrderMap().get(key);
                 } else {
@@ -2797,23 +2797,23 @@ public class BlockExplorer {
         }
 
         for (String address : addresses) {
-            Map<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = new TreeMap<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>>();
+            Map<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new TreeMap<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
             List<Transaction> orders = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
                     Transaction.CREATE_ORDER_TRANSACTION, 0);
             TradeMap tradeMap = dcSet.getTradeMap();
             for (Transaction transaction : orders) {
-                SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> tradesBuf = tradeMap
-                        .getTradesByOrderID(new BigInteger(transaction.getSignature()));
-                for (Pair<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> pair : tradesBuf) {
+                SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> tradesBuf = tradeMap
+                        .getTradesByOrderID(transaction.getSignature());
+                for (Pair<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> pair : tradesBuf) {
                     trades.put(pair.getA(), pair.getB());
                 }
             }
 
-            for (Map.Entry<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trade : trades
+            for (Map.Entry<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trade : trades
                     .entrySet()) {
-                Transaction txInitiator = Controller.getInstance().getTransaction(trade.getValue().a.toByteArray());
+                Transaction txInitiator = Controller.getInstance().getTransaction(trade.getValue().a);
 
-                Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().b.toByteArray());
+                Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().b);
 
                 all.add(new BlExpUnit(txInitiator.getBlockHeightByParentOrLast(dcSet),
                         txTarget.getBlockHeightByParentOrLast(dcSet), txInitiator.getSeqNo(dcSet),
@@ -2889,14 +2889,14 @@ public class BlockExplorer {
             } else if (unit.getUnit() instanceof Trade) {
                 Trade trade = (Trade) unit.getUnit();
 
-                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator;
+                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator;
                 if (dcSet.getCompletedOrderMap().contains(trade.getInitiator())) {
                     orderInitiator = dcSet.getCompletedOrderMap().get(trade.getInitiator());
                 } else {
                     orderInitiator = dcSet.getOrderMap().get(trade.getInitiator());
                 }
 
-                Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget;
+                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget;
                 if (dcSet.getCompletedOrderMap().contains(trade.getTarget())) {
                     orderTarget = dcSet.getCompletedOrderMap().get(trade.getTarget());
                 } else {
@@ -3291,8 +3291,8 @@ public class BlockExplorer {
 
         String[] signatures = query.split("/");
 
-        Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade = dcSet.getTradeMap()
-                .get(Fun.t2(Base58.decodeBI(signatures[0]), Base58.decodeBI(signatures[1])));
+        Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = dcSet.getTradeMap()
+                .get(Fun.t2(Base58.decode(signatures[0]), Base58.decode(signatures[1])));
         output.put("type", "trade");
         output.put("trade", query);
 
@@ -3936,7 +3936,7 @@ public class BlockExplorer {
         AssetNames assetNames = new AssetNames();
 
         TreeSet<BlExpUnit> all = new TreeSet<>();
-        Map<Tuple2<BigInteger, BigInteger>, Trade> trades = new TreeMap<Tuple2<BigInteger, BigInteger>, Trade>();
+        Map<Tuple2<byte[], byte[]>, Trade> trades = new TreeMap<Tuple2<byte[], byte[]>, Trade>();
 
         String[] signatures = query.split(",");
 
@@ -3962,16 +3962,16 @@ public class BlockExplorer {
              * transaction.getSeqNo(dcSet), transaction));
              *
              * if(transaction instanceof CreateOrderTransaction) {
-             * Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+             * Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
              * Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
              * order = ((CreateOrderTransaction)transaction).getOrder();
              *
-             * SortableList<Tuple2<BigInteger, BigInteger>, Trade> tradesBuf =
+             * SortableList<Tuple2<byte[], byte[]>, Trade> tradesBuf =
              * Controller.getInstance().getTrades(order); for
-             * (Pair<Tuple2<BigInteger, BigInteger>, Trade> pair : tradesBuf) {
+             * (Pair<Tuple2<byte[], byte[]>, Trade> pair : tradesBuf) {
              * trades.put(pair.getA(), pair.getB()); } } }
              *
-             * for(Map.Entry<Tuple2<BigInteger, BigInteger>, Trade> trade :
+             * for(Map.Entry<Tuple2<byte[], byte[]>, Trade> trade :
              * trades.entrySet()) { Transaction txInitiator =
              * Controller.getInstance().getTransaction(trade.getValue().
              * getInitiator().toByteArray());

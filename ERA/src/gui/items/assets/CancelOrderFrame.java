@@ -26,12 +26,12 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class CancelOrderFrame extends JDialog {
-    private Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    private Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
     private JTextField txtFeePow;
     private JButton cancelOrderButton;
 
-    public CancelOrderFrame(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public CancelOrderFrame(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));

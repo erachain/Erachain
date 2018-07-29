@@ -19,7 +19,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, byte[]>, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
         Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_AMOUNT = 1;
@@ -31,7 +31,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
     public static final int COLUMN_CONFIRMED = 7;
     public static final int COLUMN_DONE = 8;
 
-    private SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    private SortableList<Tuple2<String, byte[]>, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Confirmed", "DONE"});
@@ -41,7 +41,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
     }
 
     @Override
-    public SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public SortableList<Tuple2<String, byte[]>, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
         return this.orders;
     }
@@ -52,7 +52,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
         return o == null ? Null.class : o.getClass();
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(int row) {
         return this.orders.get(row).getB();
     }
@@ -80,7 +80,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
             return null;
         }
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.reloadOrder(DCSet.getInstance(), this.orders.get(row).getB().a.a);
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.reloadOrder(DCSet.getInstance(), this.orders.get(row).getB().a.a);
         //order.setDC(DCSet.getInstance());
 
 
@@ -147,7 +147,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
         if (//message.getType() == ObserverMessage.LIST_ORDER_TYPE ||
                 message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
-                this.orders = (SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                this.orders = (SortableList<Tuple2<String, byte[]>, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                         Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>) message.getValue();
                 this.orders.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);

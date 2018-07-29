@@ -19,20 +19,20 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> implements Observer {
+public class OrderTradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_AMOUNT = 2;
     public static final int COLUMN_PRICE = 3;
     public static final int COLUMN_AMOUNT_WANT = 4;
 
-    private SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades;
-    private Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    private SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades;
+    private Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
 
-    public OrderTradesTableModel(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public OrderTradesTableModel(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         this.order = order;
         this.trades = DCSet.getInstance().getTradeMap().getTrades(order.a.a);
@@ -40,11 +40,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
     }
 
     @Override
-    public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getSortableList() {
+    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getSortableList() {
         return this.trades;
     }
 
-    public Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> getTrade(int row) {
+    public Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> getTrade(int row) {
         return this.trades.get(row).getB();
     }
 
@@ -70,11 +70,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<BigInteger, BigI
             return null;
         }
 
-        Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade = this.trades.get(row).getB();
+        Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = this.trades.get(row).getB();
         int type = 0;
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initatorOrder = null;
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> targetOrder = null;
 
         if (trade != null) {

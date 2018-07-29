@@ -40,7 +40,7 @@ public class Order implements Comparable<Order> {
 
     protected DCSet dcSet;
     protected long timestamp;
-    private BigInteger id;
+    private byte[] id;
     private Account creator;
     private long haveKey;
     private long wantKey;
@@ -50,7 +50,7 @@ public class Order implements Comparable<Order> {
     private BigDecimal price;
     private boolean isExecutable = true;
 
-    public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
+    public Order(byte[] id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
         this.id = id;
         this.creator = creator;
         this.haveKey = haveKey;
@@ -66,7 +66,7 @@ public class Order implements Comparable<Order> {
         this.timestamp = timestamp;
     }
 
-    public Order(BigInteger id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
+    public Order(byte[] id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
                  BigDecimal amountWant, BigDecimal fulfilledHave,
                  byte isExecutable, long timestamp) {
         this.id = id;
@@ -87,14 +87,14 @@ public class Order implements Comparable<Order> {
 
     //GETTERS/SETTERS
 
-    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, BigInteger key) {
+    public static Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, byte[] key) {
         if (db.getOrderMap().contains(key)) {
             return db.getOrderMap().get(key);
         }
 
         if (db.getCompletedOrderMap().contains(key)) {
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
             ///return OrderMap.setExecutable(order, false);
             return order;
@@ -131,23 +131,23 @@ public class Order implements Comparable<Order> {
         return result;
     }
 
-    public static BigDecimal calcAmountWantLeft(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public static BigDecimal calcAmountWantLeft(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         return order.b.b.subtract(order.b.c).multiply(order.a.e).setScale(order.c.b.scale(), RoundingMode.HALF_DOWN).stripTrailingZeros();
     }
 
     /*
-    public static boolean isGoodIncrement(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public static boolean isGoodIncrement(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order,
-                                          Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                                          Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                                                   Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target) {
         // return order.b.c.compareTo(target.a.e.scaleByPowerOfTen(-order.c.b.scale())) < 0;
         return true;
     }
     */
 
-    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, BigInteger orderID) {
+    public static Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, byte[] orderID) {
 
         return dcSet.getCompletedOrderMap().contains(orderID) ?
                 dcSet.getCompletedOrderMap().get(orderID) :
@@ -155,17 +155,17 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public static Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> toDBrec(Order order) {
-        return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        return new Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-                new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
+                new Tuple5<byte[], String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
                 new Tuple3<Long, BigDecimal, BigDecimal>(order.getHave(), order.getAmountHave(), order.getFulfilledHave()),
                 new Tuple2<Long, BigDecimal>(order.getWant(), order.getAmountWant()));
 
     }
 
-    public static Order fromDBrec(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public static Order fromDBrec(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         return new Order(order.a.a, new Account(order.a.b), order.b.a, order.c.a, order.b.b,
                 order.c.b, order.b.c,
@@ -177,12 +177,12 @@ public class Order implements Comparable<Order> {
         this.dcSet = dcSet;
     }
 
-    public BigInteger getId() {
+    public byte[] getId() {
         return this.id;
     }
 
     public void setId(byte[] id) {
-        this.id = new BigInteger(id);
+        this.id = id;
     }
 
     public Account getCreator() {
@@ -268,11 +268,11 @@ public class Order implements Comparable<Order> {
         return this.timestamp;
     }
 
-    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades() {
+    public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getInitiatedTrades() {
         return this.getInitiatedTrades(DCSet.getInstance());
     }
 
-    public List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getInitiatedTrades(DCSet db) {
+    public List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getInitiatedTrades(DCSet db) {
         return db.getTradeMap().getInitiatedTrades(this);
     }
 
@@ -294,7 +294,7 @@ public class Order implements Comparable<Order> {
 
 		//READ ID
 		byte[] idBytes = Arrays.copyOfRange(data, position, position + ID_LENGTH);
-		BigInteger id = new BigInteger(idBytes);
+		byte[] id = new byte[](idBytes);
 		position += ID_LENGTH;
 
 		//READ CREATOR
@@ -474,14 +474,14 @@ public class Order implements Comparable<Order> {
         BigDecimal thisIncrement;
         //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap()
                 .getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
 
         if (true && !orders.isEmpty()) {
             BigDecimal price = orders.get(0).a.e;
             Long timestamp = orders.get(0).a.c;
-            for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            for (Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>item: orders) {
                 if (!item.b.a.equals(this.wantKey)
                         || !item.c.a.equals(this.haveKey)) {
@@ -517,7 +517,7 @@ public class Order implements Comparable<Order> {
 
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
-            Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                     Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(index++);
             
             // for develop
@@ -536,12 +536,10 @@ public class Order implements Comparable<Order> {
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
 
-            if ( //(order.a.b.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                 //   (order.b.a == 1010 || order.c.a == 1010)
-                    order.a.a.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
-                    //&& !db.isFork()
-                    ) {
-                compare++;
+            if (Base58.encode(order.a.a)
+                    .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+                int error = 0;
+                error ++;
             }
 
             if (this.creator.equals(order.a.b)) {
@@ -634,7 +632,7 @@ public class Order implements Comparable<Order> {
         DCSet db = this.dcSet;
 
         //ORPHAN TRADES
-        for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade : this.getInitiatedTrades(db)) {
+        for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : this.getInitiatedTrades(db)) {
             Trade.fromDBrec(trade).orphan(db);
         }
 
@@ -706,6 +704,11 @@ public class Order implements Comparable<Order> {
 
         return 0;
 
+    }
+
+    @Override
+    public String toString() {
+        return Base58.encode(this.id);
     }
 
     //COPY

@@ -450,4 +450,12 @@ public abstract class DCMap<T, U> extends Observable {
 
         this.outUses();
     }
+
+    @Override
+    public String toString() {
+        if (this.parent == null)
+            return "DCmain";
+
+        return this.parent.toString() + ".parent";
+    }
 }

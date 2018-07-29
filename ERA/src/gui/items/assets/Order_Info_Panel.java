@@ -19,7 +19,7 @@ public class Order_Info_Panel extends JPanel {
     public GridBagConstraints labelGBC = new GridBagConstraints();
     public GridBagConstraints detailGBC = new GridBagConstraints();
 
-    public Order_Info_Panel(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public Order_Info_Panel(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderREC) {
 
         // LAYOUT

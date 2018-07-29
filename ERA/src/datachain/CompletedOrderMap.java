@@ -1,10 +1,12 @@
 package datachain;
 
+import core.crypto.Base58;
 import core.item.assets.Order;
 import database.DBMap;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -15,7 +17,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
         Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -44,14 +46,14 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
     }
 
     @Override
-    protected Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    protected Map<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    protected Map<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
@@ -59,11 +61,12 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
         return this.openMap(database);
     }
 
-    private Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    private Map<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> openMap(DB database) {
         //OPEN MAP
-        BTreeMap<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        BTreeMap<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> map = database.createTreeMap("completedorders")
+                .comparator(Fun.BYTE_ARRAY_COMPARATOR)
                 //.valueSerializer(new OrderSerializer())
                 .makeOrGet();
 
@@ -72,7 +75,7 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
     }
 
     @Override
-    protected Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    protected Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getDefaultValue() {
         return null;
     }
@@ -82,19 +85,25 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
         return this.observableData;
     }
 
-    public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public void add(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         // this order is NOT executable
         ////order = datachain.OrderMap.setExecutable(order, false);
+
+        if (Base58.encode(order.a.a)
+                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
 
         this.set(order.a.a, order);
     }
 
     /*
     @Override
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(BigInteger key) {
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(byte[] key) {
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
         ///return datachain.OrderMap.setExecutable(order, false);
         return order;
@@ -102,6 +111,13 @@ public class CompletedOrderMap extends DCMap<BigInteger, Tuple3<Tuple5<BigIntege
     */
 
     public void delete(Order order) {
+
+        if (Base58.encode(order.getId())
+                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
+
         this.delete(order.getId());
     }
 }

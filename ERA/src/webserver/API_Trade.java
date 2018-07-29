@@ -116,9 +116,9 @@ public class API_Trade {
 
         Map output = new LinkedHashMap();
 
-        List<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>> ordersHave = dcSet
+        List<Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>> ordersHave = dcSet
                 .getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        List<Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>> ordersWant = dcSet
+        List<Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>> ordersWant = dcSet
                 .getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
         Map sellsJSON = new LinkedHashMap();
@@ -133,7 +133,7 @@ public class API_Trade {
         // show SELLs in BACK order
         for (int i = ordersHave.size() - 1; i >= 0; i--) {
 
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
+            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
             sellJSON.put("price", order.a.e);
@@ -167,7 +167,7 @@ public class API_Trade {
         counter = 0;
         for (int i = ordersWant.size() - 1; i >= 0; i--) {
 
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
+            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
 
             Map buyJSON = new LinkedHashMap();
 
@@ -238,7 +238,7 @@ public class API_Trade {
 
         Map tradesJSON = new LinkedHashMap();
 
-        List<Fun.Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
+        List<Fun.Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
                 want);
 
         output.put("tradesCount", trades.size());
@@ -247,15 +247,15 @@ public class API_Trade {
         BigDecimal tradeHaveAmount = BigDecimal.ZERO;
 
         int i = 0;
-        for (Fun.Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Fun.Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
             if (i++ > limit) break;
 
             Map tradeJSON = new LinkedHashMap();
 
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> orderInitiator = Order
+            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> orderInitiator = Order
                     .getOrder(dcSet, trade.a);
 
-            Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> orderTarget = Order
+            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> orderTarget = Order
                     .getOrder(dcSet, trade.b);
 
             tradeJSON.put("amountHave", trade.c);

@@ -1164,6 +1164,12 @@ public abstract class Transaction {
     // public abstract void process(DBSet db);
     public void process(Block block, boolean asPack) {
 
+        if (Base58.encode(this.signature)
+                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
+
         this.block = block;
 
         if (!asPack) {
@@ -1198,6 +1204,12 @@ public abstract class Transaction {
     }
 
     public void orphan(boolean asPack) {
+
+        if (Base58.encode(this.signature)
+                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
 
         if (!asPack) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -1295,6 +1307,11 @@ public abstract class Transaction {
 
         // IF UNCONFIRMED
         return Controller.getInstance().getLastBlock().getNextBlockVersion(db);
+    }
+
+    @Override
+    public String toString() {
+        return Base58.encode(this.signature);
     }
 
 }

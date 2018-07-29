@@ -2529,12 +2529,12 @@ public class Controller extends Observable {
      * want) { return this.getOrders(have, want, true); }
      */
     
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(
+    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(
             AssetCls have, AssetCls want) {
         return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
     }
     
-    public SortableList<Tuple2<BigInteger, BigInteger>, Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> getTrades(
+    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(
             AssetCls have, AssetCls want) {
         return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
     }
@@ -2848,7 +2848,7 @@ public class Controller extends Observable {
         return cancelOrder(creator, order.getId(), feePow);
     }
     
-    public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+    public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, byte[] orderID, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createCancelOrderTransaction(creator, orderID, feePow);

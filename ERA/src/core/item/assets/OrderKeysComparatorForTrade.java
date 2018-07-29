@@ -18,15 +18,15 @@ import java.util.Map;
  *
  * @author icreator
  */
-public class OrderKeysComparatorForTrade implements Comparator<BigInteger> {
+public class OrderKeysComparatorForTrade implements Comparator<byte[]> {
 
     @Override
-    public int compare(BigInteger orderKey1, BigInteger orderKey2) {
+    public int compare(byte[] orderKey1, byte[] orderKey2) {
 
         OrderMap map = DCSet.getInstance().getOrderMap();
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1 = map.get(orderKey1);
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2 = map.get(orderKey2);
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1 = map.get(orderKey1);
+        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2 = map.get(orderKey2);
 
         int compare = order1.a.e.compareTo(order2.a.e);
         if (compare != 0)

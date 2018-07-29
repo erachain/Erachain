@@ -20,14 +20,14 @@ public class Trade {
     private static final int TIMESTAMP_LENGTH = 8;
     private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
 
-    private BigInteger initiator;
-    private BigInteger target;
+    private byte[] initiator;
+    private byte[] target;
     private BigDecimal amountHave;
     private BigDecimal amountWant;
     private long timestamp;
 
     // make trading if two orders is seeked
-    public Trade(BigInteger initiator, BigInteger target, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
+    public Trade(byte[] initiator, byte[] target, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
         this.initiator = initiator;
         this.target = target;
         this.amountHave = amountHave;
@@ -36,41 +36,41 @@ public class Trade {
     }
 
     //PARSE/CONVERT
-    public static Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> toDBrec(Trade trade) {
-        return new Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>(
+    public static Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> toDBrec(Trade trade) {
+        return new Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>(
                 trade.initiator, trade.target, trade.amountHave, trade.amountWant, trade.timestamp);
 
     }
 
-    public static Trade fromDBrec(Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade) {
+    public static Trade fromDBrec(Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade) {
         return new Trade(trade.a, trade.b, trade.c, trade.d, trade.e);
     }
 
     public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
+        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
 
         List<Trade> trades = new ArrayList<Trade>();
-        for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> item : list) {
+        for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> item : list) {
             trades.add(Trade.fromDBrec(item));
         }
 
         return trades;
     }
 
-    public BigInteger getInitiator() {
+    public byte[] getInitiator() {
         return this.initiator;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getInitiatorOrder(DCSet db) {
         return Order.getOrder(db, this.initiator);
     }
 
-    public BigInteger getTarget() {
+    public byte[] getTarget() {
         return this.target;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getTargetOrder(DCSet db) {
         return Order.getOrder(db, this.target);
     }
@@ -100,22 +100,22 @@ public class Trade {
 
 		//READ INITIATOR
 		byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		BigInteger initiator = new BigInteger(initiatorBytes);
+		byte[] initiator = new byte[](initiatorBytes);
 		position += ORDER_LENGTH;
 
 		//READ TARGET
 		byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		BigInteger target = new BigInteger(targetBytes);
+		byte[] target = new byte[](targetBytes);
 		position += ORDER_LENGTH;
 
 		//READ AMOUNT HAVE
 		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amountHave = new BigDecimal(new byte[](amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		//READ AMOUNT WANT
 		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amountWant = new BigDecimal(new byte[](amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		//READ TIMESTAMP
