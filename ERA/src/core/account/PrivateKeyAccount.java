@@ -9,6 +9,7 @@ import java.util.Arrays;
 public class PrivateKeyAccount extends PublicKeyAccount {
 
     private byte[] seed;
+    private Pair<byte[], byte[]> keyPair;
 
     public PrivateKeyAccount(byte[] seed) {
         super(Crypto.getInstance().createKeyPair(seed));
@@ -17,7 +18,7 @@ public class PrivateKeyAccount extends PublicKeyAccount {
         //this.publicKey = keyPair.getB();
         //this.address = Crypto.getInstance().getAddress(this.publicKey);
         //this.bytes = Base58.decode(address);
-        //this.shortBytes = Arrays.copyOfRange(this.bytes, 1, this.bytes.length - 5);
+        //this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
     }
 
     public byte[] getSeed() {
