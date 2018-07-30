@@ -1,10 +1,10 @@
-package test.records;
+package transactions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
+//import java.math.Long;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -45,8 +45,8 @@ public class OrderTestsMy {
     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balanceB;
     DCSet db;
     GenesisBlock gb;
-    Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>> orderREC;
-    Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> tradeREC;
+    Order orderREC;
+    Tuple5<Long, Long, BigDecimal, BigDecimal, Long> tradeREC;
     // CREATE KNOWN ACCOUNT
     PrivateKeyAccount accountA;
     PrivateKeyAccount accountB;
@@ -76,22 +76,22 @@ public class OrderTestsMy {
     Order order_BA_6;
     Order order_BA_7;
     Order order_BA_8;
-    BigInteger order_AB_1_ID;
-    BigInteger order_AB_2_ID;
-    BigInteger order_AB_3_ID;
-    BigInteger order_AB_4_ID;
-    BigInteger order_AB_5_ID;
-    BigInteger order_AB_6_ID;
-    BigInteger order_AB_7_ID;
-    BigInteger order_AB_8_ID;
-    BigInteger order_BA_1_ID;
-    BigInteger order_BA_2_ID;
-    BigInteger order_BA_3_ID;
-    BigInteger order_BA_4_ID;
-    BigInteger order_BA_5_ID;
-    BigInteger order_BA_6_ID;
-    BigInteger order_BA_7_ID;
-    BigInteger order_BA_8_ID;
+    Long order_AB_1_ID;
+    Long order_AB_2_ID;
+    Long order_AB_3_ID;
+    Long order_AB_4_ID;
+    Long order_AB_5_ID;
+    Long order_AB_6_ID;
+    Long order_AB_7_ID;
+    Long order_AB_8_ID;
+    Long order_BA_1_ID;
+    Long order_BA_2_ID;
+    Long order_BA_3_ID;
+    Long order_BA_4_ID;
+    Long order_BA_5_ID;
+    Long order_BA_6_ID;
+    Long order_BA_7_ID;
+    Long order_BA_8_ID;
     BigDecimal trade_1_amoA;
     BigDecimal trade_1_amoB;
     BigDecimal trade_2_amoA;
@@ -159,7 +159,7 @@ public class OrderTestsMy {
     }
 
     // reload from DB
-    private Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(
+    private Order reloadOrder(
             Order order) {
 
         return db.getCompletedOrderMap().contains(order.getId()) ? db.getCompletedOrderMap().get(order.getId())
@@ -478,6 +478,69 @@ public class OrderTestsMy {
     }
 
     @Test
+    public void parseCreateOrderTransaction1() {
+
+        byte[] seed = Crypto.getInstance().digest("test_A".getBytes());
+        byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+        accountA = new PrivateKeyAccount(privateKey);
+
+        BigDecimal amountHave = new BigDecimal("123.456");
+        BigDecimal amountWant = new BigDecimal("12.456");
+
+        Order order = new Order(Transaction.makeDBRef(12, 3), this.accountA, 12L, 13L,
+                amountHave, amountWant,
+                123456l);
+
+
+        // CONVERT TO BYTES
+        //// orderCreation.makeOrder().setExecutable(false);
+        byte[] rawOrder = order.toBytes();
+        assertEquals(rawOrder.length, order.getDataLength());
+
+        Order parsedOrder = null;
+        try {
+            // PARSE FROM BYTES
+            parsedOrder = Order.parse(rawOrder);
+        } catch (Exception e) {
+            fail("Exception while parsing transaction. " + e);
+        }
+
+        // CHECK SIGNATURE
+        assertEquals(true, order.getCreator().equals(parsedOrder.getCreator()));
+
+        // CHECK HAVE
+        assertEquals(order.getHave(), parsedOrder.getHave());
+
+        // CHECK WANT
+        assertEquals(order.getWant(), parsedOrder.getWant());
+
+        // CHECK AMOUNT
+        assertEquals(0, order.getAmountHave().compareTo(parsedOrder.getAmountHave()));
+
+        // CHECK PRICE
+        assertEquals(0, order.getAmountWant().compareTo(parsedOrder.getAmountWant()));
+
+        // CHECK FEE
+        assertEquals(true, order.getPrice().compareTo(parsedOrder.getPrice())==0);
+
+        // CHECK TIMESTAMP
+        assertEquals(order.getTimestamp(), parsedOrder.getTimestamp());
+
+        // PARSE TRANSACTION FROM WRONG BYTES
+        rawOrder = new byte[order.getDataLength()];
+
+        try {
+            // PARSE FROM BYTES
+            Order.parse(rawOrder);
+
+            // FAIL
+            fail("this should throw an exception");
+        } catch (Exception e) {
+            // EXCEPTION IS THROWN OK
+        }
+    }
+
+    @Test
     public void parseCreateOrderTransaction() {
 
         init();
@@ -545,7 +608,7 @@ public class OrderTestsMy {
 
         //////////////////////////////////
         /////////// TRADE PARSE //////////
-        Trade tradeParse = new Trade(BigInteger.TEN, BigInteger.ONE,
+        Trade tradeParse = new Trade(this.order_AB_1.getId(), this.order_AB_2.getId(),
                 BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
                 BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1), timestamp);
         /*
@@ -557,13 +620,10 @@ public class OrderTestsMy {
          * } Assert.assertEquals(tradeParse_1.getTimestamp(),
          * tradeParse.getTimestamp());
          */
-
-        tradeREC = Trade.toDBrec(tradeParse);
-        Trade tradeParse_1 = Trade.fromDBrec(tradeREC);
-
-        Assert.assertEquals(tradeParse_1.getTimestamp(), tradeParse.getTimestamp());
-        Assert.assertEquals(tradeParse_1.getAmountHave(), tradeParse.getAmountHave());
-        Assert.assertEquals(tradeParse_1.getAmountWant(), tradeParse.getAmountWant());
+        
+        Assert.assertEquals(tradeParse.getTimestamp(), tradeParse.getTimestamp());
+        Assert.assertEquals(tradeParse.getAmountHave(), tradeParse.getAmountHave());
+        Assert.assertEquals(tradeParse.getAmountWant(), tradeParse.getAmountWant());
 
     }
 
@@ -626,7 +686,7 @@ public class OrderTestsMy {
         order_BA_1_ID = order_BA_1.getId();
 
         // RELOAD new VALUES (amountLeft)
-        order_AB_2 = Order.fromDBrec(reloadOrder(order_AB_2));
+        order_AB_2 = reloadOrder(order_AB_2);
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(45600)); // BALANCE
@@ -655,17 +715,17 @@ public class OrderTestsMy {
 
         // CHECK ORDERS
         // order AB_1 is left from market cap
-        Order order_AB_1_tmp = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
+        Order order_AB_1_tmp = db.getCompletedOrderMap().get(order_AB_1_ID);
         Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1_tmp.getId()));
         Assert.assertEquals(false, db.getOrderMap().contains(order_BA_1_ID));
         Assert.assertEquals(0, order_AB_1_tmp.getFulfilledHave().compareTo(order_AB_1.getAmountHave()));
-        order_BA_1 = Order.fromDBrec(Order.reloadOrder(db, order_BA_1.getId()));
+        order_BA_1 = Order.reloadOrder(db, order_BA_1.getId());
         assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(120));
         Assert.assertEquals(true, order_AB_1_tmp.isFulfilled());
         Assert.assertEquals(true, order_BA_1.isFulfilled());
 
         // order AB_2 is still in market cap
-        Order order_AB_2_tmp = Order.fromDBrec(db.getOrderMap().get(order_AB_2_ID));
+        Order order_AB_2_tmp = db.getOrderMap().get(order_AB_2_ID);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_AB_2_tmp.getId()));
         Assert.assertEquals(order_AB_2_tmp.getFulfilledHave(), BigDecimal.valueOf(20).divide(order_AB_2_tmp.getPrice(),
                 BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_HALF_UP));
@@ -724,10 +784,10 @@ public class OrderTestsMy {
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
-        order_BA_2 = Order.fromDBrec(reloadOrder(orderCreation.makeOrder()));
+        order_BA_2 = reloadOrder(orderCreation.makeOrder());
         order_BA_2_ID = order_BA_2.getId();
 
-        order_AB_2 = Order.fromDBrec(reloadOrder(order_AB_2));
+        order_AB_2 = reloadOrder(order_AB_2);
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), bal_A_keyA); // BALANCE
@@ -768,10 +828,10 @@ public class OrderTestsMy {
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
-        order_AB_8 = Order.fromDBrec(reloadOrder(orderCreation.makeOrder()));
+        order_AB_8 = reloadOrder(orderCreation.makeOrder());
         order_AB_8_ID = order_AB_8.getId();
 
-        order_BA_2 = Order.fromDBrec(reloadOrder(order_BA_2));
+        order_BA_2 = reloadOrder(order_BA_2);
 
         trade_1_amoA = order_AB_8.getAmountHaveLeft();
         trade_1_amoB = order_BA_2.getAmountHaveLeft();
@@ -842,7 +902,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
 
-        BigInteger order_AB_1_ID = orderCreation.makeOrder().getId();
+        Long order_AB_1_ID = orderCreation.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 4995 B FOR A AT A PRICE OF 0.05))
         // GENERATES TRADE 100 B FOR 1000 A
@@ -851,7 +911,7 @@ public class OrderTestsMy {
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
-        BigInteger order_BA_1_ID = orderCreation.makeOrder().getId();
+        Long order_BA_1_ID = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49900)); // BALANCE
@@ -876,12 +936,12 @@ public class OrderTestsMy {
                                                                                         // B
 
         // CHECK ORDERS
-        Order order_AB_1 = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
+        Order order_AB_1 = db.getCompletedOrderMap().get(order_AB_1_ID);
         Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1.getId()));
         Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
         Assert.assertEquals(true, order_AB_1.isFulfilled());
 
-        Order order_BA_1 = Order.fromDBrec(db.getOrderMap().get(order_BA_1_ID));
+        Order order_BA_1 = db.getOrderMap().get(order_BA_1_ID);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_BA_1.getId()));
         Assert.assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(1000));
         // if order is not fulfiller - recalc getFulfilledWant by own price:
@@ -911,8 +971,8 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
         Order order_BA_2 = orderCreation.makeOrder();
-        BigInteger order_AB_2_ID = order_BA_2.getId();
-        order_BA_2 = Order.fromDBrec(reloadOrder(order_BA_2));
+        Long order_AB_2_ID = order_BA_2.getId();
+        order_BA_2 = reloadOrder(order_BA_2);
 
         /////// BigDecimal haveTaked =
         /////// amoHave.multiply(order_BA_1.getPriceCalcReverse()).setScale(8,
@@ -942,17 +1002,17 @@ public class OrderTestsMy {
                                                                                         // B
 
         // CHECK ORDERS
-        order_AB_1 = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
+        order_AB_1 = db.getCompletedOrderMap().get(order_AB_1_ID);
         Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1.getId()));
         Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
         Assert.assertEquals(true, order_AB_1.isFulfilled());
 
-        order_BA_1 = Order.fromDBrec(db.getOrderMap().get(order_BA_1_ID));
+        order_BA_1 = db.getOrderMap().get(order_BA_1_ID);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_BA_1.getId()));
         Assert.assertEquals(order_BA_1.getFulfilledHave(), bal_A_keyB.add(order_BA_2_wantTaked));
         Assert.assertEquals(false, order_BA_1.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_2_ID));
+        Order orderC = db.getCompletedOrderMap().get(order_AB_2_ID);
         Assert.assertEquals(false, db.getOrderMap().contains(orderC.getId()));
         Assert.assertEquals(orderC.getFulfilledHave(), amoHave);
         Assert.assertEquals(true, orderC.isFulfilled());
@@ -1000,7 +1060,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 99.9 B FOR A AT A PRICE OF 5)
         // GENERATES TRADE 99,9 B FOR 495 A
@@ -1010,7 +1070,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, db).compareTo(BigDecimal.valueOf(49000))); // BALANCE
@@ -1035,12 +1095,12 @@ public class OrderTestsMy {
                                                                                         // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getOrderMap().get(orderID_A));
+        Order orderA = db.getOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(999)));
         Assert.assertEquals(false, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
+        Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(99.9)));
         Assert.assertEquals(true, orderB.isFulfilled());
@@ -1062,7 +1122,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_C = orderCreation.makeOrder().getId();
+        Long orderID_C = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, db).compareTo(BigDecimal.valueOf(48901))); // BALANCE
@@ -1087,17 +1147,17 @@ public class OrderTestsMy {
                                                                                                      // B
 
         // CHECK ORDERS
-        orderA = Order.fromDBrec(db.getOrderMap().get(orderID_A));
+        orderA = db.getOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(999)));
         Assert.assertEquals(false, orderA.isFulfilled());
 
-        orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
+        orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(99.9)));
         Assert.assertEquals(true, orderB.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getOrderMap().get(orderID_C));
+        Order orderC = db.getOrderMap().get(orderID_C);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
         Assert.assertEquals(0, orderC.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
         Assert.assertEquals(false, orderC.isFulfilled());
@@ -1140,7 +1200,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 200 B FOR PRICE OF 5)
         // GENERATES TRADE 100 B FOR 1000 A
@@ -1150,7 +1210,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, db).compareTo(BigDecimal.valueOf(49000))); // BALANCE
@@ -1175,12 +1235,12 @@ public class OrderTestsMy {
                                                                                                       // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1000)));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        Order orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(100)));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -1203,7 +1263,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_C = orderCreation.makeOrder().getId();
+        Long orderID_C = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(48904.1)); // BALANCE
@@ -1228,17 +1288,17 @@ public class OrderTestsMy {
                                                                                            // B
 
         // CHECK ORDERS
-        orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1000)));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(119.18).setScale(assetB.getScale()));
         Assert.assertEquals(false, orderB.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_C));
+        Order orderC = db.getCompletedOrderMap().get(orderID_C);
         Assert.assertEquals(false, db.getOrderMap().contains(orderC.getId()));
         Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(95.9));
         Assert.assertEquals(true, orderC.isFulfilled());
@@ -1288,7 +1348,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CREATE ORDER _A SELL 1A for 15000 = 15000
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1),
@@ -1297,7 +1357,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         // CREATE ORDER _C SELL 4A x 25000 = 100000
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(4),
@@ -1306,7 +1366,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_C = orderCreation.makeOrder().getId();
+        Long orderID_C = orderCreation.makeOrder().getId();
 
         // CREATE ORDER _D (BUY) 30000 x 2 = 60000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(60000),
@@ -1315,7 +1375,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_D = orderCreation.makeOrder().getId();
+        Long orderID_D = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); // BALANCE
@@ -1341,26 +1401,26 @@ public class OrderTestsMy {
                                                                                         // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1)));
         Assert.assertEquals(0, orderA.getFulfilledWant().compareTo(BigDecimal.valueOf(15000)));
         Assert.assertEquals(true, orderA.isFulfilled());
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
+        Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
         Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
         Assert.assertEquals(true, orderB.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getOrderMap().get(orderID_C));
+        Order orderC = db.getOrderMap().get(orderID_C);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
         Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2));
         Assert.assertEquals(false, orderC.isFulfilled());
 
         // buy order
-        Order orderD = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_D));
+        Order orderD = db.getCompletedOrderMap().get(orderID_D);
         Assert.assertEquals(false, db.getOrderMap().contains(orderD.getId()));
         Assert.assertEquals(orderD.getFulfilledHave(), BigDecimal.valueOf(60000));
         /// calc wrong Assert.assertEquals(orderD.getFulfilledWant(),
@@ -1398,7 +1458,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_E = orderCreation.makeOrder().getId();
+        Long orderID_E = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); // BALANCE
@@ -1425,7 +1485,7 @@ public class OrderTestsMy {
 
         // CHECK ORDERS
         /// order auto canceled
-        Order orderE = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_E));
+        Order orderE = db.getCompletedOrderMap().get(orderID_E);
         Assert.assertEquals(false, db.getOrderMap().contains(orderE.getId()));
         // 6000 returned by auto-cancel
         Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(56000));
@@ -1436,7 +1496,7 @@ public class OrderTestsMy {
 
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         // reload order_B
-        orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderB.getId()));
+        orderB = db.getCompletedOrderMap().get(orderB.getId());
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
         Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000));
         Assert.assertEquals(true, orderB.isFulfilled());
@@ -1496,7 +1556,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         // CREATE ORDER _B SELL 2A x 20000 = 40000
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(2),
@@ -1505,7 +1565,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CREATE ORDER _C SELL 4A x 25000 = 100000
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(4),
@@ -1514,7 +1574,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_C = orderCreation.makeOrder().getId();
+        Long orderID_C = orderCreation.makeOrder().getId();
 
         // CREATE ORDER _D (BUY) 30000 x 2 = 60000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(60003),
@@ -1523,7 +1583,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_D = orderCreation.makeOrder().getId();
+        Long orderID_D = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); // BALANCE
@@ -1548,26 +1608,26 @@ public class OrderTestsMy {
                                                                                               // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(1));
         Assert.assertEquals(orderA.getFulfilledWant(), BigDecimal.valueOf(15000.88));
         Assert.assertEquals(true, orderA.isFulfilled());
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
+        Order orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
         Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
         Assert.assertEquals(true, orderB.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getOrderMap().get(orderID_C));
+        Order orderC = db.getOrderMap().get(orderID_C);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
         Assert.assertEquals(orderC.getFulfilledHave(), BigDecimal.valueOf(0.2000576));
         Assert.assertEquals(false, orderC.isFulfilled());
 
         // buy order
-        Order orderD = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_D));
+        Order orderD = db.getCompletedOrderMap().get(orderID_D);
         Assert.assertEquals(false, db.getOrderMap().contains(orderD.getId()));
         Assert.assertEquals(orderD.getFulfilledHave(), BigDecimal.valueOf(60003));
         // Assert.assertEquals(orderD.getFulfilledWant(),
@@ -1602,7 +1662,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_E = orderCreation.makeOrder().getId();
+        Long orderID_E = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(93)); // BALANCE
@@ -1628,7 +1688,7 @@ public class OrderTestsMy {
 
         // CHECK ORDERS
         /// order in memory !!!
-        Order orderE = Order.fromDBrec(db.getOrderMap().get(orderID_E));
+        Order orderE = db.getOrderMap().get(orderID_E);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderE.getId()));
         Assert.assertEquals(orderE.getFulfilledHave(), BigDecimal.valueOf(20000.165));
         Assert.assertEquals(0, orderE.getFulfilledWant().compareTo(BigDecimal.valueOf(1)));
@@ -1637,7 +1697,7 @@ public class OrderTestsMy {
 
         Assert.assertEquals(false, db.getOrderMap().contains(orderB.getId()));
         // reload order_B
-        orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderB.getId()));
+        orderB = db.getCompletedOrderMap().get(orderB.getId());
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(2));
         Assert.assertEquals(orderB.getFulfilledWant(), BigDecimal.valueOf(40000.33));
         Assert.assertEquals(true, orderB.isFulfilled());
@@ -1651,7 +1711,7 @@ public class OrderTestsMy {
         Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
         Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165));
         
-        Order order_123 = Order.fromDBrec(db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).get(0));
+        Order order_123 = db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).get(0);
         assertEquals(1, db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).size());
         assertEquals(BigDecimal.valueOf(23000), order_123.getPrice());
         assertEquals(BigDecimal.valueOf(25999.835), order_123.getAmountHaveLeft());
@@ -1852,7 +1912,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 1000 B FOR A AT A PRICE OF 5)
         // GENERATES TRADE 100 B FOR 1000 A
@@ -1864,7 +1924,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49000).setScale(assetA.getScale())); // BALANCE
@@ -1889,12 +1949,12 @@ public class OrderTestsMy {
                                                                                                                      // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1000)));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        Order orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(100)));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -1917,7 +1977,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_C = orderCreation.makeOrder().getId();
+        Long orderID_C = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         // THIS ORDER must not be RESOLVED
@@ -1943,17 +2003,17 @@ public class OrderTestsMy {
                                                                                                               // B
 
         // CHECK ORDERS
-        orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1000)));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(100)));
         Assert.assertEquals(false, orderB.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getOrderMap().get(orderID_C));
+        Order orderC = db.getOrderMap().get(orderID_C);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderC.getId()));
         Assert.assertEquals(0, orderC.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
         Assert.assertEquals(false, orderC.isFulfilled());
@@ -1973,7 +2033,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_D = orderCreation.makeOrder().getId();
+        Long orderID_D = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         // THIS ORDER must not be RESOLVED
@@ -1999,17 +2059,17 @@ public class OrderTestsMy {
                                                                                                               // B
 
         // CHECK ORDERS
-        orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1000)));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        orderB = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_B));
+        orderB = db.getCompletedOrderMap().get(orderID_B);
         Assert.assertEquals(true, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(1, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(104)));
         Assert.assertEquals(true, orderB.isFulfilled());
 
-        Order orderD = Order.fromDBrec(db.getOrderMap().get(orderID_D));
+        Order orderD = db.getOrderMap().get(orderID_D);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderD.getId()));
         Assert.assertEquals(1, orderD.getFulfilledHave().compareTo(BigDecimal.valueOf(24)));
         Assert.assertEquals(false, orderD.isFulfilled());
@@ -2060,7 +2120,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 1000 B FOR A AT A PRICE OF 5)
         // GENERATES TRADE 100 B FOR 1000 A
@@ -2071,7 +2131,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49900).setScale(assetA.getScale())); // BALANCE
@@ -2096,12 +2156,12 @@ public class OrderTestsMy {
                                                                                                                     // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(100));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        Order orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(10));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -2152,7 +2212,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = orderCreation.makeOrder().getId();
+        Long orderID_A = orderCreation.makeOrder().getId();
 
         BigDecimal amoA2 = BigDecimal.valueOf(10).setScale(assetA.getScale());
         BigDecimal amoB2 = BigDecimal.valueOf(0.38).setScale(assetB.getScale());
@@ -2163,7 +2223,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49000).setScale(assetA.getScale())); // BALANCE
@@ -2188,12 +2248,12 @@ public class OrderTestsMy {
                                                                                                                     // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        Order orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(100));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        Order orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(10));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -2247,7 +2307,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_A = new BigInteger(orderCreation.getSignature());
+        Long orderID_A = Transaction.makeDBRef(orderCreation.getHeightSeqNo());
 
         // CREATE ORDER TWO (SELLING 1000 B FOR A AT A PRICE OF 5)
         // GENERATES TRADE 100 B FOR 1000 A
@@ -2260,7 +2320,7 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
-        BigInteger orderID_B = orderCreation.makeOrder().getId();
+        Long orderID_B = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(accountA.getBalanceUSE(keyA, db), BigDecimal.valueOf(49900).setScale(assetA.getScale())); // BALANCE
@@ -2285,12 +2345,12 @@ public class OrderTestsMy {
                                                                                                                     // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getOrderMap().get(orderID_A));
+        Order orderA = db.getOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
         Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(100));
         Assert.assertEquals(false, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        Order orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(10));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -2342,7 +2402,7 @@ public class OrderTestsMy {
         createOrderTransaction.sign(accountA, false);
         createOrderTransaction.setDC(db, false);
         createOrderTransaction.process(null, false);
-        BigInteger orderID_A = createOrderTransaction.makeOrder().getId();
+        Long orderID_A = createOrderTransaction.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
         createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
@@ -2351,7 +2411,7 @@ public class OrderTestsMy {
         createOrderTransaction.sign(accountA, false);
         createOrderTransaction.setDC(db, false);
         createOrderTransaction.process(null, false);
-        BigInteger orderID_B = createOrderTransaction.makeOrder().getId();
+        Long orderID_B = createOrderTransaction.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, db).compareTo(BigDecimal.valueOf(48000))); // BALANCE
@@ -2376,12 +2436,12 @@ public class OrderTestsMy {
                                                                                                    // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(db.getOrderMap().get(orderID_A));
+        Order orderA = db.getOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
         Assert.assertEquals(false, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        Order orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -2396,7 +2456,7 @@ public class OrderTestsMy {
         createOrderTransaction.sign(accountA, false);
         createOrderTransaction.setDC(db, false);
         createOrderTransaction.process(null, false);
-        BigInteger orderID_C = createOrderTransaction.makeOrder().getId();
+        Long orderID_C = createOrderTransaction.makeOrder().getId();
 
         // CHECK BALANCES
         Assert.assertEquals(0, accountA.getBalanceUSE(keyA, db).compareTo(BigDecimal.valueOf(48000))); // BALANCE
@@ -2421,17 +2481,17 @@ public class OrderTestsMy {
                                                                                                       // B
 
         // CHECK ORDERS
-        orderA = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_A));
+        orderA = db.getCompletedOrderMap().get(orderID_A);
         Assert.assertEquals(false, db.getOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(1000)));
         Assert.assertEquals(true, orderA.isFulfilled());
 
-        orderB = Order.fromDBrec(db.getOrderMap().get(orderID_B));
+        orderB = db.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(orderB.getId()));
         Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(250)));
         Assert.assertEquals(false, orderB.isFulfilled());
 
-        Order orderC = Order.fromDBrec(db.getCompletedOrderMap().get(orderID_C));
+        Order orderC = db.getCompletedOrderMap().get(orderID_C);
         Assert.assertEquals(false, db.getOrderMap().contains(orderC.getId()));
         Assert.assertEquals(0, orderC.getFulfilledHave().compareTo(BigDecimal.valueOf(150)));
         Assert.assertEquals(true, orderC.isFulfilled());
@@ -2494,7 +2554,7 @@ public class OrderTestsMy {
         createOrderTransaction.sign(accountA, false);
         createOrderTransaction.setDC(db, false);
         createOrderTransaction.process(null, false);
-        BigInteger orderID_A = createOrderTransaction.makeOrder().getId();
+        Long orderID_A = createOrderTransaction.makeOrder().getId();
 
         // CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
         DCSet fork2 = fork1.fork();
@@ -2503,7 +2563,7 @@ public class OrderTestsMy {
         createOrderTransaction.sign(accountA, false);
         createOrderTransaction.setDC(db, false);
         createOrderTransaction.process(null, false);
-        BigInteger orderID_B = createOrderTransaction.makeOrder().getId();
+        Long orderID_B = createOrderTransaction.makeOrder().getId();
 
         // CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
         DCSet fork3 = fork2.fork();
@@ -2512,7 +2572,7 @@ public class OrderTestsMy {
         createOrderTransaction.sign(accountB, false);
         createOrderTransaction.setDC(db, false);
         createOrderTransaction.process(null, false);
-        BigInteger orderID_C = createOrderTransaction.makeOrder().getId();
+        Long orderID_C = createOrderTransaction.makeOrder().getId();
 
         // ORPHAN ORDER THREE
         createOrderTransaction.orphan(false);
@@ -2540,12 +2600,12 @@ public class OrderTestsMy {
                                                                                                       // B
 
         // CHECK ORDERS
-        Order orderA = Order.fromDBrec(fork3.getOrderMap().get(orderID_A));
+        Order orderA = fork3.getOrderMap().get(orderID_A);
         Assert.assertEquals(false, fork3.getCompletedOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
         Assert.assertEquals(false, orderA.isFulfilled());
 
-        Order orderB = Order.fromDBrec(fork3.getOrderMap().get(orderID_B));
+        Order orderB = fork3.getOrderMap().get(orderID_B);
         Assert.assertEquals(false, fork3.getCompletedOrderMap().contains(orderB.getId()));
         assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(0));
         Assert.assertEquals(false, orderB.isFulfilled());
@@ -2582,7 +2642,7 @@ public class OrderTestsMy {
                                                                                                       // B
 
         // CHECK ORDERS
-        orderA = Order.fromDBrec(fork2.getOrderMap().get(orderID_A));
+        orderA = fork2.getOrderMap().get(orderID_A);
         Assert.assertEquals(false, fork2.getCompletedOrderMap().contains(orderA.getId()));
         Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
         Assert.assertEquals(false, orderA.isFulfilled());
@@ -2599,14 +2659,14 @@ public class OrderTestsMy {
         init();
 
         // CREATE ORDER CANCEL
-        Transaction cancelOrderTransaction = new CancelOrderTransaction(accountA, BigInteger.TEN, FEE_POWER, timestamp,
+        Transaction cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[64], FEE_POWER, timestamp,
                 0l);
         cancelOrderTransaction.sign(accountA, false);
         // CHECK IF ORDER CANCEL IS VALID
         assertEquals(true, cancelOrderTransaction.isSignatureValid(db));
 
         // INVALID SIGNATURE
-        cancelOrderTransaction = new CancelOrderTransaction(accountA, BigInteger.TEN, FEE_POWER, timestamp, 0l,
+        cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[64], FEE_POWER, timestamp, 0l,
                 new byte[1]);
 
         // CHECK IF ORDER CANCEL
@@ -2622,17 +2682,17 @@ public class OrderTestsMy {
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
-        BigInteger orderID = orderCreation.makeOrder().getId();
+        Long orderID = orderCreation.makeOrder().getId();
 
         // CREATE CANCEL ORDER
         // Long time = maker.getLastReference(db);
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER,
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER,
                 timestamp++, 0l);
 
         // CHECK IF CANCEL ORDER IS VALID
         assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(releaserReference, flags));
 
-        cancelOrderTransaction = new CancelOrderTransaction(accountA, new BigInteger(new byte[] { 5, 7 }), FEE_POWER,
+        cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[] { 5, 7 }, FEE_POWER,
                 timestamp++, 0l);
 
         // CHECK IF CANCEL ORDER IS INVALID
@@ -2642,7 +2702,7 @@ public class OrderTestsMy {
         byte[] seed = Crypto.getInstance().digest("invalid".getBytes());
         byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
         PrivateKeyAccount invalidCreator = new PrivateKeyAccount(privateKey);
-        cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, orderID, FEE_POWER, timestamp++, 0l,
+        cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l,
                 new byte[] { 1, 2 });
 
         // CHECK IF CANCEL ORDER IS INVALID
@@ -2650,7 +2710,7 @@ public class OrderTestsMy {
 
         // CREATE INVALID CANCEL ORDER NO BALANCE
         DCSet fork = db.fork();
-        cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER, timestamp++, 0l,
+        cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l,
                 new byte[] { 1, 2 });
         accountA.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false);
 
@@ -2658,7 +2718,7 @@ public class OrderTestsMy {
         assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(releaserReference, flags));
 
         // CREATE CANCEL ORDER INVALID REFERENCE
-        cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER, timestamp++, -123L,
+        cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, -123L,
                 new byte[] { 1, 2 });
 
         // CHECK IF NAME REGISTRATION IS INVALID
@@ -2675,10 +2735,10 @@ public class OrderTestsMy {
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
-        BigInteger orderID = orderCreation.makeOrder().getId();
+        Long orderID = orderCreation.makeOrder().getId();
 
         // CREATE CANCEL ORDER
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER,
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER,
                 timestamp++, 0l);
         cancelOrderTransaction.sign(accountA, false);
 
@@ -2745,13 +2805,13 @@ public class OrderTestsMy {
         orderCreation.sign(accountA, false);
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
-        BigInteger orderID = orderCreation.makeOrder().getId();
+        Long orderID = orderCreation.makeOrder().getId();
 
         assertEquals(BigDecimal.valueOf(assetA.getQuantity()).subtract(orderCreation.makeOrder().getAmountHave()),
                 accountA.getBalanceUSE(keyA, db));
 
         // CREATE CANCEL ORDER
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderID, FEE_POWER,
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER,
                 timestamp++, 0l);
         cancelOrderTransaction.sign(accountA, false);
 
@@ -2766,7 +2826,7 @@ public class OrderTestsMy {
         assertEquals(cancelOrderTransaction.getTimestamp(), orderCreation.getCreator().getLastTimestamp(db));
 
         // CHECK ORDER EXISTS
-        assertEquals(false, db.getOrderMap().contains(new BigInteger(new byte[] { 5, 6 })));
+        assertEquals(false, db.getOrderMap().contains(123L));
 
         ////////// OPHRAN ////////////////
         // CHECK BALANCE SENDER
@@ -2803,12 +2863,12 @@ public class OrderTestsMy {
         order_AB_1_ID = orderCreation.makeOrder().getId();
         
         // CHECK ORDERS
-        Order order_AB_1 = Order.fromDBrec(db.getCompletedOrderMap().get(order_AB_1_ID));
+        Order order_AB_1 = db.getCompletedOrderMap().get(order_AB_1_ID);
         Assert.assertEquals(false, db.getOrderMap().contains(order_AB_1.getId()));
         Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
         Assert.assertEquals(true, order_AB_1.isFulfilled());
 
-        Order order_BA_1 = Order.fromDBrec(db.getOrderMap().get(order_BA_1_ID));
+        Order order_BA_1 = db.getOrderMap().get(order_BA_1_ID);
         Assert.assertEquals(false, db.getCompletedOrderMap().contains(order_BA_1.getId()));
         Assert.assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(1000));
         // if order is not fulfiller - recalc getFulfilledWant by own price:
@@ -2838,8 +2898,8 @@ public class OrderTestsMy {
         orderCreation.setDC(db, false);
         orderCreation.process(null, false);
         Order order_BA_2 = orderCreation.makeOrder();
-        BigInteger order_AB_2_ID = order_BA_2.getId();
-        order_BA_2 = Order.fromDBrec(reloadOrder(order_BA_2));
+        Long order_AB_2_ID = order_BA_2.getId();
+        order_BA_2 = reloadOrder(order_BA_2);
 
         /////// BigDecimal haveTaked =
         /////// amoHave.multiply(order_BA_1.getPriceCalcReverse()).setScale(8,
@@ -2880,7 +2940,7 @@ public class OrderTestsMy {
         order_AB_3_ID = order_AB_3.getId();
         
         /// for delete in FORK
-        BigInteger deletedID = order_AB_3_ID;
+        Long deletedID = order_AB_3_ID;
 
         
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
@@ -2936,26 +2996,26 @@ public class OrderTestsMy {
         BigDecimal thisPrice;
         BigDecimal tempPrice;
 
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = fork
+        List<Order> orders = fork
                 .getOrderMap().getOrdersForTradeWithFork(wantKey, haveKey, false);
                 
         tempPrice = BigDecimal.ZERO;
         Long timestamp = 0L;
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order: orders) {
+        for (Order order: orders) {
 
-            Assert.assertEquals((long)order.b.a, wantKey);
-            Assert.assertEquals((long)order.c.a, haveKey);
+            Assert.assertEquals((long)order.getHave(), wantKey);
+            Assert.assertEquals((long)order.getWant(), haveKey);
 
-            String signB58 = Base58.encode(order.a.a);
+            //String signB58 = Base58.encode(order.a.a);
             
-            Assert.assertEquals(deletedID.equals(order.a.a), false);
+            Assert.assertEquals(deletedID.equals(order.getId()), false);
             
-            BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-            BigDecimal orderPrice = order.a.e;
+            BigDecimal orderReversePrice = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
+            BigDecimal orderPrice = order.getPrice();
 
-            Assert.assertEquals(Order.calcPrice(order.b.b, order.c.b).equals(orderPrice), true);
+            Assert.assertEquals(Order.calcPrice(order.getAmountHave(), order.getAmountWant()).equals(orderPrice), true);
 
-            String date = DateTimeFormat.timestamptoString(order.a.c);
+            String date = DateTimeFormat.timestamptoString(order.getTimestamp());
 
             compare = tempPrice.compareTo(orderPrice);
             Assert.assertEquals(compare <= 0, true);
@@ -2963,7 +3023,7 @@ public class OrderTestsMy {
                 // error
                 compare = index;
             } else if (compare == 0) {
-                compare = timestamp.compareTo(order.a.c);
+                compare = timestamp.compareTo(order.getTimestamp());
                 Assert.assertEquals(compare <= 0, true);
                 if (compare > 0) {
                     // error
@@ -2972,7 +3032,7 @@ public class OrderTestsMy {
             }
 
             tempPrice = orderPrice;
-            timestamp = order.a.c;
+            timestamp = order.getTimestamp();
             
         }
         
