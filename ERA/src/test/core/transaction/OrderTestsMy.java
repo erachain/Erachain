@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
+import core.account.Account;
 import core.transaction.*;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -483,6 +484,10 @@ public class OrderTestsMy {
         byte[] seed = Crypto.getInstance().digest("test_A".getBytes());
         byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
         accountA = new PrivateKeyAccount(privateKey);
+
+        String addr1 = accountA.getAddress();
+        Account accShort = Account.makeAccountFromShort(accountA.getShortAddressBytes());
+        String addr2 = accShort.getAddress();
 
         BigDecimal amountHave = new BigDecimal("123.456");
         BigDecimal amountWant = new BigDecimal("12.456");

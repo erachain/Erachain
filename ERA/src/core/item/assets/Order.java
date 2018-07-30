@@ -272,7 +272,7 @@ public class Order implements Comparable<Order> {
 	public static Order parse(byte[] data) throws Exception
 	{
 		//CHECK IF CORRECT LENGTH
-		if(data.length < BASE_LENGTH)
+		if(data.length != BASE_LENGTH)
 		{
 			throw new Exception("Data does not match order length");
 		}
