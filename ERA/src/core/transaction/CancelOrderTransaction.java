@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import core.item.assets.Order;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -125,11 +126,10 @@ public class CancelOrderTransaction extends Transaction {
         return new CancelOrderTransaction(typeBytes, creator, order, feePow, timestamp, reference, signatureBytes);
     }
 
-    public static void process_it(DCSet db, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public static void process_it(DCSet db, Order order) {
         if (false & !db.isFork() &&
-                (order.b.a == 1027l && order.c.a == 2l
-                        || order.c.a == 2l && order.c.a == 1027l)) {
+                (order.getHave() == 1027l && order.getWant() == 2l
+                        || order.getWant() == 2l && order.getHave() == 1027l)) {
             int ii = 123;
             ii++;
         }
@@ -137,27 +137,24 @@ public class CancelOrderTransaction extends Transaction {
         db.getCompletedOrderMap().add(order);
 
         //UPDATE BALANCE OF CREATOR
-        Account creator = new Account(order.a.b);
         //creator.setBalance(orderSignature.getHave(), creator.getBalance(db, orderSignature.getHave()).add(orderSignature.getAmountHaveLeft()), db);
-        creator.changeBalance(db, false, order.b.a, order.b.b.subtract(order.b.c), false);
+        order.getCreator().changeBalance(db, false, order.getHave(), order.getAmountHaveLeft(), false);
 
         //DELETE FROM DATABASE
-        db.getOrderMap().delete(order.a.a);
+        db.getOrderMap().delete(order.getId());
     }
 
     //PARSE CONVERT
 
-    public static void orphan_it(DCSet db, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public static void orphan_it(DCSet db, Order order) {
         db.getOrderMap().add(order);
 
         //REMOVE BALANCE OF CREATOR
-        Account creator = new Account(order.a.b);
         //creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).subtract(orderID.getAmountHaveLeft()), db);
-        creator.changeBalance(db, true, order.b.a, order.b.b.subtract(order.b.c), false);
+        order.getCreator().changeBalance(db, true, order.getHave(), order.getAmountHaveLeft(), false);
 
         //DELETE ORPHAN DATA
-        db.getCompletedOrderMap().delete(order.a.a);
+        db.getCompletedOrderMap().delete(order.getId());
     }
 
     public byte[] getorderSignature() {
@@ -181,7 +178,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //ADD CREATOR/ORDER
         transaction.put("creator", this.creator.getAddress());
-        transaction.put("orderID", Base58.encode(this.orderID));
+        transaction.put("orderID", this.orderID);
 
         return transaction;
     }
@@ -315,13 +312,13 @@ public class CancelOrderTransaction extends Transaction {
 
         assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
 
         if (this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
-            order = this.dcSet.getCompletedOrderMap().get(this.orderID);
+            order = this.dcSet.getCompletedOrderMap().get(this.getDBRef(this.height, this.getSeqNo(this.dcSet)));
         } else {
-            order = this.dcSet.getOrderMap().get(this.orderID);
+            order = this.dcSet.getOrderMap().get(this.getDBRef(this.height, this.getSeqNo(this.dcSet)));
         }
 
         assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.b.a, order.b.c);

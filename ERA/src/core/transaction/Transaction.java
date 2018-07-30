@@ -351,6 +351,7 @@ public abstract class Transaction {
     protected int height;
     protected int seqNo;
     protected Long dbRef; // height + SeqNo
+
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
     protected Long reference = 0l;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
@@ -773,10 +774,10 @@ public abstract class Transaction {
     }
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
-    public Long getDBRef() {
+    public static Long getDBRef(int height, int seqNo) {
 
-        byte[] ref = Ints.toByteArray(this.height);
-        return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(this.seqNo)));
+        byte[] ref = Ints.toByteArray(height);
+        return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seqNo)));
 
     }
 

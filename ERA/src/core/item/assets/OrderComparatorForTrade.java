@@ -13,20 +13,17 @@ import org.mapdb.Fun.Tuple5;
  *
  * @author icreator
  */
-public class OrderComparatorForTrade implements Comparator<Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
+public class OrderComparatorForTrade implements Comparator<Order> {
 
     @Override
-    public int compare(Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1,
-            Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2) {
-        
-        int compare = order1.a.e.compareTo(order2.a.e);
+    public int compare(Order order1, Order order2) {
+
+        int compare = order1.getPrice().compareTo(order2.getPrice());
         if (compare != 0)
             return compare;
 
-        return order1.a.c.compareTo(order2.a.c);
+        return Long.signum(order1.getTimestamp() - order2.getTimestamp());
+
     }
 
 }

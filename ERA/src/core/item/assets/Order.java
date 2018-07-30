@@ -4,9 +4,12 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -27,16 +30,17 @@ public class Order implements Comparable<Order> {
 
     final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
 
-    private static final int ID_LENGTH = Crypto.SIGNATURE_LENGTH;
-    private static final int CREATOR_LENGTH = 25;
+    private static final int ID_LENGTH = 8; //Crypto.SIGNATURE_LENGTH;
+    private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
-    private static final int AMOUNT_LENGTH = 12;
+    private static final int SCALE_LENGTH = 1;
+    private static final int AMOUNT_LENGTH = 8;
     private static final int FULFILLED_LENGTH = AMOUNT_LENGTH;
     private static final int TIMESTAMP_LENGTH = 8;
-    private static final int EXECUTABLE_LENGTH = 1;
+    //private static final int EXECUTABLE_LENGTH = 1;
     private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
-            + 2 * AMOUNT_LENGTH + 2 * FULFILLED_LENGTH + TIMESTAMP_LENGTH + EXECUTABLE_LENGTH;
+            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SCALE_LENGTH + FULFILLED_LENGTH + TIMESTAMP_LENGTH;
 
     protected DCSet dcSet;
     protected long timestamp;
@@ -48,7 +52,6 @@ public class Order implements Comparable<Order> {
     private BigDecimal fulfilledHave;
     private BigDecimal amountWant;
     private BigDecimal price;
-    private boolean isExecutable = true;
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
         this.id = id;
@@ -68,7 +71,7 @@ public class Order implements Comparable<Order> {
 
     public Order(Long id, Account creator, long haveKey, long wantKey, BigDecimal amountHave,
                  BigDecimal amountWant, BigDecimal fulfilledHave,
-                 byte isExecutable, long timestamp) {
+                 long timestamp) {
         this.id = id;
         this.creator = creator;
         this.haveKey = haveKey;
@@ -81,23 +84,18 @@ public class Order implements Comparable<Order> {
 
         this.price = calcPrice(amountHave, amountWant);
 
-        this.isExecutable = isExecutable == 1 ? true : false;
         this.timestamp = timestamp;
     }
 
     //GETTERS/SETTERS
 
-    public static Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(DCSet db, Long key) {
+    public static Order getOrder(DCSet db, Long key) {
         if (db.getOrderMap().contains(key)) {
             return db.getOrderMap().get(key);
         }
 
         if (db.getCompletedOrderMap().contains(key)) {
-            Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = db.getCompletedOrderMap().get(key);
-            ///return OrderMap.setExecutable(order, false);
-            return order;
+            return db.getCompletedOrderMap().get(key);
         }
 
         return null;
@@ -146,8 +144,7 @@ public class Order implements Comparable<Order> {
     }
     */
 
-    public static Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> reloadOrder(DCSet dcSet, Long orderID) {
+    public static Order reloadOrder(DCSet dcSet, Long orderID) {
 
         return dcSet.getCompletedOrderMap().contains(orderID) ?
                 dcSet.getCompletedOrderMap().get(orderID) :
@@ -155,8 +152,8 @@ public class Order implements Comparable<Order> {
 
     }
 
-    public static Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> toDBrec(Order order) {
+    /*
+    public static Order toDBrec(Order order) {
         return new Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
                 new Tuple5<Long, String, Long, Boolean, BigDecimal>(order.getId(), order.getCreator().getAddress(), order.getTimestamp(), order.isExecutable(), order.getPrice()),
@@ -172,6 +169,7 @@ public class Order implements Comparable<Order> {
                 (byte) (order.a.d ? 1 : 0), order.a.c);
 
     }
+    */
 
     public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
@@ -205,20 +203,12 @@ public class Order implements Comparable<Order> {
         return this.wantKey;
     }
 
-    public boolean isExecutable() {
-        return this.isExecutable;
-    }
-
-    public void setExecutable(boolean is) {
-        this.isExecutable = is;
-    }
-
     public AssetCls getWantAsset() {
         return this.getWantAsset(this.dcSet);
     }
 
     public AssetCls getWantAsset(DCSet db) {
-        return (AssetCls) db.getItemAssetMap().get(this.wantKey);
+        return db.getItemAssetMap().get(this.wantKey);
     }
 
     ///////////////////////// AMOUNTS
@@ -278,7 +268,6 @@ public class Order implements Comparable<Order> {
 
     //PARSE/CONVERT
 
-	/*
 	// forDB - use fulFill
 	public static Order parse(byte[] data) throws Exception
 	{
@@ -294,12 +283,12 @@ public class Order implements Comparable<Order> {
 
 		//READ ID
 		byte[] idBytes = Arrays.copyOfRange(data, position, position + ID_LENGTH);
-		byte[] id = new byte[](idBytes);
+        long id = Longs.fromByteArray(idBytes);
 		position += ID_LENGTH;
 
 		//READ CREATOR
 		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = new Account(Base58.encode(creatorBytes));
+		Account creator = Account.makeAccountFromShort(creatorBytes);
 		position += CREATOR_LENGTH;
 
 		//READ HAVE
@@ -307,19 +296,27 @@ public class Order implements Comparable<Order> {
 		long have = Longs.fromByteArray(haveBytes);
 		position += HAVE_LENGTH;
 
-		//READ HAVE
+        //READ HAVE
 		byte[] wantBytes = Arrays.copyOfRange(data, position, position + WANT_LENGTH);
 		long want = Longs.fromByteArray(wantBytes);
 		position += WANT_LENGTH;
 
-		//READ AMOUNT HAVE
+        //READ HAVE SCALE
+        byte scaleHave = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+
+        //READ AMOUNT HAVE
 		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), scaleHave);
 		position += AMOUNT_LENGTH;
 
-		//READ AMOUNT WANT
+        //READ HAVE SCALE
+        byte scaleWant = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+
+        //READ AMOUNT WANT
 		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
 		position += AMOUNT_LENGTH;
 
 		//READ TIMESTAMP
@@ -327,22 +324,16 @@ public class Order implements Comparable<Order> {
 		long timestamp = Longs.fromByteArray(timestampBytes);
 		position += TIMESTAMP_LENGTH;
 
-		//READ FULFILLED HAVE
+        //READ FULFILLED HAVE SCALE
+        byte scalefulfilledHave = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+
+        //READ FULFILLED HAVE
 		byte[] fulfilledHaveBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
-		BigDecimal fulfilledHave = new BigDecimal(new BigInteger(fulfilledHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
+		BigDecimal fulfilledHave = new BigDecimal(new BigInteger(fulfilledHaveBytes), scalefulfilledHave);
 		position += FULFILLED_LENGTH;
 
-		//READ FULFILLED WANT
-		byte[] fulfilledWantBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
-		BigDecimal fulfilledWant = new BigDecimal(new BigInteger(fulfilledWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-		position += FULFILLED_LENGTH;
-
-		//READ IS EXECUTABLE
-		byte[] isExecutableBytes = Arrays.copyOfRange(data, position, position + 1);
-		byte isExecutable = isExecutableBytes[0];
-		position += 1;
-
-		return new Order(id, creator, have, want, amountHave, amountWant, fulfilledHave, fulfilledWant, isExecutable, timestamp);
+		return new Order(id, creator, have, want, amountHave, amountWant, fulfilledHave, timestamp);
 
 	}
 
@@ -351,7 +342,7 @@ public class Order implements Comparable<Order> {
 		byte[] data = new byte[0];
 
 		//WRITE ID
-		byte[] idBytes = this.id.toByteArray();
+		byte[] idBytes = Longs.toByteArray(this.id);
 		byte[] fill = new byte[ID_LENGTH - idBytes.length];
 		idBytes = Bytes.concat(fill, idBytes);
 		data = Bytes.concat(data, idBytes);
@@ -359,7 +350,7 @@ public class Order implements Comparable<Order> {
 		//WRITE CREATOR
 		try
 		{
-			data = Bytes.concat(data , Base58.decode(this.creator.getAddress()));
+			data = Bytes.concat(data , this.creator.getShortAddressBytes());
 		}
 		catch(Exception e)
 		{
@@ -367,22 +358,28 @@ public class Order implements Comparable<Order> {
 		}
 
 		//WRITE HAVE
-		byte[] haveBytes = Longs.toByteArray(this.have);
+		byte[] haveBytes = Longs.toByteArray(this.haveKey);
 		haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
 		data = Bytes.concat(data, haveBytes);
 
 		//WRITE WANT
-		byte[] wantBytes = Longs.toByteArray(this.want);
+		byte[] wantBytes = Longs.toByteArray(this.wantKey);
 		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
 		data = Bytes.concat(data, wantBytes);
 
-		//WRITE AMOUNT HAVE
+        //WRITE AMOUNT HAVE SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.amountHave.scale()});
+
+        //WRITE AMOUNT HAVE
 		byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
 		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
 
-		//WRITE AMOUNT WANT
+        //WRITE AMOUNT WANT SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.amountWant.scale()});
+
+        //WRITE AMOUNT WANT
 		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
@@ -393,22 +390,14 @@ public class Order implements Comparable<Order> {
 		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 
+        //WRITE AMOUNT HAVE SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.fulfilledHave.scale()});
+
 		//WRITE FULFILLED HAVE
 		byte[] fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
 		fill = new byte[FULFILLED_LENGTH - fulfilledHaveBytes.length];
 		fulfilledHaveBytes = Bytes.concat(fill, fulfilledHaveBytes);
 		data = Bytes.concat(data, fulfilledHaveBytes);
-
-		//WRITE FULFILLED WANT
-		byte[] fulfilledWantBytes = this.fulfilledWant.unscaledValue().toByteArray();
-		fill = new byte[FULFILLED_LENGTH - fulfilledWantBytes.length];
-		fulfilledWantBytes = Bytes.concat(fill, fulfilledWantBytes);
-		data = Bytes.concat(data, fulfilledWantBytes);
-
-		//WRITE IS EXECUTABLE
-		byte[] isExecutableBytes = new byte[1];
-		isExecutableBytes[0] = this.isExecutable? (byte)1: (byte)0;
-		data = Bytes.concat(data, isExecutableBytes);
 
 		return data;
 	}
@@ -417,7 +406,6 @@ public class Order implements Comparable<Order> {
 	{
 		return BASE_LENGTH;
 	}
-	 */
 
     public boolean isConfirmed() {
         return isConfirmed(DCSet.getInstance());
@@ -463,7 +451,7 @@ public class Order implements Comparable<Order> {
         this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, true);
 
         //ADD ORDER TO DATABASE
-        db.getOrderMap().add(Order.toDBrec(this));
+        db.getOrderMap().add(this);
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
@@ -474,24 +462,22 @@ public class Order implements Comparable<Order> {
         BigDecimal thisIncrement;
         //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
-        List<Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = db.getOrderMap()
+        List<Order> orders = db.getOrderMap()
                 .getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
 
         if (true && !orders.isEmpty()) {
-            BigDecimal price = orders.get(0).a.e;
-            Long timestamp = orders.get(0).a.c;
-            for (Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>item: orders) {
-                if (!item.b.a.equals(this.wantKey)
-                        || !item.c.a.equals(this.haveKey)) {
+            BigDecimal price = orders.get(0).getPrice();
+            Long timestamp = orders.get(0).getTimestamp();
+            for (Order item: orders) {
+                if (item.getHave() != this.wantKey
+                        || item.getWant() != this.haveKey) {
                     // RISE ERROR
                     timestamp = null;
                     ++timestamp;
                 }
                 // потому что сранивается потом обратная цена то тут должно быть возрастание
                 // и если не так то ошибка
-                int comp = price.compareTo(item.a.e);
+                int comp = price.compareTo(item.getPrice());
                 if (comp > 0) {
                     // RISE ERROR
                     timestamp = null;
@@ -499,15 +485,15 @@ public class Order implements Comparable<Order> {
                 } else if (comp == 0) {
                     // здесь так же должно быть возростание
                     // если не так то ошибка
-                    if (timestamp.compareTo(item.a.c) > 0) {
+                    if (timestamp.compareTo(item.getTimestamp()) > 0) {
                         // RISE ERROR
                         timestamp = null;
                         ++timestamp;
                     }
                 }
 
-                price = item.a.e;
-                timestamp = item.a.c;
+                price = item.getPrice();
+                timestamp = item.getTimestamp();
             }
 
         }
@@ -517,16 +503,15 @@ public class Order implements Comparable<Order> {
 
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
-            Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = orders.get(index++);
+            Order order = orders.get(index++);
             
             // for develop
             //String signB58 = Base58.encode(order.a.a);
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;
-            BigDecimal orderReversePrice = Order.calcPrice(order.c.b, order.b.b);
-            BigDecimal orderPrice = Order.calcPrice(order.b.b, order.c.b);
+            BigDecimal orderReversePrice = Order.calcPrice(order.amountWant, order.amountHave);
+            BigDecimal orderPrice = Order.calcPrice(order.amountHave, order.amountWant);
             //BigDecimal orderPriceTemp;
 
             Trade trade;
@@ -536,7 +521,7 @@ public class Order implements Comparable<Order> {
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
 
-            if (this.creator.equals(order.a.b)) {
+            if (this.creator.equals(order.getCreator())) {
         	// IGNORE my self orders
         	continue;
             }
@@ -551,8 +536,9 @@ public class Order implements Comparable<Order> {
                 // if left not enough for 1 buy by price this order
                 break;
 
-            orderAmountHaveLeft = order.b.b.subtract(order.b.c); //.getAmountHaveLeft();
-            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
+            orderAmountHaveLeft = order.getAmountHaveLeft();
+            //orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
+            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.amountWant.scale(), RoundingMode.HALF_UP);
 
             compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
             if (compare >= 0) {
@@ -563,7 +549,8 @@ public class Order implements Comparable<Order> {
                 else {
 
                     // RESOLVE amount with SCALE
-                    tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice).setScale(orderAmountHaveLeft.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+                    tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice)
+                            .setScale(orderAmountHaveLeft.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
                     tradeAmount = tradeAmountAccurate.setScale(orderAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
 
                     // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
@@ -592,7 +579,7 @@ public class Order implements Comparable<Order> {
             //AND WE CAN BUY ANYTHING
             if (tradeAmount.compareTo(BigDecimal.ZERO) > 0) {
                 //CREATE TRADE
-                trade = new Trade(this.getId(), order.a.a, tradeAmount, tradeAmountGet, transaction.getTimestamp());
+                trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
                 trade.process(db);
 
                 // need to update from DB -.copy() not update automative
@@ -607,7 +594,7 @@ public class Order implements Comparable<Order> {
                         thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
                     // cancel order if it not fulfiled isDivisible
                     // or HAVE not enough to one WANT  = price
-                    CancelOrderTransaction.process_it(db, toDBrec(this));
+                    CancelOrderTransaction.process_it(db, this);
                     //and stop resolve
                     return;
                 }
@@ -615,9 +602,9 @@ public class Order implements Comparable<Order> {
             }
         }
         if (!completedOrder) {
-            db.getOrderMap().add(toDBrec(this));
+            db.getOrderMap().add(this);
         } else {
-            db.getCompletedOrderMap().add(toDBrec(this));
+            db.getCompletedOrderMap().add(this);
         }
     }
 
@@ -706,10 +693,7 @@ public class Order implements Comparable<Order> {
     }
 
     //COPY
-
     public Order copy() {
-        return fromDBrec(toDBrec(this));
-		/*
 		try
 		{
 			return parse(this.toBytes());
@@ -718,6 +702,5 @@ public class Order implements Comparable<Order> {
 		{
 			return null;
 		}
-		 */
     }
 }

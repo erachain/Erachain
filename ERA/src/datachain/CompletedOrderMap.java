@@ -3,6 +3,7 @@ package datachain;
 import core.crypto.Base58;
 import core.item.assets.Order;
 import database.DBMap;
+import database.serializer.OrderSerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -17,8 +18,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CompletedOrderMap extends DCMap<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
+public class CompletedOrderMap extends DCMap<Long, Order> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
     public CompletedOrderMap(DCSet databaseSet, DB database) {
@@ -46,28 +46,24 @@ public class CompletedOrderMap extends DCMap<Long, Tuple3<Tuple5<Long, String, L
     }
 
     @Override
-    protected Map<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMap(DB database) {
+    protected Map<Long, Order> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMemoryMap() {
+    protected Map<Long, Order> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
         return this.openMap(database);
     }
 
-    private Map<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> openMap(DB database) {
+    private Map<Long, Order> openMap(DB database) {
         //OPEN MAP
-        BTreeMap<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> map = database.createTreeMap("completedorders")
+        BTreeMap<Long, Order> map = database.createTreeMap("completedorders")
+                .valueSerializer(new OrderSerializer())
                 .comparator(Fun.COMPARATOR)
-                //.valueSerializer(new OrderSerializer())
                 .makeOrGet();
 
         //RETURN
@@ -75,8 +71,7 @@ public class CompletedOrderMap extends DCMap<Long, Tuple3<Tuple5<Long, String, L
     }
 
     @Override
-    protected Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getDefaultValue() {
+    protected Order getDefaultValue() {
         return null;
     }
 
@@ -85,12 +80,11 @@ public class CompletedOrderMap extends DCMap<Long, Tuple3<Tuple5<Long, String, L
         return this.observableData;
     }
 
-    public void add(Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public void add(Order order) {
         // this order is NOT executable
         ////order = datachain.OrderMap.setExecutable(order, false);
 
-        this.set(order.a.a, order);
+        this.set(order.getId(), order);
     }
 
     /*
