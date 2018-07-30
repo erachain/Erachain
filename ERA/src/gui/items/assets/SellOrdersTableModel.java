@@ -20,15 +20,13 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class SellOrdersTableModel extends
-        TableModelCls<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
+        TableModelCls<Long, Order>
         implements Observer {
     public static final int COLUMN_AMOUNT_HAVE = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_WANT = 2;
 
-    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+    public SortableList<Long, Order> orders;
     BigDecimal sumAmountHave;
     BigDecimal sumAmountWant;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Have", "Price", "Want"});
@@ -54,25 +52,23 @@ public class SellOrdersTableModel extends
     private void totalCalc() {
         sumAmountHave = BigDecimal.ZERO;
         sumAmountWant = BigDecimal.ZERO;
-        for (Pair<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
+        for (Pair<Long, Order> orderPair : this.orders) {
 
-            Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
-            sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
+            //Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
+            //sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
+            Order order = orderPair.getB();
+            sumAmountHave = sumAmountHave.add(order.getAmountHaveLeft());
 
-            sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));
+            sumAmountWant = sumAmountWant.add(order.getAmountWantLeft());
         }
     }
 
     @Override
-    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
+    public SortableList<Long, Order> getSortableList() {
         return this.orders;
     }
 
-    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-            Tuple2<Long, BigDecimal>> getOrder(
-            int row) {
+    public Order getOrder(int row) {
         return this.orders.get(row).getB();
     }
 

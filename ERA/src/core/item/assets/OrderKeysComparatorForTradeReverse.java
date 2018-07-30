@@ -21,14 +21,14 @@ public class OrderKeysComparatorForTradeReverse implements Comparator<Long> {
 
         OrderMap map = DCSet.getInstance().getOrderMap();
 
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1 = map.get(orderKey1);
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2 = map.get(orderKey2);
+        Order order1 = map.get(orderKey1);
+        Order order2 = map.get(orderKey2);
 
-        int compare = order1.a.e.compareTo(order2.a.e);
+        int compare = order1.getPrice().compareTo(order2.getPrice());
         if (compare != 0)
             return -compare;
 
-        return -order1.a.c.compareTo(order2.a.c);
+        return -Long.signum(order1.getTimestamp() - order2.getTimestamp());
 
     }
 

@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import core.item.assets.Order;
 import lang.Lang;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -18,8 +19,7 @@ public class TradesFrame extends JDialog {
 
     private OrderTradesTableModel tradesTableModel;
 
-    public TradesFrame(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public TradesFrame(Order order) {
 
         //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Trades"));

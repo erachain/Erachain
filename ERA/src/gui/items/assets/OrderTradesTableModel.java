@@ -19,32 +19,30 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class OrderTradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> implements Observer {
+public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_AMOUNT = 2;
     public static final int COLUMN_PRICE = 3;
     public static final int COLUMN_AMOUNT_WANT = 4;
 
-    private SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades;
-    private Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+    private SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades;
+    private Order order;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
 
-    public OrderTradesTableModel(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public OrderTradesTableModel(Order order) {
         this.order = order;
-        this.trades = DCSet.getInstance().getTradeMap().getTrades(order.a.a);
+        this.trades = DCSet.getInstance().getTradeMap().getTrades(order.getId());
         this.trades.registerObserver();
     }
 
     @Override
-    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getSortableList() {
         return this.trades;
     }
 
-    public Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> getTrade(int row) {
+    public Tuple5<Long, Long, BigDecimal, BigDecimal, Long> getTrade(int row) {
         return this.trades.get(row).getB();
     }
 
@@ -70,12 +68,10 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>,
             return null;
         }
 
-        Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = this.trades.get(row).getB();
+        Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = this.trades.get(row).getB();
         int type = 0;
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initatorOrder = null;
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> targetOrder = null;
+        Order initatorOrder = null;
+        Order targetOrder = null;
 
         if (trade != null) {
             DCSet db = DCSet.getInstance();
@@ -91,7 +87,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>,
 
             case COLUMN_TYPE:
 
-                return initatorOrder.b.a == this.order.b.a ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
+                return initatorOrder.getHave() == this.order.getHave() ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
 
             case COLUMN_AMOUNT:
 
@@ -112,7 +108,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>,
 
                 result = NumberAsString.formatAsString(trade.d); //getAmountWant());
 
-                if (Controller.getInstance().isAddressIsMine(targetOrder.a.b)) {
+                if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 

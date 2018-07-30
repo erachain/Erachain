@@ -264,20 +264,9 @@ public class CreateOrderTransaction extends Transaction {
         BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
 
-        return new Order(this.signature, this.creator, this.haveKey, this.wantKey,
+        return new Order(Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
                 amountHave, amountWant, // new SCALE
                 this.timestamp);
-    }
-
-    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> makeOrderDB() {
-        return new Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-                new Tuple5<byte[], String, Long, Boolean, BigDecimal>(this.getOrderId(),
-                        this.creator.getAddress(), this.timestamp, true, this.getPriceCalc()),
-                new Tuple3<Long, BigDecimal, BigDecimal>(this.haveKey, this.amountHave, BigDecimal.ZERO),
-                new Tuple2<Long, BigDecimal>(this.wantKey, this.amountWant));
-
     }
 
     @SuppressWarnings("unchecked")

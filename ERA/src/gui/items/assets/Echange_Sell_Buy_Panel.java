@@ -329,8 +329,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 if (row > buyOrdersTableModel.orders.size())
                     return;
 
-                Pair<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> rowObj = buyOrdersTableModel.orders
-                        .get(row);
+                Pair<Long, Order> rowObj = buyOrdersTableModel.orders.get(row);
                 if (rowObj == null)
                     return;
                 Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = rowObj
@@ -344,7 +343,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     buyOrdersMenu.getComponent(1).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
-                    sellOrderPanel.txtAmountHave.setText(Order.calcAmountWantLeft(order).toPlainString());
+                    sellOrderPanel.txtAmountHave.setText(order..toPlainString());
                     sellOrderPanel.txtPrice.setText(Order.calcPrice(order.c.b, order.b.b).toPlainString());
                 }
             }

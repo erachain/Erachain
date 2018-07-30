@@ -171,7 +171,7 @@ public class API_Trade {
             Map buyJSON = new LinkedHashMap();
 
             buyJSON.put("price", order.getPrice());
-            vol = order.getAmountHaveLeft()
+            vol = order.getAmountHaveLeft();
             buyJSON.put("amount", vol);
 
             sumAmount = sumAmount.add(vol);

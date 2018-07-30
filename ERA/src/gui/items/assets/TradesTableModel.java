@@ -21,7 +21,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> implements Observer {
+public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
+        Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_ASSET_1 = 2;
@@ -29,7 +30,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
     public static final int COLUMN_ASSET_2 = 4;
     BigDecimal sumAsset1;
     BigDecimal sumAsset2;
-    private SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades;
+    private SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades;
     private AssetCls have;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
 
@@ -53,10 +54,10 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
         sumAsset1 = BigDecimal.ZERO;
         sumAsset2 = BigDecimal.ZERO;
 
-        for (Pair<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> tradePair : this.trades) {
+        for (Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> tradePair : this.trades) {
 
-            Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = tradePair.getB();
-            String type = Order.getOrder(DCSet.getInstance(), trade.a).b.a == this.have.getKey() ? "Sell" : "Buy";
+            Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = tradePair.getB();
+            String type = Order.getOrder(DCSet.getInstance(), trade.a).getHave() == this.have.getKey() ? "Sell" : "Buy";
 
             if (type.equals("Buy")) {
                 sumAsset1 = sumAsset1.add(trade.c);// getAmountHave());
@@ -70,12 +71,12 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
     }
 
     @Override
-    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getSortableList() {
         return this.trades;
     }
 
-    public Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> getTrade(int row) {
-        Pair<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> rec = this.trades.get(row);
+    public Tuple5<Long, Long, BigDecimal, BigDecimal, Long> getTrade(int row) {
+        Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> rec = this.trades.get(row);
         if (rec == null)
             return null;
 
@@ -103,12 +104,10 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
             return null;
         }
 
-        Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = null;
+        Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = null;
         int type = 0;
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> initatorOrder = null;
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> targetOrder = null;
+        Order initatorOrder = null;
+        Order targetOrder = null;
 
         if (row < this.trades.size()) {
             trade = this.trades.get(row).getB();
@@ -118,9 +117,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
                 initatorOrder = Order.getOrder(db, trade.a);
                 targetOrder = Order.getOrder(db, trade.b);
 
-                type = initatorOrder.b.a
-                        == this.have.getKey() ?
-                        -1 : 1;
+                type = initatorOrder.getHave() == this.have.getKey() ? -1 : 1;
 
             }
         }
@@ -148,7 +145,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
                 else
                     result = NumberAsString.formatAsString(trade.d);
 
-                if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {
+                if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
@@ -175,7 +172,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
                 else
                     result = NumberAsString.formatAsString(trade.c);
 
-                if (Controller.getInstance().isAddressIsMine(targetOrder.a.b)) {
+                if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
@@ -213,7 +210,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<byte[], byte[]>, Tupl
     @Override
     public Object getItem(int k) {
         // TODO Auto-generated method stub
-        Pair<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> rec = this.trades.get(k);
+        Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> rec = this.trades.get(k);
         if (rec == null)
             return null;
 
