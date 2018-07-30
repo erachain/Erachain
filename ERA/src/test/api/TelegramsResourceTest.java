@@ -149,6 +149,7 @@ public class TelegramsResourceTest extends SettingTests {
             put("property2", "property2");
             put("action_key", "action_key");
             put("head", "head");
+            put("title", "title");
             put("property1", "property1");
             put("size", "size");
             put("action_name", "action_name");

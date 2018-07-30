@@ -36,6 +36,7 @@ public class R_SendResourceTest extends SettingTests {
         Map<String, String> requestField = new HashMap<String, String>() {{
             put("type_name", "type_name");
             put("creator", "creator");
+            put("data", "data");
             put("message", "message");
             put("signature", "signature");
             put("fee", "fee");
@@ -61,6 +62,12 @@ public class R_SendResourceTest extends SettingTests {
         ApiClient.executeCommand("GET wallet/lock");
     }
 
+    /**
+     * This check only field.
+     * data/message not shielded
+     *
+     * @throws Exception
+     */
     @Test
     public void sendPost() throws Exception {
         ApiClient ApiClient = new ApiClient();
@@ -71,7 +78,7 @@ public class R_SendResourceTest extends SettingTests {
         String address = parse[0].replace("[", "").replace("]", "").trim().replace("\"", "");
         String sendTransaction = ApiClient.executeCommand("POST r_send {\"creator\":\"" + address + "\"," +
                 "\"recipient\":\"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH\",\"feePow\":\"1\",\"assetKey\":\"643\",\"amount\":\"1\"," +
-                "\"title\":\"123\",\"message\":\"{\"\"msg\"\":\"\"1223\"\"}\",\"codebase\":\"0\",\"encrypt\":\"false\",\"password\":\"123456789\"}");
+                "\"title\":\"123\",\"message\":\"{\"\"msg\"\":\"\"1223\"\"}\",\"messagecode\":\"0\",\"encrypt\":\"false\",\"password\":\"123456789\"}");
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(sendTransaction);
@@ -81,6 +88,8 @@ public class R_SendResourceTest extends SettingTests {
             put("creator", "creator");
             put("amount", "amount");
             put("data", "data");
+            put("message", "message");
+            put("title", "title");
             put("signature", "signature");
             put("fee", "fee");
             put("publickey", "publickey");
