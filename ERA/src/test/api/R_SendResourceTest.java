@@ -36,7 +36,7 @@ public class R_SendResourceTest extends SettingTests {
         Map<String, String> requestField = new HashMap<String, String>() {{
             put("type_name", "type_name");
             put("creator", "creator");
-            put("data", "data");
+            put("message", "message");
             put("signature", "signature");
             put("fee", "fee");
             put("publickey", "publickey");
