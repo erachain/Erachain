@@ -342,12 +342,15 @@ public abstract class Transaction {
     protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH
             + /* REFERENCE_LENGTH */ +SIGNATURE_LENGTH;
     static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
+
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";
     // protected int type;
     protected byte[] typeBytes;
     protected Block block; // parent block
     protected int height;
+    protected int seqNo;
+    protected Long dbRef; // height + SeqNo
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
     protected Long reference = 0l;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
@@ -392,6 +395,7 @@ public abstract class Transaction {
     public static Transaction findByHeightSeqNo(DCSet db, int height, int seq) {
         return db.getTransactionFinalMap().getTransaction(height, seq);
     }
+
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public static Transaction findByDBRef(DCSet db, byte[] dbRef) {
@@ -493,6 +497,7 @@ public abstract class Transaction {
     public void setDC(DCSet dcSet, boolean asPack) {
         this.dcSet = dcSet;
         this.height = this.getBlockHeightByParentOrLast(dcSet);
+        //this.seqNo = this.block.getTransactionSeq(this.signature);
         if (!asPack)
             this.calcFee();
     }
@@ -764,6 +769,14 @@ public abstract class Transaction {
         byte[] ref = Ints.toByteArray(bh);
         Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
         return ref;
+
+    }
+
+    // reference in Map - or as signatire or as BlockHeight + seqNo
+    public Long getDBRef() {
+
+        byte[] ref = Ints.toByteArray(this.height);
+        return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(this.seqNo)));
 
     }
 

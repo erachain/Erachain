@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+public class CompletedOrderMap extends DCMap<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
         Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
@@ -46,14 +46,14 @@ public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], Strin
     }
 
     @Override
-    protected Map<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+    protected Map<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+    protected Map<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
@@ -61,12 +61,12 @@ public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], Strin
         return this.openMap(database);
     }
 
-    private Map<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+    private Map<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> openMap(DB database) {
         //OPEN MAP
-        BTreeMap<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+        BTreeMap<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> map = database.createTreeMap("completedorders")
-                .comparator(Fun.BYTE_ARRAY_COMPARATOR)
+                .comparator(Fun.COMPARATOR)
                 //.valueSerializer(new OrderSerializer())
                 .makeOrGet();
 
@@ -75,7 +75,7 @@ public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], Strin
     }
 
     @Override
-    protected Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+    protected Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getDefaultValue() {
         return null;
     }
@@ -85,25 +85,19 @@ public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], Strin
         return this.observableData;
     }
 
-    public void add(Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+    public void add(Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
         // this order is NOT executable
         ////order = datachain.OrderMap.setExecutable(order, false);
-
-        if (Base58.encode(order.a.a)
-                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
-            int error = 0;
-            error ++;
-        }
 
         this.set(order.a.a, order);
     }
 
     /*
     @Override
-    public Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(byte[] key) {
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
+    public Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
+            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(Long key) {
+        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
         ///return datachain.OrderMap.setExecutable(order, false);
         return order;
@@ -111,12 +105,6 @@ public class CompletedOrderMap extends DCMap<byte[], Tuple3<Tuple5<byte[], Strin
     */
 
     public void delete(Order order) {
-
-        if (Base58.encode(order.getId())
-                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
-            int error = 0;
-            error ++;
-        }
 
         this.delete(order.getId());
     }

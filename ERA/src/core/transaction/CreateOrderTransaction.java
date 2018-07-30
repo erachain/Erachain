@@ -196,7 +196,6 @@ public class CreateOrderTransaction extends Transaction {
                 reference, signatureBytes);
     }
 
-    @Override
     public void setDC(DCSet dcSet, boolean asPack) {
 
         super.setDC(dcSet, asPack);

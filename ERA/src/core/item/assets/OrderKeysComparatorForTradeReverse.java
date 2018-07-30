@@ -14,15 +14,15 @@ import java.util.Comparator;
  *
  * @author icreator
  */
-public class OrderKeysComparatorForTradeReverse implements Comparator<byte[]> {
+public class OrderKeysComparatorForTradeReverse implements Comparator<Long> {
 
     @Override
-    public int compare(byte[] orderKey1, byte[] orderKey2) {
+    public int compare(Long orderKey1, Long orderKey2) {
 
         OrderMap map = DCSet.getInstance().getOrderMap();
 
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1 = map.get(orderKey1);
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2 = map.get(orderKey2);
+        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order1 = map.get(orderKey1);
+        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order2 = map.get(orderKey2);
 
         int compare = order1.a.e.compareTo(order2.a.e);
         if (compare != 0)
