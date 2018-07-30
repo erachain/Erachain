@@ -3,6 +3,7 @@ package core.account;
 import core.crypto.Base32;
 import core.crypto.Base58;
 import core.crypto.Crypto;
+import utils.Pair;
 
 import java.util.Arrays;
 
@@ -14,13 +15,20 @@ public class PublicKeyAccount extends Account {
 
     public static final int PUBLIC_KEY_LENGTH = Crypto.HASH_LENGTH;
     //public static final int STIRNG_PUBLIC_KEY_LENGTH = Base58.encode(new byte[PUBLIC_KEY_LENGTH]).length();
+    protected Pair<byte[], byte[]> keyPair;
     protected byte[] publicKey;
 
     public PublicKeyAccount(byte[] publicKey) {
+        super(Crypto.getInstance().getAddress(publicKey));
         this.publicKey = publicKey;
-        this.address = Crypto.getInstance().getAddress(publicKey);
-        this.bytes = Base58.decode(address);
-        this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
+        //this.address = ;
+        //this.bytes = Base58.decode(address);
+        //this.shortBytes = Arrays.copyOfRange(this.bytes, 1, this.bytes.length - 5);
+    }
+
+    public PublicKeyAccount(Pair<byte[], byte[]> keyPair) {
+        this(keyPair.getB());
+        this.keyPair = keyPair;
     }
 
     public PublicKeyAccount(String publicKey) {
