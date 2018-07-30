@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.UriInfo;
 
+import datachain.*;
 import org.apache.commons.net.util.Base64;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -75,9 +76,6 @@ import core.transaction.UpdateNameTransaction;
 import core.transaction.VoteOnPollTransaction;
 import core.voting.Poll;
 import core.voting.PollOption;
-import datachain.DCSet;
-import datachain.SortableList;
-import datachain.TradeMap;
 import gui.models.PeersTableModel;
 import gui.models.PersonAccountsModel;
 import lang.Lang;
@@ -732,9 +730,9 @@ public class BlockExplorer {
 
             assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
             assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+            List<Order> orders = dcSet
                     .getOrderMap().getOrders(asset.getKey());
-            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
+            List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
                     .getTrades(asset.getKey());
 
             assetJSON.put("operations", orders.size() + trades.size());
@@ -799,9 +797,9 @@ public class BlockExplorer {
 
             assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
             assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+            List<Order> orders = dcSet
                     .getOrderMap().getOrders(asset.getKey());
-            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
+            List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
                     .getTrades(asset.getKey());
 
             assetJSON.put("operations", orders.size() + trades.size());
@@ -873,9 +871,9 @@ public class BlockExplorer {
 
             assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
             assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
+            List<Order> orders = dcSet
                     .getOrderMap().getOrders(asset.getKey());
-            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
+            List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap()
                     .getTrades(asset.getKey());
 
             assetJSON.put("operations", orders.size() + trades.size());
@@ -1036,8 +1034,8 @@ public class BlockExplorer {
 
     // TODO: что-то тут напутано
     public Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> calcForAsset(
-            List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders,
-            List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades) {
+            List<Order> orders,
+            List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades) {
 
         Map<Long, Integer> pairsOpenOrders = new TreeMap<Long, Integer>();
         Map<Long, BigDecimal> volumePriceOrders = new TreeMap<Long, BigDecimal>();
@@ -1047,109 +1045,107 @@ public class BlockExplorer {
         BigDecimal volumePrice = BigDecimal.ZERO;
         BigDecimal volumeAmount = BigDecimal.ZERO;
 
-        for (Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
-            if (!pairsOpenOrders.containsKey(order.c.a)) {
+        for (Order order : orders) {
+            if (!pairsOpenOrders.containsKey(order.getWant())) {
                 count = 0;
             } else {
-                count = pairsOpenOrders.get(order.c.a);
+                count = pairsOpenOrders.get(order.getWant());
             }
 
-            if (!volumeAmountOrders.containsKey(order.c.a)) {
+            if (!volumeAmountOrders.containsKey(order.getWant())) {
                 volumeAmount = BigDecimal.ZERO;
             } else {
-                volumeAmount = volumeAmountOrders.get(order.c.a);
+                volumeAmount = volumeAmountOrders.get(order.getWant());
             }
 
-            if (!volumePriceOrders.containsKey(order.c.a)) {
+            if (!volumePriceOrders.containsKey(order.getWant())) {
                 volumePrice = BigDecimal.ZERO;
             } else {
-                volumePrice = volumePriceOrders.get(order.c.a);
+                volumePrice = volumePriceOrders.get(order.getWant());
             }
 
             count++;
-            pairsOpenOrders.put(order.c.a, count);
+            pairsOpenOrders.put(order.getWant(), count);
 
-            volumeAmount = volumeAmount.add(order.b.c.subtract(order.b.c)); // getAmountHaveLeft
+            volumeAmount = volumeAmount.add(order.getAmountHaveLeft());
 
-            volumeAmountOrders.put(order.c.a, volumeAmount);
+            volumeAmountOrders.put(order.getWant(), volumeAmount);
 
-            volumePriceOrders.put(order.c.a, volumePrice);
+            volumePriceOrders.put(order.getWant(), volumePrice);
 
-            if (!pairsOpenOrders.containsKey(order.b.a)) {
+            if (!pairsOpenOrders.containsKey(order.getHave())) {
                 count = 0;
             } else {
-                count = pairsOpenOrders.get(order.b.a);
+                count = pairsOpenOrders.get(order.getHave());
             }
 
-            if (!volumePriceOrders.containsKey(order.b.a)) {
+            if (!volumePriceOrders.containsKey(order.getHave())) {
                 volumePrice = BigDecimal.ZERO;
             } else {
-                volumePrice = volumePriceOrders.get(order.b.a);
+                volumePrice = volumePriceOrders.get(order.getHave());
             }
 
-            if (!volumeAmountOrders.containsKey(order.b.a)) {
+            if (!volumeAmountOrders.containsKey(order.getHave())) {
                 volumeAmount = BigDecimal.ZERO;
             } else {
-                volumeAmount = volumeAmountOrders.get(order.b.a);
+                volumeAmount = volumeAmountOrders.get(order.getHave());
             }
 
             count++;
-            pairsOpenOrders.put(order.b.a, count);
+            pairsOpenOrders.put(order.getHave(), count);
 
-            volumePrice = volumePrice.add(order.b.c.subtract(order.b.c)); // getAmountHaveLeft
+            volumePrice = volumePrice.add(order.getAmountHaveLeft());
 
-            volumePriceOrders.put(order.b.a, volumePrice);
+            volumePriceOrders.put(order.getHave(), volumePrice);
 
-            volumeAmountOrders.put(order.b.a, volumeAmount);
+            volumeAmountOrders.put(order.getHave(), volumeAmount);
         }
 
         Map<Long, Integer> pairsTrades = new TreeMap<Long, Integer>();
         Map<Long, BigDecimal> volumePriceTrades = new TreeMap<Long, BigDecimal>();
         Map<Long, BigDecimal> volumeAmountTrades = new TreeMap<Long, BigDecimal>();
 
-        for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade : trades) {
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-                    Tuple2<Long, BigDecimal>> initiator = Order.getOrder(dcSet, trade.a);
-            if (!pairsTrades.containsKey(initiator.c.a)) {
+            Order initiator = Order.getOrder(dcSet, trade.a);
+            if (!pairsTrades.containsKey(initiator.getWant())) { //.c.a)) {
                 count = 0;
                 volumePrice = BigDecimal.ZERO;
                 volumeAmount = BigDecimal.ZERO;
             } else {
-                count = pairsTrades.get(initiator.c.a);
-                volumePrice = volumePriceTrades.get(initiator.c.a);
-                volumeAmount = volumeAmountTrades.get(initiator.c.a);
+                count = pairsTrades.get(initiator.getWant());
+                volumePrice = volumePriceTrades.get(initiator.getWant());
+                volumeAmount = volumeAmountTrades.get(initiator.getWant());
             }
 
             count++;
-            pairsTrades.put(initiator.c.a, count);
+            pairsTrades.put(initiator.getWant(), count);
 
             volumePrice = volumePrice.add(trade.d);
             volumeAmount = volumeAmount.add(trade.c);
 
-            volumePriceTrades.put(initiator.c.a, volumePrice);
-            volumeAmountTrades.put(initiator.c.a, volumeAmount);
+            volumePriceTrades.put(initiator.getWant(), volumePrice);
+            volumeAmountTrades.put(initiator.getWant(), volumeAmount);
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> target = Order
-                    .getOrder(dcSet, trade.b);
-            if (!pairsTrades.containsKey(target.c.a)) {
+            Order target = Order.getOrder(dcSet, trade.b);
+            if (!pairsTrades.containsKey(target.getWant())) {
                 count = 0;
                 volumePrice = BigDecimal.ZERO;
                 volumeAmount = BigDecimal.ZERO; // ;
             } else {
-                count = pairsTrades.get(target.c.a);
-                volumePrice = volumePriceTrades.get(target.c.a);
-                volumeAmount = volumeAmountTrades.get(target.c.a);
+                count = pairsTrades.get(target.getWant());
+                volumePrice = volumePriceTrades.get(target.getWant());
+                volumeAmount = volumeAmountTrades.get(target.getWant());
             }
 
             count++;
-            pairsTrades.put(target.c.a, count);
+            pairsTrades.put(target.getWant(), count);
 
             volumePrice = volumePrice.add(trade.c);
             volumeAmount = volumeAmount.add(trade.d);
 
-            volumePriceTrades.put(target.c.a, volumePrice);
-            volumeAmountTrades.put(target.c.a, volumeAmount);
+            volumePriceTrades.put(target.getWant(), volumePrice);
+            volumeAmountTrades.put(target.getWant(), volumeAmount);
         }
 
         Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = new TreeMap<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>>();
@@ -1178,10 +1174,9 @@ public class BlockExplorer {
     public Map jsonQueryAsset(long key) {
         Map output = new LinkedHashMap();
 
-        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
-                .getOrderMap().getOrders(key);
+        List<Order> orders = dcSet.getOrderMap().getOrders(key);
 
-        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(key);
+        List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(key);
 
         AssetCls asset = Controller.getInstance().getAsset(key);
 
@@ -1295,14 +1290,12 @@ public class BlockExplorer {
     public Map jsonQueryTrades(long have, long want) {
         Map output = new LinkedHashMap();
 
-        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersHave = dcSet
-                .getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> ordersWant = dcSet
-                .getOrderMap().getOrdersForTradeWithFork(want, have, true);
+        List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
         // Collections.reverse(ordersWant);
 
-        List<Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
+        List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
                 want);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
@@ -1329,17 +1322,18 @@ public class BlockExplorer {
         // show SELLs in BACK order
         for (int i = ordersHave.size() - 1; i >= 0; i--) {
             
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
+            Order order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
-            sellJSON.put("price", order.a.e.toPlainString());
-            vol = order.b.b.subtract(order.b.c);
+            sellJSON.put("price", order.getPrice().toPlainString());
+            vol = order.getAmountHaveLeft(); //.b.b.subtract(order.b.c);
             sellJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", Order.calcPrice(order.c.b, order.b.b).toPlainString());
+            sellJSON.put("sellingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
 
-            BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
+            //BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
+            BigDecimal sellingAmount = order.getAmountWantLeft();
 
             sellJSON.put("sellingAmount", sellingAmount.toPlainString());
 
@@ -1349,7 +1343,7 @@ public class BlockExplorer {
 
             sumSellingAmount = sumSellingAmount.add(sellingAmount);
 
-            sellsJSON.put(Base58.encode(order.a.a), sellJSON);
+            sellsJSON.put(order.getId(), sellJSON);
         }
 
         output.put("sells", sellsJSON);
@@ -1367,19 +1361,20 @@ public class BlockExplorer {
 
         for (int i = ordersWant.size() - 1; i >= 0; i--) {
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
+            Order order = ordersWant.get(i);
         
             Map buyJSON = new LinkedHashMap();
 
-            buyJSON.put("price", order.a.e.toPlainString());
-            vol = order.b.b.subtract(order.b.c);
+            buyJSON.put("price", order.getPrice().toPlainString());
+            vol = order.getAmountHaveLeft(); //.b.b.subtract(order.b.c);
             buyJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", Order.calcPrice(order.c.b, order.b.b).toPlainString());
+            buyJSON.put("buyingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
 
-            BigDecimal buyingAmount = Order.calcAmountWantLeft(order);
+            //BigDecimal buyingAmount = Order.calcAmountWantLeft(order);
+            BigDecimal buyingAmount = order.getAmountWantLeft();
 
             buyJSON.put("buyingAmount", buyingAmount.toPlainString());
 
@@ -1389,7 +1384,7 @@ public class BlockExplorer {
 
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
-            buysJSON.put(Base58.encode(order.a.a), buyJSON);
+            buysJSON.put(order.getId(), buyJSON);
         }
         output.put("buys", buysJSON);
 
@@ -1405,18 +1400,19 @@ public class BlockExplorer {
         BigDecimal tradeWantAmount = BigDecimal.ZERO;
         BigDecimal tradeHaveAmount = BigDecimal.ZERO;
 
+        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        Transaction createOrder;
+
         int i = 0;
-        for (Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade : trades) {
 
             i++;
 
             Map tradeJSON = new LinkedHashMap();
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = Order
-                    .getOrder(dcSet, trade.a);
+            Order orderInitiator = Order.getOrder(dcSet, trade.a);
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget = Order
-                    .getOrder(dcSet, trade.b);
+            Order orderTarget = Order.getOrder(dcSet, trade.b);
 
             tradeJSON.put("amountHave", trade.c.toPlainString());
             tradeJSON.put("amountWant", trade.d.toPlainString());
@@ -1424,11 +1420,12 @@ public class BlockExplorer {
             tradeJSON.put("realPrice", Order.calcPrice(trade.c, trade.d));
             tradeJSON.put("realReversePrice", Order.calcPrice(trade.d, trade.c));
 
-            tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a));
+            createOrder = finalMap.get(orderInitiator.getId());
+            tradeJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
 
-            tradeJSON.put("initiatorCreator", orderInitiator.a.b);
-            tradeJSON.put("initiatorAmount", orderInitiator.b.b.toPlainString());
-            if (orderInitiator.b.a == have) {
+            tradeJSON.put("initiatorCreator", orderInitiator.getCreator());
+            tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
+            if (orderInitiator.getHave() == have) {
                 tradeJSON.put("type", "sell");
                 tradeWantAmount = tradeWantAmount.add(trade.c);
                 tradeHaveAmount = tradeHaveAmount.add(trade.d);
@@ -1438,9 +1435,11 @@ public class BlockExplorer {
                 tradeHaveAmount = tradeHaveAmount.add(trade.c);
                 tradeWantAmount = tradeWantAmount.add(trade.d);
             }
-            tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a));
-            tradeJSON.put("targetCreator", orderTarget.a.b);
-            tradeJSON.put("targetAmount", orderTarget.b.b.toPlainString());
+
+            createOrder = finalMap.get(orderTarget.getId());
+            tradeJSON.put("targetTxSignature", Base58.encode(createOrder.getSignature()));
+            tradeJSON.put("targetCreator", orderTarget.getCreator());
+            tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
             tradeJSON.put("timestamp", trade.e);
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.e));
@@ -2031,12 +2030,11 @@ public class BlockExplorer {
             }
         }
 
-       Collection<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = dcSet
-                .getOrderMap().getValuesAll();
+       Collection<Order> orders = dcSet.getOrderMap().getValuesAll();
 
-        for (Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order : orders) {
-            if (order.b.a == key) {
-                alloreders = alloreders.add(order.b.c);
+        for (Order order : orders) {
+            if (order.getHave() == key) {
+                alloreders = alloreders.add(order.getFulfilledHave());
             }
         }
         Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_C()));
@@ -2282,8 +2280,7 @@ public class BlockExplorer {
         if (unit instanceof Trade) {
             Trade trade = (Trade) unit;
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator = trade
-                    .getInitiatorOrder(dcSet);
+            Order orderInitiator = trade.getInitiatorOrder(dcSet);
 
             /*
              * if(dcSet.getOrderMap().contains(trade.getInitiator())) {
@@ -2292,8 +2289,7 @@ public class BlockExplorer {
              * dcSet.getCompletedOrderMap().get(trade.getInitiator()); }
              */
 
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget = trade
-                    .getTargetOrder(dcSet);
+            Order orderTarget = trade.getTargetOrder(dcSet);
 
             /*
              * if(dcSet.getOrderMap().contains(trade.getTarget())) { orderTarget
@@ -2308,24 +2304,25 @@ public class BlockExplorer {
             transactionDataJSON.put("realPrice",
                     trade.getAmountWant().divide(trade.getAmountHave(), 8, RoundingMode.FLOOR).toPlainString());
 
-            transactionDataJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a));
+            Transaction createOrder = this.dcSet.getTransactionFinalMap().get(orderInitiator.getId());
+            transactionDataJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
 
-            transactionDataJSON.put("initiatorCreator", orderInitiator.a.b);
-            transactionDataJSON.put("initiatorAmount", orderInitiator.b.b.toPlainString());
-            transactionDataJSON.put("initiatorHave", orderInitiator.b.a);
-            transactionDataJSON.put("initiatorWant", orderInitiator.c.a);
+            transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator());
+            transactionDataJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
+            transactionDataJSON.put("initiatorHave", orderInitiator.getHave());
+            transactionDataJSON.put("initiatorWant", orderInitiator.getWant());
 
             if (assetNames != null) {
-                assetNames.setKey(orderInitiator.b.a);
-                assetNames.setKey(orderInitiator.c.a);
+                assetNames.setKey(orderInitiator.getHave());
+                assetNames.setKey(orderInitiator.getWant());
             }
 
-            transactionDataJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a));
-            transactionDataJSON.put("targetCreator", orderTarget.a.b);
-            transactionDataJSON.put("targetAmount", orderTarget.b.b.toPlainString());
+            Transaction createOrderTarget = this.dcSet.getTransactionFinalMap().get(orderTarget.getId());
+            transactionDataJSON.put("targetTxSignature", Base58.encode(createOrderTarget.getSignature()));
+            transactionDataJSON.put("targetCreator", orderTarget.getCreator());
+            transactionDataJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-            Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.a.a)
-                    .getBlock(dcSet);
+            Block parentBlock = createOrderTarget.getBlock(dcSet);
             transactionDataJSON.put("height", parentBlock.getHeight(dcSet));
             transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(dcSet) + 1);
 
@@ -2361,8 +2358,8 @@ public class BlockExplorer {
                     transactionDataJSON.put("compressed", false);
                 }
             } else if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
-                byte[] key = ((CancelOrderTransaction) unit).getOrderID();
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+                Long key = ((CancelOrderTransaction) unit).getOrderID();
+                Order order;
                 if (dcSet.getCompletedOrderMap().contains(key)) {
                     order = dcSet.getCompletedOrderMap().get(key);
                 } else {
@@ -2372,17 +2369,17 @@ public class BlockExplorer {
                 Map orderJSON = new LinkedHashMap();
 
                 if (assetNames != null) {
-                    assetNames.setKey(order.b.a);
-                    assetNames.setKey(order.c.a);
+                    assetNames.setKey(order.getHave());
+                    assetNames.setKey(order.getWant());
                 }
 
-                orderJSON.put("have", order.b.a);
-                orderJSON.put("want", order.c.a);
+                orderJSON.put("have", order.getHave());
+                orderJSON.put("want", order.getWant());
 
-                orderJSON.put("amount", order.b.b.toPlainString());
-                orderJSON.put("amountLeft", order.b.c.toPlainString());
-                orderJSON.put("amountWant", order.c.b.toPlainString());
-                orderJSON.put("price", order.a.e.toPlainString());
+                orderJSON.put("amount", order.getAmountHave().toPlainString());
+                orderJSON.put("amountLeft", order.getAmountHaveLeft().toPlainString());
+                orderJSON.put("amountWant", order.getAmountWant().toPlainString());
+                orderJSON.put("price", order.getPrice().toPlainString());
 
                 transactionDataJSON.put("orderSource", orderJSON);
 
@@ -2817,23 +2814,25 @@ public class BlockExplorer {
         }
 
         for (String address : addresses) {
-            Map<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = new TreeMap<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>>();
+            Map<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades
+                    = new TreeMap<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>>();
             List<Transaction> orders = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
                     Transaction.CREATE_ORDER_TRANSACTION, 0);
             TradeMap tradeMap = dcSet.getTradeMap();
             for (Transaction transaction : orders) {
-                SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> tradesBuf = tradeMap
-                        .getTradesByOrderID(transaction.getSignature());
-                for (Pair<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> pair : tradesBuf) {
+                Tuple2<Integer, Integer> dbRefTuple = dcSet.getTransactionFinalMapSigns().get(transaction.getSignature());
+                SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> tradesBuf
+                        = tradeMap.getTradesByOrderID(Transaction.makeDBRef(dbRefTuple));
+                for (Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> pair : tradesBuf) {
                     trades.put(pair.getA(), pair.getB());
                 }
             }
 
-            for (Map.Entry<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trade : trades
+            for (Map.Entry<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trade : trades
                     .entrySet()) {
-                Transaction txInitiator = Controller.getInstance().getTransaction(trade.getValue().a);
+                Transaction txInitiator = dcSet.getTransactionFinalMap().get(Transaction.parseDBRef(trade.getValue().a));
 
-                Transaction txTarget = Controller.getInstance().getTransaction(trade.getValue().b);
+                Transaction txTarget = dcSet.getTransactionFinalMap().get(Transaction.parseDBRef(trade.getValue().b));
 
                 all.add(new BlExpUnit(txInitiator.getBlockHeightByParentOrLast(dcSet),
                         txTarget.getBlockHeightByParentOrLast(dcSet), txInitiator.getSeqNo(dcSet),
@@ -2909,28 +2908,28 @@ public class BlockExplorer {
             } else if (unit.getUnit() instanceof Trade) {
                 Trade trade = (Trade) unit.getUnit();
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderInitiator;
+                Order orderInitiator;
                 if (dcSet.getCompletedOrderMap().contains(trade.getInitiator())) {
                     orderInitiator = dcSet.getCompletedOrderMap().get(trade.getInitiator());
                 } else {
                     orderInitiator = dcSet.getOrderMap().get(trade.getInitiator());
                 }
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderTarget;
+                Order orderTarget;
                 if (dcSet.getCompletedOrderMap().contains(trade.getTarget())) {
                     orderTarget = dcSet.getCompletedOrderMap().get(trade.getTarget());
                 } else {
                     orderTarget = dcSet.getOrderMap().get(trade.getTarget());
                 }
 
-                if (addresses.contains(orderInitiator.a.b)) {
-                    tXincome = Transaction.addAssetAmount(tXincome, orderInitiator.a.b, orderInitiator.b.a,
+                if (addresses.contains(orderInitiator.getCreator())) {
+                    tXincome = Transaction.addAssetAmount(tXincome, orderInitiator.getCreator().getAddress(), orderInitiator.getHave(),
                             trade.getAmountHave());
                 }
 
-                if (addresses.contains(orderTarget.a.b)) {
+                if (addresses.contains(orderTarget.getCreator())) {
 
-                    tXincome = Transaction.addAssetAmount(tXincome, orderTarget.a.b, orderInitiator.b.a,
+                    tXincome = Transaction.addAssetAmount(tXincome, orderTarget.getCreator().getAddress(), orderInitiator.getHave(),
                             trade.getAmountWant());
 
                 }
@@ -3311,8 +3310,11 @@ public class BlockExplorer {
 
         String[] signatures = query.split("/");
 
-        Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = dcSet.getTradeMap()
-                .get(Fun.t2(Base58.decode(signatures[0]), Base58.decode(signatures[1])));
+        Transaction initiator = dcSet.getTransactionFinalMap().getTransaction(Base58.decode(signatures[0]));
+        Transaction target = dcSet.getTransactionFinalMap().getTransaction(Base58.decode(signatures[1]));
+        Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = dcSet.getTradeMap()
+                .get(Fun.t2(Transaction.makeDBRef(initiator.getHeightSeqNo()),
+                        Transaction.makeDBRef(target.getHeightSeqNo())));
         output.put("type", "trade");
         output.put("trade", query);
 

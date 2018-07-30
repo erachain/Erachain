@@ -2529,20 +2529,18 @@ public class Controller extends Observable {
      * want) { return this.getOrders(have, want, true); }
      */
 
-    public SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(
+    public SortableList<Long, Order> getOrders(
             AssetCls have, AssetCls want, boolean reverse) {
         return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), reverse);
     }
 
-    public List<Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-            Tuple2<Long, BigDecimal>>> getOrders(Long have, Long want) {
+    public List<Order> getOrders(Long have, Long want) {
 
         return dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
     }
 
 
-    public SortableList<Tuple2<byte[], byte[]>, Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> getTrades(
+    public SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getTrades(
             AssetCls have, AssetCls want) {
         return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
     }
@@ -2853,7 +2851,7 @@ public class Controller extends Observable {
     }
     
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
-        return cancelOrder(creator, order.getId(), feePow);
+        return cancelOrder(creator, order, feePow);
     }
     
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, byte[] orderID, int feePow) {

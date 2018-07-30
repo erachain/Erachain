@@ -10,6 +10,7 @@ import core.item.assets.Trade;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.ItemAssetMap;
+import datachain.TransactionFinalMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -116,10 +117,8 @@ public class API_Trade {
 
         Map output = new LinkedHashMap();
 
-        List<Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>> ordersHave = dcSet
-                .getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        List<Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>> ordersWant = dcSet
-                .getOrderMap().getOrdersForTradeWithFork(want, have, true);
+        List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
         Map sellsJSON = new LinkedHashMap();
         Map buysJSON = new LinkedHashMap();
@@ -133,23 +132,23 @@ public class API_Trade {
         // show SELLs in BACK order
         for (int i = ordersHave.size() - 1; i >= 0; i--) {
 
-            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> order = ordersHave.get(i);
+            Order order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
-            sellJSON.put("price", order.a.e);
-            vol = order.b.b.subtract(order.b.c);
-            sellJSON.put("amount", vol); // getAmountHaveLeft
+            sellJSON.put("price", order.getPrice());
+            vol = order.getAmountHaveLeft();
+            sellJSON.put("amount", vol);
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", Order.calcPrice(order.c.b, order.b.b));
+            sellJSON.put("sellingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()));
 
-            BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
+            BigDecimal sellingAmount = order.getAmountWantLeft();
 
             sellJSON.put("sellingAmount", sellingAmount);
 
             sumSellingAmount = sumSellingAmount.add(sellingAmount);
 
-            sellsJSON.put(Base58.encode(order.a.a), sellJSON);
+            sellsJSON.put(order.getId().toString(), sellJSON);
 
             if(counter++ > limit) break;
 
@@ -167,25 +166,25 @@ public class API_Trade {
         counter = 0;
         for (int i = ordersWant.size() - 1; i >= 0; i--) {
 
-            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> order = ordersWant.get(i);
+            Order order = ordersWant.get(i);
 
             Map buyJSON = new LinkedHashMap();
 
-            buyJSON.put("price", order.a.e);
-            vol = order.b.b.subtract(order.b.c);
+            buyJSON.put("price", order.getPrice());
+            vol = order.getAmountHaveLeft()
             buyJSON.put("amount", vol);
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", Order.calcPrice(order.c.b, order.b.b));
+            buyJSON.put("buyingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()));
 
-            BigDecimal buyingAmount = Order.calcAmountWantLeft(order);
+            BigDecimal buyingAmount = order.getAmountWantLeft();
 
             buyJSON.put("buyingAmount", buyingAmount);
 
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
-            buysJSON.put(Base58.encode(order.a.a), buyJSON);
+            buysJSON.put(order.getId(), buyJSON);
 
             if(counter++ > limit) break;
 
@@ -238,7 +237,7 @@ public class API_Trade {
 
         Map tradesJSON = new LinkedHashMap();
 
-        List<Fun.Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
+        List<Fun.Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
                 want);
 
         output.put("tradesCount", trades.size());
@@ -246,17 +245,18 @@ public class API_Trade {
         BigDecimal tradeWantAmount = BigDecimal.ZERO;
         BigDecimal tradeHaveAmount = BigDecimal.ZERO;
 
+        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        Transaction createOrder;
+
         int i = 0;
-        for (Fun.Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Fun.Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade : trades) {
             if (i++ > limit) break;
 
             Map tradeJSON = new LinkedHashMap();
 
-            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> orderInitiator = Order
-                    .getOrder(dcSet, trade.a);
+            Order orderInitiator = Order.getOrder(dcSet, trade.a);
 
-            Fun.Tuple3<Fun.Tuple5<byte[], String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>> orderTarget = Order
-                    .getOrder(dcSet, trade.b);
+            Order orderTarget = Order.getOrder(dcSet, trade.b);
 
             tradeJSON.put("amountHave", trade.c);
             tradeJSON.put("amountWant", trade.d);
@@ -264,11 +264,12 @@ public class API_Trade {
             tradeJSON.put("realPrice", Order.calcPrice(trade.c, trade.d));
             tradeJSON.put("realReversePrice", Order.calcPrice(trade.d, trade.c));
 
-            tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a));
+            createOrder = finalMap.get(orderInitiator.getId());
+            tradeJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
 
-            tradeJSON.put("initiatorCreator", orderInitiator.a.b);
-            tradeJSON.put("initiatorAmount", orderInitiator.b.b);
-            if (orderInitiator.b.a == have) {
+            tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
+            tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave());
+            if (orderInitiator.getHave() == have) {
                 tradeJSON.put("type", "sell");
                 tradeWantAmount = tradeWantAmount.add(trade.c);
                 tradeHaveAmount = tradeHaveAmount.add(trade.d);
@@ -278,9 +279,11 @@ public class API_Trade {
                 tradeHaveAmount = tradeHaveAmount.add(trade.c);
                 tradeWantAmount = tradeWantAmount.add(trade.d);
             }
-            tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a));
-            tradeJSON.put("targetCreator", orderTarget.a.b);
-            tradeJSON.put("targetAmount", orderTarget.b.b);
+
+            createOrder = finalMap.get(orderInitiator.getId());
+            tradeJSON.put("targetTxSignature", Base58.encode(createOrder.getSignature()));
+            tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress());
+            tradeJSON.put("targetAmount", orderTarget.getAmountHave());
 
             tradeJSON.put("timestamp", trade.e);
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.e));

@@ -63,8 +63,9 @@ public class CancelOrderTransaction extends Transaction {
 
         super.setDC(dcSet, asPack);
 
-        //this.height
-        Long orderID =
+        Transaction createOrder = this.dcSet.getTransactionFinalMap().getTransaction(this.orderSignature);
+        Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
+        this.orderID = Transaction.makeDBRef(dbRefTuple2);
 
     }
 
@@ -217,17 +218,23 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         //CHECK IF ORDER EXISTS
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
-        if (this.dcSet.getOrderMap().contains(this.getOrderID()))
-            order = this.dcSet.getOrderMap().get(this.getOrderID());
+        Order order = null;
+        if (!this.dcSet.getTransactionFinalMapSigns().contains(this.orderSignature)) {
+                return ORDER_DOES_NOT_EXIST;
+        }
 
-        if (order == null && !BlockChain.DEVELOP_USE)
+        Transaction createOrder = this.dcSet.getTransactionFinalMap().getTransaction(this.orderSignature);
+        Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
+        this.orderID = Transaction.makeDBRef(dbRefTuple2);
+        if (this.dcSet.getOrderMap().contains(this.orderID))
+            order = this.dcSet.getOrderMap().get(this.orderID);
+
+        if (order == null)
             return ORDER_DOES_NOT_EXIST;
 
         ///
         //CHECK IF CREATOR IS CREATOR
-        if (order != null && !order.a.b.equals(this.creator.getAddress())) {
+        if (!createOrder.getCreator().equals(this.creator.getAddress())) {
             return INVALID_ORDER_CREATOR;
         }
 
@@ -240,8 +247,12 @@ public class CancelOrderTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, asPack);
 
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getOrderMap().get(this.getOrderID());
+        // TODO - CANCEL для транзакции в том же блоке???
+        Transaction createOrder = this.dcSet.getTransactionFinalMap().getTransaction(this.orderSignature);
+        Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
+        this.orderID = Transaction.makeDBRef(dbRefTuple2);
+
+        Order order = this.dcSet.getOrderMap().get(this.getOrderID());
 
         if (order == null && BlockChain.DEVELOP_USE) {
             return;
@@ -253,12 +264,14 @@ public class CancelOrderTransaction extends Transaction {
     //@Override
     @Override
     public void orphan(boolean asPack) {
-        //UPDATE CREATOR
+
+        // FIRST GET DB REF from FINAL
+
+        // ORPHAN
         super.orphan(asPack);
 
-        //ADD TO DATABASE
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getCompletedOrderMap().get(this.getOrderID());
+        //REMOVE ORDER DATABASE
+        Order order = this.dcSet.getCompletedOrderMap().get(this.getOrderID());
 
         if (order == null && BlockChain.DEVELOP_USE) {
             return;
@@ -312,16 +325,15 @@ public class CancelOrderTransaction extends Transaction {
 
         assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+        Order order;
 
         if (this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
-            order = this.dcSet.getCompletedOrderMap().get(this.getDBRef(this.height, this.getSeqNo(this.dcSet)));
+            order = this.dcSet.getCompletedOrderMap().get(this.orderID);
         } else {
-            order = this.dcSet.getOrderMap().get(this.getDBRef(this.height, this.getSeqNo(this.dcSet)));
+            order = this.dcSet.getOrderMap().get(this.orderID);
         }
 
-        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.b.a, order.b.c);
+        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHave());
 
         return assetAmount;
     }

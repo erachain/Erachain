@@ -96,10 +96,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>,
             Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Tuple5<Long, Long, BigDecimal, BigDecimal, Long> value) {
-                    Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
-                    long have = order.b.a;
-                    long want = order.c.a;
+                    Order order = Order.getOrder(getDCSet(), value.a);
+                    long have = order.getHave();
+                    long want = order.getWant();
                     String pairKey;
                     if (have > want) {
                         pairKey = have + "/" + want;
@@ -120,9 +119,8 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>,
             Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Tuple5<Long, Long, BigDecimal, BigDecimal, Long> value) {
-                    Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
-                    long want = order.c.a;
+                    Order order = Order.getOrder(getDCSet(), value.a);
+                    long want = order.getWant();
 
                     String wantKey;
                     wantKey = String.valueOf(want);
@@ -140,9 +138,8 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>,
             Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Tuple5<Long, Long, BigDecimal, BigDecimal, Long> value) {
-                    Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.getOrder(getDCSet(), value.a);
-                    long have = order.b.a;
+                    Order order = Order.getOrder(getDCSet(), value.a);
+                    long have = order.getHave();
 
                     String haveKey;
                     haveKey = String.valueOf(have);

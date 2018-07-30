@@ -205,8 +205,9 @@ public class CreateOrderTransaction extends Transaction {
 
     }
 
-    public byte[] getOrderId() {
-        return this.signature;
+    public Long getOrderId() {
+        //return this.signature;
+        return Transaction.makeDBRef(this.height, this.seqNo);
     }
 
     @Override

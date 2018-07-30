@@ -592,7 +592,7 @@ public class TransactionCreator {
     }
 
     public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow) {
-        return createCancelOrderTransaction(creator, order.getId(), feePow);
+        return createCancelOrderTransaction(creator, order, feePow);
     }
 
     public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, byte[] orderID, int feePow) {

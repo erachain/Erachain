@@ -774,10 +774,26 @@ public abstract class Transaction {
     }
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
-    public static Long getDBRef(int height, int seqNo) {
+    public static Long makeDBRef(int height, int seqNo) {
 
         byte[] ref = Ints.toByteArray(height);
         return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seqNo)));
+
+    }
+    public static Long makeDBRef(Tuple2<Integer, Integer> dbRef) {
+
+        byte[] ref = Ints.toByteArray(dbRef.a);
+        return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(dbRef.b)));
+
+    }
+
+    public static Tuple2<Integer, Integer> parseDBRef(Long dbRef) {
+
+        byte[] bytes = Longs.toByteArray(dbRef);
+
+        int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
+        int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+        return new Tuple2<Integer, Integer>(blockHeight, seqNo);
 
     }
 

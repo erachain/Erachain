@@ -15,6 +15,7 @@ import java.util.TimerTask;
 
 import javax.swing.JFileChooser;
 
+import core.item.assets.Order;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -1596,15 +1597,11 @@ public class Wallet extends Observable implements Observer {
 
 			// TODO : FULLFILL not work - нужно сделать запись заявок по записи
 			// заявок в основную базу а не по записи транзакций
-			Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-					Tuple2<Long, BigDecimal>> orderNew;
+			Order orderNew;
 
 			orderNew = DCSet.getInstance().getOrderMap().get(orderCreation.getOrderId());
 			if (orderNew == null) {
 				orderNew = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getOrderId());
-				if (orderNew == null) {
-					orderNew = orderCreation.makeOrderDB();
-				}
 			}
 			this.database.getOrderMap().add(orderNew);
 		}
@@ -1619,8 +1616,8 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, byte[]>(orderCreation.getCreator().getAddress(),
-					orderCreation.getSignature()));
+			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+					Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
 		}
 	}
 
@@ -1633,8 +1630,8 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, byte[]>(orderCancel.getCreator().getAddress(),
-					orderCancel.getSignature()));
+			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+					Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
 		}
 	}
 
@@ -1647,8 +1644,7 @@ public class Wallet extends Observable implements Observer {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			// DELETE ORDER
-			Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet
-					.getInstance().getOrderMap().get(orderCancel.getOrderID());
+			Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
 			this.database.getOrderMap().add(order);
 		}
 	}
