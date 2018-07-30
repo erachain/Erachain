@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
+import core.account.Account;
 import core.transaction.*;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -169,6 +170,16 @@ public class OrderTestsMy {
 
     @Test
     public void tails() {
+
+        byte[] seed = Crypto.getInstance().digest("test_A".getBytes());
+        byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+        accountA = new PrivateKeyAccount(privateKey);
+
+        String addr1 = accountA.getAddress();
+        Account accShort = Account.makeAccountFromShort(accountA.getShortAddressBytes());
+        String addr2 = accShort.getAddress();
+
+        assertEquals(addr1, addr2);
 
         MathContext rounding = new java.math.MathContext(8, RoundingMode.HALF_DOWN);
 
