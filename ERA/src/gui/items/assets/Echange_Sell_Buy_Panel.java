@@ -210,11 +210,9 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     return;
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = sellOrdersTableModel
-                        .getOrder(row);
+                Order order = sellOrdersTableModel.getOrder(row);
                 
-                Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a);
-                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
+                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
                 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
                         Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
@@ -243,7 +241,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     return;
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = sellOrdersTableModel
+                Order order = sellOrdersTableModel
                         .getOrder(row);
                 new TradesFrame(order);
             }
@@ -261,7 +259,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     return;
                 int row1 = sellOrdersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = sellOrdersTableModel
+                Order order = sellOrdersTableModel
                         .getOrder(row1);
                 new CancelOrderFrame(order);
             }
@@ -281,16 +279,14 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 if (row > sellOrdersTableModel.orders.size())
                     return;
 
-                Pair<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> rowObj = sellOrdersTableModel.orders
-                        .get(row);
+                Pair<Long, Order> rowObj = sellOrdersTableModel.orders.get(row);
                 if (rowObj == null)
                     return;
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = rowObj
-                        .getB();
+                Order order = rowObj.getB();
                 if (order == null)
                     return;
 
-                if (Controller.getInstance().isAddressIsMine(order.a.b))
+                if (Controller.getInstance().isAddressIsMine(order.getCreator().getAddress()))
                     sellOrdersMenu.getComponent(1).setEnabled(true);
                 else
                     sellOrdersMenu.getComponent(1).setEnabled(false);
@@ -298,8 +294,8 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
 
                     if (row < sellOrdersTableModel.orders.size()) {
-                        buyOrderPanel.txtAmountHave.setText(order.b.b.subtract(order.b.c).toPlainString());
-                        buyOrderPanel.txtPrice.setText(order.a.e.toPlainString());
+                        buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString());
+                        buyOrderPanel.txtPrice.setText(order.getPrice().toPlainString());
                     }
                 }
             }
@@ -332,19 +328,19 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Pair<Long, Order> rowObj = buyOrdersTableModel.orders.get(row);
                 if (rowObj == null)
                     return;
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = rowObj
+                Order order = rowObj
                         .getB();
                 if (order == null)
                     return;
 
-                if (Controller.getInstance().isAddressIsMine(order.a.b))
+                if (Controller.getInstance().isAddressIsMine(order.getCreator().getAddress()))
                     buyOrdersMenu.getComponent(1).setEnabled(true);
                 else
                     buyOrdersMenu.getComponent(1).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
-                    sellOrderPanel.txtAmountHave.setText(order..toPlainString());
-                    sellOrderPanel.txtPrice.setText(Order.calcPrice(order.c.b, order.b.b).toPlainString());
+                    sellOrderPanel.txtAmountHave.setText(order.getAmountHave().toPlainString());
+                    sellOrderPanel.txtPrice.setText(order.getPrice().toPlainString());
                 }
             }
         });
@@ -362,11 +358,8 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     return;
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = buyOrdersTableModel
-                        .getOrder(row);
-                
-                Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a);
-                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
+                Order order = buyOrdersTableModel.getOrder(row);
+                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
 
                 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,
                         Lang.getInstance().translate("Send Order"), (int) (MainFrame.getInstance().getWidth() / 1.2),
@@ -387,8 +380,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
         buyTrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> sl = buyOrdersTableModel
-                        .getSortableList();
+                SortableList<Long, Order> sl = buyOrdersTableModel.getSortableList();
                 if (sl.isEmpty())
                     return;
 
@@ -397,8 +389,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     return;
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = buyOrdersTableModel
-                        .getOrder(row);
+                Order order = buyOrdersTableModel.getOrder(row);
                 if (order != null)
                     new TradesFrame(order);
             }
@@ -408,8 +399,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
         buyCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SortableList<byte[], Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> sl = buyOrdersTableModel
-                        .getSortableList();
+                SortableList<Long, Order> sl = buyOrdersTableModel.getSortableList();
                 if (sl.isEmpty())
                     return;
                 int row = buyOrdersTable.getSelectedRow();
@@ -417,8 +407,7 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     return;
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = buyOrdersTableModel
-                        .getOrder(row);
+                Order order = buyOrdersTableModel.getOrder(row);
                 new CancelOrderFrame(order);
             }
         });
@@ -462,14 +451,13 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 if (row > tradesTableModel.getSortableList().size())
                     return;
 
-                Tuple5<byte[], byte[], BigDecimal, BigDecimal, Long> trade = tradesTableModel.getTrade(row);
+                Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = tradesTableModel.getTrade(row);
                 if (trade == null)
                     return;
 
                 DCSet db = DCSet.getInstance();
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-                        Tuple2<Long, BigDecimal>> initiator = Order.getOrder(db, trade.a);
-                boolean type = initiator.b.a == have.getKey();
+                Order initiator = Order.getOrder(db, trade.a);
+                boolean type = initiator.getHave() == have.getKey();
 
                 if (e.getClickCount() == 2) {
 

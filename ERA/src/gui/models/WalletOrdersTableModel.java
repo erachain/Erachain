@@ -109,13 +109,16 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
             case COLUMN_STATUS:
 
-                boolean active = DCSet.getInstance().getOrderMap().contains(order.getId())
-                        || DCSet.getInstance().getCompletedOrderMap().contains(order.getId());
-
                 if (order.getAmountHave().compareTo(order.getAmountHaveLeft()) == 0) {
                     return "DONE";
                 } else {
-                    return active?
+                    if (DCSet.getInstance().getCompletedOrderMap().contains(order.getId()))
+                        return "Canceled";
+
+                    if (DCSet.getInstance().getOrderMap().contains(order.getId()))
+                        return "ACTIVE";
+
+                    return "unconfirmed";
 
                 }
 
@@ -141,8 +144,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         if (//message.getType() == ObserverMessage.LIST_ORDER_TYPE ||
                 message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
-                this.orders = (SortableList<Tuple2<String, byte[]>, Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>) message.getValue();
+                this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
                 this.orders.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);
             }

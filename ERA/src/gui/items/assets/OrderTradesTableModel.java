@@ -94,7 +94,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tup
                 
                 String result = NumberAsString.formatAsString(trade.c); //getAmountHave());
 
-                if (Controller.getInstance().isAddressIsMine(initatorOrder.a.b)) {
+                if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 

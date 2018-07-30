@@ -93,8 +93,7 @@ public class SellOrdersTableModel extends
             return null;
         }
 
-        Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>,
-                Tuple2<Long, BigDecimal>> order = null;
+        Order order = null;
         boolean isMine = false;
         int size = this.orders.size();
         if (row < size) {
@@ -107,7 +106,7 @@ public class SellOrdersTableModel extends
             }
 
             Controller cntr = Controller.getInstance();
-            if (cntr.isAddressIsMine(order.a.b)) {
+            if (cntr.isAddressIsMine(order.getCreator().getAddress())) {
                 isMine = true;
             }
 
@@ -125,19 +124,16 @@ public class SellOrdersTableModel extends
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountHave, have.getScale()) + "</i></html>";
 
                 // It shows unacceptably small amount of red.
-                BigDecimal amount = order.b.b.subtract(order.b.c);
+                BigDecimal amount = order.getAmountHaveLeft();
                 String amountStr = NumberAsString.formatAsString(amount, have.getScale());
-                if (order.a.d)
-                    return amountStr;
-                else
-                    return "<html><font color=#808080>" + amountStr + "</font></html>";
+                return amountStr;
 
             case COLUMN_PRICE:
 
                 if (row == this.orders.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
-                BigDecimal price = Order.calcPrice(order.b.b, order.c.b);
+                BigDecimal price = order.getPrice();
                 return NumberAsString.formatAsString(price.stripTrailingZeros());
 
             case COLUMN_AMOUNT_WANT:
@@ -145,7 +141,7 @@ public class SellOrdersTableModel extends
                 if (row == this.orders.size())
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
-                amountStr = NumberAsString.formatAsString(Order.calcAmountWantLeft(order), want.getScale()); // getAmountWantLeft());
+                amountStr = NumberAsString.formatAsString(order.getAmountWantLeft(), want.getScale());
 
                 if (isMine)
                     amountStr = "<html><b>" + amountStr + "</b></html>";

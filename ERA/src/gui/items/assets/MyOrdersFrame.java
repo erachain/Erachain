@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import core.item.assets.Order;
 import gui.CoreRowSorter;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
@@ -85,10 +86,6 @@ public class MyOrdersFrame extends JFrame {
         this.ordersTableModel = new WalletOrdersTableModel();
         final JTable ordersTable = new JTable(this.ordersTableModel);
 
-        //CHECKBOX FOR CONFIRMED
-        TableColumn confirmedColumn = ordersTable.getColumnModel().getColumn(WalletOrdersTableModel.COLUMN_CONFIRMED);
-        confirmedColumn.setCellRenderer(ordersTable.getDefaultRenderer(Boolean.class));
-
         //ASSETS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
         CoreRowSorter sorter = new CoreRowSorter(this.ordersTableModel, indexes);
@@ -104,8 +101,7 @@ public class MyOrdersFrame extends JFrame {
                 int row = ordersTable.getSelectedRow();
                 row = ordersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersTableModel.getOrder(row);
+                Order order = ordersTableModel.getOrder(row);
                 new TradesFrame(order);
             }
         });
@@ -117,8 +113,7 @@ public class MyOrdersFrame extends JFrame {
                 int row = ordersTable.getSelectedRow();
                 row = ordersTable.convertRowIndexToModel(row);
 
-                Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersTableModel.getOrder(row);
+                Order order = ordersTableModel.getOrder(row);
                 new CancelOrderFrame(order);
             }
         });
@@ -137,8 +132,7 @@ public class MyOrdersFrame extends JFrame {
 
                 if (e.getClickCount() == 2) {
                     row = ordersTable.convertRowIndexToModel(row);
-                    Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = ordersTableModel.getOrder(row);
+                    Order order = ordersTableModel.getOrder(row);
                     new TradesFrame(order);
                 }
             }

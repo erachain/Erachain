@@ -1,5 +1,6 @@
 package gui.items.assets;
 
+import core.item.assets.Order;
 import gui.Split_Panel;
 import gui.library.MTable;
 import gui.models.WalletItemAssetsTableModel;
@@ -268,8 +269,7 @@ public class My_Order_Tab extends Split_Panel {
     class search_listener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
-            Tuple3<Tuple5<byte[], String, Long, Boolean, BigDecimal>,
-                    Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
+            Order order = null;
             if (table.getSelectedRow() >= 0)
                 order = ordersModel.getOrder(table.convertRowIndexToModel(table.getSelectedRow()));
             if (order == null) return;
