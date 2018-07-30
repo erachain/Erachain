@@ -20,13 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -394,21 +393,32 @@ public class TelegramsResource {
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
+
         JSONArray arraySign = (JSONArray) (jsonObject.get("list"));
         JSONObject out = new JSONObject();
         List<TelegramMessage> lst = new ArrayList<>();
+        Controller controller = new Controller().getInstance();
+
         for (Object obj : arraySign) {
-            if (Controller.getInstance().getTelegram(obj.toString()) == null)
+
+            if (controller.getTelegram(obj.toString()) == null)
                 out.put("signature", obj.toString());
-            else
-                lst.add(Controller.getInstance().getTelegram(obj.toString()));
+            else {
+                TelegramMessage telegramMessage = controller.getTelegram(obj.toString());
+                String address = telegramMessage.getTransaction().getCreator().getAddress();
+                String recipient = telegramMessage.getTransaction().getRecipientAccounts().stream().findFirst().get().getAddress();
+
+                if (controller.getAccountByAddress(address) != null || controller.getAccountByAddress(recipient) != null)
+                    lst.add(telegramMessage);
+                else
+                    out.put("signature", obj.toString());
+            }
         }
         try {
             Controller.getInstance().deleteTelegram(lst);
             return out.toJSONString();
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
-
         }
     }
 }
