@@ -469,7 +469,7 @@ public class Controller extends Observable {
         } catch (Throwable e) {
             // Error open DB
             error = 1;
-            // LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(),e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
             reCreateDC();
         }

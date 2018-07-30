@@ -16,8 +16,8 @@ import java.util.*;
 
 /*
  *
- * private BigInteger initiator;
-	private BigInteger target;
+ * private Long dbRef initiator;
+	private Long dbRef target;
 	private BigDecimal amountHave;
 	private BigDecimal amountWant;
 	private long timestamp;

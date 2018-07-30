@@ -681,8 +681,9 @@ public abstract class Transaction {
         return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
-    public void setBlock(Block block) {
+    public void setBlock(Block block, int seqNo) {
         this.block = block;
+        this.seqNo = seqNo;
     }
 
     public Block getBlock(DCSet db) {

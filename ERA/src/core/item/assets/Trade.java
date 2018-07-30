@@ -4,8 +4,11 @@ package core.item.assets;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -85,8 +88,7 @@ public class Trade {
         return this.timestamp;
     }
 
-	/*
-	public static Trade parse(Long data) throws Exception
+	public static Trade parse(byte[] data) throws Exception
 	{
 		//CHECK IF CORRECT LENGTH
 		if(data.length < BASE_LENGTH)
@@ -96,66 +98,71 @@ public class Trade {
 
 		int position = 0;
 
+		/*
 		//READ INITIATOR
-		Long initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
+		byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
 		Long initiator = new Long(initiatorBytes);
 		position += ORDER_LENGTH;
 
 		//READ TARGET
-		Long targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
+		byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
 		Long target = new Long(targetBytes);
 		position += ORDER_LENGTH;
 
 		//READ AMOUNT HAVE
-		Long amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amountHave = new BigDecimal(new Long(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		//READ AMOUNT WANT
-		Long amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
 		BigDecimal amountWant = new BigDecimal(new Long(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
 		position += AMOUNT_LENGTH;
 
 		//READ TIMESTAMP
-		Long timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+        byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
 		long timestamp = Longs.fromByteArray(timestampBytes);
 		position += TIMESTAMP_LENGTH;
 
 		return new Trade(initiator, target, amountHave, amountWant, timestamp);
+		*/
+		return null;
 	}
 
-	public Long toBytes()
+	public byte[] toBytes()
 	{
-		Long data = new byte[0];
+        byte[] data = new byte[0];
 
+        /*
 		//WRITE INITIATOR
-		Long initiatorBytes = this.initiator.toByteArray();
-		Long fill = new byte[ORDER_LENGTH - initiatorBytes.length];
+        byte[] initiatorBytes = this.initiator.toByteArray();
+        byte[] fill = new byte[ORDER_LENGTH - initiatorBytes.length];
 		initiatorBytes = Bytes.concat(fill, initiatorBytes);
 		data = Bytes.concat(data, initiatorBytes);
 
 		//WRITE TARGET
-		Long targetBytes = this.target.toByteArray();
+        byte[] targetBytes = this.target.toByteArray();
 		fill = new byte[ORDER_LENGTH - targetBytes.length];
 		targetBytes = Bytes.concat(fill, targetBytes);
 		data = Bytes.concat(data, targetBytes);
 
 		//WRITE AMOUNT HAVE
-		Long amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
+        byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
 		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
 
 		//WRITE AMOUNT WANT
-		Long amountWantBytes = this.amountWant.unscaledValue().toByteArray();
+        byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
 
 		//WRITE TIMESTAMP
-		Long timestampBytes = Longs.toByteArray(this.timestamp);
+        byte[] timestampBytes = Longs.toByteArray(this.timestamp);
 		data = Bytes.concat(data, timestampBytes);
 
+*/
 		return data;
 	}
 
@@ -163,7 +170,6 @@ public class Trade {
 	{
 		return BASE_LENGTH;
 	}
-	 */
 
     //PROCESS/ORPHAN
 

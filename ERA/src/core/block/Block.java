@@ -509,7 +509,7 @@ public class Block {
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
                     Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
-                    transaction.setBlock(this);
+                    transaction.setBlock(this, i + 1);
 
                     //ADD TO TRANSACTIONS
                     this.transactions.add(transaction);

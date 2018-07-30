@@ -15,8 +15,8 @@ public class OrderSerializer implements Serializer<Order>, Serializable {
 
     @Override
     public void serialize(DataOutput out, Order value) throws IOException {
-        //out.writeInt(value.getDataLength());
-        //out.write(value.toBytes());
+        out.writeInt(value.getDataLength());
+        out.write(value.toBytes());
     }
 
     @Override

@@ -230,7 +230,8 @@ public class CancelOrderTransaction extends Transaction {
             order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null)
-            return ORDER_DOES_NOT_EXIST;
+            if (!BlockChain.DEVELOP_USE)
+                return ORDER_DOES_NOT_EXIST;
 
         ///
         //CHECK IF CREATOR IS CREATOR

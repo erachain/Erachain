@@ -15,8 +15,8 @@ public class TradeSerializer implements Serializer<Trade>, Serializable {
 
     @Override
     public void serialize(DataOutput out, Trade value) throws IOException {
-        //out.writeInt(value.getDataLength());
-        //out.write(value.toBytes());
+        out.writeInt(value.getDataLength());
+        out.write(value.toBytes());
     }
 
     @Override
