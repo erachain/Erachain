@@ -18,8 +18,8 @@ import datachain.DCSet;
 
 public class Trade {
 
-    private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
-    private static final int AMOUNT_LENGTH = 8;
+    private static final int ORDER_LENGTH = Order.ID_LENGTH;
+    private static final int AMOUNT_LENGTH = Order.FULFILLED_LENGTH;
     private static final int SCALE_LENGTH = 1;
     private static final int TIMESTAMP_LENGTH = 8;
     private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH

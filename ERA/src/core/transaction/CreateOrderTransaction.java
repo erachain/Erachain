@@ -206,11 +206,7 @@ public class CreateOrderTransaction extends Transaction {
     }
 
     public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        super.setDC(dcSet, asPack);
-
-        this.haveAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.haveKey);
-        this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
-
+        this.setDC(dcSet, asPack);
         this.seqNo = seqNo;
     }
 

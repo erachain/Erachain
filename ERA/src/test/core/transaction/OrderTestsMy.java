@@ -622,24 +622,32 @@ public class OrderTestsMy {
             // EXCEPTION IS THROWN OK
         }
 
+    }
+
+    @Test
+    public void parseTrade() {
+
         //////////////////////////////////
         /////////// TRADE PARSE //////////
-        Trade tradeParse = new Trade(this.order_AB_1.getId(), this.order_AB_2.getId(),
-                BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
-                BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1), timestamp);
-        /*
-         * byte[] tradeRaw = tradeParse.toBytes();
-         * Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
-         * Trade tradeParse_1 = null; try { tradeParse_1 =
-         * Trade.parse(tradeRaw); } catch (Exception e) {
-         *
-         * } Assert.assertEquals(tradeParse_1.getTimestamp(),
-         * tradeParse.getTimestamp());
-         */
-        
-        Assert.assertEquals(tradeParse.getTimestamp(), tradeParse.getTimestamp());
-        Assert.assertEquals(tradeParse.getAmountHave(), tradeParse.getAmountHave());
-        Assert.assertEquals(tradeParse.getAmountWant(), tradeParse.getAmountWant());
+        Trade tradeParse = new Trade(543123456L, 3434546546L,
+                BigDecimal.valueOf(123451).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
+                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1), timestamp);
+         byte[] tradeRaw = tradeParse.toBytes();
+
+         Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
+
+         Trade tradeParse_1 = null;
+         try {
+             tradeParse_1 = Trade.parse(tradeRaw);
+         } catch (Exception e) {
+
+         }
+         Assert.assertEquals(tradeParse_1.getInitiator(), tradeParse.getInitiator());
+        Assert.assertEquals(tradeParse_1.getTarget(), tradeParse.getTarget());
+
+        Assert.assertEquals(tradeParse_1.getTimestamp(), tradeParse.getTimestamp());
+        Assert.assertEquals(tradeParse_1.getAmountHave(), tradeParse.getAmountHave());
+        Assert.assertEquals(tradeParse_1.getAmountWant(), tradeParse.getAmountWant());
 
     }
 

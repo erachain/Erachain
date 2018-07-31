@@ -30,13 +30,13 @@ public class Order implements Comparable<Order> {
 
     final private static BigDecimal precisionUnit = BigDecimal.ONE.scaleByPowerOfTen(-BlockChain.TRADE_PRECISION + 1);
 
-    private static final int ID_LENGTH = 8; //Crypto.SIGNATURE_LENGTH;
+    public static final int ID_LENGTH = 8; //Crypto.SIGNATURE_LENGTH;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
     private static final int SCALE_LENGTH = 1;
     private static final int AMOUNT_LENGTH = 8;
-    private static final int FULFILLED_LENGTH = AMOUNT_LENGTH;
+    public static final int FULFILLED_LENGTH = AMOUNT_LENGTH + 4;
     private static final int TIMESTAMP_LENGTH = 8;
     //private static final int EXECUTABLE_LENGTH = 1;
     private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
@@ -392,11 +392,18 @@ public class Order implements Comparable<Order> {
 		timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
 		data = Bytes.concat(data, timestampBytes);
 
+		// TRY CUT SCALE
+        byte[] fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
+        while (fulfilledHaveBytes.length > FULFILLED_LENGTH) {
+            this.fulfilledHave.setScale(this.fulfilledHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
+            fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
+        }
+
         //WRITE AMOUNT HAVE SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.fulfilledHave.scale()});
 
 		//WRITE FULFILLED HAVE
-		byte[] fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
+		///fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
 		fill = new byte[FULFILLED_LENGTH - fulfilledHaveBytes.length];
 		fulfilledHaveBytes = Bytes.concat(fill, fulfilledHaveBytes);
 		data = Bytes.concat(data, fulfilledHaveBytes);
@@ -503,6 +510,9 @@ public class Order implements Comparable<Order> {
         //boolean isDivisibleWant = true; //this.isWantDivisible(db);
         BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
 
+        int haveScale = this.getHaveAsset().getScale();
+        int wantScale = this.getWantAsset().getScale();
+
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
             Order order = orders.get(index++);
@@ -533,14 +543,13 @@ public class Order implements Comparable<Order> {
             if (thisPrice.compareTo(orderReversePrice) > 0)
                 break;
 
-            thisIncrement = orderPrice.scaleByPowerOfTen(-this.amountWant.scale());
+            thisIncrement = orderPrice.scaleByPowerOfTen(-wantScale);
             if (thisAmountHaveLeft.compareTo(thisIncrement) < 0)
                 // if left not enough for 1 buy by price this order
                 break;
 
             orderAmountHaveLeft = order.getAmountHaveLeft();
-            //orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.c.b.scale(), RoundingMode.HALF_UP);
-            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(order.amountWant.scale(), RoundingMode.HALF_UP);
+            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(wantScale, RoundingMode.HALF_UP);
 
             compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
             if (compare >= 0) {
@@ -552,12 +561,13 @@ public class Order implements Comparable<Order> {
 
                     // RESOLVE amount with SCALE
                     tradeAmountAccurate = tradeAmountGet.multiply(orderReversePrice)
-                            .setScale(orderAmountHaveLeft.scale() + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-                    tradeAmount = tradeAmountAccurate.setScale(orderAmountHaveLeft.scale(), RoundingMode.HALF_DOWN);
+                            .setScale(haveScale + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+                    tradeAmount = tradeAmountAccurate.setScale(haveScale, RoundingMode.HALF_DOWN);
 
                     // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
                     int tradeAmountPrecision = Order.precision(tradeAmount);
                     if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
+                        // PRECISION soo SMALL
                         differenceTrade = tradeAmount.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
                         differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
                         if (differenceTrade.compareTo(precisionUnit) > 0) {
@@ -581,6 +591,21 @@ public class Order implements Comparable<Order> {
             //AND WE CAN BUY ANYTHING
             if (tradeAmount.compareTo(BigDecimal.ZERO) > 0) {
                 //CREATE TRADE
+
+                // CUT PRECISION in bytes
+                tradeAmount = tradeAmount.stripTrailingZeros();
+                byte[] amountBytes = tradeAmount.unscaledValue().toByteArray();
+                while (amountBytes.length > FULFILLED_LENGTH) {
+                    tradeAmount.setScale(tradeAmount.scale() - 1, BigDecimal.ROUND_HALF_UP);
+                    amountBytes = tradeAmount.unscaledValue().toByteArray();
+                }
+                tradeAmountGet = tradeAmountGet.stripTrailingZeros();
+                amountBytes = tradeAmountGet.unscaledValue().toByteArray();
+                while (amountBytes.length > FULFILLED_LENGTH) {
+                    tradeAmountGet.setScale(tradeAmountGet.scale() - 1, BigDecimal.ROUND_HALF_UP);
+                    amountBytes = tradeAmountGet.unscaledValue().toByteArray();
+                }
+
                 trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
                 trade.process(db);
 
