@@ -237,7 +237,7 @@ public class API_Trade {
 
         Map tradesJSON = new LinkedHashMap();
 
-        List<Fun.Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades = dcSet.getTradeMap().getTrades(have,
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have,
                 want);
 
         output.put("tradesCount", trades.size());
@@ -249,20 +249,20 @@ public class API_Trade {
         Transaction createOrder;
 
         int i = 0;
-        for (Fun.Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade : trades) {
+        for (Trade trade : trades) {
             if (i++ > limit) break;
 
             Map tradeJSON = new LinkedHashMap();
 
-            Order orderInitiator = Order.getOrder(dcSet, trade.a);
+            Order orderInitiator = Order.getOrder(dcSet, trade.getInitiator());
 
-            Order orderTarget = Order.getOrder(dcSet, trade.b);
+            Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
-            tradeJSON.put("amountHave", trade.c);
-            tradeJSON.put("amountWant", trade.d);
+            tradeJSON.put("amountHave", trade.getAmountHave());
+            tradeJSON.put("amountWant", trade.getAmountWant());
 
-            tradeJSON.put("realPrice", Order.calcPrice(trade.c, trade.d));
-            tradeJSON.put("realReversePrice", Order.calcPrice(trade.d, trade.c));
+            tradeJSON.put("realPrice", trade.calcPrice());
+            tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
             createOrder = finalMap.get(orderInitiator.getId());
             tradeJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
@@ -271,13 +271,13 @@ public class API_Trade {
             tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave());
             if (orderInitiator.getHave() == have) {
                 tradeJSON.put("type", "sell");
-                tradeWantAmount = tradeWantAmount.add(trade.c);
-                tradeHaveAmount = tradeHaveAmount.add(trade.d);
+                tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
+                tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
             } else {
                 tradeJSON.put("type", "buy");
-                tradeHaveAmount = tradeHaveAmount.add(trade.c);
-                tradeWantAmount = tradeWantAmount.add(trade.d);
+                tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
+                tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
             }
 
             createOrder = finalMap.get(orderInitiator.getId());
@@ -285,8 +285,8 @@ public class API_Trade {
             tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress());
             tradeJSON.put("targetAmount", orderTarget.getAmountHave());
 
-            tradeJSON.put("timestamp", trade.e);
-            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.e));
+            tradeJSON.put("timestamp", trade.getTimestamp());
+            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.put(i, tradeJSON);
         }

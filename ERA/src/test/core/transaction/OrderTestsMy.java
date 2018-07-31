@@ -47,7 +47,7 @@ public class OrderTestsMy {
     DCSet db;
     GenesisBlock gb;
     Order orderREC;
-    Tuple5<Long, Long, BigDecimal, BigDecimal, Long> tradeREC;
+    Trade tradeREC;
     // CREATE KNOWN ACCOUNT
     PrivateKeyAccount accountA;
     PrivateKeyAccount accountB;

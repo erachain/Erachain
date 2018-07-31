@@ -258,11 +258,11 @@ public class Order implements Comparable<Order> {
         return this.timestamp;
     }
 
-    public List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getInitiatedTrades() {
+    public List<Trade> getInitiatedTrades() {
         return this.getInitiatedTrades(DCSet.getInstance());
     }
 
-    public List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getInitiatedTrades(DCSet db) {
+    public List<Trade> getInitiatedTrades(DCSet db) {
         return db.getTradeMap().getInitiatedTrades(this);
     }
 
@@ -359,12 +359,14 @@ public class Order implements Comparable<Order> {
 
 		//WRITE HAVE
 		byte[] haveBytes = Longs.toByteArray(this.haveKey);
-		haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
+        // only for BIGInteger and BigDecimal it need:
+		//haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
 		data = Bytes.concat(data, haveBytes);
 
 		//WRITE WANT
 		byte[] wantBytes = Longs.toByteArray(this.wantKey);
-		wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
+		// only for BIGInteger and BigDecimal it need:
+        // wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
 		data = Bytes.concat(data, wantBytes);
 
         //WRITE AMOUNT HAVE SCALE
@@ -439,9 +441,9 @@ public class Order implements Comparable<Order> {
         int compare = 0;
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                (this.haveKey == 1 && this.wantKey == 2)
+                (this.haveKey == 1021 || this.wantKey == 1021)
                 //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
-                && !db.isFork()
+                //&& !db.isFork()
                 ) {
             compare++;
         }
@@ -613,8 +615,8 @@ public class Order implements Comparable<Order> {
         DCSet db = this.dcSet;
 
         //ORPHAN TRADES
-        for (Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade : this.getInitiatedTrades(db)) {
-            Trade.fromDBrec(trade).orphan(db);
+        for (Trade trade : this.getInitiatedTrades(db)) {
+            trade.orphan(db);
         }
 
         //REMOVE ORDER FROM DATABASE

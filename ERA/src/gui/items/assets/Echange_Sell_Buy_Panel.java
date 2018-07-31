@@ -16,6 +16,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import core.item.assets.Trade;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -451,29 +452,29 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 if (row > tradesTableModel.getSortableList().size())
                     return;
 
-                Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = tradesTableModel.getTrade(row);
+                Trade trade = tradesTableModel.getTrade(row);
                 if (trade == null)
                     return;
 
                 DCSet db = DCSet.getInstance();
-                Order initiator = Order.getOrder(db, trade.a);
+                Order initiator = Order.getOrder(db, trade.getInitiator());
                 boolean type = initiator.getHave() == have.getKey();
 
                 if (e.getClickCount() == 2) {
 
                     if (type) {
-                        BigDecimal price = Order.calcPrice(trade.d, trade.c);
-                        sellOrderPanel.txtAmountHave.setText(trade.d.toPlainString());
+                        BigDecimal price = trade.calcPriceRevers();
+                        sellOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 
-                        buyOrderPanel.txtAmountHave.setText(trade.d.toPlainString());
+                        buyOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         buyOrderPanel.txtPrice.setText(price.toPlainString());
                     } else {
-                        BigDecimal price = Order.calcPrice(trade.c, trade.d);
-                        sellOrderPanel.txtAmountHave.setText(trade.c.toPlainString());
+                        BigDecimal price = trade.calcPrice();
+                        sellOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 
-                        buyOrderPanel.txtAmountHave.setText(trade.c.toPlainString());
+                        buyOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         buyOrderPanel.txtPrice.setText(price.toPlainString());
                     }
                 }

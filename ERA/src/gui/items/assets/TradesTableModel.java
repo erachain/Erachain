@@ -3,6 +3,7 @@ package gui.items.assets;
 import controller.Controller;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
+import core.item.assets.Trade;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
@@ -22,7 +23,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
-        Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> implements Observer {
+        Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_ASSET_1 = 2;
@@ -30,7 +31,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
     public static final int COLUMN_ASSET_2 = 4;
     BigDecimal sumAsset1;
     BigDecimal sumAsset2;
-    private SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades;
+    private SortableList<Tuple2<Long, Long>, Trade> trades;
     private AssetCls have;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
 
@@ -54,29 +55,29 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
         sumAsset1 = BigDecimal.ZERO;
         sumAsset2 = BigDecimal.ZERO;
 
-        for (Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> tradePair : this.trades) {
+        for (Pair<Tuple2<Long, Long>, Trade> tradePair : this.trades) {
 
-            Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = tradePair.getB();
-            String type = Order.getOrder(DCSet.getInstance(), trade.a).getHave() == this.have.getKey() ? "Sell" : "Buy";
+            Trade trade = tradePair.getB();
+            String type = Order.getOrder(DCSet.getInstance(), trade.getInitiator()).getHave() == this.have.getKey() ? "Sell" : "Buy";
 
             if (type.equals("Buy")) {
-                sumAsset1 = sumAsset1.add(trade.c);// getAmountHave());
-                sumAsset2 = sumAsset2.add(trade.d); //getAmountWant());
+                sumAsset1 = sumAsset1.add(trade.getAmountHave());
+                sumAsset2 = sumAsset2.add(trade.getAmountWant());
             } else {
-                sumAsset1 = sumAsset1.add(trade.d); //getAmountWant());
-                sumAsset2 = sumAsset2.add(trade.c); //getAmountHave());
+                sumAsset1 = sumAsset1.add(trade.getAmountWant());
+                sumAsset2 = sumAsset2.add(trade.getAmountHave());
             }
 
         }
     }
 
     @Override
-    public SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Trade> getSortableList() {
         return this.trades;
     }
 
-    public Tuple5<Long, Long, BigDecimal, BigDecimal, Long> getTrade(int row) {
-        Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> rec = this.trades.get(row);
+    public Trade getTrade(int row) {
+        Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(row);
         if (rec == null)
             return null;
 
@@ -104,7 +105,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
             return null;
         }
 
-        Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = null;
+        Trade trade = null;
         int type = 0;
         Order initatorOrder = null;
         Order targetOrder = null;
@@ -114,8 +115,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
             if (trade != null) {
                 DCSet db = DCSet.getInstance();
 
-                initatorOrder = Order.getOrder(db, trade.a);
-                targetOrder = Order.getOrder(db, trade.b);
+                initatorOrder = Order.getOrder(db, trade.getInitiator());
+                targetOrder = Order.getOrder(db, trade.getTarget());
 
                 type = initatorOrder.getHave() == this.have.getKey() ? -1 : 1;
 
@@ -128,7 +129,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
                 if (row == this.trades.size())
                     return "<html>" + Lang.getInstance().translate("Total") + ":</html>";
 
-                return DateTimeFormat.timestamptoString(trade.e);
+                return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
             case COLUMN_TYPE:
 
@@ -141,9 +142,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
 
                 String result = "";
                 if (type > 0)
-                    result = NumberAsString.formatAsString(trade.c);
+                    result = NumberAsString.formatAsString(trade.getAmountHave());
                 else
-                    result = NumberAsString.formatAsString(trade.d);
+                    result = NumberAsString.formatAsString(trade.getAmountWant());
 
                 if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -158,9 +159,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
                     return null;
 
                 if (type > 0)
-                    return NumberAsString.formatAsString(Order.calcPrice(trade.c, trade.d));
+                    return NumberAsString.formatAsString(trade.calcPrice());
                 else
-                    return NumberAsString.formatAsString(Order.calcPrice(trade.d, trade.c));
+                    return NumberAsString.formatAsString(trade.calcPriceRevers());
 
             case COLUMN_ASSET_2:
 
@@ -168,9 +169,9 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
                     return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
                 if (type > 0)
-                    result = NumberAsString.formatAsString(trade.d);
+                    result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
-                    result = NumberAsString.formatAsString(trade.c);
+                    result = NumberAsString.formatAsString(trade.getAmountHave());
 
                 if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -210,7 +211,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
     @Override
     public Object getItem(int k) {
         // TODO Auto-generated method stub
-        Pair<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> rec = this.trades.get(k);
+        Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(k);
         if (rec == null)
             return null;
 

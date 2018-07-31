@@ -19,9 +19,11 @@ import datachain.DCSet;
 public class Trade {
 
     private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
-    private static final int AMOUNT_LENGTH = 12;
+    private static final int AMOUNT_LENGTH = 8;
+    private static final int SCALE_LENGTH = 1;
     private static final int TIMESTAMP_LENGTH = 8;
-    private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
+    private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH
+            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
 
     private Long initiator;
     private Long target;
@@ -38,23 +40,12 @@ public class Trade {
         this.timestamp = timestamp;
     }
 
-    //PARSE/CONVERT
-    public static Tuple5<Long, Long, BigDecimal, BigDecimal, Long> toDBrec(Trade trade) {
-        return new Tuple5<Long, Long, BigDecimal, BigDecimal, Long>(
-                trade.initiator, trade.target, trade.amountHave, trade.amountWant, trade.timestamp);
-
-    }
-
-    public static Trade fromDBrec(Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade) {
-        return new Trade(trade.a, trade.b, trade.c, trade.d, trade.e);
-    }
-
     public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
-        List<Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
+        List<Trade> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
 
         List<Trade> trades = new ArrayList<Trade>();
-        for (Tuple5<Long, Long, BigDecimal, BigDecimal, Long> item : list) {
-            trades.add(Trade.fromDBrec(item));
+        for (Trade item : list) {
+            trades.add(item);
         }
 
         return trades;
@@ -88,7 +79,16 @@ public class Trade {
         return this.timestamp;
     }
 
-	public static Trade parse(byte[] data) throws Exception
+    public BigDecimal calcPrice() {
+        return Order.calcPrice(this.amountHave, this.amountWant);
+    }
+    public BigDecimal calcPriceRevers() {
+        return Order.calcPrice(this.amountWant, this.amountHave);
+    }
+
+
+    //PARSE/CONVERT
+    public static Trade parse(byte[] data) throws Exception
 	{
 		//CHECK IF CORRECT LENGTH
 		if(data.length < BASE_LENGTH)
@@ -98,26 +98,33 @@ public class Trade {
 
 		int position = 0;
 
-		/*
 		//READ INITIATOR
 		byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		Long initiator = new Long(initiatorBytes);
+		Long initiator = Longs.fromByteArray(initiatorBytes);
 		position += ORDER_LENGTH;
 
 		//READ TARGET
 		byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		Long target = new Long(targetBytes);
+		Long target = Longs.fromByteArray(targetBytes);
 		position += ORDER_LENGTH;
 
-		//READ AMOUNT HAVE
-		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountHave = new BigDecimal(new Long(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-		position += AMOUNT_LENGTH;
+        //READ HAVE SCALE
+        byte scaleHave = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
 
-		//READ AMOUNT WANT
+        //READ AMOUNT HAVE
+        byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), scaleHave);
+        position += AMOUNT_LENGTH;
+
+        //READ HAVE SCALE
+        byte scaleWant = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+
+        //READ AMOUNT WANT
         byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountWant = new BigDecimal(new Long(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-		position += AMOUNT_LENGTH;
+        BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
+        position += AMOUNT_LENGTH;
 
 		//READ TIMESTAMP
         byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
@@ -125,32 +132,33 @@ public class Trade {
 		position += TIMESTAMP_LENGTH;
 
 		return new Trade(initiator, target, amountHave, amountWant, timestamp);
-		*/
-		return null;
 	}
 
 	public byte[] toBytes()
 	{
         byte[] data = new byte[0];
 
-        /*
 		//WRITE INITIATOR
-        byte[] initiatorBytes = this.initiator.toByteArray();
-        byte[] fill = new byte[ORDER_LENGTH - initiatorBytes.length];
-		initiatorBytes = Bytes.concat(fill, initiatorBytes);
+        byte[] initiatorBytes = Longs.toByteArray(this.initiator);
 		data = Bytes.concat(data, initiatorBytes);
 
 		//WRITE TARGET
-        byte[] targetBytes = this.target.toByteArray();
-		fill = new byte[ORDER_LENGTH - targetBytes.length];
-		targetBytes = Bytes.concat(fill, targetBytes);
+        byte[] targetBytes = Longs.toByteArray(this.target);
 		data = Bytes.concat(data, targetBytes);
+
+		byte[] fill;
+
+        //WRITE AMOUNT HAVE SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.amountHave.scale()});
 
 		//WRITE AMOUNT HAVE
         byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
 		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
+
+        //WRITE AMOUNT WANT SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.amountWant.scale()});
 
 		//WRITE AMOUNT WANT
         byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
@@ -162,7 +170,6 @@ public class Trade {
         byte[] timestampBytes = Longs.toByteArray(this.timestamp);
 		data = Bytes.concat(data, timestampBytes);
 
-*/
 		return data;
 	}
 
@@ -178,7 +185,7 @@ public class Trade {
         Order target = this.getTargetOrder(db);
 
         //ADD TRADE TO DATABASE
-        db.getTradeMap().add(toDBrec(this));
+        db.getTradeMap().add(this);
         if (!db.getTradeMap().contains(new Tuple2<Long, Long>(this.initiator, this.target))) {
             int error = 0;
         }

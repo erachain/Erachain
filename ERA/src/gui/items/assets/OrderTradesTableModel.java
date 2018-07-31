@@ -2,6 +2,7 @@ package gui.items.assets;
 
 import controller.Controller;
 import core.item.assets.Order;
+import core.item.assets.Trade;
 import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
@@ -19,14 +20,14 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> implements Observer {
+public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_TYPE = 1;
     public static final int COLUMN_AMOUNT = 2;
     public static final int COLUMN_PRICE = 3;
     public static final int COLUMN_AMOUNT_WANT = 4;
 
-    private SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> trades;
+    private SortableList<Tuple2<Long, Long>, Trade> trades;
     private Order order;
 
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"});
@@ -38,11 +39,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tup
     }
 
     @Override
-    public SortableList<Tuple2<Long, Long>, Tuple5<Long, Long, BigDecimal, BigDecimal, Long>> getSortableList() {
+    public SortableList<Tuple2<Long, Long>, Trade> getSortableList() {
         return this.trades;
     }
 
-    public Tuple5<Long, Long, BigDecimal, BigDecimal, Long> getTrade(int row) {
+    public Trade getTrade(int row) {
         return this.trades.get(row).getB();
     }
 
@@ -68,7 +69,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tup
             return null;
         }
 
-        Tuple5<Long, Long, BigDecimal, BigDecimal, Long> trade = this.trades.get(row).getB();
+        Trade trade = this.trades.get(row).getB();
         int type = 0;
         Order initatorOrder = null;
         Order targetOrder = null;
@@ -76,14 +77,14 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tup
         if (trade != null) {
             DCSet db = DCSet.getInstance();
 
-            initatorOrder = Order.getOrder(db, trade.a);
-            targetOrder = Order.getOrder(db, trade.b);
+            initatorOrder = Order.getOrder(db, trade.getInitiator());
+            targetOrder = Order.getOrder(db, trade.getTarget());
         }
 
         switch (column) {
             case COLUMN_TIMESTAMP:
 
-                return DateTimeFormat.timestamptoString(trade.e);
+                return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
             case COLUMN_TYPE:
 
@@ -92,7 +93,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tup
             case COLUMN_AMOUNT:
 
                 
-                String result = NumberAsString.formatAsString(trade.c); //getAmountHave());
+                String result = NumberAsString.formatAsString(trade.getAmountHave());
 
                 if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -102,11 +103,11 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tup
 
             case COLUMN_PRICE:
 
-                return NumberAsString.formatAsString(Order.calcPrice(trade.c, trade.d));
+                return NumberAsString.formatAsString(trade.calcPrice());
 
             case COLUMN_AMOUNT_WANT:
 
-                result = NumberAsString.formatAsString(trade.d); //getAmountWant());
+                result = NumberAsString.formatAsString(trade.getAmountWant());
 
                 if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
