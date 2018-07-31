@@ -645,7 +645,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         jTextArea_Description.setColumns(20);
         jTextArea_Description.setLineWrap(true);
         jTextArea_Description.setRows(5);
-        jTextArea_Description.setText("wd");
+        jTextArea_Description.setText("");
         jScrollPane1.setViewportView(jTextArea_Description);
         jScrollPane1.setMinimumSize(new Dimension(100, 25));
 
