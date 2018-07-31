@@ -1,4 +1,4 @@
-package test.records;
+package core.transaction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.primitives.Bytes;
 import core.account.Account;
 import core.transaction.*;
 import org.junit.Assert;
@@ -211,6 +212,38 @@ public class OrderTestsMy {
     }
 
     @Test
+    public void BigIntegerTest() {
+
+        String base = "67UyisgA8ZkT4wGqv9qYksUbVkkQRdAs6Mqs48ukLVuUb9p4Aq41GGoeuHUWEaxvVRegMZiry9SBtL4DQ8ScEeHX";
+        BigInteger big1 = Base58.decodeBI("67UyisgA8ZkT4wGqv9qYksUbVkkQRdAs6Mqs48ukLVuUb9p4Aq41GGoeuHUWEaxvVRegMZiry9SBtL4DQ8ScEeHX");
+        String str2 = Base58.encode(big1);
+        byte[] byte1 = Base58.decode("67UyisgA8ZkT4wGqv9qYksUbVkkQRdAs6Mqs48ukLVuUb9p4Aq41GGoeuHUWEaxvVRegMZiry9SBtL4DQ8ScEeHX");
+        String str3 = Base58.encode(byte1);
+
+        // -17013814363506844780642576803064534131835440534817879062422700139056920191961546707349041070740193734875195536068579370457427151473666936393718839492854
+        BigInteger bi1 = Base58.decodeBI("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd");
+        byte[] byte2 = Base58.decode("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd");
+        /*
+        int left = 64 - byte2.length;
+        if (left > 0) {
+            if (bi1.signum() > 0)
+                byte2 =  Bytes.concat(new byte[left], byte2);
+            else {
+                byte[] bytesNeg = new byte[left];
+                Arrays.fill(bytesNeg, (byte)-1);
+                byte2 =  Bytes.concat(bytesNeg, byte2);
+            }
+
+        }
+        left = 64 - byte2.length;
+        // 1nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd
+        */
+        String str58 = Base58.encode(bi1, 64);
+        assertEquals(str58, base);
+
+    }
+
+        @Test
     public void scaleTest() {
 
         init();
