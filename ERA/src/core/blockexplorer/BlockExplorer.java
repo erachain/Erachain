@@ -1290,6 +1290,9 @@ public class BlockExplorer {
     public Map jsonQueryTrades(long have, long want) {
         Map output = new LinkedHashMap();
 
+        //Expected quote
+        //line: 1, col: 1475
+        //desCount":1,"trades":{"1":{"amountHave":"0.01000000","amountWant":"2.00000000","realPrice":200,"realReversePrice":0.005,"initiatorTxSignature":"4vBTEiL7GRFr4ceqepeakuNh56ftqP7sFHTu3BXGWCxVRYRd7Zvx2waXfaKrwkVhNcT2WN5T2dteC9oWW1upASrN","initiatorCreator": {+
         List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
         List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
 
@@ -1423,7 +1426,7 @@ public class BlockExplorer {
             createOrder = finalMap.get(orderInitiator.getId());
             tradeJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
 
-            tradeJSON.put("initiatorCreator", orderInitiator.getCreator());
+            tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress()); // viewCreator
             tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
             if (orderInitiator.getHave() == have) {
                 tradeJSON.put("type", "sell");
@@ -1438,7 +1441,7 @@ public class BlockExplorer {
 
             createOrder = finalMap.get(orderTarget.getId());
             tradeJSON.put("targetTxSignature", Base58.encode(createOrder.getSignature()));
-            tradeJSON.put("targetCreator", orderTarget.getCreator());
+            tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress()); // viewCreator
             tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
             tradeJSON.put("timestamp", trade.e);

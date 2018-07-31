@@ -502,6 +502,13 @@ public abstract class Transaction {
         if (!asPack)
             this.calcFee();
     }
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.dcSet = dcSet;
+        this.height = this.getBlockHeightByParentOrLast(dcSet);
+        this.seqNo = seqNo;
+        if (!asPack)
+            this.calcFee();
+    }
 
     public int getType() {
         return Byte.toUnsignedInt(this.typeBytes[0]);

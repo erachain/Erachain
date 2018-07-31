@@ -78,6 +78,7 @@ import utils.TransactionTimestampComparator;
 public class TransactionCreator {
     private DCSet fork;
     private Block lastBlock;
+    private int seqNo;
 
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
@@ -103,6 +104,7 @@ public class TransactionCreator {
 
         //UPDATE LAST BLOCK
         this.lastBlock = Controller.getInstance().getLastBlock();
+        this.seqNo = 0; // reset sequence number
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
@@ -129,7 +131,7 @@ public class TransactionCreator {
                 //THE TRANSACTION BECAME INVALID LET
                 this.fork.getTransactionMap().delete(transactionAccount);
             } else {
-                transactionAccount.setDC(this.fork, false);
+                transactionAccount.setDC(this.fork, false, ++this.seqNo);
                 if (transactionAccount.isValid(null, 0l) == Transaction.VALIDATE_OK) {
                     transactionAccount.process(null, false);
                 } else {

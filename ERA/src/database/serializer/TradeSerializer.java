@@ -25,7 +25,7 @@ public class TradeSerializer implements Serializer<Trade>, Serializable {
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            //return Trade.parse(bytes);
+            return Trade.parse(bytes);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

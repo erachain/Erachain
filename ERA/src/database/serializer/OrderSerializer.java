@@ -25,8 +25,7 @@ public class OrderSerializer implements Serializer<Order>, Serializable {
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            //return Order.parse(bytes);
-            return null;
+            return Order.parse(bytes);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
