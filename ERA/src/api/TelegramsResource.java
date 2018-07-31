@@ -420,26 +420,25 @@ public class TelegramsResource {
 
         JSONArray arraySign = (JSONArray) (jsonObject.get("list"));
         JSONObject out = new JSONObject();
-        List<TelegramMessage> lst = new ArrayList<>();
-        Controller controller = new Controller().getInstance();
+        List<TelegramMessage> deleteList = new ArrayList<>();
+        Controller controller = Controller.getInstance();
 
         for (Object obj : arraySign) {
 
-            if (controller.getTelegram(obj.toString()) == null)
+            TelegramMessage telegramMessage = controller.getTelegram(obj.toString());
+            if (telegramMessage == null)
                 out.put("signature", obj.toString());
             else {
-                TelegramMessage telegramMessage = controller.getTelegram(obj.toString());
-                String address = telegramMessage.getTransaction().getCreator().getAddress();
-                String recipient = telegramMessage.getTransaction().getRecipientAccounts().stream().findFirst().get().getAddress();
-
-                if (controller.getAccountByAddress(address) != null || controller.getAccountByAddress(recipient) != null)
-                    lst.add(telegramMessage);
-                else
-                    out.put("signature", obj.toString());
+                for (Account account: controller.getAccounts()) {
+                    if (telegramMessage.getTransaction().isInvolved(account))
+                        deleteList.add(telegramMessage);
+                    else
+                        out.put("signature", obj.toString());
+                }
             }
         }
         try {
-            Controller.getInstance().deleteTelegram(lst);
+            Controller.getInstance().deleteTelegram(deleteList);
             return out.toJSONString();
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
