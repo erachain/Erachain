@@ -186,8 +186,8 @@ public class Rec_Resource {
                             head = ((List<String>) jsonObject.get("head")).get(0);
 
                         step++;
-                        if (jsonObject.containsKey("data"))
-                            data = Base58.decode(((List<String>) jsonObject.get("data")).get(0));
+                        if (jsonObject.containsKey("message"))
+                            data = Base58.decode(((List<String>) jsonObject.get("message")).get(0));
 
                         step++;
                         if (jsonObject.containsKey("isText")

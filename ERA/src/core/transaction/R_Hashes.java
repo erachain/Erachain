@@ -265,6 +265,7 @@ public class R_Hashes extends Transaction {
         //ADD CREATOR/SERVICE/DATA
         if (data != null && data.length > 0) {
             transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+            transaction.put("message", new String(this.data, Charset.forName("UTF-8")));
             //transaction.put("data", Base58.encode(this.data));
         }
         if (url != null && url.length > 0) {

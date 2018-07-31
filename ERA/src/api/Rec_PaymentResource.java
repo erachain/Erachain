@@ -52,7 +52,7 @@ public class Rec_PaymentResource {
     }
 
     @POST
-    //"POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+    //"POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
     @Consumes(MediaType.WILDCARD)
     public String createPayment(String x) {
 

@@ -646,16 +646,16 @@ public class TransactionsResource {
                                 }
                                 r_data = cntr.decrypt(transaction.getCreator(), recipient, r_data);
                                 if (r_data == null) {
-                                    json.put("data", "error decryption");
+                                    json.put("message", "error decryption");
                                 } else {
                                     if (r_Send.isText()) {
                                         try {
-                                            json.put("data", new String(r_data, "UTF-8"));
+                                            json.put("message", new String(r_data, "UTF-8"));
                                         } catch (UnsupportedEncodingException e) {
-                                            json.put("data", "error UTF-8");
+                                            json.put("message", "error UTF-8");
                                         }
                                     } else {
-                                        json.put("data", Base58.encode(r_data));
+                                        json.put("message", Base58.encode(r_data));
                                     }
                                 }
                             }

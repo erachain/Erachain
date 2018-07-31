@@ -184,7 +184,7 @@ public class APIUtils {
         
         String title = null;
         byte[] message = null;
-        boolean istextmessage = true;
+        boolean istext = true;
         boolean encrypt = false;
         if (jsonObject != null) {
             if (jsonObject.containsKey("title")) {
@@ -202,9 +202,9 @@ public class APIUtils {
                 }
             }
             
-            if (jsonObject.containsKey("istextmessage")) {
+            if (jsonObject.containsKey("istext")) {
                 try {
-                    istextmessage = (boolean) jsonObject.get("istextmessage");
+                    istext = (boolean) jsonObject.get("istext");
                 } catch (Exception e) {
                     throw ApiErrorFactory.getInstance().createError(api.ApiErrorFactory.ERROR_JSON);
                 }
@@ -218,7 +218,7 @@ public class APIUtils {
             }
         }
         
-        byte[] isText = istextmessage ? new byte[] { 1 } : new byte[] { 0 };
+        byte[] isText = istext ? new byte[] { 1 } : new byte[] { 0 };
         byte[] isEncrypted = encrypt ? new byte[] { 1 } : new byte[] { 0 };
         
         // TRU UNLOCK
