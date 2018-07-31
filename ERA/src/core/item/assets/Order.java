@@ -606,6 +606,10 @@ public class Order implements Comparable<Order> {
                     amountBytes = tradeAmountGet.unscaledValue().toByteArray();
                 }
 
+                // нужно перенсти сюда все ПРОЦЕСС и в базу катать только ТАРГЕТЫ
+                // а тут в конце при выходе базу обновлять
+                // и COPY cltkfnm
+                this.processTrade();
                 trade = new Trade(this.getId(), order.getId(), tradeAmount, tradeAmountGet, transaction.getTimestamp());
                 trade.process(db);
 
