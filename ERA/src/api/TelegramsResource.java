@@ -61,8 +61,9 @@ public class TelegramsResource {
 
         // CREATE JSON OBJECT
         JSONArray array = new JSONArray();
+        Controller controller = Controller.getInstance();
 
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, filter)) {
+        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, filter)) {
             array.add(telegram.toJson());
         }
 
@@ -438,7 +439,7 @@ public class TelegramsResource {
             }
         }
         try {
-            Controller.getInstance().deleteTelegram(deleteList);
+            controller.deleteTelegram(deleteList);
             return out.toJSONString();
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
