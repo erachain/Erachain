@@ -69,7 +69,11 @@ public class CancelOrderTransaction extends Transaction {
 
     }
 
-    //public static String getName() { return "OLD: Cancel Order"; }
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+        //public static String getName() { return "OLD: Cancel Order"; }
 
     public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
         boolean asPack = releaserReference != null;

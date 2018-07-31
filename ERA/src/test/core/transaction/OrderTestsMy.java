@@ -41,6 +41,7 @@ public class OrderTestsMy {
     long timestamp = NTP.getTime();
 
     long flags = 0l;
+    int seqNo = 0;
 
     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balanceA;
     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balanceB;
@@ -140,7 +141,7 @@ public class OrderTestsMy {
         assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         keyA = issueAssetTransaction.getAssetKey(db);
@@ -149,7 +150,7 @@ public class OrderTestsMy {
         assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
         keyB = issueAssetTransaction.getAssetKey(db);
 
@@ -319,7 +320,7 @@ public class OrderTestsMy {
         bal_A_keyB = amountForParse.scaleByPowerOfTen(-toScale);
         orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, bal_A_keyA,
                 bal_A_keyB, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.VALIDATE_OK);
 
         // INVALID
@@ -327,7 +328,7 @@ public class OrderTestsMy {
         bal_A_keyB = amountForParse.scaleByPowerOfTen(-toScale);
         orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, bal_A_keyA,
                 bal_A_keyB, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, 30, 0L);
@@ -338,33 +339,33 @@ public class OrderTestsMy {
         bal_A_keyB = amountForParse.scaleByPowerOfTen(-toScale);
         orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, bal_A_keyA,
                 bal_A_keyB, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.VALIDATE_OK);
 
         // INVALID HAVE
         amountInvalid = amountTest;
         orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, amountInvalid,
                 BigDecimal.ONE, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
         // INVALID WANT
         orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, assetA.getKey(db), BigDecimal.ONE,
                 amountInvalid, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_LENGHT_SO_LONG);
 
         // INVALID HAVE
         amountInvalid = amountForParse.scaleByPowerOfTen(-fromScale - 1);
         orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), AssetCls.FEE_KEY, amountInvalid,
                 bal_A_keyA, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         // INVALID WANT
         orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, assetA.getKey(db), bal_A_keyA,
                 amountInvalid, (byte) 0, timestamp, 0l);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(orderCreation.isValid(releaserReference, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
     }
@@ -399,7 +400,7 @@ public class OrderTestsMy {
         CreateOrderTransaction orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY,
                 BigDecimal.valueOf(100), BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
 
@@ -407,7 +408,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.FEE_KEY,
                 BigDecimal.valueOf(100), BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         // CHECK IF ORDER CREATION INVALID
         assertEquals(Transaction.HAVE_EQUALS_WANT, orderCreation.isValid(releaserReference, flags));
@@ -416,7 +417,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY,
                 BigDecimal.valueOf(50001), BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         // CHECK IF ORDER CREATION INVALID
         assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(releaserReference, flags));
@@ -425,7 +426,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(-50.0),
                 BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         // CHECK IF ORDER CREATION INVALID
         assertEquals(Transaction.NEGATIVE_AMOUNT, orderCreation.isValid(releaserReference, flags));
@@ -434,7 +435,7 @@ public class OrderTestsMy {
                 "This is the simulated ERM asset.", 0, 8, 10L);
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, ++timeStamp, 0l);
         issueAssetTransaction.sign(accountA, false);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
         keyA = assetA.getKey(db);
 
@@ -442,7 +443,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(50.01),
                 BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         // CHECK IF ORDER CREATION INVALID
         assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(releaserReference, flags));
@@ -451,7 +452,7 @@ public class OrderTestsMy {
             // CREATE INVALID ORDER CREATION INVALID AMOUNT
             orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, keyA, BigDecimal.valueOf(0.01),
                     BigDecimal.valueOf(1.1), (byte) 0, ++timeStamp, 0l, new byte[64]);
-            orderCreation.setDC(db, false);
+            orderCreation.setDC(db, false, ++seqNo);
             // orderCreation.process(null, false);
 
             // CHECK IF ORDER CREATION INVALID
@@ -462,7 +463,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1),
                 BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         // CHECK IF ORDER CREATION INVALID
         assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(releaserReference, flags));
@@ -471,7 +472,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 114l, BigDecimal.valueOf(0.1),
                 BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
 
         // CHECK IF ORDER CREATION INVALID
         assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(releaserReference, flags));
@@ -480,7 +481,7 @@ public class OrderTestsMy {
             // CREATE ORDER CREATION INVALID REFERENCE
             orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY,
                     BigDecimal.valueOf(0.1), BigDecimal.valueOf(1), (byte) 0, ++timeStamp, -12345L, new byte[64]);
-            orderCreation.setDC(db, false);
+            orderCreation.setDC(db, false, ++seqNo);
 
             // CHECK IF ORDER CREATION IS INVALID
             assertEquals(Transaction.INVALID_REFERENCE, orderCreation.isValid(releaserReference, flags));
@@ -651,7 +652,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_1 = orderCreation.makeOrder();
         order_AB_1_ID = orderCreation.getOrderId();
@@ -659,7 +660,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(300), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_4 = orderCreation.makeOrder();
         order_AB_4_ID = order_AB_4.getId();
@@ -667,7 +668,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1400),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_3 = orderCreation.makeOrder();
         order_AB_3_ID = order_AB_3.getId();
@@ -675,7 +676,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(130), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_2 = orderCreation.makeOrder();
         order_AB_2_ID = order_AB_2.getId();
@@ -695,7 +696,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(120),
                 BigDecimal.valueOf(595), (byte) 0, timestamp++, 0l, new byte[] { 5, 6 });
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_BA_1 = orderCreation.makeOrder();
         order_BA_1_ID = order_BA_1.getId();
@@ -796,7 +797,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(260),
                 BigDecimal.valueOf(1900), (byte) 0, timestamp++, 0l, new byte[] { 5, 6 });
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_BA_2 = reloadOrder(orderCreation.makeOrder());
         order_BA_2_ID = order_BA_2.getId();
@@ -840,7 +841,7 @@ public class OrderTestsMy {
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_8 = reloadOrder(orderCreation.makeOrder());
         order_AB_8_ID = order_AB_8.getId();
@@ -913,7 +914,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(100),
                 BigDecimal.valueOf(1000), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
 
         Long order_AB_1_ID = orderCreation.makeOrder().getId();
@@ -923,7 +924,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(4995),
                 BigDecimal.valueOf(249.75), (byte) 0, timestamp++, 0l, new byte[] { 5, 6 });
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         Long order_BA_1_ID = orderCreation.makeOrder().getId();
 
@@ -982,7 +983,7 @@ public class OrderTestsMy {
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         Order order_BA_2 = orderCreation.makeOrder();
         Long order_AB_2_ID = order_BA_2.getId();
@@ -1052,7 +1053,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -1061,7 +1062,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -1071,7 +1072,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -1081,7 +1082,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(99.9),
                 BigDecimal.valueOf(495), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -1133,7 +1134,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(99),
                 BigDecimal.valueOf(19.8), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_C = orderCreation.makeOrder().getId();
@@ -1192,7 +1193,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
                 new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -1201,7 +1202,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -1211,7 +1212,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -1221,7 +1222,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(200),
                 BigDecimal.valueOf(1000), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -1274,7 +1275,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(95.9),
                 BigDecimal.valueOf(19), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_C = orderCreation.makeOrder().getId();
@@ -1339,7 +1340,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -1348,7 +1349,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db));
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, 1);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -1359,7 +1360,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(2),
                 BigDecimal.valueOf(40000), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, 2);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -1368,7 +1369,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1),
                 BigDecimal.valueOf(15000), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, 3);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -1377,16 +1378,18 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(4),
                 BigDecimal.valueOf(100000), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_C = orderCreation.makeOrder().getId();
+
+        List<Order> orders = db.getOrderMap().getOrders(keyA);
 
         // CREATE ORDER _D (BUY) 30000 x 2 = 60000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(60000),
                 BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_D = orderCreation.makeOrder().getId();
@@ -1469,7 +1472,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(56000),
                 BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountB, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_E = orderCreation.makeOrder().getId();
@@ -1548,7 +1551,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -1557,7 +1560,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db));
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -1567,7 +1570,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1),
                 BigDecimal.valueOf(15000.88), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -1576,7 +1579,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(2),
                 BigDecimal.valueOf(40000.33), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -1585,7 +1588,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(4),
                 BigDecimal.valueOf(100007), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_C = orderCreation.makeOrder().getId();
@@ -1594,7 +1597,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(60003),
                 BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_D = orderCreation.makeOrder().getId();
@@ -1673,7 +1676,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(46000),
                 BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountB, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_E = orderCreation.makeOrder().getId();
@@ -1740,7 +1743,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -1749,7 +1752,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db));
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         keyA = assetA.getKey(db);
@@ -1761,7 +1764,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(30000),
                 BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         order_AB_1_ID = orderCreation.makeOrder().getId();
@@ -1770,7 +1773,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(40000),
                 BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         order_AB_2_ID = orderCreation.makeOrder().getId();
@@ -1779,7 +1782,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(100000),
                 BigDecimal.valueOf(4), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         order_AB_3_ID = orderCreation.makeOrder().getId();
@@ -1797,7 +1800,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1),
                 BigDecimal.valueOf(15000), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         order_AB_4_ID = orderCreation.makeOrder().getId();
@@ -1828,7 +1831,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(2),
                 BigDecimal.valueOf(50000), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         order_AB_4_ID = orderCreation.makeOrder().getId();
@@ -1861,7 +1864,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(3),
                 BigDecimal.valueOf(100000), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         order_AB_5_ID = orderCreation.makeOrder().getId();
@@ -1903,7 +1906,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
                 new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -1912,7 +1915,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -1923,7 +1926,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(1000).setScale(assetA.getScale()),
                 BigDecimal.valueOf(100).setScale(assetB.getScale()), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -1935,7 +1938,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(5000).setScale(assetA.getScale()), (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db));
         orderCreation.sign(accountB, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -1988,7 +1991,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(24).setScale(assetA.getScale()), BigDecimal.valueOf(4).setScale(assetB.getScale()),
                 (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_C = orderCreation.makeOrder().getId();
@@ -2044,7 +2047,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(amo_A).setScale(assetA.getScale()),
                 BigDecimal.valueOf(amo_B).setScale(assetB.getScale()), (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_D = orderCreation.makeOrder().getId();
@@ -2111,7 +2114,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
                 new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -2120,7 +2123,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -2131,7 +2134,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(100).setScale(assetA.getScale()), BigDecimal.valueOf(10).setScale(assetB.getScale()),
                 (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -2142,7 +2145,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(20).setScale(assetA.getScale()), BigDecimal.valueOf(100).setScale(assetA.getScale()),
                 (byte) 0, timestamp++, accountB.getLastTimestamp(db));
         orderCreation.sign(accountB, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -2203,7 +2206,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
                 new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -2212,7 +2215,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -2223,7 +2226,7 @@ public class OrderTestsMy {
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoA1, amoB1, (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = orderCreation.makeOrder().getId();
@@ -2234,7 +2237,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, amoB2, amoA2, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db));
         orderCreation.sign(accountB, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -2296,7 +2299,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
                 new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // CREATE ASSET
@@ -2305,7 +2308,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -2318,7 +2321,7 @@ public class OrderTestsMy {
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, vol1, vol2, (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_A = Transaction.makeDBRef(orderCreation.getHeightSeqNo());
@@ -2331,7 +2334,7 @@ public class OrderTestsMy {
 
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, vol3, vol4, (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountB, false); // need for Order.getID()
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(releaserReference, flags));
         orderCreation.process(null, false);
         Long orderID_B = orderCreation.makeOrder().getId();
@@ -2392,7 +2395,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l,
                 new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(assetA.getScale()), false);
@@ -2403,7 +2406,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db), new byte[64]);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -2414,7 +2417,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(1000).setScale(assetA.getScale()),
                 BigDecimal.valueOf(100).setScale(assetA.getScale()), (byte) 0, timestamp++, 0l);
         createOrderTransaction.sign(accountA, false);
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.process(null, false);
         Long orderID_A = createOrderTransaction.makeOrder().getId();
 
@@ -2423,7 +2426,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(1000).setScale(assetA.getScale()),
                 BigDecimal.valueOf(200).setScale(assetA.getScale()), (byte) 0, timestamp++, 0l);
         createOrderTransaction.sign(accountA, false);
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.process(null, false);
         Long orderID_B = createOrderTransaction.makeOrder().getId();
 
@@ -2468,7 +2471,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(150).setScale(assetA.getScale()), BigDecimal.valueOf(750), (byte) 0, timestamp++, 0l,
                 new byte[] { 3, 4 });
         createOrderTransaction.sign(accountA, false);
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.process(null, false);
         Long orderID_C = createOrderTransaction.makeOrder().getId();
 
@@ -2540,7 +2543,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         // transaction = new GenesisTransaction(accountB,
@@ -2554,7 +2557,7 @@ public class OrderTestsMy {
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 accountB.getLastTimestamp(db));
-        issueAssetTransaction.setDC(db, false);
+        issueAssetTransaction.setDC(db, false, ++seqNo);
         issueAssetTransaction.process(null, false);
 
         long keyA = assetA.getKey(db);
@@ -2566,7 +2569,7 @@ public class OrderTestsMy {
                 BigDecimal.valueOf(1000), BigDecimal.valueOf(100), (byte) 0, timestamp++,
                 accountA.getLastTimestamp(fork1), new byte[] { 5, 6 });
         createOrderTransaction.sign(accountA, false);
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.process(null, false);
         Long orderID_A = createOrderTransaction.makeOrder().getId();
 
@@ -2575,7 +2578,7 @@ public class OrderTestsMy {
         createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2), new byte[] { 1, 2 });
         createOrderTransaction.sign(accountA, false);
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.process(null, false);
         Long orderID_B = createOrderTransaction.makeOrder().getId();
 
@@ -2584,7 +2587,7 @@ public class OrderTestsMy {
         createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(150),
                 BigDecimal.valueOf(750), (byte) 0, timestamp++, accountA.getLastTimestamp(fork3), new byte[] { 3, 4 });
         createOrderTransaction.sign(accountB, false);
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.process(null, false);
         Long orderID_C = createOrderTransaction.makeOrder().getId();
 
@@ -2630,7 +2633,7 @@ public class OrderTestsMy {
         // ORPHAN ORDER TWO
         createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2), new byte[] { 1, 2 });
-        createOrderTransaction.setDC(db, false);
+        createOrderTransaction.setDC(db, false, ++seqNo);
         createOrderTransaction.orphan(false);
 
         // CHECK BALANCES
@@ -2694,7 +2697,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         Long orderID = orderCreation.makeOrder().getId();
 
@@ -2747,7 +2750,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         Long orderID = orderCreation.makeOrder().getId();
 
@@ -2817,7 +2820,7 @@ public class OrderTestsMy {
         // CREATE ORDER
         assertEquals(BigDecimal.valueOf(assetA.getQuantity()), accountA.getBalanceUSE(keyA, db));
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         Long orderID = orderCreation.makeOrder().getId();
 
@@ -2829,7 +2832,7 @@ public class OrderTestsMy {
                 timestamp++, 0l);
         cancelOrderTransaction.sign(accountA, false);
 
-        cancelOrderTransaction.setDC(db, false);
+        cancelOrderTransaction.setDC(db, false, ++seqNo);
         cancelOrderTransaction.process(null, false);
 
         // CHECK BALANCE SENDER
@@ -2872,7 +2875,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyB, keyA, BigDecimal.valueOf(1), BigDecimal.valueOf(100),
                 (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_1_ID = orderCreation.makeOrder().getId();
         
@@ -2909,7 +2912,7 @@ public class OrderTestsMy {
 
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0l);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         Order order_BA_2 = orderCreation.makeOrder();
         Long order_AB_2_ID = order_BA_2.getId();
@@ -2932,7 +2935,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_1 = orderCreation.makeOrder();
         order_AB_1_ID = orderCreation.getOrderId();
@@ -2940,7 +2943,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(300), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_4 = orderCreation.makeOrder();
         order_AB_4_ID = order_AB_4.getId();
@@ -2948,7 +2951,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1400),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_3 = orderCreation.makeOrder();
         order_AB_3_ID = order_AB_3.getId();
@@ -2960,7 +2963,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(130), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, false);
-        orderCreation.setDC(db, false);
+        orderCreation.setDC(db, false, ++seqNo);
         orderCreation.process(null, false);
         order_AB_2 = orderCreation.makeOrder();
         order_AB_2_ID = order_AB_2.getId();

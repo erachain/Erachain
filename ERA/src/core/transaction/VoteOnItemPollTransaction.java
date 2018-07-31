@@ -132,6 +132,11 @@ public class VoteOnItemPollTransaction extends Transaction {
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
     }
 
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+
     public long getKey() {
         return this.key;
     }
