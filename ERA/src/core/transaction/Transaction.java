@@ -1202,7 +1202,7 @@ public abstract class Transaction {
     // public abstract void process(DBSet db);
     public void process(Block block, boolean asPack) {
 
-        if (Base58.encode(this.signature)
+        if (this.signature != null && Base58.encode(this.signature)
                 .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
             int error = 0;
             error ++;
