@@ -191,7 +191,7 @@ public class TradeResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
 
-        Transaction transaction = cntr.cancelOrder2(privateKeyAccount, orderID,
+        Transaction transaction = cntr.cancelOrder(privateKeyAccount, orderID,
                 feePower.intValue());
 
         int validate = cntr.getTransactionCreator().afterCreate(transaction, false);

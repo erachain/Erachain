@@ -2480,6 +2480,10 @@ public class Controller extends Observable {
         return this.dcSet.getAssetBalanceMap().getBalancesSortableList(account);
     }
 
+    public List<Transaction> getUnconfirmedTransactionsByAddress(String address) {
+        return this.dcSet.getTransactionMap().getTransactionsByAddress(address);
+    }
+
     // NAMES
 
     public Name getName(String nameName) {
