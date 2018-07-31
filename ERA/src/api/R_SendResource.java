@@ -30,13 +30,13 @@ public class R_SendResource {
     @GET
     public String help() {
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&data={data}&codebase={codebase}&encrypt=true&password={password}",
+        help.put("GET r_send/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&messagecode={messagecode}&encrypt=true&password={password}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&data={data}&codebase={codebase}&encrypt=true&password={password}",
+        help.put("GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&messagecode={messagecode}&encrypt=true&password={password}",
                 "make RAW for SEND asset amount and mail");
-        help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"data\": \"<data>\", \"codebase\": <codebase>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"messagecode\": <messagecode>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make and broadcast SEND asset amount and mail");
-        help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"data\": \"<data>\", \"codebase\": <codebase>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+        help.put("POST r_send/raw {\"creator\": \"<creator>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetKey>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"messagecode\": <messagecode>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
                 "make RAW for SEND asset amount and mail");
 
         return StrJSonFine.convert(help);
@@ -51,18 +51,17 @@ public class R_SendResource {
      * @param assetKeyStr  asset
      * @param amountStr    amount
      * @param title        title or head
-     * @param data         data
-     * @param message      message @Deprecated
-     * @param codebase     code if exist is text (not required field)
+     * @param message      message
+     * @param messagecode  code if exist is text (not required field)
      * @param encrypt      bool value encrypt (not required field)
      * @param password     password
      * @return JSON row
      *
      * <h2>Example request</h2>
-     * GET r_send/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH?data={\"msg\":\"123\"}&amp;encrypt=false&amp;password=123456789
+     * GET r_send/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH?message={\"msg\":\"123\"}&amp;encrypt=false&amp;password=123456789
      * <h2>Example response</h2>
      * {"type_name":"LETTER", "creator":"7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP",
-     * "data":"{"msg":"123"}","signature":"Vf8qtG3tiYV6LwvCrrTPf6zq3ikUVNZWfgwkrLU1tckvEQ2Dx8qB1qLEGkX8Wqj4WVKDYZRYfJyGb3dZCTR3asz",
+     * "message":"{"msg":"123"}","signature":"Vf8qtG3tiYV6LwvCrrTPf6zq3ikUVNZWfgwkrLU1tckvEQ2Dx8qB1qLEGkX8Wqj4WVKDYZRYfJyGb3dZCTR3asz",
      * "fee":"0.00010624", "publickey":"5sD1mTM2tB8aiQdUzKtXiNtesmJQCvHjXMrcCZWQca37", "type":31,
      * "confirmations":0, "version":0, "record_type":"LETTER", "property2":0, "property1":128, "size":166,
      * "encrypted":false, "recipient":"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH", "sub_type_name":"", "isText":true, "timestamp":1529585877655}
@@ -73,8 +72,8 @@ public class R_SendResource {
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
                           @QueryParam("feePow") String feePowStr, @QueryParam("assetKey") String assetKeyStr,
                           @QueryParam("amount") String amountStr, @QueryParam("title") String title,
-                          @QueryParam("data") String data, @QueryParam("message") String message,
-                          @QueryParam("codebase") int codebase,
+                          @QueryParam("message") String message,
+                          @QueryParam("messagecode") int messagecode,
                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 
         APIUtils.askAPICallAllowed(password, "GET send\n ", request);
@@ -86,7 +85,7 @@ public class R_SendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKeyStr, true,
                 amountStr, needAmount,
-                title, data == null? message: data, codebase, encrypt);
+                title, message, messagecode, encrypt);
 
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -113,12 +112,12 @@ public class R_SendResource {
      * @return
      * <h2>Example request</h2>
      * POST r_send {"creator":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH",
-     * "feePow":"1","assetKey":"643","amount":"1","title":"123","data":"{"msg":"1223"}",
-     * "codebase":"0","encrypt":"false","password":"123456789"}
+     * "feePow":"1","assetKey":"643","amount":"1","title":"123","message":"{"msg":"1223"}",
+     * "messagecode":"0","encrypt":"false","password":"123456789"}
      *
      * <h2>Example response</h2>
      * {
-     *   "type_name":"SEND", "creator":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy", "amount":"1", "data":"{",
+     *   "type_name":"SEND", "creator":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy", "amount":"1", "message":"{",
      *   "signature":"5QASfQZ8kp8VWdBh9tNJkvdZqNynPki2fMSyaRh3oWPiV8bGw49v66cAjYp1dCC5LKWUirkE9kqWm7kUanNChxsi",
      *   "fee":"0.00035424", "publickey":"krksTcZunJmmnXQtUoNVQhwWAXFfQ4LbCJw3Qg8THo8", "type":31,
      *   "confirmations":0, "version":0, "record_type":"SEND", "property2":0, "action_key":1, "head":"123",
@@ -150,8 +149,8 @@ public class R_SendResource {
         String assetKey = (String) jsonObject.getOrDefault("assetKey", null);
         String amount = (String) jsonObject.getOrDefault("amount", null);
         String title = (String) jsonObject.getOrDefault("title", null);
-        String data = (String) jsonObject.getOrDefault("data", (String) jsonObject.getOrDefault("message", null));
-        int codebase = Integer.valueOf((String) jsonObject.getOrDefault("codebase", 0));
+        String message = (String) jsonObject.getOrDefault("message",null);
+        int messagecode = Integer.valueOf((String) jsonObject.getOrDefault("messagecode", 0));
         boolean encrypt = Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false));
         String password = (String) jsonObject.getOrDefault("password", null);
 
@@ -160,8 +159,8 @@ public class R_SendResource {
                 recipient,
                 feePow,
                 assetKey, amount,
-                title, data, null,
-                codebase, encrypt,
+                title, message,
+                messagecode, encrypt,
                 password
         );
 
@@ -169,10 +168,10 @@ public class R_SendResource {
 
     /*
      * make and return RAW
-     * GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&data={data}&codebase={codebase}&encrypt=true&rawbase={58/64}&password={password}
+     * GET r_send/raw/{creator}/{recipient}?feePow={feePow}&assetKey={assetKey}&amount={amount}&title={title}&message={message}&messagecode={messagecode}&encrypt=true&rawbase={58/64}&password={password}
      *
-     * GET r_send/raw/79QuhunbPbc3svqsXMC2JHbh8ix6kwNAao/74eD7JSrkXPsz3xxKMhMEDoTF6TqkfEHBt?feePow=3&assetKey=1001&amount=111&title=probe&data=data&codebase=0&encrypt=true&password=1
-     * GET r_send/raw/79QuhunbPbc3svqsXMC2JHbh8ix6kwNAao/74eD7JSrkXPsz3xxKMhMEDoTF6TqkfEHBt?title=probe&data=data&rawbase=64&password=1
+     * GET r_send/raw/79QuhunbPbc3svqsXMC2JHbh8ix6kwNAao/74eD7JSrkXPsz3xxKMhMEDoTF6TqkfEHBt?feePow=3&assetKey=1001&amount=111&title=probe&message=message&messagecode=0&encrypt=true&password=1
+     * GET r_send/raw/79QuhunbPbc3svqsXMC2JHbh8ix6kwNAao/74eD7JSrkXPsz3xxKMhMEDoTF6TqkfEHBt?title=probe&message=message&rawbase=64&password=1
      */
     @GET
     // @Consumes(MediaType.WILDCARD)
@@ -182,8 +181,8 @@ public class R_SendResource {
                              @QueryParam("feePow") String feePowStr,
                              @QueryParam("assetKey") String assetKeyStr, @QueryParam("amount") String amountStr,
                              @QueryParam("title") String title,
-                             @QueryParam("data") String data, @QueryParam("message") String message,
-                             @QueryParam("codebase") int codebase, @QueryParam("encrypt") boolean encrypt,
+                             @QueryParam("message") String message,
+                             @QueryParam("messagecode") int messagecode, @QueryParam("encrypt") boolean encrypt,
                              @QueryParam("rawbase") int rawbase,
                              @QueryParam("password") String password) {
 
@@ -196,7 +195,7 @@ public class R_SendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKeyStr, true,
                 amountStr, needAmount,
-                title, data == null? message : data, codebase, encrypt);
+                title, message, messagecode, encrypt);
 
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -217,7 +216,7 @@ public class R_SendResource {
 
     /*
      * make and return RAW
-     * POST r_send/raw64 {"creator": "<creator>", "recipient": "<recipient>", "asset":"<assetKey>", "amount":"<amount>", "title": "<title>", "message": "<message>", "codebase": <codebase>, "encrypt": <true/false>,  "password": "<password>"}"
+     * POST r_send/raw64 {"creator": "<creator>", "recipient": "<recipient>", "asset":"<assetKey>", "amount":"<amount>", "title": "<title>", "message": "<message>", "messagecode": <messagecode>, "encrypt": <true/false>,  "password": "<password>"}"
      *
      */
     @POST
@@ -243,8 +242,8 @@ public class R_SendResource {
         String assetKey = (String) jsonObject.getOrDefault("assetKey", null);
         String amount = (String) jsonObject.getOrDefault("amount", null);
         String title = (String) jsonObject.getOrDefault("title", null);
-        String data = (String) jsonObject.getOrDefault("data", (String) jsonObject.getOrDefault("message", null));
-        int codebase = (int) jsonObject.getOrDefault("codebase", 0);
+        String message = (String) jsonObject.getOrDefault("message", null);
+        int messagecode = (int) jsonObject.getOrDefault("messagecode", 0);
         boolean encrypt = (boolean) jsonObject.getOrDefault("encrypt", false);
         int rawbase = (int) jsonObject.getOrDefault("rawbase", 58);
         String password = (String) jsonObject.getOrDefault("password", null);
@@ -254,8 +253,8 @@ public class R_SendResource {
                 recipient,
                 feePow,
                 assetKey, amount,
-                title, data, null,
-                codebase, encrypt,
+                title, message, messagecode,
+                encrypt,
                 rawbase,
                 password
         );

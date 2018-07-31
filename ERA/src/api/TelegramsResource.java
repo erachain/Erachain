@@ -4,6 +4,7 @@ import controller.Controller;
 import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
+import core.crypto.Base32;
 import core.crypto.Base58;
 import core.transaction.R_Send;
 import core.transaction.Transaction;
@@ -15,18 +16,21 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.mapdb.Fun.Tuple2;
 import utils.APIUtils;
+import utils.Converter;
+import utils.Pair;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -57,8 +61,9 @@ public class TelegramsResource {
 
         // CREATE JSON OBJECT
         JSONArray array = new JSONArray();
+        Controller controller = Controller.getInstance();
 
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, filter)) {
+        for (TelegramMessage telegram : controller.getLastTelegrams(timestamp, filter)) {
             array.add(telegram.toJson());
         }
 
@@ -88,7 +93,8 @@ public class TelegramsResource {
      * "record_type":"SEND",
      * "property2":128,
      * "action_key":1,
-     * "head":"NPL",
+     * "    // _description - Описание заголовка, если нет то null":"NPL",
+     * "message:"MESSAGE",
      * "property1":0,
      * "size":162,
      * "action_name":"PROPERTY",
@@ -151,9 +157,9 @@ public class TelegramsResource {
      * @param recipient_in  recipient
      * @param asset_in      asset
      * @param amount_in     amount
-     * @param title_in      title or head
-     * @param message_in    message
-     * @param istextmessage bool value isText
+     * @param title         title
+     * @param message       message
+     * @param messagecode  code if exist is text (not required field)
      * @param encrypt       bool value isEncrypt
      * @param password      password
      * @return return signature telegram
@@ -167,11 +173,12 @@ public class TelegramsResource {
      */
     @SuppressWarnings("unchecked")
     @GET
-    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{istextmessage}/{encrypt}/{password}")
+    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{messagecode}/{encrypt}/{password}")
     public String send(@PathParam("sender") String sender_in, @PathParam("recipient") String recipient_in,
                        @PathParam("assetKey") long asset_in, @PathParam("amount") String amount_in,
-                       @PathParam("title") String title_in, @PathParam("message") String message_in,
-                       @PathParam("istextmessage") boolean istextmessage, @PathParam("encrypt") boolean encrypt,
+                       @PathParam("title") String title, @PathParam("message") String message,
+                       @QueryParam("messagecode") int messagecode,
+                       @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
         //APIUtils.askAPICallAllowed(password, "GET telegrams/send", request);
@@ -217,22 +224,39 @@ public class TelegramsResource {
             out.put("status", "Invalid Amount");
             return out.toJSONString();
         }
-        byte[] message = null;
-        if (message_in != null) {
-            message = message_in.getBytes(StandardCharsets.UTF_8);
-            if (message.length > BlockChain.MAX_REC_DATA_BYTES) {
-                out.put("status_code", Transaction.INVALID_DESCRIPTION_LENGTH);
-                out.put("status", "Invalid message");
-                return out.toJSONString();
+
+        byte[] messageBytes = null;
+
+        if (message != null && message.length() > 0) {
+            if (messagecode == 0) {
+                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+            } else {
+                try {
+                    if (messagecode == 16) {
+                        messageBytes = Converter.parseHexString(message);
+                    } else if (messagecode == 32) {
+                        messageBytes = Base32.decode(message);
+                    } else if (messagecode == 58) {
+                        messageBytes = Base58.decode(message);
+                    } else if (messagecode == 64) {
+                        messageBytes = Base64.getDecoder().decode(message);
+                    }
+                } catch (Exception e) {
+                    throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MESSAGE_FORMAT);
+                }
             }
         }
 
+        // if no TEXT - set null
+        if (messageBytes != null && messageBytes.length == 0)
+            messageBytes = null;
+
         byte[] encrypted = encrypt ? new byte[]{1} : new byte[]{0};
-        byte[] isTextByte = istextmessage ? new byte[]{1} : new byte[]{0};
+        byte[] isTextByte = (messagecode == 0) ? new byte[] { 1 } : new byte[] { 0 };
 
         // title
-        if (title_in != null && title_in.getBytes(StandardCharsets.UTF_8).length > 256) {
-            out.put("status_code", Transaction.INVALID_HEAD_LENGTH);
+        if (title != null && title.getBytes(StandardCharsets.UTF_8).length > 256) {
+            out.put("status_code", Transaction.INVALID_TITLE_LENGTH);
             out.put("status", "Invalid Title");
             return out.toJSONString();
         }
@@ -247,7 +271,7 @@ public class TelegramsResource {
         try {
             transaction = cntr.r_Send(
                     account, 0, recip, asset_in, amount,
-                    title_in, message, isTextByte, encrypted);
+                    title, messageBytes, isTextByte, encrypted);
             if (transaction == null)
                 throw new Exception("transaction == null");
         } catch (Exception e) {
@@ -262,22 +286,22 @@ public class TelegramsResource {
         return out.toJSONString();
     }
 
-    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false?password=1
+    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/0/false?password=1
     @SuppressWarnings("unchecked")
     @GET
     @Path("send/{sender}/{recipient}")
     public String sendQuery(@PathParam("sender") String sender, @PathParam("recipient") String recipient,
                             @QueryParam("asset") long asset, @QueryParam("amount") String amount,
                             @QueryParam("title") String title, @QueryParam("message") String message,
-                            @QueryParam("istextmessage") boolean istextmessage, @QueryParam("encrypt") boolean encrypt,
+                            @QueryParam("messagecode") int messagecode, @QueryParam("encrypt") boolean encrypt,
                             @QueryParam("password") String password) {
 
-        return send(sender, recipient, asset, amount, title, message, istextmessage, encrypt, password);
+        return send(sender, recipient, asset, amount, title, message, messagecode, encrypt, password);
 
     }
 
-    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
-    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "istextmessage": true, "encrypt": false, "password": "122"}
+    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"messagecode\": 0, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "messagecode": 0, "encrypt": false, "password": "122"}
 
     /**
      * Send telegram. not in block chain
@@ -286,7 +310,7 @@ public class TelegramsResource {
      * @return signature telegram
      * <h2>Example request</h2>
      * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
-     * "asset":"643","amount":"0.01","title":"NPL","istextmessage":"true","encrypt":"true","password":"123456789"}
+     * "asset":"643","amount":"0.01","title":"NPL","messagecode":0,"encrypt":"true","password":"123456789"}
      * <h2>Example response</h2>
      * {
      * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
@@ -319,7 +343,7 @@ public class TelegramsResource {
                 (String) jsonObject.getOrDefault("amount", null),
                 (String) jsonObject.getOrDefault("title", null),
                 (String) jsonObject.getOrDefault("message", null),
-                Boolean.valueOf((String) jsonObject.getOrDefault("istextmessage", false)),
+                ((Long) jsonObject.getOrDefault("messagecode", 0L)).intValue(),
                 Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false)),
                 (String) jsonObject.getOrDefault("password", null));
     }
@@ -394,21 +418,31 @@ public class TelegramsResource {
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
+
         JSONArray arraySign = (JSONArray) (jsonObject.get("list"));
         JSONObject out = new JSONObject();
-        List<TelegramMessage> lst = new ArrayList<>();
+        List<TelegramMessage> deleteList = new ArrayList<>();
+        Controller controller = Controller.getInstance();
+
         for (Object obj : arraySign) {
-            if (Controller.getInstance().getTelegram(obj.toString()) == null)
+
+            TelegramMessage telegramMessage = controller.getTelegram(obj.toString());
+            if (telegramMessage == null)
                 out.put("signature", obj.toString());
-            else
-                lst.add(Controller.getInstance().getTelegram(obj.toString()));
+            else {
+                for (Account account: controller.getAccounts()) {
+                    if (telegramMessage.getTransaction().isInvolved(account))
+                        deleteList.add(telegramMessage);
+                    else
+                        out.put("signature", obj.toString());
+                }
+            }
         }
         try {
-            Controller.getInstance().deleteTelegram(lst);
+            controller.deleteTelegram(deleteList);
             return out.toJSONString();
         } catch (Exception e) {
             throw ApiErrorFactory.getInstance().createError(e.getMessage());
-
         }
     }
 }

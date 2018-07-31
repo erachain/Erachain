@@ -977,14 +977,22 @@ public class BlockExplorer {
         pollJSON.put("description", poll.getDescription());
         pollJSON.put("totalVotes", poll.getTotalVotes(asset_q).toPlainString());
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(
-                poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
-        for (Transaction transaction : transactions) {
-            CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
-            if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
-                pollJSON.put("timestamp", createPollTransaction.getTimestamp());
-                pollJSON.put("dateTime", BlockExplorer.timestampToStr(createPollTransaction.getTimestamp()));
-                break;
+        if (true) {
+            //Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(poll.getReference());
+            //Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
+            pollJSON.put("timestamp", 0l);//transactions.getTimestamp());
+            pollJSON.put("dateTime", BlockExplorer.timestampToStr(0l)); //transactions.getTimestamp()));
+        } else {
+            // OLD
+            List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByTypeAndAddress(
+                    poll.getCreator().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
+            for (Transaction transaction : transactions) {
+                CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
+                if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
+                    pollJSON.put("timestamp", createPollTransaction.getTimestamp());
+                    pollJSON.put("dateTime", BlockExplorer.timestampToStr(createPollTransaction.getTimestamp()));
+                    break;
+                }
             }
         }
 
@@ -1197,14 +1205,22 @@ public class BlockExplorer {
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap()
-                .getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
-        for (Transaction transaction : transactions) {
-            IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
-            if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
-                assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
-                assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
-                break;
+        if (true) {
+            Tuple2<Integer, Integer> blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
+            Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
+            assetJSON.put("timestamp", transactions.getTimestamp());
+            assetJSON.put("dateTime", BlockExplorer.timestampToStr(transactions.getTimestamp()));
+        } else {
+            // OLD
+            List<Transaction> transactions = dcSet.getTransactionFinalMap()
+                    .getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+            for (Transaction transaction : transactions) {
+                IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
+                if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
+                    assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
+                    assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
+                    break;
+                }
             }
         }
 
@@ -1331,7 +1347,7 @@ public class BlockExplorer {
 
             sumSellingAmount = sumSellingAmount.add(sellingAmount);
 
-            sellsJSON.put(Base58.encode(order.a.a), sellJSON);
+            sellsJSON.put(Base58.encode(order.a.a, 64), sellJSON);
         }
 
         output.put("sells", sellsJSON);
@@ -1371,7 +1387,7 @@ public class BlockExplorer {
 
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
-            buysJSON.put(Base58.encode(order.a.a), buyJSON);
+            buysJSON.put(Base58.encode(order.a.a, 64), buyJSON);
         }
         output.put("buys", buysJSON);
 
@@ -1404,7 +1420,7 @@ public class BlockExplorer {
             tradeJSON.put("realPrice", Order.calcPrice(trade.c, trade.d));
             tradeJSON.put("realReversePrice", Order.calcPrice(trade.d, trade.c));
 
-            tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a));
+            tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a, 64));
 
             tradeJSON.put("initiatorCreator", orderInitiator.a.b);
             tradeJSON.put("initiatorAmount", orderInitiator.b.b.toPlainString());
@@ -1418,7 +1434,7 @@ public class BlockExplorer {
                 tradeHaveAmount = tradeHaveAmount.add(trade.c);
                 tradeWantAmount = tradeWantAmount.add(trade.d);
             }
-            tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a));
+            tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a, 64));
             tradeJSON.put("targetCreator", orderTarget.a.b);
             tradeJSON.put("targetAmount", orderTarget.b.b.toPlainString());
 
@@ -2288,7 +2304,7 @@ public class BlockExplorer {
             transactionDataJSON.put("realPrice",
                     trade.getAmountWant().divide(trade.getAmountHave(), 8, RoundingMode.FLOOR).toPlainString());
 
-            transactionDataJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a));
+            transactionDataJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a, 64));
 
             transactionDataJSON.put("initiatorCreator", orderInitiator.a.b);
             transactionDataJSON.put("initiatorAmount", orderInitiator.b.b.toPlainString());
@@ -2300,11 +2316,11 @@ public class BlockExplorer {
                 assetNames.setKey(orderInitiator.c.a);
             }
 
-            transactionDataJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a));
+            transactionDataJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a, 64));
             transactionDataJSON.put("targetCreator", orderTarget.a.b);
             transactionDataJSON.put("targetAmount", orderTarget.b.b.toPlainString());
 
-            Block parentBlock = Controller.getInstance().getTransaction(orderInitiator.a.a.toByteArray())
+            Block parentBlock = Controller.getInstance().getTransaction(Order.bigIntToSignature(orderInitiator.a.a))
                     .getBlock(dcSet);
             transactionDataJSON.put("height", parentBlock.getHeight(dcSet));
             transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(dcSet) + 1);

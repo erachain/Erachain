@@ -4,9 +4,11 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.primitives.Bytes;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -171,6 +173,20 @@ public class Order implements Comparable<Order> {
                 order.c.b, order.b.c,
                 (byte) (order.a.d ? 1 : 0), order.a.c);
 
+    }
+
+    public static byte[] bigIntToSignature(BigInteger bigInt) {
+        byte[] bytes = bigInt.toByteArray();
+        int left = ID_LENGTH - bytes.length;
+        if (left > 0) {
+            byte[] bytesAdd = new byte[left];
+            if (bytes[0] < 0)
+                Arrays.fill(bytesAdd, (byte)-1);
+
+            return Bytes.concat(bytesAdd, bytes);
+        }
+
+        return bytes;
     }
 
     public void setDC(DCSet dcSet) {
@@ -453,8 +469,8 @@ public class Order implements Comparable<Order> {
         int compare = 0;
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                (this.haveKey == 1 && this.wantKey == 2)
-                //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
+                //(this.haveKey == 1 && this.wantKey == 2)
+                this.id.equals(new BigInteger(Base58.decode("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")))
                 && !db.isFork()
                 ) {
             compare++;

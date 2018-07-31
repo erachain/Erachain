@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import core.item.assets.Order;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -176,7 +177,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //ADD CREATOR/ORDER
         transaction.put("creator", this.creator.getAddress());
-        transaction.put("orderID", Base58.encode(this.orderID.toByteArray()));
+        transaction.put("orderID", Base58.encode(this.orderID, ORDER_LENGTH));
 
         return transaction;
     }
@@ -189,9 +190,7 @@ public class CancelOrderTransaction extends Transaction {
         byte[] data = super.toBytes(withSign, releaserReference);
 
         //WRITE ORDER
-        byte[] orderBytes = this.orderID.toByteArray();
-        byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
-        orderBytes = Bytes.concat(fill, orderBytes);
+        byte[] orderBytes = Order.bigIntToSignature(this.orderID);
         data = Bytes.concat(data, orderBytes);
 
         return data;

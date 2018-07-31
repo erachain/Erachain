@@ -445,8 +445,8 @@ public class ApiClient {
                             "Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
-                            "(deprecated) POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
-                            "Send a payment with message using the given data. \"istextmessage\" and \"encrypt\" are optional and default true. Sender and recipient can also be a name.",
+                            "(deprecated) POST rec_payment {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\":\"<assetId>\", \"amount\":\"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istext\": <true/false>, \"encrypt\": <true/false>,  \"password\": \"<password>\"}",
+                            "Send a payment with message using the given data. \"istext\" and \"encrypt\" are optional and default true. Sender and recipient can also be a name.",
                             "Errors: 1 - Json error. 104 - Invalid amount. 105 - Invalid fee. 106 - Invalid sender. 107 - Invalid recipient. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
 
@@ -646,8 +646,8 @@ public class ApiClient {
                             ""
                     },
                     {
-                            "POST rec_hashes {\"sender\": \"<sender>\", \"url\": \"<url>\", \"data\": \"<data>\", \"hahses\": \"<hashes>\"}",
-                            "Record HASHes. \"url\" link to files. \"data\" short description. \"hashes\" - String of HASHes delimited by \" \".",
+                            "POST rec_hashes {\"sender\": \"<sender>\", \"url\": \"<url>\", \"message\": \"<message>\", \"hahses\": \"<hashes>\"}",
+                            "Record HASHes. \"url\" link to files. \"message\" short description. \"hashes\" - String of HASHes delimited by \" \".",
                             ""
                     },
                     {
@@ -743,17 +743,17 @@ public class ApiClient {
                     },
                     {
                             "GET telegrams/send/78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/<message>/true/false/122",
-                            "Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+                            "Send a telegram using the given data. \"istext\" and \"encrypt\" are optional and default true.",
                             ""
                     },
                     {
-                        "GET telegrams/send/{sender}/{recipient}?asset={asset}&amount={amount}&title={title}&message={message}&istextmessage=true/false&encrypt=true/false&password={password}",
-                        "Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+                        "GET telegrams/send/{sender}/{recipient}?asset={asset}&amount={amount}&title={title}&message={message}&istext=true/false&encrypt=true/false&password={password}",
+                        "Send a telegram using the given data. \"istext\" and \"encrypt\" are optional and default true.",
                         ""
                     },
                     {
-                            "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istextmessage\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
-                            "Send a telegram using the given data. \"istextmessage\" and \"encrypt\" are optional and default true.",
+                            "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"istext\": <true/false>, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+                            "Send a telegram using the given data. \"istext\" and \"encrypt\" are optional and default true.",
                             ""
                     }
                     ,

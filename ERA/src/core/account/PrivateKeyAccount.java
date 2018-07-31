@@ -12,12 +12,9 @@ public class PrivateKeyAccount extends PublicKeyAccount {
     private Pair<byte[], byte[]> keyPair;
 
     public PrivateKeyAccount(byte[] seed) {
+        super(Crypto.getInstance().createKeyPair(seed).getB());
         this.seed = seed;
         this.keyPair = Crypto.getInstance().createKeyPair(seed);
-        this.publicKey = keyPair.getB();
-        this.address = Crypto.getInstance().getAddress(this.publicKey);
-        this.bytes = Base58.decode(address);
-        this.shortBytes = Arrays.copyOfRange(this.bytes, 5, this.bytes.length);
     }
 
     public byte[] getSeed() {

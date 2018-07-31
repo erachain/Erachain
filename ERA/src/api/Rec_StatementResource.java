@@ -43,11 +43,11 @@ public class Rec_StatementResource {
 
             String templateKeyString = (String) jsonObject.get("template");
             String message = (String) jsonObject.get("message");
-            String isTextMessageString = (String) jsonObject.get("istextmessage");
+            String isTextMessageString = (String) jsonObject.get("istext");
             String encryptString = (String) jsonObject.get("encrypt");
 
             if (maker == null)
-                return "use parameters: template=12&maker=ADDRESS&message=MESS&istextmessage=true&encrypt=true&password=PASSWORD";
+                return "use parameters: template=12&maker=ADDRESS&message=MESS&istext=true&encrypt=true&password=PASSWORD";
 
             boolean isTextMessage = true;
             if (isTextMessageString != null) {
