@@ -446,6 +446,20 @@ public abstract class Trader extends Thread {
 
     public void run() {
 
+        // WAIT START WALLET
+        // IF WALLET NOT ESXST - suspended
+        while(!cnt.doesWalletDatabaseExists()) {
+            try {
+                Thread.sleep(5000);
+            } catch (Exception e) {
+                //FAILED TO SLEEP
+            }
+        }
+
+        Account account = Controller.getInstance().wallet.getAccounts().get(1);
+        if (!account.equals(this.account))
+            return;
+
         if (cleanAllOnStart) {
             removaAll();
         }

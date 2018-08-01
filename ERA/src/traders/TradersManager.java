@@ -36,15 +36,6 @@ public class TradersManager extends Observable {
     private void start() {
 
         Controller cnt = Controller.getInstance();
-        // WAIT START WALLET
-        // IF WALLET NOT ESXST - suspended
-        while(false && !cnt.doesWalletDatabaseExists()) {
-            try {
-                Thread.sleep(3000);
-            } catch (Exception e) {
-                //FAILED TO SLEEP
-            }
-        }
 
         try {
             Thread.sleep(3000);
@@ -52,12 +43,7 @@ public class TradersManager extends Observable {
             //FAILED TO SLEEP
         }
 
-        if (!cnt.doesWalletDatabaseExists())
-            return;
-        
-        Account account = Controller.getInstance().wallet.getAccounts().get(1);
-        if (!account.equals("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP"))
-            return;
+        Account account = new Account("7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP");
 
         if (true) {
             //START RATERs THREADs
