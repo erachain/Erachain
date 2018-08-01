@@ -28,7 +28,7 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
     long key_person_table;
     TreeMap<String, java.util.Stack<Tuple3<Integer, Integer, Integer>>> addresses; //= DBSet.getInstance().getPersonAddressMap().getItems(person.getKey());
     SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Name", "To Date", "Verifier"}); //, "Data"});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Name", "Date", "Verifier"}); //, "Data"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true};
 
     public PersonAccountsModel(long person_Key) {
