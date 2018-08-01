@@ -367,7 +367,8 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                 Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = buyOrdersTableModel
                         .getOrder(row);
                 
-                Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns().get(order.a.a.toByteArray());
+                Tuple2<Integer, Integer> createOrderKey = DCSet.getInstance().getTransactionFinalMapSigns()
+                        .get(Order.bigIntToSignature(order.a.a));
                 Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(createOrderKey);
 
                 Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, createOrder,

@@ -559,9 +559,6 @@ public class Controller extends Observable {
         // CREATE NETWORK
         this.network = new Network();
 
-        // CREATE NETWORK
-        this.tradersManager = new TradersManager();
-
         // CLOSE ON UNEXPECTED SHUTDOWN
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -608,6 +605,8 @@ public class Controller extends Observable {
         MemoryViewer mamoryViewer = new MemoryViewer(this);
         mamoryViewer.start();
 
+        // CREATE NETWORK
+        this.tradersManager = new TradersManager();
 
         this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>
                 (new BigDecimal(245 * 62).setScale(2), "\u20BD"));
