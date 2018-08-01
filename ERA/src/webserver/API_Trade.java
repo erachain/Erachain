@@ -149,7 +149,7 @@ public class API_Trade {
 
             sumSellingAmount = sumSellingAmount.add(sellingAmount);
 
-            sellsJSON.put(Base58.encode(order.a.a), sellJSON);
+            sellsJSON.put(Base58.encode(order.a.a, 64), sellJSON);
 
             if(counter++ > limit) break;
 
@@ -185,7 +185,7 @@ public class API_Trade {
 
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
-            buysJSON.put(Base58.encode(order.a.a), buyJSON);
+            buysJSON.put(Base58.encode(order.a.a, 64), buyJSON);
 
             if(counter++ > limit) break;
 

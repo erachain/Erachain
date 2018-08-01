@@ -2990,7 +2990,7 @@ public class OrderTestsMy {
             Assert.assertEquals((long)order.b.a, wantKey);
             Assert.assertEquals((long)order.c.a, haveKey);
 
-            String signB58 = Base58.encode(order.a.a);
+            String signB58 = Base58.encode(order.a.a, 64);
             
             Assert.assertEquals(deletedID.equals(order.a.a), false);
             
