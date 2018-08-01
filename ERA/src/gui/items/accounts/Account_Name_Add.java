@@ -47,6 +47,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
      * Creates new form Account_Show
      */
     public Account_Name_Add() {
+
         super();
         th = this;
         if (!Controller.getInstance().isWalletUnlocked()) {
@@ -81,7 +82,6 @@ public class Account_Name_Add extends javax.swing.JDialog {
 
                 setVisible(false);
             }
-
         });
 
         jButton_OK.addActionListener(new ActionListener() {
@@ -102,9 +102,6 @@ public class Account_Name_Add extends javax.swing.JDialog {
                 } else if (name.length() == 0) {
                     name = "";
                 }
-                ;
-
-
                 if (desc.length() != 0) {
                     // write description
                     ans.put("description", desc);
@@ -121,8 +118,6 @@ public class Account_Name_Add extends javax.swing.JDialog {
                     // TODO Auto-generated catch block
                     JOptionPane.showMessageDialog(null, Lang.getInstance().translate("Invalid Account"), Lang.getInstance().translate("Invalid Account"), JOptionPane.ERROR_MESSAGE);
                 }
-
-
                 //dispose();
             }
 
@@ -165,7 +160,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
 
         jLabel_Title.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel_Title.setText("Show Account");
+        jLabel_Title.setText(Lang.getInstance().translate("Add new account"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -175,7 +170,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 10);
         getContentPane().add(jLabel_Title, gridBagConstraints);
 
-        jLabel_Name.setText("Name");
+        jLabel_Name.setText(Lang.getInstance().translate("Name") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -214,14 +209,14 @@ public class Account_Name_Add extends javax.swing.JDialog {
         jPanel1Layout.rowHeights = new int[]{0};
         jPanel1.setLayout(jPanel1Layout);
 
-        jButton_OK.setText("Ok");
+        jButton_OK.setText(Lang.getInstance().translate("Ok"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         jPanel1.add(jButton_OK, gridBagConstraints);
 
-        jButton_Cancel.setText("Cancel");
+        jButton_Cancel.setText(Lang.getInstance().translate("Cancel"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
@@ -235,7 +230,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 10);
         getContentPane().add(jPanel1, gridBagConstraints);
 
-        jLabel_Description.setText("Description");
+        jLabel_Description.setText(Lang.getInstance().translate("Description") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -252,7 +247,7 @@ public class Account_Name_Add extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 10);
         getContentPane().add(jPanel2, gridBagConstraints);
 
-        jLabel_Account.setText("Account");
+        jLabel_Account.setText(Lang.getInstance().translate("Account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

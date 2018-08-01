@@ -45,8 +45,8 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
      //   th.menu_Table.add(send_Mail_Item);
 //      add items in menu
 
-        
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
+
+        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status to person"));
       
        set_Status_Item.addActionListener(new ActionListener() {
            @Override
@@ -59,7 +59,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
        });
        this.menu_Table.add(set_Status_Item);
 
-       JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest Public Key for Person"));
+        JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest public key for person"));
       
        attestPubKey_Item.addActionListener(new ActionListener() {
            @Override
@@ -73,7 +73,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
        });
        this.menu_Table.add(attestPubKey_Item);
 
-       JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the Person Info"));
+        JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
        vouchPerson_Item.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
