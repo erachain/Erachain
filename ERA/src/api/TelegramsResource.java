@@ -159,7 +159,7 @@ public class TelegramsResource {
      * @param amount_in     amount
      * @param title         title
      * @param message       message
-     * @param messagecode  code if exist is text (not required field)
+     * @param encoding  code if exist is text (not required field)
      * @param encrypt       bool value isEncrypt
      * @param password      password
      * @return return signature telegram
@@ -173,11 +173,11 @@ public class TelegramsResource {
      */
     @SuppressWarnings("unchecked")
     @GET
-    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{messagecode}/{encrypt}/{password}")
+    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{encoding}/{encrypt}/{password}")
     public String send(@PathParam("sender") String sender_in, @PathParam("recipient") String recipient_in,
                        @PathParam("assetKey") long asset_in, @PathParam("amount") String amount_in,
                        @PathParam("title") String title, @PathParam("message") String message,
-                       @QueryParam("messagecode") int messagecode,
+                       @QueryParam("encoding") int encoding,
                        @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
@@ -228,17 +228,17 @@ public class TelegramsResource {
         byte[] messageBytes = null;
 
         if (message != null && message.length() > 0) {
-            if (messagecode == 0) {
+            if (encoding == 0) {
                 messageBytes = message.getBytes(Charset.forName("UTF-8"));
             } else {
                 try {
-                    if (messagecode == 16) {
+                    if (encoding == 16) {
                         messageBytes = Converter.parseHexString(message);
-                    } else if (messagecode == 32) {
+                    } else if (encoding == 32) {
                         messageBytes = Base32.decode(message);
-                    } else if (messagecode == 58) {
+                    } else if (encoding == 58) {
                         messageBytes = Base58.decode(message);
-                    } else if (messagecode == 64) {
+                    } else if (encoding == 64) {
                         messageBytes = Base64.getDecoder().decode(message);
                     }
                 } catch (Exception e) {
@@ -252,7 +252,7 @@ public class TelegramsResource {
             messageBytes = null;
 
         byte[] encrypted = encrypt ? new byte[]{1} : new byte[]{0};
-        byte[] isTextByte = (messagecode == 0) ? new byte[] { 1 } : new byte[] { 0 };
+        byte[] isTextByte = (encoding == 0) ? new byte[] { 1 } : new byte[] { 0 };
 
         // title
         if (title != null && title.getBytes(StandardCharsets.UTF_8).length > 256) {
@@ -293,15 +293,15 @@ public class TelegramsResource {
     public String sendQuery(@PathParam("sender") String sender, @PathParam("recipient") String recipient,
                             @QueryParam("asset") long asset, @QueryParam("amount") String amount,
                             @QueryParam("title") String title, @QueryParam("message") String message,
-                            @QueryParam("messagecode") int messagecode, @QueryParam("encrypt") boolean encrypt,
+                            @QueryParam("encoding") int encoding, @QueryParam("encrypt") boolean encrypt,
                             @QueryParam("password") String password) {
 
-        return send(sender, recipient, asset, amount, title, message, messagecode, encrypt, password);
+        return send(sender, recipient, asset, amount, title, message, encoding, encrypt, password);
 
     }
 
-    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"messagecode\": 0, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
-    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "messagecode": 0, "encrypt": false, "password": "122"}
+    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": 0, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "encoding": 0, "encrypt": false, "password": "122"}
 
     /**
      * Send telegram. not in block chain
@@ -310,7 +310,7 @@ public class TelegramsResource {
      * @return signature telegram
      * <h2>Example request</h2>
      * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
-     * "asset":"643","amount":"0.01","title":"NPL","messagecode":0,"encrypt":"true","password":"123456789"}
+     * "asset":"643","amount":"0.01","title":"NPL","encoding":0,"encrypt":"true","password":"123456789"}
      * <h2>Example response</h2>
      * {
      * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
@@ -343,7 +343,7 @@ public class TelegramsResource {
                 (String) jsonObject.getOrDefault("amount", null),
                 (String) jsonObject.getOrDefault("title", null),
                 (String) jsonObject.getOrDefault("message", null),
-                ((Long) jsonObject.getOrDefault("messagecode", 0L)).intValue(),
+                ((Long) jsonObject.getOrDefault("encoding", 0L)).intValue(),
                 Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false)),
                 (String) jsonObject.getOrDefault("password", null));
     }
