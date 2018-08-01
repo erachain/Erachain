@@ -11,7 +11,7 @@ import java.util.TreeMap;
 //import org.mapdb.Fun.Tuple2;
 //import org.mapdb.Fun.Tuple3;
 
-// address+key -> Stack person + end_date + block.height + transaction.reference
+// address -> Stack person + end_date + block.height + transaction.reference
 // transaction.reference = -1 allways??
 // Controller.getInstance().getHeight()
 public class AddressPersonMap extends DCMap<String, Stack<Tuple4<

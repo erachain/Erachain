@@ -307,7 +307,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
 
         }
 
-        descript = descript + "\n" + Lang.getInstance().translate("Coordinates Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
+        descript = descript + "\n" + Lang.getInstance().translate("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
         descript = descript + "\n" + Lang.getInstance().translate("Height") + ": " + person.getHeight();
 
         descript = descript + "\n" + person.getDescription();
@@ -383,7 +383,7 @@ public class Person_Info_002 extends javax.swing.JPanel {
             //	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
         }
 
-        jLabel_Creator.setText(Lang.getInstance().translate("Registrator") + ":");
+        jLabel_Creator.setText(Lang.getInstance().translate("Registrant:") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
