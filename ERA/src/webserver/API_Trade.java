@@ -264,7 +264,7 @@ public class API_Trade {
             tradeJSON.put("realPrice", Order.calcPrice(trade.c, trade.d));
             tradeJSON.put("realReversePrice", Order.calcPrice(trade.d, trade.c));
 
-            tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a));
+            tradeJSON.put("initiatorTxSignature", Base58.encode(orderInitiator.a.a, 64));
 
             tradeJSON.put("initiatorCreator", orderInitiator.a.b);
             tradeJSON.put("initiatorAmount", orderInitiator.b.b);
@@ -278,7 +278,7 @@ public class API_Trade {
                 tradeHaveAmount = tradeHaveAmount.add(trade.c);
                 tradeWantAmount = tradeWantAmount.add(trade.d);
             }
-            tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a));
+            tradeJSON.put("targetTxSignature", Base58.encode(orderTarget.a.a, 64));
             tradeJSON.put("targetCreator", orderTarget.a.b);
             tradeJSON.put("targetAmount", orderTarget.b.b);
 
