@@ -1,7 +1,6 @@
 package api;
 
 import controller.Controller;
-import core.BlockChain;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.crypto.Base32;
@@ -17,7 +16,6 @@ import org.json.simple.parser.JSONParser;
 import org.mapdb.Fun.Tuple2;
 import utils.APIUtils;
 import utils.Converter;
-import utils.Pair;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -30,7 +28,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Path("telegrams")
 @Produces(MediaType.APPLICATION_JSON)
@@ -430,12 +427,16 @@ public class TelegramsResource {
             if (telegramMessage == null)
                 out.put("signature", obj.toString());
             else {
+                boolean found = false;
                 for (Account account: controller.getAccounts()) {
-                    if (telegramMessage.getTransaction().isInvolved(account))
+                    if (telegramMessage.getTransaction().isInvolved(account)) {
                         deleteList.add(telegramMessage);
-                    else
-                        out.put("signature", obj.toString());
+                        found = true;
+                        break;
+                    }
                 }
+                if (!found)
+                    out.put("signature", obj.toString());
             }
         }
         try {
