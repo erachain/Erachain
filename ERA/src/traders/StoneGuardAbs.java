@@ -75,7 +75,7 @@ public class StoneGuardAbs extends Trader {
 
     private void shiftAll() {
 
-        LOGGER.info("shift ALL for " + this.haveAsset.viewName()
+        LOGGER.info(">>>>> shift ALL for " + this.haveAsset.viewName()
                 + "/" + this.wantAsset.viewName() + " to " + this.rate.toString());
 
         // REMOVE ALL ORDERS
