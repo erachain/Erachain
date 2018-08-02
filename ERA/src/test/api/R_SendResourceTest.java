@@ -78,7 +78,7 @@ public class R_SendResourceTest extends SettingTests {
         String address = parse[0].replace("[", "").replace("]", "").trim().replace("\"", "");
         String sendTransaction = ApiClient.executeCommand("POST r_send {\"creator\":\"" + address + "\"," +
                 "\"recipient\":\"79MXsjo9DEaxzu6kSvJUauLhmQrB4WogsH\",\"feePow\":\"1\",\"assetKey\":\"643\",\"amount\":\"1\"," +
-                "\"title\":\"123\",\"message\":\"{\"\"msg\"\":\"\"1223\"\"}\",\"messagecode\":\"0\",\"encrypt\":\"false\",\"password\":\"123456789\"}");
+                "\"title\":\"123\",\"message\":\"{\"\"msg\"\":\"\"1223\"\"}\",\"encoding\":\"0\",\"encrypt\":\"false\",\"password\":\"123456789\"}");
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(sendTransaction);
