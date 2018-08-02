@@ -81,7 +81,7 @@ public class BlockChain {
     public static final int ORDER_FEE_DOWN = DEVELOP_USE ? 80000 : 140000;
     public static final int SEND_AMOUNT_FEE_UP = DEVELOP_USE ? 100000 : 150000;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : DEVELOP_USE ? 153333 : 150000;
-    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 0 : 152532;
+    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 0 : 162532;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
