@@ -70,7 +70,7 @@ public class AboutFrame extends JDialog {
 
         JLabel lblAuthorsLabel = new JLabel(Lang.getInstance().translate("Author") + ": "
                 //+ "Ермолаев Дмитрий Сергеевич");
-                + Lang.getInstance().translate("Dmitrii Ermolaev"));
+                + Lang.getInstance().translate("ERACHAIN WORLD PTE LTD.")); //"Dmitrii Ermolaev"));
         lblAuthorsLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblAuthorsLabel.setForeground(Color.RED);
         lblAuthorsLabel.setHorizontalAlignment(SwingConstants.CENTER);
