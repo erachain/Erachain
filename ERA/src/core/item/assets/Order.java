@@ -10,8 +10,7 @@ import java.util.List;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import datachain.CompletedOrderMap;
-import datachain.TradeMap;
+import datachain.*;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -23,8 +22,6 @@ import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.transaction.CancelOrderTransaction;
 import core.transaction.Transaction;
-import datachain.DCSet;
-import datachain.OrderMap;
 
 public class Order implements Comparable<Order> {
 
@@ -454,7 +451,7 @@ public class Order implements Comparable<Order> {
         OrderMap ordersMap = this.dcSet.getOrderMap();
         TradeMap tradesMap = this.dcSet.getTradeMap();
 
-        int compare = 0;
+        boolean debug = false;
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 (this.haveKey == 1004l && this.wantKey == 2l)
@@ -462,15 +459,15 @@ public class Order implements Comparable<Order> {
                 //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
                 //&& !db.isFork()
                 ) {
-            compare++;
+            debug = true;
         }
+
+        // NEED FOR making secondary keys in TradeMap
+        ordersMap.add(this);
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
         this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, true);
-
-        //ADD ORDER TO DATABASE
-        ordersMap.add(this);
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
@@ -517,15 +514,28 @@ public class Order implements Comparable<Order> {
         }
 
         BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
-        BigDecimal totalAmountFulfilledWant = BigDecimal.ZERO;
-
+        BigDecimal processedAmountFulfilledWant = BigDecimal.ZERO;
 
         int haveScale = this.getHaveAsset().getScale();
         int wantScale = this.getWantAsset().getScale();
 
+        int compare = 0;
+
+        if (debug) {
+            debug = true;
+        }
+
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
-            Order order = orders.get(index++);
+            Order order;
+            if (this.dcSet.isFork()) {
+                // так как это все в памяти расположено то нужно создать новый объект
+                // иначе везде будет ссылка на один и тот же объект и
+                // при переходе на MAIN базу возьмется уже обновленный ордер из FORK DB
+                order = orders.get(index++).copy();
+            } else {
+                order = orders.get(index++);
+            }
             
             // for develop
             //String signB58 = Base58.encode(order.a.a);
@@ -554,9 +564,15 @@ public class Order implements Comparable<Order> {
                 break;
 
             thisIncrement = orderPrice.scaleByPowerOfTen(-wantScale);
-            if (thisAmountHaveLeft.compareTo(thisIncrement) < 0)
+            if (thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
                 // if left not enough for 1 buy by price this order
+                //error ++;
+                completedOrder = true;
+                // REVERT not completed AMOUNT
+                this.getCreator().changeBalance(this.dcSet, false,
+                        this.haveKey, this.getAmountHaveLeft(), false);
                 break;
+            }
 
             orderAmountHaveLeft = order.getAmountHaveLeft();
             orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(wantScale, RoundingMode.HALF_UP);
@@ -616,14 +632,27 @@ public class Order implements Comparable<Order> {
                     amountBytes = tradeAmountWant.unscaledValue().toByteArray();
                 }
 
+                if (debug) {
+                    debug = true;
+                }
+
                 //////////////////////////// TRADE /////////////////
-                trade = new Trade(this.getId(), order.getId(), tradeAmountHave, tradeAmountWant, transaction.getTimestamp());
+                trade = new Trade(this.getId(), order.getId(), this.haveKey, this.wantKey,
+                        tradeAmountHave, tradeAmountWant, transaction.getTimestamp());
 
                 //ADD TRADE TO DATABASE
                 tradesMap.add(trade);
                 // TODO: delete it check
                 if (!tradesMap.contains(new Tuple2<Long, Long>(this.getId(), order.getId()))) {
-                    int error = 0;
+                    Long error = null;
+                    error++;
+                }
+                if (!this.dcSet.isFork()) {
+                    List<Trade> trades = this.dcSet.getTradeMap().getTrades(this.haveKey, this.wantKey);
+                    if (trades.size() == 0) {
+                        Long error = null;
+                        error++;
+                    }
                 }
 
                 //UPDATE FULFILLED HAVE
@@ -635,11 +664,9 @@ public class Order implements Comparable<Order> {
                     ordersMap.delete(order);
 
                     //ADD TO COMPLETED ORDERS
-                    //target.setFulfilledWant(target.getAmountWant());
                     completedMap.add(order);
                 } else {
                     //UPDATE ORDER
-                    //target.setFulfilledWant(target.getFulfilledWant().add(amountWant));
                     ordersMap.add(order);
                 }
 
@@ -648,22 +675,30 @@ public class Order implements Comparable<Order> {
 
                 // update new values
                 thisAmountHaveLeft = this.getAmountHaveLeft();
-                totalAmountFulfilledWant.add(tradeAmountHave);
+                processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountHave);
 
-                // NOT USE automative CANCEL - becouse on ORPHAN its ma be wrong ?!?
-                if (false && !completedOrder
+                if (!completedOrder
                         &&
                         // if can't trade by more good price than self - by orderOrice - then  auto cancel!
                         thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
                     // cancel order if it not fulfiled isDivisible
                     // or HAVE not enough to one WANT  = price
-                    CancelOrderTransaction.process_it(this.dcSet, this);
+                    ///CancelOrderTransaction.process_it(this.dcSet, this);
                     //and stop resolve
-                    return;
+                    completedOrder = true;
+                    // REVERT not completed AMOUNT
+                    this.getCreator().changeBalance(this.dcSet, false,
+                            this.haveKey, this.getAmountHaveLeft(), false);
+                    break;
                 }
 
             }
         }
+
+        if (debug) {
+            debug = true;
+        }
+
         if (!completedOrder) {
             ordersMap.add(this);
         } else {
@@ -671,7 +706,7 @@ public class Order implements Comparable<Order> {
         }
 
         //TRANSFER FUNDS
-        this.getCreator().changeBalance(this.dcSet, false, this.getWant(), totalAmountFulfilledWant, false);
+        this.getCreator().changeBalance(this.dcSet, false, this.getWant(), processedAmountFulfilledWant, false);
 
     }
 
@@ -688,7 +723,6 @@ public class Order implements Comparable<Order> {
         }
 
         BigDecimal totalAmountFulfilledWant = BigDecimal.ZERO;
-        BigDecimal thisAmountHaveLeft = BigDecimal.ZERO;
 
         //ORPHAN TRADES
         for (Trade trade : this.getInitiatedTrades(this.dcSet)) {
@@ -705,10 +739,9 @@ public class Order implements Comparable<Order> {
 
             //REVERSE FULFILLED
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
-            totalAmountFulfilledWant.add(tradeAmountHave);
+            totalAmountFulfilledWant = totalAmountFulfilledWant.add(tradeAmountHave);
 
             target.getCreator().changeBalance(this.dcSet, true, target.getWant(), tradeAmountWant, false);
-            thisAmountHaveLeft.add(tradeAmountWant);
 
             //UPDATE ORDERS
             ordersMap.add(target);
@@ -717,15 +750,15 @@ public class Order implements Comparable<Order> {
             tradesMap.delete(trade);
         }
 
-        this.setFulfilledHave(this.getFulfilledHave().subtract(thisAmountHaveLeft));
-
         //REMOVE ORDER FROM DATABASE
         ordersMap.delete(this);
 
         //REMOVE HAVE
-        this.creator.changeBalance(this.dcSet, false, this.haveKey, this.amountHave, true);
+        // GET HAVE LEFT - if it CANCELWED by INCREMENT close
+        //   - если обработка остановлена по достижению порога Инкремента
+        this.creator.changeBalance(this.dcSet, false, this.haveKey, this.getFulfilledHave(), true);
         //REVERT WANT
-        this.getCreator().changeBalance(this.dcSet, true, this.getWant(), totalAmountFulfilledWant, false);
+        this.creator.changeBalance(this.dcSet, true, this.wantKey, totalAmountFulfilledWant, false);
     }
 
 	/*

@@ -101,9 +101,10 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    Order order = Order.getOrder(getDCSet(), value.getInitiator());
-                    long have = order.getHave();
-                    long want = order.getWant();
+                    // TODO: need insert keys in Trade - not fiind anytime
+                    ///Order order = Order.getOrder(getDCSet(), value.getInitiator());
+                    long have = value.getHaveKey(); //order.getHave();
+                    long want = value.getWantKey(); //order.getWant();
                     String pairKey;
                     if (have > want) {
                         pairKey = have + "/" + want;
@@ -111,7 +112,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                         pairKey = want + "/" + have;
                     }
 
-                    return new Tuple2<String, Long>(pairKey, Long.MAX_VALUE - 1l);
+                    return new Tuple2<String, Long>(pairKey, Long.MAX_VALUE - value.getTimestamp());
                 }
             });
 
@@ -124,8 +125,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    Order order = Order.getOrder(getDCSet(), value.getInitiator());
-                    long want = order.getWant();
+                    //Order order = Order.getOrder(getDCSet(), value.getInitiator());
+                    //long want = order.getWant();
+                    long want = value.getWantKey(); //order.getWant();
 
                     String wantKey;
                     wantKey = String.valueOf(want);
@@ -143,8 +145,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    Order order = Order.getOrder(getDCSet(), value.getInitiator());
-                    long have = order.getHave();
+                    //Order order = Order.getOrder(getDCSet(), value.getInitiator());
+                    //long have = order.getHave();
+                    long have = value.getHaveKey(); //order.getHave();
 
                     String haveKey;
                     haveKey = String.valueOf(have);
@@ -293,6 +296,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
     @SuppressWarnings("unchecked")
     public SortableList<Tuple2<Long, Long>, Trade> getTradesSortableList(long have, long want) {
+
         String pairKey;
         if (have > want) {
             pairKey = have + "/" + want;

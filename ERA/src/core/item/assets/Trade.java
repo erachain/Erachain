@@ -9,6 +9,8 @@ import java.util.List;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import core.item.ItemCls;
+import core.transaction.Transaction;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -19,6 +21,7 @@ import datachain.DCSet;
 public class Trade {
 
     private static final int ORDER_LENGTH = Order.ID_LENGTH;
+    private static final int ASSET_KEY_LENGTH = Transaction.KEY_LENGTH;
     private static final int AMOUNT_LENGTH = Order.FULFILLED_LENGTH;
     private static final int SCALE_LENGTH = 1;
     private static final int TIMESTAMP_LENGTH = 8;
@@ -27,14 +30,18 @@ public class Trade {
 
     private Long initiator;
     private Long target;
+    private Long haveKey;
+    private Long wantKey;
     private BigDecimal amountHave;
     private BigDecimal amountWant;
     private long timestamp;
 
     // make trading if two orders is seeked
-    public Trade(Long initiator, Long target, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
+    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
         this.initiator = initiator;
         this.target = target;
+        this.haveKey = haveKey;
+        this.wantKey = wantKey;
         this.amountHave = amountHave;
         this.amountWant = amountWant;
         this.timestamp = timestamp;
@@ -65,6 +72,13 @@ public class Trade {
 
     public Order getTargetOrder(DCSet db) {
         return Order.getOrder(db, this.target);
+    }
+
+    public Long getHaveKey() {
+        return this.haveKey;
+    }
+    public Long getWantKey() {
+        return this.wantKey;
     }
 
     public BigDecimal getAmountHave() {
@@ -108,6 +122,16 @@ public class Trade {
 		Long target = Longs.fromByteArray(targetBytes);
 		position += ORDER_LENGTH;
 
+        //READ HAVE
+        byte[] haveBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
+        Long haveKey = Longs.fromByteArray(haveBytes);
+        position += ASSET_KEY_LENGTH;
+
+        //READ WANT
+        byte[] wantBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
+        Long wantKey = Longs.fromByteArray(wantBytes);
+        position += ASSET_KEY_LENGTH;
+
         //READ HAVE SCALE
         byte scaleHave = Arrays.copyOfRange(data, position, position + 1)[0];
         position ++;
@@ -131,7 +155,7 @@ public class Trade {
 		long timestamp = Longs.fromByteArray(timestampBytes);
 		position += TIMESTAMP_LENGTH;
 
-		return new Trade(initiator, target, amountHave, amountWant, timestamp);
+		return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, timestamp);
 	}
 
 	public byte[] toBytes()
@@ -146,7 +170,15 @@ public class Trade {
         byte[] targetBytes = Longs.toByteArray(this.target);
 		data = Bytes.concat(data, targetBytes);
 
-		byte[] fill;
+        //WRITE HAVE KEY
+        byte[] haveKeyBytes = Longs.toByteArray(this.haveKey);
+        data = Bytes.concat(data, haveKeyBytes);
+
+        //WRITE HAVE KEY
+        byte[] wantKeyBytes = Longs.toByteArray(this.wantKey);
+        data = Bytes.concat(data, wantKeyBytes);
+
+        byte[] fill;
 
         //WRITE AMOUNT HAVE SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.amountHave.scale()});
