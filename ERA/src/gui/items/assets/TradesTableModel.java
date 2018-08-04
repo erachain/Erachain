@@ -8,6 +8,7 @@ import datachain.DCSet;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
+import ntp.NTP;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -29,16 +30,31 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
     public static final int COLUMN_ASSET_1 = 2;
     public static final int COLUMN_PRICE = 3;
     public static final int COLUMN_ASSET_2 = 4;
+
+    private boolean needRepaint = false;
+    private long updateTime = 0l;
+
     BigDecimal sumAsset1;
     BigDecimal sumAsset2;
+
     private SortableList<Tuple2<Long, Long>, Trade> trades;
+
     private AssetCls have;
+    private AssetCls want;
+    private long haveKey;
+    private long wantKey;
+
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"});
 
     public TradesTableModel(AssetCls have, AssetCls want) {
         Controller.getInstance().addObserver(this);
 
         this.have = have;
+        this.want = want;
+
+        this.haveKey = this.have.getKey();
+        this.wantKey = this.want.getKey();
+
         this.trades = Controller.getInstance().getTrades(have, want);
         this.trades.registerObserver();
 
@@ -184,6 +200,15 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
         return null;
     }
 
+    public void repaint() {
+        this.trades = Controller.getInstance().getTrades(this.have, want);
+        totalCalc();
+        this.fireTableDataChanged();
+        this.needRepaint = false;
+        this.updateTime = NTP.getTime();
+
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         try {
@@ -196,11 +221,46 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_TRADE_TYPE || message.getType() == ObserverMessage.REMOVE_TRADE_TYPE) {
-            totalCalc();
-            this.fireTableDataChanged();
+        int type = message.getType();
+
+        // CHECK IF LIST UPDATED
+        if (type == ObserverMessage.ADD_TRADE_TYPE
+                || type == ObserverMessage.REMOVE_TRADE_TYPE
+        ) {
+
+            Order order = (Order) message.getValue();
+            long haveKey = order.getHave();
+            long wantKey = order.getWant();
+            if (!(haveKey == this.haveKey && wantKey == this.wantKey)
+                    && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
+                return;
+            }
+
+            this.needRepaint = true;
+            return;
+
+        } else if (this.needRepaint == true) {
+            if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+                if (Controller.getInstance().isStatusOK()) {
+                    this.repaint();
+                    return;
+                } else {
+                    if (NTP.getTime() - updateTime > 100000) {
+                        this.repaint();
+                        return;
+
+                    }
+                }
+            } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                    || type == ObserverMessage.NETWORK_STATUS) {
+                if (Controller.getInstance().isStatusOK()) {
+                    this.repaint();
+                    return;
+                }
+            }
         }
+
     }
 
     public void removeObservers() {

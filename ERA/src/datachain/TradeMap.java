@@ -85,8 +85,8 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
         BTreeMap<Tuple2<Long, Long>, Trade> map = database.createTreeMap("trades")
                 .valueSerializer(new TradeSerializer())
-                //.comparator(Fun.TUPLE2_COMPARATOR)
-                .comparator(Fun.COMPARATOR)
+                .comparator(Fun.TUPLE2_COMPARATOR)
+                //.comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
 
@@ -158,7 +158,8 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
             //REVERSE KEY
             this.reverseKeyMap = database.createTreeMap("trades_key_reverse")
-                    .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
+                    //.comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
+                    .comparator(Fun.TUPLE2_COMPARATOR)
                     .makeOrGet();
 
             //BIND REVERSE KEY

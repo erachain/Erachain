@@ -93,12 +93,8 @@ public class NetworkStatus extends JLabel implements Observer {
 
             this.setIcon(walletSynchronizingIcon);
             this.setText(Lang.getInstance().translate("Wallet Synchronizing") + " " + 100 * currentHeight / height + "%");
-        }
 
-        //if (Controller.getInstance().isProcessingWalletSynchronize())
-        //	return;
-
-        if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
+        } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
             viewProgress();
 
         } else if (type == ObserverMessage.NETWORK_STATUS) {

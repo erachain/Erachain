@@ -81,9 +81,14 @@ public class BlockChain {
     public static final int ORDER_FEE_DOWN = DEVELOP_USE ? 80000 : 140000;
     public static final int SEND_AMOUNT_FEE_UP = DEVELOP_USE ? 100000 : 150000;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : DEVELOP_USE ? 153333 : 150000;
-    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 0 : 152532;
+    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 185376 : 152532;
 
-    public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
+    public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{
+            Base58.decode("447Kspr8AG1UYvTXZqDtrkbSycihFiU78W3NaworiD3o74vMa7Dr627KARn2xwutK6MoefjYrRSqXfT7a1Vks7jg"),
+            Base58.decode("4jSppUKE8o81xtdgi1JMtcf6UaqJff17hbZ2HJasRCG4dcpAppt6jJQXkkgFN61RVdQ9LcuKEMeCLyhRvs7D6V4W"),
+            Base58.decode("4XmDtBPUiajPkJ28RSRgz2WWe4oFyhXhw5G4qqa3nc9CxQGQzBiq71YmoDViPFHpDjxfW3K14B7fSEKc9uF32jU2"),
+
+        } :
             new byte[][]{
 
         // WRONG Issue Person #125

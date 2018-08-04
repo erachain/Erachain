@@ -1,11 +1,13 @@
 package gui.items.assets;
 
 import controller.Controller;
+import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
+import ntp.NTP;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -27,6 +29,9 @@ public class BuyOrdersTableModel extends
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_HAVE = 2;
 
+    private boolean needRepaint = false;
+    private long updateTime = 0l;
+
     public SortableList<Long, Order> orders;
     BigDecimal sumAmountWant;
     BigDecimal sumAmountHave;
@@ -35,10 +40,15 @@ public class BuyOrdersTableModel extends
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Want", "Price", "Have"});
     private AssetCls have;
     private AssetCls want;
+    private long haveKey;
+    private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
         this.have = have;
         this.want = want;
+
+        this.haveKey = this.have.getKey();
+        this.wantKey = this.want.getKey();
 
         this.orders = Controller.getInstance().getOrders(have, want, false);
 
@@ -173,6 +183,15 @@ public class BuyOrdersTableModel extends
         return null;
     }
 
+    public void repaint() {
+        this.orders = Controller.getInstance().getOrders(this.have, want, true);
+        totalCalc();
+        this.fireTableDataChanged();
+        this.needRepaint = false;
+        this.updateTime = NTP.getTime();
+
+    }
+
     @Override
     public void update(Observable o, Object arg) {
         try {
@@ -185,15 +204,44 @@ public class BuyOrdersTableModel extends
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
+        int type = message.getType();
+
         // CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_ORDER_TYPE
-                || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
-                //|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
-                //|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
-                ) {
-            this.orders = Controller.getInstance().getOrders(have, want, false);
-            totalCalc();
-            this.fireTableDataChanged();
+        if (type == ObserverMessage.ADD_ORDER_TYPE
+                || type == ObserverMessage.REMOVE_ORDER_TYPE
+        ) {
+
+            Order order = (Order) message.getValue();
+            long haveKey = order.getHave();
+            long wantKey = order.getWant();
+            if (!(haveKey == this.haveKey && wantKey == this.wantKey)
+                    && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
+                return;
+            }
+
+            this.needRepaint = true;
+            return;
+
+        } else if (this.needRepaint == true) {
+            if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+                if (Controller.getInstance().isStatusOK()) {
+                    this.repaint();
+                    return;
+                } else {
+                    if (NTP.getTime() - updateTime > 100000) {
+                        this.repaint();
+                        return;
+
+                    }
+                }
+            } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                    || type == ObserverMessage.NETWORK_STATUS) {
+                if (Controller.getInstance().isStatusOK()) {
+                    this.repaint();
+                    return;
+                }
+            }
         }
     }
 

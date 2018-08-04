@@ -462,8 +462,8 @@ public class Order implements Comparable<Order> {
             debug = true;
         }
 
-        // NEED FOR making secondary keys in TradeMap
-        ordersMap.add(this);
+        ////// NEED FOR making secondary keys in TradeMap
+        /// not need now ordersMap.add(this);
 
         //REMOVE HAVE
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);

@@ -25,7 +25,7 @@ public class Trade {
     private static final int AMOUNT_LENGTH = Order.FULFILLED_LENGTH;
     private static final int SCALE_LENGTH = 1;
     private static final int TIMESTAMP_LENGTH = 8;
-    private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH
+    private static final int BASE_LENGTH = 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
             + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
 
     private Long initiator;
