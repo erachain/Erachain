@@ -85,7 +85,8 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
         BTreeMap<Tuple2<Long, Long>, Trade> map = database.createTreeMap("trades")
                 .valueSerializer(new TradeSerializer())
-                .comparator(Fun.TUPLE2_COMPARATOR)
+                //.comparator(Fun.TUPLE2_COMPARATOR)
+                .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
 
