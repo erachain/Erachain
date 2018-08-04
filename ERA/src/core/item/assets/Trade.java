@@ -180,7 +180,7 @@ public class Trade {
 
     //PROCESS/ORPHAN
 
-    public void process(DCSet db) {
+    public void process_old(DCSet db) {
         Order initiator = this.getInitiatorOrder(db);
         Order target = this.getTargetOrder(db);
 
@@ -227,7 +227,7 @@ public class Trade {
         target.getCreator().changeBalance(db, false, target.getWant(), this.amountWant, false);
     }
 
-    public void orphan(DCSet db) {
+    public void orphan_old(DCSet db) {
         Order initiator = this.getInitiatorOrder(db);
         Order target = this.getTargetOrder(db);
 
