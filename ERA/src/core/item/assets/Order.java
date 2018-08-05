@@ -454,9 +454,12 @@ public class Order implements Comparable<Order> {
         boolean debug = false;
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+                //this.id.equals(Transaction.makeDBRef(12435, 1))
+                this.id.equals(770667456757788l)
                 //(this.haveKey == 1004l && this.wantKey == 2l)
                 //|| (this.wantKey == 1004l && this.haveKey == 2l)
-                Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
+                //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
+                //Arrays.equals(Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), transaction.getSignature()
                 //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
                 //&& !db.isFork()
                 ) {
@@ -537,9 +540,13 @@ public class Order implements Comparable<Order> {
             } else {
                 order = orders.get(index++);
             }
-            
-            // for develop
-            //String signB58 = Base58.encode(order.a.a);
+
+            if (
+                    //order.getId().equals(Transaction.makeDBRef(12435, 1))
+                    order.id.equals(770667456757788l)
+            ) {
+                debug = true;
+            }
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;
@@ -554,15 +561,17 @@ public class Order implements Comparable<Order> {
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
 
-            if (this.creator.equals(order.getCreator())) {
-        	// IGNORE my self orders
-        	continue;
-            }
-            
             ///////////////
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-            if (thisPrice.compareTo(orderReversePrice) > 0)
+            compare = thisPrice.compareTo(orderReversePrice);
+            if (compare > 0)
                 break;
+            else if (compare == 0)
+                // заказы с одинаковой ценой со своего же счета не схлопываем
+                if (false && this.creator.equals(order.getCreator())) {
+                    // IGNORE my self orders
+                    continue;
+                }
 
             thisIncrement = orderPrice.scaleByPowerOfTen(-wantScale);
             if (thisAmountHaveLeft.compareTo(thisIncrement) < 0) {
@@ -584,7 +593,8 @@ public class Order implements Comparable<Order> {
 
                 tradeAmountForWant = thisAmountHaveLeft;
                 if (compare == 0)
-                    tradeAmountForHave = orderAmountHaveLeft;
+
+                tradeAmountForHave = orderAmountHaveLeft;
                 else {
 
                     if (debug) {
@@ -593,8 +603,8 @@ public class Order implements Comparable<Order> {
 
                     // RESOLVE amount with SCALE
                     tradeAmountAccurate = tradeAmountForWant.multiply(orderReversePrice)
-                            .setScale(haveScale + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-                    tradeAmountForHave = tradeAmountAccurate.setScale(haveScale, RoundingMode.HALF_DOWN);
+                            .setScale(wantScale + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
+                    tradeAmountForHave = tradeAmountAccurate.setScale(wantScale, RoundingMode.HALF_DOWN);
 
                     // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
                     int tradeAmountPrecision = Order.precision(tradeAmountForHave);
@@ -648,6 +658,16 @@ public class Order implements Comparable<Order> {
                 }
 
                 //////////////////////////// TRADE /////////////////
+                if (tradeAmountForHave.scale() > wantScale
+                || tradeAmountForWant.scale() > haveScale) {
+                    Long error = null;
+                    error ++;
+                }
+                if (tradeAmountForHave.signum() <= 0
+                        || tradeAmountForWant.signum() < 0) {
+                    Long error = null;
+                    error ++;
+                }
                 trade = new Trade(this.getId(), order.getId(), this.haveKey, this.wantKey,
                         tradeAmountForHave, tradeAmountForWant, transaction.getTimestamp());
 
