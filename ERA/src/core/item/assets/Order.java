@@ -454,8 +454,9 @@ public class Order implements Comparable<Order> {
         boolean debug = false;
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
-                (this.haveKey == 1004l && this.wantKey == 2l)
-                || (this.wantKey == 1004l && this.haveKey == 2l)
+                //(this.haveKey == 1004l && this.wantKey == 2l)
+                //|| (this.wantKey == 1004l && this.haveKey == 2l)
+                Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
                 //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
                 //&& !db.isFork()
                 ) {
@@ -547,8 +548,8 @@ public class Order implements Comparable<Order> {
             //BigDecimal orderPriceTemp;
 
             Trade trade;
-            BigDecimal tradeAmountHave;
-            BigDecimal tradeAmountWant; // GET
+            BigDecimal tradeAmountForHave;
+            BigDecimal tradeAmountForWant; // GET
             BigDecimal tradeAmountAccurate;
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
@@ -575,26 +576,31 @@ public class Order implements Comparable<Order> {
             }
 
             orderAmountHaveLeft = order.getAmountHaveLeft();
-            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(wantScale, RoundingMode.HALF_UP);
+            // SCALE for HAVE in ORDER
+            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveScale, RoundingMode.HALF_UP);
 
             compare = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
             if (compare >= 0) {
 
-                tradeAmountWant = thisAmountHaveLeft;
+                tradeAmountForWant = thisAmountHaveLeft;
                 if (compare == 0)
-                    tradeAmountHave = orderAmountHaveLeft;
+                    tradeAmountForHave = orderAmountHaveLeft;
                 else {
 
+                    if (debug) {
+                        debug = true;
+                    }
+
                     // RESOLVE amount with SCALE
-                    tradeAmountAccurate = tradeAmountWant.multiply(orderReversePrice)
+                    tradeAmountAccurate = tradeAmountForWant.multiply(orderReversePrice)
                             .setScale(haveScale + BlockChain.TRADE_PRECISION, RoundingMode.HALF_DOWN);
-                    tradeAmountHave = tradeAmountAccurate.setScale(haveScale, RoundingMode.HALF_DOWN);
+                    tradeAmountForHave = tradeAmountAccurate.setScale(haveScale, RoundingMode.HALF_DOWN);
 
                     // PRECISON is WRONG!!! int tradeAmountPrecision = tradeAmount.precision();
-                    int tradeAmountPrecision = Order.precision(tradeAmountHave);
+                    int tradeAmountPrecision = Order.precision(tradeAmountForHave);
                     if (tradeAmountPrecision < BlockChain.TRADE_PRECISION) {
                         // PRECISION soo SMALL
-                        differenceTrade = tradeAmountHave.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
+                        differenceTrade = tradeAmountForHave.divide(tradeAmountAccurate, BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN);
                         differenceTrade = differenceTrade.subtract(BigDecimal.ONE).abs();
                         if (differenceTrade.compareTo(precisionUnit) > 0) {
                             // it is BAD ACCURACY
@@ -608,28 +614,33 @@ public class Order implements Comparable<Order> {
 
             } else {
 
-                tradeAmountHave = orderAmountHaveLeft;
-                tradeAmountWant = orderAmountWantLeft;
+                tradeAmountForHave = orderAmountHaveLeft;
+                tradeAmountForWant = orderAmountWantLeft;
 
             }
 
-            //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
+            if (tradeAmountForHave.compareTo(BigDecimal.ZERO) <= 0
+                || tradeAmountForWant.compareTo(BigDecimal.ZERO) <= 0) {
+                debug = true;
+            }
+
+                //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
             //AND WE CAN BUY ANYTHING
-            if (tradeAmountHave.compareTo(BigDecimal.ZERO) > 0) {
+            if (tradeAmountForHave.compareTo(BigDecimal.ZERO) > 0) {
                 //CREATE TRADE
 
                 // CUT PRECISION in bytes
-                tradeAmountHave = tradeAmountHave.stripTrailingZeros();
-                byte[] amountBytes = tradeAmountHave.unscaledValue().toByteArray();
+                tradeAmountForHave = tradeAmountForHave.stripTrailingZeros();
+                byte[] amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
                 while (amountBytes.length > FULFILLED_LENGTH) {
-                    tradeAmountHave.setScale(tradeAmountHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
-                    amountBytes = tradeAmountHave.unscaledValue().toByteArray();
+                    tradeAmountForHave.setScale(tradeAmountForHave.scale() - 1, BigDecimal.ROUND_HALF_UP);
+                    amountBytes = tradeAmountForHave.unscaledValue().toByteArray();
                 }
-                tradeAmountWant = tradeAmountWant.stripTrailingZeros();
-                amountBytes = tradeAmountWant.unscaledValue().toByteArray();
+                tradeAmountForWant = tradeAmountForWant.stripTrailingZeros();
+                amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
                 while (amountBytes.length > FULFILLED_LENGTH) {
-                    tradeAmountWant.setScale(tradeAmountWant.scale() - 1, BigDecimal.ROUND_HALF_UP);
-                    amountBytes = tradeAmountWant.unscaledValue().toByteArray();
+                    tradeAmountForWant.setScale(tradeAmountForWant.scale() - 1, BigDecimal.ROUND_HALF_UP);
+                    amountBytes = tradeAmountForWant.unscaledValue().toByteArray();
                 }
 
                 if (debug) {
@@ -638,7 +649,7 @@ public class Order implements Comparable<Order> {
 
                 //////////////////////////// TRADE /////////////////
                 trade = new Trade(this.getId(), order.getId(), this.haveKey, this.wantKey,
-                        tradeAmountHave, tradeAmountWant, transaction.getTimestamp());
+                        tradeAmountForHave, tradeAmountForWant, transaction.getTimestamp());
 
                 //ADD TRADE TO DATABASE
                 tradesMap.add(trade);
@@ -656,8 +667,8 @@ public class Order implements Comparable<Order> {
                 }
 
                 //UPDATE FULFILLED HAVE
-                order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountHave)); // this.amountHave));
-                this.setFulfilledHave(this.getFulfilledHave().add(tradeAmountWant)); //this.amountWant));
+                order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));
+                this.setFulfilledHave(this.getFulfilledHave().add(tradeAmountForWant)); //this.amountWant));
 
                 if (order.isFulfilled()) {
                     //REMOVE FROM ORDERS
@@ -671,11 +682,11 @@ public class Order implements Comparable<Order> {
                 }
 
                 //TRANSFER FUNDS
-                order.getCreator().changeBalance(this.dcSet, false, order.getWant(), tradeAmountWant, false);
+                order.getCreator().changeBalance(this.dcSet, false, order.getWant(), tradeAmountForWant, false);
 
                 // update new values
                 thisAmountHaveLeft = this.getAmountHaveLeft();
-                processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountHave);
+                processedAmountFulfilledWant = processedAmountFulfilledWant.add(tradeAmountForHave);
 
                 if (!completedOrder
                         &&

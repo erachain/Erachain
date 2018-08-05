@@ -64,7 +64,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
 
         this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
 
-        totalCalc();
+        ///totalCalc();
     }
 
     private void totalCalc() {
@@ -154,7 +154,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
             case COLUMN_ASSET_1:
 
                 if (row == this.trades.size())
-                    return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
+                    return "";
+                //    return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
 
                 String result = "";
                 if (type > 0)
@@ -172,7 +173,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
             case COLUMN_PRICE:
 
                 if (row == this.trades.size())
-                    return null;
+                    return "";
+                    ///return null;
 
                 if (type > 0)
                     return NumberAsString.formatAsString(trade.calcPrice());
@@ -182,7 +184,8 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
             case COLUMN_ASSET_2:
 
                 if (row == this.trades.size())
-                    return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
+                    return "";
+                    ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
                 if (type > 0)
                     result = NumberAsString.formatAsString(trade.getAmountWant());
@@ -200,12 +203,15 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
         return null;
     }
 
-    public void repaint() {
-        this.trades = Controller.getInstance().getTrades(this.have, want);
-        totalCalc();
-        this.fireTableDataChanged();
+    public synchronized void repaint() {
         this.needRepaint = false;
         this.updateTime = NTP.getTime();
+
+        this.trades = Controller.getInstance().getTrades(this.have, this.want);
+
+        /// so FARD to CALCULATE  --totalCalc();
+        this.fireTableDataChanged();
+        this.needRepaint = false;
 
     }
 

@@ -163,12 +163,14 @@ public class SellOrdersTableModel extends
         return null;
     }
 
-    public void repaint() {
-        this.orders = Controller.getInstance().getOrders(this.have, want, true);
-        totalCalc();
-        this.fireTableDataChanged();
+    public synchronized void repaint() {
         this.needRepaint = false;
         this.updateTime = NTP.getTime();
+
+        this.orders = Controller.getInstance().getOrders(this.have, this.want, true);
+
+        totalCalc();
+        this.fireTableDataChanged();
 
     }
 

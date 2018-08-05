@@ -49,6 +49,7 @@ public class OrderMap extends DCMap<Long, Order> {
     @SuppressWarnings("rawtypes")
     private BTreeMap haveWantKeyMap;
     @SuppressWarnings("rawtypes")
+    // TODO: cut index to WANT only
     private BTreeMap wantHaveKeyMap;
 
     public OrderMap(DCSet databaseSet, DB database) {
@@ -200,8 +201,8 @@ public class OrderMap extends DCMap<Long, Order> {
                     }
                 }
                 if (!equal) {
-                    keys.add(keyWH);
-                    int error = 0;
+                    //keys.add(keyWH);
+                    Long error = null;
                     error ++;
                 }
             }
