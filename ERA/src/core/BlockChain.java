@@ -35,7 +35,7 @@ public class BlockChain {
 
     //public static final int START_LEVEL = 1;
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -100,21 +100,8 @@ public class BlockChain {
         //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
         
         // CANCEL ORDERS - wrong after fix exchange
-        //Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), // Cancel Order
-        //Base58.decode("3LRpZ5vX5yzRWiTt2Fhh23AQAe4dmXDAepFp5jWXZ7ngRF26opwK3hqt3PGn9uXfDRzuTRMKotz5MHnjF1VP5YhQ"), // Cancel Order 39292-1
-        //Base58.decode("29zW9Z4MvsWq2c5ARbswM5A63Zon22EHkzYL6pkEwBe97RsCkdDLRFQPvUfnLBb96WjAqscJHyT1Nwcvq7wG89MY"), // Cancel Order 46831-
-        //Base58.decode("4Bqc7yBQLXeTF9a7qKPwp4m4cYWvs3F6HEBfiHdXNGw28X3PQsixac669yg8sQauCFU9uf5cCo6144UqdenZJAD4"), // Cancel Order 65431-2
-        //Base58.decode("2qNmWDyCbpthJjCKQtvUtubd6teENnFEM92WxoS4jJuE2xMFbRhyxJBFw16XrqhZoYB7JgAPRQbkoa42JCFvtZ1z"), // Cancel Order 65431-1
+        Base58.decode("5iU3zefyZnWKpv2wd7E8m2hUCmLWASLM96SEfujAfvTKKDm4TA8n1HYFF5YWZkuk1k6vHVNLLv3XCG2MWrT7oHd9"), // 136754-1
 
-
-        //Base58.decode("57vyEGwMH2eya5Czk7GSjG4hjJ2ABH165igGHU6BcnwSsu93ypL59Xj35MY5K5Cevy72Qp2dhNRzsJMqVeysjrvq"), // 8350
-        //Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V"), // 65431
-        //Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"), // 86549
-        //Base58.decode("5iU3zefyZnWKpv2wd7E8m2hUCmLWASLM96SEfujAfvTKKDm4TA8n1HYFF5YWZkuk1k6vHVNLLv3XCG2MWrT7oHd9"), // 136754
-        
-        //Base58.decode("2XXmMPUD85h1m93N1Zks9gzs4jsQYB6qk9iQoK5UEgdi7ESXceTX3TZnQX6rieCE3uoTZ53KNfu3o38YYsxJsDzq"),
-        //Base58.decode("2WrgVBhG244Pb1BMgQrt6K4AXbeLWNbBwknV4ghNxQefd3wvFoZcQmo3sU4ZMrpTNKJA9f9XPu3FzpmwEXDxzpCH"),
-                    
     };
 
     /*

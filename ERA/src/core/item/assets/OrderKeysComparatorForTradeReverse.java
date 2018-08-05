@@ -28,7 +28,7 @@ public class OrderKeysComparatorForTradeReverse implements Comparator<Long> {
         if (compare != 0)
             return -compare;
 
-        return -Long.signum(order1.getTimestamp() - order2.getTimestamp());
+        return -Long.signum(order1.getId() - order2.getId());
 
     }
 

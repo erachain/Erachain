@@ -20,28 +20,7 @@ import database.DBMap;
 import utils.ObserverMessage;
 
 /*
- * Tuple5
- * 	private BigInteger id;
-	private Account creator;
-	protected long timestamp;
-	private boolean isExecutable = true;
-	private BigDecimal Price;
-
-Tuple3
-	private long have;
-	private BigDecimal amountHave;
-	private BigDecimal fulfilledHave;
-
-Tuple3
-	private long want;
-	private BigDecimal amountWant;
-	private BigDecimal fulfilledWant;
- */
-
-/*
- for key = Long - HAS MAP + HASH SET need to use
- OLD - Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
+ for key = Long as Block Height + Transaction Sequence
  */
 public class OrderMap extends DCMap<Long, Order> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
@@ -69,18 +48,6 @@ public class OrderMap extends DCMap<Long, Order> {
         super(parent, dcSet);
 
     }
-
-    /*
-    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> setExecutable(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order, boolean executable) {
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> newOrder = new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-                new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.a.a, order.a.b, order.a.c, executable, order.a.e),
-                order.b, order.c);
-        return newOrder;
-    }
-    */
 
     @Override
     protected void createIndexes(DB database) {
@@ -121,8 +88,6 @@ public class OrderMap extends DCMap<Long, Order> {
                     @Override
                     public Tuple3<Long, Long, BigDecimal> run(
                             Long key, Order value) {
-                        //return new Tuple3<>(value.b.a, value.c.a,
-                        //        Order.calcPrice(value.b.b, value.c.b));
                         return new Tuple3<>(value.getHave(), value.getWant(),
                                 Order.calcPrice(value.getAmountHave(), value.getAmountWant()));
                     }
@@ -140,8 +105,6 @@ public class OrderMap extends DCMap<Long, Order> {
                     @Override
                     public Tuple3<Long, Long, BigDecimal> run(
                             Long key, Order value) {
-                        //return new Tuple3<>(value.c.a, value.b.a,
-                        //        Order.calcPrice(value.b.b, value.c.b));
                         return new Tuple3<>(value.getWant(), value.getHave(),
                                 Order.calcPrice(value.getAmountHave(), value.getAmountWant()));
             }
@@ -162,56 +125,6 @@ public class OrderMap extends DCMap<Long, Order> {
         return this.observableData;
     }
 
-    //COMBINE LISTS
-    private List<Long> checkKeys(Long have, Long want, List<Long> keys) {
-
-        List<Long> keysWH;
-
-        if (false) {
-            keysWH = new ArrayList<>(((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
-                    Fun.t3(have, want, null),
-                    Fun.t3(have, want, Fun.HI())).values());
-        } else if (false) {
-            keysWH = new ArrayList<>(((BTreeMap<Tuple3, Long>) this.wantHaveKeyMap).subMap(
-                    Fun.t3(have, want, null),
-                    Fun.t3(have, want, Fun.HI())).values());
-        } else if (false) {
-            keysWH = new ArrayList<>(((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
-                    Fun.t3(want, have, null),
-                    Fun.t3(want, have, Fun.HI())).values());
-        } else if (true) {
-            // CORRECT! - haveWantKeyMap LOSES some orders!
-            // https://github.com/icreator/Erachain/issues/178
-            keysWH = new ArrayList<>(((BTreeMap<Tuple3, Long>) this.wantHaveKeyMap).subMap(
-                    Fun.t3(want, have, null),
-                    Fun.t3(want, have, Fun.HI())).values());
-        } else {
-            keysWH = null;
-        }
-
-        if (keysWH != null && !keysWH.isEmpty()) {
-            boolean equal;
-            // add only new unique
-            for (Long keyWH: keysWH) {
-                equal = false;
-                for (Long key: keys) {
-                    if (key.equals(keyWH)) {
-                        equal = true;
-                        break;
-                    }
-                }
-                if (!equal) {
-                    //keys.add(keyWH);
-                    Long error = null;
-                    error ++;
-                }
-            }
-        }
-
-        return keys;
-
-    }
-
     // GET KEYs with FORKED rules
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected List<Long> getSubKeysWithParent(long have, long want) {
@@ -219,8 +132,6 @@ public class OrderMap extends DCMap<Long, Order> {
         List<Long> keys = new ArrayList<>(((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
                 Fun.t3(have, want, null),
                 Fun.t3(have, want, Fun.HI())).values());
-
-        keys = checkKeys(have, want, keys);
 
         //IF THIS IS A FORK
         if (this.parent != null) {
@@ -281,22 +192,6 @@ public class OrderMap extends DCMap<Long, Order> {
         return orders;
     }
 
-    /*
-    public boolean isExecutable(DCSet db, Long key) {
-
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.get(key);
-        // если произведение остатка
-        BigDecimal left = order.b.b.subtract(order.b.c);
-        if (left.signum() <= 0
-                || left.multiply(order.a.e).compareTo(BigDecimal.ONE.scaleByPowerOfTen(-order.c.b.scale())) < 0)
-            return false;
-
-        return true;
-
-    }
-    */
-
     public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
         Collection<Long> keys = this.getSubKeysWithParent(have, want);
@@ -326,14 +221,11 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t3(have, want, null),
                 Fun.t3(have, want, Fun.HI())).values());
 
-        keys = checkKeys(have, want, keys);
-
         if (reverse) {
             Collections.sort(keys, new OrderKeysComparatorForTradeReverse());
         } else {
             Collections.sort(keys, new OrderKeysComparatorForTrade());
         }
-
 
         //RETURN
         return new SortableList<Long, Order>(this, keys);
@@ -369,24 +261,8 @@ public class OrderMap extends DCMap<Long, Order> {
 
     public void add(Order order) {
 
-        // this order is NOT executable
-        ////this.set(order.a.a, setExecutable(order, true));
         this.set(order.getId(), order);
     }
-
-    /*
-    @Override
-    public Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(Long key) {
-        Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
-        if (order == null)
-            return null;
-
-        return setExecutable(order, true);
-    }
-    */
-
 
     public void delete(Order order) {
 

@@ -17,12 +17,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 /*
- *
- * private Long dbRef initiator; a
-	private Long dbRef target; b
-	private BigDecimal amountHave; c
-	private BigDecimal amountWant; d
-	private long timestamp; e
+Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @SuppressWarnings("rawtypes")
 public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
@@ -101,10 +96,8 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    // TODO: need insert keys in Trade - not fiind anytime
-                    ///Order order = Order.getOrder(getDCSet(), value.getInitiator());
-                    long have = value.getHaveKey(); //order.getHave();
-                    long want = value.getWantKey(); //order.getWant();
+                    long have = value.getHaveKey();
+                    long want = value.getWantKey();
                     String pairKey;
                     if (have > want) {
                         pairKey = have + "/" + want;
@@ -125,9 +118,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    //Order order = Order.getOrder(getDCSet(), value.getInitiator());
-                    //long want = order.getWant();
-                    long want = value.getWantKey(); //order.getWant();
+                    long want = value.getWantKey();
 
                     String wantKey;
                     wantKey = String.valueOf(want);
