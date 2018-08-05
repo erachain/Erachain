@@ -788,6 +788,7 @@ public abstract class Transaction {
         return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seqNo)));
 
     }
+
     public static Long makeDBRef(Tuple2<Integer, Integer> dbRef) {
 
         byte[] ref = Ints.toByteArray(dbRef.a);
