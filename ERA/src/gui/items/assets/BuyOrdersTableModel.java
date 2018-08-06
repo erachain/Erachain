@@ -163,7 +163,7 @@ public class BuyOrdersTableModel extends
                 if (row == this.orders.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
-                BigDecimal price = order.getPrice();
+                BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 return NumberAsString.formatAsString(price.stripTrailingZeros());
 
             case COLUMN_AMOUNT_HAVE:
