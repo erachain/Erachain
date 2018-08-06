@@ -70,6 +70,7 @@ public class BuyOrdersTableModel extends
         for (Pair<Long, Order> orderPair : this.orders) {
 
             Order order = orderPair.getB();
+
             sumAmountHave = sumAmountHave.add(order.getAmountHaveLeft());
 
             sumAmountWant = sumAmountWant.add(order.getAmountWantLeft());
