@@ -17,6 +17,9 @@ import java.math.BigInteger;
 import java.util.*;
 
 /*
+ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
+Поэтому нужно добавлять униальность
+
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @SuppressWarnings("rawtypes")
@@ -89,13 +92,13 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         if (parent == null) {
             //PAIR KEY
             this.pairKeyMap = database.createTreeMap("trades_key_pair")
-                    .comparator(Fun.COMPARATOR)
+                    .comparator(Fun.TUPLE3_COMPARATOR)
                     .makeOrGet();
 
             //BIND PAIR KEY
-            Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
+            Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
                 @Override
-                public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
+                public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
                     long have = value.getHaveKey();
                     long want = value.getWantKey();
                     String pairKey;
@@ -105,43 +108,46 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                         pairKey = want + "/" + have;
                     }
 
-                    return new Tuple2<String, Long>(pairKey, Long.MAX_VALUE - value.getTimestamp());
+                    return new Tuple3<String, Long, Integer>(pairKey, Long.MAX_VALUE - value.getInitiator(),
+                            Integer.MAX_VALUE - value.getSequence());
                 }
             });
 
             //
             this.wantKeyMap = database.createTreeMap("trades_key_want")
-                    .comparator(Fun.COMPARATOR)
+                    .comparator(Fun.TUPLE3_COMPARATOR)
                     .makeOrGet();
 
             //BIND
-            Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
+            Bind.secondaryKey(map, this.wantKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
                 @Override
-                public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
+                public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
                     long want = value.getWantKey();
 
                     String wantKey;
                     wantKey = String.valueOf(want);
 
-                    return new Tuple2<String, Long>(wantKey, Long.MAX_VALUE - value.getTimestamp());
+                    return new Tuple3<String, Long, Integer>(wantKey, Long.MAX_VALUE - value.getInitiator(),
+                            Integer.MAX_VALUE - value.getSequence());
                 }
             });
 
             //
             this.haveKeyMap = database.createTreeMap("trades_key_have")
-                    .comparator(Fun.COMPARATOR)
+                    .comparator(Fun.TUPLE3_COMPARATOR)
                     .makeOrGet();
 
             //BIND
-            Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
+            Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
                 @Override
-                public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
+                public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
                     long have = value.getHaveKey(); //order.getHave();
 
                     String haveKey;
                     haveKey = String.valueOf(have);
 
-                    return new Tuple2<String, Long>(haveKey, Long.MAX_VALUE - value.getTimestamp());
+                    return new Tuple3<String, Long, Integer>(haveKey, Long.MAX_VALUE - value.getInitiator(),
+                            Integer.MAX_VALUE - value.getSequence());
                 }
             });
 
@@ -236,9 +242,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     @SuppressWarnings("unchecked")
     public SortableList<Tuple2<Long, Long>, Trade> getTrades(Long orderID) {
         //ADD REVERSE KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
-                Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
+                Fun.t3(orderID, null, null),
+                Fun.t3(orderID, Fun.HI(), Fun.HI())).values();
 
         //RETURN
         return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
@@ -247,9 +253,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     @SuppressWarnings("unchecked")
     public SortableList<Tuple2<Long, Long>, Trade> getTradesByOrderID(Long orderID) {
         //ADD REVERSE KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
-                Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
+                Fun.t3(orderID, null, null),
+                Fun.t3(orderID, Fun.HI(), Fun.HI())).values();
 
         //RETURN
         return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
@@ -262,16 +268,16 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     {
 
         String haveKey = String.valueOf(haveWant);
-        HashSet<Tuple2<Long, Long>> tradesKeys = new HashSet<Tuple2<Long, Long>>(((BTreeMap<Tuple2, Tuple2<Long, Long>>)
+        HashSet<Tuple2<Long, Long>> tradesKeys = new HashSet<Tuple2<Long, Long>>(((BTreeMap<Tuple3, Tuple2<Long, Long>>)
                 this.haveKeyMap).subMap(
-                    Fun.t2(haveKey, null),
-                    Fun.t2(haveKey, Fun.HI())).values());
+                    Fun.t3(haveKey, null, null),
+                    Fun.t3(haveKey, Fun.HI(), Fun.HI())).values());
 
         String wantKey = String.valueOf(haveWant);
 
-        tradesKeys.addAll(((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.wantKeyMap).subMap(
-                Fun.t2(wantKey, null),
-                Fun.t2(wantKey, Fun.HI())).values());
+        tradesKeys.addAll(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.wantKeyMap).subMap(
+                Fun.t3(wantKey, null, null),
+                Fun.t3(wantKey, Fun.HI(), Fun.HI())).values());
 
         //GET ALL ORDERS FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();
@@ -295,9 +301,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         }
 
         //FILTER ALL KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t2(pairKey, null),
-                Fun.t2(pairKey, Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, null, null),
+                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
         //RETURN
         return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
@@ -313,9 +319,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         }
 
         //FILTER ALL KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t2(pairKey, null),
-                Fun.t2(pairKey, Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, null, null),
+                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
         List<Trade> trades = new ArrayList<Trade>();
 
@@ -342,9 +348,9 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             pairKey = want + "/" + have;
 
         //FILTER ALL KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t2(pairKey, timestamp),
-                Fun.t2(pairKey, Fun.HI())).values();
+        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, timestamp, timestamp),
+                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
 
         List<Trade> trades = new ArrayList<Trade>();
 

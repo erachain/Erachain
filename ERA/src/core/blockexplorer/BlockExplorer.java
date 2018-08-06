@@ -1446,6 +1446,9 @@ public class BlockExplorer {
             tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.put(i, tradeJSON);
+
+            if (i > 100)
+                break;
         }
         output.put("trades", tradesJSON);
 

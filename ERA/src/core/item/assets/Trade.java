@@ -102,8 +102,8 @@ public class Trade {
     public Long getTimestamp() {
         Tuple2<Integer, Integer> key = Transaction.parseDBRef(this.initiator);
         BlockChain blockChain = Controller.getInstance().getBlockChain();
-        Long timestamp = blockChain.getTimestamp(key.a) + key.b * 1000; // for add SEQUENCE in asset.Trade
-        return timestamp + this.sequence;
+        Long timestamp = blockChain.getTimestamp(key.a) + key.b * 0; // for add SEQUENCE in asset.Trade
+        return timestamp; // + this.sequence;
     }
 
 

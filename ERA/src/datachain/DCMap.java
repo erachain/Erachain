@@ -16,6 +16,11 @@ import utils.Pair;
 
 import java.util.*;
 
+/*
+ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
+Поэтому нужно добавлять униальность
+
+ */
 public abstract class DCMap<T, U> extends Observable {
 
     static Logger LOGGER = Logger.getLogger(DCMap.class.getName());
