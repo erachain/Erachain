@@ -266,6 +266,31 @@ public abstract class Trader extends Thread {
 
     }
 
+    protected JSONArray getMyOrders(String address, long haveKey, long wantKey) {
+
+        String result;
+
+        result = this.apiClient.executeCommand("GET trade/getbyaddress/" + address
+                    + '/' + haveKey + '/' + wantKey);
+        LOGGER.info("GET by address: " + "\n" + result);
+
+        JSONObject jsonObject = null;
+        try {
+            //READ JSON
+            jsonObject = (JSONObject) JSONValue.parse(result);
+        } catch (NullPointerException | ClassCastException e) {
+            //JSON EXCEPTION
+            LOGGER.info(e);
+            //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+        }
+
+        for (JSONObject item: (JSONArray) jsonObject ) {
+
+        }
+        return true;
+
+    }
+
     protected HashSet<String> makeCancelingArray(JSONArray array) {
 
         HashSet<String> cancelingArray = new HashSet();
@@ -336,9 +361,9 @@ public abstract class Trader extends Thread {
             }
         }
 
+        JSONArray =
         // CHECK MY SELL ORDERS in CAP
-        for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
-                order: this.ordersMap.getOrdersForAddress(this.address, this.haveKey, this.wantKey)) {
+        for (Order order: this.ordersMap.getOrdersForAddress(this.address, this.haveKey, this.wantKey)) {
 
             orderID = Base58.encode(order.a.a);
             if (cancelsIsUnconfirmed.contains(orderID))

@@ -1,6 +1,7 @@
 package datachain;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 import core.item.assets.*;
@@ -249,6 +250,30 @@ public class OrderMap extends DCMap<Long, Order> {
 
         //RETURN
         return new SortableList<Long, Order>(this, keys);
+    }
+
+    public List<Order> getOrdersForAddress(
+            String address, Long have, Long want) {
+
+        Collection<Long> keys;
+        keys = ((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
+                Fun.t5(address, have, want, null, null),
+                Fun.t5(address, have, want, Fun.HI(), Fun.HI())).values();
+
+        //GET ALL ORDERS FOR KEYS
+        List<Order> orders = new ArrayList<Order>();
+
+        for (Long key : keys) {
+
+            Order order = this.get(key);
+
+            // MAY BE NULLS!!!
+            if (order != null)
+                orders.add(this.get(key));
+        }
+
+        return orders;
+
     }
 
     /*

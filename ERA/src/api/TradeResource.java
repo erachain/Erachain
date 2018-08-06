@@ -9,7 +9,10 @@ import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.transaction.Transaction;
 import datachain.DCSet;
+import datachain.OrderMap;
+import datachain.TransactionFinalMap;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -45,6 +48,8 @@ public class TradeResource {
                 "make and broadcast CreateOrder ");
         help.put("GET trade/get/{signature}",
                 "Get Order");
+        help.put("GET trade/getbyaddress/{creator}/{haveKey}/{wantKey}",
+                "get list of orders in CAP by address");
         help.put("GET trade/cancel/{creator}/{signature}?password={password}",
                 "Cancel Order");
 
@@ -58,23 +63,24 @@ public class TradeResource {
 
         return "+";
     }
-        /**
-         * send and broadcast GET
-         *
-         * @param creatorStr   address in wallet
-         * @param haveKey      haveKey
-         * @param wantKey      wantKey
-         * @param haveAmount   haveAmount or head
-         * @param wantAmount   wantAmount
-         * @param feePower     fee Power
-         * @param password     password
-         * @return JSON row
-         *
-         * <h2>Example request</h2>
-         * GET create/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/2/1/1.0/100.0?password=123456789
-         * <h2>Example response</h2>
-         * {}
-         */
+
+    /**
+     * send and broadcast GET
+     *
+     * @param creatorStr address in wallet
+     * @param haveKey    haveKey
+     * @param wantKey    wantKey
+     * @param haveAmount haveAmount or head
+     * @param wantAmount wantAmount
+     * @param feePower   fee Power
+     * @param password   password
+     * @return JSON row
+     *
+     * <h2>Example request</h2>
+     * GET create/7GvWSpPr4Jbv683KFB5WtrCCJJa6M36QEP/2/1/1.0/100.0?password=123456789
+     * <h2>Example response</h2>
+     * {}
+     */
     @GET
     @Path("create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}")
     public String sendGet(@PathParam("creator") String creatorStr,
@@ -135,21 +141,35 @@ public class TradeResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
         }
 
-        BigInteger orderID = new BigInteger(signature);
-        if(!DCSet.getInstance().getOrderMap().contains(orderID)) {
+        if (DCSet.getInstance().getTransactionMap().contains(signature)) {
+            JSONObject out = new JSONObject();
+            out.put("unconfirmed", true);
+            return out.toJSONString();
+        }
+
+        Fun.Tuple2<Integer, Integer> key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
+        if (key == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
         }
 
-        Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Fun.Tuple2<Long, BigDecimal>>
-                order = DCSet.getInstance().getOrderMap().get(orderID);
-        return Order.fromDBrec(order).toJson().toJSONString();
+        Long orderID = Transaction.makeDBRef(key.a, key.b);
+        if (DCSet.getInstance().getOrderMap().contains(orderID)) {
+            JSONObject out = DCSet.getInstance().getOrderMap().get(orderID).toJson();
+            out.put("active", true);
+            return out.toJSONString();
+        } else {
+            JSONObject out = DCSet.getInstance().getCompletedOrderMap().get(orderID).toJson();
+            out.put("completed", true);
+            return out.toJSONString();
+        }
+
     }
 
     /**
      * send and broadcast GET
      *
      * @param creatorStr   address in wallet
-     * @param signatureStr    signature
+     * @param signatureStr signature
      * @param feePower     fee Power
      * @param password     password
      * @return JSON row
@@ -162,8 +182,8 @@ public class TradeResource {
     @GET
     @Path("cancel/{creator}/{signature}")
     public String cancel(@PathParam("creator") String creatorStr,
-                             @PathParam("signature") String signatureStr,
-                             @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
+                         @PathParam("signature") String signatureStr,
+                         @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
 
         APIUtils.askAPICallAllowed(password, "GET create Order\n ", request);
 
@@ -180,18 +200,27 @@ public class TradeResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_MAKER_ADDRESS);
         }
 
-        BigInteger orderID = new BigInteger(signature);
-        if(!DCSet.getInstance().getOrderMap().contains(orderID)) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+        Controller cntr = Controller.getInstance();
+
+        if (!DCSet.getInstance().getTransactionMap().contains(signature)) {
+            Fun.Tuple2<Integer, Integer> key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
+            if (key == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+            }
+
+            Long orderID = Transaction.makeDBRef(key.a, key.b);
+            if (!DCSet.getInstance().getOrderMap().contains(orderID)) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+            }
         }
 
-        Controller cntr = Controller.getInstance();
+
         PrivateKeyAccount privateKeyAccount = cntr.getPrivateKeyAccountByAddress(resultCreator.a.getAddress());
         if (privateKeyAccount == null) {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_WALLET_ADDRESS);
         }
 
-        Transaction transaction = cntr.cancelOrder2(privateKeyAccount, orderID, feePower.intValue());
+        Transaction transaction = cntr.cancelOrder2(privateKeyAccount, signature, feePower.intValue());
 
         int validate = cntr.getTransactionCreator().afterCreate(transaction, false);
 
@@ -206,4 +235,29 @@ public class TradeResource {
 
     }
 
+    @Path("getbyaddress/{creator}/{haveKey}/{wantKey}")
+    public String cancel(@PathParam("creator") String address,
+                         @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey) {
+
+
+        OrderMap ordersMap = DCSet.getInstance().getOrderMap();
+        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        Transaction createOrder;
+
+        JSONArray out = new JSONArray();
+        for( Order order: ordersMap.getOrdersForAddress(address, haveKey, wantKey)) {
+            JSONObject orderJson = order.toJson();
+            Fun.Tuple2<Integer, Integer> key = Transaction.parseDBRef(order.getId());
+            createOrder = finalMap.get(key);
+            if (createOrder == null)
+                continue;
+
+            orderJson.put("signature", Base58.encode(createOrder.getSignature()));
+
+            out.add(orderJson);
+
+        }
+
+        return out.toJSONString();
+    }
 }
