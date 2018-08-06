@@ -1317,6 +1317,9 @@ public class BlockExplorer {
         BigDecimal sumSellingAmount = BigDecimal.ZERO;
         BigDecimal sumSellingAmountGood = BigDecimal.ZERO;
 
+        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        Transaction createOrder;
+
         BigDecimal vol;
         // show SELLs in BACK order
         for (int i = ordersHave.size() - 1; i >= 0; i--) {
@@ -1342,7 +1345,9 @@ public class BlockExplorer {
 
             sumSellingAmount = sumSellingAmount.add(sellingAmount);
 
-            sellsJSON.put(order.getId(), sellJSON);
+
+            createOrder = finalMap.get(order.getId());
+            sellsJSON.put(Base58.encode(createOrder.getSignature()), sellJSON);
         }
 
         output.put("sells", sellsJSON);
@@ -1383,7 +1388,8 @@ public class BlockExplorer {
 
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
-            buysJSON.put(order.getId(), buyJSON);
+            createOrder = finalMap.get(order.getId());
+            buysJSON.put(Base58.encode(createOrder.getSignature()), buyJSON);
         }
         output.put("buys", buysJSON);
 
@@ -1398,9 +1404,6 @@ public class BlockExplorer {
 
         BigDecimal tradeWantAmount = BigDecimal.ZERO;
         BigDecimal tradeHaveAmount = BigDecimal.ZERO;
-
-        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
-        Transaction createOrder;
 
         int i = 0;
         for (Trade trade : trades) {
@@ -3971,8 +3974,16 @@ public class BlockExplorer {
         output.put("type", "transaction");
 
         for (int i = 0; i < signatures.length; i++) {
-            signatureBytes = Base58.decode(signatures[i]);
+            try {
+                signatureBytes = Base58.decode(signatures[i]);
+            } catch (Exception e) {
+                continue;
+            }
+
             Transaction transaction = Controller.getInstance().getTransaction(signatureBytes);
+            if (transaction == null)
+                continue;
+
             transaction.setDC(dcSet, false);
             List<Transaction> tt = new ArrayList<Transaction>();
             tt.add(transaction);
