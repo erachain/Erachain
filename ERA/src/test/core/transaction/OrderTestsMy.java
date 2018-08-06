@@ -536,9 +536,6 @@ public class OrderTestsMy {
         // CHECK FEE
         assertEquals(true, order.getPrice().compareTo(parsedOrder.getPrice())==0);
 
-        // CHECK TIMESTAMP
-        assertEquals(order.getTimestamp(), parsedOrder.getTimestamp());
-
         // PARSE TRANSACTION FROM WRONG BYTES
         rawOrder = new byte[order.getDataLength()];
 
@@ -626,9 +623,9 @@ public class OrderTestsMy {
 
         //////////////////////////////////
         /////////// TRADE PARSE //////////
-        Trade tradeParse = new Trade(543123456L, 3434546546L,
+        Trade tradeParse = new Trade(543123456L, 3434546546L, 2l, 1l,
                 BigDecimal.valueOf(123451).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
-                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1), timestamp);
+                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1));
          byte[] tradeRaw = tradeParse.toBytes();
 
          Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
@@ -642,7 +639,6 @@ public class OrderTestsMy {
          Assert.assertEquals(tradeParse_1.getInitiator(), tradeParse.getInitiator());
         Assert.assertEquals(tradeParse_1.getTarget(), tradeParse.getTarget());
 
-        Assert.assertEquals(tradeParse_1.getTimestamp(), tradeParse.getTimestamp());
         Assert.assertEquals(tradeParse_1.getAmountHave(), tradeParse.getAmountHave());
         Assert.assertEquals(tradeParse_1.getAmountWant(), tradeParse.getAmountWant());
 
@@ -3037,15 +3033,14 @@ public class OrderTestsMy {
 
             Assert.assertEquals(Order.calcPrice(order.getAmountHave(), order.getAmountWant()).equals(orderPrice), true);
 
-            String date = DateTimeFormat.timestamptoString(order.getTimestamp());
-
+            timestamp = 0L;
             compare = tempPrice.compareTo(orderPrice);
             Assert.assertEquals(compare <= 0, true);
             if (compare > 0) {
                 // error
                 compare = index;
             } else if (compare == 0) {
-                compare = timestamp.compareTo(order.getTimestamp());
+                compare = timestamp.compareTo(order.getId());
                 Assert.assertEquals(compare <= 0, true);
                 if (compare > 0) {
                     // error
@@ -3054,7 +3049,7 @@ public class OrderTestsMy {
             }
 
             tempPrice = orderPrice;
-            timestamp = order.getTimestamp();
+            timestamp = order.getId();
             
         }
         
