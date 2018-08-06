@@ -30,11 +30,8 @@ public class Order implements Comparable<Order> {
     private static final int SCALE_LENGTH = 1;
     private static final int AMOUNT_LENGTH = 8;
     public static final int FULFILLED_LENGTH = AMOUNT_LENGTH + 4;
-    //private static final int TIMESTAMP_LENGTH = 8;
-    //private static final int EXECUTABLE_LENGTH = 1;
     private static final int BASE_LENGTH = ID_LENGTH + CREATOR_LENGTH + HAVE_LENGTH + WANT_LENGTH
             + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SCALE_LENGTH + FULFILLED_LENGTH;
-            //+ TIMESTAMP_LENGTH;
 
     protected DCSet dcSet;
     //protected long timestamp;
