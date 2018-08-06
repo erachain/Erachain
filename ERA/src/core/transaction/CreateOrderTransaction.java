@@ -7,11 +7,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import core.crypto.Base58;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
@@ -270,8 +267,8 @@ public class CreateOrderTransaction extends Transaction {
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
 
         return new Order(Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
-                amountHave, amountWant, // new SCALE
-                this.timestamp);
+                amountHave, amountWant // new SCALE
+        );
     }
 
     @SuppressWarnings("unchecked")

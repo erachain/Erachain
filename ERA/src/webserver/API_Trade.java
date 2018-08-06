@@ -248,6 +248,9 @@ public class API_Trade {
         TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
         Transaction createOrder;
 
+        if (limit > 200)
+            limit = 200l;
+
         int i = 0;
         for (Trade trade : trades) {
             if (i++ > limit) break;
@@ -266,6 +269,7 @@ public class API_Trade {
 
             createOrder = finalMap.get(orderInitiator.getId());
             tradeJSON.put("initiatorTxSignature", Base58.encode(createOrder.getSignature()));
+            tradeJSON.put("initiatorId", orderInitiator.getId());
 
             tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
             tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave());
@@ -282,11 +286,12 @@ public class API_Trade {
 
             createOrder = finalMap.get(orderInitiator.getId());
             tradeJSON.put("targetTxSignature", Base58.encode(createOrder.getSignature()));
+            tradeJSON.put("targetId", orderTarget.getId());
             tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress());
             tradeJSON.put("targetAmount", orderTarget.getAmountHave());
 
-            tradeJSON.put("timestamp", trade.getTimestamp());
-            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
+            //tradeJSON.put("timestamp", trade.getInitiator());
+            //tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.put(i, tradeJSON);
         }

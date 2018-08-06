@@ -145,7 +145,7 @@ public class TradesTableModel extends TableModelCls<Tuple2<Long, Long>,
                 if (row == this.trades.size())
                     return "<html>" + Lang.getInstance().translate("Total") + ":</html>";
 
-                return DateTimeFormat.timestamptoString(trade.getTimestamp());
+                return DateTimeFormat.timestamptoString(trade.getInitiator());
 
             case COLUMN_TYPE:
 

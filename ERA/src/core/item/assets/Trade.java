@@ -9,13 +9,9 @@ import java.util.List;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import core.item.ItemCls;
 import core.transaction.Transaction;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
-import core.crypto.Crypto;
 import datachain.DCSet;
 
 public class Trade {
@@ -34,17 +30,15 @@ public class Trade {
     private Long wantKey;
     private BigDecimal amountHave;
     private BigDecimal amountWant;
-    private long timestamp;
 
     // make trading if two orders is seeked
-    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
+    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant) {
         this.initiator = initiator;
         this.target = target;
         this.haveKey = haveKey;
         this.wantKey = wantKey;
         this.amountHave = amountHave;
         this.amountWant = amountWant;
-        this.timestamp = timestamp;
     }
 
     public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
@@ -87,10 +81,6 @@ public class Trade {
 
     public BigDecimal getAmountWant() {
         return this.amountWant;
-    }
-
-    public long getTimestamp() {
-        return this.timestamp;
     }
 
     public BigDecimal calcPrice() {
@@ -150,12 +140,7 @@ public class Trade {
         BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
         position += AMOUNT_LENGTH;
 
-		//READ TIMESTAMP
-        byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
-		position += TIMESTAMP_LENGTH;
-
-		return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, timestamp);
+		return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant);
 	}
 
 	public byte[] toBytes()
@@ -197,10 +182,6 @@ public class Trade {
 		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
-
-		//WRITE TIMESTAMP
-        byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		data = Bytes.concat(data, timestampBytes);
 
 		return data;
 	}

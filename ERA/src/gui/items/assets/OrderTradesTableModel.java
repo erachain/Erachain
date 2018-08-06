@@ -84,7 +84,7 @@ public class OrderTradesTableModel extends TableModelCls<Tuple2<Long, Long>, Tra
         switch (column) {
             case COLUMN_TIMESTAMP:
 
-                return DateTimeFormat.timestamptoString(trade.getTimestamp());
+                return DateTimeFormat.timestamptoString(trade.getInitiator());
 
             case COLUMN_TYPE:
 

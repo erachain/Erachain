@@ -81,7 +81,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         switch (column) {
             case COLUMN_TIMESTAMP:
 
-                return DateTimeFormat.timestamptoString(order.getTimestamp());
+                return DateTimeFormat.timestamptoString(order.getId());
 
             case COLUMN_HAVE:
 

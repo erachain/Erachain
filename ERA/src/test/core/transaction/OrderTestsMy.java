@@ -11,18 +11,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import core.account.Account;
-import core.transaction.*;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import core.BlockChain;
 import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
-import core.crypto.Base58;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetVenture;
@@ -504,8 +501,8 @@ public class OrderTestsMy {
         BigDecimal amountWant = new BigDecimal("12.456");
 
         Order order = new Order(Transaction.makeDBRef(12, 3), this.accountA, 12L, 13L,
-                amountHave, amountWant,
-                123456l);
+                amountHave, amountWant
+        );
 
 
         // CONVERT TO BYTES

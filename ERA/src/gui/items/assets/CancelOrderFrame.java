@@ -88,7 +88,7 @@ public class CancelOrderFrame extends JDialog {
         //TXT TIMESTAMP
         txtGBC.gridy = 1;
 
-        JTextField txtTimestamp = new JTextField(DateTimeFormat.timestamptoString(order.getTimestamp()));
+        JTextField txtTimestamp = new JTextField(DateTimeFormat.timestamptoString(order.getId()));
         txtTimestamp.setEditable(false);
         this.add(txtTimestamp, txtGBC);
 

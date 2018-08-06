@@ -1440,8 +1440,8 @@ public class BlockExplorer {
             tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress()); // viewCreator
             tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-            tradeJSON.put("timestamp", trade.getTimestamp());
-            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
+            tradeJSON.put("timestamp", trade.getInitiator());
+            tradeJSON.put("dateTime", "--"); //BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.put(i, tradeJSON);
         }
@@ -2325,8 +2325,8 @@ public class BlockExplorer {
             transactionDataJSON.put("height", parentBlock.getHeight(dcSet));
             transactionDataJSON.put("confirmations", getHeight() - parentBlock.getHeight(dcSet) + 1);
 
-            transactionDataJSON.put("timestamp", trade.getTimestamp());
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
+            transactionDataJSON.put("timestamp", trade.getInitiator());
+            transactionDataJSON.put("dateTime", "--"); //BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             transactionJSON.put("type", "trade");
             transactionJSON.put("trade", transactionDataJSON);

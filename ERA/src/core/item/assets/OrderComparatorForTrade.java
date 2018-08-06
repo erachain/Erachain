@@ -22,7 +22,7 @@ public class OrderComparatorForTrade implements Comparator<Order> {
         if (compare != 0)
             return compare;
 
-        return Long.signum(order1.getTimestamp() - order2.getTimestamp());
+        return order1.getId().compareTo(order2.getId());
 
     }
 
