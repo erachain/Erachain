@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import core.crypto.Base58;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 

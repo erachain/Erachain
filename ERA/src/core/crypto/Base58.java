@@ -17,6 +17,8 @@
  */
 package core.crypto;
 
+import com.google.common.primitives.Bytes;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -165,6 +167,35 @@ public class Base58 {
         //
         byte[] output = Arrays.copyOfRange(decoded, decodedOffset - zeroCount, decoded.length);
         return output;
+    }
+
+    public static byte[] decode(String string, int length) {
+        byte[] bytes = Base58.decode(string);
+        int left = length - bytes.length;
+        if (left > 0) {
+            byte[] bytesNeg = new byte[left];
+            if (bytes[0] < 0)
+                Arrays.fill(bytesNeg, (byte) -1);
+
+            bytes = Bytes.concat(bytesNeg, bytes);
+
+        }
+
+        return bytes;
+    }
+    public static String encode(BigInteger bigInt, int length) {
+        byte[] bytes = bigInt.toByteArray();
+        int left = length - bytes.length;
+        if (left > 0) {
+            byte[] bytesNeg = new byte[left];
+            if (bytes[0] < 0)
+                Arrays.fill(bytesNeg, (byte) -1);
+
+            bytes = Bytes.concat(bytesNeg, bytes);
+
+        }
+
+        return encode(bytes);
     }
 
     /**

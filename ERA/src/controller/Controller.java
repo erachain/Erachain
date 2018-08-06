@@ -52,6 +52,14 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import settings.Settings;
+import traders.TradersManager;
+import utils.Converter;
+import utils.DateTimeFormat;
+import utils.MemoryViewer;
+import utils.ObserverMessage;
+import utils.Pair;
+import utils.SimpleFileVisitorForRecursiveFolderDeletion;
+import utils.SysTray;
 import utils.*;
 import webserver.WebService;
 
@@ -118,6 +126,7 @@ public class Controller extends Observable {
     private boolean dcSetWithObserver = false;
     private boolean dynamicGUI = false;
     private Network network;
+    private TradersManager tradersManager;
     private ApiService rpcService;
     private WebService webService;
     private BlockChain blockChain;
@@ -596,6 +605,8 @@ public class Controller extends Observable {
         MemoryViewer mamoryViewer = new MemoryViewer(this);
         mamoryViewer.start();
 
+        // CREATE NETWORK
+        this.tradersManager = new TradersManager();
 
         this.COMPU_RATES.put("ru", new Tuple2<BigDecimal, String>
                 (new BigDecimal(245 * 62).setScale(2), "\u20BD"));
@@ -833,7 +844,7 @@ public class Controller extends Observable {
         // CLOSE WALLET
         LOGGER.info("Closing wallet");
         this.wallet.close();
-
+        
         LOGGER.info("Closed.");
         // FORCE CLOSE
         LOGGER.info("EXIT parameter:" + par);
@@ -2454,7 +2465,7 @@ public class Controller extends Observable {
         return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
 
     }
-
+    
     // BALANCES
 
     public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
@@ -2466,6 +2477,10 @@ public class Controller extends Observable {
             Account account) {
 
         return this.dcSet.getAssetBalanceMap().getBalancesSortableList(account);
+    }
+
+    public List<Transaction> getUnconfirmedTransactionsByAddress(String address) {
+        return this.dcSet.getTransactionMap().getTransactionsByAddress(address);
     }
 
     // NAMES
@@ -2835,7 +2850,7 @@ public class Controller extends Observable {
             return this.transactionCreator.createOrderTransaction(creator, have, want, amountHave, amountWant, feePow);
         }
     }
-
+    
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
         return cancelOrder(creator, order, feePow);
     }
@@ -2844,6 +2859,13 @@ public class Controller extends Observable {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createCancelOrderTransaction(creator, orderID, feePow);
+        }
+    }
+
+    public Transaction cancelOrder2(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+        // CREATE ONLY ONE TRANSACTION AT A TIME
+        synchronized (this.transactionCreator) {
+            return this.transactionCreator.createCancelOrderTransaction2(creator, orderID, feePow);
         }
     }
 

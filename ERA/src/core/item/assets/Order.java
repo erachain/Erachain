@@ -368,6 +368,8 @@ public class Order implements Comparable<Order> {
     public JSONObject toJson() {
 
         JSONObject order = new JSONObject();
+        order.put("ID", Base58.encode(this.id));
+        order.put("creator", this.creator.getAddress());
         order.put("haveKey", this.haveKey);
         order.put("wantKey", this.wantKey);
         order.put("amountHave", this.amountHave.toPlainString());

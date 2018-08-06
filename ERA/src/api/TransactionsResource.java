@@ -184,12 +184,11 @@ public class TransactionsResource {
     @GET
     @Path("/unconfirmedof/{address}")
     public String getNetworkTransactions(@PathParam("address") String address) {
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
+        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactionsByAddress(address);
         JSONArray array = new JSONArray();
 
         for (Transaction transaction : transactions) {
-            if (transaction.getCreator().getAddress().equals(address))
-                array.add(transaction.toJson());
+            array.add(transaction.toJson());
         }
 
         return array.toJSONString();

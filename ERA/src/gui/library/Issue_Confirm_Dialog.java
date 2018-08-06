@@ -32,8 +32,6 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
     /**
      * Creates new form Issue_Asset_Confirm_Dialog
      *
-     * @param th
-     * @param th
      */
     public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                                 int w, int h, String status_Text, String title_Text) {

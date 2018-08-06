@@ -593,6 +593,22 @@ public class TransactionCreator {
         return createOrderTransaction;
     }
 
+    public Transaction createCancelOrderTransaction2(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //CREATE PRDER TRANSACTION
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte) feePow, time, 0l);
+        cancelOrderTransaction.sign(creator, false);
+        cancelOrderTransaction.setDC(this.fork, false);
+
+        return cancelOrderTransaction;
+
+    }
+
     public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow) {
         return createCancelOrderTransaction(creator, order, feePow);
     }

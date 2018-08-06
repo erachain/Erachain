@@ -24,11 +24,13 @@ import utils.ObserverMessage;
 public class OrderMap extends DCMap<Long, Order> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
+    private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")
     private BTreeMap haveWantKeyMap;
     @SuppressWarnings("rawtypes")
     // TODO: cut index to WANT only
     private BTreeMap wantHaveKeyMap;
+    private BTreeMap addressHaveWantKeyMap;
 
     public OrderMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -74,6 +76,26 @@ public class OrderMap extends DCMap<Long, Order> {
                 //.comparator(Fun.BYTE_ARRAY_COMPARATOR) // for byte[]
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
+
+        // ADDRESS HAVE/WANT KEY
+        this.addressHaveWantKeyMap = database.createTreeMap("orders_key_address_have_want")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        //BIND HAVE/WANT KEY
+        Bind.secondaryKey(map, this.addressHaveWantKeyMap,
+                new Fun.Function2<Tuple5<String, Long, Long, BigDecimal, BigInteger>, BigInteger,
+                        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>() {
+                    @Override
+                    public Tuple5<String, Long, Long, BigDecimal, BigInteger> run(
+                            BigInteger key, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+                            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
+                        return new Tuple5<String, Long, Long, BigDecimal, BigInteger>
+                                (value.a.b, value.b.a, value.c.a, value.a.e,
+                                        key);
+                    }
+                });
 
         //HAVE/WANT KEY
         this.haveWantKeyMap = database.createTreeMap("orders_key_have_want")
@@ -209,7 +231,7 @@ public class OrderMap extends DCMap<Long, Order> {
         } else {
             Collections.sort(orders, new OrderComparatorForTrade());
         }
-            
+
         //RETURN
         return orders;
     }
@@ -245,7 +267,9 @@ public class OrderMap extends DCMap<Long, Order> {
         return new SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
     }
+    */
 
+    /*
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersWantSortableList(long want) {

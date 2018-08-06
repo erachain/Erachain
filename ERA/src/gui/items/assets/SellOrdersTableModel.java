@@ -110,8 +110,8 @@ public class SellOrdersTableModel extends
             order = this.orders.get(row).getB();
 
             if (order == null) {
-                totalCalc();
-                this.fireTableRowsDeleted(row, row);
+                //totalCalc();
+                //this.fireTableRowsDeleted(row, row);
                 return null;
             }
 
