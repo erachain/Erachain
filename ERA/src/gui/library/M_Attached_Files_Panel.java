@@ -8,8 +8,7 @@ import utils.Zip_Bytes;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.validation.constraints.Null;
-
-import java.awt.Desktop;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayOutputStream;
@@ -212,7 +211,7 @@ public class M_Attached_Files_Panel extends JPanel {
 class Attache_Files_Model extends DefaultTableModel {
 
     public Attache_Files_Model() {
-        super(new Object[]{Lang.getInstance().translate("Name"), "ZIP?", "data"}, 0);
+        super(new Object[]{Lang.getInstance().translate("Name"), "ZIP?", Lang.getInstance().translate("data")}, 0);
 
     }
 

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import lang.Lang;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -217,7 +218,7 @@ public abstract class TransactionAmount extends Transaction {
     @Override
     public String viewTypeName() {
         if (this.amount == null || this.amount.signum() == 0)
-            return "LETTER";
+            return Lang.getInstance().translate("LETTER");
         
         if (this.isBackward()) {
             return "backward";
