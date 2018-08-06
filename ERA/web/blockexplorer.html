@@ -1084,11 +1084,12 @@ function trades(data)
 	output += '<td align=right><b><a href=?asset='+data.assetHave+get_lang()+'>'+getAssetName2(data.assetHave, data.assetHaveName)+'</b></td><td align=center><b>'+ data.label_Price +'</b></td>';
 	
 	output += '<td><b><a href=?asset='+data.assetWant+get_lang()+'>'+getAssetName2(data.assetWant, data.assetWantName)+'</b></td></tr>';
-	
+
+	i = 1;
 	for(key in data.trades) {
 		output += '<tr>';
 			
-		output += '<td align=center><a href=?trade='+data.trades[key].initiatorTxSignature+'/'+data.trades[key].targetTxSignature+get_lang()+'>#';
+		output += '<td align=center><a href=?trade='+data.trades[key].initiatorTxSignature+'/'+data.trades[key].targetTxSignature+get_lang()+'>#'+i++;
 		output += '<td align=center>' + data.trades[key].dateTime;
 		output += '<td align=center>' + data.trades[key].type;
 		

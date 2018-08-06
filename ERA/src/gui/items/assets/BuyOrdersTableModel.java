@@ -70,6 +70,7 @@ public class BuyOrdersTableModel extends
         for (Pair<Long, Order> orderPair : this.orders) {
 
             Order order = orderPair.getB();
+
             sumAmountHave = sumAmountHave.add(order.getAmountHaveLeft());
 
             sumAmountWant = sumAmountWant.add(order.getAmountWantLeft());
@@ -117,8 +118,8 @@ public class BuyOrdersTableModel extends
         if (row < size) {
             order = this.orders.get(row).getB();
             if (order == null) {
-                totalCalc();
-                this.fireTableRowsDeleted(row, row);
+                //totalCalc();
+                //this.fireTableRowsDeleted(row, row);
                 return null;
             }
 
@@ -163,7 +164,7 @@ public class BuyOrdersTableModel extends
                 if (row == this.orders.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
-                BigDecimal price = order.getPrice();
+                BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 return NumberAsString.formatAsString(price.stripTrailingZeros());
 
             case COLUMN_AMOUNT_HAVE:
@@ -187,7 +188,7 @@ public class BuyOrdersTableModel extends
         this.needRepaint = false;
         this.updateTime = NTP.getTime();
 
-        this.orders = Controller.getInstance().getOrders(this.have, this.want, true);
+        this.orders = Controller.getInstance().getOrders(this.have, this.want, false);
 
         totalCalc();
         this.fireTableDataChanged();

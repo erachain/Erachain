@@ -8,7 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import controller.Controller;
+import core.BlockChain;
 import core.transaction.Transaction;
 import org.mapdb.Fun.Tuple2;
 
@@ -19,9 +22,10 @@ public class Trade {
     private static final int ORDER_LENGTH = Order.ID_LENGTH;
     private static final int ASSET_KEY_LENGTH = Transaction.KEY_LENGTH;
     private static final int AMOUNT_LENGTH = Order.FULFILLED_LENGTH;
+    private static final int SEQUENCE_LENGTH = 4;
     private static final int SCALE_LENGTH = 1;
     private static final int BASE_LENGTH = 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
-            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH;
+            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SEQUENCE_LENGTH;
 
     private Long initiator;
     private Long target;
@@ -29,15 +33,17 @@ public class Trade {
     private Long wantKey;
     private BigDecimal amountHave;
     private BigDecimal amountWant;
+    private int sequence;
 
     // make trading if two orders is seeked
-    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant) {
+    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, int sequence) {
         this.initiator = initiator;
         this.target = target;
         this.haveKey = haveKey;
         this.wantKey = wantKey;
         this.amountHave = amountHave;
         this.amountWant = amountWant;
+        this.sequence = sequence;
     }
 
     public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
@@ -87,6 +93,17 @@ public class Trade {
     }
     public BigDecimal calcPriceRevers() {
         return Order.calcPrice(this.amountWant, this.amountHave);
+    }
+
+    public int getSequence() {
+        return this.sequence;
+    }
+
+    public Long getTimestamp() {
+        Tuple2<Integer, Integer> key = Transaction.parseDBRef(this.initiator);
+        BlockChain blockChain = Controller.getInstance().getBlockChain();
+        Long timestamp = blockChain.getTimestamp(key.a) + key.b * 0; // for add SEQUENCE in asset.Trade
+        return timestamp; // + this.sequence;
     }
 
 
@@ -139,7 +156,11 @@ public class Trade {
         BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
         position += AMOUNT_LENGTH;
 
-		return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant);
+        //READ SEQUENCE
+        byte[] sequenceBytes = Arrays.copyOfRange(data, position, position + SEQUENCE_LENGTH);
+        int sequence = Ints.fromByteArray(sequenceBytes);
+
+        return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, sequence);
 	}
 
 	public byte[] toBytes()
@@ -182,7 +203,11 @@ public class Trade {
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
 
-		return data;
+        //WRITE SEQUENCE
+        byte[] sequenceBytes = Ints.toByteArray(this.sequence);
+        data = Bytes.concat(data, sequenceBytes);
+
+        return data;
 	}
 
 	public int getDataLength()

@@ -185,6 +185,7 @@ public class API_Trade {
             sumBuyingAmount = sumBuyingAmount.add(buyingAmount);
 
             buysJSON.put(order.getId(), buyJSON);
+            buysJSON.put(Base58.encode(order.a.a, 64), buyJSON);
 
             if(counter++ > limit) break;
 
@@ -290,8 +291,8 @@ public class API_Trade {
             tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress());
             tradeJSON.put("targetAmount", orderTarget.getAmountHave());
 
-            //tradeJSON.put("timestamp", trade.getInitiator());
-            //tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
+            tradeJSON.put("timestamp", trade.getTimestamp());
+            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.put(i, tradeJSON);
         }

@@ -73,6 +73,22 @@ public class CancelOrderTransaction extends Transaction {
     }
         //public static String getName() { return "OLD: Cancel Order"; }
 
+
+    public byte[] getorderSignature() {
+        return this.orderSignature;
+    }
+
+    public Long getOrderID() {
+        return this.orderID;
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        return false;
+    }
+
+    //PARSE CONVERT
+
     public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
         boolean asPack = releaserReference != null;
 
@@ -128,20 +144,20 @@ public class CancelOrderTransaction extends Transaction {
         return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes);
     }
 
-    //PARSE CONVERT
-
-    public byte[] getorderSignature() {
-        return this.orderSignature;
-    }
-
-    public Long getOrderID() {
-        return this.orderID;
-    }
-
+    //@Override
     @Override
-    public boolean hasPublicText() {
-        return false;
+    public byte[] toBytes(boolean withSign, Long releaserReference) {
+        byte[] data = super.toBytes(withSign, releaserReference);
+
+        //WRITE ORDER
+        //byte[] orderBytes = this.orderSignature;
+        //byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
+        //orderBytes = Bytes.concat(fill, orderBytes);
+        data = Bytes.concat(data, this.orderSignature);
+
+        return data;
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -157,28 +173,6 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     //VALIDATE
-
-    //@Override
-    @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
-        byte[] data = super.toBytes(withSign, releaserReference);
-
-        //WRITE ORDER
-        //byte[] orderBytes = this.orderSignature;
-        //byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
-        //orderBytes = Bytes.concat(fill, orderBytes);
-        data = Bytes.concat(data, this.orderSignature);
-
-        return data;
-    }
-
-    //PROCESS/ORPHAN
-
-    @Override
-    public int getDataLength(boolean asPack) {
-        return BASE_LENGTH;
-    }
-
     //@Override
     @Override
     public int isValid(Long releaserReference, long flags) {
@@ -200,19 +194,31 @@ public class CancelOrderTransaction extends Transaction {
         if (this.dcSet.getOrderMap().contains(this.orderID))
             order = this.dcSet.getOrderMap().get(this.orderID);
 
-        if (order == null)
-            //if (false && !BlockChain.DEVELOP_USE)
+        if (order == null) {
+            if (!(
+                    BlockChain.DEVELOP_USE
+                            && this.orderID < 186400l * 2l * (long) Integer.MAX_VALUE
+            )) {
                 return ORDER_DOES_NOT_EXIST;
-
-        ///
-        //CHECK IF CREATOR IS CREATOR
-        //Transaction createOrder = this.dcSet.getTransactionFinalMap().get(transactionIndex);
-        //if (!createOrder.getCreator().equals(this.creator.getAddress())) {
-        if (!order.getCreator().equals(this.creator.getAddress())) {
-            return INVALID_ORDER_CREATOR;
+            }
+        } else {
+            if (!order.getCreator().equals(this.creator.getAddress())) {
+                return INVALID_ORDER_CREATOR;
+            }
         }
 
+
+        //CHECK IF CREATOR IS CREATOR
+
         return super.isValid(releaserReference, flags);
+    }
+
+
+    //PROCESS/ORPHAN
+
+    @Override
+    public int getDataLength(boolean asPack) {
+        return BASE_LENGTH;
     }
 
     public static void process_it(DCSet db, Order order) {
@@ -244,11 +250,12 @@ public class CancelOrderTransaction extends Transaction {
         //Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
         //this.orderID = Transaction.makeDBRef(dbRefTuple2);
 
-        Order order = this.dcSet.getOrderMap().get(this.getOrderID());
+        Order order = this.dcSet.getOrderMap().get(this.orderID);
 
-        //if (order == null && BlockChain.DEVELOP_USE) {
-        //    return;
-        //}
+        if (order == null && BlockChain.DEVELOP_USE
+                && this.orderID < 186400l * 2l * (long)Integer.MAX_VALUE) {
+            return;
+        }
 
         process_it(this.dcSet, order);
     }
@@ -274,11 +281,12 @@ public class CancelOrderTransaction extends Transaction {
         super.orphan(asPack);
 
         //REMOVE ORDER DATABASE
-        Order order = this.dcSet.getCompletedOrderMap().get(this.getOrderID());
+        Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 
-        //if (order == null && BlockChain.DEVELOP_USE) {
-        //   return;
-        //}
+        if (order == null && BlockChain.DEVELOP_USE
+            && this.orderID < 186400l * 2l * (long)Integer.MAX_VALUE) {
+           return;
+        }
 
         orphan_it(this.dcSet, order);
     }

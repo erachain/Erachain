@@ -208,6 +208,9 @@ public class ObserverMessage {
     public static final int CHAIN_REMOVE_BLOCK_TYPE = 5503;
     public static final int CHAIN_LIST_BLOCK_TYPE = 5504;
 
+    ///////////////////////// TRADERS /////////////////////
+    public static final int TRADERS_UPDATE_TYPE = 8888;
+
     ///////////////////////// WALLET /////////////////////
     public static final int WALLET_RESET_BLOCK_TYPE = 10001;
     public static final int WALLET_ADD_BLOCK_TYPE = 10002;

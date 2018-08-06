@@ -184,7 +184,7 @@ public class Accounts_Transactions_TableModel extends AbstractTableModel impleme
 
                 if (r_Tran.transaction.isConfirmed(DCSet.getInstance()))
                     return r_Tran.transaction.viewHeightSeq(DCSet.getInstance());
-                return -1;
+                return "-";
             case COLUMN_AMOUNT:
                 //	if (r_Tran.transaction.getType() == Transaction.GENESIS_SEND_ASSET_TRANSACTION)
                 return r_Tran.amount;
