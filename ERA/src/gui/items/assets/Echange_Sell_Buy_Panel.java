@@ -340,8 +340,8 @@ public class Echange_Sell_Buy_Panel extends JTabbedPane {
                     buyOrdersMenu.getComponent(1).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
-                    sellOrderPanel.txtAmountHave.setText(order.getAmountHave().toPlainString());
-                    sellOrderPanel.txtPrice.setText(order.getPrice().toPlainString());
+                    sellOrderPanel.txtAmountHave.setText(order.getAmountWant().toPlainString());
+                    sellOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
                 }
             }
         });

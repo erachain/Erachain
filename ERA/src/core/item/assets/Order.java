@@ -413,15 +413,13 @@ public class Order implements Comparable<Order> {
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
         this.creator.changeBalance(this.dcSet, true, this.haveKey, this.amountHave, true);
 
-        //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
-        //TRY AND COMPLETE ORDERS
-        boolean completedOrder = false;
-        int index = 0;
         BigDecimal thisPrice = this.price;
         //BigDecimal tempPrice;
         BigDecimal thisIncrement;
         //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
+        //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
+        //TRY AND COMPLETE ORDERS
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantKey, this.haveKey, false);
 
         if (true && !orders.isEmpty()) {
@@ -469,6 +467,9 @@ public class Order implements Comparable<Order> {
             debug = true;
         }
 
+        boolean completedOrder = false;
+        int index = 0;
+
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
             Order order;
@@ -476,10 +477,12 @@ public class Order implements Comparable<Order> {
                 // так как это все в памяти расположено то нужно создать новый объект
                 // иначе везде будет ссылка на один и тот же объект и
                 // при переходе на MAIN базу возьмется уже обновленный ордер из FORK DB
-                order = orders.get(index++).copy();
+                order = orders.get(index).copy();
             } else {
-                order = orders.get(index++);
+                order = orders.get(index);
             }
+
+            index++;
 
             if (
                     //order.getId().equals(Transaction.makeDBRef(12435, 1))
@@ -609,7 +612,8 @@ public class Order implements Comparable<Order> {
                     error ++;
                 }
                 trade = new Trade(this.getId(), order.getId(), this.haveKey, this.wantKey,
-                        tradeAmountForHave, tradeAmountForWant);
+                        tradeAmountForHave, tradeAmountForWant,
+                        index);
 
                 //ADD TRADE TO DATABASE
                 tradesMap.add(trade);

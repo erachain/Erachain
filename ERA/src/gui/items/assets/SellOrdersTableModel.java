@@ -46,7 +46,7 @@ public class SellOrdersTableModel extends
         this.haveKey = this.have.getKey();
         this.wantKey = this.want.getKey();
 
-        this.orders = Controller.getInstance().getOrders(have, want, true);
+        this.orders = Controller.getInstance().getOrders(have, want, false);
 
         columnNames[COLUMN_PRICE] += " " + want.getShort();
         columnNames[COLUMN_AMOUNT_HAVE] += " " + have.getShort();

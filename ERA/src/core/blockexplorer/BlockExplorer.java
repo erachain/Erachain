@@ -1413,9 +1413,6 @@ public class BlockExplorer {
 
             Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
-            tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
-
             tradeJSON.put("realPrice", trade.calcPrice());
             tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
@@ -1429,10 +1426,15 @@ public class BlockExplorer {
                 tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
                 tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());
 
+                tradeJSON.put("amountHave", trade.getAmountWant().toPlainString());
+                tradeJSON.put("amountWant", trade.getAmountHave().toPlainString());
             } else {
                 tradeJSON.put("type", "buy");
                 tradeHaveAmount = tradeHaveAmount.add(trade.getAmountHave());
                 tradeWantAmount = tradeWantAmount.add(trade.getAmountWant());
+
+                tradeJSON.put("amountHave", trade.getAmountHave().toPlainString());
+                tradeJSON.put("amountWant", trade.getAmountWant().toPlainString());
             }
 
             createOrder = finalMap.get(orderTarget.getId());
@@ -1440,8 +1442,8 @@ public class BlockExplorer {
             tradeJSON.put("targetCreator", orderTarget.getCreator().getAddress()); // viewCreator
             tradeJSON.put("targetAmount", orderTarget.getAmountHave().toPlainString());
 
-            tradeJSON.put("timestamp", trade.getInitiator());
-            tradeJSON.put("dateTime", "--"); //BlockExplorer.timestampToStr(trade.getTimestamp()));
+            tradeJSON.put("timestamp", trade.getTimestamp());
+            tradeJSON.put("dateTime", BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             tradesJSON.put(i, tradeJSON);
         }

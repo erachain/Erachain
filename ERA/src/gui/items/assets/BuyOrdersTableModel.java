@@ -187,7 +187,7 @@ public class BuyOrdersTableModel extends
         this.needRepaint = false;
         this.updateTime = NTP.getTime();
 
-        this.orders = Controller.getInstance().getOrders(this.have, this.want, true);
+        this.orders = Controller.getInstance().getOrders(this.have, this.want, false);
 
         totalCalc();
         this.fireTableDataChanged();

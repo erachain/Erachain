@@ -105,7 +105,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                         pairKey = want + "/" + have;
                     }
 
-                    return new Tuple2<String, Long>(pairKey, Long.MAX_VALUE - value.getInitiator());
+                    return new Tuple2<String, Long>(pairKey, Long.MAX_VALUE - value.getTimestamp());
                 }
             });
 
@@ -123,7 +123,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                     String wantKey;
                     wantKey = String.valueOf(want);
 
-                    return new Tuple2<String, Long>(wantKey, Long.MAX_VALUE - value.getInitiator());
+                    return new Tuple2<String, Long>(wantKey, Long.MAX_VALUE - value.getTimestamp());
                 }
             });
 
@@ -136,14 +136,12 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
             Bind.secondaryKey(map, this.haveKeyMap, new Fun.Function2<Tuple2<String, Long>, Tuple2<Long, Long>, Trade>() {
                 @Override
                 public Tuple2<String, Long> run(Tuple2<Long, Long> key, Trade value) {
-                    //Order order = Order.getOrder(getDCSet(), value.getInitiator());
-                    //long have = order.getHave();
                     long have = value.getHaveKey(); //order.getHave();
 
                     String haveKey;
                     haveKey = String.valueOf(have);
 
-                    return new Tuple2<String, Long>(haveKey, Long.MAX_VALUE - value.getInitiator());
+                    return new Tuple2<String, Long>(haveKey, Long.MAX_VALUE - value.getTimestamp());
                 }
             });
 
