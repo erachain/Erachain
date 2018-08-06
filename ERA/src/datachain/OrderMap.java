@@ -84,15 +84,12 @@ public class OrderMap extends DCMap<Long, Order> {
 
         //BIND HAVE/WANT KEY
         Bind.secondaryKey(map, this.addressHaveWantKeyMap,
-                new Fun.Function2<Tuple5<String, Long, Long, BigDecimal, BigInteger>, BigInteger,
-                        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>() {
+                new Fun.Function2<Fun.Tuple5<String, Long, Long, BigDecimal, Long>, Long, Order>() {
                     @Override
-                    public Tuple5<String, Long, Long, BigDecimal, BigInteger> run(
-                            BigInteger key, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
-                        return new Tuple5<String, Long, Long, BigDecimal, BigInteger>
-                                (value.a.b, value.b.a, value.c.a, value.a.e,
+                    public Fun.Tuple5<String, Long, Long, BigDecimal, Long> run(
+                            Long key, Order value) {
+                        return new Fun.Tuple5<String, Long, Long, BigDecimal, Long>
+                                (value.getCreator().getAddress(), value.getHave(), value.getWant(), value.getPrice(),
                                         key);
                     }
                 });

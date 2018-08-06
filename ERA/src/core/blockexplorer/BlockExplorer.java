@@ -2374,7 +2374,6 @@ public class BlockExplorer {
                 }
 
                 Map orderJSON = new LinkedHashMap();
-                if (order != null) {
 
                 if (assetNames != null) {
                     assetNames.setKey(order.getHave());

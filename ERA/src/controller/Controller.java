@@ -2862,7 +2862,7 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction cancelOrder2(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+    public Transaction cancelOrder2(PrivateKeyAccount creator, Long orderID, int feePow) {
         // CREATE ONLY ONE TRANSACTION AT A TIME
         synchronized (this.transactionCreator) {
             return this.transactionCreator.createCancelOrderTransaction2(creator, orderID, feePow);
