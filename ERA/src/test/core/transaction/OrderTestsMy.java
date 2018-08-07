@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.math.BigDecimal;
 //import java.math.Long;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import com.google.common.primitives.Bytes;
 import core.account.Account;
+import core.crypto.Base58;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -658,7 +660,7 @@ public class OrderTestsMy {
         /////////// TRADE PARSE //////////
         Trade tradeParse = new Trade(543123456L, 3434546546L, 2l, 1l,
                 BigDecimal.valueOf(123451).setScale(BlockChain.AMOUNT_DEDAULT_SCALE << 1),
-                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1));
+                BigDecimal.valueOf(1056789).setScale(BlockChain.AMOUNT_DEDAULT_SCALE >> 1), 0);
          byte[] tradeRaw = tradeParse.toBytes();
 
          Assert.assertEquals(tradeRaw.length, tradeParse.getDataLength());
