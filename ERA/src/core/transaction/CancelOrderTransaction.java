@@ -71,7 +71,8 @@ public class CancelOrderTransaction extends Transaction {
                 createDBRef = new Tuple2<Integer, Integer>(createOrder.getBlockHeightByParentOrLast(dcSet), 1);
         }
 
-        this.orderID = Transaction.makeDBRef(createDBRef);
+        if (createDBRef != null)
+            this.orderID = Transaction.makeDBRef(createDBRef);
 
     }
 

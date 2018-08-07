@@ -216,7 +216,8 @@ public abstract class Trader extends Thread {
             LOGGER.info(e);
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
-        if (!jsonObject.containsKey("id")) {
+        if (!jsonObject.containsKey("id")
+                || !jsonObject.containsKey("active")) {
             return false;
         }
 
@@ -293,11 +294,11 @@ public abstract class Trader extends Thread {
 
     protected HashSet<String> makeCancelingArray(JSONArray array) {
 
-        DCSet fork = this.dcSet.fork();
-
         HashSet<String> cancelingArray = new HashSet();
         if (array == null || array.isEmpty())
             return cancelingArray;
+
+        DCSet fork = this.dcSet.fork();
 
         for (int i=0; i < array.size(); i++) {
             JSONObject transactionJSON = (JSONObject) array.get(i);
@@ -314,10 +315,12 @@ public abstract class Trader extends Thread {
                 continue;
             }
 
+            // PROCESS in FORK
             transaction.process(null, false);
 
             if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
-                cancelingArray.add(transactionJSON.get("orderID").toString());
+                if (transaction.getTimestamp() > transaction.getCreator().getLastTimestamp())
+                    cancelingArray.add(transactionJSON.get("orderID").toString());
             }
         }
 

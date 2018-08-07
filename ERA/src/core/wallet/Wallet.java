@@ -1582,10 +1582,9 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		// ADD ORDER
-		// Order = orderCreation.getOrder();
-		// this.addOrder(Trade.getOrder(orderCreation.getOrder().getId(),
-		// DBSet.getInstance()));
+		if(orderCreation.getOrderId() == null)
+			return;
+
 		this.addOrder(orderCreation);
 
 	}
@@ -1606,7 +1605,10 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		// CHECK IF WE ARE CREATOR
+		if(orderCreation.getOrderId() == null)
+			return;
+
+			// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
 			// DELETE ORDER
 			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
@@ -1619,6 +1621,9 @@ public class Wallet extends Observable implements Observer {
 		if (!this.exists()) {
 			return;
 		}
+
+		if (orderCancel.getOrderID() == null)
+			return;
 
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
@@ -1633,6 +1638,9 @@ public class Wallet extends Observable implements Observer {
 		if (!this.exists()) {
 			return;
 		}
+
+		if (orderCancel.getOrderID() == null)
+			return;
 
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
