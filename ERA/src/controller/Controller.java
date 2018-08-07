@@ -2852,7 +2852,8 @@ public class Controller extends Observable {
     }
     
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, Order order, int feePow) {
-        return cancelOrder(creator, order, feePow);
+        Transaction orderCreate = this.dcSet.getTransactionFinalMap().get(Transaction.parseDBRef(order.getId()));
+        return cancelOrder(creator, orderCreate.getSignature(), feePow);
     }
     
     public Pair<Transaction, Integer> cancelOrder(PrivateKeyAccount creator, byte[] orderID, int feePow) {

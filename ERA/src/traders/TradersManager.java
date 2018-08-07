@@ -155,14 +155,10 @@ public class TradersManager extends Observable {
         if (true) {
             //START TRADER COMPU <> ERA
             HashMap<BigDecimal, BigDecimal> schemeCOMPU_ERA = new HashMap<>();
-            schemeCOMPU_ERA.put(new BigDecimal("10"), new BigDecimal("10"));
-            schemeCOMPU_ERA.put(new BigDecimal("1"), new BigDecimal("5"));
             schemeCOMPU_ERA.put(new BigDecimal("0.1"), new BigDecimal("2"));
             schemeCOMPU_ERA.put(new BigDecimal("0.01"), new BigDecimal("1"));
             schemeCOMPU_ERA.put(new BigDecimal("-0.01"), new BigDecimal("1"));
             schemeCOMPU_ERA.put(new BigDecimal("-0.1"), new BigDecimal("2"));
-            schemeCOMPU_ERA.put(new BigDecimal("-1"), new BigDecimal("5"));
-            schemeCOMPU_ERA.put(new BigDecimal("-10"), new BigDecimal("10"));
             Trader trader = new StoneGuard(this, account.getAddress(),
                     BlockChain.GENERATING_MIN_BLOCK_TIME_MS,
                     2, 1, schemeCOMPU_ERA, limit2, limit2, true);

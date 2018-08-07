@@ -808,6 +808,7 @@ public abstract class Transaction {
 
         int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
         int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+
         return new Tuple2<Integer, Integer>(blockHeight, seqNo);
 
     }

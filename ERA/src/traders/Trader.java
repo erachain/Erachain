@@ -293,6 +293,8 @@ public abstract class Trader extends Thread {
 
     protected HashSet<String> makeCancelingArray(JSONArray array) {
 
+        DCSet fork = this.dcSet.fork();
+
         HashSet<String> cancelingArray = new HashSet();
         if (array == null || array.isEmpty())
             return cancelingArray;
@@ -302,11 +304,18 @@ public abstract class Trader extends Thread {
             Transaction transaction = dcSet.getTransactionMap().get(Base58.decode((String) transactionJSON.get("signature")));
             if (transaction == null)
                 continue;
-            transaction.setDC(dcSet, false);
+
+            // TEST in FORK
+            transaction.setDC(fork, false);
             if (transaction.isValid(null, 0l) != Transaction.VALIDATE_OK) {
+
+                // DELETE in DC SET
                 dcSet.getTransactionMap().delete(transaction.getSignature());
                 continue;
             }
+
+            transaction.process(null, false);
+
             if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
                 cancelingArray.add(transactionJSON.get("orderID").toString());
             }
