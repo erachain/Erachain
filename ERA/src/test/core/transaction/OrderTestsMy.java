@@ -170,6 +170,48 @@ public class OrderTestsMy {
     }
 
     @Test
+    public void crypto() {
+
+        byte[] seed = Crypto.getInstance().digest(Base58.decode("G5Krn3UJqmPRggw2H6oj4tr4Z5Nv3cv9nUy6ddDoqtwx"));
+        byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+        accountA = new PrivateKeyAccount(privateKey);
+
+        String addr1 = accountA.getAddress();
+        Account accShort = Account.makeAccountFromShort(accountA.getShortAddressBytes());
+        String addr2 = accShort.getAddress();
+
+        assertEquals(addr1, addr2);
+
+        MathContext rounding = new java.math.MathContext(8, RoundingMode.HALF_DOWN);
+
+        BigDecimal price01 = new BigDecimal("0.3");
+        BigDecimal price02 = BigDecimal.ONE.divide(price01, 10, RoundingMode.HALF_DOWN);
+        ;
+
+        BigDecimal big02 = new BigDecimal("1.8");
+        // thisAmountHaveLeft.divide(orderPrice, 8, RoundingMode.HALF_DOWN):
+        // thisAmountHaveLeft.multiply(orderReversePrice, rounding).setScale(8,
+        // RoundingMode.HALF_DOWN);
+
+        BigDecimal big03 = big02.divide(price01, 8, RoundingMode.HALF_DOWN);
+        BigDecimal big04 = big02.multiply(price02, rounding).setScale(8, RoundingMode.HALF_DOWN);
+
+        BigDecimal big1 = new BigDecimal("89.999999999999");
+        BigDecimal big2 = big1.setScale(8, RoundingMode.HALF_DOWN);
+        BigDecimal big3 = big2.scaleByPowerOfTen(5);
+        BigDecimal big4 = big3.subtract(big2);
+
+        BigDecimal big10 = new BigDecimal("89.9999999000");
+        int prec1 = big10.precision();
+        int prec1a = Order.precision(big10);
+        BigDecimal big11 = new BigDecimal("89000.00");
+        int prec2 = big11.precision();
+        int prec2a = Order.precision(big11);
+        ++prec2;
+
+    }
+
+    @Test
     public void tails() {
 
         byte[] seed = Crypto.getInstance().digest("test_A".getBytes());

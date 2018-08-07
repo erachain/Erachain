@@ -236,7 +236,7 @@ public class VouchRecordDialog extends JDialog {
         layout.rowHeights = new int[]{0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0, 9, 0};
         getContentPane().setLayout(layout);
 
-        jLabel_recordID.setText(Lang.getInstance().translate("BlocNo-RecNo or signature") + ":");
+        jLabel_recordID.setText(Lang.getInstance().translate("BlockNo-recNo or signature") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 14;
@@ -252,7 +252,7 @@ public class VouchRecordDialog extends JDialog {
 	        }
 	        */
         //  jTextField_recordID.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        jTextField_recordID.setToolTipText("BlockNo-recNo or signature");
+        jTextField_recordID.setToolTipText(Lang.getInstance().translate("BlockNo-recNo or signature"));
         //   jTextField_recordID.setMinimumSize(new java.awt.Dimension(300, 20));
         jTextField_recordID.setText(""); // NOI18N
         //    jTextField_recordID.setPreferredSize(new java.awt.Dimension(300, 20));

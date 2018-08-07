@@ -124,7 +124,7 @@ public class PayDividendFrame extends JFrame {
 
         //LABEL AMOUNT
         labelGBC.gridy = 3;
-        JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount to pay") + ":");
+        JLabel amountLabel = new JLabel(Lang.getInstance().translate("Amount to pay:"));
         this.add(amountLabel, labelGBC);
 
         //TXT AMOUNT
@@ -135,7 +135,7 @@ public class PayDividendFrame extends JFrame {
 
         //LABEL HOLDERS TO PAY
         labelGBC.gridy = 4;
-        JLabel holdersToPayLabel = new JLabel(Lang.getInstance().translate("Holders to pay (1-400)") + ":");
+        JLabel holdersToPayLabel = new JLabel(Lang.getInstance().translate("Holders to pay (1-400):"));
         this.add(holdersToPayLabel, labelGBC);
 
         //TXT QUANTITY
