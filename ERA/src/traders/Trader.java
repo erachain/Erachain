@@ -287,13 +287,7 @@ public abstract class Trader extends Thread {
             return null;
         }
 
-        if (jsonArray == null)
-            return null;
-
-        for (JSONObject item: jsonArray) {
-
-        }
-        return true;
+        return jsonArray;
 
     }
 
@@ -336,6 +330,9 @@ public abstract class Trader extends Thread {
             LOGGER.info(e);
         }
 
+        if (arrayUnconfirmed == null)
+            return;
+
         // GET CANCELS in UNCONFIRMEDs
         HashSet<String> cancelsIsUnconfirmed = makeCancelingArray(arrayUnconfirmed);
         BigDecimal amount;
@@ -367,18 +364,21 @@ public abstract class Trader extends Thread {
             }
         }
 
-        JSONArray =
         // CHECK MY SELL ORDERS in CAP
-        for (Order order: this.ordersMap.getOrdersForAddress(this.address, this.haveKey, this.wantKey)) {
+        for (Object item: this.getMyOrders(this.address, this.haveKey, this.wantKey)) {
 
-            orderID = Base58.encode(order.a.a);
+            JSONObject order = (JSONObject) item;
+            if (!order.containsKey("signature"))
+                continue;
+
+            orderID = (String) order.get("signature");
             if (cancelsIsUnconfirmed.contains(orderID))
                 continue;
 
             if (this.scheme.containsKey(orderID)) {
-                schemeOrdersRemove(order.b.b, orderID);
+                schemeOrdersRemove(new BigDecimal(order.get("amountHave").toString()), orderID);
             }
-            cancelOrder( orderID);
+            cancelOrder(orderID);
 
             try {
                 Thread.sleep(100);
@@ -389,15 +389,18 @@ public abstract class Trader extends Thread {
         }
 
         // CHECK MY BUY ORDERS in CAP
-        for (Fun.Tuple3<Fun.Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Fun.Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>
-                order: this.ordersMap.getOrdersForAddress(this.address, this.wantKey, this.haveKey)) {
+        for (Object item: this.getMyOrders(this.address, this.wantKey, this.haveKey)) {
 
-            orderID = Base58.encode(order.a.a);
+            JSONObject order = (JSONObject) item;
+            if (!order.containsKey("signature"))
+            continue;
+
+            orderID = (String) order.get("signature");
             if (cancelsIsUnconfirmed.contains(orderID))
                 continue;
 
-            if (this.scheme.containsKey(order.c.b.negate())) {
-                schemeOrdersRemove(order.c.b.negate(), orderID);
+            if (this.scheme.containsKey(orderID)) {
+                schemeOrdersRemove(new BigDecimal(order.get("amountWant").toString()).negate(), orderID);
             }
             cancelOrder(orderID);
 
@@ -481,12 +484,18 @@ public abstract class Trader extends Thread {
         // IF WALLET NOT ESXST - suspended
         while(!cnt.doesWalletDatabaseExists()) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(1000);
             } catch (Exception e) {
                 //FAILED TO SLEEP
             }
         }
 
+        // WAIT for making ACCOUNTS in WALLET (if wallet is new)
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            //FAILED TO SLEEP
+        }
         Account account = Controller.getInstance().wallet.getAccounts().get(1);
         if (!account.equals(this.account))
             return;
