@@ -81,7 +81,7 @@ public class StoneGuard extends Trader {
 
     private void shiftAll() {
 
-        LOGGER.info("shift ALL for " + this.haveAsset.viewName()
+        LOGGER.info(">>>>> shift ALL for " + this.haveAsset.viewName()
                 + "/" + this.wantAsset.viewName() + " to " + this.rate.toString());
 
         // REMOVE ALL ORDERS
@@ -129,7 +129,7 @@ public class StoneGuard extends Trader {
         } else {
             if (//!BlockChain.DEVELOP_USE &&
                     newRate.compareTo(this.rate) == 0)
-                return false;
+                return updateCap();
 
             BigDecimal diffPerc = newRate.divide(this.rate, 8, BigDecimal.ROUND_HALF_UP)
                     .subtract(BigDecimal.ONE).multiply(Trader.M100);
