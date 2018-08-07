@@ -161,7 +161,7 @@ public class TestRec_Send {
             r_Send.sign(maker, false);
             assertEquals(r_Send.isSignatureValid(db), true);
             r_Send.setDC(db, false);
-            r_Send.setBlock(gb);
+            r_Send.setBlock(this.gb, 1);
             assertEquals(r_Send.isValid(null, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(true, null);
@@ -189,7 +189,7 @@ public class TestRec_Send {
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, false);
-            r_Send_2.setBlock(gb);
+            r_Send_2.setBlock(gb, 1);
             assertEquals(r_Send_2.isValid(null, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);
@@ -363,7 +363,7 @@ public class TestRec_Send {
             r_Send.sign(maker, false);
             assertEquals(r_Send.isSignatureValid(db), true);
             r_Send.setDC(db, false);
-            r_Send.setBlock(gb);
+            r_Send.setBlock(gb, 1);
             assertEquals(r_Send.isValid(null, flags), Transaction.VALIDATE_OK);
             
             raw_r_Send = r_Send.toBytes(true, null);
@@ -391,7 +391,7 @@ public class TestRec_Send {
             //r_Send_2.sign(maker, false);
             assertEquals(r_Send_2.isSignatureValid(db), true);
             r_Send_2.setDC(db, false);
-            r_Send_2.setBlock(gb);
+            r_Send_2.setBlock(gb, 1);
             assertEquals(r_Send_2.isValid(null, flags), Transaction.VALIDATE_OK);
 
             assertEquals(Arrays.equals(r_Send.getSignature(), r_Send_2.getSignature()), true);

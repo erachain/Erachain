@@ -1241,11 +1241,11 @@ public class API {
         */
 
         JSONArray arraySell = new JSONArray();
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order: orders) {
+        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        for (Order order: orders) {
             JSONArray itemJson = new JSONArray();
-            itemJson.add(order.b.b.subtract(order.b.c));
-            itemJson.add(Order.calcPrice(order.b.b, order.c.b));
+            itemJson.add(order.getAmountHaveLeft());
+            itemJson.add(order.getPrice());
 
             arraySell.add(itemJson);
 
@@ -1253,10 +1253,10 @@ public class API {
 
         JSONArray arrayBuy = new JSONArray();
         orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, false);
-        for (Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order: orders) {
+        for (Order order: orders) {
             JSONArray itemJson = new JSONArray();
-            itemJson.add(order.b.b.subtract(order.b.c));
-            itemJson.add(Order.calcPrice(order.c.b, order.b.b)); // REVERSE
+            itemJson.add(order.getAmountHaveLeft());
+            itemJson.add(Order.calcPrice(order.getAmountWant(), order.getAmountHave())); // REVERSE
 
             arrayBuy.add(itemJson);
 

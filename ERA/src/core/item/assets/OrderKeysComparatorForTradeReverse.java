@@ -2,23 +2,19 @@ package core.item.assets;
 
 import datachain.DCSet;
 import datachain.OrderMap;
-import org.mapdb.BTreeMap;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Comparator;
-import java.util.Map;
 
 /**
  * Sorts Orders by price and TIMESTAMP for resolve exchange
  *
  * @author icreator
  */
-public class OrderKeysComparatorForTrade implements Comparator<Long> {
+public class OrderKeysComparatorForTradeReverse implements Comparator<Long> {
 
     @Override
     public int compare(Long orderKey1, Long orderKey2) {
@@ -30,9 +26,9 @@ public class OrderKeysComparatorForTrade implements Comparator<Long> {
 
         int compare = order1.getPrice().compareTo(order2.getPrice());
         if (compare != 0)
-            return compare;
+            return -compare;
 
-        return Long.signum(order1.getId() - order2.getId());
+        return -Long.signum(order1.getId() - order2.getId());
 
     }
 

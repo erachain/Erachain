@@ -1,6 +1,8 @@
 package api;
 
 import controller.Controller;
+import core.BlockChain;
+import core.block.Block;
 import core.crypto.Base58;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
@@ -84,7 +86,7 @@ public class WalletResource {
     @Path("/lock")
     public String lock() {
         String password = null;
-        APIUtils.askAPICallAllowed(password, "GET wallet/lock", request);
+        //APIUtils.askAPICallAllowed(password, "GET wallet/lock", request);
 
         //CHECK IF WALLET EXISTS
         if (!Controller.getInstance().doesWalletExists()) {

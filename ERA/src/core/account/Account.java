@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import core.item.assets.Order;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -208,13 +209,13 @@ public class Account {
     public static Map<String, BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
 
         OrderMap map = dcSet.getOrderMap();
-        Iterator<BigInteger> iterator = map.getIterator(0, true);
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+        Iterator<Long> iterator = map.getIterator(0, true);
+        Order order;
         while (iterator.hasNext()) {
             order = map.get(iterator.next());
-            if (order.b.a == key) {
-                String address = order.a.b;
-                values.put(address, values.get(address).add(order.b.b));
+            if (order.getHave() == key) {
+                String address = order.getCreator().getAddress();
+                values.put(address, values.get(address).add(order.getAmountHave()));
             }
         }
 

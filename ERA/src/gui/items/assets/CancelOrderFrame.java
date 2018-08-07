@@ -2,6 +2,7 @@ package gui.items.assets;
 
 import controller.Controller;
 import core.account.PrivateKeyAccount;
+import core.item.assets.Order;
 import core.transaction.Transaction;
 import gui.MainFrame;
 import gui.PasswordPane;
@@ -26,13 +27,11 @@ import java.util.List;
 
 @SuppressWarnings("serial")
 public class CancelOrderFrame extends JDialog {
-    private Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+    private Order order;
     private JTextField txtFeePow;
     private JButton cancelOrderButton;
 
-    public CancelOrderFrame(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public CancelOrderFrame(Order order) {
         //super(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
         setTitle(Lang.getInstance().translate("Erachain.org") + " - " + Lang.getInstance().translate("Cancel Order"));
         this.order = order;
@@ -89,7 +88,7 @@ public class CancelOrderFrame extends JDialog {
         //TXT TIMESTAMP
         txtGBC.gridy = 1;
 
-        JTextField txtTimestamp = new JTextField(DateTimeFormat.timestamptoString(order.a.c));
+        JTextField txtTimestamp = new JTextField(DateTimeFormat.timestamptoString(order.getId()));
         txtTimestamp.setEditable(false);
         this.add(txtTimestamp, txtGBC);
 
@@ -100,7 +99,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT HAVE
         txtGBC.gridy = 2;
-        JTextField txtHave = new JTextField(String.valueOf(order.b.a));
+        JTextField txtHave = new JTextField(String.valueOf(order.getHave()));
         txtHave.setEditable(false);
         this.add(txtHave, txtGBC);
 
@@ -111,7 +110,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT WANT
         txtGBC.gridy = 3;
-        JTextField txtWant = new JTextField(String.valueOf(order.c.a));
+        JTextField txtWant = new JTextField(String.valueOf(order.getWant()));
         txtWant.setEditable(false);
         this.add(txtWant, txtGBC);
 
@@ -122,7 +121,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT WANT
         txtGBC.gridy = 4;
-        JTextField txtAmount = new JTextField(order.b.b.toPlainString());
+        JTextField txtAmount = new JTextField(order.getAmountHave().toPlainString());
         txtAmount.setEditable(false);
         this.add(txtAmount, txtGBC);
 
@@ -133,7 +132,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT PRICE
         txtGBC.gridy = 5;
-        JTextField txtPrice = new JTextField(order.a.e.toPlainString());
+        JTextField txtPrice = new JTextField(order.getPrice().toPlainString());
         txtPrice.setEditable(false);
         this.add(txtPrice, txtGBC);
 
@@ -144,7 +143,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT FULFILLED
         txtGBC.gridy = 6;
-        JTextField txtFulfilled = new JTextField(order.b.c.toPlainString());
+        JTextField txtFulfilled = new JTextField(order.getFulfilledHave().toPlainString());
         txtFulfilled.setEditable(false);
         this.add(txtFulfilled, txtGBC);
 
@@ -221,8 +220,8 @@ public class CancelOrderFrame extends JDialog {
         }
 
         //CREATE NAME UPDATE
-        PrivateKeyAccount owner = Controller.getInstance().getPrivateKeyAccountByAddress(order.a.b);
-        Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(owner, order.a.a, feePow);
+        PrivateKeyAccount owner = Controller.getInstance().getPrivateKeyAccountByAddress(order.getCreator().getAddress());
+        Pair<Transaction, Integer> result = Controller.getInstance().cancelOrder(owner, order, feePow);
 
         //CHECK VALIDATE MESSAGE
         switch (result.getB()) {

@@ -77,8 +77,8 @@ public class Accounts_Right_Panel extends JPanel {
         t.setComparator(table_Model.COLUMN_TRANSACTION, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
-                 BigDecimal transaction1 = library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), o1));
-                 BigDecimal transaction2 = library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), o2));
+                 BigDecimal transaction1 = library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o1));
+                 BigDecimal transaction2 = library.getBlockSegToBigInteger(DCSet.getInstance().getTransactionFinalMap().getRecord(o2));
                return transaction1.compareTo(transaction2);
             }
           });
