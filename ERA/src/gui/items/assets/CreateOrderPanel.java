@@ -4,6 +4,7 @@ import controller.Controller;
 import core.account.Account;
 import core.account.PrivateKeyAccount;
 import core.item.assets.AssetCls;
+import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.Transaction;
 import gui.AccountRenderer;
@@ -40,6 +41,8 @@ public class CreateOrderPanel extends JPanel {
     private JTextField txtBuyingAmount;
     private JTextPane superHintText;
     private boolean SHOW_HINTS = false;
+    boolean needUpdatePrice = false;
+    boolean noUpdatePrice = false;
     
     public CreateOrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
         this.setLayout(new GridBagLayout());
@@ -227,17 +230,26 @@ public class CreateOrderPanel extends JPanel {
             txtPrice.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
                 public void changedUpdate(DocumentEvent e) {
-                    calculateBuyingAmount(txtBuyingAmount, buying);
+                    if (!noUpdatePrice) {
+                        needUpdatePrice = false;
+                        calculateBuyingAmount(txtBuyingAmount, buying);
+                    }
                 }
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
-                    calculateBuyingAmount(txtBuyingAmount, buying);
+                    if (!noUpdatePrice) {
+                        needUpdatePrice = false;
+                        calculateBuyingAmount(txtBuyingAmount, buying);
+                    }
                 }
 
                 @Override
                 public void insertUpdate(DocumentEvent e) {
-                    calculateBuyingAmount(txtBuyingAmount, buying);
+                    if (!noUpdatePrice) {
+                        needUpdatePrice = false;
+                        calculateBuyingAmount(txtBuyingAmount, buying);
+                    }
                 }
             });
         }
@@ -271,16 +283,19 @@ public class CreateOrderPanel extends JPanel {
         txtAmountHave.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
+                needUpdatePrice = true;
                 calculateBuyingAmount(txtBuyingAmount, buying);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
+                needUpdatePrice = true;
                 calculateBuyingAmount(txtBuyingAmount, buying);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
+                needUpdatePrice = true;
                 calculateBuyingAmount(txtBuyingAmount, buying);
             }
         });
@@ -380,6 +395,7 @@ public class CreateOrderPanel extends JPanel {
      */
 
     public void calculateBuyingAmount(JTextField target, boolean buying) {
+
         int i = 1;
         try {
 
@@ -387,13 +403,26 @@ public class CreateOrderPanel extends JPanel {
             i++;
             BigDecimal price = new BigDecimal(txtPrice.getText());
 
+            BigDecimal result;
+
             if (buying) {
-                target.setText(
-                        price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+                result = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
+                if (needUpdatePrice && txtAmountHave.getText().length() > 0) {
+                    noUpdatePrice = true;
+                    txtPrice.setText(Order.calcPrice(amount, result, 2).toPlainString());
+                    noUpdatePrice = false;
+                }
+
             } else {
-                target.setText(
-                        price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+                result = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
+                if (needUpdatePrice && txtAmountHave.getText().length() > 0) {
+                    noUpdatePrice = true;
+                    txtPrice.setText(Order.calcPrice(amount, result, 2).toPlainString());
+                    noUpdatePrice = false;
+                }
             }
+            target.setText(result.toPlainString());
+
             BigDecimal r = new BigDecimal(target.getText());
             if (r.signum() != 0)
                 sellButton.setEnabled(true);

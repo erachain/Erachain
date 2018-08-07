@@ -123,7 +123,7 @@ public class StoneGuardAbs extends Trader {
         } else {
             if (//!BlockChain.DEVELOP_USE &&
                     newRate.compareTo(this.rate) == 0)
-                return false;
+                return updateCap();
 
             // IN ABSOLUTE
             BigDecimal diffAbs = newRate.subtract(this.rate);
@@ -133,6 +133,8 @@ public class StoneGuardAbs extends Trader {
 
                 this.rate = newRate;
                 shiftAll();
+            } else {
+                return updateCap();
             }
         }
 

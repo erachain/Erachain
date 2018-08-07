@@ -141,7 +141,7 @@ public class SellOrdersTableModel extends
                 if (row == this.orders.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
-                BigDecimal price = order.getPrice();
+                BigDecimal price = Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 2);
                 return NumberAsString.formatAsString(price.stripTrailingZeros());
 
             case COLUMN_AMOUNT_WANT:

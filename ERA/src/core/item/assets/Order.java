@@ -55,7 +55,7 @@ public class Order implements Comparable<Order> {
 
         this.fulfilledHave = BigDecimal.ZERO.setScale(amountHave.scale());
 
-        this.price = calcPrice(amountHave, amountWant);
+        this.price = calcPrice(amountHave, amountWant, 1);
 
         //this.timestamp = timestamp;
     }
@@ -106,16 +106,20 @@ public class Order implements Comparable<Order> {
         return powerTen(value) + value.scale();
     }
 
-    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant) {
+    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int addScale) {
         int scalePrice = amountWant.scale();
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
         scalePrice = Order.powerTen(amountHave) + (scalePrice > 0 ? scalePrice : 0);
-        BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
+        BigDecimal result = amountWant.divide(amountHave, scalePrice + addScale, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
         if (result.scale() < 0)
             return result.setScale(0);
         return result;
+    }
+
+    public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant) {
+        return calcPrice(amountHave, amountWant, 0);
     }
 
     public static Order reloadOrder(DCSet dcSet, Long orderID) {

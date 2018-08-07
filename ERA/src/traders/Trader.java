@@ -502,6 +502,9 @@ public abstract class Trader extends Thread {
         return cleaned;
     }
 
+    public boolean updateCap() {
+        return true;
+    }
 
 
     protected abstract boolean process();
