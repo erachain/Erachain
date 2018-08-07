@@ -216,7 +216,7 @@ public abstract class Trader extends Thread {
             LOGGER.info(e);
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
-        if (!jsonObject.containsKey("ID")) {
+        if (!jsonObject.containsKey("id")) {
             return false;
         }
 
@@ -273,7 +273,7 @@ public abstract class Trader extends Thread {
 
         sendRequest = this.apiClient.executeCommand("GET trade/getbyaddress/" + address
                     + '/' + haveKey + '/' + wantKey);
-        LOGGER.info("GET by address: " + "\n" + sendRequest);
+        //LOGGER.info("GET by address: " + "\n" + sendRequest);
 
         JSONArray jsonArray = null;
         try {
@@ -308,7 +308,7 @@ public abstract class Trader extends Thread {
                 continue;
             }
             if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
-                cancelingArray.add((String) transactionJSON.get("orderID"));
+                cancelingArray.add(transactionJSON.get("orderID").toString());
             }
         }
 
@@ -338,6 +338,8 @@ public abstract class Trader extends Thread {
         BigDecimal amount;
         String orderID;
 
+        boolean updated = false;
+
         // CHECK MY ORDERs in UNCONFIRMED
         for (Object json: arrayUnconfirmed) {
 
@@ -353,7 +355,9 @@ public abstract class Trader extends Thread {
                     if (cancelsIsUnconfirmed.contains(orderID))
                         continue;
 
-                    cancelOrder(orderID);
+                    // CANCEL ORDER
+                    if(cancelOrder(orderID) && !updated)
+                        updated = true;
 
                     try {
                         Thread.sleep(100);
@@ -365,57 +369,69 @@ public abstract class Trader extends Thread {
         }
 
         // CHECK MY SELL ORDERS in CAP
-        for (Object item: this.getMyOrders(this.address, this.haveKey, this.wantKey)) {
+        JSONArray list =  this.getMyOrders(this.address, this.haveKey, this.wantKey);
+        if (list != null)
+            for (Object item: list) {
 
-            JSONObject order = (JSONObject) item;
-            if (!order.containsKey("signature"))
-                continue;
+                JSONObject order = (JSONObject) item;
+                if (!order.containsKey("signature"))
+                    continue;
 
-            orderID = (String) order.get("signature");
-            if (cancelsIsUnconfirmed.contains(orderID))
-                continue;
+                orderID = (String) order.get("signature");
+                if (cancelsIsUnconfirmed.contains(orderID))
+                    continue;
 
-            if (this.scheme.containsKey(orderID)) {
-                schemeOrdersRemove(new BigDecimal(order.get("amountHave").toString()), orderID);
+                if (this.scheme.containsKey(orderID)) {
+                    schemeOrdersRemove(new BigDecimal(order.get("amountHave").toString()), orderID);
+                }
+
+                // CANCEL ORDER
+                if(cancelOrder(orderID) && !updated)
+                    updated = true;
+
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    //FAILED TO SLEEP
+                }
+
             }
-            cancelOrder(orderID);
-
-            try {
-                Thread.sleep(100);
-            } catch (Exception e) {
-                //FAILED TO SLEEP
-            }
-
-        }
 
         // CHECK MY BUY ORDERS in CAP
-        for (Object item: this.getMyOrders(this.address, this.wantKey, this.haveKey)) {
+        list = this.getMyOrders(this.address, this.wantKey, this.haveKey);
+        if (list != null)
+            for (Object item: list) {
 
-            JSONObject order = (JSONObject) item;
-            if (!order.containsKey("signature"))
-            continue;
-
-            orderID = (String) order.get("signature");
-            if (cancelsIsUnconfirmed.contains(orderID))
+                JSONObject order = (JSONObject) item;
+                if (!order.containsKey("signature"))
                 continue;
 
-            if (this.scheme.containsKey(orderID)) {
-                schemeOrdersRemove(new BigDecimal(order.get("amountWant").toString()).negate(), orderID);
-            }
-            cancelOrder(orderID);
+                orderID = (String) order.get("signature");
+                if (cancelsIsUnconfirmed.contains(orderID))
+                    continue;
 
+                if (this.scheme.containsKey(orderID)) {
+                    schemeOrdersRemove(new BigDecimal(order.get("amountWant").toString()).negate(), orderID);
+                }
+
+                // CANCEL ORDER
+                if(cancelOrder(orderID) && !updated)
+                    updated = true;
+
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    //FAILED TO SLEEP
+                }
+
+            }
+
+        if (updated) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1);
             } catch (Exception e) {
                 //FAILED TO SLEEP
             }
-
-        }
-
-        try {
-            Thread.sleep(BlockChain.GENERATING_MIN_BLOCK_TIME_MS<<1);
-        } catch (Exception e) {
-            //FAILED TO SLEEP
         }
 
     }

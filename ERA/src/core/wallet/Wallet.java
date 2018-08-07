@@ -1593,16 +1593,9 @@ public class Wallet extends Observable implements Observer {
 	private void addOrder(CreateOrderTransaction orderCreation) {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
+
 			// ADD ORDER
-
-			// TODO : FULLFILL not work - нужно сделать запись заявок по записи
-			// заявок в основную базу а не по записи транзакций
-			Order orderNew;
-
-			orderNew = DCSet.getInstance().getOrderMap().get(orderCreation.getOrderId());
-			if (orderNew == null) {
-				orderNew = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getOrderId());
-			}
+			Order orderNew = orderCreation.makeOrder();
 			this.database.getOrderMap().add(orderNew);
 		}
 	}

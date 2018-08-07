@@ -235,6 +235,7 @@ public class TradeResource {
 
     }
 
+    @GET
     @Path("getbyaddress/{creator}/{haveKey}/{wantKey}")
     public String cancel(@PathParam("creator") String address,
                          @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey) {

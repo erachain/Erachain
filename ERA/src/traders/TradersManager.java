@@ -94,11 +94,13 @@ public class TradersManager extends Observable {
         }
 
         if (true) {
-            BigDecimal limit = new BigDecimal("0.5");
+            BigDecimal limit = new BigDecimal("0.3");
             //START TRADERs THREADs
             HashMap<BigDecimal, BigDecimal> schemeUSD_RUB = new HashMap<>();
             schemeUSD_RUB.put(new BigDecimal(30000), new BigDecimal("1.0"));
             schemeUSD_RUB.put(new BigDecimal(10000), new BigDecimal("0.7"));
+            schemeUSD_RUB.put(new BigDecimal(100), new BigDecimal("0.3"));
+            schemeUSD_RUB.put(new BigDecimal(-100), new BigDecimal("0.3"));
             schemeUSD_RUB.put(new BigDecimal(-10000), new BigDecimal("0.7"));
             schemeUSD_RUB.put(new BigDecimal(-30000), new BigDecimal("1.0"));
             Trader trader1 = new StoneGuardAbs(this, account.getAddress(),
