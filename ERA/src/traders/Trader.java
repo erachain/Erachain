@@ -21,6 +21,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.Assert;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -268,23 +269,28 @@ public abstract class Trader extends Thread {
 
     protected JSONArray getMyOrders(String address, long haveKey, long wantKey) {
 
-        String result;
+        String sendRequest;
 
-        result = this.apiClient.executeCommand("GET trade/getbyaddress/" + address
+        sendRequest = this.apiClient.executeCommand("GET trade/getbyaddress/" + address
                     + '/' + haveKey + '/' + wantKey);
-        LOGGER.info("GET by address: " + "\n" + result);
+        LOGGER.info("GET by address: " + "\n" + sendRequest);
 
-        JSONObject jsonObject = null;
+        JSONArray jsonArray = null;
         try {
             //READ JSON
-            jsonObject = (JSONObject) JSONValue.parse(result);
-        } catch (NullPointerException | ClassCastException e) {
+            JSONParser jsonParser = new JSONParser();
+            jsonArray = (JSONArray) jsonParser.parse(sendRequest);
+        } catch (NullPointerException | ClassCastException | ParseException e) {
             //JSON EXCEPTION
             LOGGER.info(e);
             //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+            return null;
         }
 
-        for (JSONObject item: (JSONArray) jsonObject ) {
+        if (jsonArray == null)
+            return null;
+
+        for (JSONObject item: jsonArray) {
 
         }
         return true;
