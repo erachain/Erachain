@@ -252,9 +252,11 @@ public abstract class DCMap<T, U> extends Observable {
                 // NOTIFY ADD
                 if (this.getObservableData().containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
                     this.setChanged();
-                    if (this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_AT_TX_TYPE)
-                            || this.getObservableData().get(DBMap.NOTIFY_ADD)
-                            .equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)) {
+                    if (
+                            this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                            || this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                            || this.getObservableData().get(DBMap.NOTIFY_ADD).equals(ObserverMessage.ADD_AT_TX_TYPE)
+                            ) {
                         this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_ADD),
                                 new Pair<T, U>(key, value)));
                     } else {
@@ -308,7 +310,11 @@ public abstract class DCMap<T, U> extends Observable {
             // NOTIFY REMOVE
             if (this.getObservableData().containsKey(DBMap.NOTIFY_REMOVE)) {
                 this.setChanged();
-                if (this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.REMOVE_AT_TX)) {
+                if (
+                        this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                        || this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                        || this.getObservableData().get(DBMap.NOTIFY_REMOVE).equals(ObserverMessage.REMOVE_AT_TX)
+                ) {
                     this.notifyObservers(new ObserverMessage(this.getObservableData().get(DBMap.NOTIFY_REMOVE),
                             new Pair<T, U>(key, value)));
                 } else {

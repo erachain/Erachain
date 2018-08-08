@@ -273,6 +273,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
                 Transaction record = (Transaction) message.getValue();
 
+                boolean found = this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
+
                 if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
                     if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                         gui.library.library.notifySysTrayRecord(record);
@@ -303,9 +306,6 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                     }
                 }
                 this.fireTableDataChanged();
-                if (false)
-                    this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
-                            new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
             }
     }
 

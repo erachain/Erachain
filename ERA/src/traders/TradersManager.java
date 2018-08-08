@@ -35,6 +35,9 @@ public class TradersManager extends Observable {
 
     private void start() {
 
+        if (true)
+            return;
+
         Controller cnt = Controller.getInstance();
 
         try {
