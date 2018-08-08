@@ -1598,7 +1598,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getOrderMap().add(orderNew);
 
 			// TRADES for TARGETs
-			trades
+			//trades
 		}
 	}
 

@@ -22,6 +22,7 @@ public class Gui extends JFrame {
     //private static final long serialVersionUID = 1L;
     private static final long serialVersionUID = 2717571093561259483L;
 
+    public static final long PERIOD_UPDATE = 30000; // in MS
 
     private static Gui maingui;
     private MainFrame mainframe;
