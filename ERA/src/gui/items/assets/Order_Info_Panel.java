@@ -19,13 +19,11 @@ public class Order_Info_Panel extends JPanel {
     public GridBagConstraints labelGBC = new GridBagConstraints();
     public GridBagConstraints detailGBC = new GridBagConstraints();
 
-    public Order_Info_Panel(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderREC) {
+    public Order_Info_Panel(Order order) {
 
         // LAYOUT
         this.setLayout(new GridBagLayout());
 
-        Order order = Order.fromDBrec(orderREC);
         order.setDC(DCSet.getInstance());
 
         // LABEL GBC

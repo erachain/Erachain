@@ -492,13 +492,13 @@ public class TransactionTests3AssetsAsPack {
         init();
 
         //CREATE ORDER CANCEL
-        Transaction cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, releaserReference);
+        Transaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[10], FEE_POWER, timestamp, releaserReference);
         cancelOrderTransaction.sign(maker, asPack);
         //CHECK IF ORDER CANCEL IS VALID
         assertEquals(true, cancelOrderTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, releaserReference, new byte[1]);
+        cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[10], FEE_POWER, timestamp, releaserReference, new byte[1]);
 
         //CHECK IF ORDER CANCEL
         assertEquals(false, cancelOrderTransaction.isSignatureValid(db));
@@ -529,7 +529,7 @@ public class TransactionTests3AssetsAsPack {
         //LOGGER.info("CreateOrderTransaction.creator.getBalance(1, db): " + account.getBalance(1, dcSet));
 
         //CREATE CANCEL ORDER
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5, 6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
         //CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(account, new BigInteger(new byte[]{5,6}), FEE_POWER, System.currentTimeMillis(), account.getLastReference(dcSet));
         //cancelOrderTransaction.sign(account);
         //CHECK IF CANCEL ORDER IS VALID
@@ -537,7 +537,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(releaserReference, flags));
 
         //CREATE INVALID CANCEL ORDER ORDER DOES NOT EXIST
-        cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5, 7}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
+        cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 7}, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
 
         //CHECK IF CANCEL ORDER IS INVALID
         assertEquals(Transaction.ORDER_DOES_NOT_EXIST, cancelOrderTransaction.isValid(releaserReference, flags));
@@ -546,21 +546,21 @@ public class TransactionTests3AssetsAsPack {
         seed = Crypto.getInstance().digest("invalid".getBytes());
         privateKey = Crypto.getInstance().createKeyPair(seed).getA();
         PrivateKeyAccount invalidCreator = new PrivateKeyAccount(privateKey);
-        cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, new BigInteger(new byte[]{5, 6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
+        cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
 
         //CHECK IF CANCEL ORDER IS INVALID
         assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(releaserReference, flags));
 
         //CREATE INVALID CANCEL ORDER NO BALANCE
         DCSet fork = db.fork();
-        cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5, 6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
+        cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
         maker.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false);
 
         //CHECK IF CANCEL ORDER IS INVALID
         assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(releaserReference, flags));
 
         //CREATE CANCEL ORDER INVALID REFERENCE
-        cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5, 6}), FEE_POWER, System.currentTimeMillis(), -123L, new byte[]{1, 2});
+        cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), -123L, new byte[]{1, 2});
 
         //CHECK IF NAME REGISTRATION IS INVALID
         assertEquals(Transaction.INVALID_REFERENCE, cancelOrderTransaction.isValid(releaserReference, flags));
@@ -576,7 +576,7 @@ public class TransactionTests3AssetsAsPack {
         init();
 
         //CREATE CANCEL ORDER
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, BigInteger.TEN, FEE_POWER, timestamp, releaserReference);
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[11], FEE_POWER, timestamp, releaserReference);
         cancelOrderTransaction.sign(maker, asPack);
 
         //CONVERT TO BYTES
@@ -652,7 +652,7 @@ public class TransactionTests3AssetsAsPack {
         createOrderTransaction.process(gb, asPack);
 
         //CREATE CANCEL ORDER
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5, 6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
         cancelOrderTransaction.setDC(db,false);
         cancelOrderTransaction.sign(maker, asPack);
         cancelOrderTransaction.process(gb, asPack);
@@ -664,7 +664,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(cancelOrderTransaction.getSignature(), releaserReference);
 
         //CHECK ORDER EXISTS
-        assertEquals(false, db.getOrderMap().contains(new BigInteger(new byte[]{5, 6})));
+        assertEquals(false, db.getOrderMap().contains(12L));
     }
 
     @Ignore
@@ -696,7 +696,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(BigDecimal.valueOf(49000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
 
         //CREATE CANCEL ORDER
-        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new BigInteger(new byte[]{5, 6}), FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), releaserReference, new byte[]{1, 2});
         cancelOrderTransaction.sign(maker, asPack);
         cancelOrderTransaction.process(gb, asPack);
         //CHECK BALANCE SENDER
@@ -710,7 +710,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(createOrderTransaction.getSignature(), releaserReference);
 
         //CHECK ORDER EXISTS
-        assertEquals(true, db.getOrderMap().contains(new BigInteger(new byte[]{5, 6})));
+        assertEquals(true, db.getOrderMap().contains(12L));
     }
     @Ignore
     @Test

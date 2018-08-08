@@ -81,7 +81,7 @@ public class BlockChain {
     public static final int ORDER_FEE_DOWN = DEVELOP_USE ? 80000 : 140000;
     public static final int SEND_AMOUNT_FEE_UP = DEVELOP_USE ? 100000 : 150000;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : DEVELOP_USE ? 153333 : 150000;
-    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 0 : 162532;
+    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 185376 : 152532;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
@@ -95,14 +95,10 @@ public class BlockChain {
         //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
         
         // CANCEL ORDERS - wrong after fix exchange
-        Base58.decode("57vyEGwMH2eya5Czk7GSjG4hjJ2ABH165igGHU6BcnwSsu93ypL59Xj35MY5K5Cevy72Qp2dhNRzsJMqVeysjrvq"), // 8350
-        Base58.decode("54CvZ8MrXe8AKCWBPQewVggczBG9URvYrTSS538xLF8rYo8q2yMWtQKd2CBFTpEZzVSyzdisoZGA9nRcVVhf4Z8V"), // 65431
-        Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"), // 86549
-        Base58.decode("5iU3zefyZnWKpv2wd7E8m2hUCmLWASLM96SEfujAfvTKKDm4TA8n1HYFF5YWZkuk1k6vHVNLLv3XCG2MWrT7oHd9"), // 136754
-        
-        //Base58.decode("2XXmMPUD85h1m93N1Zks9gzs4jsQYB6qk9iQoK5UEgdi7ESXceTX3TZnQX6rieCE3uoTZ53KNfu3o38YYsxJsDzq"),
-        //Base58.decode("2WrgVBhG244Pb1BMgQrt6K4AXbeLWNbBwknV4ghNxQefd3wvFoZcQmo3sU4ZMrpTNKJA9f9XPu3FzpmwEXDxzpCH"),
-                    
+        Base58.decode("57vyEGwMH2eya5Czk7GSjG4hjJ2ABH165igGHU6BcnwSsu93ypL59Xj35MY5K5Cevy72Qp2dhNRzsJMqVeysjrvq"), // Cancel Order 8350-1
+        Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"), // Cancel Order 86549-2
+
+
     };
 
     /*

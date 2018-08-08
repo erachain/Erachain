@@ -26,38 +26,77 @@ import datachain.DCSet;
 
 public class CancelOrderTransaction extends Transaction {
     public static final byte[][] VALID_REC = new byte[][]{
-        Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
-        Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
+        //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
+        //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
     };
     // TODO - reference to ORDER - by recNor INT+INT - not 64xBYTE[] !!!
     private static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;
     private static final String NAME_ID = "Cancel Order";
     private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
-    private BigInteger orderID;
+    private byte[] orderSignature;
+    private Long orderID;
 
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
-        this.orderID = order;
+        this.orderSignature = orderSignature;
     }
 
-    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
+    public CancelOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, byte[] order, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, order, feePow, timestamp, reference);
         this.signature = signature;
         //this.calcFee();
     }
 
-    public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference, byte[] signature) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference, signature);
+    public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference, byte[] signature) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderSignature, feePow, timestamp, reference, signature);
     }
 
-    public CancelOrderTransaction(PublicKeyAccount creator, BigInteger order, byte feePow, long timestamp, Long reference) {
-        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, order, feePow, timestamp, reference);
+    public CancelOrderTransaction(PublicKeyAccount creator, byte[] orderSignature, byte feePow, long timestamp, Long reference) {
+        this(new byte[]{TYPE_ID, 0, 0, 0}, creator, orderSignature, feePow, timestamp, reference);
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "OLD: Cancel Order"; }
+
+    public void setDC(DCSet dcSet, boolean asPack) {
+
+        super.setDC(dcSet, asPack);
+
+        Tuple2<Integer, Integer> createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
+        Transaction createOrder;
+        if (createDBRef == null) {
+            createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
+            if (createOrder != null)
+                createDBRef = new Tuple2<Integer, Integer>(createOrder.getBlockHeightByParentOrLast(dcSet), 1);
+        }
+
+        if (createDBRef != null)
+            this.orderID = Transaction.makeDBRef(createDBRef);
+
+    }
+
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+        //public static String getName() { return "OLD: Cancel Order"; }
+
+
+    public byte[] getorderSignature() {
+        return this.orderSignature;
+    }
+
+    public Long getOrderID() {
+        return this.orderID;
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        return false;
+    }
+
+    //PARSE CONVERT
 
     public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
         boolean asPack = releaserReference != null;
@@ -108,56 +147,26 @@ public class CancelOrderTransaction extends Transaction {
         position += SIGNATURE_LENGTH;
 
         //READ ORDER
-        byte[] orderBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-        BigInteger order = new BigInteger(orderBytes);
+        byte[] orderSignature = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
         position += ORDER_LENGTH;
 
-        return new CancelOrderTransaction(typeBytes, creator, order, feePow, timestamp, reference, signatureBytes);
+        return new CancelOrderTransaction(typeBytes, creator, orderSignature, feePow, timestamp, reference, signatureBytes);
     }
 
-    public static void process_it(DCSet db, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
-        if (false & !db.isFork() &&
-                (order.b.a == 1027l && order.c.a == 2l
-                        || order.c.a == 2l && order.c.a == 1027l)) {
-            int ii = 123;
-            ii++;
-        }
-        //SET ORPHAN DATA
-        db.getCompletedOrderMap().add(order);
-
-        //UPDATE BALANCE OF CREATOR
-        Account creator = new Account(order.a.b);
-        //creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).add(orderID.getAmountHaveLeft()), db);
-        creator.changeBalance(db, false, order.b.a, order.b.b.subtract(order.b.c), false);
-
-        //DELETE FROM DATABASE
-        db.getOrderMap().delete(order.a.a);
-    }
-
-    //PARSE CONVERT
-
-    public static void orphan_it(DCSet db, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
-        db.getOrderMap().add(order);
-
-        //REMOVE BALANCE OF CREATOR
-        Account creator = new Account(order.a.b);
-        //creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).subtract(orderID.getAmountHaveLeft()), db);
-        creator.changeBalance(db, true, order.b.a, order.b.b.subtract(order.b.c), false);
-
-        //DELETE ORPHAN DATA
-        db.getCompletedOrderMap().delete(order.a.a);
-    }
-
-    public BigInteger getOrderID() {
-        return this.orderID;
-    }
-
+    //@Override
     @Override
-    public boolean hasPublicText() {
-        return false;
+    public byte[] toBytes(boolean withSign, Long releaserReference) {
+        byte[] data = super.toBytes(withSign, releaserReference);
+
+        //WRITE ORDER
+        //byte[] orderBytes = this.orderSignature;
+        //byte[] fill = new byte[ORDER_LENGTH - orderBytes.length];
+        //orderBytes = Bytes.concat(fill, orderBytes);
+        data = Bytes.concat(data, this.orderSignature);
+
+        return data;
     }
+
 
     @SuppressWarnings("unchecked")
     @Override
@@ -167,32 +176,12 @@ public class CancelOrderTransaction extends Transaction {
 
         //ADD CREATOR/ORDER
         transaction.put("creator", this.creator.getAddress());
-        transaction.put("orderID", Base58.encode(this.orderID, ORDER_LENGTH));
+        transaction.put("orderID", this.orderID);
 
         return transaction;
     }
 
     //VALIDATE
-
-    //@Override
-    @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
-        byte[] data = super.toBytes(withSign, releaserReference);
-
-        //WRITE ORDER
-        byte[] orderBytes = Order.bigIntToSignature(this.orderID);
-        data = Bytes.concat(data, orderBytes);
-
-        return data;
-    }
-
-    //PROCESS/ORPHAN
-
-    @Override
-    public int getDataLength(boolean asPack) {
-        return BASE_LENGTH;
-    }
-
     //@Override
     @Override
     public int isValid(Long releaserReference, long flags) {
@@ -204,21 +193,59 @@ public class CancelOrderTransaction extends Transaction {
         }
 
         //CHECK IF ORDER EXISTS
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
+        //if (!this.dcSet.getTransactionFinalMapSigns().contains(this.orderSignature)) {
+        //        return ORDER_DOES_NOT_EXIST;
+        //}
+
+        ///Tuple2<Integer, Integer> transactionRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
+        ///this.orderID = Transaction.makeDBRef(transactionIndex);
+        Order order = null;
         if (this.dcSet.getOrderMap().contains(this.orderID))
             order = this.dcSet.getOrderMap().get(this.orderID);
 
-        if (order == null)
-            return ORDER_DOES_NOT_EXIST;
-
-        ///
-        //CHECK IF CREATOR IS CREATOR
-        if (!order.a.b.equals(this.creator.getAddress())) {
-            return INVALID_ORDER_CREATOR;
+        if (order == null) {
+            if (!(
+                    BlockChain.DEVELOP_USE
+                            && this.orderID < 186400l * 2l * (long) Integer.MAX_VALUE
+            )) {
+                return ORDER_DOES_NOT_EXIST;
+            }
+        } else {
+            if (!order.getCreator().equals(this.creator.getAddress())) {
+                return INVALID_ORDER_CREATOR;
+            }
         }
 
+
+        //CHECK IF CREATOR IS CREATOR
+
         return super.isValid(releaserReference, flags);
+    }
+
+
+    //PROCESS/ORPHAN
+
+    @Override
+    public int getDataLength(boolean asPack) {
+        return BASE_LENGTH;
+    }
+
+    public static void process_it(DCSet db, Order order) {
+        if (false & !db.isFork() &&
+                (order.getHave() == 1027l && order.getWant() == 2l
+                        || order.getWant() == 2l && order.getHave() == 1027l)) {
+            int ii = 123;
+            ii++;
+        }
+        //SET ORPHAN DATA
+        db.getCompletedOrderMap().add(order);
+
+        //UPDATE BALANCE OF CREATOR
+        //creator.setBalance(orderSignature.getHave(), creator.getBalance(db, orderSignature.getHave()).add(orderSignature.getAmountHaveLeft()), db);
+        order.getCreator().changeBalance(db, false, order.getHave(), order.getAmountHaveLeft(), false);
+
+        //DELETE FROM DATABASE
+        db.getOrderMap().delete(order.getId());
     }
 
     //@Override
@@ -227,20 +254,49 @@ public class CancelOrderTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, asPack);
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getOrderMap().get(this.orderID);
+        // TODO - CANCEL для транзакции в том же блоке???
+        //Transaction createOrder = this.dcSet.getTransactionFinalMap().getTransaction(this.orderSignature);
+        //Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
+        //this.orderID = Transaction.makeDBRef(dbRefTuple2);
+
+        Order order = this.dcSet.getOrderMap().get(this.orderID);
+
+        if (order == null && BlockChain.DEVELOP_USE
+                && this.orderID < 186400l * 2l * (long)Integer.MAX_VALUE) {
+            return;
+        }
+
         process_it(this.dcSet, order);
+    }
+
+    public static void orphan_it(DCSet db, Order order) {
+        db.getOrderMap().add(order);
+
+        //REMOVE BALANCE OF CREATOR
+        //creator.setBalance(orderID.getHave(), creator.getBalance(db, orderID.getHave()).subtract(orderID.getAmountHaveLeft()), db);
+        order.getCreator().changeBalance(db, true, order.getHave(), order.getAmountHaveLeft(), false);
+
+        //DELETE ORPHAN DATA
+        db.getCompletedOrderMap().delete(order.getId());
     }
 
     //@Override
     @Override
     public void orphan(boolean asPack) {
-        //UPDATE CREATOR
+
+        // FIRST GET DB REF from FINAL
+
+        // ORPHAN
         super.orphan(asPack);
 
-        //ADD TO DATABASE
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.dcSet.getCompletedOrderMap().get(this.orderID);
+        //REMOVE ORDER DATABASE
+        Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
+
+        if (order == null && BlockChain.DEVELOP_USE
+            && this.orderID < 186400l * 2l * (long)Integer.MAX_VALUE) {
+           return;
+        }
+
         orphan_it(this.dcSet, order);
     }
 
@@ -286,10 +342,10 @@ public class CancelOrderTransaction extends Transaction {
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
 
+
         assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order;
+        Order order;
 
         if (this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
             order = this.dcSet.getCompletedOrderMap().get(this.orderID);
@@ -297,7 +353,7 @@ public class CancelOrderTransaction extends Transaction {
             order = this.dcSet.getOrderMap().get(this.orderID);
         }
 
-        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.b.a, order.b.c);
+        assetAmount = addAssetAmount(assetAmount, this.creator.getAddress(), order.getHave(), order.getAmountHave());
 
         return assetAmount;
     }

@@ -4,75 +4,80 @@ package core.item.assets;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
+import controller.Controller;
+import core.BlockChain;
+import core.transaction.Transaction;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
-import core.crypto.Crypto;
 import datachain.DCSet;
 
 public class Trade {
 
-    private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
-    private static final int AMOUNT_LENGTH = 12;
-    private static final int TIMESTAMP_LENGTH = 8;
-    private static final int BASE_LENGTH = ORDER_LENGTH + ORDER_LENGTH + 2 * AMOUNT_LENGTH + TIMESTAMP_LENGTH;
+    private static final int ORDER_LENGTH = Order.ID_LENGTH;
+    private static final int ASSET_KEY_LENGTH = Transaction.KEY_LENGTH;
+    private static final int AMOUNT_LENGTH = Order.FULFILLED_LENGTH;
+    private static final int SEQUENCE_LENGTH = 4;
+    private static final int SCALE_LENGTH = 1;
+    private static final int BASE_LENGTH = 2 * ORDER_LENGTH + 2 * ASSET_KEY_LENGTH
+            + 2 * SCALE_LENGTH + 2 * AMOUNT_LENGTH + SEQUENCE_LENGTH;
 
-    private BigInteger initiator;
-    private BigInteger target;
+    private Long initiator;
+    private Long target;
+    private Long haveKey;
+    private Long wantKey;
     private BigDecimal amountHave;
     private BigDecimal amountWant;
-    private long timestamp;
+    private int sequence;
 
     // make trading if two orders is seeked
-    public Trade(BigInteger initiator, BigInteger target, BigDecimal amountHave, BigDecimal amountWant, long timestamp) {
+    public Trade(Long initiator, Long target, Long haveKey, Long wantKey, BigDecimal amountHave, BigDecimal amountWant, int sequence) {
         this.initiator = initiator;
         this.target = target;
+        this.haveKey = haveKey;
+        this.wantKey = wantKey;
         this.amountHave = amountHave;
         this.amountWant = amountWant;
-        this.timestamp = timestamp;
-    }
-
-    //PARSE/CONVERT
-    public static Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> toDBrec(Trade trade) {
-        return new Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>(
-                trade.initiator, trade.target, trade.amountHave, trade.amountWant, trade.timestamp);
-
-    }
-
-    public static Trade fromDBrec(Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> trade) {
-        return new Trade(trade.a, trade.b, trade.c, trade.d, trade.e);
+        this.sequence = sequence;
     }
 
     public static List<Trade> getTradeByTimestmp(DCSet dcSet, long have, long want, long timestamp) {
-        List<Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long>> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
+        List<Trade> list = dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp);
 
         List<Trade> trades = new ArrayList<Trade>();
-        for (Tuple5<BigInteger, BigInteger, BigDecimal, BigDecimal, Long> item : list) {
-            trades.add(Trade.fromDBrec(item));
+        for (Trade item : list) {
+            trades.add(item);
         }
 
         return trades;
     }
 
-    public BigInteger getInitiator() {
+    public Long getInitiator() {
         return this.initiator;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getInitiatorOrder(DCSet db) {
+    public Order getInitiatorOrder(DCSet db) {
         return Order.getOrder(db, this.initiator);
     }
 
-    public BigInteger getTarget() {
+    public Long getTarget() {
         return this.target;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getTargetOrder(DCSet db) {
+    public Order getTargetOrder(DCSet db) {
         return Order.getOrder(db, this.target);
+    }
+
+    public Long getHaveKey() {
+        return this.haveKey;
+    }
+    public Long getWantKey() {
+        return this.wantKey;
     }
 
     public BigDecimal getAmountHave() {
@@ -83,15 +88,30 @@ public class Trade {
         return this.amountWant;
     }
 
-    public long getTimestamp() {
-        return this.timestamp;
+    public BigDecimal calcPrice() {
+        return Order.calcPrice(this.amountHave, this.amountWant);
+    }
+    public BigDecimal calcPriceRevers() {
+        return Order.calcPrice(this.amountWant, this.amountHave);
     }
 
-	/*
-	public static Trade parse(byte[] data) throws Exception
+    public int getSequence() {
+        return this.sequence;
+    }
+
+    public Long getTimestamp() {
+        Tuple2<Integer, Integer> key = Transaction.parseDBRef(this.initiator);
+        BlockChain blockChain = Controller.getInstance().getBlockChain();
+        Long timestamp = blockChain.getTimestamp(key.a) + key.b * 0; // for add SEQUENCE in asset.Trade
+        return timestamp; // + this.sequence;
+    }
+
+
+    //PARSE/CONVERT
+    public static Trade parse(byte[] data) throws Exception
 	{
 		//CHECK IF CORRECT LENGTH
-		if(data.length < BASE_LENGTH)
+		if(data.length != BASE_LENGTH)
 		{
 			throw new Exception("Data does not match trade length");
 		}
@@ -100,81 +120,112 @@ public class Trade {
 
 		//READ INITIATOR
 		byte[] initiatorBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		BigInteger initiator = new BigInteger(initiatorBytes);
+		Long initiator = Longs.fromByteArray(initiatorBytes);
 		position += ORDER_LENGTH;
 
 		//READ TARGET
 		byte[] targetBytes = Arrays.copyOfRange(data, position, position + ORDER_LENGTH);
-		BigInteger target = new BigInteger(targetBytes);
+		Long target = Longs.fromByteArray(targetBytes);
 		position += ORDER_LENGTH;
 
-		//READ AMOUNT HAVE
-		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-		position += AMOUNT_LENGTH;
+        //READ HAVE
+        byte[] haveBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
+        Long haveKey = Longs.fromByteArray(haveBytes);
+        position += ASSET_KEY_LENGTH;
 
-		//READ AMOUNT WANT
-		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), BlockChain.AMOUNT_DEDAULT_SCALE);
-		position += AMOUNT_LENGTH;
+        //READ WANT
+        byte[] wantBytes = Arrays.copyOfRange(data, position, position + ASSET_KEY_LENGTH);
+        Long wantKey = Longs.fromByteArray(wantBytes);
+        position += ASSET_KEY_LENGTH;
 
-		//READ TIMESTAMP
-		byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-		long timestamp = Longs.fromByteArray(timestampBytes);
-		position += TIMESTAMP_LENGTH;
+        //READ HAVE SCALE
+        byte scaleHave = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
 
-		return new Trade(initiator, target, amountHave, amountWant, timestamp);
+        //READ AMOUNT HAVE
+        byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), scaleHave);
+        position += AMOUNT_LENGTH;
+
+        //READ HAVE SCALE
+        byte scaleWant = Arrays.copyOfRange(data, position, position + 1)[0];
+        position ++;
+
+        //READ AMOUNT WANT
+        byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
+        position += AMOUNT_LENGTH;
+
+        //READ SEQUENCE
+        byte[] sequenceBytes = Arrays.copyOfRange(data, position, position + SEQUENCE_LENGTH);
+        int sequence = Ints.fromByteArray(sequenceBytes);
+
+        return new Trade(initiator, target, haveKey, wantKey, amountHave, amountWant, sequence);
 	}
 
 	public byte[] toBytes()
 	{
-		byte[] data = new byte[0];
+        byte[] data = new byte[0];
 
 		//WRITE INITIATOR
-		byte[] initiatorBytes = this.initiator.toByteArray();
-		byte[] fill = new byte[ORDER_LENGTH - initiatorBytes.length];
-		initiatorBytes = Bytes.concat(fill, initiatorBytes);
+        byte[] initiatorBytes = Longs.toByteArray(this.initiator);
 		data = Bytes.concat(data, initiatorBytes);
 
 		//WRITE TARGET
-		byte[] targetBytes = this.target.toByteArray();
-		fill = new byte[ORDER_LENGTH - targetBytes.length];
-		targetBytes = Bytes.concat(fill, targetBytes);
+        byte[] targetBytes = Longs.toByteArray(this.target);
 		data = Bytes.concat(data, targetBytes);
 
+        //WRITE HAVE KEY
+        byte[] haveKeyBytes = Longs.toByteArray(this.haveKey);
+        data = Bytes.concat(data, haveKeyBytes);
+
+        //WRITE HAVE KEY
+        byte[] wantKeyBytes = Longs.toByteArray(this.wantKey);
+        data = Bytes.concat(data, wantKeyBytes);
+
+        byte[] fill;
+
+        //WRITE AMOUNT HAVE SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.amountHave.scale()});
+
 		//WRITE AMOUNT HAVE
-		byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
+        byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
 		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
 		data = Bytes.concat(data, amountHaveBytes);
 
+        //WRITE AMOUNT WANT SCALE
+        data = Bytes.concat(data, new byte[]{(byte)this.amountWant.scale()});
+
 		//WRITE AMOUNT WANT
-		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
+        byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
 		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
 		amountWantBytes = Bytes.concat(fill, amountWantBytes);
 		data = Bytes.concat(data, amountWantBytes);
 
-		//WRITE TIMESTAMP
-		byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-		data = Bytes.concat(data, timestampBytes);
+        //WRITE SEQUENCE
+        byte[] sequenceBytes = Ints.toByteArray(this.sequence);
+        data = Bytes.concat(data, sequenceBytes);
 
-		return data;
+        return data;
 	}
 
 	public int getDataLength()
 	{
 		return BASE_LENGTH;
 	}
-	 */
 
     //PROCESS/ORPHAN
 
-    public void process(DCSet db) {
-        Order initiator = Order.fromDBrec(this.getInitiatorOrder(db));
-        Order target = Order.fromDBrec(this.getTargetOrder(db));
+    public void process_old(DCSet db) {
+        Order initiator = this.getInitiatorOrder(db);
+        Order target = this.getTargetOrder(db);
 
         //ADD TRADE TO DATABASE
-        db.getTradeMap().add(toDBrec(this));
+        db.getTradeMap().add(this);
+        if (!db.getTradeMap().contains(new Tuple2<Long, Long>(this.initiator, this.target))) {
+            int error = 0;
+        }
 
         //UPDATE FULFILLED HAVE
         initiator.setFulfilledHave(initiator.getFulfilledHave().add(this.amountWant));
@@ -187,10 +238,10 @@ public class Trade {
 
             //ADD TO COMPLETED ORDERS
             //initiator.setFulfilledWant(initiator.getAmountWant());
-            db.getCompletedOrderMap().add(Order.toDBrec(initiator));
+            db.getCompletedOrderMap().add(initiator);
         } else {
             //UPDATE ORDER
-            db.getOrderMap().add(Order.toDBrec(initiator));
+            db.getOrderMap().add(initiator);
         }
 
         if (target.isFulfilled()) {
@@ -199,11 +250,11 @@ public class Trade {
 
             //ADD TO COMPLETED ORDERS
             //target.setFulfilledWant(target.getAmountWant());
-            db.getCompletedOrderMap().add(Order.toDBrec(target));
+            db.getCompletedOrderMap().add(target);
         } else {
             //UPDATE ORDER
             //target.setFulfilledWant(target.getFulfilledWant().add(amountWant));
-            db.getOrderMap().add(Order.toDBrec(target));
+            db.getOrderMap().add(target);
         }
 
         //TRANSFER FUNDS
@@ -213,9 +264,9 @@ public class Trade {
         target.getCreator().changeBalance(db, false, target.getWant(), this.amountWant, false);
     }
 
-    public void orphan(DCSet db) {
-        Order initiator = Order.fromDBrec(this.getInitiatorOrder(db));
-        Order target = Order.fromDBrec(this.getTargetOrder(db));
+    public void orphan_old(DCSet db) {
+        Order initiator = this.getInitiatorOrder(db);
+        Order target = this.getTargetOrder(db);
 
         //REVERSE FUNDS
         //initiator.getCreator().setBalance(initiator.getWant(), initiator.getCreator().getBalance(db, initiator.getWant()).subtract(this.amountHave), db);
@@ -238,8 +289,8 @@ public class Trade {
         target.setFulfilledHave(target.getFulfilledHave().subtract(this.amountHave));
 
         //UPDATE ORDERS
-        db.getOrderMap().add(Order.toDBrec(initiator));
-        db.getOrderMap().add(Order.toDBrec(target));
+        db.getOrderMap().add(initiator);
+        db.getOrderMap().add(target);
 
         //REMOVE FROM DATABASE
         db.getTradeMap().delete(this);

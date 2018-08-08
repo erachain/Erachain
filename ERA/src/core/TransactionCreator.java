@@ -78,6 +78,7 @@ import utils.TransactionTimestampComparator;
 public class TransactionCreator {
     private DCSet fork;
     private Block lastBlock;
+    private int seqNo;
 
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
@@ -103,6 +104,7 @@ public class TransactionCreator {
 
         //UPDATE LAST BLOCK
         this.lastBlock = Controller.getInstance().getLastBlock();
+        this.seqNo = 0; // reset sequence number
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
@@ -129,7 +131,7 @@ public class TransactionCreator {
                 //THE TRANSACTION BECAME INVALID LET
                 this.fork.getTransactionMap().delete(transactionAccount);
             } else {
-                transactionAccount.setDC(this.fork, false);
+                transactionAccount.setDC(this.fork, false, ++this.seqNo);
                 if (transactionAccount.isValid(null, 0l) == Transaction.VALIDATE_OK) {
                     transactionAccount.process(null, false);
                 } else {
@@ -591,11 +593,49 @@ public class TransactionCreator {
         return createOrderTransaction;
     }
 
-    public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow) {
-        return createCancelOrderTransaction(creator, order.getId(), feePow);
+    public Transaction createCancelOrderTransaction2(PrivateKeyAccount creator, Long orderID, int feePow) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        Transaction createOrder = this.fork.getTransactionFinalMap().get(Transaction.parseDBRef(orderID));
+        if (createOrder == null)
+            return null;
+
+        byte[] orderSignature = createOrder.getSignature();
+
+        //CREATE PRDER TRANSACTION
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderSignature, (byte) feePow, time, 0l);
+        cancelOrderTransaction.sign(creator, false);
+        cancelOrderTransaction.setDC(this.fork, false);
+
+        return cancelOrderTransaction;
+
     }
 
-    public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, BigInteger orderID, int feePow) {
+    public Transaction createCancelOrderTransaction2(PrivateKeyAccount creator, byte[] orderSignature, int feePow) {
+        //CHECK FOR UPDATES
+        this.checkUpdate();
+
+        //TIME
+        long time = NTP.getTime();
+
+        //CREATE PRDER TRANSACTION
+        CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderSignature, (byte) feePow, time, 0l);
+        cancelOrderTransaction.sign(creator, false);
+        cancelOrderTransaction.setDC(this.fork, false);
+
+        return cancelOrderTransaction;
+
+    }
+
+    public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, Order order, int feePow) {
+        return createCancelOrderTransaction(creator, order, feePow);
+    }
+
+    public Pair<Transaction, Integer> createCancelOrderTransaction(PrivateKeyAccount creator, byte[] orderID, int feePow) {
         //CHECK FOR UPDATES
         this.checkUpdate();
 

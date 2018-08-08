@@ -470,20 +470,24 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
     }
 
-    public Transaction getRecord(DCSet db, String refStr) {
+    public Transaction getRecord(String refStr) {
         try {
             String[] strA = refStr.split("\\-");
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
 
-            return db.getTransactionFinalMap().getTransaction(height, seq);
+            return this.getTransaction(height, seq);
         } catch (Exception e1) {
             try {
-                return db.getTransactionFinalMap().getTransaction(Base58.decode(refStr));
+                return this.getTransaction(Base58.decode(refStr));
             } catch (Exception e2) {
                 return null;
             }
         }
+    }
+
+    public Transaction get(Long dbRefLong) {
+        return this.get(Transaction.parseDBRef(dbRefLong));
     }
 
 }

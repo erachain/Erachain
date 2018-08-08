@@ -141,7 +141,7 @@ public class PersonSetStatusDialog extends JDialog {
             return record;
         }
 
-        record = DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), jParentRecTxt.getText());
+        record = DCSet.getInstance().getTransactionFinalMap().getRecord(jParentRecTxt.getText());
         if (record == null) {
             infoPanel.show_mess(Lang.getInstance().translate("Error") + " - use 1233-321.");
             jLabel_RecordInfo.setViewportView(infoPanel);

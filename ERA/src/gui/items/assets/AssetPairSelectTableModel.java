@@ -59,7 +59,7 @@ public class AssetPairSelectTableModel extends AbstractTableModel implements Obs
         /*
          * assets.add(asset); } }
          */
-        this.all = BlockExplorer.getInstance().calcForAsset(DCSet.getInstance().getOrderMap().getOrders(this.key, true),
+        this.all = BlockExplorer.getInstance().calcForAsset(DCSet.getInstance().getOrderMap().getOrders(this.key),
                 DCSet.getInstance().getTradeMap().getTrades(this.key));
 
     }

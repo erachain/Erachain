@@ -2,62 +2,36 @@ package datachain;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
-import core.item.assets.OrderKeysComparatorForTrade;
+import core.item.assets.*;
+import database.serializer.OrderSerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
-import org.mapdb.Fun.Tuple5;
 
-import core.item.assets.Order;
-import core.item.assets.OrderComparatorForTrade;
-import core.item.assets.OrderComparatorForTradeReverse;
 import database.DBMap;
 import utils.ObserverMessage;
 
 /*
- * Tuple5
- * 	private BigInteger id;
-	private Account creator;
-	protected long timestamp;
-	private boolean isExecutable = true;
-	private BigDecimal Price;
+ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
+Поэтому нужно добавлять униальность
 
-Tuple3
-	private long have;
-	private BigDecimal amountHave;
-	private BigDecimal fulfilledHave;
-
-Tuple3
-	private long want;
-	private BigDecimal amountWant;
-	private BigDecimal fulfilledWant;
+ for key = Long as Block Height + Transaction Sequence
  */
-
-public class OrderMap extends DCMap<BigInteger,
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> {
+public class OrderMap extends DCMap<Long, Order> {
     private Map<Integer, Integer> observableData = new HashMap<Integer, Integer>();
 
+    private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")
     private BTreeMap haveWantKeyMap;
     @SuppressWarnings("rawtypes")
+    // TODO: cut index to WANT only
     private BTreeMap wantHaveKeyMap;
+    private BTreeMap addressHaveWantKeyMap;
 
     public OrderMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -77,32 +51,18 @@ public class OrderMap extends DCMap<BigInteger,
 
     }
 
-    /*
-    public static Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> setExecutable(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order, boolean executable) {
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> newOrder = new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-                new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(order.a.a, order.a.b, order.a.c, executable, order.a.e),
-                order.b, order.c);
-        return newOrder;
-    }
-    */
-
     @Override
     protected void createIndexes(DB database) {
     }
 
     @Override
-    protected Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMap(DB database) {
+    protected Map<Long, Order> getMap(DB database) {
         //OPEN MAP
         return this.openMap(database);
     }
 
     @Override
-    protected Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getMemoryMap() {
+    protected Map<Long, Order> getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
@@ -110,13 +70,30 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     @SuppressWarnings("unchecked")
-    private Map<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> openMap(DB database) {
+    private Map<Long, Order> openMap(DB database) {
         //OPEN MAP
-        BTreeMap<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> map = database.createTreeMap("orders")
-                //.valueSerializer(new OrderSerializer())
+        BTreeMap<Long, Order> map = database.createTreeMap("orders")
+                .valueSerializer(new OrderSerializer())
+                //.comparator(Fun.BYTE_ARRAY_COMPARATOR) // for byte[]
+                .comparator(Fun.COMPARATOR)
                 .makeOrGet();
+
+        // ADDRESS HAVE/WANT KEY
+        this.addressHaveWantKeyMap = database.createTreeMap("orders_key_address_have_want")
+                .comparator(Fun.COMPARATOR)
+                .makeOrGet();
+
+        //BIND HAVE/WANT KEY
+        Bind.secondaryKey(map, this.addressHaveWantKeyMap,
+                new Fun.Function2<Fun.Tuple5<String, Long, Long, BigDecimal, Long>, Long, Order>() {
+                    @Override
+                    public Fun.Tuple5<String, Long, Long, BigDecimal, Long> run(
+                            Long key, Order value) {
+                        return new Fun.Tuple5<String, Long, Long, BigDecimal, Long>
+                                (value.getCreator().getAddress(), value.getHave(), value.getWant(), value.getPrice(),
+                                        key);
+                    }
+                });
 
         //HAVE/WANT KEY
         this.haveWantKeyMap = database.createTreeMap("orders_key_have_want")
@@ -125,15 +102,14 @@ public class OrderMap extends DCMap<BigInteger,
 
         //BIND HAVE/WANT KEY
         Bind.secondaryKey(map, this.haveWantKeyMap,
-                new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger,
-                        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>() {
+                new Fun.Function2<Fun.Tuple4<Long, Long, BigDecimal, Long>, Long,
+                        Order>() {
                     @Override
-                    public Tuple4<Long, Long, BigDecimal, BigInteger> run(
-                            BigInteger key, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
-                        return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.b.a, value.c.a,
-                                Order.calcPrice(value.b.b, value.c.b), key);
+                    public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
+                            Long key, Order value) {
+                        return new Fun.Tuple4<>(value.getHave(), value.getWant(),
+                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                                value.getId());
                     }
                 });
 
@@ -144,15 +120,14 @@ public class OrderMap extends DCMap<BigInteger,
 
         //BIND HAVE/WANT KEY
         Bind.secondaryKey(map, this.wantHaveKeyMap,
-                new Fun.Function2<Tuple4<Long, Long, BigDecimal, BigInteger>, BigInteger,
-                    Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>() {
-                @Override
-                public Tuple4<Long, Long, BigDecimal, BigInteger> run(
-                        BigInteger key, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                              Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> value) {
-                return new Tuple4<Long, Long, BigDecimal, BigInteger>(value.c.a, value.b.a,
-                        Order.calcPrice(value.b.b, value.c.b), key);
+                new Fun.Function2<Fun.Tuple4<Long, Long, BigDecimal, Long>, Long,
+                        Order>() {
+                    @Override
+                    public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
+                            Long key, Order value) {
+                        return new Fun.Tuple4<>(value.getWant(), value.getHave(),
+                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                                value.getId());
             }
         });
 
@@ -162,8 +137,7 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     @Override
-    protected Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getDefaultValue() {
+    protected Order getDefaultValue() {
         return null;
     }
 
@@ -174,57 +148,27 @@ public class OrderMap extends DCMap<BigInteger,
 
     // GET KEYs with FORKED rules
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected Collection<BigInteger> getSubKeysWithParent(long have, long want) {
+    protected List<Long> getSubKeysWithParent(long have, long want) {
 
-        Collection<BigInteger> keys;
-        //FILTER ALL KEYS
-
-        ///if (false) {
-            // in haveWantKeyMap - NOT ALL ORDERS!
-        keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-                //Fun.t4(have, want, null, null),
+        List<Long> keys = new ArrayList<>(((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-        //keys = new TreeSet<BigInteger>(keys);
-        ///} else {
-            // in wantHaveKeyMap - ALL ORDERS
-        Collection<BigInteger> keysWH;
-        keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
-                //Fun.t4(have, want, null, null),
-                Fun.t4(want, have, null, null),
-                Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-        //keysWH = new TreeSet<BigInteger>(keysWH);
-            
-        //}
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 
-        if (!keysWH.isEmpty()) {
-            // add only new unique
-            Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
-            combinedKeys.addAll(keysWH);
-            keys = combinedKeys;
-        }
-
-            
         //IF THIS IS A FORK
         if (this.parent != null) {
 
             //GET ALL KEYS FOR FORK in PARENT
-            Collection<BigInteger> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+            List<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
 
             // REMOVE those who DELETED here
             if (this.deleted != null) {
                 //DELETE DELETED
-                for (BigInteger deleted : this.deleted) {
+                for (Long deleted : this.deleted) {
                     parentKeys.remove(deleted);
                 }
             }
 
-            //COMBINE LISTS
-            Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
-            combinedKeys.addAll(parentKeys);
-
-            //CONVERT SET BACK TO COLLECTION
-            keys = combinedKeys;
+            keys.addAll(parentKeys);
 
         }
 
@@ -232,10 +176,10 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Collection<BigInteger> getKeysHave(long have) {
+    private Collection<Long> getKeysHave(long have) {
 
         //FILTER ALL KEYS
-        Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+        Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, null, null, null),
                 Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
@@ -243,77 +187,40 @@ public class OrderMap extends DCMap<BigInteger,
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private Collection<BigInteger> getKeysWant(long want) {
+    private Collection<Long> getKeysWant(long want) {
 
         //FILTER ALL KEYS
-        Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
+        Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.wantHaveKeyMap).subMap(
                 Fun.t4(want, null, null, null),
                 Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
 
         return keys;
     }
 
-    public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(long haveWant) {
-        return getOrders(haveWant, false);
-    }
-
-    public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrders(long haveWant, boolean filter) {
-        Map<BigInteger, Boolean> orderKeys = new TreeMap<BigInteger, Boolean>();
-
-        //FILTER ALL KEYS
-        Collection<BigInteger> keys = this.getKeysHave(haveWant);
-
-        for (BigInteger key : keys) {
-            orderKeys.put(key, true);
-        }
-
-        keys = this.getKeysWant(haveWant);
-
-        for (BigInteger key : keys) {
-            orderKeys.put(key, true);
-        }
+    public List<Order> getOrders(long haveWant) {
 
         //GET ALL ORDERS FOR KEYS
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new ArrayList<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>();
+        List<Order> orders = new ArrayList<Order>();
 
-        for (Map.Entry<BigInteger, Boolean> orderKey : orderKeys.entrySet()) {
-            orders.add(this.get(orderKey.getKey()));
+        for (Long key: this.getKeysHave(haveWant)) {
+            orders.add(this.get(key));
+        }
+
+        for (Long key: this.getKeysWant(haveWant)) {
+            orders.add(this.get(key));
         }
 
         return orders;
     }
 
-    /*
-    public boolean isExecutable(DCSet db, BigInteger key) {
-
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = this.get(key);
-        // если произведение остатка
-        BigDecimal left = order.b.b.subtract(order.b.c);
-        if (left.signum() <= 0
-                || left.multiply(order.a.e).compareTo(BigDecimal.ONE.scaleByPowerOfTen(-order.c.b.scale())) < 0)
-            return false;
-
-        return true;
-
-    }
-    */
-
-    public List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
+    public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
-        Collection<BigInteger> keys = this.getSubKeysWithParent(have, want);
+        Collection<Long> keys = this.getSubKeysWithParent(have, want);
 
         //GET ALL ORDERS FOR KEYS
-        List<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders = new ArrayList<Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>();
+        List<Order> orders = new ArrayList<Order>();
 
-        for (BigInteger key : keys) {
+        for (Long key : keys) {
             orders.add(this.get(key));
         }
 
@@ -322,112 +229,90 @@ public class OrderMap extends DCMap<BigInteger,
         } else {
             Collections.sort(orders, new OrderComparatorForTrade());
         }
-            
+
         //RETURN
         return orders;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersSortableList(long have, long want) {
+    public SortableList<Long, Order> getOrdersSortableList(long have, long want, boolean reverse) {
 
         //FILTER ALL KEYS
-        Collection<BigInteger> keys;
-        
-        keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
+        List<Long> keys = new ArrayList<>(((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-        
-        if (false) {
-            keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-                    Fun.t4(have, want, null, null),
-                    Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-        } else if (false) {
-            keys = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
-                    Fun.t4(have, want, null, null),
-                    Fun.t4(have, want, Fun.HI(), Fun.HI())).values();
-        } else if (false) {
-            keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-                    Fun.t4(want, have, null, null),
-                    Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-        } else {
-            Collection<BigInteger> keysWH;
-            // CORRECT! - haveWantKeyMap LOSES some orders!
-            // https://github.com/icreator/Erachain/issues/178
-            keysWH = ((BTreeMap<Tuple4, BigInteger>) this.wantHaveKeyMap).subMap(
-                    Fun.t4(want, have, null, null),
-                    Fun.t4(want, have, Fun.HI(), Fun.HI())).values();
-            
-            if (!keysWH.isEmpty()) {
-                // add only new unique
-                Set<BigInteger> combinedKeys = new TreeSet<BigInteger>(keys);
-                combinedKeys.addAll(keysWH);
-                keys = combinedKeys;
-            }
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 
+        if (reverse) {
+            Collections.sort(keys, new OrderKeysComparatorForTradeReverse());
+        } else {
+            Collections.sort(keys, new OrderKeysComparatorForTrade());
         }
 
-        List<BigInteger> keysList = new ArrayList<BigInteger>(keys);
-        Collections.sort(keysList, new OrderKeysComparatorForTrade());
-
         //RETURN
-        return new SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keysList);
+        return new SortableList<Long, Order>(this, keys);
+    }
+
+    public List<Order> getOrdersForAddress(
+            String address, Long have, Long want) {
+
+        Collection<Long> keys;
+        keys = ((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
+                Fun.t5(address, have, want, null, null),
+                Fun.t5(address, have, want, Fun.HI(), Fun.HI())).values();
+
+        //GET ALL ORDERS FOR KEYS
+        List<Order> orders = new ArrayList<Order>();
+
+        for (Long key : keys) {
+
+            Order order = this.get(key);
+
+            // MAY BE NULLS!!!
+            if (order != null)
+                orders.add(this.get(key));
+        }
+
+        return orders;
+
     }
 
     /*
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersHaveSortableList(long have) {
         //FILTER ALL KEYS
-        Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-                Fun.t4(have, null, null, null),
-                Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values();
+        Collection<Long> keys = ((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
+                Fun.t3(have, null, null),
+                Fun.t3(have, Fun.HI(), Fun.HI())).values();
 
         //RETURN
-        return new SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        return new SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
     }
     */
 
     /*
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+    public SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
             Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersWantSortableList(long want) {
         //FILTER ALL KEYS
-        Collection<BigInteger> keys = ((BTreeMap<Tuple4, BigInteger>) this.haveWantKeyMap).subMap(
-                Fun.t4(null, want, null, null),
-                Fun.t4(Fun.HI(), want, Fun.HI(), Fun.HI())).values();
+        Collection<Long> keys = ((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
+                Fun.t3(null, want, null),
+                Fun.t3(Fun.HI(), want, Fun.HI())).values();
 
         //RETURN
-        return new SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
+        return new SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
     }
     */
 
-    public void add(Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order) {
+    public void add(Order order) {
 
-        // this order is NOT executable
-        ////this.set(order.a.a, setExecutable(order, true));
-        this.set(order.a.a, order);
+        this.set(order.getId(), order);
     }
-
-    /*
-    @Override
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> get(BigInteger key) {
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = super.get(key);
-        if (order == null)
-            return null;
-
-        return setExecutable(order, true);
-    }
-    */
-
 
     public void delete(Order order) {
+
         this.delete(order.getId());
     }
 }

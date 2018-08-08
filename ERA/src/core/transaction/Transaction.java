@@ -342,12 +342,16 @@ public abstract class Transaction {
     protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH
             + /* REFERENCE_LENGTH */ +SIGNATURE_LENGTH;
     static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
+
     protected DCSet dcSet;
     protected String TYPE_NAME = "unknown";
     // protected int type;
     protected byte[] typeBytes;
     protected Block block; // parent block
     protected int height;
+    protected int seqNo;
+    protected Long dbRef; // height + SeqNo
+
     // TODO REMOVE REFERENCE - use TIMESTAMP as reference
     protected Long reference = 0l;
     protected BigDecimal fee = BigDecimal.ZERO; // - for genesis
@@ -392,6 +396,7 @@ public abstract class Transaction {
     public static Transaction findByHeightSeqNo(DCSet db, int height, int seq) {
         return db.getTransactionFinalMap().getTransaction(height, seq);
     }
+
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public static Transaction findByDBRef(DCSet db, byte[] dbRef) {
@@ -493,6 +498,14 @@ public abstract class Transaction {
     public void setDC(DCSet dcSet, boolean asPack) {
         this.dcSet = dcSet;
         this.height = this.getBlockHeightByParentOrLast(dcSet);
+        //this.seqNo = this.block.getTransactionSeq(this.signature);
+        if (!asPack)
+            this.calcFee();
+    }
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.dcSet = dcSet;
+        this.height = this.getBlockHeightByParentOrLast(dcSet);
+        this.seqNo = seqNo;
         if (!asPack)
             this.calcFee();
     }
@@ -519,6 +532,12 @@ public abstract class Transaction {
 
     public Long getTimestamp() {
         return this.timestamp;
+    }
+
+    public static Long getTimestampByDBRef(Long dbRef) {
+        Tuple2<Integer, Integer> key = parseDBRef(dbRef);
+        BlockChain blockChain = Controller.getInstance().getBlockChain();
+        return blockChain.getTimestamp(key.a) + key.b;
     }
 
     // for test signature only!!!
@@ -675,8 +694,9 @@ public abstract class Transaction {
         return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
-    public void setBlock(Block block) {
+    public void setBlock(Block block, int seqNo) {
         this.block = block;
+        this.seqNo = seqNo;
     }
 
     public Block getBlock(DCSet db) {
@@ -764,6 +784,32 @@ public abstract class Transaction {
         byte[] ref = Ints.toByteArray(bh);
         Bytes.concat(ref, Ints.toByteArray(this.getSeqNo(db)));
         return ref;
+
+    }
+
+    // reference in Map - or as signatire or as BlockHeight + seqNo
+    public static Long makeDBRef(int height, int seqNo) {
+
+        byte[] ref = Ints.toByteArray(height);
+        return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seqNo)));
+
+    }
+
+    public static Long makeDBRef(Tuple2<Integer, Integer> dbRef) {
+
+        byte[] ref = Ints.toByteArray(dbRef.a);
+        return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(dbRef.b)));
+
+    }
+
+    public static Tuple2<Integer, Integer> parseDBRef(Long dbRef) {
+
+        byte[] bytes = Longs.toByteArray(dbRef);
+
+        int blockHeight = Ints.fromByteArray(Arrays.copyOfRange(bytes, 0, 4));
+        int seqNo = Ints.fromByteArray(Arrays.copyOfRange(bytes, 4, 8));
+
+        return new Tuple2<Integer, Integer>(blockHeight, seqNo);
 
     }
 
@@ -1164,6 +1210,12 @@ public abstract class Transaction {
     // public abstract void process(DBSet db);
     public void process(Block block, boolean asPack) {
 
+        if (this.signature != null && Base58.encode(this.signature)
+                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
+
         this.block = block;
 
         if (!asPack) {
@@ -1198,6 +1250,12 @@ public abstract class Transaction {
     }
 
     public void orphan(boolean asPack) {
+
+        if (Base58.encode(this.signature)
+                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+            int error = 0;
+            error ++;
+        }
 
         if (!asPack) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -1295,6 +1353,11 @@ public abstract class Transaction {
 
         // IF UNCONFIRMED
         return Controller.getInstance().getLastBlock().getNextBlockVersion(db);
+    }
+
+    @Override
+    public String toString() {
+        return Base58.encode(this.signature);
     }
 
 }

@@ -9,14 +9,14 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class TradeSerializer_old implements Serializer<Trade>, Serializable {
+public class TradeSerializer implements Serializer<Trade>, Serializable {
     private static final long serialVersionUID = -6538913048331349777L;
-    static Logger LOGGER = Logger.getLogger(TradeSerializer_old.class.getName());
+    static Logger LOGGER = Logger.getLogger(TradeSerializer.class.getName());
 
     @Override
     public void serialize(DataOutput out, Trade value) throws IOException {
-        //out.writeInt(value.getDataLength());
-        //out.write(value.toBytes());
+        out.writeInt(value.getDataLength());
+        out.write(value.toBytes());
     }
 
     @Override
@@ -25,7 +25,7 @@ public class TradeSerializer_old implements Serializer<Trade>, Serializable {
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            //return Trade.parse(bytes);
+            return Trade.parse(bytes);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

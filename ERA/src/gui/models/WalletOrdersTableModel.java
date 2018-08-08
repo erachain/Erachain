@@ -19,8 +19,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> implements Observer {
+public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, Order> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_AMOUNT = 1;
     public static final int COLUMN_HAVE = 2;
@@ -28,21 +27,18 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
     public static final int COLUMN_PRICE = 4;
     public static final int COLUMN_FULFILLED = 5;
     public static final int COLUMN_CREATOR = 6;
-    public static final int COLUMN_CONFIRMED = 7;
-    public static final int COLUMN_DONE = 8;
+    public static final int COLUMN_STATUS = 7;
 
-    private SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+    private SortableList<Tuple2<String, Long>, Order> orders;
 
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Confirmed", "DONE"});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Status"});
 
     public WalletOrdersTableModel() {
         Controller.getInstance().addWalletListener(this);
     }
 
     @Override
-    public SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
+    public SortableList<Tuple2<String, Long>, Order> getSortableList() {
         return this.orders;
     }
 
@@ -52,8 +48,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
         return o == null ? Null.class : o.getClass();
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(int row) {
+    public Order getOrder(int row) {
         return this.orders.get(row).getB();
     }
 
@@ -80,50 +75,52 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
             return null;
         }
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = Order.reloadOrder(DCSet.getInstance(), this.orders.get(row).getB().a.a);
+        Order order = this.orders.get(row).getB();
         //order.setDC(DCSet.getInstance());
-
 
         switch (column) {
             case COLUMN_TIMESTAMP:
 
-                return DateTimeFormat.timestamptoString(order.a.c);
+                return DateTimeFormat.timestamptoString(order.getId());
 
             case COLUMN_HAVE:
 
-                return DCSet.getInstance().getItemAssetMap().get(order.b.a).getShort();
+                return DCSet.getInstance().getItemAssetMap().get(order.getHave()).getShort();
 
             case COLUMN_WANT:
 
-                return DCSet.getInstance().getItemAssetMap().get(order.c.a).getShort();
+                return DCSet.getInstance().getItemAssetMap().get(order.getWant()).getShort();
 
             case COLUMN_AMOUNT:
 
-                return order.b.b.toPlainString();
+                return order.getAmountHave().toPlainString();
 
             case COLUMN_PRICE:
 
-                return Order.calcPrice(order.b.b, order.c.b);
+                return order.getPrice();
 
             case COLUMN_FULFILLED:
 
-                return order.b.c.toPlainString();
-            //return order.getFulfilledHave().toPlainString();
+                return order.getFulfilledHave().toPlainString();
 
             case COLUMN_CREATOR:
 
-                return new Account(order.a.b).getPersonAsString();
+                return order.getCreator().getPersonAsString();
 
-            case COLUMN_CONFIRMED:
+            case COLUMN_STATUS:
 
-                return DCSet.getInstance().getOrderMap().contains(order.a.a)
-                        || DCSet.getInstance().getCompletedOrderMap().contains(order.a.a);
+                if (order.getAmountHave().compareTo(order.getAmountHaveLeft()) == 0) {
+                    return "DONE";
+                } else {
+                    if (DCSet.getInstance().getCompletedOrderMap().contains(order.getId()))
+                        return "Canceled";
 
-            case COLUMN_DONE:
+                    if (DCSet.getInstance().getOrderMap().contains(order.getId()))
+                        return "ACTIVE";
 
-                if (order.b.b.compareTo(order.b.c) == 0)
-                    return "++";
-                return "";
+                    return "unconfirmed";
+
+                }
 
         }
 
@@ -147,8 +144,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, BigInte
         if (//message.getType() == ObserverMessage.LIST_ORDER_TYPE ||
                 message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
-                this.orders = (SortableList<Tuple2<String, BigInteger>, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                        Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>) message.getValue();
+                this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
                 this.orders.registerObserver();
                 //this.assets.sort(PollMap.NAME_INDEX);
             }

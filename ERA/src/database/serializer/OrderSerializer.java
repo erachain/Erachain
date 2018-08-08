@@ -9,14 +9,14 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class OrderSerializer_old implements Serializer<Order>, Serializable {
+public class OrderSerializer implements Serializer<Order>, Serializable {
     private static final long serialVersionUID = -6538913048331349777L;
-    static Logger LOGGER = Logger.getLogger(OrderSerializer_old.class.getName());
+    static Logger LOGGER = Logger.getLogger(OrderSerializer.class.getName());
 
     @Override
     public void serialize(DataOutput out, Order value) throws IOException {
-        //out.writeInt(value.getDataLength());
-        //out.write(value.toBytes());
+        out.writeInt(value.getDataLength());
+        out.write(value.toBytes());
     }
 
     @Override
@@ -25,8 +25,7 @@ public class OrderSerializer_old implements Serializer<Order>, Serializable {
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            //return Order.parse(bytes);
-            return null;
+            return Order.parse(bytes);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

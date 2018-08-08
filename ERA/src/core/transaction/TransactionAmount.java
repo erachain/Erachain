@@ -135,7 +135,12 @@ public abstract class TransactionAmount extends Transaction {
             this.asset = (AssetCls) this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
     }
-    
+
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+
     // public static String getName() { return "unknown subclass Amount"; }
     
     public Account getRecipient() {

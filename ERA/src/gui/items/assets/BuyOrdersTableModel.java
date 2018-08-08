@@ -1,11 +1,13 @@
 package gui.items.assets;
 
 import controller.Controller;
+import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import datachain.SortableList;
 import gui.models.TableModelCls;
 import lang.Lang;
+import ntp.NTP;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -20,16 +22,17 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class BuyOrdersTableModel extends
-        TableModelCls<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>
+        TableModelCls<Long, Order>
         implements Observer {
     //public static final int COLUMN_BUYING_PRICE = -1;
     public static final int COLUMN_AMOUNT_WANT = 0;
     public static final int COLUMN_PRICE = 1;
     public static final int COLUMN_AMOUNT_HAVE = 2;
 
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orders;
+    private boolean needRepaint = false;
+    private long updateTime = 0l;
+
+    public SortableList<Long, Order> orders;
     BigDecimal sumAmountWant;
     BigDecimal sumAmountHave;
     // private String[] columnNames = Lang.getInstance().translate(new
@@ -37,12 +40,17 @@ public class BuyOrdersTableModel extends
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Want", "Price", "Have"});
     private AssetCls have;
     private AssetCls want;
+    private long haveKey;
+    private long wantKey;
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
         this.have = have;
         this.want = want;
 
-        this.orders = Controller.getInstance().getOrders(have, want);
+        this.haveKey = this.have.getKey();
+        this.wantKey = this.want.getKey();
+
+        this.orders = Controller.getInstance().getOrders(have, want, false);
 
         // columnNames[COLUMN_BUYING_PRICE] += " " + have.getShort();
         columnNames[COLUMN_PRICE] += " " + have.getShort();
@@ -59,25 +67,23 @@ public class BuyOrdersTableModel extends
     private void totalCalc() {
         sumAmountWant = BigDecimal.ZERO;
         sumAmountHave = BigDecimal.ZERO;
-        for (Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> orderPair : this.orders) {
+        for (Pair<Long, Order> orderPair : this.orders) {
 
-            Tuple3<Long, BigDecimal, BigDecimal> haveItem = orderPair.getB().b;
-            sumAmountHave = sumAmountHave.add(haveItem.b.subtract(haveItem.c));
+            Order order = orderPair.getB();
 
-            sumAmountWant = sumAmountWant.add(Order.calcAmountWantLeft(orderPair.getB()));
+            sumAmountHave = sumAmountHave.add(order.getAmountHaveLeft());
+
+            sumAmountWant = sumAmountWant.add(order.getAmountWantLeft());
         }
     }
 
     @Override
-    public SortableList<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getSortableList() {
+    public SortableList<Long, Order> getSortableList() {
         return this.orders;
     }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> getOrder(
-            int row) {
-        Pair<BigInteger, Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> rec = this.orders
-                .get(row);
+    public Order getOrder(int row) {
+        Pair<Long, Order> rec = this.orders.get(row);
         if (rec == null)
             return null;
 
@@ -106,7 +112,7 @@ public class BuyOrdersTableModel extends
             return null;
         }
 
-        Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = null;
+        Order order = null;
         boolean isMine = false;
         int size = this.orders.size();
         if (row < size) {
@@ -118,14 +124,14 @@ public class BuyOrdersTableModel extends
             }
 
             Controller cntr = Controller.getInstance();
-            if (cntr.isAddressIsMine(order.a.b)) {
+            if (cntr.isAddressIsMine(order.getCreator().getAddress())) {
                 isMine = true;
             }
 
         } else if (size > row) {
-            //this.orders = Controller.getInstance().getOrders(have, want);
-            //totalCalc();
-            //this.fireTableDataChanged();
+            this.orders = Controller.getInstance().getOrders(have, want, false);
+            totalCalc();
+            this.fireTableDataChanged();
             return null;
         }
 
@@ -148,20 +154,18 @@ public class BuyOrdersTableModel extends
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountWant, want.getScale()) + "</i></html>";
 
                 // It shows unacceptably small amount of red.
-                BigDecimal amount = Order.calcAmountWantLeft(order);
+                BigDecimal amount = order.getAmountWantLeft();
 
                 String amountStr = NumberAsString.formatAsString(amount, want.getScale());
-                if (order.a.d)
-                    return amountStr;
-                else
-                    return "<html><font color=#808080>" + amountStr + "</font></html>";
+                return amountStr;
 
             case COLUMN_PRICE:
 
                 if (row == this.orders.size())
                     return "<html><b>" + Lang.getInstance().translate("Total") + "</b></html>";
 
-                BigDecimal price = Order.calcPrice(order.c.b, order.b.b);
+                //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
+                BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave(), 2);
                 return NumberAsString.formatAsString(price.stripTrailingZeros());
 
             case COLUMN_AMOUNT_HAVE:
@@ -169,7 +173,7 @@ public class BuyOrdersTableModel extends
                 if (row == this.orders.size())
                     return "<html><i>" + NumberAsString.formatAsString(sumAmountHave, have.getScale()) + "</i></html>";
 
-                amountStr = NumberAsString.formatAsString(order.b.b.subtract(order.b.c), have.getScale());
+                amountStr = NumberAsString.formatAsString(order.getAmountHaveLeft(), have.getScale());
 
                 if (isMine)
                     amountStr = "<html><b>" + amountStr + "</b></html>";
@@ -179,6 +183,17 @@ public class BuyOrdersTableModel extends
         }
 
         return null;
+    }
+
+    public synchronized void repaint() {
+        this.needRepaint = false;
+        this.updateTime = NTP.getTime();
+
+        this.orders = Controller.getInstance().getOrders(this.have, this.want, false);
+
+        totalCalc();
+        this.fireTableDataChanged();
+
     }
 
     @Override
@@ -193,15 +208,44 @@ public class BuyOrdersTableModel extends
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
+        int type = message.getType();
+
         // CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_ORDER_TYPE
-                || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE
-                //|| message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE
-                //|| message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE
-                ) {
-            this.orders = Controller.getInstance().getOrders(have, want);
-            totalCalc();
-            this.fireTableDataChanged();
+        if (type == ObserverMessage.ADD_ORDER_TYPE
+                || type == ObserverMessage.REMOVE_ORDER_TYPE
+        ) {
+
+            Order order = (Order) message.getValue();
+            long haveKey = order.getHave();
+            long wantKey = order.getWant();
+            if (!(haveKey == this.haveKey && wantKey == this.wantKey)
+                    && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
+                return;
+            }
+
+            this.needRepaint = true;
+            return;
+
+        } else if (this.needRepaint == true) {
+            if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+                if (Controller.getInstance().isStatusOK()) {
+                    this.repaint();
+                    return;
+                } else {
+                    if (NTP.getTime() - updateTime > 100000) {
+                        this.repaint();
+                        return;
+
+                    }
+                }
+            } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                    || type == ObserverMessage.NETWORK_STATUS) {
+                if (Controller.getInstance().isStatusOK()) {
+                    this.repaint();
+                    return;
+                }
+            }
         }
     }
 

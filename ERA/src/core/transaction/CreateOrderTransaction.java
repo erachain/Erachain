@@ -9,9 +9,7 @@ import java.util.Map;
 
 import core.crypto.Base58;
 import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
@@ -196,7 +194,6 @@ public class CreateOrderTransaction extends Transaction {
                 reference, signatureBytes);
     }
 
-    @Override
     public void setDC(DCSet dcSet, boolean asPack) {
 
         super.setDC(dcSet, asPack);
@@ -206,8 +203,14 @@ public class CreateOrderTransaction extends Transaction {
 
     }
 
-    public BigInteger getOrderId() {
-        return new BigInteger(this.signature);
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+
+    public Long getOrderId() {
+        //return this.signature;
+        return Transaction.makeDBRef(this.height, this.seqNo);
     }
 
     @Override
@@ -263,20 +266,10 @@ public class CreateOrderTransaction extends Transaction {
         // set SCALE by ASSETs
         BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
         BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
-        return new Order(new BigInteger(this.signature), this.creator, this.haveKey, this.wantKey,
-                amountHave, amountWant, // new SCALE
-                this.timestamp);
-    }
 
-    public Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> makeOrderDB() {
-        return new Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>(
-                new Tuple5<BigInteger, String, Long, Boolean, BigDecimal>(this.getOrderId(),
-                        this.creator.getAddress(), this.timestamp, true, this.getPriceCalc()),
-                new Tuple3<Long, BigDecimal, BigDecimal>(this.haveKey, this.amountHave, BigDecimal.ZERO),
-                new Tuple2<Long, BigDecimal>(this.wantKey, this.amountWant));
-
+        return new Order(Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
+                amountHave, amountWant // new SCALE
+        );
     }
 
     @SuppressWarnings("unchecked")
@@ -527,7 +520,8 @@ public class CreateOrderTransaction extends Transaction {
         //this.order.process(this);
 
         // изменяемые объекты нужно заново создавать
-        Order order = makeOrder();
+        //.copy() // тут надо что-то сделать новым - а то значения впамяти по ссылке меняются
+        Order order = makeOrder(); //.copy();
         order.setDC(dcSet);
         order.process(this);
 

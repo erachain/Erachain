@@ -320,6 +320,11 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
                     },
                     {
+                            "GET addresses/private/<address>",
+                            "Returns the 64-byte long base58-encoded account private key of the given address.",
+                            "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
+                    },
+                    {
                             "GET addresses/publickey/<address>",
                             "Returns the 32-byte long base58-encoded account publickey of the given address.",
                             "Errors: 102 - Invalid address."
@@ -760,9 +765,22 @@ public class ApiClient {
                     {
                             "POST telegrams/delete {\"list\": [{signature1},{signature2}...]}",
                             "Delete telegram by list of signature"
+                    },
+                    {
+                            "GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
+                            "make and broadcast CreateOrder "
+                    },
+                    {
+                            "GET trade/cancel/{creator}/{signature}?password={password}",
+                            "Cancel Order by orderID"
+                    },
+                    {
+                            "GET trade/cancelbyid/{creator}/{orderID}?password={password}",
+                            "Cancel Order by orderID"
                     }
 
-            };
+
+};
 
     public static boolean isAllowedDebugWindowCall(String uuid) {
         return allowedcalls.contains(uuid);

@@ -61,7 +61,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
             block_No = Integer.parseInt(string);
         } catch (NumberFormatException e) {
             transactions = new ArrayList<>();
-            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(DCSet.getInstance(), string);
+            Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(string);
             if (transaction != null) {
                 transaction.setDC(DCSet.getInstance(), false);
                 transactions.add(transaction);

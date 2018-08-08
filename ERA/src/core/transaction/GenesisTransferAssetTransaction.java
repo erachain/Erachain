@@ -136,6 +136,11 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
         }
     }
 
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+
     @Override
     public BigDecimal getAmount(String address) {
         BigDecimal amount = BigDecimal.ZERO;

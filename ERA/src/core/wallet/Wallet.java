@@ -15,6 +15,7 @@ import java.util.TimerTask;
 
 import javax.swing.JFileChooser;
 
+import core.item.assets.Order;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -1581,10 +1582,9 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		// ADD ORDER
-		// Order = orderCreation.getOrder();
-		// this.addOrder(Trade.getOrder(orderCreation.getOrder().getId(),
-		// DBSet.getInstance()));
+		if(orderCreation.getOrderId() == null)
+			return;
+
 		this.addOrder(orderCreation);
 
 	}
@@ -1592,19 +1592,9 @@ public class Wallet extends Observable implements Observer {
 	private void addOrder(CreateOrderTransaction orderCreation) {
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
+
 			// ADD ORDER
-
-			// TODO : FULLFILL not work - нужно сделать запись заявок по записи
-			// заявок в основную базу а не по записи транзакций
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> orderNew;
-
-			orderNew = DCSet.getInstance().getOrderMap().get(orderCreation.getOrderId());
-			if (orderNew == null) {
-				orderNew = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getOrderId());
-				if (orderNew == null) {
-					orderNew = orderCreation.makeOrderDB();
-				}
-			}
+			Order orderNew = orderCreation.makeOrder();
 			this.database.getOrderMap().add(orderNew);
 		}
 	}
@@ -1615,11 +1605,14 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
-		// CHECK IF WE ARE CREATOR
+		if(orderCreation.getOrderId() == null)
+			return;
+
+			// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCreation.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCreation.getCreator().getAddress(),
-					new BigInteger(orderCreation.getSignature())));
+			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+					Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
 		}
 	}
 
@@ -1629,11 +1622,14 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
+		if (orderCancel.getOrderID() == null)
+			return;
+
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			// DELETE ORDER
-			this.database.getOrderMap().delete(new Tuple2<String, BigInteger>(orderCancel.getCreator().getAddress(),
-					new BigInteger(orderCancel.getSignature())));
+			this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+					Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
 		}
 	}
 
@@ -1643,11 +1639,13 @@ public class Wallet extends Observable implements Observer {
 			return;
 		}
 
+		if (orderCancel.getOrderID() == null)
+			return;
+
 		// CHECK IF WE ARE CREATOR
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			// DELETE ORDER
-			Tuple3<Tuple5<BigInteger, String, Long, Boolean, BigDecimal>, Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>> order = DCSet
-					.getInstance().getOrderMap().get(orderCancel.getOrderID());
+			Order order = DCSet.getInstance().getOrderMap().get(orderCancel.getOrderID());
 			this.database.getOrderMap().add(order);
 		}
 	}

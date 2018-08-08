@@ -166,6 +166,11 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     }
 
+    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+        this.setDC(dcSet, asPack);
+        this.seqNo = seqNo;
+    }
+
     //VALIDATE
 
     @Override
