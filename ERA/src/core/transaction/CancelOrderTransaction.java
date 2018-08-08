@@ -25,6 +25,7 @@ import core.crypto.Crypto;
 import datachain.DCSet;
 
 public class CancelOrderTransaction extends Transaction {
+    private static long ALL_VALID = 187550l * 2l * (long)Integer.MAX_VALUE;
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("2SEfiztfaj9wNE2k8h3Wiko3oVHtdjawosfua5PbjeAwPTFMHhFoJqVxpYvswZUdJFfQZ7i6xXep85UvCkZoxHqi"),
         //Base58.decode("34BaZfvWJpyEKAL7i3txFcTqRcVJt2GgumJm2ANqNcvBHCxngfoXBUKhm24uhqmZx1qvShj1KwUK6WHwHX2FQpfy"),
@@ -200,13 +201,13 @@ public class CancelOrderTransaction extends Transaction {
         ///Tuple2<Integer, Integer> transactionRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         ///this.orderID = Transaction.makeDBRef(transactionIndex);
         Order order = null;
-        if (this.dcSet.getOrderMap().contains(this.orderID))
+        if (this.orderID != null && this.dcSet.getOrderMap().contains(this.orderID))
             order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null) {
             if (!(
                     BlockChain.DEVELOP_USE
-                            && this.orderID < 186400l * 2l * (long) Integer.MAX_VALUE
+                            && (this.orderID == null || this.orderID < ALL_VALID)
             )) {
                 return ORDER_DOES_NOT_EXIST;
             }
@@ -237,6 +238,7 @@ public class CancelOrderTransaction extends Transaction {
             int ii = 123;
             ii++;
         }
+
         //SET ORPHAN DATA
         db.getCompletedOrderMap().add(order);
 
@@ -262,7 +264,7 @@ public class CancelOrderTransaction extends Transaction {
         Order order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null && BlockChain.DEVELOP_USE
-                && this.orderID < 186400l * 2l * (long)Integer.MAX_VALUE) {
+                && this.orderID < ALL_VALID) {
             return;
         }
 
@@ -293,7 +295,7 @@ public class CancelOrderTransaction extends Transaction {
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 
         if (order == null && BlockChain.DEVELOP_USE
-            && this.orderID < 186400l * 2l * (long)Integer.MAX_VALUE) {
+            && this.orderID < ALL_VALID) {
            return;
         }
 

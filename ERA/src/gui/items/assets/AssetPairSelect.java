@@ -86,7 +86,7 @@ public class AssetPairSelect extends JDialog {
         tableGBC.gridy = 1;
 
 
-        pair_Panel.button1_ToolBar_LeftPanel.setVisible(true);
+        pair_Panel.button1_ToolBar_LeftPanel.setVisible(false);
         pair_Panel.button1_ToolBar_LeftPanel.setEnabled(false);
         pair_Panel.button1_ToolBar_LeftPanel.setFocusable(true);
         pair_Panel.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Next"));

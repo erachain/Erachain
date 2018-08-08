@@ -503,9 +503,47 @@ public abstract class Trader extends Thread {
     }
 
     public boolean updateCap() {
-        return true;
-    }
 
+        String result;
+        boolean updated = false;
+
+        for (BigDecimal schemeAmount: this.schemeOrders.keySet()) {
+
+            HashSet<String> schemeItems = this.schemeOrders.get(schemeAmount);
+
+            if (schemeItems == null || schemeItems.isEmpty())
+                continue;
+
+            // make copy of LIST - for concerent DELETE
+            for (String orderID: new ArrayList<>(schemeItems)) {
+                result = this.apiClient.executeCommand("GET trade/get/" + orderID);
+                //LOGGER.info("GET: " + Base58.encode(orderID) + "\n" + result);
+
+                JSONObject jsonObject = null;
+                try {
+                    //READ JSON
+                    jsonObject = (JSONObject) JSONValue.parse(result);
+                } catch (NullPointerException | ClassCastException e) {
+                    //JSON EXCEPTION
+                    LOGGER.info(e);
+                    //throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+                }
+                if (jsonObject != null && jsonObject.containsKey("completed")) {
+                    // in crete it removing this.schemeOrdersRemove(schemeAmount,  (String)jsonObject.get("signature"));
+
+                    this.createOrder(schemeAmount, this.haveKey, this.wantKey,
+                            new BigDecimal(jsonObject.get("amountHave").toString()),
+                            new BigDecimal(jsonObject.get("amountWant").toString())
+                    );
+
+                    updated = true;
+                }
+            }
+
+        }
+
+        return updated;
+    }
 
     protected abstract boolean process();
 

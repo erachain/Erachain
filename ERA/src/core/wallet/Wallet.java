@@ -1686,7 +1686,7 @@ public class Wallet extends Observable implements Observer {
 			// CHECK BLOCK
 			this.orphanBlock(block);
 
-		} else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) // .WALLET_ADD_TRANSACTION_TYPE)
+		} else if (false && message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) // .WALLET_ADD_TRANSACTION_TYPE)
 		{
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
@@ -1723,7 +1723,7 @@ public class Wallet extends Observable implements Observer {
 			else if (transaction instanceof CreateOrderTransaction) {
 				this.processOrderCreation((CreateOrderTransaction) transaction);
 			}
-		} else if (message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) // .WALLET_REMOVE_TRANSACTION_TYPE)
+		} else if (false && message.getType() == ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE) // .WALLET_REMOVE_TRANSACTION_TYPE)
 		{
 			Transaction transaction = (Transaction) message.getValue();
 

@@ -127,7 +127,7 @@ public class StoneGuardAbs extends Trader {
 
             // IN ABSOLUTE
             BigDecimal diffAbs = newRate.subtract(this.rate);
-            if (BlockChain.DEVELOP_USE ||
+            if (//BlockChain.DEVELOP_USE ||
                     diffAbs.compareTo(this.limitUP) > 0
                     || diffAbs.abs().compareTo(this.limitDown) > 0) {
 

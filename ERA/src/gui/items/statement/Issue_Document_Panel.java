@@ -275,8 +275,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true, issueDoc,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation Transaction") + " "
-                        + Lang.getInstance().translate("Issue Document"));
+                Lang.getInstance().translate("Confirmation transaction issue document"));
 
         Statement_Info ww = new Statement_Info(issueDoc);
         ww.jPanel2.setVisible(false);

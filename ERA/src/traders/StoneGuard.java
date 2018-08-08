@@ -139,6 +139,8 @@ public class StoneGuard extends Trader {
 
                 this.rate = newRate;
                 shiftAll();
+            } else {
+                return updateCap();
             }
         }
 
