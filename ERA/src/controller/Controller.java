@@ -94,11 +94,18 @@ public class Controller extends Observable {
     public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
     public static final long LICENSE_VERS = 107; // versopn of LICENSE
-    public static HashMap<String, Tuple2<Integer, Integer>> LICENSE_LANG_REFS = new HashMap<String, Tuple2<Integer, Integer>>() {
+    public static HashMap<String, Tuple2<Integer, Integer>> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE?
+            new HashMap<String, Tuple2<Integer, Integer>>() {
         {
             put("en", new Tuple2<Integer, Integer>(148450, 1));
             put("ru", new Tuple2<Integer, Integer>(148450, 1));
         }
+    } :
+            new HashMap<String, Tuple2<Integer, Integer>>() {
+                {
+                    put("en", new Tuple2<Integer, Integer>(159719, 1));
+                    put("ru", new Tuple2<Integer, Integer>(159727, 1));
+                }
     };
 
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
