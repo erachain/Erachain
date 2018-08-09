@@ -687,7 +687,8 @@ public class Order implements Comparable<Order> {
         }
 
         //TRANSFER FUNDS
-        this.getCreator().changeBalance(this.dcSet, false, this.getWant(), processedAmountFulfilledWant, false);
+        if (processedAmountFulfilledWant.signum() > 0)
+            this.getCreator().changeBalance(this.dcSet, false, this.getWant(), processedAmountFulfilledWant, false);
 
     }
 
@@ -703,7 +704,7 @@ public class Order implements Comparable<Order> {
             completedMap.delete(this);
         }
 
-        BigDecimal totalAmountFulfilledWant = BigDecimal.ZERO;
+        BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
         //ORPHAN TRADES
         for (Trade trade : this.getInitiatedTrades(this.dcSet)) {
@@ -720,7 +721,7 @@ public class Order implements Comparable<Order> {
 
             //REVERSE FULFILLED
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
-            totalAmountFulfilledWant = totalAmountFulfilledWant.add(tradeAmountHave);
+            thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
             target.getCreator().changeBalance(this.dcSet, true, target.getWant(), tradeAmountWant, false);
 
@@ -737,9 +738,9 @@ public class Order implements Comparable<Order> {
         //REMOVE HAVE
         // GET HAVE LEFT - if it CANCELWED by INCREMENT close
         //   - если обработка остановлена по достижению порога Инкремента
-        this.creator.changeBalance(this.dcSet, false, this.haveKey, this.getFulfilledHave(), true);
+        this.creator.changeBalance(this.dcSet, false, this.haveKey, this.getAmountHaveLeft(), true);
         //REVERT WANT
-        this.creator.changeBalance(this.dcSet, true, this.wantKey, totalAmountFulfilledWant, false);
+        this.creator.changeBalance(this.dcSet, true, this.wantKey, thisAmountFulfilledWant, false);
     }
 
     //COMPARE

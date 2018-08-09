@@ -11,6 +11,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import utils.DateTimeFormat;
 import utils.ObserverMessage;
+import utils.Pair;
 
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
@@ -109,9 +110,10 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
             case COLUMN_STATUS:
 
-                if (order.getAmountHave().compareTo(order.getAmountHaveLeft()) == 0) {
+                if (order.getAmountHave().compareTo(order.getFulfilledHave()) == 0) {
                     return "DONE";
                 } else {
+
                     if (DCSet.getInstance().getCompletedOrderMap().contains(order.getId()))
                         return "Canceled";
 
@@ -141,21 +143,30 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (//message.getType() == ObserverMessage.LIST_ORDER_TYPE ||
-                message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
+        if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE
+                || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
                 this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
                 this.orders.registerObserver();
-                //this.assets.sort(PollMap.NAME_INDEX);
             }
 
             this.fireTableDataChanged();
-        }
+        } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
+            //CHECK IF LIST UPDATED
+            Pair<Tuple2<String, Long>, Order> item = (Pair<Tuple2<String, Long>, Order>) message.getValue();
+            this.orders.add(0, item);
+            //this.fireTableRowsInserted(0, 0);
 
-        //CHECK IF LIST UPDATED
-        if (//message.getType() == ObserverMessage.ADD_ORDER_TYPE || message.getType() == ObserverMessage.REMOVE_ORDER_TYPE ||
-                message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE || message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
-            this.fireTableDataChanged();
+        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
+            //CHECK IF LIST UPDATED
+            this.orders.remove(0);
+            if (false) {
+                if (this.orders.size() > 3) {
+                    this.fireTableRowsDeleted(0, 0);
+                } else {
+                    this.fireTableDataChanged();
+                }
+            }
         }
     }
 

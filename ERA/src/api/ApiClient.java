@@ -320,6 +320,11 @@ public class ApiClient {
                             "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
                     },
                     {
+                            "GET addresses/private/<address>",
+                            "Returns the 64-byte long base58-encoded account private key of the given address.",
+                            "Errors: 102 - Invalid address. 201 - Wallet does not exist. 202 - Address does not exist in wallet. 203 - Wallet is locked."
+                    },
+                    {
                             "GET addresses/publickey/<address>",
                             "Returns the 32-byte long base58-encoded account publickey of the given address.",
                             "Errors: 102 - Invalid address."

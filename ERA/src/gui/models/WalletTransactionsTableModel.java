@@ -7,7 +7,9 @@ import core.transaction.*;
 import database.wallet.TransactionMap;
 import datachain.DCSet;
 import datachain.SortableList;
+import gui.Gui;
 import lang.Lang;
+import ntp.NTP;
 import org.apache.log4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import settings.Settings;
@@ -25,6 +27,9 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 // in list of records in wallet
 public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, String>, Transaction> implements Observer {
+
+    private boolean needUpdate = false;
+    private long timeUpdate = 0;
 
     public static final int COLUMN_CONFIRMATIONS = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -269,9 +274,29 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             this.fireTableDataChanged();
         } else
-            // INCOME
-            if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+
+            if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+                if (!needUpdate)
+                    return;
+
+                long period = NTP.getTime() - this.timeUpdate;
+                if (period < Gui.PERIOD_UPDATE)
+                    return;
+
+                this.timeUpdate = NTP.getTime();
+                needUpdate = false;
+                this.fireTableDataChanged();
+
+            } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+                // INCOME
+
                 Transaction record = (Transaction) message.getValue();
+
+                boolean found = this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
+
+                if (found)
+                    return;
 
                 if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
                     if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -281,6 +306,13 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                     }
                 }
 
+                if (needUpdate) {
+                    return;
+                } else {
+                    needUpdate = true;
+                    return;
+                }
+
                 //	int i = this.transactions.size();
                 //	Transaction tt = (Transaction)message.getValue();
                 //	String aa = "";
@@ -288,7 +320,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 //	Tuple2<String, String> ee = new Tuple2(aa, Base58.encode(tt.getSignature()));
                 //	Pair pp = new Pair(ee,(Transaction)message.getValue());
                 //	this.transactions.add(pp);
-                this.fireTableDataChanged();    //
+                //this.fireTableDataChanged();    //
 
             } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
 
@@ -299,13 +331,18 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                     if (item == null)
                         return;
                     if (Arrays.equals(signKey, item.getSignature())) {
-                        this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();
+                        this.transactions.remove(i);
+                        //this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();
+                        break;
                     }
                 }
-                this.fireTableDataChanged();
-                if (false)
-                    this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
-                            new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
+
+                if (needUpdate) {
+                    return;
+                } else {
+                    needUpdate = true;
+                    return;
+                }
             }
     }
 

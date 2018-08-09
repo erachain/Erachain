@@ -216,6 +216,42 @@ public class AddressesResource {
     }
 
     @GET
+    @Path("/private/{address}")
+    public String getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
+
+        // CHECK IF VALID ADDRESS
+        if (!Crypto.getInstance().isValidAddress(address)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    //ApiErrorFactory.ERROR_INVALID_ADDRESS);
+                    Transaction.INVALID_ADDRESS);
+        }
+
+        // CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        }
+
+        APIUtils.askAPICallAllowed(password, "GET addresses/private/" + address + "\nWARNING, your private key will be revealed to the caller!", request);
+
+        // CHECK WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_LOCKED);
+        }
+
+        // CHECK ACCOUNT IN WALLET
+        Account account = Controller.getInstance().getAccountByAddress(address);
+        if (account == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
+        }
+
+        byte[] seed = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
+        return Base58.encode(seed);
+    }
+
+    @GET
     @Path("/new")
     public String generateNewAccount(@QueryParam("password") String password) {
         APIUtils.askAPICallAllowed(password, "GET addresses/new", request);
