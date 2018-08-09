@@ -11,6 +11,7 @@ import gui.Gui;
 import lang.Lang;
 import ntp.NTP;
 import org.apache.log4j.Logger;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import settings.Settings;
 import utils.DateTimeFormat;
@@ -273,9 +274,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             }
 
             this.fireTableDataChanged();
-        } else
 
-            if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
+        } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
+                    || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
+                // если прилетел блок или откатился и нужно обновить - то обновляем
                 if (!needUpdate)
                     return;
 
@@ -287,16 +289,28 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 needUpdate = false;
                 this.fireTableDataChanged();
 
+            } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
+                if (!needUpdate)
+                    return;
+
+                this.timeUpdate = NTP.getTime();
+                needUpdate = false;
+                this.fireTableDataChanged();
+
             } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
                 // INCOME
 
                 Transaction record = (Transaction) message.getValue();
 
-                boolean found = this.transactions.contains(new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record));
+                Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record);
+                boolean found = this.transactions.contains(pair);
 
                 if (found)
                     return;
+
+                this.transactions.add(pair);
 
                 if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
                     if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -306,44 +320,59 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                     }
                 }
 
-                if (needUpdate) {
-                    return;
-                } else {
-                    needUpdate = true;
+            } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+                // INCOME
+
+                Transaction record = (Transaction) message.getValue();
+
+                if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
                     return;
                 }
 
-                //	int i = this.transactions.size();
-                //	Transaction tt = (Transaction)message.getValue();
-                //	String aa = "";
-                //	if (tt.getCreator() != null) aa = tt.getCreator().getAddress();
-                //	Tuple2<String, String> ee = new Tuple2(aa, Base58.encode(tt.getSignature()));
-                //	Pair pp = new Pair(ee,(Transaction)message.getValue());
-                //	this.transactions.add(pp);
-                //this.fireTableDataChanged();    //
+                Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
+                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record);
+                boolean found = this.transactions.contains(pair);
 
-            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+                if (found)
+                    return;
 
-                Transaction record = (Transaction) message.getValue();
-                byte[] signKey = record.getSignature();
-                for (int i = 0; i < this.transactions.size() - 1; i++) {
-                    Transaction item = this.transactions.get(i).getB();
-                    if (item == null)
-                        return;
-                    if (Arrays.equals(signKey, item.getSignature())) {
-                        this.transactions.remove(i);
-                        //this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();
-                        break;
+                this.transactions.add(pair);
+
+                if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
+                    if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                        gui.library.library.notifySysTrayRecord(record);
+                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                        PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
                     }
                 }
 
-                if (needUpdate) {
-                    return;
-                } else {
+                if (!needUpdate) {
                     needUpdate = true;
+                }
+                return;
+
+            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+
+            Transaction record = (Transaction) message.getValue();
+            byte[] signKey = record.getSignature();
+            for (int i = 0; i < this.transactions.size() - 1; i++) {
+                Transaction item = this.transactions.get(i).getB();
+                if (item == null)
                     return;
+                if (Arrays.equals(signKey, item.getSignature())) {
+                    this.transactions.remove(i);
+                    //this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();
+                    break;
                 }
             }
+
+            if (needUpdate) {
+                return;
+            } else {
+                needUpdate = true;
+                return;
+            }
+        }
     }
 
     public void addObservers() {
