@@ -156,6 +156,10 @@ public class BlockChain {
     public static final int FEE_INVITED_SHIFT = 6; // 2^5 = 32 - total FEE -> fee for Forger and fee for Inviter
     public static final int FEE_INVITED_SHIFT_FOR_INVITE = 1; // - total FEE for Inviter of Person
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
+    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01");
+    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.005");
+    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.002"); /// 0.0075 COMPU - Issue Person - then >> 2
+    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.0001");
     public static final int FEE_FOR_ANONIMOUSE = 33;
     // SERTIFY
     // need RIGHTS for non PERSON account
@@ -164,9 +168,9 @@ public class BlockChain {
     public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE);
     // GIFTS for R_SertifyPubKeys
     public static final int GIFTED_COMPU_AMOUNT = 10000; //FEE_PER_BYTE << 8;
-    public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
-    public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 200 * GIFTED_COMPU_AMOUNT; // GIFTED_COMPU_AMOUNT << 7;
-    public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
+    //public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
+    //public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 200 * GIFTED_COMPU_AMOUNT; // GIFTED_COMPU_AMOUNT << 7;
+    //public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
     //private int checkPoint = DEVELOP_USE?1:32400;
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(36654,
             Base58.decode("4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W"));

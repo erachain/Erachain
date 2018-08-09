@@ -5,13 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import javax.swing.JFileChooser;
 
@@ -1487,12 +1481,11 @@ public class Wallet extends Observable implements Observer {
 			return;
 
 		DCSet db = DCSet.getInstance();
+
 		boolean personalized = false;
-		for (Account pkAccount : sertifyPubKeys.getSertifiedPublicKeys()) {
-			if (pkAccount.getPersonDuration(db) != null) {
-				personalized = true;
-				break;
-			}
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(sertifyPubKeys.getKey());
+		if (personalisedData == null || personalisedData.isEmpty()) {
+			personalized = true;
 		}
 
 		if (!personalized) {
@@ -1505,21 +1498,24 @@ public class Wallet extends Observable implements Observer {
 				Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 				// GET FEE from that record
 				transPersonIssue.setDC(db, false); // RECALC FEE if from DB
-				BigDecimal issueFEE_BD = transPersonIssue.getFee();
-				// long issueFEE = transPersonIssue.getFeeLong() +
-				// BlockChain.GIFTED_COMPU_AMOUNT;
-				// BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE,
-				// BlockChain.FEE_SCALE);
-				BigDecimal issueGIFT_FEE_BD = BlockChain.GIFTED_COMPU_AMOUNT_BD;
+
+				// ISSUE NEW COMPU in chain
+				BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+
+				// GIFTs
+				if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
+					this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
+							false, FEE_KEY, issued_FEE_BD);
+				}
 
 				// GIFTs
 				if (this.accountExists(creator.getAddress())) {
-					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issueGIFT_FEE_BD);
+					this.database.getAccountMap().changeBalance(creator.getAddress(), false, FEE_KEY, issued_FEE_BD);
 				}
 
 				PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 				if (this.accountExists(pkAccount.getAddress())) {
-					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issueFEE_BD);
+					this.database.getAccountMap().changeBalance(pkAccount.getAddress(), false, FEE_KEY, issued_FEE_BD);
 				}
 			}
 		}
@@ -1537,12 +1533,11 @@ public class Wallet extends Observable implements Observer {
 
 		// GIFTs
 		DCSet db = DCSet.getInstance();
+
 		boolean personalized = false;
-		for (Account pkAccount : sertifyPubKeys.getSertifiedPublicKeys()) {
-			if (pkAccount.getPersonDuration(db) != null) {
-				personalized = true;
-				break;
-			}
+		TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = db.getPersonAddressMap().getItems(sertifyPubKeys.getKey());
+		if (personalisedData == null || personalisedData.isEmpty()) {
+			personalized = true;
 		}
 
 		if (!personalized) {
@@ -1557,21 +1552,24 @@ public class Wallet extends Observable implements Observer {
 			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
 			// GET FEE from that record
 			transPersonIssue.setDC(db, false); // RECALC FEE if from DB
-			BigDecimal issueFEE_BD = transPersonIssue.getFee();
-			// long issueFEE = transPersonIssue.getFeeLong() +
-			// BlockChain.GIFTED_COMPU_AMOUNT;
-			// BigDecimal issueFEE_BD = BigDecimal.valueOf(issueFEE,
-			// BlockChain.FEE_SCALE);
-			BigDecimal issueGIFT_FEE_BD = BlockChain.GIFTED_COMPU_AMOUNT_BD;
+
+			// ISSUE NEW COMPU in chain
+			BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+
+			// GIFTs
+			if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
+				this.database.getAccountMap().changeBalance(transPersonIssue.getCreator().getAddress(),
+						true, FEE_KEY, issued_FEE_BD);
+			}
 
 			// GIFTs
 			if (this.accountExists(creator.getAddress())) {
-				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issueGIFT_FEE_BD);
+				this.database.getAccountMap().changeBalance(creator.getAddress(), true, FEE_KEY, issued_FEE_BD);
 			}
 
 			PublicKeyAccount pkAccount = sertifyPubKeys.getSertifiedPublicKeys().get(0);
 			if (this.accountExists(creator.getAddress())) {
-				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issueFEE_BD);
+				this.database.getAccountMap().changeBalance(pkAccount.getAddress(), true, FEE_KEY, issued_FEE_BD);
 			}
 		}
 	}

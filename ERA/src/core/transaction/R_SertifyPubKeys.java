@@ -1,10 +1,7 @@
 package core.transaction;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
@@ -461,6 +458,20 @@ public class R_SertifyPubKeys extends Transaction {
         return Transaction.VALIDATE_OK;
     }
 
+    public BigDecimal getBonuses() {
+
+        long personsTotal = this.dcSet.getItemPersonMap().getLastKey();
+        if (personsTotal < 3000)
+            return BlockChain.BONUS_FEE_LVL1;
+        else if (personsTotal < 10000)
+            return BlockChain.BONUS_FEE_LVL2;
+        else if (personsTotal < 100000)
+            return BlockChain.BONUS_FEE_LVL3;
+        else
+            return BlockChain.BONUS_FEE_LVL4;
+
+    }
+
     //PROCESS/ORPHAN
 
     @Override
@@ -488,12 +499,9 @@ public class R_SertifyPubKeys extends Transaction {
 
 
         boolean personalized = false;
-        for (Account pkAccount : this.sertifiedPublicKeys) {
-            Tuple4<Long, Integer, Integer, Integer> info = pkAccount.getPersonDuration(db);
-            if (info != null) {
-                personalized = true;
-                break;
-            }
+        TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
+        if (personalisedData == null || personalisedData.isEmpty()) {
+            personalized = true;
         }
 
         PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
@@ -509,19 +517,17 @@ public class R_SertifyPubKeys extends Transaction {
             transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
 
             // ISSUE NEW COMPU in chain
-            BigDecimal issued_FEE_BD = transPersonIssue.getFee();
+            BigDecimal issued_FEE_BD = getBonuses();
 
             // BACK FEE FOR ISSUER without gift for this.CREATOR
-            transPersonIssue.getCreator().changeBalance(db, false, FEE_KEY, issued_FEE_BD
-                    .subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
+            transPersonIssue.getCreator().changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
 
             // GIVE GIFT for Witness this PUB_KEY
-            this.creator.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
-            pkAccount.changeBalance(db, false, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
+            this.creator.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            pkAccount.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
 
             // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD
-                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
+            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD.multiply(new BigDecimal("3")), true);
 
             // EMITTE LIA
             this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
@@ -585,11 +591,9 @@ public class R_SertifyPubKeys extends Transaction {
         }
 
         boolean personalized = false;
-        for (Account pkAccount : this.sertifiedPublicKeys) {
-            if (pkAccount.getPersonDuration(db) != null) {
-                personalized = true;
-                break;
-            }
+        TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
+        if (personalisedData == null || personalisedData.isEmpty()) {
+            personalized = true;
         }
 
         PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
@@ -606,19 +610,28 @@ public class R_SertifyPubKeys extends Transaction {
             //	issueFEE = issueFEE>>2;
 
             // ISSUE NEW COMPU in chain
-            BigDecimal issued_FEE_BD = transPersonIssue.getFee();
+            BigDecimal issued_FEE_BD;
+
+            long personsTotal = db.getItemPersonMap().getLastKey();
+            if (personsTotal < 3000)
+                issued_FEE_BD = BlockChain.BONUS_FEE_LVL1;
+            else if (personsTotal < 10000)
+                issued_FEE_BD = BlockChain.BONUS_FEE_LVL2;
+            else if (personsTotal < 100000)
+                issued_FEE_BD = BlockChain.BONUS_FEE_LVL3;
+            else
+                issued_FEE_BD = BlockChain.BONUS_FEE_LVL4;
 
             // BACK FEE FOR ISSUER without gift for this.CREATOR
-            transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY, issued_FEE_BD
-                    .subtract(BlockChain.GIFTED_COMPU_AMOUNT_BD), false);
+            transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
 
             // GIVE GIFT for Witness this PUB_KEY
-            this.creator.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_BD, false);
-            pkAccount.changeBalance(db, true, FEE_KEY, BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD, false);
+            this.creator.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+            pkAccount.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
 
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD
-                    .add(BlockChain.GIFTED_COMPU_AMOUNT_FOR_PERSON_BD), true);
+                    .multiply(new BigDecimal("3")), true);
 
             // EMITTE LIA
             this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);

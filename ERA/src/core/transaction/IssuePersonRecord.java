@@ -17,6 +17,7 @@ import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import datachain.AddressTime_SignatureMap;
+import datachain.DCSet;
 
 //import java.util.Map;
 // import org.apache.log4j.Logger;
@@ -56,6 +57,8 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
     //GETTERS/SETTERS
     //public String getName() { return "Issue Person"; }
+
+    //PARSE CONVERT
 
     public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
 
@@ -156,7 +159,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         return null;
     }
 
-    //PARSE CONVERT
+    //VALIDATE
 
     @Override
     public int isValid(Long releaserReference, long flags) {
@@ -248,30 +251,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
     }
 
-    //VALIDATE
-
-
     //PROCESS/ORPHAN
-
-    // GET only INVITED FEE
-    @Override
-    public int getInvitedFee() {
-        int fee = this.fee.unscaledValue().intValue();
-
-        if (true) {
-            return fee >> BlockChain.FEE_INVITED_SHIFT;
-        }
-
-        long counter = this.dcSet.getItemPersonMap().getLastKey();
-        if (counter < 10000l)
-            return fee >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
-        else if (counter < 100000l)
-            return fee >> (BlockChain.FEE_INVITED_SHIFT_FOR_INVITE + 1);
-        else if (counter < 1000000l)
-            return fee >> (BlockChain.FEE_INVITED_SHIFT_FOR_INVITE + 2);
-        else
-            return fee >> BlockChain.FEE_INVITED_SHIFT;
-    }
 
     //@Override
     public void process(Block block, boolean asPack) {
@@ -316,10 +296,19 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         
     }
 
+        /*
+    всю комиссию получает форжер - может быть это не живоая персона?
+    поэтому у форжера будут забраны компу после регистрации персоны
+    */
+
+    // GET only INVITED FEE
     @Override
-    public int calcBaseFee() {
-        int fee = calcCommonFee() >> 1;
-        return fee;
+    public int getInvitedFee() {
+        return this.fee.unscaledValue().intValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
     }
 
+    @Override
+    public int calcBaseFee() {
+        return calcCommonFee() >> 2;
+    }
 }
