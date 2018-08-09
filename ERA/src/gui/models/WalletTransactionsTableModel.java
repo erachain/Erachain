@@ -284,7 +284,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 return;
 
             long period = NTP.getTime() - this.timeUpdate;
-            if (period < Gui.PERIOD_UPDATE)
+            if (period < 2000) //Gui.PERIOD_UPDATE)
                 return;
 
             this.timeUpdate = NTP.getTime();
@@ -321,7 +321,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             this.transactions.add(0, pair);
             */
 
-            if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
+            if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
                 if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                     gui.library.library.notifySysTrayRecord(record);
                 } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
@@ -331,6 +331,10 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
             // INCOME
+
+            this.fireTableDataChanged();
+            if (true)
+                return;
 
             Pair<byte[], Transaction> pair = (Pair<byte[], Transaction>) message.getValue();
             Transaction record = pair.getB();
@@ -356,13 +360,15 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             this.transactions.add(0, pairRecord);
             */
 
-            if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
+            if (DCSet.getInstance().getTransactionMap().contains(record.getSignature())) {
                 if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                     gui.library.library.notifySysTrayRecord(record);
                 } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
                     PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
                 }
             }
+
+            this.fireTableRowsInserted(0,0);
 
             if (!needUpdate) {
                 needUpdate = true;
@@ -378,9 +384,8 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 if (item == null)
                     return;
                 if (Arrays.equals(signKey, item.getSignature())) {
-                    //this.transactions.remove(i);
-                    //this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();
-                    break;
+                    this.fireTableRowsDeleted(i, i);
+                    return;
                 }
             }
 
