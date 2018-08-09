@@ -387,6 +387,7 @@ public class Account_Transactions_Table extends JTable implements Observer {
 
         if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
             boolean is;
+            // TODO упростить
             if (((Transaction) message.getValue()).getType() == Transaction.SEND_ASSET_TRANSACTION) {
                 is = false;
                 for (int i = messageBufs.size() - 1; i >= 0; i--)

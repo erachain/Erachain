@@ -22,6 +22,7 @@ import utils.PlaySound;
 import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -258,6 +259,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
             this.syncUpdate(o, arg);
         } catch (Exception e) {
             //GUI ERROR
+            String mess = e.getMessage();
         }
     }
 
@@ -268,7 +270,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_LIST_TRANSACTION_TYPE) {
             if (this.transactions == null) {
-                this.transactions = (SortableList<Tuple2<String, String>, Transaction>) message.getValue();
+                this.transactions = (SortableList<Tuple2<String, String>, Transaction>)message.getValue();
                 this.transactions.registerObserver();
                 this.transactions.sort(TransactionMap.TIMESTAMP_INDEX, true);
             }
@@ -277,81 +279,97 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                     || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
-                // если прилетел блок или откатился и нужно обновить - то обновляем
-                if (!needUpdate)
-                    return;
-
-                long period = NTP.getTime() - this.timeUpdate;
-                if (period < Gui.PERIOD_UPDATE)
-                    return;
-
-                this.timeUpdate = NTP.getTime();
-                needUpdate = false;
-                this.fireTableDataChanged();
-
-            } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
-                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
-                if (!needUpdate)
-                    return;
-
-                this.timeUpdate = NTP.getTime();
-                needUpdate = false;
-                this.fireTableDataChanged();
-
-            } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-                // INCOME
-
-                Transaction record = (Transaction) message.getValue();
-
-                Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record);
-                boolean found = this.transactions.contains(pair);
-
-                if (found)
-                    return;
-
-                this.transactions.add(pair);
-
-                if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
-                    if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                        gui.library.library.notifySysTrayRecord(record);
-                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
-                    }
-                }
-
-            } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
-                // INCOME
-
-                Transaction record = (Transaction) message.getValue();
-
-                if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
-                    return;
-                }
-
-                Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
-                        new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record);
-                boolean found = this.transactions.contains(pair);
-
-                if (found)
-                    return;
-
-                this.transactions.add(pair);
-
-                if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
-                    if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                        gui.library.library.notifySysTrayRecord(record);
-                    } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
-                        PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
-                    }
-                }
-
-                if (!needUpdate) {
-                    needUpdate = true;
-                }
+            // если прилетел блок или откатился и нужно обновить - то обновляем
+            if (!needUpdate)
                 return;
 
-            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
+            long period = NTP.getTime() - this.timeUpdate;
+            if (period < Gui.PERIOD_UPDATE)
+                return;
+
+            this.timeUpdate = NTP.getTime();
+            needUpdate = false;
+            this.fireTableDataChanged();
+
+        } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                            || message.getType() == ObserverMessage.WALLET_SYNC_STATUS) {
+            if (!needUpdate)
+                return;
+
+            this.timeUpdate = NTP.getTime();
+            needUpdate = false;
+            this.fireTableDataChanged();
+
+        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+            // INCOME
+
+            Transaction record = (Transaction) message.getValue();
+
+            Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
+                    new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record);
+            boolean found = this.transactions.contains(pair);
+
+            if (found) {
+                return;
+            }
+
+            /*
+            Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
+            if (this.transactions.size()> 1000)
+                this.transactions.remove(this.transactions.size() - 1);
+
+            this.transactions.add(0, pair);
+            */
+
+            if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
+                if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    gui.library.library.notifySysTrayRecord(record);
+                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+                }
+            }
+
+        } else if (message.getType() == ObserverMessage.ADD_UNC_TRANSACTION_TYPE) {
+            // INCOME
+
+            Pair<byte[], Transaction> pair = (Pair<byte[], Transaction>) message.getValue();
+            Transaction record = pair.getB();
+
+            if (!Controller.getInstance().wallet.accountExists(record.getCreator().getAddress())) {
+                return;
+            }
+
+            Pair<Tuple2<String, String>, Transaction> pairRecord = new Pair<Tuple2<String, String>, Transaction>(
+                    new Tuple2<String, String>(record.getCreator().getAddress(),
+                            new String(record.getSignature())), record);
+            boolean found = this.transactions.contains(pairRecord);
+
+            if (found) {
+                return;
+            }
+
+            /*
+            Ошибка - это статичный массив - в него нельзя не добавлять ни удалять
+            if (this.transactions.size()> 1000)
+                this.transactions.remove(this.transactions.size() - 1);
+
+            this.transactions.add(0, pairRecord);
+            */
+
+            if (DCSet.getInstance().getTransactionMap().contains(((Transaction) message.getValue()).getSignature())) {
+                if (record.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    gui.library.library.notifySysTrayRecord(record);
+                } else if (Settings.getInstance().isSoundNewTransactionEnabled()) {
+                    PlaySound.getInstance().playSound("newtransaction.wav", record.getSignature());
+                }
+            }
+
+            if (!needUpdate) {
+                needUpdate = true;
+            }
+            return;
+
+        } else if (message.getType() == ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE) {
 
             Transaction record = (Transaction) message.getValue();
             byte[] signKey = record.getSignature();
@@ -360,7 +378,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 if (item == null)
                     return;
                 if (Arrays.equals(signKey, item.getSignature())) {
-                    this.transactions.remove(i);
+                    //this.transactions.remove(i);
                     //this.fireTableRowsDeleted(i, i); //.fireTableDataChanged();
                     break;
                 }
@@ -377,17 +395,20 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     public void addObservers() {
 
-        /////Controller.getInstance().addWalletListener(this);
-        //REGISTER ON TRANSACTIONS
+        //REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTransactionMap().addObserver(this);
+        // for UNCONFIRMEDs
+        DCSet.getInstance().getTransactionMap().addObserver(this);
+        // for ??
+        ///Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
     }
 
 
     public void removeObservers() {
 
-        ////Controller.getInstance().deleteObserver(this);
         Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
-        Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
+        DCSet.getInstance().getTransactionMap().addObserver(this);
+        /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }
 }
