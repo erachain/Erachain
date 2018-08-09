@@ -21,3 +21,4 @@ gui_settings.json
 .settings
 /bin*
 /bin/
+/gradle/
