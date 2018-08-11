@@ -515,11 +515,14 @@ public class Account {
         //if (amount.signum() < 0)
         //    amount = amount.negate();
 
-        if (this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork()
+        /*
+        if (false
+                && this.equals("77HyuCsr8u7f6znj2Lq8gXjK6DCG7osehs") && absKey == 1 && !db.isFork()
                 && (actionType == TransactionAmount.ACTION_SEND || actionType == TransactionAmount.ACTION_DEBT)
                 && true) {
             ;
         }
+        */
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), absKey);
