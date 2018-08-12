@@ -158,7 +158,7 @@ public class PollDetailPanel extends JPanel {
         gbc_name.gridy = 1;
         this.add(name, gbc_name);
 
-        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date") + ":");
+        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date:"));
         GridBagConstraints gbc_dateLabel = new GridBagConstraints();
         gbc_dateLabel.insets = new Insets(0, 0, 5, 5);
         gbc_dateLabel.gridx = 1;
