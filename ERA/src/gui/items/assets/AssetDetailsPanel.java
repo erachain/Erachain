@@ -100,7 +100,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //DESCRIPTION
         detailGBC.gridy = gridy;
-        JTextArea txtAreaDescription = new JTextArea(asset.getDescription());
+        JTextArea txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
         txtAreaDescription.setEditable(false);

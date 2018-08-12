@@ -33,7 +33,7 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(asset.getDescription());
+        JTextArea txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);

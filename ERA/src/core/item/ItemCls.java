@@ -221,7 +221,12 @@ public abstract class ItemCls {
         return this.description;
     }
 
-    public byte[] getReference() {
+    public String viewDescription() {
+        return this.description;
+    }
+
+
+        public byte[] getReference() {
         return this.reference;
     }
 

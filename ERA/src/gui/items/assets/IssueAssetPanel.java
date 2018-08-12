@@ -412,7 +412,8 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             text += Lang.getInstance().translate("Asset Type") + ":&nbsp;"
                     + Lang.getInstance().translate(asset.viewAssetType() + "") + "<br>";
             text += Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>";
-            text += Lang.getInstance().translate("Description") + ":<br>" + library.to_HTML(asset.getDescription())
+            text += Lang.getInstance().translate("Description") + ":<br>"
+                    + library.to_HTML(Lang.getInstance().translate(asset.viewDescription()))
                     + "<br>";
             String Status_text = "";
             

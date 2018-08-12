@@ -109,7 +109,7 @@ public class AssetSendPanel extends javax.swing.JPanel {
     // favorite combo box
       jComboBox_Asset.setModel(new AssetsComboBoxModel());
        if (asset != null) {
-           this.jTextArea_Account_Description.setText(asset.getDescription());
+           this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
 
            for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
                AssetCls item = jComboBox_Asset.getItemAt(i);

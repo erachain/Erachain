@@ -712,7 +712,7 @@ public class BlockExplorer {
 
             assetJSON.put("key", asset.getKey());
             assetJSON.put("name", asset.getName());
-            assetJSON.put("description", asset.getDescription());
+            assetJSON.put("description", Lang.getInstance().translate_from_langObj(asset.viewDescription(), langObj));
             // assetJSON.put("description", asset.getDescription());
             assetJSON.put("owner", asset.getOwner().getAddress());
             assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
@@ -780,7 +780,7 @@ public class BlockExplorer {
 
             assetJSON.put("key", asset.getKey());
             assetJSON.put("name", asset.getName());
-            assetJSON.put("description", asset.getDescription());
+            assetJSON.put("description", Lang.getInstance().translate_from_langObj(asset.viewDescription(), langObj));
             assetJSON.put("owner", asset.getOwner().getAddress());
             assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
             assetJSON.put("scale", asset.getScale());
@@ -854,7 +854,7 @@ public class BlockExplorer {
 
             assetJSON.put("key", asset.getKey());
             assetJSON.put("name", asset.getName());
-            assetJSON.put("description", asset.getDescription());
+            assetJSON.put("description", Lang.getInstance().translate_from_langObj(asset.viewDescription(), langObj));
             assetJSON.put("owner", asset.getOwner().getAddress());
             assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
             assetJSON.put("scale", asset.getScale());
@@ -1184,7 +1184,7 @@ public class BlockExplorer {
 
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
-        assetJSON.put("description", asset.getDescription());
+        assetJSON.put("description", Lang.getInstance().translate_from_langObj(asset.viewDescription(), langObj));
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", asset.getQuantity());
         assetJSON.put("scale", asset.getScale());
@@ -1261,7 +1261,7 @@ public class BlockExplorer {
             pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
             pairJSON.put("asset", pair.getKey());
             pairJSON.put("assetName", assetWant.getName());
-            pairJSON.put("description", assetWant.getDescription());
+            pairJSON.put("description", Lang.getInstance().translate_from_langObj(assetWant.viewDescription(), langObj));
             pairsJSON.put(pair.getKey(), pairJSON);
         }
 

@@ -194,7 +194,8 @@ public class WEB_Transactions_HTML {
         GenesisIssueAssetTransaction assetIssue = (GenesisIssueAssetTransaction) transaction;
         AssetCls asset = (AssetCls) assetIssue.getItem();
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ": </b>" + asset.getName();
-        out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>" + asset.getDescription();
+        out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ": </b>"
+                + Lang.getInstance().translate_from_langObj(asset.viewDescription(), langObj);
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ": </b>" + asset.getQuantity().toString();
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Scale", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.getScale() + "", langObj);
         out += "<BR><b>" + Lang.getInstance().translate_from_langObj("Asset Type", langObj) + ": </b>" + Lang.getInstance().translate_from_langObj(asset.viewAssetType() + "", langObj);
@@ -487,7 +488,8 @@ public class WEB_Transactions_HTML {
         out += "<b>" + Lang.getInstance().translate_from_langObj("Name", langObj) + ":</b> <a href=?asset="
                 + tr.getAssetKey() + get_Lang(langObj) + ">" + tr.getItem().viewName() + "</a><br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> "
-                + tr.getItem().getDescription() + "<br>";
+                //+ tr.getItem().getDescription() + "<br>";
+                + Lang.getInstance().translate_from_langObj(tr.getItem().viewDescription(), langObj) + "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Quantity", langObj) + ":</b> "
                 + ((AssetCls) tr.getItem()).getQuantity().toString() + "<br>";
         out += "<b>" + Lang.getInstance().translate_from_langObj("Scale", langObj) + ":</b> "
