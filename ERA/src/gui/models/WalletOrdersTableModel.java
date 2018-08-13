@@ -17,6 +17,7 @@ import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -34,7 +35,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     int start =0,step=100;
 
     private SortableList<Tuple2<String, Long>, Order> orders;
-    ArrayList<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
+    List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Status"});
 
     public WalletOrdersTableModel() {
@@ -191,11 +192,15 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     public void getInterval(int start,int step){
         this.start = start;
         this.step = step;
-        pp.clear();
-        pp =  this.orders.getInterval(start, step);
+       // pp.c.clear();
+        int end = start+step;
+        if (end > orders.size()) end = orders.size();
+        pp = this.orders.subList(start, end);
         
     }
     public void setInterval(int start, int step){
         getInterval(start,step);
     }
+    
+    
 }

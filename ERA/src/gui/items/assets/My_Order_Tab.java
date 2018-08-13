@@ -298,5 +298,13 @@ public class My_Order_Tab extends Split_Panel {
             ordersModel.fireTableDataChanged();
         }
     }
+    
+    @Override
+    public void delay_on_close() {
+        ordersModel.removeObservers();
+        setIntervalPanel.removeObservers();
+        
+    }
+    
 
 }

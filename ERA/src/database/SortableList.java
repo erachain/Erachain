@@ -206,15 +206,4 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         }
     }
     
-    public ArrayList<Pair<T, U>> getInterval(int start,int step){
-        
-        ArrayList<Pair<T, U>> pp = new ArrayList<Pair<T, U>>();
-        int i =0;
-        for(i = start; i<=start+step; i++){
-           pp.add(this.get(i));
-        }
-        return pp;
-        
-    }
-
 }

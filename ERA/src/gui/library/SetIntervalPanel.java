@@ -1,10 +1,21 @@
 package gui.library;
 
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import lang.Lang;
+import org.mapdb.Fun.Tuple2;
 
-public class SetIntervalPanel extends JPanel {
+import controller.Controller;
+import core.item.assets.Order;
+import datachain.SortableList;
+import lang.Lang;
+import utils.ObserverMessage;
+import utils.Pair;
+
+public class SetIntervalPanel extends JPanel implements Observer{
 
         /**
          * 
@@ -14,6 +25,7 @@ public class SetIntervalPanel extends JPanel {
          * Creates new form SetInterval
          */
         public SetIntervalPanel() {
+            Controller.getInstance().addWalletListener(this);
             initComponents();
         }
 
@@ -71,6 +83,15 @@ public class SetIntervalPanel extends JPanel {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
             gridBagConstraints.insets = new java.awt.Insets(6, 5, 5, 0);
             add(jButtonSetInterval, gridBagConstraints);
+            
+            JLabel jLabelTotal = new JLabel();
+            jLabelTotal.setText(Lang.getInstance().translate("Total")+":" + this.orders.size());
+            gridBagConstraints.gridx = 5;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+            gridBagConstraints.insets = new java.awt.Insets(6, 5, 5, 0);
+            add(jLabelTotal, gridBagConstraints);
         }// </editor-fold>                        
 
 
@@ -80,7 +101,52 @@ public class SetIntervalPanel extends JPanel {
         public javax.swing.JTextField jTextFieldEnd;
         public javax.swing.JTextField jTextFieldStart;
         public javax.swing.JButton jButtonSetInterval;
+         private SortableList<Tuple2<String, Long>, Order> orders;
         // End of variables declaration                   
+        @Override
+        public void update(Observable arg0, Object arg1) {
+            // TODO Auto-generated method stub
+            try {
+                this.syncUpdate(arg0, arg1);
+            } catch (Exception e) {
+                //GUI ERROR
+            }
+            
+            
+        }
     
+
+        @SuppressWarnings("unchecked")
+        public synchronized void syncUpdate(Observable o, Object arg) {
+            ObserverMessage message = (ObserverMessage) arg;
+
+            //CHECK IF NEW LIST
+            if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE
+                    || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
+                if (this.orders == null) {
+                    this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
+                    this.orders.registerObserver();
+                    
+                }
+               
+            } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
+                //CHECK IF LIST UPDATED
+                Pair<Tuple2<String, Long>, Order> item = (Pair<Tuple2<String, Long>, Order>) message.getValue();
+                this.orders.add(0, item);
+               
+              
+
+            } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
+                //CHECK IF LIST UPDATED
+                this.orders.remove(0);
+               
+                
+            }
+           
+        }
+        public void removeObservers() {
+            this.orders.removeObserver();
+            Controller.getInstance().deleteWalletObserver(this);
+        }
 
 }
