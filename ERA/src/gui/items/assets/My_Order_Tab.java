@@ -3,6 +3,7 @@ package gui.items.assets;
 import core.item.assets.Order;
 import gui.Split_Panel;
 import gui.library.MTable;
+import gui.library.SetIntervalPanel;
 import gui.models.WalletItemAssetsTableModel;
 import gui.models.WalletOrdersTableModel;
 import lang.Lang;
@@ -26,13 +27,12 @@ import java.math.BigInteger;
 public class My_Order_Tab extends Split_Panel {
 
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("rawtypes")
-    final MTable table;
     protected int row;
     /**
      *
      */
     WalletOrdersTableModel ordersModel;
+    private SetIntervalPanel setIntervalPanel;
 
     @SuppressWarnings("rawtypes")
     public My_Order_Tab() {
@@ -45,38 +45,37 @@ public class My_Order_Tab extends Split_Panel {
         jButton1_jToolBar_RightPanel.setVisible(false);
         jButton2_jToolBar_RightPanel.setVisible(false);
 
-        //TABLE
+        // set interval panel
+        setIntervalPanel = new SetIntervalPanel();
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
+        leftPanel.add(setIntervalPanel, gridBagConstraints);
+
+        setIntervalPanel.jButtonSetInterval.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                setInterval();
+            }
+        });
+
+        // TABLE
         ordersModel = new WalletOrdersTableModel();
-        table = new MTable(ordersModel);
-
-
-        // column #1
-        TableColumn column1 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_KEY);//.COLUMN_CONFIRMED);
-        column1.setMinWidth(1);
-        column1.setMaxWidth(1000);
-        column1.setPreferredWidth(50);
-        // column #1
-        TableColumn column2 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_CONFIRMED);//.COLUMN_CONFIRMED);
-        column2.setMinWidth(50);
-        column2.setMaxWidth(1000);
-        column2.setPreferredWidth(50);
-        // column #1
-        TableColumn column3 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_ASSET_TYPE);//.COLUMN_CONFIRMED);
-        column3.setMinWidth(50);
-        column3.setMaxWidth(1000);
-        column3.setPreferredWidth(50);
-        // column #1
-        TableColumn column4 = table.getColumnModel().getColumn(WalletItemAssetsTableModel.COLUMN_FAVORITE);//.COLUMN_KEY);//.COLUMN_CONFIRMED);
-        column4.setMinWidth(50);
-        column4.setMaxWidth(1000);
-        column4.setPreferredWidth(50);
-
+        // set interval
+        setInterval();
+        // table = new MTable(ordersModel);
 
         // add listener
-        //		jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(table);
+        // jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(table);
         // show
-        this.jTable_jScrollPanel_LeftPanel.setModel(ordersModel);
-        this.jTable_jScrollPanel_LeftPanel = table;
+        this.jTable_jScrollPanel_LeftPanel = new MTable(ordersModel);
+        // this.jTable_jScrollPanel_LeftPanel = table;
         jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
         jScrollPanel_LeftPanel.setViewportView(jTable_jScrollPanel_LeftPanel);
 
@@ -101,26 +100,22 @@ public class My_Order_Tab extends Split_Panel {
 
                 // SET FILTER
 
-
             }
         });
 
-
-        //MENU
+        // MENU
         JPopupMenu assetsMenu = new JPopupMenu();
         assetsMenu.addAncestorListener(new AncestorListener() {
-
 
             @Override
             public void ancestorAdded(AncestorEvent arg0) {
                 // TODO Auto-generated method stub
-                row = table.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
                 if (row < 1) {
                     return;
                 }
 
-                row = table.convertRowIndexToModel(row);
-
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 
             }
 
@@ -136,116 +131,112 @@ public class My_Order_Tab extends Split_Panel {
 
             }
 
-
         });
-
 
         JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
         favorite.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                favorite_set(table);
+                favorite_set(jTable_jScrollPanel_LeftPanel);
 
             }
         });
 
         assetsMenu.addPopupMenuListener(new PopupMenuListener() {
 
-                                            @Override
-                                            public void popupMenuCanceled(PopupMenuEvent arg0) {
-                                                // TODO Auto-generated method stub
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent arg0) {
+                // TODO Auto-generated method stub
 
-                                            }
+            }
 
-                                            @Override
-                                            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-                                                // TODO Auto-generated method stub
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+                // TODO Auto-generated method stub
 
-                                            }
+            }
 
-                                            @Override
-                                            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                                                // TODO Auto-generated method stub
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+                // TODO Auto-generated method stub
 
-                                                row = table.getSelectedRow();
-                                                row = table.convertRowIndexToModel(row);
+                row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 
-                                            }
+            }
 
-                                        }
+        }
 
         );
 
-
         assetsMenu.add(favorite);
-
 
         JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
         details.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                //		AssetCls asset = assetsModel.getAsset(row);
-                //			new AssetFrame(asset);
+                // AssetCls asset = assetsModel.getAsset(row);
+                // new AssetFrame(asset);
             }
         });
-        //	assetsMenu.add(details);
+        // assetsMenu.add(details);
         JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
         dividend.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                //		AssetCls asset = assetsModel.getAsset(row);
-                //		new PayDividendFrame(asset);
+                // AssetCls asset = assetsModel.getAsset(row);
+                // new PayDividendFrame(asset);
             }
         });
         assetsMenu.add(dividend);
-    //    table.setComponentPopupMenu(assetsMenu);
-        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        // table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, assetsMenu); // SELECT
+                                                                                               // ROW
+                                                                                               // ON
+                                                                                               // WHICH
+                                                                                               // CLICKED
+                                                                                               // RIGHT
+                                                                                               // BUTTON
 
-
-        //MOUSE ADAPTER
-        table.addMouseListener(new MouseAdapter() {
+        // MOUSE ADAPTER
+        this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = table.rowAtPoint(p);
-                table.setRowSelectionInterval(row, row);
+                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
             }
         });
 
-        table.addMouseListener(new MouseAdapter() {
+        this.jTable_jScrollPanel_LeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 Point p = e.getPoint();
-                int row = table.rowAtPoint(p);
-                table.setRowSelectionInterval(row, row);
-				/*
-			if(e.getClickCount() == 2)
-			{
-				row = table.convertRowIndexToModel(row);
-				AssetCls asset = assetsModel.getAsset(row);
-				new AssetFrame(asset);
-			}
-			if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1)
-			{
-
-				if (table.getSelectedColumn() == WalletItemAssetsTableModel.COLUMN_FAVORITE){
-					row = table.convertRowIndexToModel(row);
-					AssetCls asset = orderModel.getAsset(row);
-					favorite_set( table);
-
-
-
-				}
-
-
-			}
-				 */
+                int row = jTable_jScrollPanel_LeftPanel.rowAtPoint(p);
+                jTable_jScrollPanel_LeftPanel.setRowSelectionInterval(row, row);
+                /*
+                 * if(e.getClickCount() == 2) { row =
+                 * table.convertRowIndexToModel(row); AssetCls asset =
+                 * assetsModel.getAsset(row); new AssetFrame(asset); }
+                 * if(e.getClickCount() == 1 & e.getButton() == e.BUTTON1) {
+                 * 
+                 * if (table.getSelectedColumn() ==
+                 * WalletItemAssetsTableModel.COLUMN_FAVORITE){ row =
+                 * table.convertRowIndexToModel(row); AssetCls asset =
+                 * orderModel.getAsset(row); favorite_set( table);
+                 * 
+                 * 
+                 * 
+                 * }
+                 * 
+                 * 
+                 * }
+                 */
             }
         });
-
 
     }
 
@@ -264,16 +255,47 @@ public class My_Order_Tab extends Split_Panel {
     public void favorite_set(JTable assetsTable) {
     }
 
-    //CreateOrderDetailsFrame
-    //listener select row
+    // CreateOrderDetailsFrame
+    // listener select row
     class search_listener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
-            Order order = null;
-            if (table.getSelectedRow() >= 0)
-                order = ordersModel.getOrder(table.convertRowIndexToModel(table.getSelectedRow()));
-            if (order == null) return;
-            jScrollPane_jPanel_RightPanel.setViewportView(new Order_Info_Panel(order));
+            try {
+                Order order = null;
+                int i = 0;
+                if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0)
+                    i = jTable_jScrollPanel_LeftPanel
+                            .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow());
+                order = ordersModel.getOrder(i);
+                if (order == null)
+                    return;
+                jScrollPane_jPanel_RightPanel.setViewportView(new Order_Info_Panel(order));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void setInterval() {
+        Integer start = 0;
+        try {
+            start = Integer.valueOf(setIntervalPanel.jTextFieldStart.getText());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            return;
+        }
+        Integer end = 0;
+        try {
+            end = Integer.valueOf(setIntervalPanel.jTextFieldEnd.getText());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            return;
+        }
+        if (end > start) {
+            int step = end - start;
+            ordersModel.setInterval(start, step);
+            ordersModel.fireTableDataChanged();
         }
     }
 

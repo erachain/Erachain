@@ -2,6 +2,9 @@ package datachain;
 
 import database.DBMap;
 import org.apache.log4j.Logger;
+import org.mapdb.Fun.Tuple2;
+
+import core.item.assets.Order;
 import utils.ObserverMessage;
 import utils.Pair;
 
@@ -213,6 +216,18 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
         if (!additionalFilterFields.contains(fieldname)) {
             additionalFilterFields.add(fieldname);
         }
+    }
+    
+    public ArrayList<Pair<T, U>> getInterval(int start,int step){
+       
+        ArrayList<Pair<T, U>> pp = new ArrayList<Pair<T, U>>();
+        int i =0;
+        for(i = start; i<=start+step; i++){
+            Pair<T, U> ss = this.get(i);
+            if (ss != null)  pp.add(ss);
+        }
+        return pp;
+        
     }
 
 }

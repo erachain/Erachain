@@ -11,6 +11,8 @@ import utils.ObserverMessage;
 import utils.Pair;
 
 import javax.validation.constraints.Null;
+
+import java.util.Collections;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -133,6 +135,8 @@ public class WalletItemPersonsTableModel extends TableModelCls<Tuple2<String, St
             if (this.persons == null) {
                 this.persons = (SortableList<Tuple2<String, String>, PersonCls>) message.getValue();
                 this.persons.registerObserver();
+                // sort from comparator
+                Collections.sort(this.persons, (a, b) -> a.getB().getName().compareToIgnoreCase(b.getB().getName()));
             }
 
             this.fireTableDataChanged();
