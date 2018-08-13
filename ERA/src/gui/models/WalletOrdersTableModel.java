@@ -4,6 +4,7 @@ import controller.Controller;
 import core.account.Account;
 import core.block.Block;
 import core.item.assets.Order;
+import core.transaction.CreateOrderTransaction;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
@@ -184,6 +185,12 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
                 }
             }
            
+        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
+         //   Transaction record = (Transaction) message.getValue();
+         //   if (record.getType() == Transaction.CREATE_ORDER_TRANSACTION){
+         //       this.pp.add(new Pair(new Tuple2(record.getCreator().getAddress(), 0l), (CreateOrderTransaction) record));
+         //       List<Pair<Tuple2<String, Long>, Order>> ss = pp;
+         //   }
         }
        
     }

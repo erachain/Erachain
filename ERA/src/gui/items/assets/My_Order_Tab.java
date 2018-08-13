@@ -1,6 +1,7 @@
 package gui.items.assets;
 
 import core.item.assets.Order;
+import core.transaction.Transaction;
 import gui.Split_Panel;
 import gui.library.MTable;
 import gui.library.SetIntervalPanel;
@@ -46,7 +47,7 @@ public class My_Order_Tab extends Split_Panel {
         jButton2_jToolBar_RightPanel.setVisible(false);
 
         // set interval panel
-        setIntervalPanel = new SetIntervalPanel();
+        setIntervalPanel = new SetIntervalPanel(Transaction.CREATE_ORDER_TRANSACTION);
         GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;

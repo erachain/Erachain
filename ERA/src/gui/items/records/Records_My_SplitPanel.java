@@ -4,7 +4,10 @@ import controller.Controller;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.Split_Panel;
+import gui.library.MTable;
+import gui.library.SetIntervalPanel;
 import gui.library.Voush_Library_Panel;
+import gui.models.WalletTransactionsTableModel;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
 import org.mapdb.Fun.Tuple2;
@@ -28,33 +31,29 @@ public class Records_My_SplitPanel extends Split_Panel {
     private static Records_My_SplitPanel instance;
     public Voush_Library_Panel voush_Library_Panel;
     protected Transaction trans;
-    JScrollPane jScrollPane4;
-    All_Records_Panel my_Records_Panel;
-    // для прозрачности
-    int alpha = 255;
-    // VotingDetailPanel votingDetailsPanel ;
-    int alpha_int;
     private JPanel records_Info_Panel;
     private JPopupMenu menu;
     private JMenuItem item_Delete;
     private JMenuItem item_Rebroadcast;
+    public WalletTransactionsTableModel records_model;
+    public SetIntervalPanel setIntervalPanel;
 
+  
 
     private Records_My_SplitPanel() {
         super("Records_My_SplitPanel");
-        this.leftPanel.setVisible(false);
-        my_Records_Panel = new All_Records_Panel();
-        this.jSplitPanel.setLeftComponent(my_Records_Panel);
+        this.leftPanel.setVisible(true);
+       
 
         setName(Lang.getInstance().translate("My Records"));
 
-        // searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search")
-        // +": ");
-
-        jScrollPane4 = new JScrollPane();
+        //CREATE TABLE
+        this.records_model = new WalletTransactionsTableModel();
+        this.jTable_jScrollPanel_LeftPanel = new MTable(this.records_model);
+        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
 
         // not show buttons
-        jToolBar_RightPanel.setVisible(false);
+        jToolBar_RightPanel.setVisible(true);
         // toolBar_LeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setText("<HTML><B> " + Lang.getInstance().translate("Record") + "</></> ");
         jButton1_jToolBar_RightPanel.setBorderPainted(true);
@@ -70,7 +69,33 @@ public class Records_My_SplitPanel extends Split_Panel {
         });
 
         jButton2_jToolBar_RightPanel.setVisible(false);
-        my_Records_Panel.records_Table.getSelectionModel().addListSelectionListener(new search_listener());
+        this.jToolBar_RightPanel.setVisible(false);
+        this.toolBar_LeftPanel.setVisible(false);
+        
+     // set interval panel
+        setIntervalPanel = new SetIntervalPanel(Transaction.EXTENDED);
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
+        leftPanel.add(setIntervalPanel, gridBagConstraints);
+
+        setIntervalPanel.jButtonSetInterval.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                setInterval();
+            }
+        });
+
+     // set interval
+        setInterval();
+        
+        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         menu = new JPopupMenu();
         menu.addAncestorListener(new AncestorListener() {
@@ -78,10 +103,10 @@ public class Records_My_SplitPanel extends Split_Panel {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 // TODO Auto-generated method stub
-                int row = my_Records_Panel.records_Table.getSelectedRow();
-                row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+                trans = (Transaction) records_model.getItem(row);
             }
 
             @Override
@@ -94,10 +119,10 @@ public class Records_My_SplitPanel extends Split_Panel {
             @Override
             public void ancestorRemoved(AncestorEvent event) {
                 // TODO Auto-generated method stub
-                int row = my_Records_Panel.records_Table.getSelectedRow();
-                row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+                trans = (Transaction) records_model.getItem(row);
 
             }
 
@@ -135,7 +160,7 @@ public class Records_My_SplitPanel extends Split_Panel {
         });
 
         menu.add(item_Delete);
-        TableMenuPopupUtil.installContextMenu(my_Records_Panel.records_Table, menu);
+        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
         menu.addAncestorListener(new AncestorListener() {
 
             @Override
@@ -185,20 +210,21 @@ public class Records_My_SplitPanel extends Split_Panel {
 
     public void onClick() {
         // GET SELECTED OPTION
-        int row = my_Records_Panel.records_Table.getSelectedRow();
+        int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
         if (row == -1) {
             row = 0;
         }
-        row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+        row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 
-        if (my_Records_Panel.records_Table.getSelectedRow() >= 0) {
+        if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
         }
     }
 
     @Override
     public void delay_on_close() {
         // delete observer left panel
-        my_Records_Panel.records_model.removeObservers();
+        this.records_model.removeObservers();
+        this.setIntervalPanel.removeObservers();
         // get component from right panel
         //	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close
@@ -213,9 +239,9 @@ public class Records_My_SplitPanel extends Split_Panel {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
             Transaction trans = null;
-            if (my_Records_Panel.records_Table.getSelectedRow() >= 0) {
-                trans = (Transaction) my_Records_Panel.records_model.getItem(my_Records_Panel.records_Table
-                        .convertRowIndexToModel(my_Records_Panel.records_Table.getSelectedRow()));
+            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
+                trans = (Transaction) records_model.getItem(jTable_jScrollPanel_LeftPanel
+                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
                 records_Info_Panel = new JPanel();
                 records_Info_Panel.setLayout(new GridBagLayout());
@@ -259,6 +285,28 @@ public class Records_My_SplitPanel extends Split_Panel {
                 jScrollPane_jPanel_RightPanel.setViewportView(records_Info_Panel);
 
             }
+        }
+    }
+   
+    public void setInterval() {
+        Integer start = 0;
+        try {
+            start = Integer.valueOf(setIntervalPanel.jTextFieldStart.getText());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            return;
+        }
+        Integer end = 0;
+        try {
+            end = Integer.valueOf(setIntervalPanel.jTextFieldEnd.getText());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            return;
+        }
+        if (end > start) {
+            int step = end - start;
+            this.records_model.setInterval(start, step);
+            this.records_model.fireTableDataChanged();
         }
     }
 
