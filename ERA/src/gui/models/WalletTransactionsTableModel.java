@@ -48,6 +48,9 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
     private String[] columnNames = Lang.getInstance().translate(new String[]{
             "Confirmations", "Timestamp", "Type", "Creator", "Item", "Amount", "Recipient", "Fee", "Size"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, true, true, true, true, true, true, false, false};
+    private int start =0;
+    private int step =100;
+    private List<Pair<Tuple2<String, String>, Transaction>> pp;
 
     public WalletTransactionsTableModel() {
         addObservers();
@@ -107,22 +110,22 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
     @Override
     public int getRowCount() {
-        if (this.transactions == null) {
+        if (this.pp == null) {
             return 0;
         }
 
-        return this.transactions.size();
+        return this.pp.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         //try
         //{
-        if (this.transactions == null || this.transactions.size() - 1 < row) {
+        if (this.pp == null || this.pp.size() - 1 < row) {
             return null;
         }
 
-        Pair<Tuple2<String, String>, Transaction> data = this.transactions.get(row);
+        Pair<Tuple2<String, String>, Transaction> data = this.pp.get(row);
 
         if (data == null || data.getB() == null) {
             return null;
@@ -415,5 +418,18 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         Controller.getInstance().getWallet().database.getTransactionMap().deleteObserver(this);
         DCSet.getInstance().getTransactionMap().addObserver(this);
         /// ??? Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
+    }
+    
+    public void getInterval(int start,int step){
+        this.start = start;
+        this.step = step;
+       // pp.c.clear();
+        int end = start+step;
+        if (end > transactions.size()) end = transactions.size();
+        pp = this.transactions.subList(start, end);
+        
+    }
+    public void setInterval(int start, int step){
+        getInterval(start,step);
     }
 }
