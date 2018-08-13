@@ -93,6 +93,9 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             return null;
         }
         Pair<Tuple2<String, Long>, Order> item = this.pp.get(row);
+        if (item == null)
+            return null;
+
         Order order = item.getB();
         Long blockDBrefLong = item.getA().b;
         Tuple2<Integer, Integer> blockDBref = Transaction.parseDBRef(blockDBrefLong);
@@ -168,9 +171,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
         //CHECK IF NEW LIST
         if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE) {
-            this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
-            this.orders.sort(0, true);
-            getInterval(start, step);
+            this.pp.clear();
             this.fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
