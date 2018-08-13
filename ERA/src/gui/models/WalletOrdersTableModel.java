@@ -2,7 +2,9 @@ package gui.models;
 
 import controller.Controller;
 import core.account.Account;
+import core.block.Block;
 import core.item.assets.Order;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import datachain.SortableList;
 import lang.Lang;
@@ -24,21 +26,22 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, Order> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_AMOUNT = 1;
-    public static final int COLUMN_HAVE = 2;
-    public static final int COLUMN_WANT = 3;
-    public static final int COLUMN_PRICE = 4;
-    public static final int COLUMN_FULFILLED = 5;
-    public static final int COLUMN_CREATOR = 6;
-    public static final int COLUMN_STATUS = 7;
-    
+    public static final int COLUMN_AMOUNT = 2;
+    public static final int COLUMN_HAVE = 3;
+    public static final int COLUMN_WANT = 4;
+    public static final int COLUMN_PRICE = 5;
+    public static final int COLUMN_FULFILLED = 6;
+    public static final int COLUMN_CREATOR = 7;
+    public static final int COLUMN_STATUS = 8;
+    public static final int COLUMN_BLOCK = 1; 
     int start =0,step=100;
 
     private SortableList<Tuple2<String, Long>, Order> orders;
     List<Pair<Tuple2<String, Long>, Order>> pp = new ArrayList<Pair<Tuple2<String, Long>, Order>>();
-    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Status"});
+    private String[] columnNames = Lang.getInstance().translate(new String[]{"Timestamp", " ", "Amount", "Have", "Want", "Price", "Fulfilled", "Creator", "Status"});
 
     public WalletOrdersTableModel() {
+        columnNames[COLUMN_BLOCK]= Lang.getInstance().translate("Block") + "-" + Lang.getInstance().translate("Transaction");
         Controller.getInstance().addWalletListener(this);
     }
 
@@ -79,14 +82,17 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         if (this.pp == null || row > this.pp.size() - 1) {
             return null;
         }
-
-        Order order = this.pp.get(row).getB();
+        Pair<Tuple2<String, Long>, Order> ss = this.pp.get(row);
+        Order order = ss.getB();
+        Long block = ss.getA().b;
+        Tuple2<Integer, Integer> bb = Transaction.parseDBRef(block);
+        Block bb1 = Controller.getInstance().getBlockByHeight(bb.a);
         //order.setDC(DCSet.getInstance());
 
         switch (column) {
             case COLUMN_TIMESTAMP:
-
-                return DateTimeFormat.timestamptoString(order.getId());
+              
+                return DateTimeFormat.timestamptoString(bb1.getTimestamp(DCSet.getInstance()));
 
             case COLUMN_HAVE:
 
@@ -127,6 +133,9 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
                     return "unconfirmed";
 
                 }
+            case COLUMN_BLOCK:
+               
+                return bb.a + "-" + bb.b ;
 
         }
 
@@ -151,6 +160,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
                 || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
                 this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
+                this.orders.sort(0, true);
                 this.orders.registerObserver();
             }
             getInterval(start,step);
