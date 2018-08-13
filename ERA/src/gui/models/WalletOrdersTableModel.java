@@ -34,7 +34,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     public static final int COLUMN_FULFILLED = 6;
     public static final int COLUMN_CREATOR = 7;
     public static final int COLUMN_STATUS = 8;
-    public static final int COLUMN_BLOCK = 1; 
+    public static final int COLUMN_BLOCK = 1;
     int start =0,step=100;
 
     private SortableList<Tuple2<String, Long>, Order> orders;
@@ -92,7 +92,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
         switch (column) {
             case COLUMN_TIMESTAMP:
-              
+
                 return DateTimeFormat.timestamptoString(bb1.getTimestamp(DCSet.getInstance()));
 
             case COLUMN_HAVE:
@@ -135,7 +135,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
                 }
             case COLUMN_BLOCK:
-               
+
                 return bb.a + "-" + bb.b ;
 
         }
@@ -184,7 +184,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
                     this.fireTableDataChanged();
                 }
             }
-           
+
         } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
          //   Transaction record = (Transaction) message.getValue();
          //   if (record.getType() == Transaction.CREATE_ORDER_TRANSACTION){
@@ -192,7 +192,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
          //       List<Pair<Tuple2<String, Long>, Order>> ss = pp;
          //   }
         }
-       
+
     }
 
     public void removeObservers() {
@@ -205,7 +205,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         // TODO Auto-generated method stub
         return this.orders.get(k).getB();
     }
-    
+
     public void getInterval(int start,int step){
         this.start = start;
         this.step = step;
@@ -213,11 +213,11 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         int end = start+step;
         if (end > orders.size()) end = orders.size();
         pp = this.orders.subList(start, end);
-        
+
     }
     public void setInterval(int start, int step){
         getInterval(start,step);
     }
-    
-    
+
+
 }
