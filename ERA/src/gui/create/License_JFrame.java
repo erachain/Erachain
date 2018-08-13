@@ -255,7 +255,7 @@ public class License_JFrame extends JDialog {
             }
         }
         
-        if (true || buf == null) {
+        if (buf == null) {
             // load a pdf from a byte buffer
             File file = new File("Erachain Licence Agreement.pdf");
             RandomAccessFile raf = new RandomAccessFile(file, "r");
