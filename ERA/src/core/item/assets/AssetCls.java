@@ -491,7 +491,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 return "Digital Share";
             case AS_INSIDE_BONUS:
-                return "Digital Bonus";
+                return "Bonuses, Loyalty Points";
             case AS_INSIDE_ACCESS:
                 return "Digital Access Rights";
             case AS_INSIDE_VOTE:
@@ -540,7 +540,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 return "Цифровая акция. Доля собственности на внешнее или внутренне предприятие, обладание которой устанавливает право на владение соотвествующей долей на предприятии без надобности совершать какие-либо внешние действия";
             case AS_INSIDE_BONUS:
-                return "Цифровая награда (бонус). То что не имеет общепринятой стомости и не может обмениваться на другие виды активов внутри Эрачейн. Хотя обмен на другие бонусы и награды разрешены";
+                return "Цифровые баллы лояльности, бонусы, награды, скидочные очки (бонус). То что не имеет общепринятой стомости и не может обмениваться на другие виды активов внутри Эрачейн. Хотя обмен на другие бонусы и награды разрешены";
             case AS_INSIDE_ACCESS:
                 return "Цифовые права доступа и управления";
             case AS_INSIDE_VOTE:
