@@ -479,10 +479,10 @@ public class Order implements Comparable<Order> {
         while (!completedOrder && index < orders.size()) {
             //GET ORDER
             Order order;
-            if (this.dcSet.isFork()) {
+            if (this.dcSet.inMemory()) {
                 // так как это все в памяти расположено то нужно создать новый объект
                 // иначе везде будет ссылка на один и тот же объект и
-                // при переходе на MAIN базу возьмется уже обновленный ордер из FORK DB
+                // при переходе на MAIN базу возьмется уже обновленный ордер из памяти с уже пересчитанными остатками
                 order = orders.get(index).copy();
             } else {
                 order = orders.get(index);
