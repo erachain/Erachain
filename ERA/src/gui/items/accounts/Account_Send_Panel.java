@@ -12,6 +12,9 @@ import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.filechooser.FileView;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -58,7 +61,7 @@ public class Account_Send_Panel extends AssetSendPanel {
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(null, true, transaction,
                 Lang.getInstance().translate("Send Mail"),
                 (int) (this.getWidth() / 1.2), (int) (this.getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation Transaction"));
+                Lang.getInstance().translate("Confirmation Transaction"), !noRecive);
         Send_RecordDetailsFrame ww = new Send_RecordDetailsFrame((R_Send) transaction);
         dd.jScrollPane1.setViewportView(ww);
         dd.pack();
@@ -77,17 +80,16 @@ public class Account_Send_Panel extends AssetSendPanel {
                 chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                // FileNameExtensionFilter filter = new
-                // FileNameExtensionFilter("*.era","*.*");
-                // chooser.setFileFilter(filter);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
+                chooser.setFileFilter(filter);
 
-                // chooser.setAcceptAllFileFilterUsed(false);
+                chooser.setAcceptAllFileFilterUsed(false);
 
                 if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
 
                     String pp = chooser.getSelectedFile().getPath();
 
-                    File ff = new File(pp);
+                    File ff = new File(pp + ".era");
                     // if file
                     if (ff.exists() && ff.isFile()) {
                         int aaa = JOptionPane.showConfirmDialog(chooser,

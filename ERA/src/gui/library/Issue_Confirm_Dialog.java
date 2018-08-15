@@ -36,12 +36,18 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
     public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                                 int w, int h, String status_Text, String title_Text) {
         super(parent, modal);
-        Init(parent, modal, transaction, text, w, h, status_Text, title_Text);
+        Init(parent, modal, transaction, text, w, h, status_Text, title_Text, true);
+    }
+    
+    public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
+            int w, int h, String status_Text, String title_Text, boolean receive) {
+            super(parent, modal);
+            Init(parent, modal, transaction, text, w, h, status_Text, title_Text, receive);
     }
     public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
                                 int w, int h, String status_Text) {
         super(parent, modal);
-        Init(parent, modal, transaction, text, w, h, status_Text, "");
+        Init(parent, modal, transaction, text, w, h, status_Text, "", true);
     }
     
     public Issue_Confirm_Dialog(java.awt.Frame parent, boolean modal, Transaction transaction,
@@ -51,7 +57,7 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
     }
 
     public void Init(java.awt.Frame parent, boolean modal, Transaction transaction, String text,
-                     int w, int h, String status_Text, String title_Text) {
+                     int w, int h, String status_Text, String title_Text, boolean receive) {
         // setUndecorated(true);
         insest = UIManager.getFont("Label.font").getSize();
         if (insest <= 7) insest = 8;
@@ -67,9 +73,9 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
         }
 
         jStatus_Label.setText("<HTML>" + status_Text + "</HTML>");
-
-        //  setMaximumSize(new Dimension(350,200));
+         //  setMaximumSize(new Dimension(350,200));
         setSize(w, h);
+        if (!receive)jButton1.setText(Lang.getInstance().translate("Save"));
         jButton1.addActionListener(new ActionListener() {
 
             @Override

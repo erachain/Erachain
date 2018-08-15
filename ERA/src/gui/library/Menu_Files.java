@@ -19,6 +19,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -145,8 +147,8 @@ public class Menu_Files extends JMenu {
                 chooser.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                //FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
-                //chooser.setFileFilter(filter);
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
+                chooser.setFileFilter(filter);
 
                 //chooser.setAcceptAllFileFilterUsed(false);
                 String res = "";
@@ -185,29 +187,34 @@ public class Menu_Files extends JMenu {
   	          */
                 }
 
-                JSONObject js = new JSONObject();
-                js = (JSONObject) JSONValue.parse(res);
-                String creator = "";
-                if (!js.containsKey("type")) return;
-                int type = ((Long) js.get("type")).intValue();
-                if (type != 31) return;
-                if (js.containsKey("creator")) creator = (String) js.get("creator");
-                Controller ct = Controller.getInstance();
-                if (!js.containsKey("asset")) return;
-                long assetKey = ((Long) js.get("asset"));
-                if (!js.containsKey("recipient")) return;
-                String recipient = (String) js.get("recipient");
-                if (!js.containsKey("head")) return;
-                String head = (String) js.get("head");
-                if (!js.containsKey("amount")) return;
-                String amount = (String) js.get("amount");
-                Account_Send_Dialog dd = new Account_Send_Dialog(ct.getAsset(assetKey), ct.getAccountByAddress((String) creator), ct.getAccountByAddress(recipient), null);
-                dd.panel.jTextField_To.setEditable(false);
-                dd.panel.jTextField_Mess_Title.setEditable(false);
-                dd.panel.jTextField_Ammount.setEditable(false);
-                dd.panel.jComboBox_Asset.enable(false);
-                dd.sertParams(amount, "", head);
-                dd.show();
+                try {
+                    JSONObject js = new JSONObject();
+                    js = (JSONObject) JSONValue.parse(res);
+                    String creator = "";
+                    if (!js.containsKey("type")) return;
+                    int type = ((Long) js.get("type")).intValue();
+                    if (type != 31) return;
+                    if (js.containsKey("creator")) creator = (String) js.get("creator");
+                    Controller ct = Controller.getInstance();
+                    if (!js.containsKey("asset")) return;
+                    long assetKey = ((Long) js.get("asset"));
+                    if (!js.containsKey("recipient")) return;
+                    String recipient = (String) js.get("recipient");
+                    if (!js.containsKey("head")) return;
+                    String head = (String) js.get("head");
+                    if (!js.containsKey("amount")) return;
+                    String amount = (String) js.get("amount");
+                    Account_Send_Dialog dd = new Account_Send_Dialog(ct.getAsset(assetKey), ct.getAccountByAddress((String) creator), ct.getAccountByAddress(recipient), null);
+                    dd.panel.jTextField_To.setEditable(false);
+                    dd.panel.jTextField_Mess_Title.setEditable(false);
+                    dd.panel.jTextField_Ammount.setEditable(false);
+                    dd.panel.jComboBox_Asset.enable(false);
+                    dd.sertParams(amount, "", head);
+                } catch (Exception e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+               
             }
         });
         add(readTransItem);
@@ -220,9 +227,9 @@ public class Menu_Files extends JMenu {
         writeTransItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //  new SettingsFrame();
-                Account_Send_Dialog dd = new Account_Send_Dialog(null, null, null, null);
-                dd.setNoRecive(true);
-                dd.show();
+                // no receive
+                Account_Send_Dialog dd = new Account_Send_Dialog(null, null, null, null, false);
+                
 
             }
         });
