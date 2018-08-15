@@ -1,6 +1,7 @@
 package gui.models;
 
 import controller.Controller;
+import core.account.Account;
 import core.item.ItemCls;
 import core.item.assets.AssetCls;
 import core.transaction.*;
@@ -308,8 +309,11 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
 
             Transaction record = (Transaction) message.getValue();
 
+            Account creator = record.getCreator();
+
             Pair<Tuple2<String, String>, Transaction> pair = new Pair<Tuple2<String, String>, Transaction>(
-                    new Tuple2<String, String>(record.getCreator().getAddress(), new String(record.getSignature())), record);
+                    new Tuple2<String, String>(creator == null? "GENESIS" : creator.getAddress(),
+                            new String(record.getSignature())), record);
             boolean found = this.transactions.contains(pair);
 
             if (found) {

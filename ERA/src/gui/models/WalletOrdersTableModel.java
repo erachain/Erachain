@@ -1,8 +1,10 @@
 package gui.models;
 
 import controller.Controller;
+import core.BlockChain;
 import core.account.Account;
 import core.block.Block;
+import core.item.assets.AssetCls;
 import core.item.assets.Order;
 import core.transaction.CreateOrderTransaction;
 import core.transaction.Transaction;
@@ -34,7 +36,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     public static final int COLUMN_FULFILLED = 6;
     public static final int COLUMN_CREATOR = 7;
     public static final int COLUMN_STATUS = 8;
-    public static final int COLUMN_BLOCK = 1; 
+    public static final int COLUMN_BLOCK = 1;
     int start =0,step=100;
 
     private SortableList<Tuple2<String, Long>, Order> orders;
@@ -58,7 +60,14 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
     }
 
     public Order getOrder(int row) {
-        return this.pp.get(row).getB();
+        if (this.pp == null || row >= this.pp.size())
+            return null;
+
+        Pair<Tuple2<String, Long>, Order> item = this.pp.get(row);
+        if (item == null)
+            return null;
+
+        return item.getB();
     }
 
     @Override
@@ -80,28 +89,31 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.pp == null || row > this.pp.size() - 1) {
+        if (this.pp == null || row >= this.pp.size()) {
             return null;
         }
-        Pair<Tuple2<String, Long>, Order> ss = this.pp.get(row);
-        Order order = ss.getB();
-        Long block = ss.getA().b;
-        Tuple2<Integer, Integer> bb = Transaction.parseDBRef(block);
-        Block bb1 = Controller.getInstance().getBlockByHeight(bb.a);
-        //order.setDC(DCSet.getInstance());
+        Pair<Tuple2<String, Long>, Order> item = this.pp.get(row);
+        if (item == null)
+            return null;
+
+        Order order = item.getB();
+        Long blockDBrefLong = item.getA().b;
+        Tuple2<Integer, Integer> blockDBref = Transaction.parseDBRef(blockDBrefLong);
 
         switch (column) {
             case COLUMN_TIMESTAMP:
-              
-                return DateTimeFormat.timestamptoString(bb1.getTimestamp(DCSet.getInstance()));
+
+                return DateTimeFormat.timestamptoString(Controller.getInstance().getBlockChain().getTimestamp(blockDBref.a));
 
             case COLUMN_HAVE:
 
-                return DCSet.getInstance().getItemAssetMap().get(order.getHave()).getShort();
+                AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHave());
+                return asset == null? -1 : asset.getShort();
 
             case COLUMN_WANT:
 
-                return DCSet.getInstance().getItemAssetMap().get(order.getWant()).getShort();
+                asset = DCSet.getInstance().getItemAssetMap().get(order.getWant());
+                return asset == null? -1 : asset.getShort();
 
             case COLUMN_AMOUNT:
 
@@ -135,8 +147,8 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
 
                 }
             case COLUMN_BLOCK:
-               
-                return bb.a + "-" + bb.b ;
+
+                return blockDBref.a + "-" + blockDBref.b ;
 
         }
 
@@ -149,6 +161,7 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
             this.syncUpdate(o, arg);
         } catch (Exception e) {
             //GUI ERROR
+            String msg = e.getMessage();
         }
     }
 
@@ -157,8 +170,10 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         ObserverMessage message = (ObserverMessage) arg;
 
         //CHECK IF NEW LIST
-        if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE
-                || message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
+        if (message.getType() == ObserverMessage.WALLET_RESET_ORDER_TYPE) {
+            this.pp.clear();
+            this.fireTableDataChanged();
+        } else if (message.getType() == ObserverMessage.WALLET_LIST_ORDER_TYPE) {
             if (this.orders == null) {
                 this.orders = (SortableList<Tuple2<String, Long>, Order>) message.getValue();
                 this.orders.sort(0, true);
@@ -169,30 +184,19 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         } else if (message.getType() == ObserverMessage.WALLET_ADD_ORDER_TYPE) {
             //CHECK IF LIST UPDATED
             Pair<Tuple2<String, Long>, Order> item = (Pair<Tuple2<String, Long>, Order>) message.getValue();
-            this.orders.add(0, item);
-            getInterval(start,step);
+            //this.pp.add(0, item);
             //this.fireTableRowsInserted(0, 0);
+            getInterval(start,step);
+            this.fireTableDataChanged();
 
         } else if (message.getType() == ObserverMessage.WALLET_REMOVE_ORDER_TYPE) {
             //CHECK IF LIST UPDATED
-            this.orders.remove(0);
+            //this.pp.remove(0);
+            //this.fireTableRowsDeleted(0, 0);
             getInterval(start,step);
-            if (false) {
-                if (this.orders.size() > 3) {
-                    this.fireTableRowsDeleted(0, 0);
-                } else {
-                    this.fireTableDataChanged();
-                }
-            }
-           
-        } else if (message.getType() == ObserverMessage.WALLET_ADD_TRANSACTION_TYPE) {
-         //   Transaction record = (Transaction) message.getValue();
-         //   if (record.getType() == Transaction.CREATE_ORDER_TRANSACTION){
-         //       this.pp.add(new Pair(new Tuple2(record.getCreator().getAddress(), 0l), (CreateOrderTransaction) record));
-         //       List<Pair<Tuple2<String, Long>, Order>> ss = pp;
-         //   }
+            this.fireTableDataChanged();
         }
-       
+
     }
 
     public void removeObservers() {
@@ -205,19 +209,23 @@ public class WalletOrdersTableModel extends TableModelCls<Tuple2<String, Long>, 
         // TODO Auto-generated method stub
         return this.orders.get(k).getB();
     }
-    
+
     public void getInterval(int start,int step){
+       // pp.c.clear();
+        int end = start + step;
+        //if (start > orders.size()) start = orders.size();
+        if (end > orders.size()) end = orders.size();
+
         this.start = start;
         this.step = step;
-       // pp.c.clear();
-        int end = start+step;
-        if (end > orders.size()) end = orders.size();
-        pp = this.orders.subList(start, end);
-        
+
+        // new (!) LIST
+        pp = new ArrayList<>(this.orders.subList(start, end));
+
     }
+
     public void setInterval(int start, int step){
         getInterval(start,step);
     }
-    
-    
+
 }

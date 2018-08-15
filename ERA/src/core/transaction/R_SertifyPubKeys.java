@@ -500,8 +500,13 @@ public class R_SertifyPubKeys extends Transaction {
 
         boolean personalized = false;
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
-        if (personalisedData == null || personalisedData.isEmpty()) {
-            personalized = true;
+        if (personalisedData != null && !personalisedData.isEmpty()) {
+            for (Stack<Tuple3<Integer, Integer, Integer>> personalisedDataStack: personalisedData.values()) {
+                if (!personalisedDataStack.isEmpty()) {
+                    personalized = true;
+                    break;
+                }
+            }
         }
 
         PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
@@ -515,24 +520,45 @@ public class R_SertifyPubKeys extends Transaction {
 
             // GET FEE from that record
             transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
+            BigDecimal issueFEE = transPersonIssue.getFee();
 
             // ISSUE NEW COMPU in chain
             BigDecimal issued_FEE_BD = getBonuses();
 
+            if (issueFEE.compareTo(issued_FEE_BD) > 0) {
+                ///
+                ;
+            }
+
             // BACK FEE FOR ISSUER without gift for this.CREATOR
-            transPersonIssue.getCreator().changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            Account issuer = transPersonIssue.getCreator();
+            issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            BigDecimal issued_FEE_BD_total = issued_FEE_BD;
 
             // GIVE GIFT for Witness this PUB_KEY
-            this.creator.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            if (!this.creator.equals(issuer)) {
+                Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
+                Tuple4<Long, Integer, Integer, Integer> issuerPersonItem = db.getAddressPersonMap().getItem(issuer.getAddress());
+                if (creatorPersonItem == null || issuerPersonItem == null
+                    || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
+
+                    // IF it is NOT SAME address and PERSON
+                    this.creator.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+                    issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
+
+                    // EMITTE LIA
+                    this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+                    // SUBSTRACT from EMISSION (with minus)
+                    GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+                }
+            }
+
             pkAccount.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
             // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD.multiply(new BigDecimal("3")), true);
-
-            // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
-            // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY,
+                    issued_FEE_BD_total.subtract(issueFEE), true);
 
         }
 
@@ -592,8 +618,13 @@ public class R_SertifyPubKeys extends Transaction {
 
         boolean personalized = false;
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> personalisedData = this.dcSet.getPersonAddressMap().getItems(this.key);
-        if (personalisedData == null || personalisedData.isEmpty()) {
-            personalized = true;
+        if (personalisedData != null && !personalisedData.isEmpty()) {
+            for (Stack<Tuple3<Integer, Integer, Integer>> personalisedDataStack: personalisedData.values()) {
+                if (!personalisedDataStack.isEmpty()) {
+                    personalized = true;
+                    break;
+                }
+            }
         }
 
         PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
@@ -605,41 +636,41 @@ public class R_SertifyPubKeys extends Transaction {
             Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
             // GET FEE from that record
             transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
-            //long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
-            //if (true || BlockChain.START_LEVEL == 1)
-            //	issueFEE = issueFEE>>2;
+            BigDecimal issueFEE = transPersonIssue.getFee();
 
             // ISSUE NEW COMPU in chain
-            BigDecimal issued_FEE_BD;
-
-            long personsTotal = db.getItemPersonMap().getLastKey();
-            if (personsTotal < 3000)
-                issued_FEE_BD = BlockChain.BONUS_FEE_LVL1;
-            else if (personsTotal < 10000)
-                issued_FEE_BD = BlockChain.BONUS_FEE_LVL2;
-            else if (personsTotal < 100000)
-                issued_FEE_BD = BlockChain.BONUS_FEE_LVL3;
-            else
-                issued_FEE_BD = BlockChain.BONUS_FEE_LVL4;
+            BigDecimal issued_FEE_BD = getBonuses();
 
             // BACK FEE FOR ISSUER without gift for this.CREATOR
-            transPersonIssue.getCreator().changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+            Account issuer = transPersonIssue.getCreator();
+            issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+            BigDecimal issued_FEE_BD_total = issued_FEE_BD;
 
             // GIVE GIFT for Witness this PUB_KEY
-            this.creator.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+            if (!this.creator.equals(issuer)) {
+                Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
+                Tuple4<Long, Integer, Integer, Integer> issuerPersonItem = db.getAddressPersonMap().getItem(issuer.getAddress());
+                if (creatorPersonItem == null || issuerPersonItem == null
+                        || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
+
+                    // IF it is NOT SAME address and PERSON
+                    this.creator.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+                    issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
+
+                    // EMITTE LIA
+                    this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+                    // SUBSTRACT from EMISSION (with minus)
+                    GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+                }
+            }
+
             pkAccount.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
             // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD
-                    .multiply(new BigDecimal("3")), true);
-
-            // EMITTE LIA
-            this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
-            // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+            GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total.subtract(issueFEE), true);
 
         }
-
     }
 
     @Override

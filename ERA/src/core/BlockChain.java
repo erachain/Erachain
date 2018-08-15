@@ -81,7 +81,7 @@ public class BlockChain {
     public static final int ORDER_FEE_DOWN = DEVELOP_USE ? 80000 : 140000;
     public static final int SEND_AMOUNT_FEE_UP = DEVELOP_USE ? 100000 : 150000;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : DEVELOP_USE ? 153333 : 150000;
-    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 185376 : 152532;
+    public static final int ALL_BALANCES_OK_TO = DEVELOP_USE ? 185376 : 161000;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
@@ -94,10 +94,10 @@ public class BlockChain {
         //Base58.decode("2Y81A7YjBji7NDKxYWMeNapSqFWFr8D4PSxBc4dCxSrCCVia6HPy2ZsezYKgeqZugNibAMra6DYT7NKCk6cSVUWX"),
         //Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9")
         
-        // CANCEL ORDERS - wrong after fix exchange
-        Base58.decode("57vyEGwMH2eya5Czk7GSjG4hjJ2ABH165igGHU6BcnwSsu93ypL59Xj35MY5K5Cevy72Qp2dhNRzsJMqVeysjrvq"), // Cancel Order 8350-1
+        // CANCEL ORDERS - wrongs after fix exchange
+        Base58.decode("3kaJVDpKhiv4jgTt6D1z8J5rfbx9b7tFcCh928cpji3pQnLqEmUK8TKUgXEdw5zjVLQ2eUFgT3YKBBcJaKXz6DAp"), // Cancel Order 29311-1
         Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"), // Cancel Order 86549-2
-
+        Base58.decode("5iU3zefyZnWKpv2wd7E8m2hUCmLWASLM96SEfujAfvTKKDm4TA8n1HYFF5YWZkuk1k6vHVNLLv3XCG2MWrT7oHd9"), // Cancel Order 136754-1
 
     };
 
@@ -156,10 +156,13 @@ public class BlockChain {
     public static final int FEE_INVITED_SHIFT = 6; // 2^5 = 32 - total FEE -> fee for Forger and fee for Inviter
     public static final int FEE_INVITED_SHIFT_FOR_INVITE = 1; // - total FEE for Inviter of Person
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 3;
-    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01");
-    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.005");
-    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.002"); /// 0.0075 COMPU - Issue Person - then >> 2
-    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.0001");
+
+    // 0.0075 COMPU - is FEE for Issue Person - then >> 2 - всумме столько получают Форжер и кто привел
+    // Бонус получает Персона, Вносит, Удостоверяет - 3 человека = Эмиссия
+    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01"); // < 3000
+    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.005"); // < 10000
+    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.002"); // < 100000
+    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.001"); // else
     public static final int FEE_FOR_ANONIMOUSE = 33;
     // SERTIFY
     // need RIGHTS for non PERSON account
