@@ -751,8 +751,15 @@ public class GenesisBlock extends Block {
         AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
         item.setReference(this.signature);
         dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
-        //this.getDBIssueMap(db).set(this.reference, newKey);
-
 
     }
+
+    public void orphan(DCSet dcSet) throws Exception {
+
+        dcSet.getItemAssetMap().delete(AssetCls.LIA_KEY);
+
+        super.orphan(dcSet);
+
+    }
+
 }

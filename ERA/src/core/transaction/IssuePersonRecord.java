@@ -272,11 +272,6 @@ public class IssuePersonRecord extends Issue_ItemRecord {
             }
         }
 
-        // EMITTE LIA
-        this.creator.changeBalance(this.dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, false);
-        // SUBSTRACT from EMISSION (with minus)
-        GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true);
-        
     }
 
     //@Override
@@ -289,11 +284,6 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         byte[] makerBytes = maker.getPublicKey();
         this.dcSet.getIssuePersonMap().delete(makerBytes);
 
-        // EMITTE LIA
-        this.creator.changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false);
-        // SUBSTRACT from EMISSION (with minus)
-        GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true);
-        
     }
 
         /*
