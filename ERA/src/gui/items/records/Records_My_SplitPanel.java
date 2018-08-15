@@ -1,14 +1,73 @@
 package gui.items.records;
 
 import controller.Controller;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.GenesisCertifyPersonRecord;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueTemplateRecord;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
+import core.transaction.IssuePersonRecord;
+import core.transaction.IssuePollRecord;
+import core.transaction.IssueStatusRecord;
+import core.transaction.IssueTemplateRecord;
+import core.transaction.IssueUnionRecord;
+import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Hashes;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
+import core.transaction.R_SetStatusToItem;
+import core.transaction.R_SignNote;
+import core.transaction.R_Vouch;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnItemPollTransaction;
+import core.transaction.VoteOnPollTransaction;
 import datachain.DCSet;
 import gui.Split_Panel;
+import gui.items.statement.Statement_Info;
 import gui.library.MTable;
 import gui.library.SetIntervalPanel;
 import gui.library.Voush_Library_Panel;
+import gui.library.library;
 import gui.models.WalletTransactionsTableModel;
+import gui.transaction.ArbitraryTransactionDetailsFrame;
+import gui.transaction.BuyNameDetailsFrame;
+import gui.transaction.CancelOrderDetailsFrame;
+import gui.transaction.CancelSellNameDetailsFrame;
+import gui.transaction.CreateOrderDetailsFrame;
+import gui.transaction.CreatePollDetailsFrame;
+import gui.transaction.GenesisCertifyPersonRecordFrame;
+import gui.transaction.GenesisIssueAssetDetailsFrame;
+import gui.transaction.GenesisIssueTemplateDetailsFrame;
+import gui.transaction.GenesisTransferAssetDetailsFrame;
+import gui.transaction.HashesDetailsFrame;
+import gui.transaction.IssueAssetDetailsFrame;
+import gui.transaction.IssueImprintDetailsFrame;
+import gui.transaction.IssuePersonDetailsFrame;
+import gui.transaction.IssuePollDetailsFrame;
+import gui.transaction.IssueStatusDetailsFrame;
+import gui.transaction.IssueTemplateDetailsFrame;
+import gui.transaction.IssueUnionDetailsFrame;
+import gui.transaction.MultiPaymentDetailsFrame;
+import gui.transaction.RegisterNameDetailsFrame;
+import gui.transaction.SellNameDetailsFrame;
+import gui.transaction.Send_RecordDetailsFrame;
+import gui.transaction.SertifyPubKeysDetailsFrame;
+import gui.transaction.SetStatusToItemDetailsFrame;
 import gui.transaction.TransactionDetailsFactory;
+import gui.transaction.UpdateNameDetailsFrame;
+import gui.transaction.VoteOnItemPollDetailsFrame;
+import gui.transaction.VoteOnPollDetailsFrame;
+import gui.transaction.VouchingDetailsFrame;
 import lang.Lang;
 import org.mapdb.Fun.Tuple2;
 import utils.TableMenuPopupUtil;
@@ -37,6 +96,8 @@ public class Records_My_SplitPanel extends Split_Panel {
     private JMenuItem item_Rebroadcast;
     public WalletTransactionsTableModel records_model;
     public SetIntervalPanel setIntervalPanel;
+
+    private JMenuItem item_Save;
 
   
 
@@ -160,6 +221,26 @@ public class Records_My_SplitPanel extends Split_Panel {
         });
 
         menu.add(item_Delete);
+        
+        item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        item_Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // code delete
+                //int row = my_Records_Panel.records_Table.getSelectedRow();
+                //row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+                //Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+                if (trans == null) return;
+                // save
+                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+            }
+
+            
+        });
+
+        menu.add(item_Save);
+        
         TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
         menu.addAncestorListener(new AncestorListener() {
 

@@ -8,6 +8,7 @@ import core.transaction.R_Send;
 import core.transaction.Transaction;
 import gui.library.Issue_Confirm_Dialog;
 import gui.library.My_JFileChooser;
+import gui.library.library;
 import gui.transaction.Send_RecordDetailsFrame;
 import lang.Lang;
 
@@ -15,6 +16,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.filechooser.FileView;
 
+import java.awt.Container;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -73,62 +75,9 @@ public class Account_Send_Panel extends AssetSendPanel {
 
             if (noRecive) {
 
-                // String raw = Base58.encode(transaction.toBytes(false, null));
-                My_JFileChooser chooser = new My_JFileChooser();
-                chooser.setDialogTitle(Lang.getInstance().translate("Save File"));
-                // chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                chooser.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                FileNameExtensionFilter filter = new FileNameExtensionFilter("*.era","*.*");
-                chooser.setFileFilter(filter);
-
-                chooser.setAcceptAllFileFilterUsed(false);
-
-                if (chooser.showSaveDialog(getParent()) == JFileChooser.APPROVE_OPTION) {
-
-                    String pp = chooser.getSelectedFile().getPath();
-
-                    File ff = new File(pp + ".era");
-                    // if file
-                    if (ff.exists() && ff.isFile()) {
-                        int aaa = JOptionPane.showConfirmDialog(chooser,
-                                Lang.getInstance().translate("File") + Lang.getInstance().translate("Exists") + "! "
-                                        + Lang.getInstance().translate("Overwrite") + "?",
-                                Lang.getInstance().translate("Message"), JOptionPane.OK_CANCEL_OPTION,
-                                JOptionPane.INFORMATION_MESSAGE);
-                        System.out.print("\n gggg " + aaa);
-                        if (aaa != 0) {
-                            return;
-                        }
-                        ff.delete();
-
-                    }
-
-                    try (FileWriter fw = new FileWriter(ff)) {
-                        fw.write(transaction.toJson().toJSONString());
-                    } catch (IOException e) {
-                        System.out.println(e);
-                    }
-
-                    /*
-                     * try(FileOutputStream fos=new FileOutputStream(pp)) { //
-                     * перевод строки в байты // String ssst =
-                     * model.getValueAt(row, 2).toString(); byte[] buffer
-                     * =transaction.toBytes(false, null); // if ZIP
-                     *
-                     * fos.wri.write(buffer, 0, buffer.length);
-                     *
-                     * } catch(IOException ex){
-                     *
-                     * System.out.println(ex.getMessage()); }
-                     */
-                }
-
-                // JOptionPane.showMessageDialog(new JFrame(),
-                // Lang.getInstance().translate("File save"),
-                // Lang.getInstance().translate("Success"),
-                // JOptionPane.INFORMATION_MESSAGE);
+                // save
+                library.saveJSONStringToEraFile(getParent(), transaction.toJson().toJSONString());
+               
 
             } else {
 

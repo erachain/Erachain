@@ -23,6 +23,7 @@ import core.transaction.Transaction;
 import datachain.DCSet;
 import gui.Split_Panel;
 import gui.library.MTable;
+import gui.library.library;
 import gui.models.Debug_Transactions_Table_Model;
 import gui.transaction.TransactionDetailsFactory;
 import lang.Lang;
@@ -260,6 +261,26 @@ public class Records_UnConfirmed_Panel extends JPanel // JPanel
         });
 
         menu.add(item_Delete);
+        
+
+        // save jsot transactions
+        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        item_Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int row = record_stpit.jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = record_stpit.jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                Transaction trans = transactionsModel.getTransaction(row);
+                if (trans == null) return;
+                // save
+                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+            }
+
+            
+        });
+        menu.add(item_Save);
+        
         TableMenuPopupUtil.installContextMenu(record_stpit.jTable_jScrollPanel_LeftPanel, menu);
 
         // this.add(this.transactionsTable);

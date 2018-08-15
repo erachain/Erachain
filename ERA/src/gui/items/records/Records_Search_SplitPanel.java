@@ -6,6 +6,7 @@ import datachain.DCSet;
 import gui.Split_Panel;
 import gui.library.MTable;
 import gui.library.Voush_Library_Panel;
+import gui.library.library;
 import gui.models.TransactionsTableModel;
 import gui.records.VouchRecordDialog;
 import gui.transaction.TransactionDetailsFactory;
@@ -115,6 +116,25 @@ public class Records_Search_SplitPanel extends Split_Panel {
         });
 
         mainMenu.add(vouch_menu);
+        
+        // save jsot transactions
+        JMenuItem item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        item_Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
+                Transaction trans = transactionsTableModel.getTransaction(row);
+                if (trans == null) return;
+                // save
+                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+            }
+
+            
+        });
+
+        mainMenu.add(item_Save);
 
        // this.jTable_jScrollPanel_LeftPanel.setComponentPopupMenu(mainMenu);
         TableMenuPopupUtil.installContextMenu(this.jTable_jScrollPanel_LeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
