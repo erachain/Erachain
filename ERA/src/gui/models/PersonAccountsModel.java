@@ -5,6 +5,7 @@ import core.account.Account;
 import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import utils.ObserverMessage;
@@ -23,6 +24,8 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
     public static final int COLUMN_TO_DATE = 2;
     public static final int COLUMN_CREATOR = 3;
     public static final int COLUMN_CREATOR_NAME = 30;
+    public static final int COLUMN_CREATOR_KEY = 31;
+    public static final int COLUMN_CREATOR_ADDRESS = 32;
     private static final HashSet<Account> Account = null;
 
     long key_person_table;
@@ -152,12 +155,23 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
 
                 return trans.getCreator().getPersonAsString();
 
+            /*
             case 4:
                 if (trans == null)
                     return null;
 
                 if (trans.getCreator().getPerson() == null) return null;
                 return trans.getCreator().getPerson().b;
+                */
+
+            case COLUMN_CREATOR_KEY:
+                if (trans == null)
+                    return null;
+
+                if (trans.getCreator().getPerson() == null) return null;
+
+                Fun.Tuple4<Long, Integer, Integer, Integer> item = DCSet.getInstance().getAddressPersonMap().getItem(trans.getCreator().getAddress());
+                return item.a;
 
             case COLUMN_CREATOR_NAME:
                 if (trans == null)
@@ -165,6 +179,12 @@ public class PersonAccountsModel extends AbstractTableModel implements Observer 
 
                 if (trans.getCreator().getPerson() == null) return null;
                 return trans.getCreator().getPerson().b.getName();
+
+            case COLUMN_CREATOR_ADDRESS:
+                if (trans == null)
+                    return null;
+
+                return trans.getCreator().getAddress();
 
             case COLUMN_ACCOUNT_NAME:
                 Tuple2<String, String> aa = new Account(addrses_key_value).getName();
