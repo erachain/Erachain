@@ -590,6 +590,8 @@ public class R_SertifyPubKeys extends Transaction {
             db.getPersonAddressMap().addItem(this.key, address, itemP);
 
             if (!db.getAddressTime_SignatureMap().contains(address)) {
+                // for quick search public keys by address - use PUB_KEY from Person DATA owner
+                // used in - controller.Controller.getPublicKeyByAddress
                 db.getAddressTime_SignatureMap().set(address, this.signature);
             }
 

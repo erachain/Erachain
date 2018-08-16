@@ -1240,6 +1240,8 @@ public abstract class Transaction {
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
             if (!dbASmap.contains(creatorAddress)) {
+                // for quick search public keys by address - use PUB_KEY from Person DATA owner
+                // used in - controller.Controller.getPublicKeyByAddress
                 dbASmap.set(creatorAddress, signature); // for quick search
                 // public keys
             }
