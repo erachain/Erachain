@@ -535,6 +535,11 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
+            // EMITTE LIA
+            this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+
             if (!this.creator.equals(issuer)) {
                 // AND this different KEY not owned by ONE PERSON
                 Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
@@ -546,10 +551,6 @@ public class R_SertifyPubKeys extends Transaction {
                     this.creator.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
-                    // EMITTE LIA
-                    this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
-                    // SUBSTRACT from EMISSION (with minus)
-                    GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
                 }
             }
 
@@ -650,6 +651,11 @@ public class R_SertifyPubKeys extends Transaction {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
+            // EMITTE LIA
+            this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+
             // GIVE GIFT for Witness this PUB_KEY
             if (!this.creator.equals(issuer)) {
                 // AND this different KEY not owned by ONE PERSON
@@ -662,10 +668,6 @@ public class R_SertifyPubKeys extends Transaction {
                     this.creator.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
-                    // EMITTE LIA
-                    this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
-                    // SUBSTRACT from EMISSION (with minus)
-                    GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
                 }
             }
 
