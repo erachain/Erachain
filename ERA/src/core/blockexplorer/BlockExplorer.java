@@ -1632,23 +1632,16 @@ public class BlockExplorer {
             for (int i = 0; i < rowCount; i++) {
                 Map statusJSON = new LinkedHashMap();
                 statusJSON.put("status_name", statusModel.getValueAt(i, statusModel.COLUMN_STATUS_NAME));
-                statusJSON.put("status_data", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATA));
-                Object creat = statusModel.getValueAt(i, statusModel.COLUMN_MAKER);
+                statusJSON.put("status_date", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATE));
+                Account creator = (Account)statusModel.getValueAt(i, statusModel.COLUMN_MAKER_ACCOUNT);
 
-                if (!creat.equals("")) {
-                    PersonCls pers = statusModel.getCreatorPerson(i);
-                    statusJSON.put("status_creator", creat.toString());
-                    statusJSON.put("status_creator_key", pers.getKey());
-                    statusJSON.put("status_creator_name", pers.getName());
+                if (creator != null) {
+                    statusJSON.put("status_creator_address", creator.getAddress());
+                    statusJSON.put("status_creator", creator.getPersonAsString());
 
-                    // PersonCls pp = (PersonCls) statusModel.getValueAt(i,
-                    // statusModel.COLUMN_MAKER);
-                    // statusJSON.put("status_creator_name", pp.getName());
-                    // statusJSON.put("status_creator_key", pp.getKey());
                 } else {
-                    statusJSON.put("status_creator", "");
-                    statusJSON.put("status_creator_key", "");
-                    statusJSON.put("status_creator_name", "");
+                    statusJSON.put("status_creator_address", "GENESIS");
+                    statusJSON.put("status_creator", "GENESIS");
                 }
 
                 statusesJSON.put(i, statusJSON);
