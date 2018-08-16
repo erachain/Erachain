@@ -145,7 +145,7 @@ public class Other_Split_Panel extends Split_Panel {
         });
         peers_Menu.add(Baned_24_Hours_Item);
         
-        JMenuItem Baned_Allways_Item = new JMenuItem(Lang.getInstance().translate("Ban Allways"));
+        JMenuItem Baned_Allways_Item = new JMenuItem(Lang.getInstance().translate("Ban Always"));
         Baned_Allways_Item.addActionListener(new ActionListener() {
             
             @Override
