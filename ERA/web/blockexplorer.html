@@ -3431,7 +3431,8 @@ output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800" 
 
 key =0;
 for(key in data.statuses) {
-output += '<tr ><td >'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_data +'<td><a href ="?person='+data.statuses[key].status_creator_key+get_lang()+'">'+ data.statuses[key].status_creator  +'</a><tr>';
+output += '<tr ><td >'+data.statuses[key].status_name+'<td>'+ data.statuses[key].status_date
+    +'<td><a href ="?addr='+data.statuses[key].status_creator_address+get_lang()+'">'+ data.statuses[key].status_creator  +'</a><tr>';
 
 key ++;
 }
@@ -3445,7 +3446,8 @@ output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" 
 
 key =0;
 for(key in data.accounts) {
-output += '<tr><td><a href = "?addr='+data.accounts[key].adress+get_lang()+'">'+data.accounts[key].adress+'</a><td>'+ data.accounts[key].data +'<td><a href ="?person='+data.accounts[key].creator_key+get_lang()+'">'+ data.accounts[key].creator  +'</a><tr>';
+output += '<tr><td><a href = "?addr='+data.accounts[key].address+get_lang()+'">'+data.accounts[key].address+'</a><td>'
+    + data.accounts[key].date +'<td><a href ="?addr='+data.accounts[key].creator_address+get_lang()+'">'+ data.accounts[key].creator  +'</a><tr>';
 
 key ++;
 }

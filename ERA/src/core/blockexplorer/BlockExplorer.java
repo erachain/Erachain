@@ -1583,6 +1583,9 @@ public class BlockExplorer {
         // TODO Auto-generated method stub
         Map output = new LinkedHashMap();
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
+        if (person == null)
+            return null;
+
         byte[] b = person.getImage();
         String a = Base64.encodeBase64String(b);
 
@@ -1629,23 +1632,16 @@ public class BlockExplorer {
             for (int i = 0; i < rowCount; i++) {
                 Map statusJSON = new LinkedHashMap();
                 statusJSON.put("status_name", statusModel.getValueAt(i, statusModel.COLUMN_STATUS_NAME));
-                statusJSON.put("status_data", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATA));
-                Object creat = statusModel.getValueAt(i, statusModel.COLUMN_MAKER);
+                statusJSON.put("status_date", statusModel.getValueAt(i, statusModel.COLUMN_MAKE_DATE));
+                Account creator = (Account)statusModel.getValueAt(i, statusModel.COLUMN_MAKER_ACCOUNT);
 
-                if (!creat.equals("")) {
-                    PersonCls pers = statusModel.getCreatorPerson(i);
-                    statusJSON.put("status_creator", creat.toString());
-                    statusJSON.put("status_creator_key", pers.getKey());
-                    statusJSON.put("status_creator_name", pers.getName());
+                if (creator != null) {
+                    statusJSON.put("status_creator_address", creator.getAddress());
+                    statusJSON.put("status_creator", creator.getPersonAsString());
 
-                    // PersonCls pp = (PersonCls) statusModel.getValueAt(i,
-                    // statusModel.COLUMN_MAKER);
-                    // statusJSON.put("status_creator_name", pp.getName());
-                    // statusJSON.put("status_creator_key", pp.getKey());
                 } else {
-                    statusJSON.put("status_creator", "");
-                    statusJSON.put("status_creator_key", "");
-                    statusJSON.put("status_creator_name", "");
+                    statusJSON.put("status_creator_address", "GENESIS");
+                    statusJSON.put("status_creator", "GENESIS");
                 }
 
                 statusesJSON.put(i, statusJSON);
@@ -1674,21 +1670,10 @@ public class BlockExplorer {
 
             for (int i = 0; i < rowCount; i++) {
                 Map accountJSON = new LinkedHashMap();
-                accountJSON.put("adress", personModel.getValueAt(i, 0));
+                accountJSON.put("address", personModel.getValueAt(i, 0));
                 accountJSON.put("data", personModel.getValueAt(i, 2));
-                accountJSON.put("creator", personModel.getValueAt(i, 1));
-
-                PersonCls creator = (PersonCls) personModel.getValueAt(i, 4);
-
-                if (creator != null) {
-                    accountJSON.put("creator_name", creator.getName());
-                    accountJSON.put("creator_key", creator.getKey());
-                } else {
-                    accountJSON.put("creator_name", "");
-                    accountJSON.put("creator_key", "");
-
-                }
-                // accountJSON.put("creator_name"
+                accountJSON.put("creator", personModel.getValueAt(i, 3));
+                accountJSON.put("creator_address", personModel.getValueAt(i, 32));
 
                 accountsJSON.put(i, accountJSON);
 

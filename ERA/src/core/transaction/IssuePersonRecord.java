@@ -261,10 +261,15 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();
         byte[] makerBytes = maker.getPublicKey();
+        // Это нужно для быстрого поиска по публичному ключу создателя персоны,
+        // которая еще не удостоверена вообще
+        // но надо понимать что тут будет только последняя запись создания персоны и номер на нее
+        // used in webserver.API.getPersonKeyByOwnerPublicKey
         this.dcSet.getIssuePersonMap().set(makerBytes, person.getKey());
 
-        // for quick search public keys - use PUB_KEY from Person DATA
         if (person.isMustBeSigned()) {
+            // for quick search public keys by address - use PUB_KEY from Person DATA owner
+            // used in - controller.Controller.getPublicKeyByAddress
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
             String creatorAddress = maker.getAddress();
             if (!dbASmap.contains(creatorAddress)) {

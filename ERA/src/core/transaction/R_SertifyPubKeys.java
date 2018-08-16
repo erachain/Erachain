@@ -509,68 +509,53 @@ public class R_SertifyPubKeys extends Transaction {
             }
         }
 
-        PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
         if (!personalized) {
+            // IT IS NOT VOUCHED PERSON
 
-            // ISSUE NEW COMPU in chain
             BigDecimal issued_FEE_BD = getBonuses();
 
-            // IT IS NOT VOUCHED PERSON
-            // FIND person
-            ItemCls person = db.getItemPersonMap().get(this.key);
-
-            /*
-            // FIND issue record
-            Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
-
-            // GET FEE from that record
-            transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
-            BigDecimal issueFEE = transPersonIssue.getFee();
-
-            if (issueFEE.compareTo(issued_FEE_BD) > 0) {
-                ///
-                ;
-            }
-            */
-
-            // BACK FEE FOR ISSUER without gift for this.CREATOR
-            //Account issuer = transPersonIssue.getCreator();
-            Account issuer = person.getOwner();
-
-            person.getOwner().changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
+            // GIVE GIFT for this PUB_KEY
+            pkAccount.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
             BigDecimal issued_FEE_BD_total = issued_FEE_BD;
 
-            // GIVE GIFT for Witness this PUB_KEY
+            //////////// FIND Issuer (registrator) this PERSON
+            // FIND person
+            ItemCls person = db.getItemPersonMap().get(this.key);
+            // FIND issue record
+            Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
+            // GIVE GIFT for ISSUER
+            Account issuer = transPersonIssue.getCreator();
+
+            issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
+
+            // EMITTE LIA
+            issuer.changeBalance(this.dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true);
+
+            // EMITTE LIA
+            this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
+
             if (!this.creator.equals(issuer)) {
                 // AND this different KEY not owned by ONE PERSON
                 Tuple4<Long, Integer, Integer, Integer> creatorPersonItem = db.getAddressPersonMap().getItem(this.creator.getAddress());
                 Tuple4<Long, Integer, Integer, Integer> issuerPersonItem = db.getAddressPersonMap().getItem(issuer.getAddress());
                 if (creatorPersonItem == null || issuerPersonItem == null
                     || !creatorPersonItem.a.equals(issuerPersonItem.a)) {
-
                     // IF it is NOT SAME address and PERSON
+                    // GIVE GIFT for Witness this PUB_KEY
                     this.creator.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
-                    // EMITTE LIA
-                    this.creator.changeBalance(this.dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
-                    // SUBSTRACT from EMISSION (with minus)
-                    GenesisBlock.CREATOR.changeBalance(dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
                 }
             }
 
-            // EMITTE LIA
-            person.getOwner().changeBalance(this.dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, false);
-            // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true);
-
-
-            pkAccount.changeBalance(db, false, FEE_KEY, issued_FEE_BD, false);
-            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
-
-            // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY,
-                    issued_FEE_BD_total, true);
+            // TO EMITTE FEE (with minus)
+            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
 
         }
 
@@ -606,6 +591,8 @@ public class R_SertifyPubKeys extends Transaction {
             db.getPersonAddressMap().addItem(this.key, address, itemP);
 
             if (!db.getAddressTime_SignatureMap().contains(address)) {
+                // for quick search public keys by address - use PUB_KEY from Person DATA owner
+                // used in - controller.Controller.getPublicKeyByAddress
                 db.getAddressTime_SignatureMap().set(address, this.signature);
             }
 
@@ -645,24 +632,29 @@ public class R_SertifyPubKeys extends Transaction {
             // ISSUE NEW COMPU in chain
             BigDecimal issued_FEE_BD = getBonuses();
 
-            // IT IS NOT VOUCHED PERSON
+            pkAccount.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
+            BigDecimal issued_FEE_BD_total = issued_FEE_BD;
+
+            //////////// FIND Issuer (registrator) this PERSON
             // FIND person
             ItemCls person = db.getItemPersonMap().get(this.key);
-
-            /*
             // FIND issue record
             Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
-            // GET FEE from that record
-            transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
-            BigDecimal issueFEE = transPersonIssue.getFee();
+            Account issuer = transPersonIssue.getCreator();
 
             // BACK FEE FOR ISSUER without gift for this.CREATOR
-            ///Account issuer = transPersonIssue.getCreator();
-            */
-            Account issuer = person.getOwner();
-
             issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
-            BigDecimal issued_FEE_BD_total = issued_FEE_BD;
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
+
+            // EMITTE LIA
+            issuer.changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true);
+
+            // EMITTE LIA
+            this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
 
             // GIVE GIFT for Witness this PUB_KEY
             if (!this.creator.equals(issuer)) {
@@ -676,20 +668,8 @@ public class R_SertifyPubKeys extends Transaction {
                     this.creator.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
                     issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
-                    // EMITTE LIA
-                    this.creator.changeBalance(this.dcSet, true, -AssetCls.LIA_KEY, BigDecimal.ONE, false);
-                    // SUBSTRACT from EMISSION (with minus)
-                    GenesisBlock.CREATOR.changeBalance(dcSet, false, -AssetCls.LIA_KEY, BigDecimal.ONE, true);
                 }
             }
-
-            // EMITTE LIA
-            person.getOwner().changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false);
-            // SUBSTRACT from EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true);
-
-            pkAccount.changeBalance(db, true, FEE_KEY, issued_FEE_BD, false);
-            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD);
 
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total, true);
