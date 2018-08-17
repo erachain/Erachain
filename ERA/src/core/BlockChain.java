@@ -146,7 +146,7 @@ public class BlockChain {
     public static final int FEE_PER_BYTE = 64;
     public static final int FEE_SCALE = 8;
     public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
-    public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 32 * 128, FEE_SCALE);
+    public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 8 * 128, FEE_SCALE);
     public static final float FEE_POW_BASE = (float) 1.5;
     public static final int FEE_POW_MAX = 6;
     public static final int ISSUE_MULT_FEE = 1 << 10;
