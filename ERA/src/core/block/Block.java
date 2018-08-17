@@ -1035,7 +1035,7 @@ public class Block {
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    long transactionTimestamp = transaction.getTimestamp();
+                    long transactionTimestamp = transaction.getTimestamp() - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS - BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS);
                     if (transactionTimestamp > timestampEnd
                             //|| transaction.getDeadline() <= timestampBeg
                             && height > 105999
