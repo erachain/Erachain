@@ -1546,6 +1546,13 @@ public class BlockExplorer {
         int counter = start;
 
         do {
+
+            if (block.getWinValue() == 0l) {
+                block.getHeight(dcSet);
+                if (block.getHeight(dcSet) > 0)
+                    block.loadHeadMind(dcSet);
+            }
+
             Map blockJSON = new LinkedHashMap();
             blockJSON.put("height", counter);
             blockJSON.put("signature", Base58.encode(block.getSignature()));
