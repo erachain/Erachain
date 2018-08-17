@@ -138,7 +138,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
     // NOT GENESIS ISSUE START FRON NUM
     @Override
     protected long getStartKey() {
-        return 1000l;
+        return AssetCls.START_KEY;
     }
 
 	/*

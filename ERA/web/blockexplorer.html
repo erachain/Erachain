@@ -1357,8 +1357,12 @@ function mainQuery(data) {
 			//	<img src="personimage?key=1" style="vertical-align: middle;">; 
 			output +='<tr><td><br><img src="personimage?key=' + data.person_key+ '" width="100"/></td><td style ="padding-left:20px">';
 			output +='<td><font size="+1">'+ data.label_account+': <a href="?addr=' + data.account + get_lang()+'">' + data.account + '</a></font>';
-			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a></tr>';
-			
+			output +='<br><a href ="?person='+data.person_key+get_lang()+ '">' + data.label_person_name + ': '+ data.Person_Name + '</a>';
+			if ('registered' in data) {
+			    output +='<br>' + data.label_registered + ': <b>'+ data.registered + '</b>, ' + data.label_certified + ': <b>'+ data.certified + '</b>';
+			}
+			output +='</tr>';
+
 			}else{
 			
 			output += '<br><br>';
@@ -3419,7 +3423,10 @@ if (data.era_balance_a) {
 	output +=   '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
 }
 if (data.compu_balance) {
-	output +=   '<h4>Compushi: &nbsp&nbsp <b>' + data.compu_balance * 100000000 + '</b></h4><br>';
+	output +=   '<h4>Compushi: &nbsp&nbsp <b>' + data.compu_balance * 100000000 + '</b></h4>';
+}
+if (data.lia_balance_a) {
+	output +=   '<h5>' + data.label_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.label_certified + ': <b>' + data.lia_balance_b + '</b></h5></br>';
 }
 output +=   '</td>';
 output +=   '</tr>';

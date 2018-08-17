@@ -53,7 +53,7 @@ public abstract class AssetCls extends ItemCls {
 
 	// DEaL KEY
 	public static final long LIA_KEY = 5l;
-	public static final String LIA_ABBREV = "LIA"; // COMPU (compute units)
+	public static final String LIA_ABBREV = "LIA"; //
 	public static final String LIA_NAME = "LIA";
 	public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
 
@@ -63,6 +63,8 @@ public abstract class AssetCls extends ItemCls {
     public static final int INITIAL_FAVORITES = 4;
     protected static final int SCALE_LENGTH = 1;
     protected static final int ASSET_TYPE_LENGTH = 1;
+
+    public static final long START_KEY = 1000l;
 
     ///////////////////////////////////////////////////
     /**
