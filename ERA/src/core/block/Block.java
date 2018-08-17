@@ -437,16 +437,14 @@ public class Block {
 
         BigDecimal bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
         //int height = this.getHeightByParent(db);
-        if (this.heightBlock < inDay30 << 1)
-            ;
-        else if (this.heightBlock < inDay30 << 2)
+        if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
             bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-        else if (this.heightBlock < inDay30 << 3) // < 72000
+        else if (this.heightBlock < inDay30 << 3) // < 72000 = 8 mounth
             bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-        else if (this.heightBlock < 87000) //87000)
+        else if (this.heightBlock < inDay30 << 4) // < 144000 = 16 mounth
             bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         else
-            bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+            bonusFee = bonusFee.divide(new BigDecimal(16), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 
         return bonusFee;
     }
