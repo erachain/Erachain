@@ -146,7 +146,7 @@ public class BlockChain {
     public static final int FEE_PER_BYTE = 64;
     public static final int FEE_SCALE = 8;
     public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
-    public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 16 * 128, FEE_SCALE);
+    public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 8 * 128, FEE_SCALE);
     public static final float FEE_POW_BASE = (float) 1.5;
     public static final int FEE_POW_MAX = 6;
     public static final int ISSUE_MULT_FEE = 1 << 10;
@@ -173,9 +173,9 @@ public class BlockChain {
     public static final BigDecimal MINOR_ERA_BALANCE_BD = BigDecimal.valueOf(MINOR_ERA_BALANCE);
     // GIFTS for R_SertifyPubKeys
     public static final int GIFTED_COMPU_AMOUNT = 10000; //FEE_PER_BYTE << 8;
-    //public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
-    //public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 200 * GIFTED_COMPU_AMOUNT; // GIFTED_COMPU_AMOUNT << 7;
-    //public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
+    public static final BigDecimal GIFTED_COMPU_AMOUNT_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT, FEE_SCALE);
+    public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 200 * GIFTED_COMPU_AMOUNT; // GIFTED_COMPU_AMOUNT << 7;
+    public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
     //private int checkPoint = DEVELOP_USE?1:32400;
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(36654,
             Base58.decode("4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W"));

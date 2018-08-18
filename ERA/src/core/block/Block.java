@@ -428,8 +428,8 @@ public class Block {
         // NOT GIFT for MISSed forger
         long cut1 = this.target << 1;
         // TODO - off START POINT
-        if (this.heightBlock > 140000
-                && this.winValue >= cut1) {
+        if (//this.heightBlock > 140000 &&
+                this.winValue >= cut1) {
             return BigDecimal.ZERO;
         }
 
