@@ -33,9 +33,9 @@ public class TestRecTemplate {
 
     static Logger LOGGER = Logger.getLogger(TestRecTemplate.class.getName());
 
-    Long releaserReference = null;
+    //Long Transaction.FOR_NETWORK = null;
 
-    boolean asPack = false;
+    int asPack = Transaction.FOR_NETWORK;
     long FEE_KEY = AssetCls.FEE_KEY;
     long VOTE_KEY = AssetCls.ERA_KEY;
     byte FEE_POWER = (byte) 1;
@@ -88,10 +88,10 @@ public class TestRecTemplate {
 
         //CREATE ISSUE PLATE TRANSACTION
         issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueTemplateRecord.setDC(db, false);
-        issueTemplateRecord.sign(maker, false);
+        issueTemplateRecord.setDC(db, Transaction.FOR_NETWORK);
+        issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
         if (process) {
-            issueTemplateRecord.process(gb, false);
+            issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
             templateKey = template.getKey(db);
         }
     }
@@ -134,19 +134,19 @@ public class TestRecTemplate {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueTemplateRecord.sign(maker, false);
-        issueTemplateRecord.setDC(db,false);
-        issueTemplateRecord.process(gb, false);
+        issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
+        issueTemplateRecord.setDC(db,Transaction.FOR_NETWORK);
+        issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, releaserReference);
+            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, Transaction.FOR_NETWORK);
             LOGGER.info("parsedIssueTemplateTransaction: " + parsedIssueTemplateTransaction);
 
             //CHECK INSTANCE
@@ -192,11 +192,11 @@ public class TestRecTemplate {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueTemplateRecord.setDC(db,false);
-        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference, flags));
+        issueTemplateRecord.setDC(db,Transaction.FOR_NETWORK);
+        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        issueTemplateRecord.sign(maker, false);
-        issueTemplateRecord.process(gb, false);
+        issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
+        issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
         int mapSize = templateMap.size();
 
         LOGGER.info("template KEY: " + template.getKey(db));
@@ -207,10 +207,10 @@ public class TestRecTemplate {
 
         TemplateCls template_2 = new Template(maker, "test132_2", icon, image, "2_12345678910strontje");
         IssueTemplateRecord issueTemplateTransaction_2 = new IssueTemplateRecord(maker, template_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db));
-        issueTemplateTransaction_2.sign(maker, false);
-        issueTemplateTransaction_2.process(gb, false);
+        issueTemplateTransaction_2.sign(maker, Transaction.FOR_NETWORK);
+        issueTemplateTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("template_2 KEY: " + template_2.getKey(db));
-        issueTemplateTransaction_2.orphan(false);
+        issueTemplateTransaction_2.orphan(Transaction.FOR_NETWORK);
         assertEquals(mapSize, templateMap.size());
 
         //CHECK PLATE IS CORRECT
@@ -233,13 +233,13 @@ public class TestRecTemplate {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueTemplateRecord.setDC(db,false);
-        issueTemplateRecord.sign(maker, false);
-        issueTemplateRecord.process(gb, false);
+        issueTemplateRecord.setDC(db,Transaction.FOR_NETWORK);
+        issueTemplateRecord.sign(maker, Transaction.FOR_NETWORK);
+        issueTemplateRecord.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
         assertEquals(issueTemplateRecord.getTimestamp(), maker.getLastTimestamp(db));
 
-        issueTemplateRecord.orphan(false);
+        issueTemplateRecord.orphan(Transaction.FOR_NETWORK);
 
         //CHECK PLATE EXISTS SENDER
         assertEquals(false, templateMap.contains(key));
@@ -279,14 +279,14 @@ public class TestRecTemplate {
         signNoteRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawSignNoteRecord = signNoteRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
@@ -323,17 +323,17 @@ public class TestRecTemplate {
         // NOT DATA
         data = null;
         signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
-        signNoteRecord.sign(maker, asPack);
+        signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        rawSignNoteRecord = signNoteRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
@@ -370,17 +370,17 @@ public class TestRecTemplate {
         //data = null;
         templateKey = 0;
         signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
-        signNoteRecord.sign(maker, asPack);
+        signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        rawSignNoteRecord = signNoteRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
@@ -417,17 +417,17 @@ public class TestRecTemplate {
         data = null;
         templateKey = 0;
         signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 20, maker.getLastTimestamp(db));
-        signNoteRecord.sign(maker, asPack);
+        signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        rawSignNoteRecord = signNoteRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, releaserReference);
+            R_SignNote parsedSignNoteRecord = (R_SignNote) TransactionFactory.getInstance().parse(rawSignNoteRecord, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSignNote: " + parsedSignNoteRecord);
 
             //CHECK INSTANCE
@@ -471,17 +471,17 @@ public class TestRecTemplate {
         initTemplate(true);
 
         signNoteRecord = new R_SignNote(maker, FEE_POWER, templateKey, data, isText, encrypted, timestamp + 10, maker.getLastTimestamp(db));
-        signNoteRecord.setDC(db,false);
-        assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(releaserReference, flags));
+        signNoteRecord.setDC(db,Transaction.FOR_NETWORK);
+        assertEquals(Transaction.VALIDATE_OK, signNoteRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        signNoteRecord.sign(maker, false);
-        signNoteRecord.process(gb, false);
+        signNoteRecord.sign(maker, Transaction.FOR_NETWORK);
+        signNoteRecord.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         assertEquals(signNoteRecord.getTimestamp(), maker.getLastTimestamp(db));
 
         ///// ORPHAN
-        signNoteRecord.orphan(false);
+        signNoteRecord.orphan(Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         //assertEquals(signNoteRecord.getReference(), maker.getLastReference(db));

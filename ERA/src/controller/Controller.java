@@ -60,7 +60,6 @@ import utils.ObserverMessage;
 import utils.Pair;
 import utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import utils.SysTray;
-import utils.*;
 import webserver.WebService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +69,6 @@ import java.awt.TrayIcon.MessageType;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -2760,7 +2758,7 @@ public class Controller extends Observable {
             return new Pair<Transaction, Integer>(null, Transaction.INVALID_SIGNATURE);
 
         // CHECK FOR UPDATES
-        int valid = this.transactionCreator.afterCreateRaw(transaction, false, 0l);
+        int valid = this.transactionCreator.afterCreateRaw(transaction, Transaction.FOR_NETWORK, 0l);
         if (valid != Transaction.VALIDATE_OK)
             return new Pair<Transaction, Integer>(null, valid);
 
@@ -3069,26 +3067,26 @@ public class Controller extends Observable {
         }
     }
 
-    public Transaction r_SignNote(byte version, byte property1, byte property2, boolean asPack,
+    public Transaction r_SignNote(byte version, byte property1, byte property2, int asDeal,
                                   PrivateKeyAccount sender, int feePow, long key, byte[] message, byte[] isText, byte[] encrypted) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SignNote(version, property1, property2, asPack, sender, feePow, key,
+            return this.transactionCreator.r_SignNote(version, property1, property2, asDeal, sender, feePow, key,
                     message, isText, encrypted);
         }
     }
 
-    public Transaction r_SertifyPerson(int version, boolean asPack, PrivateKeyAccount creator, int feePow, long key,
+    public Transaction r_SertifyPerson(int version, int asDeal, PrivateKeyAccount creator, int feePow, long key,
                                        List<PublicKeyAccount> userAccounts, int add_day) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_SertifyPerson(version, asPack, creator, feePow, key, userAccounts,
+            return this.transactionCreator.r_SertifyPerson(version, asDeal, creator, feePow, key, userAccounts,
                     add_day);
         }
     }
 
-    public Transaction r_Vouch(int version, boolean asPack, PrivateKeyAccount creator, int feePow, int height,
+    public Transaction r_Vouch(int version, int asDeal, PrivateKeyAccount creator, int feePow, int height,
                                int seq) {
         synchronized (this.transactionCreator) {
-            return this.transactionCreator.r_Vouch(version, asPack, creator, feePow, height, seq);
+            return this.transactionCreator.r_Vouch(version, asDeal, creator, feePow, height, seq);
         }
     }
 

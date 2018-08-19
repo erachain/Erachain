@@ -1035,14 +1035,14 @@ public class Block {
                         return false;
                     }
 
-                    transaction.setDC(validatingDC, false);
+                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK);
 
                     //CHECK IF VALID
-                    if (transaction.isValid(null, 0l) != Transaction.VALIDATE_OK) {
+                    if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                         LOGGER.debug("*** Block[" + height
                                 + "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
                                 + transaction.viewFullTypeName() + "]"
-                                + "invalid code: " + transaction.isValid(null, 0l)
+                                + "invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
                                 + " " + Base58.encode(transaction.getSignature()));
                         return false;
                     }
@@ -1060,7 +1060,7 @@ public class Block {
 
                     timerStart = System.currentTimeMillis();
                     try {
-                        transaction.process(this, false);
+                        transaction.process(this, Transaction.FOR_NETWORK);
                     } catch (Exception e) {
                         if (cnt.isOnStopping())
                             return false;
@@ -1072,7 +1072,7 @@ public class Block {
 
                 } else {
 
-                    transaction.setDC(validatingDC, false);
+                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK);
 
                     //UPDATE REFERENCE OF SENDER
                     if (transaction.isReferenced())
@@ -1270,12 +1270,12 @@ public class Block {
             //LOGGER.debug("[" + seq + "] record is process" );
 
             // NEED set DC for WIPED too
-            transaction.setDC(dcSet, false);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
 
             //PROCESS
             if (!transaction.isWiped()) {
                 timerStart = System.currentTimeMillis();
-                transaction.process(this, false);
+                transaction.process(this, Transaction.FOR_NETWORK);
                 timerProcess += System.currentTimeMillis() - timerStart;
             } else {
                 //UPDATE REFERENCE OF SENDER
@@ -1394,10 +1394,10 @@ public class Block {
             Transaction transaction = transactions.get(i);
             //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
-            transaction.setDC(dcSet, false);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
 
             if (!transaction.isWiped()) {
-                transaction.orphan(false);
+                transaction.orphan(Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
                 if (transaction.isReferenced()) {

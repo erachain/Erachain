@@ -266,7 +266,7 @@ public class CreatePollFrame extends JFrame {
 
 
             //VALIDATE AND PROCESS
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_voiting, false);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK);
 
             //CHECK VALIDATE MESSAGE
             switch (result) {

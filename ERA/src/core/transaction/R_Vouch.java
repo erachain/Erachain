@@ -127,7 +127,7 @@ public class R_Vouch extends Transaction {
         int seq = Ints.fromByteArray(seqBytes);
         position += SEQ_LENGTH;
 
-        if (asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new R_Vouch(typeBytes, creator, height, seq, reference, signatureBytes);
         } else {
             return new R_Vouch(typeBytes, creator, feePow, height, seq, timestamp, reference, signatureBytes);
@@ -192,7 +192,7 @@ public class R_Vouch extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (this.height < 2) {
             //CHECK HEIGHT - not 0 and NOT GENESIS
@@ -204,7 +204,7 @@ public class R_Vouch extends Transaction {
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
 		/*
@@ -235,9 +235,9 @@ public class R_Vouch extends Transaction {
 
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         if (block == null)
             return;
@@ -272,9 +272,9 @@ public class R_Vouch extends Transaction {
     }
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         // make key for vouching record
         Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);

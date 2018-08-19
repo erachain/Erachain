@@ -27,7 +27,7 @@ public class TransactionSerializer implements Serializer<Transaction>, Serializa
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            return TransactionFactory.getInstance().parse(bytes, null);
+            return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_DB_RECORD);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

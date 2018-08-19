@@ -556,7 +556,7 @@ public class CreateOrderPanel extends JPanel {
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             // CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {

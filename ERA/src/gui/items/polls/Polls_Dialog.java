@@ -282,7 +282,7 @@ public class Polls_Dialog extends JDialog {
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             // CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {

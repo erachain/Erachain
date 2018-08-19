@@ -272,7 +272,7 @@ public class PersonSetStatusDialog extends JDialog {
         if (dd.isConfirm) {
 
 
-            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
 
             //CHECK VALIDATE MESSAGE

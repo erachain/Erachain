@@ -147,7 +147,7 @@ public class IssueTemplatePanel extends JPanel {
         }
 
         // VALIDATE AND PROCESS
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(issueTemplate, false);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(issueTemplate, Transaction.FOR_NETWORK);
 
         // CHECK VALIDATE MESSAGE
         switch (result) {

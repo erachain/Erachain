@@ -363,7 +363,7 @@ public class IssuePollPanel extends JPanel {
         }
 
         // VALIDATE AND PROCESS
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(issuePoll, false);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(issuePoll, Transaction.FOR_NETWORK);
 
         if (result == Transaction.VALIDATE_OK) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Poll issue has been sent!"),

@@ -162,7 +162,7 @@ public class SellNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
         //CHECK NAME LENGTH
         int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
@@ -199,16 +199,16 @@ public class SellNameTransaction extends Transaction {
             return INVALID_AMOUNT;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
     //PROCESS/ORPHAN
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //UPDATE REFERENCE OF CREATOR
         //this.creator.setLastReference(this.signature, db);
@@ -219,9 +219,9 @@ public class SellNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //UPDATE REFERENCE OF CREATOR
         //this.creator.setLastReference(this.reference, db);

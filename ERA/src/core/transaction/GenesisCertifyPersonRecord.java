@@ -107,7 +107,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
@@ -124,7 +124,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         //Block block = new GenesisBlock();
         int transactionIndex = -1;
@@ -161,7 +161,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
     }
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         // UNDO ALIVE PERSON for DURATION
         //db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);

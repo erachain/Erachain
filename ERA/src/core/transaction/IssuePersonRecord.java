@@ -11,13 +11,10 @@ import com.google.common.primitives.Longs;
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.block.GenesisBlock;
-import core.item.assets.AssetCls;
 import core.item.persons.PersonCls;
 import core.item.persons.PersonFactory;
 import core.item.persons.PersonHuman;
 import datachain.AddressTime_SignatureMap;
-import datachain.DCSet;
 
 //import java.util.Map;
 // import org.apache.log4j.Logger;
@@ -82,20 +79,17 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -103,7 +97,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -119,7 +113,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += person.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssuePersonRecord(typeBytes, creator, person, feePow, timestamp, reference, signatureBytes);
         } else {
             return new IssuePersonRecord(typeBytes, creator, person, signatureBytes);
@@ -169,7 +163,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         PersonCls person = (PersonCls) this.getItem();
 
@@ -227,7 +221,7 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
         // IF BALANCE 0 or more - not check FEE
         boolean check_fee_balance = this.creator.getBalance(this.dcSet, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) < 0;        
-        int res = super.isValid(releaserReference, flags | (check_fee_balance? 0l : NOT_VALIDATE_FLAG_FEE));
+        int res = super.isValid(asDeal, flags | (check_fee_balance? 0l : NOT_VALIDATE_FLAG_FEE));
 
         // FIRST PERSSONS INSERT as ADMIN
         boolean creator_admin = false;
@@ -261,9 +255,9 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     //PROCESS/ORPHAN
 
     //@Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();
@@ -287,9 +281,9 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     }
 
     //@Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();

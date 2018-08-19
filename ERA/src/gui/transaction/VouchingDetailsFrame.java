@@ -33,7 +33,7 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame {
             message += "NULL</div>";
         } else {
             message += ", time: " + record.viewTimestamp() + "</div>";
-            message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_DEAL_NETWORK) + ", fee:" + record.viewFee() + "</div>";
+            message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK) + ", fee:" + record.viewFee() + "</div>";
 
             //message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
             message += "<div>SIGN: <font size='2'>" + record.viewSignature() + "</font></div>";

@@ -386,7 +386,7 @@ public class Rec_Resource {
             int cut = 53;
             byte[] dataTail = Arrays.copyOfRange(data, cut, data.length);
             data = Bytes.concat(Arrays.copyOfRange(data, 0, cut), new byte[64], dataTail);
-            transaction = TransactionFactory.getInstance().parse(data, null);
+            transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);
             JSONObject json = transaction.toJson();
             json.put("raw", Base58.encode(data));
             return json.toJSONString();
@@ -418,7 +418,7 @@ public class Rec_Resource {
                 return APIUtils.errorMess(-1, "Parameter [data] not found");
 
             String dataStr = queryParameters.get("data").get(0);
-            transaction = TransactionFactory.getInstance().parse(Base58.decode(dataStr), null);
+            transaction = TransactionFactory.getInstance().parse(Base58.decode(dataStr), Transaction.FOR_NETWORK);
         } catch (Exception e) {
             return APIUtils.errorMess(-1, e.toString());
         }

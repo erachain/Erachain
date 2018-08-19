@@ -90,7 +90,7 @@ public class Account_Lend_Panel extends AssetSendPanel {
         if (dd.isConfirm) {
 
 
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             confirmaftecreatetransaction();
         }

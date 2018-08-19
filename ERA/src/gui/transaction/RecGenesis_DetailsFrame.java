@@ -80,7 +80,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
 
         //SIZE
         detailGBC.gridy = componentLevel;
-        JTextField feePow = new JTextField(String.valueOf(record.getDataLength(Transaction.FOR_DEAL_NETWORK, true)));
+        JTextField feePow = new JTextField(String.valueOf(record.getDataLength(Transaction.FOR_NETWORK, true)));
         feePow.setEditable(false);
         MenuPopupUtil.installContextMenu(feePow);
         this.add(feePow, detailGBC);

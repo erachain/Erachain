@@ -138,7 +138,7 @@ public class VoteOnPollTransaction extends Transaction {
         if (asDeal > Transaction.FOR_PACK) {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, feePow, timestamp, reference, signatureBytes);
         } else if (asDeal > Transaction.FOR_MYPACK) {
-            //return new VoteOnPollTransaction(typeBytes, creator, poll, option, timestamp, reference, signatureBytes);
+            return new VoteOnPollTransaction(typeBytes, creator, poll, option, reference, signatureBytes);
         } else {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, reference, signatureBytes);
         }
@@ -208,7 +208,7 @@ public class VoteOnPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
@@ -241,7 +241,7 @@ public class VoteOnPollTransaction extends Transaction {
             return ALREADY_VOTED_FOR_THAT_OPTION;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
 
     }
 
@@ -249,9 +249,9 @@ public class VoteOnPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //ADD VOTE TO POLL
         Poll poll = this.dcSet.getPollMap().get(this.poll).copy();
@@ -268,9 +268,9 @@ public class VoteOnPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //DELETE VOTE FROM POLL
         Poll poll = this.dcSet.getPollMap().get(this.poll).copy();

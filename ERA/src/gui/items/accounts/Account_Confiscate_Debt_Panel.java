@@ -88,7 +88,7 @@ public class Account_Confiscate_Debt_Panel extends AssetSendPanel {
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             confirmaftecreatetransaction();
         }

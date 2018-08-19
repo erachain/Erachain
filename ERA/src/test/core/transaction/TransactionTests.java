@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 public class TransactionTests {
 
     static Logger LOGGER = Logger.getLogger(TransactionTests.class.getName());
-    Long releaserReference = null;
+    //Long Transaction.FOR_NETWORK = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
     byte FEE_POWER = (byte) 1;
@@ -99,7 +99,7 @@ String  s= "";
 
         //CREATE PAYMENT
         Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
-        payment.sign(maker, false);
+        payment.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF PAYMENT SIGNATURE IS VALID
         assertEquals(true, payment.isSignatureValid(db));
 
@@ -118,25 +118,25 @@ String  s= "";
 
         //CREATE VALID PAYMENT
         Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
-        assertEquals(Transaction.VALIDATE_OK, payment.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
         payment = new R_Send(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db) + 10);
-        assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT NEGATIVE AMOUNT
         payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
-        assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(releaserReference, flags));
+        assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT WRONG REFERENCE
         payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, -123L, new byte[64]);
-        assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT WRONG TIMESTAMP
         payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db), maker.getLastTimestamp(db));
-        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
         payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db) - 10, maker.getLastTimestamp(db));
-        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -146,14 +146,14 @@ String  s= "";
 
         //CREATE VALID PAYMENT
         Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
-        payment.sign(maker, false);
+        payment.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawPayment = payment.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawPayment = payment.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            R_Send parsedPayment = (R_Send) TransactionFactory.getInstance().parse(rawPayment, releaserReference);
+            R_Send parsedPayment = (R_Send) TransactionFactory.getInstance().parse(rawPayment, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedPayment instanceof R_Send);
@@ -180,11 +180,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPayment = new byte[payment.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawPayment = new byte[payment.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawPayment, releaserReference);
+            TransactionFactory.getInstance().parse(rawPayment, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -201,9 +201,9 @@ String  s= "";
         //CREATE PAYMENT
         BigDecimal amount = BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, amount.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
-        payment.sign(maker, false);
+        payment.sign(maker, Transaction.FOR_NETWORK);
         BigDecimal fee = payment.getFee();
-        payment.process(gb, false);
+        payment.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.info("getConfirmedBalance: " + maker.getBalanceUSE(FEE_KEY, databaseSet));
         LOGGER.info("getConfirmedBalance FEE_KEY:" + maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -228,19 +228,19 @@ String  s= "";
 
         //CREATE PAYMENT
         Transaction payment = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
-        payment.sign(maker, false);
-        payment.process(gb, false);
+        payment.sign(maker, Transaction.FOR_NETWORK);
+        payment.process(gb, Transaction.FOR_NETWORK);
 
         BigDecimal amount1 = maker.getBalanceUSE(FEE_KEY, databaseSet);
         BigDecimal amount2 = recipient.getBalanceUSE(FEE_KEY, databaseSet);
 
         //CREATE PAYMENT2
         Transaction payment2 = new R_Send(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, last_ref);
-        payment2.sign(maker, false);
-        payment.process(gb, false);
+        payment2.sign(maker, Transaction.FOR_NETWORK);
+        payment.process(gb, Transaction.FOR_NETWORK);
 
         //ORPHAN PAYMENT
-        payment2.orphan(false);
+        payment2.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, amount1.compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -271,7 +271,7 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS VALID
         assertEquals(true, nameRegistration.isSignatureValid(db));
@@ -294,11 +294,11 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(releaserReference, flags));
-        nameRegistration.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE INVALID NAME REGISTRATION INVALID NAME LENGTH
         String longName = "";
@@ -307,10 +307,10 @@ String  s= "";
         }
         name = new Name(maker, longName, "this is the value");
         nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, nameRegistration.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME REGISTRATION INVALID NAME LENGTH
         String longValue = "";
@@ -319,18 +319,18 @@ String  s= "";
         }
         name = new Name(maker, "test2", longValue);
         nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_VALUE_LENGTH, nameRegistration.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_VALUE_LENGTH, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME REGISTRATION NAME ALREADY TAKEN
         name = new Name(maker, "test", "this is the value");
         nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.NAME_ALREADY_REGISTRED, nameRegistration.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_ALREADY_REGISTRED, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -338,17 +338,17 @@ String  s= "";
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
         name = new Name(invalidOwner, "test2", "this is the value");
         nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
-        nameRegistration.sign(invalidOwner, false);
+        nameRegistration.sign(invalidOwner, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.NOT_ENOUGH_FEE, nameRegistration.isValid(releaserReference, flags));
+        assertEquals(Transaction.NOT_ENOUGH_FEE, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE NAME REGISTRATION INVALID REFERENCE
         name = new Name(maker, "test2", "this is the value");
         nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, nameRegistration.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
     }
 
     @Test
@@ -361,14 +361,14 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         RegisterNameTransaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawNameRegistration = nameRegistration.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawNameRegistration = nameRegistration.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            RegisterNameTransaction parsedRegistration = (RegisterNameTransaction) TransactionFactory.getInstance().parse(rawNameRegistration, releaserReference);
+            RegisterNameTransaction parsedRegistration = (RegisterNameTransaction) TransactionFactory.getInstance().parse(rawNameRegistration, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedRegistration instanceof RegisterNameTransaction);
@@ -401,11 +401,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNameRegistration = new byte[nameRegistration.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawNameRegistration = new byte[nameRegistration.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawNameRegistration, releaserReference);
+            TransactionFactory.getInstance().parse(rawNameRegistration, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -424,9 +424,9 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.setDC(db,false);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.setDC(db,Transaction.FOR_NETWORK);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         //assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
@@ -448,9 +448,9 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
-        nameRegistration.orphan(false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
+        nameRegistration.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -476,7 +476,7 @@ String  s= "";
 
         //CREATE NAME UPDATE
         Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameUpdate.sign(maker, false);
+        nameUpdate.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF NAME UPDATE IS VALID
         assertEquals(true, nameUpdate.isSignatureValid(db));
 
@@ -498,18 +498,18 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(releaserReference, flags));
-        nameRegistration.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME UPDATE
         name.setValue("new value");
         Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameUpdate.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE INVALID NAME LENGTH
         String longName = "";
@@ -520,14 +520,14 @@ String  s= "";
         nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, nameUpdate.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NAME DOES NOT EXIST
         name = new Name(maker, "test2", "this is the value");
         nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NAME_DOES_NOT_EXIST, nameUpdate.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_DOES_NOT_EXIST, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE INCORRECT OWNER
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -535,25 +535,25 @@ String  s= "";
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
         name = new Name(invalidOwner, "test2", "this is the value");
         nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(invalidOwner, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(invalidOwner, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_MAKER_ADDRESS, nameUpdate.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_MAKER_ADDRESS, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NO BALANCE
         name = new Name(invalidOwner, "test2", "this is the value");
         nameUpdate = new UpdateNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NO_BALANCE, nameUpdate.isValid(releaserReference, flags));
+        assertEquals(Transaction.NO_BALANCE, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE NAME UPDATE INVALID REFERENCE
         name = new Name(maker, "test", "this is the value");
         nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, -123L);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, nameUpdate.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, nameUpdate.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -566,14 +566,14 @@ String  s= "";
 
         //CREATE NAME UPDATE
         UpdateNameTransaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameUpdate.sign(maker, false);
+        nameUpdate.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawNameUpdate = nameUpdate.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawNameUpdate = nameUpdate.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            UpdateNameTransaction parsedUpdate = (UpdateNameTransaction) TransactionFactory.getInstance().parse(rawNameUpdate, releaserReference);
+            UpdateNameTransaction parsedUpdate = (UpdateNameTransaction) TransactionFactory.getInstance().parse(rawNameUpdate, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedUpdate instanceof UpdateNameTransaction);
@@ -609,11 +609,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNameUpdate = new byte[nameUpdate.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawNameUpdate = new byte[nameUpdate.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawNameUpdate, releaserReference);
+            TransactionFactory.getInstance().parse(rawNameUpdate, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -631,16 +631,16 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
         // set FEE
         maker.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         //CREATE NAME UPDATE
         name = new Name(new Account("Qj5Aq4P4ehXaCEmi6vqVrFQDecpPXKSi8z"), "test", "new value");
         Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameUpdate.sign(maker, false);
-        nameUpdate.process(gb, false);
+        nameUpdate.sign(maker, Transaction.FOR_NETWORK);
+        nameUpdate.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -671,17 +671,17 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
         // set FEE
         maker.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         //CREATE NAME UPDATE
         name = new Name(new Account("XYLEQnuvhracK2WMN3Hjif67knkJe9hTQn"), "test", "new value");
         Transaction nameUpdate = new UpdateNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameUpdate.sign(maker, false);
-        nameUpdate.process(gb, false);
-        nameUpdate.orphan(false);
+        nameUpdate.sign(maker, Transaction.FOR_NETWORK);
+        nameUpdate.process(gb, Transaction.FOR_NETWORK);
+        nameUpdate.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -712,7 +712,7 @@ String  s= "";
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF NAME UPDATE IS VALID
         assertEquals(true, nameSaleTransaction.isSignatureValid(db));
 
@@ -733,18 +733,18 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(releaserReference, flags));
-        nameRegistration.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME SALE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME SALE INVALID NAME LENGTH
         String longName = "";
@@ -755,16 +755,16 @@ String  s= "";
         nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME SALE NAME DOES NOT EXIST
         nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NAME_DOES_NOT_EXIST, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_DOES_NOT_EXIST, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE INCORRECT OWNER
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -772,35 +772,35 @@ String  s= "";
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
         name = new Name(invalidOwner, "test2", "this is the value");
         nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(invalidOwner, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(invalidOwner, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME UPDATE IS INVALID
         nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        assertEquals(Transaction.INVALID_MAKER_ADDRESS, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_MAKER_ADDRESS, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NO BALANCE
         nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         nameSaleTransaction = new SellNameTransaction(invalidOwner, nameSale, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NO_BALANCE, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NO_BALANCE, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE NAME UPDATE INVALID REFERENCE
         nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, -123L);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE NAME UPDATE PROCESS
         nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.NAME_ALREADY_ON_SALE, nameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_ALREADY_ON_SALE, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
     }
 
     @Test
@@ -812,15 +812,15 @@ String  s= "";
 
         //CREATE NAME UPDATE
         SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawNameSale = nameSaleTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawNameSale = nameSaleTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            SellNameTransaction parsedNameSale = (SellNameTransaction) TransactionFactory.getInstance().parse(rawNameSale, releaserReference);
+            SellNameTransaction parsedNameSale = (SellNameTransaction) TransactionFactory.getInstance().parse(rawNameSale, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedNameSale instanceof SellNameTransaction);
@@ -853,11 +853,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNameSale = new byte[nameSaleTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawNameSale = new byte[nameSaleTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawNameSale, releaserReference);
+            TransactionFactory.getInstance().parse(rawNameSale, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -875,16 +875,16 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -909,8 +909,8 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
         BigDecimal bal = maker.getBalanceUSE(FEE_KEY, databaseSet);
 
         //CREATE SIGNATURE
@@ -918,9 +918,9 @@ String  s= "";
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
-        nameSaleTransaction.orphan(false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
+        nameSaleTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         //assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
@@ -943,7 +943,7 @@ String  s= "";
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF NAME UPDATE IS VALID
         assertEquals(true, nameSaleTransaction.isSignatureValid(db));
 
@@ -964,26 +964,26 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(releaserReference, flags));
-        nameRegistration.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME SALE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME UPDATE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(releaserReference, flags));
-        nameSaleTransaction.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE CANCEL NAME SALE
         CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, nameSale.getKey(), FEE_POWER, timestamp, last_ref);
 
         //CHECK IF CANCEL NAME UPDATE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID CANCEL NAME SALE INVALID NAME LENGTH
         String longName = "";
@@ -994,13 +994,13 @@ String  s= "";
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, longName, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID CANCEL NAME SALE NAME DOES NOT EXIST
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NAME_DOES_NOT_EXIST, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_DOES_NOT_EXIST, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE INCORRECT OWNER
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -1008,39 +1008,39 @@ String  s= "";
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
         name = new Name(invalidOwner, "test2", "this is the value");
         nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(invalidOwner, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(invalidOwner, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME SALE
         nameSale = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         nameSaleTransaction = new SellNameTransaction(invalidOwner, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(invalidOwner, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(invalidOwner, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME UPDATE IS INVALID
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test2", FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        assertEquals(Transaction.INVALID_MAKER_ADDRESS, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        assertEquals(Transaction.INVALID_MAKER_ADDRESS, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NO BALANCE
         cancelNameSaleTransaction = new CancelSellNameTransaction(invalidOwner, "test2", FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NO_BALANCE, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NO_BALANCE, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE NAME UPDATE INVALID REFERENCE
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, -123L);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE NAME UPDATE PROCESS
         cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
-        cancelNameSaleTransaction.sign(maker, false);
-        cancelNameSaleTransaction.process(gb, false);
+        cancelNameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        cancelNameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.NAME_NOT_FOR_SALE, cancelNameSaleTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_NOT_FOR_SALE, cancelNameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
     }
 
     @Test
@@ -1050,14 +1050,14 @@ String  s= "";
 
         //CREATE CANCEL NAME SALE
         CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
-        cancelNameSaleTransaction.sign(maker, false);
+        cancelNameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawCancelNameSale = cancelNameSaleTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawCancelNameSale = cancelNameSaleTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            CancelSellNameTransaction parsedCancelNameSale = (CancelSellNameTransaction) TransactionFactory.getInstance().parse(rawCancelNameSale, releaserReference);
+            CancelSellNameTransaction parsedCancelNameSale = (CancelSellNameTransaction) TransactionFactory.getInstance().parse(rawCancelNameSale, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedCancelNameSale instanceof CancelSellNameTransaction);
@@ -1087,11 +1087,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawCancelNameSale = new byte[cancelNameSaleTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawCancelNameSale = new byte[cancelNameSaleTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawCancelNameSale, releaserReference);
+            TransactionFactory.getInstance().parse(rawCancelNameSale, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -1109,23 +1109,23 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
 
         //CREATE CANCEL NAME SALE
         Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
-        cancelNameSaleTransaction.sign(maker, false);
-        cancelNameSaleTransaction.process(gb, false);
+        cancelNameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        cancelNameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -1146,24 +1146,24 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
 
         //CREATE CANCEL NAME SALE
         Transaction cancelNameSaleTransaction = new CancelSellNameTransaction(maker, "test", FEE_POWER, timestamp, last_ref);
-        cancelNameSaleTransaction.sign(maker, false);
-        cancelNameSaleTransaction.process(gb, false);
-        cancelNameSaleTransaction.orphan(false);
+        cancelNameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        cancelNameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
+        cancelNameSaleTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -1190,7 +1190,7 @@ String  s= "";
 
         //CREATE NAME SALE
         Transaction buyNameTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
-        buyNameTransaction.sign(maker, false);
+        buyNameTransaction.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF NAME UPDATE IS VALID
         assertEquals(true, buyNameTransaction.isSignatureValid(db));
 
@@ -1214,28 +1214,28 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(releaserReference, flags));
-        nameRegistration.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME SALE
         BigDecimal bdAmoSell = BigDecimal.valueOf(700).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         NameSale nameSale = new NameSale("test", bdAmoSell);
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME UPDATE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(releaserReference, flags));
-        nameSaleTransaction.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, nameSaleTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME PURCHASE
         BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
-        namePurchaseTransaction.sign(buyer, false);
+        namePurchaseTransaction.sign(buyer, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME PURCHASE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME PURCHASE INVALID NAME LENGTH
         String longName = "";
@@ -1251,35 +1251,35 @@ String  s= "";
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME PURCHASE NAME DOES NOT EXIST
         nameSaleInvalid = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NAME_DOES_NOT_EXIST, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_DOES_NOT_EXIST, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME PURCHASE NAME NOT FOR SALE
         Name test2 = new Name(maker, "test2", "oke");
         databaseSet.getNameMap().add(test2);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NAME_NOT_FOR_SALE, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NAME_NOT_FOR_SALE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME PURCHASE ALREADY OWNER
         nameSale = new NameSale("test", bdAmoSell);
         namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.BUYER_ALREADY_OWNER, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.BUYER_ALREADY_OWNER, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME UPDATE NO BALANCE
         buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
 
         //CHECK IF NAME UPDATE IS INVALID
-        assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         // setConfirmedBalance(long key, BigDecimal amount, DBSet db)
         buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -1288,7 +1288,7 @@ String  s= "";
         namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, -123L);
 
         //CHECK IF NAME REGISTRATION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, namePurchaseTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
     }
 
     @Test
@@ -1302,9 +1302,9 @@ String  s= "";
         BigDecimal bdAmoSell = BigDecimal.valueOf(700).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         NameSale nameSale = new NameSale("test", bdAmoSell);
         SellNameTransaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
         //nameSaleTransaction.process();
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.addAppender(null);
         LOGGER.debug("nameSale ");
@@ -1314,13 +1314,13 @@ String  s= "";
 
         //CREATE CANCEL NAME SALE
         BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
-        namePurchaseTransaction.sign(maker, false);
+        namePurchaseTransaction.sign(maker, Transaction.FOR_NETWORK);
         //CONVERT TO BYTES
-        byte[] rawNamePurchase = namePurchaseTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawNamePurchase = namePurchaseTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            BuyNameTransaction parsedNamePurchase = (BuyNameTransaction) TransactionFactory.getInstance().parse(rawNamePurchase, releaserReference);
+            BuyNameTransaction parsedNamePurchase = (BuyNameTransaction) TransactionFactory.getInstance().parse(rawNamePurchase, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedNamePurchase instanceof BuyNameTransaction);
@@ -1350,11 +1350,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNamePurchase = new byte[namePurchaseTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawNamePurchase = new byte[namePurchaseTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawNamePurchase, releaserReference);
+            TransactionFactory.getInstance().parse(rawNamePurchase, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -1372,23 +1372,23 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
 
         //CREATE NAME PURCHASE
         Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
-        purchaseNameTransaction.sign(buyer, false);
-        purchaseNameTransaction.process(gb, false);
+        purchaseNameTransaction.sign(buyer, Transaction.FOR_NETWORK);
+        purchaseNameTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         //assertEquals(BigDecimal.valueOf(498).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), buyer.getConfirmedBalance(FEE_KEY, databaseSet));
@@ -1417,24 +1417,24 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.sign(maker, false);
-        nameRegistration.process(gb, false);
+        nameRegistration.sign(maker, Transaction.FOR_NETWORK);
+        nameRegistration.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
         NameSale nameSale = new NameSale("test", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CREATE NAME SALE
         Transaction nameSaleTransaction = new SellNameTransaction(maker, nameSale, FEE_POWER, timestamp, last_ref);
-        nameSaleTransaction.sign(maker, false);
-        nameSaleTransaction.process(gb, false);
+        nameSaleTransaction.sign(maker, Transaction.FOR_NETWORK);
+        nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE SIGNATURE
 
         //CREATE NAME PURCHASE
         Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
-        purchaseNameTransaction.sign(buyer, false);
-        purchaseNameTransaction.process(gb, false);
-        purchaseNameTransaction.orphan(false);
+        purchaseNameTransaction.sign(buyer, Transaction.FOR_NETWORK);
+        purchaseNameTransaction.process(gb, Transaction.FOR_NETWORK);
+        purchaseNameTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), buyer.getBalanceUSE(FEE_KEY, databaseSet));
@@ -1466,7 +1466,7 @@ String  s= "";
 
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF POLL CREATION IS VALID
         assertEquals(true, pollCreation.isSignatureValid(db));
 
@@ -1487,11 +1487,11 @@ String  s= "";
 
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL CREATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(releaserReference, flags));
-        pollCreation.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE INVALID POLL CREATION INVALID NAME LENGTH
         String longName = "";
@@ -1502,7 +1502,7 @@ String  s= "";
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION INVALID DESCRIPTION LENGTH
         String longDescription = "";
@@ -1513,35 +1513,35 @@ String  s= "";
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_DESCRIPTION_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION NAME ALREADY TAKEN
         poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test")));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.POLL_ALREADY_CREATED, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.POLL_ALREADY_CREATED, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION NO OPTIONS
         poll = new Poll(maker, "test2", "this is the value", new ArrayList<PollOption>());
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_OPTIONS_LENGTH, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_OPTIONS_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION INVALID OPTION LENGTH
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption(longName)));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.INVALID_OPTION_LENGTH, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_OPTION_LENGTH, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION INVALID DUPLICATE OPTIONS
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test")));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.DUPLICATE_OPTION, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.DUPLICATE_OPTION, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL CREATION NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -1551,15 +1551,15 @@ String  s= "";
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
         pollCreation = new CreatePollTransaction(invalidOwner, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
         // need for calc FEE
-        pollCreation.sign(invalidOwner, false);
+        pollCreation.sign(invalidOwner, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL CREATION IS INVALID
-        assertEquals(Transaction.NOT_ENOUGH_FEE, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.NOT_ENOUGH_FEE, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE POLL CREATION INVALID REFERENCE
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
         pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
-        assertEquals(Transaction.INVALID_REFERENCE, pollCreation.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -1572,14 +1572,14 @@ String  s= "";
 
         //CREATE POLL CREATION
         CreatePollTransaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawPollCreation = pollCreation.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawPollCreation = pollCreation.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            CreatePollTransaction parsedPollCreation = (CreatePollTransaction) TransactionFactory.getInstance().parse(rawPollCreation, releaserReference);
+            CreatePollTransaction parsedPollCreation = (CreatePollTransaction) TransactionFactory.getInstance().parse(rawPollCreation, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedPollCreation instanceof CreatePollTransaction);
@@ -1621,11 +1621,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPollCreation = new byte[pollCreation.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawPollCreation = new byte[pollCreation.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawPollCreation, releaserReference);
+            TransactionFactory.getInstance().parse(rawPollCreation, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -1643,8 +1643,8 @@ String  s= "";
 
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
-        pollCreation.process(gb, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
+        pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1).subtract(pollCreation.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -1665,9 +1665,9 @@ String  s= "";
 
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
-        pollCreation.process(gb, false);
-        pollCreation.orphan(false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
+        pollCreation.process(gb, Transaction.FOR_NETWORK);
+        pollCreation.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -1688,7 +1688,7 @@ String  s= "";
 
         //CREATE POLL VOTE
         Transaction pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);
-        pollVote.sign(maker, false);
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
         //CHECK IF POLL VOTE IS VALID
         assertEquals(true, pollVote.isSignatureValid(db));
 
@@ -1711,18 +1711,18 @@ String  s= "";
         Poll poll = new Poll(maker, "test", "this is the value", Arrays.asList(new PollOption("test"), new PollOption("test2")));
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL CREATION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(releaserReference, flags));
-        pollCreation.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
+        pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE POLL VOTE
         Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastTimestamp(databaseSet));
-        pollVote.sign(maker, false);
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL VOTE IS VALID
-        assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(Transaction.FOR_NETWORK, flags));
         //pollVote.process(databaseSet, false);
 
         //CREATE INVALID POLL VOTE INVALID NAME LENGTH
@@ -1733,33 +1733,33 @@ String  s= "";
         pollVote = new VoteOnPollTransaction(maker, longName, 0, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.INVALID_NAME_LENGTH, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_NAME_LENGTH, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL VOTE POLL DOES NOT EXIST
         pollVote = new VoteOnPollTransaction(maker, "test2", 0, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.POLL_NOT_EXISTS, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.POLL_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL VOTE INVALID OPTION
         pollVote = new VoteOnPollTransaction(maker, "test", 5, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL VOTE INVALID OPTION
         pollVote = new VoteOnPollTransaction(maker, "test", -1, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.POLL_OPTION_NOT_EXISTS, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
         //CRTEATE INVALID POLL VOTE VOTED ALREADY
         pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, last_ref);
-        pollVote.sign(maker, false);
-        pollVote.process(gb, false);
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
+        pollVote.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL VOTE IS INVALID
-        assertEquals(Transaction.ALREADY_VOTED_FOR_THAT_OPTION, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.ALREADY_VOTED_FOR_THAT_OPTION, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID POLL VOTE NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -1767,7 +1767,7 @@ String  s= "";
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
         invalidOwner.setLastTimestamp(timestamp, databaseSet);
         pollVote = new VoteOnPollTransaction(invalidOwner, "test", 0, FEE_POWER, timestamp, last_ref);
-        pollVote.sign(invalidOwner, false);
+        pollVote.sign(invalidOwner, Transaction.FOR_NETWORK);
 
 
         //CHECK IF POLL VOTE IS INVALID
@@ -1776,7 +1776,7 @@ String  s= "";
 
         //CREATE POLL CREATION INVALID REFERENCE
         pollVote = new VoteOnPollTransaction(maker, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet) + 1);
-        assertEquals(Transaction.INVALID_REFERENCE, pollVote.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -1788,15 +1788,15 @@ String  s= "";
 
         //CREATE POLL Vote
         VoteOnPollTransaction pollVote = new VoteOnPollTransaction(maker, "test", 0, FEE_POWER, timestamp, last_ref);
-        pollVote.sign(maker, false);
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawPollVote = pollVote.toBytes(, Transaction.FOR_DEAL_NETWORK);
-        assertEquals(rawPollVote.length, pollVote.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        byte[] rawPollVote = pollVote.toBytes(Transaction.FOR_NETWORK, true);
+        assertEquals(rawPollVote.length, pollVote.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            VoteOnPollTransaction parsedPollVote = (VoteOnPollTransaction) TransactionFactory.getInstance().parse(rawPollVote, releaserReference);
+            VoteOnPollTransaction parsedPollVote = (VoteOnPollTransaction) TransactionFactory.getInstance().parse(rawPollVote, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedPollVote instanceof VoteOnPollTransaction);
@@ -1829,11 +1829,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPollVote = new byte[pollVote.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawPollVote = new byte[pollVote.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawPollVote, releaserReference);
+            TransactionFactory.getInstance().parse(rawPollVote, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -1852,17 +1852,17 @@ String  s= "";
 
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
-        pollCreation.process(gb, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
+        pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         BigDecimal bal = maker.getBalanceUSE(FEE_KEY, databaseSet);
 
         //CREATE POLL VOTE
         Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastTimestamp(databaseSet));
-        pollVote.sign(maker, false);
-        assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(releaserReference, flags));
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
+        assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
-        pollVote.process(gb, false);
+        pollVote.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, bal.compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -1876,8 +1876,8 @@ String  s= "";
 
         //CREATE POLL VOTE
         pollVote = new VoteOnPollTransaction(maker, poll.getName(), 1, FEE_POWER, timestamp, last_ref);
-        pollVote.sign(maker, false);
-        pollVote.process(gb, false);
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
+        pollVote.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, bal.compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -1902,14 +1902,14 @@ String  s= "";
 
         //CREATE POLL CREATION
         Transaction pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, last_ref);
-        pollCreation.sign(maker, false);
-        pollCreation.process(gb, false);
+        pollCreation.sign(maker, Transaction.FOR_NETWORK);
+        pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE POLL VOTE
         Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp, last_ref);
-        pollVote.sign(maker, false);
-        pollVote.process(gb, false);
-        pollVote.orphan(false);
+        pollVote.sign(maker, Transaction.FOR_NETWORK);
+        pollVote.process(gb, Transaction.FOR_NETWORK);
+        pollVote.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         //assertEquals(0, maker.getConfirmedBalance(FEE_KEY, databaseSet));
@@ -1935,7 +1935,7 @@ String  s= "";
 
         //CREATE ARBITRARY TRANSACTION
         Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4889, "test".getBytes(), FEE_POWER, timestamp, last_ref);
-        arbitraryTransaction.sign(maker, false);
+        arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ARBITRARY TRANSACTION IS VALID
         assertEquals(true, arbitraryTransaction.isSignatureValid(db));
@@ -1957,18 +1957,18 @@ String  s= "";
 
         //CREATE ARBITRARY TRANSACTION
         Transaction arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, last_ref);
-        arbitraryTransaction.sign(maker, false);
+        arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ARBITRARY TRANSACTION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, arbitraryTransaction.isValid(releaserReference, flags));
-        arbitraryTransaction.process(gb, false);
+        assertEquals(Transaction.VALIDATE_OK, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
+        arbitraryTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE INVALID ARBITRARY TRANSACTION INVALID data LENGTH
         byte[] longData = new byte[5000];
         arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, longData, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
-        assertEquals(Transaction.INVALID_DATA_LENGTH, arbitraryTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_DATA_LENGTH, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ARBITRARY TRANSACTION NOT ENOUGH BALANCE
         seed = Crypto.getInstance().digest("invalid".getBytes());
@@ -1977,13 +1977,13 @@ String  s= "";
         arbitraryTransaction = new ArbitraryTransactionV3(invalidOwner, null, 4776, data, FEE_POWER, timestamp, last_ref);
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
-        assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE ARBITRARY TRANSACTION INVALID REFERENCE
         arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
-        assertEquals(Transaction.INVALID_REFERENCE, arbitraryTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_REFERENCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -1995,14 +1995,14 @@ String  s= "";
 
         //CREATE ARBITRARY TRANSACTION
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, "test".getBytes(), FEE_POWER, timestamp, last_ref);
-        arbitraryTransaction.sign(maker, false);
+        arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawArbitraryTransaction = arbitraryTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawArbitraryTransaction = arbitraryTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         try {
             //PARSE FROM BYTES
-            ArbitraryTransactionV3 parsedArbitraryTransaction = (ArbitraryTransactionV3) TransactionFactory.getInstance().parse(rawArbitraryTransaction, releaserReference);
+            ArbitraryTransactionV3 parsedArbitraryTransaction = (ArbitraryTransactionV3) TransactionFactory.getInstance().parse(rawArbitraryTransaction, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedArbitraryTransaction instanceof ArbitraryTransactionV3);
@@ -2035,11 +2035,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawArbitraryTransaction = new byte[arbitraryTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawArbitraryTransaction = new byte[arbitraryTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawArbitraryTransaction, releaserReference);
+            TransactionFactory.getInstance().parse(rawArbitraryTransaction, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -2056,8 +2056,8 @@ String  s= "";
 
         //CREATE ARBITRARY TRANSACTION
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, "test".getBytes(), FEE_POWER, timestamp, last_ref);
-        arbitraryTransaction.sign(maker, false);
-        arbitraryTransaction.process(gb, false);
+        arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(0, BigDecimal.valueOf(1).subtract(arbitraryTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
@@ -2073,9 +2073,9 @@ String  s= "";
 
         //CREATE ARBITRARY TRANSACTION
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, "test".getBytes(), FEE_POWER, timestamp, last_ref);
-        arbitraryTransaction.sign(maker, false);
-        arbitraryTransaction.process(gb, false);
-        arbitraryTransaction.orphan(false);
+        arbitraryTransaction.sign(maker, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(gb, Transaction.FOR_NETWORK);
+        arbitraryTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
@@ -2153,7 +2153,7 @@ String  s= "";
 
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueAssetTransaction.sign(maker, false);
+        issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE ASSET TRANSACTION IS VALID
         assertEquals(true, issueAssetTransaction.isSignatureValid(db));
@@ -2178,18 +2178,18 @@ String  s= "";
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueAssetTransaction.sign(maker, false);
-        issueAssetTransaction.process(gb, false);
+        issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            IssueAssetTransaction parsedIssueAssetTransaction = (IssueAssetTransaction) TransactionFactory.getInstance().parse(rawIssueAssetTransaction, releaserReference);
+            IssueAssetTransaction parsedIssueAssetTransaction = (IssueAssetTransaction) TransactionFactory.getInstance().parse(rawIssueAssetTransaction, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedIssueAssetTransaction instanceof IssueAssetTransaction);
@@ -2231,11 +2231,11 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawIssueAssetTransaction, releaserReference);
+            TransactionFactory.getInstance().parse(rawIssueAssetTransaction, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -2257,11 +2257,11 @@ String  s= "";
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueAssetTransaction.sign(maker, false);
+        issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
-        assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        issueAssetTransaction.process(gb, false);
+        issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.info("asset KEY: " + asset.getKey(DCSet.getInstance()));
 
@@ -2294,13 +2294,13 @@ String  s= "";
 
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueAssetTransaction.sign(maker, false);
-        issueAssetTransaction.process(gb, false);
+        issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
         assertEquals(new BigDecimal(50000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
         assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
-        issueAssetTransaction.orphan(false);
+        issueAssetTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));

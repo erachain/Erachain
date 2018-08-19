@@ -97,7 +97,7 @@ public abstract class AddressItem_Refs extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -111,7 +111,7 @@ public abstract class AddressItem_Refs extends Transaction {
             return INVALID_DESCRIPTION_LENGTH;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
 
     }
 
@@ -119,9 +119,9 @@ public abstract class AddressItem_Refs extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         // SET REFERENCE if not setted before (in Imprint it setted)
         if (this.item.getReference() == null) this.item.setReference(this.signature);
@@ -133,9 +133,9 @@ public abstract class AddressItem_Refs extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //DELETE FROM DATABASE
         long key = this.item.removeFromMap(this.dcSet);

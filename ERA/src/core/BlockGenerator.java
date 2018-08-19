@@ -143,6 +143,8 @@ public class BlockGenerator extends Thread implements Observer {
 
         //CREATE FORK OF GIVEN DATABASE
         DCSet newBlockDb = dcSet.fork();
+        int blockHeight =  newBlockDb.getBlockMap().size() + 1;
+
         Block waitWin;
 
         long start = System.currentTimeMillis();
@@ -199,9 +201,9 @@ public class BlockGenerator extends Thread implements Observer {
                     continue;
                 }
 
-                transaction.setDC(newBlockDb, false, counter + 1);
+                transaction.setDC(newBlockDb, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
-                if (transaction.isValid(null, 0l) != Transaction.VALIDATE_OK) {
+                if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                     // INVALID TRANSACTION
                     // REMOVE FROM LIST
                     //transactionProcessed = true;
@@ -225,7 +227,7 @@ public class BlockGenerator extends Thread implements Observer {
                 //orderedTransactions.remove(transaction);
 
                 //PROCESS IN NEWBLOCKDB
-                transaction.process(null, false);
+                transaction.process(null, Transaction.FOR_NETWORK);
 
                 //TRANSACTION PROCESSES
                 //transactionProcessed = true;

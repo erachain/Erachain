@@ -112,7 +112,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         AssetCls asset = AssetFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += asset.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueAssetTransaction(typeBytes, creator, asset, feePow, timestamp, reference, signatureBytes);
         } else {
             return new IssueAssetTransaction(typeBytes, creator, asset, signatureBytes);
@@ -154,8 +154,8 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 	 */
 
     @Override
-    public void setDC(DCSet dcSet, boolean asPack) {
-        super.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal) {
+        super.setDC(dcSet, asDeal);
 
         AssetCls asset = (AssetCls) this.item;
         ///asset.getKey(dcSet);
@@ -170,8 +170,8 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     }
 
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        this.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.setDC(dcSet, asDeal);
         this.seqNo = seqNo;
     }
 
@@ -186,9 +186,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         //CHECK QUANTITY
@@ -249,9 +249,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //ADD ASSETS TO OWNER
         //this.creator.setBalance(this.getItem().getKey(db), new BigDecimal(((AssetCls)this.getItem()).getQuantity()).setScale(), db);
@@ -273,9 +273,9 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //REMOVE ASSETS FROM OWNER
         AssetCls asset = (AssetCls) this.getItem();

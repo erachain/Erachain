@@ -66,7 +66,7 @@ public class Issue_Confirm_Dialog extends javax.swing.JDialog {
         jTextPane1.set_text(text);
         if (transaction != null) {
             String feeText = "" + Lang.getInstance().translate("Size") + ":&nbsp;"
-                    + transaction.viewSize(Transaction.FOR_DEAL_NETWORK) + " Bytes, ";
+                    + transaction.viewSize(Transaction.FOR_NETWORK) + " Bytes, ";
             feeText += Lang.getInstance().translate("Fee") + ":&nbsp;<b>" + transaction.viewFee()
                     + "</b>";
             status_Text += feeText;

@@ -108,7 +108,7 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK NAME LENGTH
         String name = this.item.getName();
@@ -150,16 +150,16 @@ public abstract class Issue_ItemRecord extends Transaction {
             return INVALID_DESCRIPTION_LENGTH;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
 
     }
 
     //PROCESS/ORPHAN
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         // SET REFERENCE if not setted before (in Imprint it setted)
         if (this.item.getReference() == null)
@@ -172,9 +172,9 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //LOGGER.debug("<<<<< core.transaction.Issue_ItemRecord.orphan 1");
         //DELETE FROM DATABASE

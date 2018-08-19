@@ -156,7 +156,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
     }// </editor-fold>
 
-    public Integer makeDeal(boolean asPack) {
+    public Integer makeDeal(int asDeal) {
         // check title
         if (exData_Panel.jTextField_Title_Message.getText() == ""
                 || exData_Panel.jTextField_Title_Message.getText().length() < 5) {
@@ -238,7 +238,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         byte property1 = (byte) 0;
         byte property2 = (byte) 0;
 
-        R_SignNote issueDoc = (R_SignNote) Controller.getInstance().r_SignNote(version, property1, property2, asPack,
+        R_SignNote issueDoc = (R_SignNote) Controller.getInstance().r_SignNote(version, property1, property2, asDeal,
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, key, messageBytes,
                 new byte[]{1}, new byte[]{0});
 
@@ -287,7 +287,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
         if (dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
 
             // VALIDATE AND PROCESS
-            result = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, asPack);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(issueDoc, asDeal);
 
             // CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {
@@ -306,7 +306,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
     public void onSendClick() {
         this.jButton_Work_OK.setEnabled(false);
         this.jButton_Work_OK1.setEnabled(false);
-        Integer result = makeDeal(false);
+        Integer result = makeDeal(Transaction.FOR_NETWORK);
         if (result != null) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Statement has been sent!"),
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

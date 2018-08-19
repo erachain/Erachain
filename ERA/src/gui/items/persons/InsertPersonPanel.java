@@ -405,7 +405,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                     if (dd.isConfirm) { // s!= JOptionPane.OK_OPTION) {
                         // VALIDATE AND PROCESS
                         Integer result1 = Controller.getInstance().getTransactionCreator().afterCreate(result.getA(),
-                                false);
+                                Transaction.FOR_NETWORK);
                         if (result1 != Transaction.VALIDATE_OK) {
                             JOptionPane.showMessageDialog(new JFrame(),
                                     Lang.getInstance().translate(OnDealClick.resultMess(result1)),

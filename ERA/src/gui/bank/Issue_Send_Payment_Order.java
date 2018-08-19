@@ -257,7 +257,7 @@ public class Issue_Send_Payment_Order extends javax.swing.JPanel {
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             // CHECK VALIDATE MESSAGE
             if (result == transaction.VALIDATE_OK) {

@@ -188,7 +188,7 @@ public class BuyNameTransaction extends Transaction {
     //VALIDATE
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
         //CHECK NAME LENGTH
         int nameLength = this.nameSale.getKey().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
@@ -227,7 +227,7 @@ public class BuyNameTransaction extends Transaction {
             return INVALID_AMOUNT;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
     //@Override
@@ -246,9 +246,9 @@ public class BuyNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
         this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
 
@@ -268,9 +268,9 @@ public class BuyNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
         this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
 

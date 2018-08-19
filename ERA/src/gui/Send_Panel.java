@@ -723,7 +723,7 @@ public class Send_Panel extends JPanel {
         if (dd.isConfirm) {
 
 
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             //CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {

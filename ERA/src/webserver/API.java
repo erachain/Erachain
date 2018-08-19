@@ -471,7 +471,7 @@ public class API {
         //CREATE TRANSACTION FROM RAW
         Transaction transaction;
         try {
-            transaction = TransactionFactory.getInstance().parse(Base58.decode(raw), null);
+            transaction = TransactionFactory.getInstance().parse(Base58.decode(raw), Transaction.FOR_NETWORK);
             out = transaction.toJson();
         } catch (Exception e) {
             out.put("error", -1);
@@ -712,7 +712,7 @@ public class API {
         }
 
         try {
-            transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
+            transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             out.put("error", APIUtils.errorMess(-1, e.toString() + " parse ERROR"));
             return out;

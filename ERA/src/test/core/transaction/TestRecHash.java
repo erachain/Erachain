@@ -74,7 +74,7 @@ public class TestRecHash {
         init();
 
         hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
-        hashesRecord.sign(maker, asPack);
+        hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
         assertEquals(true, hashesRecord.isSignatureValid(db));
@@ -94,18 +94,18 @@ public class TestRecHash {
 
 
         hashesRecord = new R_Hashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
-        hashesRecord.sign(maker, asPack);
+        hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawHashesRecord = hashesRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawHashesRecord = hashesRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         R_Hashes parsed = null;
         try {
             //PARSE FROM BYTES
-            parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawHashesRecord, releaserReference);
+            parsed = (R_Hashes) TransactionFactory.getInstance().parse(rawHashesRecord, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             fail("Exception while parsing transaction. " + e);
         }
@@ -151,12 +151,12 @@ public class TestRecHash {
         hashes[0] = hash0;
 
         hashesRecord = new R_Hashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
-        hashesRecord.setDC(db, false);
+        hashesRecord.setDC(db, Transaction.FOR_NETWORK);
 
-        assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        hashesRecord.sign(maker, false);
-        hashesRecord.process(gb, false);
+        hashesRecord.sign(maker, Transaction.FOR_NETWORK);
+        hashesRecord.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         assertEquals(hashesRecord.getTimestamp(), maker.getLastTimestamp(db));
@@ -166,7 +166,7 @@ public class TestRecHash {
         assertEquals(result.size(), 1);
 
         ///// ORPHAN
-        hashesRecord.orphan(false);
+        hashesRecord.orphan(Transaction.FOR_NETWORK);
 
         //CHECK REFERENCE SENDER
         //assertEquals(hashesRecord.getReference(), maker.getLastReference(db));

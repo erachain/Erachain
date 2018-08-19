@@ -308,7 +308,7 @@ public class DeployATTransaction extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
         return isValid(0);
     }
 
@@ -372,7 +372,7 @@ public class DeployATTransaction extends Transaction {
             return INVALID_CREATION_BYTES;
         }
 
-        return super.isValid(null, 0l);
+        return super.isValid(Transaction.FOR_NETWORK, 0l);
 
     }
 
@@ -380,9 +380,9 @@ public class DeployATTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE ISSUER
-        super.process(block, asPack);
+        super.process(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
         this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false);
 
@@ -442,10 +442,10 @@ public class DeployATTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         //UPDATE ISSUER
-        super.orphan(asPack);
+        super.orphan(asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
         this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false);
 

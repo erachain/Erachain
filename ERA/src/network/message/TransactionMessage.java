@@ -16,7 +16,7 @@ public class TransactionMessage extends Message {
 
     public static TransactionMessage parse(byte[] data) throws Exception {
         //PARSE TRANSACTION
-        Transaction transaction = TransactionFactory.getInstance().parse(data, null);
+        Transaction transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);
 
         return new TransactionMessage(transaction);
     }

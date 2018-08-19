@@ -348,7 +348,7 @@ public class R_SetStatusToItem extends Transaction {
             //position += dataSize;
         }
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new R_SetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
                     timestamp, reference, signature);
@@ -585,9 +585,9 @@ public class R_SetStatusToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) {
             return result;
         }
@@ -643,10 +643,10 @@ public class R_SetStatusToItem extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         //UPDATE SENDER
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         // pack additional data
         byte[] add_data = packData();
@@ -685,10 +685,10 @@ public class R_SetStatusToItem extends Transaction {
     }
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         //UPDATE SENDER
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
 
         // UNDO ALIVE PERSON for DURATION

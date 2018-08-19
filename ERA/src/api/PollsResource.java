@@ -92,7 +92,7 @@ public class PollsResource {
             IssuePollRecord issue_voiting = (IssuePollRecord) controller.createPoll_old(account, name, description, options, feePow);
 
             //VALIDATE AND PROCESS
-            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, false);
+            int validate = controller.getTransactionCreator().afterCreate(issue_voiting, Transaction.FOR_NETWORK);
             if (validate == Transaction.VALIDATE_OK)
                 return "ok";
         } catch (NullPointerException | ClassCastException e) {

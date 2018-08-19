@@ -161,7 +161,7 @@ public class UpdateNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
         //CHECK NAME LENGTH
         int nameLength = this.name.getName().getBytes(StandardCharsets.UTF_8).length;
         if (nameLength > 400 || nameLength < 1) {
@@ -194,16 +194,16 @@ public class UpdateNameTransaction extends Transaction {
             return INVALID_CREATOR;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
     //PROCESS/ORPHAN
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //SET ORPHAN DATA
         Name oldName = this.dcSet.getNameMap().get(this.name.getName());
@@ -215,9 +215,9 @@ public class UpdateNameTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //RESTORE ORPHAN DATA
         Name oldName = this.dcSet.getUpdateNameMap().get(this);

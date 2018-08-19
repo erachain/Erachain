@@ -228,9 +228,9 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
         
-        int result = super.isValid(releaserReference, flags); 
+        int result = super.isValid(asDeal, flags);
         if (result != VALIDATE_OK) {
             return result;
         }
@@ -251,8 +251,8 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         // REMOVE FEE
         Transaction forkTransaction = this.copy();
         DCSet fork = this.dcSet.fork();
-        forkTransaction.setDC(fork, false);
-        forkTransaction.process(this.block, false);
+        forkTransaction.setDC(fork, Transaction.FOR_NETWORK);
+        forkTransaction.process(this.block, Transaction.FOR_NETWORK);
         // TODO process && orphan && isValid balances
 
         // CHECK PAYMENTS

@@ -739,7 +739,7 @@ public class Mail_Send_Panel extends JPanel {
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             // CHECK VALIDATE MESSAGE
             if (result == transaction.VALIDATE_OK) {

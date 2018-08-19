@@ -56,9 +56,9 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, boolean asPack) {
+    public void setDC(DCSet dcSet, int asDeal) {
 
-        super.setDC(dcSet, asPack);
+        super.setDC(dcSet, asDeal);
 
         Tuple2<Integer, Integer> createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
@@ -66,8 +66,8 @@ public class CancelOrderTransaction extends Transaction {
 
     }
 
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        this.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.setDC(dcSet, asDeal);
         this.seqNo = seqNo;
     }
         //public static String getName() { return "OLD: Cancel Order"; }
@@ -174,7 +174,7 @@ public class CancelOrderTransaction extends Transaction {
     //VALIDATE
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
@@ -209,7 +209,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //CHECK IF CREATOR IS CREATOR
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
 
@@ -241,9 +241,9 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         // TODO - CANCEL для транзакции в том же блоке???
         //Transaction createOrder = this.dcSet.getTransactionFinalMap().getTransaction(this.orderSignature);
@@ -273,12 +273,12 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         // FIRST GET DB REF from FINAL
 
         // ORPHAN
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //REMOVE ORDER DATABASE
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);

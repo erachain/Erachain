@@ -92,9 +92,9 @@ public class TestRec_Send_Movable {
     
             //CREATE ISSUE ASSET TRANSACTION
             IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(producer, assetMovable, FEE_POWER, ++timestamp, 0l);
-            issueAssetTransaction.sign(producer, false);
-            issueAssetTransaction.setDC(db, false);
-            issueAssetTransaction.process(gb, false);
+            issueAssetTransaction.sign(producer, Transaction.FOR_NETWORK);
+            issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+            issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
     
             assetKey = assetMovable.getKey(db);
         }
@@ -130,19 +130,19 @@ public class TestRec_Send_Movable {
         r_Send = new R_Send(producer, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(1000),
                 "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         r_Send = new R_Send(producer, FEE_POWER, recipient, keyMovable, BigDecimal.valueOf(5),
                 "", null, new byte[]{1}, new byte[]{1},
                 timestamp++, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
 
-        r_Send.sign(producer, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(producer, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         producerBalance = producer.getBalance(db, keyMovable);
 
@@ -165,7 +165,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         assertEquals(BigDecimal.valueOf(500), producer.getBalanceUSE(keyMovable, db));
@@ -198,18 +198,18 @@ public class TestRec_Send_Movable {
         r_Send = new R_Send(producer, FEE_POWER, spender, assetKey, BigDecimal.valueOf(1000),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         r_Send = new R_Send(producer, FEE_POWER, spender, assetKey, BigDecimal.valueOf(50),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(producer, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(producer, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         producerBalance = producer.getBalance(db, assetKey);
 
@@ -233,7 +233,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         producerBalance = producer.getBalance(db, assetKey);
@@ -246,7 +246,7 @@ public class TestRec_Send_Movable {
         assertEquals(BigDecimal.valueOf(0), deliverBalance.a.b);
 
         // BACK PROCESS
-        r_Send.process(gb, false);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         // INVALID
         r_Send = new R_Send(
@@ -256,9 +256,9 @@ public class TestRec_Send_Movable {
                 deliver, FEE_POWER, spender, assetKey, BigDecimal.valueOf(-100),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
         
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_HOLD_BALANCE);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_HOLD_BALANCE);
 
         // GET ON HOLD - доставщик берет к себе на руки товар
         r_Send = new R_Send(
@@ -268,12 +268,12 @@ public class TestRec_Send_Movable {
                 deliver, FEE_POWER, producer, assetKey, BigDecimal.valueOf(-10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(producer, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(producer, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         producerBalance = producer.getBalance(db, assetKey);
 
@@ -297,7 +297,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         producerBalance = producer.getBalance(db, assetKey);
@@ -313,7 +313,7 @@ public class TestRec_Send_Movable {
         assertEquals(BigDecimal.valueOf(0), deliverBalance.c.a);
         assertEquals(BigDecimal.valueOf(0), deliverBalance.c.b);
 
-        r_Send.process(gb, false);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         //////////////////////
         // GET ON HOLD - доставщик передает новому собственнику на руки товар - это подтверждает собственник
@@ -324,12 +324,12 @@ public class TestRec_Send_Movable {
                 spender, FEE_POWER, deliver, assetKey, BigDecimal.valueOf(-10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(producer, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(producer, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         spenderBalance = spender.getBalance(db, assetKey);
 
@@ -353,7 +353,7 @@ public class TestRec_Send_Movable {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         spenderBalance = spender.getBalance(db, assetKey);
 
@@ -374,7 +374,7 @@ public class TestRec_Send_Movable {
         assertEquals(BigDecimal.valueOf(10), deliverBalance.c.a);
         assertEquals(BigDecimal.valueOf(10), deliverBalance.c.b);
 
-        r_Send.process(gb, false);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
     }
 

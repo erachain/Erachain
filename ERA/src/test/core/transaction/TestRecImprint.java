@@ -28,9 +28,7 @@ public class TestRecImprint {
 
     static Logger LOGGER = Logger.getLogger(TestRecImprint.class.getName());
 
-    Long releaserReference = null;
-
-    boolean asPack = false;
+    int asPack = Transaction.FOR_NETWORK;
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 1;
     byte[] imprintReference = new byte[64];
@@ -87,7 +85,7 @@ public class TestRecImprint {
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintTransaction = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
-        issueImprintTransaction.sign(maker, false);
+        issueImprintTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE IMPRINT TRANSACTION IS VALID
         assertEquals(true, issueImprintTransaction.isSignatureValid(db));
@@ -114,18 +112,18 @@ public class TestRecImprint {
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
-        issueImprintRecord.sign(maker, false);
+        issueImprintRecord.sign(maker, asPack);
         //issueImprintRecord.process(db, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueImprintTransaction = issueImprintRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssueImprintTransaction = issueImprintRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueImprintTransaction.length, issueImprintRecord.getDataLength(false, true));
+        assertEquals(rawIssueImprintTransaction.length, issueImprintRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            IssueImprintRecord parsedIssueImprintTransaction = (IssueImprintRecord) TransactionFactory.getInstance().parse(rawIssueImprintTransaction, releaserReference);
+            IssueImprintRecord parsedIssueImprintTransaction = (IssueImprintRecord) TransactionFactory.getInstance().parse(rawIssueImprintTransaction, asPack);
             LOGGER.info("parsedIssueImprintTransaction: " + parsedIssueImprintTransaction);
 
             //CHECK INSTANCE
@@ -168,13 +166,13 @@ public class TestRecImprint {
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
-        issueImprintRecord.setDC(db,false);
+        issueImprintRecord.setDC(db,Transaction.FOR_NETWORK);
         assertEquals(issueImprintRecord.getItem().getName(), Base58.encode(imprint.getCuttedReference()));
-        issueImprintRecord.sign(maker, false);
+        issueImprintRecord.sign(maker, Transaction.FOR_NETWORK);
 
-        assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueImprintRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        issueImprintRecord.process(gb, false);
+        issueImprintRecord.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.info("imprint KEY: " + imprint.getKey(db));
 
@@ -186,11 +184,11 @@ public class TestRecImprint {
 
         ImprintCls imprint_2 = new Imprint(maker, Imprint.hashNameToBase58("test132_2"), icon, image, "e");
         IssueImprintRecord issueImprintTransaction_2 = new IssueImprintRecord(maker, imprint_2, FEE_POWER, timestamp + 10);
-        issueImprintTransaction_2.sign(maker, false);
-        issueImprintTransaction_2.setDC(db,false);
-        issueImprintTransaction_2.process(gb, false);
+        issueImprintTransaction_2.sign(maker, Transaction.FOR_NETWORK);
+        issueImprintTransaction_2.setDC(db,Transaction.FOR_NETWORK);
+        issueImprintTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("imprint_2 KEY: " + imprint_2.getKey(db));
-        issueImprintTransaction_2.orphan(false);
+        issueImprintTransaction_2.orphan(Transaction.FOR_NETWORK);
         ItemImprintMap imprintMap = db.getItemImprintMap();
         int mapSize = imprintMap.size();
         assertEquals(0, mapSize - 1);
@@ -210,13 +208,13 @@ public class TestRecImprint {
 
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(maker, imprint, FEE_POWER, timestamp);
-        issueImprintRecord.sign(maker, false);
-        issueImprintRecord.setDC(db,false);
-        issueImprintRecord.process(gb, false);
+        issueImprintRecord.sign(maker, Transaction.FOR_NETWORK);
+        issueImprintRecord.setDC(db,Transaction.FOR_NETWORK);
+        issueImprintRecord.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueImprintMap().get(issueImprintRecord);
         //		assertEquals(true, Arrays.equals(issueImprintRecord.getSignature(), maker.getLastReference()));
 
-        issueImprintRecord.orphan(false);
+        issueImprintRecord.orphan(Transaction.FOR_NETWORK);
 
         //CHECK IMPRINT EXISTS SENDER
         assertEquals(false, db.getItemImprintMap().contains(key));

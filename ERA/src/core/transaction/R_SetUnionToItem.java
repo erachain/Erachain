@@ -160,7 +160,7 @@ public class R_SetUnionToItem extends Transaction {
         Long end_date = Longs.fromByteArray(end_dateBytes);
         position += DATE_LENGTH;
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new R_SetUnionToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, timestamp, reference, signature);
         } else {
@@ -254,9 +254,9 @@ public class R_SetUnionToItem extends Transaction {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         //CHECK END_DAY
@@ -287,10 +287,10 @@ public class R_SetUnionToItem extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         //UPDATE SENDER
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         // pack additional data
         byte[] a_data = new byte[0];//this.value1;
@@ -317,10 +317,10 @@ public class R_SetUnionToItem extends Transaction {
     }
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         //UPDATE SENDER
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         // UNDO ALIVE PERSON for DURATION
         if (this.itemType == ItemCls.PERSON_TYPE)

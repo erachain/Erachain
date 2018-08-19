@@ -89,24 +89,24 @@ public class TransactionV3Tests {
                 encrypted,
                 timestamp, maker.getLastTimestamp(db)
         );
-        messageTransactionV3.sign(maker, false);
+        messageTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
-        assertEquals(messageTransactionV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        assertEquals(messageTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        messageTransactionV3.process(gb, false);
+        messageTransactionV3.process(gb,Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(1).subtract(messageTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERM_KEY, db));
         assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERM_KEY, db));
 
-        byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
-        int dd = messageTransactionV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true);
-        assertEquals(rawMessageTransactionV3.length, messageTransactionV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        byte[] rawMessageTransactionV3 = messageTransactionV3.toBytes(Transaction.FOR_NETWORK, true);
+        int dd = messageTransactionV3.getDataLength(Transaction.FOR_NETWORK, true);
+        assertEquals(rawMessageTransactionV3.length, messageTransactionV3.getDataLength(Transaction.FOR_NETWORK, true));
 
 
         R_Send messageTransactionV3_2 = null;
         try {
-            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, releaserReference);
+            messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
@@ -167,16 +167,16 @@ public class TransactionV3Tests {
                 FEE_POWER,
                 timestamp + 100, maker.getLastTimestamp(db)
         );
-        arbitraryTransactionV3.sign(maker, false);
+        arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
-            assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.NOT_YET_RELEASED);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NOT_YET_RELEASED);
         } else {
-            assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
         }
 
-        arbitraryTransactionV3.process(gb, false);
+        arbitraryTransactionV3.process(gb,Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(1000 - 110 - 120 - 201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
@@ -184,7 +184,7 @@ public class TransactionV3Tests {
         assertEquals(BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient2.getBalanceUSE(61l, db));
         assertEquals(BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient3.getBalanceUSE(61l, db));
 
-        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(Transaction.FOR_NETWORK, true);
 
         ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
         try {
@@ -238,22 +238,22 @@ public class TransactionV3Tests {
                 FEE_POWER,
                 timestamp, maker.getLastTimestamp(db)
         );
-        arbitraryTransactionV3.sign(maker, false);
+        arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
         //if (NTP.getTime() < Transaction.getARBITRARY_TRANSACTIONS_RELEASE() || arbitraryTransactionV3.getTimestamp() < Transaction.getPOWFIX_RELEASE())
         if (false) {
-            assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.NOT_YET_RELEASED);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NOT_YET_RELEASED);
         } else {
-            assertEquals(arbitraryTransactionV3.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+            assertEquals(arbitraryTransactionV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
         }
 
-        arbitraryTransactionV3.process(gb, false);
+        arbitraryTransactionV3.process(gb,Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(1).subtract(arbitraryTransactionV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(61l, db));
 
 
-        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(Transaction.FOR_NETWORK, true);
 
         ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
         try {

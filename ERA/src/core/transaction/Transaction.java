@@ -502,18 +502,18 @@ public abstract class Transaction {
     }
 
     // GETTERS/SETTERS
-    public void setDC(DCSet dcSet, boolean asPack) {
+    public void setDC(DCSet dcSet, int asDeal) {
         this.dcSet = dcSet;
-        this.height = this.getBlockHeightByParentOrLast(dcSet);
+        //this.height = this.getBlockHeightByParentOrLast(dcSet);
         //this.seqNo = this.block.getTransactionSeq(this.signature);
-        if (!asPack)
+        if (asDeal > Transaction.FOR_PACK)
             this.calcFee();
     }
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         this.dcSet = dcSet;
-        this.height = this.getBlockHeightByParentOrLast(dcSet);
+        this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
-        if (!asPack)
+        if (asDeal > Transaction.FOR_PACK)
             this.calcFee();
     }
 
@@ -684,7 +684,7 @@ public abstract class Transaction {
     // GET forged FEE without invited FEE
     public int getForgedFee(DCSet db) {
         if (this.dcSet == null)
-            this.setDC(db, false);
+            this.setDC(db, Transaction.FOR_NETWORK);
 
         int fee = this.fee.unscaledValue().intValue();
         int fee_invited = this.getInvitedFee();
@@ -759,11 +759,6 @@ public abstract class Transaction {
         if (block != null)
             return block.getHeightByParent(dc);
 
-        // Tuple2<Integer, Long> hWeight =
-        // dc.getBlockSignsMap().get(dc.getBlockMap().getLastBlockSignature());
-        // if (hWeight == null || hWeight.a == -1)
-        // return -1;
-        // return hWeight.a + 1;
         return dc.getBlockMap().size() + 1;
     }
 
@@ -937,7 +932,7 @@ public abstract class Transaction {
             transaction.put("creator", this.creator.getAddress());
             transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
             if (this.fee.signum() == 0) {
-                this.setDC(localDCSet, false);
+                this.setDC(localDCSet, Transaction.FOR_NETWORK);
             }
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
@@ -1126,12 +1121,15 @@ public abstract class Transaction {
      *   = 2 - not check person
      *   = 4 - not check PublicText
      */
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         // CHECK IF REFERENCE IS OK
-        Long reference = releaserReference == null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
-        if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0) {
-            return INVALID_TIMESTAMP;
+        //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
+        if (asDeal > Transaction.FOR_MYPACK) {
+            Long reference = this.creator.getLastTimestamp(dcSet);
+            if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0) {
+                return INVALID_TIMESTAMP;
+            }
         }
 
         // CHECK CREATOR
@@ -1221,7 +1219,7 @@ public abstract class Transaction {
     // REST
 
     // public abstract void process(DBSet db);
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         if (this.signature != null && Base58.encode(this.signature)
                 .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
@@ -1231,7 +1229,7 @@ public abstract class Transaction {
 
         this.block = block;
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             // this.calcFee();
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
@@ -1264,7 +1262,7 @@ public abstract class Transaction {
 
     }
 
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         if (Base58.encode(this.signature)
                 .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
@@ -1272,7 +1270,7 @@ public abstract class Transaction {
             error ++;
         }
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // this.creator.setBalance(FEE_KEY, this.creator.getBalance(db,
                 // FEE_KEY).add(this.fee), db);

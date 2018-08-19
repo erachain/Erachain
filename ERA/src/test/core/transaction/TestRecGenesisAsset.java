@@ -22,7 +22,7 @@ public class TestRecGenesisAsset {
 
     static Logger LOGGER = Logger.getLogger(TestRecGenesisAsset.class.getName());
 
-    Long releaserReference = null;
+    //int asPack = Transaction.FOR_NETWORK;
 
     long FEE_KEY = 1l;
     byte FEE_POWER = (byte) 1;
@@ -53,7 +53,7 @@ public class TestRecGenesisAsset {
         //CREATE ISSUE ASSET TRANSACTION
         genesisIssueAssetTransaction = new GenesisIssueAssetTransaction(asset);
         if (toProcess) {
-            genesisIssueAssetTransaction.process(gb, false);
+            genesisIssueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
             key = asset.getKey(db);
         }
 
@@ -70,19 +70,19 @@ public class TestRecGenesisAsset {
         //genesisIssueAssetTransaction.sign(creator);
         //CHECK IF ISSUE ASSET TRANSACTION IS VALID
         assertEquals(true, genesisIssueAssetTransaction.isSignatureValid());
-        assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, genesisIssueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CONVERT TO BYTES
         //LOGGER.info("CREATOR: " + genesisIssueAssetTransaction.getCreator().getPublicKey());
-        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true));
         //LOGGER.info("rawGenesisIssueAssetTransaction.length") + ": + rawGenesisIssueAssetTransaction.length);
 
         try {
             //PARSE FROM BYTES
-            GenesisIssueAssetTransaction parsedGenesisIssueAssetTransaction = (GenesisIssueAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, releaserReference);
+            GenesisIssueAssetTransaction parsedGenesisIssueAssetTransaction = (GenesisIssueAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedGenesisIssueAssetTransaction instanceof GenesisIssueAssetTransaction);
@@ -114,11 +114,11 @@ public class TestRecGenesisAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, releaserReference);
+            TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -134,14 +134,14 @@ public class TestRecGenesisAsset {
         initIssue(false);
 
         //CONVERT TO BYTES
-        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            GenesisIssueAssetTransaction parsedGenesisIssueAssetTransaction = (GenesisIssueAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, releaserReference);
+            GenesisIssueAssetTransaction parsedGenesisIssueAssetTransaction = (GenesisIssueAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedGenesisIssueAssetTransaction instanceof GenesisIssueAssetTransaction);
@@ -171,11 +171,11 @@ public class TestRecGenesisAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, releaserReference);
+            TransactionFactory.getInstance().parse(rawGenesisIssueAssetTransaction, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -217,7 +217,7 @@ public class TestRecGenesisAsset {
         //assertEquals(new BigDecimal(asset.getQuantity()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getConfirmedBalance(key, db));
         //assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getSignature(), maker.getLastReference(db)));
 
-        genesisIssueAssetTransaction.orphan(false);
+        genesisIssueAssetTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -265,28 +265,28 @@ public class TestRecGenesisAsset {
         Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS VALID
-        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
 
-        assetTransfer.process(gb, false);
+        assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE VALID ASSET TRANSFER
         maker.changeBalance(db, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS VALID
-        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ASSET TRANSFER INVALID RECIPIENT ADDRESS
         assetTransfer = new GenesisTransferAssetTransaction(new Account("test"), key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS INVALID
-        assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference, flags));
+        assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ASSET TRANSFER NEGATIVE AMOUNT
         assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS INVALID
-        assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(releaserReference, flags));
+        assertNotEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ASSET TRANSFER NOT ENOUGH ASSET BALANCE
         assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
@@ -309,14 +309,14 @@ public class TestRecGenesisAsset {
         //genesisTransferAsset.process(db);
 
         //CONVERT TO BYTES
-        byte[] rawGenesisTransferAsset = genesisTransferAsset.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawGenesisTransferAsset = genesisTransferAsset.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATALENGTH
-        assertEquals(rawGenesisTransferAsset.length, genesisTransferAsset.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawGenesisTransferAsset.length, genesisTransferAsset.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisTransferAsset, releaserReference);
+            GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisTransferAsset, Transaction.FOR_NETWORK);
             LOGGER.info(" 1: " + parsedAssetTransfer.getKey());
 
             //CHECK INSTANCE
@@ -339,11 +339,11 @@ public class TestRecGenesisAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisTransferAsset = new byte[genesisTransferAsset.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawGenesisTransferAsset = new byte[genesisTransferAsset.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawGenesisTransferAsset, releaserReference);
+            TransactionFactory.getInstance().parse(rawGenesisTransferAsset, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -369,10 +369,10 @@ public class TestRecGenesisAsset {
 
         //CREATE ASSET TRANSFER
         Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
-        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(null, flags));
+        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
 
         // assetTransfer.sign(sender); // not  NEED
-        assetTransfer.process(gb, false);
+        assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER - null
         //assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
@@ -403,8 +403,8 @@ public class TestRecGenesisAsset {
         //CREATE ASSET TRANSFER
         Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, key, amoSend);
         // assetTransfer.sign(sender); not NEED
-        assetTransfer.process(gb, false);
-        assetTransfer.orphan(false);
+        assetTransfer.process(gb, Transaction.FOR_NETWORK);
+        assetTransfer.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER - null
         //assertEquals(total, maker.getConfirmedBalance(key, db));
@@ -438,17 +438,17 @@ public class TestRecGenesisAsset {
 
         //CREATE ASSET TRANSFER
         Transaction assetTransfer = new GenesisTransferAssetTransaction(recipient, -key, amoSend, owner);
-        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(null, flags));
+        assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(Transaction.FOR_NETWORK, flags));
 
         /// PARSE
-        byte[] rawGenesisTransferAsset = assetTransfer.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawGenesisTransferAsset = assetTransfer.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATALENGTH
-        assertEquals(rawGenesisTransferAsset.length, assetTransfer.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawGenesisTransferAsset.length, assetTransfer.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisTransferAsset, releaserReference);
+            GenesisTransferAssetTransaction parsedAssetTransfer = (GenesisTransferAssetTransaction) TransactionFactory.getInstance().parse(rawGenesisTransferAsset, Transaction.FOR_NETWORK);
             System.out.println(" 1: " + parsedAssetTransfer.getKey());
 
             //CHECK INSTANCE
@@ -475,7 +475,7 @@ public class TestRecGenesisAsset {
         }
 
         // assetTransfer.sign(sender); // not  NEED
-        assetTransfer.process(gb, false);
+        assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER - null
         //assertEquals(total.subtract(amoSend), maker.getConfirmedBalance(key, db));
@@ -496,7 +496,7 @@ public class TestRecGenesisAsset {
 
         ///////////////////////////
         ////////////////////////////
-        assetTransfer.orphan(false);
+        assetTransfer.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER - null
         //assertEquals(total, maker.getConfirmedBalance(key, db));

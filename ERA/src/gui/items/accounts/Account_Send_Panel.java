@@ -81,7 +81,7 @@ public class Account_Send_Panel extends AssetSendPanel {
 
             } else {
 
-                result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+                result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                 confirmaftecreatetransaction();
             }
         }

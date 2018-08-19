@@ -118,7 +118,7 @@ public class UpdateUtil {
         do {
             List<Transaction> txs = b.getTransactions();
             for (Transaction tx : txs) {
-                tx.setDC(DCSet.getInstance(), false);
+                tx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
 
                 if (tx instanceof ArbitraryTransaction) {
                     int service = ((ArbitraryTransaction) tx).getService();

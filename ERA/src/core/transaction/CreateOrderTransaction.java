@@ -196,17 +196,17 @@ public class CreateOrderTransaction extends Transaction {
                 reference, signatureBytes);
     }
 
-    public void setDC(DCSet dcSet, boolean asPack) {
+    public void setDC(DCSet dcSet, int asDeal) {
 
-        super.setDC(dcSet, asPack);
+        super.setDC(dcSet, asDeal);
 
         this.haveAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.haveKey);
         this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
 
     }
 
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        this.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.setDC(dcSet, asDeal);
         this.seqNo = seqNo;
     }
 
@@ -355,7 +355,7 @@ public class CreateOrderTransaction extends Transaction {
     }
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting() && !BlockChain.DEVELOP_USE) {
 
@@ -505,16 +505,16 @@ public class CreateOrderTransaction extends Transaction {
             }
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
     // PROCESS/ORPHAN
 
     // @Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         // UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         // PROCESS ORDER
         // изменяемые объекты нужно заново создавать
@@ -531,9 +531,9 @@ public class CreateOrderTransaction extends Transaction {
 
     // @Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         // UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         // ORPHAN ORDER
         // изменяемые объекты нужно заново создавать

@@ -120,8 +120,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     }
 
     @Override
-    public void setDC(DCSet dcSet, boolean asPack) {
-        super.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal) {
+        super.setDC(dcSet, asDeal);
 
         if (this.amount != null) {
             long assetKey = this.getAbsKey();
@@ -136,8 +136,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
         }
     }
 
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        this.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.setDC(dcSet, asDeal);
         this.seqNo = seqNo;
     }
 
@@ -237,7 +237,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
         if (!"1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3".equals(this.recipient.getAddress())) {
@@ -263,7 +263,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         long key = this.key;
 
@@ -299,7 +299,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     }
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         // RISE ERROR
         DCSet err = null;
         err.commit();

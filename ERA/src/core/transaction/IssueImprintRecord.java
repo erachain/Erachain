@@ -106,7 +106,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
         ImprintCls imprint = Imprint.parse(Arrays.copyOfRange(data, position, data.length), false);
         position += imprint.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes);
         } else {
             return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
@@ -136,7 +136,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
     //VALIDATE
     //
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK NAME LENGTH
         ItemCls item = this.getItem();
@@ -145,7 +145,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
             return INVALID_NAME_LENGTH;
         }
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // CHECK reference in DB

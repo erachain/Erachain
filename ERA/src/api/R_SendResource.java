@@ -94,7 +94,7 @@ public class R_SendResource {
             return out.toJSONString();
         }
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();

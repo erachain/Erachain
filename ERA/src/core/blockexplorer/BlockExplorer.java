@@ -2141,7 +2141,7 @@ public class BlockExplorer {
         for (Transaction trans : transactions2) {
             LinkedHashMap transactionJSON = new LinkedHashMap();
 
-            trans.setDC(dcSet, false);
+            trans.setDC(dcSet, Transaction.FOR_NETWORK);
 
             /*
              * String itemName = "-"; Long itemKey = 0L; if (trans instanceof
@@ -2909,7 +2909,7 @@ public class BlockExplorer {
             if (unit.getUnit() instanceof TransactionAmount) {
 
                 TransactionAmount tx = (TransactionAmount) unit.getUnit();
-                tx.setDC(dcSet, false);
+                tx.setDC(dcSet, Transaction.FOR_NETWORK);
 
                 tXincome = tx.getAssetAmount();
 
@@ -4012,7 +4012,7 @@ public class BlockExplorer {
             if (transaction == null)
                 continue;
 
-            transaction.setDC(dcSet, false);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
             List<Transaction> tt = new ArrayList<Transaction>();
             tt.add(transaction);
             // output.put("transaction_Header",Transactions_JSON(tt));

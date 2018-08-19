@@ -64,20 +64,17 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -85,7 +82,7 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -101,7 +98,7 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
         TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += template.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes);
         } else {
             return new IssueTemplateRecord(typeBytes, creator, template, signatureBytes);
@@ -116,9 +113,9 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
     //PARSE CONVERT
 
     //@Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
 		/*

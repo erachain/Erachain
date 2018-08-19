@@ -24,7 +24,7 @@ public class TestRec_Send_InSideAsset {
 
     static Logger LOGGER = Logger.getLogger(TestRec_Send_InSideAsset.class.getName());
 
-    Long releaserReference = null;
+    //Long Transaction.FOR_NETWORK = null;
 
     long FEE_KEY = AssetCls.FEE_KEY;
     byte FEE_POWER = (byte) 0;
@@ -97,9 +97,9 @@ public class TestRec_Send_InSideAsset {
     
             //CREATE ISSUE ASSET TRANSACTION
             IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(emitter, assetInSide, FEE_POWER, ++timestamp, 0l);
-            issueAssetTransaction.sign(emitter, false);
-            issueAssetTransaction.setDC(db, false);
-            issueAssetTransaction.process(gb, false);
+            issueAssetTransaction.sign(emitter, Transaction.FOR_NETWORK);
+            issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+            issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
     
             assetKey = assetInSide.getKey(db);
         }
@@ -129,18 +129,18 @@ public class TestRec_Send_InSideAsset {
         r_Send = new R_Send(emitter, FEE_POWER, debtor, assetKey, BigDecimal.valueOf(1000),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         r_Send = new R_Send(emitter, FEE_POWER, creditor, assetKey, BigDecimal.valueOf(50),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(emitter, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(emitter, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         emitterBalance = emitter.getBalance(db, assetKey);
 
@@ -164,7 +164,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
         emitterBalance = emitter.getBalance(db, assetKey);
@@ -177,15 +177,15 @@ public class TestRec_Send_InSideAsset {
         assertEquals(BigDecimal.valueOf(0), creditorBalance.a.b);
 
         // BACK PROCESS
-        r_Send.process(gb, false);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         // INVALID
         r_Send = new R_Send(
                 debtor, FEE_POWER, emitter, -assetKey, BigDecimal.valueOf(10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         // INVALID
         r_Send = new R_Send(
@@ -195,28 +195,28 @@ public class TestRec_Send_InSideAsset {
                 debtor, FEE_POWER, emitter, -assetKey, BigDecimal.valueOf(10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_DEBT_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_DEBT_BALANCE);
 
         // INVALID
         r_Send = new R_Send(
                 creditor, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(100),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
         // GET CREDIT - дать в кредит актив
         r_Send = new R_Send(
                 creditor, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(10),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(emitter, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(emitter, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         creditKey = new Tuple3<String, Long, String>(creditor.getAddress(), assetKey, debtor.getAddress());
         assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
@@ -241,7 +241,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
 
@@ -263,7 +263,7 @@ public class TestRec_Send_InSideAsset {
         assertEquals(BigDecimal.valueOf(0), debtorBalance.b.b);
 
         // PROCESS BACK
-        r_Send.process(gb, false);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
         assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
 
         //////////////////////
@@ -277,8 +277,8 @@ public class TestRec_Send_InSideAsset {
                 creditor, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(20),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.NO_DEBT_BALANCE);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_DEBT_BALANCE);
 
         // INVALID
         r_Send = new R_Send(
@@ -288,11 +288,11 @@ public class TestRec_Send_InSideAsset {
                 creditor, FEE_POWER, debtor, -assetKey, BigDecimal.valueOf(7),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(emitter, false);
-        r_Send.process(gb, false);
+        r_Send.sign(emitter, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(3), db.getCredit_AddressesMap().get(creditKey));
 
@@ -316,7 +316,7 @@ public class TestRec_Send_InSideAsset {
         //////////////////////////////////////////////////
         /// ORPHAN
         /////////////////////////////////////////////////
-        r_Send.orphan(false);
+        r_Send.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(10), db.getCredit_AddressesMap().get(creditKey));
 
@@ -338,18 +338,18 @@ public class TestRec_Send_InSideAsset {
         assertEquals(BigDecimal.valueOf(10), debtorBalance.b.b);
 
         // PROCESS BACK
-        r_Send.process(gb, false);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         // SEND 2
         r_Send = new R_Send(emitter, FEE_POWER, debtor, assetKey, BigDecimal.valueOf(30),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(emitter, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(emitter, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(3), db.getCredit_AddressesMap().get(creditKey));
         creditKeyReverse = new Tuple3<String, Long, String>(debtor.getAddress(), assetKey, creditor.getAddress());
@@ -359,12 +359,12 @@ public class TestRec_Send_InSideAsset {
         r_Send = new R_Send(debtor, FEE_POWER, creditor, -assetKey, BigDecimal.valueOf(30),
                 "", null, new byte[]{1}, new byte[]{1},
                 ++timestamp, 0l);
-        r_Send.setDC(db, false);
-        assertEquals(r_Send.isValid(releaserReference, flags), Transaction.VALIDATE_OK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        assertEquals(r_Send.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
-        r_Send.sign(emitter, false);
-        r_Send.setDC(db, false);
-        r_Send.process(gb, false);
+        r_Send.sign(emitter, Transaction.FOR_NETWORK);
+        r_Send.setDC(db, Transaction.FOR_NETWORK);
+        r_Send.process(gb, Transaction.FOR_NETWORK);
 
         assertEquals(BigDecimal.valueOf(0), db.getCredit_AddressesMap().get(creditKey));
         assertEquals(BigDecimal.valueOf(27), db.getCredit_AddressesMap().get(creditKeyReverse));

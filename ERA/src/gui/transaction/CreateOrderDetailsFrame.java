@@ -1,6 +1,7 @@
 package gui.transaction;
 
 import core.transaction.CreateOrderTransaction;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
 import utils.MenuPopupUtil;
@@ -12,7 +13,7 @@ public class CreateOrderDetailsFrame extends Rec_DetailsFrame {
     public CreateOrderDetailsFrame(CreateOrderTransaction orderCreation) {
         super(orderCreation);
 
-        orderCreation.setDC(DCSet.getInstance(), false);
+        orderCreation.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
         ;
 
         //LABEL HAVE

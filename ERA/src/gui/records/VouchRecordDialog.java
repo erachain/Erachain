@@ -164,7 +164,7 @@ public class VouchRecordDialog extends JDialog {
 
         int version = 0; // without user signs
 
-        Transaction transaction = Controller.getInstance().r_Vouch(0, false,
+        Transaction transaction = Controller.getInstance().r_Vouch(0, Transaction.FOR_NETWORK,
                 authenticator, feePow,
                 record.getBlockHeight(DCSet.getInstance()), record.getSeqNo(DCSet.getInstance()));
         //Pair<Transaction, Integer> result = new Pair<Transaction, Integer>(null, 0);
@@ -183,7 +183,7 @@ public class VouchRecordDialog extends JDialog {
         if (dd.isConfirm) {
 
 
-            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
 
             //CHECK VALIDATE MESSAGE

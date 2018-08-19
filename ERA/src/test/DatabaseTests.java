@@ -81,9 +81,9 @@ public class DatabaseTests {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-        genesis_issue_person.process(gb, false);
+        genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(maker, 0L);
-        genesis_certify.process(gb, false);
+        genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         maker.setLastTimestamp(last_ref, dcSet);
         maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -103,16 +103,16 @@ public class DatabaseTests {
 
         init();
 
-        issuePersonTransaction.sign(maker, asPack);
-        issuePersonTransaction.process(gb, asPack);
+        issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
-        issuePersonTransaction.sign(maker, asPack);
-        issuePersonTransaction.process(gb, asPack);
+        issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
-        issuePersonTransaction.sign(maker, asPack);
-        issuePersonTransaction.process(gb, asPack);
+        issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
 
         //assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
@@ -121,12 +121,12 @@ public class DatabaseTests {
         DCSet fork = dcSet.fork();
 
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
-        issuePersonTransaction.sign(maker, asPack);
-        issuePersonTransaction.process(gb, asPack);
+        issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
-        issuePersonTransaction.sign(maker, asPack);
-        issuePersonTransaction.process(gb, asPack);
+        issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 
@@ -230,8 +230,8 @@ public class DatabaseTests {
 
         AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 50000l);
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
-        issueAssetTransaction.sign(maker, false);
-        issueAssetTransaction.process(gb, false);
+        issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
+        issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         //LOGGER.info(asset.toString() + " getQuantity " + asset.getQuantity());
 
         long key = asset.getKey(dcSet);

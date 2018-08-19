@@ -29,7 +29,7 @@ public class TestRecUnion {
 
     static Logger LOGGER = Logger.getLogger(TestRecUnion.class.getName());
 
-    Long releaserReference = null;
+    //int releaserReference = null;
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -123,11 +123,11 @@ public class TestRecUnion {
     public void initUnionalize() {
 
 
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        issueUnionTransaction.sign(certifier, false);
+        issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
-        issueUnionTransaction.process(gb, false);
+        issueUnionTransaction.process(gb, Transaction.FOR_NETWORK);
         unionKey = union.getKey(db);
 
         assertEquals(1, unionKey);
@@ -142,7 +142,7 @@ public class TestRecUnion {
 
         init();
 
-        issueUnionTransaction.sign(certifier, false);
+        issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE UNION TRANSACTION IS VALID
         assertEquals(true, issueUnionTransaction.isSignatureValid(db));
@@ -160,26 +160,26 @@ public class TestRecUnion {
     public void validateIssueUnionRecord() {
 
         init();
-        issueUnionTransaction.setDC(db,false);
-        issueUnionTransaction.sign(certifier, false);
+        issueUnionTransaction.setDC(db,Transaction.FOR_NETWORK);
+        issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE UNION IS VALID
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ISSUE UNION - INVALID UNIONALIZE
         issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);
-        assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
         userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK IF ISSUE UNION IS VALID
         userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
-        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK
         userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -217,20 +217,20 @@ public class TestRecUnion {
         assertEquals(union.getParent(), parsedUnion.getParent());
 
         // PARSE ISSEU UNION RECORD
-        issueUnionTransaction.sign(certifier, false);
-        issueUnionTransaction.setDC(db,false);
-        issueUnionTransaction.process(gb, false);
+        issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
+        issueUnionTransaction.setDC(db,Transaction.FOR_NETWORK);
+        issueUnionTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawIssueUnionRecord = issueUnionTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssueUnionRecord = issueUnionTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueUnionRecord.length, issueUnionTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawIssueUnionRecord.length, issueUnionTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         IssueUnionRecord parsedIssueUnionRecord = null;
         try {
             //PARSE FROM BYTES
-            parsedIssueUnionRecord = (IssueUnionRecord) TransactionFactory.getInstance().parse(rawIssueUnionRecord, releaserReference);
+            parsedIssueUnionRecord = (IssueUnionRecord) TransactionFactory.getInstance().parse(rawIssueUnionRecord, Transaction.FOR_NETWORK);
 
         } catch (Exception e) {
             fail("Exception while parsing transaction.  : " + e);
@@ -267,11 +267,11 @@ public class TestRecUnion {
         assertEquals(union.getParent(), parsedUnion.getParent());
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssueUnionRecord = new byte[issueUnionTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawIssueUnionRecord = new byte[issueUnionTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawIssueUnionRecord, releaserReference);
+            TransactionFactory.getInstance().parse(rawIssueUnionRecord, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -286,12 +286,12 @@ public class TestRecUnion {
     public void processIssueUnionRecord() {
 
         init();
-        issueUnionTransaction.setDC(db,false);
-        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(releaserReference, flags));
+        issueUnionTransaction.setDC(db,Transaction.FOR_NETWORK);
+        assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        issueUnionTransaction.sign(certifier, false);
+        issueUnionTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
-        issueUnionTransaction.process(gb, false);
+        issueUnionTransaction.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.info("union KEY: " + union.getKey(db));
 
@@ -311,7 +311,7 @@ public class TestRecUnion {
         assertEquals(issueUnionTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issueUnionTransaction.orphan(false);
+        issueUnionTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));

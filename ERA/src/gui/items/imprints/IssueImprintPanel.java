@@ -339,7 +339,7 @@ public class IssueImprintPanel extends JPanel {
             }
 
 
-            int result1 = Controller.getInstance().getTransactionCreator().afterCreate(result, false);
+            int result1 = Controller.getInstance().getTransactionCreator().afterCreate(result, Transaction.FOR_NETWORK);
 
 
             //CHECK VALIDATE MESSAGE

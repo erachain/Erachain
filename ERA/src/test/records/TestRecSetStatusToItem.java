@@ -88,8 +88,8 @@ public class TestRecSetStatusToItem {
 
         //CREATE ISSUE PERSON TRANSACTION
         issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issuePersonTransaction.setDC(db, false);
-        issuePersonTransaction.process(gb, false);
+        issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         person = (PersonCls) issuePersonTransaction.getItem();
         personkey = person.getKey(db);
 
@@ -116,7 +116,7 @@ public class TestRecSetStatusToItem {
 
 
         //CREATE SET STATUS TRANSACTION
-        setStatusTransaction.sign(maker, false);
+        setStatusTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE STATUS TRANSACTION IS VALID
         assertEquals(true, setStatusTransaction.isSignatureValid(db));
@@ -137,18 +137,18 @@ public class TestRecSetStatusToItem {
 
         init();
 
-        setStatusTransaction.sign(maker, false);
+        setStatusTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawIssueStatusTransaction = setStatusTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssueStatusTransaction = setStatusTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueStatusTransaction.length, setStatusTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawIssueStatusTransaction.length, setStatusTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         R_SetStatusToItem parsedSetStatusTransaction = null;
         try {
             //PARSE FROM BYTES
-            parsedSetStatusTransaction = (R_SetStatusToItem) TransactionFactory.getInstance().parse(rawIssueStatusTransaction, releaserReference);
+            parsedSetStatusTransaction = (R_SetStatusToItem) TransactionFactory.getInstance().parse(rawIssueStatusTransaction, Transaction.FOR_NETWORK);
             LOGGER.info("parsedSetStatusTransaction: " + parsedSetStatusTransaction);
 
         } catch (Exception e) {
@@ -156,8 +156,8 @@ public class TestRecSetStatusToItem {
         }
 
         //CHECK LEN
-        assertEquals(parsedSetStatusTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true),
-                setStatusTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(parsedSetStatusTransaction.getDataLength(Transaction.FOR_NETWORK, true),
+                setStatusTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         //CHECK INSTANCE
         assertEquals(true, parsedSetStatusTransaction instanceof R_SetStatusToItem);
@@ -203,8 +203,8 @@ public class TestRecSetStatusToItem {
     public void process_orphanSetStatusTransaction() {
 
         init();
-        setStatusTransaction.setDC(db,false);
-        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(releaserReference, flags));
+        setStatusTransaction.setDC(db,Transaction.FOR_NETWORK);
+        assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, setStatusTransaction.isValid(Transaction.FOR_NETWORK, flags));
         assertEquals(db.getPersonStatusMap().get(person.getKey(db)).size(), 0);
 
         Tuple5<Long, Long, byte[], Integer, Integer> statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
@@ -212,8 +212,8 @@ public class TestRecSetStatusToItem {
         assertEquals(null, statusDuration);
 
 
-        setStatusTransaction.sign(maker, false);
-        setStatusTransaction.process(gb, false);
+        setStatusTransaction.sign(maker, Transaction.FOR_NETWORK);
+        setStatusTransaction.process(gb, Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         // TEST TIME and EXPIRE TIME for ALIVE person
@@ -230,9 +230,9 @@ public class TestRecSetStatusToItem {
                 0l,
                 "tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
                 timestamp + 10, maker.getLastTimestamp(db));
-        setStatusTransaction_2.setDC(db,false);
-        setStatusTransaction_2.sign(maker, false);
-        setStatusTransaction_2.process(gb, false);
+        setStatusTransaction_2.setDC(db,Transaction.FOR_NETWORK);
+        setStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);
+        setStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         endDate = statusDuration.a;
@@ -240,7 +240,7 @@ public class TestRecSetStatusToItem {
 
 
         ////// ORPHAN 2 ///////
-        setStatusTransaction_2.orphan(false);
+        setStatusTransaction_2.orphan(Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         endDate = statusDuration.a;
@@ -250,7 +250,7 @@ public class TestRecSetStatusToItem {
         assertEquals(setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db));
 
         ////// ORPHAN ///////
-        setStatusTransaction.orphan(false);
+        setStatusTransaction.orphan(Transaction.FOR_NETWORK);
 
         statusDuration = db.getPersonStatusMap().getItem(personkey, status_key);
         assertEquals(statusDuration, null);

@@ -98,7 +98,7 @@ public class IssueStatusRecord extends Issue_ItemRecord {
         StatusCls status = StatusFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += status.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueStatusRecord(typeBytes, creator, status, feePow, timestamp, reference, signatureBytes);
         } else {
             return new IssueStatusRecord(typeBytes, creator, status, signatureBytes);
@@ -113,9 +113,9 @@ public class IssueStatusRecord extends Issue_ItemRecord {
     //PARSE CONVERT
 
     //@Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
 		/*

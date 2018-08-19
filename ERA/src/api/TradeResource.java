@@ -117,7 +117,7 @@ public class TradeResource {
                 wantAmount, //new BigDecimal(wantAmount), //.setScale(wantAsset.getScale()),
                 feePower.intValue());
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();
@@ -222,7 +222,7 @@ public class TradeResource {
 
         Transaction transaction = cntr.cancelOrder2(privateKeyAccount, signature, feePower.intValue());
 
-        int validate = cntr.getTransactionCreator().afterCreate(transaction, false);
+        int validate = cntr.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         if (validate == Transaction.VALIDATE_OK)
             return transaction.toJson().toJSONString();

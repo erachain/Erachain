@@ -95,7 +95,7 @@ public class IssuePollRecord extends Issue_ItemRecord {
         PollCls poll = PollFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += poll.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssuePollRecord(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes);
         } else {
             return new IssuePollRecord(typeBytes, creator, poll, signatureBytes);

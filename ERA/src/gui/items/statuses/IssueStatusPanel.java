@@ -301,7 +301,7 @@ public class IssueStatusPanel extends JPanel {
         }
 
         // VALIDATE AND PROCESS
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_Status, false);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_Status, Transaction.FOR_NETWORK);
 
         // CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {

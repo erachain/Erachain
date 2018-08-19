@@ -194,7 +194,7 @@ public class IssueUnionPanel extends JPanel {
             return;
         }
         //VALIDATE AND PROCESS
-        int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_Union, false);
+        int result = Controller.getInstance().getTransactionCreator().afterCreate(issue_Union, Transaction.FOR_NETWORK);
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Union issue has been sent!"), Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

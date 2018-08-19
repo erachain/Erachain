@@ -379,7 +379,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             // READ QUANTITY
             parsestep++;
             long quantity = Long.parseLong(this.txtQuantity.getText());
-            boolean asPack = false;
+            int asDeal = Transaction.FOR_NETWORK;
             
             // CREATE ASSET
             parsestep++;
@@ -440,7 +440,7 @@ public class IssueAssetPanel extends javax.swing.JPanel {
             }
             
             // VALIDATE AND PROCESS
-            int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, asPack);
+            int result = Controller.getInstance().getTransactionCreator().afterCreate(issueAssetTransaction, asDeal);
             
             // CHECK VALIDATE MESSAGE
             switch (result) {

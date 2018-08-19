@@ -21,7 +21,7 @@ public class TestRecGenesisPerson2 {
 
     static Logger LOGGER = Logger.getLogger(TestRecGenesisPerson2.class.getName());
 
-    Long releaserReference = null;
+    //Long Transaction.FOR_NETWORK = null;
 
     long FEE_KEY = Transaction.FEE_KEY;
     //long ALIVE_KEY = StatusCls.ALIVE_KEY;
@@ -66,7 +66,7 @@ public class TestRecGenesisPerson2 {
         //CREATE ISSUE PERSON TRANSACTION
         genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
         if (toProcess) {
-            genesisIssuePersonTransaction.process(gb, false);
+            genesisIssuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
             keyPerson = person.getKey(db);
         }
 
@@ -81,19 +81,19 @@ public class TestRecGenesisPerson2 {
         //genesisIssuePersonTransaction.sign(creator);
         //CHECK IF ISSUE PERSON TRANSACTION IS VALID
         assertEquals(true, genesisIssuePersonTransaction.isSignatureValid());
-        assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CONVERT TO BYTES
         //LOGGER.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
-        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_NETWORK, true));
         //LOGGER.info("rawGenesisIssuePersonRecord.length") + ": + rawGenesisIssuePersonRecord.length);
 
         try {
             //PARSE FROM BYTES
-            GenesisIssuePersonRecord parsedGenesisIssuePersonRecord = (GenesisIssuePersonRecord) TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, releaserReference);
+            GenesisIssuePersonRecord parsedGenesisIssuePersonRecord = (GenesisIssuePersonRecord) TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedGenesisIssuePersonRecord instanceof GenesisIssuePersonRecord);
@@ -112,11 +112,11 @@ public class TestRecGenesisPerson2 {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, releaserReference);
+            TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -129,7 +129,7 @@ public class TestRecGenesisPerson2 {
                 (byte) 1, "Slav", (float) 111.1, (float) 1.1,
                 "white", "gray", "dark", (int) 188, icon, image, "icreator", ownerSignature);
         genesisIssuePersonTransaction = new GenesisIssuePersonRecord(person);
-        assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.ITEM_PERSON_LATITUDE_ERROR, genesisIssuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -140,14 +140,14 @@ public class TestRecGenesisPerson2 {
         initIssue(false);
 
         //CONVERT TO BYTES
-        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            GenesisIssuePersonRecord parsedGenesisIssuePersonRecord = (GenesisIssuePersonRecord) TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, releaserReference);
+            GenesisIssuePersonRecord parsedGenesisIssuePersonRecord = (GenesisIssuePersonRecord) TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedGenesisIssuePersonRecord instanceof GenesisIssuePersonRecord);
@@ -171,11 +171,11 @@ public class TestRecGenesisPerson2 {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, releaserReference);
+            TransactionFactory.getInstance().parse(rawGenesisIssuePersonRecord, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -194,8 +194,8 @@ public class TestRecGenesisPerson2 {
 
         //CHECK REFERENCE RECIPIENT
         //assertNotEquals((long)genesisIssuePersonTransaction.getTimestamp(), (long)maker.getLastReference(db));
-        genesisIssuePersonTransaction.setDC(db,false);
-        genesisIssuePersonTransaction.process(gb, false);
+        genesisIssuePersonTransaction.setDC(db,Transaction.FOR_NETWORK);
+        genesisIssuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         keyPerson = person.getKey(db);
 
         //CHECK PERSON EXISTS SENDER
@@ -208,7 +208,7 @@ public class TestRecGenesisPerson2 {
 
         /////////////////
         ///// ORPHAN ////
-        genesisIssuePersonTransaction.orphan(false);
+        genesisIssuePersonTransaction.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(false, db.getItemPersonMap().contains(keyPerson));
 

@@ -118,7 +118,8 @@ public class VoteOnItemPollTransaction extends Transaction {
         int option = Ints.fromByteArray(optionBytes);
         position += OPTION_SIZE_LENGTH;
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
+
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, reference, signatureBytes);
         } else {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, reference, signatureBytes);
@@ -126,14 +127,14 @@ public class VoteOnItemPollTransaction extends Transaction {
     }
 
     @Override
-    public void setDC(DCSet dcSet, boolean asPack) {
-        super.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal) {
+        super.setDC(dcSet, asDeal);
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
     }
 
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        this.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.setDC(dcSet, asDeal);
         this.seqNo = seqNo;
     }
 
@@ -202,7 +203,7 @@ public class VoteOnItemPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK POLL EXISTS
         if (poll == null) {
@@ -214,15 +215,15 @@ public class VoteOnItemPollTransaction extends Transaction {
             return POLL_OPTION_NOT_EXISTS;
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
 
     }
 
     //PROCESS/ORPHAN
 
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //ADD VOTE TO POLL
         this.dcSet.getVoteOnItemPollMap().addItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()),
@@ -233,9 +234,9 @@ public class VoteOnItemPollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //DELETE VOTE FROM POLL
         this.dcSet.getVoteOnItemPollMap().removeItem(this.key, this.option, new BigInteger(this.creator.getShortAddressBytes()));

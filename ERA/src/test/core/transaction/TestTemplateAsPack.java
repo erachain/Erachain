@@ -27,10 +27,10 @@ public class TestTemplateAsPack {
 
     static Logger LOGGER = Logger.getLogger(TestTemplateAsPack.class.getName());
 
-    Long releaserReference = null;
+    //Long Transaction.FOR_PACK = null;
 
-    boolean asPack = true;
-    int forPack = Transaction.FOR_DEAL_SIGN;
+    //boolean asPack = true;
+    int asPack = Transaction.FOR_PACK;
 
     boolean includeReference = false;
     long FEE_KEY = 1l;
@@ -104,19 +104,19 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db,false);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK);
         issueTemplateRecord.sign(maker, asPack);
         issueTemplateRecord.process(gb, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(forPack, true));
+        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(asPack, true));
 
         try {
             //PARSE FROM BYTES
-            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, releaserReference);
+            IssueTemplateRecord parsedIssueTemplateTransaction = (IssueTemplateRecord) TransactionFactory.getInstance().parse(rawIssueTemplateTransaction, Transaction.FOR_PACK);
             LOGGER.info("parsedIssueTemplateTransaction: " + parsedIssueTemplateTransaction);
 
             //CHECK INSTANCE
@@ -154,10 +154,10 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db,false);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK);
         issueTemplateRecord.sign(maker, asPack);
 
-        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, flags));
         Long makerReference = maker.getLastTimestamp(db);
         issueTemplateRecord.process(gb, asPack);
 
@@ -195,7 +195,7 @@ public class TestTemplateAsPack {
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
-        issueTemplateRecord.setDC(db,false);
+        issueTemplateRecord.setDC(db, Transaction.FOR_PACK);
         issueTemplateRecord.sign(maker, asPack);
         issueTemplateRecord.process(gb, asPack);
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);

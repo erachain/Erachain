@@ -211,7 +211,7 @@ public class PersonConfirmDialog extends JDialog {
 
         int version = 0; // without user signs
 
-        Transaction transaction = Controller.getInstance().r_SertifyPerson(version, false, authenticator, feePow,
+        Transaction transaction = Controller.getInstance().r_SertifyPerson(version, Transaction.FOR_NETWORK, authenticator, feePow,
                 person.getKey(), sertifiedPublicKeys, toDate);
 
         String Status_text = "";
@@ -226,7 +226,7 @@ public class PersonConfirmDialog extends JDialog {
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
-            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+            Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
             // CHECK VALIDATE MESSAGE
             if (result == Transaction.VALIDATE_OK) {

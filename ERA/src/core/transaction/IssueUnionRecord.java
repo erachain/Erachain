@@ -98,7 +98,7 @@ public class IssueUnionRecord extends Issue_ItemRecord {
         UnionCls union = UnionFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += union.getDataLength(false);
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new IssueUnionRecord(typeBytes, creator, union, feePow, timestamp, reference, signatureBytes);
         } else {
             return new IssueUnionRecord(typeBytes, creator, union, signatureBytes);
@@ -113,9 +113,9 @@ public class IssueUnionRecord extends Issue_ItemRecord {
     //PARSE CONVERT
 
     //@Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
 		/*

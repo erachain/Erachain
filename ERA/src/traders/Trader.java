@@ -307,8 +307,8 @@ public abstract class Trader extends Thread {
                 continue;
 
             // TEST in FORK
-            transaction.setDC(fork, false);
-            if (transaction.isValid(null, 0l) != Transaction.VALIDATE_OK) {
+            transaction.setDC(fork, Transaction.FOR_NETWORK);
+            if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
 
                 // DELETE in DC SET
                 dcSet.getTransactionMap().delete(transaction.getSignature());
@@ -316,7 +316,7 @@ public abstract class Trader extends Thread {
             }
 
             // PROCESS in FORK
-            transaction.process(null, false);
+            transaction.process(null, Transaction.FOR_NETWORK);
 
             if (transaction.getType() == Transaction.CANCEL_ORDER_TRANSACTION) {
                 if (transaction.getTimestamp() > transaction.getCreator().getLastTimestamp())

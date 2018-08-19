@@ -72,22 +72,17 @@ public class RecordReleasePack extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -95,7 +90,7 @@ public class RecordReleasePack extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -120,13 +115,13 @@ public class RecordReleasePack extends Transaction {
         TransactionFactory tf_inct = TransactionFactory.getInstance();
         List<Transaction> transactions = new ArrayList<Transaction>();
         for (int i = 0; i < transactionsLength; i++) {
-            Transaction transaction = tf_inct.parse(Arrays.copyOfRange(data, position, data_length), releaserReference);
+            Transaction transaction = tf_inct.parse(Arrays.copyOfRange(data, position, data.length), Transaction.FOR_PACK);
             transactions.add(transaction);
 
-            position += transaction.getDataLength(FOR_DEAL_SIGN, true);
+            position += transaction.getDataLength(Transaction.FOR_PACK, true);
         }
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference, signatureBytes);
         } else {
             return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
@@ -195,7 +190,7 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK PAYMENTS SIZE
         if (this.transactions.size() < 1 || this.transactions.size() > 400) {
@@ -209,17 +204,17 @@ public class RecordReleasePack extends Transaction {
         //CHECK PAYMENTS
         for (Transaction transaction : this.transactions) {
 
-            result = transaction.isValid(releaserReference, flags);
+            result = transaction.isValid(asDeal, flags);
             if (result != Transaction.VALIDATE_OK)
                 // transaction counter x100
                 return result + counter * 100;
             //PROCESS PAYMENT IN FORK AS PACK
-            transaction.process(this.block, true);
+            transaction.process(this.block, asDeal);
             counter++;
         }
 
         // IN FORK
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
 
     }
 
@@ -227,26 +222,26 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //PROCESS PAYMENTS
         for (Transaction transaction : this.transactions) {
-            transaction.process(block, true); // as Pack in body
+            transaction.process(block, asDeal); // as Pack in body
         }
     }
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //ORPHAN PAYMENTS
         for (Transaction transaction : this.transactions) {
-            transaction.setDC(this.dcSet, true);
-            transaction.orphan(true); // as Pack in body
+            transaction.setDC(this.dcSet, asDeal);
+            transaction.orphan(asDeal); // as Pack in body
         }
     }
 

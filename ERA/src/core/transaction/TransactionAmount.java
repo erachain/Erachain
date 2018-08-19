@@ -129,16 +129,16 @@ public abstract class TransactionAmount extends Transaction {
     // GETTERS/SETTERS
     
     @Override
-    public void setDC(DCSet dcSet, boolean asPack) {
-        super.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal) {
+        super.setDC(dcSet, asDeal);
         
         if (this.amount != null) {
             this.asset = (AssetCls) this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
     }
 
-    public void setDC(DCSet dcSet, boolean asPack, int seqNo) {
-        this.setDC(dcSet, asPack);
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.setDC(dcSet, asDeal);
         this.seqNo = seqNo;
     }
 
@@ -384,7 +384,7 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override // - fee + balance - calculate here
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
         
         for (byte[] valid_item : VALID_REC) {
             if (Arrays.equals(this.signature, valid_item)) {
@@ -413,9 +413,12 @@ public abstract class TransactionAmount extends Transaction {
         }
         
         // CHECK IF REFERENCE IS OK
-        Long reference = releaserReference == null ? this.creator.getLastTimestamp(dcSet) : releaserReference;
-        if (reference.compareTo(this.timestamp) >= 0)
-            return INVALID_TIMESTAMP;
+        if (asDeal > Transaction.FOR_PACK) {
+            Long reference = this.creator.getLastTimestamp(dcSet);
+            if (reference.compareTo(this.timestamp) >= 0) {
+                return INVALID_TIMESTAMP;
+            }
+        }
         
         boolean isPerson = this.creator.isPerson(dcSet, height);
         
@@ -844,9 +847,9 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         
-        super.process(block, asPack);
+        super.process(block, asDeal);
         
         DCSet db = this.dcSet;
         
@@ -972,9 +975,9 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         
-        super.orphan(asPack);
+        super.orphan(asDeal);
         
         if (this.amount == null)
             return;

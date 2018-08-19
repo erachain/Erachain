@@ -200,7 +200,7 @@ public class R_SertifyPubKeys extends Transaction {
         int add_day = Ints.fromByteArray(Arrays.copyOfRange(data, position, position + DATE_DAY_LENGTH));
         position += DATE_DAY_LENGTH;
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new R_SertifyPubKeys(typeBytes, creator, feePow, key,
                     sertifiedPublicKeys,
                     add_day, timestamp, reference, signature,
@@ -410,11 +410,11 @@ public class R_SertifyPubKeys extends Transaction {
 
     //
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         boolean creator_admin = false;
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result == Transaction.CREATOR_NOT_PERSONALIZED) {
             long personsCount = dcSet.getItemPersonMap().getLastKey();
             if (personsCount < 20) {
@@ -475,10 +475,10 @@ public class R_SertifyPubKeys extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         //UPDATE SENDER
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         DCSet db = this.dcSet;
 
@@ -535,7 +535,7 @@ public class R_SertifyPubKeys extends Transaction {
             if(this.height < BlockChain.ALL_BALANCES_OK_TO) {
 
                 // GET FEE from that record
-                transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
+                transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
 
                 // ISSUE NEW COMPU in chain
                 BigDecimal issued_FEE_BD = transPersonIssue.getFee();
@@ -625,10 +625,10 @@ public class R_SertifyPubKeys extends Transaction {
     }
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         //UPDATE SENDER
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         DCSet db = this.dcSet;
         //UPDATE RECIPIENT
@@ -676,7 +676,7 @@ public class R_SertifyPubKeys extends Transaction {
                 // IT IS NOT VOUCHED PERSON
 
                 // GET FEE from that record
-                transPersonIssue.setDC(db, false); // NEED to RECAL?? if from DB
+                transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
                 //long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
                 //if (true || BlockChain.START_LEVEL == 1)
                 //	issueFEE = issueFEE>>2;

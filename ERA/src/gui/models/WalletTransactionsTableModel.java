@@ -144,7 +144,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         if (transaction == null)
             return null;
 
-        transaction.setDC(DCSet.getInstance(), false);
+        transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
 
         //creator = transaction.getCreator();
         String itemName = "";
@@ -244,7 +244,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 return transaction.getFee();
 
             case COLUMN_SIZE:
-                return transaction.viewSize(Transaction.FOR_DEAL_NETWORK);
+                return transaction.viewSize(Transaction.FOR_NETWORK);
         }
 
         return null;

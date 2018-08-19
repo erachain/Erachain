@@ -218,13 +218,13 @@ public class R_SignNote extends Transaction {
         }
 
         if (signersLen == 0) {
-            if (!asPack) {
+            if (asDeal > Transaction.FOR_MYPACK) {
                 return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
             } else {
                 return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
-            if (!asPack) {
+            if (asDeal > Transaction.FOR_MYPACK) {
                 return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, timestamp, reference, signatureBytes);
             } else {
                 return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
@@ -574,7 +574,7 @@ public class R_SignNote extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK DATA SIZE
         if (data == null && key <= 0)
@@ -585,7 +585,7 @@ public class R_SignNote extends Transaction {
         }
 
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         // ITEM EXIST? - for assets transfer not need - amount expect instead

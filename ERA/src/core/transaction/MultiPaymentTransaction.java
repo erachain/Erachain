@@ -125,7 +125,7 @@ public class MultiPaymentTransaction extends Transaction {
             position += Payment.BASE_LENGTH;
         }
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new MultiPaymentTransaction(typeBytes, creator, payments, feePow, timestamp, reference, signatureBytes);
         } else {
             return new MultiPaymentTransaction(typeBytes, creator, payments, reference, signatureBytes);
@@ -199,7 +199,7 @@ public class MultiPaymentTransaction extends Transaction {
 
     //@Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK PAYMENTS SIZE
         if (this.payments.size() < 1 || this.payments.size() > 400) {
@@ -244,16 +244,16 @@ public class MultiPaymentTransaction extends Transaction {
             payment.process(this.creator, fork);
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
     //PROCESS/ORPHAN
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //PROCESS PAYMENTS
         for (Payment payment : this.payments) {
@@ -268,9 +268,9 @@ public class MultiPaymentTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //ORPHAN PAYMENTS
         for (Payment payment : this.payments) {

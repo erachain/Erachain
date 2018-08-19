@@ -285,7 +285,7 @@ public class R_Send extends TransactionAmount {
             position += IS_TEXT_LENGTH;
         }
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new R_Send(typeBytes, creator, feePow, recipient, key, amount, head, arbitraryData, isTextByte,
                     encryptedByte, timestamp, reference, signatureBytes);
         } else {
@@ -437,7 +437,7 @@ public class R_Send extends TransactionAmount {
 
     // @Override
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (head.getBytes(StandardCharsets.UTF_8).length > 256)
             return INVALID_HEAD_LENGTH;
@@ -449,7 +449,7 @@ public class R_Send extends TransactionAmount {
             }
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
 }

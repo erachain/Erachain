@@ -30,7 +30,7 @@ public class TestRecPoll {
 
     static Logger LOGGER = Logger.getLogger(TestRecPoll.class.getName());
 
-    Long releaserReference = null;
+    //Long Transaction.FOR_NETWORK = null;
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -120,7 +120,7 @@ public class TestRecPoll {
 
         //CREATE ISSUE POLL TRANSACTION
         issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
-        issuePollTransaction.setDC(db, false);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
 
 
     }
@@ -128,11 +128,11 @@ public class TestRecPoll {
     public void initPollalize() {
 
 
-        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        issuePollTransaction.sign(certifier, false);
+        issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
-        issuePollTransaction.process(gb, false);
+        issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
         pollKey = poll.getKey(db);
 
         assertEquals(1, pollKey);
@@ -146,7 +146,7 @@ public class TestRecPoll {
     public void validateSignatureIssuePollRecord() {
 
 
-        issuePollTransaction.sign(certifier, false);
+        issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE POLL TRANSACTION IS VALID
         assertEquals(true, issuePollTransaction.isSignatureValid(db));
@@ -163,28 +163,28 @@ public class TestRecPoll {
     public void validateIssuePollRecord() {
 
 
-        issuePollTransaction.sign(certifier, false);
+        issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE POLL IS VALID
-        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
 
         //CREATE INVALID ISSUE POLL - INVALID POLLALIZE
         issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, 0l, new byte[64]);
-        issuePollTransaction.setDC(db, false);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
         if (!BlockChain.DEVELOP_USE)
-            assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(releaserReference, flags));
+            assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
         userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK IF ISSUE POLL IS VALID
         userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MINOR_ERA_BALANCE_BD, false);
-        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CHECK
         userAccount1.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
-        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
     }
 
@@ -219,20 +219,20 @@ public class TestRecPoll {
         assertEquals(poll.getItemTypeStr(), parsedPoll.getItemTypeStr());
 
         // PARSE ISSEU POLL RECORD
-        issuePollTransaction.sign(certifier, false);
-        issuePollTransaction.setDC(db, false);
-        issuePollTransaction.process(gb, false);
+        issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawIssuePollRecord = issuePollTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawIssuePollRecord = issuePollTransaction.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssuePollRecord.length, issuePollTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
+        assertEquals(rawIssuePollRecord.length, issuePollTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
         IssuePollRecord parsedIssuePollRecord = null;
         try {
             //PARSE FROM BYTES
-            parsedIssuePollRecord = (IssuePollRecord) TransactionFactory.getInstance().parse(rawIssuePollRecord, releaserReference);
+            parsedIssuePollRecord = (IssuePollRecord) TransactionFactory.getInstance().parse(rawIssuePollRecord, Transaction.FOR_NETWORK);
 
         } catch (Exception e) {
             fail("Exception while parsing transaction.  : " + e);
@@ -270,11 +270,11 @@ public class TestRecPoll {
         assertEquals(poll.getOptions().get(2), parsedPoll.getOptions().get(2));
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssuePollRecord = new byte[issuePollTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
+        rawIssuePollRecord = new byte[issuePollTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawIssuePollRecord, releaserReference);
+            TransactionFactory.getInstance().parse(rawIssuePollRecord, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -288,11 +288,11 @@ public class TestRecPoll {
     @Test
     public void processIssuePollRecord() {
 
-        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        issuePollTransaction.sign(certifier, false);
-        issuePollTransaction.setDC(db, false);
-        issuePollTransaction.process(gb, false);
+        issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.info("poll KEY: " + poll.getKey(db));
 
@@ -312,7 +312,7 @@ public class TestRecPoll {
         assertEquals(issuePollTransaction.getTimestamp(), certifier.getLastTimestamp(db));
 
         //////// ORPHAN /////////
-        issuePollTransaction.orphan(false);
+        issuePollTransaction.orphan(Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
         if (!BlockChain.DEVELOP_USE)

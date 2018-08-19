@@ -83,8 +83,8 @@ public class NameStorageTest {
 
         // CHECK IF NAME REGISTRATION IS VALID
         assertEquals(Transaction.VALIDATE_OK,
-                nameRegistration.isValid(releaserReference, flags));
-        nameRegistration.process(null, false);
+                nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
+        nameRegistration.process(null, Transaction.FOR_NETWORK);
     }
 
     @Test
@@ -107,9 +107,9 @@ public class NameStorageTest {
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertEquals(
@@ -136,7 +136,7 @@ public class NameStorageTest {
                 timestamp, badSender.getLastTimestamp(databaseSet));
 
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS STILL THERE!
         assertEquals(
@@ -168,8 +168,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertEquals(
@@ -188,8 +188,8 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // NEW KEY IS THERE!
         assertEquals(
@@ -209,8 +209,8 @@ public class NameStorageTest {
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
 
-        arbitraryTransaction.process(null, false);
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
                 Corekeys.PROFILEENABLE.toString()));
@@ -238,8 +238,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "skerberus",
@@ -257,9 +257,9 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertEquals("skerberus;vrontis", databaseSet.getNameStorageMap()
@@ -278,9 +278,9 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertEquals(
@@ -304,9 +304,9 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertEquals(
@@ -330,8 +330,8 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
@@ -349,9 +349,9 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         assertEquals(
                 "a;b;c",
@@ -370,9 +370,9 @@ public class NameStorageTest {
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         // KEY IS THERE!
         assertEquals(
@@ -397,9 +397,9 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -417,9 +417,9 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction2.sign(sender, false);
+        arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
 
-        arbitraryTransaction2.process(null, false);
+        arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -429,7 +429,7 @@ public class NameStorageTest {
                         Corekeys.WEBSITE.toString()));
 
         // ORPHANING FIRST TX!
-        arbitraryTransaction.orphan(false);
+        arbitraryTransaction.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(
                 " second",
@@ -437,7 +437,7 @@ public class NameStorageTest {
                         Corekeys.WEBSITE.toString()));
 
         // ORPHANING second TX!
-        arbitraryTransaction2.orphan(false);
+        arbitraryTransaction2.orphan(Transaction.FOR_NETWORK);
 
         assertNull(databaseSet.getNameStorageMap().getOpt("drizzt",
                 Corekeys.WEBSITE.toString()));
@@ -461,8 +461,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -482,8 +482,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction2.sign(sender, false);
-        arbitraryTransaction2.process(null, false);
+        arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -503,8 +503,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction3.sign(sender, false);
-        arbitraryTransaction3.process(null, false);
+        arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
@@ -531,7 +531,7 @@ public class NameStorageTest {
         // Website: firstthird
         // random : skerberus
         // asdf : asdf
-        arbitraryTransaction2.orphan(false);
+        arbitraryTransaction2.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(
                 "firstthird",
@@ -567,8 +567,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -588,8 +588,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction2.sign(sender, false);
-        arbitraryTransaction2.process(null, false);
+        arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -609,8 +609,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction3.sign(sender, false);
-        arbitraryTransaction3.process(null, false);
+        arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
@@ -636,7 +636,7 @@ public class NameStorageTest {
         // Website: secondthird
         // random : vrontis
         // asdf : asdf
-        arbitraryTransaction.orphan(false);
+        arbitraryTransaction.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(
                 "secondthird",
@@ -656,7 +656,7 @@ public class NameStorageTest {
         // removing new first
         // Website: third
         // asdf : asdf
-        arbitraryTransaction2.orphan(false);
+        arbitraryTransaction2.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(
                 "third",
@@ -690,8 +690,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction.sign(sender, false);
-        arbitraryTransaction.process(null, false);
+        arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
 
@@ -711,8 +711,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction2.sign(sender, false);
-        arbitraryTransaction2.process(null, false);
+        arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
 
@@ -732,8 +732,8 @@ public class NameStorageTest {
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
                 timestamp, sender.getLastTimestamp(databaseSet));
-        arbitraryTransaction3.sign(sender, false);
-        arbitraryTransaction3.process(null, false);
+        arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
+        arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
         DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
 
@@ -758,7 +758,7 @@ public class NameStorageTest {
         // Profenable:yes
         // Website: firstsecond
         // random : skerberus;vrontis
-        arbitraryTransaction3.orphan(false);
+        arbitraryTransaction3.orphan(Transaction.FOR_NETWORK);
 
         assertEquals(
                 "firstsecond",

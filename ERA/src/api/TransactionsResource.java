@@ -207,7 +207,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
-            record.setDC(dcSet, false);
+            record.setDC(dcSet, Transaction.FOR_NETWORK);
             array.add(record.toJson());
         }
 
@@ -537,7 +537,7 @@ public class TransactionsResource {
             // FOR ALL ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    transaction.setDC(dcSet, false);
+                    transaction.setDC(dcSet, Transaction.FOR_NETWORK);
                     // CHECK IF INVOLVED
                     if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
                         array.add(transaction.toJson());
@@ -575,7 +575,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet, false);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
@@ -622,7 +622,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction transaction : block.getTransactions()) {
-            transaction.setDC(dcSet, false);
+            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
@@ -800,7 +800,7 @@ public class TransactionsResource {
 
         }
 
-        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, false);
+        Integer result = Controller.getInstance().getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
 
         // CHECK VALIDATE MESSAGE
         if (result != Transaction.VALIDATE_OK) {

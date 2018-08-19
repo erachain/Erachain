@@ -186,7 +186,7 @@ public class Payment_Orders_TableModel extends TableModelCls<Tuple2<String, Stri
                 return transaction.getFee();
 
             case COLUMN_SIZE:
-                return transaction.viewSize(Transaction.FOR_DEAL_NETWORK);
+                return transaction.viewSize(Transaction.FOR_NETWORK);
         }
 
         return null;

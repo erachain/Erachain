@@ -80,7 +80,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
     //VALIDATE
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK NAME LENGTH
         int nameLength = this.item.getName().getBytes(StandardCharsets.UTF_8).length;
@@ -100,7 +100,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
     //PROCESS/ORPHAN
 
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         //INSERT INTO DATABASE
         this.item.insertToMap(this.dcSet, 0l);
@@ -109,7 +109,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
 
 
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         //DELETE FROM DATABASE
         this.item.removeFromMap(this.dcSet);

@@ -179,7 +179,7 @@ public class CreatePollTransaction extends Transaction {
 	 */
 
     @Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
@@ -239,16 +239,16 @@ public class CreatePollTransaction extends Transaction {
             options.add(option.getName());
         }
 
-        return super.isValid(releaserReference, flags);
+        return super.isValid(asDeal, flags);
     }
 
     //PROCESS/ORPHAN
 
     //@Override
     @Override
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
         //UPDATE CREATOR
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         //INSERT INTO DATABASE
         this.dcSet.getPollMap().add(this.poll);
@@ -257,9 +257,9 @@ public class CreatePollTransaction extends Transaction {
 
     //@Override
     @Override
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
         //UPDATE CREATOR
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         //DELETE FROM DATABASE
         this.dcSet.getPollMap().delete(this.poll);

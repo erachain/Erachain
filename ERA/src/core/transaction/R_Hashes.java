@@ -204,7 +204,7 @@ public class R_Hashes extends Transaction {
             position += HASH_LENGTH;
         }
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new R_Hashes(typeBytes, creator, feePow, url, arbitraryData, hashes, timestamp, reference, signatureBytes);
         } else {
             return new R_Hashes(typeBytes, creator, url, arbitraryData, hashes, reference, signatureBytes);
@@ -338,7 +338,7 @@ public class R_Hashes extends Transaction {
     }
 
     //@Override
-    public int isValid(Long releaserReference, long flags) {
+    public int isValid(int asDeal, long flags) {
 
         //CHECK DATA SIZE
         if (url != null && url.length > MAX_URL_LENGTH) {
@@ -353,7 +353,7 @@ public class R_Hashes extends Transaction {
             return INVALID_PARAMS_LENGTH;
         }
 
-        int result = super.isValid(releaserReference, flags);
+        int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
         /** double singns is available
@@ -372,10 +372,10 @@ public class R_Hashes extends Transaction {
 
     //PROCESS/ORPHAN
 
-    public void process(Block block, boolean asPack) {
+    public void process(Block block, int asDeal) {
 
         //UPDATE SENDER
-        super.process(block, asPack);
+        super.process(block, asDeal);
 
         int height = this.getBlockHeightByParentOrLast(dcSet);
 
@@ -408,10 +408,10 @@ public class R_Hashes extends Transaction {
         }
     }
 
-    public void orphan(boolean asPack) {
+    public void orphan(int asDeal) {
 
         //UPDATE SENDER
-        super.orphan(asPack);
+        super.orphan(asDeal);
 
         HashesSignsMap map = dcSet.getHashesSignsMap();
         for (byte[] hash : hashes) {

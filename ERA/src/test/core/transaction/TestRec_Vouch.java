@@ -24,7 +24,7 @@ public class TestRec_Vouch {
 
     static Logger LOGGER = Logger.getLogger(TestRec_Vouch.class.getName());
 
-    Long releaserReference = null;
+    //Long releaserReference = null;
 
     long ERM_KEY = AssetCls.ERA_KEY;
     long FEE_KEY = AssetCls.FEE_KEY;
@@ -73,7 +73,7 @@ public class TestRec_Vouch {
 
         //CREATE VOUCH RECORD
         Transaction vouchRecord = new R_Vouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
-        vouchRecord.sign(maker, false);
+        vouchRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF TRANSACTION IS VALID
         assertEquals(true, vouchRecord.isSignatureValid(db));
@@ -94,20 +94,20 @@ public class TestRec_Vouch {
 
         //CREATE VOUCH RECORD
         Transaction vouchRecord = new R_Vouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
-        assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
         vouchRecord = new R_Vouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);
-        assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
         // SET <2 in isValid()
         vouchRecord = new R_Vouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastTimestamp(db), new byte[64]);
-        assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
         vouchRecord = new R_Vouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastTimestamp(db), new byte[64]);
-        assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
         vouchRecord = new R_Vouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastTimestamp(db), new byte[64]);
-        assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(releaserReference, flags));
+        assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
     }
 
 
@@ -118,17 +118,17 @@ public class TestRec_Vouch {
 
         //CREATE ISSUE ASSET TRANSACTION
         R_Vouch vouchRecord = new R_Vouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
-        vouchRecord.sign(maker, false);
+        vouchRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
-        byte[] rawR_Vouch = vouchRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        byte[] rawR_Vouch = vouchRecord.toBytes(Transaction.FOR_NETWORK, true);
 
         //CHECK DATA LENGTH
-        assertEquals(rawR_Vouch.length, vouchRecord.getDataLength(false, true));
+        assertEquals(rawR_Vouch.length, vouchRecord.getDataLength(Transaction.FOR_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
-            R_Vouch parsedR_Vouch = (R_Vouch) TransactionFactory.getInstance().parse(rawR_Vouch, releaserReference);
+            R_Vouch parsedR_Vouch = (R_Vouch) TransactionFactory.getInstance().parse(rawR_Vouch, Transaction.FOR_NETWORK);
 
             //CHECK INSTANCE
             assertEquals(true, parsedR_Vouch instanceof R_Vouch);
@@ -158,11 +158,11 @@ public class TestRec_Vouch {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawR_Vouch = new byte[vouchRecord.getDataLength(false, true)];
+        rawR_Vouch = new byte[vouchRecord.getDataLength(Transaction.FOR_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
-            TransactionFactory.getInstance().parse(rawR_Vouch, releaserReference);
+            TransactionFactory.getInstance().parse(rawR_Vouch, Transaction.FOR_NETWORK);
 
             //FAIL
             fail("this should throw an exception");
@@ -192,8 +192,8 @@ public class TestRec_Vouch {
 		block.addTransaction(vouchRecord);
 		block.process(db);
 		 */
-        vouchRecord.setDC(db,false);
-        vouchRecord.process(gb, false);
+        vouchRecord.setDC(db,Transaction.FOR_NETWORK);
+        vouchRecord.process(gb, Transaction.FOR_NETWORK);
 
         Tuple2<Integer, Integer> ggg = new Tuple2<Integer, Integer>(height, seq);
 
@@ -208,7 +208,7 @@ public class TestRec_Vouch {
 
 		 */
 
-        vouchRecord.orphan(false);
+        vouchRecord.orphan(Transaction.FOR_NETWORK);
 
         value = db.getVouchRecordMap().get(height, seq);
         assertEquals(value, new Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>>(
