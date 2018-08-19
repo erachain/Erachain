@@ -294,9 +294,9 @@ public abstract class TransactionAmount extends Transaction {
     // PARSE/CONVERT
     // @Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
         
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
         
         // WRITE RECIPIENT
         data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
@@ -377,9 +377,9 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         // IF VERSION 1 (amount = null)
-        return (asPack ? BASE_LENGTH_AS_PACK : BASE_LENGTH)
+        return (withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH)
                 - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
     
@@ -1100,13 +1100,12 @@ public abstract class TransactionAmount extends Transaction {
     @Override
     public int calcBaseFee() {
         
-        if (//this.height < BlockChain.SEND_AMOUNT_FEE_UP ||
+        if (this.height < BlockChain.ALL_BALANCES_OK_TO ||
                 this.amount == null)
             return calcCommonFee();
-        
-        return calcCommonFee() + (BlockChain.FEE_PER_BYTE * 200); // for
-                                                                  // calculate
-                                                                  // balance
+
+        // v.4.11 FEE UP
+        return calcCommonFee() + (BlockChain.FEE_PER_BYTE * 200);
     }
     
 }

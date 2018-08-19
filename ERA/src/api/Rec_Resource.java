@@ -324,7 +324,8 @@ public class Rec_Resource {
             // all test a not valid for main test
             // all other network must be invalid here!
             int port = Controller.getInstance().getNetworkPort();
-            return Base58.encode(Bytes.concat(record.toBytes(false, null), Ints.toByteArray(port)));
+            return Base58.encode(Bytes.concat(record.toBytes(Transaction.FOR_NETWORK, false),
+                    Ints.toByteArray(port)));
 
         } catch (Exception e) {
             //LOGGER.info(e);

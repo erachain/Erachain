@@ -18,7 +18,7 @@ public class TransactionFactory {
         return instance;
     }
 
-    public Transaction parse(byte[] data, Long releaserReference) throws Exception {
+    public Transaction parse(byte[] data, int asDeal) throws Exception {
         //READ TYPE
         int type = Byte.toUnsignedInt(data[0]);
         //LOGGER.info(" 1: " + parsedAssetTransfer.getKey() );
@@ -28,7 +28,7 @@ public class TransactionFactory {
             case Transaction.SIGN_NOTE_TRANSACTION:
 
                 //PARSE PAYMENT TRANSACTION
-                return R_SignNote.Parse(data, releaserReference);
+                return R_SignNote.Parse(data, asDeal);
 
             case Transaction.REGISTER_NAME_TRANSACTION:
 
@@ -63,12 +63,12 @@ public class TransactionFactory {
             case Transaction.VOTE_ON_POLL_TRANSACTION:
 
                 //PARSE CREATE POLL VOTE
-                return VoteOnPollTransaction.Parse(data, releaserReference);
+                return VoteOnPollTransaction.Parse(data, asDeal);
 
             case Transaction.VOTE_ON_ITEM_POLL_TRANSACTION:
 
                 //PARSE CREATE ITEM POLL VOTE
-                return VoteOnItemPollTransaction.Parse(data, releaserReference);
+                return VoteOnItemPollTransaction.Parse(data, asDeal);
 
             case Transaction.ARBITRARY_TRANSACTION:
 
@@ -78,17 +78,17 @@ public class TransactionFactory {
             case Transaction.CREATE_ORDER_TRANSACTION:
 
                 //PARSE ORDER CREATION TRANSACTION
-                return CreateOrderTransaction.Parse(data, releaserReference);
+                return CreateOrderTransaction.Parse(data, asDeal);
 
             case Transaction.CANCEL_ORDER_TRANSACTION:
 
                 //PARSE ORDER CANCEL
-                return CancelOrderTransaction.Parse(data, releaserReference);
+                return CancelOrderTransaction.Parse(data, asDeal);
 
             case Transaction.MULTI_PAYMENT_TRANSACTION:
 
                 //PARSE MULTI PAYMENT
-                return MultiPaymentTransaction.Parse(data, releaserReference);
+                return MultiPaymentTransaction.Parse(data, asDeal);
 
             case Transaction.DEPLOY_AT_TRANSACTION:
                 return DeployATTransaction.Parse(data);
@@ -96,13 +96,13 @@ public class TransactionFactory {
             case Transaction.SEND_ASSET_TRANSACTION:
 
                 // PARSE MESSAGE TRANSACTION
-                return R_Send.Parse(data, releaserReference);
+                return R_Send.Parse(data, asDeal);
 
             case Transaction.HASHES_RECORD:
 
 
                 // PARSE ACCOUNTING TRANSACTION V3
-                return R_Hashes.Parse(data, releaserReference);
+                return R_Hashes.Parse(data, asDeal);
 				
 				/*
 		case Transaction.JSON_TRANSACTION:
@@ -115,57 +115,57 @@ public class TransactionFactory {
             case Transaction.VOUCH_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_Vouch.Parse(data, releaserReference);
+                return R_Vouch.Parse(data, asDeal);
 
             case Transaction.SET_STATUS_TO_ITEM_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_SetStatusToItem.Parse(data, releaserReference);
+                return R_SetStatusToItem.Parse(data, asDeal);
 
             case Transaction.SET_UNION_TO_ITEM_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_SetUnionToItem.Parse(data, releaserReference);
+                return R_SetUnionToItem.Parse(data, asDeal);
 
             case Transaction.CERTIFY_PUB_KEYS_TRANSACTION:
 
                 //PARSE CERTIFY PERSON TRANSACTION
-                return R_SertifyPubKeys.Parse(data, releaserReference);
+                return R_SertifyPubKeys.Parse(data, asDeal);
 
             case Transaction.ISSUE_ASSET_TRANSACTION:
 
                 //PARSE ISSUE ASSET TRANSACTION
-                return IssueAssetTransaction.Parse(data, releaserReference);
+                return IssueAssetTransaction.Parse(data, asDeal);
 
             case Transaction.ISSUE_IMPRINT_TRANSACTION:
 
                 //PARSE ISSUE IMPRINT TRANSACTION
-                return IssueImprintRecord.Parse(data, releaserReference);
+                return IssueImprintRecord.Parse(data, asDeal);
 
             case Transaction.ISSUE_TEMPLATE_TRANSACTION:
 
                 //PARSE ISSUE PLATE TRANSACTION
-                return IssueTemplateRecord.Parse(data, releaserReference);
+                return IssueTemplateRecord.Parse(data, asDeal);
 
             case Transaction.ISSUE_PERSON_TRANSACTION:
 
                 //PARSE ISSUE PERSON TRANSACTION
-                return IssuePersonRecord.Parse(data, releaserReference);
+                return IssuePersonRecord.Parse(data, asDeal);
 
             case Transaction.ISSUE_POLL_TRANSACTION:
 
                 //PARSE ISSUE POLL TRANSACTION
-                return IssuePollRecord.Parse(data, releaserReference);
+                return IssuePollRecord.Parse(data, asDeal);
 
             case Transaction.ISSUE_STATUS_TRANSACTION:
 
                 //PARSE ISSUE PLATE TRANSACTION
-                return IssueStatusRecord.Parse(data, releaserReference);
+                return IssueStatusRecord.Parse(data, asDeal);
 
             case Transaction.ISSUE_UNION_TRANSACTION:
 
                 //PARSE ISSUE PLATE TRANSACTION
-                return IssueUnionRecord.Parse(data, releaserReference);
+                return IssueUnionRecord.Parse(data, asDeal);
 
 		/*
 		case Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION:

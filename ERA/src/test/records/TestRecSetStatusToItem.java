@@ -140,10 +140,10 @@ public class TestRecSetStatusToItem {
         setStatusTransaction.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueStatusTransaction = setStatusTransaction.toBytes(true, null);
+        byte[] rawIssueStatusTransaction = setStatusTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueStatusTransaction.length, setStatusTransaction.getDataLength(false));
+        assertEquals(rawIssueStatusTransaction.length, setStatusTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         R_SetStatusToItem parsedSetStatusTransaction = null;
         try {
@@ -156,7 +156,8 @@ public class TestRecSetStatusToItem {
         }
 
         //CHECK LEN
-        assertEquals(parsedSetStatusTransaction.getDataLength(false), setStatusTransaction.getDataLength(false));
+        assertEquals(parsedSetStatusTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true),
+                setStatusTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         //CHECK INSTANCE
         assertEquals(true, parsedSetStatusTransaction instanceof R_SetStatusToItem);

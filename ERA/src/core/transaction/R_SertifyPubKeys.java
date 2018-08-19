@@ -128,12 +128,17 @@ public class R_SertifyPubKeys extends Transaction {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
-        boolean asPack = releaserReference != null;
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -142,22 +147,17 @@ public class R_SertifyPubKeys extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -165,7 +165,7 @@ public class R_SertifyPubKeys extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -301,7 +301,7 @@ public class R_SertifyPubKeys extends Transaction {
     public void signUserAccounts(List<PrivateKeyAccount> userPrivateAccounts) {
         byte[] data;
         // use this.reference in any case
-        data = this.toBytes(false, null);
+        data = this.toBytes(FOR_NETWORK, false);
         if (data == null) return;
 
         // all test a not valid for main test
@@ -325,9 +325,9 @@ public class R_SertifyPubKeys extends Transaction {
 
     //@Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE PERSON KEY
         byte[] keyBytes = Longs.toByteArray(this.key);
@@ -339,7 +339,7 @@ public class R_SertifyPubKeys extends Transaction {
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             data = Bytes.concat(data, publicAccount.getPublicKey());
 
-            if (withSign & this.getVersion() == 1) {
+            if (withSignature & this.getVersion() == 1) {
                 data = Bytes.concat(data, this.sertifiedSignatures.get(i++));
             }
         }
@@ -351,9 +351,9 @@ public class R_SertifyPubKeys extends Transaction {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         // not include reference
-        int len = asPack ? BASE_LENGTH_AS_PACK : BASE_LENGTH;
+        int len = withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH;
         int accountsSize = this.sertifiedPublicKeys.size();
         len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;
         return this.typeBytes[1] == 1 ? len + Transaction.SIGNATURE_LENGTH * accountsSize : len;
@@ -385,7 +385,7 @@ public class R_SertifyPubKeys extends Transaction {
             }
         }
 
-        byte[] data = this.toBytes(false, null);
+        byte[] data = this.toBytes(Transaction.FOR_NETWORK, false);
         if (data == null) return false;
 
         // all test a not valid for main test

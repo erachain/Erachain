@@ -164,7 +164,7 @@ public class TestRec_Send {
             r_Send.setBlock(this.gb, 1);
             assertEquals(r_Send.isValid(null, flags), Transaction.VALIDATE_OK);
             
-            raw_r_Send = r_Send.toBytes(true, null);
+            raw_r_Send = r_Send.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
             r_Send_2 = null;
             try {
@@ -201,7 +201,7 @@ public class TestRec_Send {
             );
             r_Send.sign(maker, false);
             
-            raw_r_Send = r_Send.toBytes(true, null);
+            raw_r_Send = r_Send.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
             r_Send_2 = null;
             try {
@@ -366,7 +366,7 @@ public class TestRec_Send {
             r_Send.setBlock(gb, 1);
             assertEquals(r_Send.isValid(null, flags), Transaction.VALIDATE_OK);
             
-            raw_r_Send = r_Send.toBytes(true, null);
+            raw_r_Send = r_Send.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
             r_Send_2 = null;
             try {
@@ -403,7 +403,7 @@ public class TestRec_Send {
             );
             r_Send.sign(maker, false);
             
-            raw_r_Send = r_Send.toBytes(true, null);
+            raw_r_Send = r_Send.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
             r_Send_2 = null;
             try {
@@ -519,9 +519,9 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(1090).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
         assertEquals(BigDecimal.valueOf(1010).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
-        byte[] rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
-        int dd = r_SendV3.getDataLength(false);
-        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(false));
+        byte[] rawMessageTransactionV3 = r_SendV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        int dd = r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true);
+        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
 
         R_Send messageTransactionV3_2 = null;
@@ -567,9 +567,9 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
-        rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
-        dd = r_SendV3.getDataLength(false);
-        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(false));
+        rawMessageTransactionV3 = r_SendV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        dd = r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true);
+        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
 
         messageTransactionV3_2 = null;
@@ -615,9 +615,9 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(1090).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
         assertEquals(BigDecimal.valueOf(1010).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
-        rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
-        dd = r_SendV3.getDataLength(false);
-        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(false));
+        rawMessageTransactionV3 = r_SendV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        dd = r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true);
+        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
 
         messageTransactionV3_2 = null;
@@ -660,9 +660,9 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
-        rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
-        dd = r_SendV3.getDataLength(false);
-        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(false));
+        rawMessageTransactionV3 = r_SendV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        dd = r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true);
+        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
 
         messageTransactionV3_2 = null;
@@ -706,9 +706,8 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
         assertEquals(BigDecimal.valueOf(1010).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(ERA_KEY, db));
 
-        rawMessageTransactionV3 = r_SendV3.toBytes(true, null);
-        dd = r_SendV3.getDataLength(false);
-        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(false));
+        dd = r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true);
+        assertEquals(rawMessageTransactionV3.length, r_SendV3.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             messageTransactionV3_2 = (R_Send) R_Send.Parse(rawMessageTransactionV3, releaserReference);
@@ -794,7 +793,7 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(120).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient2.getBalanceUSE(assetKeyTest, db));
         assertEquals(BigDecimal.valueOf(201).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient3.getBalanceUSE(assetKeyTest, db));
 
-        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
+        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
         try {
@@ -865,7 +864,7 @@ public class TestRec_Send {
         assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(assetKeyTest, db));
 
 
-        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(true, null);
+        byte[] rawArbitraryTransactionV3 = arbitraryTransactionV3.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         ArbitraryTransactionV3 arbitraryTransactionV3_2 = null;
         try {
@@ -896,14 +895,14 @@ public class TestRec_Send {
         /// DISCREDIR_ADDRESSES
         R_Send r_Send = new R_Send(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l);
 
-        byte[] data = r_Send.toBytes(false, null);
+        byte[] data = r_Send.toBytes(, Transaction.FOR_DEAL_SIGN);
         int port = Controller.getInstance().getNetworkPort();
         data = Bytes.concat(data, Ints.toByteArray(port));
         byte[] digest = Crypto.getInstance().digest(data);
         digest = Bytes.concat(digest, digest);
 
         R_Send r_SendSigned = new R_Send(maker, FEE_POWER, recipient, era_key, amount, "", null, isText, encrypted, timestamp, 1l, digest);
-        String raw = Base58.encode(r_SendSigned.toBytes(true, null));
+        String raw = Base58.encode(r_SendSigned.toBytes(, Transaction.FOR_DEAL_NETWORK));
         System.out.print(raw);
 
         //DCSet dcSet = DCSet.getInstance();

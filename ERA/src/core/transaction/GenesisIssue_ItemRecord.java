@@ -60,9 +60,9 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
     //public abstract Transaction Parse(byte[] data);
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE ITEM
         // without reference
@@ -72,7 +72,7 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         // not include item REFERENCE
         return BASE_LENGTH + this.item.getDataLength(false);
     }

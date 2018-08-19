@@ -222,10 +222,10 @@ public class TestRecUnion {
         issueUnionTransaction.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueUnionRecord = issueUnionTransaction.toBytes(true, null);
+        byte[] rawIssueUnionRecord = issueUnionTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueUnionRecord.length, issueUnionTransaction.getDataLength(false));
+        assertEquals(rawIssueUnionRecord.length, issueUnionTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         IssueUnionRecord parsedIssueUnionRecord = null;
         try {
@@ -267,7 +267,7 @@ public class TestRecUnion {
         assertEquals(union.getParent(), parsedUnion.getParent());
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssueUnionRecord = new byte[issueUnionTransaction.getDataLength(false)];
+        rawIssueUnionRecord = new byte[issueUnionTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES

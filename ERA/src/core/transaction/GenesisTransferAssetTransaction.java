@@ -200,7 +200,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
         //byte[] data = new byte[0];
 
         //WRITE TYPE
@@ -229,7 +229,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         return BASE_LENGTH + (this.key < 0 ? OWNER_LENGTH : 0);
     }
 

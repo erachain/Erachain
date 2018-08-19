@@ -150,7 +150,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
         byte[] data = new byte[0];
 
         // WRITE TYPE
@@ -196,13 +196,14 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         data = Bytes.concat(data, feePowBytes);
 
         // SIGNATURE
-        if (withSign) data = Bytes.concat(data, this.signature);
+        if (withSignature)
+            data = Bytes.concat(data, this.signature);
 
         return data;
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         int paymentsLength = 0;
         for (Payment payment : this.getPayments()) {
             paymentsLength += payment.getDataLength();

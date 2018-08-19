@@ -210,7 +210,7 @@ public class BlockGenerator extends Thread implements Observer {
                 }
 
                 //CHECK IF ENOUGH ROOM
-                totalBytes += transaction.getDataLength(false);
+                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
 
                 if (totalBytes > MAX_BLOCK_SIZE_BYTE
                         || ++counter > MAX_BLOCK_SIZE) {

@@ -106,12 +106,17 @@ public class IssueStatementRecord extends Transaction {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
-        boolean asPack = releaserReference != null;
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -356,9 +361,9 @@ public class IssueStatementRecord extends Transaction {
 
     //@Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         if (this.key > 0) {
             //WRITE KEY
@@ -387,14 +392,14 @@ public class IssueStatementRecord extends Transaction {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
         if (this.key > 0)
             add_len += KEY_LENGTH;
 
-        if (asPack) {
+        if (withSignature) {
             return BASE_LENGTH_AS_PACK + add_len;
         } else {
             return BASE_LENGTH + add_len;

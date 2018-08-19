@@ -121,10 +121,10 @@ public class TestRec_Vouch {
         vouchRecord.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawR_Vouch = vouchRecord.toBytes(true, null);
+        byte[] rawR_Vouch = vouchRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawR_Vouch.length, vouchRecord.getDataLength(false));
+        assertEquals(rawR_Vouch.length, vouchRecord.getDataLength(false, true));
 
         try {
             //PARSE FROM BYTES
@@ -158,7 +158,7 @@ public class TestRec_Vouch {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawR_Vouch = new byte[vouchRecord.getDataLength(false)];
+        rawR_Vouch = new byte[vouchRecord.getDataLength(false, true)];
 
         try {
             //PARSE FROM BYTES

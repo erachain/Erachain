@@ -85,10 +85,10 @@ public class TestRecGenesisPerson2 {
 
         //CONVERT TO BYTES
         //LOGGER.info("CREATOR: " + genesisIssuePersonTransaction.getCreator().getPublicKey());
-        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(true, null);
+        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(false));
+        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
         //LOGGER.info("rawGenesisIssuePersonRecord.length") + ": + rawGenesisIssuePersonRecord.length);
 
         try {
@@ -112,7 +112,7 @@ public class TestRecGenesisPerson2 {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(false)];
+        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -140,10 +140,10 @@ public class TestRecGenesisPerson2 {
         initIssue(false);
 
         //CONVERT TO BYTES
-        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(true, null);
+        byte[] rawGenesisIssuePersonRecord = genesisIssuePersonTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(false));
+        assertEquals(rawGenesisIssuePersonRecord.length, genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -171,7 +171,7 @@ public class TestRecGenesisPerson2 {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(false)];
+        rawGenesisIssuePersonRecord = new byte[genesisIssuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES

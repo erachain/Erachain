@@ -17,8 +17,8 @@ public class TransactionSerializer implements Serializer<Transaction>, Serializa
 
     @Override
     public void serialize(DataOutput out, Transaction value) throws IOException {
-        out.writeInt(value.getDataLength(false));
-        out.write(value.toBytes(true, null));
+        out.writeInt(value.getDataLength(Transaction.FOR_DB_RECORD, true));
+        out.write(value.toBytes(Transaction.FOR_DB_RECORD, true));
     }
 
     @Override

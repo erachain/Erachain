@@ -53,14 +53,17 @@ public class RecordReleasePack extends Transaction {
 
     //public static String getName() { return "Multi Send"; }
 
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        boolean asPack = releaserReference != null;
-        int data_length = data.length;
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data_length < BASE_LENGTH_AS_PACK
-                | !asPack & data_length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -120,7 +123,7 @@ public class RecordReleasePack extends Transaction {
             Transaction transaction = tf_inct.parse(Arrays.copyOfRange(data, position, data_length), releaserReference);
             transactions.add(transaction);
 
-            position += transaction.getDataLength(true);
+            position += transaction.getDataLength(FOR_DEAL_SIGN, true);
         }
 
         if (!asPack) {
@@ -161,9 +164,9 @@ public class RecordReleasePack extends Transaction {
 
     //@Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, null);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE PAYMENTS SIZE
         int transactionsLength = this.transactions.size();
@@ -172,20 +175,20 @@ public class RecordReleasePack extends Transaction {
 
         //WRITE PAYMENTS
         for (Transaction transaction : this.transactions) {
-            data = Bytes.concat(data, transaction.toBytes(withSign, releaserReference));
+            data = Bytes.concat(data, transaction.toBytes(forDeal, false));
         }
 
         return data;
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         int transactionsLength = 0;
         for (Transaction transaction : this.getTransactions()) {
-            transactionsLength += transaction.getDataLength(asPack);
+            transactionsLength += transaction.getDataLength(forDeal, true);
         }
 
-        return asPack ? BASE_LENGTH_AS_PACK : BASE_LENGTH + transactionsLength;
+        return withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH + transactionsLength;
     }
 
     //VALIDATE

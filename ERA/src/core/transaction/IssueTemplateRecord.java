@@ -45,13 +45,17 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Template"; }
 
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        boolean asPack = releaserReference != null;
-
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 

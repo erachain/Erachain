@@ -66,13 +66,20 @@ public class R_Vouch extends Transaction {
 
     //public static String getName() { return "Send"; }
 
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        boolean asPack = releaserReference != null;
+        //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -81,22 +88,17 @@ public class R_Vouch extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -104,7 +106,7 @@ public class R_Vouch extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -161,9 +163,9 @@ public class R_Vouch extends Transaction {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE HEIGHT
         byte[] heightBytes = Ints.toByteArray(this.height);
@@ -179,9 +181,9 @@ public class R_Vouch extends Transaction {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         // not include item reference
-        if (asPack) {
+        if (withSignature) {
             return BASE_LENGTH_AS_PACK;
         } else {
             return BASE_LENGTH;

@@ -1,7 +1,6 @@
 package core.transaction;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -10,8 +9,6 @@ import java.util.Map;
 import core.item.assets.Order;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
@@ -20,7 +17,6 @@ import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
-import core.crypto.Base58;
 import core.crypto.Crypto;
 import datachain.DCSet;
 
@@ -92,12 +88,17 @@ public class CancelOrderTransaction extends Transaction {
 
     //PARSE CONVERT
 
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
-        boolean asPack = releaserReference != null;
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -106,22 +107,17 @@ public class CancelOrderTransaction extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -129,7 +125,7 @@ public class CancelOrderTransaction extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -149,8 +145,8 @@ public class CancelOrderTransaction extends Transaction {
 
     //@Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
-        byte[] data = super.toBytes(withSign, releaserReference);
+    public byte[] toBytes(int forDeal, boolean withSignature) {
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE ORDER
         //byte[] orderBytes = this.orderSignature;
@@ -220,7 +216,7 @@ public class CancelOrderTransaction extends Transaction {
     //PROCESS/ORPHAN
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         return BASE_LENGTH;
     }
 

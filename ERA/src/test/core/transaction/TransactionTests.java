@@ -149,7 +149,7 @@ String  s= "";
         payment.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawPayment = payment.toBytes(true, null);
+        byte[] rawPayment = payment.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -180,7 +180,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPayment = new byte[payment.getDataLength(false)];
+        rawPayment = new byte[payment.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -364,7 +364,7 @@ String  s= "";
         nameRegistration.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawNameRegistration = nameRegistration.toBytes(true, null);
+        byte[] rawNameRegistration = nameRegistration.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -401,7 +401,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNameRegistration = new byte[nameRegistration.getDataLength(false)];
+        rawNameRegistration = new byte[nameRegistration.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -569,7 +569,7 @@ String  s= "";
         nameUpdate.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawNameUpdate = nameUpdate.toBytes(true, null);
+        byte[] rawNameUpdate = nameUpdate.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -609,7 +609,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNameUpdate = new byte[nameUpdate.getDataLength(false)];
+        rawNameUpdate = new byte[nameUpdate.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -816,7 +816,7 @@ String  s= "";
         nameSaleTransaction.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawNameSale = nameSaleTransaction.toBytes(true, null);
+        byte[] rawNameSale = nameSaleTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -853,7 +853,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNameSale = new byte[nameSaleTransaction.getDataLength(false)];
+        rawNameSale = new byte[nameSaleTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -1053,7 +1053,7 @@ String  s= "";
         cancelNameSaleTransaction.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawCancelNameSale = cancelNameSaleTransaction.toBytes(true, null);
+        byte[] rawCancelNameSale = cancelNameSaleTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -1087,7 +1087,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawCancelNameSale = new byte[cancelNameSaleTransaction.getDataLength(false)];
+        rawCancelNameSale = new byte[cancelNameSaleTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -1316,7 +1316,7 @@ String  s= "";
         BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(maker, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, last_ref);
         namePurchaseTransaction.sign(maker, false);
         //CONVERT TO BYTES
-        byte[] rawNamePurchase = namePurchaseTransaction.toBytes(true, null);
+        byte[] rawNamePurchase = namePurchaseTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -1350,7 +1350,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawNamePurchase = new byte[namePurchaseTransaction.getDataLength(false)];
+        rawNamePurchase = new byte[namePurchaseTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -1575,7 +1575,7 @@ String  s= "";
         pollCreation.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawPollCreation = pollCreation.toBytes(true, null);
+        byte[] rawPollCreation = pollCreation.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -1621,7 +1621,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPollCreation = new byte[pollCreation.getDataLength(false)];
+        rawPollCreation = new byte[pollCreation.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -1791,8 +1791,8 @@ String  s= "";
         pollVote.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawPollVote = pollVote.toBytes(true, null);
-        assertEquals(rawPollVote.length, pollVote.getDataLength(false));
+        byte[] rawPollVote = pollVote.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        assertEquals(rawPollVote.length, pollVote.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -1829,7 +1829,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPollVote = new byte[pollVote.getDataLength(false)];
+        rawPollVote = new byte[pollVote.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -1998,7 +1998,7 @@ String  s= "";
         arbitraryTransaction.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawArbitraryTransaction = arbitraryTransaction.toBytes(true, null);
+        byte[] rawArbitraryTransaction = arbitraryTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         try {
             //PARSE FROM BYTES
@@ -2035,7 +2035,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawArbitraryTransaction = new byte[arbitraryTransaction.getDataLength(false)];
+        rawArbitraryTransaction = new byte[arbitraryTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -2182,10 +2182,10 @@ String  s= "";
         issueAssetTransaction.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(true, null);
+        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(false));
+        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -2231,7 +2231,7 @@ String  s= "";
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(false)];
+        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES

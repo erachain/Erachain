@@ -2,6 +2,7 @@ package core.transCalculated;
 
 import java.util.Arrays;
 
+import core.transaction.Transaction;
 import org.json.simple.JSONObject;
 
 import com.google.common.primitives.Bytes;
@@ -54,12 +55,18 @@ public class CalculatedCounter extends Calculated {
         
         return data;
     }
-    
-    public static Calculated Parse(byte[] data) throws Exception {
 
-        //
-        // CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH) {
+    public static Calculated Parse(byte[] data, int asDeal) throws Exception {
+
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH - Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 

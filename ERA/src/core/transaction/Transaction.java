@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lang.Lang;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -76,6 +75,13 @@ public abstract class Transaction {
      * };
      */
 
+    // toBYTE & PARSE fields for different DEALs
+    public static final int FOR_MYPACK = 1; // not use this.timestamp & this.feePow
+    public static final int FOR_PACK = 2; // not use feePow
+    public static final int FOR_NETWORK = 3; // use all (but not calcalated)
+    public static final int FOR_DB_RECORD = 4; // use all + calcalated fields (FEE, BlockNo + SeqNo)
+
+    // FLAGS for VALIDATING
     public static final long NOT_VALIDATE_FLAG_FEE = 1l;
     public static final long NOT_VALIDATE_FLAG_PERSONAL = 2l;
     public static final long NOT_VALIDATE_FLAG_PUBLIC_TEXT = 4l;
@@ -334,6 +340,7 @@ public abstract class Transaction {
     public static final int ENCRYPTED_LENGTH = 1;
     public static final int IS_TEXT_LENGTH = 1;
     protected static final int FEE_POWER_LENGTH = 1;
+    public static final int FEE_LENGTH = 4;
     // protected static final int HKEY_LENGTH = 20;
     public static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH
@@ -631,7 +638,7 @@ public abstract class Transaction {
     public abstract boolean hasPublicText();
 
     public int calcCommonFee() {
-        int len = this.getDataLength(false);
+        int len = this.getDataLength(Transaction.FOR_NETWORK, true);
 
         // FEE_FOR_ANONIMOUSE !
         /// if (this.getBlockHeightByParent(db))
@@ -873,8 +880,8 @@ public abstract class Transaction {
         return timestamp < 1000 ? "null" : DateTimeFormat.timestamptoString(timestamp);
     }
 
-    public int viewSize(boolean asPack) {
-        return getDataLength(asPack);
+    public int viewSize(int forDeal) {
+        return getDataLength(forDeal, true);
     }
 
     // PARSE/CONVERT
@@ -943,7 +950,7 @@ public abstract class Transaction {
             }
         }
 
-        transaction.put("size", this.viewSize(false));
+        transaction.put("size", this.viewSize(Transaction.FOR_NETWORK));
         return transaction;
     }
 
@@ -975,17 +982,17 @@ public abstract class Transaction {
         boolean isSigned = this.signature != null;
         transaction.put("signature", isSigned ? Base58.encode(this.signature) : "null");
 
-        transaction.put("raw", Base58.encode(this.toBytes(isSigned, null)));
+        transaction.put("raw", Base58.encode(this.toBytes(FOR_NETWORK, isSigned)));
 
         return transaction;
     }
 
-    public void sign(PrivateKeyAccount creator, boolean asPack) {
+    public void sign(PrivateKeyAccount creator, int forDeal) {
 
         // use this.reference in any case and for Pack too
         // but not with SIGN
         boolean withSign = false;
-        byte[] data = this.toBytes(withSign, null);
+        byte[] data = this.toBytes(forDeal, false);
         if (data == null)
             return;
 
@@ -1007,23 +1014,23 @@ public abstract class Transaction {
 
     // releaserReference == null - not as pack
     // releaserReference = reference of releaser - as pack
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        boolean asPack = releaserReference != null;
+        //boolean asPack = releaserReference != null;
 
         byte[] data = new byte[0];
 
         // WRITE TYPE
         data = Bytes.concat(data, this.typeBytes);
 
-        if (!asPack) {
+        if (forDeal > FOR_MYPACK) {
             // WRITE TIMESTAMP
             byte[] timestampBytes = Longs.toByteArray(this.timestamp);
             timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
             data = Bytes.concat(data, timestampBytes);
         }
 
-        // WRITE REFERENCE - in any case as Pack or not
+        // WRITE REFERENCE - in any case as Pack or not - NOW it reserved FLAGS
         if (this.reference != null) {
             // NULL in imprints
             byte[] referenceBytes = Longs.toByteArray(this.reference);
@@ -1034,7 +1041,7 @@ public abstract class Transaction {
         // WRITE CREATOR
         data = Bytes.concat(data, this.creator.getPublicKey());
 
-        if (!asPack) {
+        if (forDeal > FOR_PACK) {
             // WRITE FEE POWER
             byte[] feePowBytes = new byte[1];
             feePowBytes[0] = this.feePow;
@@ -1042,14 +1049,14 @@ public abstract class Transaction {
         }
 
         // SIGNATURE
-        if (withSign)
+        if (withSignature)
             data = Bytes.concat(data, this.signature);
 
         return data;
 
     }
 
-    public abstract int getDataLength(boolean asPack);
+    public abstract int getDataLength(int forDeal, boolean withSignature);
 
     // PROCESS/ORPHAN
 
@@ -1069,7 +1076,7 @@ public abstract class Transaction {
             return false;
 
         // validation with reference - not as a pack in toBytes - in any case!
-        byte[] data = this.toBytes(false, null);
+        byte[] data = this.toBytes(FOR_NETWORK, false);
         if (data == null)
             return false;
 
@@ -1290,7 +1297,7 @@ public abstract class Transaction {
 
     public Transaction copy() {
         try {
-            return TransactionFactory.getInstance().parse(this.toBytes(true, null), null);
+            return TransactionFactory.getInstance().parse(this.toBytes(FOR_NETWORK, true), Transaction.FOR_NETWORK);
         } catch (Exception e) {
             return null;
         }

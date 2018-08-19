@@ -206,9 +206,9 @@ public class R_SendResource {
 
         String str;
         if (rawbase == 64)
-            out.put("raw64", Base64.getEncoder().encodeToString(transaction.toBytes(true, null)));
+            out.put("raw64", Base64.getEncoder().encodeToString(transaction.toBytes(Transaction.FOR_NETWORK, false)));
         else
-            out.put("raw", Base58.encode(transaction.toBytes(true, null)));
+            out.put("raw", Base58.encode(transaction.toBytes(Transaction.FOR_NETWORK, false)));
 
         return out.toJSONString();
 

@@ -20,7 +20,7 @@ public class TelegramMessage extends Message {
         //PARSE TRANSACTION
         int length = data.length;
 
-        Transaction transaction = TransactionFactory.getInstance().parse(data, null);
+        Transaction transaction = TransactionFactory.getInstance().parse(data, Transaction.FOR_NETWORK);
 
         return new TelegramMessage(transaction);
     }
@@ -37,7 +37,7 @@ public class TelegramMessage extends Message {
         byte[] data = new byte[0];
 
         //WRITE BLOCK
-        byte[] telegramBytes = this.transaction.toBytes(true, null);
+        byte[] telegramBytes = this.transaction.toBytes(Transaction.FOR_NETWORK, true);
         data = Bytes.concat(data, telegramBytes);
 
         //ADD CHECKSUM
@@ -73,7 +73,7 @@ public class TelegramMessage extends Message {
 
     @Override
     public int getDataLength() {
-        return this.transaction.getDataLength(false);
+        return this.transaction.getDataLength(Transaction.FOR_NETWORK, true);
     }
 
 }

@@ -114,12 +114,19 @@ public class R_SignNote extends Transaction {
 
     // releaserReference = null - not a pack
     // releaserReference = reference for releaser account - it is as pack
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
-        boolean asPack = releaserReference != null;
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+        //boolean asPack = asDeal != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -128,22 +135,17 @@ public class R_SignNote extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference = null;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -151,7 +153,7 @@ public class R_SignNote extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -502,9 +504,9 @@ public class R_SignNote extends Transaction {
 
     //@Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         if (this.key > 0) {
             //WRITE KEY
@@ -556,14 +558,14 @@ public class R_SignNote extends Transaction {
 	 */
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
         if (this.key > 0)
             add_len += KEY_LENGTH;
 
-        if (asPack) {
+        if (withSignature) {
             return BASE_LENGTH_AS_PACK + add_len;
         } else {
             return BASE_LENGTH + add_len;

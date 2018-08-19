@@ -93,7 +93,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
         detailGBC.gridy = componentLevel++;
         JTextField shorn_Info = new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
                 + " [" + record.viewHeightSeq(dcSet) + " "
-                + String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
+                + String.valueOf(record.getDataLength(Transaction.FOR_DEAL_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
                 + "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + record.getConfirmations(dcSet));
         shorn_Info.setEditable(false);
@@ -184,7 +184,7 @@ public class Rec_DetailsFrame extends JPanel //JFrame
 
         new JTextField(DateTimeFormat.timestamptoString(record.getTimestamp())
 
-                + String.valueOf(record.getDataLength(false)) + "^" + String.valueOf(record.getFeePow())
+                + String.valueOf(record.getDataLength(Transaction.FOR_DEAL_NETWORK, true)) + "^" + String.valueOf(record.getFeePow())
                 + "=" + record.getFeeLong() //+ ">>" + core.item.assets.AssetCls.FEE_ABBREV
                 + ">>" + record.getConfirmations(dcSet));
 

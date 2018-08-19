@@ -114,7 +114,7 @@ public class UpdateNameTransaction extends Transaction {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
         byte[] data = new byte[0];
 
         //WRITE TYPE
@@ -146,13 +146,14 @@ public class UpdateNameTransaction extends Transaction {
         data = Bytes.concat(data, feePowBytes);
 
         //SIGNATURE
-        if (withSign) data = Bytes.concat(data, this.signature);
+        if (withSignature)
+            data = Bytes.concat(data, this.signature);
 
         return data;
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         return BASE_LENGTH + this.name.getDataLength();
     }
 

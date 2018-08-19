@@ -52,8 +52,8 @@ public abstract class AddressItem_Refs extends Transaction {
 
     //@Override
     @Override
-    public void sign(PrivateKeyAccount creator, boolean asPack) {
-        super.sign(creator, asPack);
+    public void sign(PrivateKeyAccount creator, int forDeal) {
+        super.sign(creator, forDeal);
         // in IMPRINT reference already setted before sign
         if (this.item.getReference() == null) this.item.setReference(this.signature);
     }
@@ -74,8 +74,8 @@ public abstract class AddressItem_Refs extends Transaction {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
-        byte[] data = super.toBytes(withSign, releaserReference);
+    public byte[] toBytes(int forDeal, boolean withSignature) {
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         // without reference
         data = Bytes.concat(data, this.item.toBytes(false, false));
@@ -84,9 +84,9 @@ public abstract class AddressItem_Refs extends Transaction {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         // not include item reference
-        if (asPack) {
+        if (withSignature) {
             return BASE_LENGTH_AS_PACK + this.item.getDataLength(false);
         } else {
             return BASE_LENGTH + this.item.getDataLength(false);

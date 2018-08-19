@@ -15,7 +15,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
@@ -23,7 +22,7 @@ import static org.junit.Assert.*;
 public class TransactionTests3AssetsAsPack {
 
     static Logger LOGGER = Logger.getLogger(TransactionTests3AssetsAsPack.class.getName());
-    static boolean asPack = false;
+    static int asPack = Transaction.FOR_DEAL_NETWORK;
     Long releaserReference;
     long FEE_KEY = 1l;
     byte FEE_POWER = (byte) 1;
@@ -121,10 +120,10 @@ public class TransactionTests3AssetsAsPack {
         issueAssetTransaction.process(gb, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(true, releaserReference);
+        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(asPack));
+        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(asPack, true));
 
         try {
             //PARSE FROM BYTES
@@ -170,7 +169,7 @@ public class TransactionTests3AssetsAsPack {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(asPack)];
+        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(asPack, true)];
 
         try {
             //PARSE FROM BYTES
@@ -363,10 +362,10 @@ public class TransactionTests3AssetsAsPack {
         assetTransfer.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawAssetTransfer = assetTransfer.toBytes(true, releaserReference);
+        byte[] rawAssetTransfer = assetTransfer.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(asPack));
+        assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(asPack, true));
 
         try {
             //PARSE FROM BYTES
@@ -398,7 +397,7 @@ public class TransactionTests3AssetsAsPack {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawAssetTransfer = new byte[assetTransfer.getDataLength(asPack)];
+        rawAssetTransfer = new byte[assetTransfer.getDataLength(asPack, true)];
 
         try {
             //PARSE FROM BYTES
@@ -580,10 +579,10 @@ public class TransactionTests3AssetsAsPack {
         cancelOrderTransaction.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawCancelOrder = cancelOrderTransaction.toBytes(true, releaserReference);
+        byte[] rawCancelOrder = cancelOrderTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawCancelOrder.length, cancelOrderTransaction.getDataLength(asPack));
+        assertEquals(rawCancelOrder.length, cancelOrderTransaction.getDataLength(asPack, true));
 
         try {
             //PARSE FROM BYTES
@@ -617,7 +616,7 @@ public class TransactionTests3AssetsAsPack {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawCancelOrder = new byte[cancelOrderTransaction.getDataLength(asPack)];
+        rawCancelOrder = new byte[cancelOrderTransaction.getDataLength(asPack, true)];
 
         try {
             //PARSE FROM BYTES
@@ -752,7 +751,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(BigDecimal.valueOf(90).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), creator.getBalanceUSE(key, db));
         assertEquals(BigDecimal.valueOf(10).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), recipient.getBalanceUSE(key, db));
 
-        byte[] rawMessageTransaction = r_Send.toBytes(true, releaserReference);
+        byte[] rawMessageTransaction = r_Send.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         R_Send messageTransaction_2 = null;
         try {

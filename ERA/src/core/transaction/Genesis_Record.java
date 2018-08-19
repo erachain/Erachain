@@ -35,7 +35,7 @@ public class Genesis_Record extends Transaction {
     public void generateSignature() {
 
         //return generateSignature1(this.recipient, this.amount, this.timestamp);
-        byte[] data = this.toBytes(false, null);
+        byte[] data = this.toBytes(FOR_NETWORK, false);
 
         //DIGEST
         byte[] digest = Crypto.getInstance().digest(data);
@@ -58,7 +58,7 @@ public class Genesis_Record extends Transaction {
     //public abstract Transaction Parse(byte[] data);
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
         //WRITE TYPE in typeBytes[0]
         byte[] data = new byte[]{this.typeBytes[0]};
@@ -69,7 +69,7 @@ public class Genesis_Record extends Transaction {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         return BASE_LENGTH;
     }
 

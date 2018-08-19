@@ -244,7 +244,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
                 return transaction.getFee();
 
             case COLUMN_SIZE:
-                return transaction.viewSize(false);
+                return transaction.viewSize(Transaction.FOR_DEAL_NETWORK);
         }
 
         return null;

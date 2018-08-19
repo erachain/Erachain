@@ -2,6 +2,7 @@ package gui.transaction;
 
 import core.crypto.Base58;
 import core.transaction.Genesis_Record;
+import core.transaction.Transaction;
 import datachain.DCSet;
 import lang.Lang;
 import utils.MenuPopupUtil;
@@ -79,7 +80,7 @@ public class RecGenesis_DetailsFrame extends JPanel //JFrame
 
         //SIZE
         detailGBC.gridy = componentLevel;
-        JTextField feePow = new JTextField(String.valueOf(record.getDataLength(false)));
+        JTextField feePow = new JTextField(String.valueOf(record.getDataLength(Transaction.FOR_DEAL_NETWORK, true)));
         feePow.setEditable(false);
         MenuPopupUtil.installContextMenu(feePow);
         this.add(feePow, detailGBC);

@@ -67,12 +67,17 @@ public class VoteOnPollTransaction extends Transaction {
 
     //public static String getName() { return "Vote on Poll"; }
 
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
-        boolean asPack = releaserReference != null;
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -81,22 +86,17 @@ public class VoteOnPollTransaction extends Transaction {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-        Long reference;
-        if (!asPack) {
-            //READ REFERENCE
-            byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-            reference = Longs.fromByteArray(referenceBytes);
-            position += REFERENCE_LENGTH;
-        } else {
-            reference = releaserReference;
-        }
+        //READ REFERENCE
+        byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        Long reference = Longs.fromByteArray(referenceBytes);
+        position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -104,7 +104,7 @@ public class VoteOnPollTransaction extends Transaction {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -135,8 +135,10 @@ public class VoteOnPollTransaction extends Transaction {
         int option = Ints.fromByteArray(optionBytes);
         position += OPTION_SIZE_LENGTH;
 
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, feePow, timestamp, reference, signatureBytes);
+        } else if (asDeal > Transaction.FOR_MYPACK) {
+            //return new VoteOnPollTransaction(typeBytes, creator, poll, option, timestamp, reference, signatureBytes);
         } else {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, reference, signatureBytes);
         }
@@ -172,9 +174,9 @@ public class VoteOnPollTransaction extends Transaction {
     }
 
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
+    public byte[] toBytes(int forDeal, boolean withSignature) {
 
-        byte[] data = super.toBytes(withSign, releaserReference);
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE POLL SIZE
         byte[] pollBytes = this.poll.getBytes(StandardCharsets.UTF_8);
@@ -194,8 +196,8 @@ public class VoteOnPollTransaction extends Transaction {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
-        if (asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
+        if (withSignature) {
             return BASE_LENGTH_AS_PACK + this.poll.getBytes(StandardCharsets.UTF_8).length;
         } else {
             return BASE_LENGTH + this.poll.getBytes(StandardCharsets.UTF_8).length;

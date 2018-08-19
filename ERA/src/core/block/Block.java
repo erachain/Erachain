@@ -521,7 +521,7 @@ public class Block {
 
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
-                    Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, null);
+                    Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
                     transaction.setBlock(this, i + 1);
 
                     //ADD TO TRANSACTIONS
@@ -715,13 +715,13 @@ public class Block {
 
         for (Transaction transaction : this.getTransactions()) {
             //WRITE TRANSACTION LENGTH
-            int transactionLength = transaction.getDataLength(false);
+            int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
             byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
             transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
             data = Bytes.concat(data, transactionLengthBytes);
 
             //WRITE TRANSACTION
-            data = Bytes.concat(data, transaction.toBytes(true, null));
+            data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
         }
 
         return data;
@@ -761,7 +761,7 @@ public class Block {
         }
 
         for (Transaction transaction : this.getTransactions()) {
-            length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(false);
+            length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
         }
 
         return length;

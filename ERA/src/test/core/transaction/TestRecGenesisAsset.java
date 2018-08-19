@@ -74,10 +74,10 @@ public class TestRecGenesisAsset {
 
         //CONVERT TO BYTES
         //LOGGER.info("CREATOR: " + genesisIssueAssetTransaction.getCreator().getPublicKey());
-        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(true, null);
+        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(false));
+        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
         //LOGGER.info("rawGenesisIssueAssetTransaction.length") + ": + rawGenesisIssueAssetTransaction.length);
 
         try {
@@ -114,7 +114,7 @@ public class TestRecGenesisAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(false)];
+        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -134,10 +134,10 @@ public class TestRecGenesisAsset {
         initIssue(false);
 
         //CONVERT TO BYTES
-        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(true, null);
+        byte[] rawGenesisIssueAssetTransaction = genesisIssueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(false));
+        assertEquals(rawGenesisIssueAssetTransaction.length, genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -171,7 +171,7 @@ public class TestRecGenesisAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(false)];
+        rawGenesisIssueAssetTransaction = new byte[genesisIssueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -309,10 +309,10 @@ public class TestRecGenesisAsset {
         //genesisTransferAsset.process(db);
 
         //CONVERT TO BYTES
-        byte[] rawGenesisTransferAsset = genesisTransferAsset.toBytes(true, null);
+        byte[] rawGenesisTransferAsset = genesisTransferAsset.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawGenesisTransferAsset.length, genesisTransferAsset.getDataLength(false));
+        assertEquals(rawGenesisTransferAsset.length, genesisTransferAsset.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -339,7 +339,7 @@ public class TestRecGenesisAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawGenesisTransferAsset = new byte[genesisTransferAsset.getDataLength(false)];
+        rawGenesisTransferAsset = new byte[genesisTransferAsset.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -441,10 +441,10 @@ public class TestRecGenesisAsset {
         assertEquals(Transaction.VALIDATE_OK, assetTransfer.isValid(null, flags));
 
         /// PARSE
-        byte[] rawGenesisTransferAsset = assetTransfer.toBytes(true, null);
+        byte[] rawGenesisTransferAsset = assetTransfer.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawGenesisTransferAsset.length, assetTransfer.getDataLength(false));
+        assertEquals(rawGenesisTransferAsset.length, assetTransfer.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES

@@ -248,10 +248,10 @@ public class TestRecPerson {
         //issuePersonTransaction.process(db, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssuePersonRecord = issuePersonTransaction.toBytes(true, null);
+        byte[] rawIssuePersonRecord = issuePersonTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssuePersonRecord.length, issuePersonTransaction.getDataLength(false));
+        assertEquals(rawIssuePersonRecord.length, issuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         IssuePersonRecord parsedIssuePersonRecord = null;
         try {
@@ -300,7 +300,7 @@ public class TestRecPerson {
         assertEquals(person.getHeight(), parsedPerson.getHeight());
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssuePersonRecord = new byte[issuePersonTransaction.getDataLength(false)];
+        rawIssuePersonRecord = new byte[issuePersonTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -470,10 +470,10 @@ public class TestRecPerson {
         r_SertifyPubKeys.sign(certifier, false);
 
         //CONVERT TO BYTES
-        byte[] rawPersonTransfer = r_SertifyPubKeys.toBytes(true, releaserReference);
+        byte[] rawPersonTransfer = r_SertifyPubKeys.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawPersonTransfer.length, r_SertifyPubKeys.getDataLength(false));
+        assertEquals(rawPersonTransfer.length, r_SertifyPubKeys.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -515,7 +515,7 @@ public class TestRecPerson {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawPersonTransfer = new byte[r_SertifyPubKeys.getDataLength(false)];
+        rawPersonTransfer = new byte[r_SertifyPubKeys.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES

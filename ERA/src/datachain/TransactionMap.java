@@ -130,7 +130,7 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
             if (transaction.getDeadline() < timestamp || transaction.getTimestamp() > timestamp)
                 continue;
             
-            bytesTotal += transaction.getDataLength(false);
+            bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
             if (bytesTotal > core.BlockGenerator.MAX_BLOCK_SIZE_BYTE + (core.BlockGenerator.MAX_BLOCK_SIZE_BYTE >> 3)) {
                 break;
             }

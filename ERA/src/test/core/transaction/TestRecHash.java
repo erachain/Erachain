@@ -15,9 +15,6 @@ import core.account.PrivateKeyAccount;
 import core.block.GenesisBlock;
 import core.crypto.Crypto;
 import core.item.assets.AssetCls;
-import core.transaction.R_Hashes;
-import core.transaction.Transaction;
-import core.transaction.TransactionFactory;
 import datachain.DCSet;
 import datachain.HashesSignsMap;
 import ntp.NTP;
@@ -100,10 +97,10 @@ public class TestRecHash {
         hashesRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawHashesRecord = hashesRecord.toBytes(true, null);
+        byte[] rawHashesRecord = hashesRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(false));
+        assertEquals(rawHashesRecord.length, hashesRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         R_Hashes parsed = null;
         try {

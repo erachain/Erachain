@@ -224,10 +224,10 @@ public class TestRecPoll {
         issuePollTransaction.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssuePollRecord = issuePollTransaction.toBytes(true, null);
+        byte[] rawIssuePollRecord = issuePollTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssuePollRecord.length, issuePollTransaction.getDataLength(false));
+        assertEquals(rawIssuePollRecord.length, issuePollTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         IssuePollRecord parsedIssuePollRecord = null;
         try {
@@ -270,7 +270,7 @@ public class TestRecPoll {
         assertEquals(poll.getOptions().get(2), parsedPoll.getOptions().get(2));
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssuePollRecord = new byte[issuePollTransaction.getDataLength(false)];
+        rawIssuePollRecord = new byte[issuePollTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES

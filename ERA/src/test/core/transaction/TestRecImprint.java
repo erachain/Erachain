@@ -118,10 +118,10 @@ public class TestRecImprint {
         //issueImprintRecord.process(db, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueImprintTransaction = issueImprintRecord.toBytes(true, null);
+        byte[] rawIssueImprintTransaction = issueImprintRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueImprintTransaction.length, issueImprintRecord.getDataLength(false));
+        assertEquals(rawIssueImprintTransaction.length, issueImprintRecord.getDataLength(false, true));
 
         try {
             //PARSE FROM BYTES

@@ -2202,7 +2202,7 @@ public class BlockExplorer {
                 }
             }
 
-            transactionJSON.put("size", trans.viewSize(false));
+            transactionJSON.put("size", trans.viewSize(Transaction.FOR_NETWORK));
             transactionJSON.put("fee", trans.getFee());
             transactionJSON.put("confirmations", trans.getConfirmations(dcSet));
             transactionJSON.put("type", Lang.getInstance().translate_from_langObj(trans.viewFullTypeName(), langObj));

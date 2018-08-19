@@ -50,14 +50,20 @@ public class IssueImprintRecord extends Issue_ItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Imprint"; }
 
-    public static Transaction Parse(byte[] data, Long releaserReference) throws Exception {
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        boolean asPack = releaserReference != null;
+        //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH_AS_PACK
-                | !asPack & data.length < BASE_LENGTH
-                ) {
+        int test_len = BASE_LENGTH;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len -= Transaction.TIMESTAMP_LENGTH;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len += Transaction.FEE_POWER_LENGTH;
+        }
+        if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
 
@@ -66,22 +72,17 @@ public class IssueImprintRecord extends Issue_ItemRecord {
         int position = TYPE_LENGTH;
 
         long timestamp = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             //READ TIMESTAMP
             byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
             timestamp = Longs.fromByteArray(timestampBytes);
             position += TIMESTAMP_LENGTH;
         }
 
-		/*
-		byte[] reference = null;
-		if (!asPack && typeBytes[1] == 0) {
-			// in not PACKED and it is VERSION - 0
-			//READ REFERENCE
-			reference = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
-			position += REFERENCE_LENGTH;
-		}
-		 */
+        //READ REFERENCE
+        //byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
+        //Long reference = Longs.fromByteArray(referenceBytes);
+        //position += REFERENCE_LENGTH;
 
         //READ CREATOR
         byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
@@ -89,7 +90,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
         position += CREATOR_LENGTH;
 
         byte feePow = 0;
-        if (!asPack) {
+        if (asDeal > Transaction.FOR_PACK) {
             //READ FEE POWER
             byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
             feePow = feePowBytes[0];
@@ -156,9 +157,9 @@ public class IssueImprintRecord extends Issue_ItemRecord {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         // not include item reference
-        if (asPack) {
+        if (withSignature) {
             return BASE_LENGTH_AS_PACK + this.getItem().getDataLength(false);
         } else {
             return BASE_LENGTH + this.getItem().getDataLength(false);

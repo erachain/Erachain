@@ -2750,7 +2750,7 @@ public class Controller extends Observable {
         // CREATE TRANSACTION FROM RAW
         Transaction transaction;
         try {
-            transaction = TransactionFactory.getInstance().parse(rawData, null);
+            transaction = TransactionFactory.getInstance().parse(rawData, Transaction.FOR_NETWORK);
         } catch (Exception e) {
             return new Pair<Transaction, Integer>(null, Transaction.INVALID_RAW_DATA);
         }

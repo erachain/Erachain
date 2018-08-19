@@ -30,6 +30,8 @@ public class TestTemplateAsPack {
     Long releaserReference = null;
 
     boolean asPack = true;
+    int forPack = Transaction.FOR_DEAL_SIGN;
+
     boolean includeReference = false;
     long FEE_KEY = 1l;
     byte FEE_POWER = (byte) 1;
@@ -107,10 +109,10 @@ public class TestTemplateAsPack {
         issueTemplateRecord.process(gb, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(true, null);
+        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(asPack));
+        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(forPack, true));
 
         try {
             //PARSE FROM BYTES

@@ -33,7 +33,7 @@ public class TransactionMessage extends Message {
         byte[] data = new byte[0];
 
         //WRITE BLOCK
-        byte[] transactionBytes = this.transaction.toBytes(true, null);
+        byte[] transactionBytes = this.transaction.toBytes(Transaction.FOR_NETWORK, true);
         data = Bytes.concat(data, transactionBytes);
 
         //ADD CHECKSUM
@@ -44,7 +44,7 @@ public class TransactionMessage extends Message {
 
     @Override
     public int getDataLength() {
-        return this.transaction.getDataLength(false);
+        return this.transaction.getDataLength(Transaction.FOR_NETWORK, true);
     }
 
 }

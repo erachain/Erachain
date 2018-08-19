@@ -139,10 +139,10 @@ public class TestRecTemplate {
         issueTemplateRecord.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(true, null);
+        byte[] rawIssueTemplateTransaction = issueTemplateRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(false));
+        assertEquals(rawIssueTemplateTransaction.length, issueTemplateRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -279,10 +279,10 @@ public class TestRecTemplate {
         signNoteRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        byte[] rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+        byte[] rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -326,10 +326,10 @@ public class TestRecTemplate {
         signNoteRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+        rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -373,10 +373,10 @@ public class TestRecTemplate {
         signNoteRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+        rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -420,10 +420,10 @@ public class TestRecTemplate {
         signNoteRecord.sign(maker, asPack);
 
         //CONVERT TO BYTES
-        rawSignNoteRecord = signNoteRecord.toBytes(true, null);
+        rawSignNoteRecord = signNoteRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(false));
+        assertEquals(rawSignNoteRecord.length, signNoteRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES

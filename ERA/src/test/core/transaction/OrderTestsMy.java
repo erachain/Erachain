@@ -11,7 +11,6 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.primitives.Bytes;
 import core.account.Account;
 import core.crypto.Base58;
 import org.junit.Assert;
@@ -30,7 +29,6 @@ import core.item.assets.Order;
 import core.item.assets.Trade;
 import datachain.DCSet;
 import ntp.NTP;
-import utils.DateTimeFormat;
 
 public class OrderTestsMy {
     Long releaserReference = null;
@@ -362,7 +360,7 @@ public class OrderTestsMy {
                     timestamp, 0l);
             orderCreation.sign(accountA, false);
 
-            raw = orderCreation.toBytes(true, null);
+            raw = orderCreation.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
             orderCreation_2 = null;
             try {
@@ -636,8 +634,8 @@ public class OrderTestsMy {
 
         // CONVERT TO BYTES
         //// orderCreation.makeOrder().setExecutable(false);
-        byte[] rawOrderCreation = orderCreation.toBytes(true, null);
-        assertEquals(rawOrderCreation.length, orderCreation.getDataLength(false));
+        byte[] rawOrderCreation = orderCreation.toBytes(, Transaction.FOR_DEAL_NETWORK);
+        assertEquals(rawOrderCreation.length, orderCreation.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         CreateOrderTransaction parsedOrderCreation = null;
         try {
@@ -681,7 +679,7 @@ public class OrderTestsMy {
         assertEquals(orderCreation.getTimestamp(), parsedOrderCreation.getTimestamp());
 
         // PARSE TRANSACTION FROM WRONG BYTES
-        rawOrderCreation = new byte[orderCreation.getDataLength(false)];
+        rawOrderCreation = new byte[orderCreation.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             // PARSE FROM BYTES
@@ -2838,10 +2836,10 @@ public class OrderTestsMy {
         cancelOrderTransaction.sign(accountA, false);
 
         // CONVERT TO BYTES
-        byte[] rawCancelOrder = cancelOrderTransaction.toBytes(true, null);
+        byte[] rawCancelOrder = cancelOrderTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         // CHECK DATALENGTH
-        assertEquals(rawCancelOrder.length, cancelOrderTransaction.getDataLength(false));
+        assertEquals(rawCancelOrder.length, cancelOrderTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             // PARSE FROM BYTES
@@ -2877,7 +2875,7 @@ public class OrderTestsMy {
         }
 
         // PARSE TRANSACTION FROM WRONG BYTES
-        rawCancelOrder = new byte[cancelOrderTransaction.getDataLength(false)];
+        rawCancelOrder = new byte[cancelOrderTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             // PARSE FROM BYTES

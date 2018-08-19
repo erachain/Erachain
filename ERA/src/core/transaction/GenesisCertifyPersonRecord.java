@@ -84,8 +84,8 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 
     //@Override
     @Override
-    public byte[] toBytes(boolean withSign, Long releaserReference) {
-        byte[] data = super.toBytes(withSign, releaserReference);
+    public byte[] toBytes(int forDeal, boolean withSignature) {
+        byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE RECIPIENT
         data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
@@ -99,7 +99,7 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
     }
 
     @Override
-    public int getDataLength(boolean asPack) {
+    public int getDataLength(int forDeal, boolean withSignature) {
         return BASE_LENGTH;
     }
 

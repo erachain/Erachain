@@ -120,10 +120,10 @@ public class TestRecStatus {
         issueStatusRecord.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueStatusTransaction = issueStatusRecord.toBytes(true, null);
+        byte[] rawIssueStatusTransaction = issueStatusRecord.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueStatusTransaction.length, issueStatusRecord.getDataLength(false));
+        assertEquals(rawIssueStatusTransaction.length, issueStatusRecord.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES

@@ -123,10 +123,10 @@ public class TestRecAsset {
         assetTransfer.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawAssetTransfer = assetTransfer.toBytes(true, null);
+        byte[] rawAssetTransfer = assetTransfer.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(false));
+        assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -202,10 +202,10 @@ public class TestRecAsset {
         issueAssetTransaction.process(gb, false);
 
         //CONVERT TO BYTES
-        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(true, null);
+        byte[] rawIssueAssetTransaction = issueAssetTransaction.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATA LENGTH
-        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(false));
+        assertEquals(rawIssueAssetTransaction.length, issueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -248,7 +248,7 @@ public class TestRecAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(false)];
+        rawIssueAssetTransaction = new byte[issueAssetTransaction.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -441,10 +441,10 @@ public class TestRecAsset {
         assetTransfer.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawAssetTransfer = assetTransfer.toBytes(true, releaserReference);
+        byte[] rawAssetTransfer = assetTransfer.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(false));
+        assertEquals(rawAssetTransfer.length, assetTransfer.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -485,7 +485,7 @@ public class TestRecAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawAssetTransfer = new byte[assetTransfer.getDataLength(false)];
+        rawAssetTransfer = new byte[assetTransfer.getDataLength(Transaction.FOR_DEAL_MYPACK, true)];
 
         try {
             //PARSE FROM BYTES
@@ -733,10 +733,10 @@ public class TestRecAsset {
         r_Send.sign(maker, false);
 
         //CONVERT TO BYTES
-        byte[] rawAssetTransfer = r_Send.toBytes(true, releaserReference);
+        byte[] rawAssetTransfer = r_Send.toBytes(, Transaction.FOR_DEAL_NETWORK);
 
         //CHECK DATALENGTH
-        assertEquals(rawAssetTransfer.length, r_Send.getDataLength(false));
+        assertEquals(rawAssetTransfer.length, r_Send.getDataLength(Transaction.FOR_DEAL_NETWORK, true));
 
         try {
             //PARSE FROM BYTES
@@ -777,7 +777,7 @@ public class TestRecAsset {
         }
 
         //PARSE TRANSACTION FROM WRONG BYTES
-        rawAssetTransfer = new byte[r_Send.getDataLength(false)];
+        rawAssetTransfer = new byte[r_Send.getDataLength(Transaction.FOR_DEAL_NETWORK, true)];
 
         try {
             //PARSE FROM BYTES
