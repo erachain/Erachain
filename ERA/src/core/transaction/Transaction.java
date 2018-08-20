@@ -1167,6 +1167,7 @@ public abstract class Transaction {
     }
 
     public void process_gifts(int level, int fee_gift, Account creator, boolean asOrphan) {
+
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         // byte[] recordSignature = record.getSignature();
         // TODO if PERSON die - skip it step
@@ -1183,7 +1184,12 @@ public abstract class Transaction {
         long personKey = personDuration.a;
         // ItemCls person = ItemCls.getItem(db, ItemCls.PERSON_TYPE, personKey);
         ItemCls person = this.dcSet.getItemPersonMap().get(personKey);
-        Account invitedAccount = person.getOwner();
+        Tuple2<Integer, Integer> invitedDBRef = this.dcSet.getTransactionFinalMapSigns().get(person.getReference());
+
+        Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(invitedDBRef);
+
+        Account invitedAccount = issueRecord.getCreator();
+
         if (creator.equals(invitedAccount)) {
             // IT IS ME - all fee!
             creator.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
@@ -1234,6 +1240,8 @@ public abstract class Transaction {
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
             if (!dbASmap.contains(creatorAddress)) {
+                // for quick search public keys by address - use PUB_KEY from Person DATA owner
+                // used in - controller.Controller.getPublicKeyByAddress
                 dbASmap.set(creatorAddress, signature); // for quick search
                 // public keys
             }

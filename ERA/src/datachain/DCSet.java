@@ -35,6 +35,8 @@ public class DCSet implements Observer, IDB {
     private DCSet parent;
     private int uses;
 
+    private boolean inMemory = false;
+
     private BlockChain bchain;
 
     private AddressForging addressForging;
@@ -112,7 +114,8 @@ public class DCSet implements Observer, IDB {
     private boolean withObserver;// observe
     private boolean dynamicGUI;// observe
 
-    public DCSet(DB database, boolean withObserver, boolean dynamicGUI) {
+    public DCSet(DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+        this.inMemory = inMemory;
         uses = 1;
         this.withObserver = withObserver;
         this.dynamicGUI = dynamicGUI;
@@ -364,7 +367,7 @@ public class DCSet implements Observer, IDB {
                 .make();
 
         //CREATE INSTANCE
-        instance = new DCSet(database, withObserver, dynamicGUI);
+        instance = new DCSet(database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
@@ -384,7 +387,7 @@ public class DCSet implements Observer, IDB {
                 //.newMemoryDirectDB()
                 .make();
 
-        return new DCSet(database, false, false);
+        return new DCSet(database, false, false, true);
     }
 
     public static DB createForkbase() {
@@ -420,6 +423,10 @@ public class DCSet implements Observer, IDB {
 
     public boolean isDynamicGUI() {
         return this.dynamicGUI;
+    }
+
+    public boolean inMemory() {
+        return this.inMemory || this.parent != null;
     }
 
     @Override

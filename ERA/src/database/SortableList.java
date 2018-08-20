@@ -205,5 +205,5 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Obse
             additionalFilterFields.add(fieldname);
         }
     }
-
+    
 }

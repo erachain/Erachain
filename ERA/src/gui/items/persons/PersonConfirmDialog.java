@@ -61,6 +61,7 @@ public class PersonConfirmDialog extends JDialog {
     private javax.swing.JTextField jTextField_Address1;
     private javax.swing.JTextField jTextField_Address2;
     private javax.swing.JTextField jTextField_Address3;
+
     public PersonConfirmDialog(PersonCls person, PublicKeyAccount publicKey) {
         super();
 
@@ -81,7 +82,7 @@ public class PersonConfirmDialog extends JDialog {
          setPreferredSize(MainFrame.getInstance().getPreferredSize());
         // PACK
         this.pack();
-        this.setResizable(false);
+        this.setResizable(true);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
         // MainFrame.this.add(comp, constraints).setFocusable(false);
@@ -361,7 +362,7 @@ public class PersonConfirmDialog extends JDialog {
             }
         });
 
-        if (publicKey == null) {
+        if (publicKey == null || publicKey.isPerson()) {
             jLabel_Adress1_Check.setText(Lang.getInstance().translate("Insert Public Key"));
         } else {
             jTextField_Address1.setText(publicKey.getBase58());

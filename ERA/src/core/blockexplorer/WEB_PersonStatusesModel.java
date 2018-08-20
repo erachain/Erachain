@@ -22,11 +22,12 @@ import java.util.*;
 
 @SuppressWarnings("serial")
 public class WEB_PersonStatusesModel extends AbstractTableModel implements Observer {
-    public static final int COLUMN_MAKE_DATA = 0;
+    public static final int COLUMN_MAKE_DATE = 0;
     public static final int COLUMN_STATUS_NAME = 1;
     public static final int COLUMN_PERIOD = 2;
     public static final int COLUMN_MAKER = 3;
     public static final int COLUMN_RECORD_NO = 4;
+    public static final int COLUMN_MAKER_ACCOUNT = 31;
 
     TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses;
     List<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>> statusesRows;
@@ -127,7 +128,7 @@ public class WEB_PersonStatusesModel extends AbstractTableModel implements Obser
 
         switch (column) {
 
-            case COLUMN_MAKE_DATA:
+            case COLUMN_MAKE_DATE:
 
                 block = value.b.d;
                 recNo = value.b.e;
@@ -161,6 +162,14 @@ public class WEB_PersonStatusesModel extends AbstractTableModel implements Obser
                 recNo = value.b.e;
                 record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
                 return record == null ? "" : ((Account) record.getCreator()).getPersonAsString();
+
+            case COLUMN_MAKER_ACCOUNT:
+
+                block = value.b.d;
+                recNo = value.b.e;
+                record = Transaction.findByHeightSeqNo(dcSet, block, recNo);
+                return record == null ? null : record.getCreator();
+
 
             case COLUMN_RECORD_NO:
 

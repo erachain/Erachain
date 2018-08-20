@@ -530,7 +530,13 @@ public abstract class TransactionAmount extends Transaction {
                                 }
                             }
                             
-                            if (height > BlockChain.HOLD_VALID_START && asset.isMovable()) {
+                            if (true
+                                    // для всех активов абсолютно - можно взять на баланс!
+                                    // даже деньги и обязателтсва внешние - типа общие деньги разделили по разным рукам???
+                                    // взятие на руки подтверждает что ты в реальном мире их взял
+                                    ///|| height > BlockChain.HOLD_VALID_START
+                                    /// ащк фдд&& asset.isMovable()
+                                    ) {
                                 // if GOODS - HOLD it in STOCK and check BALANCE
                                 boolean unLimited = absKey > AssetCls.REAL_KEY // not
                                         // genesis
@@ -786,8 +792,9 @@ public abstract class TransactionAmount extends Transaction {
                     
                     // IF send from PERSON to ANONIMOUSE
                     // TODO: PERSON RULE 1
-                    if (BlockChain.PERSON_SEND_PROTECT && actionType != ACTION_DEBT && actionType != ACTION_HOLD
-                            && assetType != AssetCls.AS_INSIDE_BONUS && isPerson && absKey != FEE_KEY) {
+                    if (BlockChain.PERSON_SEND_PROTECT && isPerson && absKey != FEE_KEY
+                            && actionType != ACTION_DEBT && actionType != ACTION_HOLD
+                            && assetType != AssetCls.AS_INSIDE_BONUS) {
                         HashSet<Account> recipients = this.getRecipientAccounts();
                         for (Account recipient : recipients) {
                             if (!recipient.isPerson(dcSet, height)
@@ -1093,7 +1100,8 @@ public abstract class TransactionAmount extends Transaction {
     @Override
     public int calcBaseFee() {
         
-        if (this.height < BlockChain.SEND_AMOUNT_FEE_UP || this.amount == null)
+        if (//this.height < BlockChain.SEND_AMOUNT_FEE_UP ||
+                this.amount == null)
             return calcCommonFee();
         
         return calcCommonFee() + (BlockChain.FEE_PER_BYTE * 200); // for

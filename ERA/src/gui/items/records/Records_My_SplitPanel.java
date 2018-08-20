@@ -1,11 +1,73 @@
 package gui.items.records;
 
 import controller.Controller;
+import core.transaction.ArbitraryTransaction;
+import core.transaction.BuyNameTransaction;
+import core.transaction.CancelOrderTransaction;
+import core.transaction.CancelSellNameTransaction;
+import core.transaction.CreateOrderTransaction;
+import core.transaction.CreatePollTransaction;
+import core.transaction.GenesisCertifyPersonRecord;
+import core.transaction.GenesisIssueAssetTransaction;
+import core.transaction.GenesisIssueTemplateRecord;
+import core.transaction.GenesisTransferAssetTransaction;
+import core.transaction.IssueAssetTransaction;
+import core.transaction.IssueImprintRecord;
+import core.transaction.IssuePersonRecord;
+import core.transaction.IssuePollRecord;
+import core.transaction.IssueStatusRecord;
+import core.transaction.IssueTemplateRecord;
+import core.transaction.IssueUnionRecord;
+import core.transaction.MultiPaymentTransaction;
+import core.transaction.R_Hashes;
+import core.transaction.R_Send;
+import core.transaction.R_SertifyPubKeys;
+import core.transaction.R_SetStatusToItem;
+import core.transaction.R_SignNote;
+import core.transaction.R_Vouch;
+import core.transaction.RegisterNameTransaction;
+import core.transaction.SellNameTransaction;
 import core.transaction.Transaction;
+import core.transaction.UpdateNameTransaction;
+import core.transaction.VoteOnItemPollTransaction;
+import core.transaction.VoteOnPollTransaction;
 import datachain.DCSet;
 import gui.Split_Panel;
+import gui.items.statement.Statement_Info;
+import gui.library.MTable;
+import gui.library.SetIntervalPanel;
 import gui.library.Voush_Library_Panel;
+import gui.library.library;
+import gui.models.WalletTransactionsTableModel;
+import gui.transaction.ArbitraryTransactionDetailsFrame;
+import gui.transaction.BuyNameDetailsFrame;
+import gui.transaction.CancelOrderDetailsFrame;
+import gui.transaction.CancelSellNameDetailsFrame;
+import gui.transaction.CreateOrderDetailsFrame;
+import gui.transaction.CreatePollDetailsFrame;
+import gui.transaction.GenesisCertifyPersonRecordFrame;
+import gui.transaction.GenesisIssueAssetDetailsFrame;
+import gui.transaction.GenesisIssueTemplateDetailsFrame;
+import gui.transaction.GenesisTransferAssetDetailsFrame;
+import gui.transaction.HashesDetailsFrame;
+import gui.transaction.IssueAssetDetailsFrame;
+import gui.transaction.IssueImprintDetailsFrame;
+import gui.transaction.IssuePersonDetailsFrame;
+import gui.transaction.IssuePollDetailsFrame;
+import gui.transaction.IssueStatusDetailsFrame;
+import gui.transaction.IssueTemplateDetailsFrame;
+import gui.transaction.IssueUnionDetailsFrame;
+import gui.transaction.MultiPaymentDetailsFrame;
+import gui.transaction.RegisterNameDetailsFrame;
+import gui.transaction.SellNameDetailsFrame;
+import gui.transaction.Send_RecordDetailsFrame;
+import gui.transaction.SertifyPubKeysDetailsFrame;
+import gui.transaction.SetStatusToItemDetailsFrame;
 import gui.transaction.TransactionDetailsFactory;
+import gui.transaction.UpdateNameDetailsFrame;
+import gui.transaction.VoteOnItemPollDetailsFrame;
+import gui.transaction.VoteOnPollDetailsFrame;
+import gui.transaction.VouchingDetailsFrame;
 import lang.Lang;
 import org.mapdb.Fun.Tuple2;
 import utils.TableMenuPopupUtil;
@@ -28,33 +90,31 @@ public class Records_My_SplitPanel extends Split_Panel {
     private static Records_My_SplitPanel instance;
     public Voush_Library_Panel voush_Library_Panel;
     protected Transaction trans;
-    JScrollPane jScrollPane4;
-    All_Records_Panel my_Records_Panel;
-    // для прозрачности
-    int alpha = 255;
-    // VotingDetailPanel votingDetailsPanel ;
-    int alpha_int;
     private JPanel records_Info_Panel;
     private JPopupMenu menu;
     private JMenuItem item_Delete;
     private JMenuItem item_Rebroadcast;
+    public WalletTransactionsTableModel records_model;
+    public SetIntervalPanel setIntervalPanel;
 
+    private JMenuItem item_Save;
+
+  
 
     private Records_My_SplitPanel() {
         super("Records_My_SplitPanel");
-        this.leftPanel.setVisible(false);
-        my_Records_Panel = new All_Records_Panel();
-        this.jSplitPanel.setLeftComponent(my_Records_Panel);
+        this.leftPanel.setVisible(true);
+       
 
         setName(Lang.getInstance().translate("My Records"));
 
-        // searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search")
-        // +": ");
-
-        jScrollPane4 = new JScrollPane();
+        //CREATE TABLE
+        this.records_model = new WalletTransactionsTableModel();
+        this.jTable_jScrollPanel_LeftPanel = new MTable(this.records_model);
+        this.jScrollPanel_LeftPanel.setViewportView(this.jTable_jScrollPanel_LeftPanel);
 
         // not show buttons
-        jToolBar_RightPanel.setVisible(false);
+        jToolBar_RightPanel.setVisible(true);
         // toolBar_LeftPanel.setVisible(false);
         jButton1_jToolBar_RightPanel.setText("<HTML><B> " + Lang.getInstance().translate("Record") + "</></> ");
         jButton1_jToolBar_RightPanel.setBorderPainted(true);
@@ -70,7 +130,33 @@ public class Records_My_SplitPanel extends Split_Panel {
         });
 
         jButton2_jToolBar_RightPanel.setVisible(false);
-        my_Records_Panel.records_Table.getSelectionModel().addListSelectionListener(new search_listener());
+        this.jToolBar_RightPanel.setVisible(false);
+        this.toolBar_LeftPanel.setVisible(false);
+        
+     // set interval panel
+        setIntervalPanel = new SetIntervalPanel(Transaction.EXTENDED);
+        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_END;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 10);
+        leftPanel.add(setIntervalPanel, gridBagConstraints);
+
+        setIntervalPanel.jButtonSetInterval.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                // TODO Auto-generated method stub
+                setInterval();
+            }
+        });
+
+     // set interval
+        setInterval();
+        
+        jTable_jScrollPanel_LeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         menu = new JPopupMenu();
         menu.addAncestorListener(new AncestorListener() {
@@ -78,10 +164,10 @@ public class Records_My_SplitPanel extends Split_Panel {
             @Override
             public void ancestorAdded(AncestorEvent event) {
                 // TODO Auto-generated method stub
-                int row = my_Records_Panel.records_Table.getSelectedRow();
-                row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+                trans = (Transaction) records_model.getItem(row);
             }
 
             @Override
@@ -94,10 +180,10 @@ public class Records_My_SplitPanel extends Split_Panel {
             @Override
             public void ancestorRemoved(AncestorEvent event) {
                 // TODO Auto-generated method stub
-                int row = my_Records_Panel.records_Table.getSelectedRow();
-                row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+                int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
+                row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
                 if (row < 0) return;
-                trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+                trans = (Transaction) records_model.getItem(row);
 
             }
 
@@ -135,7 +221,27 @@ public class Records_My_SplitPanel extends Split_Panel {
         });
 
         menu.add(item_Delete);
-        TableMenuPopupUtil.installContextMenu(my_Records_Panel.records_Table, menu);
+        
+        item_Save = new JMenuItem(Lang.getInstance().translate("Save"));
+        item_Save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // code delete
+                //int row = my_Records_Panel.records_Table.getSelectedRow();
+                //row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+                //Transaction trans = (Transaction) my_Records_Panel.records_model.getItem(row);
+                if (trans == null) return;
+                // save
+                library.saveTransactionJSONtoFileSystem(getParent(), trans);
+            }
+
+            
+        });
+
+        menu.add(item_Save);
+        
+        TableMenuPopupUtil.installContextMenu(jTable_jScrollPanel_LeftPanel, menu);
         menu.addAncestorListener(new AncestorListener() {
 
             @Override
@@ -185,20 +291,21 @@ public class Records_My_SplitPanel extends Split_Panel {
 
     public void onClick() {
         // GET SELECTED OPTION
-        int row = my_Records_Panel.records_Table.getSelectedRow();
+        int row = jTable_jScrollPanel_LeftPanel.getSelectedRow();
         if (row == -1) {
             row = 0;
         }
-        row = my_Records_Panel.records_Table.convertRowIndexToModel(row);
+        row = jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(row);
 
-        if (my_Records_Panel.records_Table.getSelectedRow() >= 0) {
+        if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
         }
     }
 
     @Override
     public void delay_on_close() {
         // delete observer left panel
-        my_Records_Panel.records_model.removeObservers();
+        this.records_model.removeObservers();
+        this.setIntervalPanel.removeObservers();
         // get component from right panel
         //	Component c1 = jScrollPane_jPanel_RightPanel.getViewport().getView();
         // if Person_Info 002 delay on close
@@ -213,9 +320,9 @@ public class Records_My_SplitPanel extends Split_Panel {
         @Override
         public void valueChanged(ListSelectionEvent arg0) {
             Transaction trans = null;
-            if (my_Records_Panel.records_Table.getSelectedRow() >= 0) {
-                trans = (Transaction) my_Records_Panel.records_model.getItem(my_Records_Panel.records_Table
-                        .convertRowIndexToModel(my_Records_Panel.records_Table.getSelectedRow()));
+            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() >= 0) {
+                trans = (Transaction) records_model.getItem(jTable_jScrollPanel_LeftPanel
+                        .convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
 
                 records_Info_Panel = new JPanel();
                 records_Info_Panel.setLayout(new GridBagLayout());
@@ -259,6 +366,28 @@ public class Records_My_SplitPanel extends Split_Panel {
                 jScrollPane_jPanel_RightPanel.setViewportView(records_Info_Panel);
 
             }
+        }
+    }
+   
+    public void setInterval() {
+        Integer start = 0;
+        try {
+            start = Integer.valueOf(setIntervalPanel.jTextFieldStart.getText());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            return;
+        }
+        Integer end = 0;
+        try {
+            end = Integer.valueOf(setIntervalPanel.jTextFieldEnd.getText());
+        } catch (NumberFormatException e) {
+            // TODO Auto-generated catch block
+            return;
+        }
+        if (end > start) {
+            int step = end - start;
+            this.records_model.setInterval(start, step);
+            this.records_model.fireTableDataChanged();
         }
     }
 

@@ -223,8 +223,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_IMMOVABLE:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность"));
-                if(BlockChain.DEVELOP_USE)
-                    this.holdAsset.setText(Lang.getInstance().translate("Прием на охрану/получено из охраны"));
+                this.holdAsset.setText(Lang.getInstance().translate("Прием на охрану/получено из охраны"));
 
                 this.debtAsset.setText(Lang.getInstance().translate("Пепедать в аренду"));
                 this.debtAsset.setVisible(true);
@@ -378,7 +377,7 @@ public class DealsPopupMenu extends JPopupMenu {
 
             case AssetCls.AS_INSIDE_VOTE:
                 this.sendAsset.setText(Lang.getInstance().translate("Наделить голосом"));
-                //this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
 
                 this.debtAsset.setText(Lang.getInstance().translate("Передать делегату"));
                 this.debtAsset.setVisible(true);
@@ -390,9 +389,9 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
 
             case AssetCls.AS_INDEX:
-                this.sendAsset.setText(Lang.getInstance().translate("Певести в собственность индекс"));
-                //this.holdAsset.setText(Lang.getInstance().translate("Учесть прием индекса на баланс"));
-                this.holdAsset.setVisible(false);
+                this.sendAsset.setText(Lang.getInstance().translate("Перевести в собственность индекс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием индекса на баланс"));
+                //this.holdAsset.setVisible(false);
 
                 //this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
                 this.debtAsset.setVisible(false);

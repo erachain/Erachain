@@ -65,15 +65,8 @@ public class CancelOrderTransaction extends Transaction {
         super.setDC(dcSet, asPack);
 
         Tuple2<Integer, Integer> createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        Transaction createOrder;
-        if (createDBRef == null) {
-            createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
-            if (createOrder != null)
-                createDBRef = new Tuple2<Integer, Integer>(createOrder.getBlockHeightByParentOrLast(dcSet), 1);
-        }
-
-        if (createDBRef != null)
-            this.orderID = Transaction.makeDBRef(createDBRef);
+        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
+        this.orderID = Transaction.makeDBRef(createDBRef);
 
     }
 

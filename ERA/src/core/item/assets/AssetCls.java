@@ -51,11 +51,11 @@ public abstract class AssetCls extends ItemCls {
     public static final String REAL_DESCR = "Труд, знания, заслуги и польза" + ": "
             + REAL_NAME + "(" + REAL_ABBREV + "). ";
 
-    // DEaL KEY
-    public static final long LIA_KEY = 5l;
-    public static final String LIA_ABBREV = "LIA"; // COMPU (compute units)
-    public static final String LIA_NAME = "LIA";
-    public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
+	// DEaL KEY
+	public static final long LIA_KEY = 5l;
+	public static final String LIA_ABBREV = "LIA"; //
+	public static final String LIA_NAME = "LIA";
+	public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
 
     public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
@@ -63,6 +63,8 @@ public abstract class AssetCls extends ItemCls {
     public static final int INITIAL_FAVORITES = 4;
     protected static final int SCALE_LENGTH = 1;
     protected static final int ASSET_TYPE_LENGTH = 1;
+
+    public static final long START_KEY = 1000l;
 
     ///////////////////////////////////////////////////
     /**
@@ -305,6 +307,18 @@ public abstract class AssetCls extends ItemCls {
     }
 
     @Override
+    public String viewDescription() {
+        switch ((int)this.key) {
+            case 1:
+                return "<b>ERA</b> is an <u>Accounting Unit</u> allowing a User, that has a sufficient amount of such units and with such sufficiency threshold preset in the ERACHAIN Software, to use the ERACHAIN Software for making his Request Entries to the Log, including provision of such service to other Users, receiving it for the COMPU Accounting Units and producing new COMPU Accounting Units as per the ERACHAIN Software rules and operating procedure available on the Erachain.org website. For more information see Erachain Licence Agreement on the <a href=\"http://erachain.org\">Erachain.org</a>.";
+            case 2:
+                return "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>.";
+        }
+
+        return this.description;
+    }
+
+    @Override
     public int getItemTypeInt() {
         return ItemCls.ASSET_TYPE;
     }
@@ -478,7 +492,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 return "Digital Share";
             case AS_INSIDE_BONUS:
-                return "Digital Bonus";
+                return "Bonuses, Loyalty Points";
             case AS_INSIDE_ACCESS:
                 return "Digital Access Rights";
             case AS_INSIDE_VOTE:
@@ -504,19 +518,21 @@ public abstract class AssetCls extends ItemCls {
             case AS_OUTSIDE_GOODS:
                 return lang.translate("Movable things and goods. These goods can be taken for storage by the storekeeper or for confirmation of delivery. In this case you can see the balances on the accounts of storekeepers and delivery agents");
             case AS_OUTSIDE_IMMOVABLE:
-                return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent");
+                return "Недвижимость и иные товары и вещи не подлежащие доставке. Такие вещи можно взять и дать в аренду и передать на охрану";
+                
             case AS_OUTSIDE_CURRENCY:
-                return lang.translate("External money that must be transferred to an external bank account or transferred in cash. The amount on your account shows the right to demand the issuer to transfer such amount of money to your bank account. In order to satisfy the demand it is necessary to set it up for the payment, and after the money has arrived into your account confirm the repayment of this demand");
+                return "Внешние деньги, которые необходимо перевести на внешний банковский счет или передать наличными. Величина на вашем счете показывает право требовать к эмитенту перевод такого количества денег на ваш банковский счет. Для удовлетворения требования необходимо выставить его на оплату, а после прихода денег подтвердить погашение этого требования. Так же можно учесь взятие их на хранение, например общую суммы собранных средств на ICO раздать на руки разным держателям - они должны подтвердить получение этих средвст транзакцикй \"подтвердить принятие на руки\"";
             case AS_OUTSIDE_SERVICE:
                 return lang.translate("An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment");
             case AS_OUTSIDE_SHARE:
                 return lang.translate("External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer");
             case AS_OUTSIDE_BILL:
-                return lang.translate("A digital promissory note can be called for redemption by external money");
+                return "Цифровой простой вексель, который можно предъявить к погашению внешними деньгами. Можно учеть передачу его на руки";
             case AS_OUTSIDE_BILL_EX:
-                return lang.translate("A digital bill of exchange can be called for redemption by external money");
+                return "Цифровой переводной вексель, который можно предъявить к погашению внешними деньгами. Можно учеть передачу его на руки";
             case AS_OUTSIDE_OTHER_CLAIM:
-                return lang.translate("Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation");
+                return "Другие внешние права, требования и обязательства. Любое обязательство (как и другие внешние активы), которое может быть истребовано внесением записи \"требования исполнения\" и погашено записью \"подтверждения исполнения\" этого обязательства. Можно учеть передачу их на руки";
+
             case AS_INSIDE_ASSETS:
                 return lang.translate("Internal (digital) asset. It does not require any external additional actions when transferring between accounts inside Erachain");
             case AS_INSIDE_CURRENCY:
@@ -526,7 +542,7 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_SHARE:
                 return lang.translate("Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions");
             case AS_INSIDE_BONUS:
-                return lang.translate("Digital reward (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed");
+                return "Цифровые баллы лояльности, бонусы, награды, скидочные очки (бонус). То что не имеет общепринятой стомости и не может обмениваться на другие виды активов внутри Эрачейн. Хотя обмен на другие бонусы и награды разрешены";
             case AS_INSIDE_ACCESS:
                 return lang.translate("Digital rights of access and control");
             case AS_INSIDE_VOTE:

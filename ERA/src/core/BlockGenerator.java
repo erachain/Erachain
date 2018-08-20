@@ -190,7 +190,7 @@ public class BlockGenerator extends Thread implements Observer {
             try {
 
                 //CHECK TRANSACTION TIMESTAMP AND DEADLINE
-                if (transaction.getTimestamp() > timestamp || transaction.getDeadline() < timestamp
+                if (transaction.getTimestamp() > timestamp  // записи могут старые включаться если они еще живые || transaction.getDeadline() < timestamp
                         || !transaction.isSignatureValid(newBlockDb)) {
                     // INVALID TRANSACTION
                     // REMOVE FROM LIST
@@ -560,7 +560,7 @@ public class BlockGenerator extends Thread implements Observer {
                             if (newWinner) {
                                 LOGGER.info("NEW WINER RECEIVED - drop my block");
                             } else {
-                                // MAKING NEW BLOCK
+                                /////////////////////    MAKING NEW BLOCK  //////////////////////
                                 status = 7;
 
                                 // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP

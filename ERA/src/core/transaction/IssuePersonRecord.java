@@ -261,10 +261,15 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();
         byte[] makerBytes = maker.getPublicKey();
+        // Это нужно для быстрого поиска по публичному ключу создателя персоны,
+        // которая еще не удостоверена вообще
+        // но надо понимать что тут будет только последняя запись создания персоны и номер на нее
+        // used in webserver.API.getPersonKeyByOwnerPublicKey
         this.dcSet.getIssuePersonMap().set(makerBytes, person.getKey());
 
-        // for quick search public keys - use PUB_KEY from Person DATA
         if (person.isMustBeSigned()) {
+            // for quick search public keys by address - use PUB_KEY from Person DATA owner
+            // used in - controller.Controller.getPublicKeyByAddress
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
             String creatorAddress = maker.getAddress();
             if (!dbASmap.contains(creatorAddress)) {
@@ -272,11 +277,6 @@ public class IssuePersonRecord extends Issue_ItemRecord {
             }
         }
 
-        // EMITTE LIA
-        this.creator.changeBalance(this.dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, false);
-        // SUBSTRACT from EMISSION (with minus)
-        GenesisBlock.CREATOR.changeBalance(dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, true);
-        
     }
 
     //@Override
@@ -289,11 +289,6 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         byte[] makerBytes = maker.getPublicKey();
         this.dcSet.getIssuePersonMap().delete(makerBytes);
 
-        // EMITTE LIA
-        this.creator.changeBalance(this.dcSet, true, AssetCls.LIA_KEY, BigDecimal.ONE, false);
-        // SUBSTRACT from EMISSION (with minus)
-        GenesisBlock.CREATOR.changeBalance(dcSet, false, AssetCls.LIA_KEY, BigDecimal.ONE, true);
-        
     }
 
         /*
@@ -304,11 +299,18 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     // GET only INVITED FEE
     @Override
     public int getInvitedFee() {
-        return this.fee.unscaledValue().intValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+        if (this.height > BlockChain.ALL_BALANCES_OK_TO)
+            return this.fee.unscaledValue().intValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+        else
+            return super.getInvitedFee();
     }
 
     @Override
-    public int calcBaseFee() {
-        return calcCommonFee() >> 2;
+    public int calcBaseFee()
+    {
+        if (this.height > BlockChain.ALL_BALANCES_OK_TO)
+            return calcCommonFee() >> 2;
+        else
+            return calcCommonFee() >> 1;
     }
 }

@@ -154,6 +154,7 @@
   "Cancel Sell Name": "Отменить Продажу Имени",
   "Cancel": "Отмена",
   "Certified": "Заверено",
+  "certified": "заверено",
   "Character count: 0/4000": "Количество символов: 0/4000",
   "Check": "Проверить",
   "Check to pay": "Проверка оплаты",
@@ -707,6 +708,8 @@
   "Register Name": "Регистрация Имени",
   "Register": "Регистрация",
   "Registrant:": "Регистратор",
+  "Registered": "Зарегистрировано",
+  "registered": "зарегистрировано",
   "Remote": "Удалённый",
   "Remove Favorite": "Удалить из избранных",
   "Remove": "Удалить",
@@ -1132,7 +1135,16 @@
   "DashBoard": "Обзор",
   "Network DashBoard": "Обзор среды",
   "Network Port": "Порт Сети",
+<<<<<<< ERA/languages/ru.json
   "Unique Hashes": "Единичные хэши",
   "Linked Hashes": "Привязанные хэши",
+=======
+  "Unique Hashes": "Единичные Хэши",
+  "Linked Hashes": "Привязанные Хэши",
+  "<b>ERA</b> is an <u>Accounting Unit</u> allowing a User, that has a sufficient amount of such units and with such sufficiency threshold preset in the ERACHAIN Software, to use the ERACHAIN Software for making his Request Entries to the Log, including provision of such service to other Users, receiving it for the COMPU Accounting Units and producing new COMPU Accounting Units as per the ERACHAIN Software rules and operating procedure available on the Erachain.org website. For more information see Erachain Licence Agreement on the <a href=\"http://erachain.org\">Erachain.org</a>."
+    : "<b>ERA</b> - это <u>Учетная единица</u>, дающая право Пользователю, обладающему достаточным количеством этих единиц, порог достаточности которого задан в Программном обеспечении ERACHAIN использовать Программное обеспечение ERACHAIN для внесения своих Записей-заявок в Журнал, в том числе оказывать эту услугу для других Пользователей, получая за это от них Учетные единицы COMPU и производя новые Учетные единицы COMPU в соответствии с правилами и порядком работы Программного обеспечения ERACHAIN, доступными на веб-сайте Erachain.org. Для большей информации смотрите Лицензионное Соглашение Эрачейн на сайте <a href=\"http://erachain.org\">Erachain.org</a>",
+  "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>."
+  : "<b>COMPU</b> - это <u>Учетная единица</u>, дающая право Пользователю, обладающему достаточным количеством этих единиц, порог достаточности которого вычисляется в Программном обеспечении ERACHAIN, использовать Программное обеспечение ERACHAIN для внесения Записей-заявок Пользователя в Журнал как самостоятельно, так и путем получения такой услуги от других Пользователей. Учетная единица COMPU действует в Журнале как единица оплаты за оказание услуги внесения записи в Журнал. Для большей информации смотрите Лицензионное Соглашение Эрачейн на сайте <a href=\"http://erachain.org\">Erachain.org</a>",
+>>>>>>> ERA/languages/ru.json
   "": ""
 }

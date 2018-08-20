@@ -98,7 +98,7 @@ public class Controller extends Observable {
             new HashMap<String, Tuple2<Integer, Integer>>() {
         {
             put("en", new Tuple2<Integer, Integer>(148450, 1));
-            put("ru", new Tuple2<Integer, Integer>(148450, 1));
+            put("ru", new Tuple2<Integer, Integer>(191502, 1));
         }
     } :
             new HashMap<String, Tuple2<Integer, Integer>>() {
