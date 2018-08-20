@@ -797,6 +797,8 @@ public class API {
     public Response getUnconfirmedLastReferenceUnconfirmed(@PathParam("address") String address,
                                                            @PathParam("from") int from, @PathParam("count") int count) {
 
+        // сейчас этот поиск делается по другому и он не нужен вообще для создания транзакций а следовательно закроем его
+        /*
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
             throw ApiErrorFactory.getInstance().createError(
@@ -854,6 +856,13 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(out)
                 .build();
+        */
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity("---nope")
+                .build();
+
     }
 
 
@@ -1768,6 +1777,7 @@ public class API {
      * ************* TRANSACTIONS **************
      */
 
+
     /**
      * web api. get transaction by address. in method set static limit transaction 50.
      *
@@ -1779,9 +1789,12 @@ public class API {
     public Response getTransaction(@QueryParam("address") String address) {
         Account account = Controller.getInstance().getAccountByAddress(address);
         JSONArray array = new JSONArray();
-        for (Transaction transaction : Controller.getInstance().getLastTransactions(account, 50)) {
-            array.add(transaction.toJson());
-        }
+        // Это ошибочный метод который роется в КОШЕЛЬКЕ!
+        // все методы работы с транзакция вынесены в API_Transactions кроме взять по номеру и SCAN
+
+        ///for (Transaction transaction : Controller.getInstance().getLastTransactions(account, 50)) {
+        ///    array.add(transaction.toJson());
+        ///}
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(array.toJSONString())).build();
