@@ -13,7 +13,12 @@ import java.util.Arrays;
 // TODO - reference NOT NEED - because it is unique record! - make it as new version protocol
 public class IssueImprintRecord extends Issue_ItemRecord {
     //protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK;
+
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK - REFERENCE_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK - REFERENCE_LENGTH;
     protected static final int BASE_LENGTH = Transaction.BASE_LENGTH - REFERENCE_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD - REFERENCE_LENGTH;
+
     private static final byte TYPE_ID = (byte) ISSUE_IMPRINT_TRANSACTION;
     private static final String NAME_ID = "Issue Imprint";
 
@@ -159,13 +164,23 @@ public class IssueImprintRecord extends Issue_ItemRecord {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // not include item reference
-        if (withSignature) {
-            return BASE_LENGTH_AS_PACK + this.getItem().getDataLength(false);
-        } else {
-            return BASE_LENGTH + this.getItem().getDataLength(false);
-        }
-    }
 
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len + this.getItem().getDataLength(false);
+
+    }
 
     //PROCESS/ORPHAN
 

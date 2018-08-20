@@ -37,9 +37,13 @@ public class R_SertifyPubKeys extends Transaction {
     private static final String NAME_ID = "Sertify Person";
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
     private static final int DATE_DAY_LENGTH = 4; // one year + 256 days max
-    private static final int SELF_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
+
+    private static final int LOAD_LENGTH = DATE_DAY_LENGTH + KEY_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     protected Long key; // PERSON KEY
     protected Integer add_day; // in days
     protected List<PublicKeyAccount> sertifiedPublicKeys;
@@ -353,10 +357,23 @@ public class R_SertifyPubKeys extends Transaction {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // not include reference
-        int len = withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH;
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
         int accountsSize = this.sertifiedPublicKeys.size();
-        len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;
-        return this.typeBytes[1] == 1 ? len + Transaction.SIGNATURE_LENGTH * accountsSize : len;
+        base_len += accountsSize * PublicKeyAccount.PUBLIC_KEY_LENGTH;
+        return this.typeBytes[1] == 1 ? base_len + Transaction.SIGNATURE_LENGTH * accountsSize : base_len;
     }
 
     //VALIDATE

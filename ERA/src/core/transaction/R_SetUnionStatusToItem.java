@@ -20,9 +20,13 @@ public class R_SetUnionStatusToItem extends Transaction {
     private static final byte TYPE_ID = (byte) Transaction.SET_UNION_STATUS_TO_ITEM_TRANSACTION;
     private static final String NAME_ID = "Set Union Status to Unit";
     private static final int DATE_LENGTH = Transaction.TIMESTAMP_LENGTH; // one year + 256 days max
-    private static final int SELF_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
+
+    private static final int LOAD_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + KEY_LENGTH + 1 + KEY_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     protected Long key; // UNION KEY
     protected Long statusKey; // STATUS KEY
     protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
@@ -251,8 +255,22 @@ public class R_SetUnionStatusToItem extends Transaction {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // not include reference
-        int len = withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH;
-        return len;
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len;
+
     }
 
     //VALIDATE

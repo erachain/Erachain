@@ -92,9 +92,13 @@ public abstract class TransactionAmount extends Transaction {
     public static final String NAME_SPEND = "SPEND";
     public static final int AMOUNT_LENGTH = 8;
     public static final int RECIPIENT_LENGTH = Account.ADDRESS_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + RECIPIENT_LENGTH + KEY_LENGTH
-            + AMOUNT_LENGTH;
+
+    protected static final int LOAD_LENGTH = RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     protected Account recipient;
     protected BigDecimal amount;
     protected long key = Transaction.FEE_KEY;
@@ -379,8 +383,21 @@ public abstract class TransactionAmount extends Transaction {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // IF VERSION 1 (amount = null)
-        return (withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH)
-                - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len - (this.typeBytes[2] < 0 ? (KEY_LENGTH + AMOUNT_LENGTH) : 0);
     }
     
     @Override // - fee + balance - calculate here

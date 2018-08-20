@@ -18,8 +18,11 @@ public class RecordReleasePack extends Transaction {
     private static final byte TYPE_ID = (byte) Transaction.RELEASE_PACK;
     private static final String NAME_ID = "Release pack";
     private static final int PACK_SIZE_LENGTH = 4;
+
+    private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + PACK_SIZE_LENGTH;
     private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + PACK_SIZE_LENGTH;
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + PACK_SIZE_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + PACK_SIZE_LENGTH;
 
     private List<Transaction> transactions;
 
@@ -178,12 +181,26 @@ public class RecordReleasePack extends Transaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
         int transactionsLength = 0;
         for (Transaction transaction : this.getTransactions()) {
             transactionsLength += transaction.getDataLength(forDeal, true);
         }
 
-        return withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH + transactionsLength;
+        return base_len + transactionsLength;
     }
 
     //VALIDATE

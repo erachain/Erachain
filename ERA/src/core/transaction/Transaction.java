@@ -349,6 +349,7 @@ public abstract class Transaction {
     protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
+
     // in pack toByte and Parse - reference not included
     static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
 
@@ -1053,18 +1054,7 @@ public abstract class Transaction {
 
     }
 
-    public int getDataLength(int forDeal, boolean withSignature) {
-
-        if (forDeal == FOR_MYPACK)
-            return Transaction.BASE_LENGTH_AS_MYPACK;
-        else if (forDeal == FOR_MYPACK)
-            return BASE_LENGTH_AS_PACK;
-        else if (forDeal == FOR_DB_RECORD)
-            return BASE_LENGTH_AS_DBRECORD;
-
-        return BASE_LENGTH;
-
-    }
+    public abstract int getDataLength(int forDeal, boolean withSignature);
 
     // PROCESS/ORPHAN
 

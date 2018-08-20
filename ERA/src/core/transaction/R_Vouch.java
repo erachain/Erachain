@@ -22,7 +22,12 @@ import java.util.List;
 //   ++ FEE = 0, no TIMESTAMP??, max importance for including in block
 public class R_Vouch extends Transaction {
 
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + HEIGHT_LENGTH + SEQ_LENGTH;
+    protected static final int LOAD_LENGTH = HEIGHT_LENGTH + SEQ_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     private static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
     private static final String NAME_ID = "Vouch";
     static Logger LOGGER = Logger.getLogger(R_Vouch.class.getName());
@@ -183,11 +188,22 @@ public class R_Vouch extends Transaction {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // not include item reference
-        if (withSignature) {
-            return BASE_LENGTH_AS_PACK;
-        } else {
-            return BASE_LENGTH;
-        }
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len;
+
     }
 
     //@Override

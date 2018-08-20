@@ -232,19 +232,6 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 	}
 	 */
 
-	/*
-	@Override
-	public int getDataLength(boolean asPack)
-	{
-		// not include asset reference
-		if (asPack) {
-			return BASE_LENGTH_AS_PACK + this.asset.getDataLength(false);
-		} else {
-			return BASE_LENGTH + this.asset.getDataLength(false);
-		}
-	}
-	 */
-
     //PROCESS/ORPHAN
 
     //@Override

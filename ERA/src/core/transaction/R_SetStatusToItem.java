@@ -29,9 +29,13 @@ public class R_SetStatusToItem extends Transaction {
     private static final int ITEM_TYPE_LENGTH = 1;
     // need RIGHTS for non PERSON account
     // DESCRIPTION as tail
-    private static final int SELF_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + ITEM_TYPE_LENGTH + KEY_LENGTH;
-    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + SELF_LENGTH;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + SELF_LENGTH;
+
+    private static final int LOAD_LENGTH = 2 * DATE_LENGTH + KEY_LENGTH + ITEM_TYPE_LENGTH + KEY_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     protected Long key; // STATUS KEY
     protected int itemType; // ITEM TYPE (CAnnot read ITEMS on start DB - need reset ITEM after
     protected Long itemKey; // ITEM KEY
@@ -572,14 +576,27 @@ public class R_SetStatusToItem extends Transaction {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // not include reference
-        int len = withSignature ? BASE_LENGTH_AS_PACK : BASE_LENGTH;
-        len += (this.value_1 == 0 ? 0 : VALUE_LENGTH)
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        base_len += (this.value_1 == 0 ? 0 : VALUE_LENGTH)
                 + (this.value_2 == 0 ? 0 : VALUE_LENGTH)
                 + (this.data_1 == null ? 0 : 1 + this.data_1.length)
                 + (this.data_2 == null ? 0 : 1 + this.data_2.length)
                 + (this.ref_to_parent == 0 ? 0 : REF_LENGTH)
                 + (this.description == null ? 0 : this.description.length);
-        return len;
+        return base_len;
     }
 
     //VALIDATE

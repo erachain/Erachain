@@ -59,7 +59,9 @@ public class R_Send extends TransactionAmount {
     public static final int NO_DATA_MASK = 128; // 0x10000000
     public static final int MAX_DATA_VIEW = 64;
     //private static int position;
-    protected static final int BASE_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
+
+    protected static final int LOAD_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
+
     private static final byte TYPE_ID = (byte) Transaction.SEND_ASSET_TRANSACTION;
     private static final String NAME_ID = "Send";
     protected String head;
@@ -430,7 +432,7 @@ public class R_Send extends TransactionAmount {
         int dataLen = super.getDataLength(forDeal, withSignature) + 1 + head.getBytes(StandardCharsets.UTF_8).length;
 
         if (this.typeBytes[3] >= 0)
-            return dataLen + BASE_LENGTH + this.data.length;
+            return dataLen + LOAD_LENGTH + this.data.length;
         else
             return dataLen;
     }

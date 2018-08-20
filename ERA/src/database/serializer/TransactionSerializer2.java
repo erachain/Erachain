@@ -17,8 +17,13 @@ public class TransactionSerializer2 implements Serializer<Transaction>, Serializ
 
     @Override
     public void serialize(DataOutput out, Transaction value) throws IOException {
-        out.writeInt(value.getDataLength(Transaction.FOR_DB_RECORD, true));
-        out.write(value.toBytes(Transaction.FOR_DB_RECORD, true));
+        if (false) {
+            out.writeInt(value.getDataLength(Transaction.FOR_DB_RECORD, true));
+            out.write(value.toBytes(Transaction.FOR_DB_RECORD, true));
+        } else {
+            out.writeInt(value.getDataLength(Transaction.FOR_NETWORK, true));
+            out.write(value.toBytes(Transaction.FOR_NETWORK, true));
+        }
     }
 
     @Override
@@ -27,7 +32,11 @@ public class TransactionSerializer2 implements Serializer<Transaction>, Serializ
         byte[] bytes = new byte[length];
         in.readFully(bytes);
         try {
-            return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_DB_RECORD);
+            if (false) {
+                return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_DB_RECORD);
+            } else {
+                return TransactionFactory.getInstance().parse(bytes, Transaction.FOR_NETWORK);
+            }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }

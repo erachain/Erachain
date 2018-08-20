@@ -559,17 +559,27 @@ public class R_SignNote extends Transaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
         int add_len = 0;
         if (this.data != null && this.data.length > 0)
             add_len += IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH + this.data.length;
         if (this.key > 0)
             add_len += KEY_LENGTH;
 
-        if (withSignature) {
-            return BASE_LENGTH_AS_PACK + add_len;
-        } else {
-            return BASE_LENGTH + add_len;
-        }
+        return base_len + add_len;
     }
 
     //@Override

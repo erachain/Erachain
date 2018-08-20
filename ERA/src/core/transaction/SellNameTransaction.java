@@ -15,6 +15,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
+/**
+* @deprecated
+ */
 public class SellNameTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) SELL_NAME_TRANSACTION;
     private static final String NAME_ID = "OLD: Sale Name";

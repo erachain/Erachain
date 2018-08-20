@@ -30,7 +30,12 @@ public class CancelOrderTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) CANCEL_ORDER_TRANSACTION;
     private static final String NAME_ID = "Cancel Order";
     private static final int ORDER_LENGTH = Crypto.SIGNATURE_LENGTH;
+
+    private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + ORDER_LENGTH;
+    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + ORDER_LENGTH;
     private static final int BASE_LENGTH = Transaction.BASE_LENGTH + ORDER_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + ORDER_LENGTH;
+
     private byte[] orderSignature;
     private Long orderID;
 
@@ -217,7 +222,21 @@ public class CancelOrderTransaction extends Transaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        return BASE_LENGTH;
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len;
+
     }
 
     public static void process_it(DCSet db, Order order) {

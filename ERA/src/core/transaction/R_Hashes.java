@@ -41,8 +41,15 @@ public class R_Hashes extends Transaction {
 
     private static final int URL_SIZE_LENGTH = 1;
     public static final int MAX_URL_LENGTH = (int) Math.pow(256, URL_SIZE_LENGTH) - 1;
-    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + URL_SIZE_LENGTH + DATA_SIZE_LENGTH;
     private static final int HASH_LENGTH = 32;
+
+
+    protected static final int LOAD_LENGTH = URL_SIZE_LENGTH + DATA_SIZE_LENGTH;
+    protected static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    protected static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     protected byte[] url; // url
     protected byte[] data;
     protected byte[][] hashes;
@@ -326,15 +333,24 @@ public class R_Hashes extends Transaction {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
         int add_len = this.url == null? 0 : this.url.length
                 + this.data.length
                 + this.hashes.length * HASH_LENGTH;
 
-        if (withSignature) {
-            return BASE_LENGTH_AS_PACK + add_len;
-        } else {
-            return BASE_LENGTH + add_len;
-        }
+        return base_len + add_len;
     }
 
     //@Override

@@ -47,7 +47,13 @@ public class CreateOrderTransaction extends Transaction {
     private static final int HAVE_LENGTH = 8;
     private static final int WANT_LENGTH = 8;
     // private static final int PRICE_LENGTH = 12;
-    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + HAVE_LENGTH + WANT_LENGTH + 2 * AMOUNT_LENGTH;
+
+    private static final int LOAD_LENGTH = HAVE_LENGTH + WANT_LENGTH + 2 * AMOUNT_LENGTH;
+    private static final int BASE_LENGTH_AS_MYPACK = Transaction.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_PACK = Transaction.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH = Transaction.BASE_LENGTH + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+
     private final BigDecimal FEE_MIN_1 = new BigDecimal("-0.0001");
     private long haveKey;
     private long wantKey;
@@ -350,8 +356,22 @@ public class CreateOrderTransaction extends Transaction {
     // VALIDATE
 
     @Override
-    public int getDataLength(int forDeal, boolean withSignature) {
-        return BASE_LENGTH;
+    public int getDataLength(int forDeal, boolean withSignature)
+    {
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len;
     }
 
     @Override

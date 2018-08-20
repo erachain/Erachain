@@ -19,7 +19,13 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
     private static final byte TYPE_ID = (byte) Transaction.GENESIS_CERTIFY_PERSON_TRANSACTION;
     private static final String NAME_ID = "GENESIS Certify Person";
     private static final int RECIPIENT_LENGTH = TransactionAmount.RECIPIENT_LENGTH;
-    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH;
+
+
+    private static final int LOAD_LENGTH = RECIPIENT_LENGTH + KEY_LENGTH;
+    private static final int BASE_LENGTH_AS_MYPACK = Genesis_Record.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_PACK = Genesis_Record.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
+    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + LOAD_LENGTH;
+    private static final int BASE_LENGTH_AS_DBRECORD = Genesis_Record.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
     private Account recipient;
     private long key;
@@ -100,7 +106,20 @@ public class GenesisCertifyPersonRecord extends Genesis_Record {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        return BASE_LENGTH;
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len;
     }
 
 

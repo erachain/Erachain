@@ -74,7 +74,21 @@ public class GenesisIssue_ItemRecord extends Genesis_Record {
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
         // not include item REFERENCE
-        return BASE_LENGTH + this.item.getDataLength(false);
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len + this.item.getDataLength(false);
     }
 
     //VALIDATE

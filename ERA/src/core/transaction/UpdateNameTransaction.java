@@ -18,6 +18,9 @@ import java.util.Map;
 
 //import java.math.BigInteger;
 
+/**
+ * @deprecated
+ */
 public class UpdateNameTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) UPDATE_NAME_TRANSACTION;
     private static final String NAME_ID = "OLD: Update Name";
