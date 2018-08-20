@@ -7,20 +7,13 @@ import datachain.DCSet;
 import gui.items.Item_Search_SplitPanel;
 import gui.items.accounts.Account_Send_Dialog;
 import gui.items.mails.Mail_Send_Dialog;
-import gui.library.MButton;
-import gui.models.PersonAccountsModel;
 import gui.records.VouchRecordDialog;
 import lang.Lang;
 
 import javax.swing.*;
-
-import org.mapdb.Fun.Tuple3;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Stack;
-import java.util.TreeMap;
 
 public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
 
@@ -60,7 +53,7 @@ public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
   
 //    add items in menu
       
-             JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
+             JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status to person"));
            
             set_Status_Item.addActionListener(new ActionListener() {
                 @Override
@@ -73,7 +66,7 @@ public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
             });
             this.menu_Table.add(set_Status_Item);
 
-            JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest Public Key for Person"));
+            JMenuItem attestPubKey_Item = new JMenuItem(Lang.getInstance().translate("Attest public key for person"));
            
             attestPubKey_Item.addActionListener(new ActionListener() {
                 @Override
@@ -87,7 +80,7 @@ public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
             });
             this.menu_Table.add(attestPubKey_Item);
 
-            JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the Person Info"));
+            JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
             vouchPerson_Item.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
