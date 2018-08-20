@@ -337,7 +337,6 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         Iterable keys = Fun.filter(this.recipientKey, address);
         Iterator iter = keys.iterator();
         int prevKey = startHeight;
-        keys = null;
         while (iter.hasNext()) {
             Tuple2<Integer, Integer> key = (Tuple2<Integer, Integer>) iter.next();
             if (key.a >= startHeight) {
@@ -350,7 +349,6 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
                 return key;
             }
         }
-        iter = null;
         return null;
     }
 

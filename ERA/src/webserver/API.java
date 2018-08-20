@@ -1773,30 +1773,4 @@ public class API {
         }
     }
 
-    /*
-     * ************* TRANSACTIONS **************
-     */
-
-
-    /**
-     * web api. get transaction by address. in method set static limit transaction 50.
-     *
-     * @param address address
-     * @return list of transaction(JSON string)
-     */
-    @GET
-    @Path("sendassetsfilter")
-    public Response getTransaction(@QueryParam("address") String address) {
-        Account account = Controller.getInstance().getAccountByAddress(address);
-        JSONArray array = new JSONArray();
-        // Это ошибочный метод который роется в КОШЕЛЬКЕ!
-        // все методы работы с транзакция вынесены в API_Transactions кроме взять по номеру и SCAN
-
-        ///for (Transaction transaction : Controller.getInstance().getLastTransactions(account, 50)) {
-        ///    array.add(transaction.toJson());
-        ///}
-        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
-                .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(array.toJSONString())).build();
-    }
 }
