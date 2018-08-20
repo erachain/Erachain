@@ -343,11 +343,13 @@ public abstract class Transaction {
     public static final int FEE_LENGTH = 4;
     // protected static final int HKEY_LENGTH = 20;
     public static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
-    protected static final int BASE_LENGTH = TYPE_LENGTH + FEE_POWER_LENGTH + REFERENCE_LENGTH + TIMESTAMP_LENGTH
+    protected static final int BASE_LENGTH_AS_MYPACK = TYPE_LENGTH;
+    protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
+    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH
+            + CREATOR_LENGTH + SIGNATURE_LENGTH;
+    protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
     // in pack toByte and Parse - reference not included
-    protected static final int BASE_LENGTH_AS_PACK = TYPE_LENGTH + CREATOR_LENGTH
-            + /* REFERENCE_LENGTH */ +SIGNATURE_LENGTH;
     static Logger LOGGER = Logger.getLogger(Transaction.class.getName());
 
     protected DCSet dcSet;
@@ -1051,7 +1053,18 @@ public abstract class Transaction {
 
     }
 
-    public abstract int getDataLength(int forDeal, boolean withSignature);
+    public int getDataLength(int forDeal, boolean withSignature) {
+
+        if (forDeal == FOR_MYPACK)
+            return Transaction.BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_MYPACK)
+            return BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            return BASE_LENGTH_AS_DBRECORD;
+
+        return BASE_LENGTH;
+
+    }
 
     // PROCESS/ORPHAN
 
