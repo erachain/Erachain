@@ -86,11 +86,11 @@ public class ForgingStatus extends JLabel implements Observer {
                     setToolTipText(Lang.getInstance().translate("To start forging you need to unlock the wallet."
                             + " " + timeForge));
                 } else if (Controller.getInstance().getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT && Controller.getInstance().getStatus() == Controller.STATUS_OK) {
-                    setToolTipText(Lang.getInstance().translate("To start forging need await SYNC peer."
-                            + " " + timeForge));
+                    setToolTipText(Lang.getInstance().translate("To start forging need await SYNC peer.")
+                            + " " + timeForge);
                 } else {
-                    setToolTipText(Lang.getInstance().translate("For forging wallet must be online and fully synchronized."
-                            + " " + timeForge));
+                    setToolTipText(Lang.getInstance().translate("For forging wallet must be online and fully synchronized.")
+                            + " " + timeForge);
                 }
 
             }

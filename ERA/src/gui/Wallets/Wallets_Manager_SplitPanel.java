@@ -7,6 +7,7 @@ import gui.library.My_JFileChooser;
 import lang.Lang;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,6 +26,7 @@ public class Wallets_Manager_SplitPanel extends Split_Panel {
         this.searchToolBar_LeftPanel.setVisible(false);
         this.toolBar_LeftPanel.setVisible(true);
         this.button1_ToolBar_LeftPanel.setVisible(true);
+        this.button1_ToolBar_LeftPanel.setBorder(new LineBorder(Color.BLACK));
         this.button1_ToolBar_LeftPanel.setText(Lang.getInstance().translate("Add Wallet"));
         this.button2_ToolBar_LeftPanel.setVisible(false);
 
