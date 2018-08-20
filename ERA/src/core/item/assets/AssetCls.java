@@ -1,14 +1,14 @@
 package core.item.assets;
 
 
-import org.json.simple.JSONObject;
-
 import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.ItemCls;
 import datachain.DCSet;
 import datachain.Issue_ItemMap;
 import datachain.Item_Map;
+import lang.Lang;
+import org.json.simple.JSONObject;
 
 
 // 1019 - Movable = true; Divisible = NO; Quantity = 1
@@ -51,13 +51,13 @@ public abstract class AssetCls extends ItemCls {
     public static final String REAL_DESCR = "Труд, знания, заслуги и польза" + ": "
             + REAL_NAME + "(" + REAL_ABBREV + "). ";
 
-	// DEaL KEY
-	public static final long LIA_KEY = 5l;
-	public static final String LIA_ABBREV = "LIA"; // COMPU (compute units)
-	public static final String LIA_NAME = "LIA";
-	public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
+    // DEaL KEY
+    public static final long LIA_KEY = 5l;
+    public static final String LIA_ABBREV = "LIA"; // COMPU (compute units)
+    public static final String LIA_NAME = "LIA";
+    public static final String LIA_DESCR = "Life ID Asset (" + LIA_NAME + ")";
 
-	public static final int UNIQUE = 1;
+    public static final int UNIQUE = 1;
     public static final int VENTURE = 2;
     public static final int NAME = 3;
     public static final int INITIAL_FAVORITES = 4;
@@ -67,26 +67,25 @@ public abstract class AssetCls extends ItemCls {
     ///////////////////////////////////////////////////
     /**
      * GOODS
-     *  передача в собственность, взять на хранение
-     *  0 : движимая вещь вовне - может быть доставлена и передана на хранение (товары)
+     * передача в собственность, взять на хранение
+     * 0 : движимая вещь вовне - может быть доставлена и передана на хранение (товары)
      */
     public static final int AS_OUTSIDE_GOODS = 0; // movable
 
     /**
      * ASSETS
-     *  передача имущества не требует действий во вне - все исполняется тут же. Их можно дать в долг и заьрать самостоятельно
-     *  Требования не предъявляются.
-     *  3 : цифровое имущество - не требует действий вовне и исполняется внутри платформы (токены, цифровые валюты, цифровые билеты, цифровые права и т.д.)
-     *  
+     * передача имущества не требует действий во вне - все исполняется тут же. Их можно дать в долг и заьрать самостоятельно
+     * Требования не предъявляются.
+     * 3 : цифровое имущество - не требует действий вовне и исполняется внутри платформы (токены, цифровые валюты, цифровые билеты, цифровые права и т.д.)
      */
     public static final int AS_INSIDE_ASSETS = 1;
 
     /**
      * IMMOVABLE
-     *  передача в сосбтвенность, дать в аренду (по графику времени), взять на охрану
-     *  1 : недвижимая вещь вовне - может быть передана в аренду (недвижимость)
+     * передача в сосбтвенность, дать в аренду (по графику времени), взять на охрану
+     * 1 : недвижимая вещь вовне - может быть передана в аренду (недвижимость)
      */
-    
+
     public static final int AS_OUTSIDE_IMMOVABLE = 2;
 
     /**
@@ -127,7 +126,7 @@ public abstract class AssetCls extends ItemCls {
     /**
      * outside CLAIMS
      * +++ требования и обязательства вовне - можно истребовать право и подтвердить его исполнение (ссуда, займ, услуга, право, требование, деньги, билеты и т.д.)
-     *
+     * <p>
      * учет обязательств прав и требований на услуги и действия во внешнем мире - в том числе займы, ссуды, кредиты, фьючерсы и т.д.
      * нельзя вернуть эмитенту - но можно потребовать исполнение прав и можно подтвердить исполнение (погасить требование)
      * это делается теми же трнзакциями что выдать и забрать долг у внутренних активов
@@ -138,7 +137,7 @@ public abstract class AssetCls extends ItemCls {
     ///////////////
     /**
      * inside CURRENCY
-     * +++ деньги 
+     * +++ деньги
      * === полный аналог ASSET по действиям в протоколе - чисто для наименования другого
      */
     public static final int AS_INSIDE_CURRENCY = 51;
@@ -264,26 +263,26 @@ public abstract class AssetCls extends ItemCls {
 
                 return "±" + this.name;
         }
-        
+
         if (this.asset_type >= AS_OUTSIDE_CURRENCY
                 && this.asset_type <= AS_OUTSIDE_OTHER_CLAIM)
-                return "◄" + this.name;
-                
+            return "◄" + this.name;
+
         if (this.asset_type == AS_INSIDE_ASSETS
                 || this.asset_type >= AS_INSIDE_CURRENCY
                 && this.asset_type <= AS_INSIDE_OTHER_CLAIM)
-                return "►" + this.name;
-                
+            return "►" + this.name;
+
         return "?" + this.name;
 
     }
 
 
     public PublicKeyAccount getOwner() {
-	if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
-	    return BlockChain.ASSET_OWNERS.get(this.key);
-	}
-	
+        if (this.key > 10 && this.key < 100 && BlockChain.ASSET_OWNERS.containsKey(this.key)) {
+            return BlockChain.ASSET_OWNERS.get(this.key);
+        }
+
         return this.owner;
     }
 
@@ -343,7 +342,7 @@ public abstract class AssetCls extends ItemCls {
         if (this.key > 0 && this.key < 5 ||
                 this.key > 1000 &&
                         this.key < BlockChain.AMOUNT_SCALE_FROM
-                ) {
+        ) {
             //return this.asset_type == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
             // IN ANY CASE
             return BlockChain.AMOUNT_DEDAULT_SCALE;
@@ -500,46 +499,44 @@ public abstract class AssetCls extends ItemCls {
     }
 
     public static String viewAssetTypeDescriptionCls(int asset_type) {
+        Lang lang = Lang.getInstance();
         switch (asset_type) {
             case AS_OUTSIDE_GOODS:
-                return "Движимые вещи и товары. Эти товары могут быть взяты на хранение кладовщиком или за подтверждение доставки. При этом видны остатки на счетах кладовщиков и доставщиков";
+                return lang.translate("Movable things and goods. These goods can be taken for storage by the storekeeper or for confirmation of delivery. In this case you can see the balances on the accounts of storekeepers and delivery agents");
             case AS_OUTSIDE_IMMOVABLE:
-                return "Недвижимость и иные товары и вещи не подлежащие доставке. Такие вещи можно взять и дать в аренду";
-                
+                return lang.translate("Real estate and other goods and things not subject to delivery. Such things can be taken and given for rent");
             case AS_OUTSIDE_CURRENCY:
-                return "Внешние деньги, которые необходимо перевести на внешний банковский счет или передать наличными. Величина на вашем счете показывает право требовать к эмитенту перевод такого количества денег на ваш банковский счет. Для удовлетворения требования необходимо выставить его на оплату, а после прихода денег подтвердить погашение этого требования";
+                return lang.translate("External money that must be transferred to an external bank account or transferred in cash. The amount on your account shows the right to demand the issuer to transfer such amount of money to your bank account. In order to satisfy the demand it is necessary to set it up for the payment, and after the money has arrived into your account confirm the repayment of this demand");
             case AS_OUTSIDE_SERVICE:
-                return "Внешняя услуга, которую необходимо оказать вовне. Для уведомления вашего желания на оказание услуги необходимо предъявить требование и потом подтвердить его исполнение для вас";
+                return lang.translate("An external service that needs to be provided outside. To notify your wish to provide services you must make demands and then confirm the fulfillment");
             case AS_OUTSIDE_SHARE:
-                return "Внешние акции, которые необходимо передать во внешнем депозитарии. Депозитарий можно уведомить предъявлением требования и после подтвердить передачу акций";
+                return lang.translate("External shares which have to be transferred to an external depository. The depositary can be notified by presenting the claim and then confirm the shares transfer");
             case AS_OUTSIDE_BILL:
-                return "Цифровой простой вексель, который можно предъявить к погашению внешними деньгами";
+                return lang.translate("A digital promissory note can be called for redemption by external money");
             case AS_OUTSIDE_BILL_EX:
-                return "Цифровой переводной вексель, который можно предъявить к погашению внешними деньгами";
+                return lang.translate("A digital bill of exchange can be called for redemption by external money");
             case AS_OUTSIDE_OTHER_CLAIM:
-                return "Другие внешние права, требования и обязательства. Любое обязательство (как и другие внешние активы), которое может быть истребовано внесением записи \"требования исполнения\" и погашено записью \"подтверждения исполнения\" этого обязательства";
-
+                return lang.translate("Other external rights, requirements and obligations. Any obligation (as well as other external assets), which can be claimed by the record \"summon\" and discharged by the record \"confirmation of fulfillment\" of this obligation");
             case AS_INSIDE_ASSETS:
-                return "Внутренний (цифровой) актив. То что не требует каких либо внешних дополнительных действий при передаче его между счетами внутри Эрачейн";
+                return lang.translate("Internal (digital) asset. It does not require any external additional actions when transferring between accounts inside Erachain");
             case AS_INSIDE_CURRENCY:
-                return "Цифровые деньги";
+                return lang.translate("Digital money");
             case AS_INSIDE_UTILITY:
-                return "Цифровая услуга или стоимость - то что может быть использовано внутри Эрачейн, например как оплата за внешние услуги";
+                return lang.translate("Digital service or a cost is something that can be used inside Erachain nvironment, for example as a payment for external services");
             case AS_INSIDE_SHARE:
-                return "Цифровая акция. Доля собственности на внешнее или внутренне предприятие, обладание которой устанавливает право на владение соотвествующей долей на предприятии без надобности совершать какие-либо внешние действия";
+                return lang.translate("Digital share. The share of ownership of an external or internal enterpris, the possession of which establishes the right to own the corresponding share of the enterprise without the need to take any external actions");
             case AS_INSIDE_BONUS:
-                return "Цифровая награда (бонус). То что не имеет общепринятой стомости и не может обмениваться на другие виды активов внутри Эрачейн. Хотя обмен на другие бонусы и награды разрешены";
+                return lang.translate("Digital reward (bonus). It has no generally accepted value and can not be exchanged for other types of assets inside the Erachain environment. The exchange for other bonuses and rewards are allowed");
             case AS_INSIDE_ACCESS:
-                return "Цифовые права доступа и управления";
+                return lang.translate("Digital rights of access and control");
             case AS_INSIDE_VOTE:
-                return "Цифовой голос для голосований";
+                return lang.translate("A digital voice for voting");
             case AS_INDEX:
-                return "Индекс на внешние и внутренние активы, например на валюты на ФОРЕКСе";
+                return lang.translate("Index on foreign and domestic assets, for example currencies on FOREX");
             case AS_INSIDE_OTHER_CLAIM:
-                return "Другие цифровые права, требования и обязательства. Эти активы (как и другие цифровые) можно передать в долг и самостоятельно конфисковать долг у должника.";
-
+                return lang.translate("Other digital rights, requirements and obligations. These assets (as well as other digital assets) can be given in debt and seized by the lender.");
             case AS_ACCOUNTING:
-                return "Счетные (бухгалтерские) единицы. Не имеют общепринятой стоимости и могут обмениваться только между собой. Все действия с ними возможны в целях учета - передать, принять на хранение (на баланс), выдать в долг, забрать долг и т.д.";
+                return lang.translate("Accounting (bookkeeping) units. They do not have a generally accepted value and can only be exchanged among themselves. Actions with them are possible only for accounting purposes: transfer, take for storage (on balance), lend, take back the debt, etc.");
         }
         return "";
     }
