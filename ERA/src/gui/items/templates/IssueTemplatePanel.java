@@ -113,8 +113,7 @@ public class IssueTemplatePanel extends JPanel {
         // Issue_Asset_Confirm_Dialog cont = new
         // Issue_Asset_Confirm_Dialog(issueAssetTransaction);
         String text = "<HTML><body>";
-        text += Lang.getInstance().translate("Confirmation Transaction") + ":&nbsp;"
-                + Lang.getInstance().translate("Issue Template") + "<br><br><br>";
+        text += Lang.getInstance().translate("Confirmation transaction issue template") + "<br><br><br>";
         text += Lang.getInstance().translate("Creator") + ":&nbsp;" + issueTemplate.getCreator() + "<br>";
         text += Lang.getInstance().translate("Title") + ":&nbsp;" + issueTemplate.getItem().viewName() + "<br>";
         text += Lang.getInstance().translate("Description") + ":<br>"
@@ -131,8 +130,7 @@ public class IssueTemplatePanel extends JPanel {
         Issue_Confirm_Dialog dd = new Issue_Confirm_Dialog(MainFrame.getInstance(), true,  issueTemplate,
                 text,
                 (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
-                Lang.getInstance().translate("Confirmation Transaction") + " "
-                        + Lang.getInstance().translate("Issue Template"));
+                Lang.getInstance().translate("Confirmation transaction issue template"));
         IssueTemplateDetailsFrame ww = new IssueTemplateDetailsFrame(issueTemplate);
         dd.jScrollPane1.setViewportView(ww);
         dd.setLocationRelativeTo(th);
