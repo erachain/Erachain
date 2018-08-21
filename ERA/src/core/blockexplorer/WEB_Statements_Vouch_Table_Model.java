@@ -174,7 +174,7 @@ public class WEB_Statements_Vouch_Table_Model extends AbstractTableModel impleme
             if (ss.getType() == Transaction.VOUCH_TRANSACTION) {
                 R_Vouch ss1 = (R_Vouch) ss;
                 if (ss1.getVouchHeight() == blockNo
-                        && ss1.getVouchSeq() == recNo
+                        && ss1.getVouchSeqNo() == recNo
                         )
 
                     if (!this.transactions.contains(ss)) {

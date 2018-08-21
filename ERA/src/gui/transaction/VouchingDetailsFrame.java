@@ -20,13 +20,13 @@ public class VouchingDetailsFrame extends Rec_DetailsFrame {
 
         //NAME
         ++detailGBC.gridy;
-        JTextField name = new JTextField(vouchRecord.getVouchHeight() + "-" + vouchRecord.getVouchSeq());
+        JTextField name = new JTextField(vouchRecord.getVouchHeight() + "-" + vouchRecord.getVouchSeqNo());
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
         this.add(name, detailGBC);
 
         Transaction record = DCSet.getInstance().getTransactionFinalMap().
-                getTransaction(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeq());
+                getTransaction(vouchRecord.getVouchHeight(), vouchRecord.getVouchSeqNo());
 
         String message = "<div>";
         if (record == null) {
