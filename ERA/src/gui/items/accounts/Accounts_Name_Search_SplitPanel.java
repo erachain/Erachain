@@ -213,7 +213,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         });
         menu.add(menu_copyPublicKey);
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
@@ -224,7 +224,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);
@@ -235,7 +235,7 @@ public class Accounts_Name_Search_SplitPanel extends Split_Panel {
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit Name"));
+        JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Edit name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getAccount(row);

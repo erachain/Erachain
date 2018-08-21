@@ -73,7 +73,7 @@ public class HyperLinkAccount {
         }
         account_Menu.add(copyPublicKey);
 
-        JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem Send_Coins_Crator = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_Crator.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new Account_Send_Dialog(null, null, account, null);

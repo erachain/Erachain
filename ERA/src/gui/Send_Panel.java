@@ -314,7 +314,7 @@ public class Send_Panel extends JPanel {
         labelEncGBC.gridx = 2;
         labelEncGBC.gridy = y;
 
-        JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
+        JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt message") + ":");
         encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         this.add(encLabel, labelEncGBC);
 

@@ -54,8 +54,8 @@ public class Account_Lend_Panel extends AssetSendPanel {
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Lend"));
-        this.jLabel_To.setText(Lang.getInstance().translate("Debtor Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Debtor Details") + ":");
+        this.jLabel_To.setText(Lang.getInstance().translate("Debtor account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Debtor details") + ":");
 
 
        

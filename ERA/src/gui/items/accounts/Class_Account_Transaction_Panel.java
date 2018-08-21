@@ -187,7 +187,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         labelFromGBC.weightx = 0;
         labelFromGBC.gridx = 0;
         labelFromGBC.gridy = ++y;
-        JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select Account") + ":");
+        JLabel fromLabel = new JLabel(Lang.getInstance().translate("Select account") + ":");
         this.add(fromLabel, labelFromGBC);
         // fontHeight =
         // fromLabel.getFontMetrics(fromLabel.getFont()).getHeight();
@@ -372,7 +372,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         labelEncGBC.gridx = 2;
         labelEncGBC.gridy = y;
 
-        JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt Message") + ":");
+        JLabel encLabel = new JLabel(Lang.getInstance().translate("Encrypt message") + ":");
         encLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         this.add(encLabel, labelEncGBC);
 
@@ -459,7 +459,7 @@ public class Class_Account_Transaction_Panel extends JPanel {
         feelabelGBC.fill = GridBagConstraints.BOTH;
         feelabelGBC.weightx = 0;
         feelabelGBC.gridx = 2;
-        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee Level") + ":");
+        final JLabel feeLabel = new JLabel(Lang.getInstance().translate("Fee level") + ":");
         feeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         feeLabel.setVerticalAlignment(SwingConstants.TOP);
         this.add(feeLabel, feelabelGBC);

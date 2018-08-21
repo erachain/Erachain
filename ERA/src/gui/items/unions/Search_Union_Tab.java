@@ -31,7 +31,7 @@ public class Search_Union_Tab extends Item_Search_SplitPanel {
         });
         this.menu_Table.add(confirm_Menu);
 
-        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set Status"));
+        JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new UnionSetStatusDialog(th, (UnionCls) item_Menu);
