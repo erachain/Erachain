@@ -116,7 +116,7 @@ public class Accounts_Library_Panel extends JPanel {
         });
         menu.add(menu_copyPublicKey);
 
-        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy Verifier Name"));
+        JMenuItem menu_copyName = new JMenuItem(Lang.getInstance().translate("Copy verifier name"));
         menu_copyName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -129,7 +129,7 @@ public class Accounts_Library_Panel extends JPanel {
         });
         menu.add(menu_copyName);
 
-        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy Account Verifier"));
+        JMenuItem copy_Creator_Address = new JMenuItem(Lang.getInstance().translate("Copy account verifier"));
         copy_Creator_Address.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -139,7 +139,7 @@ public class Accounts_Library_Panel extends JPanel {
         });
         menu.add(copy_Creator_Address);
 
-        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy Verifier Public Key"));
+        JMenuItem menu_copy_Creator_PublicKey = new JMenuItem(Lang.getInstance().translate("Copy verifier public key"));
         menu_copy_Creator_PublicKey.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -163,7 +163,7 @@ public class Accounts_Library_Panel extends JPanel {
         menu.add(menu_copy_Block_PublicKey);
 
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);
@@ -174,7 +174,7 @@ public class Accounts_Library_Panel extends JPanel {
         });
         menu.add(Send_Coins_item_Menu);
 
-        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        JMenuItem Send_Mail_item_Menu = new JMenuItem(Lang.getInstance().translate("Send mail"));
         Send_Mail_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);
@@ -185,7 +185,7 @@ public class Accounts_Library_Panel extends JPanel {
         });
         menu.add(Send_Mail_item_Menu);
 
-        JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Set Name"));
+        JMenuItem setName = new JMenuItem(Lang.getInstance().translate("Set name"));
         setName.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 Account account = person_Accounts_Model.getAccount(row);

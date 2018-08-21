@@ -44,7 +44,7 @@ public class Issue_Document_Panel extends javax.swing.JPanel {
 
         txtFeePow.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "0", "1", "2", "3", "4", "5", "6", "7", "8" }));
         txtFeePow.setSelectedIndex(0);
-        jLabel_Account_Work.setText(Lang.getInstance().translate("Select Account") + ":");
+        jLabel_Account_Work.setText(Lang.getInstance().translate("Select account") + ":");
         jButton_Work_OK.setText(Lang.getInstance().translate("Sign and Send"));
         jButton_Work_OK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

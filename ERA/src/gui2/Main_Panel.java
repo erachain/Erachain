@@ -282,7 +282,7 @@ public class Main_Panel extends javax.swing.JPanel {
     // add tab from name
     public void addTab(String str) {
 
-        if (str.equals(Lang.getInstance().translate("Send Payment Order")) || str.equals("Issue_Send_Payment_Order")) {
+        if (str.equals(Lang.getInstance().translate("Send payment order")) || str.equals("Issue_Send_Payment_Order")) {
             insertTab(Lang.getInstance().translate("Send Payment Order"), new Issue_Send_Payment_Order());
             return;
         }
@@ -306,8 +306,8 @@ public class Main_Panel extends javax.swing.JPanel {
             insertTab(Lang.getInstance().translate("Search Persons"), new Persons_Search_SplitPanel());
             return;
         }
-        if (str.equals(Lang.getInstance().translate("Issue Person")) || str.equals("IssuePersonPanel")) {
-            insertTab(Lang.getInstance().translate("Issue Person"), new IssuePersonPanel());
+        if (str.equals(Lang.getInstance().translate("Issue person")) || str.equals("IssuePersonPanel")) {
+            insertTab(Lang.getInstance().translate("Issue person"), new IssuePersonPanel());
             return;
 
         }

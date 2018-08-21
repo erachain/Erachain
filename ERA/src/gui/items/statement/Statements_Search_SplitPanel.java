@@ -179,7 +179,7 @@ public class Statements_Search_SplitPanel extends Split_Panel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status"));
 
         set_Status_Item.addActionListener(new ActionListener() {
             @Override

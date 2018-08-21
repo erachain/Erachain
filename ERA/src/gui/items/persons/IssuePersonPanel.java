@@ -382,7 +382,7 @@ public class IssuePersonPanel extends JPanel {
                     " ",
                     (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                     Lang.getInstance().translate("Confirmation Transaction") + " "
-                            + Lang.getInstance().translate("Issue Person"));
+                            + Lang.getInstance().translate("Issue person"));
 
             IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame(issuePersonRecord);
             // ww.jPanel2.setVisible(false);

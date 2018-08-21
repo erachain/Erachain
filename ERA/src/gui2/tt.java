@@ -64,7 +64,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(records_Node);
         root.add(other_Node);
 
-        bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send Payment Order")));
+        bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Send payment order")));
         bank_Tree.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Payments Orders")));
 
         person_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Persons")));

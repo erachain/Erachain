@@ -94,7 +94,7 @@ public class IssuePersonDetailsFrame extends Rec_DetailsFrame {
 
         //LABEL owner Public key
         ++labelGBC.gridy;
-        JLabel owner_Public_keyLabel = new JLabel(Lang.getInstance().translate("Public Key") + ":");
+        JLabel owner_Public_keyLabel = new JLabel(Lang.getInstance().translate("Public key") + ":");
         this.add(owner_Public_keyLabel, labelGBC);
 
         //owner public key

@@ -222,15 +222,15 @@ public class AssetSendPanel extends javax.swing.JPanel {
        }
 
       this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
-      this.jLabel_Account.setText(Lang.getInstance().translate("Select Account") + ":");
+      this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
       this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
       this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
       this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
      this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
-      this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt Message") + ":");
+      this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");
       this.jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
       this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount") + ":");
-      this.jLabel_Fee.setText(Lang.getInstance().translate("Fee Level") + ":");
+      this.jLabel_Fee.setText(Lang.getInstance().translate("Fee level") + ":");
 
       this.jButton_ok.setText(Lang.getInstance().translate("Send"));
    // CONTEXT MENU

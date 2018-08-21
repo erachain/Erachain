@@ -148,7 +148,7 @@ public class DealsPopupMenu extends JPopupMenu {
         });
         this.add(copyBankKey);
 
-        JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Edit Name"));
+        JMenuItem set_name = new JMenuItem(Lang.getInstance().translate("Edit name"));
         set_name.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new Account_Set_Name_Dialog(pubKey.getAddress());
@@ -198,8 +198,8 @@ public class DealsPopupMenu extends JPopupMenu {
         
         switch (this.asset.getAssetType()) {
             case AssetCls.AS_OUTSIDE_GOODS:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить прием \"на руки\""));
+                this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+                this.holdAsset.setText(Lang.getInstance().translate("Confirm acceptance \"in hand\""));
 
                 // поидее тут как ЛИЗИНГ
                 this.debtAsset.setVisible(false);
@@ -209,70 +209,70 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
                 
             case AssetCls.AS_INSIDE_ASSETS:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
                 
             case AssetCls.AS_OUTSIDE_IMMOVABLE:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Прием на охрану/получено из охраны"));
+                this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
+                this.holdAsset.setText(Lang.getInstance().translate("The employment security/received from security"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Пепедать в аренду"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to rent"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Изъять из аренды"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Withdraw from lease"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Вернуть из аренды"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Return from rent"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
                 
             case AssetCls.AS_OUTSIDE_CURRENCY:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать требование платежа"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.sendAsset.setText(Lang.getInstance().translate("Send payment request"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение"));
+                this.debtAsset.setText(Lang.getInstance().translate("Require repayment"));
                 this.debtAsset.setVisible(true);
                 this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить погашение"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Confirm repayment"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
                 
             case AssetCls.AS_OUTSIDE_SERVICE:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать требование услуги"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.sendAsset.setText(Lang.getInstance().translate("Transfer Service Requirement"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Потребовать предоставление услуги"));
+                this.debtAsset.setText(Lang.getInstance().translate("To require the provision of services"));
                 this.debtAsset.setVisible(true);
                 this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить предоставление услуги"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Confirm the provision of services"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
                 
             case AssetCls.AS_OUTSIDE_SHARE:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать акции в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.sendAsset.setText(Lang.getInstance().translate("To transfer shares in the property"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Потребовать передачу акций"));
+                this.debtAsset.setText(Lang.getInstance().translate("To require the transfer of shares"));
                 this.debtAsset.setVisible(true);
                 this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение акций"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Confirm receipt of shares"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
                 
             case AssetCls.AS_OUTSIDE_BILL:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));  //"Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));
 
                 this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя!"));
                 this.debtAsset.setVisible(true);
@@ -286,7 +286,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 
             case AssetCls.AS_OUTSIDE_BILL_EX:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
-                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));  //"Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Подтвердить получение выплаты?"));
 
                 this.debtAsset.setText(Lang.getInstance().translate("Потребовать погашение векселя!"));
                 this.debtAsset.setVisible(true);
@@ -314,70 +314,70 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.sendAsset.setText(Lang.getInstance().translate("Певести в собственность деньги"));
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием денег на баланс"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
 
             case AssetCls.AS_INSIDE_UTILITY:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность действе"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
 
             case AssetCls.AS_INSIDE_SHARE:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность акции"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
 
             case AssetCls.AS_INSIDE_BONUS:
                 this.sendAsset.setText(Lang.getInstance().translate("Начислить бонусы"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
 
             case AssetCls.AS_INSIDE_ACCESS:
                 this.sendAsset.setText(Lang.getInstance().translate("Наделить правами"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
 
             case AssetCls.AS_INSIDE_VOTE:
                 this.sendAsset.setText(Lang.getInstance().translate("Наделить голосом"));
-                this.holdAsset.setText(Lang.getInstance().translate("Учесть прием на баланс"));
+                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
 
                 this.debtAsset.setText(Lang.getInstance().translate("Передать делегату"));
                 this.debtAsset.setVisible(true);
@@ -406,11 +406,11 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность требование"));
                 this.holdAsset.setText(Lang.getInstance().translate("Учесть прием требования на баланс"));
 
-                this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
+                this.debtAsset.setText(Lang.getInstance().translate("Transfer to debt"));
                 this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Return debt"));
                 this.debtAssetReturn.setVisible(true);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a debt"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;
