@@ -47,14 +47,17 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
-        int test_len = BASE_LENGTH;
+        int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_MYPACK;
         } else if (asDeal == Transaction.FOR_PACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH;
+            test_len = BASE_LENGTH_AS_PACK;
         } else if (asDeal == Transaction.FOR_DB_RECORD) {
-            test_len += Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
         }
+
         if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }

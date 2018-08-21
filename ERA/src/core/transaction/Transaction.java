@@ -346,8 +346,7 @@ public abstract class Transaction {
     protected static final int BASE_LENGTH_AS_MYPACK = TYPE_LENGTH;
     protected static final int BASE_LENGTH_AS_PACK = BASE_LENGTH_AS_MYPACK + TIMESTAMP_LENGTH
             + CREATOR_LENGTH + SIGNATURE_LENGTH;
-    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH
-            + CREATOR_LENGTH + SIGNATURE_LENGTH;
+    protected static final int BASE_LENGTH = BASE_LENGTH_AS_PACK + FEE_POWER_LENGTH + REFERENCE_LENGTH;
     protected static final int BASE_LENGTH_AS_DBRECORD = BASE_LENGTH + FEE_LENGTH;
 
     // in pack toByte and Parse - reference not included
