@@ -1,15 +1,8 @@
 package webserver;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -21,6 +14,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import api.ApiErrorFactory;
+import controller.Controller;
+import core.account.Account;
+import core.block.Block;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -36,27 +33,16 @@ import utils.TransactionTimestampComparator;
 @Produces(MediaType.APPLICATION_JSON)
 public class API_TransactionsResource {
 
-//	static Logger LOGGER = Logger.getLogger(API_TransactionsResource.class.getName());
-
     @Context
     HttpServletRequest request;
-
-//	private static int count_step;
-
-//	private static boolean run_test = false;
-
-//	protected String tt;
-
-//	private static Thread thread;
-//	private static int sleep;
-//	private static BigDecimal amm;
-//	private static byte[] mes;
 
     @GET
     public Response Default() {
 
         Map<String, String> help = new LinkedHashMap<String, String>();
 
+        help.put("apirecords/incomingfromblock/{address}/{blockStart}",
+                Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
                 Lang.getInstance().translate("Get all Records (and Unconfirmed) for Address & Asset Key by record type. recordType is option parameter"));
         help.put("apirecords/getlastbyaddress?address={address}&timestamp={Timestamp}&limit={Limit}&unconfirmed=true",
@@ -78,10 +64,72 @@ public class API_TransactionsResource {
 
     }
 
+    /**
+
+     по блокам проходится и берет записи в них пока не просмотрит 2000 блоков и не насобирвет 100 записей. Если при этом не достигнут конец цепочи,
+     то выдаст в ответе параметр next со значением блока с которого нужно начать новый поиск.
+     Ограничение поиска сделано чтобы не грузить сервер запросами
+
+     */
+    @GET
+    @Path("incomingfromblock/{address}/{from}")
+    public String incomingFromBlock(@PathParam("address") String address, @PathParam("from") Long from) {
+
+
+        int height = from.intValue();
+        Block block;
+        try {
+            block = Controller.getInstance().getBlockByHeight(height);
+            if (block == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+            }
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_BLOCK_HEIGHT);
+        }
+
+        JSONObject out = new JSONObject();
+        JSONArray array = new JSONArray();
+        DCSet dcSet = DCSet.getInstance();
+
+        int counter = 0;
+        int counterBlock = 0;
+
+        do {
+            for (Transaction transaction : block.getTransactions()) {
+                transaction.setDC(dcSet, false);
+                HashSet<Account> recipients = transaction.getRecipientAccounts();
+                for (Account recipient : recipients) {
+                    if (recipient.equals(address)) {
+                        array.add(transaction.toJson());
+                        counter++;
+                        break;
+                    }
+                }
+            }
+
+            // one BLOCK checked
+            if (counter > 100 || counterBlock++ > 2000)
+                break;
+
+            block = Controller.getInstance().getBlockByHeight(++height);
+
+        } while (block != null);
+
+        out.put("txs", array);
+
+        // IF not ENDs of CHAIN
+        if (block != null) {
+            out.put("next", height + 1);
+        }
+
+        return out.toJSONString();
+
+    }
+
     @SuppressWarnings("unchecked")
     @GET
     @Path("getbyaddress")
-    public Response getByAddress(@QueryParam("address") String address, @QueryParam("asset") String asset,
+    public Response getByAddress(@QueryParam("address") String address, @QueryParam("asset") Long asset,
             @QueryParam("recordType") String recordType, @QueryParam("unconfirmed") boolean unconfirmed) {
         List<Transaction> result;
         if (address == null || address.equals("")) {
@@ -101,7 +149,7 @@ public class API_TransactionsResource {
             if (recordType != null) {
                 if (transaction.viewTypeName().toUpperCase().equals(recordType.toUpperCase())) {
                     if (asset != null) {
-                        if (transaction.getAbsKey() == new Long(asset))
+                        if (asset.equals(transaction.getAbsKey()))
                             array.add(transaction.toJson());
                     } else
                         array.add(transaction.toJson());
@@ -109,7 +157,7 @@ public class API_TransactionsResource {
             } else {
 
                 if (asset != null) {
-                    if (transaction.getAbsKey() == new Long(asset))
+                    if (asset.equals(transaction.getAbsKey()))
                         array.add(transaction.toJson());
 
                 } else
@@ -165,7 +213,7 @@ public class API_TransactionsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("getbyaddressfromtransactionlimit")
-    public Response getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") String asset,
+    public Response getByAddressLimit(@QueryParam("address") String address, @QueryParam("asset") Long asset,
                                       @QueryParam("start") long start, @QueryParam("end") long end, @QueryParam("type") String type1,
                                       @QueryParam("sort") String sort) {
         List<Transaction> result;
@@ -205,7 +253,7 @@ public class API_TransactionsResource {
         TreeMap<BigDecimal, Transaction> rec = new TreeMap<BigDecimal, Transaction>();
         for (Transaction transaction : result) {
             if (asset != null) {
-                if (transaction.getAbsKey() == new Long(asset)) {
+                if (asset.equals(transaction.getAbsKey())) {
                     rec.put(library.getBlockSegToBigInteger(transaction), transaction);
                 }
 
