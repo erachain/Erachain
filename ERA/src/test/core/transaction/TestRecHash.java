@@ -151,7 +151,7 @@ public class TestRecHash {
         hashes[0] = hash0;
 
         hashesRecord = new R_Hashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
-        hashesRecord.setDC(db, Transaction.FOR_NETWORK);
+        hashesRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(Transaction.FOR_NETWORK, flags));
 

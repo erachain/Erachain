@@ -307,7 +307,7 @@ public abstract class Trader extends Thread {
                 continue;
 
             // TEST in FORK
-            transaction.setDC(fork, Transaction.FOR_NETWORK);
+            ///transaction.setDC(fork, Transaction.FOR_NETWORK);
             if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
 
                 // DELETE in DC SET

@@ -486,7 +486,7 @@ public class Block {
 
         for (Transaction transaction : this.getTransactions()) {
             //fee = fee.add(transaction.getFee());
-            fee += transaction.getForgedFee(db);
+            fee += transaction.getForgedFee();
         }
 
         // TODO calculate AT FEE
@@ -522,7 +522,7 @@ public class Block {
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
                     Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
-                    transaction.setBlock(this, i + 1);
+                    ///transaction.setBlock(this, i + 1);
 
                     //ADD TO TRANSACTIONS
                     this.transactions.add(transaction);
@@ -1008,9 +1008,12 @@ public class Block {
             TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = validatingDC.getTransactionFinalMapSigns();
 
+            int seqNo = 0;
             for (Transaction transaction : this.transactions) {
                 if (cnt.isOnStopping())
                     return false;
+
+                seqNo++;
 
                 if (!transaction.isWiped()) {
 
@@ -1018,7 +1021,7 @@ public class Block {
                     if (transaction.getCreator() == null) {
                         // ALL GENESIS transaction
                         LOGGER.debug("*** Block[" + height
-                                + "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
+                                + "].Tx[" + seqNo + " : " ///this.getTransactionSeq(transaction.getSignature()) + " : "
                                 + transaction.viewFullTypeName() + "]"
                                 + "creator is Null!"
                         );
@@ -1035,7 +1038,7 @@ public class Block {
                         return false;
                     }
 
-                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK);
+                    transaction.setBlock(this, validatingDC, Transaction.FOR_NETWORK, height, seqNo);
 
                     //CHECK IF VALID
                     if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
@@ -1072,7 +1075,7 @@ public class Block {
 
                 } else {
 
-                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK);
+                    transaction.setBlock(this, validatingDC, Transaction.FOR_NETWORK, height, seqNo);
 
                     //UPDATE REFERENCE OF SENDER
                     if (transaction.isReferenced())
@@ -1262,6 +1265,7 @@ public class Block {
         long timerFinalMap_set = 0;
         long timerTransFinalMapSinds_set = 0;
 
+        int seqNo = 0;
         for (Transaction transaction : this.transactions) {
 
             if (cnt.isOnStopping())
@@ -1270,7 +1274,7 @@ public class Block {
             //LOGGER.debug("[" + seq + "] record is process" );
 
             // NEED set DC for WIPED too
-            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
 
             //PROCESS
             if (!transaction.isWiped()) {
@@ -1387,6 +1391,7 @@ public class Block {
 
         this.getTransactions();
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+        int seqNo = 0;
         for (int i = this.transactionCount - 1; i >= 0; i--) {
             if (cnt.isOnStopping())
                 throw new Exception("on stoping");
@@ -1394,7 +1399,7 @@ public class Block {
             Transaction transaction = transactions.get(i);
             //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
-            transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
 
             if (!transaction.isWiped()) {
                 transaction.orphan(Transaction.FOR_NETWORK);

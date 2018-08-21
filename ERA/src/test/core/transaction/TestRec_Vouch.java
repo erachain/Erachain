@@ -192,7 +192,7 @@ public class TestRec_Vouch {
 		block.addTransaction(vouchRecord);
 		block.process(db);
 		 */
-        vouchRecord.setDC(db,Transaction.FOR_NETWORK);
+        vouchRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         vouchRecord.process(gb, Transaction.FOR_NETWORK);
 
         Tuple2<Integer, Integer> ggg = new Tuple2<Integer, Integer>(height, seq);

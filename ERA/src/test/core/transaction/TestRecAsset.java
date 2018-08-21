@@ -108,7 +108,7 @@ public class TestRecAsset {
 
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
@@ -136,7 +136,7 @@ public class TestRecAsset {
             assertEquals(true, parsedAssetTransfer instanceof R_Send);
 
             BigDecimal ammountParsed = parsedAssetTransfer.getAmount();
-            parsedAssetTransfer.setDC(db, Transaction.FOR_NETWORK);
+            parsedAssetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             BigDecimal ammountParsed_inDC = parsedAssetTransfer.getAmount();
 
             assertEquals(ammountParsed_inDC, amount_asset);
@@ -198,7 +198,7 @@ public class TestRecAsset {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -273,7 +273,7 @@ public class TestRecAsset {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
@@ -309,7 +309,7 @@ public class TestRecAsset {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-        issueAssetTransaction.setDC(db,Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db,Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
         assertEquals(new BigDecimal(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(key, db));
@@ -343,7 +343,7 @@ public class TestRecAsset {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-        issueAssetTransaction.setDC(db,Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db,Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
 
@@ -511,7 +511,7 @@ public class TestRecAsset {
         maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
         assetTransfer.sign(maker, Transaction.FOR_NETWORK);
-        assetTransfer.setDC(db, Transaction.FOR_NETWORK);
+        assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assetTransfer.isValid(Transaction.FOR_NETWORK, flags);
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
@@ -543,7 +543,7 @@ public class TestRecAsset {
         maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         Transaction assetTransfer = new R_Send(maker, FEE_POWER, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
         assetTransfer.sign(maker, Transaction.FOR_NETWORK);
-        assetTransfer.setDC(db, Transaction.FOR_NETWORK);
+        assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
         assetTransfer.orphan(Transaction.FOR_NETWORK);
 
@@ -573,7 +573,7 @@ public class TestRecAsset {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
 
@@ -807,7 +807,7 @@ public class TestRecAsset {
                 "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
                 timestamp, maker.getLastTimestamp(db));
         messageTransaction.sign(maker, Transaction.FOR_NETWORK);
-        messageTransaction.setDC(db,Transaction.FOR_NETWORK);
+        messageTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         messageTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE SENDER
@@ -843,7 +843,7 @@ public class TestRecAsset {
                 "headdd", "wqeszcssd234".getBytes(), new byte[]{1}, new byte[]{1},
                 timestamp, maker.getLastTimestamp(db));
         messageTransaction.sign(maker, Transaction.FOR_NETWORK);
-        messageTransaction.setDC(db, Transaction.FOR_NETWORK);
+        messageTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         messageTransaction.process(gb, Transaction.FOR_NETWORK);
         messageTransaction.orphan(Transaction.FOR_NETWORK);
 

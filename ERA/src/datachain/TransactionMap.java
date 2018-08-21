@@ -388,4 +388,10 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
     public boolean contains(Transaction transaction) {
         return this.contains(transaction.getSignature());
     }
+
+    public Transaction get(byte[] signature) {
+        Transaction item = super.get(signature);
+        item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, this.getDCSet().getBlockMap().size() + 1, 1);
+        return item;
+    }
 }

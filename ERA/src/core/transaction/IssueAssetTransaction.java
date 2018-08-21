@@ -156,12 +156,11 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 	}
 	 */
 
-    @Override
-    public void setDC(DCSet dcSet, int asDeal) {
-        super.setDC(dcSet, asDeal);
+	/*
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         AssetCls asset = (AssetCls) this.item;
-        ///asset.getKey(dcSet);
 
         if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
             // MAKE OLD STYLE ASSET with DEVISIBLE:
@@ -172,11 +171,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         }
 
     }
-
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
-    }
+    */
 
     //VALIDATE
 

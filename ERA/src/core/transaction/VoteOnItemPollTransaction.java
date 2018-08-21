@@ -129,16 +129,15 @@ public class VoteOnItemPollTransaction extends Transaction {
         }
     }
 
-    @Override
-    public void setDC(DCSet dcSet, int asDeal) {
-        super.setDC(dcSet, asDeal);
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
     }
-
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
     }
 
     public long getKey() {

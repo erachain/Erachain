@@ -124,9 +124,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
         return this.key;
     }
 
-    @Override
-    public void setDC(DCSet dcSet, int asDeal) {
-        super.setDC(dcSet, asDeal);
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
 
         if (this.amount != null) {
             long assetKey = this.getAbsKey();
@@ -142,8 +141,19 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        if (this.amount != null) {
+            long assetKey = this.getAbsKey();
+            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(assetKey);
+            if (asset == null || assetKey > BlockChain.AMOUNT_SCALE_FROM) {
+                int different_scale = BlockChain.AMOUNT_DEDAULT_SCALE - asset.getScale();
+                if (different_scale != 0) {
+                    // RESCALE AMOUNT
+                    this.amount = this.amount.scaleByPowerOfTen(different_scale);
+                }
+            }
+        }
     }
 
     @Override

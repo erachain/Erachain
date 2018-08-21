@@ -103,7 +103,7 @@ public class Mails_Transactions_Table extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+            //messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
             
             boolean is = false;
             for (MessageBuf message : messageBufs) {
@@ -299,7 +299,7 @@ public class Mails_Transactions_Table extends JTable implements Observer {
 
         for (Transaction messagetx : transactions) {
 
-            messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+            //messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
 
             if (asset.getKey() == messagetx.getAssetKey()) {
                 boolean is = false;

@@ -3051,7 +3051,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(100),
                 BigDecimal.valueOf(100), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(fork, Transaction.FOR_NETWORK);
+        orderCreation.setDC(fork, Transaction.FOR_NETWORK, 1, 1);
         orderCreation.process(null,Transaction.FOR_NETWORK);
         order_AB_1 = orderCreation.makeOrder();
         order_AB_1_ID = orderCreation.getOrderId();
@@ -3059,7 +3059,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(30), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(fork, Transaction.FOR_NETWORK);
+        orderCreation.setDC(fork, Transaction.FOR_NETWORK, 1, 2);
         orderCreation.process(null,Transaction.FOR_NETWORK);
         order_AB_4 = orderCreation.makeOrder();
         order_AB_4_ID = order_AB_4.getId();
@@ -3067,7 +3067,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1400),
                 BigDecimal.valueOf(200), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(fork, Transaction.FOR_NETWORK);
+        orderCreation.setDC(fork, Transaction.FOR_NETWORK, 1, 3);
         orderCreation.process(null,Transaction.FOR_NETWORK);
         order_AB_3 = orderCreation.makeOrder();
         order_AB_3_ID = order_AB_3.getId();
@@ -3076,7 +3076,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, wantKey, haveKey, BigDecimal.valueOf(1000),
                 BigDecimal.valueOf(130), (byte) 0, timestamp - 1000, 0l, new byte[64]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(fork, Transaction.FOR_NETWORK);
+        orderCreation.setDC(fork, Transaction.FOR_NETWORK, 1, 4);
         orderCreation.process(null,Transaction.FOR_NETWORK);
         order_AB_2 = orderCreation.makeOrder();
         order_AB_2_ID = order_AB_2.getId();

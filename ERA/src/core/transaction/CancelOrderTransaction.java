@@ -61,21 +61,22 @@ public class CancelOrderTransaction extends Transaction {
 
     //GETTERS/SETTERS
 
-    public void setDC(DCSet dcSet, int asDeal) {
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
 
-        super.setDC(dcSet, asDeal);
+        Tuple2<Integer, Integer> createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
+        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
+        this.orderID = Transaction.makeDBRef(createDBRef);
+    }
+
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         Tuple2<Integer, Integer> createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
         //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
         this.orderID = Transaction.makeDBRef(createDBRef);
 
     }
-
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
-    }
-        //public static String getName() { return "OLD: Cancel Order"; }
 
 
     public byte[] getorderSignature() {

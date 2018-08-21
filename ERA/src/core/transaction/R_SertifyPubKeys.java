@@ -555,7 +555,7 @@ public class R_SertifyPubKeys extends Transaction {
             if(this.height < BlockChain.ALL_BALANCES_OK_TO) {
 
                 // GET FEE from that record
-                transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
+                ///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
 
                 // ISSUE NEW COMPU in chain
                 BigDecimal issued_FEE_BD = transPersonIssue.getFee();
@@ -696,7 +696,7 @@ public class R_SertifyPubKeys extends Transaction {
                 // IT IS NOT VOUCHED PERSON
 
                 // GET FEE from that record
-                transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
+                ////transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // NEED to RECAL?? if from DB
                 //long issueFEE = transPersonIssue.getFeeLong() + BlockChain.GIFTED_COMPU_AMOUNT;
                 //if (true || BlockChain.START_LEVEL == 1)
                 //	issueFEE = issueFEE>>2;

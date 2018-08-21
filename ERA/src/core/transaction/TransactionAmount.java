@@ -131,19 +131,21 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     // GETTERS/SETTERS
-    
-    @Override
-    public void setDC(DCSet dcSet, int asDeal) {
-        super.setDC(dcSet, asDeal);
-        
+
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+
         if (this.amount != null) {
-            this.asset = (AssetCls) this.dcSet.getItemAssetMap().get(this.getAbsKey());
+            this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
     }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+        
+        if (this.amount != null) {
+            this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
+        }
     }
 
     // public static String getName() { return "unknown subclass Amount"; }

@@ -144,7 +144,7 @@ public class WalletTransactionsTableModel extends TableModelCls<Tuple2<String, S
         if (transaction == null)
             return null;
 
-        transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+        //transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
 
         //creator = transaction.getCreator();
         String itemName = "";

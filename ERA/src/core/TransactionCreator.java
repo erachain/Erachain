@@ -158,7 +158,7 @@ public class TransactionCreator {
         //CREATE NAME REGISTRATION
         RegisterNameTransaction nameRegistration = new RegisterNameTransaction(creator, name, (byte) feePow, time, 0l);
         nameRegistration.sign(creator, Transaction.FOR_NETWORK);
-        nameRegistration.setDC(this.fork, Transaction.FOR_NETWORK);
+        nameRegistration.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(nameRegistration, this.afterCreate(nameRegistration, Transaction.FOR_NETWORK));
@@ -174,7 +174,7 @@ public class TransactionCreator {
         //CREATE NAME UPDATE
         UpdateNameTransaction nameUpdate = new UpdateNameTransaction(creator, name, (byte) feePow, time, 0l);
         nameUpdate.sign(creator, Transaction.FOR_NETWORK);
-        nameUpdate.setDC(this.fork, Transaction.FOR_NETWORK);
+        nameUpdate.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(nameUpdate, this.afterCreate(nameUpdate, Transaction.FOR_NETWORK));
@@ -190,7 +190,7 @@ public class TransactionCreator {
         //CREATE NAME SALE
         SellNameTransaction nameSaleTransaction = new SellNameTransaction(creator, nameSale, (byte) feePow, time, 0l);
         nameSaleTransaction.sign(creator, Transaction.FOR_NETWORK);
-        nameSaleTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        nameSaleTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(nameSaleTransaction, this.afterCreate(nameSaleTransaction, Transaction.FOR_NETWORK));
@@ -206,7 +206,7 @@ public class TransactionCreator {
         //CREATE CANCEL NAME SALE
         CancelSellNameTransaction cancelNameSaleTransaction = new CancelSellNameTransaction(creator, nameSale.getKey(), (byte) feePow, time, 0l);
         cancelNameSaleTransaction.sign(creator, Transaction.FOR_NETWORK);
-        cancelNameSaleTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        cancelNameSaleTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(cancelNameSaleTransaction, this.afterCreate(cancelNameSaleTransaction, Transaction.FOR_NETWORK));
@@ -222,7 +222,7 @@ public class TransactionCreator {
         //CREATE NAME PURCHASE
         BuyNameTransaction namePurchase = new BuyNameTransaction(creator, nameSale, nameSale.getName().getOwner(), (byte) feePow, time, 0l);
         namePurchase.sign(creator, Transaction.FOR_NETWORK);
-        namePurchase.setDC(this.fork, Transaction.FOR_NETWORK);
+        namePurchase.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(namePurchase, this.afterCreate(namePurchase, Transaction.FOR_NETWORK));
@@ -238,7 +238,7 @@ public class TransactionCreator {
         //CREATE POLL CREATION
         IssuePollRecord pollCreation = new IssuePollRecord(creator, poll, (byte) feePow, time, 0l);
         pollCreation.sign(creator, Transaction.FOR_NETWORK);
-        pollCreation.setDC(this.fork, Transaction.FOR_NETWORK);
+        pollCreation.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return pollCreation;
 
@@ -254,7 +254,7 @@ public class TransactionCreator {
         //CREATE POLL CREATION
         CreatePollTransaction pollCreation = new CreatePollTransaction(creator, poll, (byte) feePow, time, 0l);
         pollCreation.sign(creator, Transaction.FOR_NETWORK);
-        pollCreation.setDC(this.fork, Transaction.FOR_NETWORK);
+        pollCreation.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return pollCreation;
 
@@ -270,7 +270,7 @@ public class TransactionCreator {
         //CREATE POLL VOTE
         VoteOnItemPollTransaction pollVote = new VoteOnItemPollTransaction(creator, pollKey, optionIndex, (byte) feePow, time, 0l);
         pollVote.sign(creator, Transaction.FOR_NETWORK);
-        pollVote.setDC(this.fork, Transaction.FOR_NETWORK);
+        pollVote.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return pollVote;
@@ -287,7 +287,7 @@ public class TransactionCreator {
         //CREATE POLL VOTE
         VoteOnPollTransaction pollVote = new VoteOnPollTransaction(creator, poll, optionIndex, (byte) feePow, time, 0l);
         pollVote.sign(creator, Transaction.FOR_NETWORK);
-        pollVote.setDC(this.fork, Transaction.FOR_NETWORK);
+        pollVote.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(pollVote, this.afterCreate(pollVote, Transaction.FOR_NETWORK));
@@ -304,7 +304,7 @@ public class TransactionCreator {
         Transaction arbitraryTransaction;
         arbitraryTransaction = new ArbitraryTransactionV3(creator, payments, service, data, (byte) feePow, time, 0l);
         arbitraryTransaction.sign(creator, Transaction.FOR_NETWORK);
-        arbitraryTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        arbitraryTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(arbitraryTransaction, this.afterCreate(arbitraryTransaction, Transaction.FOR_NETWORK));
@@ -327,7 +327,7 @@ public class TransactionCreator {
         //CREATE ISSUE ASSET TRANSACTION
         IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(creator, asset, (byte) feePow, time, 0l);
         issueAssetTransaction.sign(creator, Transaction.FOR_NETWORK);
-        issueAssetTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return issueAssetTransaction;
     }
@@ -346,7 +346,7 @@ public class TransactionCreator {
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte) feePow, time);
         issueImprintRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueImprintRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueImprintRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(issueImprintRecord, this.afterCreate(issueImprintRecord, Transaction.FOR_NETWORK));
@@ -366,7 +366,7 @@ public class TransactionCreator {
         //CREATE ISSUE IMPRINT TRANSACTION
         IssueImprintRecord issueImprintRecord = new IssueImprintRecord(creator, imprint, (byte) feePow, time);
         issueImprintRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueImprintRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueImprintRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return issueImprintRecord;
@@ -409,7 +409,7 @@ public class TransactionCreator {
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(creator, template, (byte) feePow, time, 0l);
         issueTemplateRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueTemplateRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueTemplateRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return issueTemplateRecord;
@@ -459,7 +459,7 @@ public class TransactionCreator {
         //CREATE ISSUE PLATE TRANSACTION
         IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, person, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
-        issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         if (forIssue) {
@@ -505,7 +505,7 @@ public class TransactionCreator {
         //CREATE ISSUE PLATE TRANSACTION
         IssuePersonRecord issuePersonRecord = new IssuePersonRecord(creator, human, (byte) feePow, time, lastReference);
         issuePersonRecord.sign(creator, Transaction.FOR_NETWORK);
-        issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issuePersonRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         boolean asPack = false;
@@ -527,7 +527,7 @@ public class TransactionCreator {
         //CREATE ISSUE PLATE TRANSACTION
         IssuePollRecord issueStatusRecord = new IssuePollRecord(creator, status, (byte) feePow, time, 0l);
         issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return issueStatusRecord;
     }
@@ -546,7 +546,7 @@ public class TransactionCreator {
         //CREATE ISSUE PLATE TRANSACTION
         IssueStatusRecord issueStatusRecord = new IssueStatusRecord(creator, status, (byte) feePow, time, 0l);
         issueStatusRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueStatusRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return issueStatusRecord;
     }
@@ -565,7 +565,7 @@ public class TransactionCreator {
         //CREATE ISSUE PLATE TRANSACTION
         IssueUnionRecord issueUnionRecord = new IssueUnionRecord(creator, union, (byte) feePow, time, 0l);
         issueUnionRecord.sign(creator, Transaction.FOR_NETWORK);
-        issueUnionRecord.setDC(this.fork, Transaction.FOR_NETWORK);
+        issueUnionRecord.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return issueUnionRecord;
 
@@ -589,7 +589,7 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS
         createOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
-        createOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        createOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return createOrderTransaction;
     }
@@ -610,7 +610,7 @@ public class TransactionCreator {
         //CREATE PRDER TRANSACTION
         CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderSignature, (byte) feePow, time, 0l);
         cancelOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
-        cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return cancelOrderTransaction;
 
@@ -626,7 +626,7 @@ public class TransactionCreator {
         //CREATE PRDER TRANSACTION
         CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderSignature, (byte) feePow, time, 0l);
         cancelOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
-        cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return cancelOrderTransaction;
 
@@ -646,7 +646,7 @@ public class TransactionCreator {
         //CREATE PRDER TRANSACTION
         CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(creator, orderID, (byte) feePow, time, 0l);
         cancelOrderTransaction.sign(creator, Transaction.FOR_NETWORK);
-        cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK);
+        cancelOrderTransaction.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(cancelOrderTransaction, this.afterCreate(cancelOrderTransaction, Transaction.FOR_NETWORK));
@@ -662,7 +662,7 @@ public class TransactionCreator {
         //CREATE MULTI PAYMENTS
         MultiPaymentTransaction multiPayment = new MultiPaymentTransaction(creator, payments, (byte) feePow, time, 0l);
         multiPayment.sign(creator, Transaction.FOR_NETWORK);
-        multiPayment.setDC(this.fork, Transaction.FOR_NETWORK);
+        multiPayment.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         //VALIDATE AND PROCESS
         return new Pair<Transaction, Integer>(multiPayment, this.afterCreate(multiPayment, Transaction.FOR_NETWORK));
@@ -678,7 +678,7 @@ public class TransactionCreator {
         //DEPLOY AT
         DeployATTransaction deployAT = new DeployATTransaction(creator, name, description, type, tags, creationBytes, amount, (byte) feePow, time, 0l);
         deployAT.sign(creator, Transaction.FOR_NETWORK);
-        deployAT.setDC(this.fork, Transaction.FOR_NETWORK);
+        deployAT.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return new Pair<Transaction, Integer>(deployAT, this.afterCreate(deployAT, Transaction.FOR_NETWORK));
 
@@ -700,7 +700,7 @@ public class TransactionCreator {
         //messageTx = new R_Send(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
         messageTx = new R_Send(creator, (byte) feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
-        messageTx.setDC(this.fork, Transaction.FOR_NETWORK);
+        messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return messageTx;// new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, false));
     }
@@ -719,7 +719,7 @@ public class TransactionCreator {
         //CREATE MESSAGE TRANSACTION
         messageTx = new R_Send(version, property1, property2, creator, (byte) feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
-        messageTx.setDC(this.fork, Transaction.FOR_NETWORK);
+        messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return messageTx;
     }
@@ -738,7 +738,7 @@ public class TransactionCreator {
         recordNoteTx = new R_SignNote(version, property1, property1,
                 creator, (byte) feePow, key, message, isText, encrypted, timestamp, 0l);
         recordNoteTx.sign(creator, asDeal);
-        recordNoteTx.setDC(this.fork, asDeal);
+        recordNoteTx.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo);
 
         return recordNoteTx;
 
@@ -761,7 +761,7 @@ public class TransactionCreator {
                 userAccounts,
                 add_day, timestamp, 0l);
         record.sign(creator, asDeal);
-        record.setDC(this.fork, asDeal);
+        record.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo);
 
         return record;
     }
@@ -782,7 +782,7 @@ public class TransactionCreator {
                 height, seq,
                 timestamp, 0l);
         record.sign(creator, asDeal);
-        record.setDC(this.fork, asDeal);
+        record.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo);
 
         return record;
     }
@@ -807,7 +807,7 @@ public class TransactionCreator {
         //CREATE MESSAGE TRANSACTION
         messageTx = new R_Hashes(creator, (byte) feePow, url, data, hashes, timestamp, 0l);
         messageTx.sign(creator, Transaction.FOR_NETWORK);
-        messageTx.setDC(this.fork, Transaction.FOR_NETWORK);
+        messageTx.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return new Pair<Transaction, Integer>(messageTx, afterCreate(messageTx, Transaction.FOR_NETWORK));
     }
@@ -872,7 +872,7 @@ public class TransactionCreator {
                 beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
                 timestamp, 0l);
         record.sign(creator, Transaction.FOR_NETWORK);
-        record.setDC(this.fork, Transaction.FOR_NETWORK);
+        record.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
 
         return record;
     }
@@ -947,7 +947,7 @@ public class TransactionCreator {
 
     public Integer afterCreate(Transaction transaction, int asDeal) {
         //CHECK IF PAYMENT VALID
-        transaction.setDC(this.fork, asDeal);
+        transaction.setDC(this.fork, asDeal, this.blockHeight, ++this.seqNo);
         int valid = transaction.isValid(asDeal, 0l);
 
         if (valid == Transaction.VALIDATE_OK) {

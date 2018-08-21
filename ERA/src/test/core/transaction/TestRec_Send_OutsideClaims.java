@@ -95,7 +95,7 @@ public class TestRec_Send_OutsideClaims {
         assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
         issueAssetTransaction = new IssueAssetTransaction(maker, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(db);
@@ -117,7 +117,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 maker, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_BACKWARD_ACTION);
 
@@ -127,7 +127,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
@@ -137,7 +137,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_RECIPIENT);
 
@@ -148,7 +148,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 maker, FEE_POWER, recipient, keyA, amount, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
         
@@ -173,7 +173,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, recipient2, keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
@@ -198,7 +198,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
@@ -208,7 +208,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, recipient2, credit_keyA, BigDecimal.ONE, head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
@@ -218,7 +218,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK2, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_BALANCE);
 
@@ -228,7 +228,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, maker, credit_keyA, new BigDecimal(2), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
         
@@ -252,7 +252,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
         
@@ -279,7 +279,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 maker, FEE_POWER, recipientPK, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.INVALID_CLAIM_DEBT_RECIPIENT);
 
@@ -289,7 +289,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, maker, keyA, new BigDecimal(10), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.NO_INCLAIM_BALANCE);
 
@@ -299,7 +299,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
@@ -330,7 +330,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK2, FEE_POWER, maker, credit_keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
@@ -342,7 +342,7 @@ public class TestRec_Send_OutsideClaims {
                 prop2,
                 recipientPK2, FEE_POWER, maker, keyA, new BigDecimal(1), head, data, isText, encrypted, timestamp, ++timestamp);
         r_SendV3.sign(recipientPK2, Transaction.FOR_NETWORK);
-        r_SendV3.setDC(db, Transaction.FOR_NETWORK);
+        r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         balanceA = recipientPK2.getBalance(db, keyA);
         balanceB = maker.getBalance(db, keyA);

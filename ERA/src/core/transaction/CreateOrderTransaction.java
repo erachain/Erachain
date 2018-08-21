@@ -205,6 +205,7 @@ public class CreateOrderTransaction extends Transaction {
                 reference, signatureBytes);
     }
 
+    /*
     public void setDC(DCSet dcSet, int asDeal) {
 
         super.setDC(dcSet, asDeal);
@@ -213,10 +214,20 @@ public class CreateOrderTransaction extends Transaction {
         this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
 
     }
+    */
+
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+
+        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
+        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
+    }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
+        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
     }
 
     public Long getOrderId() {

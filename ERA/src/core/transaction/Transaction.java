@@ -504,6 +504,7 @@ public abstract class Transaction {
     }
 
     // GETTERS/SETTERS
+    /*
     public void setDC(DCSet dcSet, int asDeal) {
         this.dcSet = dcSet;
         //this.height = this.getBlockHeightByParentOrLast(dcSet);
@@ -511,7 +512,17 @@ public abstract class Transaction {
         if (asDeal > Transaction.FOR_PACK)
             this.calcFee();
     }
+    */
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.dcSet = dcSet;
+        this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
+        this.seqNo = seqNo;
+        if (asDeal > Transaction.FOR_PACK)
+            this.calcFee();
+    }
+
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        this.block = block;
         this.dcSet = dcSet;
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
@@ -684,9 +695,9 @@ public abstract class Transaction {
     }
 
     // GET forged FEE without invited FEE
-    public int getForgedFee(DCSet db) {
-        if (this.dcSet == null)
-            this.setDC(db, Transaction.FOR_NETWORK);
+    public int getForgedFee() {
+        //if (this.dcSet == null)
+        //    this.setDC(db, Transaction.FOR_NETWORK);
 
         int fee = this.fee.unscaledValue().intValue();
         int fee_invited = this.getInvitedFee();
@@ -701,11 +712,6 @@ public abstract class Transaction {
 
     public BigDecimal feeToBD(int fee) {
         return BigDecimal.valueOf(fee, BlockChain.AMOUNT_DEDAULT_SCALE);
-    }
-
-    public void setBlock(Block block, int seqNo) {
-        this.block = block;
-        this.seqNo = seqNo;
     }
 
     public Block getBlock(DCSet db) {
@@ -933,9 +939,9 @@ public abstract class Transaction {
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
             transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
-            if (this.fee.signum() == 0) {
-                this.setDC(localDCSet, Transaction.FOR_NETWORK);
-            }
+            //if (this.fee.signum() == 0) {
+            //    this.setDC(localDCSet, Transaction.FOR_NETWORK);
+            //}
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
             transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
