@@ -97,7 +97,7 @@ public class TelegramsResource {
      * "action_name":"PROPERTY",
      * "recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
      * "backward":false,
-     * "asset":643,
+     * "assetKey":643,
      * "sub_type_name":"PROPERTY",
      * "timestamp":1529583735448
      * }}]
@@ -152,8 +152,9 @@ public class TelegramsResource {
      *
      * @param sender_in     address in wallet
      * @param recipient_in  recipient
-     * @param asset_in      asset
-     * @param amount_in     amount
+     * @param feePow        feePow
+     * @param assetKey      assetKey
+     * @param amount        amount
      * @param title         title
      * @param message       message
      * @param encoding  code if exist is text (not required field)
@@ -162,7 +163,7 @@ public class TelegramsResource {
      * @return return signature telegram
      *
      * <h2>Example request</h2>
-     * GET telegrams/send/79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/true/false/1
+     * GET telegrams/send/79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/0/2/0.0001/title1/message1/true/false/1
      * <h2>Example response</h2>
      * {
      * "signature":"2vcTBHyCSUD7Qh968S1hr9mQpRgSswpCinCMeMX26XaUq58MDSCah3q9ntavhezqUGe7doR4hz4ZuPbc1QS2XzNg"
@@ -170,11 +171,11 @@ public class TelegramsResource {
      */
     @SuppressWarnings("unchecked")
     @GET
-    @Path("send/{sender}/{recipient}/{assetKey}/{amount}/{title}/{message}/{encoding}/{encrypt}/{password}")
+    @Path("send/{sender}/{recipient}/{feePow}/{assetKey}/{amount}/{title}/{message}/{encoding}/{encrypt}/{password}")
     public String send(@PathParam("sender") String sender_in, @PathParam("recipient") String recipient_in,
-                       @PathParam("assetKey") long asset_in, @PathParam("amount") String amount_in,
+                       @PathParam("feePow") int feePow, @PathParam("assetKey") long assetKey, @PathParam("amount") BigDecimal amount,
                        @PathParam("title") String title, @PathParam("message") String message,
-                       @QueryParam("encoding") int encoding,
+                       @PathParam("encoding") int encoding,
                        @PathParam("encrypt") boolean encrypt,
                        @PathParam("password") String password) {
 
@@ -207,18 +208,6 @@ public class TelegramsResource {
             // e1.printStackTrace();
             out.put("status_code", Transaction.INVALID_ADDRESS);
             out.put("status", "Invalid Recipient Address");
-            return out.toJSONString();
-        }
-        BigDecimal amount;
-        // READ AMOUNT
-        try {
-            // USE max DEEP SCALE!
-            amount = new BigDecimal(amount_in);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            // e.printStackTrace();
-            out.put("status_code", Transaction.INVALID_AMOUNT);
-            out.put("status", "Invalid Amount");
             return out.toJSONString();
         }
 
@@ -267,7 +256,7 @@ public class TelegramsResource {
 
         try {
             transaction = cntr.r_Send(
-                    account, 0, recip, asset_in, amount,
+                    account, feePow, recip, assetKey, amount,
                     title, messageBytes, isTextByte, encrypted);
             if (transaction == null)
                 throw new Exception("transaction == null");
@@ -283,22 +272,23 @@ public class TelegramsResource {
         return out.toJSONString();
     }
 
-    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu/2/0.0001/title/message/0/false?password=1
+    // GET telegrams/send/7NH4wjxVy1y8kqBPtArA4UsevPMdgJS2Dk/7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu?
+    // 2/0.0001/title/message/0/false?password=1
     @SuppressWarnings("unchecked")
     @GET
     @Path("send/{sender}/{recipient}")
     public String sendQuery(@PathParam("sender") String sender, @PathParam("recipient") String recipient,
-                            @QueryParam("asset") long asset, @QueryParam("amount") String amount,
+                            @QueryParam("feePow") int feePow, @QueryParam("assetKey") long assetKey, @QueryParam("amount") BigDecimal amount,
                             @QueryParam("title") String title, @QueryParam("message") String message,
                             @QueryParam("encoding") int encoding, @QueryParam("encrypt") boolean encrypt,
                             @QueryParam("password") String password) {
 
-        return send(sender, recipient, asset, amount, title, message, encoding, encrypt, password);
+        return send(sender, recipient, feePow, assetKey, amount, title, message, encoding, encrypt, password);
 
     }
 
-    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"asset\": <assetKey>, \"amount\": \"<amount>\", \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": 0, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
-    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "asset": 2, "amount": "0.0001", "title": "title", "message": "<message>", "encoding": 0, "encrypt": false, "password": "122"}
+    // "POST telegrams/send {\"sender\": \"<sender>\", \"recipient\": \"<recipient>\", \"feePow\":<feePow>, \"assetKey\": <assetKey>, \"amount\": <amount>, \"title\": \"<title>\", \"message\": \"<message>\", \"encoding\": 0, \"encrypt\": <true/false>, \"password\": \"<password>\"}",
+    // POST telegrams/send {"sender": "78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", "recipient": "7C5HJALxTbAhzyhwVZeDCsGqVnSwcdEtqu", "feePow":0, "asset": 2, "amount": 0.0001, "title": "title", "message": "<message>", "encoding": 0, "encrypt": false, "password": "122"}
 
     /**
      * Send telegram. not in block chain
@@ -307,7 +297,7 @@ public class TelegramsResource {
      * @return signature telegram
      * <h2>Example request</h2>
      * POST telegrams/send {"sender":"79WA9ypHx1iyDJn45VUXE5gebHTVrZi2iy","recipient":"7Dpv5Gi8HjCBgtDN1P1niuPJQCBQ5H8Zob",
-     * "asset":"643","amount":"0.01","title":"NPL","encoding":0,"encrypt":"true","password":"123456789"}
+     * "feePow":0,"assetKey":643,"amount":0.01,"title":"NPL","encoding":0,"encrypt":true,"password":"123456789"}
      * <h2>Example response</h2>
      * {
      * "signature":"FC3vHuUoPhYArc8L4DbgshH4mu54EaFZdGJ8Mh48FozDb5oSZazNVucyiyTYpFAHZNALUVYn5DCATMMNvtJTPhf"
@@ -327,21 +317,16 @@ public class TelegramsResource {
             LOGGER.info(e);
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
-		/*
-		public String sendPost(@QueryParam("sender") String sender1, @QueryParam("recipient") String recipient1,
-			@QueryParam("amount") String amount1, @QueryParam("message") String message1,
-			@QueryParam("title") String title1, @QueryParam("asset") int asset1, @QueryParam("password") String pass,
-			) {
-		 */
 
         return send((String) jsonObject.getOrDefault("sender", null),
                 (String) jsonObject.getOrDefault("recipient", null),
-                Integer.valueOf((String) jsonObject.getOrDefault("asset", 0)),
-                (String) jsonObject.getOrDefault("amount", null),
+                Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString()),
+                Long.valueOf(jsonObject.getOrDefault("assetKey", 0).toString()),
+                new BigDecimal(jsonObject.getOrDefault("amount", 0).toString()),
                 (String) jsonObject.getOrDefault("title", null),
                 (String) jsonObject.getOrDefault("message", null),
-                ((Long) jsonObject.getOrDefault("encoding", 0L)).intValue(),
-                Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false)),
+                Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString()),
+                Boolean.valueOf((boolean)jsonObject.getOrDefault("encrypt", false)),
                 (String) jsonObject.getOrDefault("password", null));
     }
 
