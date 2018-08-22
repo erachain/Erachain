@@ -15,6 +15,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -57,7 +58,12 @@ public class R_SignNote extends Transaction {
     public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+                      byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // asPack
@@ -91,6 +97,15 @@ public class R_SignNote extends Transaction {
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
+    }
+    public R_SignNote(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+                      byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures, long timestamp,
+                      Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+        this.signers = signers;
+        this.signatures = signatures;
+        this.setTypeBytes();
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as Pack
@@ -167,6 +182,14 @@ public class R_SignNote extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //////// local parameters
 
         long key = 0l;
@@ -222,13 +245,15 @@ public class R_SignNote extends Transaction {
 
         if (signersLen == 0) {
             if (asDeal > Transaction.FOR_MYPACK) {
-                return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+                return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
+                        timestamp, reference, signatureBytes, feeLong);
             } else {
                 return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
             if (asDeal > Transaction.FOR_MYPACK) {
-                return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, timestamp, reference, signatureBytes);
+                return new R_SignNote(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers,
+                        signatures, timestamp, reference, signatureBytes, feeLong);
             } else {
                 return new R_SignNote(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
             }

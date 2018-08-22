@@ -1,5 +1,6 @@
 package core.transaction;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Stack;
 
+import core.BlockChain;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
@@ -67,7 +69,12 @@ public class R_Hashes extends Transaction {
     public R_Hashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public R_Hashes(byte[] typeBytes, PublicKeyAccount creator, byte feePow, byte[] url, byte[] data, byte[][] hashes,
+                    long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, url, data, hashes, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // asPack
@@ -175,6 +182,14 @@ public class R_Hashes extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //////// local parameters
 
         //READ NAME
@@ -215,7 +230,8 @@ public class R_Hashes extends Transaction {
         }
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new R_Hashes(typeBytes, creator, feePow, url, arbitraryData, hashes, timestamp, reference, signatureBytes);
+            return new R_Hashes(typeBytes, creator, feePow, url, arbitraryData, hashes, timestamp, reference,
+                    signatureBytes, feeLong);
         } else {
             return new R_Hashes(typeBytes, creator, url, arbitraryData, hashes, reference, signatureBytes);
         }

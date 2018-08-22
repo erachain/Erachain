@@ -93,8 +93,15 @@ public class R_Send extends TransactionAmount {
                   Long reference, byte[] signature) {
         this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        // this.calcFee();
     }
+    public R_Send(byte[] typeBytes, PublicKeyAccount creator, byte feePow, Account recipient, long key,
+                  BigDecimal amount, String head, byte[] data, byte[] isText, byte[] encrypted, long timestamp,
+                  Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, recipient, key, amount, head, data, isText, encrypted, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+    }
+
 
     // as pack
     public R_Send(byte[] typeBytes, PublicKeyAccount creator, Account recipient, long key, BigDecimal amount,
@@ -231,6 +238,16 @@ public class R_Send extends TransactionAmount {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
+        ///////////////// LOAD
+
         // READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
         Account recipient = new Account(Base58.encode(recipientBytes));
@@ -300,7 +317,7 @@ public class R_Send extends TransactionAmount {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new R_Send(typeBytes, creator, feePow, recipient, key, amount, head, arbitraryData, isTextByte,
-                    encryptedByte, timestamp, reference, signatureBytes);
+                    encryptedByte, timestamp, reference, signatureBytes, feeLong);
         } else {
             return new R_Send(typeBytes, creator, recipient, key, amount, head, arbitraryData, isTextByte,
                     encryptedByte, reference, signatureBytes);

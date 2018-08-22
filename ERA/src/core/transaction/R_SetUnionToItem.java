@@ -61,7 +61,13 @@ public class R_SetUnionToItem extends Transaction {
         this(typeBytes, creator, feePow, key, itemType, itemKey,
                 beg_date, end_date, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public R_SetUnionToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+                            Long beg_date, Long end_date, long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, key, itemType, itemKey,
+                beg_date, end_date, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as pack
@@ -142,6 +148,14 @@ public class R_SetUnionToItem extends Transaction {
         byte[] signature = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ STATUS KEY
         byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
         long key = Longs.fromByteArray(keyBytes);
@@ -169,7 +183,7 @@ public class R_SetUnionToItem extends Transaction {
 
         if (asDeal > Transaction.FOR_MYPACK) {
             return new R_SetUnionToItem(typeBytes, creator, feePow, key, itemType, itemKey,
-                    beg_date, end_date, timestamp, reference, signature);
+                    beg_date, end_date, timestamp, reference, signature, feeLong);
         } else {
             return new R_SetStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, 0, 0, null, null, 0, null,

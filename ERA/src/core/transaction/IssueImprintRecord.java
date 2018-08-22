@@ -7,6 +7,7 @@ import core.item.ItemCls;
 import core.item.imprints.Imprint;
 import core.item.imprints.ImprintCls;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 // reference - as item.name
@@ -29,6 +30,11 @@ public class IssueImprintRecord extends Issue_ItemRecord {
 
     public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow, long timestamp, byte[] signature) {
         super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
+    }
+    public IssueImprintRecord(byte[] typeBytes, PublicKeyAccount creator, ImprintCls imprint, byte feePow,
+                              long timestamp, byte[] signature, long feeLong) {
+        super(typeBytes, NAME_ID, creator, imprint, feePow, timestamp, null, signature);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // asPack
@@ -109,13 +115,21 @@ public class IssueImprintRecord extends Issue_ItemRecord {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ IMPRINT
         // imprint parse without reference - if is = signature
         ImprintCls imprint = Imprint.parse(Arrays.copyOfRange(data, position, data.length), false);
         position += imprint.getDataLength(false);
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes);
+            return new IssueImprintRecord(typeBytes, creator, imprint, feePow, timestamp, signatureBytes, feeLong);
         } else {
             return new IssueImprintRecord(typeBytes, creator, imprint, signatureBytes);
         }

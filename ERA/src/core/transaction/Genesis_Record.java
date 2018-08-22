@@ -70,20 +70,8 @@ public class Genesis_Record extends Transaction {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        int base_len;
-        if (forDeal == FOR_MYPACK)
-            base_len = BASE_LENGTH_AS_MYPACK;
-        else if (forDeal == FOR_PACK)
-            base_len = BASE_LENGTH_AS_PACK;
-        else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
-        else
-            base_len = BASE_LENGTH;
 
-        if (!withSignature)
-            base_len -= SIGNATURE_LENGTH;
-
-        return base_len;
+        return BASE_LENGTH;
 
     }
 

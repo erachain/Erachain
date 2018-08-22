@@ -1,10 +1,12 @@
 package core.transaction;
 
 import com.google.common.primitives.Longs;
+import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.polls.PollCls;
 import core.item.polls.PollFactory;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class IssuePollRecord extends Issue_ItemRecord {
@@ -17,6 +19,11 @@ public class IssuePollRecord extends Issue_ItemRecord {
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference, signature);
+    }
+    public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp,
+                           Long reference, byte[] signature, long feeLong) {
+        super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference, signature);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte[] signature) {
@@ -93,13 +100,21 @@ public class IssuePollRecord extends Issue_ItemRecord {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ POLL
         // poll parse without reference - if is = signature
         PollCls poll = PollFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += poll.getDataLength(false);
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssuePollRecord(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes);
+            return new IssuePollRecord(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {
             return new IssuePollRecord(typeBytes, creator, poll, signatureBytes);
         }

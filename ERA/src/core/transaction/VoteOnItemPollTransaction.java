@@ -3,6 +3,7 @@ package core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -10,13 +11,11 @@ import core.item.polls.PollCls;
 import datachain.DCSet;
 import org.json.simple.JSONObject;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 
-/**
- * @deprecated
- */
 public class VoteOnItemPollTransaction extends Transaction {
     private static final byte TYPE_ID = (byte) VOTE_ON_ITEM_POLL_TRANSACTION;
     private static final String NAME_ID = "Vote on Item Poll";
@@ -37,7 +36,12 @@ public class VoteOnItemPollTransaction extends Transaction {
     public VoteOnItemPollTransaction(byte[] typeBytes, PublicKeyAccount creator, long pollKey, int option, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public VoteOnItemPollTransaction(byte[] typeBytes, PublicKeyAccount creator, long pollKey, int option, byte feePow,
+                                     long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, pollKey, option, feePow, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as pack
@@ -110,6 +114,14 @@ public class VoteOnItemPollTransaction extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         /////
         //READ POLL
         byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
@@ -122,8 +134,8 @@ public class VoteOnItemPollTransaction extends Transaction {
         position += OPTION_SIZE_LENGTH;
 
         if (asDeal > Transaction.FOR_MYPACK) {
-
-            return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, reference, signatureBytes);
+            return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, feePow, timestamp, reference,
+                    signatureBytes, feeLong);
         } else {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, reference, signatureBytes);
         }

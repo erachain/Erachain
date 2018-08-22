@@ -3,6 +3,7 @@ package core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -44,7 +45,12 @@ public class R_Vouch extends Transaction {
     public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, feePow, height, seq, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp,
+                   Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, height, seq, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as pack
@@ -70,6 +76,22 @@ public class R_Vouch extends Transaction {
     //GETTERS/SETTERS
 
     //public static String getName() { return "Send"; }
+
+    public int getVouchHeight() {
+        return this.vouchHeight;
+    }
+
+    public int getVouchSeqNo() {
+        return this.vouchSeqNo;
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        return false;
+    }
+
+    //PARSE/CONVERT
+
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
@@ -125,6 +147,14 @@ public class R_Vouch extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ HEIGHT
         byte[] heightBytes = Arrays.copyOfRange(data, position, position + HEIGHT_LENGTH);
         int vouchHeight = Ints.fromByteArray(heightBytes);
@@ -136,27 +166,13 @@ public class R_Vouch extends Transaction {
         position += SEQ_LENGTH;
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new R_Vouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, reference, signatureBytes);
+            return new R_Vouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, reference,
+                    signatureBytes, feeLong);
         } else {
             return new R_Vouch(typeBytes, creator, vouchHeight, vouchSeqNo, reference, signatureBytes);
         }
 
     }
-
-    public int getVouchHeight() {
-        return this.vouchHeight;
-    }
-
-    public int getVouchSeqNo() {
-        return this.vouchSeqNo;
-    }
-
-    @Override
-    public boolean hasPublicText() {
-        return false;
-    }
-
-    //PARSE/CONVERT
 
     @SuppressWarnings("unchecked")
     @Override

@@ -340,7 +340,7 @@ public abstract class Transaction {
     public static final int ENCRYPTED_LENGTH = 1;
     public static final int IS_TEXT_LENGTH = 1;
     protected static final int FEE_POWER_LENGTH = 1;
-    public static final int FEE_LENGTH = 4;
+    public static final int FEE_LENGTH = 8;
     // protected static final int HKEY_LENGTH = 20;
     public static final int CREATOR_LENGTH = PublicKeyAccount.PUBLIC_KEY_LENGTH;
     protected static final int BASE_LENGTH_AS_MYPACK = TYPE_LENGTH;
@@ -517,7 +517,7 @@ public abstract class Transaction {
         this.dcSet = dcSet;
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
-        if (asDeal > Transaction.FOR_PACK)
+        if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
             this.calcFee();
     }
 
@@ -526,7 +526,7 @@ public abstract class Transaction {
         this.dcSet = dcSet;
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
         this.seqNo = seqNo;
-        if (asDeal > Transaction.FOR_PACK)
+        if (asDeal > Transaction.FOR_PACK && (this.fee == null || this.fee.signum() == 0) )
             this.calcFee();
     }
 
@@ -1054,6 +1054,12 @@ public abstract class Transaction {
         // SIGNATURE
         if (withSignature)
             data = Bytes.concat(data, this.signature);
+
+        if (forDeal == FOR_DB_RECORD) {
+            // WRITE FEE
+            byte[] feeBytes = Longs.toByteArray(this.fee.unscaledValue().longValue());
+            data = Bytes.concat(data, feeBytes);
+        }
 
         return data;
 

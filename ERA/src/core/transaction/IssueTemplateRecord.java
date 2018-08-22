@@ -1,10 +1,12 @@
 package core.transaction;
 
 import com.google.common.primitives.Longs;
+import core.BlockChain;
 import core.account.PublicKeyAccount;
 import core.item.templates.TemplateCls;
 import core.item.templates.TemplateFactory;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 //import java.util.Map;
@@ -20,6 +22,11 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);
+    }
+    public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow,
+                               long timestamp, Long reference, byte[] signature, long feeLong) {
+        super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference, signature);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte[] signature) {
@@ -96,13 +103,21 @@ public class IssueTemplateRecord extends Issue_ItemRecord {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ PLATE
         // template parse without reference - if is = signature
         TemplateCls template = TemplateFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += template.getDataLength(false);
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes);
+            return new IssueTemplateRecord(typeBytes, creator, template, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {
             return new IssueTemplateRecord(typeBytes, creator, template, signatureBytes);
         }

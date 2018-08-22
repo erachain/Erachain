@@ -23,7 +23,6 @@ import java.util.*;
 public class CreatePollTransaction extends Transaction {
     private static final int TYPE_ID = Transaction.CREATE_POLL_TRANSACTION;
     private static final String NAME_ID = "Create Poll";
-    private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
     private PublicKeyAccount creator;
     private Poll poll;
@@ -41,6 +40,13 @@ public class CreatePollTransaction extends Transaction {
         this.signature = signature;
         //this.calcFee();
     }
+    public CreatePollTransaction(byte[] typeBytes, PublicKeyAccount creator, Poll poll, byte feePow, long timestamp,
+                                 Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, poll, feePow, timestamp, reference);
+
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+    }
 
     public CreatePollTransaction(PublicKeyAccount creator, Poll poll, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(new byte[]{TYPE_ID, 0, 0, 0}, creator, poll, feePow, timestamp, reference, signature);
@@ -53,21 +59,34 @@ public class CreatePollTransaction extends Transaction {
     //GETTERS/SETTERS
     //public static String getName() { return "Create Poll"; }
 
-    public static Transaction Parse(byte[] data) throws Exception {
-        //CHECK IF WE MATCH BLOCK LENGTH
-        if (data.length < BASE_LENGTH) {
-            throw new Exception("Data does not match block length");
+    public static Transaction Parse(byte[] data, int asDeal) throws Exception {
+
+        int test_len;
+        if (asDeal == Transaction.FOR_MYPACK) {
+            test_len = BASE_LENGTH_AS_MYPACK;
+        } else if (asDeal == Transaction.FOR_PACK) {
+            test_len = BASE_LENGTH_AS_PACK;
+        } else if (asDeal == Transaction.FOR_DB_RECORD) {
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
         }
 
+        if (data.length < test_len) {
+            throw new Exception("Data does not match block length " + data.length);
+        }
 
         // READ TYPE
         byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
         int position = TYPE_LENGTH;
 
-        //READ TIMESTAMP
-        byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-        long timestamp = Longs.fromByteArray(timestampBytes);
-        position += TIMESTAMP_LENGTH;
+        long timestamp = 0;
+        if (asDeal > Transaction.FOR_MYPACK) {
+            //READ TIMESTAMP
+            byte[] timestampBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
+            timestamp = Longs.fromByteArray(timestampBytes);
+            position += TIMESTAMP_LENGTH;
+        }
 
         //READ REFERENCE
         byte[] referenceBytes = Arrays.copyOfRange(data, position, position + REFERENCE_LENGTH);
@@ -83,15 +102,26 @@ public class CreatePollTransaction extends Transaction {
         Poll poll = Poll.parse(Arrays.copyOfRange(data, position, data.length));
         position += poll.getDataLength();
 
-        //READ FEE POWER
-        byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
-        byte feePow = feePowBytes[0];
-        position += 1;
+        byte feePow = 0;
+        if (asDeal > Transaction.FOR_PACK) {
+            // READ FEE POWER
+            byte[] feePowBytes = Arrays.copyOfRange(data, position, position + 1);
+            feePow = feePowBytes[0];
+            position += 1;
+        }
 
         //READ SIGNATURE
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
 
-        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes);
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
+        return new CreatePollTransaction(typeBytes, creator, poll, feePow, timestamp, reference, signatureBytes, feeLong);
     }
 
     public Poll getPoll() {
@@ -133,10 +163,12 @@ public class CreatePollTransaction extends Transaction {
         //WRITE TYPE
         data = Bytes.concat(data, this.typeBytes);
 
-        //WRITE TIMESTAMP
-        byte[] timestampBytes = Longs.toByteArray(this.timestamp);
-        timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
-        data = Bytes.concat(data, timestampBytes);
+        if (forDeal > FOR_MYPACK) {
+            // WRITE TIMESTAMP
+            byte[] timestampBytes = Longs.toByteArray(this.timestamp);
+            timestampBytes = Bytes.ensureCapacity(timestampBytes, TIMESTAMP_LENGTH, 0);
+            data = Bytes.concat(data, timestampBytes);
+        }
 
         //WRITE REFERENCE
         byte[] referenceBytes = Longs.toByteArray(this.reference);
@@ -149,21 +181,43 @@ public class CreatePollTransaction extends Transaction {
         //WRITE POLL
         data = Bytes.concat(data, this.poll.toBytes());
 
-        //WRITE FEE POWER
-        byte[] feePowBytes = new byte[1];
-        feePowBytes[0] = this.feePow;
-        data = Bytes.concat(data, feePowBytes);
+        if (forDeal > FOR_PACK) {
+            // WRITE FEE POWER
+            byte[] feePowBytes = new byte[1];
+            feePowBytes[0] = this.feePow;
+            data = Bytes.concat(data, feePowBytes);
+        }
 
         //SIGNATURE
         if (withSignature)
             data = Bytes.concat(data, this.signature);
+
+        if (forDeal == FOR_DB_RECORD) {
+            // WRITE FEE
+            byte[] feeBytes = Longs.toByteArray(this.fee.unscaledValue().longValue());
+            data = Bytes.concat(data, feeBytes);
+        }
 
         return data;
     }
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        return BASE_LENGTH + this.poll.getDataLength();
+
+        int base_len;
+        if (forDeal == FOR_MYPACK)
+            base_len = BASE_LENGTH_AS_MYPACK;
+        else if (forDeal == FOR_PACK)
+            base_len = BASE_LENGTH_AS_PACK;
+        else if (forDeal == FOR_DB_RECORD)
+            base_len = BASE_LENGTH_AS_DBRECORD;
+        else
+            base_len = BASE_LENGTH;
+
+        if (!withSignature)
+            base_len -= SIGNATURE_LENGTH;
+
+        return base_len + this.poll.getDataLength();
     }
 
     //VALIDATE

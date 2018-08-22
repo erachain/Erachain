@@ -58,7 +58,7 @@ public class TransactionFactory {
             case Transaction.CREATE_POLL_TRANSACTION:
 
                 //PARSE CREATE POLL TRANSACTION
-                return CreatePollTransaction.Parse(data);
+                return CreatePollTransaction.Parse(data, asDeal);
 
             case Transaction.VOTE_ON_POLL_TRANSACTION:
 

@@ -82,6 +82,14 @@ public class CreateOrderTransaction extends Transaction {
         //this.order = new Order(new BigInteger(signature), creator, haveKey, wantKey, amountHave, amountWant, timestamp);
 
     }
+    public CreateOrderTransaction(byte[] typeBytes, PublicKeyAccount creator, long haveKey, long wantKey,
+                                  BigDecimal amountHave, BigDecimal amountWant, byte feePow, long timestamp, Long reference,
+                                  byte[] signature, long feeLong) {
+        this(typeBytes, creator, haveKey, wantKey, amountHave, amountWant, feePow, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+
+    }
 
     public CreateOrderTransaction(PublicKeyAccount creator, long haveKey, long wantKey, BigDecimal amountHave,
                                   BigDecimal amountWant, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -161,6 +169,14 @@ public class CreateOrderTransaction extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         // READ HAVE
         byte[] haveBytes = Arrays.copyOfRange(data, position, position + HAVE_LENGTH);
         long have = Longs.fromByteArray(haveBytes);
@@ -202,7 +218,7 @@ public class CreateOrderTransaction extends Transaction {
         }
 
         return new CreateOrderTransaction(typeBytes, creator, have, want, amountHave, amountWant, feePow, timestamp,
-                reference, signatureBytes);
+                reference, signatureBytes, feeLong);
     }
 
     /*
@@ -313,7 +329,7 @@ public class CreateOrderTransaction extends Transaction {
     }
 
     // @Override
-    @Override
+    //@Override
     public byte[] toBytes(int forDeal, boolean withSignature) {
         byte[] data = super.toBytes(forDeal, withSignature);
 

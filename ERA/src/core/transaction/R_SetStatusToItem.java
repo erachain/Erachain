@@ -15,6 +15,7 @@ import org.mapdb.Fun.Tuple5;
 import org.mapdb.Fun.Tuple6;
 import utils.DateTimeFormat;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -115,7 +116,17 @@ public class R_SetStatusToItem extends Transaction {
                 value_1, value_2, data_1, data_2, ref_to_parent, description,
                 timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public R_SetStatusToItem(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key, int itemType, long itemKey,
+                             Long beg_date, Long end_date,
+                             long value_1, long value_2, byte[] data_1, byte[] data_2, long ref_to_parent, byte[] description,
+                             long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, key, itemType, itemKey,
+                beg_date, end_date,
+                value_1, value_2, data_1, data_2, ref_to_parent, description,
+                timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as pack
@@ -270,6 +281,14 @@ public class R_SetStatusToItem extends Transaction {
         byte[] signature = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ STATUS KEY
         byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
         long key = Longs.fromByteArray(keyBytes);
@@ -358,7 +377,7 @@ public class R_SetStatusToItem extends Transaction {
         if (asDeal > Transaction.FOR_MYPACK) {
             return new R_SetStatusToItem(typeBytes, creator, feePow, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,
-                    timestamp, reference, signature);
+                    timestamp, reference, signature, feeLong);
         } else {
             return new R_SetStatusToItem(typeBytes, creator, key, itemType, itemKey,
                     beg_date, end_date, value_1, value_2, data_1, data_2, ref_to_parent, additonalData,

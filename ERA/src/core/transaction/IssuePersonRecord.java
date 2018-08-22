@@ -31,6 +31,11 @@ public class IssuePersonRecord extends Issue_ItemRecord {
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp, Long reference, byte[] signature) {
         super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);
     }
+    public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte feePow, long timestamp,
+                             Long reference, byte[] signature, long feeLong) {
+        super(typeBytes, NAME_ID, creator, person, feePow, timestamp, reference, signature);
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+    }
 
     public IssuePersonRecord(byte[] typeBytes, PublicKeyAccount creator, PersonCls person, byte[] signature) {
         super(typeBytes, NAME_ID, creator, person, (byte) 0, 0l, null, signature);
@@ -111,13 +116,21 @@ public class IssuePersonRecord extends Issue_ItemRecord {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ PERSON
         // person parse without reference - if is = signature
         PersonCls person = PersonFactory.getInstance().parse(Arrays.copyOfRange(data, position, data.length), false);
         position += person.getDataLength(false);
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new IssuePersonRecord(typeBytes, creator, person, feePow, timestamp, reference, signatureBytes);
+            return new IssuePersonRecord(typeBytes, creator, person, feePow, timestamp, reference, signatureBytes, feeLong);
         } else {
             return new IssuePersonRecord(typeBytes, creator, person, signatureBytes);
         }

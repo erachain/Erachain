@@ -3,6 +3,7 @@ package core.transaction;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import core.BlockChain;
 import core.account.Account;
 import core.account.PublicKeyAccount;
 import core.block.Block;
@@ -34,7 +35,12 @@ public class RecordReleasePack extends Transaction {
     public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, transactions, feePow, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
+    }
+    public RecordReleasePack(byte[] typeBytes, PublicKeyAccount creator, List<Transaction> transactions, byte feePow,
+                             long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, transactions, feePow, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as pack - calcFee not needed
@@ -109,6 +115,14 @@ public class RecordReleasePack extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         /////
         //READ PACK SIZE
         byte[] transactionsLengthBytes = Arrays.copyOfRange(data, position, position + PACK_SIZE_LENGTH);
@@ -130,7 +144,8 @@ public class RecordReleasePack extends Transaction {
         }
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference, signatureBytes);
+            return new RecordReleasePack(typeBytes, creator, transactions, feePow, timestamp, reference,
+                    signatureBytes, feeLong);
         } else {
             return new RecordReleasePack(typeBytes, creator, transactions, reference, signatureBytes);
         }

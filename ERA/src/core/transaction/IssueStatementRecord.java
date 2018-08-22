@@ -12,6 +12,7 @@ import core.account.PublicKeyAccount;
 import core.crypto.Base58;
 import org.json.simple.JSONObject;
 
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -51,8 +52,14 @@ public class IssueStatementRecord extends Transaction {
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data, byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature) {
         this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
         this.signature = signature;
-        //this.calcFee();
     }
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+                                byte[] isText, byte[] encrypted, long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference);
+        this.signature = signature;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+    }
+
 
     // asPack
     public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, long templateKey, byte[] data, byte[] isText, byte[] encrypted, Long reference, byte[] signature) {
@@ -79,6 +86,15 @@ public class IssueStatementRecord extends Transaction {
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
+    }
+    public IssueStatementRecord(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long templateKey, byte[] data,
+                                byte[] isText, byte[] encrypted, PublicKeyAccount[] signers, byte[][] signatures,
+                                long timestamp, Long reference, byte[] signature, long feeLong) {
+        this(typeBytes, creator, feePow, templateKey, data, isText, encrypted, timestamp, reference, signature);
+        this.signers = signers;
+        this.signatures = signatures;
+        this.setTypeBytes();
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
     }
 
     // as Pack
@@ -157,6 +173,14 @@ public class IssueStatementRecord extends Transaction {
         byte[] signatureBytes = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //////// local parameters
 
         long key = 0l;
@@ -212,13 +236,15 @@ public class IssueStatementRecord extends Transaction {
 
         if (signersLen == 0) {
             if (asDeal > Transaction.FOR_MYPACK) {
-                return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, timestamp, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
+                        timestamp, reference, signatureBytes, feeLong);
             } else {
                 return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, reference, signatureBytes);
             }
         } else {
             if (asDeal > Transaction.FOR_MYPACK) {
-                return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, timestamp, reference, signatureBytes);
+                return new IssueStatementRecord(typeBytes, creator, feePow, key, arbitraryData, isTextByte, encryptedByte,
+                        signers, signatures, timestamp, reference, signatureBytes, feeLong);
             } else {
                 return new IssueStatementRecord(typeBytes, creator, key, arbitraryData, isTextByte, encryptedByte, signers, signatures, reference, signatureBytes);
             }

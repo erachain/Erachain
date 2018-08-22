@@ -29,11 +29,7 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
     private static final int OWNER_LENGTH = RECIPIENT_LENGTH;
     private static final int AMOUNT_LENGTH = TransactionAmount.AMOUNT_LENGTH;
 
-    private static final int LOAD_LENGTH = RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
-    private static final int BASE_LENGTH_AS_MYPACK = Genesis_Record.BASE_LENGTH_AS_MYPACK + LOAD_LENGTH;
-    private static final int BASE_LENGTH_AS_PACK = Genesis_Record.BASE_LENGTH_AS_PACK + LOAD_LENGTH;
-    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + LOAD_LENGTH;
-    private static final int BASE_LENGTH_AS_DBRECORD = Genesis_Record.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
+    private static final int BASE_LENGTH = Genesis_Record.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
     private Account owner;
     private Account recipient;
@@ -245,20 +241,8 @@ public class GenesisTransferAssetTransaction extends Genesis_Record {
 
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
-        int base_len;
-        if (forDeal == FOR_MYPACK)
-            base_len = BASE_LENGTH_AS_MYPACK;
-        else if (forDeal == FOR_PACK)
-            base_len = BASE_LENGTH_AS_PACK;
-        else if (forDeal == FOR_DB_RECORD)
-            base_len = BASE_LENGTH_AS_DBRECORD;
-        else
-            base_len = BASE_LENGTH;
 
-        if (!withSignature)
-            base_len -= SIGNATURE_LENGTH;
-
-        return base_len + (this.key < 0 ? OWNER_LENGTH : 0);
+        return BASE_LENGTH + (this.key < 0 ? OWNER_LENGTH : 0);
     }
 
 

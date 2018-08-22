@@ -88,8 +88,19 @@ public class R_SertifyPubKeys extends Transaction {
                 add_day, timestamp, reference);
         this.signature = signature;
         this.sertifiedSignatures = sertifiedSignatures;
-        //this.calcFee();
     }
+    public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, byte feePow, long key,
+                            List<PublicKeyAccount> sertifiedPublicKeys,
+                            int add_day, long timestamp, Long reference, byte[] signature, long feeLong,
+                            List<byte[]> sertifiedSignatures) {
+        this(typeBytes, creator, feePow, key,
+                sertifiedPublicKeys,
+                add_day, timestamp, reference);
+        this.signature = signature;
+        this.sertifiedSignatures = sertifiedSignatures;
+        this.fee = BigDecimal.valueOf(feeLong, BlockChain.AMOUNT_DEDAULT_SCALE);
+    }
+
 
     // as pack
     public R_SertifyPubKeys(byte[] typeBytes, PublicKeyAccount creator, long key,
@@ -183,6 +194,14 @@ public class R_SertifyPubKeys extends Transaction {
         byte[] signature = Arrays.copyOfRange(data, position, position + SIGNATURE_LENGTH);
         position += SIGNATURE_LENGTH;
 
+        long feeLong = 0;
+        if (asDeal == FOR_DB_RECORD) {
+            // READ FEE
+            byte[] feeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
+            feeLong = Longs.fromByteArray(feeBytes);
+            position += FEE_LENGTH;
+        }
+
         //READ PERSON KEY
         byte[] keyBytes = Arrays.copyOfRange(data, position, position + KEY_LENGTH);
         long key = Longs.fromByteArray(keyBytes);
@@ -210,7 +229,7 @@ public class R_SertifyPubKeys extends Transaction {
         if (asDeal > Transaction.FOR_MYPACK) {
             return new R_SertifyPubKeys(typeBytes, creator, feePow, key,
                     sertifiedPublicKeys,
-                    add_day, timestamp, reference, signature,
+                    add_day, timestamp, reference, signature, feeLong,
                     sertifiedSignatures);
         } else {
             return new R_SertifyPubKeys(typeBytes, creator, key,
