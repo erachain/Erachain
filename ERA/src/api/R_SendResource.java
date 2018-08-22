@@ -143,6 +143,9 @@ public class R_SendResource {
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
 
+        if (jsonObject == null)
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
         String feePow = (String) jsonObject.getOrDefault("feePow", null);
@@ -235,6 +238,9 @@ public class R_SendResource {
             //JSON EXCEPTION
             throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
         }
+
+        if (jsonObject == null)
+            throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
