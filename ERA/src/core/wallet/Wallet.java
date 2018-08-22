@@ -1147,11 +1147,13 @@ public class Wallet extends Observable implements Observer {
 		DCSet dcSet = DCSet.getInstance();
 		int height = block.getHeight(dcSet);
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+		int seqNo;
 		for (int i = transactions.size() - 1; i >= 0; i--) {
 
+			seqNo = i + 1;
+
 			Transaction transaction = transactions.get(i);
-			/// seqNo = i + 1 !!!
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, i + 1);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, seqNo);
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT

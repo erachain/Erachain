@@ -1397,7 +1397,9 @@ public class Block {
 
         this.getTransactions();
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
+        int seqNo;
         for (int i = this.transactionCount - 1; i >= 0; i--) {
+            seqNo = i + 1;
             if (cnt.isOnStopping())
                 throw new Exception("on stoping");
 
@@ -1405,7 +1407,7 @@ public class Block {
             //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
             // (!) seqNo = i + 1
-            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, this.heightBlock, i + 1);
+            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
             if (!transaction.isWiped()) {
                 transaction.orphan(Transaction.FOR_NETWORK);
@@ -1420,7 +1422,7 @@ public class Block {
             //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
             unconfirmedMap.add(transaction);
 
-            Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height, i);
+            Tuple2<Integer, Integer> key = new Tuple2<Integer, Integer>(height, seqNo);
             finalMap.delete(key);
             transFinalMapSinds.delete(transaction.getSignature());
             List<byte[]> signatures = transaction.getSignatures();

@@ -96,7 +96,9 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
                     @Override
                     public String[] run(Tuple2<Integer, Integer> key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
-                        //val.setDC(getDCSet(), false);
+
+                        val.setDC(getDCSet());
+
                         for (Account acc : val.getRecipientAccounts()) {
                             recps.add(acc.getAddress());
                         }

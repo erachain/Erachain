@@ -504,15 +504,12 @@ public abstract class Transaction {
     }
 
     // GETTERS/SETTERS
-    /*
-    public void setDC(DCSet dcSet, int asDeal) {
+
+    // NEED FOR DB SECONDATY KEYS
+    // see org.mapdb.Bind.secondaryKeys
+    public void setDC(DCSet dcSet) {
         this.dcSet = dcSet;
-        //this.height = this.getBlockHeightByParentOrLast(dcSet);
-        //this.seqNo = this.block.getTransactionSeq(this.signature);
-        if (asDeal > Transaction.FOR_PACK)
-            this.calcFee();
     }
-    */
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         this.dcSet = dcSet;
         this.height = blockHeight; //this.getBlockHeightByParentOrLast(dcSet);
