@@ -96,7 +96,7 @@ public class API_TransactionsResource {
 
         do {
             for (Transaction transaction : block.getTransactions()) {
-                transaction.setDC(dcSet, false);
+                //transaction.setDC(dcSet, false);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
                 for (Account recipient : recipients) {
                     if (recipient.equals(address)) {

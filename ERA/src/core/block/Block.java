@@ -511,10 +511,10 @@ public class Block {
             //LOAD TRANSACTIONS
             this.transactions = new ArrayList<Transaction>();
 
-            try {
-                int position = 0;
-                for (int i = 0; i < transactionCount; i++) {
-                    //GET TRANSACTION SIZE
+            int position = 0;
+            for (int i = 0; i < transactionCount; i++) {
+                //GET TRANSACTION SIZE
+                try {
                     byte[] transactionLengthBytes = Arrays.copyOfRange(this.rawTransactions, position, position + TRANSACTION_SIZE_LENGTH);
                     int transactionLength = Ints.fromByteArray(transactionLengthBytes);
                     position += TRANSACTION_SIZE_LENGTH;
@@ -529,9 +529,14 @@ public class Block {
 
                     //ADD TO POSITION
                     position += transactionLength;
+                } catch (Exception e) {
+                    //FAILED TO LOAD TRANSACTIONS
+                    //throw new Exception(
+                    LOGGER.error("block getTransactions error: " + e.getMessage(), e);
+                    Long error = null;
+                    ++error;
+
                 }
-            } catch (Exception e) {
-                //FAILED TO LOAD TRANSACTIONS
             }
         }
 
@@ -974,13 +979,16 @@ public class Block {
         }
         //CHECK TRANSACTIONS
 
-        if (this.transactions == null || this.transactionCount == 0) {
+        if (this.transactionCount == 0) {
             // empty transactions
         } else {
             int seq = 1;
             byte[] blockSignature = this.getSignature();
             byte[] transactionSignature;
+            byte[] transactionsSignatures = new byte[0];
+
             this.getTransactions();
+
             boolean isPrimarySet = !dcSet.isFork();
 
             long timerProcess = 0;
@@ -988,8 +996,6 @@ public class Block {
             long timerUnconfirmedMap_delete = 0;
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
-
-            byte[] transactionsSignatures = new byte[0];
 
             long timestampEnd = this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
@@ -1013,7 +1019,7 @@ public class Block {
                 if (cnt.isOnStopping())
                     return false;
 
-                seqNo++;
+                seqNo++; /// (!!)
 
                 if (!transaction.isWiped()) {
 
@@ -1031,7 +1037,7 @@ public class Block {
                     if (!transaction.isSignatureValid(validatingDC)) {
                         //
                         LOGGER.debug("*** Block[" + height
-                                + "].Tx[" + this.getTransactionSeq(transaction.getSignature()) + " : "
+                                + "].Tx[" + seqNo + "=" + this.getTransactionSeq(transaction.getSignature()) + " : "
                                 + transaction.viewFullTypeName() + "]"
                                 + "signature not valid!"
                                 + " " + Base58.encode(transaction.getSignature()));
@@ -1132,8 +1138,6 @@ public class Block {
                         }
                     }
                 }
-
-                seq++;
 
                 transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
             }
@@ -1253,7 +1257,9 @@ public class Block {
         int seq = 1;
         byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
+
         this.getTransactions();
+
         //DBSet dbSet = Controller.getInstance().getDBSet();
         TransactionMap unconfirmedMap = dcSet.getTransactionMap();
         TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
@@ -1391,7 +1397,6 @@ public class Block {
 
         this.getTransactions();
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
-        int seqNo = 0;
         for (int i = this.transactionCount - 1; i >= 0; i--) {
             if (cnt.isOnStopping())
                 throw new Exception("on stoping");
@@ -1399,7 +1404,8 @@ public class Block {
             Transaction transaction = transactions.get(i);
             //LOGGER.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
 
-            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
+            // (!) seqNo = i + 1
+            transaction.setBlock(this, dcSet, Transaction.FOR_NETWORK, this.heightBlock, i + 1);
 
             if (!transaction.isWiped()) {
                 transaction.orphan(Transaction.FOR_NETWORK);

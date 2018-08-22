@@ -174,6 +174,10 @@ public class R_Send extends TransactionAmount {
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
+        // READ TYPE
+        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
+        int position = TYPE_LENGTH;
+
         int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
             test_len = BASE_LENGTH_AS_MYPACK;
@@ -185,13 +189,17 @@ public class R_Send extends TransactionAmount {
             test_len = BASE_LENGTH;
         }
 
-        if (data.length < test_len) {
-            throw new Exception("Data does not match block length " + data.length);
+        if (typeBytes[2] < 0) {
+            // without AMOUNT
+            test_len -= KEY_LENGTH + AMOUNT_LENGTH;
+        }
+        if (typeBytes[3] < 0) {
+            test_len -= DATA_SIZE_LENGTH + ENCRYPTED_LENGTH + IS_TEXT_LENGTH;
         }
 
-        // READ TYPE
-        byte[] typeBytes = Arrays.copyOfRange(data, 0, TYPE_LENGTH);
-        int position = TYPE_LENGTH;
+            if (data.length < test_len) {
+            throw new Exception("Data does not match block length " + data.length);
+        }
 
         long timestamp = 0;
         if (asDeal > Transaction.FOR_MYPACK) {

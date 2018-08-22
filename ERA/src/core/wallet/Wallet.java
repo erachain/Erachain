@@ -1057,13 +1057,13 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// CHECK TRANSACTIONS
-		int seqNo = 1;
+		int seqNo = 0;
 		for (Transaction transaction : block.getTransactions()) {
 
 			if (!this.isWalletDatabaseExisting())
 				return;
 
-			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, seqNo++);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
@@ -1150,6 +1150,7 @@ public class Wallet extends Observable implements Observer {
 		for (int i = transactions.size() - 1; i >= 0; i--) {
 
 			Transaction transaction = transactions.get(i);
+			/// seqNo = i + 1 !!!
 			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, i + 1);
 			this.orphanTransaction(transaction);
 
