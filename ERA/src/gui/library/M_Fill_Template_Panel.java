@@ -207,7 +207,7 @@ public class M_Fill_Template_Panel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 8, 0);
         //	add(jCheckBox_Is_Text, gridBagConstraints);
 
-        jCheckBox_Is_Encripted.setText(Lang.getInstance().translate("Encrypt Message"));
+        jCheckBox_Is_Encripted.setText(Lang.getInstance().translate("Encrypt message"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;

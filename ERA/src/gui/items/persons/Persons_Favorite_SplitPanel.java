@@ -24,7 +24,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
         super(table_Model, "Persons_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
         th = this;
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
@@ -34,7 +34,7 @@ public class Persons_Favorite_SplitPanel extends Item_SplitPanel {
         });
 
        // th.menu_Table.add(vsend_Coins_Item);
-        JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send Mail"));
+        JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

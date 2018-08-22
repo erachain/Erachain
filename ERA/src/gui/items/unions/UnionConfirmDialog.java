@@ -211,7 +211,7 @@ public class UnionConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
         getContentPane().add(jLabel_UnionInfo, gridBagConstraints);
 
-        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Account") + ":");
+        jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;

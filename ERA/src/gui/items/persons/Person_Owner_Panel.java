@@ -104,7 +104,7 @@ public class Person_Owner_Panel extends JPanel {
         menu.add(menu_copyName);
 
 
-        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem Send_Coins_item_Menu = new JMenuItem(Lang.getInstance().translate("Send asset"));
         Send_Coins_item_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new Account_Send_Dialog(null, null, null, person_Accounts_Model.getPerson(row));

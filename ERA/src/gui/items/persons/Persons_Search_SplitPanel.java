@@ -27,7 +27,7 @@ public class Persons_Search_SplitPanel extends Item_Search_SplitPanel {
         super(search_Table_Model, "Persons_Search_SplitPanel", "Persons_Search_SplitPanel");
 
         this.th = this;
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override

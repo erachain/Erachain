@@ -22,7 +22,7 @@ public class Imprints_Favorite_SplitPanel extends Item_SplitPanel {
         super(table_Model, "Persons_Favorite_SplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
         th = this;
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override

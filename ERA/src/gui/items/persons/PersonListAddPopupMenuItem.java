@@ -17,7 +17,7 @@ import lang.Lang;
 public class PersonListAddPopupMenuItem {
 
     public PersonListAddPopupMenuItem(PersonCls person, JPopupMenu menu){
-        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send Asset"));
+        JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
             @Override
