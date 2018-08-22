@@ -2901,7 +2901,7 @@ public class Controller extends Observable {
     }
 
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
-            String feePowStr, String assetKeyStr, boolean checkAsset, String amountStr, boolean needAmount,
+            int feePow, String assetKeyStr, boolean checkAsset, String amountStr, boolean needAmount,
             String title, String message, int messagecode, boolean encrypt) {
         
         Controller cnt = Controller.getInstance();
@@ -2928,6 +2928,7 @@ public class Controller extends Observable {
         }
 
         // READ FEE
+        /*
         int feePow = 0;
         if (feePowStr != null) {
             try {
@@ -2936,6 +2937,7 @@ public class Controller extends Observable {
                 return new Pair<Integer, Transaction>(Transaction.INVALID_FEE_POWER, null);
             }
         }
+        */
 
         // READ AMOUNT
         BigDecimal amount = null;

@@ -70,7 +70,7 @@ public class R_SendResource {
     // @Consumes(MediaType.WILDCARD)
     @Path("{creator}/{recipient}")
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("feePow") String feePowStr, @QueryParam("assetKey") String assetKeyStr,
+                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") String assetKeyStr,
                           @QueryParam("amount") String amountStr, @QueryParam("title") String title,
                           @QueryParam("message") String message,
                           @QueryParam("encoding") int encoding,
@@ -148,13 +148,13 @@ public class R_SendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        String feePow = (String) jsonObject.getOrDefault("feePow", null);
+        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         String assetKey = (String) jsonObject.getOrDefault("assetKey", null);
         String amount = (String) jsonObject.getOrDefault("amount", null);
         String title = (String) jsonObject.getOrDefault("title", null);
         String message = (String) jsonObject.getOrDefault("message",null);
-        int encoding = Integer.valueOf((String) jsonObject.getOrDefault("encoding", 0));
-        boolean encrypt = Boolean.valueOf((String) jsonObject.getOrDefault("encrypt", false));
+        int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
+        boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
         String password = (String) jsonObject.getOrDefault("password", null);
 
         return sendGet(
@@ -181,7 +181,7 @@ public class R_SendResource {
     //@Produces("text/plain")
     @Path("raw/{creator}/{recipient}")
     public String rawSendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                             @QueryParam("feePow") String feePowStr,
+                             @QueryParam("feePow") int feePowStr,
                              @QueryParam("assetKey") String assetKeyStr, @QueryParam("amount") String amountStr,
                              @QueryParam("title") String title,
                              @QueryParam("message") String message,
@@ -244,14 +244,14 @@ public class R_SendResource {
 
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
-        String feePow = (String) jsonObject.getOrDefault("feePow", null);
+        int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
         String assetKey = (String) jsonObject.getOrDefault("assetKey", null);
         String amount = (String) jsonObject.getOrDefault("amount", null);
         String title = (String) jsonObject.getOrDefault("title", null);
-        String message = (String) jsonObject.getOrDefault("message", null);
-        int encoding = (int) jsonObject.getOrDefault("encoding", 0);
-        boolean encrypt = (boolean) jsonObject.getOrDefault("encrypt", false);
-        int rawbase = (int) jsonObject.getOrDefault("rawbase", 58);
+        String message = (String) jsonObject.getOrDefault("message",null);
+        int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
+        boolean encrypt = Boolean.valueOf((boolean) jsonObject.getOrDefault("encrypt", false));
+        int rawbase = Integer.valueOf(jsonObject.getOrDefault("rawbase", 58).toString());
         String password = (String) jsonObject.getOrDefault("password", null);
 
         return rawSendGet(
