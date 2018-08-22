@@ -234,7 +234,7 @@ public class R_Vouch extends Transaction {
             return INVALID_BLOCK_HEIGHT;
         }
 
-        if (this.vouchSeqNo < 0) {
+        if (this.vouchSeqNo <= 0) {
             //CHECK DATA SIZE
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
@@ -255,8 +255,7 @@ public class R_Vouch extends Transaction {
 		if (tx == null )
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		 */
-        Transaction tx = this.dcSet.getTransactionFinalMap().getTransaction(vouchHeight, vouchSeqNo);
-        if (tx == null) {
+        if (!this.dcSet.getTransactionFinalMap().contains(new Tuple2<Integer, Integer>(this.vouchHeight, this.vouchSeqNo))) {
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
