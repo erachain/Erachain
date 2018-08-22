@@ -2901,7 +2901,7 @@ public class Controller extends Observable {
     }
 
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
-            int feePow, String assetKeyStr, boolean checkAsset, String amountStr, boolean needAmount,
+            int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
             String title, String message, int messagecode, boolean encrypt) {
         
         Controller cnt = Controller.getInstance();
@@ -2940,6 +2940,7 @@ public class Controller extends Observable {
         */
 
         // READ AMOUNT
+        /*
         BigDecimal amount = null;
         if (amountStr != null) {
             try {
@@ -2949,25 +2950,21 @@ public class Controller extends Observable {
             }
 
         }
+        */
 
         if (needAmount && (amount == null || amount.signum() == 0)) {
             return new Pair<Integer, Transaction>(Transaction.INVALID_AMOUNT_IS_NULL, null);
         }
 
-        long assetKey = 0;
+        //long assetKey = 0;
         if (amount != null) {
             if (amount.compareTo(BigDecimal.ZERO) == 0)
                 amount = null;
             else {
                 // PARSE asset Key
-                if (assetKeyStr == null) {
+                if (assetKey == 0) {
                     assetKey = 2;
                 } else {
-                    try {
-                        assetKey = new Long(assetKeyStr);
-                    } catch (Exception e) {
-                        return new Pair<Integer, Transaction>(Transaction.INVALID_ITEM_KEY, null);
-                    }
 
                     if (checkAsset) {
                         AssetCls asset;

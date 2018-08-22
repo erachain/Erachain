@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -48,8 +49,8 @@ public class R_SendResource {
      * @param creatorStr   address in wallet
      * @param recipientStr recipient
      * @param feePowStr    fee
-     * @param assetKeyStr  asset
-     * @param amountStr    amount
+     * @param assetKey     assetKey
+     * @param amount       amount
      * @param title        title or head
      * @param message      message
      * @param encoding  code if exist is text (not required field)
@@ -70,8 +71,8 @@ public class R_SendResource {
     // @Consumes(MediaType.WILDCARD)
     @Path("{creator}/{recipient}")
     public String sendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") String assetKeyStr,
-                          @QueryParam("amount") String amountStr, @QueryParam("title") String title,
+                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                          @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
                           @QueryParam("message") String message,
                           @QueryParam("encoding") int encoding,
                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
@@ -83,8 +84,8 @@ public class R_SendResource {
 
         boolean needAmount = false;
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
-                assetKeyStr, true,
-                amountStr, needAmount,
+                assetKey, true,
+                amount, needAmount,
                 title, message, encoding, encrypt);
 
         Transaction transaction = result.getB();
@@ -149,8 +150,8 @@ public class R_SendResource {
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-        String assetKey = (String) jsonObject.getOrDefault("assetKey", null);
-        String amount = (String) jsonObject.getOrDefault("amount", null);
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
+        BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
         String title = (String) jsonObject.getOrDefault("title", null);
         String message = (String) jsonObject.getOrDefault("message",null);
         int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
@@ -182,7 +183,7 @@ public class R_SendResource {
     @Path("raw/{creator}/{recipient}")
     public String rawSendGet(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
                              @QueryParam("feePow") int feePowStr,
-                             @QueryParam("assetKey") String assetKeyStr, @QueryParam("amount") String amountStr,
+                             @QueryParam("assetKey") long assetKey, @QueryParam("amount") BigDecimal amountStr,
                              @QueryParam("title") String title,
                              @QueryParam("message") String message,
                              @QueryParam("encoding") int encoding, @QueryParam("encrypt") boolean encrypt,
@@ -196,7 +197,7 @@ public class R_SendResource {
 
         boolean needAmount = false;
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
-                assetKeyStr, true,
+                assetKey, true,
                 amountStr, needAmount,
                 title, message, encoding, encrypt);
 
@@ -245,8 +246,8 @@ public class R_SendResource {
         String creator = (String) jsonObject.getOrDefault("creator", null);
         String recipient = (String) jsonObject.getOrDefault("recipient", null);
         int feePow = Integer.valueOf(jsonObject.getOrDefault("feePow", 0).toString());
-        String assetKey = (String) jsonObject.getOrDefault("assetKey", null);
-        String amount = (String) jsonObject.getOrDefault("amount", null);
+        long assetKey = Long.valueOf(jsonObject.getOrDefault("assetKey", 0l).toString());
+        BigDecimal amount = new BigDecimal(jsonObject.getOrDefault("amount", 0).toString());
         String title = (String) jsonObject.getOrDefault("title", null);
         String message = (String) jsonObject.getOrDefault("message",null);
         int encoding = Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString());
