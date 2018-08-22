@@ -383,10 +383,10 @@ public class WEB_Transactions_HTML {
         String out = "";
         R_Vouch vouchRecord = (R_Vouch) transaction;
         Transaction record = DCSet.getInstance().getTransactionFinalMap().getTransaction(vouchRecord.getVouchHeight(),
-                vouchRecord.getVouchSeq());
+                vouchRecord.getVouchSeqNo());
 		/*out += "<b>" + Lang.getInstance().translate_from_langObj("height-seq.", langObj) + ":</b> <a href=?tx="
 				+  Base58.encode(record.getSignature()) + get_Lang(langObj) + ">" + vouchRecord.getVouchHeight() + "-"
-				+ vouchRecord.getVouchSeq() + "</a><br>"; */
+				+ vouchRecord.getVouchSeqNo() + "</a><br>"; */
         out += "<b>" + Lang.getInstance().translate_from_langObj("Description", langObj) + ":</b> ";
 
         out += "<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width='800'  class='table table-striped' style='border: 1px solid #ddd; word-wrap: break-word;'><tr><td><td>";

@@ -116,7 +116,7 @@ public class TestRecStatus {
         //CREATE ISSUE STATUS TRANSACTION
         IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
         issueStatusRecord.sign(maker, Transaction.FOR_NETWORK);
-        issueStatusRecord.setDC(db,Transaction.FOR_NETWORK);
+        issueStatusRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueStatusRecord.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -172,7 +172,7 @@ public class TestRecStatus {
 
         //CREATE ISSUE STATUS TRANSACTION
         IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
-        issueStatusRecord.setDC(db,Transaction.FOR_NETWORK);
+        issueStatusRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(Transaction.FOR_NETWORK, flags));
 
         issueStatusRecord.sign(maker, Transaction.FOR_NETWORK);
@@ -187,7 +187,7 @@ public class TestRecStatus {
         StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje", true);
         IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db));
         issueStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);
-        issueStatusTransaction_2.setDC(db,Transaction.FOR_NETWORK);
+        issueStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);
         LOGGER.info("status_2 KEY: " + status_2.getKey(db));
         issueStatusTransaction_2.orphan(Transaction.FOR_NETWORK);

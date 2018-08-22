@@ -488,4 +488,10 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         return this.get(Transaction.parseDBRef(dbRefLong));
     }
 
+    public Transaction get(Tuple2<Integer, Integer> key) {
+        Transaction item = super.get(key);
+        item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+        return item;
+    }
+
 }

@@ -293,7 +293,7 @@ public class API_TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
-            record.setDC(dcSet, Transaction.FOR_NETWORK);
+            //record.setDC(dcSet, Transaction.FOR_NETWORK);
             array.add(record.toJson());
         }
 

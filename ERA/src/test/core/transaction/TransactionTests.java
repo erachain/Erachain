@@ -424,7 +424,7 @@ String  s= "";
 
         //CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, last_ref);
-        nameRegistration.setDC(db,Transaction.FOR_NETWORK);
+        nameRegistration.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         nameRegistration.sign(maker, Transaction.FOR_NETWORK);
         nameRegistration.process(gb, Transaction.FOR_NETWORK);
 

@@ -112,14 +112,17 @@ public class CreateOrderTransaction extends Transaction {
         //boolean asPack = releaserReference != null;
 
         // CHECK IF WE MATCH BLOCK LENGTH
-        int test_len = BASE_LENGTH;
+        int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_MYPACK;
         } else if (asDeal == Transaction.FOR_PACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH;
+            test_len = BASE_LENGTH_AS_PACK;
         } else if (asDeal == Transaction.FOR_DB_RECORD) {
-            test_len += Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
         }
+
         if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
@@ -202,6 +205,7 @@ public class CreateOrderTransaction extends Transaction {
                 reference, signatureBytes);
     }
 
+    /*
     public void setDC(DCSet dcSet, int asDeal) {
 
         super.setDC(dcSet, asDeal);
@@ -210,10 +214,20 @@ public class CreateOrderTransaction extends Transaction {
         this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
 
     }
+    */
+
+    public void setBlock(Block block, DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setBlock(block, dcSet, asDeal, blockHeight, seqNo);
+
+        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
+        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
+    }
 
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
+        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
     }
 
     public Long getOrderId() {

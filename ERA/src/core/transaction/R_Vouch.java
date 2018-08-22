@@ -31,14 +31,14 @@ public class R_Vouch extends Transaction {
     private static final byte TYPE_ID = (byte) Transaction.VOUCH_TRANSACTION;
     private static final String NAME_ID = "Vouch";
     static Logger LOGGER = Logger.getLogger(R_Vouch.class.getName());
-    protected int height;
-    protected int seq;
+    protected int vouchHeight;
+    protected int vouchSeqNo;
 
-    public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference) {
+    public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int vouchHeight, int vouchSeqNo, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
 
-        this.height = height;
-        this.seq = seq;
+        this.vouchHeight = vouchHeight;
+        this.vouchSeqNo = vouchSeqNo;
     }
 
     public R_Vouch(byte[] typeBytes, PublicKeyAccount creator, byte feePow, int height, int seq, long timestamp, Long reference, byte[] signature) {
@@ -76,14 +76,17 @@ public class R_Vouch extends Transaction {
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
-        int test_len = BASE_LENGTH;
+        int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_MYPACK;
         } else if (asDeal == Transaction.FOR_PACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH;
+            test_len = BASE_LENGTH_AS_PACK;
         } else if (asDeal == Transaction.FOR_DB_RECORD) {
-            test_len += Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
         }
+
         if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
@@ -124,28 +127,28 @@ public class R_Vouch extends Transaction {
 
         //READ HEIGHT
         byte[] heightBytes = Arrays.copyOfRange(data, position, position + HEIGHT_LENGTH);
-        int height = Ints.fromByteArray(heightBytes);
+        int vouchHeight = Ints.fromByteArray(heightBytes);
         position += HEIGHT_LENGTH;
 
         //READ SEQ
         byte[] seqBytes = Arrays.copyOfRange(data, position, position + SEQ_LENGTH);
-        int seq = Ints.fromByteArray(seqBytes);
+        int vouchSeqNo = Ints.fromByteArray(seqBytes);
         position += SEQ_LENGTH;
 
         if (asDeal > Transaction.FOR_MYPACK) {
-            return new R_Vouch(typeBytes, creator, height, seq, reference, signatureBytes);
+            return new R_Vouch(typeBytes, creator, feePow, vouchHeight, vouchSeqNo, timestamp, reference, signatureBytes);
         } else {
-            return new R_Vouch(typeBytes, creator, feePow, height, seq, timestamp, reference, signatureBytes);
+            return new R_Vouch(typeBytes, creator, vouchHeight, vouchSeqNo, reference, signatureBytes);
         }
 
     }
 
     public int getVouchHeight() {
-        return this.height;
+        return this.vouchHeight;
     }
 
-    public int getVouchSeq() {
-        return this.seq;
+    public int getVouchSeqNo() {
+        return this.vouchSeqNo;
     }
 
     @Override
@@ -161,8 +164,8 @@ public class R_Vouch extends Transaction {
         //GET BASE
         JSONObject transaction = this.getJsonBase();
 
-        transaction.put("height", this.height);
-        transaction.put("seq", this.seq);
+        transaction.put("vouchHeight", this.vouchHeight);
+        transaction.put("vouchSeqNo", this.vouchSeqNo);
 
         return transaction;
     }
@@ -173,12 +176,12 @@ public class R_Vouch extends Transaction {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE HEIGHT
-        byte[] heightBytes = Ints.toByteArray(this.height);
+        byte[] heightBytes = Ints.toByteArray(this.vouchHeight);
         heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
         data = Bytes.concat(data, heightBytes);
 
         //SEQ HEIGHT
-        byte[] seqBytes = Ints.toByteArray(this.seq);
+        byte[] seqBytes = Ints.toByteArray(this.vouchSeqNo);
         seqBytes = Bytes.ensureCapacity(seqBytes, SEQ_LENGTH, 0);
         data = Bytes.concat(data, seqBytes);
 
@@ -210,12 +213,12 @@ public class R_Vouch extends Transaction {
     @Override
     public int isValid(int asDeal, long flags) {
 
-        if (this.height < 2) {
+        if (this.vouchHeight < 2) {
             //CHECK HEIGHT - not 0 and NOT GENESIS
             return INVALID_BLOCK_HEIGHT;
         }
 
-        if (this.seq < 0) {
+        if (this.vouchSeqNo < 0) {
             //CHECK DATA SIZE
             return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
@@ -236,13 +239,9 @@ public class R_Vouch extends Transaction {
 		if (tx == null )
 			return INVALID_BLOCK_TRANS_SEQ_ERROR;
 		 */
-        Transaction tx = this.dcSet.getTransactionFinalMap().getTransaction(height, seq);
+        Transaction tx = this.dcSet.getTransactionFinalMap().getTransaction(vouchHeight, vouchSeqNo);
         if (tx == null) {
-            if (height == 104841 && seq == 1) {
-                // "32tebyLDxbucXod4N4TAZZGCMqLJdXtDQuY4o1P4gxDBcBKkdCi41LdAxVD9Xzy3rmPQ41yHXtFJvhD6SPkrfaa3
-            } else {
-                return INVALID_BLOCK_TRANS_SEQ_ERROR;
-            }
+            return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
         return Transaction.VALIDATE_OK;
@@ -259,7 +258,7 @@ public class R_Vouch extends Transaction {
             return;
 
         // make key for vouching record
-        Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);
+        Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.vouchHeight, this.vouchSeqNo);
         // find value
         Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value = this.dcSet.getVouchRecordMap().get(recordKey);
 
@@ -293,7 +292,7 @@ public class R_Vouch extends Transaction {
         super.orphan(asDeal);
 
         // make key for vouching record
-        Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.height, this.seq);
+        Tuple2<Integer, Integer> recordKey = new Tuple2<Integer, Integer>(this.vouchHeight, this.vouchSeqNo);
         // find value
         Tuple2<BigDecimal, List<Tuple2<Integer, Integer>>> value = this.dcSet.getVouchRecordMap().get(recordKey);
         // update value
@@ -326,9 +325,9 @@ public class R_Vouch extends Transaction {
 
         HashSet<Account> accounts = new HashSet<Account>();
 
-        Transaction record = dcSet.getTransactionFinalMap().getTransaction(height, seq);
+        Transaction record = dcSet.getTransactionFinalMap().getTransaction(vouchHeight, vouchSeqNo);
         if (record == null) {
-            LOGGER.debug("core.transaction.R_Vouch.getRecipientAccounts() not found record: " + height + "-" + seq);
+            LOGGER.debug("core.transaction.R_Vouch.getRecipientAccounts() not found record: " + vouchHeight + "-" + vouchSeqNo);
             return accounts;
         }
         accounts.addAll(record.getInvolvedAccounts());

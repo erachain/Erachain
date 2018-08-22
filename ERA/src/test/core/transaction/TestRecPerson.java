@@ -105,13 +105,13 @@ public class TestRecPerson {
         //personGeneral.setKey(genesisPersonKey);
 
         GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-        genesis_issue_person.setDC(db, Transaction.FOR_NETWORK);
+        genesis_issue_person.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
         //genesisPersonKey = db.getIssuePersonMap().size();
         genesisPersonKey = genesis_issue_person.getAssetKey(db);
 
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
-        genesis_certify.setDC(db, Transaction.FOR_NETWORK);
+        genesis_certify.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         certifier.setLastTimestamp(last_ref, db);
@@ -319,7 +319,7 @@ public class TestRecPerson {
 
         //assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(db, Transaction.FOR_NETWORK));
         assertEquals(Transaction.INVALID_IMAGE_LENGTH, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
-        issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
@@ -389,7 +389,7 @@ public class TestRecPerson {
                 sertifiedPublicKeys,
                 356, timestamp, userAccount1.getLastTimestamp(db));
         //CREATE INVALID ISSUE PERSON - NOT FEE
-        personalizeRecord_0.setDC(db, Transaction.FOR_NETWORK);
+        personalizeRecord_0.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
         userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);

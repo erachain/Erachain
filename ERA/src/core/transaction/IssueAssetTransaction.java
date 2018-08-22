@@ -59,14 +59,17 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         //boolean asPack = releaserReference != null;
 
         //CHECK IF WE MATCH BLOCK LENGTH
-        int test_len = BASE_LENGTH;
+        int test_len;
         if (asDeal == Transaction.FOR_MYPACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH + Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_MYPACK;
         } else if (asDeal == Transaction.FOR_PACK) {
-            test_len -= Transaction.TIMESTAMP_LENGTH;
+            test_len = BASE_LENGTH_AS_PACK;
         } else if (asDeal == Transaction.FOR_DB_RECORD) {
-            test_len += Transaction.FEE_POWER_LENGTH;
+            test_len = BASE_LENGTH_AS_DBRECORD;
+        } else {
+            test_len = BASE_LENGTH;
         }
+
         if (data.length < test_len) {
             throw new Exception("Data does not match block length " + data.length);
         }
@@ -153,12 +156,11 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
 	}
 	 */
 
-    @Override
-    public void setDC(DCSet dcSet, int asDeal) {
-        super.setDC(dcSet, asDeal);
+	/*
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         AssetCls asset = (AssetCls) this.item;
-        ///asset.getKey(dcSet);
 
         if (false && dcSet.getItemAssetMap().getLastKey() < BlockChain.AMOUNT_SCALE_FROM) {
             // MAKE OLD STYLE ASSET with DEVISIBLE:
@@ -169,11 +171,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
         }
 
     }
-
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        this.setDC(dcSet, asDeal);
-        this.seqNo = seqNo;
-    }
+    */
 
     //VALIDATE
 

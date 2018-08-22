@@ -120,7 +120,7 @@ public class TestRecPoll {
 
         //CREATE ISSUE POLL TRANSACTION
         issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
-        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
 
     }
@@ -171,7 +171,7 @@ public class TestRecPoll {
 
         //CREATE INVALID ISSUE POLL - INVALID POLLALIZE
         issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, 0l, new byte[64]);
-        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         if (!BlockChain.DEVELOP_USE)
             assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
@@ -220,7 +220,7 @@ public class TestRecPoll {
 
         // PARSE ISSEU POLL RECORD
         issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
-        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -291,7 +291,7 @@ public class TestRecPoll {
         assertEquals(Transaction.VALIDATE_OK, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
-        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK);
+        issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issuePollTransaction.process(gb, Transaction.FOR_NETWORK);
 
         LOGGER.info("poll KEY: " + poll.getKey(db));

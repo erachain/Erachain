@@ -114,11 +114,13 @@ public class UpdateUtil {
         DCSet.getInstance().getPostCommentMap().reset();
 
         Block b = new GenesisBlock();
+        int height = b.getHeight(DCSet.getInstance());
         DCSet.getInstance().flush(b.getDataLength(true) >> 7, false);
         do {
             List<Transaction> txs = b.getTransactions();
+            int seqNo = 0;
             for (Transaction tx : txs) {
-                tx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+                tx.setBlock(b, DCSet.getInstance(), Transaction.FOR_NETWORK, height, ++seqNo);
 
                 if (tx instanceof ArbitraryTransaction) {
                     int service = ((ArbitraryTransaction) tx).getService();

@@ -135,10 +135,8 @@ public class VoteOnPollTransaction extends Transaction {
         int option = Ints.fromByteArray(optionBytes);
         position += OPTION_SIZE_LENGTH;
 
-        if (asDeal > Transaction.FOR_PACK) {
+        if (asDeal > Transaction.FOR_MYPACK) {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, feePow, timestamp, reference, signatureBytes);
-        } else if (asDeal > Transaction.FOR_MYPACK) {
-            return new VoteOnPollTransaction(typeBytes, creator, poll, option, reference, signatureBytes);
         } else {
             return new VoteOnPollTransaction(typeBytes, creator, poll, option, reference, signatureBytes);
         }

@@ -917,7 +917,6 @@ public class Wallet extends Observable implements Observer {
 		synchronized (accounts) {
 			for (Account account : accounts) {
 				// CHECK IF INVOLVED
-				transaction.setDC(dcSet, Transaction.FOR_NETWORK);
 				if (transaction.isInvolved(account)) {
 					// DELETE FROM ACCOUNT TRANSACTIONS
 					this.database.getTransactionMap().delete(account, transaction);
@@ -948,6 +947,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
+	/*
 	private boolean findLastBlockOff(byte[] lastBlockSignature, Block block) {
 
 		datachain.BlockSignsMap blockSignsMap = DCSet.getInstance().getBlockSignsMap();
@@ -980,6 +980,7 @@ public class Wallet extends Observable implements Observer {
 
 		return false;
 	}
+	*/
 
 	public boolean checkNeedSyncWallet(byte[] reference) {
 
@@ -1042,6 +1043,7 @@ public class Wallet extends Observable implements Observer {
 		String blockGeneratorStr = blockGenerator.getAddress();
 
 		DCSet dcSet = DCSet.getInstance();
+		int height = block.getHeight(dcSet);
 
 		// CHECK IF WE ARE GENERATOR
 		if (this.accountExists(blockGeneratorStr)) {
@@ -1055,12 +1057,13 @@ public class Wallet extends Observable implements Observer {
 		}
 
 		// CHECK TRANSACTIONS
+		int seqNo = 1;
 		for (Transaction transaction : block.getTransactions()) {
 
 			if (!this.isWalletDatabaseExisting())
 				return;
 
-			transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, seqNo++);
 			this.processTransaction(transaction);
 
 			// SKIP PAYMENT TRANSACTIONS
@@ -1142,11 +1145,12 @@ public class Wallet extends Observable implements Observer {
 		List<Transaction> transactions = block.getTransactions();
 
 		DCSet dcSet = DCSet.getInstance();
+		int height = block.getHeight(dcSet);
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		for (int i = transactions.size() - 1; i >= 0; i--) {
 
 			Transaction transaction = transactions.get(i);
-			transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+			transaction.setBlock(block, dcSet, Transaction.FOR_NETWORK, height, i + 1);
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1496,8 +1500,8 @@ public class Wallet extends Observable implements Observer {
 			if (person != null) {
 				// FIND issue record
 				Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
-				// GET FEE from that record
-				transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
+				///// GET FEE from that record
+				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 				// ISSUE NEW COMPU in chain
 				BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
@@ -1550,8 +1554,8 @@ public class Wallet extends Observable implements Observer {
 
 			// FIND issue record
 			Transaction transPersonIssue = db.getTransactionFinalMap().getTransaction(person.getReference());
-			// GET FEE from that record
-			transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
+			//// GET FEE from that record
+			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 			// ISSUE NEW COMPU in chain
 			BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
@@ -1694,7 +1698,7 @@ public class Wallet extends Observable implements Observer {
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
 
-			transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+			///transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
 			this.processTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1732,7 +1736,7 @@ public class Wallet extends Observable implements Observer {
 		{
 			Transaction transaction = (Transaction) message.getValue();
 
-			transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+			///transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT

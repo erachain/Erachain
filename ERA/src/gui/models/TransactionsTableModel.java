@@ -63,7 +63,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
             transactions = new ArrayList<>();
             Transaction transaction = DCSet.getInstance().getTransactionFinalMap().getRecord(string);
             if (transaction != null) {
-                transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+                //transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
                 transactions.add(transaction);
             }
             this.fireTableDataChanged();
@@ -71,9 +71,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
         }
 
         transactions = (List<Transaction>) DCSet.getInstance().getTransactionFinalMap().getTransactionsByBlock(block_No);
-        for (Transaction transaction: transactions) {
-            transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
-        }
+        //for (Transaction transaction: transactions) {
+            //transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+        //}
         this.fireTableDataChanged();
 
     }
@@ -108,7 +108,7 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
                         ac = assetTransfer.getOwner().getAddress();
                         //				System.out.print("\n k="+ k + "ac="+ac);
                         if (ac.equals(address)) {
-                            gT.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+                            //gT.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
                             transactions.add(gT);
                         }
                     }
@@ -119,9 +119,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
 
 
             transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(account.getAddress()));//.findTransactions(address, sender=address, recipient=address, minHeight=0, maxHeight=0, type=0, service=0, desc=false, offset=0, limit=0);//.getTransactionsByBlock(block_No);
-            for (Transaction transaction: transactions) {
-                transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
-            }
+            //for (Transaction transaction: transactions) {
+            //    transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+            //}
 
             this.fireTableDataChanged();
         } else {
@@ -135,9 +135,9 @@ public class TransactionsTableModel extends TableModelCls<byte[], Transaction> i
     public void view_Transactioms_From_Adress(String str) {
 
         transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddress(str);
-        for (Transaction transaction: transactions) {
-            transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
-        }
+        //for (Transaction transaction: transactions) {
+        //    transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+        //}
         this.fireTableDataChanged();
 
 
