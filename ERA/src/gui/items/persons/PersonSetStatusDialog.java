@@ -82,15 +82,15 @@ public class PersonSetStatusDialog extends JDialog {
         this.person = person;
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         initComponents();
-        this.setTitle(Lang.getInstance().translate("Set Status"));
-        jLabel_Address.setText(Lang.getInstance().translate("Your Account") + ":");
+        this.setTitle(Lang.getInstance().translate("Set status"));
+        jLabel_Address.setText(Lang.getInstance().translate("Your account") + ":");
         jLabel_Data_From.setText(Lang.getInstance().translate("From Date") + ":");
         jLabel_Data_To.setText(" " + Lang.getInstance().translate("To Date") + ":");
         jLabel_Param1.setText("%1 (" + Lang.getInstance().translate("integer") + ") :");
         jLabel_Param2.setText("%2 (" + Lang.getInstance().translate("integer") + ") :");
         jLabel_Addition1.setText("%3 (" + Lang.getInstance().translate("string") + "):");
         jLabel_Addition2.setText("%4 (" + Lang.getInstance().translate("string") + "):");
-        jLabel_Parent_record.setText(Lang.getInstance().translate("Parent Record") + ":");
+        jLabel_Parent_record.setText(Lang.getInstance().translate("Parent record") + ":");
         jLabel_Status.setText(Lang.getInstance().translate("Status") + ":");
         jLabel_Title.setText(Lang.getInstance().translate("Information about the person") + ":");
         jLabel__Description.setText("%D (" + Lang.getInstance().translate("text") + ") :");
@@ -554,7 +554,7 @@ public class PersonSetStatusDialog extends JDialog {
         });
 
 
-        jButton_SetStatus = new MButton(Lang.getInstance().translate("Set Status"), 2);
+        jButton_SetStatus = new MButton(Lang.getInstance().translate("Set status"), 2);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 7;
         gridBagConstraints.gridy = 28;

@@ -89,7 +89,7 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status"));
+        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status"));
 
         set_Status_Item.addActionListener(
                 new ActionListener() {
@@ -105,19 +105,15 @@ public class Statements_Favorite_SplitPanel extends Split_Panel {
 
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
-        vouch_Item.addActionListener(new ActionListener() {
+        vouch_Item.addActionListener(e -> {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) return;
+            if (jTable_jScrollPanel_LeftPanel.getSelectedRow() < 0) return;
 
 
-                Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
-                if (statement == null) return;
-                DCSet db = DCSet.getInstance();
-                new VouchRecordDialog(statement.getBlockHeight(db), statement.getSeqNo(db));
-            }
+            Transaction statement = search_Table_Model.get_Statement(jTable_jScrollPanel_LeftPanel.convertRowIndexToModel(jTable_jScrollPanel_LeftPanel.getSelectedRow()));
+            if (statement == null) return;
+            DCSet db = DCSet.getInstance();
+            new VouchRecordDialog(statement.getBlockHeight(db), statement.getSeqNo(db));
         });
 
         menu.add(vouch_Item);

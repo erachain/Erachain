@@ -368,12 +368,12 @@ class Issue_Send_Payment_Order1 extends JPanel {
         this.jCheckBox_Encrypted.setText(Lang.getInstance().translate("Encrypt"));
         this.jLabel_4_Data.setText(Lang.getInstance().translate("INN"));
         this.jLabel_ACCOUNT_ERA_Of_Bank.setText(Lang.getInstance().translate("To: (Account ERA)"));
-        this.jLabel_Account.setText(Lang.getInstance().translate("Select Account"));
+        this.jLabel_Account.setText(Lang.getInstance().translate("Select account"));
         this.jLabel_Ammount.setText(Lang.getInstance().translate("Amount"));
         this.jLabel_BIK.setText(Lang.getInstance().translate("BIK"));
         this.jLabel_Date.setText(Lang.getInstance().translate("Date"));
         this.jLabel_Description.setText(Lang.getInstance().translate("Purpose payment"));
-        this.jLabel_Number.setText(Lang.getInstance().translate("Order Number"));
+        this.jLabel_Number.setText(Lang.getInstance().translate("Order number"));
         this.jLabel_Payment_info.setText(Lang.getInstance().translate("Payment details"));
         this.jLabel_Reciever.setText(Lang.getInstance().translate("Recipient"));
         this.jLabel_Reciever_BIK.setText(Lang.getInstance().translate("BIK"));
@@ -381,7 +381,7 @@ class Issue_Send_Payment_Order1 extends JPanel {
         this.jLabel_Reciever_INN.setText(Lang.getInstance().translate("INN"));
         this.jLabel_Recivier_in_Bank1.setText(Lang.getInstance().translate("Account"));
         this.jLabel_Sender.setText(Lang.getInstance().translate("Sender"));
-        this.jLabel_Title.setText(Lang.getInstance().translate("Send Payment Order"));
+        this.jLabel_Title.setText(Lang.getInstance().translate("Send payment order"));
         this.jLabel_in_Bank.setText(Lang.getInstance().translate("Account"));
     }
 

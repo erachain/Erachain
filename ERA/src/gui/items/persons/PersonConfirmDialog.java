@@ -307,7 +307,7 @@ public class PersonConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 9, 0, 9);
         getContentPane().add(jLabel_PersonInfo, gridBagConstraints);
 
-        jLabel_YourAddress.setText(Lang.getInstance().translate("Your Account") + ":");
+        jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -331,7 +331,7 @@ public class PersonConfirmDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(21, 0, 0, 13);
         getContentPane().add(jComboBox_YourAddress, gridBagConstraints);
 
-        jLabel_Address1.setText(Lang.getInstance().translate("Public Key") + ":");
+        jLabel_Address1.setText(Lang.getInstance().translate("Public key") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;

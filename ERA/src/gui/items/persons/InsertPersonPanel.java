@@ -150,7 +150,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txt_Sign.setEditable(false);
         mainPanel.add(txt_Sign, gridBagConstraints);
 
-        label_public_key.setText(Lang.getInstance().translate("Public Key") + ":");
+        label_public_key.setText(Lang.getInstance().translate("Public key") + ":");
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 18;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
@@ -394,7 +394,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
                             " ",
                             (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text,
                             Lang.getInstance().translate("Confirmation Transaction") + " "
-                                    + Lang.getInstance().translate("Issue Person"));
+                                    + Lang.getInstance().translate("Issue person"));
 
                     IssuePersonDetailsFrame ww = new IssuePersonDetailsFrame((IssuePersonRecord) result.getA());
                     // ww.jPanel2.setVisible(false);
