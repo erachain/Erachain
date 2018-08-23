@@ -1242,7 +1242,9 @@ public class Block {
             cnt.blockchainSyncStatusUpdate(heightBlock);
         }
 
-        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+        if (!BlockChain.DEVELOP_USE
+                && this.heightBlock > 150000
+        ) {
             setCOMPUbals(dcSet, this.heightBlock);
         }
     }
@@ -1266,7 +1268,9 @@ public class Block {
 
         this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
-        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+        if (!BlockChain.DEVELOP_USE
+                && this.heightBlock > 150000
+        ) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, this.heightBlock - 1);
         }
@@ -1377,18 +1381,25 @@ public class Block {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
                     ballParent = (BigDecimal) parentBalanses.get(key.a);
-                    if (ballParent == null
-                            || ballParent.compareTo(ball.a.b) != 0) {
+                    if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
+                            ||  ballParent == null && ball.a.b.signum() != 0) {
+                        LOGGER.error(" WRONG COMPU orphan [" + heightParent + "] for ADDR :" + key.a
+                                + " balParent : " + (ballParent==null?"NULL":ballParent.toPlainString())
+                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString()));
 
-                        LOGGER.error(" WRONG COMPU orphan [" + heightParent + 1 + "] for ADDR :" + key.a
-                                + " balParent : " + ballParent.toPlainString() + " ---> " + ball.a.b.toPlainString());
-
-                        Long error = null;
-                        //error++;
+                        error = true;
                     }
-
                 }
             }
+            if (error) {
+                error = false;
+            }
+            //WRONG COMPU orphan [1637251] for ADDR :73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS balParent : -89.88749283 ---> -89.88800483
+            //  -  WRONG COMPU orphan [1637251] for ADDR :7QmyokwesG4mri3qR5VcrXQvnPAAsEksVN balParent : 0.28052000 ---> 0.28103200
+            // WRONG COMPU orphan [1637251] for ADDR :7QmyokwesG4mri3qR5VcrXQvnPAAsEksVN balParent : 0.28052000 ---> 0.28103200
+
+            //WRONG COMPU orphan [1637241] for ADDR :7QmyokwesG4mri3qR5VcrXQvnPAAsEksVN balParent : 0.28052000 ---> 0.28103200
+            //WRONG COMPU orphan [1637241] for ADDR :73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS balParent : -89.88698083 ---> -89.88749283
         }
     }
 
@@ -1405,7 +1416,9 @@ public class Block {
             return;
         }
 
-        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+        if (!BlockChain.DEVELOP_USE
+                && this.heightBlock > 150000
+        ) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, height);
         }
@@ -1438,7 +1451,9 @@ public class Block {
 
         }
 
-        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+        if (!BlockChain.DEVELOP_USE
+                && this.heightBlock > 150000
+        ) {
             // TEST COMPU ORPHANs
             compareCOMPUbals(dcSet, height - 1);
         }

@@ -700,6 +700,9 @@ public abstract class Transaction {
 
     // GET only INVITED FEE
     public long getInvitedFee() {
+        if (true)
+            return 0l;
+
         long fee = this.fee.unscaledValue().longValue();
         return fee >> BlockChain.FEE_INVITED_SHIFT;
     }
@@ -1142,6 +1145,8 @@ public abstract class Transaction {
         }
 
         int height = this.getBlockHeightByParentOrLast(dcSet);
+        //if (height <= 0 || height > 1000)
+        //    return INVALID_TIMESTAMP;
 
         if ( (flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
                 && this.hasPublicText()

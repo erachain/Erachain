@@ -2,6 +2,7 @@ package gui.transaction;
 // 30/03
 
 import controller.Controller;
+import core.item.persons.PersonCls;
 import core.transaction.R_SertifyPubKeys;
 import lang.Lang;
 import org.apache.log4j.Logger;
@@ -24,7 +25,13 @@ public class SertifyPubKeysDetailsFrame extends Rec_DetailsFrame {
 
         // PERSON
         ++detailGBC.gridy;
-        JTextField person = new JTextField(Controller.getInstance().getPerson(sertifyPubKeysRecord.getKey()).toString());
+        JTextField person;
+        PersonCls personItem = Controller.getInstance().getPerson(sertifyPubKeysRecord.getKey());
+        if (personItem == null)
+            person = new JTextField("not found");
+        else
+            person = new JTextField(personItem.toString());
+
         person.setEditable(false);
         MenuPopupUtil.installContextMenu(person);
         this.add(person, detailGBC);

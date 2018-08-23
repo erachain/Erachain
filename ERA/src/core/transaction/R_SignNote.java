@@ -711,5 +711,4 @@ public class R_SignNote extends Transaction {
 
     }
 
-
 }

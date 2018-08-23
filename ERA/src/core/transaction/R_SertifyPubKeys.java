@@ -786,7 +786,7 @@ public class R_SertifyPubKeys extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        if (true) {
+        if (false) {
             return getInvolvedAccounts().contains(account);
 
         } else {
