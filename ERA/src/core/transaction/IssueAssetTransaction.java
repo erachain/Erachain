@@ -14,7 +14,6 @@ import core.account.PublicKeyAccount;
 import core.block.Block;
 import core.item.assets.AssetCls;
 import core.item.assets.AssetFactory;
-import core.item.assets.AssetVenture;
 import datachain.DCSet;
 
 public class IssueAssetTransaction extends Issue_ItemRecord {
@@ -333,7 +332,7 @@ public class IssueAssetTransaction extends Issue_ItemRecord {
     }
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_ASSET_MULT_FEE;
     }
 }

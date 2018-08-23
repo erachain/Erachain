@@ -477,7 +477,7 @@ public class R_Hashes extends Transaction {
         return false;
     }
 
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee();
     }
 }

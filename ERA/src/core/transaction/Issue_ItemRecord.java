@@ -195,7 +195,7 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<>();
+        HashSet<Account> accounts = getRecipientAccounts();
         accounts.add(this.creator);
         return accounts;
     }
@@ -203,22 +203,30 @@ public abstract class Issue_ItemRecord extends Transaction {
     @Override
     public HashSet<Account> getRecipientAccounts() {
         HashSet<Account> accounts = new HashSet<>();
+        if (!this.item.getOwner().equals(this.creator)) {
+            accounts.add(this.item.getOwner());
+        }
         return accounts;
     }
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
 
-        if (address.equals(this.creator.getAddress())) {
-            return true;
+        if (true) {
+            return getInvolvedAccounts().contains(account);
+        } else {
+            String address = account.getAddress();
+
+            if (address.equals(this.creator.getAddress())) {
+                return true;
+            }
         }
 
         return false;
     }
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * BlockChain.ISSUE_MULT_FEE;
     }
 }

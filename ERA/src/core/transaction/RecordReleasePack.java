@@ -328,7 +328,7 @@ public class RecordReleasePack extends Transaction {
     }
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee();
     }
 

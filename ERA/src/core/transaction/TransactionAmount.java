@@ -1123,7 +1123,7 @@ public abstract class TransactionAmount extends Transaction {
     // public abstract Map<String, Map<Long, BigDecimal>> getAssetAmount();
     
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         
         if (this.height < BlockChain.ALL_BALANCES_OK_TO ||
                 this.amount == null)

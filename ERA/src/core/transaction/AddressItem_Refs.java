@@ -174,10 +174,10 @@ public abstract class AddressItem_Refs extends Transaction {
     }
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
 
-        int add_fee = 0;
-        int len = this.getItem().getName().length();
+        long add_fee = 0;
+        long len = this.getItem().getName().length();
         if (len < 10) {
             add_fee = 3 ^ (10 - len) * 100;
         }

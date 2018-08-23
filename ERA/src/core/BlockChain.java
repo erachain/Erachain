@@ -146,7 +146,7 @@ public class BlockChain {
     //	 1487844444444   1509434273     1509434273
     public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
-    public static final int FEE_PER_BYTE = 64;
+    public static final int FEE_PER_BYTE = 100;
     public static final int FEE_SCALE = 8;
     public static final BigDecimal FEE_RATE = BigDecimal.valueOf(1, FEE_SCALE);
     public static final BigDecimal MIN_FEE_IN_BLOCK = BigDecimal.valueOf(FEE_PER_BYTE * 8 * 128, FEE_SCALE);

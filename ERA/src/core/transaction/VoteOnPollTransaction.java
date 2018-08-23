@@ -353,7 +353,7 @@ public class VoteOnPollTransaction extends Transaction {
     }
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
 
         // TODO delete IT
         if (this.getBlockHeightByParentOrLast(this.dcSet) > TODO_h1)

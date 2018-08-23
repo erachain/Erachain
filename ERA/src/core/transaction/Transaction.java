@@ -675,7 +675,7 @@ public abstract class Transaction {
     }
 
     // get fee
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee();
     }
 
@@ -692,15 +692,15 @@ public abstract class Transaction {
     }
 
     // GET forged FEE without invited FEE
-    public int getForgedFee() {
-        int fee = this.fee.unscaledValue().intValue();
-        int fee_invited = this.getInvitedFee();
+    public long getForgedFee() {
+        long fee = this.fee.unscaledValue().longValue();
+        long fee_invited = this.getInvitedFee();
         return fee - fee_invited;
     }
 
     // GET only INVITED FEE
-    public int getInvitedFee() {
-        int fee = this.fee.unscaledValue().intValue();
+    public long getInvitedFee() {
+        long fee = this.fee.unscaledValue().longValue();
         return fee >> BlockChain.FEE_INVITED_SHIFT;
     }
 
@@ -1175,7 +1175,7 @@ public abstract class Transaction {
 
     }
 
-    public void process_gifts(int level, int fee_gift, Account creator, boolean asOrphan) {
+    public void process_gifts(int level, long fee_gift, Account creator, boolean asOrphan) {
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         // byte[] recordSignature = record.getSignature();
@@ -1205,13 +1205,13 @@ public abstract class Transaction {
             return;
         }
 
-        int fee_gift_next;
+        long fee_gift_next;
         if (fee_gift > 2)
             fee_gift_next = fee_gift >> BlockChain.FEE_INVITED_SHIFT_IN_LEVEL;
         else
             fee_gift_next = fee_gift - 1;
 
-        int fee_gift_get = fee_gift - fee_gift_next;
+        long fee_gift_get = fee_gift - fee_gift_next;
         // invitedAccount.addBalanceOWN(FEE_KEY, fee_gift_get_BD, db);
         invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE), false);
 

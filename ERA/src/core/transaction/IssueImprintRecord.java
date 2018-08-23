@@ -202,7 +202,7 @@ public class IssueImprintRecord extends Issue_ItemRecord {
     //PROCESS/ORPHAN
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee() + BlockChain.FEE_PER_BYTE * 128 * 4;
     }
 

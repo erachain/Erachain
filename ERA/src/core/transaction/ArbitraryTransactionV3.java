@@ -286,7 +286,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
     }
 
     @Override
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         return calcCommonFee();
     }
 

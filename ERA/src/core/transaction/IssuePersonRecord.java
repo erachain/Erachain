@@ -315,15 +315,15 @@ public class IssuePersonRecord extends Issue_ItemRecord {
 
     // GET only INVITED FEE
     @Override
-    public int getInvitedFee() {
+    public long getInvitedFee() {
         if (this.height > BlockChain.ALL_BALANCES_OK_TO)
-            return this.fee.unscaledValue().intValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
+            return this.fee.unscaledValue().longValue() >> BlockChain.FEE_INVITED_SHIFT_FOR_INVITE;
         else
             return super.getInvitedFee();
     }
 
     @Override
-    public int calcBaseFee()
+    public long calcBaseFee()
     {
         if (this.height > BlockChain.ALL_BALANCES_OK_TO)
             return calcCommonFee() >> 2;

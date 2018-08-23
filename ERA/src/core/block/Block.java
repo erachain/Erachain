@@ -455,10 +455,8 @@ public class Block {
                 bonusFee = bonusFee.divide(new BigDecimal(2), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
             else if (this.heightBlock < inDay30 << 3) // 16 mounth
                 bonusFee = bonusFee.divide(new BigDecimal(4), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
-            else if (this.heightBlock < inDay30 << 4) //  64 mounth
-                bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
             else
-                bonusFee = bonusFee.divide(new BigDecimal(16), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+                bonusFee = bonusFee.divide(new BigDecimal(8), 8, BigDecimal.ROUND_DOWN).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
         }
 
         return bonusFee;
@@ -1207,7 +1205,24 @@ public class Block {
         this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY, blockTotalFee, true);
 
     }
-    
+
+    public void setCOMPUbals(DCSet dcSet, int height) {
+        // TEST COMPU ORPHANs
+        HashMap bals = new HashMap();
+        Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal totalNeg = BigDecimal.ZERO;
+        for (Tuple2<String, Long> key : keys) {
+            if (key.b == 2l) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
+                        .getAssetBalanceMap().get(key);
+
+                bals.put(key.a, ball.a.b);
+            }
+        }
+        totalCOMPUtest.put(height, bals);
+    }
+
     // TODO - make it trownable
     public void process_after(Controller cnt, DCSet dcSet) throws Exception {
 
@@ -1227,21 +1242,8 @@ public class Block {
             cnt.blockchainSyncStatusUpdate(heightBlock);
         }
 
-        if (false) {
-            // TEST COMPU ORPHANs
-            HashMap bals = new HashMap();
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
-            BigDecimal total = BigDecimal.ZERO;
-            BigDecimal totalNeg = BigDecimal.ZERO;
-            for (Tuple2<String, Long> key : keys) {
-                if (key.b == 2l) {
-                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
-                            .getAssetBalanceMap().get(key);
-
-                    bals.put(key.a, ball.a.b);
-                }
-            }
-            totalCOMPUtest.put(this.heightBlock, bals);
+        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+            setCOMPUbals(dcSet, this.heightBlock);
         }
     }
 
@@ -1263,7 +1265,12 @@ public class Block {
         LOGGER.debug("getBlockMap().set timer: " + (System.currentTimeMillis() - timerStart));
 
         this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
-        
+
+        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+            // TEST COMPU ORPHANs
+            compareCOMPUbals(dcSet, this.heightBlock - 1);
+        }
+
         // for DEBUG
         if (this.heightBlock == 65431
                 || this.heightBlock == 86549) {
@@ -1358,6 +1365,33 @@ public class Block {
 
     }
 
+    public void compareCOMPUbals(DCSet dcSet, int heightParent) {
+        HashMap parentBalanses = (HashMap) totalCOMPUtest.get(heightParent);
+        if (parentBalanses != null) {
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
+            BigDecimal ballParent;
+            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            boolean error = false;
+            for (Tuple2<String, Long> key : keys) {
+                if (key.b == 2l) {
+                    ball = dcSet.getAssetBalanceMap().get(key);
+
+                    ballParent = (BigDecimal) parentBalanses.get(key.a);
+                    if (ballParent == null
+                            || ballParent.compareTo(ball.a.b) != 0) {
+
+                        LOGGER.error(" WRONG COMPU orphan [" + heightParent + 1 + "] for ADDR :" + key.a
+                                + " balParent : " + ballParent.toPlainString() + " ---> " + ball.a.b.toPlainString());
+
+                        Long error = null;
+                        //error++;
+                    }
+
+                }
+            }
+        }
+    }
+
     public void orphan(DCSet dcSet) throws Exception {
 
         Controller cnt = Controller.getInstance();
@@ -1369,6 +1403,11 @@ public class Block {
         if (height == 1) {
             // GENESIS BLOCK cannot be orphanED
             return;
+        }
+
+        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
+            // TEST COMPU ORPHANs
+            compareCOMPUbals(dcSet, height);
         }
 
         long start = System.currentTimeMillis();
@@ -1391,7 +1430,6 @@ public class Block {
         LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
                 + " for records:" + this.getTransactionCount() + " millsec/record:" + tickets / (this.getTransactionCount() + 1));
 
-        this.heightBlock = -1;
         //this.parentBlock = null;
         byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
         if (!Arrays.equals(lastSignature, this.reference)) {
@@ -1400,31 +1438,12 @@ public class Block {
 
         }
 
-        if (false) {
+        if (!BlockChain.DEVELOP_USE && this.heightBlock > 150000) {
             // TEST COMPU ORPHANs
-            HashMap parentBalanses = (HashMap)totalCOMPUtest.get(height - 1);
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
-            BigDecimal ballParent;
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
-            for (Tuple2<String, Long> key : keys) {
-                if (key.b == 2l) {
-                    ball = dcSet.getAssetBalanceMap().get(key);
-
-                    ballParent = (BigDecimal) parentBalanses.get(key.a);
-                    if (ballParent == null
-                        || ballParent.compareTo(ball.a.b) != 0) {
-
-                        LOGGER.error(" WRONG COMPU orphan [" + height + "] for ADDR :" + key.a
-                                + " balParent : " + ballParent.toPlainString() + " --- " + ball.a.b.toPlainString());
-
-                        Long error = null;
-                        error++;
-                    }
-
-                }
-            }
+            compareCOMPUbals(dcSet, height - 1);
         }
 
+        this.heightBlock = -1;
 
     }
 

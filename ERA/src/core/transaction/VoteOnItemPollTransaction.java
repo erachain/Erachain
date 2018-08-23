@@ -279,7 +279,7 @@ public class VoteOnItemPollTransaction extends Transaction {
         return false;
     }
 
-    public int calcBaseFee() {
+    public long calcBaseFee() {
         // TODO: умножать комиссию на размер списка переголосваний (СТЕК)
         return calcCommonFee();
     }

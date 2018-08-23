@@ -771,9 +771,8 @@ public class R_SertifyPubKeys extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = new HashSet<Account>();
+        HashSet<Account> accounts = getRecipientAccounts();
         accounts.add(this.creator);
-        accounts.addAll(this.getRecipientAccounts());
         return accounts;
     }
 
@@ -787,12 +786,17 @@ public class R_SertifyPubKeys extends Transaction {
 
     @Override
     public boolean isInvolved(Account account) {
-        String address = account.getAddress();
-        if (address.equals(creator.getAddress())) return true;
+        if (true) {
+            return getInvolvedAccounts().contains(account);
 
-        for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
-            if (address.equals(publicAccount.getAddress()))
-                return true;
+        } else {
+            String address = account.getAddress();
+            if (address.equals(creator.getAddress())) return true;
+
+            for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
+                if (address.equals(publicAccount.getAddress()))
+                    return true;
+            }
         }
 
         return false;
