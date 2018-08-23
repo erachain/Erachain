@@ -2036,6 +2036,8 @@ public class BlockExplorer {
          List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal totalNeg = BigDecimal.ZERO;
         for (Tuple2<String, Long> addr : addrs) {
             if (addr.b == key) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
@@ -2043,12 +2045,19 @@ public class BlockExplorer {
                 // all = all.add(ball.a);
                 Account account = new Account(addr.a);
                 BigDecimal ballans = account.getBalanceUSE(key);
+                if (ball.a.b.signum() > 0) {
+                    total = total.add(ball.a.b);
+                } else {
+                    totalNeg = totalNeg.add(ball.a.b);
+                }
 
                 top100s.add(Fun.t3(addr.a, ballans, ball.a.b));
             }
         }
 
-       Collection<Order> orders = dcSet.getOrderMap().getValuesAll();
+        totalNeg = total.add(totalNeg);
+
+        Collection<Order> orders = dcSet.getOrderMap().getValuesAll();
 
         for (Order order : orders) {
             if (order.getHave() == key) {

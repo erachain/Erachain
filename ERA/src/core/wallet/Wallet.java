@@ -1709,7 +1709,7 @@ public class Wallet extends Observable implements Observer {
 			Pair<byte[], Transaction> value = (Pair<byte[], Transaction>) message.getValue();
 			Transaction transaction = value.getB();
 
-			///transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+			transaction.setDC(DCSet.getInstance());
 			this.processTransaction(transaction);
 
 			// CHECK IF PAYMENT
@@ -1747,7 +1747,7 @@ public class Wallet extends Observable implements Observer {
 		{
 			Transaction transaction = (Transaction) message.getValue();
 
-			///transaction.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+			transaction.setDC(DCSet.getInstance());
 			this.orphanTransaction(transaction);
 
 			// CHECK IF PAYMENT

@@ -207,7 +207,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
-            //record.setDC(dcSet, Transaction.FOR_NETWORK);
+            record.setDC(dcSet);
             array.add(record.toJson());
         }
 
@@ -537,7 +537,7 @@ public class TransactionsResource {
             // FOR ALL ACCOUNTS
             synchronized (accounts) {
                 for (Account account : accounts) {
-                    //transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+                    transaction.setDC(dcSet);
                     // CHECK IF INVOLVED
                     if (!account.equals(transaction.getCreator()) && transaction.isInvolved(account)) {
                         array.add(transaction.toJson());
@@ -575,7 +575,8 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction transaction : block.getTransactions()) {
-            //transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+            transaction.setDC(dcSet);
+            // TODO: тут наверное поиск быстрее по HsahSet будет
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {
@@ -622,7 +623,7 @@ public class TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction transaction : block.getTransactions()) {
-            //transaction.setDC(dcSet, Transaction.FOR_NETWORK);
+            transaction.setDC(dcSet);
             HashSet<Account> recipients = transaction.getRecipientAccounts();
             for (Account recipient : recipients) {
                 if (recipient.equals(address)) {

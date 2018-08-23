@@ -275,7 +275,7 @@ public class RecordReleasePack extends Transaction {
 
         //ORPHAN PAYMENTS
         for (Transaction transaction : this.transactions) {
-            //transaction.setDC(this.dcSet, asDeal);
+            transaction.setDC(this.dcSet);
             transaction.orphan(asDeal); // as Pack in body
         }
     }

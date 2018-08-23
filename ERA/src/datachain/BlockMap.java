@@ -231,6 +231,9 @@ public class BlockMap extends DCMap<Integer, Block> {
     public Block getWithMind(int height) {
 
         Block block = super.get(height);
+        if (block == null)
+            return null;
+
         block.setHeight(height);
         block.loadHeadMind(this.getDCSet());
         return block;

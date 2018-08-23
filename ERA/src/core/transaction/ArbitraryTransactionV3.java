@@ -251,7 +251,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         // REMOVE FEE
         Transaction forkTransaction = this.copy();
         DCSet fork = this.dcSet.fork();
-        //forkTransaction.setDC(fork, Transaction.FOR_NETWORK);
+        forkTransaction.setBlock(this.block, fork, Transaction.FOR_NETWORK, this.height,  this.seqNo);
         forkTransaction.process(this.block, Transaction.FOR_NETWORK);
         // TODO process && orphan && isValid balances
 

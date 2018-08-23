@@ -125,6 +125,8 @@ public class WEB_Balance_from_Adress_TableModel extends AbstractTableModel imple
         }
 
         AssetCls asset = Controller.getInstance().getAsset(table_balance.get(row).getB().getA());
+        if (asset == null)
+            return "";
 
 
         Pair<Tuple2<String, Long>, BigDecimal> sa;

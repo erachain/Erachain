@@ -3,13 +3,12 @@ package core.block;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -39,6 +38,7 @@ import utils.Converter;
 
 public class Block {
 
+    static private HashMap totalCOMPUtest = new HashMap();
     public static final int VERSION_LENGTH = 4;
     //public static final int TIMESTAMP_LENGTH = 8;
     public static final int GENERATING_BALANCE_LENGTH = 4;
@@ -466,7 +466,7 @@ public class Block {
 
     public BigDecimal getTotalFee(DCSet db) {
         BigDecimal fee = this.getFeeByProcess(db);
-        return fee.add(getBonusFee());
+        return fee.add(this.getBonusFee());
     }
 
 	/*
@@ -997,7 +997,7 @@ public class Block {
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+            long timestampEnd = this.getTimestamp(dcSet) + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS>>1) + 1;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 
@@ -1057,8 +1057,7 @@ public class Block {
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    long transactionTimestamp = transaction.getTimestamp() - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS - BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS);
-                    if (transactionTimestamp > timestampEnd
+                    if (transaction.getTimestamp() > timestampEnd
                             //|| transaction.getDeadline() <= timestampBeg
                             && height > 105999
                             ) {
@@ -1190,15 +1189,17 @@ public class Block {
                 //richAccount.setBalance(Transaction.FEE_KEY, richAccount.getBalance(dcSet, Transaction.FEE_KEY).add(bonus_fee), dcSet);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
             } else {
-                emittedFee = BigDecimal.ZERO;
+                emittedFee = bonusFee;
             }
             
         } else {
             emittedFee = bonusFee;
         }
 
-        // SUBSTRACT from EMISSION (with minus)
-        GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
+        if (emittedFee.signum() != 0) {
+            // SUBSTRACT from EMISSION (with minus)
+            GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY, emittedFee, true);
+        }
 
         //LOGGER.debug("<<< core.block.Block.orphan(DBSet) #3");
 
@@ -1226,6 +1227,22 @@ public class Block {
             cnt.blockchainSyncStatusUpdate(heightBlock);
         }
 
+        if (false) {
+            // TEST COMPU ORPHANs
+            HashMap bals = new HashMap();
+            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            BigDecimal total = BigDecimal.ZERO;
+            BigDecimal totalNeg = BigDecimal.ZERO;
+            for (Tuple2<String, Long> key : keys) {
+                if (key.b == 2l) {
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
+                            .getAssetBalanceMap().get(key);
+
+                    bals.put(key.a, ball.a.b);
+                }
+            }
+            totalCOMPUtest.put(this.heightBlock, bals);
+        }
     }
 
     // TODO - make it trownable
@@ -1381,6 +1398,31 @@ public class Block {
             LOGGER.debug("[" + this.heightBlock + "] orphaning time: " + (System.currentTimeMillis() - start) * 0.001
                     + "  ERROR ");
 
+        }
+
+        if (false) {
+            // TEST COMPU ORPHANs
+            HashMap parentBalanses = (HashMap)totalCOMPUtest.get(height - 1);
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
+            BigDecimal ballParent;
+            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            for (Tuple2<String, Long> key : keys) {
+                if (key.b == 2l) {
+                    ball = dcSet.getAssetBalanceMap().get(key);
+
+                    ballParent = (BigDecimal) parentBalanses.get(key.a);
+                    if (ballParent == null
+                        || ballParent.compareTo(ball.a.b) != 0) {
+
+                        LOGGER.error(" WRONG COMPU orphan [" + height + "] for ADDR :" + key.a
+                                + " balParent : " + ballParent.toPlainString() + " --- " + ball.a.b.toPlainString());
+
+                        Long error = null;
+                        error++;
+                    }
+
+                }
+            }
         }
 
 

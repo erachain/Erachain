@@ -523,7 +523,8 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
 
     public Transaction get(Tuple2<Integer, Integer> key) {
         Transaction item = super.get(key);
-        if (item == null) return null;
+        if (item == null)
+            return null;
 
         item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
         return item;

@@ -26,6 +26,7 @@ import datachain.DCSet;
 import gui.library.library;
 import gui.models.TransactionsTableModel;
 import lang.Lang;
+import sun.util.locale.provider.LocaleServiceProviderPool;
 import utils.StrJSonFine;
 import utils.TransactionTimestampComparator;
 
@@ -96,7 +97,7 @@ public class API_TransactionsResource {
 
         do {
             for (Transaction transaction : block.getTransactions()) {
-                //transaction.setDC(dcSet, false);
+                transaction.setDC(dcSet);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
                 for (Account recipient : recipients) {
                     if (recipient.equals(address)) {
@@ -108,7 +109,7 @@ public class API_TransactionsResource {
             }
 
             // one BLOCK checked
-            if (counter > 100 || counterBlock++ > 2000)
+            if (counter > 100 || counterBlock++ > 200)
                 break;
 
             block = Controller.getInstance().getBlockByHeight(++height);
@@ -293,7 +294,7 @@ public class API_TransactionsResource {
         DCSet dcSet = DCSet.getInstance();
 
         for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, from, count, descending)) {
-            //record.setDC(dcSet, Transaction.FOR_NETWORK);
+            record.setDC(dcSet);
             array.add(record.toJson());
         }
 

@@ -107,7 +107,7 @@ public class Account_Transactions_Table extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            //messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+            messagetx.setDC(DCSet.getInstance());
 
             boolean is = false;
             for (MessageBuf message : messageBufs) {
@@ -287,7 +287,7 @@ public class Account_Transactions_Table extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            //messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+            messagetx.setDC(DCSet.getInstance());
             
             if (asset.getKey() == messagetx.getAssetKey()) {
                 boolean is = false;
@@ -400,7 +400,7 @@ public class Account_Transactions_Table extends JTable implements Observer {
                 if (!is) {
                     
                     Transaction transactopn = (Transaction)message.getValue();
-                    //transactopn.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+                    transactopn.setDC(DCSet.getInstance());
                     addMessage(0, (R_Send) transactopn, null);
 
                     messagesModel.setRowCount(messageBufs.size());

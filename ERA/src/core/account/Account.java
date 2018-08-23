@@ -117,6 +117,9 @@ public class Account {
 
     // make TYPE of transactionAmount by signs of KEY and AMOUNT
     public static int actionType(long key, BigDecimal amount) {
+        if (key == 0l || amount == null || amount.signum() == 0)
+            return 0;
+
         int type;
         int amount_sign = amount.signum();
         if (key > 0) {

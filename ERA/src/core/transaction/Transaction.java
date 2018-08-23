@@ -693,9 +693,6 @@ public abstract class Transaction {
 
     // GET forged FEE without invited FEE
     public int getForgedFee() {
-        //if (this.dcSet == null)
-        //    this.setDC(db, Transaction.FOR_NETWORK);
-
         int fee = this.fee.unscaledValue().intValue();
         int fee_invited = this.getInvitedFee();
         return fee - fee_invited;
@@ -928,7 +925,6 @@ public abstract class Transaction {
         int height;
         if (this.creator == null) {
             transaction.put("creator", "genesis");
-            // transaction.put("reference", "genesis");
             transaction.put("signature", "genesis");
             height = 1;
         } else {
@@ -936,9 +932,6 @@ public abstract class Transaction {
             transaction.put("publickey", Base58.encode(this.creator.getPublicKey()));
             transaction.put("creator", this.creator.getAddress());
             transaction.put("signature", this.signature == null ? "null" : Base58.encode(this.signature));
-            //if (this.fee.signum() == 0) {
-            //    this.setDC(localDCSet, Transaction.FOR_NETWORK);
-            //}
             transaction.put("fee", this.fee.toPlainString());
             transaction.put("timestamp", this.timestamp < 1000 ? "null" : this.timestamp);
             transaction.put("version", Byte.toUnsignedInt(this.typeBytes[1]));
@@ -1251,7 +1244,8 @@ public abstract class Transaction {
             }
 
             // Multi Level Referal
-            process_gifts(0, getInvitedFee(), this.creator, false);
+            if (false)
+                process_gifts(0, getInvitedFee(), this.creator, false);
 
             String creatorAddress = this.creator.getAddress();
             AddressTime_SignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
@@ -1290,7 +1284,8 @@ public abstract class Transaction {
             }
 
             // calc INVITED FEE
-            process_gifts(0, getInvitedFee(), this.creator, true);
+            if (false)
+                process_gifts(0, getInvitedFee(), this.creator, true);
 
             // UPDATE REFERENCE OF SENDER
             if (this.isReferenced()) {

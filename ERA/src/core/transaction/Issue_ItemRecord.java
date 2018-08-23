@@ -195,13 +195,14 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        return this.getRecipientAccounts();
+        HashSet<Account> accounts = new HashSet<>();
+        accounts.add(this.creator);
+        return accounts;
     }
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
         HashSet<Account> accounts = new HashSet<>();
-        accounts.add(this.creator);
         return accounts;
     }
 

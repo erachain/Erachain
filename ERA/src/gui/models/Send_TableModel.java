@@ -102,7 +102,7 @@ public class Send_TableModel extends JTable implements Observer {
         }
 
         for (Transaction messagetx : transactions) {
-            ///messagetx.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+            messagetx.setDC(DCSet.getInstance());
 
             boolean is = false;
             for (MessageBuf message : messageBufs) {

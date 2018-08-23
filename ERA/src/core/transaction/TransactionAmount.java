@@ -347,13 +347,13 @@ public abstract class TransactionAmount extends Transaction {
         if (this.amount != null) {
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
-            transaction.put("amount", this.viewAmount());
-            // transaction.put("action_type", this.viewActionType());
+            transaction.put("amount", this.amount.toPlainString());
             transaction.put("action_key", this.getActionType());
             transaction.put("actionKey", this.getActionType());
             transaction.put("action_name", this.viewActionType());
             transaction.put("actionName", this.viewActionType());
-            transaction.put("backward", this.isBackward());
+            if (this.isBackward())
+                transaction.put("backward", this.isBackward());
         }
         
         return transaction;
