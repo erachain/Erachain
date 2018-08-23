@@ -389,9 +389,11 @@ public class TransactionMap extends DCMap<byte[], Transaction> implements Observ
         return this.contains(transaction.getSignature());
     }
 
+    /* локально по месту надо делать наполнение - чтобы не тормозить обработку тут
     public Transaction get(byte[] signature) {
         Transaction item = super.get(signature);
-        item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, this.getDCSet().getBlockMap().size() + 1, 1);
+        //item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, this.getDCSet().getBlockMap().size() + 1, 1);
         return item;
     }
+    */
 }

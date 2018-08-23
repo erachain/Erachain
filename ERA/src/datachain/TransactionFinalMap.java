@@ -195,8 +195,15 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         keys = null;
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
+        Transaction item;
+        Tuple2<Integer, Integer> key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iter.next()));
+
+            key = (Tuple2<Integer, Integer>)iter.next();
+            item = this.map.get(key);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+
+            txs.add(item);
             counter++;
         }
         iter = null;
@@ -248,8 +255,14 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         keys = null;
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
+        Transaction item;
+        Tuple2<Integer, Integer> key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iter.next()));
+            key = (Tuple2<Integer, Integer>)iter.next();
+            item = this.map.get(key);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+
+            txs.add(item);
             counter++;
         }
         iter = null;
@@ -264,8 +277,14 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         keys = null;
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
+        Transaction item;
+        Tuple2<Integer, Integer> key;
         while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iter.next()));
+            key = (Tuple2<Integer, Integer>)iter.next();
+            item = this.map.get(key);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+
+            txs.add(item);
             counter++;
         }
         iter = null;
@@ -312,8 +331,14 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         recipientKeys = null;
         senderKeys = null;
         List<Transaction> txs = new ArrayList<>();
+        Transaction item;
+        Tuple2<Integer, Integer> key;
         while (iter.hasNext()) {
-            txs.add(this.map.get(iter.next()));
+            key = (Tuple2<Integer, Integer>)iter.next();
+            item = this.map.get(key);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+
+            txs.add(item);
         }
         treeKeys = null;
         return txs;
@@ -367,9 +392,15 @@ public class TransactionFinalMap extends DCMap<Tuple2<Integer, Integer>, Transac
         Iterator iter = keys.iterator();
         keys = null;
         List<Transaction> txs = new ArrayList<>();
+        Transaction item;
+        Tuple2<Integer, Integer> key;
 
         while (iter.hasNext()) {
-            txs.add(this.map.get(iter.next()));
+            key = (Tuple2<Integer, Integer>)iter.next();
+            item = this.map.get(key);
+            item.setDC(this.getDCSet(), Transaction.FOR_NETWORK, key.a, key.b);
+
+            txs.add(item);
         }
         iter = null;
         return txs;
