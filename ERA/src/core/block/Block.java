@@ -437,7 +437,7 @@ public class Block {
 
         BigDecimal bonusFee = BlockChain.MIN_FEE_IN_BLOCK;
 
-        if(this.heightBlock < BlockChain.ALL_BALANCES_OK_TO) {
+        if(this.heightBlock < BlockChain.VERS_4_11) {
             if (this.heightBlock < inDay30 << 1)
                 ;
             else if (this.heightBlock < inDay30 << 2) // 120 days = 4 mounth
