@@ -1125,12 +1125,16 @@ public abstract class TransactionAmount extends Transaction {
     @Override
     public long calcBaseFee() {
         
-        if (this.height < BlockChain.ALL_BALANCES_OK_TO ||
+        if (this.height < BlockChain.VERS_4_11 ||
                 this.amount == null)
             return calcCommonFee();
 
         // v.4.11 FEE UP
-        return calcCommonFee() + (BlockChain.FEE_PER_BYTE * 200);
+        long fee = calcCommonFee();
+        if (fee < 200 * BlockChain.FEE_PER_BYTE)
+            return BlockChain.FEE_PER_BYTE * 200;
+
+        return fee;
     }
     
 }
