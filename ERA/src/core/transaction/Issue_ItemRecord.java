@@ -184,21 +184,28 @@ public abstract class Issue_ItemRecord extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        return this.getRecipientAccounts();
-    }
-
-    @Override
-    public HashSet<Account> getRecipientAccounts() {
-        HashSet<Account> accounts = new HashSet<>();
+        HashSet<Account> accounts = this.getRecipientAccounts();
         accounts.add(this.creator);
         return accounts;
     }
 
     @Override
+    public HashSet<Account> getRecipientAccounts() {
+        HashSet<Account> accounts = new HashSet<>();
+        if (!this.item.getOwner().equals(this.creator)) {
+            accounts.add(this.item.getOwner());
+        }
+        return accounts;
+    }
+
+    @Override
     public boolean isInvolved(Account account) {
+
         String address = account.getAddress();
 
         if (address.equals(this.creator.getAddress())) {
+            return true;
+        } else if (address.equals(this.item.getOwner().getAddress())) {
             return true;
         }
 
