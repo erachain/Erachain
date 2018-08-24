@@ -326,7 +326,7 @@ public class TelegramsResource {
                 (String) jsonObject.getOrDefault("title", null),
                 (String) jsonObject.getOrDefault("message", null),
                 Integer.valueOf(jsonObject.getOrDefault("encoding", 0).toString()),
-                Boolean.valueOf((boolean)jsonObject.getOrDefault("encrypt", false)),
+                Boolean.valueOf(Boolean.parseBoolean(jsonObject.getOrDefault("encrypt", false).toString())),
                 (String) jsonObject.getOrDefault("password", null));
     }
 

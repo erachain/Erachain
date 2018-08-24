@@ -15,6 +15,7 @@ import gui.items.link_hashes.Table_Model_Issue_Hashes;
 import gui.library.MTable;
 import gui.library.My_JFileChooser;
 import lang.Lang;
+import utils.FileHash;
 import utils.Pair;
 
 import javax.swing.*;
@@ -264,49 +265,12 @@ public class Write_Documents_Hashes_Panel extends Split_Panel {
 
                 for (File patch : patchs) {
 
-                    String file_name = patch.getPath();
-                    File file = new File(patch.getPath());
-
-                    // преобразуем в байты
-                    long file_len = file.length();
-                    if (file_len > Integer.MAX_VALUE) {
-                        table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("length very long") + " - " + file_name});
-                        continue;
-                    }
-                    byte[] fileInArray = new byte[(int) file.length()];
-                    FileInputStream f = null;
-                    try {
-                        f = new FileInputStream(patch.getPath());
-                    } catch (FileNotFoundException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("error streaming") + " - " + file_name});
-                        continue;
-                    }
-                    try {
-                        f.read(fileInArray);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        table_Model.addRow(new Object[]{"",
-                                Lang.getInstance().translate("error reading") + " - " + file_name});
-                        continue;
-                    }
-                    try {
-                        f.close();
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        continue;
-                    }
-
                     /// HASHING
-                    String hashes = Base58.encode(Crypto.getInstance().digest(fileInArray));
+                    FileHash gf = new FileHash(patch);
+                    String hashes = gf.getHash();
                     table_Model.addRow(new Object[]{hashes,
-                            Lang.getInstance().translate("from file ") + file_name});
-
+                            Lang.getInstance().translate("from file ") +  patch.getPath()});
+                    gf = null;
                 }
 
 

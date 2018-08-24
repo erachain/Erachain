@@ -771,7 +771,7 @@ public class R_SertifyPubKeys extends Transaction {
 
     @Override
     public HashSet<Account> getInvolvedAccounts() {
-        HashSet<Account> accounts = getRecipientAccounts();
+        HashSet<Account> accounts = this.getRecipientAccounts();
         accounts.add(this.creator);
         return accounts;
     }
